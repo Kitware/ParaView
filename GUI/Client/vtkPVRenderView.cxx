@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.379");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.380");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -553,7 +553,7 @@ void vtkPVRenderView::PrepareForDelete()
     // If it's the last win, save the size of the nav frame
 
     if (pvapp->GetNumberOfWindows() <= 1 &&
-        pvapp->GetSaveWindowGeometry())
+        pvapp->GetSaveUserInterfaceGeometry())
       {
       pvapp->SetRegistryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY, "%d", 
@@ -722,7 +722,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SplitFrame->SetSeparatorSize(5);
   this->SplitFrame->SetFrame1MinimumSize(80);
 
-  if (app->GetSaveWindowGeometry() &&
+  if (app->GetSaveUserInterfaceGeometry() &&
       app->HasRegistryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY))
     {
@@ -2887,7 +2887,7 @@ void vtkPVRenderView::PrintView()
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
-    DPI = this->GetParentWindow()->GetPrintTargetDPI();
+    DPI = this->GetApplication()->GetPrintTargetDPI();
     }
 
   if (DPI >= 150.0)

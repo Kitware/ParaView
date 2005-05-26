@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.16");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.17");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -92,7 +92,7 @@ int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServe
     // constructor or even the KWApplication constructor since we need the
     // application name to be set)
 
-    this->PVApplication->GetApplicationSettingsFromRegistry();
+    this->PVApplication->RestoreApplicationSettingsFromRegistry();
     }
 
   this->PVApplication->SetProcessModule(
