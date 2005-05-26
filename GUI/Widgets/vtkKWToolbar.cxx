@@ -29,6 +29,9 @@ static int vtkKWToolbarGlobalFlatAspect        = 0;
 static int vtkKWToolbarGlobalWidgetsFlatAspect = 0;
 #endif
 
+const char *vtkKWToolbar::FlatAspectRegKey = "ToolbarFlatFrame";
+const char *vtkKWToolbar::WidgetsFlatAspectRegKey = "ToolbarFlatButtons";
+
 int vtkKWToolbar::GetGlobalFlatAspect() 
 { 
   return vtkKWToolbarGlobalFlatAspect; 
@@ -49,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.47");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.48");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);

@@ -163,6 +163,13 @@ public:
   virtual void Bind();
   virtual void UnBind();
 
+  // Description:
+  // Some constants
+  //BTX
+  static const char *FlatAspectRegKey;
+  static const char *WidgetsFlatAspectRegKey;
+  //ETX
+
 protected:
   vtkKWToolbar();
   ~vtkKWToolbar();
