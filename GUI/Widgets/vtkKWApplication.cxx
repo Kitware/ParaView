@@ -22,7 +22,6 @@
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -63,7 +62,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.205");
+vtkCxxRevisionMacro(vtkKWApplication, "1.206");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);

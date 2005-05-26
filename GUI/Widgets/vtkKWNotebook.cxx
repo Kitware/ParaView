@@ -20,7 +20,6 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWidgetsConfigure.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
@@ -60,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.74");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.75");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -158,11 +157,7 @@ vtkKWNotebook::vtkKWNotebook()
   this->NumberOfMostRecentPages  = 4;
   this->PagesCanBePinned         = 0;
   this->EnablePageTabContextMenu = 0;
-#ifdef USE_NOTEBOOK_ICONS
-  this->ShowIcons                = 1;
-#else
   this->ShowIcons                = 0;
-#endif
 
   this->IdCounter       = 0;
   this->CurrentId       = -1;
