@@ -28,7 +28,7 @@
 
 #include "vtkKWWidget.h"
 
-class VTK_EXPORT vtkKWMultiColumnList : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWWidget
 {
 public:
   static vtkKWMultiColumnList* New();

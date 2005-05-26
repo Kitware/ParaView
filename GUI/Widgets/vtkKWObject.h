@@ -26,10 +26,11 @@
 #include "vtkObject.h"
 
 #include "vtkTcl.h" // Needed for Tcl interpreter
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWObject : public vtkObject
+class KWWIDGETS_EXPORT vtkKWObject : public vtkObject
 {
 public:
   static vtkKWObject* New();

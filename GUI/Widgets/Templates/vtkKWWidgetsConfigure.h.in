@@ -1,11 +1,21 @@
-#undef BUILD_SHARED_LIBS
-#cmakedefine BUILD_SHARED_LIBS
-#ifdef BUILD_SHARED_LIBS
-#define KWDLL
-#else
-#define KWSTATIC
-#endif
+/*=========================================================================
 
-#cmakedefine USE_NOTEBOOK_ICONS
+  Module:    vtkKWWidgetsConfigure.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#ifndef __vtkKWWidgetsConfigure_h
+#define __vtkKWWidgetsConfigure_h
+
+#cmakedefine KWWIDGETS_SHARED_LIBS
 
 #define KW_INSTALL_LIB_DIR "${KW_INSTALL_LIB_DIR}"
+
+#endif

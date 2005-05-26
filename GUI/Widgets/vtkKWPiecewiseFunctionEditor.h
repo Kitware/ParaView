@@ -23,7 +23,7 @@
 class vtkKWCheckButton;
 class vtkPiecewiseFunction;
 
-class VTK_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueFunctionEditor
+class KWWIDGETS_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueFunctionEditor
 {
 public:
   static vtkKWPiecewiseFunctionEditor* New();

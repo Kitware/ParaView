@@ -32,7 +32,7 @@ class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWPushButtonSet;
 
-class VTK_EXPORT vtkKWRange : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT vtkKWRange : public vtkKWWidgetLabeled
 {
 public:
   static vtkKWRange* New();

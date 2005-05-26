@@ -30,7 +30,7 @@ class vtkKWThumbWheel;
 class vtkScalarBarWidget;
 class vtkVolumeProperty;
 
-class VTK_EXPORT vtkKWScalarBarAnnotation : public vtkKWPopupFrameCheckButton
+class KWWIDGETS_EXPORT vtkKWScalarBarAnnotation : public vtkKWPopupFrameCheckButton
 {
 public:
   static vtkKWScalarBarAnnotation* New();

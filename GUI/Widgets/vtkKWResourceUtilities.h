@@ -20,11 +20,12 @@
 #define __vtkKWResourceUtilities_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWWidget;
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWResourceUtilities : public vtkObject
+class KWWIDGETS_EXPORT vtkKWResourceUtilities : public vtkObject
 {
 public:
   static vtkKWResourceUtilities* New();

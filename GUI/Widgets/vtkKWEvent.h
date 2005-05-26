@@ -16,9 +16,9 @@
 #ifndef __vtkKWEvent_h
 #define __vtkKWEvent_h
 
-#include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class VTK_EXPORT vtkKWEvent
+class KWWIDGETS_EXPORT vtkKWEvent
 {
   public:
 
@@ -229,6 +229,3 @@ class VTK_EXPORT vtkKWEvent
 };
 
 #endif
-
-
-

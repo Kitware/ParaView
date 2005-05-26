@@ -29,7 +29,7 @@ class vtkKWPushButton;
 class vtkKWToolbarSet;
 class vtkKWSelectionFrameInternals;
 
-class VTK_EXPORT vtkKWSelectionFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSelectionFrame : public vtkKWWidget
 {
 public:
   static vtkKWSelectionFrame* New();

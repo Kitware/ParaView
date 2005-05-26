@@ -32,7 +32,7 @@ class vtkKWRenderWidget;
 class vtkKWScale;
 class vtkKWTextPropertyEditor;
 
-class VTK_EXPORT vtkKWCornerAnnotationEditor : public vtkKWPopupFrameCheckButton
+class KWWIDGETS_EXPORT vtkKWCornerAnnotationEditor : public vtkKWPopupFrameCheckButton
 {
 public:
   static vtkKWCornerAnnotationEditor* New();

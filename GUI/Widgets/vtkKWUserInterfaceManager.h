@@ -43,7 +43,7 @@ class vtkKWWidget;
 class vtkKWUserInterfacePanel;
 class vtkKWUserInterfaceManagerInternals;
 
-class VTK_EXPORT vtkKWUserInterfaceManager : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWUserInterfaceManager : public vtkKWObject
 {
 public:
   vtkTypeRevisionMacro(vtkKWUserInterfaceManager,vtkKWObject);

@@ -30,7 +30,7 @@ class vtkKWApplication;
 class vtkKWWidget;
 class vtkKWWidgetSetInternals;
 
-class VTK_EXPORT vtkKWWidgetSet : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWWidgetSet : public vtkKWWidget
 {
 public:
   vtkTypeRevisionMacro(vtkKWWidgetSet,vtkKWWidget);

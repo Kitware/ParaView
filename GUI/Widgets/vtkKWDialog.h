@@ -20,7 +20,7 @@
 
 #include "vtkKWTopLevel.h"
 
-class VTK_EXPORT vtkKWDialog : public vtkKWTopLevel
+class KWWIDGETS_EXPORT vtkKWDialog : public vtkKWTopLevel
 {
 public:
   static vtkKWDialog* New();

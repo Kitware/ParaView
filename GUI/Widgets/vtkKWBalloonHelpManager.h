@@ -33,7 +33,7 @@ class vtkKWTopLevel;
 class vtkKWLabel;
 class vtkKWWidget;
 
-class VTK_EXPORT vtkKWBalloonHelpManager : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWBalloonHelpManager : public vtkKWObject
 {
 public:
   static vtkKWBalloonHelpManager* New();

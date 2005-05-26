@@ -20,10 +20,11 @@
 #define __vtkKWRenderWidgetCallbackCommand_h
 
 #include "vtkCommand.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWRenderWidget;
 
-class VTK_EXPORT vtkKWRenderWidgetCallbackCommand : public vtkCommand
+class KWWIDGETS_EXPORT vtkKWRenderWidgetCallbackCommand : public vtkCommand
 {
 public:
   static vtkKWRenderWidgetCallbackCommand *New() 

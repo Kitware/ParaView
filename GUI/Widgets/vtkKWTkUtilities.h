@@ -19,6 +19,7 @@
 #define __vtkKWTkUtilities_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -34,7 +35,7 @@ class vtkKWWidget;
 class vtkKWApplication;
 struct Tcl_Interp;
 
-class VTK_EXPORT vtkKWTkUtilities : public vtkObject
+class KWWIDGETS_EXPORT vtkKWTkUtilities : public vtkObject
 {
 public:
   static vtkKWTkUtilities* New();

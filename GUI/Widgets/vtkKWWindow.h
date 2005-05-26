@@ -28,7 +28,7 @@ class vtkKWSplitFrame;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
 
-class VTK_EXPORT vtkKWWindow : public vtkKWWindowBase
+class KWWIDGETS_EXPORT vtkKWWindow : public vtkKWWindowBase
 {
 public:
 

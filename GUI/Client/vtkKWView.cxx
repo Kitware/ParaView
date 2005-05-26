@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.13");
+vtkCxxRevisionMacro(vtkKWView, "1.14");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -966,10 +966,10 @@ void vtkKWView::Select(vtkKWWindow *pw)
     // If there is a "Page Setup" menu, insert below
     int clidx;
     if (pw->GetFileMenu()->HasItem(
-          vtkKWWindowBase::GetPrintOptionsMenuLabel()))
+          vtkKWWindowBase::PrintOptionsMenuLabel))
       {
       clidx = pw->GetFileMenu()->GetIndex(
-        vtkKWWindowBase::GetPrintOptionsMenuLabel()) + 1;  
+        vtkKWWindowBase::PrintOptionsMenuLabel) + 1;  
       }
     else
       {

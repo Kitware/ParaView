@@ -47,7 +47,7 @@
 
 #include "vtkKWWidgetLabeled.h"
 
-class VTK_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWWidgetLabeled
 {
 public:
   vtkTypeRevisionMacro(vtkKWParameterValueFunctionInterface,vtkKWWidgetLabeled);

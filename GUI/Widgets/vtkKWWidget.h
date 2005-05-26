@@ -30,7 +30,7 @@ class vtkKWWindowBase;
 class vtkKWDragAndDropTargetSet;
 class vtkKWWidgetInternals;
 
-class VTK_EXPORT vtkKWWidget : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWWidget : public vtkKWObject
 {
 public:
   static vtkKWWidget* New();

@@ -30,7 +30,7 @@ class vtkColorTransferFunction;
 class vtkKWEntryLabeled;
 class vtkKWOptionMenu;
 
-class VTK_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
+class KWWIDGETS_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
 {
 public:
   static vtkKWColorTransferFunctionEditor* New();

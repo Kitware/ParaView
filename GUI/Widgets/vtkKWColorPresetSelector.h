@@ -28,7 +28,7 @@ class vtkKWColorPresetSelectorInternals;
 
 //----------------------------------------------------------------------------
 
-class VTK_EXPORT vtkKWColorPresetSelector : public vtkKWOptionMenuLabeled
+class KWWIDGETS_EXPORT vtkKWColorPresetSelector : public vtkKWOptionMenuLabeled
 {
 public:
   static vtkKWColorPresetSelector* New();

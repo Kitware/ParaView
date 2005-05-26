@@ -36,7 +36,7 @@ class vtkImageData;
 class vtkKWMenu;
 class vtkKWToolbar;
 
-class VTK_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWWidget
 {
 public:
   static vtkKWSelectionFrameLayoutManager* New();

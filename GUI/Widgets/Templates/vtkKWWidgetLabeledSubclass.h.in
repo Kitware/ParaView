@@ -30,7 +30,7 @@
 class vtkKWApplication;
 class vtkKW@WidgetType@;
 
-class VTK_EXPORT vtkKW@WidgetType@Labeled : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT vtkKW@WidgetType@Labeled : public vtkKWWidgetLabeled
 {
 public:
   static vtkKW@WidgetType@Labeled* New();

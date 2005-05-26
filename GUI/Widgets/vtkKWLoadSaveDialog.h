@@ -22,7 +22,7 @@
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWLoadSaveDialog : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWLoadSaveDialog : public vtkKWWidget
 {
 public:
   static vtkKWLoadSaveDialog* New();

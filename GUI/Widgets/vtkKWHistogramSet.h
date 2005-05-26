@@ -19,13 +19,14 @@
 #define __vtkKWHistogramSet_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkDataArray;
 class vtkKWHistogram;
 class vtkKWHistogramCallback;
 class vtkKWHistogramSetInternals;
 
-class VTK_EXPORT vtkKWHistogramSet : public vtkObject
+class KWWIDGETS_EXPORT vtkKWHistogramSet : public vtkObject
 {
 public:
   static vtkKWHistogramSet* New();

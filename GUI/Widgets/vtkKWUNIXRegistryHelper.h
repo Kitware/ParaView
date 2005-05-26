@@ -24,7 +24,7 @@
 
 class vtkKWUNIXRegistryHelperInternals;
 
-class VTK_EXPORT vtkKWUNIXRegistryHelper : public vtkKWRegistryHelper
+class KWWIDGETS_EXPORT vtkKWUNIXRegistryHelper : public vtkKWRegistryHelper
 {
 public:
   static vtkKWUNIXRegistryHelper* New();

@@ -19,7 +19,7 @@
 
 class vtkKWMenu;
 
-class VTK_EXPORT vtkKWMenuButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMenuButton : public vtkKWWidget
 {
 public:
   static vtkKWMenuButton* New();

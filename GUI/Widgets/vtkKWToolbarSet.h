@@ -26,7 +26,7 @@ class vtkKWToolbar;
 class vtkKWToolbarSetInternals;
 class vtkKWMenu;
 
-class VTK_EXPORT vtkKWToolbarSet : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWToolbarSet : public vtkKWWidget
 {
 public:
   static vtkKWToolbarSet* New();

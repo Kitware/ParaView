@@ -22,11 +22,12 @@
 #define __vtkKWRegistryHelper_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 #define REG_KEY_VALUE_SIZE_MAX 8192
 #define REG_KEY_NAME_SIZE_MAX 100
 
-class VTK_EXPORT vtkKWRegistryHelper : public vtkObject
+class KWWIDGETS_EXPORT vtkKWRegistryHelper : public vtkObject
 {
 public:
   // Description:

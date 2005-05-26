@@ -27,7 +27,7 @@ class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWText;
 
-class VTK_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
+class KWWIDGETS_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
 {
 public:
   static vtkKWTclInteractor* New();

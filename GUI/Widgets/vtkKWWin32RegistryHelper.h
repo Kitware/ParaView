@@ -23,7 +23,7 @@
 #include "vtkKWRegistryHelper.h"
 #include "vtkWindows.h" // needed for HKEY
 
-class VTK_EXPORT vtkKWWin32RegistryHelper : public vtkKWRegistryHelper
+class KWWIDGETS_EXPORT vtkKWWin32RegistryHelper : public vtkKWRegistryHelper
 {
 public:
   static vtkKWWin32RegistryHelper* New();

@@ -24,7 +24,7 @@
 class vtkKWApplication;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkKWWidgetLabeled : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWWidgetLabeled : public vtkKWWidget
 {
 public:
   static vtkKWWidgetLabeled* New();

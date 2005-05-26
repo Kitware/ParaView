@@ -18,13 +18,14 @@
 #define __vtkKWHistogram_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkColorTransferFunction;
 class vtkDataArray;
 class vtkImageData;
 class vtkDoubleArray;
 
-class VTK_EXPORT vtkKWHistogram : public vtkObject
+class KWWIDGETS_EXPORT vtkKWHistogram : public vtkObject
 {
 public:
   static vtkKWHistogram* New();
@@ -164,7 +165,7 @@ public:
   // transparent and the resulting image is created in RGBA space instead
   // of RGB.
   //BTX
-  class VTK_EXPORT ImageDescriptor
+  class KWWIDGETS_EXPORT ImageDescriptor
   {
   public:
     ImageDescriptor();

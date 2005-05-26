@@ -28,7 +28,7 @@ const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
 const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
 const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.242");
+vtkCxxRevisionMacro(vtkKWWindow, "1.243");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -85,7 +85,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Menu : Window
 
   this->GetWindowMenu()->AddCommand(
-    vtkKWWindow::HideMainPanelMenuLabel, this, "MainPanelVisibilityCallback", 1);
+    vtkKWWindow::HideMainPanelMenuLabel, 
+    this, "MainPanelVisibilityCallback", 1);
 
   // Split frame
 

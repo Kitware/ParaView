@@ -26,7 +26,7 @@ class vtkKWApplication;
 class vtkKWListBox;
 class vtkKWPushButton;
 
-class VTK_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWWidget
 {
 public:
   static vtkKWListBoxToListBoxSelectionEditor* New();

@@ -1,4 +1,5 @@
 #include "vtkKWEvent.h"
+#include "vtkKWObject.h"
 
 int main()
 {

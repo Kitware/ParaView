@@ -22,11 +22,12 @@
 #define __vtkKWIcon_h
 
 #include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWApplication;
 class vtkKWIcon;
 
-class VTK_EXPORT vtkKWIcon : public vtkObject
+class KWWIDGETS_EXPORT vtkKWIcon : public vtkObject
 {
 public:
   static vtkKWIcon* New();

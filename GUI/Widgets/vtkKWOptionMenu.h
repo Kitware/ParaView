@@ -24,7 +24,7 @@
 class vtkKWApplication;
 class vtkKWMenu;
 
-class VTK_EXPORT vtkKWOptionMenu : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWOptionMenu : public vtkKWWidget
 {
 public:
   static vtkKWOptionMenu* New();

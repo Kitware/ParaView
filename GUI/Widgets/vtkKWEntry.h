@@ -23,7 +23,7 @@
 
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWEntry : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWEntry : public vtkKWWidget
 {
 public:
   static vtkKWEntry* New();

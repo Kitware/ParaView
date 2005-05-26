@@ -21,7 +21,7 @@
 
 #include "vtkKWWidget.h"
 
-class VTK_EXPORT vtkKWFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWFrame : public vtkKWWidget
 {
 public:
   static vtkKWFrame* New();

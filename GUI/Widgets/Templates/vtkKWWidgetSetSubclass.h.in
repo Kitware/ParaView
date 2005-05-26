@@ -32,7 +32,7 @@
 
 class vtkKW@WidgetType@;
 
-class VTK_EXPORT vtkKW@WidgetType@Set : public vtkKWWidgetSet
+class KWWIDGETS_EXPORT vtkKW@WidgetType@Set : public vtkKWWidgetSet
 {
 public:
   static vtkKW@WidgetType@Set* New();

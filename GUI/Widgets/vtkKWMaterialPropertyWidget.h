@@ -30,7 +30,7 @@ class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWMaterialPropertyWidgetInternals;
 
-class VTK_EXPORT vtkKWMaterialPropertyWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMaterialPropertyWidget : public vtkKWWidget
 {
 public:
   vtkTypeRevisionMacro(vtkKWMaterialPropertyWidget, vtkKWWidget);

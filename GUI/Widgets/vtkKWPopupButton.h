@@ -25,7 +25,7 @@
 class vtkKWFrame;
 class vtkKWTopLevel;
 
-class VTK_EXPORT vtkKWPopupButton : public vtkKWPushButton
+class KWWIDGETS_EXPORT vtkKWPopupButton : public vtkKWPushButton
 {
 public:
   static vtkKWPopupButton* New();

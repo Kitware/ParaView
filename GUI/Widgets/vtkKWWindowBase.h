@@ -30,7 +30,7 @@ class vtkKWTclInteractor;
 class vtkKWToolbarSet;
 class vtkKWMostRecentFilesManager;
 
-class VTK_EXPORT vtkKWWindowBase : public vtkKWTopLevel
+class KWWIDGETS_EXPORT vtkKWWindowBase : public vtkKWTopLevel
 {
 public:
 
@@ -224,7 +224,6 @@ public:
   // Some constants
   //BTX
   static const char *PrintOptionsMenuLabel;
-  static const char *GetPrintOptionsMenuLabel();
   static const char *WindowGeometryRegKey;
   static const unsigned int DefaultWidth;
   static const unsigned int DefaultHeight;

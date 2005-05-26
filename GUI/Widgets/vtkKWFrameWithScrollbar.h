@@ -24,7 +24,7 @@
 class vtkKWApplication;
 class vtkKWWidget;
 
-class VTK_EXPORT vtkKWFrameWithScrollbar : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWFrameWithScrollbar : public vtkKWWidget
 {
 public:
   static vtkKWFrameWithScrollbar* New();

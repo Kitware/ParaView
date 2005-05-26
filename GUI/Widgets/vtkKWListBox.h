@@ -27,7 +27,7 @@
 
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWListBox : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWWidget
 {
 public:
   static vtkKWListBox* New();

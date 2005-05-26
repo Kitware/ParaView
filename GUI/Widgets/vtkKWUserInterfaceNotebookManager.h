@@ -42,7 +42,7 @@ class vtkKWUserInterfacePanel;
 class vtkKWWidget;
 class vtkKWUserInterfaceNotebookManagerInternals;
 
-class VTK_EXPORT vtkKWUserInterfaceNotebookManager : public vtkKWUserInterfaceManager
+class KWWIDGETS_EXPORT vtkKWUserInterfaceNotebookManager : public vtkKWUserInterfaceManager
 {
 public:
   static vtkKWUserInterfaceNotebookManager* New();

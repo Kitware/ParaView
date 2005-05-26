@@ -31,7 +31,7 @@ class vtkRenderer;
 class vtkTextActor;
 class vtkTextMapper;
 
-class VTK_EXPORT vtkKWRenderWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWRenderWidget : public vtkKWWidget
 {
 public:
   static vtkKWRenderWidget* New();

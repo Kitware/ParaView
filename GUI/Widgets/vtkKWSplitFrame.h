@@ -24,7 +24,7 @@
 class vtkKWApplication;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkKWSplitFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSplitFrame : public vtkKWWidget
 {
 public:
   static vtkKWSplitFrame* New();

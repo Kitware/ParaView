@@ -22,7 +22,7 @@
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWCheckButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCheckButton : public vtkKWWidget
 {
 public:
   static vtkKWCheckButton* New();

@@ -26,10 +26,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkKWGenericRenderWindowInteractor_h
 
 #include "vtkGenericRenderWindowInteractor.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWRenderWidget;
 
-class VTK_EXPORT vtkKWGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
+class KWWIDGETS_EXPORT vtkKWGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
 {
 public:
   static vtkKWGenericRenderWindowInteractor *New();

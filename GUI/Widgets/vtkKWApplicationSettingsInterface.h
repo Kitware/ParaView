@@ -30,7 +30,7 @@ class vtkKWPushButton;
 class vtkKWWindow;
 class vtkKWOptionMenuLabeled;
 
-class VTK_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
+class KWWIDGETS_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
 {
 public:
   static vtkKWApplicationSettingsInterface* New();

@@ -36,7 +36,7 @@ class vtkKWText;
 class vtkKWApplicationInternals;
 class vtkKWLoadSaveDialog;
 
-class VTK_EXPORT vtkKWApplication : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
   static vtkKWApplication* New();

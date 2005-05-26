@@ -22,7 +22,7 @@
 
 #include "vtkKWObject.h"
 
-class VTK_EXPORT vtkKWBWidgets : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWBWidgets : public vtkKWObject
 {
 public:
   static vtkKWBWidgets* New();

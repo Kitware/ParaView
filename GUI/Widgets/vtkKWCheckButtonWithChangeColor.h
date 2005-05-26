@@ -23,7 +23,7 @@
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 
-class VTK_EXPORT vtkKWCheckButtonWithChangeColor : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCheckButtonWithChangeColor : public vtkKWWidget
 {
 public:
   static vtkKWCheckButtonWithChangeColor* New();

@@ -26,7 +26,7 @@
 
 class vtkKWLoadSaveDialog;
 
-class VTK_EXPORT vtkKWLoadSaveButton : public vtkKWPushButton
+class KWWIDGETS_EXPORT vtkKWLoadSaveButton : public vtkKWPushButton
 {
 public:
   static vtkKWLoadSaveButton* New();

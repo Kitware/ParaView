@@ -22,7 +22,7 @@
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWLabel : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWLabel : public vtkKWWidget
 {
 public:
   static vtkKWLabel* New();

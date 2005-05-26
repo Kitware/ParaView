@@ -21,7 +21,7 @@
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWPushButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWPushButton : public vtkKWWidget
 {
 public:
   static vtkKWPushButton* New();

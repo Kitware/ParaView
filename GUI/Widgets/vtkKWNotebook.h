@@ -28,7 +28,7 @@ class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWNotebookInternals;
 
-class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWNotebook : public vtkKWWidget
 {
 public:
 

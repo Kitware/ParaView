@@ -26,7 +26,7 @@
 class vtkKWRange;
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWExtent : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWExtent : public vtkKWWidget
 {
 public:
   static vtkKWExtent* New();
