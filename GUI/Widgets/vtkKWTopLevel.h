@@ -56,19 +56,27 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Display the toplevel.
+  // Display the toplevel. Hide it with the Withdraw() method.
   // This also call DeIconify(), Focus() and Raise()
   virtual void Display();
-
-  // Description:
-  // Arrange for the toplevel to be displayed in normal (non-iconified) form.
-  // This is done by mapping the window.
-  virtual void DeIconify();
 
   // Description:
   // Arranges for window to be withdrawn from the screen. This causes the
   // window to be unmapped and forgotten about by the window manager.
   virtual void Withdraw();
+
+  // Description:
+  // Inform the window manager that this toplevel should be modal.
+  // If it is set, Display() will bring up the toplevel and grab it.
+  // Withdraw() will bring down the toplevel, and release the grab.
+  vtkSetClampMacro(Modal, int, 0, 1);
+  vtkBooleanMacro(Modal, int);
+  vtkGetMacro(Modal, int);
+
+  // Description:
+  // Arrange for the toplevel to be displayed in normal (non-iconified) form.
+  // This is done by mapping the window.
+  virtual void DeIconify();
 
   // Description:
   // Arranges for window to be displayed above all of its siblings in the
@@ -93,6 +101,17 @@ public:
   // Return 1 on success, 0 otherwise.
   virtual int SetSize(int w, int h);
   virtual int GetSize(int *w, int *h);
+
+  // Description:
+  // Convenience method to set/get the minimum window size. 
+  // For gridded windows the dimensions are specified in grid units; 
+  // otherwise they are specified in pixel units. The window manager will
+  // restrict the window's dimensions to be greater than or equal to width
+  // and height.
+  // No effect if called before Create()
+  // Return 1 on success, 0 otherwise.
+  virtual int SetMinimumSize(int w, int h);
+  virtual int GetMinimumSize(int *w, int *h);
 
   // Description:
   // Convenience method to set/get the window size and position in screen pixel
@@ -166,6 +185,7 @@ protected:
 
   int HasBeenMapped;
   int HideDecoration;
+  int Modal;
 
 private:
   vtkKWTopLevel(const vtkKWTopLevel&); // Not implemented

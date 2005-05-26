@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.21");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.22");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -138,7 +138,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
       this->Hostname->GetWidget()->AddValue(server);
       }
     }
-  this->GrabDialog = 0;
+  this->Modal = 0;
 }
 
 //----------------------------------------------------------------------------

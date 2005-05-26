@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.7");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.8");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -37,6 +37,7 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->Menu            = NULL;
   this->HasBeenMapped   = 0;
   this->HideDecoration  = 0;
+  this->Modal           = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -120,15 +121,9 @@ void vtkKWTopLevel::Display()
   this->Raise();
   this->Focus();
   this->Script("update idletasks");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTopLevel::DeIconify()
-{
-  if (this->IsCreated())
+  if (this->Modal)
     {
-    this->Script("wm deiconify %s", this->GetWidgetName());
-    this->HasBeenMapped = 1;
+    this->Grab();
     }
 }
 
@@ -138,6 +133,20 @@ void vtkKWTopLevel::Withdraw()
   if (this->IsCreated())
     {
     this->Script("wm withdraw %s", this->GetWidgetName());
+    }
+  if (this->Modal)
+    {
+    this->ReleaseGrab();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::DeIconify()
+{
+  if (this->IsCreated())
+    {
+    this->Script("wm deiconify %s", this->GetWidgetName());
+    this->HasBeenMapped = 1;
     }
 }
 
@@ -279,6 +288,10 @@ int vtkKWTopLevel::SetSize(int w, int h)
 //----------------------------------------------------------------------------
 int vtkKWTopLevel::GetSize(int *w, int *h)
 {
+  if (!w || !h)
+    {
+    return 0;
+    }
   *w = this->GetWidth();
   *h = this->GetHeight();
   return 1;
@@ -286,9 +299,31 @@ int vtkKWTopLevel::GetSize(int *w, int *h)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTopLevel::SetMinimumSize(int w, int h)
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+  this->Script("wm minsize %s %d %d", this->GetWidgetName(), w, h);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTopLevel::GetMinimumSize(int *w, int *h)
+{
+  if (!this->IsCreated() || !w || !h)
+    {
+    return 0;
+    }
+  return sscanf(this->Script("wm minsize %s", this->GetWidgetName()), 
+                "%d %d", w, h) == 2 ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTopLevel::SetGeometry(const char *geometry)
 {
-  if (!this->IsCreated() && geometry)
+  if (!this->IsCreated() || !geometry)
     {
     return 0;
     }
@@ -386,5 +421,6 @@ void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MasterWindow: " << this->GetMasterWindow() << endl;
   os << indent << "HasBeenMapped: " << this->GetHasBeenMapped() << endl;
   os << indent << "HideDecoration: " << (this->HideDecoration ? "On" : "Off" ) << endl;
+  os << indent << "Modal: " << this->GetModal() << endl;
 }
 
