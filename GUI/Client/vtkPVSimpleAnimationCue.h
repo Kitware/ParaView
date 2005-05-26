@@ -40,7 +40,7 @@ public:
   vtkTypeRevisionMacro(vtkPVSimpleAnimationCue, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void Create(vtkKWApplication* app, const char* type, 
+  void CreateWidget(vtkKWApplication* app, const char* type, 
     const char* args);
 
   // Description:
@@ -163,7 +163,7 @@ public:
   // Stop Recording.
   virtual void StopRecording();
 
-  virtual void RecordState(double ntime, double offset);
+  void RecordState(double ntime, double offset);
 
   // Description:
   // Adds a new key frame is the property animated by this cue has changed since last

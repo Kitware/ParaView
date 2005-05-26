@@ -37,7 +37,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.1");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.2");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -49,7 +49,7 @@ public:
     this->Target = t;
     }
 
-  virtual void Execute(vtkObject* obj, unsigned long event, void* data)
+  virtual void Execute(vtkObject* , unsigned long , void* )
     {
     if (this->Target)
       {

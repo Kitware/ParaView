@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.29");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.30");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -267,7 +267,8 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
     vtkErrorMacro("TimeLineParent must be set");
     return;
     }
-  this->Superclass::Create(app, "frame", args);
+
+  this->CreateWidget(app, "frame", args);
   
   this->TimeLineContainer->SetParent(this->TimeLineParent);
   this->TimeLineContainer->Create(app, NULL);

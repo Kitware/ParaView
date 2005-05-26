@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.2");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.3");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -173,7 +173,7 @@ void vtkPVSimpleAnimationCue::Observe(vtkObject* toObserve, unsigned long event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSimpleAnimationCue::Create(vtkKWApplication* app, const char* type, 
+void vtkPVSimpleAnimationCue::CreateWidget(vtkKWApplication* app, const char* type, 
   const char* args)
 {
   if (!this->Superclass::Create(app, type, args))
@@ -244,7 +244,7 @@ void vtkPVSimpleAnimationCue::CreateProxy()
 
 //-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event,
-  void* data)
+  void* )
 {
   if (vtkSMKeyFrameAnimationCueManipulatorProxy::SafeDownCast(wdg))
     {
