@@ -17,7 +17,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWindow.h"
+#include "vtkKWWindowBase.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWBalloonHelpManager.h"
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.121");
+vtkCxxRevisionMacro(vtkKWWidget, "1.122");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -462,13 +462,13 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWindow* vtkKWWidget::GetWindow()
+vtkKWWindowBase* vtkKWWidget::GetWindow()
 {
-  vtkKWWindow* win =0;
+  vtkKWWindowBase* win =0;
   vtkKWWidget* widget = this->GetParent();
   while(widget)
     {
-    if((win = vtkKWWindow::SafeDownCast(widget)))
+    if((win = vtkKWWindowBase::SafeDownCast(widget)))
       {
       return win;
       }

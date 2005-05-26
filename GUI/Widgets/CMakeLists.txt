@@ -100,6 +100,7 @@ SET( KWWidgets_SRCS
   vtkKWWidgetLabeled.cxx 
   vtkKWWidgetSet.cxx 
   vtkKWWindow.cxx 
+  vtkKWWindowBase.cxx 
   )
 
 # The "set of widgets" are automatically generated from some core widgets

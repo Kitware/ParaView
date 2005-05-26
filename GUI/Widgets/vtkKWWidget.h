@@ -26,7 +26,7 @@
 #include "vtkKWObject.h"
 
 class vtkKWIcon;
-class vtkKWWindow;
+class vtkKWWindowBase;
 class vtkKWDragAndDropTargetSet;
 class vtkKWWidgetInternals;
 
@@ -152,9 +152,9 @@ public:
   void Focus();
 
   // Description:
-  // Get the containing vtkKWWindow for this Widget if there is one.
+  // Get the containing vtkKWWindowBase for this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
-  vtkKWWindow* GetWindow();
+  vtkKWWindowBase* GetWindow();
 
   // Description:
   // Convenience method to Set/Get the current background and foreground colors
