@@ -255,6 +255,10 @@ protected:
   virtual void UnregisterProxies();
   
   int CueVisibility;
+  virtual void Create(vtkKWApplication*app, const char* type, const char* args)
+    { this->Superclass::Create(app, type, args); }
+  virtual void RecordState(double a, double b)
+    { this->Superclass::RecordState(a, b); }
 
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&); // Not implemented.
