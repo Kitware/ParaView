@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.33");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.34");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -53,14 +53,13 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
 
   this->InterfaceSettingsFrame = 0;
   this->ConfirmExitCheckButton = 0;
-  this->SaveWindowGeometryCheckButton = 0;
+  this->SaveUserInterfaceGeometryCheckButton = 0;
   this->ShowSplashScreenCheckButton = 0;
   this->ShowBalloonHelpCheckButton = 0;
 
   // Interface customization
 
   this->InterfaceCustomizationFrame = 0;
-  this->EnableDragAndDropCheckButton = 0;
   this->ResetDragAndDropButton = 0;
 
   // Toolbar settings
@@ -94,10 +93,10 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     this->ConfirmExitCheckButton = NULL;
     }
 
-  if (this->SaveWindowGeometryCheckButton)
+  if (this->SaveUserInterfaceGeometryCheckButton)
     {
-    this->SaveWindowGeometryCheckButton->Delete();
-    this->SaveWindowGeometryCheckButton = NULL;
+    this->SaveUserInterfaceGeometryCheckButton->Delete();
+    this->SaveUserInterfaceGeometryCheckButton = NULL;
     }
 
   if (this->ShowSplashScreenCheckButton)
@@ -118,12 +117,6 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     {
     this->InterfaceCustomizationFrame->Delete();
     this->InterfaceCustomizationFrame = NULL;
-    }
-
-  if (this->EnableDragAndDropCheckButton)
-    {
-    this->EnableDragAndDropCheckButton->Delete();
-    this->EnableDragAndDropCheckButton = NULL;
     }
 
   if (this->ResetDragAndDropButton)
@@ -243,19 +236,23 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Interface settings : Save application geometry on exit ?
 
-  if (!this->SaveWindowGeometryCheckButton)
+  if (!this->SaveUserInterfaceGeometryCheckButton)
     {
-    this->SaveWindowGeometryCheckButton = vtkKWCheckButton::New();
+    this->SaveUserInterfaceGeometryCheckButton = vtkKWCheckButton::New();
     }
 
-  this->SaveWindowGeometryCheckButton->SetParent(frame);
-  this->SaveWindowGeometryCheckButton->Create(app, 0);
-  this->SaveWindowGeometryCheckButton->SetText("Save window geometry on exit");
-  this->SaveWindowGeometryCheckButton->SetCommand(this, "SaveWindowGeometryCallback");
-  this->SaveWindowGeometryCheckButton->SetBalloonHelpString(
-    "Save the window size and location on exit and restore it on startup.");
+  this->SaveUserInterfaceGeometryCheckButton->SetParent(frame);
+  this->SaveUserInterfaceGeometryCheckButton->Create(app, 0);
+  this->SaveUserInterfaceGeometryCheckButton->SetText(
+    "Save user interface geometry on exit");
+  this->SaveUserInterfaceGeometryCheckButton->SetCommand(
+    this, "SaveUserInterfaceGeometryCallback");
+  this->SaveUserInterfaceGeometryCheckButton->SetBalloonHelpString(
+    "Save the user interface size and location on exit and restore it "
+    "on startup.");
 
-  tk_cmd << "pack " << this->SaveWindowGeometryCheckButton->GetWidgetName()
+  tk_cmd << "pack " 
+         << this->SaveUserInterfaceGeometryCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
@@ -290,7 +287,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->ShowBalloonHelpCheckButton->SetParent(frame);
   this->ShowBalloonHelpCheckButton->Create(app, 0);
-  this->ShowBalloonHelpCheckButton->SetText("Show tooltips");
+  this->ShowBalloonHelpCheckButton->SetText("Show balloon help");
   this->ShowBalloonHelpCheckButton->SetCommand(
     this, "ShowBalloonHelpCallback");
   this->ShowBalloonHelpCheckButton->SetBalloonHelpString(
@@ -320,28 +317,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   frame = this->InterfaceCustomizationFrame->GetFrame();
 
   // --------------------------------------------------------------
-  // Interface customization : Drag & Drop : Enable
-
-  if (!this->EnableDragAndDropCheckButton)
-    {
-    this->EnableDragAndDropCheckButton = vtkKWCheckButton::New();
-    }
-
-  this->EnableDragAndDropCheckButton->SetParent(frame);
-  this->EnableDragAndDropCheckButton->Create(app, 0);
-  this->EnableDragAndDropCheckButton->SetText("Enable interface Drag & Drop");
-  this->EnableDragAndDropCheckButton->SetCommand(
-    this, "EnableDragAndDropCallback");
-  this->EnableDragAndDropCheckButton->SetBalloonHelpString(
-    "When this option is enabled you can drag & drop elements of the "
-    "interface within the same panel or from one panel to the other. "
-    "To do so, drag the title of a labeled frame to reposition it within "
-    "a panel, or drop it on another tab to move it to a different panel.");
-
-  tk_cmd << "pack " << this->EnableDragAndDropCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
-
-  // --------------------------------------------------------------
   // Interface customization : Drag & Drop : Reset
 
   if (!this->ResetDragAndDropButton)
@@ -354,8 +329,13 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ResetDragAndDropButton->SetText("Reset Interface To Default State");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
-    "Reset the placement of all user interface elements, discarding any "
-    "Drag & Drop events.");
+    "You can drag & drop elements of the "
+    "interface within the same panel or from one panel to the other. "
+    "To do so, drag the title of a labeled frame to reposition it within "
+    "a panel, or drop it on another tab to move it to a different panel."
+    "Press this button to reset the placement of all user interface elements "
+    "to their default position. You will need to restart the application for "
+    "the interface to be reset.");
 
   tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none -padx 22 -pady 2" 
@@ -487,16 +467,16 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ConfirmExitCheckButton)
     {
     this->ConfirmExitCheckButton->SetState(
-      vtkKWMessageDialog::GetMessageDialogResponseFromRegistry(
-        this->GetApplication(), VTK_KW_EXIT_DIALOG_NAME) ? 0 : 1);
+      vtkKWMessageDialog::RestoreMessageDialogResponseFromRegistry(
+        this->GetApplication(), vtkKWApplication::ExitDialogName) ? 0 : 1);
     }
 
   // Interface settings : Save application geometry on exit ?
 
-  if (this->SaveWindowGeometryCheckButton)
+  if (this->SaveUserInterfaceGeometryCheckButton)
     {
-    this->SaveWindowGeometryCheckButton->SetState(
-      this->GetApplication()->GetSaveWindowGeometry());
+    this->SaveUserInterfaceGeometryCheckButton->SetState(
+      this->GetApplication()->GetSaveUserInterfaceGeometry());
     }
   
   // Interface settings : Show splash screen ?
@@ -520,55 +500,24 @@ void vtkKWApplicationSettingsInterface::Update()
   vtkKWUserInterfaceNotebookManager *uim_nb = 
     vtkKWUserInterfaceNotebookManager::SafeDownCast(
       this->Window->GetUserInterfaceManager());
-
-  if (this->EnableDragAndDropCheckButton)
+  if (!uim_nb)
     {
-    if (uim_nb)
-      {
-      this->EnableDragAndDropCheckButton->SetState(
-        uim_nb->GetEnableDragAndDrop());
-      }
-    else
-      {
-      this->EnableDragAndDropCheckButton->SetEnabled(0);
-      this->ResetDragAndDropButton->SetEnabled(0);
-      }
+    this->ResetDragAndDropButton->SetEnabled(0);
     }
 
   // Toolbar settings : flat frame
 
   if (FlatFrameCheckButton)
     {
-    if (this->GetApplication()->HasRegistryValue(
-          2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
-      {
-      this->FlatFrameCheckButton->SetState(
-        this->GetApplication()->GetIntRegistryValue(
-          2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY));
-      }
-    else
-      {
-      this->FlatFrameCheckButton->SetState(
-        vtkKWToolbar::GetGlobalFlatAspect());
-      }
+    this->FlatFrameCheckButton->SetState(vtkKWToolbar::GetGlobalFlatAspect());
     }
 
   // Toolbar settings : flat buttons
 
   if (FlatButtonsCheckButton)
     {
-    if (this->GetApplication()->HasRegistryValue(
-          2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
-      {
-      this->FlatButtonsCheckButton->SetState(
-        this->GetApplication()->GetIntRegistryValue(
-          2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY));
-      }
-    else
-      {
-      this->FlatButtonsCheckButton->SetState(
-        vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-      }
+    this->FlatButtonsCheckButton->SetState(
+      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
     }
 
   // If there is no toolbars, disable the interface
@@ -592,7 +541,7 @@ void vtkKWApplicationSettingsInterface::Update()
     {
     char buffer[128];
     sprintf(buffer, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, 
-            this->Window->GetPrintTargetDPI());
+            this->GetApplication()->GetPrintTargetDPI());
     this->DPIOptionMenu->GetWidget()->SetCurrentEntry(buffer);
     }
 }
@@ -606,27 +555,23 @@ void vtkKWApplicationSettingsInterface::ConfirmExitCallback()
     return;
     }
 
-  vtkKWMessageDialog::StoreMessageDialogResponseInRegistry(
+  vtkKWMessageDialog::SaveMessageDialogResponseToRegistry(
     this->GetApplication(),
-    VTK_KW_EXIT_DIALOG_NAME, 
+    vtkKWApplication::ExitDialogName, 
     this->ConfirmExitCheckButton->GetState() ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::SaveWindowGeometryCallback()
+void vtkKWApplicationSettingsInterface::SaveUserInterfaceGeometryCallback()
 {
-  if (!this->SaveWindowGeometryCheckButton || 
-      !this->SaveWindowGeometryCheckButton->IsCreated())
+  if (!this->SaveUserInterfaceGeometryCheckButton || 
+      !this->SaveUserInterfaceGeometryCheckButton->IsCreated())
     {
     return;
     }
   
-  int state = this->SaveWindowGeometryCheckButton->GetState() ? 1 : 0;
-  
-  this->GetApplication()->SetRegistryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", state);
-  
-  this->GetApplication()->SetSaveWindowGeometry(state);
+  int state = this->SaveUserInterfaceGeometryCheckButton->GetState() ? 1 : 0;
+  this->GetApplication()->SetSaveUserInterfaceGeometry(state);
 }
 
 //----------------------------------------------------------------------------
@@ -639,10 +584,6 @@ void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
     }
 
   int state = this->ShowSplashScreenCheckButton->GetState() ? 1 : 0;
- 
-  this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY, "%d", state);
-
   this->GetApplication()->SetShowSplashScreen(state);
 }
 
@@ -656,29 +597,7 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
     }
 
   int state = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
-
-  this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY, "%d", state);
-
   this->GetApplication()->GetBalloonHelpManager()->SetShow(state);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::EnableDragAndDropCallback()
-{
-  if (this->IsCreated())
-    {
-    int flag = this->EnableDragAndDropCheckButton->GetState() ? 1 : 0;
-    this->GetApplication()->SetRegistryValue(
-      2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY, "%d", flag);
-    vtkKWUserInterfaceNotebookManager *uim_nb = 
-      vtkKWUserInterfaceNotebookManager::SafeDownCast(
-        this->Window->GetUserInterfaceManager());
-    if (uim_nb)
-      {
-      uim_nb->SetEnableDragAndDrop(flag);
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -715,8 +634,7 @@ void vtkKWApplicationSettingsInterface::FlatFrameCallback()
     return;
     }
 
-  this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", 
+  vtkKWToolbar::SetGlobalFlatAspect(
     this->FlatFrameCheckButton->GetState() ? 1 : 0);
 
   if (this->Window)
@@ -734,9 +652,8 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
     return;
     }
 
-  this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", 
-    this->FlatButtonsCheckButton->GetState() ? 1 : 0); 
+  vtkKWToolbar::SetGlobalWidgetsFlatAspect(
+    this->FlatButtonsCheckButton->GetState() ? 1 : 0);
 
   if (this->Window)
     {
@@ -747,9 +664,9 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
 //---------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::DPICallback(double dpi)
 {
-  if (this->Window)
+  if (this->GetApplication())
     {
-    this->Window->SetPrintTargetDPI(dpi);
+    this->GetApplication()->SetPrintTargetDPI(dpi);
     }
 }
 
@@ -770,9 +687,9 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
     this->ConfirmExitCheckButton->SetEnabled(this->GetEnabled());
     }
 
-  if (this->SaveWindowGeometryCheckButton)
+  if (this->SaveUserInterfaceGeometryCheckButton)
     {
-    this->SaveWindowGeometryCheckButton->SetEnabled(this->GetEnabled());
+    this->SaveUserInterfaceGeometryCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowSplashScreenCheckButton)
@@ -790,11 +707,6 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
   if (this->InterfaceCustomizationFrame)
     {
     this->InterfaceCustomizationFrame->SetEnabled(this->GetEnabled());
-    }
-
-  if (this->EnableDragAndDropCheckButton)
-    {
-    this->EnableDragAndDropCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ResetDragAndDropButton)

@@ -55,10 +55,9 @@ public:
   // Description:
   // Callback used when interaction has been performed.
   virtual void ConfirmExitCallback();
-  virtual void SaveWindowGeometryCallback();
+  virtual void SaveUserInterfaceGeometryCallback();
   virtual void ShowSplashScreenCallback();
   virtual void ShowBalloonHelpCallback();
-  virtual void EnableDragAndDropCallback();
   virtual void ResetDragAndDropCallback();
   virtual void FlatFrameCallback();
   virtual void FlatButtonsCallback();
@@ -84,14 +83,13 @@ protected:
   vtkKWFrameLabeled *InterfaceSettingsFrame;
 
   vtkKWCheckButton  *ConfirmExitCheckButton;
-  vtkKWCheckButton  *SaveWindowGeometryCheckButton;
+  vtkKWCheckButton  *SaveUserInterfaceGeometryCheckButton;
   vtkKWCheckButton  *ShowSplashScreenCheckButton;
   vtkKWCheckButton  *ShowBalloonHelpCheckButton;
 
   // Interface customization
 
   vtkKWFrameLabeled *InterfaceCustomizationFrame;
-  vtkKWCheckButton  *EnableDragAndDropCheckButton;
   vtkKWPushButton   *ResetDragAndDropButton;
 
   // Toolbar settings
