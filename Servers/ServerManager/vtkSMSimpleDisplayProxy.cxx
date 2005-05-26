@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -859,20 +859,6 @@ void vtkSMSimpleDisplayProxy::Update()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find AddViewProp on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->ActorProxy);
-  if (this->HasVolumePipeline)
-    {
-    pp->AddProxy(this->VolumeActorProxy);
-    }
-    */
   if (!this->ObjectsCreated)
     {
     vtkErrorMacro("Display proxy not created!");
@@ -894,20 +880,7 @@ void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     vtkErrorMacro("Display proxy not created!");
     return;
     }
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find RemoveViewProp on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->ActorProxy);
-  if (this->HasVolumePipeline)
-    {
-    pp->RemoveProxy(this->VolumeActorProxy);
-    }
-    */
+  
   rm->RemovePropFromRenderer(this->ActorProxy);
   if (this->HasVolumePipeline)
     {
