@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.18");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -238,17 +238,7 @@ void vtkPVHorizontalAnimationInterface::RemoveAllKeyFrames()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::RestoreWindowGeometry()
+void vtkPVHorizontalAnimationInterface::RestoreWindowGeometryFromRegistry()
 {
   if (this->GetApplication()->HasRegistryValue(2, "Geometry", 
       "AnimationFrame1Size"))
@@ -260,7 +250,7 @@ void vtkPVHorizontalAnimationInterface::RestoreWindowGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::SaveWindowGeometry()
+void vtkPVHorizontalAnimationInterface::SaveWindowGeometryToRegistry()
 {
   if (this->IsCreated())
     {

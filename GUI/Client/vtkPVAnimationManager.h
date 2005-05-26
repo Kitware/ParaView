@@ -207,8 +207,8 @@ public:
 
   // Description:
   // Save/Restore window geometry
-  virtual void SaveWindowGeometry();
-  virtual void RestoreWindowGeometry();
+  virtual void SaveWindowGeometryToRegistry();
+  virtual void RestoreWindowGeometryFromRegistry();
 
   // Description:
   // Remove all the keyframes in the animation.

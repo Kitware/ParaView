@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.46");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.47");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1325,18 +1325,18 @@ void vtkPVAnimationManager::RemoveAllKeyFrames()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::SaveWindowGeometry()
+void vtkPVAnimationManager::SaveWindowGeometryToRegistry()
 {
   if (this->IsCreated())
     {
-    this->HAnimationInterface->SaveWindowGeometry();
+    this->HAnimationInterface->SaveWindowGeometryToRegistry();
     }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::RestoreWindowGeometry()
+void vtkPVAnimationManager::RestoreWindowGeometryFromRegistry()
 {
-  this->HAnimationInterface->RestoreWindowGeometry();
+  this->HAnimationInterface->RestoreWindowGeometryFromRegistry();
 }
 
 //-----------------------------------------------------------------------------
@@ -1345,7 +1345,6 @@ void vtkPVAnimationManager::InvalidateAllGeometries()
   this->AnimationScene->InvalidateAllGeometries();
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
 {

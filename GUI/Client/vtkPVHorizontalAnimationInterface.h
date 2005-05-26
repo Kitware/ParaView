@@ -78,8 +78,8 @@ public:
 
   // Description:
   // Save restore window geometry.
-  virtual void SaveWindowGeometry();
-  virtual void RestoreWindowGeometry();
+  virtual void SaveWindowGeometryToRegistry();
+  virtual void RestoreWindowGeometryFromRegistry();
 
   // Description:
   // Remove All Key frames from this cue.
