@@ -26,7 +26,6 @@ class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWText;
-class vtkKWWindow;
 
 class VTK_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
 {

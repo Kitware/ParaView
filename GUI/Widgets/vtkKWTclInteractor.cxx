@@ -19,14 +19,13 @@
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/stl/string>
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.31");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.32");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
