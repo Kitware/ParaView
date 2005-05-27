@@ -62,7 +62,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.207");
+vtkCxxRevisionMacro(vtkKWApplication, "1.208");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -965,8 +965,8 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
-  char value[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
+  char buffer[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
+  char value[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
   va_list var_args;
   va_start(var_args, format);
