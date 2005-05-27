@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.714");
+vtkCxxRevisionMacro(vtkPVWindow, "1.715");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3739,15 +3739,12 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
-  if ( this->InDemo )
+  if (this->InDemo)
     {
     return;
     }
-  if (this->CurrentPVSource == 0)
-    {
-    return;
-    }
-  if (this->CurrentPVSource->GetInitialized() == 0)
+
+  if (this->CurrentPVSource && this->CurrentPVSource->GetInitialized() == 0)
     {
     this->DisableToolbarButtons();
     return;
@@ -3755,17 +3752,19 @@ void vtkPVWindow::EnableToolbarButtons()
 
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
-  while ( !it->IsDoneWithTraversal() )
+  while (!it->IsDoneWithTraversal())
     {
     vtkKWPushButton* button = 0;
     const char* key = 0;
     if (it->GetData(button) == VTK_OK && button && it->GetKey(key) && key)
       {
       vtkPVSource* proto = 0;
-      if ( this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
+      if (this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
         {
-        if (proto->GetInputProperty(0) &&
-            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto) )
+        if (!proto->GetInputProperty(0) ||
+            (this->CurrentPVSource && 
+             proto->GetInputProperty(0)->GetIsValidInput(
+               this->CurrentPVSource, proto)))
           {
           button->EnabledOn();
           }
