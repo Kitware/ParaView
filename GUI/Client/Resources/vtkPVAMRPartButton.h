@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVAMRPartButton.png (zlib, base64)
  */
-#define image_PVAMRPartButton_width         32
-#define image_PVAMRPartButton_height        32
-#define image_PVAMRPartButton_pixel_size    3
-#define image_PVAMRPartButton_buffer_length 1804
+static const unsigned int  image_PVAMRPartButton_width         = 32;
+static const unsigned int  image_PVAMRPartButton_height        = 32;
+static const unsigned int  image_PVAMRPartButton_pixel_size    = 3;
+static const unsigned long image_PVAMRPartButton_buffer_length = 1804;
 
 static const unsigned char image_PVAMRPartButton[] = 
   "eNrllmtQlGUUx/+TGY5Truk4qaPhJZVQJCfUNZU1RRkHcSG8Ky43gXVZVth9H9d9WFBJtA"

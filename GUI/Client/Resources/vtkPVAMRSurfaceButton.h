@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVAMRSurfaceButton.png (zlib, base64)
  */
-#define image_PVAMRSurfaceButton_width         32
-#define image_PVAMRSurfaceButton_height        32
-#define image_PVAMRSurfaceButton_pixel_size    3
-#define image_PVAMRSurfaceButton_buffer_length 1628
+static const unsigned int  image_PVAMRSurfaceButton_width         = 32;
+static const unsigned int  image_PVAMRSurfaceButton_height        = 32;
+static const unsigned int  image_PVAMRSurfaceButton_pixel_size    = 3;
+static const unsigned long image_PVAMRSurfaceButton_buffer_length = 1628;
 
 static const unsigned char image_PVAMRSurfaceButton[] = 
   "eNrtlmtMU2ccxj+jZUyyQTDRLXHJNo0ZMxhIFJeJOiYqJqJbp4DSjlEmliLdhlyLlGtbYO"

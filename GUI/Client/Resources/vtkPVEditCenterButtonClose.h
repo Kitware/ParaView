@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVEditCenterButtonClose.png (zlib, base64)
  */
-#define image_PVEditCenterButtonClose_width         32
-#define image_PVEditCenterButtonClose_height        32
-#define image_PVEditCenterButtonClose_pixel_size    3
-#define image_PVEditCenterButtonClose_buffer_length 1088
+static const unsigned int  image_PVEditCenterButtonClose_width         = 32;
+static const unsigned int  image_PVEditCenterButtonClose_height        = 32;
+static const unsigned int  image_PVEditCenterButtonClose_pixel_size    = 3;
+static const unsigned long image_PVEditCenterButtonClose_buffer_length = 1088;
 
 static const unsigned char image_PVEditCenterButtonClose[] = 
   "eNq1lt1uElEQxzcxPgMXJiaitW2wrSlFPqqpBgpIuxpZ1gJFwJiQYGMhKF8LXrTatNS0TT"

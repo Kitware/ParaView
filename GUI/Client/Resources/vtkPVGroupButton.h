@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVGroupButton.png (zlib, base64)
  */
-#define image_PVGroupButton_width         32
-#define image_PVGroupButton_height        32
-#define image_PVGroupButton_pixel_size    3
-#define image_PVGroupButton_buffer_length 1448
+static const unsigned int  image_PVGroupButton_width         = 32;
+static const unsigned int  image_PVGroupButton_height        = 32;
+static const unsigned int  image_PVGroupButton_pixel_size    = 3;
+static const unsigned long image_PVGroupButton_buffer_length = 1448;
 
 static const unsigned char image_PVGroupButton[] = 
   "eNrVVltTUlEY7SekcjEzrwmo5Tg1QkDTRSu1RFMwUUFESm0EsUCxjEZD0dIZKVHBC1p2kc"

@@ -24,9 +24,6 @@
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-#define REG_KEY_VALUE_SIZE_MAX 8192
-#define REG_KEY_NAME_SIZE_MAX 100
-
 class KWWIDGETS_EXPORT vtkKWRegistryHelper : public vtkObject
 {
 public:
@@ -84,14 +81,20 @@ public:
   // Should the registry be locked?
   vtkGetMacro(Locked, int);
 
-//BTX
+  //BTX
   enum {
     READONLY,
     READWRITE
   };
-//ETX
 
-  protected:
+  enum
+  {
+    RegistryKeyValueSizeMax = 8192,
+    RegistryKeyNameSizeMax = 100
+  };
+  //ETX
+
+protected:
   vtkKWRegistryHelper();
   virtual ~vtkKWRegistryHelper();
 

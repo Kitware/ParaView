@@ -66,11 +66,11 @@ public:
   // The structure and contents of each image are decoded and 
   // written into a form that can be used programatically. 
   // For example, the file foobar.png is converted into:
-  //   #define image_foobar_width         19
-  //   #define image_foobar_height        19
-  //   #define image_foobar_pixel_size    3
-  //   #define image_foobar_buffer_length 40
-  //   static unsigned char image_foobar[] = 
+  //   static const unsigned int image_foobar_width  = 19
+  //   static const unsigned int image_foobar_height     = 19
+  //   static const unsigned int image_foobar_pixel_size = 3
+  //   static const unsigned long image_foobar_buffer_length = 40
+  //   static const unsigned char image_foobar[] = 
   //     "eNpjYCAfPH1wg1Q0qnFU46jGwaaRPAAAa7/zXA==";
   // Several options can be combined into the 'options' parameter.
   //   CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB: 

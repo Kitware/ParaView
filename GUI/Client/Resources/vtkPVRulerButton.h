@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVRulerButton.png (zlib, base64)
  */
-#define image_PVRulerButton_width         32
-#define image_PVRulerButton_height        32
-#define image_PVRulerButton_pixel_size    3
-#define image_PVRulerButton_buffer_length 936
+static const unsigned int  image_PVRulerButton_width         = 32;
+static const unsigned int  image_PVRulerButton_height        = 32;
+static const unsigned int  image_PVRulerButton_pixel_size    = 3;
+static const unsigned long image_PVRulerButton_buffer_length = 936;
 
 static const unsigned char image_PVRulerButton[] = 
   "eNq9lkFrE0EUx3vpwRDEaLVGKZRCwVNF4kEv3kIoNSlFUg0SQVKNoB6igSq1lK0itKWWgi"

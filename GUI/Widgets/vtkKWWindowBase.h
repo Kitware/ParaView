@@ -127,8 +127,8 @@ public:
   vtkGetObjectMacro(ProgressGauge, vtkKWProgressGauge);
 
   // Description:
-  // Get the menu objects.
-  vtkGetObjectMacro(FileMenu,vtkKWMenu);
+  // Get the menu objects. This will allocate and create them on the fly.
+  vtkKWMenu *GetFileMenu();
   vtkKWMenu *GetEditMenu();
   vtkKWMenu *GetViewMenu();
   vtkKWMenu *GetWindowMenu();
@@ -177,13 +177,10 @@ public:
   virtual char* GetTitle();
 
   // Description:
-  // Display the tcl interactor.
+  // Get/display the tcl interactor.
+  virtual vtkKWTclInteractor* GetTclInteractor();
   virtual void DisplayTclInteractor();
   
-  // Description:
-  // Get the Tcl interactor object.
-  vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
-
   // Description:
   // Update the UI. This will call:
   //   UpdateToolbarState
@@ -224,6 +221,17 @@ public:
   // Some constants
   //BTX
   static const char *PrintOptionsMenuLabel;
+  static const char *FileMenuLabel;
+  static const char *FileCloseMenuLabel;
+  static const char *FileExitMenuLabel;
+  static const char *OpenRecentFileMenuLabel;
+  static const char *EditMenuLabel;
+  static const char *ViewMenuLabel;
+  static const char *WindowMenuLabel;
+  static const char *HelpMenuLabel;
+  static const char *HelpTopicsMenuLabel;
+  static const char *HelpCheckForUpdatesMenuLabel;
+  static const char *ToolbarsVisibilityMenuLabel;
   static const char *WindowGeometryRegKey;
   static const unsigned int DefaultWidth;
   static const unsigned int DefaultHeight;
@@ -258,13 +266,6 @@ protected:
   virtual void SaveWindowGeometryToRegistry();
   virtual void RestoreWindowGeometryFromRegistry();
 
-  vtkKWMenu *FileMenu;
-  vtkKWMenu *EditMenu;
-  vtkKWMenu *ViewMenu;
-  vtkKWMenu *WindowMenu;
-  vtkKWMenu *HelpMenu;
-  vtkKWMenu *ToolbarsVisibilityMenu;
-
   vtkKWFrame *MenuBarSeparatorFrame;
 
   vtkKWFrame *MainFrame;
@@ -288,12 +289,21 @@ protected:
   int   SupportPrint;
   int   PromptBeforeClose;
 
+  // Allocated and created when queried
+
+  vtkKWMenu *FileMenu;
+  vtkKWMenu *EditMenu;
+  vtkKWMenu *ViewMenu;
+  vtkKWMenu *WindowMenu;
+  vtkKWMenu *HelpMenu;
+  vtkKWMenu *ToolbarsVisibilityMenu;
+
   vtkKWTclInteractor *TclInteractor;
 
 private:
+
   vtkKWWindowBase(const vtkKWWindowBase&); // Not implemented
   void operator=(const vtkKWWindowBase&); // Not implemented
 };
 
 #endif
-

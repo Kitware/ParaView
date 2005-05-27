@@ -32,7 +32,7 @@
 
 #include <kwsys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.42");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.43");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -48,7 +48,7 @@ int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, 
 #define VTK_KW_PVFE_TICKS_SEP                2
 #define VTK_KW_PVFE_TICKS_VALUE_CANVAS_WIDTH ((int)ceil((double)VTK_KW_PVFE_TICKS_TEXT_SIZE * 6.2))
 #define VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT ((int)ceil((double)VTK_KW_PVFE_TICKS_TEXT_SIZE * 1.45))
-  
+
 // For some reasons, the end-point of a line/rectangle is not drawn on Win32. 
 // Comply with that.
 
@@ -60,6 +60,19 @@ int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, 
 #define RSTRANGE 1
 
 #define VTK_KW_PVFE_TESTING 0
+
+const char *vtkKWParameterValueFunctionEditor::FunctionTag = "function_tag";
+const char *vtkKWParameterValueFunctionEditor::SelectedTag = "selected_tag";
+const char *vtkKWParameterValueFunctionEditor::PointTag = "point_tag";
+const char *vtkKWParameterValueFunctionEditor::GuidelineTag = "point_guideline_tag";
+const char *vtkKWParameterValueFunctionEditor::LineTag = "line_tag";
+const char *vtkKWParameterValueFunctionEditor::TextTag = "text_tag";
+const char *vtkKWParameterValueFunctionEditor::HistogramTag = "histogram_tag";
+const char *vtkKWParameterValueFunctionEditor::FrameForegroundTag = "framefg_tag";
+const char *vtkKWParameterValueFunctionEditor::FrameBackgroundTag = "framebg_tag";
+const char *vtkKWParameterValueFunctionEditor::ParameterCursorTag = "cursor_tag";
+const char *vtkKWParameterValueFunctionEditor::ParameterTicksTag = "p_ticks_tag";
+const char *vtkKWParameterValueFunctionEditor::ValueTicksTag = "v_ticks_tag";
 
 //----------------------------------------------------------------------------
 vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
@@ -1805,27 +1818,27 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <ButtonPress-1> {" << this->GetTclName() 
            << " StartInteractionCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
@@ -1834,13 +1847,13 @@ void vtkKWParameterValueFunctionEditor::Bind()
     if (this->ParameterCursorInteractionStyle & 
         vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleDragWithLeftButton)
       {
-      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <ButtonPress-1> {" << this->GetTclName() 
              << " ParameterCursorStartInteractionCallback %%x}" << endl;
-      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <ButtonRelease-1> {" << this->GetTclName() 
              << " ParameterCursorEndInteractionCallback}" << endl;
-      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <B1-Motion> {" << this->GetTclName() 
              << " ParameterCursorMoveCallback %%x}" << endl;
       }
@@ -1945,31 +1958,31 @@ void vtkKWParameterValueFunctionEditor::UnBind()
     tk_cmd << "bind " << canv
            << " <ButtonPress-1> {}" << endl;
     
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
            << " <B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <Shift-B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
            << " <Shift-B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_POINT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <ButtonRelease-1> {}" << endl;
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
            << " <ButtonRelease-1> {}" << endl;
 
     // Paameter Cursor
 
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <ButtonPress-1> {}"  << endl;
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <ButtonRelease-1> {}" << endl;
-    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <B1-Motion> {}" << endl;
 
     tk_cmd << "bind " << canv 
@@ -2562,7 +2575,7 @@ void vtkKWParameterValueFunctionEditor::SetShowFunctionLine(int arg)
 
   if (!this->ShowFunctionLine)
     {
-    this->CanvasRemoveTag(VTK_KW_PVFE_LINE_TAG);
+    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::LineTag);
     }
 
   this->RedrawFunction();
@@ -2648,7 +2661,7 @@ void vtkKWParameterValueFunctionEditor::SetPointStyle(int arg)
   // coordinates of the items will be changed, and this will produce
   // unexpected results. 
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_POINT_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::PointTag);
 
   this->RedrawFunction();
 }
@@ -2679,7 +2692,7 @@ void vtkKWParameterValueFunctionEditor::SetFirstPointStyle(int arg)
   // coordinates of the items will be changed, and this will produce
   // unexpected results. 
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_POINT_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::PointTag);
 
   this->RedrawFunction();
 }
@@ -2710,7 +2723,7 @@ void vtkKWParameterValueFunctionEditor::SetLastPointStyle(int arg)
   // coordinates of the items will be changed, and this will produce
   // unexpected results. 
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_POINT_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::PointTag);
 
   this->RedrawFunction();
 }
@@ -2754,7 +2767,7 @@ void vtkKWParameterValueFunctionEditor::SetCanvasOutlineStyle(int arg)
   // Remove the outline now. This will force the style to be re-created
   // properly. 
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_FRAME_FG_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::FrameForegroundTag);
 
   this->RedrawRangeFrame();
 }
@@ -2969,10 +2982,10 @@ void vtkKWParameterValueFunctionEditor::SetNumberOfParameterTicks(int arg)
 
   this->Modified();
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_PARAMETER_TICKS_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag);
   if (this->ParameterTicksCanvas->IsCreated())
     {
-    this->CanvasRemoveTag(VTK_KW_PVFE_PARAMETER_TICKS_TAG, 
+    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag, 
                           this->ParameterTicksCanvas->GetWidgetName());
     }
 
@@ -3031,10 +3044,10 @@ void vtkKWParameterValueFunctionEditor::SetNumberOfValueTicks(int arg)
 
   this->Modified();
 
-  this->CanvasRemoveTag(VTK_KW_PVFE_VALUE_TICKS_TAG);
+  this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::ValueTicksTag);
   if (this->ValueTicksCanvas->IsCreated())
     {
-    this->CanvasRemoveTag(VTK_KW_PVFE_VALUE_TICKS_TAG, 
+    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::ValueTicksTag, 
                           this->ValueTicksCanvas->GetWidgetName());
     }
 
@@ -3416,7 +3429,7 @@ void vtkKWParameterValueFunctionEditor::SetShowPointGuideline(int arg)
 
   if (!this->ShowPointGuideline)
     {
-    this->CanvasRemoveTag(VTK_KW_PVFE_POINT_GUIDELINE_TAG);
+    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::GuidelineTag);
     }
 
   this->RedrawFunction();
@@ -4199,7 +4212,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
   // solid background. Then we can insert objects between those two
   // frames (histogram for example)
 
-  int has_tag = this->CanvasHasTag(VTK_KW_PVFE_FRAME_FG_TAG);
+  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameForegroundTag);
   if (!has_tag)
     {
     if (this->ShowCanvasOutline)
@@ -4208,48 +4221,48 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_l " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+               << "-tags {framefg_l " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_r " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+               << "-tags {framefg_r " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_t " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+               << "-tags {framefg_t " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_b " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+               << "-tags {framefg_b " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
         }
-      tk_cmd << canv << " lower " << VTK_KW_PVFE_FRAME_FG_TAG
-             << " {" << VTK_KW_PVFE_FUNCTION_TAG << "}" << endl;
+      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::FrameForegroundTag
+             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" << endl;
       }
     }
   else 
     {
     if (!this->ShowCanvasOutline)
       {
-      tk_cmd << canv << " delete " << VTK_KW_PVFE_FRAME_FG_TAG << endl;
+      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << endl;
       }
     }
 
   // The background
 
-  has_tag = this->CanvasHasTag(VTK_KW_PVFE_FRAME_BG_TAG);
+  has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameBackgroundTag);
   if (!has_tag)
     {
     if (this->ShowCanvasBackground)
       {
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << " -tags {" << VTK_KW_PVFE_FRAME_BG_TAG << "}" << endl;
-      tk_cmd << canv << " lower " << VTK_KW_PVFE_FRAME_BG_TAG 
+             << " -tags {" << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << "}" << endl;
+      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
              << " all" << endl;
       }
     }
@@ -4257,7 +4270,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
     {
     if (!this->ShowCanvasBackground)
       {
-      tk_cmd << canv << " delete " << VTK_KW_PVFE_FRAME_BG_TAG << endl;
+      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << endl;
       }
     }
 
@@ -4335,7 +4348,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
 
   if (this->ShowCanvasBackground)
     {
-    tk_cmd << canv << " coords " << VTK_KW_PVFE_FRAME_BG_TAG 
+    tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
            << " " << p_w_range[0] * factors[0]
            << " " << v_w_range[0] * factors[1]
            << " " << p_w_range[1] * factors[0]
@@ -4346,7 +4359,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
             (int)(this->FrameBackgroundColor[0] * 255.0),
             (int)(this->FrameBackgroundColor[1] * 255.0),
             (int)(this->FrameBackgroundColor[2] * 255.0));
-    tk_cmd << canv << " itemconfigure " << VTK_KW_PVFE_FRAME_BG_TAG 
+    tk_cmd << canv << " itemconfigure " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
            << " -outline " << color << " -fill " << color << endl;
     }
 
@@ -4384,7 +4397,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
 
   // Create the ticks if not created already
 
-  int has_p_tag = this->CanvasHasTag(VTK_KW_PVFE_PARAMETER_TICKS_TAG);
+  int has_p_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag);
   if (!has_p_tag)
     {
     if (this->ShowParameterTicks)
@@ -4393,14 +4406,14 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
         {
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {p_tick_t" << i << " " 
-               << VTK_KW_PVFE_PARAMETER_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {p_tick_b" << i << " " 
-               << VTK_KW_PVFE_PARAMETER_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
         tk_cmd << p_t_canv << " create text 0 0 -text {} -anchor n " 
                << "-font {{fixed} " << VTK_KW_PVFE_TICKS_TEXT_SIZE << "} "
                << "-tags {p_tick_b_t" << i << " " 
-               << VTK_KW_PVFE_PARAMETER_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
         }
       }
     }
@@ -4409,13 +4422,13 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     if (!this->ShowParameterTicks)
       {
       tk_cmd << canv << " delete " 
-             << VTK_KW_PVFE_PARAMETER_TICKS_TAG << endl;
+             << vtkKWParameterValueFunctionEditor::ParameterTicksTag << endl;
       tk_cmd << p_t_canv << " delete " 
-             << VTK_KW_PVFE_PARAMETER_TICKS_TAG << endl;
+             << vtkKWParameterValueFunctionEditor::ParameterTicksTag << endl;
       }
     }
 
-  int has_v_tag = this->CanvasHasTag(VTK_KW_PVFE_VALUE_TICKS_TAG);
+  int has_v_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ValueTicksTag);
   if (!has_v_tag)
     {
     if (this->ShowValueTicks)
@@ -4424,14 +4437,14 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
         {
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {v_tick_l" << i << " " 
-               << VTK_KW_PVFE_VALUE_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {v_tick_r" << i << " " 
-               << VTK_KW_PVFE_VALUE_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
         tk_cmd << v_t_canv << " create text 0 0 -text {} -anchor e " 
                << "-font {{fixed} " << VTK_KW_PVFE_TICKS_TEXT_SIZE << "} "
                << "-tags {v_tick_l_t" << i << " " 
-               << VTK_KW_PVFE_VALUE_TICKS_TAG << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
         }
       }
     }
@@ -4440,9 +4453,9 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     if (!this->ShowValueTicks)
       {
       tk_cmd << canv << " delete " 
-             << VTK_KW_PVFE_VALUE_TICKS_TAG << endl;
+             << vtkKWParameterValueFunctionEditor::ValueTicksTag << endl;
       tk_cmd << v_t_canv << " delete " 
-             << VTK_KW_PVFE_VALUE_TICKS_TAG << endl;
+             << vtkKWParameterValueFunctionEditor::ValueTicksTag << endl;
       }
     }
 
@@ -4567,22 +4580,22 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
 
   // Create the cursor if not created already
 
-  int has_tag = this->CanvasHasTag(VTK_KW_PVFE_PARAMETER_CURSOR_TAG);
+  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterCursorTag);
   if (!has_tag)
     {
     if (this->ShowParameterCursor)
       {
       tk_cmd << canv << " create line 0 0 0 0 "
-             << " -tags {" << VTK_KW_PVFE_PARAMETER_CURSOR_TAG << "}" << endl;
-      tk_cmd << canv << " lower " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
-             << " {" << VTK_KW_PVFE_FUNCTION_TAG << "}" << endl;
+             << " -tags {" << vtkKWParameterValueFunctionEditor::ParameterCursorTag << "}" << endl;
+      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" << endl;
       }
     }
   else 
     {
     if (!this->ShowParameterCursor)
       {
-      tk_cmd << canv << " delete " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG<< endl;
+      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::ParameterCursorTag<< endl;
       }
     }
 
@@ -4596,7 +4609,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
     double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
 
-    tk_cmd << canv << " coords " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+    tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " " << this->ParameterCursorPosition * factors[0]
            << " " << v_v_range[0] * factors[1]
            << " " << this->ParameterCursorPosition * factors[0]
@@ -4609,7 +4622,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
             (int)(this->ParameterCursorColor[1] * 255.0),
             (int)(this->ParameterCursorColor[2] * 255.0));
     
-    tk_cmd << canv << " itemconfigure " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+    tk_cmd << canv << " itemconfigure " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " -fill " << color << endl;
     }
 
@@ -4660,8 +4673,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
     {
     *tk_cmd << canv << " create text 0 0 -text {} " 
             << "-tags {t" << id 
-            << " " << VTK_KW_PVFE_TEXT_TAG
-            << " " << VTK_KW_PVFE_FUNCTION_TAG << "}\n";
+            << " " << vtkKWParameterValueFunctionEditor::TextTag
+            << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
     }
 
   // Get the style
@@ -4749,8 +4762,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         break;
       }
     *tk_cmd << " 0 0 0 0 -tags {p" << id 
-            << " " << VTK_KW_PVFE_POINT_TAG 
-            << " " << VTK_KW_PVFE_FUNCTION_TAG << "}\n";
+            << " " << vtkKWParameterValueFunctionEditor::PointTag 
+            << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
     *tk_cmd << canv << " lower p" << id << " t" << id << endl;
     }
 
@@ -4761,8 +4774,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
     if (!this->CanvasHasTag("g", &id))
       {
       *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 1 " 
-              << " -tags {g" << id << " " << VTK_KW_PVFE_POINT_GUIDELINE_TAG 
-              << " " << VTK_KW_PVFE_FUNCTION_TAG
+              << " -tags {g" << id << " " << vtkKWParameterValueFunctionEditor::GuidelineTag 
+              << " " << vtkKWParameterValueFunctionEditor::FunctionTag
               << "}" << endl;
       *tk_cmd << canv << " lower g" << id << " p" << id << endl;
       }
@@ -4778,8 +4791,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         {
         *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 2 " 
                 << " -tags {l" << id 
-                << " " << VTK_KW_PVFE_LINE_TAG
-                << " " << VTK_KW_PVFE_FUNCTION_TAG << "}\n";
+                << " " << vtkKWParameterValueFunctionEditor::LineTag
+                << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
         *tk_cmd << canv << " lower l" << id << " p" << id - 1 << endl;
         }
       }
@@ -4973,13 +4986,13 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
 
   if (!this->HasFunction() || !this->GetFunctionSize())
     {
-    this->CanvasRemoveTag(VTK_KW_PVFE_FUNCTION_TAG);
+    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::FunctionTag);
     return;
     }
 
   // Are we going to create or delete points ?
 
-  int c_nb_points = this->CanvasHasTag(VTK_KW_PVFE_POINT_TAG);
+  int c_nb_points = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
   int nb_points_changed = (c_nb_points != this->GetFunctionSize());
 
   // Try to save the selection before (eventually) creating new points
@@ -4989,7 +5002,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
     {
     int item_id = atoi(
       this->Script("lindex [%s find withtag %s] 0",
-                   canv, VTK_KW_PVFE_SELECTED_TAG));
+                   canv, vtkKWParameterValueFunctionEditor::SelectedTag));
     this->GetCanvasItemCenter(item_id, s_x, s_y);
     }
 
@@ -5005,7 +5018,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
 
   // Delete the extra points
 
-  c_nb_points = this->CanvasHasTag(VTK_KW_PVFE_POINT_TAG);
+  c_nb_points = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
   for (i = nb_points; i < c_nb_points; i++)
     {
     tk_cmd << canv << " delete p" << i << " l" << i << " t" << i << endl;
@@ -5071,9 +5084,9 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
   const char *canv = this->Canvas->GetWidgetName();
 
   ostrstream img_name;
-  img_name << canv << "." << VTK_KW_PVFE_HISTOGRAM_TAG << ends;
+  img_name << canv << "." << vtkKWParameterValueFunctionEditor::HistogramTag << ends;
 
-  int has_tag = this->CanvasHasTag(VTK_KW_PVFE_HISTOGRAM_TAG);
+  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag);
 
   // Create the image if not created already
 
@@ -5193,12 +5206,12 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
       {
       tk_cmd << canv << " create image 0 0 -anchor nw "
              << " -image " << img_name.str()
-             << " -tags {" << VTK_KW_PVFE_HISTOGRAM_TAG << "}"
+             << " -tags {" << vtkKWParameterValueFunctionEditor::HistogramTag << "}"
              << endl;
       if (this->ShowCanvasBackground)
         {
-        tk_cmd << canv << " raise " << VTK_KW_PVFE_HISTOGRAM_TAG 
-               << " " << VTK_KW_PVFE_FRAME_BG_TAG
+        tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::HistogramTag 
+               << " " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag
                << endl;
         }
       }
@@ -5210,7 +5223,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     double *v_v_range = this->GetVisibleValueRange();
     double c_y = factors[1] * (v_w_range[1] - v_v_range[1]);
 
-    tk_cmd << canv << " coords " << VTK_KW_PVFE_HISTOGRAM_TAG
+    tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::HistogramTag
            << " " << this->HistogramImageDescriptor->Range[0] * factors[0] 
            << " " << c_y << endl;
     }
@@ -5218,7 +5231,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     {
     if (has_tag)
       {
-      tk_cmd << canv << " delete " << VTK_KW_PVFE_HISTOGRAM_TAG << endl;
+      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::HistogramTag << endl;
       tk_cmd << "image delete " << img_name.str() << endl;
       }
     }
@@ -5261,11 +5274,11 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 
     ostrstream tk_cmd;
 
-    tk_cmd << canv << " addtag " << VTK_KW_PVFE_SELECTED_TAG 
+    tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
            << " withtag p" <<  this->SelectedPoint << endl;
-    tk_cmd << canv << " addtag " << VTK_KW_PVFE_SELECTED_TAG 
+    tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
            << " withtag t" <<  this->SelectedPoint << endl;
-    tk_cmd << canv << " raise " << VTK_KW_PVFE_SELECTED_TAG << " all" << endl;
+    tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::SelectedTag << " all" << endl;
 
     tk_cmd << ends;
     this->Script(tk_cmd.str());
@@ -5300,9 +5313,9 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
     ostrstream tk_cmd;
 
     tk_cmd << canv << " dtag p" <<  this->SelectedPoint
-           << " " << VTK_KW_PVFE_SELECTED_TAG << endl;
+           << " " << vtkKWParameterValueFunctionEditor::SelectedTag << endl;
     tk_cmd << canv << " dtag t" <<  this->SelectedPoint
-           << " " << VTK_KW_PVFE_SELECTED_TAG << endl;
+           << " " << vtkKWParameterValueFunctionEditor::SelectedTag << endl;
 
     tk_cmd << ends;
     this->Script(tk_cmd.str());

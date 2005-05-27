@@ -606,7 +606,6 @@ protected:
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
-  vtkKWMenu *PreferencesMenu;
 
   vtkPVInteractorStyle *CameraStyle2D;
   vtkPVInteractorStyle *CameraStyle3D;

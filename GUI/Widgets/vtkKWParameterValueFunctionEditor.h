@@ -27,19 +27,6 @@
 #include "vtkKWHistogram.h" // I need this one
 //ETX
 
-#define VTK_KW_PVFE_SELECTED_TAG             "selected_tag"
-#define VTK_KW_PVFE_POINT_TAG                "point_tag"
-#define VTK_KW_PVFE_POINT_GUIDELINE_TAG      "point_guideline_tag"
-#define VTK_KW_PVFE_LINE_TAG                 "line_tag"
-#define VTK_KW_PVFE_TEXT_TAG                 "text_tag"
-#define VTK_KW_PVFE_FUNCTION_TAG             "function_tag"
-#define VTK_KW_PVFE_HISTOGRAM_TAG            "histogram_tag"
-#define VTK_KW_PVFE_FRAME_FG_TAG             "framefg_tag"
-#define VTK_KW_PVFE_FRAME_BG_TAG             "framebg_tag"
-#define VTK_KW_PVFE_PARAMETER_CURSOR_TAG     "cursor_tag"
-#define VTK_KW_PVFE_PARAMETER_TICKS_TAG      "p_ticks_tag"
-#define VTK_KW_PVFE_VALUE_TICKS_TAG          "v_ticks_tag"
-
 class vtkCallbackCommand;
 class vtkKWCanvas;
 class vtkKWFrame;
@@ -873,6 +860,23 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Some constants
+  //BTX
+  static const char *FunctionTag;
+  static const char *SelectedTag;
+  static const char *PointTag;
+  static const char *GuidelineTag;
+  static const char *LineTag;
+  static const char *TextTag;
+  static const char *HistogramTag;
+  static const char *FrameForegroundTag;
+  static const char *FrameBackgroundTag;
+  static const char *ParameterCursorTag;
+  static const char *ParameterTicksTag;
+  static const char *ValueTicksTag;
+  //ETX
 
 protected:
   vtkKWParameterValueFunctionEditor();

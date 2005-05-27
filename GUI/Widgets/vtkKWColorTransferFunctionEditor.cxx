@@ -30,11 +30,13 @@
 #include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.26");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.27");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
 #define VTK_KW_CTFE_HSV_NO_WRAP_LABEL "HSVNoWrap"
+
+#define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
 #define VTK_KW_CTFE_NB_ENTRIES 3
 
@@ -1308,7 +1310,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
                << " -image " << image_name.c_str() 
                << " -tags {" << VTK_KW_CTFE_COLOR_RAMP_TAG << "}" << endl;
         tk_cmd << canv << " lower " << VTK_KW_CTFE_COLOR_RAMP_TAG
-               << " {" << VTK_KW_PVFE_FUNCTION_TAG << "}" << endl;
+               << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" << endl;
         }
       }
     else 

@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVPickCenterButton.png (zlib, base64)
  */
-#define image_PVPickCenterButton_width         32
-#define image_PVPickCenterButton_height        32
-#define image_PVPickCenterButton_pixel_size    3
-#define image_PVPickCenterButton_buffer_length 1232
+static const unsigned int  image_PVPickCenterButton_width         = 32;
+static const unsigned int  image_PVPickCenterButton_height        = 32;
+static const unsigned int  image_PVPickCenterButton_pixel_size    = 3;
+static const unsigned long image_PVPickCenterButton_buffer_length = 1232;
 
 static const unsigned char image_PVPickCenterButton[] = 
   "eNq1ltlPE1EUxseIT/hso0QMBWSTJZTSFjRI2MoyLF2gLZUWJEYk0MpSSqkPbGETkCWUpa"

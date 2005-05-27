@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVCutButton.png (zlib, base64)
  */
-#define image_PVCutButton_width         32
-#define image_PVCutButton_height        32
-#define image_PVCutButton_pixel_size    3
-#define image_PVCutButton_buffer_length 540
+static const unsigned int  image_PVCutButton_width         = 32;
+static const unsigned int  image_PVCutButton_height        = 32;
+static const unsigned int  image_PVCutButton_pixel_size    = 3;
+static const unsigned long image_PVCutButton_buffer_length = 540;
 
 static const unsigned char image_PVCutButton[] = 
   "eNrFljFOBDEMRbeiotlqLsEJKFnBFbbiBhQUK1ouQrUSd6GkmAPxtV/6smzHyRDQjqxRJh"

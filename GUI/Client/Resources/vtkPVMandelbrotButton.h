@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVMandelbrotButton.png (zlib, base64)
  */
-#define image_PVMandelbrotButton_width         32
-#define image_PVMandelbrotButton_height        32
-#define image_PVMandelbrotButton_pixel_size    3
-#define image_PVMandelbrotButton_buffer_length 1392
+static const unsigned int  image_PVMandelbrotButton_width         = 32;
+static const unsigned int  image_PVMandelbrotButton_height        = 32;
+static const unsigned int  image_PVMandelbrotButton_pixel_size    = 3;
+static const unsigned long image_PVMandelbrotButton_buffer_length = 1392;
 
 static const unsigned char image_PVMandelbrotButton[] = 
   "eNqllstvW0UUh9dNyYKWRStVwK4qEmx4LKBiiQRSgUIDpFEqCAgoilSgXSCgD0pJ6pgEHJ"

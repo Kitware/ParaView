@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVTranslateViewButton.png (zlib, base64)
  */
-#define image_PVTranslateViewButton_width         32
-#define image_PVTranslateViewButton_height        32
-#define image_PVTranslateViewButton_pixel_size    3
-#define image_PVTranslateViewButton_buffer_length 996
+static const unsigned int  image_PVTranslateViewButton_width         = 32;
+static const unsigned int  image_PVTranslateViewButton_height        = 32;
+static const unsigned int  image_PVTranslateViewButton_pixel_size    = 3;
+static const unsigned long image_PVTranslateViewButton_buffer_length = 996;
 
 static const unsigned char image_PVTranslateViewButton[] = 
   "eNq9ll1rE0EUhn9Grko/EkrbpKHN7lqCEBqaZIlJk00jkVKtUC8jKGgT0N55IX7ciRU0Yq"
@@ -28,10 +28,10 @@ static const unsigned char image_PVTranslateViewButton[] =
  * Resource generated for image:
  *    PVTranslateViewButtonActive.png (zlib, base64)
  */
-#define image_PVTranslateViewButtonActive_width         32
-#define image_PVTranslateViewButtonActive_height        32
-#define image_PVTranslateViewButtonActive_pixel_size    3
-#define image_PVTranslateViewButtonActive_buffer_length 980
+static const unsigned int  image_PVTranslateViewButtonActive_width         = 32;
+static const unsigned int  image_PVTranslateViewButtonActive_height        = 32;
+static const unsigned int  image_PVTranslateViewButtonActive_pixel_size    = 3;
+static const unsigned long image_PVTranslateViewButtonActive_buffer_length = 980;
 
 static const unsigned char image_PVTranslateViewButtonActive[] = 
   "eNq9ls9KI0EQxvs0l+nLzCXP4CEQCOpB2Ev+ES/xEJQQTUBvq+CCmwiamwdBvIkKGlHXTZ"

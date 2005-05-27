@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVSurfaceVectorsButton.png (zlib, base64)
  */
-#define image_PVSurfaceVectorsButton_width         32
-#define image_PVSurfaceVectorsButton_height        32
-#define image_PVSurfaceVectorsButton_pixel_size    3
-#define image_PVSurfaceVectorsButton_buffer_length 1128
+static const unsigned int  image_PVSurfaceVectorsButton_width         = 32;
+static const unsigned int  image_PVSurfaceVectorsButton_height        = 32;
+static const unsigned int  image_PVSurfaceVectorsButton_pixel_size    = 3;
+static const unsigned long image_PVSurfaceVectorsButton_buffer_length = 1128;
 
 static const unsigned char image_PVSurfaceVectorsButton[] = 
   "eNql1UtLW0EUB/D5Lv0ECt124Sbgpgp1kSCWkoKVGMFFogg1UfT6iDeEy01cKCKoiCtRJE"

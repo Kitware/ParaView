@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVIntegrateFlowButton.png (zlib, base64)
  */
-#define image_PVIntegrateFlowButton_width         32
-#define image_PVIntegrateFlowButton_height        32
-#define image_PVIntegrateFlowButton_pixel_size    3
-#define image_PVIntegrateFlowButton_buffer_length 1640
+static const unsigned int  image_PVIntegrateFlowButton_width         = 32;
+static const unsigned int  image_PVIntegrateFlowButton_height        = 32;
+static const unsigned int  image_PVIntegrateFlowButton_pixel_size    = 3;
+static const unsigned long image_PVIntegrateFlowButton_buffer_length = 1640;
 
 static const unsigned char image_PVIntegrateFlowButton[] = 
   "eNq1lulTWlcYxm/apMmkcQsFZJFVdq6SUGWRisQ9iogIGhXZkdVdo0mUpNqkJjFUcAGXKE"

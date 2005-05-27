@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVStreamTracerButton.png (zlib, base64)
  */
-#define image_PVStreamTracerButton_width         32
-#define image_PVStreamTracerButton_height        32
-#define image_PVStreamTracerButton_pixel_size    3
-#define image_PVStreamTracerButton_buffer_length 1168
+static const unsigned int  image_PVStreamTracerButton_width         = 32;
+static const unsigned int  image_PVStreamTracerButton_height        = 32;
+static const unsigned int  image_PVStreamTracerButton_pixel_size    = 3;
+static const unsigned long image_PVStreamTracerButton_buffer_length = 1168;
 
 static const unsigned char image_PVStreamTracerButton[] = 
   "eNq1ls9TUlEUx4+u27SyVf9B0zTTezXW2CXxR9MPTU2yqRSV4IIpIIKSwEPkKQHyI9PRtI"

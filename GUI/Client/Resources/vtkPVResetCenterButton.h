@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVResetCenterButton.png (zlib, base64)
  */
-#define image_PVResetCenterButton_width         32
-#define image_PVResetCenterButton_height        32
-#define image_PVResetCenterButton_pixel_size    3
-#define image_PVResetCenterButton_buffer_length 1216
+static const unsigned int  image_PVResetCenterButton_width         = 32;
+static const unsigned int  image_PVResetCenterButton_height        = 32;
+static const unsigned int  image_PVResetCenterButton_pixel_size    = 3;
+static const unsigned long image_PVResetCenterButton_buffer_length = 1216;
 
 static const unsigned char image_PVResetCenterButton[] = 
   "eNq1lslPU1EUxq8xrjDBlV0YMSLIPKSldECDpAwFfIgdoC2VFmVTCbQylLbUGKZAQSAMoQ"

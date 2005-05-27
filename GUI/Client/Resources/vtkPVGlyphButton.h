@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVGlyphButton.png (zlib, base64)
  */
-#define image_PVGlyphButton_width         32
-#define image_PVGlyphButton_height        32
-#define image_PVGlyphButton_pixel_size    3
-#define image_PVGlyphButton_buffer_length 440
+static const unsigned int  image_PVGlyphButton_width         = 32;
+static const unsigned int  image_PVGlyphButton_height        = 32;
+static const unsigned int  image_PVGlyphButton_pixel_size    = 3;
+static const unsigned long image_PVGlyphButton_buffer_length = 440;
 
 static const unsigned char image_PVGlyphButton[] = 
   "eNrtVrsKwkAQtEqVJlVaOxEkhZWCjUjEH7CKlZ1WImJn7U8IgmDnh1ha5IOcMLBEvdwjnq"

@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVLogoSmall.png (zlib, base64)
  */
-#define image_PVLogoSmall_width         95
-#define image_PVLogoSmall_height        16
-#define image_PVLogoSmall_pixel_size    3
-#define image_PVLogoSmall_buffer_length 1304
+static const unsigned int  image_PVLogoSmall_width         = 95;
+static const unsigned int  image_PVLogoSmall_height        = 16;
+static const unsigned int  image_PVLogoSmall_pixel_size    = 3;
+static const unsigned long image_PVLogoSmall_buffer_length = 1304;
 
 static const unsigned char image_PVLogoSmall[] = 
   "eNrtV0FLVFEUvm2jzQj9ARct2oli7cyYWkU7cVkM4SIIoRZDRdYmMtFFbkRbaGlpRlIEQQ"

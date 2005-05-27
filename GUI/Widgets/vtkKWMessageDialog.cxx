@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.71");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.72");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -581,7 +581,7 @@ int vtkKWMessageDialog::RestoreMessageDialogResponseFromRegistry(
   vtkKWApplication *app,
   const char* dialogname)
 {
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   int retval = 0;
   if (app && dialogname && 
       app->GetRegistryValue(3, "Dialogs", dialogname, buffer))

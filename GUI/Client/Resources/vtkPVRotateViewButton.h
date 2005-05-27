@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVRotateViewButton.png (zlib, base64)
  */
-#define image_PVRotateViewButton_width         32
-#define image_PVRotateViewButton_height        32
-#define image_PVRotateViewButton_pixel_size    3
-#define image_PVRotateViewButton_buffer_length 1004
+static const unsigned int  image_PVRotateViewButton_width         = 32;
+static const unsigned int  image_PVRotateViewButton_height        = 32;
+static const unsigned int  image_PVRotateViewButton_pixel_size    = 3;
+static const unsigned long image_PVRotateViewButton_buffer_length = 1004;
 
 static const unsigned char image_PVRotateViewButton[] = 
   "eNq1lm1v0lAUxz8G75YOki0bK0gpW2c26C4PpTy08GKGCWoiyaJLFnXDDZyowS1hSuZzfC"
@@ -28,10 +28,10 @@ static const unsigned char image_PVRotateViewButton[] =
  * Resource generated for image:
  *    PVRotateViewButtonActive.png (zlib, base64)
  */
-#define image_PVRotateViewButtonActive_width         32
-#define image_PVRotateViewButtonActive_height        32
-#define image_PVRotateViewButtonActive_pixel_size    3
-#define image_PVRotateViewButtonActive_buffer_length 976
+static const unsigned int  image_PVRotateViewButtonActive_width         = 32;
+static const unsigned int  image_PVRotateViewButtonActive_height        = 32;
+static const unsigned int  image_PVRotateViewButtonActive_pixel_size    = 3;
+static const unsigned long image_PVRotateViewButtonActive_buffer_length = 976;
 
 static const unsigned char image_PVRotateViewButtonActive[] = 
   "eNq1ls9L40AUx99pLplLeul/UdSgFXvcbmoFFT2pqBEF0Uq7wrYNWlBQVPBU8SdaUeu2B/"

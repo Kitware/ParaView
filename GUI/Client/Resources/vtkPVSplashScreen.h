@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVSplashScreen.png (zlib, base64)
  */
-#define image_PVSplashScreen_width         481
-#define image_PVSplashScreen_height        360
-#define image_PVSplashScreen_pixel_size    4
-#define image_PVSplashScreen_buffer_length 182272
+static const unsigned int  image_PVSplashScreen_width         = 481;
+static const unsigned int  image_PVSplashScreen_height        = 360;
+static const unsigned int  image_PVSplashScreen_pixel_size    = 4;
+static const unsigned long image_PVSplashScreen_buffer_length = 182272;
 
 static const unsigned char image_PVSplashScreen_section_1[] = 
   "eNrsvQeYJVd1LqqentFEaSSBiMaAARMkwDYYbJxxvPfih8lgg+2LMWAwDy7YYBRQQAgECI"
@@ -2625,5 +2625,5 @@ static const unsigned char *image_PVSplashScreen_sections[3] = {
   image_PVSplashScreen_section_3
 };
 
-#define image_PVSplashScreen_nb_sections    3
+static const unsigned int image_PVSplashScreen_nb_sections   = 3;
 

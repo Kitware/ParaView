@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVCalculatorButton.png (zlib, base64)
  */
-#define image_PVCalculatorButton_width         32
-#define image_PVCalculatorButton_height        32
-#define image_PVCalculatorButton_pixel_size    4
-#define image_PVCalculatorButton_buffer_length 3692
+static const unsigned int  image_PVCalculatorButton_width         = 32;
+static const unsigned int  image_PVCalculatorButton_height        = 32;
+static const unsigned int  image_PVCalculatorButton_pixel_size    = 4;
+static const unsigned long image_PVCalculatorButton_buffer_length = 3692;
 
 static const unsigned char image_PVCalculatorButton[] = 
   "eNqdVwtYzmcbf3rr1flM57zlFW8pHRRTRKMaNoca5RSlRCWHKMo5Q2oVTdIVciEMyyy0RH"

@@ -24,8 +24,6 @@
 
 #include "vtkKWParameterValueFunctionEditor.h"
 
-#define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
-
 class vtkColorTransferFunction;
 class vtkKWEntryLabeled;
 class vtkKWOptionMenu;

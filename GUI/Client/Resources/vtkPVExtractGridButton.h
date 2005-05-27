@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVExtractGridButton.png (zlib, base64)
  */
-#define image_PVExtractGridButton_width         32
-#define image_PVExtractGridButton_height        32
-#define image_PVExtractGridButton_pixel_size    3
-#define image_PVExtractGridButton_buffer_length 796
+static const unsigned int  image_PVExtractGridButton_width         = 32;
+static const unsigned int  image_PVExtractGridButton_height        = 32;
+static const unsigned int  image_PVExtractGridButton_pixel_size    = 3;
+static const unsigned long image_PVExtractGridButton_buffer_length = 796;
 
 static const unsigned char image_PVExtractGridButton[] = 
   "eNqtlj9LA0EQxVOlSpPqeiHNIaSR2IQDFcUuphDRysBVQUFQxEYULMTWwkJSCdZWgh/B0i"

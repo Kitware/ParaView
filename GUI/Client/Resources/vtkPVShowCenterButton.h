@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVShowCenterButton.png (zlib, base64)
  */
-#define image_PVShowCenterButton_width         32
-#define image_PVShowCenterButton_height        32
-#define image_PVShowCenterButton_pixel_size    3
-#define image_PVShowCenterButton_buffer_length 1060
+static const unsigned int  image_PVShowCenterButton_width         = 32;
+static const unsigned int  image_PVShowCenterButton_height        = 32;
+static const unsigned int  image_PVShowCenterButton_pixel_size    = 3;
+static const unsigned long image_PVShowCenterButton_buffer_length = 1060;
 
 static const unsigned char image_PVShowCenterButton[] = 
   "eNq1Vl1PE0EUHWP8DX0wMRFBIMhHWkpb0CCplAVcxN0ttKVSUF6QSBuQpV3qAwiBQoDwEc"

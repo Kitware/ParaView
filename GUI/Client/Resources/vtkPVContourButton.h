@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVContourButton.png (zlib, base64)
  */
-#define image_PVContourButton_width         32
-#define image_PVContourButton_height        32
-#define image_PVContourButton_pixel_size    3
-#define image_PVContourButton_buffer_length 2364
+static const unsigned int  image_PVContourButton_width         = 32;
+static const unsigned int  image_PVContourButton_height        = 32;
+static const unsigned int  image_PVContourButton_pixel_size    = 3;
+static const unsigned long image_PVContourButton_buffer_length = 2364;
 
 static const unsigned char image_PVContourButton[] = 
   "eNqtVnlUVHUU7t95+E/n1zGt92yxvs4pAVGgXBinOp2yVQcDUTNFjEUwQBm2YQYVTVwGEo"

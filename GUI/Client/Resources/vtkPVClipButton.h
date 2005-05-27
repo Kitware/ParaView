@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVClipButton.png (zlib, base64)
  */
-#define image_PVClipButton_width         32
-#define image_PVClipButton_height        32
-#define image_PVClipButton_pixel_size    3
-#define image_PVClipButton_buffer_length 604
+static const unsigned int  image_PVClipButton_width         = 32;
+static const unsigned int  image_PVClipButton_height        = 32;
+static const unsigned int  image_PVClipButton_pixel_size    = 3;
+static const unsigned long image_PVClipButton_buffer_length = 604;
 
 static const unsigned char image_PVClipButton[] = 
   "eNrFlj9LA0EQxa+66ppU1ws2cpBGEIKNEUM67awE7VNYiNjli1gd+F0sLe4D+eILwzA7+y"

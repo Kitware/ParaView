@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVEditCenterButtonOpen.png (zlib, base64)
  */
-#define image_PVEditCenterButtonOpen_width         32
-#define image_PVEditCenterButtonOpen_height        32
-#define image_PVEditCenterButtonOpen_pixel_size    3
-#define image_PVEditCenterButtonOpen_buffer_length 1092
+static const unsigned int  image_PVEditCenterButtonOpen_width         = 32;
+static const unsigned int  image_PVEditCenterButtonOpen_height        = 32;
+static const unsigned int  image_PVEditCenterButtonOpen_pixel_size    = 3;
+static const unsigned long image_PVEditCenterButtonOpen_buffer_length = 1092;
 
 static const unsigned char image_PVEditCenterButtonOpen[] = 
   "eNq1lt1OGlEQxzdp+gxcNGlSW6vGqo1IAW1jGxC36LYpy1ZAKjRNSKipEFq+VnqhrVFs1P"

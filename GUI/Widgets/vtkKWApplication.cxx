@@ -62,7 +62,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.206");
+vtkCxxRevisionMacro(vtkKWApplication, "1.207");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -93,10 +93,28 @@ vtkKWApplication::vtkKWApplication()
 
   this->MajorVersion = 1;
   this->MinorVersion = 0;
-  this->Name = 
-    kwsys::SystemTools::DuplicateString("Sample Application");
-  this->VersionName = 
-    kwsys::SystemTools::DuplicateString("SampleApplication10");
+
+  const char *nameofexec = Tcl_GetNameOfExecutable();
+  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+    {
+    kwsys_stl::string filename = 
+      kwsys::SystemTools::GetFilenameName(nameofexec);
+    kwsys_stl::string filenamewe = 
+      kwsys::SystemTools::GetFilenameWithoutExtension(filename);
+    this->Name = 
+      kwsys::SystemTools::DuplicateString(filenamewe.c_str());
+    filenamewe += "10";
+    this->VersionName = 
+      kwsys::SystemTools::DuplicateString(filenamewe.c_str());
+    }
+  else
+    {
+    this->Name = 
+      kwsys::SystemTools::DuplicateString("Sample Application");
+    this->VersionName = 
+      kwsys::SystemTools::DuplicateString("SampleApplication10");
+    }
+
   this->ReleaseName = 
     kwsys::SystemTools::DuplicateString("unknown");
   this->PrettyName = NULL;
@@ -947,8 +965,8 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[REG_KEY_NAME_SIZE_MAX];
-  char value[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
+  char value[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
   sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
   va_list var_args;
   va_start(var_args, format);
@@ -970,8 +988,8 @@ int vtkKWApplication::GetRegistryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buff[REG_KEY_VALUE_SIZE_MAX];
-  char buffer[REG_KEY_NAME_SIZE_MAX];
+  char buff[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
+  char buffer[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
   sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
 
   vtkKWRegistryHelper *reg = this->GetRegistryHelper();
@@ -994,7 +1012,7 @@ int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[REG_KEY_NAME_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
   sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
   vtkKWRegistryHelper *reg = this->GetRegistryHelper();
   reg->SetTopLevel(this->GetName());
@@ -1006,7 +1024,7 @@ int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey,
 int vtkKWApplication::HasRegistryValue(int level, const char* subkey, 
                                        const char* key)
 {
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   return this->GetRegistryValue(level, subkey, key, buffer);
 }
 
@@ -1019,7 +1037,7 @@ float vtkKWApplication::GetFloatRegistryValue(int level, const char* subkey,
     return 0;
     }
   float res = 0;
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   if (this->GetRegistryValue(level, subkey, key, buffer))
     {
     res = atof(buffer);
@@ -1036,7 +1054,7 @@ int vtkKWApplication::GetIntRegistryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   if (this->GetRegistryValue(level, subkey, key, buffer))
     {
     res = atoi(buffer);
@@ -1052,7 +1070,7 @@ int vtkKWApplication::GetBooleanRegistryValue(
     {
     return 0;
     }
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  char buffer[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   int allset = 0;
   if (this->GetRegistryValue(level, subkey, key, buffer))
     {
@@ -1532,11 +1550,11 @@ void vtkKWApplication::FindInstallationDirectory()
     }
   else
     {
-    char setup_key[REG_KEY_NAME_SIZE_MAX];
+    char setup_key[vtkKWRegistryHelper::RegistryKeyNameSizeMax];
     sprintf(setup_key, "%s\\Setup", this->GetVersionName());
     vtkKWRegistryHelper *reg = this->GetRegistryHelper();
     reg->SetTopLevel(this->GetName());
-    char installed_path[REG_KEY_VALUE_SIZE_MAX];
+    char installed_path[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
       kwsys_stl::string directory(installed_path);

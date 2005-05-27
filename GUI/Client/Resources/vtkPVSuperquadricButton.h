@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVSuperquadricButton.png (zlib, base64)
  */
-#define image_PVSuperquadricButton_width         32
-#define image_PVSuperquadricButton_height        32
-#define image_PVSuperquadricButton_pixel_size    3
-#define image_PVSuperquadricButton_buffer_length 1656
+static const unsigned int  image_PVSuperquadricButton_width         = 32;
+static const unsigned int  image_PVSuperquadricButton_height        = 32;
+static const unsigned int  image_PVSuperquadricButton_pixel_size    = 3;
+static const unsigned long image_PVSuperquadricButton_buffer_length = 1656;
 
 static const unsigned char image_PVSuperquadricButton[] = 
   "eNrtltlTmmcUxq+SxsmYurDvsijgFmO0YEzVRBRBRRQXFndQBJVFFJSoiOBWl7jHDa111I"

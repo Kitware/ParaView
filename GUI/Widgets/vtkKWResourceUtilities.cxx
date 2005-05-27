@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.5");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.6");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -481,14 +481,17 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     const char *pixel_byte_type = "const unsigned char";
 
     out 
-      << "#define image_" << image_name.c_str() << "_width         " 
-      << width << endl
-      << "#define image_" << image_name.c_str() << "_height        " 
-      << height << endl
-      << "#define image_" << image_name.c_str() << "_pixel_size    " 
-      << pixel_size << endl
-      << "#define image_" << image_name.c_str() << "_buffer_length " 
-      << nb_of_bytes << endl
+      << "static const unsigned int  image_" << image_name.c_str() 
+      << "_width         = " << width <<  ";" << endl
+      << "static const unsigned int  image_" << image_name.c_str() 
+      << "_height        = " 
+      << height << ";" << endl
+      << "static const unsigned int  image_" << image_name.c_str() 
+      << "_pixel_size    = " 
+      << pixel_size << ";" << endl
+      << "static const unsigned long image_" << image_name.c_str() 
+      << "_buffer_length = " 
+      << nb_of_bytes << ";" << endl
       << endl
       << "static " << pixel_byte_type << " image_" << image_name.c_str();
     if (nb_of_bytes >= max_bytes)
@@ -566,8 +569,8 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
         }
       out << "};" << endl
           << endl
-          << "#define image_" << image_name.c_str() << "_nb_sections    " 
-          << section_idx << endl;
+          << "static const unsigned int image_" << image_name.c_str() 
+          << "_nb_sections   = " << section_idx << ";" << endl;
       }
 
     out << endl;

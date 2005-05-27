@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVVectorDisplacementButton.png (zlib, base64)
  */
-#define image_PVVectorDisplacementButton_width         32
-#define image_PVVectorDisplacementButton_height        32
-#define image_PVVectorDisplacementButton_pixel_size    3
-#define image_PVVectorDisplacementButton_buffer_length 1104
+static const unsigned int  image_PVVectorDisplacementButton_width         = 32;
+static const unsigned int  image_PVVectorDisplacementButton_height        = 32;
+static const unsigned int  image_PVVectorDisplacementButton_pixel_size    = 3;
+static const unsigned long image_PVVectorDisplacementButton_buffer_length = 1104;
 
 static const unsigned char image_PVVectorDisplacementButton[] = 
   "eNqllttOE1EUhh9DQENa40xPUxPBgES9UGxNjCXxhkQgJoCGEi/U0BaxrUApgj6AiaG2Ug"

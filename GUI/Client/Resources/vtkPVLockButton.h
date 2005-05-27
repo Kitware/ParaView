@@ -2,10 +2,10 @@
  * Resource generated for image:
  *    PVUnlockedButton.png (zlib, base64)
  */
-#define image_PVUnlockedButton_width         15
-#define image_PVUnlockedButton_height        15
-#define image_PVUnlockedButton_pixel_size    3
-#define image_PVUnlockedButton_buffer_length 260
+static const unsigned int  image_PVUnlockedButton_width         = 15;
+static const unsigned int  image_PVUnlockedButton_height        = 15;
+static const unsigned int  image_PVUnlockedButton_pixel_size    = 3;
+static const unsigned long image_PVUnlockedButton_buffer_length = 260;
 
 static const unsigned char image_PVUnlockedButton[] = 
   "eNrbvx8F9M+cm1DXEVbZltbYNX/p8v04wO7de0JKGvSLuw3L+w2Ku40qJujmtuQ0dWJVnF"
@@ -17,10 +17,10 @@ static const unsigned char image_PVUnlockedButton[] =
  * Resource generated for image:
  *    PVLockedButton.png (zlib, base64)
  */
-#define image_PVLockedButton_width         15
-#define image_PVLockedButton_height        15
-#define image_PVLockedButton_pixel_size    3
-#define image_PVLockedButton_buffer_length 268
+static const unsigned int  image_PVLockedButton_width         = 15;
+static const unsigned int  image_PVLockedButton_height        = 15;
+static const unsigned int  image_PVLockedButton_pixel_size    = 3;
+static const unsigned long image_PVLockedButton_buffer_length = 268;
 
 static const unsigned char image_PVLockedButton[] = 
   "eNrbv59OYN3GTbW9k/NaulsnTd+2fQcelYVtvXpZ9UYVE4DIsLzfKKO6d+Y8rCoruybqF3"

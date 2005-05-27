@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.713");
+vtkCxxRevisionMacro(vtkPVWindow, "1.714");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -179,7 +179,6 @@ vtkPVWindow::vtkPVWindow()
   this->FilterMenu = vtkKWMenu::New();
   this->SelectMenu = vtkKWMenu::New();
   this->GlyphMenu = vtkKWMenu::New();
-  this->PreferencesMenu = 0;
   
   // This toolbar contains buttons for modifying user interaction
   // mode
@@ -665,12 +664,6 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu = NULL;
     }
 
-  if (this->PreferencesMenu)
-    {
-    this->PreferencesMenu->Delete();
-    this->PreferencesMenu=NULL;
-    }
-
   if (this->LowerToolbars)
     {
     this->LowerToolbars->Delete();
@@ -705,6 +698,8 @@ void vtkPVWindow::PrepareForDelete()
 void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 {
   // Add view options.
+
+  vtkKWMenu *menu = NULL;
 
   // View menu: Show the application settings
 
@@ -759,73 +754,64 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // We do not need Close in the file menu since we don't
   // support multiple windows (exit is enough)
 
-  this->FileMenu->DeleteMenuItem("Close");
+  menu = this->GetFileMenu();
+
+  menu->DeleteMenuItem(vtkKWWindowBase::FileCloseMenuLabel);
 
   int clidx = this->GetFileMenuInsertPosition();
 
   // Open a data file. Can support multiple file formats (see Open()).
 
-  this->FileMenu->InsertCommand(
+  menu->InsertCommand(
     clidx++, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
 
   // Save current data in VTK format.
 
-  this->FileMenu->InsertCommand(
+  menu->InsertCommand(
     clidx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
-  this->FileMenu->InsertSeparator(clidx++);
+  menu->InsertSeparator(clidx++);
 
   // Add advanced file options
 
-  this->FileMenu->InsertCommand(clidx++, "Load Session", this, 
-                                "LoadScript", 0,
-                                "Restore a trace of actions.");
-  this->FileMenu->InsertCommand(clidx++, "Save Session State", this,
-                                "SaveState", 7,
-                                "Write the current state of ParaView "
-                                "in a file.");
-  this->FileMenu->InsertCommand(clidx++,
-                                "Save Session Trace", this, 
-                                "SaveTrace", 3,
-                                "Save a trace of every action "
-                                "since start up.");
-  this->FileMenu->InsertCommand(clidx++, "Save Batch Script", this,
-                                "SaveBatchScript", 7,
-                                "Write a script which can run "
-                                "in batch by ParaView");
-  this->FileMenu->InsertCommand(clidx++, "Save SM State", this,
-                                "SaveSMState", 6,
-                                "Server the server manager state "
-                                "as xml.");
-  this->FileMenu->InsertCommand(clidx++,
-                                "Import Package", this, 
-                                "OpenPackage", 3,
-                                "Import modules defined in a ParaView package ");
+  menu->InsertCommand(
+    clidx++, "Load Session", 
+    this, "LoadScript", 0, "Restore a trace of actions.");
+  menu->InsertCommand(
+    clidx++, "Save Session State", 
+    this, "SaveState", 7,"Write the current state of ParaView in a file.");
+  menu->InsertCommand(
+    clidx++, "Save Session Trace", 
+    this, "SaveTrace", 3, "Save a trace of every action since start up.");
+  menu->InsertCommand(
+    clidx++, "Save Batch Script", 
+    this, "SaveBatchScript", 7, 
+    "Write a script which can run in batch by ParaView");
+  menu->InsertCommand(
+    clidx++, "Save SM State", 
+    this, "SaveSMState", 6, "Server the server manager state as xml.");
+  menu->InsertCommand(
+    clidx++, "Import Package", 
+    this,  "OpenPackage", 3, "Import modules defined in a ParaView package ");
   
-  this->PreferencesMenu = vtkKWMenu::New();
-  this->PreferencesMenu->SetParent(this->FileMenu);
-  this->PreferencesMenu->SetTearOff(0);
-  this->PreferencesMenu->Create(this->GetApplication(), "");  
+  menu->InsertSeparator(clidx++);
 
-  //this->FileMenu->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
-  this->FileMenu->InsertSeparator(clidx++);
-
-  this->FileMenu->InsertCommand(clidx++, "Save Animation", this,
+  menu->InsertCommand(clidx++, "Save Animation", this,
     "SaveAnimation", 5, "Save animation as a movie or images.");
   
-  this->FileMenu->InsertCommand(clidx++, "Save Geometry", this,
+  menu->InsertCommand(clidx++, "Save Geometry", this,
     "SaveGeometry", 5, "Save geometry from each frame. This will create "
     "a series of .vtp files.");
   
-  this->FileMenu->InsertSeparator(clidx++);
+  menu->InsertSeparator(clidx++);
   
   this->InsertRecentFilesMenu(clidx++, this);
   
-  this->FileMenu->InsertSeparator(clidx++);
+  menu->InsertSeparator(clidx++);
 
   /*
   // Open XML package
-  this->FileMenu->InsertCommand(clidx++, "Open Package", this, 
+  menu->InsertCommand(clidx++, "Open Package", this, 
                                 "OpenPackage", 8,
                                 "Open a ParaView package and load the "
                                 "contents");
@@ -888,8 +874,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     4, "Lookmark Manager", this, 
     "DisplayLookmarkManager", "Create and Manage Your Lookmarks");
 #endif
-
-  // Preferences sub-menu
 
   // Edit menu
 
@@ -1383,7 +1367,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
-  this->FileMenu->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
+  this->GetFileMenu()->SetState(
+    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
 
   if (app->GetSaveUserInterfaceGeometry())
     {
@@ -1502,6 +1487,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->UpdateSourceMenu();
 
   // Update preferences
+
   if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
@@ -1994,8 +1980,9 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
                 this->MainView->GetWidgetName());  
 
   int menu_idx = this->GetHelpMenuInsertPosition();
-  this->HelpMenu->InsertSeparator(menu_idx++);
-  this->HelpMenu->InsertCommand(
+
+  this->GetHelpMenu()->InsertSeparator(menu_idx++);
+  this->GetHelpMenu()->InsertCommand(
     menu_idx, "Play Demo", this, "PlayDemo", 0);
 }
 
@@ -4413,7 +4400,8 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     {
     this->ReaderList->AppendItem(prototype);
     }
-  this->FileMenu->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
+  this->GetFileMenu()->SetState(
+    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
 }
 
 //-----------------------------------------------------------------------------
@@ -4864,7 +4852,6 @@ void vtkPVWindow::UpdateMenuState()
   this->PropagateEnableState(this->FilterMenu);
   this->PropagateEnableState(this->SelectMenu);
   this->PropagateEnableState(this->GlyphMenu);
-  this->PropagateEnableState(this->PreferencesMenu);
 
   int menu_state = 
     (this->GetEnabled() ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
@@ -4893,9 +4880,10 @@ void vtkPVWindow::UpdateMenuState()
 
   if (!source_grabbed)
     {
-    this->GetMenu()->SetState("View",  menu_state);
-    this->GetMenu()->SetState("Window",  menu_state);
-    this->GetMenu()->SetState("Help",  menu_state);
+    this->GetMenu()->SetState(vtkKWWindowBase::ViewMenuLabel,  menu_state);
+    this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
+    this->GetMenu()->SetState(
+      vtkKWWindowBase::HelpMenuLabel,  menu_state);
     }
 
   // Disable or enable the select menu. Checks if there are any valid
@@ -4913,6 +4901,7 @@ void vtkPVWindow::UpdateMenuState()
   this->GetMenu()->SetState(
     VTK_PV_SELECT_SOURCE_MENU_LABEL, 
     no_sources || source_grabbed ? vtkKWMenu::Disabled : menu_state);
+
   if (this->ViewMenu)
     {
     this->ViewMenu->SetState(
