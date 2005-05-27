@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25.2.1");
 
 struct vtkSMSourceProxyInternals
 {
@@ -55,6 +55,18 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 //---------------------------------------------------------------------------
 vtkSMSourceProxy::~vtkSMSourceProxy()
 {
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i<this->GetNumberOfIDs(); i++)
+    {
+    vtkClientServerID sourceID = this->GetID(i);
+    stream << vtkClientServerStream::Invoke << sourceID
+           << "SetExecutive" << 0 <<  vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
+    }
+
   delete this->PInternals;
 
   this->DataInformation->Delete();
@@ -157,6 +169,7 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
     vtkClientServerID sourceID = this->GetID(i);
     stream << vtkClientServerStream::Invoke << sourceID
            << "SetExecutive" << execId <<  vtkClientServerStream::End;
+    pm->DeleteStreamObject(execId, stream);
     }
 
 

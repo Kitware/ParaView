@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.1");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.2");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -174,6 +174,8 @@ vtkSMPartDisplay::vtkSMPartDisplay()
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::~vtkSMPartDisplay()
 {
+  this->CleanUpVTKObjects();
+
   this->GeometryInformation->Delete();
 
   this->PropVisibilityProperty->Delete();
@@ -618,6 +620,37 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     }
 }
   
+//----------------------------------------------------------------------------
+void vtkSMPartDisplay::CleanUpVTKObjects()
+{
+  int num = this->GeometryProxy->GetNumberOfIDs();
+  int i;
+  vtkClientServerStream stream;
+  for (i = 0; i < num; i++)
+    {
+    vtkClientServerID id = this->GeometryProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->UpdateSuppressorProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->MapperProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->VolumeTetraFilterProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->VolumeMapperProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    }
+
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
 {

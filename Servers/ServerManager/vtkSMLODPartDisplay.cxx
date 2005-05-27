@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13.2.1");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,7 @@ vtkSMLODPartDisplay::vtkSMLODPartDisplay()
 //----------------------------------------------------------------------------
 vtkSMLODPartDisplay::~vtkSMLODPartDisplay()
 {
+  this->CleanUpVTKObjects();
   if(this->LODMapperProxy)
     {
     this->LODMapperProxy->Delete();
@@ -330,6 +331,34 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
       << vtkClientServerStream::Invoke << this->LODDeciProxy->GetID(i) << "SetInput" 
       << vtkClientServerStream::LastResult << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLODPartDisplay::CleanUpVTKObjects()
+{
+  int num = this->LODDeciProxy->GetNumberOfIDs();
+  int i;
+  vtkClientServerStream stream;
+  for (i = 0; i < num; i++)
+    {
+    vtkClientServerID id = this->LODDeciProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->LODUpdateSuppressorProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->LODMapperProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    id = this->LODVolumeMapperProxy->GetID(i);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    }
+
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
     }
 }
 

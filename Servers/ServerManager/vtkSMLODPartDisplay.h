@@ -104,6 +104,7 @@ protected:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exeist on all processes.
   virtual void CreateVTKObjects(int num);
+  void CleanUpVTKObjects();
 
   vtkPVLODPartDisplayInformation* LODInformation;
   int LODInformationIsValid;

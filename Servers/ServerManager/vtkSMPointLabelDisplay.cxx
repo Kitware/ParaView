@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5.2.1");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,8 @@ vtkSMPointLabelDisplay::~vtkSMPointLabelDisplay()
 {
   // This will remove the actor from the renderer.
   this->SetProcessModule(0);
+
+  this->CleanUpVTKObjects();
 
   this->UpdateSuppressorProxy->Delete();
   this->UpdateSuppressorProxy = 0;
@@ -211,6 +213,21 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMPointLabelDisplay::CleanUpVTKObjects()
+{
+  vtkClientServerStream stream;
+  vtkClientServerID id = this->UpdateSuppressorProxy->GetID(0);
+  stream << vtkClientServerStream::Invoke << id
+         << "SetExecutive" << 0 << vtkClientServerStream::End;
+  id = this->DuplicateProxy->GetID(0);
+  stream << vtkClientServerStream::Invoke << id
+         << "SetExecutive" << 0 << vtkClientServerStream::End;
+  id = this->PointLabelMapperProxy->GetID(0);
+  stream << vtkClientServerStream::Invoke << id
+         << "SetExecutive" << 0 << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
+}
 
 //----------------------------------------------------------------------------
 void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)

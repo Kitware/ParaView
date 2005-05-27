@@ -216,6 +216,7 @@ protected:
   void SetSource(vtkSMSourceProxy* source) {this->Source = source;}
 
   virtual void CreateVTKObjects(int num);
+  virtual void CleanUpVTKObjects();
   virtual void RemoveAllCaches();
 
   // Description:

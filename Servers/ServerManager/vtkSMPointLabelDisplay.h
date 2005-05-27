@@ -111,6 +111,7 @@ protected:
 
   // This method gets called by SetProcessModule.
   virtual void CreateVTKObjects(int num);
+  void CleanUpVTKObjects();
 
   vtkSMPointLabelDisplay(const vtkSMPointLabelDisplay&); // Not implemented
   void operator=(const vtkSMPointLabelDisplay&); // Not implemented
