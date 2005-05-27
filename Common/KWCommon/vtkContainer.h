@@ -94,10 +94,6 @@ static inline int vtkContainerCompareMethod(short d1, short d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(int d1, int d2)
 { return vtkContainerDefaultCompare(d1,d2); }
-#ifdef VTK_USE_64BIT_IDS
-static inline int vtkContainerCompareMethod(vtkIdType d1, vtkIdType d2)
-{ return vtkContainerDefaultCompare(d1,d2); }
-#endif
 static inline int vtkContainerCompareMethod(long d1, long d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(unsigned char d1, unsigned char d2)
@@ -108,6 +104,20 @@ static inline int vtkContainerCompareMethod(unsigned int d1, unsigned int d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(unsigned long d1, unsigned long d2)
 { return vtkContainerDefaultCompare(d1,d2); }
+#if defined(VTK_TYPE_USE_LONG_LONG)
+static inline int vtkContainerCompareMethod(long long d1, long long d2)
+{ return vtkContainerDefaultCompare(d1,d2); }
+static inline int vtkContainerCompareMethod(unsigned long long d1,
+                                            unsigned long long d2)
+{ return vtkContainerDefaultCompare(d1,d2); }
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+static inline int vtkContainerCompareMethod(__int64 d1, __int64 d2)
+{ return vtkContainerDefaultCompare(d1,d2); }
+static inline int vtkContainerCompareMethod(unsigned __int64 d1,
+                                            unsigned __int64 d2)
+{ return vtkContainerDefaultCompare(d1,d2); }
+#endif
 static inline int vtkContainerCompareMethod(float d1, float d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(double d1, double d2)
@@ -128,10 +138,6 @@ static inline short vtkContainerCreateMethod(short d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline int vtkContainerCreateMethod(int d1)
 { return vtkContainerDefaultCreate(d1); }
-#ifdef VTK_USE_64BIT_IDS
-static inline int vtkContainerCreateMethod(vtkIdType d1)
-{ return vtkContainerDefaultCreate(d1); }
-#endif
 static inline long vtkContainerCreateMethod(long d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline unsigned char vtkContainerCreateMethod(unsigned char d1)
@@ -142,6 +148,18 @@ static inline unsigned int vtkContainerCreateMethod(unsigned int d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline unsigned long vtkContainerCreateMethod(unsigned long d1)
 { return vtkContainerDefaultCreate(d1); }
+#if defined(VTK_TYPE_USE_LONG_LONG)
+static inline long long vtkContainerCreateMethod(long long d1)
+{ return vtkContainerDefaultCreate(d1); }
+static inline unsigned long long vtkContainerCreateMethod(unsigned long long d1)
+{ return vtkContainerDefaultCreate(d1); }
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+static inline __int64 vtkContainerCreateMethod(__int64 d1)
+{ return vtkContainerDefaultCreate(d1); }
+static inline unsigned __int64 vtkContainerCreateMethod(unsigned __int64 d1)
+{ return vtkContainerDefaultCreate(d1); }
+#endif
 static inline float vtkContainerCreateMethod(float d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline double vtkContainerCreateMethod(double d1)
@@ -156,14 +174,19 @@ static inline void vtkContainerDeleteMethod(vtkObjectBase* d1)
 static inline void vtkContainerDeleteMethod(char) {}
 static inline void vtkContainerDeleteMethod(short) {}
 static inline void vtkContainerDeleteMethod(int) {}
-#ifdef VTK_USE_64BIT_IDS
-static inline void vtkContainerDeleteMethod(vtkIdType) {}
-#endif
 static inline void vtkContainerDeleteMethod(long) {}
 static inline void vtkContainerDeleteMethod(unsigned char) {}
 static inline void vtkContainerDeleteMethod(unsigned short) {}
 static inline void vtkContainerDeleteMethod(unsigned int) {}
 static inline void vtkContainerDeleteMethod(unsigned long) {}
+#if defined(VTK_TYPE_USE_LONG_LONG)
+static inline void vtkContainerDeleteMethod(long long) {}
+static inline void vtkContainerDeleteMethod(unsigned long long) {}
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+static inline void vtkContainerDeleteMethod(__int64) {}
+static inline void vtkContainerDeleteMethod(unsigned __int64) {}
+#endif
 static inline void vtkContainerDeleteMethod(float) {}
 static inline void vtkContainerDeleteMethod(double) {}
 static inline void vtkContainerDeleteMethod(const char* d1) 
