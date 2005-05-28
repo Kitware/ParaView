@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.5");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.6");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -83,7 +83,7 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->StatusFrameSeparator  = vtkKWFrame::New();
   this->StatusFrame           = vtkKWFrame::New();
   this->StatusLabel           = vtkKWLabel::New();
-  this->StatusImage           = vtkKWLabel::New();
+  this->StatusImage           = NULL;
 
   this->ProgressFrame         = vtkKWFrame::New();
   this->ProgressGauge         = vtkKWProgressGauge::New();
@@ -95,8 +95,8 @@ vtkKWWindowBase::vtkKWWindowBase()
 
   this->CommandFunction       = vtkKWWindowBaseCommand;
 
-  this->SupportHelp           = 1;
-  this->SupportPrint          = 1;
+  this->SupportHelp           = 0;
+  this->SupportPrint          = 0;
   this->PromptBeforeClose     = 0;
 
   this->MostRecentFilesManager = vtkKWMostRecentFilesManager::New();
@@ -274,28 +274,28 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
 
   // Menu : Help
 
+  menu = this->GetHelpMenu();
+
   if (this->SupportHelp)
     {
-    menu = this->GetHelpMenu();
-
     cmd = "DisplayHelpDialog ";
     cmd += this->GetTclName();
     menu->AddCommand(
       vtkKWWindowBase::HelpTopicsMenuLabel, app, cmd.c_str(), 0);
-
-    if (app->HasCheckForUpdates())
-      {
-      menu->AddCommand(
-        vtkKWWindowBase::HelpCheckForUpdatesMenuLabel,app,"CheckForUpdates",0);
-      }
-
-    menu->AddSeparator();
-    label = "About ";
-    label += app->GetPrettyName();
-    cmd = "DisplayAboutDialog ";
-    cmd += this->GetTclName();
-    menu->AddCommand(label.c_str(), this->GetApplication(), cmd.c_str(), 0);
     }
+
+  if (app->HasCheckForUpdates())
+    {
+    menu->AddCommand(
+      vtkKWWindowBase::HelpCheckForUpdatesMenuLabel,app,"CheckForUpdates",0);
+    }
+  
+  menu->AddSeparator();
+  label = "About ";
+  label += app->GetPrettyName();
+  cmd = "DisplayAboutDialog ";
+  cmd += this->GetTclName();
+  menu->AddCommand(label.c_str(), this->GetApplication(), cmd.c_str(), 0);
 
   // Menubar separator
 
@@ -367,13 +367,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   
   // Status frame : image
 
-  this->StatusImage->SetParent(this->StatusFrame);
-  this->StatusImage->Create(app, "-relief sunken -bd 1");
-
   this->UpdateStatusImage();
-
-  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
-               this->StatusImage->GetWidgetName());
 
   // Status frame : label
 
@@ -786,6 +780,8 @@ void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
 {
   this->Toolbars->PopulateToolbarsVisibilityMenu(
     this->GetToolbarsVisibilityMenu());
+
+  this->UpdateToolbarState();
 }
 
 //----------------------------------------------------------------------------
@@ -947,30 +943,48 @@ void vtkKWWindowBase::DisplayTclInteractor()
 }
 
 //----------------------------------------------------------------------------
+vtkKWLabel* vtkKWWindowBase::GetStatusImage()
+{
+  if (!this->StatusImage)
+    {
+    this->StatusImage = vtkKWLabel::New();
+    }
+
+  if (!this->StatusImage->IsCreated() && 
+      this->StatusFrame && this->StatusFrame->IsCreated())
+    {
+    this->StatusImage->SetParent(this->StatusFrame);
+    this->StatusImage->Create(
+      this->StatusFrame->GetApplication(), "-relief sunken -bd 1");
+    kwsys_stl::string before;
+    if (this->StatusLabel && this->StatusLabel->IsCreated())
+      {
+      before = " -before ";
+      before += this->StatusLabel->GetWidgetName();
+      }
+    this->StatusImage->Script(
+      "pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y %s", 
+      this->StatusImage->GetWidgetName(), before.c_str());
+    }
+
+  return this->StatusImage;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindowBase::UpdateStatusImage()
 {
-  if (!this->StatusImage || !this->StatusImage->IsCreated())
+  // No default image here
+
+  // Subclasses will likely update the StatusImage with a logo of their own.
+  // Here is, for example, how, provided that you created or updated
+  // the myownlogo image (photo), using vtkKWTkUtilities::UpdatePhoto for ex.
+  /*
+  vtkKWLabel *status_image = this->GetStatusImage();
+  if (status_image && status_image->IsCreated())
     {
-    return;
+    status_image->SetImageOption("myownlogo");
     }
-
-  // Create an empty image for now. It will be modified later on
-
-  kwsys_stl::string image_name(
-    this->Script("%s cget -image", this->StatusImage->GetWidgetName()));
-  if (!image_name.size() || !*image_name.c_str())
-    {
-    image_name = this->Script("image create photo");
-    }
-
-  this->Script("%s configure "
-               "-image %s "
-               "-fg white -bg white "
-               "-highlightbackground white -highlightcolor white "
-               "-highlightthickness 0 "
-               "-padx 0 -pady 0", 
-               this->StatusImage->GetWidgetName(),
-               image_name.c_str());
+  */
 }
 
 //----------------------------------------------------------------------------

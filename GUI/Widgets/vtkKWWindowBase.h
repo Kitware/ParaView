@@ -150,8 +150,10 @@ public:
   int GetHelpMenuInsertPosition();
 
   // Description:
-  // Does the window support help (if false, no help entries 
-  // should be added to the  menus)
+  // Set/Get a hint about help support. Disabled by default.
+  // If set to true (programmatically or by a superclass), it will hint the
+  // instance about populating the help menu with common entries. 
+  // For example, an entry invoking the application's DisplayHelpDialog.
   vtkSetClampMacro(SupportHelp, int, 0, 1);
   vtkGetMacro(SupportHelp, int);
   vtkBooleanMacro(SupportHelp, int);
@@ -165,8 +167,11 @@ public:
     const char *filename, vtkKWObject *target, const char *command);
   
   // Description:
-  // Does the window support print (if false, no print-related entries 
-  // will/should be added to the  menus)
+  // Set/Get a hint about print support. Disabled by default.
+  // If set to true (programmatically or by a superclass), it will hint the
+  // instance about populating some menus with common print-related entries. 
+  // For example, an entry in the file menu to set up print options like
+  // the application's PrintTargetDPI.
   vtkSetClampMacro(SupportPrint, int, 0, 1);
   vtkGetMacro(SupportPrint, int);
   vtkBooleanMacro(SupportPrint, int);
@@ -255,7 +260,9 @@ protected:
 
   // Description:
   // Update the image in the status frame. Usually a logo of some sort.
+  // Override this function to include your own application logo
   virtual void UpdateStatusImage();
+  virtual vtkKWLabel *GetStatusImage();
 
   // Description:
   // Recent files manager
