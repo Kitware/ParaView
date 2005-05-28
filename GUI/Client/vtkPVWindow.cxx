@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.715");
+vtkCxxRevisionMacro(vtkPVWindow, "1.716");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -144,6 +144,9 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->SupportHelp = 1;
+  this->SupportPrint = 1;
+
   this->LastProgress = 0;
   this->ExpectProgress = 0;
   
@@ -1547,28 +1550,34 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 //----------------------------------------------------------------------------
 void vtkPVWindow::UpdateStatusImage()
 {
-  if (!this->StatusImage || !this->StatusImage->IsCreated())
-    {
-    return;
-    }
-
   this->Superclass::UpdateStatusImage();
 
-  kwsys_stl::string image_name(
-    this->Script("%s cget -image", this->StatusImage->GetWidgetName()));
+  // Request the status image (this will allocate/create/pack it on the fly)
+  // then update its -image option (photo)
 
-  // Update status image
-  
-  if (!vtkKWTkUtilities::UpdatePhoto(
-        this->StatusImage->GetApplication(),
-        image_name.c_str(),
-        image_PVLogoSmall, 
-        image_PVLogoSmall_width, 
-        image_PVLogoSmall_height,
-        image_PVLogoSmall_pixel_size,
-        image_PVLogoSmall_buffer_length))
+  vtkKWLabel *status_image = this->GetStatusImage();
+  if (status_image && status_image->IsCreated())
     {
-    vtkWarningMacro("Error updating status image!" << image_name.c_str());
+    kwsys_stl::string image_name(status_image->GetImageOption());
+    if (!image_name.size() || !*image_name.c_str())
+      {
+      image_name = status_image->Script("image create photo");
+      status_image->SetImageOption(image_name.c_str());
+      }
+
+    // Update status image
+  
+    if (!vtkKWTkUtilities::UpdatePhoto(
+          status_image->GetApplication(),
+          image_name.c_str(),
+          image_PVLogoSmall, 
+          image_PVLogoSmall_width, 
+          image_PVLogoSmall_height,
+          image_PVLogoSmall_pixel_size,
+          image_PVLogoSmall_buffer_length))
+      {
+      vtkWarningMacro("Error updating status image!" << image_name.c_str());
+      }
     }
 }
 //-----------------------------------------------------------------------------
