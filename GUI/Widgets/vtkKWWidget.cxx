@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.122");
+vtkCxxRevisionMacro(vtkKWWidget, "1.123");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -1058,6 +1058,11 @@ void vtkKWWidget::SetImageOption(const unsigned char* data,
     return;
     }
 
+  if (!this->HasConfigurationOption(image_option))
+    {
+    return;
+    }
+
   ostrstream image_name;
   image_name << this->GetWidgetName() << "." << &image_option[1] << ends;
 
@@ -1113,6 +1118,28 @@ void vtkKWWidget::SetImageOption(const char *image_name,
 
   this->Script("%s configure %s {%s}", 
                this->GetWidgetName(), image_option, image_name);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::GetImageOption(const char *image_option)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return NULL;
+    }
+
+  if (!image_option || !*image_option)
+    {
+    image_option = "-image";
+    }
+
+  if (!this->HasConfigurationOption(image_option))
+    {
+    return NULL;
+    }
+
+  return this->Script("%s cget %s", this->GetWidgetName(), image_option);
 }
 
 //----------------------------------------------------------------------------

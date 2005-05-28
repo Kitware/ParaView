@@ -260,6 +260,7 @@ public:
                               const char *image_option = 0);
   virtual void SetImageOption(const char *image_name,
                               const char *image_option = 0);
+  virtual const char* GetImageOption(const char *image_option = 0);
   
   // Description:
   // Grab the widget (locally)
