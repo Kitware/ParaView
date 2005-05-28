@@ -300,7 +300,8 @@ public:
   virtual void DisplayHelpDialog(vtkKWWindowBase *master);
 
   // Description:
-  // Set/Get the the on-line help starting page
+  // Set/Get the help starting page.
+  // If set to a CHM/HTML page, it will be opened automatically on Windows.
   vtkGetStringMacro(HelpDialogStartingPage);
   vtkSetStringMacro(HelpDialogStartingPage);
 
@@ -352,6 +353,11 @@ public:
   virtual void UnRegisterDialogUp(vtkKWWidget *ptr);
   vtkGetMacro(DialogUp, int);
   
+  // Description:
+  // Open a link (media).On Win32, use ShellExecute to trigger the default
+  // viewers.
+  static int OpenLink(const char *link);
+
   // Description:
   // Some constants
   //BTX

@@ -40,6 +40,7 @@ static Tcl_Interp *Et_Interp = 0;
 
 #ifdef _WIN32
 #include "vtkWindows.h"
+#include <shellapi.h>
 #include <process.h>
 #include <mapi.h>
 #include <htmlhelp.h>
@@ -62,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.208");
+vtkCxxRevisionMacro(vtkKWApplication, "1.209");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -540,7 +541,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   
   Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
     
-  // create the SetApplicationIcon command
+  // As a convenience, withdraw the main Tk toplevel
+
+  Tcl_GlobalEval(interp, "wm withdraw .");
+
+  // Create the SetApplicationIcon command
+
 #ifdef _WIN32
   vtkKWSetApplicationIconTclCommand_DoInit(interp);
 #endif
@@ -595,6 +601,20 @@ void vtkKWApplication::Start()
 //----------------------------------------------------------------------------
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
+  // If no windows has been mapped so far, then as a convenience,
+  // map the first one
+
+  int nb_windows = this->GetNumberOfWindows();
+  for (int i = 0; i < nb_windows && !this->GetNthWindow(i)->IsMapped(); i++)
+    {
+    }
+  if (i >= nb_windows && nb_windows)
+    {
+    this->GetNthWindow(0)->Display();
+    }
+
+  // Start the event loop
+
   while (this->GetNumberOfWindows())
     {
     this->DoOneTclEvent();
@@ -713,6 +733,20 @@ void vtkKWApplication::DoOneTclEvent()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWApplication::OpenLink(const char *link)
+{
+#ifdef _WIN32
+  HINSTANCE result = ShellExecute(
+    NULL, "open", link, NULL, NULL, SW_SHOWNORMAL);
+  if ((int)result <= 32)
+    {
+    return 0;
+    }
+#endif
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 {
   kwsys_stl::string title = "Exit ";
@@ -752,43 +786,81 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 //----------------------------------------------------------------------------
 void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 {
-#ifdef _WIN32
-  ostrstream temp;
-  if (this->InstallationDirectory)
+  if (!this->HelpDialogStartingPage)
     {
-    temp << this->InstallationDirectory << "/";
+    return;
     }
-  temp << this->Name << ".chm";
-  if (this->HelpDialogStartingPage)
+
+  kwsys_stl::string helplink;
+
+  // If it's not a remote link (crude test) and we can't find it yet, try in
+  // the install/bin directory
+
+  int is_local = strstr(this->HelpDialogStartingPage, "://") ? 0 : 1;
+  if (is_local && 
+      !kwsys::SystemTools::FileExists(this->HelpDialogStartingPage))
     {
-    temp << "::/" << this->HelpDialogStartingPage;
+    this->FindInstallationDirectory();
+    if (this->InstallationDirectory)
+      {
+      helplink += this->InstallationDirectory;
+      helplink += "/";
+      }
     }
-  temp << ends;
+
+  helplink += this->HelpDialogStartingPage;
   
-  if (!HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0))
+  int status = 1;
+
+#ifdef _WIN32
+  // .chm ?
+
+  if (strstr(helplink.c_str(), ".chm") || 
+      strstr(helplink.c_str(), ".CHM"))
     {
-    vtkKWMessageDialog::PopupMessage(
-      this, master,
-      "Loading Help Error",
-      "Help file cannot be displayed. This can be a result of "
-      "the program being wrongly installed or help file being "
-      "corrupted. Please reinstall this program.", 
-      vtkKWMessageDialog::ErrorIcon);
+    status = HtmlHelp(NULL, helplink.c_str(), HH_DISPLAY_TOPIC, 0) ? 1 : 0;
     }
+  
+  // otherwise just try to open
 
-  temp.rdbuf()->freeze(0);
-
+  else
+    {
+    status = this->OpenLink(helplink.c_str());
+    }
 #else
-  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-  dlg->SetMasterWindow(master);
-  dlg->Create(this,"");
-  dlg->SetText(
-    "HTML help is included in the help subdirectory of\n"
-    "this application. You can view this help using a\n"
-    "standard web browser by loading the Help.htm file.");
-  dlg->Invoke();  
-  dlg->Delete();
+  kwsys_stl::string msg;
+  msg += "Please check the help resource ";
+  if (kwsys::SystemTools::FileExists(helplink.c_str()))
+    {
+    msg += helplink.c_str();
+    }
+  else
+    {
+    msg += this->HelpDialogStartingPage;
+    }
+  msg += " for more information.";
+  
+  vtkKWMessageDialog::PopupMessage(
+    this, master, "Help", msg.c_str(), vtkKWMessageDialog::WarningIcon);
 #endif
+
+  if (!status)
+    {
+    kwsys_stl::string msg;
+    msg += "The help resource ";
+    if (kwsys::SystemTools::FileExists(helplink.c_str()))
+      {
+      msg += helplink.c_str();
+      }
+    else
+      {
+      msg += this->HelpDialogStartingPage;
+      }
+    msg += " cannot be displayed. This can be a result of "
+      "the program being wrongly installed or the help file being corrupted.";
+    vtkKWMessageDialog::PopupMessage(
+      this, master, "Help Error", msg.c_str(), vtkKWMessageDialog::ErrorIcon);
+    }
 }
 
 //----------------------------------------------------------------------------
