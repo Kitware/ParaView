@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.26");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.27");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -60,8 +60,6 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  const char *wname = this->GetWidgetName();
 
   this->Canvas = vtkKWCanvas::New();
   this->Canvas->SetParent(this);

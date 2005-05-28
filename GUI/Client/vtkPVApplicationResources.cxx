@@ -467,7 +467,7 @@ void vtkPVApplication::CreateSplashScreen()
   unsigned char *buffer = 
     new unsigned char [image_PVSplashScreen_buffer_length];
 
-  int i;
+  unsigned int i;
   unsigned char *curPos = buffer;
   for (i = 0; i < image_PVSplashScreen_nb_sections; i++)
     {
