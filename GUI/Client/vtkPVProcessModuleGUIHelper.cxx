@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.17");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.18");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -122,7 +122,6 @@ int vtkPVProcessModuleGUIHelper::ActualRun(int argc, char **argv)
 {
   if (this->PVApplication->GetStartGUI())
     {
-    this->PVApplication->Script("wm withdraw .");
     this->PVApplication->Start(argc, argv);
     }
   else
