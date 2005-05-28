@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.209");
+vtkCxxRevisionMacro(vtkKWApplication, "1.210");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -604,8 +604,8 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   // If no windows has been mapped so far, then as a convenience,
   // map the first one
 
-  int nb_windows = this->GetNumberOfWindows();
-  for (int i = 0; i < nb_windows && !this->GetNthWindow(i)->IsMapped(); i++)
+  int i, nb_windows = this->GetNumberOfWindows();
+  for (i = 0; i < nb_windows && !this->GetNthWindow(i)->IsMapped(); i++)
     {
     }
   if (i >= nb_windows && nb_windows)
