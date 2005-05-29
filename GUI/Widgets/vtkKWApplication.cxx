@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.210");
+vtkCxxRevisionMacro(vtkKWApplication, "1.211");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -733,7 +733,11 @@ void vtkKWApplication::DoOneTclEvent()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::OpenLink(const char *link)
+int vtkKWApplication::OpenLink(const char *
+#ifdef _WIN32
+                               link
+#endif
+)
 {
 #ifdef _WIN32
   HINSTANCE result = ShellExecute(
@@ -811,6 +815,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   helplink += this->HelpDialogStartingPage;
   
   int status = 1;
+  kwsys_stl::string msg;
 
 #ifdef _WIN32
   // .chm ?
@@ -828,8 +833,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
     status = this->OpenLink(helplink.c_str());
     }
 #else
-  kwsys_stl::string msg;
-  msg += "Please check the help resource ";
+  msg = "Please check the help resource ";
   if (kwsys::SystemTools::FileExists(helplink.c_str()))
     {
     msg += helplink.c_str();
@@ -846,8 +850,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 
   if (!status)
     {
-    kwsys_stl::string msg;
-    msg += "The help resource ";
+    msg = "The help resource ";
     if (kwsys::SystemTools::FileExists(helplink.c_str()))
       {
       msg += helplink.c_str();
