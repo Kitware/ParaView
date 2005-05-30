@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.35");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.36");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -332,13 +332,13 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     "You can drag & drop elements of the "
     "interface within the same panel or from one panel to the other. "
     "To do so, drag the title of a labeled frame to reposition it within "
-    "a panel, or drop it on another tab to move it to a different panel."
+    "a panel, or drop it on another tab to move it to a different panel. "
     "Press this button to reset the placement of all user interface elements "
     "to their default position. You will need to restart the application for "
     "the interface to be reset.");
 
   tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none -padx 22 -pady 2" 
+         << "  -side top -anchor w -expand y -fill x -padx 2 -pady 2" 
          << endl;
 
   // --------------------------------------------------------------
