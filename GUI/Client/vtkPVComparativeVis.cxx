@@ -41,7 +41,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.2");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
@@ -413,7 +413,6 @@ int vtkPVComparativeVis::Show()
   vtkSMProxyManager* proxM = vtkSMProxy::GetProxyManager();
   vtkSMRenderModuleProxy* ren =
     this->Application->GetRenderModuleProxy();
-
   int winSize[2];
   ren->GetServerRenderWindowSize(winSize);
 
@@ -609,6 +608,10 @@ void vtkPVComparativeVis::Hide()
 {
   vtkSMRenderModuleProxy* ren =
     this->Application->GetRenderModuleProxy();
+  if (!ren)
+    {
+    return;
+    }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     ren->GetProperty("Displays"));
