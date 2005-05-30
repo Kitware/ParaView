@@ -39,11 +39,11 @@ public:
   void Update();
 
   // Description:
-  // Brings up the visualization dialog with a new visualization
+  // Brings up the visualization dialog with a new visualization.
   void AddVisualization();
 
   // Description:
-  // Brings up the visualization dialog for the current visualization
+  // Brings up the visualization dialog for the current visualization.
   void EditVisualization();
 
   // Description:
@@ -57,6 +57,15 @@ public:
   // Description:
   // Hides the currently shown visualization.
   void HideVisualization();
+
+  // Description:
+  // Should be called by PrepareDelete() of window.
+  void PrepareForDelete();
+
+  // Description:
+  // Returns the comparative manager object. This is the actual
+  // object that manager the comparative visualizations.
+  vtkGetObjectMacro(Manager, vtkPVComparativeVisManager);
 
 protected:
   vtkPVComparativeVisManagerGUI();

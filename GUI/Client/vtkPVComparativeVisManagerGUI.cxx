@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.2");
 
 int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -113,6 +113,12 @@ void vtkPVComparativeVisManagerGUI::Create(
   this->Script("pack %s", this->HideButton->GetWidgetName());
 
   this->Manager->SetApplication(vtkPVApplication::SafeDownCast(app));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisManagerGUI::PrepareForDelete()
+{
+  this->HideVisualization();
 }
 
 //----------------------------------------------------------------------------
