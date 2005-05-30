@@ -14,10 +14,12 @@
 =========================================================================*/
 // .NAME vtkPVSimpleAnimationCue - minimal GUI for vtkSMAnimationCueProxy
 // .SECTION Description
-// This class provides the minimalistic GUI stuff for the vtkSMAnimationCueProxy.
-// The subclasses can provide the GUI for the cue eg. animation tracks or otherwise.
-// This class provides methods to manage vtkSMAnimationCueProxy and
-// vtkSMKeyFrameAnimationCueManipulatorProxy and the keyframes associated with it.
+// This class provides the minimalistic GUI stuff for the
+// vtkSMAnimationCueProxy.  The subclasses can provide the GUI for the cue
+// eg. animation tracks or otherwise.  This class provides methods to
+// manage vtkSMAnimationCueProxy and
+// vtkSMKeyFrameAnimationCueManipulatorProxy and the keyframes associated
+// with it.
 
 #ifndef __vtkPVSimpleAnimationCue_h
 #define __vtkPVSimpleAnimationCue_h
@@ -44,8 +46,8 @@ public:
     const char* args);
 
   // Description:
-  // Virtual indicates if this cue is a actual cue, which has a proxy associated with it
-  // or merely a grouping GUI element.
+  // Virtual indicates if this cue is a actual cue, which has a proxy
+  // associated with it or merely a grouping GUI element.
   vtkGetMacro(Virtual, int);
 
   // Description:
@@ -54,9 +56,9 @@ public:
   virtual char* GetTextRepresentation();
 
   // Description:
-  // Pointer to the parent animation cue , if any.
-  // Note that parent is not reference counted. This is needed to build
-  // a text representation for the cue (as returned by GetTextRepresentation())
+  // Pointer to the parent animation cue , if any.  Note that parent is not
+  // reference counted. This is needed to build a text representation for
+  // the cue (as returned by GetTextRepresentation())
   void SetParentAnimationCue(vtkPVSimpleAnimationCue* cue)
     { this->ParentCue = cue; }
 
@@ -74,8 +76,8 @@ public:
   int GetNumberOfKeyFrames();
 
   // Description:
-  // Returns the time for the keyframe at the given id.
-  // Time is normalized to the span of the cue [0,1].
+  // Returns the time for the keyframe at the given id.  Time is normalized
+  // to the span of the cue [0,1].
   double GetKeyFrameTime(int id);
 
   // Description:
@@ -84,22 +86,25 @@ public:
   void SetKeyFrameTime(int id, double time);
 
   // Description:
-  // Add a new key frame to the cue at the given time. If this cue is Virtual, this
-  // can add upto two keyframes. If the cue is Non-Virtual, it creates a key frame of
-  // the type vtkPVAnimationManager::RAMP and adds it to the cue at the specified time.
-  // NOTE: It does not verify is a key frame already exists at the same time. Time is
-  // normalized to the span of the cue [0,1].
+  // Add a new key frame to the cue at the given time. If this cue is
+  // Virtual, this can add upto two keyframes. If the cue is Non-Virtual,
+  // it creates a key frame of the type vtkPVAnimationManager::RAMP and
+  // adds it to the cue at the specified time.  NOTE: It does not verify is
+  // a key frame already exists at the same time. Time is normalized to the
+  // span of the cue [0,1].
   int AddNewKeyFrame(double time);
 
   // Description:
-  // Creates a new key frame of the specified type and add it to the cue at the given time.
-  // Time is normalized to the span of the cue [0,1]. This method also does not verify is a 
-  // key frame already exists at the specified time. 
+  // Creates a new key frame of the specified type and add it to the cue at
+  // the given time.  Time is normalized to the span of the cue [0,1]. This
+  // method also does not verify is a key frame already exists at the
+  // specified time.
   int CreateAndAddKeyFrame(double time, int type);
 
   // Description:
-  // Determine a time to append a new keyframe (the old keyframes in this cue may get
-  // shrunk to accomadate the new keyframe) and calls AddNewKeyFrame.
+  // Determine a time to append a new keyframe (the old keyframes in this
+  // cue may get shrunk to accomadate the new keyframe) and calls
+  // AddNewKeyFrame.
   int AppendNewKeyFrame();
  
   // Description:
@@ -149,14 +154,17 @@ public:
   // Description:
   // Methods to set the animated proxy/property/domain/element information.
   void SetAnimatedProxy(vtkSMProxy* proxy);
+  vtkSMProxy* GetAnimatedProxy();
   void SetAnimatedPropertyName(const char* name);
   const char* GetAnimatedPropertyName();
-
   void SetAnimatedDomainName(const char* name);
+  const char* GetAnimatedDomainName();
   void SetAnimatedElement(int index);
+  int GetAnimatedElement();
 
   // Description:
-  // Start Recording. Once recording has been started new key frames cannot be added directly.
+  // Start Recording. Once recording has been started new key frames cannot
+  // be added directly.
   virtual void StartRecording();
 
   // Description:
@@ -166,14 +174,15 @@ public:
   void RecordState(double ntime, double offset);
 
   // Description:
-  // Adds a new key frame is the property animated by this cue has changed since last
-  // call to InitializeStatus(). ntime is the time at which this key frame will be added.
-  // If onlyFocus is 1, the new key frame is added only if this cue has the focus.
+  // Adds a new key frame is the property animated by this cue has changed
+  // since last call to InitializeStatus(). ntime is the time at which this
+  // key frame will be added.  If onlyFocus is 1, the new key frame is
+  // added only if this cue has the focus.
 //  virtual void KeyFramePropertyChanges(double ntime, double offset, int onlyFocus);
 
   // Description:
-  // Get the animation cue proxy associated with this cue. If this cue is Virtual, 
-  // this method returns NULL.
+  // Get the animation cue proxy associated with this cue. If this cue is
+  // Virtual, this method returns NULL.
   vtkGetObjectMacro(CueProxy, vtkSMAnimationCueProxy);
 
   // Description:
@@ -224,9 +233,9 @@ protected:
   virtual void CreateProxy();
 
   // Description:
-  // Set if the Cue is virtual i.e. it has no proxies associated with it, instead 
-  // is a dummy cue used as a container for other cues.
-  // NOTE: this property must not be changed after Create.
+  // Set if the Cue is virtual i.e. it has no proxies associated with it,
+  // instead is a dummy cue used as a container for other cues.  NOTE: this
+  // property must not be changed after Create.
   vtkSetMacro(Virtual, int);
 
   // Description:
@@ -270,11 +279,11 @@ protected:
   int KeyFramesCreatedCount;
 
   // Description:
-  // A PVCue registers the proxies and adds it to the AnimationScene iff it 
+  // A PVCue registers the proxies and adds it to the AnimationScene iff it
   // has atleast two keyframes and it is not virtual. Whenever this
-  // criteria is not met, it is unregistered and removed form the AnimationScene.
-  // This ensures that SMState and BatchScript will have only those cue proxies
-  // which actually constitute any animation.
+  // criteria is not met, it is unregistered and removed form the
+  // AnimationScene.  This ensures that SMState and BatchScript will have
+  // only those cue proxies which actually constitute any animation.
   virtual void RegisterProxies();
   virtual void UnregisterProxies(); 
 //BTX

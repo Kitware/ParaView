@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.3");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.4");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -234,7 +234,7 @@ void vtkPVSimpleAnimationCue::CreateProxy()
     pp->AddProxy(this->KeyFrameManipulatorProxy);
     }
   IntVectPropertySetElement(this->CueProxy, "TimeMode", 
-    VTK_ANIMATION_CUE_TIMEMODE_NORMALIZED);
+                            vtkAnimationCue::TIMEMODE_NORMALIZED);
   DoubleVectPropertySetElement(this->CueProxy, "StartTime", 0.0);
   DoubleVectPropertySetElement(this->CueProxy, "EndTime", 1.0);
   this->CueProxy->UpdateVTKObjects(); //calls CreateVTKObjects(1) internally.
@@ -501,7 +501,8 @@ int vtkPVSimpleAnimationCue::GetTimeBounds(double bounds[2])
   int num = this->GetNumberOfKeyFrames();
   if (num <= 0)
     {
-    return 0;
+    bounds[0] = bounds[1] = 0;
+    return 1;
     }
   bounds[0] = this->GetKeyFrameTime(0);
   if (num!=1)
@@ -529,7 +530,7 @@ void vtkPVSimpleAnimationCue::SetTimeBounds(double bounds[2], int enable_scaling
     if (!this->GetTimeBounds(cur_bounds))
       {
       //this should not happen!
-      vtkErrorMacro("Failed to obtained current time bounds!");
+      vtkErrorMacro("Failed to obtain current time bounds!");
       return;
       }
 
@@ -841,6 +842,28 @@ void vtkPVSimpleAnimationCue::SetAnimatedProxy(vtkSMProxy *proxy)
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* vtkPVSimpleAnimationCue::GetAnimatedProxy()
+{
+  if (this->Virtual)
+    {
+    return 0;
+    }
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->CueProxy->GetProperty("AnimatedProxy"));
+  if (!pp)
+    {
+    return 0;
+    }
+
+  if (pp->GetNumberOfProxies() < 1)
+    {
+    return 0;
+    }
+
+  return pp->GetProxy(0);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::SetAnimatedPropertyName(const char* name)
 {
   if (this->Virtual)
@@ -883,6 +906,32 @@ void vtkPVSimpleAnimationCue::SetAnimatedDomainName(const char* name)
 }
 
 //-----------------------------------------------------------------------------
+const char* vtkPVSimpleAnimationCue::GetAnimatedDomainName()
+{
+  if (this->Virtual)
+    {
+    vtkErrorMacro("Trying to get animated domain name of a virtual cue.");
+    return 0;
+    }
+  
+  vtkSMStringVectorProperty* dvp = vtkSMStringVectorProperty::SafeDownCast(
+    this->CueProxy->GetProperty("AnimatedDomainName"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Trying to get animated domain name of a cue without one.");
+    return 0;
+    }
+
+  if (dvp->GetNumberOfElements() < 1)
+    {
+    vtkErrorMacro("Trying to get animated domain name of a cue without one.");
+    return 0;
+    }
+
+  return dvp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::SetAnimatedElement(int index)
 {
   if (this->Virtual)
@@ -892,6 +941,32 @@ void vtkPVSimpleAnimationCue::SetAnimatedElement(int index)
     }
   IntVectPropertySetElement(this->CueProxy,"AnimatedElement", index);
   this->CueProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVSimpleAnimationCue::GetAnimatedElement()
+{
+  if (this->Virtual)
+    {
+    vtkErrorMacro("Trying to get animated element of a virtual cue.");
+    return -1;
+    }
+  
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CueProxy->GetProperty("AnimatedElement"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Trying to get animated element of a cue without one.");
+    return -1;
+    }
+
+  if (dvp->GetNumberOfElements() < 1)
+    {
+    vtkErrorMacro("Trying to get animated element of a cue without one.");
+    return -1;
+    }
+
+  return dvp->GetElement(0);
 }
 
 //-----------------------------------------------------------------------------
