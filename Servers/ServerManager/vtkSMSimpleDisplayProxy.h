@@ -130,6 +130,7 @@ protected:
   // access to the MapperProxy. It needs this proxy to extract and cache
   // the input geometry
   friend class vtkPVComparativeVisManager;
+  friend class vtkPVComparativeVis;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
 //ETX
