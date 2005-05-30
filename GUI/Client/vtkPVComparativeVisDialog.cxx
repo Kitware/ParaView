@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.2");
 
 int vtkPVComparativeVisDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -46,7 +46,7 @@ struct vtkPVComparativeVisDialogInternals
 class vtkCueSelectionCommand : public vtkCommand
 {
 public:
-  void Execute(vtkObject *caller, unsigned long eid, void *callData)
+  void Execute(vtkObject *caller, unsigned long, void*)
   {
     this->Dialog->CueSelected(vtkPVComparativeVisWidget::SafeDownCast(caller));
   }
