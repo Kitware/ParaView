@@ -164,6 +164,10 @@ protected:
   // Given a proxy, remove all previous proxies from it's consumer list.
   void RemoveConsumers(vtkSMProxy* proxy);
 
+  //BTX
+  friend class vtkSMProxy;
+  //ETX
+
   vtkSMProxyPropertyInternals* PPInternals;
 
   // Description:

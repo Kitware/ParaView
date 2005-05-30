@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMProxy, "1.40");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -148,10 +148,16 @@ vtkSMProxy::~vtkSMProxy()
 
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.begin();
-  // To remove cyclic dependancy
+  // To remove cyclic dependancy as well as this proxy from
+  // the consumer list of all
   for(; it != this->Internals->Properties.end(); it++)
     {
-    it->second.Property.GetPointer()->RemoveAllDependents();
+    vtkSMProperty* prop = it->second.Property.GetPointer();
+    prop->RemoveAllDependents();
+    if (prop->IsA("vtkSMProxyProperty"))
+      {
+      vtkSMProxyProperty::SafeDownCast(prop)->RemoveConsumers(this);
+      }
     }
   delete this->Internals;
   this->SetVTKClassName(0);
