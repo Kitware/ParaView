@@ -48,13 +48,20 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.8");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.9");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
 
 struct vtkPVComparativeVisManagerInternals
 {
+  vtkPVComparativeVisManagerInternals()
+    {
+      this->CurrentPVSource = 0;
+      this->MainPanelVisibility = 1;
+      this->InteractorStyle = 0;
+    }
+
   vtkstd::list<vtkSMSimpleDisplayProxy*> VisibleDisplayProxies;
   int MainPanelVisibility;
   int InteractorStyle;
@@ -137,6 +144,8 @@ void vtkPVComparativeVisManager::AddVisualization(vtkPVComparativeVis* vis)
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
 {
+  vtkPVComparativeVis* curVis = 
+    this->GetVisualization(this->CurrentVisualization);
   vtkPVComparativeVisManagerInternals::VisualizationsType::iterator iter = 
     this->Internal->Visualizations.begin();
   for(; iter != this->Internal->Visualizations.end(); iter++)
@@ -144,6 +153,10 @@ void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
     vtkPVComparativeVis* vis = iter->GetPointer();
     if (vis && vis->GetName() && name && strcmp(name, vis->GetName()) == 0)
       {
+      if (iter->GetPointer() == curVis)
+        {
+        this->Hide();
+        }
       this->Internal->Visualizations.erase(iter);
       break;
       }
@@ -244,6 +257,8 @@ void vtkPVComparativeVisManager::Show()
 
   mainView->ForceRender();
 
+  this->Application->Script("update idletasks");
+
   vtkTimerLog::MarkStartEvent("Show Vis");
   if (!currentVis->Show())
     {
@@ -256,9 +271,6 @@ void vtkPVComparativeVisManager::Show()
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::Hide()
 {
-  vtkSMRenderModuleProxy* ren =
-    this->Application->GetRenderModuleProxy();
-
   vtkPVWindow* window = this->Application->GetMainWindow();
   vtkKWToolbarSet* toolbars = window->GetToolbars();
   vtkstd::list<vtkKWToolbar*>::iterator iter = 
@@ -281,12 +293,18 @@ void vtkPVComparativeVisManager::Hide()
     (*iter2)->SetVisibilityCM(1);
     }
 
-  vtkSMIntVectorProperty* parallelProj =
-    vtkSMIntVectorProperty::SafeDownCast(
-      ren->GetProperty("CameraParallelProjection"));
-  parallelProj->SetElements1(this->Internal->ParallelProjection);
+  vtkSMRenderModuleProxy* ren =
+    this->Application->GetRenderModuleProxy();
 
-  ren->UpdateVTKObjects();
+  if (ren)
+    {
+    vtkSMIntVectorProperty* parallelProj =
+      vtkSMIntVectorProperty::SafeDownCast(
+        ren->GetProperty("CameraParallelProjection"));
+    parallelProj->SetElements1(this->Internal->ParallelProjection);
+    
+    ren->UpdateVTKObjects();
+    }
 
   window->SetCurrentPVSource(this->Internal->CurrentPVSource);
 
@@ -311,7 +329,10 @@ void vtkPVComparativeVisManager::Hide()
     }
   this->Application->GetMainView()->ForceRender();
 
-  ren->ResetCameraClippingRange();
+  if (ren)
+    {
+    ren->ResetCameraClippingRange();
+    }
 
   window->SetInComparativeVis(0);
   window->UpdateEnableState();
