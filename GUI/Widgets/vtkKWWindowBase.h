@@ -128,6 +128,9 @@ public:
 
   // Description:
   // Get the menu objects. This will allocate and create them on the fly.
+  // Several convenience functions are also available to get the position
+  // where to safely insert entries in those menus without interferring with
+  // entries that should stay at the end of the menus.
   vtkKWMenu *GetFileMenu();
   vtkKWMenu *GetEditMenu();
   vtkKWMenu *GetViewMenu();
@@ -137,17 +140,20 @@ public:
   
   // Description:
   // Convenience method that return the position where to safely insert 
-  // entries in the file menu without interferring with entries that should
-  // stay at the end of the menu (at the moment, it checks for the 'close',
-  // 'exit' or 'print setup' commands).
-  int GetFileMenuInsertPosition();
+  // entries in the corresponding menu without interferring with entries
+  // that should stay at the end of the menu.
+  // At the moment, GetFileMenuInsertPosition() checks for the 'close',
+  // 'exit' or 'print setup' commands, GetHelpMenuInsertPosition() checks for
+  // the 'about' commands, GetViewMenuInsertPosition() is available for
+  // subclasses to be redefined. 
+  virtual int GetFileMenuInsertPosition();
+  virtual int GetHelpMenuInsertPosition();
+  virtual int GetViewMenuInsertPosition();
 
   // Description:
   // Convenience method that return the position where to safely insert 
   // entries in the help menu without interferring with entries that should
-  // stay at the end of the menu (at the moment, it checks for the 'about'
-  // commands).
-  int GetHelpMenuInsertPosition();
+  // stay at the end of the menu .
 
   // Description:
   // Set/Get a hint about help support. Disabled by default.
@@ -191,7 +197,7 @@ public:
   //   UpdateToolbarState
   //   UpdateEnableState 
   //   UpdateMenuState
-  //   Update on all panels belonging to the GetUserInterfaceManager, if any
+  //   Update on all panels belonging to the UserInterfaceManager, if any
   virtual void Update();
 
   // Description:

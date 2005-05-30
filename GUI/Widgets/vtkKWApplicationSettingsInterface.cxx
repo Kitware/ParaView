@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.34");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.35");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -499,7 +499,7 @@ void vtkKWApplicationSettingsInterface::Update()
 
   vtkKWUserInterfaceNotebookManager *uim_nb = 
     vtkKWUserInterfaceNotebookManager::SafeDownCast(
-      this->Window->GetUserInterfaceManager());
+      this->Window->GetMainUserInterfaceManager());
   if (!uim_nb)
     {
     this->ResetDragAndDropButton->SetEnabled(0);
@@ -618,7 +618,7 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
 
   vtkKWUserInterfaceNotebookManager *uim_nb = 
     vtkKWUserInterfaceNotebookManager::SafeDownCast(
-      this->Window->GetUserInterfaceManager());
+      this->Window->GetMainUserInterfaceManager());
   if (uim_nb)
     {
     uim_nb->DeleteAllDragAndDropEntries();

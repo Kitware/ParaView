@@ -20,7 +20,9 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
+#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWMessageDialog.h"
 
 #include <kwsys/SystemTools.hxx>
 
@@ -28,7 +30,7 @@ const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
 const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
 const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.243");
+vtkCxxRevisionMacro(vtkKWWindow, "1.244");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -42,6 +44,14 @@ vtkKWWindow::vtkKWWindow()
   this->MainSplitFrame        = vtkKWSplitFrame::New();
 
   this->MainNotebook          = vtkKWNotebook::New();
+  this->MainNotebook->PagesCanBePinnedOn();
+  this->MainNotebook->EnablePageTabContextMenuOn();
+
+  this->MainUserInterfaceManager = vtkKWUserInterfaceNotebookManager::New();
+  this->MainUserInterfaceManager->SetNotebook(this->MainNotebook);
+  this->MainUserInterfaceManager->EnableDragAndDropOn();
+
+  this->ApplicationSettingsInterface = NULL;
 
   this->CommandFunction       = vtkKWWindowCommand;
 }
@@ -62,6 +72,18 @@ vtkKWWindow::~vtkKWWindow()
     this->MainNotebook->Delete();
     this->MainNotebook = NULL;
     }
+
+  if (this->ApplicationSettingsInterface)
+    {
+    this->ApplicationSettingsInterface->Delete();
+    this->ApplicationSettingsInterface = NULL;
+    }
+
+  if (this->MainUserInterfaceManager)
+    {
+    this->MainUserInterfaceManager->Delete();
+    this->MainUserInterfaceManager = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -80,13 +102,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Superclass::Create(app, args);
 
   kwsys_stl::string cmd;
-  kwsys_stl::string label;
-  
-  // Menu : Window
-
-  this->GetWindowMenu()->AddCommand(
-    vtkKWWindow::HideMainPanelMenuLabel, 
-    this, "MainPanelVisibilityCallback", 1);
+  vtkKWMenu *menu = NULL;
+  int idx;
 
   // Split frame
 
@@ -95,6 +112,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Script("pack %s -side top -fill both -expand t",
                this->MainSplitFrame->GetWidgetName());
+
+  // Menu : Window
+
+  menu = this->GetWindowMenu();
+  menu->AddCommand(
+    vtkKWWindow::HideMainPanelMenuLabel, 
+    this, "MainPanelVisibilityCallback", 1);
 
   // Create the notebook
 
@@ -108,12 +132,24 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // If we have a User Interface Manager, it's time to create it
 
-  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
+  vtkKWUserInterfaceManager *uim = this->GetMainUserInterfaceManager();
   if (uim && !uim->IsCreated())
     {
     uim->Create(app);
     }
 
+  // Menu: View
+
+  menu = this->GetViewMenu();
+  idx = this->GetViewMenuInsertPosition();
+  menu->InsertSeparator(idx++);
+  cmd = "ShowMainUserInterface {";
+  cmd += this->GetApplicationSettingsInterface()->GetName();
+  cmd += "}";
+  menu->InsertCommand(
+    idx++, this->GetApplicationSettingsInterface()->GetName(), 
+    this, cmd.c_str(), 0);
+  
   // Udpate the enable state
 
   this->UpdateEnableState();
@@ -129,6 +165,88 @@ vtkKWFrame* vtkKWWindow::GetMainPanelFrame()
 vtkKWFrame* vtkKWWindow::GetViewFrame()
 {
   return this->MainSplitFrame ? this->MainSplitFrame->GetFrame2() : NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWUserInterfaceManager* vtkKWWindow::GetMainUserInterfaceManager()
+{
+  return this->MainUserInterfaceManager;
+}
+
+//----------------------------------------------------------------------------
+vtkKWApplicationSettingsInterface* 
+vtkKWWindow::GetApplicationSettingsInterface()
+{
+  // If not created, create the application settings interface, connect it
+  // to the current window, and manage it with the current interface manager.
+
+  // Subclasses that will add more settings will likely to create a subclass
+  // of vtkKWApplicationSettingsInterface and override this function so that
+  // it instantiates that subclass instead vtkKWApplicationSettingsInterface.
+
+  if (!this->ApplicationSettingsInterface)
+    {
+    this->ApplicationSettingsInterface = 
+      vtkKWApplicationSettingsInterface::New();
+    this->ApplicationSettingsInterface->SetWindow(this);
+    this->ApplicationSettingsInterface->SetUserInterfaceManager(
+      this->GetMainUserInterfaceManager());
+    }
+  return this->ApplicationSettingsInterface;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowMainUserInterface(const char *name)
+{
+  if (this->GetMainUserInterfaceManager())
+    {
+    this->ShowMainUserInterface(
+      this->GetMainUserInterfaceManager()->GetPanel(name));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
+{
+  if (!panel)
+    {
+    return;
+    }
+
+  vtkKWUserInterfaceManager *uim = this->GetMainUserInterfaceManager();
+  if (!uim || !uim->HasPanel(panel))
+    {
+    return;
+    }
+
+  this->SetMainPanelVisibility(1);
+
+  if (!panel->Raise())
+    {
+    kwsys_stl::string msg;
+    msg = "The panel you are trying to access could not be displayed "
+      "properly. Please make sure there is enough room in the notebook "
+      "to bring up this part of the interface.";
+    if (this->MainNotebook && 
+        this->MainNotebook->GetShowOnlyMostRecentPages() &&
+        this->MainNotebook->GetPagesCanBePinned())
+      {
+      msg += " This may happen if you displayed ";
+      msg += this->MainNotebook->GetNumberOfMostRecentPages();
+      msg += " notebook pages "
+        "at the same time and pinned/locked all of them. In that case, "
+        "try to hide or unlock a notebook page first.";
+      }
+    vtkKWMessageDialog::PopupMessage( 
+      this->GetApplication(), this, "User Interface Warning", msg.c_str(),
+      vtkKWMessageDialog::WarningIcon);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWWindow::PrintOptionsCallback()
+{
+  this->ShowMainUserInterface(this->GetApplicationSettingsInterface());
 }
 
 //----------------------------------------------------------------------------
@@ -209,11 +327,11 @@ void vtkKWWindow::Update()
 
   // Update the whole interface
 
-  if (this->GetUserInterfaceManager())
+  if (this->GetMainUserInterfaceManager())
     {
     // Redundant Update() here, since we call UpdateEnableState(), which as 
     // a side effect will update each panel (see UpdateEnableState())
-    // this->GetUserInterfaceManager()->Update();
+    // this->GetMainUserInterfaceManager()->Update();
     }
 }
 
@@ -228,13 +346,13 @@ void vtkKWWindow::UpdateEnableState()
 
   // Update all the user interface panels
 
-  if (this->GetUserInterfaceManager())
+  if (this->GetMainUserInterfaceManager())
     {
-    this->GetUserInterfaceManager()->SetEnabled(this->GetEnabled());
+    this->GetMainUserInterfaceManager()->SetEnabled(this->GetEnabled());
     // As a side effect, SetEnabled() call an Update() on the panel, 
     // which will call an UpdateEnableState() too,
-    // this->GetUserInterfaceManager()->UpdateEnableState();
-    // this->GetUserInterfaceManager()->Update();
+    // this->GetMainUserInterfaceManager()->UpdateEnableState();
+    // this->GetMainUserInterfaceManager()->Update();
     }
 
   // Update the window element

@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.6");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.7");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -327,7 +327,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Main frame
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app, "-bg #223344");
+  this->MainFrame->Create(app, NULL);
 
   this->Script("pack %s -side top -fill both -expand t",
                this->MainFrame->GetWidgetName());
@@ -567,6 +567,38 @@ vtkKWMenu *vtkKWWindowBase::GetFileMenu()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWindowBase::GetFileMenuInsertPosition()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // First find the print-related menu commands
+
+  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::PrintOptionsMenuLabel))
+    {
+    return this->GetFileMenu()->GetIndex(
+      vtkKWWindowBase::PrintOptionsMenuLabel);
+    }
+
+  // Otherwise find Close or Exit if Close was removed
+
+  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileCloseMenuLabel))
+    {
+    return this->GetFileMenu()->GetIndex(
+      vtkKWWindowBase::FileCloseMenuLabel);  
+    }
+
+  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileExitMenuLabel))
+    {
+    return this->GetFileMenu()->GetIndex(vtkKWWindowBase::FileExitMenuLabel);  
+    }
+
+  return this->GetHelpMenu()->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindowBase::GetEditMenu()
 {
   if (!this->EditMenu)
@@ -610,6 +642,12 @@ vtkKWMenu *vtkKWWindowBase::GetViewMenu()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWindowBase::GetViewMenuInsertPosition()
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindowBase::GetWindowMenu()
 {
   if (!this->WindowMenu)
@@ -650,6 +688,24 @@ vtkKWMenu *vtkKWWindowBase::GetHelpMenu()
     }
   
   return this->HelpMenu;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowBase::GetHelpMenuInsertPosition()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // Find about
+
+  if (this->GetHelpMenu()->HasItem("About*"))
+    {
+    return this->GetHelpMenu()->GetIndex("About*") - 1;
+    }
+
+  return this->GetHelpMenu()->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
@@ -723,56 +779,6 @@ void vtkKWWindowBase::AddRecentFile(const char *name,
     this->MostRecentFilesManager->AddFile(name, target, command);
     this->MostRecentFilesManager->SaveFilesToRegistry();
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindowBase::GetFileMenuInsertPosition()
-{
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
-
-  // First find the print-related menu commands
-
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::PrintOptionsMenuLabel))
-    {
-    return this->GetFileMenu()->GetIndex(
-      vtkKWWindowBase::PrintOptionsMenuLabel);
-    }
-
-  // Otherwise find Close or Exit if Close was removed
-
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileCloseMenuLabel))
-    {
-    return this->GetFileMenu()->GetIndex(
-      vtkKWWindowBase::FileCloseMenuLabel);  
-    }
-
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileExitMenuLabel))
-    {
-    return this->GetFileMenu()->GetIndex(vtkKWWindowBase::FileExitMenuLabel);  
-    }
-
-  return this->GetHelpMenu()->GetNumberOfItems();
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindowBase::GetHelpMenuInsertPosition()
-{
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
-
-  // Find about
-
-  if (this->GetHelpMenu()->HasItem("About*"))
-    {
-    return this->GetHelpMenu()->GetIndex("About*") - 1;
-    }
-
-  return this->GetHelpMenu()->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------

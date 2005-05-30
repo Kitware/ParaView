@@ -27,6 +27,9 @@ class vtkKWNotebook;
 class vtkKWSplitFrame;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
+class vtkKWUserInterfaceNotebookManager;
+class vtkKWApplicationSettingsInterface;
+class vtkKWUserInterfacePanel;
 
 class KWWIDGETS_EXPORT vtkKWWindow : public vtkKWWindowBase
 {
@@ -71,16 +74,29 @@ public:
   virtual void Render();
 
   // Description:
-  // Get the User Interface Manager.
-  virtual vtkKWUserInterfaceManager* GetUserInterfaceManager()
-    { return 0; };
+  // Get the main User Interface Manager. In this implementation, the 
+  // main UIM is attached to the MainNotebook. Subclasses of 
+  // vtkKWUserInterfacePanel can be created and associated to this UIM so
+  // that they can be managed automatically.
+  virtual vtkKWUserInterfaceManager* GetMainUserInterfaceManager();
+
+  // Description:
+  // Show a main user interface given its name. The name is the name returned
+  // by the GetName() method of a vtkKWUserInterfacePanel (UIP). The 
+  // main UserInterfaceManager (UIM) will be queried to check if it is indeed
+  // managing an UIP with that name, and show/raise that UIP accordingly.
+  virtual void ShowMainUserInterface(const char *name);
+
+  // Description:
+  // Get the Application Settings Interface. 
+  virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
   // Description:
   // Update the UI. This will call:
   //   UpdateToolbarState
   //   UpdateEnableState 
   //   UpdateMenuState
-  //   Update on all panels belonging to the GetUserInterfaceManager, if any
+  //   Update on all panels belonging to the UserInterfaceManager, if any
   virtual void Update();
 
   // Description:
@@ -95,9 +111,8 @@ public:
 
   // Description:
   // Callbacks.
-  // Process the click on the error icon.
-  // Override it in subclasses to popup more elaborate log/error dialog.
   virtual void MainPanelVisibilityCallback();
+  virtual void PrintOptionsCallback();
 
   // Description:
   // Some constants
@@ -116,10 +131,20 @@ protected:
   virtual void SaveWindowGeometryToRegistry();
   virtual void RestoreWindowGeometryFromRegistry();
 
+  // Description:
+  // Show a main user interface. The  main UserInterfaceManager (UIM) will be
+  // queried to check if it is indeedmanaging the UIP, and show/raise that UIP
+  // accordingly.
+  virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
+
   vtkKWNotebook *MainNotebook;
   vtkKWSplitFrame *MainSplitFrame;
+  vtkKWApplicationSettingsInterface *ApplicationSettingsInterface;
 
 private:
+
+  vtkKWUserInterfaceNotebookManager *MainUserInterfaceManager;
+
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented
 };

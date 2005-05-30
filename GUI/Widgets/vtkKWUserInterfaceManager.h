@@ -73,6 +73,7 @@ public:
   // (see vtkKWUserInterfacePanel::SetUserInterfaceManager()).
   // Return a unique positive ID corresponding to that panel, or < 0 on error.
   virtual int AddPanel(vtkKWUserInterfacePanel *panel);
+  virtual int HasPanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
   // Get the number of panel
@@ -201,7 +202,6 @@ protected:
   PanelSlot* GetPanelSlot(int id);
   PanelSlot* GetPanelSlot(const char *panel_name);
   PanelSlot* GetNthPanelSlot(int rank);
-  int HasPanel(vtkKWUserInterfacePanel *panel);
   int GetPanelId(vtkKWUserInterfacePanel *panel);
 
   //ETX

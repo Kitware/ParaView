@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.14");
+vtkCxxRevisionMacro(vtkKWView, "1.15");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -929,22 +929,25 @@ void vtkKWView::EditCopy()
 //----------------------------------------------------------------------------
 void vtkKWView::Select(vtkKWWindow *pw)
 {
+  int idx;
+
   if (this->MenuEntryName)
     {
     // now add property options
-    char *rbv = 
-      pw->GetViewMenu()->CreateRadioButtonVariable(
-        pw->GetViewMenu(),"Radio");
-
-    pw->GetViewMenu()->AddRadioButton(VTK_KW_VIEW_MENU_INDEX, 
-                                      this->MenuEntryName, 
-                                      rbv, 
-                                      this, 
-                                      "ShowViewProperties", 
-                                      this->GetMenuEntryUnderline(),
-                                      this->MenuEntryHelp ? 
-                                      this->MenuEntryHelp :
-                                      this->MenuEntryName
+    char *rbv = pw->GetViewMenu()->CreateRadioButtonVariable(
+      pw->GetViewMenu(),"Radio");
+    idx = pw->GetViewMenuInsertPosition();
+    pw->GetViewMenu()->InsertRadioButton(
+      idx,
+      VTK_KW_VIEW_MENU_INDEX, 
+      this->MenuEntryName, 
+      rbv, 
+      this, 
+      "ShowViewProperties", 
+      this->GetMenuEntryUnderline(),
+      this->MenuEntryHelp ? 
+      this->MenuEntryHelp :
+      this->MenuEntryName
       );
     delete [] rbv;
     }
@@ -964,18 +967,17 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     // add the Print option
     // If there is a "Page Setup" menu, insert below
-    int clidx;
     if (pw->GetFileMenu()->HasItem(
           vtkKWWindowBase::PrintOptionsMenuLabel))
       {
-      clidx = pw->GetFileMenu()->GetIndex(
+      idx = pw->GetFileMenu()->GetIndex(
         vtkKWWindowBase::PrintOptionsMenuLabel) + 1;  
       }
     else
       {
-      clidx = this->ParentWindow->GetFileMenuInsertPosition();  
+      idx = this->ParentWindow->GetFileMenuInsertPosition();  
       }
-    pw->GetFileMenu()->InsertCommand(clidx, "Print", this, "PrintView", 0);
+    pw->GetFileMenu()->InsertCommand(idx, "Print", this, "PrintView", 0);
     }
   
   if ( this->SupportCopy )
@@ -1049,9 +1051,9 @@ void vtkKWView::MakeSelected()
 {
   if (this->ParentWindow)
     {
-    if (this->ParentWindow->GetUserInterfaceManager())
+    if (this->ParentWindow->GetMainUserInterfaceManager())
       {
-      this->ParentWindow->GetUserInterfaceManager()->Update();
+      this->ParentWindow->GetMainUserInterfaceManager()->Update();
       }
     }
   this->Script("focus %s", this->VTKWidget->GetWidgetName());

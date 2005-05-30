@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.440");
+vtkCxxRevisionMacro(vtkPVSource, "1.441");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1151,8 +1151,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->GetPVWindow()->UpdateEnableState();
     }
 
-  window->GetViewMenu()->CheckRadioButton(
-                                  window->GetViewMenu(), "Radio", 2);
+  window->GetViewMenu()->CheckRadioButton(window->GetViewMenu(), "Radio", 2);
   this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 

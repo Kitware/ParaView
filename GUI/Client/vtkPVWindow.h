@@ -68,7 +68,6 @@ class vtkKWMenuButton;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
 class vtkKWToolbar;
-class vtkKWUserInterfaceNotebookManager;
 class vtkPVAnimationInterface;
 class vtkPVApplication;
 class vtkPVApplicationSettingsInterface;
@@ -102,8 +101,6 @@ template <class value>
 class vtkLinkedList;
 //ETX
 
-#define VTK_PV_APPSETTINGS_MENU_INDEX  1
-#define VTK_PV_APPSETTINGS_MENU_LABEL  " Application Settings"
 #define VTK_PV_SOURCE_MENU_INDEX       2
 #define VTK_PV_SOURCE_MENU_LABEL       " Source"
 #define VTK_PV_ANIMATION_MENU_INDEX    3
@@ -472,13 +469,8 @@ public:
   //ETX
 
   // Description:
-  // Get the User Interface Manager.
-  virtual vtkKWUserInterfaceManager* GetUserInterfaceManager();
-
-  // Description:
   // Get/Show the Application Settings Interface. 
-  virtual vtkPVApplicationSettingsInterface *GetApplicationSettingsInterface();
-  int ShowApplicationSettingsInterface();
+  virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
   //BTX
   // Description:
@@ -588,7 +580,6 @@ public:
   // Description:
   // This method is called when error icon is clicked.
   void ErrorIconCallback();
-  virtual void PrintOptionsCallback();
   virtual void ToolbarVisibilityChangedCallback();
   virtual void NumberOfToolbarsChangedCallback();
     
@@ -770,8 +761,6 @@ protected:
   int ExpectProgress;
   int ModifiedEnableState;
 
-  vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
-  vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
   vtkKWSplitFrame *LowerFrame;
   vtkKWToolbarSet* LowerToolbars;
   
@@ -788,6 +777,12 @@ protected:
 #ifdef PARAVIEW_USE_LOOKMARKS
   vtkPVLookmarkManager *PVLookmarkManager;
 #endif
+
+  // Description:
+  // Show a main user interface. The  main UserInterfaceManager (UIM) will be
+  // queried to check if it is indeedmanaging the UIP, and show/raise that UIP
+  // accordingly.
+  virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
 
 private:
 

@@ -42,7 +42,6 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
-#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkPVApplication.h"
@@ -137,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.718");
+vtkCxxRevisionMacro(vtkPVWindow, "1.719");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -317,9 +316,6 @@ vtkPVWindow::vtkPVWindow()
   this->MenusDisabled = 0;
   this->ToolbarButtonsDisabled = 0;
 
-  this->UserInterfaceManager = 0;
-  this->ApplicationSettingsInterface = 0;
-
   this->InteractorID.ID = 0;
   this->ServerFileListingID.ID = 0;
 
@@ -327,6 +323,14 @@ vtkPVWindow::vtkPVWindow()
   #ifdef PARAVIEW_USE_LOOKMARKS
   this->PVLookmarkManager = NULL;
   #endif
+
+  if (this->MainSplitFrame)
+    {
+    this->MainSplitFrame->SetFrame1MinimumSize(200);
+    this->MainSplitFrame->SetFrame2MinimumSize(200);
+    this->MainSplitFrame->SetFrame1Size(380);
+    this->MainSplitFrame->SetSeparatorSize(5);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -367,22 +371,6 @@ void vtkPVWindow::PrepareForDelete()
     }
 
   this->SetInteractor(NULL);
-
-  // First delete the interface panels
-
-  if (this->ApplicationSettingsInterface)
-    {
-    this->ApplicationSettingsInterface->Delete();
-    this->ApplicationSettingsInterface = NULL;
-    }
-
-  // Then the interface manager
-
-  if (this->UserInterfaceManager)
-    {
-    this->UserInterfaceManager->Delete();
-    this->UserInterfaceManager = NULL;
-    }
 
   if (this->ResetCameraButton)
     {
@@ -711,35 +699,19 @@ void vtkPVWindow::PrepareForDelete()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 {
-  // Add view options.
-
   vtkKWMenu *menu = NULL;
-
-  // View menu: Show the application settings
-
-  char *rbv = 
-    this->GetViewMenu()->CreateRadioButtonVariable(
-      this->GetViewMenu(),"Radio");
-
-  this->GetViewMenu()->AddRadioButton(
-    VTK_PV_APPSETTINGS_MENU_INDEX, 
-    VTK_PV_APPSETTINGS_MENU_LABEL, 
-    rbv, 
-    this, 
-    "ShowApplicationSettingsInterface", 
-    1,
-    "Display the application settings");
-  delete [] rbv;
-
-  this->GetViewMenu()->AddSeparator();
+  int idx;
+  char *rbv = NULL;
 
   // View menu: shows the notebook for the current source and data object.
 
-  rbv = 
-    this->GetViewMenu()->CreateRadioButtonVariable(
-      this->GetViewMenu(),"Radio");
+  menu = this->GetViewMenu();
+  idx = this->GetViewMenuInsertPosition();
 
-  this->GetViewMenu()->AddRadioButton(
+  rbv = menu->CreateRadioButtonVariable(menu, "Radio");
+
+  menu->InsertRadioButton(
+    idx++,
     VTK_PV_SOURCE_MENU_INDEX, 
     VTK_PV_SOURCE_MENU_LABEL, 
     rbv, 
@@ -747,13 +719,11 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "ShowCurrentSourcePropertiesCallback", 
     1,
     "Display the properties of the current data source or filter");
-  delete [] rbv;
 
   // View menu: Shows the V animation tool
-  rbv = this->GetViewMenu()->CreateRadioButtonVariable(
-    this->GetViewMenu(), "Radio");
 
-  this->GetViewMenu()->AddRadioButton(
+  menu->InsertRadioButton(
+    idx++,
     VTK_PV_ANIMATION_MENU_INDEX + 1,
     " Keyframe Animation",
     rbv,
@@ -761,6 +731,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "ShowAnimationPanes",
     1,
     "Display the interface for creating animations");
+
   delete [] rbv;
   
   // File menu: 
@@ -772,60 +743,60 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   menu->DeleteMenuItem(vtkKWWindowBase::FileCloseMenuLabel);
 
-  int clidx = this->GetFileMenuInsertPosition();
+  idx = this->GetFileMenuInsertPosition();
 
   // Open a data file. Can support multiple file formats (see Open()).
 
   menu->InsertCommand(
-    clidx++, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
+    idx++, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
 
   // Save current data in VTK format.
 
   menu->InsertCommand(
-    clidx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
+    idx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
-  menu->InsertSeparator(clidx++);
+  menu->InsertSeparator(idx++);
 
   // Add advanced file options
 
   menu->InsertCommand(
-    clidx++, "Load Session", 
+    idx++, "Load Session", 
     this, "LoadScript", 0, "Restore a trace of actions.");
   menu->InsertCommand(
-    clidx++, "Save Session State", 
+    idx++, "Save Session State", 
     this, "SaveState", 7,"Write the current state of ParaView in a file.");
   menu->InsertCommand(
-    clidx++, "Save Session Trace", 
+    idx++, "Save Session Trace", 
     this, "SaveTrace", 3, "Save a trace of every action since start up.");
   menu->InsertCommand(
-    clidx++, "Save Batch Script", 
+    idx++, "Save Batch Script", 
     this, "SaveBatchScript", 7, 
     "Write a script which can run in batch by ParaView");
   menu->InsertCommand(
-    clidx++, "Save SM State", 
+    idx++, "Save SM State", 
     this, "SaveSMState", 6, "Server the server manager state as xml.");
   menu->InsertCommand(
-    clidx++, "Import Package", 
+    idx++, "Import Package", 
     this,  "OpenPackage", 3, "Import modules defined in a ParaView package ");
   
-  menu->InsertSeparator(clidx++);
+  menu->InsertSeparator(idx++);
 
-  menu->InsertCommand(clidx++, "Save Animation", this,
+  menu->InsertCommand(idx++, "Save Animation", this,
     "SaveAnimation", 5, "Save animation as a movie or images.");
   
-  menu->InsertCommand(clidx++, "Save Geometry", this,
+  menu->InsertCommand(idx++, "Save Geometry", this,
     "SaveGeometry", 5, "Save geometry from each frame. This will create "
     "a series of .vtp files.");
   
-  menu->InsertSeparator(clidx++);
+  menu->InsertSeparator(idx++);
   
-  this->InsertRecentFilesMenu(clidx++, this);
+  this->InsertRecentFilesMenu(idx++, this);
   
-  menu->InsertSeparator(clidx++);
+  menu->InsertSeparator(idx++);
 
   /*
   // Open XML package
-  menu->InsertCommand(clidx++, "Open Package", this, 
+  menu->InsertCommand(idx++, "Open Package", this, 
                                 "OpenPackage", 8,
                                 "Open a ParaView package and load the "
                                 "contents");
@@ -1102,15 +1073,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // On X11, the window name is the same as the widget name.
 
   this->WidgetName = kwsys::SystemTools::DuplicateString(".paraview");
-
-  // Allow the user to interactively resize the properties parent.
-  // Set the left panel size (Frame1) for this app. Do it now before
-  // the superclass eventually restores the size from the registry
-
-  this->MainSplitFrame->SetFrame1MinimumSize(200);
-  this->MainSplitFrame->SetFrame2MinimumSize(200);
-  this->MainSplitFrame->SetFrame1Size(380);
-  this->MainSplitFrame->SetSeparatorSize(5);
 
   // Invoke super method
 
@@ -2139,18 +2101,7 @@ void vtkPVWindow::OpenCallback()
 }
 
 //----------------------------------------------------------------------------
-vtkKWUserInterfaceManager* vtkPVWindow::GetUserInterfaceManager()
-{
-  if (!this->UserInterfaceManager)
-    {
-    this->UserInterfaceManager = vtkKWUserInterfaceNotebookManager::New();
-    this->UserInterfaceManager->SetNotebook(this->GetMainNotebook());
-    }
-  return this->UserInterfaceManager;
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplicationSettingsInterface* 
+vtkKWApplicationSettingsInterface* 
 vtkPVWindow::GetApplicationSettingsInterface()
 {
   // If not created, create the application settings interface, connect it
@@ -2161,34 +2112,28 @@ vtkPVWindow::GetApplicationSettingsInterface()
     this->ApplicationSettingsInterface = 
       vtkPVApplicationSettingsInterface::New();
     this->ApplicationSettingsInterface->SetWindow(this);
-
-    vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
-    if (uim)
-      {
-      this->ApplicationSettingsInterface->SetUserInterfaceManager(uim);
-      }
+    this->ApplicationSettingsInterface->SetUserInterfaceManager(
+      this->GetMainUserInterfaceManager());
     }
   return this->ApplicationSettingsInterface;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::ShowApplicationSettingsInterface()
+void vtkPVWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
 {
-  if (this->GetApplicationSettingsInterface())
+  if (!panel)
     {
-    this->SetMainPanelVisibility(1);
-    
-    // Forget current props and pack the notebook
-    
-    this->MainNotebook->UnpackSiblings();
-    
-    this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
-               this->MainNotebook->GetWidgetName());
-
-    return this->GetApplicationSettingsInterface()->Raise();
+    return;
     }
 
-  return 0;
+  // Forget current props and pack the notebook
+  
+  this->MainNotebook->UnpackSiblings();
+  
+  this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
+               this->MainNotebook->GetWidgetName());
+
+  this->Superclass::ShowMainUserInterface(panel);
 }
 
 //-----------------------------------------------------------------------------
@@ -4526,12 +4471,6 @@ void vtkPVWindow::ErrorIconCallback()
 {
   this->Superclass::ErrorIconCallback();
   this->ShowErrorLog();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::PrintOptionsCallback()
-{
-  this->ShowApplicationSettingsInterface();
 }
 
 //-----------------------------------------------------------------------------
