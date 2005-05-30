@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.24");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.25");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -34,10 +34,10 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame2 = vtkKWFrame::New();
   this->Frame2->SetParent(this);
 
-  this->Frame1Size = 100;
-  this->Frame2Size = 700;
-  this->Frame1MinimumSize = 50;
-  this->Frame2MinimumSize = 50;
+  this->Frame1Size = 250;
+  this->Frame2Size = 600;
+  this->Frame1MinimumSize = 150;
+  this->Frame2MinimumSize = 150;
 
   this->Frame1Visibility = 1;
   this->Frame2Visibility = 1;
@@ -45,7 +45,7 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->SeparatorSize = 4;
   this->SeparatorMargin = 2;
 
-  this->Size = 806;
+  this->Size = this->Frame1Size + this->Frame2Size + this->SeparatorSize + this->SeparatorMargin * 2;
 
   this->Orientation = vtkKWSplitFrame::Horizontal;
 }
