@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTracedWidget );
-vtkCxxRevisionMacro(vtkPVTracedWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVTracedWidget, "1.2");
 
 int vtkPVTracedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -65,6 +65,8 @@ vtkPVTraceHelper* vtkPVTracedWidget::GetTraceHelper()
 //----------------------------------------------------------------------------
 void vtkPVTracedWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
+
   os << indent << "TraceHelper: ";
   if (this->TraceHelper)
     {
