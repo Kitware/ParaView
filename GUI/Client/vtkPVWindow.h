@@ -594,6 +594,14 @@ public:
   };
 //ETX
 
+  // Description:
+  // Show a main user interface given its name. The name is the name returned
+  // by the GetName() method of a vtkKWUserInterfacePanel (UIP). The 
+  // main UserInterfaceManager (UIM) will be queried to check if it is indeed
+  // managing an UIP with that name, and show/raise that UIP accordingly.
+  virtual void ShowMainUserInterface(const char *name)
+    { this->Superclass::ShowMainUserInterface(name); }
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
