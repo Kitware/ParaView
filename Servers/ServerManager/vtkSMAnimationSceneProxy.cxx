@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.11");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, const char* ext,
   int oldMode = this->GetPlayMode();
   double old_framerate = this->GetFrameRate();
   int old_loop = this->GetLoop();
-  this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
+  this->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
   this->SetFrameRate(framerate);
   this->SetLoop(0);
   this->Play();
@@ -349,7 +349,7 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
   int oldMode = this->GetPlayMode();
   int old_loop = this->GetLoop();
   this->SetLoop(0);
-  this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
+  this->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
   this->Play();
   this->SetPlayMode(oldMode);
   this->SetLoop(old_loop);
@@ -535,7 +535,7 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
     scene->SetPlayMode(mode);
     }
   // Caching is disabled when play mode is real time.
-  if (mode == VTK_ANIMATION_SCENE_PLAYMODE_REALTIME && this->Caching)
+  if (mode == vtkAnimationScene::PLAYMODE_REALTIME && this->Caching)
     {
     vtkWarningMacro("Disabling caching. "
       "Caching not available in Real Time mode.");
@@ -596,7 +596,7 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
 {
   if (!this->GetCaching() || 
-      this->GetPlayMode() == VTK_ANIMATION_SCENE_PLAYMODE_REALTIME)
+      this->GetPlayMode() == vtkAnimationScene::PLAYMODE_REALTIME)
     {
     return;
     }
