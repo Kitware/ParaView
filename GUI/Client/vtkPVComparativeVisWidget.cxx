@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVComparativeVisWidget.h"
 
 #include "vtkEventForwarderCommand.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisWidget, "1.2");
 
 int vtkPVComparativeVisWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -41,6 +42,7 @@ vtkPVComparativeVisWidget::vtkPVComparativeVisWidget()
   this->CommandFunction = vtkPVComparativeVisWidgetCommand;
 
   this->TrackSelector = vtkPVActiveTrackSelector::New();
+  this->NumberOfFramesEntry = vtkKWEntry::New();
 
   vtkEventForwarderCommand* ef = vtkEventForwarderCommand::New();
   ef->SetTarget(this);
@@ -55,6 +57,11 @@ vtkPVComparativeVisWidget::vtkPVComparativeVisWidget()
 vtkPVComparativeVisWidget::~vtkPVComparativeVisWidget()
 {
   this->TrackSelector->Delete();
+  this->NumberOfFramesEntry->Delete();
+  if (this->LastCueEditor)
+    {
+    this->LastCueEditor->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +84,12 @@ void vtkPVComparativeVisWidget::Create(vtkKWApplication *app, const char *)
   this->TrackSelector->SetFocusCurrentCue(0);
   this->TrackSelector->GetSourceMenuButton()->SetWidth(15);
   this->TrackSelector->GetPropertyMenuButton()->SetWidth(20);
-  this->Script("pack %s", this->TrackSelector->GetWidgetName());
+  this->Script("pack %s -side left", this->TrackSelector->GetWidgetName());
+
+  this->NumberOfFramesEntry->SetParent(this);
+  this->NumberOfFramesEntry->Create(app, "");
+  this->NumberOfFramesEntry->SetValue(5);
+  this->Script("pack %s -side left", this->NumberOfFramesEntry->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -85,7 +97,14 @@ void vtkPVComparativeVisWidget::CopyToVisualization(vtkPVComparativeVis* cv)
 {
   if (this->LastCueEditor)
     {
-    cv->AddProperty(this->LastCue, this->LastCueEditor->GetCueProxy(), 3);  
+    int numFrames = 1;
+    if (this->NumberOfFramesEntry->GetValueAsInt() > 0)
+      {
+      numFrames = this->NumberOfFramesEntry->GetValueAsInt();
+      }
+    this->LastCueEditor->SetDuration(numFrames);
+    cv->AddProperty(
+      this->LastCue, this->LastCueEditor->GetCueProxy(), numFrames);  
     }
 }
 
@@ -110,6 +129,7 @@ void vtkPVComparativeVisWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
         }
       this->LastCue = selectedCue;
       this->LastCueEditor = vtkPVSimpleAnimationCue::New();
+      this->LastCueEditor->SetDuration(5);
       this->LastCueEditor->SetKeyFrameParent(trackE->GetPropertiesFrame());
       this->LastCueEditor->CreateWidget(this->GetApplication(), 0, 0);
 
@@ -121,6 +141,8 @@ void vtkPVComparativeVisWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
         this->LastCue->GetAnimatedDomainName());
       this->LastCueEditor->SetAnimatedElement(
         this->LastCue->GetAnimatedElement());
+
+      this->LastCueEditor->AppendNewKeyFrame();
       }
     trackE->SetAnimationCue(this->LastCueEditor);
     }

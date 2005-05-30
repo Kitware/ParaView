@@ -19,6 +19,7 @@
 
 #include "vtkKWWidget.h"
 
+class vtkKWEntry;
 class vtkPVActiveTrackSelector;
 class vtkPVAnimationCue;
 class vtkPVComparativeVis;
@@ -58,6 +59,7 @@ protected:
   vtkPVActiveTrackSelector* TrackSelector;
   vtkPVSimpleAnimationCue* LastCueEditor;
   vtkPVAnimationCue* LastCue;
+  vtkKWEntry* NumberOfFramesEntry;
 
 private:
   vtkPVComparativeVisWidget(const vtkPVComparativeVisWidget&); // Not implemented
