@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.30");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.31");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -770,6 +770,24 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
     pvKF->SaveState(file);
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
+{
+  int keyid = this->Superclass::CreateAndAddKeyFrame(time, type);
+  if (keyid < 0)
+    {
+    return keyid;
+    }
+  vtkPVKeyFrame* keyf = this->GetKeyFrame(keyid);
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
+    this->GetApplication());
+  vtkPVWindow* pvWin = pvApp->GetMainWindow();
+  vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
+
+  keyf->SetAnimationScene(pvAM->GetAnimationScene());
+  return keyid;
 }
 
 //-----------------------------------------------------------------------------

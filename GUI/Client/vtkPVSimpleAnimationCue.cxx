@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.4");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.5");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -132,6 +132,7 @@ vtkPVSimpleAnimationCue::vtkPVSimpleAnimationCue()
   this->Observer->SetTarget(this);
 
   this->KeyFrameParent = 0;
+  this->Duration = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -517,6 +518,25 @@ int vtkPVSimpleAnimationCue::GetTimeBounds(double bounds[2])
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::SetDuration(double duration)
+{
+  if (duration != this->Duration)
+    {
+    this->Duration = duration;
+    this->Modified();
+    }
+  vtkCollectionIterator* iter = this->PVKeyFrames->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+       iter->GoToNextItem())
+    {
+    vtkPVKeyFrame* pvKeyFrame = vtkPVKeyFrame::SafeDownCast(
+      iter->GetCurrentObject());
+    pvKeyFrame->SetDuration(duration);
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::SetTimeBounds(double bounds[2], int enable_scaling)
 {
   int num = this->GetNumberOfKeyFrames();
@@ -618,6 +638,7 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   // provide a pointer to cue, so that the interace
   // can be in accordance with the animated proeprty.
   keyframe->Create(this->GetApplication(),NULL);
+  keyframe->SetDuration(this->Duration);
   keyframe->SetKeyTime(time);
   keyframe->SetKeyValue(0);
   int id = this->AddKeyFrame(keyframe);

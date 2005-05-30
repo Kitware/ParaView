@@ -198,6 +198,14 @@ public:
   // are scaled.
   virtual void SetTimeBounds(double bounds[2], int enable_scaling=0);
   virtual int GetTimeBounds(double* bounds);
+
+  // Description:
+  // Creates a new key frame of the specified type and add it to the cue at
+  // the given time.  Time is normalized to the span of the cue [0,1]. This
+  // method also does not verify is a key frame already exists at the
+  // specified time.
+  virtual int CreateAndAddKeyFrame(double time, int type);
+
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();

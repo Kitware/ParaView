@@ -25,6 +25,7 @@ class vtkKWThumbWheel;
 class vtkPVWidget;
 class vtkKWLabel;
 class vtkKWPushButton;
+class vtkPVAnimationScene;
 class vtkPVKeyFrameObserver;
 class vtkSMAnimationCueProxy;
 class vtkSMProperty;
@@ -59,7 +60,8 @@ public:
 
   // Description:
   // Initilizes the Key Value using the property element at given index.
-  virtual void InitializeKeyValueUsingProperty(vtkSMProperty* property, int index);
+  virtual void InitializeKeyValueUsingProperty(
+    vtkSMProperty* property, int index);
  
   // Description:
   // Initialize the Key Value bounds using current animatied property value
@@ -88,10 +90,10 @@ public:
   virtual void PrepareForDisplay();
  
   // Description:
-  // A pointer to the AnimationCueProxy is need so that the keyframe
-  // can obtain information about the animated property. Must be set before
-  // calling create and should not be changed thereafter. Note that it is not 
-  // reference counted for fear of loops.
+  // A pointer to the AnimationCueProxy is need so that the keyframe can
+  // obtain information about the animated property. Must be set before
+  // calling create and should not be changed thereafter. Note that it is
+  // not reference counted for fear of loops.
   void SetAnimationCueProxy(vtkSMAnimationCueProxy* cueproxy) 
     { this->AnimationCueProxy = cueproxy; }
   vtkGetObjectMacro(AnimationCueProxy, vtkSMAnimationCueProxy);
@@ -100,11 +102,22 @@ public:
 
   virtual void UpdateEnableState();
 
-
   // Description:
   // Name is used for trace alone. Do not use this directly.
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
+
+  // Description:
+  // Used to obtain duration. If not set the Duration ivar will be used
+  // in normalizing time.
+  void SetAnimationScene(vtkPVAnimationScene* scene);
+  vtkGetObjectMacro(AnimationScene, vtkPVAnimationScene);
+
+  // Description:
+  // If AnimationScene is not set, Duration is used to normalize time.
+  void SetDuration(double duration);
+  vtkGetMacro(Duration, double);
+
 protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
@@ -152,6 +165,11 @@ protected:
   double GetNormalizedTime(double rtime);
 
   double TimeBounds[2];
+
+  vtkPVAnimationScene* AnimationScene;
+
+  double Duration;
+
 private:
   vtkPVKeyFrame(const vtkPVKeyFrame&); // Not implemented.
   void operator=(const vtkPVKeyFrame&); // Not implemented.

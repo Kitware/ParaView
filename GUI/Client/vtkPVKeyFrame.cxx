@@ -44,7 +44,9 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.15");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.16");
+vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
+
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -117,6 +119,8 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->Name = NULL;
   this->MinButton = vtkKWPushButton::New();
   this->MaxButton = vtkKWPushButton::New();
+  this->AnimationScene = 0;
+  this->Duration = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +155,8 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
   this->MinButton->Delete();
   this->MaxButton->Delete();
   this->SetName(NULL);
+
+  this->SetAnimationScene(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -227,13 +233,15 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->MinButton->SetParent(this);
   this->MinButton->Create(this->GetApplication(),0);
   this->MinButton->SetText("min");
-  this->MinButton->SetBalloonHelpString("Set the value to the minimum possible, given the "
+  this->MinButton->SetBalloonHelpString(
+    "Set the value to the minimum possible, given the "
     "current state of the system.");
   this->MinButton->SetCommand(this,"MinimumCallback");
   this->MaxButton->SetParent(this);
   this->MaxButton->Create(this->GetApplication(),0);
   this->MaxButton->SetText("max");
-  this->MaxButton->SetBalloonHelpString("Set the value to the maximum possible, given the "
+  this->MaxButton->SetBalloonHelpString(
+    "Set the value to the maximum possible, given the "
     "current state of the system.");
   this->MaxButton->SetCommand(this, "MaximumCallback");
 
@@ -330,7 +338,8 @@ void vtkPVKeyFrame::SetValueToMinimum()
 {
   this->UpdateDomain();
   vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-  vtkPVSelectionList *pvSelect = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+  vtkPVSelectionList *pvSelect = 
+    vtkPVSelectionList::SafeDownCast(this->ValueWidget);
   if (pvWheel && pvWheel->GetClampMinimumValue())
     {
     this->SetKeyValue(pvWheel->GetMinimumValue());
@@ -353,7 +362,8 @@ void vtkPVKeyFrame::SetValueToMaximum()
 {
   this->UpdateDomain();
   vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-  vtkPVSelectionList *pvSelect = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+  vtkPVSelectionList *pvSelect = 
+    vtkPVSelectionList::SafeDownCast(this->ValueWidget);
   if (pvWheel && pvWheel->GetClampMaximumValue())
     {
     this->SetKeyValue(pvWheel->GetMaximumValue());
@@ -372,7 +382,8 @@ void vtkPVKeyFrame::MaximumCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int index)
+void vtkPVKeyFrame::InitializeKeyValueUsingProperty(
+  vtkSMProperty* property, int index)
 {
   if (!property )
     {
@@ -395,15 +406,20 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     }
   if (vtkSMVectorProperty::SafeDownCast(property))
     {
-    if ((int)(vtkSMVectorProperty::SafeDownCast(property)->GetNumberOfElements()) <= index)
+    if (
+      static_cast<int>(
+        (vtkSMVectorProperty::SafeDownCast(property)->GetNumberOfElements())) 
+      <= index)
       {
-      vtkErrorMacro("Invalid index " << index << " for property : " << property->GetXMLName());
+      vtkErrorMacro(<<"Invalid index " << index << " for property : " 
+                    << property->GetXMLName());
       return;
       }
     }
   if (vtkSMDoubleVectorProperty::SafeDownCast(property))
     {
-    this->SetKeyValue(vtkSMDoubleVectorProperty::SafeDownCast(property)->GetElement(index));
+    this->SetKeyValue(
+      vtkSMDoubleVectorProperty::SafeDownCast(property)->GetElement(index));
     }
   else if (vtkSMIntVectorProperty::SafeDownCast(property))
     {
@@ -412,8 +428,9 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     }
   else if (vtkSMIdTypeVectorProperty::SafeDownCast(property))
     {
-    this->SetKeyValue(static_cast<double>(vtkSMIdTypeVectorProperty::SafeDownCast(
-          property)->GetElement(index)));
+    this->SetKeyValue(
+      static_cast<double>(vtkSMIdTypeVectorProperty::SafeDownCast(
+                            property)->GetElement(index)));
     }
   else if (vtkSMStringVectorProperty::SafeDownCast(property))
     {
@@ -446,7 +463,8 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     else
       {
       const char* string = svp->GetElement(index);
-      vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget); 
+      vtkPVSelectionList* pvList = 
+        vtkPVSelectionList::SafeDownCast(this->ValueWidget); 
       if (string && pvList)
         {
         // find the index for this string in the widget / or domain.
@@ -491,7 +509,8 @@ void vtkPVKeyFrame::UpdateDomain()
   if (bd)
     {
     // Domain does not change for boolean.
-    vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+    vtkPVSelectionList* pvList = 
+      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
     if (pvList->GetNumberOfItems() != 2)
       {
       pvList->RemoveAllItems();
@@ -501,9 +520,11 @@ void vtkPVKeyFrame::UpdateDomain()
     }
   else if (ed)
     {
-    vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+    vtkPVSelectionList* pvList = 
+      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
     // Update PVSelectionList using emumerated elements.
-    if (pvList && (pvList->GetMTime() <= ed->GetMTime() || pvList->GetNumberOfItems()==0))
+    if (pvList && (pvList->GetMTime() <= ed->GetMTime() || 
+                   pvList->GetNumberOfItems()==0))
       {
       pvList->RemoveAllItems();
       for (unsigned int cc=0; cc < ed->GetNumberOfEntries(); cc++)
@@ -516,9 +537,11 @@ void vtkPVKeyFrame::UpdateDomain()
     }
   else if (sld)
     {
-    vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+    vtkPVSelectionList* pvList = 
+      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
     // Update PVSelectionList using strings.
-    if (pvList && (pvList->GetMTime() <= sld->GetMTime() || pvList->GetNumberOfItems()==0))
+    if (pvList && (pvList->GetMTime() <= sld->GetMTime() || 
+                   pvList->GetNumberOfItems()==0))
       {
       pvList->RemoveAllItems();
       for (unsigned int cc=0; cc < sld->GetNumberOfStrings(); cc++)
@@ -567,7 +590,8 @@ void vtkPVKeyFrame::UpdateDomain()
       {
       wheel->SetMinimumValue(min);
       wheel->ClampMinimumValueOn();
-      this->Script("grid %s -column %d -row 1", this->MinButton->GetWidgetName(), column);
+      this->Script("grid %s -column %d -row 1", 
+                   this->MinButton->GetWidgetName(), column);
       column++;
       }
     else
@@ -579,7 +603,8 @@ void vtkPVKeyFrame::UpdateDomain()
       {
       wheel->SetMaximumValue(max);
       wheel->ClampMaximumValueOn();
-      this->Script("grid %s -column %d -row 1", this->MaxButton->GetWidgetName(), column);
+      this->Script("grid %s -column %d -row 1", 
+                   this->MaxButton->GetWidgetName(), column);
       }
     else
       {
@@ -680,11 +705,26 @@ void vtkPVKeyFrame::TimeChangedCallback()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVKeyFrame::SetDuration(double duration)
+{
+  if (duration != this->Duration)
+    {
+    this->Duration = duration;
+    this->Modified();
+    }
+  double ntime = this->GetNormalizedTime(
+    this->TimeThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetKeyTime(ntime);
+}
+
+//-----------------------------------------------------------------------------
 double vtkPVKeyFrame::GetNormalizedTime(double rtime)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-  double duration = pvApp->GetMainWindow()->GetAnimationManager()->
-    GetAnimationScene()->GetDuration();
+  double duration = this->Duration;
+  if (this->AnimationScene)
+    {
+    duration = this->AnimationScene->GetDuration();
+    }
   if (duration == 0)
     {
     vtkErrorMacro("Scene durantion is 0");
@@ -696,9 +736,11 @@ double vtkPVKeyFrame::GetNormalizedTime(double rtime)
 //-----------------------------------------------------------------------------
 double vtkPVKeyFrame::GetRelativeTime(double ntime)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-  double duration = pvApp->GetMainWindow()->GetAnimationManager()->
-    GetAnimationScene()->GetDuration();
+  double duration = this->Duration;
+  if (this->AnimationScene)
+    {
+    duration = this->AnimationScene->GetDuration();
+    }
   return duration*ntime;
 }
 
@@ -739,7 +781,8 @@ void vtkPVKeyFrame::SetKeyTime(double time)
 {
   DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyTime", time);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", this->GetTclName(), time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", 
+                                   this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------

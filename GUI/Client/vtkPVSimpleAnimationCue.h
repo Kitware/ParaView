@@ -99,7 +99,7 @@ public:
   // the given time.  Time is normalized to the span of the cue [0,1]. This
   // method also does not verify is a key frame already exists at the
   // specified time.
-  int CreateAndAddKeyFrame(double time, int type);
+  virtual int CreateAndAddKeyFrame(double time, int type);
 
   // Description:
   // Determine a time to append a new keyframe (the old keyframes in this
@@ -223,6 +223,11 @@ public:
   // Typically, this is an instance of vtkPVTrackEditor.
   void SetKeyFrameParent(vtkKWWidget* kfParent);
 
+  // Description:
+  // Forwarded to all created key frames.
+  void SetDuration(double duration);
+  vtkGetMacro(Duration, double);
+
 protected:
   vtkPVSimpleAnimationCue();
   ~vtkPVSimpleAnimationCue();
@@ -292,6 +297,9 @@ protected:
   void Observe(vtkObject* toObserver, unsigned long event);
   virtual void ExecuteEvent(vtkObject* wdg, unsigned long event, void*data);
 //ETX
+
+  double Duration;
+
 private:
   vtkPVSimpleAnimationCue(const vtkPVSimpleAnimationCue&); // Not implemented.
   void operator=(const vtkPVSimpleAnimationCue&); // Not implemented.
