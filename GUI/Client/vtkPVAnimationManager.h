@@ -159,8 +159,8 @@ public:
 
   // Description:
   // Returns a new Key frame of the specified type. Note that this method
-  // does not "Create" the key frame (by calling Create).  vtkPVKeyFrame*
-  // NewKeyFrame(int type);
+  // does not "Create" the key frame (by calling Create).  
+  vtkPVKeyFrame* NewKeyFrame(int type);
 
   // Description:
   // Returns the type of the key frame.
