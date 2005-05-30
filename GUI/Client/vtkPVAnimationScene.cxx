@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.33");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.34");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -423,7 +423,7 @@ void vtkPVAnimationScene::CreateProxy()
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"StartTime",0.0);
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", 60.0);
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"TimeMode",
-    VTK_ANIMATION_CUE_TIMEMODE_RELATIVE);
+                               vtkAnimationCue::TIMEMODE_RELATIVE);
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", 1.0);
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -629,13 +629,13 @@ void vtkPVAnimationScene::GoToPrevious()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetPlayModeToSequence()
 {
-  this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
+  this->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetPlayModeToRealTime()
 {
-  this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_REALTIME);
+  this->SetPlayMode(vtkAnimationScene::PLAYMODE_REALTIME);
 }
 
 //-----------------------------------------------------------------------------
@@ -643,13 +643,13 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
 {
   switch (mode)
     {
-  case VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE:
+  case vtkAnimationScene::PLAYMODE_SEQUENCE:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
     this->AnimationManager->EnableCacheCheck();
     // Change the time scale increment to 1.
     this->TimeScale->SetResolution(1);
     break;
-  case VTK_ANIMATION_SCENE_PLAYMODE_REALTIME:
+  case vtkAnimationScene::PLAYMODE_REALTIME:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_REALTIME_TITLE);
     this->AnimationManager->DisableCacheCheck();
       // disable cahce check when in real time mode.
