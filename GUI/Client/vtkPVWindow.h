@@ -255,7 +255,7 @@ public:
 
   // Description:
   // Show the comparative vis gui.
-  void ShowCVManager();
+  void ShowComparativeVisManager();
  
   // Description:
   // Callback for saving animation as images.
@@ -583,6 +583,10 @@ public:
   virtual void ToolbarVisibilityChangedCallback();
   virtual void NumberOfToolbarsChangedCallback();
     
+  // Description:
+  // Returns the comparative vis. manager interface.
+  vtkPVComparativeVisManagerGUI* GetComparativeVisManagerGUI();
+  
 //BTX
   enum InteractorStyles
   {
@@ -690,7 +694,11 @@ protected:
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;
 
-  vtkPVComparativeVisManagerGUI* CVManagerGUI;
+  // Description:
+  // Create the comparative vis. manager interface. This is normally called
+  // by ShowComparativeVisManager() but can be called separately if a
+  // manager has to be created without showing it.
+  void CreateComparativeVisManagerGUI();
 
   // Extensions of files that loaded readers recognize.
   char *FileExtensions;
@@ -745,8 +753,6 @@ protected:
   // Create error log display.
   void CreateErrorLogDisplay();
 
-  void CreateCVManagerGUI();
-
   void HideCenterActor();
   void ShowCenterActor();
 
@@ -793,6 +799,7 @@ protected:
   virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
 
 private:
+  vtkPVComparativeVisManagerGUI* ComparativeVisManagerGUI;
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented

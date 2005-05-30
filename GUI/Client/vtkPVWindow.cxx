@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.720");
+vtkCxxRevisionMacro(vtkPVWindow, "1.721");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -246,7 +246,7 @@ vtkPVWindow::vtkPVWindow()
   this->TimerLogDisplay = 0;
   this->ErrorLogDisplay = 0;
 
-  this->CVManagerGUI = 0;
+  this->ComparativeVisManagerGUI = 0;
 
   // Set the extension and the type (name) of the script for
   // this application. They are all Tcl scripts but we give
@@ -368,6 +368,14 @@ void vtkPVWindow::PrepareForDelete()
     {
 //    this->Script("bind %s <Configure> {}", 
 //                this->MainView->GetVTKWidget()->GetWidgetName(), this->GetTclName());
+    }
+
+  if (this->ComparativeVisManagerGUI)
+    {
+    this->ComparativeVisManagerGUI->PrepareForDelete();
+    this->ComparativeVisManagerGUI->SetMasterWindow(NULL);
+    this->ComparativeVisManagerGUI->Delete();
+    this->ComparativeVisManagerGUI = 0;
     }
 
   this->SetInteractor(NULL);
@@ -679,13 +687,6 @@ void vtkPVWindow::PrepareForDelete()
     this->ErrorLogDisplay = NULL;
     }
 
-  if (this->CVManagerGUI )
-    {
-    this->CVManagerGUI->SetMasterWindow(NULL);
-    this->CVManagerGUI->Delete();
-    this->CVManagerGUI = NULL;
-    }
-
 #ifdef PARAVIEW_USE_LOOKMARKS
   if (this->PVLookmarkManager )
     {
@@ -856,7 +857,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Comparative vis manager
 //   this->GetWindowMenu()->InsertCommand(
 //     6, "Comparative Vis. Manager", this, 
-//     "ShowCVManager", 0, 
+//     "ShowComparativeVisManager", 0, 
 //     "Show comparative visualization manager");
 
 #ifdef PARAVIEW_USE_LOOKMARKS
@@ -3936,22 +3937,29 @@ void vtkPVWindow::CreateErrorLogDisplay()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::ShowCVManager()
+void vtkPVWindow::ShowComparativeVisManager()
 {
-  this->CreateCVManagerGUI();  
-  this->CVManagerGUI->Update();
-  this->CVManagerGUI->Display();
+  vtkPVComparativeVisManagerGUI* gui = this->GetComparativeVisManagerGUI();
+  gui->Update();
+  gui->Display();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::CreateCVManagerGUI()
+vtkPVComparativeVisManagerGUI* vtkPVWindow::GetComparativeVisManagerGUI()
 {
-  if ( ! this->CVManagerGUI )
+  this->CreateComparativeVisManagerGUI();  
+  return this->ComparativeVisManagerGUI;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::CreateComparativeVisManagerGUI()
+{
+  if ( ! this->ComparativeVisManagerGUI )
     {
-    this->CVManagerGUI = vtkPVComparativeVisManagerGUI::New();
-    this->CVManagerGUI->SetTitle("Comparative Vis");
-    this->CVManagerGUI->SetMasterWindow(this);
-    this->CVManagerGUI->Create(this->GetPVApplication(), 0);
+    this->ComparativeVisManagerGUI = vtkPVComparativeVisManagerGUI::New();
+    this->ComparativeVisManagerGUI->SetTitle("Comparative Vis");
+    this->ComparativeVisManagerGUI->SetMasterWindow(this);
+    this->ComparativeVisManagerGUI->Create(this->GetPVApplication(), 0);
     }  
 }
 
