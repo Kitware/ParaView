@@ -80,6 +80,7 @@ public:
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
   // This will change the label when SetLabelText() is called.
+  // Defaults to LABEL_CASE_UPPERCASE_FIRST.
   //BTX
   enum
   {

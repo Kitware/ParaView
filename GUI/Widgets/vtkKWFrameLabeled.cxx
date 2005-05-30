@@ -26,10 +26,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.7");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.8");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+                             int argc, char *argv[]);
+
+int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST;
+int vtkKWFrameLabeled::BoldLabel = 1;
+int vtkKWFrameLabeled::AllowShowHide = 1;
 
 //----------------------------------------------------------------------------
 vtkKWFrameLabeled::vtkKWFrameLabeled()
@@ -284,8 +288,6 @@ void vtkKWFrameLabeled::PerformShowHideFrame()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWFrameLabeled::AllowShowHide = 0;
-
 void vtkKWFrameLabeled::AllowShowHideOn() 
 { 
   vtkKWFrameLabeled::AllowShowHide = 1; 
@@ -296,8 +298,6 @@ void vtkKWFrameLabeled::AllowShowHideOff()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWFrameLabeled::BoldLabel = 0;
-
 void vtkKWFrameLabeled::BoldLabelOn() 
 { 
   vtkKWFrameLabeled::BoldLabel = 1; 
@@ -308,7 +308,6 @@ void vtkKWFrameLabeled::BoldLabelOff()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWFrameLabeled::LabelCase = 0;
 
 void vtkKWFrameLabeled::SetLabelCase(int v) 
 { 
