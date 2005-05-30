@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.47");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.48");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -205,7 +205,6 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
 
   this->ActiveTrackSelector->SetParent(
     this->VAnimationInterface->GetSelectorFrame());
-  this->ActiveTrackSelector->SetAnimationManager(this);
   this->ActiveTrackSelector->Create(app, "-relief flat");
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->ActiveTrackSelector->GetWidgetName());
