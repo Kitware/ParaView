@@ -69,8 +69,6 @@ ADD_LIBRARY(vtkClientServer
   vtkClientServerInterpreter.h
   vtkClientServerStream.cxx
   vtkClientServerStream.h
-  vtkType.h
-  vtkTypeFromNative.h
   )
 TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
 
@@ -80,8 +78,6 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
     ${VTKCS_SOURCE_DIR}/vtkClientServerID.h
     ${VTKCS_SOURCE_DIR}/vtkClientServerInterpreter.h
     ${VTKCS_SOURCE_DIR}/vtkClientServerStream.h
-    ${VTKCS_SOURCE_DIR}/vtkType.h
-    ${VTKCS_SOURCE_DIR}/vtkTypeFromNative.h
     )
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 

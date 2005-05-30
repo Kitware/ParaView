@@ -24,7 +24,6 @@
 #define __vtkPVDataInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkTypeFromNative.h" // This is required to get the 64 bit int definition.
 
 class vtkCollection;
 class vtkCompositeDataSet;

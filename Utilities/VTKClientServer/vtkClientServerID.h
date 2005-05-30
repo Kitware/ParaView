@@ -23,7 +23,7 @@
 #define __vtkClientServerID_h
 
 #include "vtkClientServerConfigure.h" // Top-level vtkClientServer header.
-#include "vtkType.h"                  // vtkTypeUInt32
+#include "vtkSystemIncludes.h" // vtkTypeUInt32
 
 struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
 {

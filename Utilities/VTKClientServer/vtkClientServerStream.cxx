@@ -16,7 +16,7 @@
 
 #include "vtkByteSwap.h"
 #include "vtkSmartPointer.h"
-#include "vtkTypeFromNative.h"
+#include "vtkTypeTraits.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -46,44 +46,12 @@
   case float64_##kind: { vtkTypeFloat64* T = 0; call; } break
 
 //----------------------------------------------------------------------------
-// Type string parsing functions.
-#define VTK_CSS_VALUE_FROM_STRING(type, format) \
-  int vtkClientServerStreamValueFromString(const char* str, type* value) \
-  { return sscanf(str, "%" format, value)?1:0; }
-
-// Intel C++ 8.0 produces a false warning about %hhd and %hhu in the
-// sscanf conversions.  Disable the warning.  This is fixed in 8.1.
-#if defined(__INTEL_COMPILER) && __INTEL_COMPILER==800
-# pragma warning (push)
-# pragma warning (disable:269)
-#endif
-
-VTK_CSS_VALUE_FROM_STRING(vtkTypeInt8, VTK_TYPE_FORMAT_INT8)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeInt16, VTK_TYPE_FORMAT_INT16)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeInt32, VTK_TYPE_FORMAT_INT32)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeInt64, VTK_TYPE_FORMAT_INT64)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt8, VTK_TYPE_FORMAT_UINT8)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt16, VTK_TYPE_FORMAT_UINT16)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt32, VTK_TYPE_FORMAT_UINT32)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt64, VTK_TYPE_FORMAT_UINT64)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat32, VTK_TYPE_FORMAT_FLOAT32)
-VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat64, VTK_TYPE_FORMAT_FLOAT64)
-
-#if defined(__INTEL_COMPILER) && __INTEL_COMPILER==800
-# pragma warning (pop)
-#endif
-
-#undef VTK_CSS_VALUE_FROM_STRING
-
-//----------------------------------------------------------------------------
 // Define some traits for vtkType types.
 template <class T> struct vtkClientServerTypeTraits;
-#define VTK_CLIENT_SERVER_TYPE_TRAIT(in, out, print)    \
-  VTK_TEMPLATE_SPECIALIZATION                           \
+#define VTK_CLIENT_SERVER_TYPE_TRAIT(in, out)           \
+  VTK_TEMPLATE_SPECIALIZE                               \
   struct vtkClientServerTypeTraits< in >                \
   {                                                     \
-    /* Type to which to convert for display. */         \
-    typedef print PrintType;                            \
     /* Type identifier for value of this type. */       \
     static vtkClientServerStream::Types Value()         \
       { return vtkClientServerStream::out##_value; }    \
@@ -91,16 +59,16 @@ template <class T> struct vtkClientServerTypeTraits;
     static vtkClientServerStream::Types Array()         \
       { return vtkClientServerStream::out##_array; }    \
   }
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt8, int8, vtkTypeInt16);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt16, int16, vtkTypeInt16);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt32, int32, vtkTypeInt32);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt64, int64, vtkTypeInt64);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt8, uint8, vtkTypeUInt16);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt16, uint16, vtkTypeUInt16);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt32, uint32, vtkTypeUInt32);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt64, uint64, vtkTypeUInt64);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat32, float32, vtkTypeFloat32);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat64, float64, vtkTypeFloat64);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt8, int8);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt16, int16);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt32, int32);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt64, int64);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt8, uint8);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt16, uint16);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt32, uint32);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt64, uint64);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat32, float32);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat64, float64);
 #undef VTK_CLIENT_SERVER_TYPE_TRAIT
 
 //----------------------------------------------------------------------------
@@ -462,7 +430,7 @@ vtkClientServerStream&
 vtkClientServerStreamOperatorSL(vtkClientServerStream* self, T x)
 {
   // Store the type first, then the value.
-  typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
   *self << vtkClientServerTypeTraits<Type>::Value();
   return vtkClientServerStreamInternals::Write(*self, &x, sizeof(x));
 }
@@ -536,7 +504,7 @@ vtkClientServerStream::Array
 vtkClientServerStreamInsertArray(const T* data, int length)
 {
   // Construct and return the array information structure.
-  typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
   vtkClientServerStream::Array a =
     {
       vtkClientServerTypeTraits<Type>::Array(),
@@ -828,7 +796,7 @@ int
 vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
                                       int midx, int argument, T* value)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
   if(const unsigned char* data =
      vtkClientServerStreamInternals::GetValue(*self, midx, 1+argument))
     {
@@ -881,7 +849,7 @@ vtkClientServerStreamGetArgumentArray(const vtkClientServerStream* self,
                                       int midx, int argument, T* value,
                                       vtkTypeUInt32 length)
 {
-  typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::SizedType Type;
   if(const unsigned char* data =
      vtkClientServerStreamInternals::GetValue(*self, midx, 1+argument))
     {
@@ -1892,7 +1860,7 @@ template <class T>
 void vtkClientServerStreamValueToString(const vtkClientServerStream* self,
                                         ostream& os, int m, int a, T*)
 {
-  typedef VTK_CSS_TYPENAME vtkClientServerTypeTraits<T>::PrintType PrintType;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType PrintType;
   T arg;
   self->GetArgument(m, a, &arg);
   os << static_cast<PrintType>(arg);
@@ -1904,7 +1872,7 @@ template <class T>
 void vtkClientServerStreamArrayToString(const vtkClientServerStream* self,
                                         ostream& os, int m, int a, T*)
 {
-  typedef VTK_CSS_TYPENAME vtkClientServerTypeTraits<T>::PrintType PrintType;
+  typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType PrintType;
   vtkTypeUInt32 length;
   T arglocal[6];
   T* arg = arglocal;
@@ -2403,7 +2371,12 @@ int vtkClientServerStreamValueFromString(const char* begin, const char* end,
   ptr[end-begin] = 0;
 
   // Try to convert the value.
-  int result = vtkClientServerStreamValueFromString(ptr, value);
+  VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType pvalue;
+  int result = sscanf(ptr, vtkTypeTraits<T>::ParseFormat(), &pvalue)?1:0;
+  if(result)
+    {
+    *value = static_cast<T>(pvalue);
+    }
 
   // Free the buffer.
   if(ptr != buffer)
