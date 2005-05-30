@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.717");
+vtkCxxRevisionMacro(vtkPVWindow, "1.718");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -883,10 +883,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "Show log of all errors and warnings");
 
   // Comparative vis manager
-  this->GetWindowMenu()->InsertCommand(
-    6, "Comparative Vis. Manager", this, 
-    "ShowCVManager", 0, 
-    "Show comparative visualization manager");
+//   this->GetWindowMenu()->InsertCommand(
+//     6, "Comparative Vis. Manager", this, 
+//     "ShowCVManager", 0, 
+//     "Show comparative visualization manager");
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   // Display Lookmark Manager
