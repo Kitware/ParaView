@@ -1226,7 +1226,7 @@ proc extract_run {} {
   $extract(vtkTemp814) SetExpanded 1
   $extract(vtkTemp824) SetExpanded 1
 
-  $extract(vtkTemp1) HideHorizontalPane
+  $extract(vtkTemp1) SetSecondaryPanelVisibility 0
   # State for vtkPVAnimationScene
   $extract(vtkTemp480) SetDuration [expr 56 / $speed]
   $extract(vtkTemp480) SetPlayMode 0
@@ -1513,7 +1513,7 @@ proc iso_run {} {
   $iso(vtkTemp790) RemoveAllKeyFrames
 
   $iso(vtkTemp1) ShowAnimationPanes
-  $iso(vtkTemp1) HideHorizontalPane
+  $iso(vtkTemp1) SetSecondaryPanelVisibility 0
   set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 0 0]
   set iso(vtkTemp1228) [$iso(vtkTemp790) GetKeyFrame $tempid ]
   #State of a Key Frame 

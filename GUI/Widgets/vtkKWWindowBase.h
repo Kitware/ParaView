@@ -109,8 +109,8 @@ public:
   // managers, etc. therefore GetViewFrame() will be overriden in order to
   // return the most convenient viewing frame. 
   // The rational here is that GetViewFrame() always return the frame that
-  // can be used by users or developpers to add more UI, without knowing
-  // about the current layout.
+  // can be used by users or developpers to add more "viewing" element (say,
+  // renderwidgets, 3D scenes), without knowing about the current layout.
   virtual vtkKWFrame* GetViewFrame();
 
   // Description:

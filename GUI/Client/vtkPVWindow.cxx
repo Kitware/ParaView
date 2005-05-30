@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.721");
+vtkCxxRevisionMacro(vtkPVWindow, "1.722");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -238,11 +238,6 @@ vtkPVWindow::vtkPVWindow()
   
   this->LowerToolbars = vtkKWToolbarSet::New();
   
-  this->LowerFrame = vtkKWSplitFrame::New();
-  this->LowerFrame->SetFrame1Size(480);
-  this->LowerFrame->SetFrame1MinimumSize(0);
-  this->LowerFrame->SetFrame2MinimumSize(0);
-
   this->TimerLogDisplay = 0;
   this->ErrorLogDisplay = 0;
 
@@ -330,6 +325,21 @@ vtkPVWindow::vtkPVWindow()
     this->MainSplitFrame->SetFrame2MinimumSize(200);
     this->MainSplitFrame->SetFrame1Size(380);
     this->MainSplitFrame->SetSeparatorSize(5);
+    }
+
+  // By default, the animation tracks are not shown
+
+  if (this->SecondarySplitFrame)
+    {
+    this->SecondarySplitFrame->Frame2VisibilityOff();
+    }
+
+  // There is only one page in the secondary notebook, the "Animation" page
+  // so do not show the tab to save some space
+
+  if (this->SecondaryNotebook)
+    {
+    this->SecondaryNotebook->AlwaysShowTabsOff();
     }
 }
 
@@ -613,12 +623,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->PickCenterToolbar->Delete();
     this->PickCenterToolbar = NULL;
-    }
-
-  if (this->LowerFrame)
-    {
-    this->LowerFrame->Delete();
-    this->LowerFrame = NULL;
     }
 
   this->DeleteAllSources();
@@ -1083,11 +1087,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->Withdraw();
 
-  // Add Show lower pane to menu.
-  this->GetWindowMenu()->AddCommand(VTK_PV_SHOW_HORZPANE_LABEL, this,
-    "ToggleHorizontalPaneVisibilityCallback", 0);
-
-  this->LowerToolbars->SetParent(this->GetViewFrame());
+  this->LowerToolbars->SetParent(this->GetMainSplitFrame()->GetFrame2());
   this->LowerToolbars->Create(app,0);
   this->LowerToolbars->ShowBottomSeparatorOff();
   this->LowerToolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
@@ -1099,21 +1099,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
     this->LowerToolbars->GetWidgetName());
 
-  this->LowerFrame->Frame2VisibilityOff();
-
-  this->LowerFrame->SetSeparatorSize(5);
-  this->LowerFrame->SetOrientationToVertical();
-  this->LowerFrame->SetParent(this->GetViewFrame());
-  this->LowerFrame->Create(app);
-  this->Script("pack %s -side top -fill both -expand t",
-               this->LowerFrame->GetWidgetName());
-  int hvisibility = 0;
-  if (app->HasRegistryValue(2, "RunTime", "HorizontalPaneVisibility"))
-    {
-    hvisibility = app->GetIntRegistryValue(2, "RunTime", "HorizontalPaneVisibility");
-    }
-  this->SetHorizontalPaneVisibility(hvisibility);
-  
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Put the version in the status bar.
@@ -1350,8 +1335,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                wname, tname);
 
   // Interface for the animation tool.
+
   this->AnimationManager->SetParent(this);
-  this->AnimationManager->SetHorizantalParent(this->LowerFrame->GetFrame2());
+  this->AnimationManager->SetHorizantalParent(
+    this->GetSecondaryNotebook()->GetFrame(
+      this->GetSecondaryNotebook()->AddPage("Animation")));
   this->AnimationManager->SetVerticalParent(this->GetMainPanelFrame());
   this->AnimationManager->Create(app, "-relief flat");
   this->AnimationManager->ShowHAnimationInterface();
@@ -1978,7 +1966,7 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, const char* sourcena
 void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 {
   this->MainView = vtkPVRenderView::New();
-  this->MainView->SetParent(this->LowerFrame->GetFrame1());
+  this->MainView->SetParent(this->GetViewFrame());
   this->MainView->SetPropertiesParent(this->GetMainPanelFrame());
   this->MainView->SetParentWindow(this);
   this->MainView->Create(this->GetApplication(),"-width 200 -height 200");
@@ -3832,7 +3820,6 @@ void vtkPVWindow::ShowAnimationPanes()
   
   //Bring up the properties panel.
   this->SetMainPanelVisibility(1);
-//  this->ShowHorizontalPane();
   
   // We need to update the properties-menu radio button too!
   this->GetViewMenu()->CheckRadioButton(
@@ -3844,45 +3831,13 @@ void vtkPVWindow::ShowAnimationPanes()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::GetHorizontalPaneVisibility()
-{
-  return (this->LowerFrame && this->LowerFrame->GetFrame2Visibility()) ? 1 : 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
+void vtkPVWindow::SetSecondaryPanelVisibility(int arg)
 {
   this->GetTraceHelper()->AddEntry(
-    "$kw(%s) SetHorizontalPaneVisibility %d",
+    "$kw(%s) SetSecondaryPanelVisibility %d",
     this->GetTclName(), arg);
-  if (arg)
-    {
-    if (!this->GetHorizontalPaneVisibility())
-      {
-      this->LowerFrame->Frame2VisibilityOn();
-      this->Script("%s entryconfigure 1 -label {%s}",
-        this->GetWindowMenu()->GetWidgetName(),
-        VTK_PV_HIDE_HORZPANE_LABEL);
-      }
-    }
-  else
-    {
-    if (this->GetHorizontalPaneVisibility())
-      {
-      this->LowerFrame->Frame2VisibilityOff();
-      this->Script("%s entryconfigure 1 -label {%s}",
-        this->GetWindowMenu()->GetWidgetName(),
-        VTK_PV_SHOW_HORZPANE_LABEL);
-      }
-    }
-  this->GetApplication()->SetRegistryValue(2, "RunTime",
-    "HorizontalPaneVisibility", "%d", arg);
-}
 
-//----------------------------------------------------------------------------
-void vtkPVWindow::ToggleHorizontalPaneVisibilityCallback()
-{
-  this->SetHorizontalPaneVisibility(!this->GetHorizontalPaneVisibility());
+  this->Superclass::SetSecondaryPanelVisibility(arg);
 }
 
 //----------------------------------------------------------------------------
@@ -4826,7 +4781,6 @@ void vtkPVWindow::UpdateEnableState()
 
   this->PropagateEnableState(this->Toolbar);
 
-  this->PropagateEnableState(this->LowerFrame);
   this->PropagateEnableState(this->AnimationManager);
   this->PropagateEnableState(this->TimerLogDisplay);
   this->PropagateEnableState(this->ErrorLogDisplay);
@@ -5062,10 +5016,6 @@ void vtkPVWindow::SaveWindowGeometryToRegistry()
 
   if (this->IsCreated())
     {
-    this->GetApplication()->SetRegistryValue(
-      2, "Geometry", "WindowHorizontalFrame1Size",
-      "%d", this->LowerFrame->GetFrame1Size());
-
     if (this->AnimationManager)
       {
       this->AnimationManager->SaveWindowGeometryToRegistry();
@@ -5077,16 +5027,6 @@ void vtkPVWindow::SaveWindowGeometryToRegistry()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::RestorePVWindowGeometry()
 {
-  if (this->GetApplication()->HasRegistryValue(
-      2, "Geometry", "WindowHorizontalFrame1Size"))
-    {
-    int reg_size = this->GetApplication()->GetIntRegistryValue(
-      2, "Geometry", "WindowHorizontalFrame1Size");
-    if (reg_size >= this->LowerFrame->GetFrame1MinimumSize())
-      {
-      this->LowerFrame->SetFrame1Size(reg_size);
-      }
-    }
   if (this->AnimationManager)
     {
     this->AnimationManager->RestoreWindowGeometryFromRegistry();

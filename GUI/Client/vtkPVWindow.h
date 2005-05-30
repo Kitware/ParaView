@@ -553,11 +553,7 @@ public:
   // Description:
   // This changes the visibility of the Horizontal pane.
   // Animation key frames are shown in the Horizontal pane.
-  int GetHorizontalPaneVisibility();
-  void SetHorizontalPaneVisibility(int);
-  void HideHorizontalPane() { this->SetHorizontalPaneVisibility(0); }
-  void ShowHorizontalPane() { this->SetHorizontalPaneVisibility(1); }
-  void ToggleHorizontalPaneVisibilityCallback();
+  virtual void SetSecondaryPanelVisibility(int);
 
   // Description:
   // Access to the vtkKWToolbarSet for the Lower toolbars.
@@ -775,7 +771,6 @@ protected:
   int ExpectProgress;
   int ModifiedEnableState;
 
-  vtkKWSplitFrame *LowerFrame;
   vtkKWToolbarSet* LowerToolbars;
   
   vtkClientServerID ServerFileListingID;

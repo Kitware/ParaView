@@ -62,7 +62,7 @@ $kw(vtkTemp481) SetCurrentTime 0.000000
 $kw(vtkTemp481) Play
 $kw(vtkTemp481) SetCurrentTime 0.000000
 $kw(vtkTemp4) ShowAnimationPanes
-$kw(vtkTemp4) SetHorizontalPaneVisibility 1
+$kw(vtkTemp4) SetSecondaryPanelVisibility 1
 $kw(vtkTemp481) SetCurrentTime 8.9000 
 
 #Retrace
