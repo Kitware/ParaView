@@ -30,7 +30,7 @@ const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
 const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
 const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.244");
+vtkCxxRevisionMacro(vtkKWWindow, "1.245");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -223,23 +223,25 @@ void vtkKWWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
 
   if (!panel->Raise())
     {
-    kwsys_stl::string msg;
-    msg = "The panel you are trying to access could not be displayed "
-      "properly. Please make sure there is enough room in the notebook "
-      "to bring up this part of the interface.";
+    ostrstream msg;
+    msg << "The panel you are trying to access could not be displayed "
+        << "properly. Please make sure there is enough room in the notebook "
+        << "to bring up this part of the interface.";
     if (this->MainNotebook && 
         this->MainNotebook->GetShowOnlyMostRecentPages() &&
         this->MainNotebook->GetPagesCanBePinned())
       {
-      msg += " This may happen if you displayed ";
-      msg += this->MainNotebook->GetNumberOfMostRecentPages();
-      msg += " notebook pages "
-        "at the same time and pinned/locked all of them. In that case, "
-        "try to hide or unlock a notebook page first.";
+      msg << " This may happen if you displayed " 
+          << this->MainNotebook->GetNumberOfMostRecentPages() 
+          << " notebook pages "
+          << "at the same time and pinned/locked all of them. In that case, "
+          << "try to hide or unlock a notebook page first.";
       }
+    msg << ends;
     vtkKWMessageDialog::PopupMessage( 
-      this->GetApplication(), this, "User Interface Warning", msg.c_str(),
+      this->GetApplication(), this, "User Interface Warning", msg.str(),
       vtkKWMessageDialog::WarningIcon);
+    msg.rdbuf()->freeze(0);
     }
 }
 
