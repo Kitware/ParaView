@@ -13,22 +13,25 @@
 
 =========================================================================*/
 #include "vtkPVActiveTrackSelector.h"
-#include "vtkObjectFactory.h"
 
-#include "vtkPVApplication.h"
-#include "vtkPVAnimationManager.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWMenu.h"
-#include "vtkPVSource.h"
-#include "vtkPVAnimationCueTree.h"
-#include "vtkSmartPointer.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationCueTree.h"
+#include "vtkPVAnimationManager.h"
+#include "vtkPVApplication.h"
+#include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMAnimationCueProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
 #include <vtkstd/string>
+
 class vtkPVActiveTrackSelectorInternals
 {
 public:
@@ -39,25 +42,24 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.1");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
-  this->AnimationManager = 0;
-  
   this->SourceLabel = vtkKWLabel::New();
   this->SourceMenuButton = vtkKWMenuButton::New();
   this->PropertyLabel = vtkKWLabel::New();
   this->PropertyMenuButton = vtkKWMenuButton::New();
   this->Internals = new vtkPVActiveTrackSelectorInternals;
   this->CurrentSourceCueTree = 0;
-  
+  this->CurrentCue = 0;
+  this->PackHorizontally = 0;
+  this->FocusCurrentCue = 1;
 }
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 {
   this->CurrentSourceCueTree = 0;
-  this->SetAnimationManager(0);
   this->SourceLabel->Delete();
   this->SourceMenuButton->Delete();
   this->PropertyLabel->Delete();
@@ -68,11 +70,6 @@ vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
 {
-  if (!this->AnimationManager)
-    {
-    vtkErrorMacro("AnimationManager must be set before calling Create");
-    return;
-    }
   if (!this->Superclass::Create(app, "frame", args))
     {
     vtkErrorMacro("Failed creating the widget");
@@ -80,7 +77,7 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
     }
   
   this->SourceLabel->SetParent(this);
-  this->SourceLabel->SetText("Source");
+  this->SourceLabel->SetText("Source:");
   this->SourceLabel->Create(app, 0);
   
   this->SourceMenuButton->SetParent(this);
@@ -89,7 +86,7 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
   
 
   this->PropertyLabel->SetParent(this);
-  this->PropertyLabel->SetText("Property");
+  this->PropertyLabel->SetText("Property:");
   this->PropertyLabel->Create(app, 0);
 
   this->PropertyMenuButton->SetParent(this);
@@ -97,17 +94,27 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
   this->PropertyMenuButton->SetBalloonHelpString(
     "Select a Property to animate for the choosen Source.");
 
-  this->Script("grid %s %s -sticky news -padx 2 -pady 2",
-    this->SourceLabel->GetWidgetName(),
-    this->SourceMenuButton->GetWidgetName());
-  this->Script("grid %s %s -sticky news -padx 2 -pady 2",
-    this->PropertyLabel->GetWidgetName(),
-    this->PropertyMenuButton->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 0 ",
-    this->GetWidgetName());
-  this->Script("grid columnconfigure %s 1 -weight 2 ",
-    this->GetWidgetName());
-
+  if (!this->PackHorizontally)
+    {
+    this->Script("grid %s %s -sticky news -padx 2 -pady 2",
+                 this->SourceLabel->GetWidgetName(),
+                 this->SourceMenuButton->GetWidgetName());
+    this->Script("grid %s %s -sticky news -padx 2 -pady 2",
+                 this->PropertyLabel->GetWidgetName(),
+                 this->PropertyMenuButton->GetWidgetName());
+    this->Script("grid columnconfigure %s 0 -weight 0 ",
+                 this->GetWidgetName());
+    this->Script("grid columnconfigure %s 1 -weight 2 ",
+                 this->GetWidgetName());
+    }
+  else
+    {
+    this->Script("grid %s %s %s %s",
+                 this->SourceLabel->GetWidgetName(),
+                 this->SourceMenuButton->GetWidgetName(),
+                 this->PropertyLabel->GetWidgetName(),
+                 this->PropertyMenuButton->GetWidgetName());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +155,7 @@ void vtkPVActiveTrackSelector::AddSource(vtkPVAnimationCueTree* cue)
   
   ostrstream command;
   command << "SelectSourceCallback " << key  << ends;
-  this->SourceMenuButton->AddCommand(cue->GetLabelText(),
-    this, command.str(), "Select Source");
+  this->SourceMenuButton->AddCommand(cue->GetLabelText(), this, command.str(), 0);
   command.rdbuf()->freeze(0);
 }
 
@@ -180,6 +186,17 @@ void vtkPVActiveTrackSelector::RemoveSource(vtkPVAnimationCueTree* cue)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVActiveTrackSelector::ShallowCopy(vtkPVActiveTrackSelector* source)
+{
+  vtkPVActiveTrackSelectorInternals::MapOfStringToCueTrees::iterator iter =
+    source->Internals->SourceCueTrees.begin();
+  for (; iter != source->Internals->SourceCueTrees.end(); iter++)
+    {
+    this->AddSource(iter->second);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::CleanupSource()
 {
   this->CleanupPropertiesMenu();
@@ -193,10 +210,11 @@ void vtkPVActiveTrackSelector::SelectSourceCallback(const char* key)
   this->GetTraceHelper()->AddEntry("$kw(%s) SelectSourceCallback %s",
     this->GetTclName(), key);
   this->SelectSourceCallbackInternal(key);
-  if (this->CurrentSourceCueTree)
+  if (this->CurrentSourceCueTree && this->FocusCurrentCue)
     {
     this->CurrentSourceCueTree->GetFocus();
     }
+  this->CurrentCue = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -265,8 +283,7 @@ void vtkPVActiveTrackSelector::BuildPropertiesMenu(const char* pretext,
 
       ostrstream command;
       command << "SelectPropertyCallback " << index << ends;
-      this->PropertyMenuButton->AddCommand(label.str(), this,
-        command.str(), "Select Property");
+      this->PropertyMenuButton->AddCommand(label.str(), this, command.str(), 0);
       command.rdbuf()->freeze(0);
       }
     label.rdbuf()->freeze(0);
@@ -283,7 +300,11 @@ void vtkPVActiveTrackSelector::SelectPropertyCallback(int cue_index)
   this->SelectPropertyCallbackInternal(cue_index);
   vtkPVAnimationCue* cue= 
     this->Internals->PropertyCues[cue_index].GetPointer();
-  cue->GetFocus();
+  if( this->FocusCurrentCue )
+    {
+    cue->GetFocus();
+    }
+  this->InvokeEvent(vtkCommand::WidgetModifiedEvent);
 }
   
 
@@ -292,6 +313,10 @@ void vtkPVActiveTrackSelector::SelectPropertyCallbackInternal(int cue_index)
 {
   this->PropertyMenuButton->SetButtonText(
     this->PropertyMenuButton->GetMenu()->GetItemLabel(cue_index));
+
+  vtkPVAnimationCue* cue= 
+    this->Internals->PropertyCues[cue_index].GetPointer();
+  this->CurrentCue = cue;
 }
 
 //-----------------------------------------------------------------------------
