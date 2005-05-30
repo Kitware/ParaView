@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.21");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.22");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -87,6 +87,15 @@ void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
 vtkKWMenu* vtkKWMenuButton::GetMenu()
 {
   return this->Menu;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetWidth(int width)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
 }
 
 //----------------------------------------------------------------------------

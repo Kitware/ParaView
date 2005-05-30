@@ -58,6 +58,11 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Convenience method to set the button width (in chars if text, 
+  // in pixels if image).
+  void SetWidth(int width);
+
 protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
