@@ -49,6 +49,7 @@
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVComparativeVisManagerGUI.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVErrorLogDisplay.h"
@@ -136,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.716");
+vtkCxxRevisionMacro(vtkPVWindow, "1.717");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -151,6 +152,7 @@ vtkPVWindow::vtkPVWindow()
   this->ExpectProgress = 0;
   
   this->InDemo = 0;
+  this->InComparativeVis = 0;
   this->Interactor = 0;
 
   this->InteractiveRenderEnabled = 0;
@@ -242,8 +244,10 @@ vtkPVWindow::vtkPVWindow()
   this->LowerFrame->SetFrame1MinimumSize(0);
   this->LowerFrame->SetFrame2MinimumSize(0);
 
-  this->TimerLogDisplay = NULL;
-  this->ErrorLogDisplay = NULL;
+  this->TimerLogDisplay = 0;
+  this->ErrorLogDisplay = 0;
+
+  this->CVManagerGUI = 0;
 
   // Set the extension and the type (name) of the script for
   // this application. They are all Tcl scripts but we give
@@ -687,6 +691,13 @@ void vtkPVWindow::PrepareForDelete()
     this->ErrorLogDisplay = NULL;
     }
 
+  if (this->CVManagerGUI )
+    {
+    this->CVManagerGUI->SetMasterWindow(NULL);
+    this->CVManagerGUI->Delete();
+    this->CVManagerGUI = NULL;
+    }
+
 #ifdef PARAVIEW_USE_LOOKMARKS
   if (this->PVLookmarkManager )
     {
@@ -871,6 +882,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "ShowErrorLog", 2, 
     "Show log of all errors and warnings");
 
+  // Comparative vis manager
+  this->GetWindowMenu()->InsertCommand(
+    6, "Comparative Vis. Manager", this, 
+    "ShowCVManager", 0, 
+    "Show comparative visualization manager");
+
 #ifdef PARAVIEW_USE_LOOKMARKS
   // Display Lookmark Manager
   this->GetWindowMenu()->InsertCommand(
@@ -940,8 +957,10 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->RotateCameraButton->SetBalloonHelpString(
     "3D Movements Interaction Mode\nThis interaction mode can be configured "
     "from View->3D View Properties->Camera");
-  this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
-               this->RotateCameraButton->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -command {%s SetInteractorStyle %d}",
+               this->RotateCameraButton->GetWidgetName(), 
+               this->GetTclName(),
+               INTERACTOR_STYLE_3D);
   this->InteractorToolbar->AddWidget(this->RotateCameraButton);
   this->RotateCameraButton->SetState(1);
 
@@ -955,8 +974,10 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
     "the Parallel Projection setting (View->3D View Properties->General) to "
     "interact with 2D objects. This interaction mode can be configured "
     "from View->3D View Properties->Camera");
-  this->Script("%s configure -command {%s ChangeInteractorStyle 2}", 
-               this->TranslateCameraButton->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -command {%s SetInteractorStyle %d}", 
+               this->TranslateCameraButton->GetWidgetName(), 
+               this->GetTclName(),
+               INTERACTOR_STYLE_2D);
   this->InteractorToolbar->AddWidget(this->TranslateCameraButton);
 
   this->MainView->ResetCamera();
@@ -1189,7 +1210,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->PickCenterButton->Create(app, "-image PVPickCenterButton");
-  this->PickCenterButton->SetCommand(this, "ChangeInteractorStyle 4");
+  ostrstream command;
+  command << "SetInteractorStyle " << INTERACTOR_STYLE_CENTER_OF_ROTATION 
+          << ends;
+  this->PickCenterButton->SetCommand(this, command.str());
+  delete[] command.str();
   this->PickCenterButton->SetBalloonHelpString(
     "Pick the center of rotation of the current data set.");
   this->PickCenterToolbar->AddWidget(this->PickCenterButton);
@@ -1815,13 +1840,33 @@ void vtkPVWindow::ResizeCenterActor()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::ChangeInteractorStyle(int index)
+int vtkPVWindow::GetInteractorStyle()
+{
+  vtkInteractorObserver* style =
+    this->Interactor->GetInteractorStyle();
+  if (style == this->CameraStyle3D)
+    {
+    return INTERACTOR_STYLE_3D;
+    }
+  else if (style == this->CameraStyle2D)
+    {
+    return INTERACTOR_STYLE_2D;
+    }
+  else if (style == this->CenterOfRotationStyle)
+    {
+    return INTERACTOR_STYLE_CENTER_OF_ROTATION;
+    }
+  return INTERACTOR_STYLE_UNKNOWN;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SetInteractorStyle(int iStyle)
 {
   int pick_toolbar_vis = 0;
   
-  switch (index)
+  switch (iStyle)
     {
-    case 1:
+    case INTERACTOR_STYLE_3D:
       this->TranslateCameraButton->SetState(0);
       // Camera styles are not duplicated on satellites.
       // Cameras are synchronized before each render.
@@ -1830,15 +1875,15 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->ResizeCenterActor();
       this->ShowCenterActor();
       break;
-    case 2:
+    case INTERACTOR_STYLE_2D:
       this->RotateCameraButton->SetState(0);
       this->Interactor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
       break;
-    case 3:
+    case INTERACTOR_STYLE_TRACKBALL:
       vtkErrorMacro("Trackball no longer suported.");
       break;
-    case 4:
+    case INTERACTOR_STYLE_CENTER_OF_ROTATION:
       this->Interactor->SetInteractorStyle(this->CenterOfRotationStyle);
       this->HideCenterActor();
       break;
@@ -1847,6 +1892,12 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
   this->Toolbars->SetToolbarVisibility(
     this->PickCenterToolbar, pick_toolbar_vis);
   this->MainView->EventuallyRender();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::ChangeInteractorStyle(int index)
+{
+  this->SetInteractorStyle(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -1919,18 +1970,19 @@ void vtkPVWindow::KeyAction(char keyCode, int x, int y)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::Configure(int vtkNotUsed(width), int vtkNotUsed(height))
 {
-  if (this->MainView)
+  if (!this->MainView)
     {
-    this->MainView->Configured();
-    // The above Configured call could have changed the size of the render
-    // window, so get the size from there instead of using the input width and
-    // height.
-    int *size = this->MainView->GetRenderWindowSize();
-    if (this->Interactor)
-      {
-      this->Interactor->UpdateSize(size[0], size[1]);
-      this->Interactor->ConfigureEvent();
-      }
+    return;
+    }
+  this->MainView->Configured();
+  // The above Configured call could have changed the size of the render
+  // window, so get the size from there instead of using the input width and
+  // height.
+  int *size = this->MainView->GetRenderWindowSize();
+  if (this->Interactor)
+    {
+    this->Interactor->UpdateSize(size[0], size[1]);
+    this->Interactor->ConfigureEvent();
     }
 }
 
@@ -3939,6 +3991,26 @@ void vtkPVWindow::CreateErrorLogDisplay()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVWindow::ShowCVManager()
+{
+  this->CreateCVManagerGUI();  
+  this->CVManagerGUI->Update();
+  this->CVManagerGUI->Display();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::CreateCVManagerGUI()
+{
+  if ( ! this->CVManagerGUI )
+    {
+    this->CVManagerGUI = vtkPVComparativeVisManagerGUI::New();
+    this->CVManagerGUI->SetTitle("Comparative Vis");
+    this->CVManagerGUI->SetMasterWindow(this);
+    this->CVManagerGUI->Create(this->GetPVApplication(), 0);
+    }  
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
@@ -4864,6 +4936,34 @@ void vtkPVWindow::UpdateMenuState()
   int menu_state = 
     (this->GetEnabled() ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
 
+  int i;
+  int numWindowMItems = 0;
+
+  if (this->WindowMenu)
+    {
+    numWindowMItems = this->WindowMenu->GetNumberOfItems();
+    }
+
+  if (this->InComparativeVis)
+    {
+    vtkKWMenu* menu = this->GetMenu();
+    int numItems = menu->GetNumberOfItems();
+    int i;
+    for (i=0; i<numItems; i++)
+      {
+      menu->SetState(i, vtkKWMenu::Disabled);
+      }
+    this->GetMenu()->SetState("Window",  menu_state);
+    for (i=0; i<numWindowMItems; i++)
+      {
+      this->WindowMenu->SetState(i, vtkKWMenu::Disabled);
+      }    
+    this->WindowMenu->SetState("Command Prompt", menu_state);
+    this->WindowMenu->SetState("Timer Log", menu_state);
+    this->WindowMenu->SetState("Error Log", menu_state);
+    return;
+    }
+
   int in_recording = 
     this->AnimationManager && this->AnimationManager->GetInRecording();
 
@@ -4875,6 +4975,14 @@ void vtkPVWindow::UpdateMenuState()
     return;
     }
   
+  if (this->WindowMenu && !source_grabbed)
+    {
+    for (i=0; i<numWindowMItems; i++)
+      {
+      this->WindowMenu->SetState(i, menu_state);
+      }    
+    }
+
   // Source grabbed or in recording ? Disable the root menu entries
   // In recording (or not recording anymore) ? Re-enable View, Window, Help
 
@@ -4888,6 +4996,8 @@ void vtkPVWindow::UpdateMenuState()
 
   if (!source_grabbed)
     {
+    this->GetMenu()->SetState(vtkKWWindowBase::FileMenuLabel,  menu_state);
+    this->GetMenu()->SetState(vtkKWWindowBase::EditMenuLabel,  menu_state);
     this->GetMenu()->SetState(vtkKWWindowBase::ViewMenuLabel,  menu_state);
     this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
     this->GetMenu()->SetState(

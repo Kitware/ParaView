@@ -23,6 +23,7 @@
 class vtkInteractorStyleTrackballMultiActor;
 class vtkPVAnimationCue;
 class vtkPVApplication;
+class vtkPVComparativeVis;
 //BTX
 struct vtkPVComparativeVisManagerInternals;
 //ETX
@@ -36,9 +37,20 @@ public:
 
   void SetApplication(vtkPVApplication*);
 
-  void Process();
+  void Show();
+  void Hide();
 
-  void SetNumberOfParameterValues(unsigned int idx, unsigned int numValues);
+  unsigned int GetNumberOfVisualizations();
+
+  vtkPVComparativeVis* GetVisualization(unsigned int idx);
+  vtkPVComparativeVis* GetVisualization(const char* name); 
+
+  void AddVisualization(vtkPVComparativeVis* vis); 
+
+  void RemoveVisualization(const char* name); 
+
+  vtkSetStringMacro(CurrentVisualization);
+  vtkGetStringMacro(CurrentVisualization);
 
 protected:
   vtkPVComparativeVisManager();
@@ -47,24 +59,9 @@ protected:
   vtkPVApplication* Application;
   vtkPVComparativeVisManagerInternals* Internal;
 
-  void TraverseCue(vtkPVAnimationCue* cue);
-  void StoreGeometry();
-  void PlayOne(unsigned int idx);
-  void GetIndices(unsigned int gidx);
-  void GetIndex(unsigned int paramIdx, unsigned int gidx);
-  void TraverseAllCues();
-  void RemoveAllCues();
-  void ConnectAllGeometry();
-
-  void ExecuteEvent(vtkObject* , unsigned long event, unsigned int paramIdx);
-
-  static void AddBounds(double bounds[6], double totalB[6]);
-
-//BTX
-  friend class vtkCVAnimationSceneObserver;
-//ETX
-
   vtkInteractorStyleTrackballMultiActor* IStyle;
+
+  char* CurrentVisualization;
 
 private:
   vtkPVComparativeVisManager(const vtkPVComparativeVisManager&); // Not implemented.

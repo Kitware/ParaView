@@ -74,6 +74,7 @@ class vtkPVApplication;
 class vtkPVApplicationSettingsInterface;
 class vtkPVCameraManipulator;
 class vtkPVColorMap;
+class vtkPVComparativeVisManagerGUI;
 class vtkPVErrorLogDisplay;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
@@ -254,6 +255,10 @@ public:
   // Stuff for creating a log file for times.
   void ShowTimerLog();
   void ShowErrorLog();
+
+  // Description:
+  // Show the comparative vis gui.
+  void ShowCVManager();
  
   // Description:
   // Callback for saving animation as images.
@@ -346,6 +351,11 @@ public:
   vtkGetMacro(InDemo, int);
 
   // Description:
+  // Set to true when in comparative vis mode
+  vtkSetMacro(InComparativeVis, int);
+  vtkGetMacro(InComparativeVis, int);
+
+  // Description:
   // Adds manipulator to the list of available manipulators.
   void AddManipulator(const char* type, const char* name, 
                       vtkPVCameraManipulator*);
@@ -379,7 +389,12 @@ public:
   void KeyAction(char keyCode, int x, int y);
 
   // Description:
-  // Change the current interactor style
+  // Set/Get the current interactor style. 
+  void SetInteractorStyle(int iStyle);
+  int GetInteractorStyle();
+
+  // Description
+  // Call SetInteractorStyle(). Legacy method.
   void ChangeInteractorStyle(int index);
 
   // Description:
@@ -577,6 +592,17 @@ public:
   virtual void ToolbarVisibilityChangedCallback();
   virtual void NumberOfToolbarsChangedCallback();
     
+//BTX
+  enum InteractorStyles
+  {
+    INTERACTOR_STYLE_UNKNOWN = 0,
+    INTERACTOR_STYLE_3D = 1,
+    INTERACTOR_STYLE_2D = 2,
+    INTERACTOR_STYLE_TRACKBALL = 3,
+    INTERACTOR_STYLE_CENTER_OF_ROTATION = 4
+  };
+//ETX
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -665,6 +691,8 @@ protected:
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;
 
+  vtkPVComparativeVisManagerGUI* CVManagerGUI;
+
   // Extensions of files that loaded readers recognize.
   char *FileExtensions;
   char *FileDescriptions;
@@ -718,6 +746,8 @@ protected:
   // Create error log display.
   void CreateErrorLogDisplay();
 
+  void CreateCVManagerGUI();
+
   void HideCenterActor();
   void ShowCenterActor();
 
@@ -734,6 +764,7 @@ protected:
   int ToolbarButtonsDisabled;
 
   int InDemo;
+  int InComparativeVis;
 
   double LastProgress;
   int ExpectProgress;
