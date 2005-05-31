@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.10.2.2");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.10.2.3");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -762,15 +762,26 @@ void vtkAMRSpyPlotReader::Execute()
 void vtkAMRSpyPlotReader::AddGhostLevelArray(int numLevels)
 {
   vtkCTHData* output = this->GetOutput();
-  int numCells = output->GetNumberOfCells();
-  int numBlocks = output->GetNumberOfBlocks();
   vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
   int blockId;
   int dims[3];
   int i, j, k;
   unsigned char* ptr;
   int iLevel, jLevel, kLevel, tmp;
-
+  
+  
+  // There is some bizaare windows .net optimization
+  // happening when you first get the number of
+  // cell it's often a random number... :)
+  // Yes, this is ludicris but please leave this
+  // logic until further notice 
+  int _numCells = output->GetNumberOfCells();
+  int numCells = output->GetNumberOfCells();
+  if (_numCells != numCells) 
+    {
+    vtkWarningMacro("Microsoft .net optimization blows chunks" << endl);
+    }
+  int numBlocks = output->GetNumberOfBlocks();
   output->SetNumberOfGhostLevels(numLevels);
   array->SetNumberOfTuples(numCells);
   ptr = (unsigned char*)(array->GetVoidPointer(0));
