@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.25");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.26");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -372,13 +372,18 @@ void vtkKWSplitFrame::SetFrame1Size(int size)
     {
     this->Frame2Size = this->Frame2MinimumSize;
     this->Size = this->Frame1Size + this->Frame2Size + this->GetTotalSeparatorSize();
-    if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    if (this->IsCreated())
       {
-      this->Script("%s configure -width %d", this->GetWidgetName(), this->Size);
-      }
-    else
-      {
-      this->Script("%s configure -height %d", this->GetWidgetName(), this->Size);
+      if (this->Orientation == vtkKWSplitFrame::Horizontal)
+        {
+        this->Script(
+          "%s configure -width %d", this->GetWidgetName(), this->Size);
+        }
+      else
+        {
+        this->Script(
+          "%s configure -height %d", this->GetWidgetName(), this->Size);
+        }
       }
     }
   this->Update();
