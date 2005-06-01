@@ -201,10 +201,12 @@ public:
   //BTX
   static const char *MainPanelSizeRegKey;
   static const char *MainPanelVisibilityRegKey;
+  static const char *MainPanelVisibilityKeyAccelerator;
   static const char *HideMainPanelMenuLabel;
   static const char *ShowMainPanelMenuLabel;
   static const char *SecondaryPanelSizeRegKey;
   static const char *SecondaryPanelVisibilityRegKey;
+  static const char *SecondaryPanelVisibilityKeyAccelerator;
   static const char *HideSecondaryPanelMenuLabel;
   static const char *ShowSecondaryPanelMenuLabel;
   //ETX

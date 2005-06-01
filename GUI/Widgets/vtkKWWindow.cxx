@@ -30,15 +30,17 @@
 
 const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
 const char *vtkKWWindow::MainPanelVisibilityRegKey = "MainPanelVisibility";
+const char *vtkKWWindow::MainPanelVisibilityKeyAccelerator = "F5";
 const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
 const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
 
 const char *vtkKWWindow::SecondaryPanelSizeRegKey = "SecondaryPanelSize";
 const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibility";
+const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.248");
+vtkCxxRevisionMacro(vtkKWWindow, "1.249");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -159,7 +161,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Superclass::Create(app, args);
 
-  kwsys_stl::string cmd;
+  kwsys_stl::string cmd, event;
   vtkKWMenu *menu = NULL;
   int idx;
 
@@ -176,6 +178,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   menu = this->GetWindowMenu();
   menu->AddCommand(vtkKWWindow::HideMainPanelMenuLabel, 
                    this, "MainPanelVisibilityCallback", 1);
+  menu->SetItemAccelerator(
+    vtkKWWindow::HideMainPanelMenuLabel,
+    vtkKWWindow::MainPanelVisibilityKeyAccelerator);
+  event = "<Key-";
+  event += vtkKWWindow::MainPanelVisibilityKeyAccelerator;
+  event += ">";
+  this->SetBind(this, event.c_str(), "MainPanelVisibilityCallback");
 
   // Create the main notebook
 
@@ -225,6 +234,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   menu = this->GetWindowMenu();
   menu->AddCommand(vtkKWWindow::HideSecondaryPanelMenuLabel, 
                    this, "SecondaryPanelVisibilityCallback", 1);
+  menu->SetItemAccelerator(
+    vtkKWWindow::HideSecondaryPanelMenuLabel,
+    vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator);
+  event = "<Key-";
+  event += vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator;
+  event += ">";
+  this->SetBind(this, event.c_str(), "SecondaryPanelVisibilityCallback");
 
   // Menu : View : Application Settings
 
