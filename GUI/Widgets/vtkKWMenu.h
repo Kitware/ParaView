@@ -178,6 +178,11 @@ public:
   void SetItemCompoundImage(const char *item, const char *imagename);
 
   // Description:
+  // Set/Get the accelerator for a given item.
+  void SetItemAccelerator(int position, const char *accelerator);
+  void SetItemAccelerator(const char *item, const char *accelerator);
+
+  // Description:
   // Checks if an item is in the menu
   int HasItem(const char* item);
 

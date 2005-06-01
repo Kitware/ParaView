@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.65");
+vtkCxxRevisionMacro(vtkKWMenu, "1.66");
 
 
 
@@ -995,6 +995,25 @@ void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
 void vtkKWMenu::SetItemCompoundImage(const char *item, const char *imagename)
 {
   this->SetItemCompoundImage(this->GetIndex(item), imagename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
+{
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -accelerator {%s}", 
+               this->GetWidgetName(), idx, accelerator);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemAccelerator(const char *item, const char *accelerator)
+{
+  this->SetItemAccelerator(this->GetIndex(item), accelerator);
 }
 
 //----------------------------------------------------------------------------
