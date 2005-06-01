@@ -21,8 +21,9 @@
 #include "vtkRenderer.h"
 #include "vtkInteractorObserver.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMIntVectorProperty.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -177,6 +178,18 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << endl;
     }
 
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SaveState(const char* name, ostream* file,
+  vtkIndent indent)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("IgnorePlaceWidgetChanges"));
+  int old_ipc = ivp->GetElement(0);
+  ivp->SetElement(0, 1);
+  this->Superclass::SaveState(name, file, indent);
+  ivp->SetElement(0, old_ipc);
 }
 
 //----------------------------------------------------------------------------
