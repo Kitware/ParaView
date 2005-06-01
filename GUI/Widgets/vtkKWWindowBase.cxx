@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.9");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.10");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -313,17 +313,16 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
 
   this->MainToolbarSet->SetParent(this);  
   this->MainToolbarSet->Create(app, NULL);
-  this->MainToolbarSet->ShowBottomSeparatorOn();
   this->MainToolbarSet->ShowTopSeparatorOff();
+  this->MainToolbarSet->ShowBottomSeparatorOn();
   this->MainToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->MainToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");
   this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
-  this->Script(
-    "pack %s -padx 0 -pady 0 -side top -fill x -expand no",
-    this->MainToolbarSet->GetWidgetName());
+  this->Script("pack %s -padx 0 -pady 0 -side top -fill x -expand no",
+               this->MainToolbarSet->GetWidgetName());
 
   // Main frame
 
@@ -1011,6 +1010,7 @@ void vtkKWWindowBase::UpdateToolbarState()
       vtkKWToolbar::GetGlobalFlatAspect());
     this->MainToolbarSet->SetToolbarsWidgetsFlatAspect(
       vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    this->PropagateEnableState(this->MainToolbarSet);
     }
 }
 
@@ -1021,11 +1021,7 @@ void vtkKWWindowBase::UpdateEnableState()
 
   // Update the toolbars
 
-  if (this->MainToolbarSet)
-    {
-    this->PropagateEnableState(this->MainToolbarSet);
-    this->UpdateToolbarState();
-    }
+  this->UpdateToolbarState();
 
   // Update the Tcl interactor
 

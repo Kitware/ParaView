@@ -40,7 +40,7 @@ const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.249");
+vtkCxxRevisionMacro(vtkKWWindow, "1.250");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -258,14 +258,15 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->SecondaryToolbarSet->SetParent(this->GetMainSplitFrame()->GetFrame2());
   this->SecondaryToolbarSet->Create(app, NULL);
-  this->SecondaryToolbarSet->ShowBottomSeparatorOff();
   this->SecondaryToolbarSet->ShowTopSeparatorOn();
+  this->SecondaryToolbarSet->ShowBottomSeparatorOff();
   this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");
   this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
-  this->Script("pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
+
+  this->Script("pack %s -padx 0 -pady 0 -side top -fill x -expand no ",
                this->SecondaryToolbarSet->GetWidgetName());
 
   // Udpate the enable state
@@ -580,6 +581,24 @@ void vtkKWWindow::Render()
 {
 }
 
+//-----------------------------------------------------------------------------
+void vtkKWWindow::NumberOfToolbarsChangedCallback()
+{
+  this->Superclass::NumberOfToolbarsChangedCallback();
+
+  this->SecondaryToolbarSet->PopulateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+  
+//----------------------------------------------------------------------------
+void vtkKWWindow::ToolbarVisibilityChangedCallback()
+{
+  this->Superclass::ToolbarVisibilityChangedCallback();
+
+  this->SecondaryToolbarSet->UpdateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+
 //----------------------------------------------------------------------------
 void vtkKWWindow::Update()
 {
@@ -592,6 +611,21 @@ void vtkKWWindow::Update()
     // Redundant Update() here, since we call UpdateEnableState(), which as 
     // a side effect will update each panel (see UpdateEnableState())
     // this->GetMainUserInterfaceManager()->Update();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWWindow::UpdateToolbarState()
+{
+  this->Superclass::UpdateToolbarState();
+
+  if (this->SecondaryToolbarSet)
+    {
+    this->SecondaryToolbarSet->SetToolbarsFlatAspect(
+      vtkKWToolbar::GetGlobalFlatAspect());
+    this->SecondaryToolbarSet->SetToolbarsWidgetsFlatAspect(
+      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    this->PropagateEnableState(this->SecondaryToolbarSet);
     }
 }
 
@@ -686,38 +720,6 @@ void vtkKWWindow::UpdateMenuState()
       this->WindowMenu->ConfigureItem(idx, label.c_str());
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkKWWindow::UpdateToolbarState()
-{
-  this->Superclass::UpdateToolbarState();
-
-  if (this->SecondaryToolbarSet)
-    {
-    this->SecondaryToolbarSet->SetToolbarsFlatAspect(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    this->SecondaryToolbarSet->SetToolbarsWidgetsFlatAspect(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkKWWindow::NumberOfToolbarsChangedCallback()
-{
-  this->Superclass::NumberOfToolbarsChangedCallback();
-
-  this->SecondaryToolbarSet->PopulateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
-}
-  
-//----------------------------------------------------------------------------
-void vtkKWWindow::ToolbarVisibilityChangedCallback()
-{
-  this->Superclass::ToolbarVisibilityChangedCallback();
-
-  this->SecondaryToolbarSet->UpdateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
 }
 
 //----------------------------------------------------------------------------
