@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.441");
+vtkCxxRevisionMacro(vtkPVSource, "1.442");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1218,6 +1218,12 @@ void vtkPVSource::CleanupDisplays()
     }
   if (this->CubeAxesDisplayProxy)
     {
+    const char* proxyName = proxm->GetProxyName("displays",
+      this->CubeAxesDisplayProxy);
+    if (proxyName)
+      {
+      proxm->UnRegisterProxy("displays", proxyName);
+      }
     this->RemoveDisplayFromRenderModule(this->CubeAxesDisplayProxy);
     this->CubeAxesDisplayProxy->Delete();
     this->CubeAxesDisplayProxy = 0;
@@ -1285,6 +1291,11 @@ void vtkPVSource::SetupDisplays()
     {
     ccpp->AddProxy(this->Proxy);
     this->CubeAxesDisplayProxy->UpdateVTKObjects();
+    ostrstream str;
+    str << this->GetName() << ".CubeAxesDisplay" << ends;
+    proxm->RegisterProxy(
+      "displays", str.str(), this->CubeAxesDisplayProxy);
+    str.rdbuf()->freeze(0);
     }
   this->CubeAxesDisplayProxy->SetVisibilityCM(0);
   this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
