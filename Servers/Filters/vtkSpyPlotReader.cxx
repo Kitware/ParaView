@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.12");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.13");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -772,7 +772,7 @@ int vtkSpyPlotReader::UpdateMetaData()
     {
     if(fileFields.find(this->CellDataArraySelection->GetArrayName(field))==fileFields.end())
       {
-      this->CellDataArraySelection->RemoveArrayFromIndex(field);
+      this->CellDataArraySelection->RemoveArrayByIndex(field);
       }
     else
       {
