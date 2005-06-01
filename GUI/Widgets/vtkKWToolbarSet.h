@@ -125,6 +125,12 @@ public:
   vtkGetMacro(ShowBottomSeparator, int); 
 
   // Description:
+  // Show or hide a separator at the top of the set
+  virtual void SetShowTopSeparator(int);
+  vtkBooleanMacro(ShowTopSeparator, int); 
+  vtkGetMacro(ShowTopSeparator, int); 
+
+  // Description:
   // Update the toolbar set 
   // (update the enabled state of all toolbars, call PackToolbars(), etc.).
   virtual void Update();
@@ -147,10 +153,12 @@ protected:
   vtkKWToolbarSet();
   ~vtkKWToolbarSet();
 
+  vtkKWFrame *TopSeparatorFrame;
   vtkKWFrame *ToolbarsFrame;
   vtkKWFrame *BottomSeparatorFrame;
 
   int ShowBottomSeparator;
+  int ShowTopSeparator;
   int SynchronizeToolbarsVisibilityWithRegistry;
 
   char *ToolbarVisibilityChangedCommand;
@@ -181,6 +189,7 @@ protected:
 
   virtual void Pack();
   virtual void PackBottomSeparator();
+  virtual void PackTopSeparator();
 
 private:
   vtkKWToolbarSet(const vtkKWToolbarSet&); // Not implemented

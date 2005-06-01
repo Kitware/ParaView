@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.8");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.9");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -314,6 +314,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   this->MainToolbarSet->SetParent(this);  
   this->MainToolbarSet->Create(app, NULL);
   this->MainToolbarSet->ShowBottomSeparatorOn();
+  this->MainToolbarSet->ShowTopSeparatorOff();
   this->MainToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->MainToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");

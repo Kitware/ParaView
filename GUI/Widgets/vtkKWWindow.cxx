@@ -38,7 +38,7 @@ const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibil
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.247");
+vtkCxxRevisionMacro(vtkKWWindow, "1.248");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -243,6 +243,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->SecondaryToolbarSet->SetParent(this->GetMainSplitFrame()->GetFrame2());
   this->SecondaryToolbarSet->Create(app, NULL);
   this->SecondaryToolbarSet->ShowBottomSeparatorOff();
+  this->SecondaryToolbarSet->ShowTopSeparatorOn();
   this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");
