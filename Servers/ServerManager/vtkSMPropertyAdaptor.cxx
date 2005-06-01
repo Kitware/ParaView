@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.12");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -439,7 +439,8 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue()
       }
     }
 
-  if (this->EnumerationDomain && this->IntVectorProperty)
+  if (this->EnumerationDomain && this->IntVectorProperty && 
+    this->IntVectorProperty->GetNumberOfElements() > 0)
     {
     int val = this->IntVectorProperty->GetElement(0);
     for (unsigned int i=0; i<this->EnumerationDomain->GetNumberOfEntries(); i++)
@@ -452,12 +453,14 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue()
       }
     }
 
-  if (this->StringListDomain && this->StringVectorProperty)
+  if (this->StringListDomain && this->StringVectorProperty 
+    && this->StringVectorProperty->GetNumberOfElements() > 0)
     {
     name = this->StringVectorProperty->GetElement(0);
     }
 
-  if (this->ProxyGroupDomain && this->ProxyProperty)
+  if (this->ProxyGroupDomain && this->ProxyProperty
+    && this->ProxyProperty->GetNumberOfProxies() > 0)
     {
     name = 
       this->ProxyGroupDomain->GetProxyName(this->ProxyProperty->GetProxy(0));
