@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.64");
+vtkCxxRevisionMacro(vtkKWMenu, "1.65");
 
 
 
@@ -995,6 +995,20 @@ void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
 void vtkKWMenu::SetItemCompoundImage(const char *item, const char *imagename)
 {
   this->SetItemCompoundImage(this->GetIndex(item), imagename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetEnabled(int e)
+{
+  int old_enabled = this->GetEnabled();
+  this->Superclass::SetEnabled(e);
+
+  // So even if the requested state was the same, propagate to the entries
+
+  if (this->GetEnabled() == old_enabled)
+    {
+    this->UpdateEnableState();
+    }
 }
 
 //----------------------------------------------------------------------------

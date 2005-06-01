@@ -215,6 +215,16 @@ public:
   //ETX
 
   // Description:
+  // Set or get enabled state.
+  // This method has been overriden to propagate the state to all its
+  // menu entries by calling UpdateEnableState(), *even* if the
+  // state (this->Enabled) is actually unchanged by the function. This
+  // make sure all the menu entries have been enabled/disabled properly.
+  virtual void SetEnabled(int);
+
+  // Description:
+  // This method has been overriden to propagate the state to all its
+  // menu entries by calling SetState().
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated

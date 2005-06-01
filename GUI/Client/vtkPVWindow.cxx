@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.722");
+vtkCxxRevisionMacro(vtkPVWindow, "1.723");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3399,11 +3399,7 @@ void vtkPVWindow::UpdateFilterMenu()
       }
 
     // If there are no sources, disable the menu.
-    if (numFilters > 0)
-      {
-      this->PropagateEnableState(this->FilterMenu);
-      }
-    else
+    if (numFilters <= 0)
       {
       this->FilterMenu->SetEnabled(0);
       }
