@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.34");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.35");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -297,7 +297,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     this->VCRControl->GetWidgetName());
   this->VCRControl->UpdateEnableState();
 
-  this->VCRToolbar->SetParent(this->Window->GetLowerToolbars()->GetToolbarsFrame());
+  this->VCRToolbar->SetParent(this->Window->GetSecondaryToolbarSet()->GetToolbarsFrame());
   this->VCRToolbar->Create(app);
   this->VCRToolbar->SetPlayCommand(this, "Play");
   this->VCRToolbar->SetStopCommand(this, "Stop");
@@ -309,7 +309,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRToolbar->SetRecordCheckCommand(this, "ToolbarRecordCheckButtonCallback");
   this->VCRToolbar->SetRecordStateCommand(this, "RecordState");
   this->VCRToolbar->SetSaveAnimationCommand(this, "SaveAnimationCallback");
-  this->Window->GetLowerToolbars()->AddToolbar(this->VCRToolbar, 0);
+  this->Window->GetSecondaryToolbarSet()->AddToolbar(this->VCRToolbar, 0);
   this->VCRToolbar->UpdateEnableState();
 
   // Animation Control: Time scale
@@ -980,7 +980,7 @@ void vtkPVAnimationScene::SaveInBatchScript(ofstream* file)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetAnimationToolbarVisibility(int visible)
 {
-  this->Window->GetLowerToolbars()->SetToolbarVisibility(
+  this->Window->GetSecondaryToolbarSet()->SetToolbarVisibility(
     this->VCRToolbar, visible);
 }
 

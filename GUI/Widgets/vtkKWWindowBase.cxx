@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.7");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.8");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -70,7 +70,7 @@ vtkKWWindowBase::vtkKWWindowBase()
 
   // Toolbars
 
-  this->Toolbars               = vtkKWToolbarSet::New();
+  this->MainToolbarSet               = vtkKWToolbarSet::New();
   this->ToolbarsVisibilityMenu = NULL; 
   this->MenuBarSeparatorFrame  = vtkKWFrame::New();
 
@@ -133,10 +133,10 @@ vtkKWWindowBase::~vtkKWWindowBase()
     this->HelpMenu = NULL;
     }
 
-  if (this->Toolbars)
+  if (this->MainToolbarSet)
     {
-    this->Toolbars->Delete();
-    this->Toolbars = NULL;
+    this->MainToolbarSet->Delete();
+    this->MainToolbarSet = NULL;
     }
 
   if (this->MenuBarSeparatorFrame)
@@ -311,18 +311,18 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
 
   // Toolbars
 
-  this->Toolbars->SetParent(this);  
-  this->Toolbars->Create(app, NULL);
-  this->Toolbars->ShowBottomSeparatorOn();
-  this->Toolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
-  this->Toolbars->SetToolbarVisibilityChangedCommand(
+  this->MainToolbarSet->SetParent(this);  
+  this->MainToolbarSet->Create(app, NULL);
+  this->MainToolbarSet->ShowBottomSeparatorOn();
+  this->MainToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
+  this->MainToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");
-  this->Toolbars->SetNumberOfToolbarsChangedCommand(
+  this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
   this->Script(
     "pack %s -padx 0 -pady 0 -side top -fill x -expand no",
-    this->Toolbars->GetWidgetName());
+    this->MainToolbarSet->GetWidgetName());
 
   // Main frame
 
@@ -425,7 +425,7 @@ void vtkKWWindowBase::PrepareForDelete()
   // Have reference to this object:
   // this->Menu
   // this->MenuBarSeparatorFrame
-  // this->Toolbars
+  // this->MainToolbarSet
   // this->MainFrame
   // this->StatusFrameSeparator
   // this->StatusFrame
@@ -784,7 +784,7 @@ void vtkKWWindowBase::AddRecentFile(const char *name,
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
 {
-  this->Toolbars->PopulateToolbarsVisibilityMenu(
+  this->MainToolbarSet->PopulateToolbarsVisibilityMenu(
     this->GetToolbarsVisibilityMenu());
 
   this->UpdateToolbarState();
@@ -793,7 +793,7 @@ void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::ToolbarVisibilityChangedCallback()
 {
-  this->Toolbars->UpdateToolbarsVisibilityMenu(
+  this->MainToolbarSet->UpdateToolbarsVisibilityMenu(
     this->GetToolbarsVisibilityMenu());
 
   this->UpdateToolbarState();
@@ -1004,11 +1004,11 @@ void vtkKWWindowBase::Update()
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::UpdateToolbarState()
 {
-  if (this->Toolbars)
+  if (this->MainToolbarSet)
     {
-    this->Toolbars->SetToolbarsFlatAspect(
+    this->MainToolbarSet->SetToolbarsFlatAspect(
       vtkKWToolbar::GetGlobalFlatAspect());
-    this->Toolbars->SetToolbarsWidgetsFlatAspect(
+    this->MainToolbarSet->SetToolbarsWidgetsFlatAspect(
       vtkKWToolbar::GetGlobalWidgetsFlatAspect());
     }
 }
@@ -1020,9 +1020,9 @@ void vtkKWWindowBase::UpdateEnableState()
 
   // Update the toolbars
 
-  if (this->Toolbars)
+  if (this->MainToolbarSet)
     {
-    this->PropagateEnableState(this->Toolbars);
+    this->PropagateEnableState(this->MainToolbarSet);
     this->UpdateToolbarState();
     }
 
@@ -1104,7 +1104,7 @@ void vtkKWWindowBase::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
-  os << indent << "Toolbars: " << this->GetToolbars() << endl;
+  os << indent << "MainToolbarSet: " << this->GetMainToolbarSet() << endl;
 }
 
 

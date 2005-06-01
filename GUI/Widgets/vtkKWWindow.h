@@ -63,21 +63,33 @@
 // inside the secondary panel, and GetMainUserInterfaceManager() can be used
 // to retrieve the corresponding UIM.
 //
-// +----------------------+
-// |    MPF |             |
-// |+--+    |             |
-// ||  +---+|             |    MPF: GetMainPanelFrame()
-// ||      ||             |    MNB: MainNotebook
-// ||      ||    VF       |   
-// ||      ||             |    VF: GetViewFrame()
-// ||      ||             |
-// || MNB  |+-------------+    SPF: GetSecondaryPanelFrame()
-// ||      ||+--+   SPF   |    SNB: SecondaryNotebook
-// ||      |||  +--------+|
-// ||      |||           ||
-// ||      |||    SNB    ||
-// |+------+|+-----------+|
-// +----------------------+
+// Below the SecondarySplitFrame is a second toolbar set packed
+// (SecondaryToolbarSet)
+//
+// +---------------------------+
+// |           MB              |    MB: GetMenu() (see vtkKWTopLevel)
+// +---------------------------+
+// |           TBS             |    TBS: GetToolbars() (see superclass)
+// +---------------------------+
+// |    MPF |                  |
+// |+--+    |                  |
+// ||  +---+|                  |    MPF: GetMainPanelFrame()
+// ||      ||       VF         |    MNB: MainNotebook
+// ||      ||                  |   
+// ||      ||                  |    VF: GetViewFrame()
+// ||      ||                  |
+// || MNB  |+------------------+    SPF: GetSecondaryPanelFrame()
+// ||      ||+--+      SPF     |    SNB: SecondaryNotebook
+// ||      |||  +-------------+|
+// ||      |||                ||
+// ||      |||    SNB         ||
+// ||      |||                ||
+// ||      ||+----------------+|
+// ||      |+------------------+
+// |+------+|                  |    SF: GetStatusFrame() (see superclass)
+// +--------+------------------+
+// |            SF             |    SF: GetStatusFrame() (see superclass)
+// +---------------------------+
 
 
 #ifndef __vtkKWWindow_h
@@ -143,6 +155,10 @@ public:
   virtual vtkKWFrame* GetViewFrame();
 
   // Description:
+  // Get the secondary toolbar set.
+  vtkGetObjectMacro(SecondaryToolbarSet, vtkKWToolbarSet);
+
+  // Description:
   // Call render on all widgets and elements that support that functionality
   virtual void Render();
 
@@ -169,10 +185,16 @@ public:
   virtual void UpdateMenuState();
 
   // Description:
+  // Update the toolbar state
+  virtual void UpdateToolbarState();
+
+  // Description:
   // Callbacks.
   virtual void MainPanelVisibilityCallback();
   virtual void SecondaryPanelVisibilityCallback();
   virtual void PrintOptionsCallback();
+  virtual void ToolbarVisibilityChangedCallback();
+  virtual void NumberOfToolbarsChangedCallback();
 
   // Description:
   // Some constants
@@ -212,6 +234,8 @@ protected:
   vtkKWNotebook *SecondaryNotebook;
 
   vtkKWApplicationSettingsInterface *ApplicationSettingsInterface;
+
+  vtkKWToolbarSet *SecondaryToolbarSet;
 
 private:
 

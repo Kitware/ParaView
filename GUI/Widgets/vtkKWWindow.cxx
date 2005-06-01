@@ -23,6 +23,8 @@
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWToolbarSet.h"
+#include "vtkKWToolbar.h"
 
 #include <kwsys/SystemTools.hxx>
 
@@ -36,7 +38,7 @@ const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibil
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.246");
+vtkCxxRevisionMacro(vtkKWWindow, "1.247");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -77,6 +79,10 @@ vtkKWWindow::vtkKWWindow()
   this->SecondaryUserInterfaceManager->SetNotebook(this->SecondaryNotebook);
   this->SecondaryUserInterfaceManager->EnableDragAndDropOn();
 
+  // Toolbar set
+
+  this->SecondaryToolbarSet = vtkKWToolbarSet::New();
+  
   // Interfaces
 
   this->ApplicationSettingsInterface = NULL;
@@ -123,6 +129,12 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->SecondaryUserInterfaceManager->Delete();
     this->SecondaryUserInterfaceManager = NULL;
+    }
+
+  if (this->SecondaryToolbarSet)
+    {
+    this->SecondaryToolbarSet->Delete();
+    this->SecondaryToolbarSet = NULL;
     }
 
   if (this->ApplicationSettingsInterface)
@@ -225,6 +237,19 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   menu->InsertCommand(
     idx++, this->GetApplicationSettingsInterface()->GetName(), 
     this, cmd.c_str(), 0);
+
+  // Secondary toolbar
+
+  this->SecondaryToolbarSet->SetParent(this->GetMainSplitFrame()->GetFrame2());
+  this->SecondaryToolbarSet->Create(app, NULL);
+  this->SecondaryToolbarSet->ShowBottomSeparatorOff();
+  this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
+  this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(
+    this, "ToolbarVisibilityChangedCallback");
+  this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(
+    this, "NumberOfToolbarsChangedCallback");
+  this->Script("pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
+               this->SecondaryToolbarSet->GetWidgetName());
 
   // Udpate the enable state
 
@@ -646,6 +671,38 @@ void vtkKWWindow::UpdateMenuState()
     }
 }
 
+//-----------------------------------------------------------------------------
+void vtkKWWindow::UpdateToolbarState()
+{
+  this->Superclass::UpdateToolbarState();
+
+  if (this->SecondaryToolbarSet)
+    {
+    this->SecondaryToolbarSet->SetToolbarsFlatAspect(
+      vtkKWToolbar::GetGlobalFlatAspect());
+    this->SecondaryToolbarSet->SetToolbarsWidgetsFlatAspect(
+      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWWindow::NumberOfToolbarsChangedCallback()
+{
+  this->Superclass::NumberOfToolbarsChangedCallback();
+
+  this->SecondaryToolbarSet->PopulateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+  
+//----------------------------------------------------------------------------
+void vtkKWWindow::ToolbarVisibilityChangedCallback()
+{
+  this->Superclass::ToolbarVisibilityChangedCallback();
+
+  this->SecondaryToolbarSet->UpdateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+
 //----------------------------------------------------------------------------
 void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -655,4 +712,5 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SecondaryNotebook: " << this->GetSecondaryNotebook() << endl;
   os << indent << "MainSplitFrame: " << this->GetMainSplitFrame() << endl;
   os << indent << "SecondarySplitFrame: " << this->GetSecondarySplitFrame() << endl;
+  os << indent << "SecondaryToolbarSet: " << this->SecondaryToolbarSet << endl;
 }

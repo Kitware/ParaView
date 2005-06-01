@@ -48,7 +48,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.9");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.10");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -195,7 +195,7 @@ void vtkPVComparativeVisManager::Show()
   this->Internal->MainPanelVisibility = window->GetMainPanelVisibility();
   window->SetMainPanelVisibility(0);
 
-  vtkKWToolbarSet* toolbars = window->GetToolbars();
+  vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
   int numToolbars = toolbars->GetNumberOfToolbars();
   this->Internal->VisibleToolbars.clear();
   int i;
@@ -209,7 +209,7 @@ void vtkPVComparativeVisManager::Show()
       }
     }
 
-  toolbars = window->GetLowerToolbars();
+  toolbars = window->GetSecondaryToolbarSet();
   numToolbars = toolbars->GetNumberOfToolbars();
   for (i=0; i< numToolbars; i++)
     {
@@ -272,13 +272,13 @@ void vtkPVComparativeVisManager::Show()
 void vtkPVComparativeVisManager::Hide()
 {
   vtkPVWindow* window = this->Application->GetMainWindow();
-  vtkKWToolbarSet* toolbars = window->GetToolbars();
+  vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
   vtkstd::list<vtkKWToolbar*>::iterator iter = 
       this->Internal->VisibleToolbars.begin();
   for(; iter != this->Internal->VisibleToolbars.end(); iter++)
     {
     toolbars->SetToolbarVisibility(*iter, 1);
-    window->GetLowerToolbars()->SetToolbarVisibility(*iter, 1);;    
+    window->GetSecondaryToolbarSet()->SetToolbarVisibility(*iter, 1);;    
     }
   window->UpdateToolbarState();
 

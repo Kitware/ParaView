@@ -556,10 +556,6 @@ public:
   virtual void SetSecondaryPanelVisibility(int);
 
   // Description:
-  // Access to the vtkKWToolbarSet for the Lower toolbars.
-  vtkGetObjectMacro(LowerToolbars, vtkKWToolbarSet);
-
-  // Description:
   // Called to add a default animation for a source.
   // vtkPVSource calls this when the source is initialized.
   void AddDefaultAnimation(vtkPVSource* pvSource);
@@ -576,8 +572,6 @@ public:
   // Description:
   // This method is called when error icon is clicked.
   void ErrorIconCallback();
-  virtual void ToolbarVisibilityChangedCallback();
-  virtual void NumberOfToolbarsChangedCallback();
     
   // Description:
   // Returns the comparative vis. manager interface.
@@ -771,8 +765,6 @@ protected:
   int ExpectProgress;
   int ModifiedEnableState;
 
-  vtkKWToolbarSet* LowerToolbars;
-  
   vtkClientServerID ServerFileListingID;
 
   vtkSMAxesProxy *CenterAxesProxy; 

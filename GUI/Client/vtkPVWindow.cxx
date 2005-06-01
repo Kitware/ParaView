@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.723");
+vtkCxxRevisionMacro(vtkPVWindow, "1.724");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -235,8 +235,6 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationManager->GetTraceHelper()->SetReferenceCommand(
     "GetAnimationManager");
   this->AnimationManager->SetApplication(this->GetApplication());
-  
-  this->LowerToolbars = vtkKWToolbarSet::New();
   
   this->TimerLogDisplay = 0;
   this->ErrorLogDisplay = 0;
@@ -671,12 +669,6 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu = NULL;
     }
 
-  if (this->LowerToolbars)
-    {
-    this->LowerToolbars->Delete();
-    this->LowerToolbars = NULL;
-    }
-
   if (this->TimerLogDisplay )
     {
     this->TimerLogDisplay->SetMasterWindow(NULL);
@@ -886,15 +878,15 @@ void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
 {
   if (!strcmp(identifier, "tools"))
     {
-    this->Toolbars->SetToolbarVisibility(this->Toolbar, state);
+    this->GetMainToolbarSet()->SetToolbarVisibility(this->Toolbar, state);
     }
   else if(!strcmp(identifier, "camera"))
     {
-    this->Toolbars->SetToolbarVisibility(this->PickCenterToolbar, state);
+    this->GetMainToolbarSet()->SetToolbarVisibility(this->PickCenterToolbar, state);
     }
   else if (!strcmp(identifier, "interaction"))
     {
-    this->Toolbars->SetToolbarVisibility(this->InteractorToolbar, state);
+    this->GetMainToolbarSet()->SetToolbarVisibility(this->InteractorToolbar, state);
     }
 }
 
@@ -1087,18 +1079,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->Withdraw();
 
-  this->LowerToolbars->SetParent(this->GetMainSplitFrame()->GetFrame2());
-  this->LowerToolbars->Create(app,0);
-  this->LowerToolbars->ShowBottomSeparatorOff();
-  this->LowerToolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
-  this->LowerToolbars->SetToolbarVisibilityChangedCommand(
-    this, "ToolbarVisibilityChangedCallback");
-  this->LowerToolbars->SetNumberOfToolbarsChangedCommand(
-    this, "NumberOfToolbarsChangedCallback");
-  this->Script(
-    "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
-    this->LowerToolbars->GetWidgetName());
-
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Put the version in the status bar.
@@ -1124,14 +1104,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
     }
 
-  this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->InteractorToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
-  this->Toolbars->AddToolbar(this->InteractorToolbar);
+  this->GetMainToolbarSet()->AddToolbar(this->InteractorToolbar);
 
-  this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->Toolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
   this->Toolbar->Create(app);
   this->Toolbar->ResizableOn();
-  this->Toolbars->AddToolbar(this->Toolbar);
+  this->GetMainToolbarSet()->AddToolbar(this->Toolbar);
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);
   this->ToolbarMenuButton->Create(
@@ -1153,7 +1133,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
     }
   this->InitializeInteractorInterfaces(app);
-  this->PickCenterToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->PickCenterToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
   this->PickCenterToolbar->Create(app);
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
@@ -1283,7 +1263,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   proxy->Delete();
   this->ChangeInteractorStyle(1);
 
-  this->Toolbars->AddToolbar(this->PickCenterToolbar);
+  this->GetMainToolbarSet()->AddToolbar(this->PickCenterToolbar);
 
   // Configure the window, i.e. setup the interactors
   // We need this update or the window size will be invalid.
@@ -1840,7 +1820,7 @@ void vtkPVWindow::SetInteractorStyle(int iStyle)
       break;
     }
 
-  this->Toolbars->SetToolbarVisibility(
+  this->GetMainToolbarSet()->SetToolbarVisibility(
     this->PickCenterToolbar, pick_toolbar_vis);
   this->MainView->EventuallyRender();
 }
@@ -4732,14 +4712,6 @@ void vtkPVWindow::UpdateToolbarState()
     {
     this->EnableToolbarButtons();
     }
-
-  if (this->LowerToolbars)
-    {
-    this->LowerToolbars->SetToolbarsFlatAspect(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    this->LowerToolbars->SetToolbarsWidgetsFlatAspect(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -5030,24 +5002,6 @@ void vtkPVWindow::RestorePVWindowGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::NumberOfToolbarsChangedCallback()
-{
-  this->Superclass::NumberOfToolbarsChangedCallback();
-
-  this->LowerToolbars->PopulateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
-}
-  
-//----------------------------------------------------------------------------
-void vtkPVWindow::ToolbarVisibilityChangedCallback()
-{
-  this->Superclass::ToolbarVisibilityChangedCallback();
-
-  this->LowerToolbars->UpdateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -5081,7 +5035,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationManager: " << this->AnimationManager << endl;
   os << indent << "InteractorID: " << this->InteractorID << endl;
   os << indent << "InDemo: " << this->InDemo << endl;
-  os << indent << "LowerToolbars: " << this->LowerToolbars << endl;
   os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
   os << indent << "TraceHelper: " << this->TraceHelper << endl;
 

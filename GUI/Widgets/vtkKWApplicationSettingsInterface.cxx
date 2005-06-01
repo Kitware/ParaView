@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.36");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.37");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -518,21 +518,6 @@ void vtkKWApplicationSettingsInterface::Update()
     {
     this->FlatButtonsCheckButton->SetState(
       vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    }
-
-  // If there is no toolbars, disable the interface
-
-  if (!this->Window->GetToolbars() ||
-      !this->Window->GetToolbars()->GetNumberOfToolbars())
-    {
-    if (this->FlatFrameCheckButton)
-      {
-      this->FlatFrameCheckButton->SetEnabled(0);
-      }
-    if (this->FlatButtonsCheckButton)
-      {
-      this->FlatButtonsCheckButton->SetEnabled(0);
-      }
     }
 
   // Print settings

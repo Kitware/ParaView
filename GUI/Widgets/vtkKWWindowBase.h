@@ -114,8 +114,8 @@ public:
   virtual vtkKWFrame* GetViewFrame();
 
   // Description:
-  // Get the toolbar set.
-  vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
+  // Get the main toolbar set.
+  vtkGetObjectMacro(MainToolbarSet, vtkKWToolbarSet);
 
   // Description:
   // Get the status frame object.
@@ -294,7 +294,7 @@ protected:
   vtkKWFrame      *TrayFrame;
   vtkKWLabel      *TrayImageError;
 
-  vtkKWToolbarSet *Toolbars;
+  vtkKWToolbarSet *MainToolbarSet;
 
   char  *ScriptExtension;
   char  *ScriptType;
