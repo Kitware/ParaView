@@ -24,7 +24,7 @@
 
 #include <vtkstd/map>
 vtkStandardNewMacro(vtkSMPropertyStatusManager);
-vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.3");
+vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.4");
 
 //*****************************************************************************
 class vtkSMPropertyStatusManagerInternals
@@ -124,7 +124,7 @@ int vtkSMPropertyStatusManager::HasPropertyChanged(vtkSMVectorProperty* property
     vtkErrorMacro("Property is not registered with this property status manager.");
     return 0;
     }
-  return HasPropertyChangedInternal(iter->first, iter->second, -1);
+  return this->HasPropertyChangedInternal(iter->first, iter->second, -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ int vtkSMPropertyStatusManager::HasPropertyChanged(
     vtkErrorMacro("Property is not registered with this property status manager.");
     return 0;
     }
-  return HasPropertyChangedInternal(iter->first, iter->second, index);
+  return this->HasPropertyChangedInternal(iter->first, iter->second, index);
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ int vtkSMPropertyStatusManager::HasPropertyChangedInternal(
     return 1;
     }
 
-  if (static_cast<unsigned int>(index) >= num_elems)
+  if (index >= static_cast<int>(num_elems))
     {// index is beyond range, we know nothing about it.
     return 0;
     }
