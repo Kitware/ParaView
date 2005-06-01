@@ -24,7 +24,7 @@
 #include "vtkSMIceTMultiDisplayProxy.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -145,6 +145,10 @@ void vtkSMIceTRenderModuleProxy::EndInteractiveRender()
 int vtkSMIceTRenderModuleProxy::GetLocalRenderDecision(unsigned long mem, 
   int stillRender)
 {
+  if (this->GetSuppressGeometryCollectionDecision())
+    {
+    return 0;
+    }
   if (!stillRender && this->GetUseLODDecision())
     {
     return 1; 
