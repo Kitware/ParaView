@@ -932,7 +932,7 @@
      <StringVectorProperty 
         name="AddScalarVariable" 
         command="AddScalarVariable" 
-        number_of_elements="3" 
+        number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="3"
         element_types="2 2 0" /> 
@@ -940,7 +940,7 @@
      <StringVectorProperty 
         name="AddVectorVariable" 
         command="AddVectorVariable" 
-        number_of_elements="5" 
+        number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="5"
         element_types="2 2 0 0 0" /> 
