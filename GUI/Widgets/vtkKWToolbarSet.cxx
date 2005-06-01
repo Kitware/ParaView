@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.15");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.16");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -47,6 +47,9 @@ public:
   typedef kwsys_stl::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
 
   ToolbarsContainer Toolbars;
+
+  kwsys_stl::string PreviousPackInfo;
+  kwsys_stl::string PreviousGridInfo;
 };
 
 //----------------------------------------------------------------------------
@@ -178,6 +181,15 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
                this->TopSeparatorFrame->GetWidgetName(), 
                VTK_KW_TOOLBAR_RELIEF_SEP);
 
+  // This is needed for the hack in Pack() to work, otherwise
+  // the widget is not hidden properly if the user packs it manually
+  // and don't update it after that (i.e. call a method that would
+  // call Pack()). This will likely force Pack() to be called
+  // twice each time we add a toolbar, but it's not like we have
+  // thousand's of them. Again, hack, sorry. 
+  
+  this->SetBind(this, "<Map>", "Pack");
+
   this->Update();
 }
 
@@ -203,27 +215,74 @@ void vtkKWToolbarSet::Pack()
   // This is a hack. I tried hard to solve the problem, without success.
   // It seems that no matter what, if you pack the toolbar set, show
   // some toolbars, them hide all of them, the toolbarset frame does not
-  // collapse automatically to "nothing", but keeps its previous height, even
+  // collapse automatically, but keeps its previous height, even
   // if all the widgets packed around are setup to reclaim the space that 
   // would have been left by an empty toolbar set.
+  // Furthermore, it seems you can not even pack or grid an empty frame
+  // it showing up as a one pixel high frame.
   // This is annoying. One solution would to add a method to allow the
-  // user to have a callback invoked each time the number of visible toolbars
+  // user to set a callback to invoke each time the number of visible toolbars
   // change. This callback could in turn pack/unpack the whole toolbarset
-  // if no toolbars are available. This put the burden on the users, and I
-  // would rather have that class solves its own problems.
-  // So here is the hack. If nothing is visible, and the height is higher
+  // if no toolbars are available. This would put the burden on the users, and
+  // I would rather have that class solves its own problems.
+  // Here is one hack. If nothing is visible, and the height is higher
   // than 1, and it is likely we did not collapse correctly, then we
   // should manually configure the height to be 1 (sadly, it can not be 0:
   // "if this option is less "than or equal to zero then the window 
-  // will not request any size at all").
+  // will not request any size at all"). Well that extra pixel still shows.
+  // Here is another hack. Hide the whole widget by saving the previous
+  // packing or gridding info, unpack it, and restore it later on. Evil.
 
-  if (!this->GetNumberOfVisibleToolbars() && this->IsMapped())
+  // If we are mapped, and we do not have any toolbar, 
+  // save the widget's layout info and remove the widget from the layout
+
+  if (this->IsCreated())
     {
-    int height = 0;
-    vtkKWTkUtilities::GetGeometry(this, NULL, &height, NULL, NULL);
-    if (height > 1)
+    if (!this->GetNumberOfVisibleToolbars())
       {
-      this->ConfigureOptions("-height 1");
+      // Store the previous info
+
+      if (this->IsPacked())
+        {
+        this->Internals->PreviousPackInfo = 
+          this->Script("pack info %s", this->GetWidgetName());
+        this->Script("pack forget %s", this->GetWidgetName());
+        this->Internals->PreviousGridInfo.clear();
+        }
+      else
+        {
+        kwsys_stl::string grid_info = 
+          this->Script("grid info %s", this->GetWidgetName());
+        if (!grid_info.empty())
+          {
+          this->Internals->PreviousPackInfo.clear();
+          this->Internals->PreviousGridInfo = grid_info;
+          this->Script("grid forget %s", this->GetWidgetName());
+          }
+        }
+      }
+
+    // If we are not mapped, and we do have toolbars, 
+    // restore the widget's layout info
+
+    else
+      {
+      // Restore the previous info
+
+      if (!this->Internals->PreviousPackInfo.empty())
+        {
+        this->Script("pack %s %s", this->GetWidgetName(), 
+                     this->Internals->PreviousPackInfo.c_str());
+        this->Internals->PreviousPackInfo.clear();
+        this->Internals->PreviousGridInfo.clear();
+        }
+      else if (!this->Internals->PreviousGridInfo.empty())
+        {
+        this->Script("grid %s %s", this->GetWidgetName(), 
+                     this->Internals->PreviousGridInfo.c_str());
+        this->Internals->PreviousPackInfo.clear();
+        this->Internals->PreviousGridInfo.clear();
+        }
       }
     }
 }
@@ -273,18 +332,18 @@ void vtkKWToolbarSet::PackTopSeparator()
 // ----------------------------------------------------------------------------
 void vtkKWToolbarSet::PackToolbars()
 {
-  if (!this->IsCreated() || !this->Internals)
+  if (!this->IsCreated() || !this->Internals || !this->ToolbarsFrame)
     {
     return;
     }
+
+  this->ToolbarsFrame->UnpackChildren();
 
   if (!this->GetNumberOfVisibleToolbars())
     {
     this->ToolbarsFrame->Unpack();
     return;
     }
-
-  this->ToolbarsFrame->UnpackChildren();
 
   ostrstream tk_cmd;
 
@@ -386,9 +445,12 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
     this->RestoreToolbarVisibilityFromRegistry(toolbar_slot->Toolbar);
     }
 
-  // Pack the toolbars
+  // Pack the toolbars if we just brought a visible toolbar
 
-  this->Pack();
+  if (toolbar_slot->Visibility)
+    {
+    this->Pack();
+    }
 
   this->InvokeNumberOfToolbarsChangedCommand();
 

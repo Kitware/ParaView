@@ -138,7 +138,7 @@ public:
   // Description:
   // (Re)Pack the toolbars, if needed (if the widget is created, and the
   // toolbar is created, AddToolbar will pack the toolbar automatically).
-  virtual void PackToolbars();
+  virtual void Pack();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -187,7 +187,7 @@ protected:
 
   //ETX
 
-  virtual void Pack();
+  virtual void PackToolbars();
   virtual void PackBottomSeparator();
   virtual void PackTopSeparator();
 

@@ -27,7 +27,7 @@
 #include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.32");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.33");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -281,7 +281,7 @@ void vtkKWSelectionFrame::Pack()
     {
     tk_cmd << "pack " << this->ToolbarSet->GetWidgetName()
            << " -side top -fill x -expand no -padx 1 -pady 1" << endl;
-    this->ToolbarSet->PackToolbars();
+    this->ToolbarSet->Pack();
     }
 
   if (this->BodyFrame->IsCreated())
