@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.8");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.9");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -384,6 +384,15 @@ void vtkKWTopLevel::SetIconName(const char *name)
     {
     this->Script("wm iconname %s {%s}",
                  this->GetWidgetName(), name ? name : NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::SetResizable(int w, int h)
+{
+  if (this->IsCreated())
+    {
+    this->Script("wm resizable %s %d %d", this->GetWidgetName(), w, h);
     }
 }
 

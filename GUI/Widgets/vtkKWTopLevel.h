@@ -164,6 +164,13 @@ public:
   virtual void SetIconName(const char *name);
 
   // Description:
+  // Set whether or not the user may interactively resize the toplevel window.
+  // The parameters are boolean values that determine whether the width and
+  // height of the window may be modified by the user.
+  // No effect if called before Create()
+  virtual void SetResizable(int w, int h);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
