@@ -174,6 +174,12 @@ public:
   // trough's height. In pixel.
   virtual void SetWidth(int width);
 
+  // Description
+  // Convenience method to set the desired long dimension of the scale. 
+  // For vertical scales this is the scale's height, for horizontal scales
+  // it is the scale's width. In pixel.
+  virtual void SetLength(int length);
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 

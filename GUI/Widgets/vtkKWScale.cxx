@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.86");
+vtkCxxRevisionMacro(vtkKWScale, "1.87");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -949,6 +949,16 @@ void vtkKWScale::SetWidth(int width)
     {
     this->Script("%s config -width %d",
                  this->Scale->GetWidgetName(), width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScale::SetLength(int length)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s config -length %d",
+                 this->Scale->GetWidgetName(), length);
     }
 }
 
