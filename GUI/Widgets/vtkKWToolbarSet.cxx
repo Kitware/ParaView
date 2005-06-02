@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.17");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.18");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -298,7 +298,6 @@ void vtkKWToolbarSet::Pack()
 
       if (!this->Internals->PreviousPackInfo.empty())
         {
-        cout << "restoring: " << this->Internals->PreviousPackInfo.c_str() << endl;
         this->Script("pack %s %s", this->GetWidgetName(), 
                      this->Internals->PreviousPackInfo.c_str());
         this->Internals->PreviousPackInfo.assign("");
