@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.211");
+vtkCxxRevisionMacro(vtkKWApplication, "1.212");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -340,8 +340,10 @@ int vtkKWApplication::Exit()
     }
 
   // Prompt confirmation if needed
+  // Let's just use the first window here, if any, to center the dialog
 
-  if (this->PromptBeforeExit && !this->DisplayExitDialog(NULL))
+  if (this->PromptBeforeExit && 
+      !this->DisplayExitDialog(this->GetNthWindow(0)))
     {
     return 0;
     }
