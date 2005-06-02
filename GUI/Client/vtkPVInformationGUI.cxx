@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.5");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.6");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -112,7 +112,7 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app, const char* options)
   this->ExtentDisplay->Create(this->GetApplication(), "");
   this->ExtentDisplay->SetLabelText("Extents");
   
-  this->Script("pack %s %s %s %s -side top -anchor nw",
+  this->Script("pack %s %s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
                this->NumDataSetsLabel->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
@@ -135,6 +135,10 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
 
   // Put the data type as the label of the top frame.
   int dataType = dataInfo->GetDataSetType();
+  if (dataInfo->GetBaseDataSetType() >= 0)
+    {
+    dataType = dataInfo->GetBaseDataSetType();
+    }
   if (dataType == VTK_POLY_DATA)
     {
     type << "Polygonal";
@@ -176,7 +180,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     this->Script("pack %s -fill x -expand t -pady 2", 
                  this->ExtentDisplay->GetWidgetName());
     }
-  else if (dataType == VTK_MULTI_BLOCK_DATA_SET)
+  else if (dataType == VTK_HIERARCHICAL_DATA_SET)
     {
     type << "Multi-block composite";
     this->Script("pack forget %s", 
@@ -197,20 +201,22 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   delete[] type.str();
   
   ostrstream numcells;
-  if (dataType == VTK_MULTI_BLOCK_DATA_SET ||
-      dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
+
+  if (dataType == VTK_HIERARCHICAL_DATA_SET ||
+      dataType == VTK_HIERARCHICAL_BOX_DATA_SET ||
+      dataInfo->GetNumberOfDataSets() > 1 || 1)
     {
     ostrstream numds;
     numds << "Number of datasets: " 
-             << dataInfo->GetNumberOfDataSets() 
-             << ends;
+          << dataInfo->GetNumberOfDataSets() 
+          << ends;
     this->NumDataSetsLabel->SetText(numds.str());
     delete[] numds.str();
     }
   else
     {
-    this->Script("pack forget %s", 
-                 this->NumDataSetsLabel->GetWidgetName());
+    //this->Script("pack forget %s", 
+    //this->NumDataSetsLabel->GetWidgetName());
     }
 
   numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
