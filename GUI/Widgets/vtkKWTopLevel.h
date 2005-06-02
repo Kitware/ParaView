@@ -74,6 +74,39 @@ public:
   vtkGetMacro(Modal, int);
 
   // Description:
+  // Set/Get the position this toplevel should be centered at when Display()
+  // is called. The default is to not set/change the position at all.
+  // If set to MasterWindowCenter, it will be centered inside its master 
+  // window ; if  the MastWindow ivar is not set, it will be centered on
+  // screen, as in if the ivar was set to ScreenCenter. If set to 
+  // Pointer, it will centered at the current mouse position.
+  //BTX
+  enum
+  {
+    DisplayPositionDefault            = 0,
+    DisplayPositionMasterWindowCenter = 1,
+    DisplayPositionScreenCenter       = 2,
+    DisplayPositionPointer            = 3,
+  };
+  //ETX
+  vtkSetClampMacro(DisplayPosition, int, 
+                   vtkKWTopLevel::DisplayPositionDefault, 
+                   vtkKWTopLevel::DisplayPositionPointer);
+  vtkGetMacro(DisplayPosition, int);
+  virtual void SetDisplayPositionToDefault() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionDefault); };
+  virtual void SetDisplayPositionToMasterWindowCenter() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionMasterWindowCenter); };
+  virtual void SetDisplayPositionToScreenCenter() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionScreenCenter); };
+  virtual void SetDisplayPositionToPointer() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionPointer); };
+
+  // Description:
   // Arrange for the toplevel to be displayed in normal (non-iconified) form.
   // This is done by mapping the window.
   virtual void DeIconify();
@@ -194,6 +227,7 @@ protected:
   int HasBeenMapped;
   int HideDecoration;
   int Modal;
+  int DisplayPosition;
 
   // Description:
   // Convenience method to get the width/height of the toplevel as requested
@@ -202,6 +236,10 @@ protected:
   // it is mapped to screen, as requested by the geometry manager.
   virtual int GetRequestedWidth();
   virtual int GetRequestedHeight();
+
+  // Description:
+  // Compute the display position (centered or at pointer)
+  virtual void ComputeDisplayPosition(int *x, int *y);
 
 private:
   vtkKWTopLevel(const vtkKWTopLevel&); // Not implemented

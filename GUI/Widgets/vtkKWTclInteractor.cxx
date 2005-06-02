@@ -25,7 +25,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.32");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.33");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -134,23 +134,6 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app, const char *args)
                this->GetWidgetName(), this->GetTclName());
   
   this->Withdraw();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTclInteractor::Display()
-{
-  if (this->MasterWindow)
-    {
-    int width, height, x, y;
-    const char *res = 
-      this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
-    sscanf(res, "%dx%d+%d+%d", &width, &height, &x, &y);
-    x += width / 3;
-    y += height / 3;
-    this->SetPosition(x, y);
-    }
-
-  this->Superclass::Display();
 }
 
 //----------------------------------------------------------------------------

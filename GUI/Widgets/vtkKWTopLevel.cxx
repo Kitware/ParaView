@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.10");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.11");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -38,6 +38,7 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->HasBeenMapped   = 0;
   this->HideDecoration  = 0;
   this->Modal           = 0;
+  this->DisplayPosition = vtkKWTopLevel::DisplayPositionDefault;
 }
 
 //----------------------------------------------------------------------------
@@ -123,6 +124,14 @@ void vtkKWTopLevel::Display()
   // it is resized from a default 200x200 win to what it needs.
 
   this->Script("update idletasks");
+
+  if (this->DisplayPosition != vtkKWTopLevel::DisplayPositionDefault)
+    {
+    int x, y;
+    this->ComputeDisplayPosition(&x, &y);
+    this->SetPosition(x, y);
+    }
+
   this->DeIconify();
   this->Raise();
   this->Focus();
@@ -142,6 +151,78 @@ void vtkKWTopLevel::Withdraw()
   if (this->Modal)
     {
     this->ReleaseGrab();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
+{
+  if (!this->IsCreated() ||
+      this->DisplayPosition == vtkKWTopLevel::DisplayPositionDefault)
+    {
+    return;
+    }
+
+  int width, height;
+
+  if (this->DisplayPosition == vtkKWTopLevel::DisplayPositionPointer)
+    {
+    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
+           "%d %d", x, y);
+    }
+  else if (this->DisplayPosition == 
+           vtkKWTopLevel::DisplayPositionMasterWindowCenter ||
+           this->DisplayPosition == 
+           vtkKWTopLevel::DisplayPositionScreenCenter)
+    {
+    int sw, sh;
+    sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
+           "%d %d", &sw, &sh);
+
+    vtkKWTopLevel *master = 
+      vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
+    if (master && this->DisplayPosition == 
+        vtkKWTopLevel::DisplayPositionMasterWindowCenter)
+      {
+      master->GetSize(&width, &height);
+      master->GetPosition(x, y);
+      
+      *x += width / 2;
+      *y += height / 2;
+      
+      if (*x > sw - 200)
+        {
+        *x = sw / 2;
+        }
+      if (*y > sh - 200)
+        {
+        *y = sh / 2;
+        }
+      }
+    else
+      {
+      *x = sw / 2;
+      *y = sh / 2;
+      }
+    }
+
+  // That call is not necessary since it has been added to both
+  // GetRequestedWidth and GetRequestedHeight. If it is removed from them
+  // for performance reasons (I doubt it), uncomment that line.
+  // The call to 'update' enable the geometry manager to compute the layout
+  // of the widget behind the scene, and return proper values.
+  // this->Script("update idletasks");
+
+  width = this->GetRequestedWidth();
+  height = this->GetRequestedHeight();
+
+  if (*x > width / 2)
+    {
+    *x -= width / 2;
+    }
+  if (*y > height / 2)
+    {
+    *y -= height / 2;
     }
 }
 
@@ -464,5 +545,6 @@ void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HasBeenMapped: " << this->GetHasBeenMapped() << endl;
   os << indent << "HideDecoration: " << (this->HideDecoration ? "On" : "Off" ) << endl;
   os << indent << "Modal: " << this->GetModal() << endl;
+  os << indent << "DisplayPosition: " << this->GetDisplayPosition() << endl;
 }
 

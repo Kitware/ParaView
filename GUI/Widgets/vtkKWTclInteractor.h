@@ -39,11 +39,6 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
   
   // Description:
-  // Display the interactor
-  // Override superclass to set position automatically
-  virtual void Display();
-
-  // Description:
   // Evaluate the tcl string
   virtual void Evaluate();
 

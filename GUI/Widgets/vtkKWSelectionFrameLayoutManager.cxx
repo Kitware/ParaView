@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.16");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.17");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1225,7 +1225,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
 
   vtkKWSimpleEntryDialog *dlg = vtkKWSimpleEntryDialog::New();
   dlg->SetMasterWindow(this->GetWindow());
-  dlg->InvokeAtPointerOn();
+  dlg->SetDisplayPositionToPointer();
   dlg->SetTitle("Change frame title");
   dlg->SetStyleToOkCancel();
   dlg->Create(this->GetApplication(), 0);

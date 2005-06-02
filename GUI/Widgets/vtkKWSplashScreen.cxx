@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.25");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -29,6 +29,8 @@ vtkKWSplashScreen::vtkKWSplashScreen()
 
   this->ImageName = NULL;
   this->ProgressMessageVerticalOffset = -10;
+
+  this->DisplayPosition = vtkKWTopLevel::DisplayPositionScreenCenter;
 }
 
 //----------------------------------------------------------------------------
@@ -39,7 +41,7 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
     this->Canvas->Delete();
     }
 
-  this->SetImageName(0);
+  this->SetImageName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -74,6 +76,12 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 
   this->Script("%s create image 0 0 -tags image -anchor nw", 
                this->Canvas->GetWidgetName());
+
+  if (this->ImageName)
+    {
+    this->Script("%s itemconfigure image -image %s", 
+                 this->Canvas->GetWidgetName(), this->ImageName);
+    }
   
   // Insert the text
 
@@ -119,46 +127,12 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Display()
 {
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
   // Update canvas size and message position
 
   this->UpdateCanvasSize();
   this->UpdateProgressMessagePosition();
 
-  // Get screen size
-
-  int sw, sh;
-  const char *res = 
-    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
-                 this->GetWidgetName(), this->GetWidgetName());
-  sscanf(res, "%d %d", &sw, &sh);
-
-  // Get size of splash from image size
-
-  int w = 0, h = 0;
-  if (this->ImageName)
-    {
-    this->Script("%s itemconfigure image -image %s", 
-                 this->Canvas->GetWidgetName(), this->ImageName);
-    res = this->Script("concat [%s cget -width] [%s cget -height]", 
-                       this->ImageName, this->ImageName);
-    sscanf(res, "%d %d", &w, &h);
-    }
-
-  // Center the splash
-
-  int x = (sw - w) / 2;
-  int y = (sh - h) / 2;
-
-  this->SetPosition(x, y);
-
   this->Superclass::Display();
-
-  this->Script("update", this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -191,10 +165,10 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
 
   this->Modified();
 
-  if (this->IsCreated() && this->ImageName)
+  if (this->ImageName && this->Canvas && this->Canvas->IsCreated())
     {
-    this->Script("%s itemconfigure image -image %s", 
-                 this->Canvas->GetWidgetName(), this->ImageName);
+    this->Canvas->Script("%s itemconfigure image -image %s", 
+                         this->Canvas->GetWidgetName(), this->ImageName);
     }
 } 
 

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.73");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.74");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -343,10 +343,10 @@ int vtkKWMessageDialog::Invoke()
     }
   if (this->Options & vtkKWMessageDialog::InvokeAtPointer)
     {
-    this->InvokeAtPointerOn();
+    this->SetDisplayPositionToPointer();
     }
 
-  this->Script("wm resizable %s 0 0", this->GetWidgetName());
+  this->SetResizable(0, 0);
 
   int res = this->Superclass::Invoke();
 

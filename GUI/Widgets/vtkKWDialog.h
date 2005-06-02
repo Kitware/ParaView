@@ -14,6 +14,8 @@
 // .NAME vtkKWDialog - dialog box superclass
 // .SECTION Description
 // A generic superclass for dialog boxes.
+// This is a toplevel that is modal by default, and centered in its
+// master window (or on screen)
 
 #ifndef __vtkKWDialog_h
 #define __vtkKWDialog_h
@@ -32,13 +34,16 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Invoke the dialog and display it in a modal manner. 
+  // Invoke the dialog, display it and enter an event loop until the user
+  // confirm (OK) or cancel the dialog.
+  // Note that a dialog is a modal toplevel by default.
   // This method returns a zero if the dilaog was killed or 
   // canceled, nonzero otherwise.
   virtual int Invoke();
 
   // Description:
-  // Display the dialog in a modal manner.
+  // Display the dialog. 
+  // Note that a dialog is a modal toplevel by default.
   virtual void Display();
 
   // Description:
@@ -52,7 +57,7 @@ public:
   // Description:
   // Returns 0 if the dialog is active e.g. displayed
   // 1 if it was Canceled 2 if it was OK.
-  int GetStatus() {return this->Done;};
+  int GetStatus() { return this->Done; };
 
   // Description:
   // Return frame to pack into.
@@ -69,26 +74,14 @@ public:
   vtkSetMacro(BeepType, int);
   vtkGetMacro(BeepType, int);
 
-  // Description:
-  // Invoke the dialog centered at the mouse pointer position (default is
-  // either screen center or window center)
-  vtkSetClampMacro(InvokeAtPointer, int, 0, 1);
-  vtkBooleanMacro(InvokeAtPointer, int);
-  vtkGetMacro(InvokeAtPointer, int);
-
 protected:
 
   vtkKWDialog();
   ~vtkKWDialog() {};
 
-  // Description:
-  // Compute the display position (centered or at pointer)
-  virtual void ComputeInvokePosition(int *x, int *y);
-
   int Done;
   int Beep;
   int BeepType;
-  int InvokeAtPointer;
 
 private:
   vtkKWDialog(const vtkKWDialog&); // Not implemented

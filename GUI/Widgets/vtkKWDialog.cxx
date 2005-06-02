@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.48");
+vtkCxxRevisionMacro(vtkKWDialog, "1.49");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -31,75 +31,8 @@ vtkKWDialog::vtkKWDialog()
   this->Done = 1;
   this->Beep = 0;
   this->BeepType = 0;
-  this->InvokeAtPointer = 0;
   this->Modal = 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWDialog::ComputeInvokePosition(int *x, int *y)
-{
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  int width, height;
-
-  if (this->InvokeAtPointer)
-    {
-    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
-           "%d %d", x, y);
-    }
-  else
-    {
-    int sw, sh;
-    sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
-           "%d %d", &sw, &sh);
-
-    vtkKWTopLevel *master = 
-      vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
-    if (master)
-      {
-      master->GetSize(&width, &height);
-      master->GetPosition(x, y);
-      
-      *x += width / 2;
-      *y += height / 2;
-
-      if (*x > sw - 200)
-        {
-        *x = sw / 2;
-        }
-      if (*y > sh - 200)
-        {
-        *y = sh / 2;
-        }
-      }
-    else
-      {
-      *x = sw / 2;
-      *y = sh / 2;
-      }
-    }
-
-  // That call is not necessary since it has been added to both
-  // GetRequestedWidth and GetRequestedHeight. If it is removed from them
-  // for performance reasons (I doubt it), uncomment that line.
-  // The call to 'update' enable the geometry manager to compute the layout
-  // of the widget behind the scene, and return proper values.
-  // this->Script("update idletasks");
-
-  width = this->GetRequestedWidth();
-  height = this->GetRequestedHeight();
-
-  if (*x > width / 2)
-    {
-    *x -= width / 2;
-    }
-  if (*y > height / 2)
-    {
-    *y -= height / 2;
-    }
+  this->DisplayPosition = vtkKWTopLevel::DisplayPositionMasterWindowCenter;
 }
 
 //----------------------------------------------------------------------------
@@ -108,11 +41,6 @@ int vtkKWDialog::Invoke()
   this->Done = 0;
 
   this->GetApplication()->RegisterDialogUp(this);
-
-  int x, y;
-
-  this->ComputeInvokePosition(&x, &y);
-  this->SetPosition(x, y);
 
   this->Display();
 
@@ -178,6 +106,5 @@ void vtkKWDialog::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Beep: " << this->GetBeep() << endl;
   os << indent << "BeepType: " << this->GetBeepType() << endl;
-  os << indent << "InvokeAtPointer: " << this->GetInvokeAtPointer() << endl;
 }
 
