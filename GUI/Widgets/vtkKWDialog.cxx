@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.47");
+vtkCxxRevisionMacro(vtkKWDialog, "1.48");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -36,20 +36,19 @@ vtkKWDialog::vtkKWDialog()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDialog::Invoke()
+void vtkKWDialog::ComputeInvokePosition(int *x, int *y)
 {
-  this->Done = 0;
-
-  this->GetApplication()->RegisterDialogUp(this);
+  if (!this->IsCreated())
+    {
+    return;
+    }
 
   int width, height;
-
-  int x, y;
 
   if (this->InvokeAtPointer)
     {
     sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
-           "%d %d", &x, &y);
+           "%d %d", x, y);
     }
   else
     {
@@ -62,39 +61,57 @@ int vtkKWDialog::Invoke()
     if (master)
       {
       master->GetSize(&width, &height);
-      master->GetPosition(&x, &y);
+      master->GetPosition(x, y);
       
-      x += width / 2;
-      y += height / 2;
+      *x += width / 2;
+      *y += height / 2;
 
-      if (x > sw - 200)
+      if (*x > sw - 200)
         {
-        x = sw / 2;
+        *x = sw / 2;
         }
-      if (y > sh - 200)
+      if (*y > sh - 200)
         {
-        y = sh / 2;
+        *y = sh / 2;
         }
       }
     else
       {
-      x = sw / 2;
-      y = sh / 2;
+      *x = sw / 2;
+      *y = sh / 2;
       }
     }
 
-  width = this->GetWidth();
-  height = this->GetHeight();
+  // That call is not necessary since it has been added to both
+  // GetRequestedWidth and GetRequestedHeight. If it is removed from them
+  // for performance reasons (I doubt it), uncomment that line.
+  // The call to 'update' enable the geometry manager to compute the layout
+  // of the widget behind the scene, and return proper values.
+  // this->Script("update idletasks");
 
-  if (x > width / 2)
-    {
-    x -= width / 2;
-    }
-  if (y > height / 2)
-    {
-    y -= height / 2;
-    }
+  width = this->GetRequestedWidth();
+  height = this->GetRequestedHeight();
 
+  if (*x > width / 2)
+    {
+    *x -= width / 2;
+    }
+  if (*y > height / 2)
+    {
+    *y -= height / 2;
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDialog::Invoke()
+{
+  this->Done = 0;
+
+  this->GetApplication()->RegisterDialogUp(this);
+
+  int x, y;
+
+  this->ComputeInvokePosition(&x, &y);
   this->SetPosition(x, y);
 
   this->Display();

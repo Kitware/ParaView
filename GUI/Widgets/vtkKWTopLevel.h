@@ -98,9 +98,15 @@ public:
   // Description:
   // Convenience method to set/get the window size in pixels 
   // No effect if called before Create()
+  // This will in turn call GetWidget() and GetHeight()
   // Return 1 on success, 0 otherwise.
   virtual int SetSize(int w, int h);
   virtual int GetSize(int *w, int *h);
+
+  // Description:
+  // Convenience method to guess the width/height of the toplevel.
+  virtual int GetWidth();
+  virtual int GetHeight();
 
   // Description:
   // Convenience method to set/get the minimum window size. 
@@ -123,11 +129,6 @@ public:
   // otherwise
   virtual int SetGeometry(const char *);
   virtual const char* GetGeometry();
-
-  // Description:
-  // Convenience method to guess the width/height of the toplevel.
-  virtual int GetWidth();
-  virtual int GetHeight();
 
   // Description:
   // Return if the toplevel has ever been mapped (deiconified)
@@ -193,6 +194,14 @@ protected:
   int HasBeenMapped;
   int HideDecoration;
   int Modal;
+
+  // Description:
+  // Convenience method to get the width/height of the toplevel as requested
+  // by the window manager. Not exposed in public since it is so Tk
+  // related. Is is usually used to get the geometry of a window before
+  // it is mapped to screen, as requested by the geometry manager.
+  virtual int GetRequestedWidth();
+  virtual int GetRequestedHeight();
 
 private:
   vtkKWTopLevel(const vtkKWTopLevel&); // Not implemented

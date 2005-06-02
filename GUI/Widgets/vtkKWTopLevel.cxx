@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.9");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.10");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -117,10 +117,15 @@ void vtkKWTopLevel::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::Display()
 {
+  // it is important to call update first, so that the geometry manager
+  // can pack everything behind the scenes, and *then* raise the window
+  // with its proper size. Not doing so would make the window flicker as
+  // it is resized from a default 200x200 win to what it needs.
+
+  this->Script("update idletasks");
   this->DeIconify();
   this->Raise();
   this->Focus();
-  this->Script("update idletasks");
   if (this->Modal)
     {
     this->Grab();
@@ -243,7 +248,7 @@ int vtkKWTopLevel::GetWidth()
     return 0;
     }
 
-  return atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
+  return atoi(this->Script("winfo width %s", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
@@ -254,6 +259,34 @@ int vtkKWTopLevel::GetHeight()
     return 0;
     }
 
+  return atoi(this->Script("winfo height %s", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTopLevel::GetRequestedWidth()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // The call to 'update' enable the geometry manager to compute the layout
+  // of the widget behind the scene, and return proper values.
+  this->Script("update idletasks");
+  return atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTopLevel::GetRequestedHeight()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // The call to 'update' enable the geometry manager to compute the layout
+  // of the widget behind the scene, and return proper values.
+  this->Script("update idletasks");
   return atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
 }
 

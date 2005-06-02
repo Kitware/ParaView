@@ -154,12 +154,6 @@ public:
   virtual void Other();
 
   // Description:
-  // Convenience method to guess the width/height of the dialog.
-  // Override the superclass to make smarter choice given the contents.
-  virtual int GetWidth();
-  virtual int GetHeight();
-
-  // Description:
   // Convenience static method to store/retrieve a message dialog response
   // for a given application in/from the registry.
   // This can be used to prevent the user from answering the same question

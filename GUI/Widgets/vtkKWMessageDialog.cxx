@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.72");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.73");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -486,94 +486,6 @@ void vtkKWMessageDialog::Other()
   this->Withdraw();
   this->ReleaseGrab();
   this->Done = 3;  
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMessageDialog::GetWidth()
-{
-  int width = this->Superclass::GetWidth();
-
-  if (!this->IsCreated() || this->GetHasBeenMapped())
-    {
-    return width;
-    }
-
-  // GetWidth() is called by vtkKWDialog when it's time to center the
-  // dialog. Unfortunately, since the widget has not been mapped at that
-  // time, 'winfo width' will most probably return 1, and 'winfo reqwidth'
-  // will return the default size of the top level window. Let's try to
-  // help a bit by checking the size of the internal frames (which width can
-  // be set explicitly).
-
-  if (this->TopFrame)
-    {
-    int iwidth = atoi(this->Script("winfo reqwidth %s", 
-                                   this->TopFrame->GetWidgetName()));
-    if (iwidth > width)
-      {
-      width = iwidth;
-      }
-    }
-
-  if (this->MessageDialogFrame)
-    {
-    int iwidth = atoi(this->Script("winfo reqwidth %s", 
-                                   this->MessageDialogFrame->GetWidgetName()));
-    if (iwidth > width)
-      {
-      width = iwidth;
-      }
-    }
-
-  if (this->BottomFrame)
-    {
-    int iwidth = atoi(this->Script("winfo reqwidth %s", 
-                                   this->BottomFrame->GetWidgetName()));
-    if (iwidth > width)
-      {
-      width = iwidth;
-      }
-    }
-
-  return width;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMessageDialog::GetHeight()
-{
-  int height = this->Superclass::GetHeight();
-
-  if (!this->IsCreated() || this->GetHasBeenMapped())
-    {
-    return height;
-    }
-
-  // GetHeight() is called by vtkKWDialog when it's time to center the
-  // dialog. Unfortunately, since the widget has not been mapped at that
-  // time, 'winfo height' will most probably return 1, and 'winfo reqheight'
-  // will return the default size of the top level window. Let's try to help
-  // a bit by checking the size of the internal frames (which height can be
-  // set explicitly).
-
-  if (this->TopFrame)
-    {
-    height += atoi(this->Script("winfo reqheight %s", 
-                                this->TopFrame->GetWidgetName()));
-    }
-
-  if (this->MessageDialogFrame)
-    {
-    height += atoi(this->Script("winfo reqheight %s", 
-                                this->MessageDialogFrame->GetWidgetName()));
-    }
-
-  if (this->BottomFrame)
-    {
-    height += atoi(this->Script("winfo reqheight %s", 
-                                this->BottomFrame->GetWidgetName()));
-    }
-
-  return height;
 }
 
 //----------------------------------------------------------------------------

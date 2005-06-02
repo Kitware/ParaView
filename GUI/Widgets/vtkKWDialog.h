@@ -81,6 +81,10 @@ protected:
   vtkKWDialog();
   ~vtkKWDialog() {};
 
+  // Description:
+  // Compute the display position (centered or at pointer)
+  virtual void ComputeInvokePosition(int *x, int *y);
+
   int Done;
   int Beep;
   int BeepType;
