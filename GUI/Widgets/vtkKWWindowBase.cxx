@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.10");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.11");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -321,8 +321,10 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
-  this->Script("pack %s -padx 0 -pady 0 -side top -fill x -expand no",
-               this->MainToolbarSet->GetWidgetName());
+  this->Script(
+    "pack %s -padx 0 -pady 0 -side top -fill x -expand no -after %s",
+    this->MainToolbarSet->GetWidgetName(),
+    this->MenuBarSeparatorFrame->GetWidgetName());
 
   // Main frame
 

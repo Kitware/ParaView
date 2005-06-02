@@ -40,7 +40,7 @@ const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.250");
+vtkCxxRevisionMacro(vtkKWWindow, "1.251");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -177,7 +177,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   menu = this->GetWindowMenu();
   menu->AddCommand(vtkKWWindow::HideMainPanelMenuLabel, 
-                   this, "MainPanelVisibilityCallback", 1);
+                   this, "MainPanelVisibilityCallback", 5);
   menu->SetItemAccelerator(
     vtkKWWindow::HideMainPanelMenuLabel,
     vtkKWWindow::MainPanelVisibilityKeyAccelerator);
@@ -233,7 +233,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   menu = this->GetWindowMenu();
   menu->AddCommand(vtkKWWindow::HideSecondaryPanelMenuLabel, 
-                   this, "SecondaryPanelVisibilityCallback", 1);
+                   this, "SecondaryPanelVisibilityCallback", 5);
   menu->SetItemAccelerator(
     vtkKWWindow::HideSecondaryPanelMenuLabel,
     vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator);
@@ -266,8 +266,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
-  this->Script("pack %s -padx 0 -pady 0 -side top -fill x -expand no ",
-               this->SecondaryToolbarSet->GetWidgetName());
+  this->Script(
+    "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no -after %s",
+    this->SecondaryToolbarSet->GetWidgetName(),
+    this->SecondarySplitFrame->GetWidgetName()); // important
 
   // Udpate the enable state
 

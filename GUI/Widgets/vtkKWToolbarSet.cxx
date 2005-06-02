@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.16");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.17");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -246,8 +246,35 @@ void vtkKWToolbarSet::Pack()
         {
         this->Internals->PreviousPackInfo = 
           this->Script("pack info %s", this->GetWidgetName());
+        
+        // Tk bug/feature ? The -after or -before parameter are not returned
+        // by pack. Let's find them manually.
+
+        if (!this->Internals->PreviousPackInfo.empty())
+          {
+          ostrstream master, previous_slave, next_slave;
+          
+          vtkKWTkUtilities::GetMasterInPack(this, master);
+          master << ends;
+
+          vtkKWTkUtilities::GetPreviousAndNextSlaveInPack(
+            this->GetApplication()->GetMainInterp(),
+            master.str(), this->GetWidgetName(), previous_slave, next_slave);
+          previous_slave << ends;
+          next_slave << ends;
+          if (*previous_slave.str())
+            {
+            this->Internals->PreviousPackInfo += " -after ";
+            this->Internals->PreviousPackInfo += previous_slave.str();
+            }
+          else if (*next_slave.str())
+            {
+            this->Internals->PreviousPackInfo += " -before ";
+            this->Internals->PreviousPackInfo += next_slave.str();
+            }
+          }
         this->Script("pack forget %s", this->GetWidgetName());
-        this->Internals->PreviousGridInfo.clear();
+        this->Internals->PreviousGridInfo.assign("");
         }
       else
         {
@@ -255,7 +282,7 @@ void vtkKWToolbarSet::Pack()
           this->Script("grid info %s", this->GetWidgetName());
         if (!grid_info.empty())
           {
-          this->Internals->PreviousPackInfo.clear();
+          this->Internals->PreviousPackInfo.assign("");
           this->Internals->PreviousGridInfo = grid_info;
           this->Script("grid forget %s", this->GetWidgetName());
           }
@@ -271,17 +298,18 @@ void vtkKWToolbarSet::Pack()
 
       if (!this->Internals->PreviousPackInfo.empty())
         {
+        cout << "restoring: " << this->Internals->PreviousPackInfo.c_str() << endl;
         this->Script("pack %s %s", this->GetWidgetName(), 
                      this->Internals->PreviousPackInfo.c_str());
-        this->Internals->PreviousPackInfo.clear();
-        this->Internals->PreviousGridInfo.clear();
+        this->Internals->PreviousPackInfo.assign("");
+        this->Internals->PreviousGridInfo.assign("");
         }
       else if (!this->Internals->PreviousGridInfo.empty())
         {
         this->Script("grid %s %s", this->GetWidgetName(), 
                      this->Internals->PreviousGridInfo.c_str());
-        this->Internals->PreviousPackInfo.clear();
-        this->Internals->PreviousGridInfo.clear();
+        this->Internals->PreviousPackInfo.assign("");
+        this->Internals->PreviousGridInfo.assign("");
         }
       }
     }
