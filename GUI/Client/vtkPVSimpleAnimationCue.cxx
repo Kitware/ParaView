@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.5");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.6");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -491,7 +491,15 @@ int vtkPVSimpleAnimationCue::AppendNewKeyFrame()
   int id = this->AddNewKeyFrame(1.0);
   if (id != -1)
     {
-    this->SelectKeyFrame(id);
+    if (id == 1) // when the first key frame is added, 2 keyframes are created
+        //hence, to select the first one among the two--
+      {
+      this->SelectKeyFrame(0);
+      }
+    else
+      {
+      this->SelectKeyFrame(id);
+      }
     }
   return id;
 }
