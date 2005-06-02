@@ -33,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.18");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.19");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -325,7 +325,7 @@ void vtkKWToolbarSet::PackBottomSeparator()
   if (this->ShowBottomSeparator && this->GetNumberOfVisibleToolbars())
     {
     this->Script(
-      "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after",
+      "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
       this->BottomSeparatorFrame->GetWidgetName(),
       this->ToolbarsFrame->GetWidgetName());
     }
