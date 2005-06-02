@@ -5,46 +5,42 @@ source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp23) $argv $argc
 
 
-set kw(vtkTemp781) [$kw(vtkTemp2) InitializeReadCustom "spcthreader" "$DataDir/Data/SPCTH/ball_and_box.spcth"]
-$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp781) "$DataDir/Data/SPCTH/ball_and_box.spcth"
-$kw(vtkTemp2) FinalizeRead $kw(vtkTemp781) "$DataDir/Data/SPCTH/ball_and_box.spcth"
-set kw(vtkTemp791) [$kw(vtkTemp781) GetPVWidget {Filename}]
-$kw(vtkTemp791) SetValue "$DataDir/Data/SPCTH/ball_and_box.spcth"
-set kw(vtkTemp782) [$kw(vtkTemp781) GetPVWidget {file_flag}]
-$kw(vtkTemp782) SetState 1
-set kw(vtkTemp784) [$kw(vtkTemp781) GetPVWidget {TimeStep}]
-$kw(vtkTemp784) SetValue 0
-set kw(vtkTemp790) [$kw(vtkTemp781) GetPVWidget {CellArrays}]
-$kw(vtkTemp790) SetArrayStatus {M - 0} 1
-$kw(vtkTemp790) SetArrayStatus {M - 1} 1
-$kw(vtkTemp790) SetArrayStatus {VX} 1
-$kw(vtkTemp790) SetArrayStatus {VZ} 1
-$kw(vtkTemp790) SetArrayStatus {P} 1
-$kw(vtkTemp790) SetArrayStatus {VOLM - 0} 1
-$kw(vtkTemp790) SetArrayStatus {VOLM - 1} 1
+set kw(vtkTemp793) [$kw(vtkTemp2) InitializeReadCustom "spcthreader" "$DataDir/Data/SPCTH/ball_and_box.spcth"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp793) "$DataDir/Data/SPCTH/ball_and_box.spcth"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp793) "$DataDir/Data/SPCTH/ball_and_box.spcth"
+set kw(vtkTemp803) [$kw(vtkTemp793) GetPVWidget {Filename}]
+$kw(vtkTemp803) SetValue "$DataDir/Data/SPCTH/ball_and_box.spcth"
+set kw(vtkTemp794) [$kw(vtkTemp793) GetPVWidget {file_flag}]
+$kw(vtkTemp794) SetState 1
+set kw(vtkTemp796) [$kw(vtkTemp793) GetPVWidget {TimeStep}]
+$kw(vtkTemp796) SetValue 0
+set kw(vtkTemp802) [$kw(vtkTemp793) GetPVWidget {CellArrays}]
+$kw(vtkTemp802) SetArrayStatus {M - 0} 1
+$kw(vtkTemp802) SetArrayStatus {M - 1} 1
+$kw(vtkTemp802) SetArrayStatus {VX} 1
+$kw(vtkTemp802) SetArrayStatus {VZ} 1
+$kw(vtkTemp802) SetArrayStatus {P} 1
+$kw(vtkTemp802) SetArrayStatus {VOLM - 0} 1
+$kw(vtkTemp802) SetArrayStatus {VOLM - 1} 1
 $kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
 $kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
-$kw(vtkTemp781) AcceptCallback
-$kw(vtkTemp23) SetCameraState -16.792 6.208 17.928  -0.000 0.000 0.000  0.103 0.966 -0.238
-set kw(vtkTemp819) [$kw(vtkTemp2) CreatePVSource CTHPart]
-$kw(vtkTemp23) SetCameraState -16.792 6.208 17.928  -0.000 0.000 0.000  0.103 0.966 -0.238
-set kw(vtkTemp820) [$kw(vtkTemp819) GetPVWidget {Input}]
-$kw(vtkTemp820) SetCurrentValue $kw(vtkTemp781)
-set kw(vtkTemp823) [$kw(vtkTemp819) GetPVWidget {ArraySelection}]
-$kw(vtkTemp823) ClearAllSelections
-$kw(vtkTemp823) SetSelectState {VOLM - 0} 1
-$kw(vtkTemp823) SetSelectState {VOLM - 1} 1
-set kw(vtkTemp839) [$kw(vtkTemp819) GetPVWidget {Clipping}]
-set kw(vtkTemp832) [$kw(vtkTemp839) GetPVWidget {On}]
-$kw(vtkTemp832) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
-$kw(vtkTemp832) SetNormal -0.19466 0.10478 0.97526
-$kw(vtkTemp839) SetCurrentValue {On}
-$kw(vtkTemp832) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
-$kw(vtkTemp832) SetNormal -0.19466 0.10478 0.97526
-set kw(vtkTemp867) [$kw(vtkTemp2) GetPVColorMap {Part Index} 1]
-$kw(vtkTemp867) SetScalarBarTitle {Part Index}
-$kw(vtkTemp819) AcceptCallback
-$kw(vtkTemp23) SetCameraState -9.442 -8.657 -21.859  -0.000 0.000 0.000  0.133 0.901 -0.414
+$kw(vtkTemp793) AcceptCallback
+set kw(vtkTemp833) [$kw(vtkTemp2) CreatePVSource CTHPart]
+set kw(vtkTemp834) [$kw(vtkTemp833) GetPVWidget {Input}]
+$kw(vtkTemp834) SetCurrentValue $kw(vtkTemp793)
+set kw(vtkTemp837) [$kw(vtkTemp833) GetPVWidget {ArraySelection}]
+$kw(vtkTemp837) ClearAllSelections
+$kw(vtkTemp837) SetSelectState {VOLM - 0} 1
+$kw(vtkTemp837) SetSelectState {VOLM - 1} 1
+set kw(vtkTemp853) [$kw(vtkTemp833) GetPVWidget {Clipping}]
+$kw(vtkTemp853) SetCurrentValue {On}
+set kw(vtkTemp846) [$kw(vtkTemp853) GetPVWidget {On}]
+$kw(vtkTemp846) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
+$kw(vtkTemp846) SetNormal 0 0 1
+set kw(vtkTemp880) [$kw(vtkTemp2) GetPVColorMap {Part Index} 1]
+$kw(vtkTemp880) SetScalarBarTitle {Part Index}
+$kw(vtkTemp833) AcceptCallback
+$kw(vtkTemp23) SetCameraState -17.750 6.583 -16.838  -0.000 0.000 0.000  0.213 0.965 0.153
 
 # Retrace
 update
@@ -61,3 +57,4 @@ source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
 $Application Exit
+
