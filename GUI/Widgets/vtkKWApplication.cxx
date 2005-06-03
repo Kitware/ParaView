@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.212");
+vtkCxxRevisionMacro(vtkKWApplication, "1.213");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -240,6 +240,8 @@ void vtkKWApplication::PrepareForDelete()
     this->BalloonHelpManager->Delete();
     this->BalloonHelpManager = NULL;
     }
+
+  this->Script("foreach a [ after info ] { after cancel $a }");
 }
     
 //----------------------------------------------------------------------------
@@ -360,8 +362,6 @@ int vtkKWApplication::Exit()
 
   this->SaveApplicationSettingsToRegistry();
 
-  this->PrepareForDelete();
-
   // Close all windows
   // This loop might be a little dangerous if a window never closes...
   // We could loop over the given number of window, and test if there
@@ -376,6 +376,14 @@ int vtkKWApplication::Exit()
       win->Close();
       }
     }
+
+  // This call has to be here, not before the previous loop, so that
+  // (for example, the balloon help manager is not destroyed before
+  // all windows are removed (in some rare occasions, a user can be fast
+  // enough to quit the app while moving the mouse on a widget that
+  // has a binding to the balloon help manager
+
+  this->PrepareForDelete();
 
   return 1;
 }
@@ -1024,7 +1032,7 @@ vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper()
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager *vtkKWApplication::GetBalloonHelpManager()
 {
-  if (!this->BalloonHelpManager)
+  if (!this->BalloonHelpManager && !this->InExit)
     {
     this->BalloonHelpManager = vtkKWBalloonHelpManager::New();
     this->BalloonHelpManager->SetApplication(this);

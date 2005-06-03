@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.37");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.38");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -491,8 +491,12 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->ShowBalloonHelpCheckButton)
     {
-    this->ShowBalloonHelpCheckButton->SetState(
-      this->GetApplication()->GetBalloonHelpManager()->GetShow());
+    vtkKWBalloonHelpManager *mgr = 
+      this->GetApplication()->GetBalloonHelpManager();
+    if (mgr)
+      {
+      this->ShowBalloonHelpCheckButton->SetState(mgr->GetShow());
+      }
     }
 
   // Interface customization : Drag & Drop : Enable
@@ -582,7 +586,12 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
     }
 
   int state = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
-  this->GetApplication()->GetBalloonHelpManager()->SetShow(state);
+  vtkKWBalloonHelpManager *mgr = 
+    this->GetApplication()->GetBalloonHelpManager();
+  if (mgr)
+    {
+    mgr->SetShow(state);
+    }
 }
 
 //----------------------------------------------------------------------------

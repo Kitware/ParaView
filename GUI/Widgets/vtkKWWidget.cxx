@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.123");
+vtkCxxRevisionMacro(vtkKWWidget, "1.124");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -228,7 +228,12 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 
     if (this->BalloonHelpString)
       {
-      this->GetApplication()->GetBalloonHelpManager()->AddBindings(this);
+      vtkKWBalloonHelpManager *mgr = 
+        this->GetApplication()->GetBalloonHelpManager();
+      if (mgr)
+        {
+        mgr->AddBindings(this);
+        }
       }
     }
 
@@ -457,7 +462,12 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
   
   if (this->BalloonHelpString && this->GetApplication() && this->IsCreated())
     {
-    this->GetApplication()->GetBalloonHelpManager()->AddBindings(this);
+    vtkKWBalloonHelpManager *mgr = 
+      this->GetApplication()->GetBalloonHelpManager();
+    if (mgr)
+      {
+      mgr->AddBindings(this);
+      }
     }
 }
 
