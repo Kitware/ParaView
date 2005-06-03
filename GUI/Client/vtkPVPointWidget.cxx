@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.53");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -99,7 +99,7 @@ void vtkPVPointWidget::SetVisibility(int v)
   if (v)
     { // Get around the progress clearing the status text.
     // We can get rid of this when Andy adds the concept of a global status.
-    this->Script("after 500 {%s SetStatusText {'p' picks a point.}}",
+    this->Script("after 500 {catch {%s SetStatusText {'p' picks a point.}}}",
                  this->GetPVApplication()->GetMainWindow()->GetTclName());
     }
   else
@@ -361,7 +361,7 @@ void vtkPVPointWidget::ActualPlaceWidget()
   // Get around the progress clearing the status text.
   // We can get rid of this when Andy adds the concept of a global status.
   // fixme: Put the message in enable.
-  this->Script("after 500 {%s SetStatusText {'p' picks a point.}}",
+  this->Script("after 500 {catch {%s SetStatusText {'p' picks a point.}}}",
                this->GetPVApplication()->GetMainWindow()->GetTclName());
 }
 

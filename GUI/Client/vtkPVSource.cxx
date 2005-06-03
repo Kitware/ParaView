@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.443");
+vtkCxxRevisionMacro(vtkPVSource, "1.444");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -972,7 +972,7 @@ void vtkPVSource::PreAcceptCallback()
     }
   this->Script("%s configure -cursor watch",
                this->GetPVWindow()->GetWidgetName());
-  this->Script("after idle {%s AcceptCallback}", this->GetTclName());
+  this->Script("after idle {catch {%s AcceptCallback}}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
