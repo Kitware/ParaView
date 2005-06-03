@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.6");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.7");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -1133,4 +1133,5 @@ void vtkPVSimpleAnimationCue::PrintSelf(ostream& os ,vtkIndent indent)
      this->KeyFrameManipulatorProxyName : "NULL") << endl;
   os << indent << "KeyFrameManipulatorProxy: " << 
     this->KeyFrameManipulatorProxy << endl;
+  os << indent << "Duration: " << this->Duration << endl;
 }

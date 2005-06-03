@@ -48,7 +48,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.10");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.11");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -342,4 +342,7 @@ void vtkPVComparativeVisManager::Hide()
 void vtkPVComparativeVisManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "CurrentVisualization: " 
+     << (this->CurrentVisualization?this->CurrentVisualization:"(null)")
+     << endl;
 }

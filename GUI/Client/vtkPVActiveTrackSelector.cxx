@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.2");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -323,4 +323,35 @@ void vtkPVActiveTrackSelector::SelectPropertyCallbackInternal(int cue_index)
 void vtkPVActiveTrackSelector::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "PropertyMenuButton: ";
+  if (this->PropertyMenuButton)
+    {
+    this->PropertyMenuButton->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "SourceMenuButton: ";
+  if (this->SourceMenuButton)
+    {
+    this->SourceMenuButton->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "CurrentCue: ";
+  if (this->CurrentCue)
+    {
+    this->CurrentCue->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "PackHorizontally: " << this->PackHorizontally << endl;
+  os << indent << "FocusCurrentCue: " << this->FocusCurrentCue << endl;
 }

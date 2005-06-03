@@ -44,7 +44,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.16");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.17");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 
 //*****************************************************************************
@@ -860,5 +860,7 @@ void vtkPVKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
     this->KeyFrameProxyName : "NULL") << endl;
   os << indent << "KeyFrameProxy: " << this->KeyFrameProxy << endl;
   os << indent << "AnimationCueProxy: " << this->AnimationCueProxy << endl;
+  os << indent << "AnimationScene: " << this->AnimationScene << endl;
+  os << indent << "Duration: " << this->Duration << endl;
 }
 

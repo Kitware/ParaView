@@ -41,7 +41,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.2");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.3");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
@@ -642,4 +642,7 @@ void vtkPVComparativeVis::PrintSelf(ostream& os, vtkIndent indent)
     {
     iter->GetPointer()->PrintSelf(os, indent.GetNextIndent());
     }
+  os << indent << "IsGenerated: " << this->IsGenerated << endl;
+  os << indent << "Name: " << (this->Name?this->Name:"(null)") << endl;
+  os << indent << "MultiActorHelper: " << this->MultiActorHelper << endl;
 }

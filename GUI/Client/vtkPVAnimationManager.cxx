@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.48");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.49");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1355,4 +1355,14 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ProxyIterator: " << this->ProxyIterator << endl;
   os << indent << "AdvancedView: " << this->AdvancedView << endl;
   os << indent << "InRecording: " << this->InRecording << endl;
+
+  os << indent << "ActiveTrackSelector: ";
+  if (this->ActiveTrackSelector)
+    {
+    this->ActiveTrackSelector->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

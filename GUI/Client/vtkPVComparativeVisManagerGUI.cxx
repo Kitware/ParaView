@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.2");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.3");
 
 int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -230,5 +230,15 @@ void vtkPVComparativeVisManagerGUI::Update()
 void vtkPVComparativeVisManagerGUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Manager: ";
+  if (this->Manager)
+    {
+    this->Manager->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(null)" << endl;
+    }
 }
 

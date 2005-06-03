@@ -37,7 +37,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.3");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.4");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -612,4 +612,5 @@ void vtkPVTrackEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PropertiesFrame: " << this->PropertiesFrame << endl;
+  os << indent << "ShowKeyFrameLabel: " << this->ShowKeyFrameLabel << endl;
 }

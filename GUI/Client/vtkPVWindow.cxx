@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.724");
+vtkCxxRevisionMacro(vtkPVWindow, "1.725");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -5037,6 +5037,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InDemo: " << this->InDemo << endl;
   os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
   os << indent << "TraceHelper: " << this->TraceHelper << endl;
+  os << indent << "InComparativeVis: " << this->InComparativeVis << endl;
 
   // Lookmarks part:
 #ifdef PARAVIEW_USE_LOOKMARKS
