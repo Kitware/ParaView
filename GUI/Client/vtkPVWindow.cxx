@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.727");
+vtkCxxRevisionMacro(vtkPVWindow, "1.728");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1303,9 +1303,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                wname, tname);
   this->Script("bind %s <Control-Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 0 1}",
                wname, tname);
-  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-               wname, tname);
-  
+
+  // Please explain me what it does. Right now, if you exit the app using
+  // the keyboard accelerator, it will crash right there
+  //  this->Script("bind %s <Configure> {%s Configure %%w %%h}", wname, tname);
+
   // We need keyboard focus to get key events in the render window.
   // we are using the p key for picking.
   this->Script("bind %s <Enter> {focus %s}",
