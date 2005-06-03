@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.26");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -31,6 +31,7 @@ vtkKWSplashScreen::vtkKWSplashScreen()
   this->ProgressMessageVerticalOffset = -10;
 
   this->DisplayPosition = vtkKWTopLevel::DisplayPositionScreenCenter;
+  this->HideDecoration  = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -58,9 +59,6 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
   // Call the superclass to create the whole widget
 
   this->Superclass::Create(app, args);
-
-  this->Withdraw();
-  this->HideDecorationOn();
 
   // Create and pack the canvas
 
@@ -133,6 +131,13 @@ void vtkKWSplashScreen::Display()
   this->UpdateProgressMessagePosition();
 
   this->Superclass::Display();
+
+  // As much as call to 'update' are evil, this is the only way to bring
+  // the splashscreen up-to-date and in front. 'update idletasks' will not
+  // do the trick because this code is usually executed during initialization
+  // or creation of the UI, not in the event loop
+
+  this->Script("update");
 }
 
 //----------------------------------------------------------------------------

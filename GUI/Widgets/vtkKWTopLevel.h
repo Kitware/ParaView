@@ -164,10 +164,6 @@ public:
   virtual const char* GetGeometry();
 
   // Description:
-  // Return if the toplevel has ever been mapped (deiconified)
-  vtkGetMacro(HasBeenMapped, int);
-
-  // Description:
   // Set/Get if the toplevel should be displayed without decorations (i.e.
   // ignored by the window manager). Default to 0. If not decorated, the
   // toplevel will usually be displayed without a title bar, resizing handles,
@@ -224,7 +220,6 @@ protected:
   char *Title;
   char *WindowClass;
 
-  int HasBeenMapped;
   int HideDecoration;
   int Modal;
   int DisplayPosition;

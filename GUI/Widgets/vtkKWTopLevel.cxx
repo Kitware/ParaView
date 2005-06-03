@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.11");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.12");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -35,7 +35,6 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->WindowClass     = NULL;
   this->MasterWindow    = NULL;
   this->Menu            = NULL;
-  this->HasBeenMapped   = 0;
   this->HideDecoration  = 0;
   this->Modal           = 0;
   this->DisplayPosition = vtkKWTopLevel::DisplayPositionDefault;
@@ -118,12 +117,19 @@ void vtkKWTopLevel::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::Display()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   // it is important to call update first, so that the geometry manager
   // can pack everything behind the scenes, and *then* raise the window
   // with its proper size. Not doing so would make the window flicker as
   // it is resized from a default 200x200 win to what it needs.
 
   this->Script("update idletasks");
+
+  this->DeIconify();
 
   if (this->DisplayPosition != vtkKWTopLevel::DisplayPositionDefault)
     {
@@ -132,9 +138,9 @@ void vtkKWTopLevel::Display()
     this->SetPosition(x, y);
     }
 
-  this->DeIconify();
   this->Raise();
   this->Focus();
+
   if (this->Modal)
     {
     this->Grab();
@@ -232,7 +238,6 @@ void vtkKWTopLevel::DeIconify()
   if (this->IsCreated())
     {
     this->Script("wm deiconify %s", this->GetWidgetName());
-    this->HasBeenMapped = 1;
     }
 }
 
@@ -542,7 +547,6 @@ void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
     os << "None" << endl;
     }
   os << indent << "MasterWindow: " << this->GetMasterWindow() << endl;
-  os << indent << "HasBeenMapped: " << this->GetHasBeenMapped() << endl;
   os << indent << "HideDecoration: " << (this->HideDecoration ? "On" : "Off" ) << endl;
   os << indent << "Modal: " << this->GetModal() << endl;
   os << indent << "DisplayPosition: " << this->GetDisplayPosition() << endl;
