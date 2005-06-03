@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.12");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.13");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -122,14 +122,7 @@ void vtkKWTopLevel::Display()
     return;
     }
 
-  // it is important to call update first, so that the geometry manager
-  // can pack everything behind the scenes, and *then* raise the window
-  // with its proper size. Not doing so would make the window flicker as
-  // it is resized from a default 200x200 win to what it needs.
-
-  this->Script("update idletasks");
-
-  this->DeIconify();
+  // Position the toplevel.
 
   if (this->DisplayPosition != vtkKWTopLevel::DisplayPositionDefault)
     {
@@ -137,6 +130,8 @@ void vtkKWTopLevel::Display()
     this->ComputeDisplayPosition(&x, &y);
     this->SetPosition(x, y);
     }
+
+  this->DeIconify();
 
   this->Raise();
   this->Focus();

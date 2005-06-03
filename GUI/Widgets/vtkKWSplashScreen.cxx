@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.27");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -204,6 +204,26 @@ void vtkKWSplashScreen::SetProgressMessageVerticalOffset(int _arg)
   this->Modified();
 
   this->UpdateProgressMessagePosition();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSplashScreen::GetRequestedWidth()
+{
+  if (this->IsCreated() && this->ImageName)
+    {
+    return atoi(this->Script("%s cget -width", this->ImageName));
+    }
+  return this->Superclass::GetRequestedWidth();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSplashScreen::GetRequestedHeight()
+{
+  if (this->IsCreated() && this->ImageName)
+    {
+    return atoi(this->Script("%s cget -height", this->ImageName));
+    }
+  return this->Superclass::GetRequestedHeight();
 }
 
 // ---------------------------------------------------------------------------

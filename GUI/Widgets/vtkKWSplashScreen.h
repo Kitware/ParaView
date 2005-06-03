@@ -73,6 +73,17 @@ protected:
   void UpdateCanvasSize();
   void UpdateProgressMessagePosition();
 
+  // Description:
+  // Convenience method to get the width/height of the toplevel as requested
+  // by the window manager. Not exposed in public since it is so Tk
+  // related. Is is usually used to get the geometry of a window before
+  // it is mapped to screen, as requested by the geometry manager.
+  // Override to prevent the splashscreen from flickering at startup.
+  // Return the size of the image itself, without explicitly calling
+  // 'update' to let the geometry manager figure things out (= flicker)
+  virtual int GetRequestedWidth();
+  virtual int GetRequestedHeight();
+
 private:
   vtkKWSplashScreen(const vtkKWSplashScreen&); // Not implemented
   void operator=(const vtkKWSplashScreen&); // Not implemented
