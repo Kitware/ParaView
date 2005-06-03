@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.49");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.50");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -565,10 +565,10 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
         {
         s << "grid " << (*it)->GetWidgetName() << " -row " 
           << row << " -column " << num << " -sticky news "
-          << " -ipadx " 
+          << " -padx " 
           << (this->PadX + (this->WidgetsFlatAspect ? 
                             this->WidgetsFlatAdditionalPadX : 0))
-          << " -ipady "
+          << " -pady "
           << (this->PadY + (this->WidgetsFlatAspect ? 
                             this->WidgetsFlatAdditionalPadY : 0))
           << endl;
@@ -621,10 +621,10 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     }
 
   s << " -sticky news -row 0 "
-    << " -ipadx " 
+    << " -padx " 
     << (this->PadX + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadX : 0))
-    << " -ipady "
+    << " -pady "
     << (this->PadY + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadY : 0))
     << ends;
