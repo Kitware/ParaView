@@ -86,7 +86,7 @@ public:
     DisplayPositionDefault            = 0,
     DisplayPositionMasterWindowCenter = 1,
     DisplayPositionScreenCenter       = 2,
-    DisplayPositionPointer            = 3,
+    DisplayPositionPointer            = 3
   };
   //ETX
   vtkSetClampMacro(DisplayPosition, int, 
