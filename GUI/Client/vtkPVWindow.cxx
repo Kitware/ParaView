@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.725");
+vtkCxxRevisionMacro(vtkPVWindow, "1.726");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4817,7 +4817,6 @@ void vtkPVWindow::UpdateMenuState()
     {
     vtkKWMenu* menu = this->GetMenu();
     int numItems = menu->GetNumberOfItems();
-    int i;
     for (i=0; i<numItems; i++)
       {
       menu->SetState(i, vtkKWMenu::Disabled);

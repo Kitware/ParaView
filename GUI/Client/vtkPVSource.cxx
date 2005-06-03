@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.442");
+vtkCxxRevisionMacro(vtkPVSource, "1.443");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1291,11 +1291,11 @@ void vtkPVSource::SetupDisplays()
     {
     ccpp->AddProxy(this->Proxy);
     this->CubeAxesDisplayProxy->UpdateVTKObjects();
-    ostrstream str;
-    str << this->GetName() << ".CubeAxesDisplay" << ends;
+    ostrstream str2;
+    str2 << this->GetName() << ".CubeAxesDisplay" << ends;
     proxm->RegisterProxy(
-      "displays", str.str(), this->CubeAxesDisplayProxy);
-    str.rdbuf()->freeze(0);
+      "displays", str2.str(), this->CubeAxesDisplayProxy);
+    str2.rdbuf()->freeze(0);
     }
   this->CubeAxesDisplayProxy->SetVisibilityCM(0);
   this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
