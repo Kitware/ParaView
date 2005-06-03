@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.213");
+vtkCxxRevisionMacro(vtkKWApplication, "1.214");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -636,12 +636,12 @@ void vtkKWApplication::RestoreApplicationSettingsFromRegistry()
 { 
   // Show balloon help ?
 
-  if (this->HasRegistryValue(
-    2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey))
+  vtkKWBalloonHelpManager *mgr = this->GetBalloonHelpManager();
+  if (mgr && this->HasRegistryValue(
+        2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey))
     {
-    this->GetBalloonHelpManager()->SetShow(
-      this->GetIntRegistryValue(
-        2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey));
+    mgr->SetShow(this->GetIntRegistryValue(
+                   2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey));
     }
 
   // Save user interface geometry ?
@@ -702,9 +702,13 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
 { 
   // Show balloon help ?
 
-  this->SetRegistryValue(
-    2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey, "%d", 
-    this->GetBalloonHelpManager()->GetShow());
+  vtkKWBalloonHelpManager *mgr = this->GetBalloonHelpManager();
+  if (mgr)
+    {
+    this->SetRegistryValue(
+      2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey, "%d", 
+      mgr->GetShow());
+    }
   
   // Save user interface geometry ?
 
