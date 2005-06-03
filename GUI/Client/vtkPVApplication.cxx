@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.356");
+vtkCxxRevisionMacro(vtkPVApplication, "1.357");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1158,8 +1158,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
-  this->Script("proc bgerror { m } "
-               "{ global Application; $Application DisplayTCLError $m }");
+  this->Script(
+    "proc bgerror { m } "
+    "{ global Application errorInfo; "
+    "$Application DisplayTCLError \"$m $errorInfo\"}");
+
   this->OutputWindow->SetApplication(this);
 
   this->Script(
