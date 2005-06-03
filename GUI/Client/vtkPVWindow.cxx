@@ -22,7 +22,6 @@
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
-#include "vtkKWBalloonHelpManager.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -136,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.726");
+vtkCxxRevisionMacro(vtkPVWindow, "1.727");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
