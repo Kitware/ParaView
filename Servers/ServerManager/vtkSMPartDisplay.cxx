@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.2");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.3");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -626,6 +626,8 @@ void vtkSMPartDisplay::CleanUpVTKObjects()
   int num = this->GeometryProxy->GetNumberOfIDs();
   int i;
   vtkClientServerStream stream;
+  vtkClientServerStream clientRenderServerStream;
+
   for (i = 0; i < num; i++)
     {
     vtkClientServerID id = this->GeometryProxy->GetID(i);
@@ -635,7 +637,7 @@ void vtkSMPartDisplay::CleanUpVTKObjects()
     stream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     id = this->MapperProxy->GetID(i);
-    stream << vtkClientServerStream::Invoke << id
+    clientRenderServerStream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     id = this->VolumeTetraFilterProxy->GetID(i);
     stream << vtkClientServerStream::Invoke << id
@@ -647,7 +649,14 @@ void vtkSMPartDisplay::CleanUpVTKObjects()
 
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::DATA_SERVER, stream);
+    }
+  if (clientRenderServerStream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+      clientRenderServerStream);
     }
 }
 

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13.2.2");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13.2.3");
 
 
 //----------------------------------------------------------------------------
@@ -339,26 +339,35 @@ void vtkSMLODPartDisplay::CleanUpVTKObjects()
 {
   int num = this->LODDeciProxy->GetNumberOfIDs();
   int i;
-  vtkClientServerStream stream;
+  vtkClientServerStream dataServerStream;
+  vtkClientServerStream clientRenderServerStream;
+
   for (i = 0; i < num; i++)
     {
     vtkClientServerID id = this->LODDeciProxy->GetID(i);
-    stream << vtkClientServerStream::Invoke << id
+    dataServerStream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     id = this->LODUpdateSuppressorProxy->GetID(i);
-    stream << vtkClientServerStream::Invoke << id
+    dataServerStream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     id = this->LODMapperProxy->GetID(i);
-    stream << vtkClientServerStream::Invoke << id
+    clientRenderServerStream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     id = this->LODVolumeMapperProxy->GetID(i);
-    stream << vtkClientServerStream::Invoke << id
+    clientRenderServerStream << vtkClientServerStream::Invoke << id
            << "SetExecutive" << 0 << vtkClientServerStream::End;
     }
 
-  if (stream.GetNumberOfMessages() > 0)
+  if (dataServerStream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(this->Servers, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::DATA_SERVER, dataServerStream);
+    }
+  if (clientRenderServerStream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+      clientRenderServerStream);
     }
 }
 
