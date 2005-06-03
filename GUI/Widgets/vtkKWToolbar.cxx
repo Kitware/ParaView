@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.48");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.49");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -417,7 +417,7 @@ void vtkKWToolbar::ScheduleResize()
     return;
     }
   this->Expanding = 1;
-  this->Script("after idle {%s Resize}", this->GetTclName());
+  this->Script("after idle {catch {%s Resize}}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------

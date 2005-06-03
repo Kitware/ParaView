@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.29");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.30");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -1010,7 +1010,7 @@ void vtkKWThumbWheel::PerformNonLinearMotionCallback()
   
   // Check if we are still in motion later (asynchronously)
 
-  this->Script("after %d {%s PerformNonLinearMotionCallback}", 
+  this->Script("after %d {catch {%s PerformNonLinearMotionCallback}}", 
                VTK_KW_TW_NL_REFRESH_RATE,
                this->GetTclName());
 
