@@ -1,7 +1,7 @@
 ADD_EXECUTABLE(TestRegistry TestRegistry.cxx)
 ADD_TEST(TestRegistry ${CXX_TEST_PATH}/TestRegistry)
-TARGET_LINK_LIBRARIES(TestRegistry KWWidgetsTCL)
+TARGET_LINK_LIBRARIES(TestRegistry ${KWWidgets_LIBRARIES})
 
 ADD_EXECUTABLE(TestRandom TestRandom.cxx)
 ADD_TEST(TestRandom ${CXX_TEST_PATH}/TestRandom)
-TARGET_LINK_LIBRARIES(TestRandom KWWidgetsTCL)
+TARGET_LINK_LIBRARIES(TestRandom ${KWWidgets_LIBRARIES})

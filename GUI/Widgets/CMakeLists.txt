@@ -9,7 +9,7 @@ SET (KWWidgets_INCLUDE_PATH
   CACHE INTERNAL "include paths for KWWidgets"
   )
 
-SET (KWWidgets_LIBRARIES KWWidgetsTCL
+SET (KWWidgets_LIBRARIES KWWidgets
   CACHE INTERNAL "libraries for KWWidgets")
 ########################################################################
 
@@ -68,6 +68,7 @@ SET( KWWidgets_SRCS
   vtkKWPushButton.cxx 
   vtkKWPushButtonWithMenu.cxx 
   vtkKWRadioButton.cxx 
+  vtkKWRadioButtonSet.cxx 
   vtkKWRange.cxx 
   vtkKWRegistryHelper.cxx
   vtkKWRenderWidget.cxx 
@@ -113,7 +114,6 @@ FOREACH (WidgetType
     Label
     LabelLabeled
     PushButton
-    RadioButton
     Scale
     )
   SET (WidgetType ${WidgetType})
@@ -234,38 +234,36 @@ ENDIF(BUILD_TESTING)
 SUBDIRS(Utilities)
 
 IF(VTK_WRAP_TCL)
-  VTK_WRAP_TCL2(KWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
+  VTK_WRAP_TCL2(KWWidgets KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
 ELSE(VTK_WRAP_TCL)
   SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
   INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
-  VTK_WRAP_TCL3(KWWidgetsTCL KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
+  VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
 ENDIF(VTK_WRAP_TCL)
 
-ADD_LIBRARY(KWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
+ADD_LIBRARY(KWWidgets ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 IF(KWSYS_NAMESPACE)
-  TARGET_LINK_LIBRARIES (KWWidgetsTCL ${KWSYS_NAMESPACE})
+  TARGET_LINK_LIBRARIES (KWWidgets ${KWSYS_NAMESPACE})
 ENDIF(KWSYS_NAMESPACE)
 
 IF(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES (KWWidgetsTCL
+  TARGET_LINK_LIBRARIES (KWWidgets
     vtkHybridTCL
     vtkCommonTCL
     )
+  IF (VTK_USE_PARALLEL)
+    TARGET_LINK_LIBRARIES(KWWidgets vtkParallelTCL)
+  ENDIF (VTK_USE_PARALLEL)
+  IF (VTK_USE_PATENTED)
+    TARGET_LINK_LIBRARIES(KWWidgets vtkPatentedTCL)
+  ENDIF (VTK_USE_PATENTED)
 ELSE(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES (KWWidgetsTCL
+  TARGET_LINK_LIBRARIES (KWWidgets
     vtkHybrid
     vtkCommonTCL
     )
 ENDIF(VTK_WRAP_TCL)
-
-IF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(KWWidgetsTCL vtkParallelTCL)
-ENDIF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
-
-IF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(KWWidgetsTCL vtkPatentedTCL)
-ENDIF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 
@@ -287,7 +285,7 @@ IF(BUILD_SHARED_LIBS)
   IF(NOT KW_INSTALL_LIB_DIR)
     SET(KW_INSTALL_LIB_DIR /lib)
   ENDIF(NOT KW_INSTALL_LIB_DIR)
-  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} KWWidgetsTCL)
+  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} KWWidgets)
 ENDIF(BUILD_SHARED_LIBS)
 
 IF (BUILD_EXAMPLES)

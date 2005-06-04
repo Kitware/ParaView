@@ -1,4 +1,2 @@
 ADD_EXECUTABLE(KWConvertImageToHeader KWConvertImageToHeader.cxx)
-TARGET_LINK_LIBRARIES(KWConvertImageToHeader
-  KWWidgetsTCL
-  )
+TARGET_LINK_LIBRARIES(KWConvertImageToHeader ${KWWidgets_LIBRARIES})
