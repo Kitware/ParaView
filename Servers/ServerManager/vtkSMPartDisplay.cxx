@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.3");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23.2.4");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -623,7 +623,11 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::CleanUpVTKObjects()
 {
-  int num = this->GeometryProxy->GetNumberOfIDs();
+  int num = 0;
+  if (this->GeometryProxy)
+    {
+    this->GeometryProxy->GetNumberOfIDs();
+    }
   int i;
   vtkClientServerStream stream;
   vtkClientServerStream clientRenderServerStream;

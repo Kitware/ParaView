@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5.2.3");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5.2.4");
 
 
 //----------------------------------------------------------------------------
@@ -217,21 +217,31 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
 void vtkSMPointLabelDisplay::CleanUpVTKObjects()
 {
   vtkClientServerStream stream;
-  vtkClientServerID id = this->UpdateSuppressorProxy->GetID(0);
-  stream << vtkClientServerStream::Invoke << id
-         << "SetExecutive" << 0 << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    vtkProcessModule::CLIENT_AND_SERVERS, stream);
-  id = this->DuplicateProxy->GetID(0);
-  stream << vtkClientServerStream::Invoke << id
-         << "SetExecutive" << 0 << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    vtkProcessModule::DATA_SERVER, stream);
-  id = this->PointLabelMapperProxy->GetID(0);
-  stream << vtkClientServerStream::Invoke << id
-         << "SetExecutive" << 0 << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+  vtkClientServerID id;
+  if (this->UpdateSuppressorProxy->GetNumberOfIDs())
+    {
+    id = this->UpdateSuppressorProxy->GetID(0);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    }
+  if (this->DuplicateProxy->GetNumberOfIDs())
+    {
+    id = this->DuplicateProxy->GetID(0);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::DATA_SERVER, stream);
+    }
+  if (this->PointLabelMapperProxy->GetNumberOfIDs())
+    {
+    id = this->PointLabelMapperProxy->GetID(0);
+    stream << vtkClientServerStream::Invoke << id
+           << "SetExecutive" << 0 << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+    }
 }
 
 //----------------------------------------------------------------------------
