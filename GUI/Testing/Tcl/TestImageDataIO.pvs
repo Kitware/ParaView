@@ -22,13 +22,13 @@ set ext "vti"
 if {$nprocs > 1} { set ext "pvti" }
 
 # Write the vtkImageData.
-$kw(vtkTemp1) WriteVTKFile "testImageData.$ext"
+$kw(vtkTemp1) WriteVTKFile "$TempDir/testImageData.$ext"
 
 # Delete the old pipeline.
 $kw(vtkTemp257) DeleteCallback
 
 # Read the vtkImageData from the temporary file.
-$kw(vtkTemp1) Open "testImageData.$ext"
+$kw(vtkTemp1) Open "$TempDir/testImageData.$ext"
 set kw(vtkTemp289) [$kw(vtkTemp1) GetCurrentPVSource]
 $kw(vtkTemp289) AcceptCallback
 
@@ -47,11 +47,11 @@ source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
 # Delete the temporary file.
-catch { file delete -force "testImageData.$ext" }
+catch { file delete -force "$TempDir/testImageData.$ext" }
 
 if {$nprocs > 1} {
   # Delete the temporary file's pieces.
   for {set i 0} { $i < $nprocs } { incr i } {
-  catch { file delete -force "testImageData$i.vti" }
+  catch { file delete -force "$TempDir/testImageData_$i.vti" }
   }
 }
