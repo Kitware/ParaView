@@ -18,8 +18,8 @@ if {$nprocs > 1} { set ext "pvtp" }
 $pvWindow Open "$DataDir/Data/blow data.vtk"
 if { [catch {
   $pvWindow ShowCurrentSourceProperties
-  $pvWindow WriteVTKFile vtkParaViewWriteTest.$ext
-  $pvWindow WriteVTKFile vtkParaViewWriteTestGhost.$ext 3
+  $pvWindow WriteVTKFile "$TempDir/vtkParaViewWriteTest.$ext"
+  $pvWindow WriteVTKFile "$TempDir/vtkParaViewWriteTestGhost.$ext" 3
   
   # Barrier after write.  We don't want to delete files before they
   # are written.
@@ -28,19 +28,18 @@ if { [catch {
     Invoke result() Barrier
   }
 
-  file delete -force vtkParaViewWriteTest.$ext
-  file delete -force vtkParaViewWriteTestGhost.$ext
+  catch { file delete -force "$TempDir/vtkParaViewWriteTest.$ext" }
+  catch { file delete -force "$TempDir/vtkParaViewWriteTestGhost.$ext" }
 
   
   if {$nprocs > 1} {
     # Delete the temporary file's pieces.
     for {set i 0} { $i < $nprocs } { incr i } {
-      catch { file delete -force "vtkParaViewWriteTest.$i.vtp" }
-      catch { file delete -force "vtkParaViewWriteTestGhost.$i.vtp" }
+      catch { file delete -force "$TempDir/vtkParaViewWriteTest_$i.vtp" }
+      catch { file delete -force "$TempDir/vtkParaViewWriteTestGhost_$i.vtp" }
     }
   }
 
-  file delete -force vtkParaViewWriteTest.tcl
 } res ] != 0 } {
 	puts "Error: $res"
 	$Application SetExitStatus 1
