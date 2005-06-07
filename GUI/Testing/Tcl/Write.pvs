@@ -28,8 +28,8 @@ if { [catch {
     Invoke result() Barrier
   }
 
-  catch { file delete -force "$TempDir/vtkParaViewWriteTest.$ext" }
-  catch { file delete -force "$TempDir/vtkParaViewWriteTestGhost.$ext" }
+  file delete -force "$TempDir/vtkParaViewWriteTest.$ext"
+  file delete -force "$TempDir/vtkParaViewWriteTestGhost.$ext"
 
   
   if {$nprocs > 1} {
