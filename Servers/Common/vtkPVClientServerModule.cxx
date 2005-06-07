@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.33");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.34");
 
 
 //----------------------------------------------------------------------------
@@ -426,7 +426,7 @@ void vtkPVClientServerModule::Initialize()
       comm->SetReportErrors(0);
       }
     int err = this->SocketController->ProcessRMIs(0);
-    if (err != vtkMultiProcessController::NO_ERROR)
+    if (err != vtkMultiProcessController::RMI_NO_ERROR)
       {
       cout << "Server message: Connection to server was broken due to: ";
       switch ( err )
