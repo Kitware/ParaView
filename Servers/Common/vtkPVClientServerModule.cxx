@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.32");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.33");
 
 
 //----------------------------------------------------------------------------
@@ -407,16 +407,38 @@ void vtkPVClientServerModule::Initialize()
     this->SocketController->Send(&numProcs, 1, 1, 8843);
     
     //
-    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this),
+    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI,
+                                   (void *)(this),
                                    VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
     // for SendMessages
-    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this),
+    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, 
+                                   (void *)(this),
                                    VTK_PV_CLIENTSERVER_RMI_TAG);
-    this->SocketController->AddRMI(vtkPVClientServerRootRMI, (void *)(this),
+    this->SocketController->AddRMI(vtkPVClientServerRootRMI, 
+                                   (void *)(this),
                                    VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
     
     this->Controller->CreateOutputWindow();
-    this->SocketController->ProcessRMIs();
+    vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
+      this->SocketController->GetCommunicator());
+    if (comm)
+      {
+      comm->SetReportErrors(0);
+      }
+    int err = this->SocketController->ProcessRMIs(0);
+    if (err != vtkMultiProcessController::NO_ERROR)
+      {
+      cout << "Server message: Connection to server was broken due to: ";
+      switch ( err )
+        {
+        case vtkMultiProcessController::RMI_TAG_ERROR:
+          cout << "Could not receive command stream from client.";
+          break;
+        case vtkMultiProcessController::RMI_ARG_ERROR:
+          cout << "Could not receive command argument from client.";
+        }
+      cout << endl;
+      }
     if(this->Options->GetRenderServerMode())
       {
       cout << "Exit Render Server.\n";
