@@ -16,8 +16,11 @@ SET (KWWidgets_LIBRARIES KWWidgets
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+IF(NOT WIN32)
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
+ENDIF(NOT WIN32)
 
-SET( KWWidgets_SRCS
+SET(KWWidgets_SRCS
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBWidgets.cxx
@@ -104,6 +107,40 @@ SET( KWWidgets_SRCS
   vtkKWWindowBase.cxx 
   )
 
+# Abstract/pure virtual classes
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkKWMaterialPropertyWidget.cxx
+  vtkKWParameterValueFunctionEditor.cxx
+  vtkKWParameterValueFunctionInterface.cxx
+  vtkKWUserInterfaceManager.cxx
+  vtkKWWidgetSet.cxx
+  ABSTRACT
+  )
+
+# Helper classes
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkKWEvent.cxx
+  vtkKWGenericRenderWindowInteractor.cxx
+  vtkKWRenderWidgetCallbackCommand.cxx 
+  WRAP_EXCLUDE
+  )
+
+# Add the registry code, and the set_icon command on win32
+
+IF (WIN32)
+  SET(KWWidgets_SRCS ${KWWidgets_SRCS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    vtkKWWin32RegistryHelper.cxx)
+  SET_SOURCE_FILES_PROPERTIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    WRAP_EXCLUDE)
+ELSE (WIN32)
+  SET(KWWidgets_SRCS ${KWWidgets_SRCS} 
+    vtkKWUNIXRegistryHelper.cxx)
+ENDIF (WIN32)
+
 # The "set of widgets" are automatically generated from some core widgets
 # (i.e., CheckButton => vtkKWCheckButtonSet).
 # If you modify this list, please update the README.txt file accordingly.
@@ -156,82 +193,18 @@ FOREACH (WidgetType
     ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx)
 ENDFOREACH (WidgetType)
 
-IF (WIN32)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
-    vtkKWWin32RegistryHelper.cxx
-    )
-  SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
-    WRAP_EXCLUDE
-    )
-ELSE (WIN32)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    vtkKWUNIXRegistryHelper.cxx
-    )
-ENDIF (WIN32)
+# Include dirs
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkKWMaterialPropertyWidget.cxx
-  vtkKWParameterValueFunctionEditor.cxx
-  vtkKWParameterValueFunctionInterface.cxx
-  vtkKWUserInterfaceManager.cxx
-  vtkKWWidgetSet.cxx
-  ABSTRACT
+INCLUDE_DIRECTORIES(
+  ${KWWidgets_BINARY_DIR}
+  ${KWWidgets_SOURCE_DIR}
+  ${VTK_INCLUDE_DIR}
+  ${KWSYS_INCLUDE_DIR}
   )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkKWEvent.cxx
-  vtkKWGenericRenderWindowInteractor.cxx
-  vtkKWRenderWidgetCallbackCommand.cxx 
-  WRAP_EXCLUDE
-  )
+# Wrap the classes in Tcl
 
-# If needed, copy the Tcl/Tk support files needed for vtkKWApplication
-# at run-time to initialize Tcl/Tk
-
-IF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
-  IF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
-    INCLUDE(${VTK_TCL_TK_MACROS})
-
-    IF (EXECUTABLE_OUTPUT_PATH)
-      VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
-        ${VTK_TCL_SUPPORT_LIBRARY_PATH}
-        ${VTK_TK_SUPPORT_LIBRARY_PATH}
-        ${EXECUTABLE_OUTPUT_PATH} "TclTk/lib")
-    ENDIF (EXECUTABLE_OUTPUT_PATH)
-
-    VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
-    IF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
-      SET (TCL_TK_VERSION "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
-    ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
-
-    VTK_GET_TCL_SUPPORT_FILES(${VTK_TCL_SUPPORT_LIBRARY_PATH} "TCL_SUPPORT_FILES")
-    IF(KW_INSTALL_LIB_DIR)
-      FOREACH (file ${TCL_SUPPORT_FILES})
-        STRING (REGEX REPLACE "${VTK_TCL_SUPPORT_LIBRARY_PATH}/" "" base ${file})
-        GET_FILENAME_COMPONENT(dest ${base} PATH)
-        INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tcl${TCL_TK_VERSION}/${dest} FILES ${file})
-      ENDFOREACH (file)
-    ENDIF(KW_INSTALL_LIB_DIR)
-
-    VTK_GET_TK_SUPPORT_FILES(${VTK_TK_SUPPORT_LIBRARY_PATH} "TK_SUPPORT_FILES")
-    IF(KW_INSTALL_LIB_DIR)
-      FOREACH (file ${TK_SUPPORT_FILES})
-        STRING (REGEX REPLACE "${VTK_TK_SUPPORT_LIBRARY_PATH}/" "" base ${file})
-        GET_FILENAME_COMPONENT(dest ${base} PATH)
-        INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tk${TCL_TK_VERSION}/${dest} FILES ${file})
-      ENDFOREACH (file)
-    ENDIF(KW_INSTALL_LIB_DIR)
-
-  ENDIF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
-ENDIF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
-
-IF(BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF(BUILD_TESTING)
-
-SUBDIRS(Utilities)
+SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 
 IF(VTK_WRAP_TCL)
   VTK_WRAP_TCL2(KWWidgets KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
@@ -241,11 +214,9 @@ ELSE(VTK_WRAP_TCL)
   VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
 ENDIF(VTK_WRAP_TCL)
 
-ADD_LIBRARY(KWWidgets ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
+# Build the library
 
-IF(KWSYS_NAMESPACE)
-  TARGET_LINK_LIBRARIES (KWWidgets ${KWSYS_NAMESPACE})
-ENDIF(KWSYS_NAMESPACE)
+ADD_LIBRARY(KWWidgets ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 IF(VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES (KWWidgets
@@ -265,21 +236,42 @@ ELSE(VTK_WRAP_TCL)
     )
 ENDIF(VTK_WRAP_TCL)
 
-SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
+# We need kwsys
 
-IF(NOT WIN32)
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-ENDIF(NOT WIN32)
+IF(KWSYS_NAMESPACE)
+  TARGET_LINK_LIBRARIES (KWWidgets ${KWSYS_NAMESPACE})
+ENDIF(KWSYS_NAMESPACE)
 
-OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
-MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
+# If needed, copy the Tcl/Tk support files needed at run-time 
+# to initialize Tcl/Tk
 
-INCLUDE_DIRECTORIES(
-  ${KWWidgets_BINARY_DIR}
-  ${KWWidgets_SOURCE_DIR}
-  ${VTK_INCLUDE_DIR}
-  ${KWSYS_INCLUDE_DIR}
-  )
+IF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
+  IF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
+    INCLUDE(${VTK_TCL_TK_MACROS})
+    IF (EXECUTABLE_OUTPUT_PATH)
+      VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
+        ${VTK_TCL_SUPPORT_LIBRARY_PATH}
+        ${VTK_TK_SUPPORT_LIBRARY_PATH}
+        ${EXECUTABLE_OUTPUT_PATH} "TclTk/lib")
+    ENDIF (EXECUTABLE_OUTPUT_PATH)
+  ENDIF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
+ENDIF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
+
+# Testing ? Examples ?
+
+IF(BUILD_TESTING)
+  SUBDIRS(Testing)
+ENDIF(BUILD_TESTING)
+
+IF (BUILD_EXAMPLES)
+  SUBDIRS(Examples)
+ENDIF (BUILD_EXAMPLES)
+
+# Build the utilities
+
+SUBDIRS(Utilities)
+
+# Install the library
 
 IF(BUILD_SHARED_LIBS)
   IF(NOT KW_INSTALL_LIB_DIR)
@@ -288,9 +280,7 @@ IF(BUILD_SHARED_LIBS)
   INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} KWWidgets)
 ENDIF(BUILD_SHARED_LIBS)
 
-IF (BUILD_EXAMPLES)
-  SUBDIRS(Examples)
-ENDIF (BUILD_EXAMPLES)
+# Configure some build settings
 
 SET (KWWIDGETS_SHARED_LIBS ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
