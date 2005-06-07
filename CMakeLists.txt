@@ -3,7 +3,8 @@ PROJECT(ParaView)
 
 #########################################################################
 # Disallow in-source build
-STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" "${ParaView_BINARY_DIR}" INSOURCE)
+STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" 
+  "${ParaView_BINARY_DIR}" INSOURCE)
 IF(INSOURCE)
   MESSAGE(FATAL_ERROR "ParaView requires an out of source Build. Please create a separate binary directory and run CMake there.")
 ENDIF(INSOURCE)
@@ -505,6 +506,7 @@ FOREACH(external EXODUS SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   IF(PARAVIEW_USE_${external})
     FIND_PATH(${external}_SOURCE_DIR 
       ${external}ParaViewImport.cmake
+      ${CMAKE_CURRENT_SOURCE_DIR}/../${external}
       ${CMAKE_CURRENT_SOURCE_DIR}/vtkSNL/IO
       ${CMAKE_CURRENT_SOURCE_DIR}/../vtkSNL/IO
       ${CMAKE_CURRENT_SOURCE_DIR}/../../vtkSNL/IO
