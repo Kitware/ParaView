@@ -14,17 +14,17 @@
 #include "vtkKWResourceUtilities.h"
 #include "vtkOutputWindow.h"
 
-#include <kwsys/CommandLineArguments.hxx>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 int unknown_argument_handler(const char *, void *) { return 0; };
 
 //----------------------------------------------------------------------------
-void display_usage(kwsys::CommandLineArguments &args)
+void display_usage(vtksys::CommandLineArguments &args)
 {
-  kwsys_stl::string exe_basename = 
-    kwsys::SystemTools::GetFilenameName(args.GetArgv0());
+  vtksys_stl::string exe_basename = 
+    vtksys::SystemTools::GetFilenameName(args.GetArgv0());
   cerr << "Usage: " << exe_basename.c_str() << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << endl;
   cerr << args.GetHelp();
 }
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 {
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
-  kwsys::CommandLineArguments args;
+  vtksys::CommandLineArguments args;
 
   int option_update = 0;
   int option_zlib = 0;
@@ -44,17 +44,17 @@ int main(int argc, char **argv)
   args.SetUnknownArgumentCallback(unknown_argument_handler);
 
   args.AddArgument(
-    "--update", kwsys::CommandLineArguments::NO_ARGUMENT, 
+    "--update", vtksys::CommandLineArguments::NO_ARGUMENT, 
     &option_update, 
     "Update header only if one of the image is more recent than the header.");
 
   args.AddArgument(
-    "--zlib", kwsys::CommandLineArguments::NO_ARGUMENT, 
+    "--zlib", vtksys::CommandLineArguments::NO_ARGUMENT, 
     &option_zlib, 
     "Compress the image buffer using zlib.");
 
   args.AddArgument(
-    "--base64", kwsys::CommandLineArguments::NO_ARGUMENT, 
+    "--base64", vtksys::CommandLineArguments::NO_ARGUMENT, 
     &option_base64, 
     "Convert the image buffer to base64.");
 

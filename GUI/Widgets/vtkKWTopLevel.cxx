@@ -18,11 +18,11 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWMenu.h"
 
-#include <kwsys/stl/string>
+#include <vtksys/stl/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.13");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.14");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -57,7 +57,7 @@ vtkKWTopLevel::~vtkKWTopLevel()
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::Create(vtkKWApplication *app, const char *args)
 {
-  kwsys_stl::string str;
+  vtksys_stl::string str;
   if (this->GetWindowClass())
     {
     str += " -class ";

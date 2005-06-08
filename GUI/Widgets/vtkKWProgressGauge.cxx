@@ -17,11 +17,11 @@
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.27");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.28");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);

@@ -19,11 +19,11 @@
 #include "vtkKWTkUtilities.h"
 
 #include <ctype.h>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.51");
+vtkCxxRevisionMacro(vtkKWObject, "1.52");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -71,7 +71,7 @@ const char *vtkKWObject::GetTclName()
   vtkTclGetObjectFromPointer(
     this->GetApplication()->GetMainInterp(), (void *)this, "vtkKWObject");
 
-  this->TclName = kwsys::SystemTools::DuplicateString(
+  this->TclName = vtksys::SystemTools::DuplicateString(
     this->GetApplication()->GetMainInterp()->result);
 
   return this->TclName;

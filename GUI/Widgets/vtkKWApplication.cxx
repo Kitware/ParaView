@@ -32,9 +32,9 @@
 
 #include <stdarg.h>
 
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/stl/vector>
-#include <kwsys/stl/algorithm>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/vector>
+#include <vtksys/stl/algorithm>
 
 static Tcl_Interp *Et_Interp = 0;
 
@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.216");
+vtkCxxRevisionMacro(vtkKWApplication, "1.217");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -75,8 +75,8 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 class vtkKWApplicationInternals
 {
 public:
-  typedef kwsys_stl::vector<vtkKWWindowBase*> WindowsContainer;
-  typedef kwsys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
+  typedef vtksys_stl::vector<vtkKWWindowBase*> WindowsContainer;
+  typedef vtksys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
 
   WindowsContainer Windows;
 };
@@ -96,40 +96,40 @@ vtkKWApplication::vtkKWApplication()
   this->MinorVersion = 0;
 
   const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+  if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
     {
-    kwsys_stl::string filename = 
-      kwsys::SystemTools::GetFilenameName(nameofexec);
-    kwsys_stl::string filenamewe = 
-      kwsys::SystemTools::GetFilenameWithoutExtension(filename);
+    vtksys_stl::string filename = 
+      vtksys::SystemTools::GetFilenameName(nameofexec);
+    vtksys_stl::string filenamewe = 
+      vtksys::SystemTools::GetFilenameWithoutExtension(filename);
     this->Name = 
-      kwsys::SystemTools::DuplicateString(filenamewe.c_str());
+      vtksys::SystemTools::DuplicateString(filenamewe.c_str());
     filenamewe += "10";
     this->VersionName = 
-      kwsys::SystemTools::DuplicateString(filenamewe.c_str());
+      vtksys::SystemTools::DuplicateString(filenamewe.c_str());
     }
   else
     {
     this->Name = 
-      kwsys::SystemTools::DuplicateString("Sample Application");
+      vtksys::SystemTools::DuplicateString("Sample Application");
     this->VersionName = 
-      kwsys::SystemTools::DuplicateString("SampleApplication10");
+      vtksys::SystemTools::DuplicateString("SampleApplication10");
     }
 
   this->ReleaseName = 
-    kwsys::SystemTools::DuplicateString("unknown");
+    vtksys::SystemTools::DuplicateString("unknown");
   this->PrettyName = NULL;
 
   // Limited Edition Mode name
 
   this->LimitedEditionMode = 0;
   this->LimitedEditionModeName = NULL;
-  kwsys_stl::string lename(this->Name);
+  vtksys_stl::string lename(this->Name);
   lename += " Limited Edition";
   this->SetLimitedEditionModeName(lename.c_str());
 
   this->HelpDialogStartingPage = 
-    kwsys::SystemTools::DuplicateString("Introduction.htm");
+    vtksys::SystemTools::DuplicateString("Introduction.htm");
 
   this->InstallationDirectory = NULL;
   this->EmailFeedbackAddress  = NULL;
@@ -295,7 +295,7 @@ int vtkKWApplication::RemoveWindow(vtkKWWindowBase *win)
     win->PrepareForDelete();
 
     vtkKWApplicationInternals::WindowsContainerIterator it = 
-      kwsys_stl::find(this->Internals->Windows.begin(),
+      vtksys_stl::find(this->Internals->Windows.begin(),
                       this->Internals->Windows.end(),
                       win);
     win->UnRegister(this);
@@ -432,23 +432,23 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   if (!has_tcllibpath_env || !has_tklibpath_env)
     {
     const char *nameofexec = Tcl_GetNameOfExecutable();
-    if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+    if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
       {
       char dir_unix[1024], buffer[1024];
-      kwsys_stl::string dir = kwsys::SystemTools::GetFilenamePath(nameofexec);
-      kwsys::SystemTools::ConvertToUnixSlashes(dir);
+      vtksys_stl::string dir = vtksys::SystemTools::GetFilenamePath(nameofexec);
+      vtksys::SystemTools::ConvertToUnixSlashes(dir);
       strcpy(dir_unix, dir.c_str());
 
       // Installed KW application, otherwise build tree/windows
       sprintf(buffer, "%s/..%s/TclTk", dir_unix, KW_INSTALL_LIB_DIR);
-      int exists = kwsys::SystemTools::FileExists(buffer);
+      int exists = vtksys::SystemTools::FileExists(buffer);
       if (!exists)
         {
         sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = kwsys::SystemTools::FileExists(buffer);
+        exists = vtksys::SystemTools::FileExists(buffer);
         }
-      kwsys_stl::string collapsed = 
-        kwsys::SystemTools::CollapseFullPath(buffer);
+      vtksys_stl::string collapsed = 
+        vtksys::SystemTools::CollapseFullPath(buffer);
       sprintf(buffer, collapsed.c_str());
       if (exists)
         {
@@ -465,7 +465,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         {
         char tcl_library[1024] = "";
         sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (kwsys::SystemTools::FileExists(tcl_library))
+        if (vtksys::SystemTools::FileExists(tcl_library))
           {
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
                           TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
@@ -494,7 +494,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
           {
           char tk_library[1024] = "";
           sprintf(tk_library, "%s/lib/tk%s", buffer, TK_VERSION);
-          if (kwsys::SystemTools::FileExists(tk_library))
+          if (vtksys::SystemTools::FileExists(tk_library))
             {
             if (!Tcl_SetVar(interp, "tk_library", tk_library, 
                             TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
@@ -770,10 +770,10 @@ int vtkKWApplication::OpenLink(const char *
 //----------------------------------------------------------------------------
 int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 {
-  kwsys_stl::string title = "Exit ";
+  vtksys_stl::string title = "Exit ";
   title += this->GetPrettyName();
 
-  kwsys_stl::string msg = "Are you sure you want to exit ";
+  vtksys_stl::string msg = "Are you sure you want to exit ";
   msg += this->GetPrettyName();
   msg += "?";
   
@@ -812,14 +812,14 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
     return;
     }
 
-  kwsys_stl::string helplink;
+  vtksys_stl::string helplink;
 
   // If it's not a remote link (crude test) and we can't find it yet, try in
   // the install/bin directory
 
   int is_local = strstr(this->HelpDialogStartingPage, "://") ? 0 : 1;
   if (is_local && 
-      !kwsys::SystemTools::FileExists(this->HelpDialogStartingPage))
+      !vtksys::SystemTools::FileExists(this->HelpDialogStartingPage))
     {
     this->FindInstallationDirectory();
     if (this->InstallationDirectory)
@@ -832,9 +832,10 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   helplink += this->HelpDialogStartingPage;
   
   int status = 1;
-  kwsys_stl::string msg;
+  vtksys_stl::string msg;
 
 #ifdef _WIN32
+#ifdef KWWIDGETS_HAS_HTML_HELP
   // .chm ?
 
   if (strstr(helplink.c_str(), ".chm") || 
@@ -846,12 +847,13 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   // otherwise just try to open
 
   else
+#endif
     {
     status = this->OpenLink(helplink.c_str());
     }
 #else
   msg = "Please check the help resource ";
-  if (kwsys::SystemTools::FileExists(helplink.c_str()))
+  if (vtksys::SystemTools::FileExists(helplink.c_str()))
     {
     msg += helplink.c_str();
     }
@@ -868,7 +870,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   if (!status)
     {
     msg = "The help resource ";
-    if (kwsys::SystemTools::FileExists(helplink.c_str()))
+    if (vtksys::SystemTools::FileExists(helplink.c_str()))
       {
       msg += helplink.c_str();
       }
@@ -1234,7 +1236,7 @@ void vtkKWApplication::RetrieveDialogLastPathRegistryValue(
 int vtkKWApplication::LoadScript(const char* filename)
 {
   int res = 1;
-  kwsys_stl::string filename_copy(filename);
+  vtksys_stl::string filename_copy(filename);
   if (Tcl_EvalFile(Et_Interp, filename_copy.c_str()) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << filename_copy.c_str()
@@ -1430,7 +1432,7 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &
     {
     ostrstream upd;
     upd << this->InstallationDirectory << "/WiseUpdt.exe" << ends;
-    int res = kwsys::SystemTools::FileExists(upd.str());
+    int res = vtksys::SystemTools::FileExists(upd.str());
     upd.rdbuf()->freeze(0);
     if (res)
       {
@@ -1498,8 +1500,8 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
      << this->GetReleaseName()
      << ")" << endl;
 
-  kwsys_stl::string ver = 
-    kwsys::SystemTools::GetOperatingSystemNameAndVersion();
+  vtksys_stl::string ver = 
+    vtksys::SystemTools::GetOperatingSystemNameAndVersion();
   os << ver.c_str();
 
 #ifdef _WIN32
@@ -1625,10 +1627,10 @@ void vtkKWApplication::UnRegisterDialogUp(vtkKWWidget *)
 void vtkKWApplication::FindInstallationDirectory()
 {
   const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+  if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
     {
-    kwsys_stl::string directory = 
-      kwsys::SystemTools::GetFilenamePath(nameofexec);
+    vtksys_stl::string directory = 
+      vtksys::SystemTools::GetFilenamePath(nameofexec);
     // remove the /bin from the end
     // directory[strlen(directory) - 4] = '\0';
     // => do not *do* that: first it breaks all the apps 
@@ -1637,7 +1639,7 @@ void vtkKWApplication::FindInstallationDirectory()
     // about msdev path, bin/release, bin/debug, etc.
     // If you need to remove whatever dir, just copy the result of this
     // method and strip it where needed.
-    kwsys::SystemTools::ConvertToUnixSlashes(directory);
+    vtksys::SystemTools::ConvertToUnixSlashes(directory);
     this->SetInstallationDirectory(directory.c_str());
     }
   else
@@ -1649,8 +1651,8 @@ void vtkKWApplication::FindInstallationDirectory()
     char installed_path[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
-      kwsys_stl::string directory(installed_path);
-      kwsys::SystemTools::ConvertToUnixSlashes(directory);
+      vtksys_stl::string directory(installed_path);
+      vtksys::SystemTools::ConvertToUnixSlashes(directory);
       this->SetInstallationDirectory(directory.c_str());
       }
     else
@@ -1658,8 +1660,8 @@ void vtkKWApplication::FindInstallationDirectory()
       reg->SetGlobalScope(1);
       if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
         {
-        kwsys_stl::string directory(installed_path);
-        kwsys::SystemTools::ConvertToUnixSlashes(directory);
+        vtksys_stl::string directory(installed_path);
+        vtksys::SystemTools::ConvertToUnixSlashes(directory);
         this->SetInstallationDirectory(directory.c_str());
         }
       else

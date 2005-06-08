@@ -22,11 +22,11 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.8");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.9");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -102,14 +102,14 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
     }
   else
     {
-    kwsys_stl::string res;
+    vtksys_stl::string res;
     switch (vtkKWFrameLabeled::LabelCase)
       {
       case vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST:
-        res = kwsys::SystemTools::CapitalizedWords(text);
+        res = vtksys::SystemTools::CapitalizedWords(text);
         break;
       case vtkKWFrameLabeled::LABEL_CASE_LOWERCASE_FIRST:
-        res = kwsys::SystemTools::UnCapitalizedWords(text);
+        res = vtksys::SystemTools::UnCapitalizedWords(text);
         break;
       }
     this->GetLabel()->SetText(res.c_str());

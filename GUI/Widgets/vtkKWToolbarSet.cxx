@@ -27,14 +27,14 @@
 #define VTK_KW_TOOLBAR_RELIEF_SEP "sunken"
 #endif
 
-#include <kwsys/stl/list>
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/stl/algorithm>
+#include <vtksys/stl/list>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.20");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.21");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -44,13 +44,13 @@ class vtkKWToolbarSetInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWToolbarSet::ToolbarSlot*> ToolbarsContainer;
-  typedef kwsys_stl::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
+  typedef vtksys_stl::list<vtkKWToolbarSet::ToolbarSlot*> ToolbarsContainer;
+  typedef vtksys_stl::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
 
   ToolbarsContainer Toolbars;
 
-  kwsys_stl::string PreviousPackInfo;
-  kwsys_stl::string PreviousGridInfo;
+  vtksys_stl::string PreviousPackInfo;
+  vtksys_stl::string PreviousGridInfo;
 };
 
 //----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ void vtkKWToolbarSet::Pack()
         }
       else
         {
-        kwsys_stl::string grid_info = 
+        vtksys_stl::string grid_info = 
           this->Script("grid info %s", this->GetWidgetName());
         if (!grid_info.empty())
           {
@@ -489,7 +489,7 @@ int vtkKWToolbarSet::RemoveToolbar(vtkKWToolbar *toolbar)
   vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
 
   vtkKWToolbarSetInternals::ToolbarsContainerIterator pos = 
-    kwsys_stl::find(this->Internals->Toolbars.begin(),
+    vtksys_stl::find(this->Internals->Toolbars.begin(),
                  this->Internals->Toolbars.end(),
                  toolbar_slot);
 
@@ -705,9 +705,9 @@ void vtkKWToolbarSet::SaveToolbarVisibilityToRegistry(
       toolbar_slot->Toolbar && 
       toolbar_slot->Toolbar->GetName())
     {
-    char *clean_name = kwsys::SystemTools::RemoveChars(
+    char *clean_name = vtksys::SystemTools::RemoveChars(
       toolbar_slot->Toolbar->GetName(), " ");
-    kwsys_stl::string key(clean_name);
+    vtksys_stl::string key(clean_name);
     delete [] clean_name;
 
     key += "Visibility";
@@ -725,9 +725,9 @@ void vtkKWToolbarSet::RestoreToolbarVisibilityFromRegistry(
       toolbar_slot->Toolbar && 
       toolbar_slot->Toolbar->GetName())
     {
-    char *clean_name = kwsys::SystemTools::RemoveChars(
+    char *clean_name = vtksys::SystemTools::RemoveChars(
       toolbar_slot->Toolbar->GetName(), " ");
-    kwsys_stl::string key(clean_name);
+    vtksys_stl::string key(clean_name);
     delete [] clean_name;
     
     key += "Visibility";
@@ -801,10 +801,10 @@ void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
           char *rbv = menu->CreateCheckButtonVariable(
             menu, (*it)->Toolbar->GetName());
 
-          kwsys_stl::string command("ToggleToolbarVisibility ");
+          vtksys_stl::string command("ToggleToolbarVisibility ");
           command += (*it)->Toolbar->GetTclName();
 
-          kwsys_stl::string help("Show/Hide the ");
+          vtksys_stl::string help("Show/Hide the ");
           help += (*it)->Toolbar->GetName();
           help += " toolbar";
         

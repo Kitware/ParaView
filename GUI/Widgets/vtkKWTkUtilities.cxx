@@ -22,8 +22,8 @@
 #include "vtkWindows.h"
 #include "X11/Xutil.h"
 
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/Base64.h>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/Base64.h>
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.49");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.50");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -122,7 +122,7 @@ const char* vtkKWTkUtilities::EvaluateStringFromArgsInternal(
   
   // Estimate the length of the result string.  Never underestimates.
 
-  int length = kwsys::SystemTools::EstimateFormatLength(format, var_args1);
+  int length = vtksys::SystemTools::EstimateFormatLength(format, var_args1);
   
   // If our stack-allocated buffer is too small, allocate on one on
   // the heap that will be large enough.
@@ -474,7 +474,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
       {
       base64_buffer = new unsigned char [buffer_length];
-      buffer_length = kwsysBase64_Decode(data_ptr, 0, 
+      buffer_length = vtksysBase64_Decode(data_ptr, 0, 
                                          base64_buffer, buffer_length);
       if (buffer_length == 0)
         {
@@ -653,11 +653,11 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
     {
     char buffer[1024];
     sprintf(buffer, "%s/%s.png", directory, file_name);
-    int found = kwsys::SystemTools::FileExists(buffer);
+    int found = vtksys::SystemTools::FileExists(buffer);
     if (!found)
       {
       sprintf(buffer, "%s/Resources/%s.png", directory, file_name);
-      found = kwsys::SystemTools::FileExists(buffer);
+      found = vtksys::SystemTools::FileExists(buffer);
       }
     if (found && 
         vtkKWResourceUtilities::ReadPNGImage(
@@ -780,7 +780,7 @@ int vtkKWTkUtilities::GetPhotoHeight(vtkKWWidget *widget)
 
   // Retrieve -image option
 
-  kwsys_stl::string cmd;
+  vtksys_stl::string cmd;
   cmd += widget->GetWidgetName();
   cmd += " cget -image";
   
@@ -800,7 +800,7 @@ int vtkKWTkUtilities::GetPhotoHeight(vtkKWWidget *widget)
 
   // Get size
 
-  kwsys_stl::string image_name(interp->result);
+  vtksys_stl::string image_name(interp->result);
   return vtkKWTkUtilities::GetPhotoHeight(interp, image_name.c_str());
 }
 

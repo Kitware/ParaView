@@ -22,13 +22,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWBalloonHelpManager.h"
 
-#include <kwsys/stl/vector>
-#include <kwsys/stl/algorithm>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/stl/vector>
+#include <vtksys/stl/algorithm>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.124");
+vtkCxxRevisionMacro(vtkKWWidget, "1.125");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -37,8 +37,8 @@ int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
 class vtkKWWidgetInternals
 {
 public:
-  typedef kwsys_stl::vector<vtkKWWidget*> WidgetsContainer;
-  typedef kwsys_stl::vector<vtkKWWidget*>::iterator WidgetsContainerIterator;
+  typedef vtksys_stl::vector<vtkKWWidget*> WidgetsContainer;
+  typedef vtksys_stl::vector<vtkKWWidget*>::iterator WidgetsContainerIterator;
 
   WidgetsContainer *Children;
 
@@ -265,7 +265,7 @@ int vtkKWWidget::HasChild(vtkKWWidget *child)
 {
   if (this->GetNumberOfChildren())
     {
-    return kwsys_stl::find(this->Internals->Children->begin(),
+    return vtksys_stl::find(this->Internals->Children->begin(),
                            this->Internals->Children->end(),
                            child) == this->Internals->Children->end() ? 0 : 1;
     }
@@ -278,7 +278,7 @@ void vtkKWWidget::RemoveChild(vtkKWWidget *child)
   if (this->GetNumberOfChildren())
     {
     this->Internals->Children->erase(
-      kwsys_stl::find(this->Internals->Children->begin(),
+      vtksys_stl::find(this->Internals->Children->begin(),
                       this->Internals->Children->end(),
                       child));
     child->UnRegister(this);
@@ -777,7 +777,7 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
   char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    clean_str = kwsys::SystemTools::RemoveChars(str, "{}");
+    clean_str = vtksys::SystemTools::RemoveChars(str, "{}");
     str = clean_str;
     }
 
@@ -842,7 +842,7 @@ const char* vtkKWWidget::ConvertTclStringToInternalString(
   char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    clean_str = kwsys::SystemTools::RemoveChars(str, "{}");
+    clean_str = vtksys::SystemTools::RemoveChars(str, "{}");
     str = clean_str;
     }
 

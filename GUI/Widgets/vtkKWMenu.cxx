@@ -17,11 +17,11 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindowBase.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.66");
+vtkCxxRevisionMacro(vtkKWMenu, "1.67");
 
 
 
@@ -450,7 +450,7 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object,
   const char *objname = Object->GetTclName();
   if (objname && varname)
     {
-    char *clean_name = kwsys::SystemTools::RemoveChars(varname, " ");
+    char *clean_name = vtksys::SystemTools::RemoveChars(varname, " ");
     buffer = new char[strlen(objname) + strlen(clean_name) + 1]; 
     sprintf(buffer, "%s%s", objname, clean_name);
     delete [] clean_name;

@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 
-#include <kwsys/stl/string>
+#include <vtksys/stl/string>
 
 #define VTK_KWTEXT_BOLD_MARKER "**"
 #define VTK_KWTEXT_BOLD_TAG "_boldtag_"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.31");
+vtkCxxRevisionMacro(vtkKWText, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -119,7 +119,7 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
   int state = this->TextWidget->GetStateOption();
   this->TextWidget->SetStateOption(1);
 
-  kwsys_stl::string str(this->ConvertInternalStringToTclString(s, 0));
+  vtksys_stl::string str(this->ConvertInternalStringToTclString(s, 0));
 
   // In QuickFormatting mode, look for markers, and use tags accordingly
 
@@ -158,26 +158,26 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
         {
         // Text before the marker, using the current tag
 
-        kwsys_stl::string before;
+        vtksys_stl::string before;
         before.append(str.c_str(), closest_marker - str.c_str());
         this->AppendValue(before.c_str(), tag);
 
         // Zone inside the marker, using the current tag + the marker's tag
 
-        kwsys_stl::string new_tag;
+        vtksys_stl::string new_tag;
         if (tag)
           {
           new_tag.append(tag);
           }
         new_tag.append(" ").append(markertag[closest_marker_id * 2 + 1]);
-        kwsys_stl::string zone;
+        vtksys_stl::string zone;
         zone.append(closest_marker + len_marker, 
                     end_marker - closest_marker - len_marker);
         this->AppendValue(zone.c_str(), new_tag.c_str());
 
         // Text after the marker, using the current tag
 
-        kwsys_stl::string after;
+        vtksys_stl::string after;
         after.append(end_marker + len_marker);
         this->AppendValue(after.c_str(), tag);
 
@@ -212,7 +212,7 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
     this->TextWidget = vtkKWWidget::New();
     }
 
-  kwsys_stl::string all_args("-width 20 -wrap word ");
+  vtksys_stl::string all_args("-width 20 -wrap word ");
   if (args)
     {
     all_args += args;
@@ -223,7 +223,7 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
   // Create the default tags
 
   const char *wname = this->TextWidget->GetWidgetName();
-  kwsys_stl::string font(this->Script("%s cget -font", wname));
+  vtksys_stl::string font(this->Script("%s cget -font", wname));
 
   char bold_font[512], italic_font[512];
   vtkKWTkUtilities::ChangeFontWeightToBold(
@@ -268,7 +268,7 @@ void vtkKWText::CreateVerticalScrollbar(vtkKWApplication *app)
     this->VerticalScrollBar->Create(app, "scrollbar", "-orient vertical");
     if (this->TextWidget && this->TextWidget->IsCreated())
       {
-      kwsys_stl::string command("-command {");
+      vtksys_stl::string command("-command {");
       command += this->TextWidget->GetWidgetName();
       command += " yview}";
       this->VerticalScrollBar->ConfigureOptions(command.c_str());

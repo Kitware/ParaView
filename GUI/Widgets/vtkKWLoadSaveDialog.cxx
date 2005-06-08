@@ -17,11 +17,11 @@
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.39");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.40");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -151,7 +151,7 @@ const char* vtkKWLoadSaveDialog::GenerateLastPath(const char* path)
   // Store last path
   if ( path && strlen(path) > 0 )
     {
-    char *pth = kwsys::SystemTools::DuplicateString(path);
+    char *pth = vtksys::SystemTools::DuplicateString(path);
     int pos = strlen(path);
     // Strip off the file name
     while (pos && pth[pos] != '/' && pth[pos] != '\\')

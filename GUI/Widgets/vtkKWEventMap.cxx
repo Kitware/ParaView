@@ -14,9 +14,9 @@
 #include "vtkKWEventMap.h"
 #include "vtkObjectFactory.h"
 
-#include "kwsys/stl/string"
+#include "vtksys/stl/string"
 
-vtkCxxRevisionMacro(vtkKWEventMap, "1.2");
+vtkCxxRevisionMacro(vtkKWEventMap, "1.3");
 vtkStandardNewMacro(vtkKWEventMap);
 
 //----------------------------------------------------------------------------
@@ -411,7 +411,7 @@ void vtkKWEventMap::RemoveMouseEvent(int button, int modifier, const char *actio
 
   // Need to keep it around in case sombody is passing a pointer
   // to an action that we are going to delete below
-  kwsys_stl::string old_action(action);
+  vtksys_stl::string old_action(action);
 
   if (this->MouseEvents)
     {
@@ -488,7 +488,7 @@ void vtkKWEventMap::RemoveKeyEvent(char key, int modifier, const char *action)
 
   // Need to keep it around in case sombody is passing a pointer
   // to an action that we are going to delete below
-  kwsys_stl::string old_action(action);
+  vtksys_stl::string old_action(action);
 
   if (this->KeyEvents)
     {
@@ -572,8 +572,8 @@ void vtkKWEventMap::RemoveKeySymEvent(const char *keySym, int modifier, const ch
 
   // Need to keep it around in case sombody is passing a pointer
   // to an action that we are going to delete below
-  kwsys_stl::string old_action(action);
-  kwsys_stl::string old_keysym(keySym);
+  vtksys_stl::string old_action(action);
+  vtksys_stl::string old_keysym(keySym);
 
   if (this->KeySymEvents)
     {

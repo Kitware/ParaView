@@ -18,11 +18,11 @@
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/stl/list>
-#include <kwsys/stl/algorithm>
+#include <vtksys/stl/list>
+#include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.18");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.19");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -32,8 +32,8 @@ class vtkKWUserInterfaceManagerInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWUserInterfaceManager::PanelSlot*> PanelsContainer;
-  typedef kwsys_stl::list<vtkKWUserInterfaceManager::PanelSlot*>::iterator PanelsContainerIterator;
+  typedef vtksys_stl::list<vtkKWUserInterfaceManager::PanelSlot*> PanelsContainer;
+  typedef vtksys_stl::list<vtkKWUserInterfaceManager::PanelSlot*>::iterator PanelsContainerIterator;
 
   PanelsContainer Panels;
 };
@@ -352,7 +352,7 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = this->GetPanelSlot(panel);
 
   vtkKWUserInterfaceManagerInternals::PanelsContainerIterator pos = 
-    kwsys_stl::find(this->Internals->Panels.begin(),
+    vtksys_stl::find(this->Internals->Panels.begin(),
                  this->Internals->Panels.end(),
                  panel_slot);
 

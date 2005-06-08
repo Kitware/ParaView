@@ -23,12 +23,12 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/stl/list>
-#include <kwsys/stl/string>
+#include <vtksys/stl/list>
+#include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.7");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.8");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -38,12 +38,12 @@ class vtkKWColorPresetSelectorInternals
 public:
   struct PresetNode
   {
-    kwsys_stl::string Name;
+    vtksys_stl::string Name;
     vtkColorTransferFunction *ColorTransferFunction;
   };
 
-  typedef kwsys_stl::list<PresetNode> PresetContainer;
-  typedef kwsys_stl::list<PresetNode>::iterator PresetContainerIterator;
+  typedef vtksys_stl::list<PresetNode> PresetContainer;
+  typedef vtksys_stl::list<PresetNode>::iterator PresetContainerIterator;
 
   PresetContainer Presets;
 };
@@ -717,7 +717,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
   vtkKWMenu *menu = this->GetWidget()->GetMenu();
   menu->DeleteAllMenuItems();
 
-  kwsys_stl::string callback, preset_label, img_name;
+  vtksys_stl::string callback, preset_label, img_name;
   char func_addr[128];
 
   double *data_start, *data_ptr, *data_ptr_end;

@@ -26,7 +26,7 @@
 #include "vtkKWToolbarSet.h"
 #include "vtkKWToolbar.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
 const char *vtkKWWindow::MainPanelVisibilityRegKey = "MainPanelVisibility";
@@ -42,7 +42,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.252");
+vtkCxxRevisionMacro(vtkKWWindow, "1.253");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -209,7 +209,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Superclass::Create(app, args);
 
-  kwsys_stl::string cmd, event;
+  vtksys_stl::string cmd, event;
   vtkKWMenu *menu = NULL;
   int idx;
 
@@ -521,7 +521,7 @@ void vtkKWWindow::ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel)
 
   if (!panel->Raise())
     {
-    kwsys_stl::string msg;
+    vtksys_stl::string msg;
     msg = "The panel you are trying to access could not be displayed "
       "properly. Please make sure there is enough room in the notebook "
       "to bring up this part of the interface.";
@@ -611,7 +611,7 @@ void vtkKWWindow::ShowViewUserInterface(vtkKWUserInterfacePanel *panel)
 
   if (!panel->Raise())
     {
-    kwsys_stl::string msg;
+    vtksys_stl::string msg;
     msg = "The panel you are trying to access could not be displayed "
       "properly. Please make sure there is enough room in the notebook "
       "to bring up this part of the interface.";
@@ -840,7 +840,7 @@ void vtkKWWindow::UpdateMenuState()
       }
     if (idx >= 0)
       {
-      kwsys_stl::string label("-label {");
+      vtksys_stl::string label("-label {");
       label += this->GetMainPanelVisibility()
         ? vtkKWWindow::HideMainPanelMenuLabel 
         : vtkKWWindow::ShowMainPanelMenuLabel;
@@ -867,7 +867,7 @@ void vtkKWWindow::UpdateMenuState()
       }
     if (idx >= 0)
       {
-      kwsys_stl::string label("-label {");
+      vtksys_stl::string label("-label {");
       label += this->GetSecondaryPanelVisibility()
         ? vtkKWWindow::HideSecondaryPanelMenuLabel 
         : vtkKWWindow::ShowSecondaryPanelMenuLabel;

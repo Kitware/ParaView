@@ -20,11 +20,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTopLevel.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.19");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.20");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);

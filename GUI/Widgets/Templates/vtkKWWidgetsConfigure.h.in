@@ -15,6 +15,7 @@
 #define __vtkKWWidgetsConfigure_h
 
 #cmakedefine KWWIDGETS_SHARED_LIBS
+#cmakedefine KWWIDGETS_HAS_HTML_HELP
 
 #define KW_INSTALL_LIB_DIR "${KW_INSTALL_LIB_DIR}"
 

@@ -19,12 +19,12 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWApplication.h"
 
-#include <kwsys/stl/list>
-#include <kwsys/stl/algorithm>
+#include <vtksys/stl/list>
+#include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.2");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.3");
 
 int vtkKWDragAndDropTargetSetCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -34,8 +34,8 @@ class vtkKWDragAndDropTargetSetInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWDragAndDropTargetSet::TargetSlot*> TargetsContainer;
-  typedef kwsys_stl::list<vtkKWDragAndDropTargetSet::TargetSlot*>::iterator TargetsContainerIterator;
+  typedef vtksys_stl::list<vtkKWDragAndDropTargetSet::TargetSlot*> TargetsContainer;
+  typedef vtksys_stl::list<vtkKWDragAndDropTargetSet::TargetSlot*>::iterator TargetsContainerIterator;
 
   TargetsContainer Targets;
 };
@@ -365,7 +365,7 @@ int vtkKWDragAndDropTargetSet::RemoveTarget(vtkKWWidget *widget)
     }
   
   vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator pos = 
-    kwsys_stl::find(this->Internals->Targets.begin(),
+    vtksys_stl::find(this->Internals->Targets.begin(),
                  this->Internals->Targets.end(),
                  found);
   

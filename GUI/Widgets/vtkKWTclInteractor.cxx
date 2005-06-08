@@ -21,11 +21,11 @@
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/stl/string>
+#include <vtksys/stl/string>
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.33");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.34");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -164,7 +164,7 @@ void vtkKWTclInteractor::Evaluate()
     }
   this->UnRegister(this);
 
-  kwsys_stl::string res(this->Script("set _tmp_err"));
+  vtksys_stl::string res(this->Script("set _tmp_err"));
   this->DisplayText->AppendValue(res.c_str());
   this->DisplayText->AppendValue("\n\n");
 

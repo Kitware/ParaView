@@ -29,7 +29,7 @@
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 const char *vtkKWWindowBase::PrintOptionsMenuLabel = "Print options...";
 const char *vtkKWWindowBase::FileMenuLabel = "File";
@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.12");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.13");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -272,8 +272,8 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
 
   this->Superclass::Create(app, args);
 
-  kwsys_stl::string cmd;
-  kwsys_stl::string label;
+  vtksys_stl::string cmd;
+  vtksys_stl::string label;
   vtkKWMenu *menu = NULL;
 
   this->SetIconName(app->GetPrettyName());
@@ -511,7 +511,7 @@ void vtkKWWindowBase::SaveWindowGeometryToRegistry()
     return;
     }
 
-  kwsys_stl::string geometry = this->GetGeometry();
+  vtksys_stl::string geometry = this->GetGeometry();
   this->GetApplication()->SetRegistryValue(
     2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey, "%s", geometry.c_str());
 }
@@ -818,7 +818,7 @@ void vtkKWWindowBase::LoadScript()
   load_dialog->SetTitle("Load Script");
   load_dialog->SetDefaultExtension(this->ScriptExtension);
 
-  kwsys_stl::string filetypes;
+  vtksys_stl::string filetypes;
   filetypes += "{{";
   filetypes += this->ScriptType;
   filetypes += " Scripts} {";
@@ -833,7 +833,7 @@ void vtkKWWindowBase::LoadScript()
       load_dialog->GetFileName() && 
       strlen(load_dialog->GetFileName()) > 0)
     {
-    if (!kwsys::SystemTools::FileExists(load_dialog->GetFileName()))
+    if (!vtksys::SystemTools::FileExists(load_dialog->GetFileName()))
       {
       vtkWarningMacro("Unable to open script file!");
       }
@@ -943,7 +943,7 @@ void vtkKWWindowBase::DisplayTclInteractor()
   vtkKWTclInteractor *tcl_interactor = this->GetTclInteractor();
   if (tcl_interactor)
     {
-    kwsys_stl::string title;
+    vtksys_stl::string title;
     if (this->GetTitle())
       {
       title += this->GetTitle();
@@ -969,7 +969,7 @@ vtkKWLabel* vtkKWWindowBase::GetStatusImage()
     this->StatusImage->SetParent(this->StatusFrame);
     this->StatusImage->Create(
       this->StatusFrame->GetApplication(), "-relief sunken -bd 1");
-    kwsys_stl::string before;
+    vtksys_stl::string before;
     if (this->StatusLabel && this->StatusLabel->IsCreated())
       {
       before = " -before ";
@@ -1075,13 +1075,13 @@ void vtkKWWindowBase::UpdateMenuState()
 
   if (this->HelpMenu) // do not use GetHelpMenu() here
     {
-    kwsys_stl::string about_command = "DisplayAbout ";
+    vtksys_stl::string about_command = "DisplayAbout ";
     about_command +=  this->GetTclName();
     int pos = this->GetHelpMenu()->GetIndexOfCommand(
       this->GetApplication(), about_command.c_str());
     if (pos >= 0)
       {
-      kwsys_stl::string label("-label {About ");
+      vtksys_stl::string label("-label {About ");
       label += this->GetApplication()->GetPrettyName();
       label += "}";
       this->GetHelpMenu()->ConfigureItem(pos, label.c_str());

@@ -23,12 +23,12 @@
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/stl/list>
-#include <kwsys/stl/algorithm>
+#include <vtksys/stl/list>
+#include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.39");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.40");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -38,9 +38,9 @@ class vtkKWUserInterfaceNotebookManagerInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*> DragAndDropEntriesContainer;
-  typedef kwsys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::iterator DragAndDropEntriesContainerIterator;
-  typedef kwsys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::reverse_iterator DragAndDropEntriesContainerReverseIterator;
+  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*> DragAndDropEntriesContainer;
+  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::iterator DragAndDropEntriesContainerIterator;
+  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::reverse_iterator DragAndDropEntriesContainerReverseIterator;
 
   DragAndDropEntriesContainer DragAndDropEntries;
 };
@@ -1212,7 +1212,7 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   if (prev_entry)
     {
     vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator pos = 
-      kwsys_stl::find(this->Internals->DragAndDropEntries.begin(),
+      vtksys_stl::find(this->Internals->DragAndDropEntries.begin(),
                    this->Internals->DragAndDropEntries.end(),
                    prev_entry);
     if (pos == this->Internals->DragAndDropEntries.end())

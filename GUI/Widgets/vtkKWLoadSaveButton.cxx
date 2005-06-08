@@ -18,11 +18,11 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.8");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.9");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -166,17 +166,17 @@ void vtkKWLoadSaveButton::UpdateFileName()
     }
   else
     {
-    kwsys_stl::string new_fname; 
+    vtksys_stl::string new_fname; 
     if (this->TrimPathFromFileName)
       {
-      new_fname = kwsys::SystemTools::GetFilenameName(fname);
+      new_fname = vtksys::SystemTools::GetFilenameName(fname);
       }
     else
       {
       new_fname = fname;
       }
     new_fname = 
-      kwsys::SystemTools::CropString(new_fname, this->MaximumFileNameLength);
+      vtksys::SystemTools::CropString(new_fname, this->MaximumFileNameLength);
     this->SetText(new_fname.c_str());
     }
 } 

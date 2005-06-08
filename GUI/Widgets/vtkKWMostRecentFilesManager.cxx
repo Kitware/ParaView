@@ -17,11 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWMenu.h"
 
-#include <kwsys/stl/string>
-#include <kwsys/stl/list>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/stl/string>
+#include <vtksys/stl/list>
+#include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.3");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.4");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
@@ -62,13 +62,13 @@ public:
   
   private:
     
-    kwsys_stl::string FileName;
+    vtksys_stl::string FileName;
     vtkKWObject *TargetObject;
-    kwsys_stl::string TargetCommand;
+    vtksys_stl::string TargetCommand;
   };
 
-  typedef kwsys_stl::list<FileEntry*> FileEntriesContainer;
-  typedef kwsys_stl::list<FileEntry*>::iterator FileEntriesContainerIterator;
+  typedef vtksys_stl::list<FileEntry*> FileEntriesContainer;
+  typedef vtksys_stl::list<FileEntry*>::iterator FileEntriesContainerIterator;
 
   FileEntriesContainer MostRecentFileEntries;
 };
@@ -164,11 +164,11 @@ void vtkKWMostRecentFilesManager::AddFile(
     return;
     }
 
-  kwsys_stl::string evalstr = "eval file join {\"";
+  vtksys_stl::string evalstr = "eval file join {\"";
   evalstr += filename;
   evalstr += "\"}";
 
-  kwsys_stl::string filename_expanded = 
+  vtksys_stl::string filename_expanded = 
     this->GetApplication()->Script(evalstr.c_str());
 
   this->AddFileInternal(
@@ -414,8 +414,8 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
           vtkErrorMacro("Error! Can not add entry with empty target object!");
           continue;
           }
-        kwsys_stl::string short_file = 
-          kwsys::SystemTools::CropString(filename, 40);
+        vtksys_stl::string short_file = 
+          vtksys::SystemTools::CropString(filename, 40);
         ostrstream label;
         ostrstream cmd;
         label << count << " " << short_file.c_str() << ends;

@@ -23,11 +23,11 @@
 
 #include "Resources/vtkKWIconResources.h"
 
-#include <kwsys/Base64.h>
+#include <vtksys/Base64.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.7");
+vtkCxxRevisionMacro(vtkKWIcon, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -89,7 +89,7 @@ void vtkKWIcon::SetImage(const unsigned char *data,
     if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
       {
       base64_buffer = new unsigned char [buffer_length];
-      buffer_length = kwsysBase64_Decode(data_ptr, 0, 
+      buffer_length = vtksysBase64_Decode(data_ptr, 0, 
                                          base64_buffer, buffer_length);
       if (buffer_length == 0)
         {

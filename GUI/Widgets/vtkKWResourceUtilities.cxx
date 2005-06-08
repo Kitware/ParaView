@@ -20,8 +20,8 @@
 #include "vtk_png.h"
 #include "vtk_zlib.h"
 
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/Base64.h>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/Base64.h>
 
 #ifdef _MSC_VER
 // Let us get rid of this funny warning on /W4:
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.6");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.7");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -339,15 +339,15 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
   // Update only, bail out if the header is more recent than all the images
 
-  if (opt_update && kwsys::SystemTools::FileExists(header_filename))
+  if (opt_update && vtksys::SystemTools::FileExists(header_filename))
     {
     long int header_mod_time = 
-      kwsys::SystemTools::ModifiedTime(header_filename);
+      vtksys::SystemTools::ModifiedTime(header_filename);
     int up_to_date = 1;
     for (int img_idx = 0; img_idx < nb_images; img_idx++)
       {
       if (image_filenames[img_idx] && 
-          (kwsys::SystemTools::ModifiedTime(image_filenames[img_idx]) >
+          (vtksys::SystemTools::ModifiedTime(image_filenames[img_idx]) >
            header_mod_time))
         {
         up_to_date = 0;
@@ -386,7 +386,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     // Image exists ?
 
-    if (!kwsys::SystemTools::FileExists(image_filename))
+    if (!vtksys::SystemTools::FileExists(image_filename))
       {
       vtkGenericWarningMacro("Unable to find image " << image_filename);
       all_ok = 0;
@@ -440,7 +440,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
       {
       base64_buffer = new unsigned char [nb_of_bytes * 2];
       nb_of_bytes = 
-        kwsysBase64_Encode(data_ptr, nb_of_bytes, base64_buffer, 0);
+        vtksysBase64_Encode(data_ptr, nb_of_bytes, base64_buffer, 0);
       if (nb_of_bytes == 0)
         {
         vtkGenericWarningMacro("Unable to base64 image buffer!");
@@ -455,10 +455,10 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     
     // Output the image in the header
 
-    kwsys_stl::string image_basename = 
-      kwsys::SystemTools::GetFilenameName(image_filename);
-    kwsys_stl::string image_name = 
-      kwsys::SystemTools::GetFilenameWithoutExtension(image_basename);
+    vtksys_stl::string image_basename = 
+      vtksys::SystemTools::GetFilenameName(image_filename);
+    vtksys_stl::string image_name = 
+      vtksys::SystemTools::GetFilenameWithoutExtension(image_basename);
   
     out << "/* " << endl
         << " * Resource generated for image:" << endl

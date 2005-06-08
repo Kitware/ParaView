@@ -29,20 +29,20 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/stl/list>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/list>
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWMaterialPropertyWidget::Preset*> PresetsContainer;
-  typedef kwsys_stl::list<vtkKWMaterialPropertyWidget::Preset*>::iterator PresetsContainerIterator;
+  typedef vtksys_stl::list<vtkKWMaterialPropertyWidget::Preset*> PresetsContainer;
+  typedef vtksys_stl::list<vtkKWMaterialPropertyWidget::Preset*>::iterator PresetsContainerIterator;
 
   PresetsContainer Presets;
 };
@@ -214,7 +214,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Diffuse = 0.0;
   preset->Specular = 0.0;
   preset->SpecularPower = 1.0;
-  preset->HelpString = kwsys::SystemTools::DuplicateString(
+  preset->HelpString = vtksys::SystemTools::DuplicateString(
     "Full ambient eliminating all directional shading.");
   this->Internals->Presets.push_back(preset);
 
@@ -225,7 +225,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Diffuse = 1.0;
   preset->Specular = 0.0;
   preset->SpecularPower = 1.0;
-  preset->HelpString = kwsys::SystemTools::DuplicateString(
+  preset->HelpString = vtksys::SystemTools::DuplicateString(
     "Dull material properties (no specular lighting)");
   this->Internals->Presets.push_back(preset);
   
@@ -236,7 +236,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Specular = 0.2;
   preset->Diffuse = 0.9;
   preset->SpecularPower = 10.0;
-  preset->HelpString = kwsys::SystemTools::DuplicateString(
+  preset->HelpString = vtksys::SystemTools::DuplicateString(
     "Smooth material properties (moderate specular lighting");
   this->Internals->Presets.push_back(preset);
   
@@ -247,7 +247,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Diffuse = 0.6;
   preset->Specular = 0.5;
   preset->SpecularPower = 40.0;
-  preset->HelpString = kwsys::SystemTools::DuplicateString(
+  preset->HelpString = vtksys::SystemTools::DuplicateString(
     "Shiny material properties (high specular lighting)");
   this->Internals->Presets.push_back(preset);
 } 

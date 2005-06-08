@@ -18,8 +18,8 @@
 #include "vtkKWRadioButton.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/stl/list>
-#include <kwsys/stl/algorithm>
+#include <vtksys/stl/list>
+#include <vtksys/stl/algorithm>
 
 #ifdef _WIN32
 static int vtkKWToolbarGlobalFlatAspect        = 1;
@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.50");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.51");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -62,8 +62,8 @@ class vtkKWToolbarInternals
 {
 public:
 
-  typedef kwsys_stl::list<vtkKWWidget*> WidgetsContainer;
-  typedef kwsys_stl::list<vtkKWWidget*>::iterator WidgetsContainerIterator;
+  typedef vtksys_stl::list<vtkKWWidget*> WidgetsContainer;
+  typedef vtksys_stl::list<vtkKWWidget*>::iterator WidgetsContainerIterator;
 
   WidgetsContainer Widgets;
 };
@@ -226,7 +226,7 @@ void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
   else
     {
     vtkKWToolbarInternals::WidgetsContainerIterator location_pos = 
-      kwsys_stl::find(this->Internals->Widgets.begin(),
+      vtksys_stl::find(this->Internals->Widgets.begin(),
                    this->Internals->Widgets.end(),
                    location);
     if (location_pos == this->Internals->Widgets.end())
@@ -254,7 +254,7 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
     }
 
   vtkKWToolbarInternals::WidgetsContainerIterator location_pos = 
-    kwsys_stl::find(this->Internals->Widgets.begin(),
+    vtksys_stl::find(this->Internals->Widgets.begin(),
                  this->Internals->Widgets.end(),
                  widget);
   if (location_pos == this->Internals->Widgets.end())

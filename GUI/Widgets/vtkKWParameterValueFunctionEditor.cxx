@@ -30,9 +30,9 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWIcon.h"
 
-#include <kwsys/stl/string>
+#include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.43");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.44");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1354,7 +1354,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
       "Change the histogram mode from log to linear.");
 
     vtkKWIcon *icon = vtkKWIcon::New();
-    kwsys_stl::string img_name;
+    vtksys_stl::string img_name;
 
     icon->SetImage(vtkKWIcon::ICON_GRID_LINEAR);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
