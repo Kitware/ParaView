@@ -62,6 +62,13 @@ public:
   vtkBooleanMacro(ClampMaximumValue, int);  
 
   // Description:
+  // Set the range.
+  virtual void SetRange(double min, double max)
+    { this->SetMinimumValue(min); this->SetMaximumValue(max); };
+  virtual void SetRange(const double *range) 
+    { this->SetRange(range[0], range[1]); };
+
+  // Description:
   // Set/Get the resolution of the thumbwheel. Moving the thumbwheel will
   // increase/decrease the value by an amount proportional to this resolution.
   virtual void SetResolution(double r);
@@ -121,6 +128,7 @@ public:
   vtkGetMacro(ThumbWheelHeight, int);
   virtual void SetThumbWheelSize(int w, int h) 
     { this->SetThumbWheelWidth(w); this->SetThumbWheelHeight(h); };
+  virtual void SetLength(int v) { this->SetThumbWheelWidth(v); };
 
   // Description:
   // Enable/Disable automatic thumbwheel resizing. Turn it off if you want
@@ -151,8 +159,8 @@ public:
   virtual void ToggleDisplayThumbWheelCenterIndicator();
 
   // Description:
-  // Set/Get the average size (in pixels) of the notches on the visible part of 
-  // the thumbwheel. Can be a decimal value, since it's only used to compute
+  // Set/Get the average size (in pixels) of the notches on the visible part
+  // of the thumbwheel. Can be a decimal value, since it's only used to compute
   // the number of notches to display depending on the current thumbwheel size.
   virtual void SetSizeOfNotches(double v);
   vtkGetMacro(SizeOfNotches, double);
@@ -189,9 +197,9 @@ public:
 
   // Description:
   // Set/Get the entry expansion flag. This flag is only used if PopupMode 
-  // is On. In that case, the default behaviour is to provide a widget as compact
-  // as possible, i.e. the Entry won't be expanded if the widget grows. Set
-  // ExpandEntry to On to override this behaviour.
+  // is On. In that case, the default behaviour is to provide a widget as 
+  // compact as possible, i.e. the Entry won't be expanded if the widget grows.
+  // Set ExpandEntry to On to override this behaviour.
   virtual void SetExpandEntry(int flag);
   vtkGetMacro(ExpandEntry, int);
   vtkBooleanMacro(ExpandEntry, int);  
