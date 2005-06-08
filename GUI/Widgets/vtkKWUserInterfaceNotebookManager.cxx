@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.38");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.39");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -304,6 +304,78 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(
   this->Notebook->Raise(title, tag);
 }
 
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::RaisePanel(
+  vtkKWUserInterfacePanel *panel)
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro("Can not raise pages if the manager has not been created.");
+    return 0;
+    }
+
+  if (!panel)
+    {
+    vtkErrorMacro("Can not raise the pages from a NULL panel.");
+    return 0;
+    }
+  
+  if (!this->HasPanel(panel))
+    {
+    vtkErrorMacro("Can not raise the pages from a panel that is not "
+                  "in the manager.");
+    return 0;
+    }
+
+  // As a convenience, if the panel that this page was created for has 
+  // not been created yet, it is created now. This allow the GUI creation to 
+  // be delayed until it is really needed.
+
+  if (!panel->IsCreated())
+    {
+    panel->Create(this->GetApplication());
+    }
+
+  // Show the pages that share the same tag (i.e. the pages that belong to the 
+  // same panel).
+
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
+    {
+    vtkErrorMacro("Can not access the panel to show its pages.");
+    return 0;
+    }
+
+  // If the page raised at the moment is part of this panel, then we are 
+  // OK already, otherwise raise a page.
+
+  int current_id = this->Notebook->GetRaisedPageId();
+  if (!current_id || tag != this->Notebook->GetPageTag(current_id))
+    {
+    this->Notebook->RaiseFirstPageMatchingTag(tag);
+    }
+
+  // Then show the remaining pages in the panel
+
+  if (!this->ShowPanel(panel))
+    {
+    return 0;
+    }
+
+  // If there were pages matching that tag, but we end up with the raised
+  // page not matching that tag, then we failed (maybe because of the notebook
+  // constraints, the number of pages already pinned, etc).
+
+  current_id = this->Notebook->GetRaisedPageId();
+  if (current_id && 
+      this->Notebook->GetNumberOfPagesMatchingTag(tag) &&
+      this->Notebook->GetPageTag(current_id) != tag)
+    {
+    return 0;
+    }
+
+  return 1;
+}
 
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::ShowPanel(
@@ -448,46 +520,6 @@ int vtkKWUserInterfaceNotebookManager::IsPanelVisible(
 
   return (this->Notebook->GetNumberOfPagesMatchingTag(tag) ==
           this->Notebook->GetNumberOfVisiblePagesMatchingTag(tag));
-}
-
-//----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::RaisePanel(
-  vtkKWUserInterfacePanel *panel)
-{
-  // First show the panel
-
-  if (!this->ShowPanel(panel))
-    {
-    return 0;
-    }
-
-  // If the page raised at the moment is part of this panel, then we are 
-  // OK already.
-
-  int tag = this->GetPanelId(panel);
-  int current_id = this->Notebook->GetRaisedPageId();
-  if (current_id && tag == this->Notebook->GetPageTag(current_id))
-    {
-    return 1;
-    }
- 
-  // Otherwise raise the first page
-
-  this->Notebook->RaiseFirstPageMatchingTag(tag);
-
-  // If there were pages matching that tag, but we end up with the raised
-  // page not matching that tag, then we failed (maybe because of the notebook
-  // constraints, the number of pages already pinned, etc).
-
-  current_id = this->Notebook->GetRaisedPageId();
-  if (current_id && 
-      this->Notebook->GetNumberOfPagesMatchingTag(tag) &&
-      this->Notebook->GetPageTag(current_id) != tag)
-    {
-    return 0;
-    }
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
