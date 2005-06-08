@@ -55,7 +55,7 @@ public:
   // Set the command that is called when the color is changed - the object is
   // the KWObject that will have the method called on it.  The second argument
   // is the name of the method to be called and any arguments in string form.
-  // The calling is done via TCL wrappers for the KWObject.
+  // Note that the current color is passed too, as 3 RGB (double) parameters.
   virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
   // Description:
