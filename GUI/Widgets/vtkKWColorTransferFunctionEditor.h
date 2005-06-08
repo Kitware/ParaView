@@ -48,7 +48,9 @@ public:
   virtual int GetPointColorAsRGB(int id, double rgb[3]);
   virtual int GetPointColorAsHSV(int id, double hsv[3]);
   virtual int SetPointColorAsRGB(int id, const double rgb[3]);
+  virtual int SetPointColorAsRGB(int id, double r, double g, double b);
   virtual int SetPointColorAsHSV(int id, const double hsv[3]);
+  virtual int SetPointColorAsHSV(int id, double h, double s, double v);
 
   // Description:
   // Show/Hide the color ramp.

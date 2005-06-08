@@ -30,7 +30,7 @@
 #include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.27");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.28");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -1019,6 +1019,17 @@ int vtkKWColorTransferFunctionEditor::SetPointColorAsRGB(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::SetPointColorAsRGB(
+  int id, double r, double g, double b)
+{
+  double rgb[3];
+  rgb[0] = r;
+  rgb[1] = g;
+  rgb[2] = b;
+  return this->SetPointColorAsRGB(id, rgb);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWColorTransferFunctionEditor::GetPointColorAsHSV(int id, double hsv[3])
 {
   double rgb[3];
@@ -1043,6 +1054,17 @@ int vtkKWColorTransferFunctionEditor::SetPointColorAsHSV(
     }
 
   return this->MoveFunctionPointInColorSpace(id, parameter, hsv, VTK_CTF_HSV);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::SetPointColorAsHSV(
+  int id, double h, double s, double v)
+{
+  double hsv[3];
+  hsv[0] = h;
+  hsv[1] = s;
+  hsv[2] = v;
+  return this->SetPointColorAsHSV(id, hsv);
 }
 
 //----------------------------------------------------------------------------
