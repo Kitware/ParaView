@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.380");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.381");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -557,7 +557,7 @@ void vtkPVRenderView::PrepareForDelete()
       {
       pvapp->SetRegistryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY, "%d", 
-        this->SplitFrame->GetFrame1Size());
+        this->SplitFrame->GetFrame2Size());
       }
     }
 
@@ -635,7 +635,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Create the frames
 
-  this->Frame->Create(app,"frame","-bd 3 -relief ridge");
+  this->Frame->Create(app,"frame","-bd 0 -relief ridge");
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->Frame->GetWidgetName());
 
@@ -719,20 +719,21 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->SplitFrame->SetParent(this->GetPropertiesParent());
   this->SplitFrame->SetOrientationToVertical();
+  this->SplitFrame->SetExpandFrameToFrame1();
   this->SplitFrame->SetSeparatorSize(5);
-  this->SplitFrame->SetFrame1MinimumSize(80);
+  this->SplitFrame->SetFrame2MinimumSize(80);
 
   if (app->GetSaveUserInterfaceGeometry() &&
       app->HasRegistryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY))
     {
-    this->SplitFrame->SetFrame1Size(
+    this->SplitFrame->SetFrame2Size(
       app->GetIntRegistryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY));
     }
   else
     {
-    this->SplitFrame->SetFrame1Size(80);
+    this->SplitFrame->SetFrame2Size(80);
     }
 
   this->SplitFrame->Create(app);
@@ -742,7 +743,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Configure the navigation frame
 
-  this->NavigationFrame->SetParent(this->SplitFrame->GetFrame1());
+  this->NavigationFrame->SetParent(this->SplitFrame->GetFrame2());
   this->NavigationFrame->ShowHideFrameOff();
   this->NavigationFrame->Create(app, 0);
   this->NavigationFrame->SetLabelText("Navigation");
@@ -891,7 +892,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
 //----------------------------------------------------------------------------
 vtkKWWidget *vtkPVRenderView::GetSourceParent()
 {
-  return this->SplitFrame->GetFrame2();
+  return this->SplitFrame->GetFrame1();
 }
 
 //----------------------------------------------------------------------------
