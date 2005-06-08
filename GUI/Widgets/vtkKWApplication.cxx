@@ -36,6 +36,8 @@
 #include <vtksys/stl/vector>
 #include <vtksys/stl/algorithm>
 
+#include "Resources/KWWidgets.rc.h"
+
 static Tcl_Interp *Et_Interp = 0;
 
 #ifdef _WIN32
@@ -63,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.217");
+vtkCxxRevisionMacro(vtkKWApplication, "1.218");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -625,6 +627,20 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
     {
     this->GetNthWindow(0)->Display();
     }
+
+  // Set the KWWidgets icon by default
+  // For this to work, the executable should be linked against the
+  // KWWidgets resource file KWWidgets.rc:
+  // CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/Resources/KWWidgets.rc.in foo.rc)
+  // ADD_EXECUTABLE(... foo.rc)
+
+#ifdef _WIN32
+  this->Script("update");
+  this->Script(
+    "catch {vtkKWSetApplicationIcon {} %d big}", IDI_KWWIDGETSICO);
+  this->Script(
+    "catch {vtkKWSetApplicationIcon {} %d small}", IDI_KWWIDGETSICOSMALL);
+#endif _WIN32
 
   // Start the event loop
 

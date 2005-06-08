@@ -347,3 +347,20 @@ SET (KWWIDGETS_SHARED_LIBS ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
   ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetsConfigure.h.in 
   ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
+
+# The Resources/KWWidgets.rc.in can be configured for examples/samples
+# or use apps. Provide defaults values. Typically, you should then use:
+# CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/Resources/KWWidgets.rc.in foo.rc)
+# ADD_EXECUTABLE(... foo.rc)
+
+IF(WIN32)
+  IF(VTK_TK_RESOURCE_FILE)
+    GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${VTK_TK_RESOURCE_FILE} PATH)
+    INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
+  ENDIF(VTK_TK_RESOURCE_FILE)
+  SET (KWWIDGETS_RES_MAJOR_VERSION 1)
+  SET (KWWIDGETS_RES_MINOR_VERSION 0)
+  SET (KWWIDGETS_RES_APP_NAME "Unknown")
+  SET (KWWIDGETS_RES_FILE_NAME "Unknown")
+  SET (KWWIDGETS_RES_COMPANY_NAME "Kitware Inc.")
+ENDIF(WIN32)
