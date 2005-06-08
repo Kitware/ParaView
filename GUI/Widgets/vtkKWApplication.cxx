@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.215");
+vtkCxxRevisionMacro(vtkKWApplication, "1.216");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -241,9 +241,12 @@ void vtkKWApplication::PrepareForDelete()
     this->BalloonHelpManager = NULL;
     }
 
-  this->Script("foreach a [ after info ] { after cancel $a }");
+  if (this->MainInterp)
+    {
+    this->Script("foreach a [ after info ] { after cancel $a }");
+    }
 }
-    
+
 //----------------------------------------------------------------------------
 void vtkKWApplication::SetApplication(vtkKWApplication*) 
 { 
