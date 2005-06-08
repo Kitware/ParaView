@@ -56,7 +56,7 @@ public:
   vtkGetMacro(ValueCursorMargin, int);
 
   // Description:
-  // Select/Deselect a color
+  // Select/Deselect a color (in HSV space)
   vtkGetVector3Macro(SelectedColor, double);
   virtual void SetSelectedColor(double h, double s, double v);
   virtual void SetSelectedColor(double hsv[3])
@@ -79,12 +79,22 @@ public:
 
   // Description:
   // Commands.
+  // Note that the current color is passed, as 3 HSV (double) parameters,
+  // unless InvokeCommandsWithRGB is true, in that case the current HSV 
+  // value is converted to RGB first.
   virtual void SetSelectionChangedCommand(
     vtkKWObject* object, const char *method);
   virtual void SetSelectionChangingCommand(
     vtkKWObject* object, const char *method);
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeSelectionChangingCommand();
+
+  // Description:
+  // Set/Get if the commands should be invoked with RGB parameters instead
+  // of the current HSV value.
+  vtkSetMacro(InvokeCommandsWithRGB, int);
+  vtkGetMacro(InvokeCommandsWithRGB, int);
+  vtkBooleanMacro(InvokeCommandsWithRGB, int);
 
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -129,6 +139,7 @@ protected:
   int    Selected;
   double SelectedColor[3];
   int    ModificationOnly;
+  int    InvokeCommandsWithRGB;
   int    HideValue;
   double PreviouslySelectedColor[3];
 

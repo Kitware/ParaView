@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.7");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.8");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -46,6 +46,7 @@ vtkKWHSVColorSelector::vtkKWHSVColorSelector()
   this->ValueCursorMargin        = 2;
   this->Selected                 = 0;
   this->ModificationOnly         = 0;
+  this->InvokeCommandsWithRGB    = 0;
   this->HideValue                = 0;
 
   this->SelectedColor[0]         = 0.0;
@@ -461,7 +462,17 @@ void vtkKWHSVColorSelector::InvokeCommand(const char *command)
 {
   if (command && *command)
     {
-    this->Script("eval %s", command);
+    double rgb[3], *color;
+    if (this->InvokeCommandsWithRGB)
+      {
+      vtkMath::HSVToRGB(this->SelectedColor, rgb);
+      color = rgb;
+      }
+    else
+      {
+      color = this->SelectedColor;
+      }
+    this->Script("eval %s %lf %lf %lf", command, color[0], color[1], color[2]);
     }
 }
 
@@ -1169,6 +1180,8 @@ void vtkKWHSVColorSelector::PrintSelf(
   os << indent << "ValueCursorMargin: "<< this->ValueCursorMargin << endl;
   os << indent << "ModificationOnly: "
      << (this->ModificationOnly ? "On" : "Off") << endl;
+  os << indent << "InvokeCommandsWithRGB: "
+     << (this->InvokeCommandsWithRGB ? "On" : "Off") << endl;
   os << indent << "SelectedColor: (" 
      << this->SelectedColor[0] << ", "
      << this->SelectedColor[1] << ", "
