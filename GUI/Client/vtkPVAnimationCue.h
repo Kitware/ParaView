@@ -263,7 +263,7 @@ protected:
   virtual void UnregisterProxies();
   
   int CueVisibility;
-
+  int DisableSelectionChangedEvent;
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&); // Not implemented.
   void operator=(const vtkPVAnimationCue&); // Not implemented.

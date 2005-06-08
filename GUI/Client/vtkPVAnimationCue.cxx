@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.31");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.32");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -144,6 +144,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->Name = NULL;
   this->TclNameCommand = 0;
   this->CueVisibility = 1;
+  this->DisableSelectionChangedEvent = 0;
 }
 
 
@@ -376,9 +377,10 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
       // raise this event on this cue, so that the VAnimationInterface (if
       // it is listening) will know that selection has changed and will
       // update to show the right key frame.
-      //this->InvokeEvent(event, calldata);
-      
-      this->SelectKeyFrameInternal(this->TimeLine->GetSelectedPoint());
+      if (!this->DisableSelectionChangedEvent)
+        {
+        this->SelectKeyFrameInternal(this->TimeLine->GetSelectedPoint());
+        }
       return;
 
     case vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent:
@@ -656,10 +658,13 @@ void vtkPVAnimationCue::RemoveAllKeyFrames()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SelectKeyFrame(int id)
 {
+  this->DisableSelectionChangedEvent = 1;
   this->TimeLine->SelectPoint(id);
-//  this->Superclass::SelectKeyFrame(id); don't call Superclass::SelectKeyFrame
-//  it will get called as a result of 
-//  vtkKWParameterValueFunctionEditor::SelectionChangedEvent
+  this->Superclass::SelectKeyFrame(id); 
+  this->DisableSelectionChangedEvent = 0;
+  // DisableSelectionChangedEvent is needed to avoid invoking of the event twice
+  // (since TimeLine->SelectPoint() may lead to 
+  // vtkKWParameterValueFunctionEditor::SelectionChangedEvent.
 }
 
 //-----------------------------------------------------------------------------

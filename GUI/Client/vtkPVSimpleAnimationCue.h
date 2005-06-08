@@ -222,6 +222,7 @@ public:
   // This is the parent frame which will contain the Keyframes.
   // Typically, this is an instance of vtkPVTrackEditor.
   void SetKeyFrameParent(vtkKWWidget* kfParent);
+  vtkGetObjectMacro(KeyFrameParent, vtkKWWidget);
 
   // Description:
   // Forwarded to all created key frames.

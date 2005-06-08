@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.50");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.51");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -836,6 +836,7 @@ int vtkPVAnimationManager::GetKeyFrameType(vtkPVKeyFrame* kf)
 vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVSimpleAnimationCue* pvCue, 
   int type, vtkPVKeyFrame* replaceFrame)
 {
+  //TODO: This method must be moved to vtkPVSimpleAnimationCue.
   if (this->GetKeyFrameType(replaceFrame) == type)
     {
     // no replace necessary.
@@ -846,6 +847,7 @@ vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVSimpleAnimationCue* p
     {
     return NULL;
     }
+  keyFrame->SetParent(pvCue->GetKeyFrameParent());
   keyFrame->SetAnimationCueProxy(pvCue->GetCueProxy());
   keyFrame->Create(this->GetApplication(), 0);
   pvCue->ReplaceKeyFrame(replaceFrame, keyFrame);
