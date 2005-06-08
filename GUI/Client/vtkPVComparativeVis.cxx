@@ -41,29 +41,41 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.3");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.4");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
 
+//PIMPL (private implementation)
 struct vtkPVComparativeVisInternals
 {
   typedef vtkstd::vector<vtkSmartPointer<vtkSMProxy> > ProxiesType;
   typedef vtkstd::vector<ProxiesType> ProxiesVectorType;
+  // Geometry cache. These server side objects (sources) that store
+  // the generated geometry.
   ProxiesVectorType Caches;
+  // Display objects: geometry filters, mappers, actors etc.
   ProxiesVectorType Displays;
 
   typedef vtkstd::vector<double> BoundsType;
   typedef vtkstd::vector<BoundsType> BoundsVectorType;
+  // The bounds of each frame
   BoundsVectorType Bounds;
 
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxy> > CuesType;
+  // These define the comparative visualization.
+  typedef vtkstd::vector<vtkSmartPointer<vtkPVSimpleAnimationCue> > CuesType;
   CuesType Cues;
+  // The number of properties (parameters). Should be >= 1 for Generate().
+  // Currently only 2 can be shown
   vtkstd::vector<unsigned int> NumberOfPropertyValues;
 
   typedef vtkstd::vector<vtkSmartPointer<vtkPVAnimationCue> > AnimationCuesType;
+  // Not actually used in generating the vis. Used by the GUI.
   AnimationCuesType AnimationCues;
 
+  // All the proxy vectors are 1D. ComputeIndices() convert an index
+  // to these vectors to an nD array (where n is the number of parameters).
+  // The result of ComputeIndices() is stored in this vector. 
   vtkstd::vector<unsigned int> Indices;
 };
 
@@ -139,6 +151,8 @@ void vtkPVComparativeVis::Initialize()
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVis::RemoveAllProperties()
 {
+  this->Hide();
+
   this->Internal->Cues.clear();
   this->Internal->AnimationCues.clear();
   this->Internal->NumberOfPropertyValues.clear();
@@ -169,6 +183,16 @@ unsigned int vtkPVComparativeVis::GetNumberOfProperties()
 }
 
 //-----------------------------------------------------------------------------
+unsigned int vtkPVComparativeVis::GetNumberOfPropertyValues(unsigned int idx)
+{
+  if (idx >= this->Internal->NumberOfPropertyValues.size())
+    {
+    return 0;
+    }
+  return this->Internal->NumberOfPropertyValues[idx];
+}
+
+//-----------------------------------------------------------------------------
 vtkPVAnimationCue* vtkPVComparativeVis::GetAnimationCue(unsigned int idx)
 {
   if (idx >= this->Internal->AnimationCues.size())
@@ -179,8 +203,18 @@ vtkPVAnimationCue* vtkPVComparativeVis::GetAnimationCue(unsigned int idx)
 }
 
 //-----------------------------------------------------------------------------
+vtkPVSimpleAnimationCue* vtkPVComparativeVis::GetCue(unsigned int idx)
+{
+  if (idx >= this->Internal->Cues.size())
+    {
+    return 0;
+    }
+  return this->Internal->Cues[idx];
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVComparativeVis::AddProperty(
-  vtkPVAnimationCue* acue, vtkSMProxy* cue, int numValues)
+  vtkPVAnimationCue* acue, vtkPVSimpleAnimationCue* cue, int numValues)
 {
   if (!cue)
     {
@@ -195,6 +229,9 @@ void vtkPVComparativeVis::AddProperty(
 }
 
 //-----------------------------------------------------------------------------
+// This function is the main workhorse. It generates a "row" of the comparative
+// visualization. A "row" is a collection of frames in which only one parameter
+// is varied (played) over it's range while others are kept constant
 void vtkPVComparativeVis::PlayOne(unsigned int idx)
 {
   vtkTimerLog::MarkStartEvent("Play One");
@@ -208,13 +245,14 @@ void vtkPVComparativeVis::PlayOne(unsigned int idx)
     return;
     }
 
+  // Define the animation (row).
   vtkCVAnimationSceneObserver* observer = vtkCVAnimationSceneObserver::New();
   observer->Vis = this;
   observer->PropertyIndex = idx;
 
   vtkSMAnimationSceneProxy* player = vtkSMAnimationSceneProxy::New();
   player->UpdateVTKObjects();
-  player->AddCue(this->Internal->Cues[idx]);
+  player->AddCue(this->Internal->Cues[idx]->GetCueProxy());
   player->UpdateVTKObjects();
   player->AddObserver(vtkCommand::AnimationCueTickEvent, observer);
 
@@ -228,6 +266,8 @@ void vtkPVComparativeVis::PlayOne(unsigned int idx)
     this->Application->GetRenderModuleProxy();
   ren->InvalidateAllGeometries();
 
+  // Run. Note that PlayOne() is recursive and this may lead to other
+  // calls of PlayOne() with a different property index.
   player->Play();
 
   observer->Delete();
@@ -244,10 +284,18 @@ void vtkPVComparativeVis::ExecuteEvent(
     case vtkCommand::AnimationCueTickEvent:
       if (this->Application)
         {
+        // If not the last property, call the next one. For example,
+        // if there are two parameters and each have 2 values, the
+        // following cases will be generated (in order):
+        // 0 0
+        // 0 1
+        // 1 0
+        // 1 1
         if (paramIndex < this->Internal->Cues.size() - 1)
           {
           this->PlayOne(paramIndex+1);
           }
+        // If last property, render the "frame" and store the geometry
         else
           {
           vtkTimerLog::MarkStartEvent("Force Render");
@@ -261,16 +309,17 @@ void vtkPVComparativeVis::ExecuteEvent(
 }
 
 //-----------------------------------------------------------------------------
+// Cache the geometry on the server
 void vtkPVComparativeVis::StoreGeometry()
 {
-  cout << "IN STORE GEOMETRY" << endl;
   vtkTimerLog::MarkStartEvent("Store Geometry");
   unsigned int prevSize = this->Internal->Caches.size();
   this->Internal->Caches.resize(prevSize+1);
   this->Internal->Displays.resize(prevSize+1);
   this->Internal->Bounds.resize(prevSize+1);
 
-  // Initialize bounds for this case
+  // Initialize bounds for this case. These bounds are
+  // later used in Show()
   this->Internal->Bounds[prevSize].resize(6);
   double* totBounds = 
     &this->Internal->Bounds[prevSize][0];
@@ -294,7 +343,6 @@ void vtkPVComparativeVis::StoreGeometry()
       iter->GetCurrentObject());
     if (pDisp && pDisp->GetVisibilityCM())
       {
-      cout << "Storing" << endl;
       // Geometry cache will make copies (shallow) of all geometry objects
       // and cache them.
       vtkSMProxyManager* proxM = vtkSMProxy::GetProxyManager();
@@ -307,6 +355,7 @@ void vtkPVComparativeVis::StoreGeometry()
       this->Internal->Caches[prevSize].push_back(proxy);
       proxy->Delete();
       
+      // Create the display and copy setting from original.
       vtkSMProxy* display = proxM->NewProxy("displays", pDisp->GetXMLName());
       if (display)
         {
@@ -336,6 +385,14 @@ void vtkPVComparativeVis::StoreGeometry()
 }
 
 //-----------------------------------------------------------------------------
+// Given a 1D index, compute one entry in the nD index vector. For example,
+// for 2 parameters with 2 values each:
+// 1D idx   param1 idx   param2 idx
+// ------  -----------   ----------
+//    0          0            0
+//    1          0            1
+//    2          1            0
+//    3          1            1
 void vtkPVComparativeVis::ComputeIndex(unsigned int paramIdx, unsigned int gidx)
 {
   unsigned int numParams = this->Internal->NumberOfPropertyValues.size();
@@ -366,6 +423,7 @@ void vtkPVComparativeVis::ComputeIndex(unsigned int paramIdx, unsigned int gidx)
 }
 
 //-----------------------------------------------------------------------------
+// Compute all nD indices
 void vtkPVComparativeVis::ComputeIndices(unsigned int gidx)
 {
   unsigned int numParams = this->Internal->NumberOfPropertyValues.size();
@@ -402,6 +460,7 @@ int vtkPVComparativeVis::Show()
     return 0;
     }
 
+  unsigned int numProps = this->Internal->NumberOfPropertyValues.size();
   if (this->Internal->NumberOfPropertyValues.size() < 1 ||
       this->Internal->NumberOfPropertyValues.size() > 2)
     {
@@ -410,12 +469,17 @@ int vtkPVComparativeVis::Show()
     return 0;
     }
 
+  // We need to get the size of the render server render window since
+  // that is the main display. The aspect ratio on the client might
+  // be different and the visualization might not look right there but
+  // there isn't much we can do about that.
   vtkSMProxyManager* proxM = vtkSMProxy::GetProxyManager();
   vtkSMRenderModuleProxy* ren =
     this->Application->GetRenderModuleProxy();
   int winSize[2];
   ren->GetServerRenderWindowSize(winSize);
 
+  // Compute the collective bounds (of all frames)
   double biggestBounds[6] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, 
                              VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
                              VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
@@ -427,7 +491,13 @@ int vtkPVComparativeVis::Show()
     this->AddBounds(bounds, biggestBounds);
     }
   int nx = this->Internal->NumberOfPropertyValues[0];
-  int ny = this->Internal->NumberOfPropertyValues[1];
+  int ny = 1;
+  if (numProps > 1)
+    {
+    ny = this->Internal->NumberOfPropertyValues[1];
+    }
+  // Compute a proper cell (frame) spacing based on the data
+  // bounds aspect ratio and window aspect ratio.
   double dataWidth = biggestBounds[1] - biggestBounds[0];
   double dataHeight = biggestBounds[3] - biggestBounds[2];
   double displayWidth = winSize[0] / (double)nx;
@@ -451,6 +521,7 @@ int vtkPVComparativeVis::Show()
       (biggestBounds[3]-biggestBounds[2])*cellSpacing[1]/dataHeight;
     }
   
+  // Use by the interactor
   this->MultiActorHelper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   vtkSMProxyProperty* actorsP = vtkSMProxyProperty::SafeDownCast(
@@ -462,7 +533,11 @@ int vtkPVComparativeVis::Show()
     vtkPVComparativeVisInternals::ProxiesType::iterator iter2 = 
       this->Internal->Displays[i].begin();
     double xPos = cellSpacing[0]*this->Internal->Indices[0];
-    double yPos = cellSpacing[1]*this->Internal->Indices[1]; 
+    double yPos = 0;
+    if (numProps > 1)
+      {
+      yPos = cellSpacing[1]*this->Internal->Indices[1];
+      }
 
     for(; iter2 != this->Internal->Displays[i].end(); iter2++)
       {
@@ -473,6 +548,9 @@ int vtkPVComparativeVis::Show()
         ren->GetProperty("Displays"));
       pp->AddProxy(vtkSMDisplayProxy::SafeDownCast(display));
 
+      // If showing the first time, set the position as well as the
+      // clipping planes of actors. Clipping planes simulate multiple
+      // renderer.
       if (this->InFirstShow)
         {
         actorsP->AddProxy(display->GetActorProxy());
@@ -564,6 +642,7 @@ int vtkPVComparativeVis::Show()
     this->InFirstShow = 0;
     }
 
+  // Place and focus the camera
   vtkSMDoubleVectorProperty* position = 
     vtkSMDoubleVectorProperty::SafeDownCast(
       ren->GetProperty("CameraPosition"));
@@ -591,6 +670,9 @@ int vtkPVComparativeVis::Show()
   totalBounds[5] = biggestBounds[5];
   ren->ResetCamera(totalBounds);
 
+  // To avoid warping and clipping plane issues, use parallel
+  // projection. This is not an optimal solution and should
+  // be fixed in long run.
   vtkSMDoubleVectorProperty* parallelScale = 
     vtkSMDoubleVectorProperty::SafeDownCast(
       ren->GetProperty("CameraParallelScale"));
@@ -606,6 +688,11 @@ int vtkPVComparativeVis::Show()
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVis::Hide()
 {
+  if (!this->Application)
+    {
+    return;
+    }
+
   vtkSMRenderModuleProxy* ren =
     this->Application->GetRenderModuleProxy();
   if (!ren)

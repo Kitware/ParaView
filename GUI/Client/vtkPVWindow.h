@@ -600,6 +600,8 @@ protected:
   vtkPVWindow();
   ~vtkPVWindow();
 
+  static const char* ComparativeVisMenuLabel;
+
   int OpenWithReader(const char *fileName, vtkPVReaderModule* reader);
   vtkPVReaderModule* InitializeRead(vtkPVReaderModule* proto, 
                                     const char *fileName);

@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.3");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -83,8 +83,8 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
   this->SourceMenuButton->SetParent(this);
   this->SourceMenuButton->Create(app, 0);
   this->SourceMenuButton->SetBalloonHelpString("Select a Source to animate.");
+  this->SourceMenuButton->SetButtonText("Unselected"); 
   
-
   this->PropertyLabel->SetParent(this);
   this->PropertyLabel->SetText("Property:");
   this->PropertyLabel->Create(app, 0);
@@ -93,6 +93,7 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
   this->PropertyMenuButton->Create(app, 0);
   this->PropertyMenuButton->SetBalloonHelpString(
     "Select a Property to animate for the choosen Source.");
+  this->PropertyMenuButton->SetButtonText("Unselected"); 
 
   if (!this->PackHorizontally)
     {
@@ -201,7 +202,7 @@ void vtkPVActiveTrackSelector::CleanupSource()
 {
   this->CleanupPropertiesMenu();
   this->CurrentSourceCueTree = 0;
-  this->SourceMenuButton->SetButtonText(""); 
+  this->SourceMenuButton->SetButtonText("Unselected"); 
 }
 
 //-----------------------------------------------------------------------------
@@ -245,7 +246,7 @@ void vtkPVActiveTrackSelector::CleanupPropertiesMenu()
 {
   this->PropertyMenuButton->GetMenu()->DeleteAllMenuItems();
   this->Internals->PropertyCues.clear();
-  this->PropertyMenuButton->SetButtonText("");
+  this->PropertyMenuButton->SetButtonText("Unselected");
 }
 
 //-----------------------------------------------------------------------------

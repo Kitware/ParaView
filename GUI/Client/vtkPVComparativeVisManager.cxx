@@ -20,27 +20,19 @@
 #include "vtkInteractorStyleTrackballMultiActor.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationCue.h"
-#include "vtkPVAnimationCueTree.h"
-#include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVComparativeVis.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVHorizontalAnimationInterface.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkRenderer.h"
-#include "vtkSMAnimationSceneProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSimpleDisplayProxy.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
@@ -48,11 +40,12 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.11");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.12");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
 
+// Private implementation
 struct vtkPVComparativeVisManagerInternals
 {
   vtkPVComparativeVisManagerInternals()
@@ -62,6 +55,8 @@ struct vtkPVComparativeVisManagerInternals
       this->InteractorStyle = 0;
     }
 
+  // These are used to store the state of the main window prior
+  // to Show(). This state is later restored after Hide().
   vtkstd::list<vtkSMSimpleDisplayProxy*> VisibleDisplayProxies;
   int MainPanelVisibility;
   int InteractorStyle;
@@ -83,7 +78,8 @@ vtkPVComparativeVisManager::vtkPVComparativeVisManager()
   this->Application = 0;
   this->Internal = new vtkPVComparativeVisManagerInternals;
   this->IStyle = 0;
-  this->CurrentVisualization = 0;
+  this->SelectedVisualizationName = 0;
+  this->CurrentlyDisplayedVisualization = 0;
 
   this->IStyle = 
     vtkInteractorStyleTrackballMultiActor::New();
@@ -98,7 +94,7 @@ vtkPVComparativeVisManager::~vtkPVComparativeVisManager()
     {
     this->IStyle->Delete();
     }
-  this->SetCurrentVisualization(0);
+  this->SetSelectedVisualizationName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,20 +128,42 @@ vtkPVComparativeVis* vtkPVComparativeVisManager::GetVisualization(
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVComparativeVisManager::GenerateVisualization(vtkPVComparativeVis* vis)
+{
+  if (!vis)
+    {
+    return;
+    }
+
+  this->Hide();
+  vis->Generate();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::AddVisualization(vtkPVComparativeVis* vis)
 {
+  if (!vis->GetName())
+    {
+    vtkErrorMacro("Cannot add visualization without a name!");
+    return;
+    }
   if (this->Application)
     {
     vis->SetApplication(this->Application);
     }
   this->Internal->Visualizations.push_back(vis);
+
+  if (!this->SelectedVisualizationName)
+    {
+    this->SetSelectedVisualizationName(vis->GetName());
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
 {
   vtkPVComparativeVis* curVis = 
-    this->GetVisualization(this->CurrentVisualization);
+    this->GetVisualization(this->SelectedVisualizationName);
   vtkPVComparativeVisManagerInternals::VisualizationsType::iterator iter = 
     this->Internal->Visualizations.begin();
   for(; iter != this->Internal->Visualizations.end(); iter++)
@@ -164,113 +182,145 @@ void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisManager::Show()
+int vtkPVComparativeVisManager::Show()
 {
   if (!this->Application)
     {
     vtkErrorMacro("Application is not set. Cannot show");
-    return;
+    return 0;
     }
 
   vtkPVComparativeVis* currentVis = this->GetVisualization(
-    this->CurrentVisualization);
+    this->SelectedVisualizationName);
   if (!currentVis)
     {
     vtkErrorMacro("No current visualization defined. Cannot switch to "
                   "comparative visualization mode.");
-    return;
+    return 0;
     }
 
-  this->IStyle->SetApplication(this->Application);
-
-  vtkPVWindow* window = this->Application->GetMainWindow();
-  window->SetInComparativeVis(1);
-  window->UpdateEnableState();
-
-  this->Internal->InteractorStyle = window->GetInteractorStyle();
-  window->SetInteractorStyle(vtkPVWindow::INTERACTOR_STYLE_2D);
-  window->GetInteractor()->SetInteractorStyle(this->IStyle);
-  this->Internal->CurrentPVSource = window->GetCurrentPVSource();
-  window->SetCurrentPVSource(0);
-  this->Internal->MainPanelVisibility = window->GetMainPanelVisibility();
-  window->SetMainPanelVisibility(0);
-
-  vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
-  int numToolbars = toolbars->GetNumberOfToolbars();
-  this->Internal->VisibleToolbars.clear();
-  int i;
-  for (i=0; i< numToolbars; i++)
+  if (currentVis == this->CurrentlyDisplayedVisualization)
     {
-    vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
-    if (toolbars->GetToolbarVisibility(toolbar))
-      {
-      this->Internal->VisibleToolbars.push_back(toolbar);
-      toolbars->SetToolbarVisibility(toolbar, 0);
-      }
+    return 1;
     }
 
-  toolbars = window->GetSecondaryToolbarSet();
-  numToolbars = toolbars->GetNumberOfToolbars();
-  for (i=0; i< numToolbars; i++)
+  if (!this->CurrentlyDisplayedVisualization)
     {
-    vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
-    if (toolbars->GetToolbarVisibility(toolbar))
+    this->IStyle->SetApplication(this->Application);
+    
+    vtkPVWindow* window = this->Application->GetMainWindow();
+    // Make sure the main window updates it's enable state based
+    // on InComparativeVis.
+    window->SetInComparativeVis(1);
+    window->UpdateEnableState();
+    
+    // Store the state and change it according to comparative vis
+    // requirements. During comparative vis mode, the user should
+    // not be able to change any visualization settings (create, modify,
+    // delete sources etc.)
+    this->Internal->InteractorStyle = window->GetInteractorStyle();
+    window->SetInteractorStyle(vtkPVWindow::INTERACTOR_STYLE_2D);
+    window->GetInteractor()->SetInteractorStyle(this->IStyle);
+    this->Internal->CurrentPVSource = window->GetCurrentPVSource();
+    window->SetCurrentPVSource(0);
+    this->Internal->MainPanelVisibility = window->GetMainPanelVisibility();
+    window->SetMainPanelVisibility(0);
+    
+    vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
+    int numToolbars = toolbars->GetNumberOfToolbars();
+    this->Internal->VisibleToolbars.clear();
+    int i;
+    for (i=0; i< numToolbars; i++)
       {
-      this->Internal->VisibleToolbars.push_back(toolbar);
-      toolbars->SetToolbarVisibility(toolbar, 0);
+      vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
+      if (toolbars->GetToolbarVisibility(toolbar))
+        {
+        this->Internal->VisibleToolbars.push_back(toolbar);
+        toolbars->SetToolbarVisibility(toolbar, 0);
+        }
       }
+    
+    toolbars = window->GetSecondaryToolbarSet();
+    numToolbars = toolbars->GetNumberOfToolbars();
+    for (i=0; i< numToolbars; i++)
+      {
+      vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
+      if (toolbars->GetToolbarVisibility(toolbar))
+        {
+        this->Internal->VisibleToolbars.push_back(toolbar);
+        toolbars->SetToolbarVisibility(toolbar, 0);
+        }
+      }
+    window->UpdateToolbarState();
+    
+    this->Internal->VisibleDisplayProxies.clear();
+    
+    // Hide all visible displays (to be restored after Hide())
+    vtkSMRenderModuleProxy* ren =
+      this->Application->GetRenderModuleProxy();
+    vtkCollection* displays = ren->GetDisplays();
+    vtkCollectionIterator* iter = displays->NewIterator();
+    for(iter->GoToFirstItem(); 
+        !iter->IsDoneWithTraversal(); 
+        iter->GoToNextItem())
+      {
+      vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
+        iter->GetCurrentObject());
+      if (pDisp && pDisp->GetVisibilityCM())
+        {
+        pDisp->SetVisibilityCM(0);
+        this->Internal->VisibleDisplayProxies.push_back(pDisp);
+        }
+      }
+    iter->Delete();
+    
+    // Store camera settings
+    vtkPVRenderView* mainView = this->Application->GetMainView();
+    vtkCamera* camera = 
+      this->Application->GetMainView()->GetRenderer()->GetActiveCamera();
+    camera->GetPosition(this->Internal->CameraPosition);
+    camera->GetFocalPoint(this->Internal->CameraFocalPoint);
+    camera->GetViewUp(this->Internal->CameraViewUp);
+    
+    vtkSMIntVectorProperty* parallelProj =
+      vtkSMIntVectorProperty::SafeDownCast(
+        ren->GetProperty("CameraParallelProjection"));
+    this->Internal->ParallelProjection = parallelProj->GetElement(0);
+    parallelProj->SetElements1(1);
+    
+    ren->UpdateVTKObjects();
+    
+    mainView->ForceRender();
+
+    // Make sure the render window size is updated (we hid the left panel)
+    this->Application->Script("update idletasks");
     }
-  window->UpdateToolbarState();
-
-  this->Internal->VisibleDisplayProxies.clear();
-
-  vtkSMRenderModuleProxy* ren =
-    this->Application->GetRenderModuleProxy();
-  vtkCollection* displays = ren->GetDisplays();
-  vtkCollectionIterator* iter = displays->NewIterator();
-  for(iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  else
     {
-    vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
-      iter->GetCurrentObject());
-    if (pDisp && pDisp->GetVisibilityCM())
-      {
-      pDisp->SetVisibilityCM(0);
-      this->Internal->VisibleDisplayProxies.push_back(pDisp);
-      }
+    this->CurrentlyDisplayedVisualization->Hide();
     }
-  iter->Delete();
 
-  vtkPVRenderView* mainView = this->Application->GetMainView();
-  vtkCamera* camera = 
-    this->Application->GetMainView()->GetRenderer()->GetActiveCamera();
-  camera->GetPosition(this->Internal->CameraPosition);
-  camera->GetFocalPoint(this->Internal->CameraFocalPoint);
-  camera->GetViewUp(this->Internal->CameraViewUp);
-
-  vtkSMIntVectorProperty* parallelProj =
-    vtkSMIntVectorProperty::SafeDownCast(
-      ren->GetProperty("CameraParallelProjection"));
-  this->Internal->ParallelProjection = parallelProj->GetElement(0);
-  parallelProj->SetElements1(1);
-
-  ren->UpdateVTKObjects();
-
-  mainView->ForceRender();
-
-  this->Application->Script("update idletasks");
-
+  int retVal = 1;
   vtkTimerLog::MarkStartEvent("Show Vis");
+  this->CurrentlyDisplayedVisualization = currentVis;
   if (!currentVis->Show())
     {
     this->Hide();
+    retVal = 0;
     }
   this->IStyle->SetHelperProxy(currentVis->GetMultiActorHelper());
   vtkTimerLog::MarkEndEvent("Show Vis");
+  return retVal;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::Hide()
 {
+  if (!this->CurrentlyDisplayedVisualization)
+    {
+    return;
+    }
+  // Restore state prior to Show()
   vtkPVWindow* window = this->Application->GetMainWindow();
   vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
   vtkstd::list<vtkKWToolbar*>::iterator iter = 
@@ -278,7 +328,7 @@ void vtkPVComparativeVisManager::Hide()
   for(; iter != this->Internal->VisibleToolbars.end(); iter++)
     {
     toolbars->SetToolbarVisibility(*iter, 1);
-    window->GetSecondaryToolbarSet()->SetToolbarVisibility(*iter, 1);;    
+    window->GetSecondaryToolbarSet()->SetToolbarVisibility(*iter, 1);
     }
   window->UpdateToolbarState();
 
@@ -322,7 +372,7 @@ void vtkPVComparativeVisManager::Hide()
     );
 
   vtkPVComparativeVis* currentVis = this->GetVisualization(
-    this->CurrentVisualization);
+    this->SelectedVisualizationName);
   if (currentVis)
     {
     currentVis->Hide();
@@ -334,6 +384,7 @@ void vtkPVComparativeVisManager::Hide()
     ren->ResetCameraClippingRange();
     }
 
+  this->CurrentlyDisplayedVisualization = 0;
   window->SetInComparativeVis(0);
   window->UpdateEnableState();
 }
@@ -342,7 +393,16 @@ void vtkPVComparativeVisManager::Hide()
 void vtkPVComparativeVisManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CurrentVisualization: " 
-     << (this->CurrentVisualization?this->CurrentVisualization:"(null)")
+  os << indent << "SelectedVisualizationName: " 
+     << (this->SelectedVisualizationName?this->SelectedVisualizationName:"(null)")
      << endl;
+  os << indent << "CurrentlyDisplayedVisualization: ";
+  if (this->CurrentlyDisplayedVisualization)
+    {
+    this->CurrentlyDisplayedVisualization->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

@@ -234,7 +234,7 @@ public:
   void SetAdvancedView(int advanced);
 
   // Description:
-  // Get's the cue tree for an animateable proxy registed with the proxyname.
+  // Gets the cue tree for an animateable proxy registed with the proxyname.
   vtkPVAnimationCueTree* GetAnimationCueTreeForProxy(const char* proxyname);
 
   // Description:

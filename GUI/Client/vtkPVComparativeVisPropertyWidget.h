@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkPVComparativeVisWidget.h
+  Module:    vtkPVComparativeVisPropertyWidget.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,15 +11,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVComparativeVisWidget -
+// .NAME vtkPVComparativeVisPropertyWidget - widget for setting up one parameter of comparative vis
 // .SECTION Description
+// This class describes a widget designed for setting up one property
+// (parameter) of a comparative visualization. It has a track editor
+// for choosing the property and an entry to enter the number of
+// parameter values.
+// .SECTION See Also
+// vtkPVComparativeVis
 
-#ifndef __vtkPVComparativeVisWidget_h
-#define __vtkPVComparativeVisWidget_h
+#ifndef __vtkPVComparativeVisPropertyWidget_h
+#define __vtkPVComparativeVisPropertyWidget_h
 
 #include "vtkKWWidget.h"
 
-class vtkKWEntry;
+class vtkKWEntryLabeled;
 class vtkPVActiveTrackSelector;
 class vtkPVAnimationCue;
 class vtkPVComparativeVis;
@@ -27,11 +33,11 @@ class vtkPVSimpleAnimationCue;
 class vtkPVTrackEditor;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkPVComparativeVisWidget : public vtkKWWidget
+class VTK_EXPORT vtkPVComparativeVisPropertyWidget : public vtkKWWidget
 {
 public:
-  static vtkPVComparativeVisWidget* New();
-  vtkTypeRevisionMacro(vtkPVComparativeVisWidget,vtkKWWidget);
+  static vtkPVComparativeVisPropertyWidget* New();
+  vtkTypeRevisionMacro(vtkPVComparativeVisPropertyWidget,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -44,7 +50,9 @@ public:
 
   // Description:
   // Copy the values of the given vis to the widget.
-  void CopyFromVisualization(vtkPVAnimationCue* cue);
+  void CopyFromVisualization(vtkPVAnimationCue* acue, 
+                             vtkPVSimpleAnimationCue* cue,
+                             unsigned int numValues);
 
   // Description:
   // Show the cue editor for the currently selected property in
@@ -53,17 +61,17 @@ public:
   void ShowCueEditor(vtkPVTrackEditor* ed);
 
 protected:
-  vtkPVComparativeVisWidget();
-  ~vtkPVComparativeVisWidget();
+  vtkPVComparativeVisPropertyWidget();
+  ~vtkPVComparativeVisPropertyWidget();
 
   vtkPVActiveTrackSelector* TrackSelector;
   vtkPVSimpleAnimationCue* LastCueEditor;
   vtkPVAnimationCue* LastCue;
-  vtkKWEntry* NumberOfFramesEntry;
+  vtkKWEntryLabeled* NumberOfFramesEntry;
 
 private:
-  vtkPVComparativeVisWidget(const vtkPVComparativeVisWidget&); // Not implemented
-  void operator=(const vtkPVComparativeVisWidget&); // Not implemented
+  vtkPVComparativeVisPropertyWidget(const vtkPVComparativeVisPropertyWidget&); // Not implemented
+  void operator=(const vtkPVComparativeVisPropertyWidget&); // Not implemented
 };
 
 #endif

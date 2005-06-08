@@ -37,7 +37,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.4");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.5");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -104,8 +104,6 @@ vtkPVTrackEditor::vtkPVTrackEditor()
   this->Observer = vtkPVTrackEditorObserver::New();
   this->Observer->SetTarget(this);
   this->ActiveKeyFrame = 0;
-
-  this->ShowKeyFrameLabel = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,18 +154,16 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", 
     this->KeyFramePropertiesFrame->GetWidgetName());
 
-  if (this->ShowKeyFrameLabel)
-    {
-    this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-    this->TitleLabelLabel->Create(app,"-relief flat");
-    this->TitleLabelLabel->SetText("Current Track:");
+  this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->TitleLabelLabel->Create(app,"-relief flat");
+  this->TitleLabelLabel->SetText("Current Track:");
+  
+  this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->TitleLabel->Create(app,"-relief flat");
+  vtkKWTkUtilities::ChangeFontWeightToBold(
+    this->GetApplication()->GetMainInterp(), 
+    this->TitleLabel->GetWidgetName());
 
-    this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-    this->TitleLabel->Create(app,"-relief flat");
-    vtkKWTkUtilities::ChangeFontWeightToBold(
-      this->GetApplication()->GetMainInterp(), 
-      this->TitleLabel->GetWidgetName());
-    }
 
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->PropertiesFrame->Create(app, 0);
@@ -217,16 +213,14 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
   this->DeleteKeyFrameButton->SetText("Delete KeyFrame");
   this->DeleteKeyFrameButton->SetCommand(this, "DeleteKeyFrameButtonCallback");
 
-  if (this->ShowKeyFrameLabel)
-    {
-    this->SelectKeyFrameLabel->SetParent(
-      this->KeyFramePropertiesFrame->GetFrame());
-    this->SelectKeyFrameLabel->SetText(
-      "Select or Add a key frame in the Animation Tracks "
-      "window to show its properties.");
-
-    this->SelectKeyFrameLabel->Create(app, "-justify left");
-    }
+  this->SelectKeyFrameLabel->SetParent(
+    this->KeyFramePropertiesFrame->GetFrame());
+  this->SelectKeyFrameLabel->SetText("No source selected.");
+  
+  
+  this->SelectKeyFrameLabel->Create(app, "-justify left");
+  this->Script("grid %s - -row 1 -sticky ew", 
+               this->SelectKeyFrameLabel->GetWidgetName());
 
   this->Script("grid %s - - -row 0 -sticky ew", 
                this->IndexScale->GetWidgetName());
@@ -284,6 +278,20 @@ void vtkPVTrackEditor::SetAnimationCue(vtkPVSimpleAnimationCue* cue)
     {
     return;
     }
+
+  if (!cue)
+    {
+    this->SelectKeyFrameLabel->SetText("No source selected.");
+    }
+  else if (cue->GetVirtual())
+    {
+    this->SelectKeyFrameLabel->SetText("No property selected.");
+    }
+  else
+    {
+    this->SelectKeyFrameLabel->SetText("");
+    }
+
   if (this->SimpleAnimationCue)
     {
     this->SimpleAnimationCue->RemoveObservers(vtkPVSimpleAnimationCue::SelectionChangedEvent,
@@ -367,10 +375,7 @@ void vtkPVTrackEditor::SetActiveKeyFrame(vtkPVKeyFrame* keyframe)
 
   if (this->ActiveKeyFrame)
     {
-    if (this->ShowKeyFrameLabel)
-      {
-      this->Script("grid forget %s", this->SelectKeyFrameLabel->GetWidgetName());
-      }
+    this->Script("grid forget %s", this->SelectKeyFrameLabel->GetWidgetName());
     this->Script("grid %s - -row 1 -sticky ew", 
                  this->PropertiesFrame->GetWidgetName());
     this->Script("grid %s -columnspan 3 -row 1 -sticky ew",
@@ -378,11 +383,8 @@ void vtkPVTrackEditor::SetActiveKeyFrame(vtkPVKeyFrame* keyframe)
     }
   else
     {
-    if (this->ShowKeyFrameLabel)
-      {
-      this->Script("grid %s - -row 1 -sticky ew", 
-                   this->SelectKeyFrameLabel->GetWidgetName());
-      }
+    this->Script("grid %s - -row 1 -sticky ew", 
+                 this->SelectKeyFrameLabel->GetWidgetName());
     }
 }
 
@@ -442,24 +444,6 @@ void vtkPVTrackEditor::SetKeyFrameIndex(int val)
 //-----------------------------------------------------------------------------
 void vtkPVTrackEditor::Update()
 {
-  if (this->ShowKeyFrameLabel)
-    {
-
-    // This wierd stuff is needed as otherwise if the Animation Interaface
-    // hasn't been packed even once, Tcl would get stuck adjusting the
-    // wraplenth.
-    if (!this->IsPacked() && 
-        this->SelectKeyFrameLabel->GetAdjustWrapLengthToWidth())
-      {
-      this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOff();
-      }
-    else if (this->IsPacked() && 
-             !this->SelectKeyFrameLabel->GetAdjustWrapLengthToWidth())
-      {
-      this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
-      }
-    }
-
   int id = -1;
   if (!this->SimpleAnimationCue || this->SimpleAnimationCue->GetVirtual()
     || (id = this->SimpleAnimationCue->GetSelectedKeyFrameIndex()) == -1)
@@ -478,22 +462,16 @@ void vtkPVTrackEditor::Update()
 
   if (this->SimpleAnimationCue == NULL)
     {
-    if (this->ShowKeyFrameLabel)
-      {
-      this->Script("grid forget %s", this->TitleLabel->GetWidgetName());
-      this->Script("grid forget %s", this->TitleLabelLabel->GetWidgetName());
-      }
+    this->Script("grid forget %s", this->TitleLabel->GetWidgetName());
+    this->Script("grid forget %s", this->TitleLabelLabel->GetWidgetName());
     this->SetAddDeleteButtonVisibility(0);
     }
   else
 
     {
-    if (this->ShowKeyFrameLabel)
-      {
-      this->Script("grid %s %s -row 0 -sticky w", 
-                   this->TitleLabelLabel->GetWidgetName(),
-                   this->TitleLabel->GetWidgetName());
-      }
+    this->Script("grid %s %s -row 0 -sticky w", 
+                 this->TitleLabelLabel->GetWidgetName(),
+                 this->TitleLabel->GetWidgetName());
     this->SetAddDeleteButtonVisibility(!this->SimpleAnimationCue->GetVirtual());
 
     }
@@ -612,5 +590,5 @@ void vtkPVTrackEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PropertiesFrame: " << this->PropertiesFrame << endl;
-  os << indent << "ShowKeyFrameLabel: " << this->ShowKeyFrameLabel << endl;
+  os << indent << "TitleLabel: " << this->TitleLabel << endl;
 }

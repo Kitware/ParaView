@@ -13,6 +13,8 @@
 =========================================================================*/
 #include "vtkPVComparativeVisManagerGUI.h"
 
+#include "vtkKWFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
@@ -25,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.3");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.4");
 
 int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -37,23 +39,43 @@ vtkPVComparativeVisManagerGUI::vtkPVComparativeVisManagerGUI()
 
   this->Manager = vtkPVComparativeVisManager::New();
 
+  this->MainFrame = vtkKWFrame::New();
+
+  this->ListFrame = vtkKWFrameLabeled::New();
   this->ComparativeVisList = vtkKWListBox::New();
-  this->AddButton = vtkKWPushButton::New();
+
+  this->CommandFrame = vtkKWFrame::New();
+  this->CreateButton = vtkKWPushButton::New();
   this->EditButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
   this->ShowButton = vtkKWPushButton::New();
   this->HideButton = vtkKWPushButton::New();
+  this->CloseButton = vtkKWPushButton::New();
+
+  this->EditDialog = vtkPVComparativeVisDialog::New();
+
+  this->InShow = 0;
+  this->VisSelected = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisManagerGUI::~vtkPVComparativeVisManagerGUI()
 {
+  this->MainFrame->Delete();
+
+  this->ListFrame->Delete();
   this->ComparativeVisList->Delete();
-  this->AddButton->Delete();
+
+  this->CommandFrame->Delete();
+  this->CreateButton->Delete();
   this->EditButton->Delete();
   this->DeleteButton->Delete();
   this->ShowButton->Delete();
   this->HideButton->Delete();
+
+  this->CloseButton->Delete();
+
+  this->EditDialog->Delete();
 
   this->Manager->Delete();
 }
@@ -73,46 +95,94 @@ void vtkPVComparativeVisManagerGUI::Create(
   // Call the superclass to create the whole widget
   this->Superclass::Create(app, args);
 
-  this->ComparativeVisList->SetParent(this);
+  this->MainFrame->SetParent(this);
+  this->MainFrame->Create(app, "");
+  this->Script("pack %s -padx 5 -pady 5 -expand t -fill both", 
+               this->MainFrame->GetWidgetName());
+
+  this->ListFrame->SetParent(this->MainFrame);
+  this->ListFrame->Create(app, "");
+  this->ListFrame->SetLabelText("Current Visualizations");
+  this->Script("pack %s -side top -expand t -fill both", 
+               this->ListFrame->GetWidgetName());
+
+  this->ComparativeVisList->SetParent(this->ListFrame->GetFrame());
   this->ComparativeVisList->Create(app, "");
-  this->Script("pack %s", this->ComparativeVisList->GetWidgetName());
+  this->Script("pack %s -side top -pady 5 -expand t -fill both", 
+               this->ComparativeVisList->GetWidgetName());
 
-  this->AddButton->SetParent(this);
-  this->AddButton->SetBalloonHelpString("Add a visualization.");
-  this->AddButton->Create(app, "");
-  this->AddButton->SetCommand(this, "AddVisualization");
-  this->AddButton->SetText("Add");
-  this->Script("pack %s", this->AddButton->GetWidgetName());
+  this->ComparativeVisList->SetDoubleClickCallback(this, "ShowVisualization");
+  this->ComparativeVisList->SetSingleClickCallback(this, "ItemSelected");
 
-  this->EditButton->SetParent(this);
-  this->EditButton->SetBalloonHelpString("Edit a visualization.");
-  this->EditButton->Create(app, "");
-  this->EditButton->SetCommand(this, "EditVisualization");
-  this->EditButton->SetText("Edit");
-  this->Script("pack %s", this->EditButton->GetWidgetName());
+  this->CommandFrame->SetParent(this->MainFrame);
+  this->CommandFrame->Create(app, "");
+  this->Script("pack %s -side top -pady 5 -expand t -fill x", 
+               this->CommandFrame->GetWidgetName());
 
-  this->DeleteButton->SetParent(this);
-  this->DeleteButton->SetBalloonHelpString("Delete a visualization.");
+  this->CreateButton->SetParent(this->CommandFrame);
+  this->CreateButton->SetBalloonHelpString("Create a visualization");
+  this->CreateButton->Create(app, "");
+  this->CreateButton->SetWidth(7);
+  this->CreateButton->SetCommand(this, "AddVisualization");
+  this->CreateButton->SetText("Create");
+  this->Script("pack %s -side left -padx 2", this->CreateButton->GetWidgetName());
+
+  this->DeleteButton->SetParent(this->CommandFrame);
+  this->DeleteButton->SetBalloonHelpString("Delete a visualization");
   this->DeleteButton->Create(app, "");
+  this->DeleteButton->SetWidth(7);
   this->DeleteButton->SetCommand(this, "DeleteVisualization");
   this->DeleteButton->SetText("Delete");
-  this->Script("pack %s", this->DeleteButton->GetWidgetName());
+  this->Script("pack %s  -side left -padx 2", 
+               this->DeleteButton->GetWidgetName());
 
-  this->ShowButton->SetParent(this);
-  this->ShowButton->SetBalloonHelpString("Show a visualization.");
+  this->EditButton->SetParent(this->CommandFrame);
+  this->EditButton->SetBalloonHelpString("Edit a visualization");
+  this->EditButton->Create(app, "");
+  this->EditButton->SetWidth(7);
+  this->EditButton->SetCommand(this, "EditVisualization");
+  this->EditButton->SetText("Edit");
+  this->Script("pack %s -side left -padx 2", this->EditButton->GetWidgetName());
+
+  this->ShowButton->SetParent(this->CommandFrame);
+  this->ShowButton->SetBalloonHelpString("Show a visualization");
   this->ShowButton->Create(app, "");
+  this->ShowButton->SetWidth(7);
   this->ShowButton->SetCommand(this, "ShowVisualization");
   this->ShowButton->SetText("Show");
-  this->Script("pack %s", this->ShowButton->GetWidgetName());
+  this->Script("pack %s -side left -padx 2", this->ShowButton->GetWidgetName());
 
-  this->HideButton->SetParent(this);
-  this->HideButton->SetBalloonHelpString("Hide a visualization.");
+  this->HideButton->SetParent(this->CommandFrame);
+  this->HideButton->SetBalloonHelpString("Hide a visualization");
   this->HideButton->Create(app, "");
+  this->HideButton->SetWidth(7);
   this->HideButton->SetCommand(this, "HideVisualization");
   this->HideButton->SetText("Hide");
-  this->Script("pack %s", this->HideButton->GetWidgetName());
+  this->Script("pack %s -side left -padx 2", this->HideButton->GetWidgetName());
 
-  this->Manager->SetApplication(vtkPVApplication::SafeDownCast(app));
+  this->CloseButton->SetParent(this->MainFrame);
+  this->CloseButton->SetBalloonHelpString("Close the visualization dialog");
+  this->CloseButton->Create(app, "");
+  this->CloseButton->SetCommand(this, "Withdraw");
+  this->CloseButton->SetText("Close");
+  this->Script("pack %s -side top -expand t -fill x", 
+               this->CloseButton->GetWidgetName());
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  this->Manager->SetApplication(pvApp);
+
+  this->EditDialog->Create(app, "");
+  this->EditDialog->SetMasterWindow(pvApp->GetMainWindow());
+  this->EditDialog->SetTitle("Edit visualization");
+
+  this->SetResizable(0, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisManagerGUI::ItemSelected()
+{
+  this->VisSelected = 1;
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -124,24 +194,22 @@ void vtkPVComparativeVisManagerGUI::PrepareForDelete()
 //----------------------------------------------------------------------------
 void vtkPVComparativeVisManagerGUI::AddVisualization()
 {
-  vtkPVComparativeVisDialog* mydialog = vtkPVComparativeVisDialog::New();
-  mydialog->InitializeToDefault();
-  mydialog->Create(this->GetApplication(), 0);
-  mydialog->SetMasterWindow(this);
-  mydialog->SetTitle("Add a visualization");
+  this->EditDialog->InitializeToDefault();
 
-  if (mydialog->Invoke()) 
+  if (this->EditDialog->Invoke()) 
     {
     vtkPVComparativeVis* vis = vtkPVComparativeVis::New();
-    vis->SetName("My first vis");
-    mydialog->CopyToVisualization(vis);
+    this->EditDialog->CopyToVisualization(vis);
     
     this->Manager->AddVisualization(vis);
+    if (vis->GetName() && vis->GetName()[0] != '\0')
+      {
+      this->Manager->SetSelectedVisualizationName(vis->GetName());
+      }
+
     vis->Delete();
     this->Update();
     }
-  
-  mydialog->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -153,20 +221,17 @@ void vtkPVComparativeVisManagerGUI::EditVisualization()
     vtkPVComparativeVis* vis = this->Manager->GetVisualization(cur);
     if (vis)
       {
-      vtkPVComparativeVisDialog* mydialog = vtkPVComparativeVisDialog::New();
-      mydialog->InitializeFromVisualization(vis);
-      mydialog->Create(this->GetApplication(), 0);
-      mydialog->SetMasterWindow(this);
-      mydialog->SetTitle("Edit visualization");
-      mydialog->CopyFromVisualization(vis);
+      this->EditDialog->CopyFromVisualization(vis);
 
-      if (mydialog->Invoke()) 
+      if (this->EditDialog->Invoke()) 
         {
-        mydialog->CopyToVisualization(vis);
+        this->EditDialog->CopyToVisualization(vis);
+        if (vis->GetName() && vis->GetName()[0] != '\0')
+          {
+          this->Manager->SetSelectedVisualizationName(vis->GetName());
+          }
         this->Update();
         }
-  
-      mydialog->Delete();
       }
     }
 }
@@ -177,6 +242,10 @@ void vtkPVComparativeVisManagerGUI::DeleteVisualization()
   if (this->ComparativeVisList->GetSelection())
     {
     this->Manager->RemoveVisualization(this->ComparativeVisList->GetSelection());
+    if (!this->Manager->GetCurrentlyDisplayedVisualization())
+      {
+      this->InShow = 0;
+      }
     this->Update();
     }
 }
@@ -198,11 +267,15 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
           app->GetMainWindow()->GetAnimationManager();
         int prevStat = aMan->GetCacheGeometry();
         aMan->SetCacheGeometry(0);
-        vis->Generate();
+        this->Manager->GenerateVisualization(vis);
         aMan->SetCacheGeometry(prevStat);
         }
-      this->Manager->SetCurrentVisualization(cur);
-      this->Manager->Show();
+      this->Manager->SetSelectedVisualizationName(cur);
+      if (this->Manager->Show())
+        {
+        this->InShow = 1;
+        }
+      this->Update();
       }
     }  
 }
@@ -211,6 +284,8 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
 void vtkPVComparativeVisManagerGUI::HideVisualization()
 {
   this->Manager->Hide();
+  this->InShow = 0;
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -218,11 +293,85 @@ void vtkPVComparativeVisManagerGUI::Update()
 {
   this->ComparativeVisList->DeleteAll();
 
+  int idx=-1;
+  // Add all the visualizations to the list
   unsigned int numVis = this->Manager->GetNumberOfVisualizations();
   for (unsigned int i=0; i<numVis; i++)
     {
     vtkPVComparativeVis* vis = this->Manager->GetVisualization(i);
-    this->ComparativeVisList->AppendUnique(vis->GetName());
+    const char* name = vis->GetName();
+    if (name && name[0] != '\0')
+      {
+      this->ComparativeVisList->AppendUnique(name);
+      if (this->Manager->GetSelectedVisualizationName() &&
+          strcmp(this->Manager->GetSelectedVisualizationName(), name) == 0)
+        {
+        idx = i;
+        }
+      }
+    }
+
+  // Select the current vis.
+  if (idx >= 0)
+    {
+    this->ComparativeVisList->SetSelectionIndex(idx);
+    this->VisSelected = 1;
+    }
+  else if (this->ComparativeVisList->GetNumberOfItems() > 0)
+    {
+    this->ComparativeVisList->SetSelectionIndex(0);
+    }
+  else
+    {
+    this->VisSelected = 0;
+    }
+
+  this->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+// This takes care enabling/disabling buttons
+void vtkPVComparativeVisManagerGUI::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ComparativeVisList);
+  this->PropagateEnableState(this->CreateButton);
+  this->PropagateEnableState(this->EditButton);
+  this->PropagateEnableState(this->DeleteButton);
+  this->PropagateEnableState(this->ShowButton);
+  this->PropagateEnableState(this->HideButton);
+  this->PropagateEnableState(this->CloseButton);
+
+  if (this->GetEnabled())
+    {
+    if (!this->InShow)
+      {
+      this->HideButton->SetEnabled(0);
+      this->CreateButton->SetEnabled(1);
+      }
+    else
+      {
+      this->HideButton->SetEnabled(1);
+      this->CreateButton->SetEnabled(0);
+      }
+    if (this->ComparativeVisList->GetNumberOfItems() < 1 ||
+        !this->VisSelected)
+      {
+      this->EditButton->SetEnabled(0);
+      this->ShowButton->SetEnabled(0);
+      this->DeleteButton->SetEnabled(0);
+      }
+    else
+      {
+      this->EditButton->SetEnabled(1);
+      this->ShowButton->SetEnabled(1);
+      this->DeleteButton->SetEnabled(1);
+      }
+    if (this->InShow)
+      {
+      this->EditButton->SetEnabled(0);
+      }
     }
 }
 

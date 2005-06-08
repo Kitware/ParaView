@@ -12,8 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkInteractorStyleTrackballMultiActor -
+// .NAME vtkInteractorStyleTrackballMultiActor - transform multiple actors
 // .SECTION Description 
+// vtkInteractorStyleTrackballMultiActor transforms multiple actors based
+// on the user interaction. This is a paraview server/client aware
+// interactor. Instead of directly calling method on the actors, it
+// sets the property values of a helper proxy. The server side object
+// the proxy represents (vtkMultiActorHelper) is responsible of actually
+// applying the transform to the actors.
 
 #ifndef __vtkInteractorStyleTrackballMultiActor_h
 #define __vtkInteractorStyleTrackballMultiActor_h
@@ -29,6 +35,8 @@ public:
   static vtkInteractorStyleTrackballMultiActor *New();
   vtkTypeRevisionMacro(vtkInteractorStyleTrackballMultiActor,vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  virtual void OnChar() {};
 
   // Description:
   // Event bindings controlling the effects of pressing mouse buttons
@@ -46,14 +54,8 @@ public:
   // they might be called from OnTimer, they do not have mouse coord parameters
   // (use interactor's GetEventPosition and GetLastEventPosition)
   virtual void Rotate();
-  virtual void Spin();
   virtual void Pan();
-  virtual void Dolly();
   virtual void UniformScale();
-
-  vtkSetMacro(UseObjectCenter, int);
-  vtkGetMacro(UseObjectCenter, int);
-  vtkBooleanMacro(UseObjectCenter, int);
 
   // Description:
   // In order to make calls on the application, we need a pointer to
@@ -62,6 +64,8 @@ public:
   vtkGetObjectMacro(Application, vtkPVApplication);
 
   // Description:
+  // The helper proxy represents the server side objects
+  // that is responsible of eventually transforming the actors.
   void SetHelperProxy(vtkSMProxy* HelperProxy);
   vtkGetObjectMacro(HelperProxy, vtkSMProxy);
 
@@ -69,11 +73,6 @@ protected:
   vtkInteractorStyleTrackballMultiActor();
   ~vtkInteractorStyleTrackballMultiActor();
 
-  void Prop3DTransform(vtkProp3D *prop3D,
-                       int NumRotation,
-                       double **rotate,
-                       double *scale);
-  
   double MotionFactor;
   int UseObjectCenter;
 

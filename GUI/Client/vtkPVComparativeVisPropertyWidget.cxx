@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Module:    vtkPVComparativeVisWidget.cxx
+Module:    vtkPVComparativeVisPropertyWidget.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -12,11 +12,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#include "vtkPVComparativeVisWidget.h"
+#include "vtkPVComparativeVisPropertyWidget.h"
 
 #include "vtkEventForwarderCommand.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVActiveTrackSelector.h"
@@ -30,20 +32,21 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMAnimationCueProxy.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkPVComparativeVisWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisWidget, "1.2");
+vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.1");
 
-int vtkPVComparativeVisWidgetCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVComparativeVisPropertyWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVComparativeVisWidget::vtkPVComparativeVisWidget()
+vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
 {
-  this->CommandFunction = vtkPVComparativeVisWidgetCommand;
+  this->CommandFunction = vtkPVComparativeVisPropertyWidgetCommand;
 
   this->TrackSelector = vtkPVActiveTrackSelector::New();
-  this->NumberOfFramesEntry = vtkKWEntry::New();
+  this->NumberOfFramesEntry = vtkKWEntryLabeled::New();
 
+  // Forward the WidgetModifiedEvent the track editor signals.
   vtkEventForwarderCommand* ef = vtkEventForwarderCommand::New();
   ef->SetTarget(this);
   this->TrackSelector->AddObserver(vtkCommand::WidgetModifiedEvent, ef);
@@ -54,7 +57,7 @@ vtkPVComparativeVisWidget::vtkPVComparativeVisWidget()
 }
 
 //----------------------------------------------------------------------------
-vtkPVComparativeVisWidget::~vtkPVComparativeVisWidget()
+vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 {
   this->TrackSelector->Delete();
   this->NumberOfFramesEntry->Delete();
@@ -65,7 +68,8 @@ vtkPVComparativeVisWidget::~vtkPVComparativeVisWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisWidget::Create(vtkKWApplication *app, const char *)
+void vtkPVComparativeVisPropertyWidget::Create(
+  vtkKWApplication *app, const char *)
 {
   if (!this->Superclass::Create(app, "frame", NULL))
     {
@@ -88,38 +92,52 @@ void vtkPVComparativeVisWidget::Create(vtkKWApplication *app, const char *)
 
   this->NumberOfFramesEntry->SetParent(this);
   this->NumberOfFramesEntry->Create(app, "");
-  this->NumberOfFramesEntry->SetValue(5);
-  this->Script("pack %s -side left", this->NumberOfFramesEntry->GetWidgetName());
+  this->NumberOfFramesEntry->GetWidget()->SetValue(5);
+  this->NumberOfFramesEntry->GetWidget()->SetWidth(3);
+  this->NumberOfFramesEntry->SetLabelText("Number of Frames:");;
+  this->Script("pack %s -side left", 
+               this->NumberOfFramesEntry->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisWidget::CopyToVisualization(vtkPVComparativeVis* cv)
+void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
+  vtkPVComparativeVis* cv)
 {
   if (this->LastCueEditor)
     {
     int numFrames = 1;
-    if (this->NumberOfFramesEntry->GetValueAsInt() > 0)
+    int value = this->NumberOfFramesEntry->GetWidget()->GetValueAsInt();
+    if (value > 0)
       {
-      numFrames = this->NumberOfFramesEntry->GetValueAsInt();
+      numFrames = value;
       }
     this->LastCueEditor->SetDuration(numFrames);
     cv->AddProperty(
-      this->LastCue, this->LastCueEditor->GetCueProxy(), numFrames);  
+      this->LastCue, this->LastCueEditor, numFrames);  
     }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisWidget::CopyFromVisualization(vtkPVAnimationCue* cue)
+void vtkPVComparativeVisPropertyWidget::CopyFromVisualization(
+  vtkPVAnimationCue* acue, vtkPVSimpleAnimationCue* cue, unsigned int numValues)
 {
-  this->TrackSelector->SelectCue(cue);
+  this->TrackSelector->SelectCue(acue);
+  this->LastCue = acue;
+  this->LastCueEditor = cue;
+  cue->Register(this);
+  this->NumberOfFramesEntry->GetWidget()->SetValue(static_cast<int>(numValues));
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
+void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
 {
   vtkPVAnimationCue* selectedCue = this->TrackSelector->GetCurrentCue();
   if (selectedCue)
     {
+    // Store the cue selected by the track selector. This cue is actually
+    // the one in the ParaView animation track list. Therefore, we also
+    // make a copy and use that in the comparative vis. This is so because
+    // we do not want to modify a cue in the ParaView animation editor.
     if (this->LastCue != selectedCue || !this->LastCueEditor)
       {
       if (this->LastCueEditor)
@@ -142,14 +160,20 @@ void vtkPVComparativeVisWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
       this->LastCueEditor->SetAnimatedElement(
         this->LastCue->GetAnimatedElement());
 
-      this->LastCueEditor->AppendNewKeyFrame();
+      // Create 2 default keyframes.
+      this->LastCueEditor->AppendNewKeyFrame();      
       }
     trackE->SetAnimationCue(this->LastCueEditor);
+    trackE->GetTitleLabel()->SetText(selectedCue->GetTextRepresentation());
+    }
+  else
+    {
+    trackE->SetAnimationCue(0);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeVisWidget::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVComparativeVisPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

@@ -11,16 +11,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVComparativeVisManagerGUI -
+// .NAME vtkPVComparativeVisManagerGUI - user interface to vtkPVComparativeVisManager
 // .SECTION Description
+// vtkPVComparativeVisManagerGUI provides user interface to 
+// vtkPVComparativeVisManager. It does not store state but uses
+// vtkPVComparativeVisManager as state data.
 
 #ifndef __vtkPVComparativeVisManagerGUI_h
 #define __vtkPVComparativeVisManagerGUI_h
 
 #include "vtkKWTopLevel.h"
 
+class vtkKWFrame;
+class vtkKWFrameLabeled;
 class vtkKWListBox;
 class vtkKWPushButton;
+class vtkPVComparativeVisDialog;
 class vtkPVComparativeVisManager;
 
 class VTK_EXPORT vtkPVComparativeVisManagerGUI : public vtkKWTopLevel
@@ -67,19 +73,41 @@ public:
   // object that manager the comparative visualizations.
   vtkGetObjectMacro(Manager, vtkPVComparativeVisManager);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  virtual void UpdateEnableState();
+
+  // Description:
+  // Called by the list box when a visualization is selected.
+  void ItemSelected();
+
 protected:
   vtkPVComparativeVisManagerGUI();
   ~vtkPVComparativeVisManagerGUI();
 
+  vtkKWFrame* MainFrame;
+
+  // List of visualizations
+  vtkKWFrameLabeled* ListFrame;
   vtkKWListBox* ComparativeVisList;
 
-  vtkKWPushButton* AddButton;
+  // Buttons
+  vtkKWFrame* CommandFrame;
+  vtkKWPushButton* CreateButton;
   vtkKWPushButton* EditButton;
   vtkKWPushButton* DeleteButton;
   vtkKWPushButton* ShowButton;
   vtkKWPushButton* HideButton;
+  vtkKWPushButton* CloseButton;
 
+  // Popup dialog to edit a visualization
+  vtkPVComparativeVisDialog* EditDialog;
+
+  // Underlying data
   vtkPVComparativeVisManager* Manager;
+
+  int InShow;
+  int VisSelected;
 
 private:
   vtkPVComparativeVisManagerGUI(const vtkPVComparativeVisManagerGUI&); // Not implemented

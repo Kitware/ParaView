@@ -68,12 +68,6 @@ public:
   void SetKeyFrameType(int type);
 
   // Description:
-  // Determines whether the key frame label is shown or not. Should be
-  // set before Create().
-  vtkSetMacro(ShowKeyFrameLabel, int);
-  vtkGetMacro(ShowKeyFrameLabel, int);
-  vtkBooleanMacro(ShowKeyFrameLabel, int);
-
   // Callbacks
   void IndexChangedCallback();
   void AddKeyFrameButtonCallback();
@@ -83,7 +77,12 @@ public:
   // Updates the GUI.
   void Update();
 
+  // Description:
+  // Returns the label for the current track.
+  vtkGetObjectMacro(TitleLabel, vtkKWLabel);
+
   virtual void UpdateEnableState();
+
 protected:
   vtkPVTrackEditor();
   ~vtkPVTrackEditor();
@@ -105,8 +104,6 @@ protected:
   vtkKWScale* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
  
-  int ShowKeyFrameLabel;
-
   int InterpolationValid; 
   // flag indicating if the Interpolation should be enabled for the
   // current key frame. It is disabled for the last key frame.

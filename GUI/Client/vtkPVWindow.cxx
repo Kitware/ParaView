@@ -135,10 +135,12 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.728");
+vtkCxxRevisionMacro(vtkPVWindow, "1.729");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
+
+const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
@@ -833,27 +835,31 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->GetWindowMenu()->AddSeparator();
 
   this->GetWindowMenu()->InsertCommand(
-    4, "Command Prompt", this,
-    "DisplayTclInteractor", 8,
+    4, "Command Prompt", 
+    this, "DisplayTclInteractor", 
+    8,
     "Display a prompt to interact with the ParaView engine");
 
   // Log stuff (not traced)
   this->GetWindowMenu()->InsertCommand(
-    5, "Timer Log", this, 
-    "ShowTimerLog", 2, 
+    5, "Timer Log", 
+    this, "ShowTimerLog", 
+    2, 
     "Show log of render events and timing");
               
   // Log stuff (not traced)
   this->GetWindowMenu()->InsertCommand(
-    5, "Error Log", this, 
-    "ShowErrorLog", 2, 
+    5, "Error Log", 
+    this, "ShowErrorLog", 
+    2, 
     "Show log of all errors and warnings");
 
   // Comparative vis manager
-//   this->GetWindowMenu()->InsertCommand(
-//     6, "Comparative Vis. Manager", this, 
-//     "ShowComparativeVisManager", 0, 
-//     "Show comparative visualization manager");
+  this->GetWindowMenu()->InsertCommand(
+    6, vtkPVWindow::ComparativeVisMenuLabel, 
+    this, "ShowComparativeVisManager", 
+    0, 
+    "Show comparative visualization manager");
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   // Display Lookmark Manager
@@ -904,23 +910,28 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   int state = 0;
   if (app->GetRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 0))
     {
-    state = app->GetIntRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation");
+    state = app->GetIntRegistryValue(
+      2, "RunTime", "ResetViewResetsCenterOfRotation");
     }
-  this->ResetCameraButton->AddCheckButton("Reset Center Of Rotation", "CenterOfRotation", state,
-                                          "Button sets the center opf rotation to center of visible modules.");
+  this->ResetCameraButton->AddCheckButton(
+    "Reset Center Of Rotation", "CenterOfRotation", state,
+    "Button sets the center opf rotation to center of visible modules.");
   state = 0;
   if (app->GetRegistryValue(2, "RunTime", "ResetViewResetsViewAngle", 0))
     {
     state = app->GetIntRegistryValue(2, "RunTime", "ResetViewResetsViewAngle");
     }
-  this->ResetCameraButton->AddCheckButton("Reset View Angle", "ViewAngle", state,
-                                          "Button sets the view plane normal to the default z axis.");
+  this->ResetCameraButton->AddCheckButton(
+    "Reset View Angle", "ViewAngle", state,
+    "Button sets the view plane normal to the default z axis.");
   
   // Rotate camera interactor style
 
   this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->RotateCameraButton->Create(
-    app, "-indicatoron 0 -highlightthickness 0 -image PVRotateViewButton -selectimage PVRotateViewButtonActive");
+    app, 
+    "-indicatoron 0 -highlightthickness 0 -image PVRotateViewButton "
+    "-selectimage PVRotateViewButtonActive");
   this->RotateCameraButton->SetBalloonHelpString(
     "3D Movements Interaction Mode\nThis interaction mode can be configured "
     "from View->3D View Properties->Camera");
@@ -935,7 +946,9 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->TranslateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->TranslateCameraButton->Create(
-    app, "-indicatoron 0 -highlightthickness 0 -image PVTranslateViewButton -selectimage PVTranslateViewButtonActive");
+    app, 
+    "-indicatoron 0 -highlightthickness 0 -image PVTranslateViewButton "
+    "-selectimage PVTranslateViewButtonActive");
   this->TranslateCameraButton->SetBalloonHelpString(
     "2D Movements Interaction Mode\nThis mode can be used in conjunction with "
     "the Parallel Projection setting (View->3D View Properties->General) to "
@@ -1238,9 +1251,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Script("bind %s <Control-KeyPress-Return> {%s AcceptCurrentSource}",
                this->GetWidgetName(), 
                this->GetTclName());
-  this->Script("bind %s <Control-KeyPress-q> {%s Close}",
+  this->Script("bind %s <Control-KeyPress-q> {%s Exit}",
                this->GetWidgetName(), 
-               this->GetTclName());
+               app->GetTclName());
 
   if (pvApp->GetRegistryValue(2, "RunTime", "CenterActorVisibility", 0))
     {
@@ -3889,7 +3902,7 @@ void vtkPVWindow::CreateComparativeVisManagerGUI()
   if ( ! this->ComparativeVisManagerGUI )
     {
     this->ComparativeVisManagerGUI = vtkPVComparativeVisManagerGUI::New();
-    this->ComparativeVisManagerGUI->SetTitle("Comparative Vis");
+    this->ComparativeVisManagerGUI->SetTitle("Comparative Visualizations");
     this->ComparativeVisManagerGUI->SetMasterWindow(this);
     this->ComparativeVisManagerGUI->Create(this->GetPVApplication(), 0);
     }  
@@ -4806,30 +4819,26 @@ void vtkPVWindow::UpdateMenuState()
   int menu_state = 
     (this->GetEnabled() ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
 
-  int i;
-  int numWindowMItems = 0;
-
-  if (this->WindowMenu)
-    {
-    numWindowMItems = this->WindowMenu->GetNumberOfItems();
-    }
-
   if (this->InComparativeVis)
     {
     vtkKWMenu* menu = this->GetMenu();
-    int numItems = menu->GetNumberOfItems();
-    for (i=0; i<numItems; i++)
-      {
-      menu->SetState(i, vtkKWMenu::Disabled);
-      }
+    menu->SetState(vtkKWMenu::Disabled);
     this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
-    for (i=0; i<numWindowMItems; i++)
+    if (this->WindowMenu)
       {
-      this->WindowMenu->SetState(i, vtkKWMenu::Disabled);
-      }    
+      this->WindowMenu->SetState(vtkKWMenu::Disabled);
+      }
     this->WindowMenu->SetState("Command Prompt", menu_state);
     this->WindowMenu->SetState("Timer Log", menu_state);
     this->WindowMenu->SetState("Error Log", menu_state);
+    this->WindowMenu->SetState(vtkPVWindow::ComparativeVisMenuLabel, menu_state);
+
+    if (this->FileMenu)
+      {
+      this->GetMenu()->SetState(vtkKWWindowBase::FileMenuLabel,  menu_state);
+      this->FileMenu->SetState(vtkKWMenu::Disabled);
+      this->FileMenu->SetState(vtkPVWindow::FileExitMenuLabel, menu_state);
+      }
     return;
     }
 
@@ -4846,10 +4855,7 @@ void vtkPVWindow::UpdateMenuState()
   
   if (this->WindowMenu && !source_grabbed)
     {
-    for (i=0; i<numWindowMItems; i++)
-      {
-      this->WindowMenu->SetState(i, menu_state);
-      }    
+    this->WindowMenu->SetState(menu_state);
     }
 
   // Source grabbed or in recording ? Disable the root menu entries

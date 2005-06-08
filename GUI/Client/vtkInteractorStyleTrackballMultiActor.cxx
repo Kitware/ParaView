@@ -30,7 +30,7 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.4");
+vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.5");
 vtkStandardNewMacro(vtkInteractorStyleTrackballMultiActor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,Application,vtkPVApplication);
@@ -40,7 +40,6 @@ vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,HelperProxy,vtkSMProx
 vtkInteractorStyleTrackballMultiActor::vtkInteractorStyleTrackballMultiActor() 
 {
   this->MotionFactor    = 10.0;
-  this->UseObjectCenter = 0;
   this->Application = 0;
   this->HelperProxy = 0;
 }
@@ -69,12 +68,6 @@ void vtkInteractorStyleTrackballMultiActor::OnMouseMove()
     case VTKIS_PAN:
       this->FindPokedRenderer(x, y);
       this->Pan();
-      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
-      break;
-
-    case VTKIS_DOLLY:
-      this->FindPokedRenderer(x, y);
-      this->Dolly();
       this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
       break;
 
@@ -153,14 +146,7 @@ void vtkInteractorStyleTrackballMultiActor::OnMiddleButtonDown()
     return;
     }
 
-  if (this->Interactor->GetControlKey())
-    {
-    this->StartDolly();
-    }
-  else
-    {
-    this->StartPan();
-    }
+  this->StartPan();
 
   this->GetApplication()->GetMainWindow()->InteractiveRenderEnabledOn();
 }
@@ -170,10 +156,6 @@ void vtkInteractorStyleTrackballMultiActor::OnMiddleButtonUp()
 {
   switch (this->State) 
     {
-    case VTKIS_DOLLY:
-      this->EndDolly();
-      break;
-
     case VTKIS_PAN:
       this->EndPan();
       break;
@@ -288,11 +270,6 @@ void vtkInteractorStyleTrackballMultiActor::Rotate()
 }
   
 //----------------------------------------------------------------------------
-void vtkInteractorStyleTrackballMultiActor::Spin()
-{
-}
-
-//----------------------------------------------------------------------------
 void vtkInteractorStyleTrackballMultiActor::Pan()
 {
   if (this->CurrentRenderer == NULL)
@@ -336,11 +313,6 @@ void vtkInteractorStyleTrackballMultiActor::Pan()
 }
 
 //----------------------------------------------------------------------------
-void vtkInteractorStyleTrackballMultiActor::Dolly()
-{
-}
-
-//----------------------------------------------------------------------------
 void vtkInteractorStyleTrackballMultiActor::UniformScale()
 {
   if (this->CurrentRenderer == NULL)
@@ -380,74 +352,7 @@ void vtkInteractorStyleTrackballMultiActor::PrintSelf(ostream& os, vtkIndent ind
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Application: " << this->Application << endl;
-  os << indent << "UseObjectCenter: " << this->UseObjectCenter << endl;
   os << indent << "HelperProxy: " << this->HelperProxy << endl;
 }
 
-//----------------------------------------------------------------------------
-void vtkInteractorStyleTrackballMultiActor::Prop3DTransform(vtkProp3D *prop3D,
-                                                            int numRotation,
-                                                            double **rotate,
-                                                            double *scale)
-{
-  double *boxCenter = 0;
-  if (this->UseObjectCenter)
-    {
-    boxCenter = prop3D->GetCenter();
-    }
-  else
-    {
-    boxCenter = prop3D->GetOrigin();
-    }
-
-  vtkMatrix4x4 *oldMatrix = vtkMatrix4x4::New();
-  prop3D->GetMatrix(oldMatrix);
-  
-  double orig[3];
-  prop3D->GetOrigin(orig);
-  
-  vtkTransform *newTransform = vtkTransform::New();
-  newTransform->PostMultiply();
-  if (prop3D->GetUserMatrix() != NULL) 
-    {
-    newTransform->SetMatrix(prop3D->GetUserMatrix());
-    }
-  else 
-    {
-    newTransform->SetMatrix(oldMatrix);
-    }
-  
-  newTransform->Translate(-(boxCenter[0]), -(boxCenter[1]), -(boxCenter[2]));
-  
-  for (int i = 0; i < numRotation; i++) 
-    {
-    newTransform->RotateWXYZ(rotate[i][0], rotate[i][1],
-                             rotate[i][2], rotate[i][3]);
-    }
-  
-  if ((scale[0] * scale[1] * scale[2]) != 0.0) 
-    {
-    newTransform->Scale(scale[0], scale[1], scale[2]);
-    }
-  
-  newTransform->Translate(boxCenter[0], boxCenter[1], boxCenter[2]);
-  
-  // now try to get the composit of translate, rotate, and scale
-  newTransform->Translate(-(orig[0]), -(orig[1]), -(orig[2]));
-  newTransform->PreMultiply();
-  newTransform->Translate(orig[0], orig[1], orig[2]);
-  
-  if (prop3D->GetUserMatrix() != NULL) 
-    {
-    newTransform->GetMatrix(prop3D->GetUserMatrix());
-    }
-  else 
-    {
-    prop3D->SetPosition(newTransform->GetPosition());
-    prop3D->SetScale(newTransform->GetScale());
-    prop3D->SetOrientation(newTransform->GetOrientation());
-    }
-  oldMatrix->Delete();
-  newTransform->Delete();
-}
 
