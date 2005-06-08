@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.218");
+vtkCxxRevisionMacro(vtkKWApplication, "1.219");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -640,7 +640,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
     "catch {vtkKWSetApplicationIcon {} %d big}", IDI_KWWIDGETSICO);
   this->Script(
     "catch {vtkKWSetApplicationIcon {} %d small}", IDI_KWWIDGETSICOSMALL);
-#endif _WIN32
+#endif
 
   // Start the event loop
 
