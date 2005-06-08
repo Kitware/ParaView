@@ -78,8 +78,11 @@ SET(PROJECT_TESTS
   VolumeGroup
   XdmfRead
   XdmfReadImageData
+  XdmfReadImageDataCollection
   XdmfReadStructuredGrid
+  XdmfReadStructuredGridCollection
   XdmfReadRectilinearGrid
+  XdmfReadRectilinearGridCollection
 #  TestAnimationSaveLoad
   )
 
