@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.75");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.76");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -990,7 +990,8 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
   // Show the tab body
 
   ostrstream cmd;
-  cmd << "pack " << page->Frame->GetWidgetName() << " -fill both -anchor n" 
+  cmd << "pack " << page->Frame->GetWidgetName() 
+      << " -fill both -anchor n -expand 1" 
       << endl;
 
   // Show the page tab
