@@ -20,7 +20,7 @@
 #include "vtkPVDataSetAttributesInformation.h"
 
 vtkStandardNewMacro(vtkPVVolumePropertyWidget);
-vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
                      vtkPVDataInformation);
@@ -64,7 +64,7 @@ void vtkPVVolumePropertyWidget::PrintSelf(ostream &os, vtkIndent indent)
 
 
 // ---------------------------------------------------------------------------
-int vtkPVVolumePropertyWidget::GetDataSetNumberOfComponents()
+int vtkPVVolumePropertyWidget::GetNumberOfComponents()
 {
   if (this->DataInformation && this->ArrayName)
     {
@@ -78,7 +78,7 @@ int vtkPVVolumePropertyWidget::GetDataSetNumberOfComponents()
       return arrayInfo->GetNumberOfComponents();
       }
     }
-  return 0;
+  return this->Superclass::GetNumberOfComponents();
 }
 
 // ---------------------------------------------------------------------------
@@ -100,7 +100,7 @@ int vtkPVVolumePropertyWidget::GetDataSetScalarRange(
       return 1;
       }
     }
-  return 0;
+  return this->Superclass::GetDataSetScalarRange(comp, range);
 }
 
 // ---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ int vtkPVVolumePropertyWidget::GetDataSetAdjustedScalarRange(
       return 1;
       }
     }
-  return 0;
+  return this->Superclass::GetDataSetAdjustedScalarRange(comp, range);
 }
 
 // ---------------------------------------------------------------------------

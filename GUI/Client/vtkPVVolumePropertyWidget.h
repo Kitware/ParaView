@@ -61,11 +61,10 @@ protected:
   
   vtkPVDataInformation *DataInformation;
 
-  // Get the dataset information
   // This methods will be overriden in subclasses so that something
   // different than the DataSet ivar will be used to compute the
   // corresponding items
-  virtual int GetDataSetNumberOfComponents();
+  virtual int GetNumberOfComponents();
   virtual int GetDataSetScalarRange(int comp, double range[2]);
   virtual int GetDataSetAdjustedScalarRange(int comp, double range[2]);
   virtual const char* GetDataSetScalarName();
