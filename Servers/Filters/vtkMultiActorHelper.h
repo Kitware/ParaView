@@ -12,8 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMultiActorHelper -
+// .NAME vtkMultiActorHelper - server side helper object for vtkInteractorStyleTrackballMultiActor
 // .SECTION Description 
+// vtkMultiActorHelper transforms actors based on the user interaction.
+// The user interaction are translated to appropriate property values
+// by vtkInteractorStyleTrackballMultiActor and sent to the server.
+// .SECTION See Also
+// vtkInteractorStyleTrackballMultiActor
+
 
 #ifndef __vtkMultiActorHelper_h
 #define __vtkMultiActorHelper_h
@@ -30,10 +36,20 @@ public:
   vtkTypeRevisionMacro(vtkMultiActorHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Rotate all actors using the transform matrix.
   void Rotate(double transform[8]);
+
+  // Description:
+  // Pan all actors.
   void Pan(double x, double y);
+
+  // Description:
+  // Scale all actors.
   void UniformScale(double scaleFactor);
   
+  // Description:
+  // Add an actor to be transformed.
   void AddActor(vtkActor* actor);
 
 protected:

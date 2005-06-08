@@ -26,7 +26,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkCVGeometryCache, "1.4");
+vtkCxxRevisionMacro(vtkCVGeometryCache, "1.5");
 vtkStandardNewMacro(vtkCVGeometryCache);
 
 struct vtkCVGeometryCacheInternal
@@ -73,8 +73,9 @@ int vtkCVGeometryCache::RequestInformation(
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  // RequestData() synchronizes (communicates among processes), so we need
-  // all procs to call RequestData().
+  // Since this object stores the input of a mapper that is already broken
+  // in the pieces, tell the pipeline we can produce as many pieces as
+  // wanted
   outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
 
   return 1;

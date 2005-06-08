@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCVGeometryCache -
+// .NAME vtkCVGeometryCache - caches geometry assigned to a mapper
 // .SECTION Description
+// vtkCVGeometryCache is a source that provides a cached geometry
+// (shallow) copied from the input of a mapper. It is used in
+// comparative visualization. This is a multiple output source (one
+// output for each added geometry)
 
 #ifndef __vtkCVGeometryCache_h
 #define __vtkCVGeometryCache_h
@@ -34,6 +38,8 @@ public:
   vtkTypeRevisionMacro(vtkCVGeometryCache,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Shallow copies the input of the mapper into the internal cache.
   void AddGeometry(vtkMapper* mapper);
 
 protected:
