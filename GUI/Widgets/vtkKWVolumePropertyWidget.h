@@ -165,8 +165,8 @@ public:
   virtual void EnableGradientOpacityCallback(int val);
   virtual void GradientOpacityFunctionChangedCallback();
   virtual void GradientOpacityFunctionChangingCallback();
-  virtual void HSVColorSelectionChangedCallback();
-  virtual void HSVColorSelectionChangingCallback();
+  virtual void HSVColorSelectionChangedCallback(double h, double s, double v);
+  virtual void HSVColorSelectionChangingCallback(double h, double s, double v);
   virtual void ComponentWeightChangedCallback(int index);
   virtual void ComponentWeightChangingCallback(int index);
 
@@ -243,11 +243,10 @@ protected:
 
   virtual void UpdateHSVColorSelectorFromScalarColorFunctionEditor();
 
-  // Get the dataset information
   // This methods will be overriden in subclasses so that something
   // different than the DataSet ivar will be used to compute the
   // corresponding items
-  virtual int GetDataSetNumberOfComponents();
+  virtual int GetNumberOfComponents();
   virtual int GetDataSetScalarRange(int comp, double range[2]);
   virtual int GetDataSetAdjustedScalarRange(int comp, double range[2]);
   virtual const char* GetDataSetScalarName();

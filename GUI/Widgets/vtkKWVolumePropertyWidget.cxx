@@ -18,25 +18,26 @@
 #include "vtkImageData.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWColorTransferFunctionEditor.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWHistogramSet.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWOptionMenuLabeled.h"
-#include "vtkKWPopupButtonLabeled.h"
-#include "vtkKWScaleSetLabeled.h"
 #include "vtkKWOptionMenu.h"
+#include "vtkKWOptionMenuLabeled.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
+#include "vtkKWPopupButtonLabeled.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWScaleSet.h"
+#include "vtkKWScaleSetLabeled.h"
 #include "vtkKWVolumeMaterialPropertyWidget.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkVolumeProperty.h"
 
@@ -46,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.8");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -431,12 +432,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->GradientOpacityFunctionEditor->SetParent(frame);
   this->GradientOpacityFunctionEditor->GetLabel()->SetText("Gradient Opacity Mapping:");
   this->GradientOpacityFunctionEditor->ComputePointColorFromValueOn();
-  this->GradientOpacityFunctionEditor->WindowLevelModeOn();
-  this->GradientOpacityFunctionEditor->WindowLevelModeLockEndPointValueOn();
   this->GradientOpacityFunctionEditor->LockEndPointsParameterOn();
   this->GradientOpacityFunctionEditor->SetPointMarginToCanvas(
     this->ScalarOpacityFunctionEditor->GetPointMarginToCanvas());
-  this->GradientOpacityFunctionEditor->DisableAddAndRemoveOn();
   this->GradientOpacityFunctionEditor->SetCanvasHeight(
     this->ScalarColorFunctionEditor->GetCanvasHeight());
   this->GradientOpacityFunctionEditor->SetShowValueRange(
@@ -704,7 +702,7 @@ void vtkKWVolumePropertyWidget::Update()
 
   int has_prop = this->VolumeProperty ? 1 : 0;
 
-  int nb_components = this->GetDataSetNumberOfComponents();
+  int nb_components = this->GetNumberOfComponents();
 
   char hist_name[1024];
       
@@ -831,13 +829,20 @@ void vtkKWVolumePropertyWidget::Update()
 
     if (has_prop)
       {
+      vtkPiecewiseFunction *ofun = 
+        this->VolumeProperty->GetScalarOpacity(this->SelectedComponent);
+      this->ScalarOpacityFunctionEditor->SetPiecewiseFunction(ofun);
+
       if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
         {
-        this->ScalarOpacityFunctionEditor->SetPiecewiseFunction(
-          this->VolumeProperty->GetScalarOpacity(this->SelectedComponent));
         this->ScalarOpacityFunctionEditor
           ->SetWholeParameterRangeAndMaintainVisible(p_range);
-      }
+        }
+      else
+        {
+        this->ScalarOpacityFunctionEditor
+          ->SetWholeParameterRangeAndMaintainVisible(ofun->GetRange());
+        }
 
       this->ScalarOpacityFunctionEditor
         ->SetWholeValueRangeAndMaintainVisible(0.0, 1.0);
@@ -900,13 +905,19 @@ void vtkKWVolumePropertyWidget::Update()
     if (!no_rgb && has_prop && 
         this->VolumeProperty->GetColorChannels(this->SelectedComponent) == 3)
       {
+      vtkColorTransferFunction *cfun = 
+        this->VolumeProperty->GetRGBTransferFunction(this->SelectedComponent);
+      this->ScalarColorFunctionEditor->SetColorTransferFunction(cfun);
+
       if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
         {
-        this->ScalarColorFunctionEditor->SetColorTransferFunction(
-          this->VolumeProperty->GetRGBTransferFunction(
-            this->SelectedComponent));
         this->ScalarColorFunctionEditor
           ->SetWholeParameterRangeAndMaintainVisible(p_range);
+        }
+      else
+        {
+        this->ScalarColorFunctionEditor
+          ->SetWholeParameterRangeAndMaintainVisible(cfun->GetRange());
         }
       }
     else
@@ -1019,12 +1030,12 @@ void vtkKWVolumePropertyWidget::Update()
     
     if (has_prop)
       {
+      vtkPiecewiseFunction *gfun = 
+       this->VolumeProperty->GetStoredGradientOpacity(this->SelectedComponent);
+      this->GradientOpacityFunctionEditor->SetPiecewiseFunction(gfun);
+
       if (this->GetDataSetScalarRange(scalar_field, p_range))
         {
-        this->GradientOpacityFunctionEditor->SetPiecewiseFunction(
-          this->VolumeProperty->GetStoredGradientOpacity(
-            this->SelectedComponent));
-
         // WARNING: hard-coded value here according to the raycast mapper
         // behaviour (1/4 of the range)
 
@@ -1032,6 +1043,11 @@ void vtkKWVolumePropertyWidget::Update()
         p_range[0] = 0.0;
         this->GradientOpacityFunctionEditor
           ->SetWholeParameterRangeAndMaintainVisible(p_range);
+        }
+      else
+        {
+        this->GradientOpacityFunctionEditor
+          ->SetWholeParameterRangeAndMaintainVisible(gfun->GetRange());
         }
       this->GradientOpacityFunctionEditor
         ->SetWholeValueRangeAndMaintainVisible(0.0, 1.0);
@@ -1204,7 +1220,7 @@ void vtkKWVolumePropertyWidget::SetDataSet(
 }
 
 // ---------------------------------------------------------------------------
-int vtkKWVolumePropertyWidget::GetDataSetNumberOfComponents()
+int vtkKWVolumePropertyWidget::GetNumberOfComponents()
 {
   if (this->DataSet)
     {
@@ -1214,7 +1230,7 @@ int vtkKWVolumePropertyWidget::GetDataSetNumberOfComponents()
       return scalars->GetNumberOfComponents();
       }
     }
-  return 0;
+  return VTK_MAX_VRCOMP;
 }
 
 // ---------------------------------------------------------------------------
@@ -1227,6 +1243,7 @@ int vtkKWVolumePropertyWidget::GetDataSetScalarRange(
     if (scalars)
       {
       scalars->GetRange(range, comp);
+      return 1;
       }
     }
   return 0;
@@ -1399,7 +1416,7 @@ void vtkKWVolumePropertyWidget::SetShowComponentWeights(int arg)
 void vtkKWVolumePropertyWidget::SetSelectedComponent(int arg)
 {
   if (this->SelectedComponent == arg ||
-      arg < 0 || arg >= this->GetDataSetNumberOfComponents())
+      arg < 0 || arg >= this->GetNumberOfComponents())
     {
     return;
     }
@@ -1522,7 +1539,7 @@ void vtkKWVolumePropertyWidget::EnableShadingCallback()
   // Update the others
 
   int nb_shade_comp = this->GetIndependentComponents() 
-    ? this->GetDataSetNumberOfComponents() : 1;
+    ? this->GetNumberOfComponents() : 1;
   for (int i = 1; i < nb_shade_comp; i++)
     {
     this->VolumeProperty->SetShade(i, this->VolumeProperty->GetShade(0));
@@ -1774,11 +1791,10 @@ void vtkKWVolumePropertyWidget::GradientOpacityFunctionChangingCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::HSVColorSelectionChangedCallback()
+void vtkKWVolumePropertyWidget::HSVColorSelectionChangedCallback(
+  double h, double s, double v)
 {
-  if (!this->HSVColorSelector ||
-      !this->HSVColorSelector->HasSelection() ||
-      !this->ScalarColorFunctionEditor || 
+  if (!this->ScalarColorFunctionEditor || 
       !this->ScalarColorFunctionEditor->HasFunction() || 
       !this->ScalarColorFunctionEditor->HasSelection())
     {
@@ -1786,18 +1802,16 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangedCallback()
     }
   
   this->ScalarColorFunctionEditor->SetPointColorAsHSV(
-    this->ScalarColorFunctionEditor->GetSelectedPoint(), 
-    this->HSVColorSelector->GetSelectedColor());
+    this->ScalarColorFunctionEditor->GetSelectedPoint(), h, s, v);
 
   this->InvokeVolumePropertyChangedCommand();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback()
+void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback(
+  double h, double s, double v)
 {
-  if (!this->HSVColorSelector ||
-      !this->HSVColorSelector->HasSelection() ||
-      !this->ScalarColorFunctionEditor || 
+  if (!this->ScalarColorFunctionEditor || 
       !this->ScalarColorFunctionEditor->HasFunction() || 
       !this->ScalarColorFunctionEditor->HasSelection())
     {
@@ -1808,8 +1822,7 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback()
     this->ScalarColorFunctionEditor->GetColorTransferFunction()->GetMTime();
 
   this->ScalarColorFunctionEditor->SetPointColorAsHSV(
-    this->ScalarColorFunctionEditor->GetSelectedPoint(), 
-    this->HSVColorSelector->GetSelectedColor());
+    this->ScalarColorFunctionEditor->GetSelectedPoint(), h, s, v);
 
   if (this->ScalarColorFunctionEditor->GetColorTransferFunction()->GetMTime() >
       mtime &&
