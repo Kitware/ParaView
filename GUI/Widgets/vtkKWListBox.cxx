@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.34");
+vtkCxxRevisionMacro(vtkKWListBox, "1.35");
 
 
 //----------------------------------------------------------------------------
@@ -217,16 +217,20 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
-  this->Script("bind %s <Double-1> {%s %s}", this->Listbox->GetWidgetName(),
-               obj->GetTclName(), methodAndArgs);
+  this->Script("bind %s <Double-1> {%s %s}", 
+               this->Listbox->GetWidgetName(),
+               (obj ? obj->GetTclName() : ""), 
+               (methodAndArgs ? methodAndArgs : ""));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
-  this->Script("bind %s <ButtonRelease-1> {%s %s}", this->Listbox->GetWidgetName(),
-               obj->GetTclName(), methodAndArgs);
+  this->Script("bind %s <ButtonRelease-1> {%s %s}", 
+               this->Listbox->GetWidgetName(),
+               (obj ? obj->GetTclName() : ""), 
+               (methodAndArgs ? methodAndArgs : ""));
 }
 
 
