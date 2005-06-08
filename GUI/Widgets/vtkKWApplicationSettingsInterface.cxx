@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.38");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.39");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -210,7 +210,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
+         << " -side top -anchor nw -fill x -padx 2 -pady 2 " 
          << " -in " << page->GetWidgetName() << endl;
   
   frame = this->InterfaceSettingsFrame->GetFrame();
@@ -311,7 +311,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->InterfaceCustomizationFrame->SetLabelText("Interface Customization");
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
+         << " -side top -anchor nw -fill x -padx 2 -pady 2 " 
          << " -in " << page->GetWidgetName() << endl;
   
   frame = this->InterfaceCustomizationFrame->GetFrame();
@@ -355,7 +355,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 "  
+         << " -side top -anchor nw -fill x -padx 2 -pady 2 "  
          << " -in " << page->GetWidgetName() << endl;
   
   frame = this->ToolbarSettingsFrame->GetFrame();
@@ -410,7 +410,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->PrintSettingsFrame->SetLabelText("Print Settings");
     
   tk_cmd << "pack " << this->PrintSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 "  
+         << " -side top -anchor nw -fill x -padx 2 -pady 2 "  
          << " -in " << page->GetWidgetName() << endl;
   
   frame = this->PrintSettingsFrame->GetFrame();

@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.34");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -172,7 +172,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
     return;
     }
 
-  this->Script("%s config -bd 3 -relief ridge",  this->GetWidgetName());
+  this->Script("%s config -bd 1 -relief ridge",  this->GetWidgetName());
 
   // The title bar
 
