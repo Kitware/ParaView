@@ -56,9 +56,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the user interface manager. This automatically adds/registers the 
+  // Set the user interface manager. This automatically adds the 
   // panel to the manager. If you want to remove this panel from the manager,
   // set the manager to NULL (it is done automatically by the destructor).
+  // Note that ownership is transferred to the manager by incrementing
+  // (and decrementing later on) the ref count of the panel in 
+  // vtkKWUserInterfaceManager's AddPanel and RemovePanel methods.
   virtual void SetUserInterfaceManager(vtkKWUserInterfaceManager*);
   vtkGetObjectMacro(UserInterfaceManager, vtkKWUserInterfaceManager);
 

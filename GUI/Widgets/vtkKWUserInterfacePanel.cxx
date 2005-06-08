@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.10");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.11");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -60,7 +60,6 @@ void vtkKWUserInterfacePanel::SetUserInterfaceManager(vtkKWUserInterfaceManager 
   if (this->UserInterfaceManager != NULL) 
     { 
     this->UserInterfaceManager->RemovePanel(this);
-    this->UserInterfaceManager->UnRegister(this); 
     }
 
   this->UserInterfaceManager = _arg; 
@@ -68,9 +67,8 @@ void vtkKWUserInterfacePanel::SetUserInterfaceManager(vtkKWUserInterfaceManager 
   if (this->UserInterfaceManager != NULL) 
     { 
     this->UserInterfaceManager->AddPanel(this);
-    this->UserInterfaceManager->Register(this); 
     } 
-
+  
   this->Modified(); 
 } 
 
@@ -215,7 +213,8 @@ int vtkKWUserInterfacePanel::IsVisible()
 //----------------------------------------------------------------------------
 int vtkKWUserInterfacePanel::Raise()
 {
-  if (this->Show() && this->UserInterfaceManager)
+  this->Show();
+  if (this->UserInterfaceManager)
     {
     return this->UserInterfaceManager->RaisePanel(this);
     }
