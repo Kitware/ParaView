@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.11");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.12");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -231,6 +231,30 @@ vtkKWWindowBase::~vtkKWWindowBase()
 
   this->SetScriptExtension(NULL);
   this->SetScriptType(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::PrepareForDelete()
+{
+  // Have reference to this object:
+  // this->Menu
+  // this->MenuBarSeparatorFrame
+  // this->MainToolbarSet
+  // this->MainFrame
+  // this->StatusFrameSeparator
+  // this->StatusFrame
+
+  if (this->TclInteractor )
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+
+  if (this->MainToolbarSet)
+    {
+    this->MainToolbarSet->RemoveAllToolbars();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -419,25 +443,6 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Udpate the enable state
 
   this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::PrepareForDelete()
-{
-  // Have reference to this object:
-  // this->Menu
-  // this->MenuBarSeparatorFrame
-  // this->MainToolbarSet
-  // this->MainFrame
-  // this->StatusFrameSeparator
-  // this->StatusFrame
-
-  if (this->TclInteractor )
-    {
-    this->TclInteractor->SetMasterWindow(NULL);
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
