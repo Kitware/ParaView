@@ -88,12 +88,13 @@ public:
   virtual vtkKWUserInterfacePanel* GetNthPanel(int rank);
 
   // Description:
-  // Remove a panel from the manager.
+  // Remove a panel (or all) from the manager.
   // Note that you most probably do not need to call this method, since setting
   // a panel's UserInterfaceManager ivar to NULL will remove the panel 
   // automatically (this is done in the panel's destructor).
   // Return 1 on success, 0 on error.
   virtual int RemovePanel(vtkKWUserInterfacePanel *panel);
+  virtual void RemoveAllPanels();
 
   // Description:
   // Instruct the manager to reserve a page for a given panel.

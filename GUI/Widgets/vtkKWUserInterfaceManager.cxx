@@ -22,7 +22,7 @@
 #include <kwsys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.17");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.18");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -51,19 +51,9 @@ vtkKWUserInterfaceManager::~vtkKWUserInterfaceManager()
 {
   // Delete all panels
 
+  this->RemoveAllPanels();
   if (this->Internals)
     {
-    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
-      this->Internals->Panels.begin();
-    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
-      this->Internals->Panels.end();
-    for (; it != end; ++it)
-      {
-      if (*it)
-        {
-        delete (*it);
-        }
-      }
     delete this->Internals;
     }
 }
@@ -326,6 +316,14 @@ int vtkKWUserInterfaceManager::AddPanel(vtkKWUserInterfacePanel *panel)
   panel_slot->Panel = panel;
   panel_slot->Id = this->IdCounter++;
 
+  // For convenience, make sure the panel use this instance.
+  // Note that vtkKWUserInterfacePanel::SetUserInterfaceManager also
+  // calls the current method for convenience.
+
+  panel_slot->Panel->SetUserInterfaceManager(this);
+
+  panel_slot->Panel->Register(this);
+
   return panel_slot->Id;
 }
 
@@ -369,11 +367,28 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 
   this->Internals->Panels.erase(pos);
 
+  // For convenience, make sure the panel does not use this instance anymore.
+  // Note that vtkKWUserInterfacePanel::SetUserInterfaceManager also
+  // calls the current method for convenience.
+
+  panel_slot->Panel->SetUserInterfaceManager(NULL);
+
+  panel_slot->Panel->UnRegister(this);
+
   // Delete the panel slot
 
   delete panel_slot;
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManager::RemoveAllPanels()
+{
+  while (this->GetNumberOfPanels())
+    {
+    this->RemovePanel(this->GetNthPanel(0));
+    }
 }
 
 //----------------------------------------------------------------------------
