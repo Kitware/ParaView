@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.729");
+vtkCxxRevisionMacro(vtkPVWindow, "1.730");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -330,7 +330,7 @@ vtkPVWindow::vtkPVWindow()
 
   if (this->SecondarySplitFrame)
     {
-    this->SecondarySplitFrame->Frame2VisibilityOff();
+    this->SecondarySplitFrame->Frame1VisibilityOff();
     }
 
   // There is only one page in the secondary notebook, the "Animation" page
@@ -833,12 +833,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Window menu:
 
   this->GetWindowMenu()->AddSeparator();
-
-  this->GetWindowMenu()->InsertCommand(
-    4, "Command Prompt", 
-    this, "DisplayTclInteractor", 
-    8,
-    "Display a prompt to interact with the ParaView engine");
 
   // Log stuff (not traced)
   this->GetWindowMenu()->InsertCommand(
