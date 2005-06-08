@@ -43,10 +43,13 @@ public:
 
   // Description:
   // Set/Get the value of the text. AppendValue() is a convenience function
-  // to add text at the end.
+  // to add text at the end. If a tag is provided, it will be used to 
+  // tag the corresponding text.
   virtual char *GetValue();
-  virtual void SetValue(const char *, const char *tag = NULL);
-  virtual void AppendValue(const char *, const char *tag = NULL);
+  virtual void SetValue(const char *);
+  virtual void SetValue(const char *, const char *tag);
+  virtual void AppendValue(const char *);
+  virtual void AppendValue(const char *, const char *tag);
 
   // Description:
   // Set/Get if this text is editable by the user. Default is On.

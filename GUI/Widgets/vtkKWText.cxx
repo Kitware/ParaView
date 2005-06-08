@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.30");
+vtkCxxRevisionMacro(vtkKWText, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -70,8 +70,14 @@ char *vtkKWText::GetValue()
 
   const char *val = this->Script("%s get 1.0 {end -1 chars}", 
                                  this->TextWidget->GetWidgetName());
-  this->SetValueString(this->ConvertTclStringToInternalString(val));
+  this->SetValueString(this->ConvertTclStringToInternalString(val, 0));
   return this->GetValueString();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWText::SetValue(const char *s)
+{
+  this->SetValue(s, NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +103,12 @@ void vtkKWText::SetValue(const char *s, const char *tag)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWText::AppendValue(const char *s)
+{
+  this->AppendValue(s, NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWText::AppendValue(const char *s, const char *tag)
 {
   if (!this->IsCreated() || !s)
@@ -107,7 +119,7 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
   int state = this->TextWidget->GetStateOption();
   this->TextWidget->SetStateOption(1);
 
-  kwsys_stl::string str(this->ConvertInternalStringToTclString(s));
+  kwsys_stl::string str(this->ConvertInternalStringToTclString(s, 0));
 
   // In QuickFormatting mode, look for markers, and use tags accordingly
 
@@ -250,7 +262,7 @@ void vtkKWText::CreateVerticalScrollbar(vtkKWApplication *app)
     this->VerticalScrollBar = vtkKWWidget::New();
     }
 
-  if (!this->VerticalScrollBar->IsCreated())
+  if (!this->VerticalScrollBar->IsCreated() && this->IsCreated())
     {
     this->VerticalScrollBar->SetParent(this);
     this->VerticalScrollBar->Create(app, "scrollbar", "-orient vertical");
