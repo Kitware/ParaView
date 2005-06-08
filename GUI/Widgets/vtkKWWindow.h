@@ -66,23 +66,30 @@
 // Below the SecondarySplitFrame is a second toolbar set packed
 // (SecondaryToolbarSet)
 //
+// Last, a third user interface manager, the ViewUserInterfaceManager is
+// coupled to a ViewNotebook and packed inside the top part of the
+// secondary split frame. A default page is added to provide the
+// frame for GetViewFrame(). This notebook and user interface manager
+// are likely not be manipulated as often as the other panels and UIM, but 
+// can be used to provide multiple "views".
+//
 // +---------------------------+
 // |           MB              |    MB: GetMenu() (see vtkKWTopLevel)
 // +---------------------------+
 // |           TBS             |    TBS: GetToolbars() (see superclass)
 // +---------------------------+
-// |    MPF |                  |
-// |+--+    |                  |
-// ||  +---+|                  |    MPF: GetMainPanelFrame()
-// ||      ||       VF         |    MNB: MainNotebook
-// ||      ||                  |   
-// ||      ||                  |    VF: GetViewFrame()
-// ||      ||                  |
+// |+--+ MPF|+--+              |
+// ||  +---+||  +-------------+|
+// ||      |||                ||    MPF: GetMainPanelFrame()
+// ||      |||    VNB/VF      ||    MNB: MainNotebook
+// ||      |||                ||   
+// ||      |||                ||    
+// ||      ||+----------------+|
 // || MNB  |+------------------+    SPF: GetSecondaryPanelFrame()
 // ||      ||+--+      SPF     |    SNB: SecondaryNotebook
 // ||      |||  +-------------+|
-// ||      |||                ||
-// ||      |||    SNB         ||
+// ||      |||                ||    VNB: ViewNotebook
+// ||      |||    SNB         ||    VF: GetViewFrame() (first page of VNB)
 // ||      |||                ||
 // ||      ||+----------------+|
 // ||      |+------------------+
@@ -146,9 +153,21 @@ public:
   virtual void ShowSecondaryUserInterface(const char *name);
 
   // Description:
+  // View panel. 
+  // The whole layout of the window is described at length at the beginning
+  // of this document.
+  // This panel is probably not going to be used much, by default it
+  // creates a single page in the notebook, which frame is returned by
+  // GetViewFrame.
+  vtkGetObjectMacro(ViewNotebook, vtkKWNotebook);
+  virtual vtkKWUserInterfaceManager* GetViewUserInterfaceManager();
+  virtual void ShowViewUserInterface(const char *name);
+
+  // Description:
   // Convenience method to get the frame available for "viewing". 
-  // Override the superclass to return the first part of the 
-  // SecondarySplitFrame.
+  // Override the superclass to return a page in the notebook of the
+  // view user interface manager (located in the first part of the 
+  // SecondarySplitFrame).
   // The rational here is that GetViewFrame() always return the frame that
   // can be used by users or developpers to add more "viewing" element (say,
   // renderwidgets, 3D scenes), without knowing about the current layout.
@@ -197,6 +216,11 @@ public:
   virtual void NumberOfToolbarsChangedCallback();
 
   // Description:
+  // Deallocate/delete/reparent some internal objects in order to solve
+  // reference loops that would prevent this instance from being deleted.
+  virtual void PrepareForDelete();
+
+  // Description:
   // Some constants
   //BTX
   static const char *MainPanelSizeRegKey;
@@ -209,6 +233,8 @@ public:
   static const char *SecondaryPanelVisibilityKeyAccelerator;
   static const char *HideSecondaryPanelMenuLabel;
   static const char *ShowSecondaryPanelMenuLabel;
+  static const char *DefaultViewPanelName;
+  static const char *TclInteractorMenuLabel;
   //ETX
 
 protected:
@@ -226,14 +252,18 @@ protected:
   // query the main UserInterfaceManager (UIM) to check if it is indeed
   // managing the UIP, and show/raise that UIP accordingly.
   // The ShowSecondaryUserInterface will do the same on the secondary UIM.
+  // The ShowViewUserInterface will do the same on the view UIM.
   virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel);
+  virtual void ShowViewUserInterface(vtkKWUserInterfacePanel *panel);
 
   vtkKWSplitFrame *MainSplitFrame;
   vtkKWNotebook *MainNotebook;
 
   vtkKWSplitFrame *SecondarySplitFrame;
   vtkKWNotebook *SecondaryNotebook;
+
+  vtkKWNotebook *ViewNotebook;
 
   vtkKWApplicationSettingsInterface *ApplicationSettingsInterface;
 
@@ -243,6 +273,7 @@ private:
 
   vtkKWUserInterfaceNotebookManager *MainUserInterfaceManager;
   vtkKWUserInterfaceNotebookManager *SecondaryUserInterfaceManager;
+  vtkKWUserInterfaceNotebookManager *ViewUserInterfaceManager;
 
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented

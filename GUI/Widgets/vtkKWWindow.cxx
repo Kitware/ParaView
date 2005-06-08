@@ -39,8 +39,10 @@ const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibil
 const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
 const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
+const char *vtkKWWindow::DefaultViewPanelName = "View";
+const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.251");
+vtkCxxRevisionMacro(vtkKWWindow, "1.252");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -54,6 +56,7 @@ vtkKWWindow::vtkKWWindow()
   // Main Panel
 
   this->MainSplitFrame        = vtkKWSplitFrame::New();
+  this->MainSplitFrame->SetFrame1MinimumSize(250);
 
   this->MainNotebook          = vtkKWNotebook::New();
   this->MainNotebook->PagesCanBePinnedOn();
@@ -67,11 +70,8 @@ vtkKWWindow::vtkKWWindow()
   // Secondary panel
 
   this->SecondarySplitFrame = vtkKWSplitFrame::New();
-  this->SecondarySplitFrame->SetFrame1MinimumSize(50);
-  this->SecondarySplitFrame->SetFrame1Size(500);
-  this->SecondarySplitFrame->SetFrame2MinimumSize(50);
 
-  this->SecondaryNotebook          = vtkKWNotebook::New();
+  this->SecondaryNotebook = vtkKWNotebook::New();
   this->SecondaryNotebook->PagesCanBePinnedOn();
   this->SecondaryNotebook->EnablePageTabContextMenuOn();
   this->SecondaryNotebook->AlwaysShowTabsOn();
@@ -80,6 +80,18 @@ vtkKWWindow::vtkKWWindow()
     vtkKWUserInterfaceNotebookManager::New();
   this->SecondaryUserInterfaceManager->SetNotebook(this->SecondaryNotebook);
   this->SecondaryUserInterfaceManager->EnableDragAndDropOn();
+
+  // View panel
+
+  this->ViewNotebook = vtkKWNotebook::New();
+  this->ViewNotebook->PagesCanBePinnedOn();
+  this->ViewNotebook->EnablePageTabContextMenuOn();
+  this->ViewNotebook->AlwaysShowTabsOff();
+
+  this->ViewUserInterfaceManager = 
+    vtkKWUserInterfaceNotebookManager::New();
+  this->ViewUserInterfaceManager->SetNotebook(this->ViewNotebook);
+  this->ViewUserInterfaceManager->EnableDragAndDropOn();
 
   // Toolbar set
 
@@ -133,6 +145,18 @@ vtkKWWindow::~vtkKWWindow()
     this->SecondaryUserInterfaceManager = NULL;
     }
 
+  if (this->ViewNotebook)
+    {
+    this->ViewNotebook->Delete();
+    this->ViewNotebook = NULL;
+    }
+
+  if (this->ViewUserInterfaceManager)
+    {
+    this->ViewUserInterfaceManager->Delete();
+    this->ViewUserInterfaceManager = NULL;
+    }
+
   if (this->SecondaryToolbarSet)
     {
     this->SecondaryToolbarSet->Delete();
@@ -143,6 +167,30 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->ApplicationSettingsInterface->Delete();
     this->ApplicationSettingsInterface = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::PrepareForDelete()
+{
+  if (this->MainUserInterfaceManager)
+    {
+    this->MainUserInterfaceManager->RemoveAllPanels();
+    }
+
+  if (this->SecondaryUserInterfaceManager)
+    {
+    this->SecondaryUserInterfaceManager->RemoveAllPanels();
+    }
+
+  if (this->ViewUserInterfaceManager)
+    {
+    this->ViewUserInterfaceManager->RemoveAllPanels();
+    }
+
+  if (this->SecondaryToolbarSet)
+    {
+    this->SecondaryToolbarSet->RemoveAllToolbars();
     }
 }
 
@@ -221,12 +269,39 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->SecondaryNotebook->GetWidgetName());
 
-  // If we have a main User Interface Manager, it's time to create it
+  // If we have a secondary User Interface Manager, it's time to create it
 
   uim = this->GetSecondaryUserInterfaceManager();
   if (uim && !uim->IsCreated())
     {
     uim->Create(app);
+    }
+
+  // Create the view notebook
+
+  this->ViewNotebook->SetParent(this->SecondarySplitFrame->GetFrame2());
+  this->ViewNotebook->Create(app, NULL);
+
+  this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
+               this->ViewNotebook->GetWidgetName());
+
+  // If we have a view User Interface Manager, it's time to create it
+  // Also create a default page for the view
+
+  uim = this->GetViewUserInterfaceManager();
+  if (uim)
+    {
+    if  (!uim->IsCreated())
+      {
+      uim->Create(app);
+      }
+    
+    vtkKWUserInterfacePanel *panel = vtkKWUserInterfacePanel::New();
+    panel->SetName(vtkKWWindow::DefaultViewPanelName);
+    panel->SetUserInterfaceManager(this->GetViewUserInterfaceManager());
+    panel->Create(app);
+    panel->Delete();
+    panel->AddPage(panel->GetName(), NULL);
     }
 
   // Menu : Window
@@ -254,6 +329,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     idx++, this->GetApplicationSettingsInterface()->GetName(), 
     this, cmd.c_str(), 0);
 
+  // Menu : Window : Tcl Interactor
+
+  this->GetWindowMenu()->AddCommand(
+    vtkKWWindow::TclInteractorMenuLabel, 
+    this, "DisplayTclInteractor", 8, 
+    "Display a prompt to interact with the Tcl engine");
+
   // Secondary toolbar
 
   this->SecondaryToolbarSet->SetParent(this->GetMainSplitFrame()->GetFrame2());
@@ -279,8 +361,17 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 vtkKWFrame* vtkKWWindow::GetViewFrame()
 {
-  return this->SecondarySplitFrame ? 
-    this->SecondarySplitFrame->GetFrame1() : NULL;
+  if (this->ViewUserInterfaceManager)
+    {
+    vtkKWUserInterfacePanel *panel = 
+      this->ViewUserInterfaceManager->GetPanel(
+        vtkKWWindow::DefaultViewPanelName);
+    if (panel)
+      {
+      return vtkKWFrame::SafeDownCast(panel->GetPageWidget(panel->GetName()));
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -454,14 +545,14 @@ void vtkKWWindow::ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel)
 vtkKWFrame* vtkKWWindow::GetSecondaryPanelFrame()
 {
   return this->SecondarySplitFrame ? 
-    this->SecondarySplitFrame->GetFrame2() : NULL;
+    this->SecondarySplitFrame->GetFrame1() : NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindow::GetSecondaryPanelVisibility()
 {
   return (this->SecondarySplitFrame && 
-          this->SecondarySplitFrame->GetFrame2Visibility() ? 1 : 0);
+          this->SecondarySplitFrame->GetFrame1Visibility() ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -474,7 +565,7 @@ void vtkKWWindow::SetSecondaryPanelVisibility(int arg)
 
   if (this->SecondarySplitFrame)
     {
-    this->SecondarySplitFrame->SetFrame2Visibility(arg);
+    this->SecondarySplitFrame->SetFrame1Visibility(arg);
     }
 
   this->UpdateMenuState();
@@ -484,6 +575,60 @@ void vtkKWWindow::SetSecondaryPanelVisibility(int arg)
 void vtkKWWindow::SecondaryPanelVisibilityCallback()
 {
   this->SetSecondaryPanelVisibility(!this->GetSecondaryPanelVisibility());
+}
+
+//----------------------------------------------------------------------------
+vtkKWUserInterfaceManager* vtkKWWindow::GetViewUserInterfaceManager()
+{
+  return this->ViewUserInterfaceManager;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowViewUserInterface(const char *name)
+{
+  if (this->GetViewUserInterfaceManager())
+    {
+    this->ShowViewUserInterface(
+      this->GetViewUserInterfaceManager()->GetPanel(name));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowViewUserInterface(vtkKWUserInterfacePanel *panel)
+{
+  if (!panel)
+    {
+    return;
+    }
+
+  vtkKWUserInterfaceManager *uim = this->GetViewUserInterfaceManager();
+  if (!uim || !uim->HasPanel(panel))
+    {
+    return;
+    }
+
+  this->SetSecondaryPanelVisibility(1);
+
+  if (!panel->Raise())
+    {
+    kwsys_stl::string msg;
+    msg = "The panel you are trying to access could not be displayed "
+      "properly. Please make sure there is enough room in the notebook "
+      "to bring up this part of the interface.";
+    if (this->ViewNotebook && 
+        this->ViewNotebook->GetShowOnlyMostRecentPages() &&
+        this->ViewNotebook->GetPagesCanBePinned())
+      {
+      msg += " This may happen if you displayed ";
+      msg += this->ViewNotebook->GetNumberOfMostRecentPages();
+      msg += " notebook pages "
+        "at the same time and pinned/locked all of them. In that case, "
+        "try to hide or unlock a notebook page first.";
+      }
+    vtkKWMessageDialog::PopupMessage( 
+      this->GetApplication(), this, "User Interface Warning", msg.c_str(),
+      vtkKWMessageDialog::WarningIcon);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -516,7 +661,6 @@ void vtkKWWindow::SaveWindowGeometryToRegistry()
 
   this->GetApplication()->SetRegistryValue(
     2, "Geometry", vtkKWWindow::SecondaryPanelSizeRegKey, "%d", 
-    // NOTE: we are saving Frame1, since Frame2's size can't be set
     this->SecondarySplitFrame->GetFrame1Size());
 
   this->GetApplication()->SetRegistryValue(
@@ -543,7 +687,6 @@ void vtkKWWindow::RestoreWindowGeometryFromRegistry()
       2, "Geometry", vtkKWWindow::MainPanelSizeRegKey);
     if (reg_size >= this->MainSplitFrame->GetFrame1MinimumSize())
       {
-      // NOTE: we are restoring Frame1, since Frame2's size can't be set
       this->MainSplitFrame->SetFrame1Size(reg_size);
       }
     }
@@ -640,6 +783,7 @@ void vtkKWWindow::UpdateEnableState()
 
   this->PropagateEnableState(this->MainNotebook);
   this->PropagateEnableState(this->SecondaryNotebook);
+  this->PropagateEnableState(this->ViewNotebook);
 
   // Update all the user interface panels
 
@@ -659,6 +803,15 @@ void vtkKWWindow::UpdateEnableState()
     // which will call an UpdateEnableState() too,
     // this->GetSecondaryUserInterfaceManager()->UpdateEnableState();
     // this->GetSecondaryUserInterfaceManager()->Update();
+    }
+
+  if (this->GetViewUserInterfaceManager())
+    {
+    this->GetViewUserInterfaceManager()->SetEnabled(this->GetEnabled());
+    // As a side effect, SetEnabled() call an Update() on the panel, 
+    // which will call an UpdateEnableState() too,
+    // this->GetViewUserInterfaceManager()->UpdateEnableState();
+    // this->GetViewUserInterfaceManager()->Update();
     }
 
   // Update the window element
@@ -731,6 +884,7 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "MainNotebook: " << this->GetMainNotebook() << endl;
   os << indent << "SecondaryNotebook: " << this->GetSecondaryNotebook() << endl;
+  os << indent << "ViewNotebook: " << this->GetViewNotebook() << endl;
   os << indent << "MainSplitFrame: " << this->GetMainSplitFrame() << endl;
   os << indent << "SecondarySplitFrame: " << this->GetSecondarySplitFrame() << endl;
   os << indent << "SecondaryToolbarSet: " << this->SecondaryToolbarSet << endl;
