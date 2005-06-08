@@ -30,20 +30,20 @@
 #include "vtkStringList.h"
 #include "vtkPVTraceHelper.h"
 
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/stl/vector>
-#include <kwsys/stl/algorithm>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/vector>
+#include <vtksys/stl/algorithm>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.77");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.78");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
 {
 public:
-  typedef kwsys_stl::vector<vtkKWEntry*> EntriesContainer;
-  typedef kwsys_stl::vector<vtkKWEntry*>::iterator EntriesContainerIterator;
+  typedef vtksys_stl::vector<vtkKWEntry*> EntriesContainer;
+  typedef vtksys_stl::vector<vtkKWEntry*>::iterator EntriesContainerIterator;
 
   EntriesContainer Entries;
 };
@@ -208,7 +208,7 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
           {
           delete[] this->EntryValues[cc];
           }
-        this->EntryValues[cc] = kwsys::SystemTools::DuplicateString(
+        this->EntryValues[cc] = vtksys::SystemTools::DuplicateString(
           this->GetEntry(cc)->GetValue());
         this->AcceptedCallback();
         this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
@@ -389,7 +389,7 @@ void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
     {
     delete [] this->EntryValues[index];
     }
-  this->EntryValues[index] = kwsys::SystemTools::DuplicateString(value);
+  this->EntryValues[index] = vtksys::SystemTools::DuplicateString(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,7 +424,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
       {
       delete [] this->EntryValues[idx];
       }
-    this->EntryValues[idx] = kwsys::SystemTools::DuplicateString(values[idx]);
+    this->EntryValues[idx] = vtksys::SystemTools::DuplicateString(values[idx]);
     sscanf(values[idx], "%f", &scalars[idx]);
     }
   
@@ -454,7 +454,7 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = 
-      kwsys::SystemTools::DuplicateString(entry->GetValue());
+      vtksys::SystemTools::DuplicateString(entry->GetValue());
     scalars[idx] = entry->GetValueAsFloat();
     }
   

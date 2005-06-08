@@ -17,11 +17,11 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTracedWidget );
-vtkCxxRevisionMacro(vtkPVTracedWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVTracedWidget, "1.3");
 
 int vtkPVTracedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

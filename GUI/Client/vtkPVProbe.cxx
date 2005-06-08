@@ -45,11 +45,11 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMXYPlotActorProxy.h"
 #include <vtkstd/string>
-#include <kwsys/ios/sstream>
+#include <vtksys/ios/sstream>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.143");
+vtkCxxRevisionMacro(vtkPVProbe, "1.144");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -179,7 +179,7 @@ void vtkPVProbe::CreateProperties()
       return;
       }
 
-    kwsys_ios::ostringstream str;
+    vtksys_ios::ostringstream str;
     // SourceListName.SourceProxyName.XYPlotDisplay == name for the 
     // Display proxy.
     str << this->GetSourceList() << "."
@@ -268,14 +268,14 @@ void vtkPVProbe::AcceptCallbackInternal()
         if (numComponents > 1)
           {
           // make sure we fill buffer from the beginning
-          kwsys_ios::ostringstream arrayStrm;
+          vtksys_ios::ostringstream arrayStrm;
           arrayStrm << array->GetName() << ": ( ";
           arrayData = arrayStrm.str();
 
           for (j = 0; j < numComponents; j++)
             {
             // make sure we fill buffer from the beginning
-            kwsys_ios::ostringstream tempStrm;
+            vtksys_ios::ostringstream tempStrm;
             tempStrm << array->GetComponent( 0, j );
             tempArray = tempStrm.str();
 
@@ -302,7 +302,7 @@ void vtkPVProbe::AcceptCallbackInternal()
         else
           {
           // make sure we fill buffer from the beginning
-          kwsys_ios::ostringstream arrayStrm;
+          vtksys_ios::ostringstream arrayStrm;
           arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl;
 
           label += arrayStrm.str();

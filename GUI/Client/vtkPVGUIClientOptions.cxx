@@ -15,13 +15,13 @@
 
 #include "vtkObjectFactory.h"
 
-#include <kwsys/CommandLineArguments.hxx>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/SystemTools.hxx>
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.6");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -94,8 +94,8 @@ int vtkPVGUIClientOptions::PostProcess(int argc, const char* const* argv)
 
 int vtkPVGUIClientOptions::WrongArgument(const char* argument)
 {
-  if ( kwsys::SystemTools::FileExists(argument) &&
-    kwsys::SystemTools::GetFilenameLastExtension(argument) == ".pvs")
+  if ( vtksys::SystemTools::FileExists(argument) &&
+    vtksys::SystemTools::GetFilenameLastExtension(argument) == ".pvs")
     {
     this->SetParaViewScriptName(argument);
     return 1;

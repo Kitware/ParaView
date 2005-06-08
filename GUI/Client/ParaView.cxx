@@ -65,7 +65,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
         
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
@@ -104,7 +104,7 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 {
   int argc;
   char **argv;
-  kwsys::SystemTools::ConvertWindowsCommandLineToUnixArguments(
+  vtksys::SystemTools::ConvertWindowsCommandLineToUnixArguments(
     lpCmdLine, &argc, &argv);
 
   int retVal = MyMain(argc, argv);

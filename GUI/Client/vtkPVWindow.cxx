@@ -110,7 +110,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #ifndef VTK_USE_ANSI_STDLIB
 # define PV_NOCREATE | ios::nocreate
@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.730");
+vtkCxxRevisionMacro(vtkPVWindow, "1.731");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1075,7 +1075,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Make sure the widget is name appropriately: paraview instead of a number.
   // On X11, the window name is the same as the widget name.
 
-  this->WidgetName = kwsys::SystemTools::DuplicateString(".paraview");
+  this->WidgetName = vtksys::SystemTools::DuplicateString(".paraview");
 
   // Invoke super method
 
@@ -1522,7 +1522,7 @@ void vtkPVWindow::UpdateStatusImage()
   vtkKWLabel *status_image = this->GetStatusImage();
   if (status_image && status_image->IsCreated())
     {
-    kwsys_stl::string image_name(status_image->GetImageOption());
+    vtksys_stl::string image_name(status_image->GetImageOption());
     if (!image_name.size() || !*image_name.c_str())
       {
       image_name = status_image->Script("image create photo");
@@ -2060,7 +2060,7 @@ void vtkPVWindow::OpenCallback()
   if ( loadDialog->Invoke() )
     {
     openFileName = 
-      kwsys::SystemTools::DuplicateString(loadDialog->GetFileName());
+      vtksys::SystemTools::DuplicateString(loadDialog->GetFileName());
     }
   this->SetEnabled(enabled);
   
@@ -2120,7 +2120,7 @@ int vtkPVWindow::Open(char *openFileNameUnSafe, int store)
   // (Ex: {} are added when a filename with a space is dropped on ParaView
 
   char *openFileName = 
-    kwsys::SystemTools::RemoveChars(openFileNameUnSafe, "{}");
+    vtksys::SystemTools::RemoveChars(openFileNameUnSafe, "{}");
 
   if (!this->CheckIfFileIsReadable(openFileName))
     {
@@ -2610,7 +2610,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
     if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
                                                        numParts))
       {
-      if(kwsys::SystemTools::StringEndsWith(fileName, wm->GetExtension()))
+      if(vtksys::SystemTools::StringEndsWith(fileName, wm->GetExtension()))
         {
         writer = wm;
         break;
@@ -4140,7 +4140,7 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
   // Store last path
   if ( openFileName && strlen(openFileName) > 0 )
     {
-    char *pth = kwsys::SystemTools::DuplicateString(openFileName);
+    char *pth = vtksys::SystemTools::DuplicateString(openFileName);
     int pos = strlen(openFileName);
     // Strip off the file name
     while (pos && pth[pos] != '/' && pth[pos] != '\\')
@@ -4388,7 +4388,7 @@ void vtkPVWindow::WarningMessage(const char* message)
 {
   this->Script("bell");
   this->CreateErrorLogDisplay();
-  char *wmessage = kwsys::SystemTools::DuplicateString(message);
+  char *wmessage = vtksys::SystemTools::DuplicateString(message);
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
@@ -4401,7 +4401,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   cout << "ErrorMessage" << endl;
   this->Script("bell");
   this->CreateErrorLogDisplay();
-  char *wmessage = kwsys::SystemTools::DuplicateString(message);
+  char *wmessage = vtksys::SystemTools::DuplicateString(message);
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
@@ -4517,7 +4517,7 @@ void vtkPVWindow::AddManipulator(const char* rotypes, const char* name,
     return;
     }
 
-  char *types = kwsys::SystemTools::DuplicateString(rotypes);
+  char *types = vtksys::SystemTools::DuplicateString(rotypes);
   char t[100];
   int res = 1;
 
@@ -4558,7 +4558,7 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
     return;
     }
 
-  char *types = kwsys::SystemTools::DuplicateString(rotypes);
+  char *types = vtksys::SystemTools::DuplicateString(rotypes);
   char t[100];
   int res = 1;
 

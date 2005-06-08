@@ -85,7 +85,7 @@
 #include <vtkstd/string>
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.381");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.382");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2595,7 +2595,7 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
 {
   const char* writerName = 0;
 
-  kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameLastExtension(filename);
+  vtksys_stl::string ext_stl = vtksys::SystemTools::GetFilenameLastExtension(filename);
   if (ext_stl == ".bmp")
     {
     writerName = "vtkBMPWriter";

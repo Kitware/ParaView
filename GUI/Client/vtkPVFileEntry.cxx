@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #define MAX_FILES_ON_THE_LIST 500
 
@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.110");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.111");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -327,7 +327,7 @@ void vtkPVFileEntry::BrowseCallback()
     }
   if (fname && fname[0])
     {
-    kwsys_stl::string path = kwsys::SystemTools::GetFilenamePath(fname);
+    vtksys_stl::string path = vtksys::SystemTools::GetFilenamePath(fname);
     if (path.size())
       {
       loadDialog->SetLastPath(path.c_str());
@@ -405,7 +405,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   char* format = 0;
   already_set = dom->GetNumberOfStrings();
 
-  kwsys_stl::string path = kwsys::SystemTools::GetFilenamePath(fileName);
+  vtksys_stl::string path = vtksys::SystemTools::GetFilenamePath(fileName);
   if ( !this->Path || strcmp(this->Path, path.c_str()) != 0 )
     {
     already_set = 0;
@@ -431,8 +431,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   char* number = new char [ strlen(fileName) + 1];
 
-  kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
-  kwsys_stl::string ext = kwsys::SystemTools::GetFilenameExtension(fileName);
+  vtksys_stl::string file = vtksys::SystemTools::GetFilenameName(fileName);
+  vtksys_stl::string ext = vtksys::SystemTools::GetFilenameExtension(fileName);
   if (ext.size() >= 1)
     {
     ext.erase(0,1); // Get rid of the "." GetFilenameExtension returns.
@@ -492,9 +492,9 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         {
         this->FileListSelect->AddSourceElement(files->GetString(cc));
         }
-      if ( kwsys::SystemTools::StringStartsWith(
+      if ( vtksys::SystemTools::StringStartsWith(
              files->GetString(cc), file.c_str() ) &&
-           kwsys::SystemTools::StringEndsWith(
+           vtksys::SystemTools::StringEndsWith(
              files->GetString(cc), ext.c_str()) )
         {
         cnt ++;
@@ -583,7 +583,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       for ( cc = min; cc <= max; cc ++ )
         {
         sprintf(name, format, path.c_str(), prefix, cc, ext.c_str());
-        kwsys_stl::string shname = kwsys::SystemTools::GetFilenameName(name);
+        vtksys_stl::string shname = vtksys::SystemTools::GetFilenameName(name);
         if ( files->GetIndex(shname.c_str()) >= 0 )
           {
           this->FileListSelect->AddFinalElement(shname.c_str(), 1);
@@ -595,7 +595,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   if ( !this->FileListSelect->GetNumberOfElementsOnFinalList() )
     {
-    file = kwsys::SystemTools::GetFilenameName(fileName);
+    file = vtksys::SystemTools::GetFilenameName(fileName);
     this->FileListSelect->AddFinalElement(file.c_str(), 1);
     }
 
@@ -615,7 +615,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       dom->AddString(str.str());
       str.rdbuf()->freeze(0);
       }
-    kwsys_stl::string cfile = kwsys::SystemTools::GetFilenameName(fileName);
+    vtksys_stl::string cfile = vtksys::SystemTools::GetFilenameName(fileName);
     ostrstream fullPath;
     fullPath << this->Path << "/" << cfile.c_str() << ends;
     unsigned int i;
@@ -726,8 +726,8 @@ void vtkPVFileEntry::UpdateTimesteps()
   int cc;
   int is_present = 0;
 
-  kwsys_stl::string filename = 
-    kwsys::SystemTools::GetFilenameName(fullfilename);
+  vtksys_stl::string filename = 
+    vtksys::SystemTools::GetFilenameName(fullfilename);
   
   for (cc = 0; cc < max_elems; cc++)
     {
@@ -769,8 +769,8 @@ void vtkPVFileEntry::Initialize()
       unsigned int cc;
       for ( cc = 0; cc < sld->GetNumberOfStrings(); cc ++ )
         {
-        kwsys_stl::string filename = 
-          kwsys::SystemTools::GetFilenameName(sld->GetString(cc));
+        vtksys_stl::string filename = 
+          vtksys::SystemTools::GetFilenameName(sld->GetString(cc));
         this->FileListSelect->AddFinalElement(filename.c_str(), 1);
         }
       }
@@ -783,7 +783,7 @@ void vtkPVFileEntry::Initialize()
   const char* fileName = this->Entry->GetValue();
   if ( fileName && fileName[0] )
     {
-    kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
+    vtksys_stl::string file = vtksys::SystemTools::GetFilenameName(fileName);
     this->FileListSelect->AddFinalElement(file.c_str(), 1);
     }
 
@@ -948,7 +948,7 @@ void vtkPVFileEntry::UpdateTimeStep()
     }
 
   this->IgnoreFileListEvents = 1;
-  kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
+  vtksys_stl::string file = vtksys::SystemTools::GetFilenameName(fileName);
   this->FileListSelect->AddFinalElement(file.c_str(), 1);
   int ts = this->FileListSelect->GetElementIndexFromFinalList(file.c_str());
   if ( ts < 0 )

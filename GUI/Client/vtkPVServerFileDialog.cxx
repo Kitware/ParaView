@@ -36,13 +36,13 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.40");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.41");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -968,7 +968,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                x + image_icon_max_width / 2, y);
   if (this->GetApplication()->GetMainInterp()->result)
     {
-    tmp = kwsys::SystemTools::DuplicateString(
+    tmp = vtksys::SystemTools::DuplicateString(
       this->GetApplication()->GetMainInterp()->result);
     if (directory)
       {

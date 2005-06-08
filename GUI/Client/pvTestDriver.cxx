@@ -18,7 +18,7 @@
 #include "pvTestDriver.h"
 #include "pvTestDriverConfig.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h>
@@ -252,7 +252,7 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
 }
 
 void
-pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
+pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                                 const char* paraView,
                                 const char* paraviewFlags,
                                 const char* numProc,
@@ -348,7 +348,7 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
   commandLine.push_back(0);
 }
 
-int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
+int pvTestDriver::StartServer(vtksysProcess* server, const char* name,
                               vtkstd::vector<char>& out,
                               vtkstd::vector<char>& err)
 {
@@ -357,16 +357,16 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
     return 1;
     }
   cerr << "pvTestDriver: starting process " << name << "\n";
-  kwsysProcess_SetTimeout(server, this->TimeOut);
-  kwsysProcess_Execute(server);
+  vtksysProcess_SetTimeout(server, this->TimeOut);
+  vtksysProcess_Execute(server);
   int foundWaiting = 0;
   vtkstd::string output;
   while(!foundWaiting)
     {
     int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
                                          &foundWaiting);
-    if(pipe == kwsysProcess_Pipe_None ||
-       pipe == kwsysProcess_Pipe_Timeout)
+    if(pipe == vtksysProcess_Pipe_None ||
+       pipe == vtksysProcess_Pipe_Timeout)
       {
       break;
       }
@@ -379,21 +379,21 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
   else
     {
     cerr << "pvTestDriver: " << name << " never started.\n";
-    kwsysProcess_Kill(server);
+    vtksysProcess_Kill(server);
     return 0;
     }
 }
 
-int pvTestDriver::StartClient(kwsysProcess* client, const char* name)
+int pvTestDriver::StartClient(vtksysProcess* client, const char* name)
 {
   if(!client)
     {
     return 1;
     }
   cerr << "pvTestDriver: starting process " << name << "\n";
-  kwsysProcess_SetTimeout(client, this->TimeOut);
-  kwsysProcess_Execute(client);
-  if(kwsysProcess_GetState(client) == kwsysProcess_State_Executing)
+  vtksysProcess_SetTimeout(client, this->TimeOut);
+  vtksysProcess_Execute(client);
+  if(vtksysProcess_GetState(client) == vtksysProcess_State_Executing)
     {
     cerr << "pvTestDriver: " << name << " sucessfully started.\n";
     return 1;
@@ -401,18 +401,18 @@ int pvTestDriver::StartClient(kwsysProcess* client, const char* name)
   else
     {
     this->ReportStatus(client, name);
-    kwsysProcess_Kill(client);
+    vtksysProcess_Kill(client);
     return 0;
     }
 }
 
-void pvTestDriver::Stop(kwsysProcess* p, const char* name)
+void pvTestDriver::Stop(vtksysProcess* p, const char* name)
 {
   if(p)
     {
     cerr << "pvTestDriver: killing process " << name << "\n";
-    kwsysProcess_Kill(p);
-    kwsysProcess_WaitForExit(p, 0);
+    vtksysProcess_Kill(p);
+    vtksysProcess_WaitForExit(p, 0);
     }
 }
 
@@ -451,7 +451,7 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
 
   vtkstd::vector<vtkstd::string> lines;
   vtkstd::vector<vtkstd::string>::iterator it;
-  kwsys::SystemTools::Split(output.c_str(), lines);
+  vtksys::SystemTools::Split(output.c_str(), lines);
 
   int i, j;
 
@@ -506,31 +506,31 @@ int pvTestDriver::Main(int argc, char* argv[])
 
   // mpi code
   // Allocate process managers.
-  kwsysProcess* renderServer = 0;
+  vtksysProcess* renderServer = 0;
   if(this->TestRenderServer)
     {
-    renderServer = kwsysProcess_New();
+    renderServer = vtksysProcess_New();
     if(!renderServer)
       {
-      cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the render server.\n";
+      cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the render server.\n";
       return 1;
       }
     }
-  kwsysProcess* server = 0;
+  vtksysProcess* server = 0;
   if(this->TestServer)
     {
-    server = kwsysProcess_New();
+    server = vtksysProcess_New();
     if(!server)
       {
-      cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the server.\n";
+      cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the server.\n";
       return 1;
       }
     }
-  kwsysProcess* client = kwsysProcess_New();
+  vtksysProcess* client = vtksysProcess_New();
   if(!client)
     {
-    kwsysProcess_Delete(server);
-    cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the client.\n";
+    vtksysProcess_Delete(server);
+    cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the client.\n";
     return 1;
     }
 
@@ -542,7 +542,7 @@ int pvTestDriver::Main(int argc, char* argv[])
   vtkstd::vector<char> RenderServerStdErr;
 
   // Construct the render server process command line
-  kwsys_stl::vector<const char*> renderServerCommand;
+  vtksys_stl::vector<const char*> renderServerCommand;
   if(renderServer)
     {
     this->CreateCommandLine(renderServerCommand,
@@ -550,10 +550,10 @@ int pvTestDriver::Main(int argc, char* argv[])
                             "--render-server",
                             this->MPIRenderServerNumProcessFlag.c_str());
     this->ReportCommand(&renderServerCommand[0], "renderserver");
-    kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
+    vtksysProcess_SetCommand(renderServer, &renderServerCommand[0]);
     }
 
-  kwsys_stl::vector<const char*> serverCommand;
+  vtksys_stl::vector<const char*> serverCommand;
   if(server)
     {
     const char* serverExe = this->ParaViewServer.c_str();
@@ -568,11 +568,11 @@ int pvTestDriver::Main(int argc, char* argv[])
                             "--server",
                             this->MPIServerNumProcessFlag.c_str());
     this->ReportCommand(&serverCommand[0], "server");
-    kwsysProcess_SetCommand(server, &serverCommand[0]);
+    vtksysProcess_SetCommand(server, &serverCommand[0]);
     }
 
   // Construct the client process command line.
-  kwsys_stl::vector<const char*> clientCommand;
+  vtksys_stl::vector<const char*> clientCommand;
   vtkstd::string clientFlag;
   if(renderServer)
     {
@@ -614,7 +614,7 @@ int pvTestDriver::Main(int argc, char* argv[])
                           this->MPIClientNumProcessFlag.c_str(),
                           this->ArgStart, argc, argv);
   this->ReportCommand(&clientCommand[0], "client");
-  kwsysProcess_SetCommand(client, &clientCommand[0]);
+  vtksysProcess_SetCommand(client, &clientCommand[0]);
 
   // Kill the processes if they are taking too long.
   if(this->ReverseConnection)
@@ -698,14 +698,14 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
 
   // Wait for the client and server to exit.
-  kwsysProcess_WaitForExit(client, 0);
+  vtksysProcess_WaitForExit(client, 0);
   if(server)
     {
-    kwsysProcess_WaitForExit(server, 0);
+    vtksysProcess_WaitForExit(server, 0);
     }
   if(renderServer)
     {
-    kwsysProcess_WaitForExit(renderServer, 0);
+    vtksysProcess_WaitForExit(renderServer, 0);
     }
 #ifdef PV_TEST_CLEAN_COMMAND
   // If any executable did not exit properly, run a user-specified
@@ -714,9 +714,9 @@ int pvTestDriver::Main(int argc, char* argv[])
   //
   // For example: "killall -9 rsh paraview"
   //
-  if(kwsysProcess_GetState(client) != kwsysProcess_State_Exited ||
-     kwsysProcess_GetState(server) != kwsysProcess_State_Exited ||
-     kwsysProcess_GetState(renderServer) != kwsysProcess_State_Exited)
+  if(vtksysProcess_GetState(client) != vtksysProcess_State_Exited ||
+     vtksysProcess_GetState(server) != vtksysProcess_State_Exited ||
+     vtksysProcess_GetState(renderServer) != vtksysProcess_State_Exited)
     {
     if(strlen(PV_TEST_CLEAN_COMMAND) > 0)
       {
@@ -738,14 +738,14 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
 
   // Free process managers.
-  kwsysProcess_Delete(client);
+  vtksysProcess_Delete(client);
   if(server)
     {
-    kwsysProcess_Delete(server);
+    vtksysProcess_Delete(server);
     }
   if(renderServer)
     {
-    kwsysProcess_Delete(renderServer);
+    vtksysProcess_Delete(renderServer);
     }
   // Report the server return code if it is nonzero.  Otherwise report
   // the client return code.
@@ -780,69 +780,69 @@ void pvTestDriver::ReportCommand(const char* const* command, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
+int pvTestDriver::ReportStatus(vtksysProcess* process, const char* name)
 {
   int result = 1;
-  switch(kwsysProcess_GetState(process))
+  switch(vtksysProcess_GetState(process))
     {
-    case kwsysProcess_State_Starting:
+    case vtksysProcess_State_Starting:
       {
       cerr << "pvTestDriver: Never started " << name << " process.\n";
       } break;
-    case kwsysProcess_State_Error:
+    case vtksysProcess_State_Error:
       {
       cerr << "pvTestDriver: Error executing " << name << " process: "
-           << kwsysProcess_GetErrorString(process)
+           << vtksysProcess_GetErrorString(process)
            << "\n";
       } break;
-    case kwsysProcess_State_Exception:
+    case vtksysProcess_State_Exception:
       {
       cerr << "pvTestDriver: " << name
                       << " process exited with an exception: ";
-      switch(kwsysProcess_GetExitException(process))
+      switch(vtksysProcess_GetExitException(process))
         {
-        case kwsysProcess_Exception_None:
+        case vtksysProcess_Exception_None:
           {
           cerr << "None";
           } break;
-        case kwsysProcess_Exception_Fault:
+        case vtksysProcess_Exception_Fault:
           {
           cerr << "Segmentation fault";
           } break;
-        case kwsysProcess_Exception_Illegal:
+        case vtksysProcess_Exception_Illegal:
           {
           cerr << "Illegal instruction";
           } break;
-        case kwsysProcess_Exception_Interrupt:
+        case vtksysProcess_Exception_Interrupt:
           {
           cerr << "Interrupted by user";
           } break;
-        case kwsysProcess_Exception_Numerical:
+        case vtksysProcess_Exception_Numerical:
           {
           cerr << "Numerical exception";
           } break;
-        case kwsysProcess_Exception_Other:
+        case vtksysProcess_Exception_Other:
           {
           cerr << "Unknown";
           } break;
         }
       cerr << "\n";
       } break;
-    case kwsysProcess_State_Executing:
+    case vtksysProcess_State_Executing:
       {
       cerr << "pvTestDriver: Never terminated " << name << " process.\n";
       } break;
-    case kwsysProcess_State_Exited:
+    case vtksysProcess_State_Exited:
       {
-      result = kwsysProcess_GetExitValue(process);
+      result = vtksysProcess_GetExitValue(process);
       cerr << "pvTestDriver: " << name << " process exited with code "
                       << result << "\n";
       } break;
-    case kwsysProcess_State_Expired:
+    case vtksysProcess_State_Expired:
       {
       cerr << "pvTestDriver: killed " << name << " process due to timeout.\n";
       } break;
-    case kwsysProcess_State_Killed:
+    case vtksysProcess_State_Killed:
       {
       cerr << "pvTestDriver: killed " << name << " process.\n";
       } break;
@@ -851,7 +851,7 @@ int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int pvTestDriver::WaitForLine(kwsysProcess* process, vtkstd::string& line,
+int pvTestDriver::WaitForLine(vtksysProcess* process, vtkstd::string& line,
                               double timeout,
                               vtkstd::vector<char>& out,
                               vtkstd::vector<char>& err)
@@ -880,7 +880,7 @@ int pvTestDriver::WaitForLine(kwsysProcess* process, vtkstd::string& line,
           line.append(&out[0], length);
           }
         out.erase(out.begin(), outiter+1);
-        return kwsysProcess_Pipe_STDOUT;
+        return vtksysProcess_Pipe_STDOUT;
         }
       }
 
@@ -903,51 +903,51 @@ int pvTestDriver::WaitForLine(kwsysProcess* process, vtkstd::string& line,
           line.append(&err[0], length);
           }
         err.erase(err.begin(), erriter+1);
-        return kwsysProcess_Pipe_STDERR;
+        return vtksysProcess_Pipe_STDERR;
         }
       }
 
     // No newlines found.  Wait for more data from the process.
     int length;
     char* data;
-    int pipe = kwsysProcess_WaitForData(process, &data, &length, &timeout);
-    if(pipe == kwsysProcess_Pipe_Timeout)
+    int pipe = vtksysProcess_WaitForData(process, &data, &length, &timeout);
+    if(pipe == vtksysProcess_Pipe_Timeout)
       {
       // Timeout has been exceeded.
       return pipe;
       }
-    else if(pipe == kwsysProcess_Pipe_STDOUT)
+    else if(pipe == vtksysProcess_Pipe_STDOUT)
       {
       // Append to the stdout buffer.
       vtkstd::vector<char>::size_type size = out.size();
       out.insert(out.end(), data, data+length);
       outiter = out.begin()+size;
       }
-    else if(pipe == kwsysProcess_Pipe_STDERR)
+    else if(pipe == vtksysProcess_Pipe_STDERR)
       {
       // Append to the stderr buffer.
       vtkstd::vector<char>::size_type size = err.size();
       err.insert(err.end(), data, data+length);
       erriter = err.begin()+size;
       }
-    else if(pipe == kwsysProcess_Pipe_None)
+    else if(pipe == vtksysProcess_Pipe_None)
       {
       // Both stdout and stderr pipes have broken.  Return leftover data.
       if(!out.empty())
         {
         line.append(&out[0], outiter-out.begin());
         out.erase(out.begin(), out.end());
-        return kwsysProcess_Pipe_STDOUT;
+        return vtksysProcess_Pipe_STDOUT;
         }
       else if(!err.empty())
         {
         line.append(&err[0], erriter-err.begin());
         err.erase(err.begin(), err.end());
-        return kwsysProcess_Pipe_STDERR;
+        return vtksysProcess_Pipe_STDERR;
         }
       else
         {
-        return kwsysProcess_Pipe_None;
+        return vtksysProcess_Pipe_None;
         }
       }
     }
@@ -969,14 +969,14 @@ void pvTestDriver::PrintLine(const char* pname, const char* line)
 }
 
 //----------------------------------------------------------------------------
-int pvTestDriver::WaitForAndPrintLine(const char* pname, kwsysProcess* process,
+int pvTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
                                       vtkstd::string& line, double timeout,
                                       vtkstd::vector<char>& out,
                                       vtkstd::vector<char>& err,
                                       int* foundWaiting)
 {
   int pipe = this->WaitForLine(process, line, timeout, out, err);
-  if(pipe == kwsysProcess_Pipe_STDOUT || pipe == kwsysProcess_Pipe_STDERR)
+  if(pipe == vtksysProcess_Pipe_STDOUT || pipe == vtksysProcess_Pipe_STDERR)
     {
     this->PrintLine(pname, line.c_str());
     if(foundWaiting && (line.find("Waiting") != line.npos))

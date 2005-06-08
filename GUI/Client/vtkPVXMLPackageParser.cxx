@@ -36,9 +36,9 @@
 #include "vtkPVTraceHelper.h"
 
 #include <ctype.h>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.49");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.50");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -693,11 +693,11 @@ int vtkPVXMLPackageParser::LoadServerManagerFile(vtkPVXMLElement* le)
     }
 
   // Check if a directory is specified.
-  kwsys_stl::string tmpDir;
+  vtksys_stl::string tmpDir;
   const char* directory = le->GetAttribute("directory");
   if (!directory)
     {
-    tmpDir = kwsys::SystemTools::GetFilenamePath(this->GetFileName());
+    tmpDir = vtksys::SystemTools::GetFilenamePath(this->GetFileName());
     directory = tmpDir.c_str();
     }
 

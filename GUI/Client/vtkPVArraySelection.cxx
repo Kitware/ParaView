@@ -37,14 +37,14 @@
 #include <vtkstd/string>
 #include <vtkstd/set>
 #include <vtkstd/vector>
-#include <kwsys/ios/sstream>
+#include <vtksys/ios/sstream>
 
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.68");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.69");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -404,7 +404,7 @@ void vtkPVArraySelection::SetPropertyFromGUI()
         if ( (state && !this->Selection->ArrayIsEnabled(aname)) ||
             (!state && this->Selection->ArrayIsEnabled(aname)) )
           {
-          kwsys_ios::ostringstream str;
+          vtksys_ios::ostringstream str;
           str << state;
           svp->SetElement(elemCount++, aname);
           svp->SetElement(elemCount++, str.str().c_str());

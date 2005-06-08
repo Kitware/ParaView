@@ -23,13 +23,13 @@
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #include <stdarg.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.26");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.27");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -61,7 +61,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
     "%s create text %d %d -text {%s} -font %s -tags x",
     this->Canvas->GetWidgetName(), 170, 10, text,font);
   delete [] text;
-  char* tmp = kwsys::SystemTools::DuplicateString(res);
+  char* tmp = vtksys::SystemTools::DuplicateString(res);
   
   if (this->CreateSelectionBindings)
     {
@@ -94,7 +94,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
           "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[0]-50, y, itext, font);
         delete [] itext;
-        tmp = kwsys::SystemTools::DuplicateString(cres);
+        tmp = vtksys::SystemTools::DuplicateString(cres);
         
         this->CalculateBBox(this->Canvas, tmp, bboxIn);
         if (this->CreateSelectionBindings)
@@ -180,7 +180,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
       "-tags x -fill blue",
       this->Canvas->GetWidgetName(), bboxSource[2]+50, y, otext, font);
     delete [] otext;
-    tmp = kwsys::SystemTools::DuplicateString(nres);
+    tmp = vtksys::SystemTools::DuplicateString(nres);
     
     // Get the bounding box for the name.
     this->CalculateBBox(this->Canvas, tmp, bboxOut);

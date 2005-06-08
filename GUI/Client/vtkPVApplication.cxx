@@ -106,13 +106,13 @@
 #include <vtkstd/string>
 #include <sys/stat.h>
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.357");
+vtkCxxRevisionMacro(vtkPVApplication, "1.358");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -248,7 +248,7 @@ public:
       if ( message )
         {
         message += 3;
-        char *rmessage = kwsys::SystemTools::DuplicateString(message);
+        char *rmessage = vtksys::SystemTools::DuplicateString(message);
         int last = strlen(rmessage) - 1;
         while ( last > 0 && 
                 (rmessage[last] == ' ' || rmessage[last] == '\n' || 
@@ -381,7 +381,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
   Vtkpvservercommontcl_Init(interp); 
 
   char* script = 
-    kwsys::SystemTools::DuplicateString(vtkPVApplication::ExitProc);  
+    vtksys::SystemTools::DuplicateString(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     if (err)
@@ -434,7 +434,7 @@ vtkPVApplication::vtkPVApplication()
   // since it is first created in vtkKWApplication's constructor
   // (in vtkKWApplication's constructor GetClassName() returns
   // the wrong value because the virtual table is not setup yet)
-  char* tclname = kwsys::SystemTools::DuplicateString(this->GetTclName());
+  char* tclname = vtksys::SystemTools::DuplicateString(this->GetTclName());
   vtkTclUpdateCommand(this->MainInterp, tclname, this);
   delete[] tclname;
 

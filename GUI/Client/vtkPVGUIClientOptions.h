@@ -20,7 +20,7 @@
 // or using Command Line Arguments.
 // 
 // .SECTION See Also
-// kwsys::CommandLineArguments
+// vtksys::CommandLineArguments
 
 #ifndef __vtkPVGUIClientOptions_h
 #define __vtkPVGUIClientOptions_h

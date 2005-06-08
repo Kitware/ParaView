@@ -38,11 +38,11 @@
 #include <vtkstd/vector>
 #include <vtkstd/map>
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.47");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -314,7 +314,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     {
     ostrstream str;
     str << "[ " << scale->GetTclName() << " GetValue ]" << ends;
-    value = kwsys::SystemTools::DuplicateString(str.str());
+    value = vtksys::SystemTools::DuplicateString(str.str());
     str.rdbuf()->freeze(0);
     }
   else if ( vectorEntry )
@@ -329,7 +329,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
       str << f[cc] << " ";
       }
     str << "}" <<ends;
-    value = kwsys::SystemTools::DuplicateString(str.str());
+    value = vtksys::SystemTools::DuplicateString(str.str());
     str.rdbuf()->freeze(0);
     }
   else
@@ -371,7 +371,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
       {
       const char* val = 
         this->GetApplication()->Script("eval set __foo__ %s", value);
-      char *rname = kwsys::SystemTools::AppendStrings("Manipulator", name);
+      char *rname = vtksys::SystemTools::AppendStrings("Manipulator", name);
       this->GetApplication()->SetRegistryValue(2, "RunTime", rname, val);
       delete[] rname;
       }

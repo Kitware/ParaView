@@ -59,12 +59,12 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkSMXDMFPropertyDomain.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.49");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.50");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -731,7 +731,7 @@ char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
 {
   char* listname = this->GetSourceListName(proxyname);
   char* sourcename  = this->GetSourceName(proxyname);
-  char* key = kwsys::SystemTools::AppendStrings(listname, ".", sourcename);
+  char* key = vtksys::SystemTools::AppendStrings(listname, ".", sourcename);
   delete [] listname;
   delete [] sourcename;
   return key;
@@ -1054,11 +1054,11 @@ void vtkPVAnimationManager::SaveAnimation()
     {
     this->GetApplication()->SaveDialogLastPathRegistryValue(saveDialog, "SaveAnimationFile2");
     const char* filename = saveDialog->GetFileName();  
-    kwsys_stl::string filename_stl = filename;
-    kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameLastExtension(filename);
-    kwsys_stl::string::size_type dot_pos = filename_stl.rfind(".");
-    kwsys_stl::string fileRoot;
-    if (dot_pos != kwsys_stl::string::npos)
+    vtksys_stl::string filename_stl = filename;
+    vtksys_stl::string ext_stl = vtksys::SystemTools::GetFilenameLastExtension(filename);
+    vtksys_stl::string::size_type dot_pos = filename_stl.rfind(".");
+    vtksys_stl::string fileRoot;
+    if (dot_pos != vtksys_stl::string::npos)
       {
       fileRoot = filename_stl.substr(0, dot_pos);
       }

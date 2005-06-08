@@ -16,14 +16,14 @@
 #include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 #include <stdarg.h>
 
 #define vtkPVTraceHelper_RefCountReferenceHelper 0
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.2");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -197,7 +197,7 @@ void vtkPVTraceHelper::OutputEntry(ostream *os, const char *format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  int estimated_length = kwsys::SystemTools::EstimateFormatLength(format, ap);
+  int estimated_length = vtksys::SystemTools::EstimateFormatLength(format, ap);
   va_end(ap);
   
   va_list var_args;
@@ -228,7 +228,7 @@ void vtkPVTraceHelper::AddEntry(const char *format, ...)
 
   va_list ap;
   va_start(ap, format);
-  int estimated_length = kwsys::SystemTools::EstimateFormatLength(format, ap);
+  int estimated_length = vtksys::SystemTools::EstimateFormatLength(format, ap);
   va_end(ap);
   
   va_list var_args;

@@ -22,9 +22,9 @@
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
-#include <kwsys/Process.h>
-#include <kwsys/stl/string>
-#include <kwsys/stl/vector>
+#include <vtksys/Process.h>
+#include <vtksys/stl/string>
+#include <vtksys/stl/vector>
 
 class pvTestDriver 
 {
@@ -38,10 +38,10 @@ protected:
                          vtkstd::vector<vtkstd::string>& flags);
   
   void ReportCommand(const char* const* command, const char* name);
-  int ReportStatus(kwsysProcess* process, const char* name);
+  int ReportStatus(vtksysProcess* process, const char* name);
   int ProcessCommandLine(int argc, char* argv[]);
   void CollectConfiguredOptions();
-  void CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
+  void CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                          const char* paraView,
                          const char* paraviewFlags, 
                          const char* numProc,
@@ -49,16 +49,16 @@ protected:
                          int argCount=0,
                          char* argv[]=0);
   
-  int StartServer(kwsysProcess* server, const char* name,
+  int StartServer(vtksysProcess* server, const char* name,
                   vtkstd::vector<char>& out, vtkstd::vector<char>& err);
-  int StartClient(kwsysProcess* client, const char* name);
-  void Stop(kwsysProcess* p, const char* name);
+  int StartClient(vtksysProcess* client, const char* name);
+  void Stop(vtksysProcess* p, const char* name);
   int OutputStringHasError(const char* pname, vtkstd::string& output);
 
-  int WaitForLine(kwsysProcess* process, vtkstd::string& line, double timeout,
+  int WaitForLine(vtksysProcess* process, vtkstd::string& line, double timeout,
                   vtkstd::vector<char>& out, vtkstd::vector<char>& err);
   void PrintLine(const char* pname, const char* line);
-  int WaitForAndPrintLine(const char* pname, kwsysProcess* process,
+  int WaitForAndPrintLine(const char* pname, vtksysProcess* process,
                           vtkstd::string& line, double timeout,
                           vtkstd::vector<char>& out, vtkstd::vector<char>& err,
                           int* foundWaiting);
