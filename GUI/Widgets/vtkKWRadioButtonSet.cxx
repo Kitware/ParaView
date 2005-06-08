@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.16");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.17");
 
 int vtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -41,6 +41,18 @@ vtkKWRadioButton* vtkKWRadioButtonSet::GetWidget(int id)
 vtkKWRadioButton* vtkKWRadioButtonSet::AddWidget(int id)
 {
   return static_cast<vtkKWRadioButton*>(this->AddWidgetInternal(id));
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWRadioButtonSet::AddWidgetInternal(int id)
+{
+  vtkKWRadioButton *widget = 
+    static_cast<vtkKWRadioButton*>(this->Superclass::AddWidgetInternal(id));
+  if (widget)
+    {
+    widget->SetValue(id);
+    }
+  return widget;
 }
 
 //----------------------------------------------------------------------------
