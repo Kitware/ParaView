@@ -29,11 +29,12 @@
 
 #include <kwsys/stl/list>
 #include <kwsys/SystemTools.hxx>
+#include <kwsys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.19");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.20");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -90,28 +91,6 @@ vtkKWToolbarSet::~vtkKWToolbarSet()
     this->TopSeparatorFrame = NULL;
     }
 
-  // Delete all toolbars
-
-  if (this->Internals)
-    {
-    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
-      this->Internals->Toolbars.begin();
-    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
-      this->Internals->Toolbars.end();
-    for (; it != end; ++it)
-      {
-      if (*it)
-        {
-        if ((*it)->SeparatorFrame)
-          {
-          (*it)->SeparatorFrame->Delete();
-          }
-        delete (*it);
-        }
-      }
-    delete this->Internals;
-    }
-
   if (this->ToolbarVisibilityChangedCommand)
     {
     delete [] this->ToolbarVisibilityChangedCommand;
@@ -122,6 +101,14 @@ vtkKWToolbarSet::~vtkKWToolbarSet()
     {
     delete [] this->NumberOfToolbarsChangedCommand;
     this->NumberOfToolbarsChangedCommand = NULL;
+    }
+
+  // Delete all toolbars
+
+  this->RemoveAllToolbars();
+  if (this->Internals)
+    {
+    delete this->Internals;
     }
 }
 
@@ -472,6 +459,8 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
     this->RestoreToolbarVisibilityFromRegistry(toolbar_slot->Toolbar);
     }
 
+  toolbar_slot->Toolbar->Register(this);
+
   // Pack the toolbars if we just brought a visible toolbar
 
   if (toolbar_slot->Visibility)
@@ -482,6 +471,69 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
   this->InvokeNumberOfToolbarsChangedCommand();
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWToolbarSet::RemoveToolbar(vtkKWToolbar *toolbar)
+{
+  // Check if the toolbar is in
+
+  if (!this->HasToolbar(toolbar))
+    {
+    vtkErrorMacro("The toolbar is not in the toolbar set.");
+    return 0;
+    }
+
+  // Find the panel in the manager
+
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+
+  vtkKWToolbarSetInternals::ToolbarsContainerIterator pos = 
+    kwsys_stl::find(this->Internals->Toolbars.begin(),
+                 this->Internals->Toolbars.end(),
+                 toolbar_slot);
+
+  if (pos == this->Internals->Toolbars.end())
+    {
+    vtkErrorMacro("Error while removing a toolbar from the set "
+                  "(can not find the toolbar).");
+    return 0;
+    }
+
+  // Remove the toolbar from the container
+  
+  this->Internals->Toolbars.erase(pos);
+
+  // Pack the toolbars if we just removed a visible toolbar
+
+  if (toolbar_slot->Visibility)
+    {
+    this->Pack();
+    }
+
+  // Delete the toolbar slot
+
+  if (toolbar_slot->SeparatorFrame)
+    {
+    toolbar_slot->SeparatorFrame->Delete();
+    }
+  
+  toolbar_slot->Toolbar->UnRegister(this);
+
+  delete toolbar_slot;
+
+  this->InvokeNumberOfToolbarsChangedCommand();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::RemoveAllToolbars()
+{
+  while (this->GetNumberOfToolbars())
+    {
+    this->RemoveToolbar(this->GetNthToolbar(0));
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -624,7 +676,7 @@ void vtkKWToolbarSet::SetShowTopSeparator(int arg)
 }
 
 //----------------------------------------------------------------------------
-vtkKWToolbar* vtkKWToolbarSet::GetToolbar(int index)
+vtkKWToolbar* vtkKWToolbarSet::GetNthToolbar(int index)
 {
   if (index >= 0 && index < this->GetNumberOfToolbars() && this->Internals)
     {

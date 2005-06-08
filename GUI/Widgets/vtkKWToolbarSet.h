@@ -50,9 +50,15 @@ public:
   virtual int HasToolbar(vtkKWToolbar *toolbar);
   
   // Description:
-  // Return a toolbar at a particular index.
-  virtual vtkKWToolbar* GetToolbar(int index);
+  // Get the n-th toolbar, and the number of toolbars.
+  virtual vtkKWToolbar* GetNthToolbar(int rank);
   virtual int GetNumberOfToolbars();
+
+  // Description:
+  // Remove a toolbar (or all) from the set.
+  // Return 1 on success, 0 otherwise.
+  virtual int RemoveToolbar(vtkKWToolbar *toolbar);
+  virtual void RemoveAllToolbars();
 
   // Description:
   // Set/Get the flat aspect of the toolbars
