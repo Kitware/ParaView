@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.12");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.13");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -232,7 +232,7 @@ int vtkPVComparativeVisManager::Show()
     int i;
     for (i=0; i< numToolbars; i++)
       {
-      vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
+      vtkKWToolbar* toolbar = toolbars->GetNthToolbar(i);
       if (toolbars->GetToolbarVisibility(toolbar))
         {
         this->Internal->VisibleToolbars.push_back(toolbar);
@@ -244,7 +244,7 @@ int vtkPVComparativeVisManager::Show()
     numToolbars = toolbars->GetNumberOfToolbars();
     for (i=0; i< numToolbars; i++)
       {
-      vtkKWToolbar* toolbar = toolbars->GetToolbar(i);
+      vtkKWToolbar* toolbar = toolbars->GetNthToolbar(i);
       if (toolbars->GetToolbarVisibility(toolbar))
         {
         this->Internal->VisibleToolbars.push_back(toolbar);
