@@ -41,8 +41,14 @@ public:
   // Description:
   // Specify the value to store in the button's associated variable 
   // whenever this button is selected.
-  void SetValue(int v);
-  void SetValue(const char *v);
+  virtual void SetValue(int v);
+  virtual void SetValue(const char *v);
+
+  // Description:
+  // Convenience method to set the button's associated variable directly
+  // to a specific value.
+  virtual void SetVariableValue(int v);
+  virtual void SetVariableValue(const char *v);
 
 protected:
   vtkKWRadioButton() {};

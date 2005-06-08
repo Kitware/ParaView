@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.17");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.18");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
@@ -52,7 +52,25 @@ void vtkKWRadioButton::SetValue(const char *v)
 {
   if (this->IsCreated())
     {
-    this->Script("%s configure -value %s", this->GetWidgetName(), v);
+    this->Script("%s configure -value {%s}", this->GetWidgetName(), v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::SetVariableValue(int v)
+{
+  if (this->IsCreated())
+    {
+    this->Script("set %s %d", this->GetVariableName(), v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::SetVariableValue(const char *v)
+{
+  if (this->IsCreated())
+    {
+    this->Script("set %s {%s}", this->GetVariableName(), v);
     }
 }
 
