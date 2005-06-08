@@ -52,17 +52,17 @@ INCLUDE_DIRECTORIES(
 
 IF (WIN32)
 
- FIND_PATH( HTML_HELP_PATH htmlhelp.h ${ParaView_SOURCE_DIR}/Utilities/HtmlHelp)
+ FIND_PATH( HTML_HELP_INCLUDE_PATH htmlhelp.h ${ParaView_SOURCE_DIR}/Utilities/HtmlHelp)
 
- IF (HTML_HELP_PATH)
-   INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
- ELSE (HTML_HELP_PATH)
+ IF (HTML_HELP_INCLUDE_PATH)
+   INCLUDE_DIRECTORIES(${HTML_HELP_INCLUDE_PATH})
+ ELSE (HTML_HELP_INCLUDE_PATH)
    SET (PARAVIEW_CAN_BUILD 0)
    MESSAGE("ParaView requires htmlhelp to build. Please install html help."
            "You can find html help on the msdn web site here:\n"
            "http://msdn.microsoft.com/\n"
            "http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconwhtshw.asp")
- ENDIF (HTML_HELP_PATH)
+ ENDIF (HTML_HELP_INCLUDE_PATH)
 
 
  FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp ${ParaView_SOURCE_DIR}/Utilities/HtmlHelp)
@@ -71,9 +71,9 @@ IF (WIN32)
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
  ELSE (HTML_HELP_LIBRARY)
    SET (PARAVIEW_CAN_BUILD 0)
-   MESSAGE("ParaView requires htmlhelp to build. Please set HTML_HELP_PATH")
+   MESSAGE("ParaView requires htmlhelp to build. Please set HTML_HELP_INCLUDE_PATH")
  ENDIF (HTML_HELP_LIBRARY)
- MARK_AS_ADVANCED(HTML_HELP_LIBRARY HTML_HELP_PATH)
+ MARK_AS_ADVANCED(HTML_HELP_LIBRARY HTML_HELP_INCLUDE_PATH)
 ENDIF (WIN32)
 
 SUBDIRS(Widgets)
