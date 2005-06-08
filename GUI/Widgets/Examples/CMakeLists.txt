@@ -1,3 +1,5 @@
 SUBDIRS(
   SimpleWindow
+  SimpleWindowWithPanels
+  WidgetsTour
 )
