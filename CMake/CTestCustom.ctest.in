@@ -14,7 +14,6 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   HeaderTesting-Rendering       
   HeaderTesting-Hybrid          
   HeaderTesting-Parallel        
-  HeaderTesting-Patented        
   HeaderTesting-PVServer-Common 
   HeaderTesting-PVServer-Filters
   HeaderTesting-PVServer-ServerManager
