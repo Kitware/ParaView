@@ -1,0 +1,36 @@
+# KWWidgets Tcl package configuration.
+
+package ifneeded kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
+  namespace eval ::kwwidgets::init {
+    proc load_library_package {libName libPath {libPrefix {@KWWIDGETS_TCL_LIBNAME_PREFIX@}}} {
+      set libExt [info sharedlibextension]
+      set currentDirectory [pwd]
+      set libFile [file join $libPath "$libPrefix$libName$libExt"]
+      if {[catch "cd {$libPath}; load {$libFile}" errorMessage]} {
+        puts $errorMessage
+      }
+      cd $currentDirectory
+    }
+    set version {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+  }
+  package provide kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+}
+
+# The is the C++ DLL itself
+
+package ifneeded KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
+    if {[package require vtkCommonTCL]} {
+        package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+        ::kwwidgets::init::load_library_package KWWidgets {@KWWIDGETS_TCL_LIBRARY_DIR@}
+    }
+}
+
+# The is the Tcl package itself, we load the DLL and eventually
+# perform some initialization
+
+package ifneeded kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
+    if {[package require -exact KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}]} {
+        package provide kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+    }
+    # Eventually package require vtkcommon
+}

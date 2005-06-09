@@ -330,8 +330,12 @@ public:
   // Initialize Tcl/Tk
   // Return NULL on error (eventually provides an ostream where detailed
   // error messages will be stored).
+  // One method takes argc/argv and will create an internal Tcl interpreter
+  // on the fly, the other takes a Tcl interpreter and uses it afterward
+  // (this is mainly intended for initialization as a Tcl package)
   //BTX
   static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
+  static Tcl_Interp *InitializeTcl(Tcl_Interp *interp, ostream *err = 0);
   //ETX
 
   // Description:

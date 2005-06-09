@@ -23,6 +23,11 @@ IF (NOT VTK_SOURCE_DIR)
   ENDIF(NOT VTK_WRAP_TCL)
 ENDIF (NOT VTK_SOURCE_DIR)
 
+# Version
+
+SET (KWWIDGETS_MAJOR_VERSION 1)
+SET (KWWIDGETS_MINOR_VERSION 0)
+
 # Output directories
 
 IF(NOT LIBRARY_OUTPUT_PATH)
@@ -143,6 +148,7 @@ SET(KWWidgets_SRCS
   vtkKWWidgetSet.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx
   )
 
 # Abstract/pure virtual classes
@@ -162,6 +168,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
   WRAP_EXCLUDE
   )
 
@@ -244,7 +251,9 @@ INCLUDE_DIRECTORIES(
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
 INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
-VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
+VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "vtkKWWidgetsInitializeCommand" "${KWWIDGETS_MAJOR_VERSION}.${KWWIDGETS_MINOR_VERSION}")
+
+SUBDIRS(Wrapping/Tcl)
 
 # Build the library
 
@@ -343,7 +352,7 @@ CONFIGURE_FILE(
   ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
 
 # The Resources/KWWidgets.rc.in can be configured for examples/samples
-# or use apps. Provide defaults values. Typically, you should then use:
+# or use apps. Here are some defaults values. Typically, you should then use:
 # CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/Resources/KWWidgets.rc.in foo.rc)
 # ADD_EXECUTABLE(... foo.rc)
 
@@ -352,8 +361,8 @@ IF(WIN32)
     GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${VTK_TK_RESOURCE_FILE} PATH)
     INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
   ENDIF(VTK_TK_RESOURCE_FILE)
-  SET (KWWIDGETS_RES_MAJOR_VERSION 1)
-  SET (KWWIDGETS_RES_MINOR_VERSION 0)
+  SET (KWWIDGETS_RES_MAJOR_VERSION "${KWWIDGETS_MAJOR_VERSION}")
+  SET (KWWIDGETS_RES_MINOR_VERSION "${KWWIDGETS_MINOR_VERSION}")
   SET (KWWIDGETS_RES_APP_NAME "Unknown")
   SET (KWWIDGETS_RES_FILE_NAME "Unknown")
   SET (KWWIDGETS_RES_COMPANY_NAME "Kitware Inc.")

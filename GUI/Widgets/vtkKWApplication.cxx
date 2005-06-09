@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.219");
+vtkCxxRevisionMacro(vtkKWApplication, "1.220");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -419,8 +419,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   sprintf(buf, "%d", argc-1);
   Tcl_SetVar(interp, (char *)"argc", buf, TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, (char *)"argv0", argv[0], TCL_GLOBAL_ONLY);
-  Tcl_SetVar(interp, (char *)"tcl_interactive", 
-             (char *)"0", TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, (char *)"tcl_interactive", (char *)"0", TCL_GLOBAL_ONLY);
 
   // Find the path to our internal Tcl/Tk support library/packages
   // if we are not using the installed Tcl/Tk (i.e., if the support
@@ -526,6 +525,17 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
 #endif
 
+  return vtkKWApplication::InitializeTcl(interp);
+}
+
+//----------------------------------------------------------------------------
+Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
+{
+  if (Et_Interp)
+    {
+    return;
+    }
+
   // Init Tcl
 
   Et_Interp = interp;
@@ -578,7 +588,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     return NULL;
     }
 
-  // Initialize Widgets
+  // Initialize Widgets and BWidgets
 
   Kwwidgets_Init(interp);
 
