@@ -46,10 +46,9 @@ const char *vtkKWWindowBase::ToolbarsVisibilityMenuLabel = "Toolbars";
 const char *vtkKWWindowBase::OpenRecentFileMenuLabel = "Open Recent File";
 const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
-const unsigned int vtkKWWindowBase::DefaultWidth = 900;
-const unsigned int vtkKWWindowBase::DefaultHeight = 700;
+const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.13");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.14");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -366,8 +365,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    this->SetSize(
-      vtkKWWindowBase::DefaultWidth, vtkKWWindowBase::DefaultHeight);
+    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
     }
 
   // Status frame
@@ -536,8 +534,7 @@ void vtkKWWindowBase::RestoreWindowGeometryFromRegistry()
     }
   else
     {
-    this->SetSize(
-      vtkKWWindowBase::DefaultWidth, vtkKWWindowBase::DefaultHeight);
+    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
     }
 }
 

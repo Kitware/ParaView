@@ -244,8 +244,7 @@ public:
   static const char *HelpCheckForUpdatesMenuLabel;
   static const char *ToolbarsVisibilityMenuLabel;
   static const char *WindowGeometryRegKey;
-  static const unsigned int DefaultWidth;
-  static const unsigned int DefaultHeight;
+  static const char *DefaultGeometry;
   //ETX
 
 protected:
