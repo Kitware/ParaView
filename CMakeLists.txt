@@ -248,8 +248,6 @@ IF(NOT BUILD_SHARED_LIBS)
   SET(VTK_TCL_TK_STATIC ON CACHE INTERNAL "" FORCE)
 ENDIF(NOT BUILD_SHARED_LIBS)
 
-OPTION(VTK_USE_PATENTED "Build VTK with patented support" OFF)
-
 # Specify python build so that we can use vtkTkRenderWidget with no
 # vtkRenderWindow wrapped.
 ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
@@ -293,9 +291,6 @@ SET(VTK_INCLUDE_DIR
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
 SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
-IF(VTK_USE_PATENTED)
-  SET(kits ${kits} Patented)
-ENDIF(VTK_USE_PATENTED)
 FOREACH(kit ${kits})
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
     ${ParaView_SOURCE_DIR}/VTK/${kit}
