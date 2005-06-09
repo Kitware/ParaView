@@ -32,14 +32,9 @@
 #include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
 
-#ifdef VTK_USE_PATENTED
-#include "vtkKitwareContourFilter.h"
-#include "vtkKitwareCutter.h"
-#endif
-
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart2, "1.2");
+vtkCxxRevisionMacro(vtkExtractCTHPart2, "1.3");
 vtkStandardNewMacro(vtkExtractCTHPart2);
 vtkCxxSetObjectMacro(vtkExtractCTHPart2,ClipPlane,vtkPlane);
 
@@ -235,14 +230,7 @@ void vtkExtractCTHPart2::ExecutePart(const char* arrayName,
   data->GetPointData()->SetScalars(pointVolumeFraction);
 
   // Create the contour surface.
-#ifdef VTK_USE_PATENTED
-  //vtkContourFilter *contour = vtkContourFilter::New();
-  vtkContourFilter *contour = vtkKitwareContourFilter::New();
-  // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  contour->ComputeNormalsOff();
-#else
   vtkContourFilter *contour = vtkContourFilter::New();
-#endif
   contour->SetInput(data);
   contour->SetValue(0, 0.5);
 
@@ -288,11 +276,8 @@ void vtkExtractCTHPart2::ExecutePart(const char* arrayName,
     clip1->SetClipFunction(this->ClipPlane);
     append2->AddInput(clip1->GetOutput());
     // We need to create a capping surface.
-#ifdef VTK_USE_PATENTED
-    vtkCutter *cut = vtkKitwareCutter::New();
-#else
     vtkCutter *cut = vtkCutter::New();
-#endif
+
     cut->SetInput(data);
     cut->SetCutFunction(this->ClipPlane);
     cut->SetValue(0, 0.0);

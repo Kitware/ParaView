@@ -24,7 +24,6 @@
 #define __vtkCTHAMRContour_h
 
 #include "vtkCTHDataToPolyDataFilter.h"
-#include "vtkToolkits.h" // I need the VTK_USE_PATENTED flag 
 
 class vtkCTHData;
 class vtkPolyData;

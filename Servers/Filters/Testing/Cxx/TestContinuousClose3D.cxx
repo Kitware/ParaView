@@ -23,10 +23,6 @@
 #include "vtkTestUtilities.h"
 #include "vtkTesting.h"
 
-#ifdef VTK_USE_PATENTED
-#include "vtkPVKitwareContourFilter.h"
-#endif
-
 int main(int argc, char* argv[])
 {
   char* fname = 
@@ -60,14 +56,6 @@ int main(int argc, char* argv[])
   vtkImageGradientMagnitude *magnitude = vtkImageGradientMagnitude::New();
   magnitude->SetInput( erode->GetOutput() );
   magnitude->SetDimensionality (3);
-
-#ifdef VTK_USE_PATENTED
-  vtkPVKitwareContourFilter* contour = vtkPVKitwareContourFilter::New();
-  contour->SetInput( magnitude->GetOutput() );
-  contour->SetValue(0, 0.5);
-  contour->Update();  //discard
-  contour->Delete();
-#endif
 
   vtkImageViewer *viewer = vtkImageViewer::New();
   viewer->SetInput ( magnitude->GetOutput() );

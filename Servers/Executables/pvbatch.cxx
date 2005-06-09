@@ -12,7 +12,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
+#include "vtkToolkits.h" // For VTK_USE_MPI
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVMain.h"
 #include "vtkProcessModule.h"
@@ -38,10 +38,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #ifdef VTK_USE_VOLUMERENDERING
 #include "vtkVolumeRenderingInstantiator.h"
-#endif
-
-#ifdef VTK_USE_PATENTED
-#include "vtkPatentedInstantiator.h"
 #endif
 
 #ifdef VTK_USE_HYBRID
@@ -87,9 +83,6 @@ extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
-#ifdef VTK_USE_PATENTED
-extern "C" void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
-#endif
 extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
@@ -112,9 +105,6 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
   vtkHybridCS_Initialize(pm->GetInterpreter());
   vtkParallelCS_Initialize(pm->GetInterpreter());
-#ifdef VTK_USE_PATENTED
-  vtkPatentedCS_Initialize(pm->GetInterpreter());
-#endif
   vtkPVCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
 

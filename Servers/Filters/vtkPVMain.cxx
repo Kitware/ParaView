@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
+#include "vtkToolkits.h" // For VTK_USE_MPI 
 #include "vtkPVConfig.h"
 #include "vtkPVFiltersConfig.h"
 
@@ -39,7 +39,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.7");
+vtkCxxRevisionMacro(vtkPVMain, "1.8");
 
 
 

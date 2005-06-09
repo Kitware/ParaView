@@ -22,7 +22,6 @@
 
 #include "vtkProcessModule.h"
 
-// Needed for VTK_USE_PATENTED
 #include "vtkToolkits.h"
 #include "vtkSMGeneratedModules.h"
 
@@ -42,7 +41,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.15");
+vtkCxxRevisionMacro(vtkSMApplication, "1.16");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()

@@ -142,9 +142,6 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
-IF(VTK_USE_PATENTED)
-  SET(kits ${kits} Patented)
-ENDIF(VTK_USE_PATENTED)
 FOREACH(kit ${kits})
   INCLUDE_DIRECTORIES(
     ${VTK_SOURCE_DIR}/${kit}
