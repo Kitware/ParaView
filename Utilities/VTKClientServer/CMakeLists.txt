@@ -86,9 +86,6 @@ SUBDIRS(Wrapping)
 
 # Build vtkClientServer wrappers for VTK kits.
 SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering)
-IF(VTK_USE_PATENTED)
-  SUBDIRS(Patented)
-ENDIF(VTK_USE_PATENTED)
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
 IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
