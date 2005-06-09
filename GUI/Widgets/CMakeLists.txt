@@ -18,6 +18,9 @@ SET (KWWidgets_LIBRARIES KWWidgets
 IF (NOT VTK_SOURCE_DIR)
   FIND_PACKAGE(VTK REQUIRED) 
   INCLUDE(${VTK_USE_FILE})
+  IF(NOT VTK_WRAP_TCL)
+    MESSAGE(FATAL_ERROR "Please set VTK_WRAP_TCL to ON")
+  ENDIF(NOT VTK_WRAP_TCL)
 ENDIF (NOT VTK_SOURCE_DIR)
 
 # Output directories
@@ -239,18 +242,9 @@ INCLUDE_DIRECTORIES(
 # Wrap the classes in Tcl
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
-
-IF(VTK_WRAP_TCL)
-  VTK_WRAP_TCL2(KWWidgets KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
-ELSE(VTK_WRAP_TCL)
-  IF (VTKTclWrapping_SOURCE_DIR)
-    SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
-    INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
-    VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
-  ELSE (VTKTclWrapping_SOURCE_DIR)
-    MESSAGE(FATAL_ERROR "Please set VTK_WRAP_TCL to ON")
-  ENDIF (VTKTclWrapping_SOURCE_DIR)
-ENDIF(VTK_WRAP_TCL)
+SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
+INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
+VTK_WRAP_TCL3(KWWidgets KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
 
 # Build the library
 

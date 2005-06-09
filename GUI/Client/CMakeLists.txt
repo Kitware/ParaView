@@ -283,8 +283,8 @@ SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/GUI/Client/Utilities")
 PV_WRAP_VTK_CS(KWParaView PVSERVER "${KIT_WRAP_DEPS}")
 
 # Wrap Tcl code
-SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
-INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
+SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
+INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(vtkKWParaView ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewClient_SRCS}" "")
 ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServer_SRCS} 

@@ -93,7 +93,8 @@ SET(VTK_WRAP_TCL_EXE
 SET(VTK_WRAP_TCL_INIT_EXE 
   "${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/vtkWrapTclInit${EXE_EXT}"
   CACHE INTERNAL "Location of program to do tcl wrapping")
-INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
+INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
+SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
 VTK_WRAP_TCL3(vtkCommonTCL vtkTCLSources "${VTK_TCL_FILES}" "")
 
 ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources}
