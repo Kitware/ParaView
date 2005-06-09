@@ -40,14 +40,14 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.14");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.15");
 
 class vtkXMLPVDWriterInternals
 {
@@ -221,7 +221,7 @@ int vtkXMLPVDWriter::RequestData(vtkInformation* request,
           fname = this->Internal->CreatePieceFileName(i);
           full = this->Internal->FilePath;
           full += fname;
-          kwsys::SystemTools::RemoveFile(full.c_str());
+          vtksys::SystemTools::RemoveFile(full.c_str());
           }
         this->RemoveADirectory(subdir.c_str());
         this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);
@@ -295,22 +295,22 @@ int vtkXMLPVDWriter::WriteCollectionFileIfRequested()
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::MakeDirectory(const char* name)
 {
-  if( !kwsys::SystemTools::MakeDirectory(name) )
+  if( !vtksys::SystemTools::MakeDirectory(name) )
     {
     vtkErrorMacro( << "Sorry unable to create directory: " << name 
                    << endl << "Last systen error was: " 
-                   << kwsys::SystemTools::GetLastSystemError().c_str() );
+                   << vtksys::SystemTools::GetLastSystemError().c_str() );
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::RemoveADirectory(const char* name)
 {
-  if( !kwsys::SystemTools::RemoveADirectory(name) )
+  if( !vtksys::SystemTools::RemoveADirectory(name) )
     {
     vtkErrorMacro( << "Sorry unable to remove a directory: " << name 
                    << endl << "Last systen error was: " 
-                   << kwsys::SystemTools::GetLastSystemError().c_str() );
+                   << vtksys::SystemTools::GetLastSystemError().c_str() );
     }
 
 }

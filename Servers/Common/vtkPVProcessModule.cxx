@@ -45,7 +45,7 @@
 
 #include <sys/stat.h>
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.35");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -398,8 +398,8 @@ const char* vtkPVProcessModule::GetDemoPath()
 
   if(this->Options)
     {
-    kwsys_stl::string selfPath, errorMsg;
-    if (kwsys::SystemTools::FindProgramPath(
+    vtksys_stl::string selfPath, errorMsg;
+    if (vtksys::SystemTools::FindProgramPath(
           this->Options->GetArgv0(), selfPath, errorMsg))
       {
       const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
@@ -498,7 +498,7 @@ void vtkPVProcessModule::SetProcessEnvironmentVariable(int processId,
                                                        const char* var)
 {
   (void)processId;
-  char* envstr = kwsys::SystemTools::DuplicateString(var);
+  char* envstr = vtksys::SystemTools::DuplicateString(var);
   putenv(envstr);
 }
 

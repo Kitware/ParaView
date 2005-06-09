@@ -16,8 +16,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 
-#include <kwsys/CommandLineArguments.hxx>
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/SystemTools.hxx>
 
 
 //----------------------------------------------------------------------------
@@ -35,20 +35,20 @@ public:
       this->XMLParser->Delete();
     }
   vtkCommandOptionsXMLParser* XMLParser;
-  kwsys::CommandLineArguments CMD;
+  vtksys::CommandLineArguments CMD;
 };
 //****************************************************************************
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.2");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.3");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
 {
   this->ProcessType = EVERYBODY;
-  // Initialize kwsys::CommandLineArguments
+  // Initialize vtksys::CommandLineArguments
   this->Internals = new vtkCommandOptionsInternal(this);
   this->Internals->CMD.SetUnknownArgumentCallback(vtkCommandOptions::UnknownArgumentHandler);
   this->Internals->CMD.SetClientData(this);
@@ -77,7 +77,7 @@ vtkCommandOptions::~vtkCommandOptions()
 //----------------------------------------------------------------------------
 const char* vtkCommandOptions::GetHelp()
 {
-  int width = kwsys::SystemTools::GetTerminalWidth();
+  int width = vtksys::SystemTools::GetTerminalWidth();
   if ( width < 9 )
     {
     width = 80;
@@ -189,11 +189,11 @@ void vtkCommandOptions::AddDeprecatedArgument(const char* longarg, const char* s
     return;
     }
   // Add a callback for the deprecated argument handling
-  this->Internals->CMD.AddCallback(longarg, kwsys::CommandLineArguments::NO_ARGUMENT,
+  this->Internals->CMD.AddCallback(longarg, vtksys::CommandLineArguments::NO_ARGUMENT,
                                    vtkCommandOptions::DeprecatedArgumentHandler, this, help);
   if(shortarg)
     {
-    this->Internals->CMD.AddCallback(shortarg, kwsys::CommandLineArguments::NO_ARGUMENT,
+    this->Internals->CMD.AddCallback(shortarg, vtksys::CommandLineArguments::NO_ARGUMENT,
                                      vtkCommandOptions::DeprecatedArgumentHandler, this, help);
     }
 }
@@ -241,7 +241,7 @@ void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, i
     }
   if(type & this->ProcessType || type == vtkCommandOptions::EVERYBODY)
     {
-    typedef kwsys::CommandLineArguments argT;
+    typedef vtksys::CommandLineArguments argT;
     this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
     if ( shortarg )
       {
@@ -260,7 +260,7 @@ void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, c
     }
   if(type & this->ProcessType || type == vtkCommandOptions::EVERYBODY)
     {
-    typedef kwsys::CommandLineArguments argT;
+    typedef vtksys::CommandLineArguments argT;
     this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
     if ( shortarg )
       {

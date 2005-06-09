@@ -36,10 +36,10 @@
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 #include "vtkDynamicLoader.h"
-#include <kwsys/ios/sstream>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.6");
+vtkCxxRevisionMacro(vtkPVMain, "1.7");
 
 
 
@@ -151,7 +151,7 @@ int vtkPVMain::Run(vtkPVOptions* options,
 #endif
 
   int display_help = 0;
-  kwsys_ios::ostringstream sscerr;
+  vtksys_ios::ostringstream sscerr;
   if ( !options->Parse(argc, argv) )
     {
     if ( options->GetUnknownArgument() )

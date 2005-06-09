@@ -23,9 +23,9 @@
 #include "vtkTclUtil.h"
 #include "vtkWindows.h"
 
-#include <kwsys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.9");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.10");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -74,23 +74,23 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
   if (!has_tcllibpath_env || !has_tklibpath_env)
     {
     const char *nameofexec = Tcl_GetNameOfExecutable();
-    if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+    if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
       {
       char dir_unix[1024], buffer[1024];
-      kwsys_stl::string dir = kwsys::SystemTools::GetFilenamePath(nameofexec);
-      kwsys::SystemTools::ConvertToUnixSlashes(dir);
+      vtksys_stl::string dir = vtksys::SystemTools::GetFilenamePath(nameofexec);
+      vtksys::SystemTools::ConvertToUnixSlashes(dir);
       strcpy(dir_unix, dir.c_str());
 
       // Installed KW application, otherwise build tree/windows
       sprintf(buffer, "%s/../lib/TclTk", dir_unix);
-      int exists = kwsys::SystemTools::FileExists(buffer);
+      int exists = vtksys::SystemTools::FileExists(buffer);
       if (!exists)
         {
         sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = kwsys::SystemTools::FileExists(buffer);
+        exists = vtksys::SystemTools::FileExists(buffer);
         }
-      kwsys_stl::string collapsed = 
-        kwsys::SystemTools::CollapseFullPath(buffer);
+      vtksys_stl::string collapsed = 
+        vtksys::SystemTools::CollapseFullPath(buffer);
       sprintf(buffer, collapsed.c_str());
       if (exists)
         {
@@ -107,7 +107,7 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
         {
         char tcl_library[1024] = "";
         sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (kwsys::SystemTools::FileExists(tcl_library))
+        if (vtksys::SystemTools::FileExists(tcl_library))
           {
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
                           TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
@@ -212,7 +212,7 @@ int vtkPVProcessModuleBatchHelper::RunGUIStart(int argc, char **argv, int numSer
 
   vtkPVBatchOptions* boptions = vtkPVBatchOptions::SafeDownCast(this->ProcessModule->GetOptions());
   char* file = 
-    kwsys::SystemTools::DuplicateString(boptions->GetBatchScriptName());
+    vtksys::SystemTools::DuplicateString(boptions->GetBatchScriptName());
   int res = 0; 
   // make exit do nothing in batch scripts
   if(Tcl_GlobalEval(interp, "proc exit {} {}") != TCL_OK)

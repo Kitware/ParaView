@@ -18,9 +18,6 @@
 // 
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
-// 
-// .SECTION See Also
-// kwsys::CommandLineArguments
 
 #ifndef __vtkPVServerOptions_h
 #define __vtkPVServerOptions_h
