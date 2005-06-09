@@ -16,9 +16,9 @@
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
-#include <kwsys/SystemTools.hxx>
-#include <kwsys/RegularExpression.hxx>
-#include <kwsys/ios/fstream>
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/ios/fstream>
 
 class Output
 {
@@ -64,7 +64,7 @@ public:
 
   int ProcessFile(const char* file, const char* title)
     {
-    kwsys_ios::ifstream ifs(file);
+    vtksys_ios::ifstream ifs(file);
     if ( !ifs )
       {
       cout << "Canot open file: " << file << endl;
@@ -80,12 +80,12 @@ public:
     vtkstd::string line;
     vtkstd::string::size_type cc;
 
-    kwsys::RegularExpression reIfDef("^[ \r\n\t]*#[ \r\n\t]*if");
-    kwsys::RegularExpression reElse("^[ \r\n\t]*#[ \r\n\t]*el(se|if)");
-    kwsys::RegularExpression reEndif("^[ \r\n\t]*#[ \r\n\t]*endif");
+    vtksys::RegularExpression reIfDef("^[ \r\n\t]*#[ \r\n\t]*if");
+    vtksys::RegularExpression reElse("^[ \r\n\t]*#[ \r\n\t]*el(se|if)");
+    vtksys::RegularExpression reEndif("^[ \r\n\t]*#[ \r\n\t]*endif");
     int res = 0;
 
-    while ( kwsys::SystemTools::GetLineFromStream(ifs, line) )
+    while ( vtksys::SystemTools::GetLineFromStream(ifs, line) )
       {
       res ++;
       int regex = 0;
