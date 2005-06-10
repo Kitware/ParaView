@@ -90,6 +90,8 @@ public:
   // Description:
   // Add a page to the panel (this will, in turn, instructs the manager to 
   // reserve a page for this given panel).
+  // balloon specifies the balloon help for that page, icon is an optional
+  // icon in case it is supported by the manager later on.
   // Return a unique positive ID, or < 0 on error.
   virtual int AddPage(const char *title, 
                       const char *balloon = 0, 
