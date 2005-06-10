@@ -1,5 +1,1 @@
-SUBDIRS(
-  SimpleWindow
-  SimpleWindowWithPanels
-  WidgetsTour
-)
+SUBDIRS(Cxx Tcl)

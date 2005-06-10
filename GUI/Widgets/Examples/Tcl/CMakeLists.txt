@@ -1,0 +1,4 @@
+SUBDIRS(
+  SimpleWindow
+  SimpleWindowWithPanels
+)
