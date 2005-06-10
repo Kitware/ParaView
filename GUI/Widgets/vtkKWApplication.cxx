@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.222");
+vtkCxxRevisionMacro(vtkKWApplication, "1.223");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -646,6 +646,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   if (i >= nb_windows && nb_windows)
     {
     this->GetNthWindow(0)->Display();
+    this->Script("wm withdraw .");
     }
 
   // Set the KWWidgets icon by default
