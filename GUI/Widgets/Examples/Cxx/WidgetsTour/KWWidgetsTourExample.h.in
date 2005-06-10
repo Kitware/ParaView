@@ -1,0 +1,27 @@
+static const char *SourceDir = "@CMAKE_CURRENT_SOURCE_DIR@";
+static const char *ProjectName = "@PROJECT_NAME@";
+static const char *ExampleDirName = "@EXAMPLE_DIR_NAME@";
+static const char *WidgetsDirName = "@WIDGETS_DIR_NAME@";
+
+/* 
+   Forward declare widget init functions
+ */
+
+@WIDGETS_FORWARD_DECL@
+
+/* 
+   Create widgets map
+ */
+
+typedef int (*WidgetEntryPointFunctionPointer)(vtkKWWidget *parent);
+typedef struct
+{
+  const char *Name;
+  WidgetEntryPointFunctionPointer EntryPoint;
+} WidgetNode;
+
+WidgetNode Widgets[] = 
+{
+  @WIDGETS_NODES@
+  {NULL , NULL}
+};
