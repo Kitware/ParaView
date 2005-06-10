@@ -37,10 +37,8 @@ public:
 
   // Description:
   // Get/Set the function
-  //BTX
   vtkGetObjectMacro(ColorTransferFunction, vtkColorTransferFunction);
   virtual void SetColorTransferFunction(vtkColorTransferFunction*);
-  //ETX
 
   // Description:
   // Set/Get a point color. Those methodes do not trigger any commands/events.
@@ -61,10 +59,8 @@ public:
   // Description:
   // Get/Set a specific function to display in the color ramp. If not
   // specified, the ColorTransferFunction will be used.
-  //BTX
   vtkGetObjectMacro(ColorRampTransferFunction, vtkColorTransferFunction);
   virtual void SetColorRampTransferFunction(vtkColorTransferFunction*);
-  //ETX
 
   // Description:
   // Set/Get the color ramp height (in pixels).

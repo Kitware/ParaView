@@ -647,12 +647,10 @@ public:
   // Set/Get the histogram and secondary histogram over the parameter range.
   // The primary histogram is drawn in a bar/area style, the secondary
   // one is drawn as dots on top of the primary.
-  //BTX
   vtkGetObjectMacro(Histogram, vtkKWHistogram);
   virtual void SetHistogram(vtkKWHistogram*);
   vtkGetObjectMacro(SecondaryHistogram, vtkKWHistogram);
   virtual void SetSecondaryHistogram(vtkKWHistogram*);
-  //ETX
 
   // Description:
   // Set/Get the histogram and secondary histogram color. 

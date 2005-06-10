@@ -40,8 +40,7 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent} {
     lappend objects ofun
     lappend objects gfun
 
-# TODO: this can't be done because of PV
-#    vpw SetVolumeProperty vp
+    vpw SetVolumeProperty vp
     vpw SetWindowLevel 128 128
 
     lappend objects vp

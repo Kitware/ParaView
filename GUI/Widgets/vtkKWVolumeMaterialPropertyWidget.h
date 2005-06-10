@@ -37,10 +37,8 @@ public:
   
   // Description:
   // Set/get the volume property observed by this widget
-//BTX
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
-//ETX
 
   // Description:
   // Set/get the component controlled by the widget

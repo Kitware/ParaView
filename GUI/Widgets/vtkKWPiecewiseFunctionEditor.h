@@ -32,10 +32,8 @@ public:
 
   // Description:
   // Get/Set the function
-//BTX
   vtkGetObjectMacro(PiecewiseFunction, vtkPiecewiseFunction);
   virtual void SetPiecewiseFunction(vtkPiecewiseFunction*);
-//ETX
 
   // Description:
   // Create the widget.

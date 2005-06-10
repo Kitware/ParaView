@@ -49,7 +49,6 @@ public:
   // and actor2d
   virtual void Update();
 
-  //BTX
   // Description:
   // Set/Get the text property to control.
   virtual void SetTextProperty(vtkTextProperty*);
@@ -62,7 +61,6 @@ public:
   // that the vtkActor2D color has to be used instead.
   virtual void SetActor2D(vtkActor2D*);
   vtkGetObjectMacro(Actor2D, vtkActor2D);
-  //ETX
 
   // Description:
   // Set the widget aspect to be long, i.e. the widgets will be packed on 

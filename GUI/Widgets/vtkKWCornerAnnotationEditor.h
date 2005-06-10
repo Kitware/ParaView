@@ -61,7 +61,6 @@ public:
   virtual void SetRenderWidget(vtkKWRenderWidget*);
   vtkGetObjectMacro(RenderWidget,vtkKWRenderWidget);
 
-  //BTX
   // Description:
   // Get the underlying vtkCornerAnnotation. 
   // In vtkKWView mode, the CornerAnnotation is created automatically and 
@@ -70,7 +69,6 @@ public:
   // In vtkKWRenderWidget, the corner prop is part of vtkKWRenderWidget, and
   // this method is just a gateway to vtkKWRenderWidget::GetCornerAnnotation().
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
-  //ETX
   
   // Description:
   // Set/Get the annotation visibility

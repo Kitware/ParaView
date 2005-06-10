@@ -51,28 +51,22 @@ public:
 
   // Description:
   // Get/Set the transfer function mapping scalar value to color
-//BTX
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
   virtual void SetVolumeProperty(vtkVolumeProperty*);
-//ETX
 
   // Description:
   // The data this volume property is used for. 
   // Will be used to get the scalar range of the transfer functions for
   // example.
-//BTX
   vtkGetObjectMacro(DataSet, vtkDataSet);
   virtual void SetDataSet(vtkDataSet*);
-//ETX
 
   // Description:
   // Set/Get the histograms for the data this volume property is used for.
   // Obviously those histograms must have been computed using the same
   // data as the DataSet Ivar above.
-//BTX
   vtkGetObjectMacro(HistogramSet, vtkKWHistogramSet);
   virtual void SetHistogramSet(vtkKWHistogramSet*);
-//ETX
 
   // Description:
   // Set/get the current component controlled by the widget

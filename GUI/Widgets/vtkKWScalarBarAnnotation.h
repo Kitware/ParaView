@@ -49,12 +49,10 @@ public:
   // Create the widget.
   virtual void Create(vtkKWApplication *app, const char* args);
 
-  //BTX
   // Description:
   // Set/Get the vtkScalarBarWidget that owns the scalar bar actor.
   virtual void SetScalarBarWidget(vtkScalarBarWidget*);
   vtkGetObjectMacro(ScalarBarWidget, vtkScalarBarWidget);
-  //ETX
 
   // Description:
   // Set/Get the scalar bar visibility
@@ -68,14 +66,12 @@ public:
   vtkSetMacro(AnnotationChangedEvent, int);
   vtkGetMacro(AnnotationChangedEvent, int);
 
-  //BTX
   // Description:
   // Set/get the volume property that can be used to set the LUT of the
   // scalar bar actor (i.e. allow the user to choose which component to
   // visualize)
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
-  //ETX
 
   // Description:
   // Set/get the number of components corresponding to the data represented
