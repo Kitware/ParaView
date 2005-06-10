@@ -24,7 +24,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegistryHelper, "1.1");
+vtkCxxRevisionMacro(vtkKWRegistryHelper, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWRegistryHelper *vtkKWRegistryHelper::New()
@@ -66,7 +66,7 @@ vtkKWRegistryHelper::~vtkKWRegistryHelper()
 
 //----------------------------------------------------------------------------
 int vtkKWRegistryHelper::Open(const char *toplevel,
-                                  const char *subkey, int readonly)
+                              const char *subkey, int readonly)
 {
   int res = 0;
   if ( this->GetLocked() )
@@ -80,7 +80,7 @@ int vtkKWRegistryHelper::Open(const char *toplevel,
       return 0;
       }
     }
-  if ( !toplevel )
+  if (!toplevel || !*toplevel)
     {
     vtkErrorMacro("vtkKWRegistryHelper::Opened() Toplevel not defined");
     return 0;
