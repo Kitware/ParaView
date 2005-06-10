@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.44");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.45");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -3156,7 +3156,7 @@ void vtkKWParameterValueFunctionEditor::SetFrameBackgroundColor(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetBackgroundColor(int r, int g, int b)
+void vtkKWParameterValueFunctionEditor::SetBackgroundColor(double r, double g, double b)
 {
   this->Superclass::SetBackgroundColor(r, g, b);
   if (this->Canvas)

@@ -577,9 +577,7 @@ public:
   virtual void SetFrameBackgroundColor(double r, double g, double b);
   virtual void SetFrameBackgroundColor(double rgb[3])
     { this->SetFrameBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void SetBackgroundColor(int r, int g, int b);
-  virtual void SetBackgroundColor(double r, double g, double b)
-    { this->Superclass::SetBackgroundColor(r, g, b); }
+  virtual void SetBackgroundColor(double r, double g, double b);
   
   // Description:
   // Set/Get the point color. 

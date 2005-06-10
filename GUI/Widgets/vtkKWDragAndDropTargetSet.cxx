@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.3");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.4");
 
 int vtkKWDragAndDropTargetSetCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -527,7 +527,7 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
       if (anchor->HasConfigurationOption("-fg") &&
           anchor->HasConfigurationOption("-bg"))
         {
-        int fr, fg, fb, br, bg, bb;
+        double fr, fg, fb, br, bg, bb;
         anchor->GetForegroundColor(&fr, &fg, &fb);
         anchor->GetBackgroundColor(&br, &bg, &bb);
         anchor->SetForegroundColor(br, bg, bb);
@@ -632,7 +632,7 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       if (anchor->HasConfigurationOption("-fg") &&
           anchor->HasConfigurationOption("-bg"))
         {
-        int fr, fg, fb, br, bg, bb;
+        double fr, fg, fb, br, bg, bb;
         anchor->GetForegroundColor(&fr, &fg, &fb);
         anchor->GetBackgroundColor(&br, &bg, &bb);
         anchor->SetForegroundColor(br, bg, bb);

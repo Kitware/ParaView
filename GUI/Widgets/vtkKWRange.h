@@ -349,9 +349,9 @@ protected:
     HIGHLIGHT_COLOR
   };
   //ETX
-  virtual void GetWholeRangeColor(int type, int &r, int &g, int &b);
-  virtual void GetRangeColor(int type, int &r, int &g, int &b);
-  virtual void GetSliderColor(int type, int &r, int &g, int &b);
+  virtual void GetWholeRangeColor(int type, double &r, double &g, double &b);
+  virtual void GetRangeColor(int type, double &r, double &g, double &b);
+  virtual void GetSliderColor(int type, double &r, double &g, double &b);
 
   // Description:
   // Redraw elements

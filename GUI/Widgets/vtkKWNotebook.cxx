@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.77");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.78");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -2239,7 +2239,7 @@ void vtkKWNotebook::UpdateMaskPosition()
     // this half-size.
 
 #if _WIN32
-    int tr, tg, tb, lr, lg, lb;
+    double tr, tg, tb, lr, lg, lb;
     page->TabFrame->GetBackgroundColor(&tr, &tg, &tb);
     page->Label->GetBackgroundColor(&lr, &lg, &lb);
     if (tr == lr && tg == lg && tb == lb)

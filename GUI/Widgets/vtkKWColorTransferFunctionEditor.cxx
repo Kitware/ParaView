@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.29");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.30");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -1205,14 +1205,18 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
 
     if (!in_canvas)
       {
-      int bg_r, bg_g, bg_b;
+      double bg_r, bg_g, bg_b;
       this->ColorRamp->GetBackgroundColor(&bg_r, &bg_g, &bg_b);
+      unsigned char rgb[3];
+      rgb[0] = (unsigned char)bg_r * 255.0;
+      rgb[1] = (unsigned char)bg_g * 255.0;
+      rgb[2] = (unsigned char)bg_b * 255.0;
       img_ptr = img_buffer;
       for (i = 0; i < img_offset_x; i++)
         {
-        *img_ptr++ = (unsigned char)bg_r;
-        *img_ptr++ = (unsigned char)bg_g;
-        *img_ptr++ = (unsigned char)bg_b;
+        *img_ptr++ = rgb[0];
+        *img_ptr++ = rgb[1];
+        *img_ptr++ = rgb[2];
         }
       }
 
@@ -1379,19 +1383,14 @@ void vtkKWColorTransferFunctionEditor::GetColorRampOutlineSunkenColors(
     return;
     }
 
-  int r, g, b;
   double fr, fg, fb;
   double fh, fs, fv;
   
-  this->ColorRamp->GetBackgroundColor(&r, &g, &b);
+  this->ColorRamp->GetBackgroundColor(&fr, &fg, &fb);
 
-  bg_rgb[0] = (unsigned char)r;
-  bg_rgb[1] = (unsigned char)g;
-  bg_rgb[2] = (unsigned char)b;
-
-  fr = (double)r / 255.0;
-  fg = (double)g / 255.0;
-  fb = (double)b / 255.0;
+  bg_rgb[0] = (unsigned char)fr * 255.0;
+  bg_rgb[1] = (unsigned char)fg * 255.0;
+  bg_rgb[2] = (unsigned char)fb * 255.0;
 
   if (fr == fg && fg == fb)
     {

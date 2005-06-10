@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.42");
+vtkCxxRevisionMacro(vtkKWRange, "1.43");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1102,14 +1102,13 @@ void vtkKWRange::SetRangeInteractionColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
+void vtkKWRange::GetWholeRangeColor(int type, double &r, double &g, double &b)
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  double fr, fg, fb;
   double fh, fs, fv;
 
   switch (type)
@@ -1120,18 +1119,14 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
 
       this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
 
-      fr = (double)r / 255.0;
-      fg = (double)g / 255.0;
-      fb = (double)b / 255.0;
-
-      if (fr == fg && fg == fb)
+      if (r == g && g == b)
         {
         fh = fs = 0.0;
-        fv = fr;
+        fv = r;
         }
       else
         {
-        vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+        vtkMath::RGBToHSV(r, g, b, &fh, &fs, &fv);
         }
 
       if (type == vtkKWRange::DARK_SHADOW_COLOR)
@@ -1147,11 +1142,7 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
         fv = 1.0;
         }
 
-      vtkMath::HSVToRGB(fh, fs, fv, &fr, &fg, &fb);
-
-      r = (int)(fr * 255.0);
-      g = (int)(fg * 255.0);
-      b = (int)(fb * 255.0);
+      vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
 
       break;
 
@@ -1165,14 +1156,13 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
+void vtkKWRange::GetRangeColor(int type, double &r, double &g, double &b)
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  double fr, fg, fb;
   double fh, fs, fv;
   double *rgb;
 
@@ -1184,18 +1174,14 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
 
       this->GetRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
 
-      fr = (double)r / 255.0;
-      fg = (double)g / 255.0;
-      fb = (double)b / 255.0;
-
-      if (fr == fg && fg == fb)
+      if (r == g && g == b)
         {
         fh = fs = 0.0;
-        fv = fr;
+        fv = r;
         }
       else
         {
-        vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+        vtkMath::RGBToHSV(r, g, b, &fh, &fs, &fv);
         }
 
       if (type == vtkKWRange::DARK_SHADOW_COLOR)
@@ -1211,11 +1197,7 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
         fv = 1.0;
         }
 
-      vtkMath::HSVToRGB(fh, fs, fv, &fr, &fg, &fb);
-
-      r = (int)(fr * 255.0);
-      g = (int)(fg * 255.0);
-      b = (int)(fb * 255.0);
+      vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
 
       break;
 
@@ -1231,9 +1213,9 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
         }
       else
         {
-        r = (int)(rgb[0] * 255.0);
-        g = (int)(rgb[1] * 255.0);
-        b = (int)(rgb[2] * 255.0);
+        r = rgb[0];
+        g = rgb[1];
+        b = rgb[2];
         }
 
       break;
@@ -1241,7 +1223,7 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::GetSliderColor(int type, int &r, int &g, int &b)
+void vtkKWRange::GetSliderColor(int type, double &r, double &g, double &b)
 {
   this->GetWholeRangeColor(type, r, g, b);
 }
@@ -1900,21 +1882,33 @@ void vtkKWRange::UpdateRangeColors()
   const char *canv = this->Canvas->GetWidgetName();
 
   char bgcolor[10], dscolor[10], lscolor[10], hlcolor[10];
-  int r, g, b;
+  double r, g, b;
 
   // Set the color of the Range
 
   this->GetRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
-  sprintf(bgcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(bgcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetRangeColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
-  sprintf(dscolor, "#%02x%02x%02x", r, g, b);
+  sprintf(dscolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetRangeColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
-  sprintf(hlcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(hlcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetRangeColor(vtkKWRange::LIGHT_SHADOW_COLOR, r, g, b);
-  sprintf(lscolor, "#%02x%02x%02x", r, g, b);
+  sprintf(lscolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   tk_cmd << canv << " itemconfigure rbgc -outline {} -fill "<< bgcolor << endl;
   tk_cmd << canv << " itemconfigure rdsc -fill " << dscolor << endl;
@@ -1938,21 +1932,33 @@ void vtkKWRange::UpdateColors()
   const char *canv = this->Canvas->GetWidgetName();
 
   char bgcolor[10], dscolor[10], lscolor[10], hlcolor[10];
-  int r, g, b;
+  double r, g, b;
 
   // Set the color of the Whole Range
 
   this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
-  sprintf(bgcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(bgcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetWholeRangeColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
-  sprintf(dscolor, "#%02x%02x%02x", r, g, b);
+  sprintf(dscolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetWholeRangeColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
-  sprintf(hlcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(hlcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetWholeRangeColor(vtkKWRange::LIGHT_SHADOW_COLOR, r, g, b);
-  sprintf(lscolor, "#%02x%02x%02x", r, g, b);
+  sprintf(lscolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   tk_cmd << canv << " itemconfigure wbgc -outline {} -fill "<< bgcolor << endl;
   tk_cmd << canv << " itemconfigure wdsc -fill " << dscolor << endl;
@@ -1966,13 +1972,22 @@ void vtkKWRange::UpdateColors()
   // Set the color of all Sliders
 
   this->GetSliderColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
-  sprintf(bgcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(bgcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetSliderColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
-  sprintf(dscolor, "#%02x%02x%02x", r, g, b);
+  sprintf(dscolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   this->GetSliderColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
-  sprintf(hlcolor, "#%02x%02x%02x", r, g, b);
+  sprintf(hlcolor, "#%02x%02x%02x", 
+          (int)(r * 255.0), 
+          (int)(g * 255.0),
+          (int)(b * 255.0));
 
   tk_cmd << canv << " itemconfigure sbgc -outline {} -fill "<< bgcolor << endl;
   tk_cmd << canv << " itemconfigure sdsc -fill " << dscolor << endl;
