@@ -16,21 +16,27 @@ package ifneeded kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MIN
   package provide kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
 }
 
+# Note that we @KWWIDGETS_TCL_LIBRARY_DIR@ will be set for install targets
+# to some Tcl code that uses "info script". Be aware that "info script" does
+# *not* return anything in the current pkgIndex.tcl context, because it
+# is not sourced, per say. That is the reason why we need to source
+# another file, inside each kits subdirectory. That source will in turn
+# perform a "package require" that will call load_library_package successfully
+# since "info script" will be defined.
+
 # The is the C++ DLL itself
+# Do not mess up with the quoting
+package ifneeded KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} "
+    package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+    ::kwwidgets::init::load_library_package KWWidgets {@KWWIDGETS_TCL_LIBRARY_DIR@}
+"
 
-package ifneeded KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
-    if {[package require vtkCommonTCL]} {
-        package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
-        ::kwwidgets::init::load_library_package KWWidgets {@KWWIDGETS_TCL_LIBRARY_DIR@}
+# The is the Tcl package itself
+# Do not mess up with the quoting
+
+package ifneeded kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} "
+    package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+    if {\[catch {source \[file join {@KWWIDGETS_TCL_SCRIPT_DIR@} kwwidgets kwwidgets.tcl\]} errorMessage\]} {
+        puts \$errorMessage
     }
-}
-
-# The is the Tcl package itself, we load the DLL and eventually
-# perform some initialization
-
-package ifneeded kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
-    if {[package require -exact KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}]} {
-        package provide kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
-    }
-    # Eventually package require vtkcommon
-}
+"
