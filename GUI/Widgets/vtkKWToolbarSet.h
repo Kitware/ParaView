@@ -44,9 +44,12 @@ public:
   // Description:
   // Add a toolbar to the set.
   // The default_visibility parameter sets the visibility of the toolbar
-  // in the set once it is added.
+  // in the set once it is added (so that it can be added hidden for example,
+  // before its visibility setting is retrieved from the registry).
   // Return 1 on success, 0 otherwise.
-  virtual int AddToolbar(vtkKWToolbar *toolbar, int default_visibility = 1);
+  virtual int AddToolbar(vtkKWToolbar *toolbar)
+    { return this->AddToolbar(toolbar, 1); };
+  virtual int AddToolbar(vtkKWToolbar *toolbar, int default_visibility);
   virtual int HasToolbar(vtkKWToolbar *toolbar);
   
   // Description:
