@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.51");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.52");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -124,22 +124,12 @@ vtkKWToolbar::~vtkKWToolbar()
     this->DefaultOptionsWidget = NULL;
     }
 
+  this->RemoveAllWidgets();
   if (this->Internals)
     {
-    vtkKWToolbarInternals::WidgetsContainerIterator it = 
-      this->Internals->Widgets.begin();
-    vtkKWToolbarInternals::WidgetsContainerIterator end = 
-      this->Internals->Widgets.end();
-    for (; it != end; ++it)
-      {
-      if (*it)
-        {
-        (*it)->Delete();
-        }
-      }
     delete this->Internals;
     }
-
+  
   this->SetName(NULL);
 }
 
@@ -260,13 +250,37 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
   if (location_pos == this->Internals->Widgets.end())
     {
     vtkErrorMacro("Unable to remove widget from toolbar");
+    return;
     }
-  else
+
+  (*location_pos)->UnRegister(this);
+  this->Internals->Widgets.erase(location_pos);
+
+  this->UpdateWidgets();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::RemoveAllWidgets()
+{
+  if (!this->Internals)
     {
-    (*location_pos)->Delete();
-    this->Internals->Widgets.erase(location_pos);
-    this->UpdateWidgets();
+    return;
     }
+
+  vtkKWToolbarInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWToolbarInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
+    {
+    if (*it)
+      {
+      (*it)->UnRegister(this);
+      }
+    }
+  this->Internals->Widgets.clear();
+
+  this->UpdateWidgets();
 }
 
 //----------------------------------------------------------------------------

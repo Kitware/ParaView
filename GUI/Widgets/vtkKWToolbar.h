@@ -62,8 +62,9 @@ public:
   virtual void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
 
   // Description:
-  // Remove a widget from the toolbar
+  // Remove a widget (or all) from the toolbar
   virtual void RemoveWidget(vtkKWWidget* widget);
+  virtual void RemoveAllWidgets();
 
   // Description:
   // Convenience method to retrieve a widget given its name. The name is
