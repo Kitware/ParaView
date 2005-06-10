@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.125");
+vtkCxxRevisionMacro(vtkKWWidget, "1.126");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -610,60 +610,40 @@ int vtkKWWidget::GetStateOption()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
+void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
 {
   vtkKWTkUtilities::GetBackgroundColor(this, r, g, b);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetBackgroundColor(int r, int g, int b)
+double* vtkKWWidget::GetBackgroundColor()
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", r, g, b);
-  this->Script("%s config -bg %s", this->GetWidgetName(), color);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
-{
-  int ir, ig, ib;
-  this->GetBackgroundColor(&ir, &ig, &ib);
-
-  *r = (double)ir / 255.0;
-  *g = (double)ig / 255.0;
-  *b = (double)ib / 255.0;
+  static double rgb[3];
+  this->GetBackgroundColor(rgb, rgb + 1, rgb + 2);
+  return rgb;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 {
-  this->SetBackgroundColor(
-    (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
-{
-  vtkKWTkUtilities::GetOptionColor(this, "-fg", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetForegroundColor(int r, int g, int b)
-{
   char color[10];
-  sprintf(color, "#%02x%02x%02x", r, g, b);
-  this->Script("%s config -fg %s", this->GetWidgetName(), color);
+  sprintf(color, "#%02x%02x%02x", 
+          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+  this->Script("%s config -bg %s", this->GetWidgetName(), color);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetForegroundColor(double *r, double *g, double *b)
 {
-  int ir, ig, ib;
-  this->GetForegroundColor(&ir, &ig, &ib);
+  vtkKWTkUtilities::GetOptionColor(this, "-fg", r, g, b);
+}
 
-  *r = (double)ir / 255.0;
-  *g = (double)ig / 255.0;
-  *b = (double)ib / 255.0;
+//----------------------------------------------------------------------------
+double* vtkKWWidget::GetForegroundColor()
+{
+  static double rgb[3];
+  this->GetForegroundColor(rgb, rgb + 1, rgb + 2);
+  return rgb;
 }
 
 //----------------------------------------------------------------------------
