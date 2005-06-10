@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.8");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.9");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -347,7 +347,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
     if(lmkWidget)
       {
 //      lmkWidget->SetLookmarkState(onoff);
-      int fr, fg, fb, br, bg, bb;
+      double fr, fg, fb, br, bg, bb;
       anchor = lmkWidget->GetDragAndDropTargetSet()->GetSourceAnchor();
       anchor->GetForegroundColor(&fr, &fg, &fb);
       anchor->GetBackgroundColor(&br, &bg, &bb);
@@ -362,7 +362,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       {
 //      if(lmkFolder->GetSelectionFlag() != onoff)
 //        {
-        int fr, fg, fb, br, bg, bb;
+        double fr, fg, fb, br, bg, bb;
         anchor = lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor();
         anchor->GetForegroundColor(&fr, &fg, &fb);
         anchor->GetBackgroundColor(&br, &bg, &bb);
