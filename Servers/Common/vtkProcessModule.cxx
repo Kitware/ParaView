@@ -28,6 +28,7 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModuleGUIHelper.h"
+#include "vtkKWProcessStatistics.h"
 
 #include <vtkstd/map>
 
@@ -45,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.22");
+vtkCxxRevisionMacro(vtkProcessModule, "1.23");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -100,6 +101,8 @@ vtkProcessModule::vtkProcessModule()
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->GUIHelper = 0;
   this->LogFile = 0;
+
+  this->MemoryInformation = vtkKWProcessStatistics::New();
 }
 
 //----------------------------------------------------------------------------
@@ -132,6 +135,9 @@ vtkProcessModule::~vtkProcessModule()
     delete this->LogFile;
     this->LogFile = 0;
     }
+
+  this->MemoryInformation->Delete();
+  this->MemoryInformation = 0;
 }
 
 //----------------------------------------------------------------------------

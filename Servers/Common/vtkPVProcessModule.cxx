@@ -40,6 +40,7 @@
 #include "vtkPVServerInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkPVServerOptions.h"
+#include "vtkKWProcessStatistics.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -53,7 +54,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.36");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -333,6 +334,12 @@ void vtkPVProcessModule::LogEndEvent(char* str)
     {
     *this->LogFile << str << ", " << this->Timer->GetElapsedTime()
                    << " seconds" << endl;
+    *this->LogFile << "--- Virtual memory available: "
+                   << this->MemoryInformation->GetAvailableVirtualMemory()
+                   << " KB" << endl;
+    *this->LogFile << "--- Physical memory available: "
+                   << this->MemoryInformation->GetAvailablePhysicalMemory()
+                   << " KB" << endl;
     }
 }
 

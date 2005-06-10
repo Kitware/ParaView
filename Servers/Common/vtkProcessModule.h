@@ -36,6 +36,7 @@ class vtkPVProgressHandler;
 class vtkProcessObject;
 class vtkProcessModuleGUIHelper;
 class vtkPVOptions;
+class vtkKWProcessStatistics;
 
 //BTX
 struct vtkProcessModuleInternals;
@@ -308,6 +309,8 @@ protected:
   vtkPVOptions* Options;
   vtkProcessModuleGUIHelper* GUIHelper;
   ofstream *LogFile;
+
+  vtkKWProcessStatistics *MemoryInformation;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

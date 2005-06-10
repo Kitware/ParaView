@@ -59,6 +59,7 @@ INCLUDE_DIRECTORIES(
   ${PVCommon_SOURCE_DIR}
   ${HDF5_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
+  ${KWCommon_INCLUDE_PATH}
   )
 
 # Setup vtkInstantiator registration for this library's classes.
