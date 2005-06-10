@@ -158,7 +158,7 @@ bg_toolbar_label Delete
 # Each button will set the label foreground or (a darker) background color
 
 set nb_buttons 10
-set buttons {}
+set objects {}
 for {set i 0} {$i < $nb_buttons} {incr i} {
     set hue [expr double($i) * (1.0 / double($nb_buttons))]
 
@@ -172,7 +172,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
     eval $fg_button SetBackgroundColor $rgb
     $fg_button SetBalloonHelpString "Set the label foreground color"
     fg_toolbar AddWidget $fg_button
-    lappend buttons $fg_button
+    lappend objects $fg_button
 
     set rgb [math HSVToRGB $hue 0.5 0.5]
     set bg_button "bg_button$i"
@@ -184,7 +184,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
     eval $bg_button SetBackgroundColor $rgb
     $bg_button SetBalloonHelpString "Set the label background color"
     bg_toolbar AddWidget $bg_button
-    lappend buttons $bg_button
+    lappend objects $bg_button
 }
 
 # Start the application
@@ -195,7 +195,7 @@ set ret [app GetExitStatus]
 # Deallocate and exit
 
 math Delete
-foreach abutton $buttons { $abutton Delete }
+foreach object $objects { $object Delete }
 ccb Delete
 bg_toolbar Delete
 fg_toolbar Delete

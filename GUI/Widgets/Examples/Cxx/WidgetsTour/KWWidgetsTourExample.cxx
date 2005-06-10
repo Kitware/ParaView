@@ -51,7 +51,7 @@ int my_main(int argc, char *argv[])
     win->GetMainUserInterfaceManager());
   widgets_panel->Create(app);
 
-  widgets_panel->AddPage("Widgets", "Select a widget");
+  widgets_panel->AddPage("Widgets", "Select a widget", NULL);
   vtkKWWidget *page_widget = widgets_panel->GetPageWidget("Widgets");
 
   // Add a list box to pick a widget example
@@ -76,24 +76,39 @@ int my_main(int argc, char *argv[])
   source_panel->Create(app);
   win->GetSecondaryNotebook()->AlwaysShowTabsOff();
 
-  source_panel->AddPage("Source", "Display the example source");
-  page_widget = source_panel->GetPageWidget("Source");
-
   win->GetViewNotebook()->ShowOnlyPagesWithSameTagOn();
 
-  // Add text widget to display the example source
+  // Add text widget to display the Tcl example source
 
-  vtkKWText *source_text = vtkKWText::New();
-  source_text->SetParent(page_widget);
-  source_text->EditableTextOff();
-  source_text->UseVerticalScrollbarOn();
-  source_text->Create(app, NULL);
-  source_text->SetWrapToNone();
+  source_panel->AddPage("Tcl Source", "Display the Tcl example source", NULL);
+  page_widget = source_panel->GetPageWidget("Tcl Source");
+
+  vtkKWText *tcl_source_text = vtkKWText::New();
+  tcl_source_text->SetParent(page_widget);
+  tcl_source_text->EditableTextOff();
+  tcl_source_text->UseVerticalScrollbarOn();
+  tcl_source_text->Create(app, NULL);
+  tcl_source_text->SetWrapToNone();
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
-              source_text->GetWidgetName());
+              tcl_source_text->GetWidgetName());
 
-  source_panel->Raise();
+  // Add text widget to display the C++ example source
+
+  source_panel->AddPage("C++ Source", "Display the C++ example source", NULL);
+  page_widget = source_panel->GetPageWidget("C++ Source");
+
+  vtkKWText *cxx_source_text = vtkKWText::New();
+  cxx_source_text->SetParent(page_widget);
+  cxx_source_text->EditableTextOff();
+  cxx_source_text->UseVerticalScrollbarOn();
+  cxx_source_text->Create(app, NULL);
+  cxx_source_text->SetWrapToNone();
+
+  app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
+              cxx_source_text->GetWidgetName());
+
+  source_panel->RaisePage("C++ Source");
 
   // Populate the examples
   // Create a panel for each one, and pass the frame
@@ -106,7 +121,7 @@ int my_main(int argc, char *argv[])
     panel->SetUserInterfaceManager(win->GetViewUserInterfaceManager());
     panel->Create(app);
     panel->Delete();
-    panel->AddPage(panel->GetName(), NULL);
+    panel->AddPage(panel->GetName(), NULL, NULL);
 
     vtkKWFrameWithScrollbar *framews = vtkKWFrameWithScrollbar::New();
     framews->SetParent(panel->GetPageWidget(panel->GetName()));
@@ -120,7 +135,7 @@ int my_main(int argc, char *argv[])
       {
       widgets_list->AppendUnique(node_ptr->Name);
 
-      // Try to find the source
+      // Try to find the C++ source
 
       vtksys_stl::string example_source(node_ptr->Name);
       example_source += ".cxx";
@@ -145,8 +160,47 @@ int my_main(int argc, char *argv[])
         }
       if (vtksys::SystemTools::FileExists(example_source_path.c_str()))
         {
-        app->Script("set source(%s) [read [open %s]]", 
+        app->Script("set cxx_source(%s) [read [open %s]]", 
                     node_ptr->Name, example_source_path.c_str());
+        }
+      else
+        {
+        app->Script("set cxx_source(%s) {}", node_ptr->Name);
+        }
+
+      // Try to find the Tcl source
+
+      example_source = node_ptr->Name;
+      example_source += ".tcl";
+
+      example_source_path = SourceDir;
+      example_source_path += "/../../Tcl/";
+      example_source_path += ExampleDirName;
+      example_source_path += '/';
+      example_source_path += WidgetsDirName;
+      example_source_path += '/';
+      example_source_path += example_source;
+
+      if (!vtksys::SystemTools::FileExists(example_source_path.c_str()))
+        {
+        example_source_path = app->GetInstallationDirectory();
+        example_source_path += "/../share/";
+        example_source_path += ProjectName;
+        example_source_path += "/Examples/Tcl/";
+        example_source_path += ExampleDirName;
+        example_source_path += '/';
+        example_source_path += WidgetsDirName;
+        example_source_path += '/';
+        example_source_path += example_source;
+        }
+      if (vtksys::SystemTools::FileExists(example_source_path.c_str()))
+        {
+        app->Script("set tcl_source(%s) [read [open %s]]", 
+                    node_ptr->Name, example_source_path.c_str());
+        }
+      else
+        {
+        app->Script("set tcl_source(%s) {}", node_ptr->Name);
         }
       }
     node_ptr++;
@@ -160,15 +214,22 @@ int my_main(int argc, char *argv[])
   cmd += " ShowViewUserInterface [";
   cmd += widgets_list->GetTclName();
   cmd += " GetSelection]";
+
+  // Show the C++ example source
+
   cmd += ";";
-
-  // Show the example source
-
-  cmd += "catch {";
-  cmd += source_text->GetTclName();
-  cmd += " SetValue $source([";
+  cmd += cxx_source_text->GetTclName();
+  cmd += " SetValue $cxx_source([";
   cmd += widgets_list->GetTclName();
-  cmd += " GetSelection]) }";
+  cmd += " GetSelection])";
+
+  // Show the Tcl example source
+
+  cmd += ";";
+  cmd += tcl_source_text->GetTclName();
+  cmd += " SetValue $tcl_source([";
+  cmd += widgets_list->GetTclName();
+  cmd += " GetSelection])";
 
   widgets_list->SetSingleClickCallback(NULL, cmd.c_str());
   
@@ -183,7 +244,8 @@ int my_main(int argc, char *argv[])
   widgets_panel->Delete();
   widgets_list->Delete();
   source_panel->Delete();
-  source_text->Delete();
+  tcl_source_text->Delete();
+  cxx_source_text->Delete();
   app->Delete();
   
   return ret;

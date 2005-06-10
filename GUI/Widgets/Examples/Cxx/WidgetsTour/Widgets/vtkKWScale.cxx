@@ -5,61 +5,59 @@ int vtkKWScaleEntryPoint(vtkKWWidget *parent)
 {
   vtkKWApplication *app = parent->GetApplication();
 
-  vtkKWScale *scale;
-
   // Create a scale
 
-  scale = vtkKWScale::New();
-  scale->SetParent(parent);
-  scale->Create(app, NULL);
-  scale->SetRange(0.0, 100.0);
-  scale->SetResolution(1.0);
-  scale->SetLength(150);
-  scale->DisplayEntry();
-  scale->DisplayEntryAndLabelOnTopOff();
-  scale->DisplayLabel("A scale:");
+  vtkKWScale *scale1 = vtkKWScale::New();
+  scale1->SetParent(parent);
+  scale1->Create(app, NULL);
+  scale1->SetRange(0.0, 100.0);
+  scale1->SetResolution(1.0);
+  scale1->SetLength(150);
+  scale1->DisplayEntry();
+  scale1->DisplayEntryAndLabelOnTopOff();
+  scale1->DisplayLabel("A scale:");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
-    scale->GetWidgetName());
+    scale1->GetWidgetName());
 
-  scale->Delete();
+  scale1->Delete();
 
   // Create another scale, but put the label and entry on top
 
-  scale = vtkKWScale::New();
-  scale->SetParent(parent);
-  scale->Create(app, NULL);
-  scale->SetRange(0.0, 100.0);
-  scale->SetResolution(1.0);
-  scale->SetLength(350);
-  scale->DisplayEntry();
-  scale->DisplayEntryAndLabelOnTopOn();
-  scale->DisplayLabel("A scale with label/entry on top:");
-  scale->SetBalloonHelpString("This time, the label and entry are on top");
+  vtkKWScale *scale2 = vtkKWScale::New();
+  scale2->SetParent(parent);
+  scale2->Create(app, NULL);
+  scale2->SetRange(0.0, 100.0);
+  scale2->SetResolution(1.0);
+  scale2->SetLength(350);
+  scale2->DisplayEntry();
+  scale2->DisplayEntryAndLabelOnTopOn();
+  scale2->DisplayLabel("A scale with label/entry on top:");
+  scale2->SetBalloonHelpString("This time, the label and entry are on top");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
-    scale->GetWidgetName());
+    scale2->GetWidgetName());
 
-  scale->Delete();
+  scale2->Delete();
 
   // Create another scale, popup mode
 
-  scale = vtkKWScale::New();
-  scale->SetParent(parent);
-  scale->PopupScaleOn();
-  scale->Create(app, NULL);
-  scale->SetRange(0.0, 100.0);
-  scale->SetResolution(1.0);
-  scale->DisplayEntry();
-  scale->DisplayLabel("A popup scale:");
+  vtkKWScale *scale3 = vtkKWScale::New();
+  scale3->SetParent(parent);
+  scale3->PopupScaleOn();
+  scale3->Create(app, NULL);
+  scale3->SetRange(0.0, 100.0);
+  scale3->SetResolution(1.0);
+  scale3->DisplayEntry();
+  scale3->DisplayLabel("A popup scale:");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
-    scale->GetWidgetName());
+    scale3->GetWidgetName());
 
-  scale->Delete();
+  scale3->Delete();
 
   return 1;
 }
