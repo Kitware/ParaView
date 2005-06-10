@@ -104,21 +104,21 @@ public:
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 
   // selected mode). 
-  vtkGetVector3Macro(TitleColor, float);
-  vtkGetVector3Macro(TitleSelectedColor, float);
-  vtkGetVector3Macro(TitleBackgroundColor, float);
-  vtkGetVector3Macro(TitleBackgroundSelectedColor, float);
-  virtual void SetTitleColor(float r, float g, float b);
-  virtual void SetTitleColor(float rgb[3])
+  vtkGetVector3Macro(TitleColor, double);
+  vtkGetVector3Macro(TitleSelectedColor, double);
+  vtkGetVector3Macro(TitleBackgroundColor, double);
+  vtkGetVector3Macro(TitleBackgroundSelectedColor, double);
+  virtual void SetTitleColor(double r, double g, double b);
+  virtual void SetTitleColor(double rgb[3])
     { this->SetTitleColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void SetTitleSelectedColor(float r, float g, float b);
-  virtual void SetTitleSelectedColor(float rgb[3])
+  virtual void SetTitleSelectedColor(double r, double g, double b);
+  virtual void SetTitleSelectedColor(double rgb[3])
     { this->SetTitleSelectedColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void SetTitleBackgroundColor(float r, float g, float b);
-  virtual void SetTitleBackgroundColor(float rgb[3])
+  virtual void SetTitleBackgroundColor(double r, double g, double b);
+  virtual void SetTitleBackgroundColor(double rgb[3])
     { this->SetTitleBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void SetTitleBackgroundSelectedColor(float r, float g, float b);
-  virtual void SetTitleBackgroundSelectedColor(float rgb[3])
+  virtual void SetTitleBackgroundSelectedColor(double r, double g, double b);
+  virtual void SetTitleBackgroundSelectedColor(double rgb[3])
     { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
@@ -166,14 +166,14 @@ protected:
   virtual void Bind();
   virtual void UnBind();
 
-  virtual int SetColor(float *color, float r, float g, float b);
+  virtual int SetColor(double *color, double r, double g, double b);
   virtual void UpdateColors();
   virtual void UpdateSelectionList();
 
-  float TitleColor[3];
-  float TitleSelectedColor[3];
-  float TitleBackgroundColor[3];
-  float TitleBackgroundSelectedColor[3];
+  double TitleColor[3];
+  double TitleSelectedColor[3];
+  double TitleBackgroundColor[3];
+  double TitleBackgroundSelectedColor[3];
 
   char *CloseCommand;
   char *SelectionListCommand;

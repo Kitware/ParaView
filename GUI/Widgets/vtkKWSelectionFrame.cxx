@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.35");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -381,7 +381,7 @@ const char* vtkKWSelectionFrame::GetTitle()
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrame::SetColor(
-  float *color, float r, float g, float b)
+  double *color, double r, double g, double b)
 {
   if ((r == color[0] && g == color[1] &&  b == color[2]) ||
       (r < 0.0 || r > 1.0) || (g < 0.0 || g > 1.0) || (b < 0.0 || b > 1.0))
@@ -398,7 +398,7 @@ int vtkKWSelectionFrame::SetColor(
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitleColor(
-  float r, float g, float b)
+  double r, double g, double b)
 {
   if (this->SetColor(this->TitleColor, r, g, b))
     {
@@ -409,7 +409,7 @@ void vtkKWSelectionFrame::SetTitleColor(
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitleSelectedColor(
-  float r, float g, float b)
+  double r, double g, double b)
 {
   if (this->SetColor(this->TitleSelectedColor, r, g, b))
     {
@@ -420,7 +420,7 @@ void vtkKWSelectionFrame::SetTitleSelectedColor(
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitleBackgroundColor(
-  float r, float g, float b)
+  double r, double g, double b)
 {
   if (this->SetColor(this->TitleBackgroundColor, r, g, b))
     {
@@ -431,7 +431,7 @@ void vtkKWSelectionFrame::SetTitleBackgroundColor(
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitleBackgroundSelectedColor(
-  float r, float g, float b)
+  double r, double g, double b)
 {
   if (this->SetColor(this->TitleBackgroundSelectedColor, r, g, b))
     {
@@ -519,7 +519,7 @@ void vtkKWSelectionFrame::UpdateColors()
     return;
     }
 
-  float *fgcolor, *bgcolor;
+  double *fgcolor, *bgcolor;
 
   if (this->Selected)
     {

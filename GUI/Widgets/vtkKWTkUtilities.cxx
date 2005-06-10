@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.50");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.51");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -163,7 +163,7 @@ const char* vtkKWTkUtilities::EvaluateStringFromArgsInternal(
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
                                    const char *widget, 
                                    const char *color, 
-                                   int *r, int *g, int *b)
+                                   double *r, double *g, double *b)
 {
   if (!interp || !widget || !color || !r || !g || !b)
     {
@@ -183,16 +183,16 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
   int rr, gg, bb;
   if (sscanf(interp->result, "%d %d %d", &rr, &gg, &bb) == 3)
     {
-    *r = static_cast<int>((static_cast<float>(rr) / 65535.0) * 255.0);
-    *g = static_cast<int>((static_cast<float>(gg) / 65535.0) * 255.0);
-    *b = static_cast<int>((static_cast<float>(bb) / 65535.0) * 255.0); 
+    *r = static_cast<double>(rr) / 65535.0;
+    *g = static_cast<double>(gg) / 65535.0;
+    *b = static_cast<double>(bb) / 65535.0; 
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(vtkKWWidget *widget, 
                                    const char *color, 
-                                   int *r, int *g, int *b)
+                                   double *r, double *g, double *b)
 {
   if (!widget || !widget->IsCreated())
     {
@@ -209,7 +209,7 @@ void vtkKWTkUtilities::GetRGBColor(vtkKWWidget *widget,
 void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
                                       const char *widget,
                                       const char *option,
-                                      int *r, int *g, int *b)
+                                      double *r, double *g, double *b)
 {
   if (!interp || !widget || !option || !r || !g || !b)
     {
@@ -233,7 +233,7 @@ void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget, 
                                       const char *option,
-                                      int *r, int *g, int *b)
+                                      double *r, double *g, double *b)
 {
   if (!widget || !widget->IsCreated())
     {
@@ -249,14 +249,14 @@ void vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget,
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
                                           const char *widget,
-                                          int *r, int *g, int *b)
+                                          double *r, double *g, double *b)
 {
   vtkKWTkUtilities::GetOptionColor(interp, widget, "-bg", r, g, b);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetBackgroundColor(vtkKWWidget *widget, 
-                                          int *r, int *g, int *b)
+                                          double *r, double *g, double *b)
 {
   if (!widget || !widget->IsCreated())
     {
@@ -539,7 +539,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     // At the moment let's not use the alpha layer inside the photo but 
     // blend with the current background color
 
-    int r, g, b;
+    double r, g, b;
     if (blend_with_name)
       {
       vtkKWTkUtilities::GetOptionColor(interp, 
@@ -552,6 +552,10 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       vtkKWTkUtilities::GetBackgroundColor(interp, ".", &r, &g, &b);
       }
     
+    r *= 255.0;
+    g *= 255.0;
+    b *= 255.0;
+
     // Create photo pixels
 
     int xx, yy;
@@ -559,7 +563,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       {
       for (xx=0; xx < width; xx++)
         {
-        float alpha = static_cast<float>(*(data_ptr + 3)) / 255.0;
+        double alpha = static_cast<float>(*(data_ptr + 3)) / 255.0;
         
         *(pp)     = static_cast<int>(r * (1 - alpha) + *(data_ptr)    * alpha);
         *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(data_ptr+ 1) * alpha);

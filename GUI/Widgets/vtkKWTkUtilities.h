@@ -66,39 +66,39 @@ public:
     va_list var_args1, va_list var_args2);
 
   // Description:
-  // Get the RGB components (0..255) that correspond to 'color' (say, #223344)
+  // Get the RGB components that correspond to 'color' (say, #223344)
   // in the widget given by 'widget' (say, .foo.bar). Color may be specified
   // in any of the forms acceptable for a Tk color option.
   // A convenience method is provided to query a vtkKWWidget directly.
   static void GetRGBColor(Tcl_Interp *interp,
                           const char *widget, 
                           const char *color, 
-                          int *r, int *g, int *b);
+                          double *r, double *g, double *b);
   static void GetRGBColor(vtkKWWidget *widget, 
                           const char *color, 
-                          int *r, int *g, int *b);
+                          double *r, double *g, double *b);
 
   // Description:
-  // Get the RGB components (0..255) that correspond to the color 'option'
+  // Get the RGB components that correspond to the color 'option'
   // (say -bg, -fg, etc.) of the widget given by 'widget' (say, .foo.bar).
   // A convenience method is provided to query a vtkKWWidget directly.
   static void GetOptionColor(Tcl_Interp *interp,
                              const char *widget, 
                              const char *option, 
-                             int *r, int *g, int *b);
+                             double *r, double *g, double *b);
   static void GetOptionColor(vtkKWWidget *widget,
                              const char *option, 
-                             int *r, int *g, int *b);
+                             double *r, double *g, double *b);
   
   // Description:
-  // Get the RGB components (0..255) of the background color
+  // Get the RGB components of the background color
   // of the widget given by 'widget' (say, .foo.bar).
   // A convenience method is provided to query a vtkKWWidget directly.
   static void GetBackgroundColor(Tcl_Interp *interp,
                                  const char *widget, 
-                                 int *r, int *g, int *b);
+                                 double *r, double *g, double *b);
   static void GetBackgroundColor(vtkKWWidget *widget,
-                                 int *r, int *g, int *b);
+                                 double *r, double *g, double *b);
 
   // Description:
   // Get the geometry of a widget given by 'widget' (say, .foo.bar).
