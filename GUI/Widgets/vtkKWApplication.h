@@ -108,12 +108,14 @@ public:
   vtkGetMacro(MinorVersion, int);
 
   // Description:
-  // Set/Get the application version name - this is the application name
-  // postfixed with the version number (major/minor), no spaces.
+  // Set/Get the application version name - this usually is the application 
+  // name postfixed with the version number (major/minor), no spaces.
   // It is typically used as the master key to store registry settings
   // (ex: VolView20, ParaView1.1, etc.)
+  // If it has not been set, it will use the value of Name and append
+  // the major/minor version.
   vtkSetStringMacro(VersionName);
-  vtkGetStringMacro(VersionName);
+  virtual const char* GetVersionName();
 
   // Description:
   // Set/Get the application release name - this is the release of the 
@@ -148,8 +150,10 @@ public:
   // Descrition:
   // Set/Get the name of the application when it runs in limited edition mode.
   // This is used by GetPrettyName() for example, instead of the Name variable.
+  // If it has not been set, it will use the value of Name and append
+  // the "Limited Edition" to it.
   vtkSetStringMacro(LimitedEditionModeName);
-  vtkGetStringMacro(LimitedEditionModeName);
+  virtual const char *GetLimitedEditionModeName();
 
   // Description:
   // Set/Get the directory in which the current application is supposed

@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.221");
+vtkCxxRevisionMacro(vtkKWApplication, "1.222");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -86,6 +86,17 @@ public:
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
+  // Setup Tcl
+
+  this->MainInterp = Et_Interp;
+  if (!this->MainInterp)
+    {
+    vtkErrorMacro(
+      "Interpreter not set. This probably means that Tcl was not "
+      "initialized properly...");
+    return;
+    }
+
   this->CommandFunction = vtkKWApplicationCommand;
   
   // Instantiate the PIMPL Encapsulation for STL containers
@@ -97,41 +108,51 @@ vtkKWApplication::vtkKWApplication()
   this->MajorVersion = 1;
   this->MinorVersion = 0;
 
-  const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
+  // Try to find if we are running from a script and set the application name
+  // accordingly. Otherwise try to find the executable name.
+
+  this->Name = NULL;
+  const char *script = this->Script("file rootname [file tail [info script]]");
+  if (script && *script)
     {
-    vtksys_stl::string filename = 
-      vtksys::SystemTools::GetFilenameName(nameofexec);
-    vtksys_stl::string filenamewe = 
-      vtksys::SystemTools::GetFilenameWithoutExtension(filename);
-    this->Name = 
-      vtksys::SystemTools::DuplicateString(filenamewe.c_str());
-    filenamewe += "10";
-    this->VersionName = 
-      vtksys::SystemTools::DuplicateString(filenamewe.c_str());
+    this->Name = vtksys::SystemTools::DuplicateString(script);
     }
   else
     {
-    this->Name = 
-      vtksys::SystemTools::DuplicateString("Sample Application");
-    this->VersionName = 
-      vtksys::SystemTools::DuplicateString("SampleApplication10");
+    const char *nameofexec = Tcl_GetNameOfExecutable();
+    if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
+      {
+      vtksys_stl::string filename = 
+        vtksys::SystemTools::GetFilenameName(nameofexec);
+      vtksys_stl::string filenamewe = 
+        vtksys::SystemTools::GetFilenameWithoutExtension(filename);
+      if (!vtksys::SystemTools::StringStartsWith(filenamewe.c_str(), "wish") &&
+          !vtksys::SystemTools::StringStartsWith(filenamewe.c_str(), "tclsh"))
+        {
+        this->Name = 
+          vtksys::SystemTools::DuplicateString(filenamewe.c_str());
+        }
+      }
     }
 
-  this->ReleaseName = 
-    vtksys::SystemTools::DuplicateString("unknown");
+  // Still no name... use default...
+
+  if (!this->Name)
+    {
+    this->Name = 
+      vtksys::SystemTools::DuplicateString("Sample Application");
+    }
+
+  this->VersionName = NULL;
+  this->ReleaseName = NULL;
   this->PrettyName = NULL;
 
   // Limited Edition Mode name
 
   this->LimitedEditionMode = 0;
   this->LimitedEditionModeName = NULL;
-  vtksys_stl::string lename(this->Name);
-  lename += " Limited Edition";
-  this->SetLimitedEditionModeName(lename.c_str());
 
-  this->HelpDialogStartingPage = 
-    vtksys::SystemTools::DuplicateString("Introduction.htm");
+  this->HelpDialogStartingPage = NULL;
 
   this->InstallationDirectory = NULL;
   this->EmailFeedbackAddress  = NULL;
@@ -164,17 +185,6 @@ vtkKWApplication::vtkKWApplication()
   this->SplashScreen = NULL;
   this->HasSplashScreen = 0;
   this->ShowSplashScreen = 1;
-
-  // Setup Tcl
-
-  this->MainInterp = Et_Interp;
-  if (!this->MainInterp)
-    {
-    vtkErrorMacro(
-      "Interpreter not set. This probably means that Tcl was not "
-      "initialized properly...");
-    return;
-    }
 
   this->PrintTargetDPI        = 100.0;
 
@@ -1334,6 +1344,39 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkKWApplication::GetVersionName()
+{
+  if (this->VersionName)
+    {
+    return this->VersionName;
+    }
+  if (this->Name)
+    {
+    static char versionname_buffer[1024];
+    sprintf(versionname_buffer, "%s%d.%d", 
+            this->Name, this->MajorVersion, this->MinorVersion);
+    return versionname_buffer;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::GetLimitedEditionModeName()
+{
+  if (this->LimitedEditionModeName)
+    {
+    return this->LimitedEditionModeName;
+    }
+  if (this->Name)
+    {
+    static char lemname_buffer[1024];
+    sprintf(lemname_buffer, "%s Limited Edition", this->Name);
+    return lemname_buffer;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWApplication::GetPrettyName()
 {
   ostrstream pretty_str;
@@ -1519,12 +1562,12 @@ int vtkKWApplication::CanEmailFeedback()
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
 {
-  os << this->GetPrettyName() 
-     << " (" 
-     << this->GetVersionName() 
-     << " " 
-     << this->GetReleaseName()
-     << ")" << endl;
+  os << this->GetPrettyName() << " (" << this->GetVersionName();
+  if (this->GetReleaseName())
+    {
+    os << " "  << this->GetReleaseName();
+    }
+  os << ")" << endl;
 
   vtksys_stl::string ver = 
     vtksys::SystemTools::GetOperatingSystemNameAndVersion();
@@ -1734,9 +1777,9 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MajorVersion: " << this->MajorVersion << endl;
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "ReleaseName: " 
-     << this->GetReleaseName() << endl;
+     << (this->ReleaseName ? this->ReleaseName : NULL) << endl;
   os << indent << "VersionName: " 
-     << this->GetVersionName() << endl;
+     << (this->VersionName ? this->VersionName : NULL) << endl;
   os << indent << "PrettyName: " 
      << this->GetPrettyName() << endl;
   os << indent << "EmailFeedbackAddress: "
