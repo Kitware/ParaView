@@ -578,7 +578,9 @@ public:
   virtual void SetFrameBackgroundColor(double rgb[3])
     { this->SetFrameBackgroundColor(rgb[0], rgb[1], rgb[2]); };
   virtual void SetBackgroundColor(double r, double g, double b);
-  
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->Superclass::SetBackgroundColor(rgb); };
+
   // Description:
   // Set/Get the point color. 
   // Overriden by ComputePointColorFromValue if supported.
