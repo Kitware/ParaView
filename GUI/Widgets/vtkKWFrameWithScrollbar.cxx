@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.2");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -56,7 +56,13 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
   // The widget itself is a BWidget's ScrolledWindow
 
   const char *wname = this->GetWidgetName();
-  this->Script("ScrolledWindow %s -relief flat -bd 2", wname);
+  const char *res = this->Script("ScrolledWindow %s -relief flat -bd 2",wname);
+  cout << res << endl;
+  if (strcmp(res, wname)) 
+    {
+    vtkErrorMacro("Failed creating a ScrolledWindow for " << wname);
+    return;
+    }
 
   // ScrollableFrame is a BWidget's ScrollableFrame
   // attached to the ScrolledWindow
