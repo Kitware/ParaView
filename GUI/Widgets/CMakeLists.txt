@@ -166,6 +166,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
+  vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
   WRAP_EXCLUDE
