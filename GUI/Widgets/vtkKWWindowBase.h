@@ -92,12 +92,18 @@ public:
   //BTX
   enum 
   {
-    ERROR_ICON_NONE = 0,
-    ERROR_ICON_BLACK,
-    ERROR_ICON_RED
+    ErrorIconNone = 0,
+    ErrorIconBlack,
+    ErrorIconRed
   };
   //ETX
   virtual void SetErrorIcon(int);
+  virtual void SetErrorIconToNone()
+    { this->SetErrorIcon(vtkKWWindowBase::ErrorIconNone); };
+  virtual void SetErrorIconToBlack()
+    { this->SetErrorIcon(vtkKWWindowBase::ErrorIconBlack); };
+  virtual void SetErrorIconToRed()
+    { this->SetErrorIcon(vtkKWWindowBase::ErrorIconRed); };
 
   // Description:
   // The window is made of a menu bar (methods are available to access each

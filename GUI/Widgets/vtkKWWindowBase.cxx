@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.14");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.15");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -858,7 +858,7 @@ void vtkKWWindowBase::WarningMessage(const char* message)
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "Warning",
     message, vtkKWMessageDialog::WarningIcon);
-  this->SetErrorIcon(vtkKWWindowBase::ERROR_ICON_RED);
+  this->SetErrorIconToRed();
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
 }
 
@@ -868,7 +868,7 @@ void vtkKWWindowBase::ErrorMessage(const char* message)
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "Error",
     message, vtkKWMessageDialog::ErrorIcon);
-  this->SetErrorIcon(vtkKWWindowBase::ERROR_ICON_RED);
+  this->SetErrorIconToRed();
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
 }
 
@@ -880,15 +880,15 @@ void vtkKWWindowBase::SetErrorIcon(int s)
     return;
     }
 
-  if (s > vtkKWWindowBase::ERROR_ICON_NONE) 
+  if (s > vtkKWWindowBase::ErrorIconNone) 
     {
     this->Script("pack %s -fill both -ipadx 4 -expand yes", 
                  this->TrayImageError->GetWidgetName());
-    if (s == vtkKWWindowBase::ERROR_ICON_RED)
+    if (s == vtkKWWindowBase::ErrorIconRed)
       {
       this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
       }
-    else if (s == vtkKWWindowBase::ERROR_ICON_BLACK)
+    else if (s == vtkKWWindowBase::ErrorIconBlack)
       {
       this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERROR);
       }
@@ -902,7 +902,7 @@ void vtkKWWindowBase::SetErrorIcon(int s)
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::ErrorIconCallback()
 {
-  this->SetErrorIcon(vtkKWWindowBase::ERROR_ICON_BLACK);
+  this->SetErrorIcon(vtkKWWindowBase::ErrorIconBlack);
 }
 
 //----------------------------------------------------------------------------

@@ -73,30 +73,46 @@
 // are likely not be manipulated as often as the other panels and UIM, but 
 // can be used to provide multiple "views".
 //
-// +---------------------------+
-// |           MB              |    MB: GetMenu() (see vtkKWTopLevel)
-// +---------------------------+
-// |           TBS             |    TBS: GetToolbars() (see superclass)
-// +---------------------------+
-// |+--+ MPF|+--+              |
-// ||  +---+||  +-------------+|
-// ||      |||                ||    MPF: GetMainPanelFrame()
-// ||      |||    VNB/VF      ||    MNB: MainNotebook
-// ||      |||                ||   
-// ||      |||                ||    
-// ||      ||+----------------+|
-// || MNB  |+------------------+    SPF: GetSecondaryPanelFrame()
-// ||      ||+--+      SPF     |    SNB: SecondaryNotebook
-// ||      |||  +-------------+|
-// ||      |||                ||    VNB: ViewNotebook
-// ||      |||    SNB         ||    VF: GetViewFrame() (first page of VNB)
-// ||      |||                ||
-// ||      ||+----------------+|
-// ||      |+------------------+
-// |+------+|                  |    SF: GetStatusFrame() (see superclass)
-// +--------+------------------+
-// |            SF             |    SF: GetStatusFrame() (see superclass)
-// +---------------------------+
+// So this describes the default layout so far, with the secondary
+// panel below the view frame. The PanelLayout ivar can be set 
+// to change this layout to a different configuration where the secondary
+// panel is below the main panel.
+//
+// MB:   GetMenu() (see vtkKWTopLevel)
+// MTBS: GetMainToolbarSet() (see superclass)
+// MPF:  GetMainPanelFrame()
+// MNB:  MainNotebook
+// VNB:  ViewNotebook
+// VF:   GetViewFrame() (first page of the VNB)
+// SPF:  GetSecondaryPanelFrame()
+// SNB:  SecondaryNotebook
+// STBS: GetSecondaryToolbarSet()
+// SF:   GetStatusFrame() (see superclass)
+// 
+// +---------------------------+    +---------------------------+
+// |           MB              |    |           MB              |    
+// +---------------------------+    +---------------------------+
+// |           MTBS            |    |           MTBS            |    
+// +--------+------------------+    +--------+------------------+
+// |+--+ MPF|+--+              |    |+--+ MPF|+--+              |   
+// ||  +---+||  +-------------+|    ||  +---+||  +-------------+|
+// ||      |||                ||    ||      |||                ||    
+// ||      |||    VNB (VF)    ||    ||      |||                ||    
+// ||      |||                ||    ||      |||                ||   
+// ||      |||                ||    || MNB  |||                ||    
+// ||      ||+----------------+|    ||      |||                ||
+// || MNB  |+------------------+    |+------+||    VNB (VF)    ||
+// ||      ||+--+      SPF     |    +--------+|                ||
+// ||      |||  +-------------+|    |+--+ SPF||                ||
+// ||      |||                ||    ||  +---+||                ||    
+// ||      |||    SNB         ||    ||      |||                ||    
+// ||      |||                ||    ||      |||                ||    
+// ||      |||                ||    || SNB  |||                ||    
+// ||      ||+----------------+|    ||      ||+----------------+|
+// |+------+|      STBS        |    |+------+|      STBS        |    
+// +--------+------------------+    +--------+------------------+
+// |            SF             |    |            SF             |    
+// +---------------------------+    +---------------------------+
 
 
 #ifndef __vtkKWWindow_h
@@ -130,7 +146,6 @@ public:
   // Main panel. 
   // The whole layout of the window is described at length at the beginning
   // of this document.
-  vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
   virtual vtkKWFrame* GetMainPanelFrame();
   virtual int GetMainPanelVisibility();
   virtual void SetMainPanelVisibility(int);
@@ -143,7 +158,6 @@ public:
   // Secondary panel. 
   // The whole layout of the window is described at length at the beginning
   // of this document.
-  vtkGetObjectMacro(SecondarySplitFrame, vtkKWSplitFrame);
   virtual vtkKWFrame* GetSecondaryPanelFrame();
   virtual int GetSecondaryPanelVisibility();
   virtual void SetSecondaryPanelVisibility(int);
@@ -151,6 +165,30 @@ public:
   vtkGetObjectMacro(SecondaryNotebook, vtkKWNotebook);
   virtual vtkKWUserInterfaceManager* GetSecondaryUserInterfaceManager();
   virtual void ShowSecondaryUserInterface(const char *name);
+
+  // Description:
+  // Set the panel layout type. 
+  // The whole layout of the window is described at length at the beginning
+  // of this document.
+  // IMPORTANT: this ivar has to be set before calling Create(), and can
+  // not be changed afterwards.
+  //BTX
+  enum 
+  {
+    PanelLayoutSecondaryBelowView = 0,
+    PanelLayoutSecondaryBelowMain
+  };
+  //ETX
+  vtkSetClampMacro(PanelLayout, int, 
+                   vtkKWWindow::PanelLayoutSecondaryBelowView, 
+                   vtkKWWindow::PanelLayoutSecondaryBelowMain);
+  vtkGetMacro(PanelLayout, int);
+  virtual void SetPanelLayoutToSecondaryBelowView()
+    { this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowView);};
+  virtual void SetPanelLayoutToSecondaryBelowMain()
+    { this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowMain);};
+  vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
+  vtkGetObjectMacro(SecondarySplitFrame, vtkKWSplitFrame);
 
   // Description:
   // View panel. 
@@ -256,6 +294,8 @@ protected:
   virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowViewUserInterface(vtkKWUserInterfacePanel *panel);
+
+  int PanelLayout;
 
   vtkKWSplitFrame *MainSplitFrame;
   vtkKWNotebook *MainNotebook;
