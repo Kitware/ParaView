@@ -24,7 +24,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.21");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.22");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -227,6 +227,7 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
       !vtkKWTkUtilities::UpdatePhoto(
         interp, "bwplus", plus_bits, plus_width, plus_height, 3))
     {
+    vtkGenericWarningMacro("Can not initialize bwidgets resources.");
     return;
     }
 
@@ -259,7 +260,7 @@ void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* mod
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     vtkGenericWarningMacro(<< module << " failed to initialize. Error:" 
-    << interp->result);
+                           << interp->result);
     }
   delete[] script;
 }
