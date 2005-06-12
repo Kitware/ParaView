@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.88");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.89");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -126,6 +126,8 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
+  this->Close();
+
   if (this->Observer)
     {
     this->Observer->Delete();

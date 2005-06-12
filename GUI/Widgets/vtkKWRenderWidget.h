@@ -104,6 +104,10 @@ public:
   virtual void RemoveInteractionBindings();
   
   // Description:
+  // Get the interactor.
+  vtkGetObjectMacro(Interactor, vtkKWGenericRenderWindowInteractor);
+
+  // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
   virtual void AddProp(vtkProp *prop);
   virtual void AddOverlayProp(vtkProp *prop);
