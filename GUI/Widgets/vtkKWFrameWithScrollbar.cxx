@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.3");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -57,7 +57,6 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
 
   const char *wname = this->GetWidgetName();
   const char *res = this->Script("ScrolledWindow %s -relief flat -bd 2",wname);
-  cout << res << endl;
   if (strcmp(res, wname)) 
     {
     vtkErrorMacro("Failed creating a ScrolledWindow for " << wname);
