@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.731");
+vtkCxxRevisionMacro(vtkPVWindow, "1.732");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4392,7 +4392,7 @@ void vtkPVWindow::WarningMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
-  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
+  this->SetErrorIconToRed();
 }
 
 //-----------------------------------------------------------------------------
@@ -4405,7 +4405,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
-  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
+  this->SetErrorIconToRed();
   cout << "ErrorMessage end" << endl;
   if ( this->GetPVApplication()->GetGUIClientOptions()->GetCrashOnErrors() )
     {

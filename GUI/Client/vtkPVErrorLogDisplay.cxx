@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.9");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.10");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -73,7 +73,7 @@ void vtkPVErrorLogDisplay::Clear()
     vtkKWWindow *window = app->GetMainWindow();
     if (window)
       {
-      window->SetErrorIcon(vtkKWWindow::ERROR_ICON_NONE);
+      window->SetErrorIconToNone();
       }
     }
   this->Update();
