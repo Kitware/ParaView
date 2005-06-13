@@ -70,15 +70,20 @@ public:
   enum 
   {
     ExpandFrame1 = 0,
-    ExpandFrame2
+    ExpandFrame2,
+    ExpandBothFrames
   };
   //ETX
-  vtkSetMacro(ExpandFrame, int);
+  vtkSetClampMacro(ExpandFrame, int, 
+                   vtkKWSplitFrame::ExpandFrame1, 
+                   vtkKWSplitFrame::ExpandBothFrames);
   vtkGetMacro(ExpandFrame, int);
   virtual void SetExpandFrameToFrame1()
     { this->SetExpandFrame(vtkKWSplitFrame::ExpandFrame1); };
   virtual void SetExpandFrameToFrame2()
     { this->SetExpandFrame(vtkKWSplitFrame::ExpandFrame2); };
+  virtual void SetExpandFrameToBothFrames()
+    { this->SetExpandFrame(vtkKWSplitFrame::ExpandBothFrames); };
 
   // Description:
   // Set/Get The minimum size for the two frames.

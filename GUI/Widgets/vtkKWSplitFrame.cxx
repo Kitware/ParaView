@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.27");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.28");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -32,7 +32,7 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame2 = vtkKWFrame::New();
 
   this->Frame1Size = 250;
-  this->Frame2Size = 600;
+  this->Frame2Size = 250;
 
   this->Frame1MinimumSize = 150;
   this->Frame2MinimumSize = 150;
@@ -218,8 +218,6 @@ void vtkKWSplitFrame::ConfigureCallback()
     return;
     }
 
-  this->Size = size;
-
   // Size of second frame
   // Adjust the first frame size if needed
 
@@ -233,7 +231,7 @@ void vtkKWSplitFrame::ConfigureCallback()
       }
     this->Frame2Size = tmp;
     }
-  else
+  else if (this->ExpandFrame == vtkKWSplitFrame::ExpandFrame1)
     {
     tmp = size - this->Frame2Size - this->GetTotalSeparatorSize();
     if (tmp < this->Frame1MinimumSize)
@@ -243,6 +241,26 @@ void vtkKWSplitFrame::ConfigureCallback()
       }
     this->Frame1Size = tmp;
     }
+  else
+    {
+    tmp = size - this->Size;
+    int frame1size = this->Frame1Size + tmp / 2;
+    int frame2size = this->Frame2Size + (tmp - tmp / 2);
+    if (frame1size < this->Frame1MinimumSize)
+      {
+      frame2size -= (this->Frame1MinimumSize - frame1size);
+      frame1size = this->Frame1MinimumSize;
+      }
+    if (frame2size < this->Frame2MinimumSize)
+      {
+      frame1size -= (this->Frame2MinimumSize - frame2size);
+      frame2size = this->Frame2MinimumSize;
+      }
+    this->Frame1Size = frame1size;
+    this->Frame2Size = frame2size;
+    }
+
+  this->Size = size;
 
   this->Update();
 }
