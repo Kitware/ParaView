@@ -271,7 +271,7 @@ The points are expected to be in a mostly planar distribution."
           short_help="Create 2D Delaunay triangulation of input points.">
     <Filter class="vtkDelaunay2D">
       <Input name="Input"
-             class="vtkPolyData"/>
+             class="vtkPointSet"/>
     </Filter>
     <InputMenu trace_name="Input" label="Input" property="Input"
                input_name="Input"/>
