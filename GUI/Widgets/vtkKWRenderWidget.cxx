@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.89");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.90");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -51,7 +51,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->ParentWindow = NULL;
   
   this->VTKWidget = vtkKWWidget::New();
-  this->VTKWidget->SetParent(this);
 
   // Create two renderers by default (main one and overlay)
 
@@ -277,7 +276,10 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 
   char *local = new char[(args ? strlen(args) : 0) + 100];
   sprintf(local, "%s -rw Addr=%p", (args ? args : ""), this->RenderWindow);
+
+  this->VTKWidget->SetParent(this);
   this->VTKWidget->Create(app, "vtkTkRenderWidget", local);
+
   delete [] local;
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
