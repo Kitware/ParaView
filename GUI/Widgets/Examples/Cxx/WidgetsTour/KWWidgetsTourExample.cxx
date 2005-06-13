@@ -103,6 +103,10 @@ int my_main(int argc, char *argv[])
   tcl_source_text->GetWidget()->EditableTextOff();
   tcl_source_text->GetWidget()->UseVerticalScrollbarOn();
   tcl_source_text->GetWidget()->SetWrapToNone();
+  tcl_source_text->GetWidget()->SetHeight(3000);
+  tcl_source_text->GetWidget()->AddTagMatcher("#[^\n]*", "_fg_navy_tag_");
+  tcl_source_text->GetWidget()->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  tcl_source_text->GetWidget()->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               tcl_source_text->GetWidgetName());
@@ -118,6 +122,12 @@ int my_main(int argc, char *argv[])
   cxx_source_text->GetWidget()->EditableTextOff();
   cxx_source_text->GetWidget()->UseVerticalScrollbarOn();
   cxx_source_text->GetWidget()->SetWrapToNone();
+  cxx_source_text->GetWidget()->SetHeight(3000);
+  cxx_source_text->GetWidget()->AddTagMatcher("#[a-z]+", "_fg_red_tag_");
+  cxx_source_text->GetWidget()->AddTagMatcher("//[^\n]*", "_fg_navy_tag_");
+  cxx_source_text->GetWidget()->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  cxx_source_text->GetWidget()->AddTagMatcher("<[^>]*>", "_fg_blue_tag_");
+  cxx_source_text->GetWidget()->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               cxx_source_text->GetWidgetName());
