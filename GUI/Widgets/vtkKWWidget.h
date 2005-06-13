@@ -303,14 +303,24 @@ protected:
   // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
   // internal format (given the widget's application CharacterEncoding), 
   // and vice-versa.
-  // If no_curly_braces is true, curly braces will be removed from the
-  // string, so that the resulting string can be used to set an option
-  // using the usual {%s} syntax.
-
+  // The 'source' string is the source to convert.
+  // It returns a pointer to a static buffer where the converted string
+  // can be found (so be quick about it).
+  // The 'options' can be set to perform some replacements/escaping.
+  // ConvertStringEscapeInterpretable will attempt to escape all characters
+  // that can be interpreted (when found between a pair of quotes for
+  // example): $ [ ] "
+  //BTX
+  enum
+  {
+    ConvertStringEscapeCurlyBraces   = 1,
+    ConvertStringEscapeInterpretable = 2
+  };
   const char* ConvertTclStringToInternalString(
-    const char *str, int no_curly_braces = 1);
+    const char *source, int options = 0);
   const char* ConvertInternalStringToTclString(
-    const char *str, int no_curly_braces = 1);
+    const char *source, int options = 0);
+  //ETX
 
   virtual void PropagateEnableState(vtkKWWidget* widget);
 

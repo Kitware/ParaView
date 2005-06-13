@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.40");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.41");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -120,16 +120,16 @@ int vtkKWLoadSaveDialog::Invoke()
 
   if (path && strlen(path))
     {
-    path = this->ConvertTclStringToInternalString(path);
-    
-    this->SetFileName(path);
+    this->SetFileName(
+      this->ConvertTclStringToInternalString(path));
+
     if (this->ChooseDirectory && support_choose_dir)
       {
-      this->SetLastPath(path);
+      this->SetLastPath(this->GetFileName());
       }
     else
       {
-      this->GenerateLastPath(path);
+      this->GenerateLastPath(this->GetFileName());
       }
     res = 1;
     }

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.127");
+vtkCxxRevisionMacro(vtkKWWidget, "1.128");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -752,24 +752,35 @@ const char* vtkKWWidget::GetTclCharacterEncodingAsString(int encoding)
 
 //----------------------------------------------------------------------------
 const char* vtkKWWidget::ConvertInternalStringToTclString(
-  const char *str, int no_curly_braces)
+  const char *source, int options)
 {
-  if (!str || !this->IsCreated())
+  if (!source || !this->IsCreated())
     {
     return NULL;
     }
 
-  // Shall we remove the curly braces so that we can use the {%s}
-  // syntax to use the string inside this->Script ?
+  static vtksys_stl::string dest;
+  const char *res = source;
 
-  char *clean_str = NULL;
-  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
+  // Escape
+  
+  vtksys_stl::string escape_chars;
+  if (options)
     {
-    clean_str = vtksys::SystemTools::RemoveChars(str, "{}");
-    str = clean_str;
+    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
+      {
+      escape_chars += "{}";
+      }
+    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
+      {
+      escape_chars += "[]$\"";
+      }
+    dest = 
+      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+    res = source = dest.c_str();
     }
 
-  // No encoding known ? The fast way, return unchanged
+  // Handle the encoding
 
   int app_encoding = this->GetApplication()->GetCharacterEncoding();
   if (app_encoding != VTK_ENCODING_NONE &&
@@ -790,79 +801,76 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
       Tcl_FreeEncoding(tcl_encoding);
       
       // Convert from that encoding
-      
-      const char *res = 
-        this->Script("encoding convertfrom %s {%s}", tcl_encoding_name, str);
+      // Doing so will unescape the string, so we have do it again :(
+      // That is the only way to process strings that can have a 
+      // curly brace in them
 
-      if (clean_str)
+      res = source = this->Script(
+        "encoding convertfrom %s \"%s\"", tcl_encoding_name, source);
+      if (options)
         {
-        delete [] clean_str;
+        dest = 
+          vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+        res = source = dest.c_str();
         }
-
-      return res;
       }
     }
 
-  // Otherwise just return unchanged (or without the braces)
-
-  if (clean_str)
-    {
-    const char *res = this->Script("set __foo__ {%s}", str);
-    delete [] clean_str;
-    return res;
-    }
-  
-  return str;
+  return res;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWWidget::ConvertTclStringToInternalString(
-  const char *str, int no_curly_braces)
+  const char *source, int options)
 {
-  if (!str || !this->IsCreated())
+  if (!source || !this->IsCreated())
     {
     return NULL;
     }
 
-  // Shall we remove the curly braces so that we can use the {%s}
-  // syntax to use the string inside this->Script ?
+  static vtksys_stl::string dest;
+  const char *res = source;
+
+  // Escape
   
-  char *clean_str = NULL;
-  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
+  vtksys_stl::string escape_chars;
+  if (options)
     {
-    clean_str = vtksys::SystemTools::RemoveChars(str, "{}");
-    str = clean_str;
+    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
+      {
+      escape_chars += "{}";
+      }
+    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
+      {
+      escape_chars += "[]$\"";
+      }
+    dest = 
+      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+    res = source = dest.c_str();
     }
 
-  // No encoding known ? The fast way, return unchanged
+  // Handle the encoding
 
   int app_encoding = this->GetApplication()->GetCharacterEncoding();
   if (app_encoding != VTK_ENCODING_NONE &&
       app_encoding != VTK_ENCODING_UNKNOWN)
     {
-    // Otherwise try to encode/decode
+    // Convert from that encoding
+    // Doing so will unescape the string, so we have do it again :(
+    // That is the only way to process strings that can have a 
+    // curly brace in them
 
-    const char *res = 
-      this->Script("encoding convertfrom identity {%s}", str);
-    
-    if (clean_str)
+    res = source = this->Script(
+      "encoding convertfrom identity \"%s\"", source);
+    if (options)
       {
-      delete [] clean_str;
+      dest = 
+        vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+      res = source = dest.c_str();
       }
-    
-    return res;
     }
   
-  // Otherwise just return unchanged (or without the braces)
-  
-  if (clean_str)
-    {
-    const char *res = this->Script("set __foo__ {%s}", str);
-    delete [] clean_str;
-    return res;
-    }
-  
-  return str;
+  return res;
 }
 
 //----------------------------------------------------------------------------
@@ -873,8 +881,9 @@ void vtkKWWidget::SetTextOption(const char *str, const char *option)
     return;
     }
 
-  const char *val = this->ConvertInternalStringToTclString(str);
-  this->Script("catch {%s configure %s {%s}}", 
+  const char *val = this->ConvertInternalStringToTclString(
+    str, vtkKWWidget::ConvertStringEscapeInterpretable);
+  this->Script("%s configure %s \"%s\"", 
                this->GetWidgetName(), option, val ? val : "");
 }
 

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.58");
+vtkCxxRevisionMacro(vtkKWEntry, "1.59");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -143,9 +143,10 @@ void vtkKWEntry::SetValue(const char *s)
     this->Script("%s delete 0 end", this->Entry->GetWidgetName());
     if (s)
       {
-      const char *str = this->ConvertInternalStringToTclString(s);
-      this->Script("catch {%s insert 0 {%s}}", 
-                   this->Entry->GetWidgetName(), str ? str : "");
+      const char *val = this->ConvertInternalStringToTclString(
+        s, vtkKWWidget::ConvertStringEscapeInterpretable);
+      this->Script("%s insert 0 \"%s\"", 
+                   this->Entry->GetWidgetName(), val ? val : "");
       }
     }
 

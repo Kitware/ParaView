@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.28");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -185,9 +185,10 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
     return;
     }
 
-  const char *str = this->ConvertInternalStringToTclString(txt);;
-  this->Script("catch {%s itemconfigure msg -text {%s}}",
-               this->Canvas->GetWidgetName(), (str ? str : ""));
+  const char *val = this->ConvertInternalStringToTclString(
+    txt, vtkKWWidget::ConvertStringEscapeInterpretable);
+  this->Script("%s itemconfigure msg -text \"%s\"",
+               this->Canvas->GetWidgetName(), (val ? val : ""));
 
   this->Display();
 }
