@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.382");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.383");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2638,7 +2638,7 @@ void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)
     switch ( val ) 
       {
       case VTK_CURSOR_ARROW:
-        image = "arror";
+        image = "arrow";
         break;
       case VTK_CURSOR_SIZENE:
         image = "top_right_corner";
