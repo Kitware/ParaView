@@ -22,12 +22,12 @@
 // between the menu bar on top (and eventually toolbars) and the status bar
 // at the bottom.
 //
-// This "view frame" is now further divided horizontally into two parts by 
-// a split frame instance, the MainSplitFrame.
-// The first part (on the left usually) is called the "main panel" area, and
-// it can be hidden or shown using the SetMainPanelVisibility() method.
+// This old "view frame" is now further divided horizontally into two parts 
+// by a split frame instance.
+// The first part (on the left) is called the "main panel" area, and
+// can be hidden or shown using the SetMainPanelVisibility() method.
 // A convenience method GetMainPanelFrame() can be used to retrieve that
-// "main panel area", even if it is currently entirely allocated to
+// "main panel area" frame, even if it is currently entirely allocated to
 // the main notebook, MainNotebook.
 // The MainNotebook element is packed in the main panel and is used to
 // display interface elements organized as *pages* inside *panels*. 
@@ -37,83 +37,97 @@
 // "user interface manager" (UIM) to the main user interface manager, as 
 // returned by GetMainUserInterfaceManager(). Since the main UIM is itself
 // attached to the main notebook, it will display the UIP automatically inside
-// the notebook and take care of showing/raising/hiding the panels properly.
-// The ShowMainUserInterface() method can be used show a main interface panel
-// given its name. The name is the typically the string returned by the
+// the notebook and take care of showing/raising/hiding the pages properly.
+// The ShowMainUserInterface() method can be used to show a main interface
+// panel given its name. The name is typically the string returned by the
 // GetName() method of a vtkKWUserInterfacePanel (UIP). 
 // The ShowMainUserInterface() method will query the main UIM to check if it
 // is indeed managing a panel (UIP) with that name, and show/raise that UIP
 // accordingly.
 //
-// Note that by doing following a framework, a subclass will be free of using
+// Note that by following such framework, a subclass will be free of using
 // a totally different type of UIM, while the UIP implementation and 
 // manipulation will remain exactly the same. One just has to focus on creating
-// simple panels packing user interface components, and the UIM will be
+// simple panels to pack user interface components, and the UIM will be
 // responsible for mapping them into a higher-level interface, like a notebook.
 // It will also take care of show/hiding conflicting interfaces, provide
 // some cross-panels features like drag and drop, serialize the UI state, etc.
 //
 // In the same way, the right part of the MainSplitFrame (i.e., not the main
-// panel itself, but the remaining space on the other side of the separator)
-// is also divided vertically into two parts by a split frame instance, 
-// the SecondarySplitFrame. The same methods as described above are available
-// for this secondary subdivision, i.e. SetSecondaryPanelVisibility() can be
+// panel itself, but the remaining space on the right side of the separator)
+// is also divided vertically into two parts by a split frame instance.
+// The same methods as described above are available for this secondary
+//  subdivision, i.e. SetSecondaryPanelVisibility() can be
 // used to show/hide the secondary panel, GetSecondaryPanelFrame() can be
-// used to retrieve the secondary panel frame, the SecondaryNotebook is packed
-// inside the secondary panel, and GetMainUserInterfaceManager() can be used
-// to retrieve the corresponding UIM.
+// used to retrieve the secondary panel frame, a SecondaryNotebook is
+// packed inside the secondary panel, and GetMainUserInterfaceManager() can
+// be used to retrieve the corresponding UIM.
 //
-// Below the SecondarySplitFrame is a second toolbar set packed
-// (SecondaryToolbarSet)
+// Below the SecondarySplitFrame is a second toolbar set (SecondaryToolbarSet)
+// available for extra toolbars.
 //
-// Last, a third user interface manager, the ViewUserInterfaceManager is
-// coupled to a ViewNotebook and packed inside the top part of the
-// secondary split frame. A default page is added to provide the
-// frame for GetViewFrame(). This notebook and user interface manager
+// The space available for "viewing", or packing 3D scenes, is returned by
+// GetViewFrame(). Under the hood, a third user interface manager, the 
+// ViewUserInterfaceManager is coupled to a ViewNotebook and packed inside
+// the top part of the secondary split frame (i.e. the large part that is
+// not considered a user interface panel). A default page is added to that
+// notebook to provide the frame for GetViewFrame(). Since there is only 
+// one page, the tab is not shown by default, leaving all the notebook
+// space available for viewing. This notebook and its user interface manager
 // are likely not be manipulated as often as the other panels and UIM, but 
-// can be used to provide multiple "views".
+// can be used to provide multiple "views" for example.
+// As a convenience, a GetViewPanelFrame() method returns the parent
+// of the notebook, i.e. the space into which the notebook was packed, so
+// that other elements can be packed below or before the notebook itself.
 //
-// So this describes the default layout so far, with the secondary
-// panel below the view frame. The PanelLayout ivar can be set 
-// to change this layout to a different configuration where the secondary
-// panel is below the main panel.
+// This describes the default layout so far, where the secondary panel is
+// located below the view frame. The PanelLayout ivar can be set 
+// to change this layout to different configurations where:
+// - the secondary panel is below the main panel.
+// - the secondary panel is below both main and the view panel.
+// Note that there is no accessor to get the split frame objects, since
+// you should not rely on them to parent your widgets. Use the panel
+// frame accessors instead, they will return the correct value even if
+// the layout changes (i.e., GetMainPanelFrame(), GetSecondaryPanelFrame(),
+// GetViewPanelFrame()).
 //
 // MB:   GetMenu() (see vtkKWTopLevel)
 // MTBS: GetMainToolbarSet() (see superclass)
 // MPF:  GetMainPanelFrame()
 // MNB:  MainNotebook
 // VNB:  ViewNotebook
+// VPF:  GetViewPanelFrame()
 // VF:   GetViewFrame() (first page of the VNB)
 // SPF:  GetSecondaryPanelFrame()
 // SNB:  SecondaryNotebook
 // STBS: GetSecondaryToolbarSet()
 // SF:   GetStatusFrame() (see superclass)
 // 
-// +---------------------------+    +---------------------------+
-// |           MB              |    |           MB              |    
-// +---------------------------+    +---------------------------+
-// |           MTBS            |    |           MTBS            |    
-// +--------+------------------+    +--------+------------------+
-// |+--+ MPF|+--+              |    |+--+ MPF|+--+              |   
-// ||  +---+||  +-------------+|    ||  +---+||  +-------------+|
-// ||      |||                ||    ||      |||                ||    
-// ||      |||    VNB (VF)    ||    ||      |||                ||    
-// ||      |||                ||    ||      |||                ||   
-// ||      |||                ||    || MNB  |||                ||    
-// ||      ||+----------------+|    ||      |||                ||
-// || MNB  |+------------------+    |+------+||    VNB (VF)    ||
-// ||      ||+--+      SPF     |    +--------+|                ||
-// ||      |||  +-------------+|    |+--+ SPF||                ||
-// ||      |||                ||    ||  +---+||                ||    
-// ||      |||    SNB         ||    ||      |||                ||    
-// ||      |||                ||    ||      |||                ||    
-// ||      |||                ||    || SNB  |||                ||    
-// ||      ||+----------------+|    ||      ||+----------------+|
-// |+------+|      STBS        |    |+------+|      STBS        |    
-// +--------+------------------+    +--------+------------------+
-// |            SF             |    |            SF             |    
-// +---------------------------+    +---------------------------+
-
+// +----------------------+  +----------------------+  +----------------------+
+// |           MB         |  |        MB            |  |        MB            |
+// +----------------------+  +----------------------+  +----------------------+
+// |           MTBS       |  |           MTBS       |  |           MTBS       |
+// +--------+-------------+  +--------+-------------+  +--------+-------------+
+// |+--+ MPF|+--+ VPF     |  |+--+ MPF|+--+  VPF    |  |+--+ MPF|+--+    VPF  |
+// ||  +---+||  +--------+|  ||  +---+||  +--------+|  ||  +---+||  +--------+|
+// ||      |||           ||  ||      |||           ||  ||      |||           ||
+// ||      ||| VNB (VF)  ||  ||      |||           ||  ||      |||           ||
+// ||      |||           ||  ||      |||           ||  ||      ||| VNB (VF)  ||
+// ||      |||           ||  || MNB  |||           ||  || MNB  |||           ||
+// ||      ||+-----------+|  ||      |||           ||  ||      |||           ||
+// || MNB  |+-------------+  |+------+|| VNB (VF)  ||  ||      |||           ||
+// ||      ||+--+  SPF    |  +--------+|           ||  ||      ||+-----------+|
+// ||      |||  +--------+|  |+--+ SPF||           ||  |+------+|   STBS      |
+// ||      |||           ||  ||  +---+||           ||  +--------+-------------+
+// ||      |||  SNB      ||  ||      |||           ||  |+--+ SPF              |
+// ||      |||           ||  ||      |||           ||  ||  +-----------------+|
+// ||      |||           ||  || SNB  |||           ||  || SNB                ||
+// ||      ||+-----------+|  ||      ||+-----------+|  ||                    ||
+// |+------+|    STBS     |  |+------+|      STBS   |  |+--------------------+|
+// +--------+-------------+  +--------+-------------+  +----------------------+
+// |            SF        |  |            SF        |  |            SF        |
+// +----------------------+  +----------------------+  +----------------------+
+//   Secondary below View      Secondary below Main      Secondary below Both
 
 #ifndef __vtkKWWindow_h
 #define __vtkKWWindow_h
@@ -176,19 +190,33 @@ public:
   enum 
   {
     PanelLayoutSecondaryBelowView = 0,
-    PanelLayoutSecondaryBelowMain
+    PanelLayoutSecondaryBelowMain,
+    PanelLayoutSecondaryBelowMainAndView
   };
   //ETX
   vtkSetClampMacro(PanelLayout, int, 
                    vtkKWWindow::PanelLayoutSecondaryBelowView, 
-                   vtkKWWindow::PanelLayoutSecondaryBelowMain);
+                   vtkKWWindow::PanelLayoutSecondaryBelowMainAndView);
   vtkGetMacro(PanelLayout, int);
   virtual void SetPanelLayoutToSecondaryBelowView()
     { this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowView);};
   virtual void SetPanelLayoutToSecondaryBelowMain()
     { this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowMain);};
-  vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
-  vtkGetObjectMacro(SecondarySplitFrame, vtkKWSplitFrame);
+  virtual void SetPanelLayoutToSecondaryBelowMainAndView()
+    {this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowMainAndView);};
+
+  // Description:
+  // Convenience method to get the frame available for "viewing". 
+  // Override the superclass to return a page in the notebook of the
+  // view user interface manager (located in the first part of the 
+  // SecondarySplitFrame).
+  // This method should be used instead of GetViewPanelFrame(), unless
+  // you really need to have both multiple notebook pages and common UI
+  // elements on top or below the notebook.
+  // The rational here is that GetViewFrame() always return the frame that
+  // can be used by users or developpers to add more "viewing" element (say,
+  // renderwidgets, 3D scenes), without knowing about the current layout.
+  virtual vtkKWFrame* GetViewFrame();
 
   // Description:
   // View panel. 
@@ -196,20 +224,13 @@ public:
   // of this document.
   // This panel is probably not going to be used much, by default it
   // creates a single page in the notebook, which frame is returned by
-  // GetViewFrame.
+  // GetViewFrame(). The GetViewPanelFrame() method returns the parent of
+  // the notebook, if one really need to pack something out of the 
+  // GetViewFrame().
   vtkGetObjectMacro(ViewNotebook, vtkKWNotebook);
   virtual vtkKWUserInterfaceManager* GetViewUserInterfaceManager();
   virtual void ShowViewUserInterface(const char *name);
-
-  // Description:
-  // Convenience method to get the frame available for "viewing". 
-  // Override the superclass to return a page in the notebook of the
-  // view user interface manager (located in the first part of the 
-  // SecondarySplitFrame).
-  // The rational here is that GetViewFrame() always return the frame that
-  // can be used by users or developpers to add more "viewing" element (say,
-  // renderwidgets, 3D scenes), without knowing about the current layout.
-  virtual vtkKWFrame* GetViewFrame();
+  virtual vtkKWFrame* GetViewPanelFrame();
 
   // Description:
   // Get the secondary toolbar set.

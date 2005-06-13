@@ -42,7 +42,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.254");
+vtkCxxRevisionMacro(vtkKWWindow, "1.255");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -53,16 +53,16 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWWindow::vtkKWWindow()
 {
-  this->MainSplitFrame        = vtkKWSplitFrame::New();
+  this->MainSplitFrame = vtkKWSplitFrame::New();
   this->MainSplitFrame->SetFrame1MinimumSize(250);
 
   this->SecondarySplitFrame = vtkKWSplitFrame::New();
 
-  this->PanelLayout   = vtkKWWindow::PanelLayoutSecondaryBelowView;
+  this->PanelLayout = vtkKWWindow::PanelLayoutSecondaryBelowView;
 
   // Main Panel
 
-  this->MainNotebook          = vtkKWNotebook::New();
+  this->MainNotebook = vtkKWNotebook::New();
   this->MainNotebook->PagesCanBePinnedOn();
   this->MainNotebook->EnablePageTabContextMenuOn();
   this->MainNotebook->AlwaysShowTabsOn();
@@ -216,42 +216,42 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   int idx;
   vtkKWUserInterfaceManager *uim;
 
-  // Main Split frame
-
-  this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
-  this->MainSplitFrame->Create(app);
-
-  this->Script("pack %s -side top -fill both -expand t",
-               this->MainSplitFrame->GetWidgetName());
-
-  // Secondary Split frame
+  // Main and Secondary split frames
 
   this->SecondarySplitFrame->SetSeparatorSize(
     this->MainSplitFrame->GetSeparatorSize());
   this->SecondarySplitFrame->SetOrientationToVertical();
+
   if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
     {
+    this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
+    this->MainSplitFrame->Create(app);
     this->SecondarySplitFrame->SetParent(this->MainSplitFrame->GetFrame2());
+    this->SecondarySplitFrame->Create(app);
+    }
+  else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
+    {
+    this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
+    this->MainSplitFrame->Create(app);
+    this->SecondarySplitFrame->SetParent(this->MainSplitFrame->GetFrame1());
+    this->SecondarySplitFrame->Create(app);
     }
   else
     {
-    this->SecondarySplitFrame->SetParent(this->MainSplitFrame->GetFrame1());
+    this->SecondarySplitFrame->SetParent(this->Superclass::GetViewFrame());
+    this->SecondarySplitFrame->Create(app);
+    this->MainSplitFrame->SetParent(this->SecondarySplitFrame->GetFrame2());
+    this->MainSplitFrame->Create(app);
     }
-  this->SecondarySplitFrame->Create(app);
 
+  this->Script("pack %s -side top -fill both -expand t",
+               this->MainSplitFrame->GetWidgetName());
   this->Script("pack %s -side top -fill both -expand t",
                this->SecondarySplitFrame->GetWidgetName());
 
   // Create the view notebook
 
-  if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
-    {
-    this->ViewNotebook->SetParent(this->SecondarySplitFrame->GetFrame2());
-    }
-  else
-    {
-    this->ViewNotebook->SetParent(this->MainSplitFrame->GetFrame2());
-    }
+  this->ViewNotebook->SetParent(this->GetViewPanelFrame());
   this->ViewNotebook->Create(app, NULL);
 
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
@@ -355,7 +355,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Secondary toolbar
 
-  this->SecondaryToolbarSet->SetParent(this->GetMainSplitFrame()->GetFrame2());
+  this->SecondaryToolbarSet->SetParent(this->MainSplitFrame->GetFrame2());
   this->SecondaryToolbarSet->Create(app, NULL);
   this->SecondaryToolbarSet->ShowTopSeparatorOn();
   this->SecondaryToolbarSet->ShowBottomSeparatorOff();
@@ -375,22 +375,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Udpate the enable state
 
   this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-vtkKWFrame* vtkKWWindow::GetViewFrame()
-{
-  if (this->ViewUserInterfaceManager)
-    {
-    vtkKWUserInterfacePanel *panel = 
-      this->ViewUserInterfaceManager->GetPanel(
-        vtkKWWindow::DefaultViewPanelName);
-    if (panel)
-      {
-      return vtkKWFrame::SafeDownCast(panel->GetPageWidget(panel->GetName()));
-      }
-    }
-  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -478,10 +462,14 @@ vtkKWFrame* vtkKWWindow::GetMainPanelFrame()
     {
     return this->MainSplitFrame ? this->MainSplitFrame->GetFrame1() : NULL;
     }
-  else
+  else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
     {
     return this->SecondarySplitFrame 
       ? this->SecondarySplitFrame->GetFrame2() : NULL;
+    }
+  else
+    {
+    return this->MainSplitFrame ? this->MainSplitFrame->GetFrame1() : NULL;
     }
 }
 
@@ -602,6 +590,39 @@ void vtkKWWindow::SetSecondaryPanelVisibility(int arg)
 void vtkKWWindow::SecondaryPanelVisibilityCallback()
 {
   this->SetSecondaryPanelVisibility(!this->GetSecondaryPanelVisibility());
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWWindow::GetViewFrame()
+{
+  if (this->ViewUserInterfaceManager)
+    {
+    vtkKWUserInterfacePanel *panel = 
+      this->ViewUserInterfaceManager->GetPanel(
+        vtkKWWindow::DefaultViewPanelName);
+    if (panel)
+      {
+      return vtkKWFrame::SafeDownCast(panel->GetPageWidget(panel->GetName()));
+      }
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWWindow::GetViewPanelFrame()
+{
+  if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
+    {
+    return this->SecondarySplitFrame->GetFrame2();
+    }
+  else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
+    {
+    return this->MainSplitFrame->GetFrame2();
+    }
+  else
+    {
+    return this->MainSplitFrame->GetFrame2();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -912,8 +933,8 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MainNotebook: " << this->GetMainNotebook() << endl;
   os << indent << "SecondaryNotebook: " << this->GetSecondaryNotebook() << endl;
   os << indent << "ViewNotebook: " << this->GetViewNotebook() << endl;
-  os << indent << "MainSplitFrame: " << this->GetMainSplitFrame() << endl;
-  os << indent << "SecondarySplitFrame: " << this->GetSecondarySplitFrame() << endl;
+  os << indent << "MainSplitFrame: " << this->MainSplitFrame << endl;
+  os << indent << "SecondarySplitFrame: " << this->SecondarySplitFrame << endl;
   os << indent << "SecondaryToolbarSet: " << this->SecondaryToolbarSet << endl;
   os << indent << "PanelLayout: " << this->PanelLayout << endl;
 }
