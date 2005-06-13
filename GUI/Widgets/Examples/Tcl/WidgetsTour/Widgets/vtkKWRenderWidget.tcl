@@ -16,7 +16,7 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
     # Switch to trackball style, it's nicer
 
-    [[rw GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
+    [[[rw GetRenderWindow] GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
 
     # Create a 3D object reader
 

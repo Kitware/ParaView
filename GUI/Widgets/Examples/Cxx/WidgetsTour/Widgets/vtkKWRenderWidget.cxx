@@ -5,6 +5,7 @@
 #include "vtkKWRenderWidget.h"
 #include "vtkKWWindow.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
 #include "KWWidgetsTourExamplePath.h"
@@ -27,7 +28,7 @@ int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *win)
   // Switch to trackball style, it's nicer
 
   vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
-    rw->GetInteractor()->GetInteractorStyle());
+    rw->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   if (istyle)
     {
     istyle->SetCurrentStyleToTrackballCamera();

@@ -36,7 +36,7 @@ pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 
 # Switch to trackball style, it's nicer
 
-[[rw GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
+[[[rw GetRenderWindow] GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
 
 # Create a 3D object reader
 

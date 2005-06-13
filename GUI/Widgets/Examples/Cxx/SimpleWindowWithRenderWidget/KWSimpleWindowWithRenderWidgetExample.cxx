@@ -1,12 +1,13 @@
-#include "vtkKWApplication.h"
-#include "vtkKWWindowBase.h"
-#include "vtkKWRenderWidget.h"
-#include "vtkKWFrame.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkXMLPolyDataReader.h"
 #include "vtkActor.h"
 #include "vtkInteractorStyleSwitch.h"
+#include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
+#include "vtkKWRenderWidget.h"
+#include "vtkKWWindowBase.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
+#include "vtkXMLPolyDataReader.h"
 
 #include "vtkKWWidgetsConfigure.h"
 
@@ -55,7 +56,7 @@ int my_main(int argc, char *argv[])
   // Switch to trackball style, it's nicer
 
   vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
-    rw->GetInteractor()->GetInteractorStyle());
+    rw->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   if (istyle)
     {
     istyle->SetCurrentStyleToTrackballCamera();
