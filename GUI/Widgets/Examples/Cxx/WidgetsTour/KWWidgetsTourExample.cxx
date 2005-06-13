@@ -1,12 +1,14 @@
 #include "vtkKWApplication.h"
+#include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWText.h"
-#include "vtkKWWindow.h"
-#include "vtkKWNotebook.h"
 #include "vtkKWListBox.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWSplitFrame.h"
+#include "vtkKWText.h"
+#include "vtkKWTextLabeled.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWUserInterfacePanel.h"
-#include "vtkKWApplication.h"
+#include "vtkKWWindow.h"
 
 #include "KWWidgetsTourExampleEntryPoints.h"
 #include "KWWidgetsTourExamplePath.h"
@@ -40,6 +42,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWWindow *win = vtkKWWindow::New();
   win->SupportHelpOn();
+  win->SetPanelLayoutToSecondaryBelowMainAndView();
   app->AddWindow(win);
   win->Create(app, NULL);
 
@@ -76,37 +79,48 @@ int my_main(int argc, char *argv[])
   source_panel->Create(app);
   win->GetSecondaryNotebook()->AlwaysShowTabsOff();
 
+  // Add a page, and divide it using a split frame
+
+  source_panel->AddPage("Source", "Display the example source", NULL);
+  page_widget = source_panel->GetPageWidget("Source");
+
+  vtkKWSplitFrame *source_split = vtkKWSplitFrame::New();
+  source_split->SetParent(page_widget);
+  source_split->SetExpandFrameToBothFrames();
+  source_split->Create(app);
+
+  app->Script("pack %s -side top -expand y -fill both -padx 0 -pady 0", 
+              source_split->GetWidgetName());
+
   // Add text widget to display the Tcl example source
 
-  source_panel->AddPage("Tcl Source", "Display the Tcl example source", NULL);
-  page_widget = source_panel->GetPageWidget("Tcl Source");
-
-  vtkKWText *tcl_source_text = vtkKWText::New();
-  tcl_source_text->SetParent(page_widget);
-  tcl_source_text->EditableTextOff();
-  tcl_source_text->UseVerticalScrollbarOn();
+  vtkKWTextLabeled *tcl_source_text = vtkKWTextLabeled::New();
+  tcl_source_text->SetParent(source_split->GetFrame1());
   tcl_source_text->Create(app, NULL);
-  tcl_source_text->SetWrapToNone();
+  tcl_source_text->SetLabelPositionToTop();
+  tcl_source_text->SetLabelText("Tcl Source");
+
+  tcl_source_text->GetWidget()->EditableTextOff();
+  tcl_source_text->GetWidget()->UseVerticalScrollbarOn();
+  tcl_source_text->GetWidget()->SetWrapToNone();
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               tcl_source_text->GetWidgetName());
 
   // Add text widget to display the C++ example source
 
-  source_panel->AddPage("C++ Source", "Display the C++ example source", NULL);
-  page_widget = source_panel->GetPageWidget("C++ Source");
-
-  vtkKWText *cxx_source_text = vtkKWText::New();
-  cxx_source_text->SetParent(page_widget);
-  cxx_source_text->EditableTextOff();
-  cxx_source_text->UseVerticalScrollbarOn();
+  vtkKWTextLabeled *cxx_source_text = vtkKWTextLabeled::New();
+  cxx_source_text->SetParent(source_split->GetFrame2());
   cxx_source_text->Create(app, NULL);
-  cxx_source_text->SetWrapToNone();
+  cxx_source_text->SetLabelPositionToTop();
+  cxx_source_text->SetLabelText("C++ Source");
+
+  cxx_source_text->GetWidget()->EditableTextOff();
+  cxx_source_text->GetWidget()->UseVerticalScrollbarOn();
+  cxx_source_text->GetWidget()->SetWrapToNone();
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               cxx_source_text->GetWidgetName());
-
-  source_panel->RaisePage("C++ Source");
 
   // Populate the examples
   // Create a panel for each one, and pass the frame
@@ -187,13 +201,13 @@ int my_main(int argc, char *argv[])
 
   sprintf(buffer, 
           "%s ShowViewUserInterface [%s GetSelection] ;"
-          "%s  SetValue $cxx_source([%s GetSelection]) ; "
-          "%s  SetValue $tcl_source([%s GetSelection]) ; ",
+          "%s SetValue $cxx_source([%s GetSelection]) ; "
+          "%s SetValue $tcl_source([%s GetSelection]) ; ",
           win->GetTclName(),
           widgets_list->GetTclName(),
-          cxx_source_text->GetTclName(),
+          cxx_source_text->GetWidget()->GetTclName(),
           widgets_list->GetTclName(),
-          tcl_source_text->GetTclName(),
+          tcl_source_text->GetWidget()->GetTclName(),
           widgets_list->GetTclName());
 
   widgets_list->SetSingleClickCallback(NULL, buffer);
@@ -209,6 +223,7 @@ int my_main(int argc, char *argv[])
   widgets_panel->Delete();
   widgets_list->Delete();
   source_panel->Delete();
+  source_split->Delete();
   tcl_source_text->Delete();
   cxx_source_text->Delete();
   app->Delete();

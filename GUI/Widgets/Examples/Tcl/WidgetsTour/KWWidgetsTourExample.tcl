@@ -19,6 +19,7 @@ app SetHelpDialogStartingPage "http://www.kitware.com"
 
 vtkKWWindow win
 win SupportHelpOn
+win SetPanelLayoutToSecondaryBelowMainAndView
 app AddWindow win
 win Create app ""
 
@@ -52,35 +53,44 @@ source_panel SetUserInterfaceManager [win GetSecondaryUserInterfaceManager]
 source_panel Create app
 [win GetSecondaryNotebook] AlwaysShowTabsOff
 
+# Add a page, and divide it using a split frame
+
+source_panel AddPage "Source" "Display the example source" ""
+set page_widget [source_panel GetPageWidget "Source"]
+
+vtkKWSplitFrame source_split
+source_split SetParent $page_widget
+source_split SetExpandFrameToBothFrames
+source_split Create app
+
+pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 # Add text widget to display the Tcl example source
 
-source_panel AddPage "Tcl Source" "Display the Tcl example source" ""
-set page_widget [source_panel GetPageWidget "Tcl Source"]
-
-vtkKWText tcl_source_text
-tcl_source_text SetParent $page_widget
-tcl_source_text EditableTextOff
-tcl_source_text UseVerticalScrollbarOn
+vtkKWTextLabeled tcl_source_text
+tcl_source_text SetParent [source_split GetFrame1]
 tcl_source_text Create app ""
-tcl_source_text SetWrapToNone
+tcl_source_text SetLabelPositionToTop
+tcl_source_text SetLabelText "Tcl Source"
+
+[tcl_source_text GetWidget] EditableTextOff
+[tcl_source_text GetWidget] UseVerticalScrollbarOn
+[tcl_source_text GetWidget] SetWrapToNone
 
 pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 # Add text widget to display the C++ example source
 
-source_panel AddPage "C++ Source" "Display the C++ example source" ""
-set page_widget [source_panel GetPageWidget "C++ Source"]
-
-vtkKWText cxx_source_text
-cxx_source_text SetParent $page_widget
-cxx_source_text EditableTextOff
-cxx_source_text UseVerticalScrollbarOn
+vtkKWTextLabeled cxx_source_text
+cxx_source_text SetParent [source_split GetFrame2]
 cxx_source_text Create app ""
-cxx_source_text SetWrapToNone
+cxx_source_text SetLabelPositionToTop
+cxx_source_text SetLabelText "C++ Source"
+
+[cxx_source_text GetWidget] EditableTextOff
+[cxx_source_text GetWidget] UseVerticalScrollbarOn
+[cxx_source_text GetWidget] SetWrapToNone
 
 pack [cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
-
-source_panel RaisePage "Tcl Source"
 
 # Populate the examples
 # Create a panel for each one, and pass the frame
@@ -119,7 +129,7 @@ foreach widget $widgets {
 
 # Raise the example panel
 
-set cmd {win ShowViewUserInterface [widgets_list GetSelection] ; tcl_source_text SetValue $tcl_source([widgets_list GetSelection]) ; catch { cxx_source_text SetValue $cxx_source([widgets_list GetSelection])}}
+set cmd {win ShowViewUserInterface [widgets_list GetSelection] ; [tcl_source_text GetWidget] SetValue $tcl_source([widgets_list GetSelection]) ; [cxx_source_text GetWidget] SetValue $cxx_source([widgets_list GetSelection])}
 
 widgets_list SetSingleClickCallback "" $cmd
 
@@ -137,6 +147,7 @@ win Delete
 widgets_panel Delete
 widgets_list Delete
 source_panel Delete
+source_split Delete
 tcl_source_text Delete
 cxx_source_text Delete
 
