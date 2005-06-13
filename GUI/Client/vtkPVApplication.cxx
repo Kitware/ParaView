@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.358");
+vtkCxxRevisionMacro(vtkPVApplication, "1.359");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -156,7 +156,6 @@ private:
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaview_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvservermanagertcl_Init(Tcl_Interp *interp); 
 extern "C" int Vtkpvservercommontcl_Init(Tcl_Interp *interp); 
@@ -374,8 +373,6 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
   Vtkpvdevelopmenttcl_Init(interp);
 #endif
 
-  Vtktkrenderwidget_Init(interp);
-   
   Vtkkwparaview_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
   Vtkpvservercommontcl_Init(interp); 
