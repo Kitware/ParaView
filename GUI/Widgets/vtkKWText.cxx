@@ -17,19 +17,42 @@
 #include "vtkKWTkUtilities.h"
 
 #include <vtksys/stl/string>
+#include <vtksys/stl/list>
+#include <vtksys/RegularExpression.hxx>
 
-#define VTK_KWTEXT_BOLD_MARKER "**"
-#define VTK_KWTEXT_BOLD_TAG "_boldtag_"
+const char *vtkKWText::MarkerBold = "**";
+const char *vtkKWText::MarkerItalic = "~~";
+const char *vtkKWText::MarkerUnderline = "__";
 
-#define VTK_KWTEXT_ITALIC_MARKER "~~"
-#define VTK_KWTEXT_ITALIC_TAG "_italictag_"
-
-#define VTK_KWTEXT_UNDERLINE_MARKER "__"
-#define VTK_KWTEXT_UNDERLINE_TAG "_underlinetag_"
+const char *vtkKWText::TagBold = "_bold_tag_";
+const char *vtkKWText::TagItalic = "_italic_tag_";
+const char *vtkKWText::TagUnderline = "_underline_tag_";
+const char *vtkKWText::TagFgNavy = "_fg_navy_tag_";
+const char *vtkKWText::TagFgRed = "_fg_red_tag_";
+const char *vtkKWText::TagFgBlue = "_fg_blue_tag_";
+const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.32");
+vtkCxxRevisionMacro(vtkKWText, "1.33");
+
+//----------------------------------------------------------------------------
+class vtkKWTextInternals
+{
+public:
+
+  class TagMatcher
+  {
+  public:
+    vtksys_stl::string Regexp;
+    vtksys_stl::string Tag;
+  };
+
+  typedef vtksys_stl::list<vtkKWTextInternals::TagMatcher> TagMatchersContainer;
+  typedef vtksys_stl::list<vtkKWTextInternals::TagMatcher>::iterator TagMatchersContainerIterator;
+
+  TagMatchersContainer TagMatchers;
+};
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -40,6 +63,8 @@ vtkKWText::vtkKWText()
   this->EditableText         = 1;
   this->QuickFormatting      = 0;
   this->UseVerticalScrollbar = 0;
+
+  this->Internals = new vtkKWTextInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -58,6 +83,14 @@ vtkKWText::~vtkKWText()
     }
 
   this->SetValueString(NULL);
+
+  // Delete all presets
+
+  if (this->Internals)
+    {
+    delete this->Internals;
+    this->Internals = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +103,8 @@ char *vtkKWText::GetValue()
 
   const char *val = this->Script("%s get 1.0 {end -1 chars}", 
                                  this->TextWidget->GetWidgetName());
-  this->SetValueString(this->ConvertTclStringToInternalString(val, 0));
+  this->SetValueString(
+    this->ConvertTclStringToInternalString(val));
   return this->GetValueString();
 }
 
@@ -119,7 +153,16 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
   int state = this->TextWidget->GetStateOption();
   this->TextWidget->SetStateOption(1);
 
-  vtksys_stl::string str(this->ConvertInternalStringToTclString(s, 0));
+  this->AppendValueInternalTagging(s, tag);
+  
+  this->TextWidget->SetStateOption(state);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
+{
+  // Don't check for this->Created() for speed, since it is called
+  // by AppendValue which does the check already
 
   // In QuickFormatting mode, look for markers, and use tags accordingly
 
@@ -128,9 +171,9 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
     const int nb_markers = 3;
     const char* markertag[nb_markers * 2] = 
       {
-        VTK_KWTEXT_BOLD_MARKER, VTK_KWTEXT_BOLD_TAG,
-        VTK_KWTEXT_ITALIC_MARKER, VTK_KWTEXT_ITALIC_TAG,
-        VTK_KWTEXT_UNDERLINE_MARKER, VTK_KWTEXT_UNDERLINE_TAG
+        vtkKWText::MarkerBold, vtkKWText::TagBold,
+        vtkKWText::MarkerItalic, vtkKWText::TagItalic,
+        vtkKWText::MarkerUnderline, vtkKWText::TagUnderline
       };
 
     // First find the closest known marker
@@ -139,7 +182,7 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
     int i, closest_marker_id = -1;
     for (i = 0; i < nb_markers; i++)
       {
-      const char *find_marker = strstr(str.c_str(), markertag[i * 2]);
+      const char *find_marker = strstr(str, markertag[i * 2]);
       if (find_marker && (!closest_marker || find_marker < closest_marker))
         {
         closest_marker = find_marker;
@@ -159,8 +202,8 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
         // Text before the marker, using the current tag
 
         vtksys_stl::string before;
-        before.append(str.c_str(), closest_marker - str.c_str());
-        this->AppendValue(before.c_str(), tag);
+        before.append(str, closest_marker - str);
+        this->AppendValueInternalTagging(before.c_str(), tag);
 
         // Zone inside the marker, using the current tag + the marker's tag
 
@@ -173,25 +216,78 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
         vtksys_stl::string zone;
         zone.append(closest_marker + len_marker, 
                     end_marker - closest_marker - len_marker);
-        this->AppendValue(zone.c_str(), new_tag.c_str());
+        this->AppendValueInternalTagging(zone.c_str(), new_tag.c_str());
 
         // Text after the marker, using the current tag
 
         vtksys_stl::string after;
         after.append(end_marker + len_marker);
-        this->AppendValue(after.c_str(), tag);
+        this->AppendValueInternalTagging(after.c_str(), tag);
 
         return;
         }
       }
     }
 
-  this->Script("catch {%s insert end {%s} %s}", 
+  // The tag matchers
+
+  vtkKWTextInternals::TagMatchersContainerIterator it = 
+    this->Internals->TagMatchers.begin();
+  vtkKWTextInternals::TagMatchersContainerIterator end = 
+    this->Internals->TagMatchers.end();
+  int found_regexp = 0;
+  for (; it != end; ++it)
+    {
+    vtksys::RegularExpression re((*it).Regexp.c_str());
+    if (re.find(str))
+      {
+      // Text before the regexp, using the current tag
+
+      vtksys_stl::string before;
+      before.append(str, re.start());
+
+      // Zone inside the regexp, using the current tag + the marker's tag
+
+      vtksys_stl::string new_tag;
+      if (tag)
+        {
+        new_tag.append(tag);
+        }
+      new_tag.append(" ").append((*it).Tag);
+      vtksys_stl::string zone;
+      zone.append(str + re.start(), re.end() - re.start());
+
+      // Text after the regexp, using the current tag
+
+      vtksys_stl::string after;
+      after.append(str + re.end());
+
+      this->AppendValueInternalTagging(before.c_str(), tag);
+      this->AppendValueInternal(zone.c_str(), new_tag.c_str());
+      this->AppendValueInternalTagging(after.c_str(), tag);
+      found_regexp = 1;
+      break;
+      }
+    }
+
+  if (!found_regexp)
+    {
+    this->AppendValueInternal(str, tag);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWText::AppendValueInternal(const char *s, const char *tag)
+{
+  // Don't check for this->Created() for speed, since it is called
+  // by AppendValue which does the check already
+
+  const char *val = this->ConvertInternalStringToTclString(
+    s, vtkKWWidget::ConvertStringEscapeInterpretable);
+
+  this->Script("%s insert end \"%s\" %s", 
                this->TextWidget->GetWidgetName(),
-               str.c_str(),
-               tag ? tag : "");
-  
-  this->TextWidget->SetStateOption(state);
+               val ? val : "", tag ? tag : "");
 }
 
 //----------------------------------------------------------------------------
@@ -232,11 +328,25 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
     app->GetMainInterp(), font.c_str(), italic_font);
 
   this->Script("%s tag config %s -font \"%s\"", 
-               wname, VTK_KWTEXT_BOLD_TAG, bold_font);
+               wname, vtkKWText::TagBold, bold_font);
+
   this->Script("%s tag config %s -font \"%s\"", 
-               wname, VTK_KWTEXT_ITALIC_TAG, italic_font);
+               wname, vtkKWText::TagItalic, italic_font);
+
   this->Script("%s tag config %s -underline 1", 
-               wname, VTK_KWTEXT_UNDERLINE_TAG);
+               wname, vtkKWText::TagUnderline);
+
+  this->Script("%s tag config %s -foreground #000080", 
+               wname, vtkKWText::TagFgNavy);
+
+  this->Script("%s tag config %s -foreground #FF0000", 
+               wname, vtkKWText::TagFgRed);
+
+  this->Script("%s tag config %s -foreground #0000FF", 
+               wname, vtkKWText::TagFgBlue);
+
+  this->Script("%s tag config %s -foreground #006400", 
+               wname, vtkKWText::TagFgDarkGreen);
   
   // Create the scrollbars
 
@@ -418,6 +528,20 @@ void vtkKWText::UpdateEnableState()
       this->EditableText ? this->GetEnabled() : 0);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkKWText::AddTagMatcher(const char *regexp, const char *tag)
+{
+  if (!this->Internals || !regexp || !tag)
+    {
+    return;
+    }
+
+  vtkKWTextInternals::TagMatcher tagmatcher;
+  tagmatcher.Regexp = regexp;
+  tagmatcher.Tag = tag;
+  this->Internals->TagMatchers.push_back(tagmatcher);
+} 
 
 //----------------------------------------------------------------------------
 void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)

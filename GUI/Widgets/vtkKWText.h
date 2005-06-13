@@ -22,6 +22,7 @@
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWTextInternals;
 
 class KWWIDGETS_EXPORT vtkKWText : public vtkKWWidget
 {
@@ -87,6 +88,11 @@ public:
   virtual void SetWrapToChar();
 
   // Description:
+  // Add a tag matcher. Whenever a regular expression 'regexp' is matched
+  // it will be tagged with 'tag'.
+  virtual void AddTagMatcher(const char *regexp, const char *tag);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -94,6 +100,21 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Some constants
+  //BTX
+  static const char *MarkerBold;
+  static const char *MarkerItalic;
+  static const char *MarkerUnderline;
+  static const char *TagBold;
+  static const char *TagItalic;
+  static const char *TagUnderline;
+  static const char *TagFgNavy;
+  static const char *TagFgRed;
+  static const char *TagFgBlue;
+  static const char *TagFgDarkGreen;
+  //ETX
 
 protected:
   vtkKWText();
@@ -117,6 +138,15 @@ protected:
   // Description:
   // Pack.
   virtual void Pack();
+
+  //BTX
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWTextInternals *Internals;
+  //ETX
+
+  virtual void AppendValueInternalTagging(const char *, const char *tag);
+  virtual void AppendValueInternal(const char *, const char *tag);
 
 private:
   vtkKWText(const vtkKWText&); // Not implemented
