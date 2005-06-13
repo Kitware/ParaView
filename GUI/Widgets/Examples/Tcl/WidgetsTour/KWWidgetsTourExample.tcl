@@ -72,9 +72,14 @@ tcl_source_text Create app ""
 tcl_source_text SetLabelPositionToTop
 tcl_source_text SetLabelText "Tcl Source"
 
-[tcl_source_text GetWidget] EditableTextOff
-[tcl_source_text GetWidget] UseVerticalScrollbarOn
-[tcl_source_text GetWidget] SetWrapToNone
+set text_widget [tcl_source_text GetWidget]
+$text_widget EditableTextOff
+$text_widget UseVerticalScrollbarOn
+$text_widget SetWrapToNone
+$text_widget SetHeight 3000
+$text_widget AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
+$text_widget AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
+$text_widget AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
 pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
@@ -86,9 +91,16 @@ cxx_source_text Create app ""
 cxx_source_text SetLabelPositionToTop
 cxx_source_text SetLabelText "C++ Source"
 
-[cxx_source_text GetWidget] EditableTextOff
-[cxx_source_text GetWidget] UseVerticalScrollbarOn
-[cxx_source_text GetWidget] SetWrapToNone
+set text_widget [cxx_source_text GetWidget]
+$text_widget EditableTextOff
+$text_widget UseVerticalScrollbarOn
+$text_widget SetWrapToNone
+$text_widget SetHeight 3000
+$text_widget AddTagMatcher "#\[a-z\]+" "_fg_red_tag_"
+$text_widget AddTagMatcher "//\[^\n\]*" "_fg_navy_tag_"
+$text_widget AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
+$text_widget AddTagMatcher "<\[^>\]*>" "_fg_blue_tag_"
+$text_widget AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
 pack [cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
