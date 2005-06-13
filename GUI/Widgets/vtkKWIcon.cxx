@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.8");
+vtkCxxRevisionMacro(vtkKWIcon, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -199,244 +199,12 @@ void vtkKWIcon::SetImage(int image)
   
   switch (image)
     {
-    case vtkKWIcon::ICON_ANNOTATE:
-      this->SetImage(
-        image_annotate, 
-        image_annotate_width, image_annotate_height,
-        image_annotate_pixel_size, 
-        image_annotate_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_AXES:
-      this->SetImage(
-        image_axes, 
-        image_axes_width, image_axes_height,
-        image_axes_pixel_size, 
-        image_axes_buffer_length);
-      break;
-
     case vtkKWIcon::ICON_CONNECTION:
       this->SetImage(
         image_connection, 
         image_connection_width, image_connection_height,
         image_connection_pixel_size, 
         image_connection_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_CONTOURS:
-      this->SetImage(
-        image_contours, 
-        image_contours_width, image_contours_height,
-        image_contours_pixel_size, 
-        image_contours_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_CUT:
-      this->SetImage(
-        image_cut, 
-        image_cut_width, image_cut_height,
-        image_cut_pixel_size, 
-        image_cut_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_AIF:
-      this->SetImage(
-        image_doc_aif, 
-        image_doc_aif_width, image_doc_aif_height,
-        image_doc_aif_pixel_size, 
-        image_doc_aif_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_ASF:
-      this->SetImage(
-        image_doc_asf, 
-        image_doc_asf_width, image_doc_asf_height,
-        image_doc_asf_pixel_size, 
-        image_doc_asf_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_AVI:
-      this->SetImage(
-        image_doc_avi, 
-        image_doc_avi_width, image_doc_avi_height,
-        image_doc_avi_pixel_size, 
-        image_doc_avi_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_BMP:
-      this->SetImage(
-        image_doc_bmp, 
-        image_doc_bmp_width, image_doc_bmp_height,
-        image_doc_bmp_pixel_size, 
-        image_doc_bmp_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_CHM:
-      this->SetImage(
-        image_doc_chm, 
-        image_doc_chm_width, image_doc_chm_height,
-        image_doc_chm_pixel_size, 
-        image_doc_chm_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_EXE:
-      this->SetImage(
-        image_doc_exe, 
-        image_doc_exe_width, image_doc_exe_height,
-        image_doc_exe_pixel_size, 
-        image_doc_exe_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_GIF:
-      this->SetImage(
-        image_doc_gif, 
-        image_doc_gif_width, image_doc_gif_height,
-        image_doc_gif_pixel_size, 
-        image_doc_gif_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_HLP:
-      this->SetImage(
-        image_doc_hlp, 
-        image_doc_hlp_width, image_doc_hlp_height,
-        image_doc_hlp_pixel_size, 
-        image_doc_hlp_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_HTTP:
-      this->SetImage(
-        image_doc_http, 
-        image_doc_http_width, image_doc_http_height,
-        image_doc_http_pixel_size, 
-        image_doc_http_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_JPG:
-      this->SetImage(
-        image_doc_jpg, 
-        image_doc_jpg_width, image_doc_jpg_height,
-        image_doc_jpg_pixel_size, 
-        image_doc_jpg_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_MP3:
-      this->SetImage(
-        image_doc_mp3, 
-        image_doc_mp3_width, image_doc_mp3_height,
-        image_doc_mp3_pixel_size, 
-        image_doc_mp3_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_MPEG:
-      this->SetImage(
-        image_doc_mpeg, 
-        image_doc_mpeg_width, image_doc_mpeg_height,
-        image_doc_mpeg_pixel_size, 
-        image_doc_mpeg_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_MSI:
-      this->SetImage(
-        image_doc_msi, 
-        image_doc_msi_width, image_doc_msi_height,
-        image_doc_msi_pixel_size, 
-        image_doc_msi_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_PDF:
-      this->SetImage(
-        image_doc_pdf, 
-        image_doc_pdf_width, image_doc_pdf_height,
-        image_doc_pdf_pixel_size, 
-        image_doc_pdf_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_PNG:
-      this->SetImage(
-        image_doc_png, 
-        image_doc_png_width, image_doc_png_height,
-        image_doc_png_pixel_size, 
-        image_doc_png_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_POSTSCRIPT:
-      this->SetImage(
-        image_doc_postscript, 
-        image_doc_postscript_width, image_doc_postscript_height,
-        image_doc_postscript_pixel_size, 
-        image_doc_postscript_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_POWERPOINT:
-      this->SetImage(
-        image_doc_powerpoint, 
-        image_doc_powerpoint_width, image_doc_powerpoint_height,
-        image_doc_powerpoint_pixel_size, 
-        image_doc_powerpoint_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_QUICKTIME:
-      this->SetImage(
-        image_doc_quicktime, 
-        image_doc_quicktime_width, image_doc_quicktime_height,
-        image_doc_quicktime_pixel_size, 
-        image_doc_quicktime_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_REALAUDIO:
-      this->SetImage(
-        image_doc_realaudio, 
-        image_doc_realaudio_width, image_doc_realaudio_height,
-        image_doc_realaudio_pixel_size, 
-        image_doc_realaudio_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_TGA:
-      this->SetImage(
-        image_doc_tga, 
-        image_doc_tga_width, image_doc_tga_height,
-        image_doc_tga_pixel_size, 
-        image_doc_tga_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_TIF:
-      this->SetImage(
-        image_doc_tif, 
-        image_doc_tif_width, image_doc_tif_height,
-        image_doc_tif_pixel_size, 
-        image_doc_tif_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_TXT:
-      this->SetImage(
-        image_doc_txt, 
-        image_doc_txt_width, image_doc_txt_height,
-        image_doc_txt_pixel_size, 
-        image_doc_txt_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_WAV:
-      this->SetImage(
-        image_doc_wav, 
-        image_doc_wav_width, image_doc_wav_height,
-        image_doc_wav_pixel_size, 
-        image_doc_wav_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_WORD:
-      this->SetImage(
-        image_doc_word, 
-        image_doc_word_width, image_doc_word_height,
-        image_doc_word_pixel_size, 
-        image_doc_word_buffer_length);
-      break;
-
-    case vtkKWIcon::ICON_DOC_ZIP:
-      this->SetImage(
-        image_doc_zip, 
-        image_doc_zip_width, image_doc_zip_height,
-        image_doc_zip_pixel_size, 
-        image_doc_zip_buffer_length);
       break;
 
     case vtkKWIcon::ICON_ERROR:
@@ -455,14 +223,6 @@ void vtkKWIcon::SetImage(int image)
         image_expand_buffer_length);
       break;
 
-    case vtkKWIcon::ICON_FILTERS:
-      this->SetImage(
-        image_filters, 
-        image_filters_width, image_filters_height,
-        image_filters_pixel_size, 
-        image_filters_buffer_length);
-      break;      
-
     case vtkKWIcon::ICON_FOLDER:
       this->SetImage(
         image_folder, 
@@ -478,14 +238,6 @@ void vtkKWIcon::SetImage(int image)
         image_folder_open_pixel_size, 
         image_folder_open_buffer_length);
       break;
-
-    case vtkKWIcon::ICON_GENERAL:
-      this->SetImage(
-        image_general, 
-        image_general_width, image_general_height,
-        image_general_pixel_size, 
-        image_general_buffer_length);
-      break;      
 
     case vtkKWIcon::ICON_GRID_LINEAR:
       this->SetImage(
@@ -519,14 +271,6 @@ void vtkKWIcon::SetImage(int image)
         image_info_mini_buffer_length);
       break;
 
-    case vtkKWIcon::ICON_LAYOUT:
-      this->SetImage(
-        image_layout, 
-        image_layout_width, image_layout_height,
-        image_layout_pixel_size, 
-        image_layout_buffer_length);
-      break;
-
     case vtkKWIcon::ICON_LOCK:
       this->SetImage(
         image_lock, 
@@ -535,14 +279,6 @@ void vtkKWIcon::SetImage(int image)
         image_lock_buffer_length);
       break;
 
-    case vtkKWIcon::ICON_MACROS:
-      this->SetImage(
-        image_macros, 
-        image_macros_width, image_macros_height,
-        image_macros_pixel_size, 
-        image_macros_buffer_length);
-      break;      
-
     case vtkKWIcon::ICON_MAG_GLASS:
       this->SetImage(
         image_mag_glass,
@@ -550,14 +286,6 @@ void vtkKWIcon::SetImage(int image)
         image_mag_glass_pixel_size,
         image_mag_glass_buffer_length);
       break;
-
-    case vtkKWIcon::ICON_MATERIAL:
-      this->SetImage(
-        image_material, 
-        image_material_width, image_material_height,
-        image_material_pixel_size, 
-        image_material_buffer_length);
-      break;      
 
     case vtkKWIcon::ICON_MINUS:
       this->SetImage(
@@ -598,14 +326,6 @@ void vtkKWIcon::SetImage(int image)
         image_plus_pixel_size, 
         image_plus_buffer_length);
       break;      
-
-    case vtkKWIcon::ICON_PREFERENCES:
-      this->SetImage(
-        image_preferences, 
-        image_preferences_width, image_preferences_height,
-        image_preferences_pixel_size, 
-        image_preferences_buffer_length);
-      break;
 
     case vtkKWIcon::ICON_QUESTION:
       this->SetImage(
@@ -653,14 +373,6 @@ void vtkKWIcon::SetImage(int image)
         image_stopwatch_width, image_stopwatch_height,
         image_stopwatch_pixel_size, 
         image_stopwatch_buffer_length);
-      break;
-      
-    case vtkKWIcon::ICON_TRANSFER:
-      this->SetImage(
-        image_transfer, 
-        image_transfer_width, image_transfer_height,
-        image_transfer_pixel_size, 
-        image_transfer_buffer_length);
       break;
       
     case vtkKWIcon::ICON_TRANSPORT_BEGINNING:

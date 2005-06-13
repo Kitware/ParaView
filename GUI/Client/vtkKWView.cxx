@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.15");
+vtkCxxRevisionMacro(vtkKWView, "1.16");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -352,10 +352,8 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->Create(app,"");
 
   vtkKWIcon *ico = vtkKWIcon::New();
-  ico->SetImage(vtkKWIcon::ICON_GENERAL);
   this->Notebook->AddPage(
     "General", "Set the general properties of the image view", ico);
-  ico->SetImage(vtkKWIcon::ICON_ANNOTATE);
   this->Notebook->AddPage(
     "Annotate", "Set the corner annotation", ico);
   ico->Delete();
