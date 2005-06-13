@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.126");
+vtkCxxRevisionMacro(vtkKWWidget, "1.127");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -187,15 +187,23 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 
   this->WidgetIsCreated = 1;
 
+  const char *ret = NULL;
+
   if (type)
     {
     if (args)
       {
-      this->Script("%s %s %s", type, this->GetWidgetName(), args);
+      ret = this->Script("%s %s %s", type, this->GetWidgetName(), args);
       }
     else
       {
-      this->Script("%s %s", type, this->GetWidgetName());
+      ret = this->Script("%s %s", type, this->GetWidgetName());
+      }
+    if (ret && strcmp(ret, this->GetWidgetName()))
+      {
+      vtkErrorMacro("Error creating the widget " << this->GetWidgetName() 
+                    << " of type " << type << ": " << ret);
+      return 0;
       }
 
     /* Update enable state
