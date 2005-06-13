@@ -12,7 +12,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *win)
+int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
