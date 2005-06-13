@@ -288,6 +288,36 @@ The points are expected to be in a mostly planar distribution."
       <Item name="Project on best-fitting plane"
             value="2"/>
     </SelectionList>
+    <ThumbWheel label="Alpha"
+                property="Alpha"
+                trace_name="Alpha"
+                type="float"
+                resolution="0.01"
+                minimum_value="0"
+                help="Specify alpha (or distance) value to control output of this filter. For a non-zero alpha value, only edges or triangles contained within a sphere centered at mesh vertices will be output. Otherwise, only triangles will be output." />
+
+    <ThumbWheel label="Tolerance"
+                trace_name="Tolerance"
+                property="Tolerance"
+                resolution="0.001"
+                minimum_value="0"
+                help="Specify a tolerance to control discarding of closely spaced points.
+This tolerance is specified as a fraction of the diagonal length of the bounding
+box of the points." />
+
+    <ThumbWheel label="Offset"
+                trace_name="Offset"
+                property="Offset"
+                resolution="0.1"
+                minimum_value="1"
+                help="Specify a multiplier to control the size of the initial, bounding Delaunay triangulation." />
+
+    <LabeledToggle label="Bounding Triangulation"
+                   trace_name="BoundingTriangulation"
+                   property="BoundingTriangulation"
+                   help="If checked, bounding triangulation points (and associated triangles) are included in the
+output. (These are introduced as an initial triangulation to begin the triangulation process.
+This feature is nice for debugging output.)" />
     <Documentation>
 Delaunay2D is a filter that constructs a 2D Delaunay triangulation from 
 a list of input points. These points may be represented by any dataset 

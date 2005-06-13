@@ -402,6 +402,34 @@
         default_values="0"> 
        <IntRangeDomain name="range" min="0" max="2"/>
      </IntVectorProperty>
+     <DoubleVectorProperty name="Alpha"
+       command="SetAlpha"
+       number_of_elements="1"
+       animateable="1"
+       default_values="0.0">
+       <DoubleRangeDomain name="range" min="0"/>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty name="Tolerance"
+       command="SetTolerance"
+       number_of_elements="1"
+       animateable="1"
+       default_values="0.00001">
+       <DoubleRangeDomain name="range" min="0" max="1.0" />
+     </DoubleVectorProperty>
+     <DoubleVectorProperty name="Offset"
+       command="SetOffset"
+       number_of_elements="1"
+       animateable="1"
+       default_values="1.0">
+       <DoubleRangeDomain name="range" min="0.75"/>
+     </DoubleVectorProperty>
+     <IntVectorProperty name="BoundingTriangulation"
+       command="SetBoundingTriangulation"
+       number_of_elements="1"
+       animateable="1"
+       default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
    </SourceProxy>
 
    <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
