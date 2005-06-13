@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.35");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.36");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -237,15 +237,12 @@ void vtkPVAnimationScene::SetWindow(vtkPVWindow *window)
     {
     return;
     }
-  if ( this->Window )
+  if ( this->Window  && this->ErrorEventTag)
     {
     this->Window->RemoveObserver(this->ErrorEventTag);
+    this->ErrorEventTag = 0;
     }
   this->Window = window;
-  if ( this->Window )
-    {
-    this->ErrorEventTag = this->Window->AddObserver(vtkKWEvent::ErrorMessageEvent, this->Observer);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -439,9 +436,10 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %f",
     this->GetTclName(), fileRoot, ext, width, height, framerate);
+  this->CaptureErrorEvents();
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
     width, height, framerate);
-  
+  this->ReleaseErrorEvents();
   if (savefailed)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -456,7 +454,9 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
 {
   // Start at the beginning.
   this->GetTraceHelper()->AddEntry("$kw(%s) SaveGeometry %s", this->GetTclName(), filename);
+  this->CaptureErrorEvents();
   int error = this->AnimationSceneProxy->SaveGeometry(filename);
+  this->ReleaseErrorEvents();
   if (error == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -553,6 +553,26 @@ void vtkPVAnimationScene::SetDuration(double duration)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::CaptureErrorEvents()
+{
+  if (!this->ErrorEventTag && this->Window)
+    {
+    this->ErrorEventTag = this->Window->AddObserver(
+      vtkKWEvent::ErrorMessageEvent, this->Observer);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::ReleaseErrorEvents()
+{
+  if (this->ErrorEventTag && this->Window)
+    {
+    this->Window->RemoveObserver(this->ErrorEventTag);
+    this->ErrorEventTag = 0;
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::Play()
 {
   this->InPlay = 1;
@@ -564,8 +584,9 @@ void vtkPVAnimationScene::Play()
   this->VCRControl->UpdateEnableState();
   this->VCRToolbar->SetInPlay(1);
   this->VCRToolbar->UpdateEnableState();
-  
+  this->CaptureErrorEvents(); 
   this->AnimationSceneProxy->Play();
+  this->ReleaseErrorEvents();
   this->InPlay = 0;
   if (this->Window)
     {

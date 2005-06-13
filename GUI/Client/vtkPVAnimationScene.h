@@ -171,6 +171,9 @@ protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
 
+  void CaptureErrorEvents();
+  void ReleaseErrorEvents();
+
   vtkPVRenderView* RenderView;
   vtkPVWindow* Window;
   vtkPVAnimationManager* AnimationManager;
