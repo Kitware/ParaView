@@ -1,6 +1,5 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkKWNotebook.h"
@@ -9,7 +8,8 @@
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWApplication.h"
 
-#include "KWWidgetsTourExample.h"
+#include "KWWidgetsTourExampleEntryPoints.h"
+#include "KWWidgetsTourExamplePath.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -76,8 +76,6 @@ int my_main(int argc, char *argv[])
   source_panel->Create(app);
   win->GetSecondaryNotebook()->AlwaysShowTabsOff();
 
-  win->GetViewNotebook()->ShowOnlyPagesWithSameTagOn();
-
   // Add text widget to display the Tcl example source
 
   source_panel->AddPage("Tcl Source", "Display the Tcl example source", NULL);
@@ -113,6 +111,10 @@ int my_main(int argc, char *argv[])
   // Populate the examples
   // Create a panel for each one, and pass the frame
 
+  win->GetViewNotebook()->ShowOnlyPagesWithSameTagOn();
+
+  char buffer[2048];
+
   WidgetNode *node_ptr = Widgets;
   while (node_ptr->Name && node_ptr->EntryPoint)
     {
@@ -123,45 +125,29 @@ int my_main(int argc, char *argv[])
     panel->Delete();
     panel->AddPage(panel->GetName(), NULL, NULL);
 
-    vtkKWFrameWithScrollbar *framews = vtkKWFrameWithScrollbar::New();
-    framews->SetParent(panel->GetPageWidget(panel->GetName()));
-    framews->Create(app, NULL);
-    framews->Delete();
-
-    app->Script("pack %s -side top -expand y -fill both", 
-                framews->GetWidgetName());
-
-    if ((*node_ptr->EntryPoint)(framews->GetFrame()))
+    if ((*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win))
       {
       widgets_list->AppendUnique(node_ptr->Name);
 
       // Try to find the C++ source
 
-      vtksys_stl::string example_source(node_ptr->Name);
-      example_source += ".cxx";
+      sprintf(
+        buffer, 
+        "%s/Examples/Cxx/%s/%s/%s.cxx", 
+        KWWIDGETS_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
 
-      vtksys_stl::string example_source_path(SourceDir);
-      example_source_path += '/';
-      example_source_path += WidgetsDirName;
-      example_source_path += '/';
-      example_source_path += example_source;
-
-      if (!vtksys::SystemTools::FileExists(example_source_path.c_str()))
+      if (!vtksys::SystemTools::FileExists(buffer))
         {
-        example_source_path = app->GetInstallationDirectory();
-        example_source_path += "/../share/";
-        example_source_path += ProjectName;
-        example_source_path += "/Examples/Cxx/";
-        example_source_path += ExampleDirName;
-        example_source_path += '/';
-        example_source_path += WidgetsDirName;
-        example_source_path += '/';
-        example_source_path += example_source;
+        sprintf(
+          buffer, 
+          "%s/../share/%s/Examples/Cxx/%s/%s/%s.cxx",
+          app->GetInstallationDirectory(), 
+          KWWIDGETS_PROJECT_NAME,ExampleDirName,WidgetsDirName,node_ptr->Name);
         }
-      if (vtksys::SystemTools::FileExists(example_source_path.c_str()))
+      if (vtksys::SystemTools::FileExists(buffer))
         {
         app->Script("set cxx_source(%s) [read [open %s]]", 
-                    node_ptr->Name, example_source_path.c_str());
+                    node_ptr->Name, buffer);
         }
       else
         {
@@ -170,33 +156,23 @@ int my_main(int argc, char *argv[])
 
       // Try to find the Tcl source
 
-      example_source = node_ptr->Name;
-      example_source += ".tcl";
+      sprintf(
+        buffer, 
+        "%s/Examples/Tcl/%s/%s/%s.tcl", 
+        KWWIDGETS_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
 
-      example_source_path = SourceDir;
-      example_source_path += "/../../Tcl/";
-      example_source_path += ExampleDirName;
-      example_source_path += '/';
-      example_source_path += WidgetsDirName;
-      example_source_path += '/';
-      example_source_path += example_source;
-
-      if (!vtksys::SystemTools::FileExists(example_source_path.c_str()))
+      if (!vtksys::SystemTools::FileExists(buffer))
         {
-        example_source_path = app->GetInstallationDirectory();
-        example_source_path += "/../share/";
-        example_source_path += ProjectName;
-        example_source_path += "/Examples/Tcl/";
-        example_source_path += ExampleDirName;
-        example_source_path += '/';
-        example_source_path += WidgetsDirName;
-        example_source_path += '/';
-        example_source_path += example_source;
+        sprintf(buffer, 
+                "%s/../share/%s/Examples/Tcl/%s/%s/%s.tcl",
+                app->GetInstallationDirectory(), 
+                KWWIDGETS_PROJECT_NAME, 
+                ExampleDirName, WidgetsDirName, node_ptr->Name);
         }
-      if (vtksys::SystemTools::FileExists(example_source_path.c_str()))
+      if (vtksys::SystemTools::FileExists(buffer))
         {
         app->Script("set tcl_source(%s) [read [open %s]]", 
-                    node_ptr->Name, example_source_path.c_str());
+                    node_ptr->Name, buffer);
         }
       else
         {
@@ -206,32 +182,21 @@ int my_main(int argc, char *argv[])
     node_ptr++;
     }
 
-  vtksys_stl::string cmd;
+  // Setup the command that will raise the example panel, 
+  // bring the C++ and Tcl source for each example
 
-  // Raise the example panel
+  sprintf(buffer, 
+          "%s ShowViewUserInterface [%s GetSelection] ;"
+          "%s  SetValue $cxx_source([%s GetSelection]) ; "
+          "%s  SetValue $tcl_source([%s GetSelection]) ; ",
+          win->GetTclName(),
+          widgets_list->GetTclName(),
+          cxx_source_text->GetTclName(),
+          widgets_list->GetTclName(),
+          tcl_source_text->GetTclName(),
+          widgets_list->GetTclName());
 
-  cmd += win->GetTclName();
-  cmd += " ShowViewUserInterface [";
-  cmd += widgets_list->GetTclName();
-  cmd += " GetSelection]";
-
-  // Show the C++ example source
-
-  cmd += ";";
-  cmd += cxx_source_text->GetTclName();
-  cmd += " SetValue $cxx_source([";
-  cmd += widgets_list->GetTclName();
-  cmd += " GetSelection])";
-
-  // Show the Tcl example source
-
-  cmd += ";";
-  cmd += tcl_source_text->GetTclName();
-  cmd += " SetValue $tcl_source([";
-  cmd += widgets_list->GetTclName();
-  cmd += " GetSelection])";
-
-  widgets_list->SetSingleClickCallback(NULL, cmd.c_str());
+  widgets_list->SetSingleClickCallback(NULL, buffer);
   
   // Start the application
 

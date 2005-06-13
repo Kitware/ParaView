@@ -1,8 +1,9 @@
-#include "vtkKWThumbWheel.h"
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
+#include "vtkKWThumbWheel.h"
+#include "vtkKWWindow.h"
 
-int vtkKWThumbWheelEntryPoint(vtkKWWidget *parent)
+int vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

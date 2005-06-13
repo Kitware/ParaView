@@ -1,4 +1,4 @@
-proc vtkKWScaleEntryPoint {parent} {
+proc vtkKWScaleEntryPoint {parent win} {
 
     global objects
     set app [$parent GetApplication]
@@ -17,8 +17,6 @@ proc vtkKWScaleEntryPoint {parent} {
     
     pack [scale1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
 
-    lappend objects scale1
-
     # Create another scale, but put the label and entry on top
 
     vtkKWScale scale2
@@ -34,8 +32,6 @@ proc vtkKWScaleEntryPoint {parent} {
 
     pack [scale2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-    lappend objects scale2
-
     # Create another scale, popup mode
 
     vtkKWScale scale3
@@ -49,7 +45,11 @@ proc vtkKWScaleEntryPoint {parent} {
 
     pack [scale3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-    lappend objects scale3
-
     return 1
+}
+
+proc vtkKWScaleFinalizePoint {} {
+    scale1 Delete
+    scale2 Delete
+    scale3 Delete
 }

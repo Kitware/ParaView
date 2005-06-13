@@ -1,4 +1,4 @@
-proc vtkKWThumbWheelEntryPoint {parent} {
+proc vtkKWThumbWheelEntryPoint {parent win} {
 
     global objects
     set app [$parent GetApplication]
@@ -15,8 +15,6 @@ proc vtkKWThumbWheelEntryPoint {parent} {
     [thumbwheel1 GetLabel] SetText "A thumbwheel:"
 
     pack [thumbwheel1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
-
-    lappend objects thumbwheel1
 
     # Create another thumbwheel but put the label and entry on top
 
@@ -36,8 +34,6 @@ proc vtkKWThumbWheelEntryPoint {parent} {
 
     pack [thumbwheel2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
     
-    lappend objects thumbwheel2
-
     # Create another thumbwheel popup mode
 
     vtkKWThumbWheel thumbwheel3
@@ -52,7 +48,11 @@ proc vtkKWThumbWheelEntryPoint {parent} {
 
     pack [thumbwheel3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-    lappend objects thumbwheel3
-
     return 1
+}
+
+proc vtkKWThumbWheelFinalizePoint {} {
+    thumbwheel1 Delete
+    thumbwheel2 Delete
+    thumbwheel3 Delete
 }

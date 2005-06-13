@@ -18,7 +18,6 @@ app SetHelpDialogStartingPage "http://www.kitware.com"
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
 vtkKWWindow win
-win SetWidgetName ".foo"
 win SupportHelpOn
 app AddWindow win
 win Create app ""
@@ -53,8 +52,6 @@ source_panel SetUserInterfaceManager [win GetSecondaryUserInterfaceManager]
 source_panel Create app
 [win GetSecondaryNotebook] AlwaysShowTabsOff
 
-[win GetViewNotebook] ShowOnlyPagesWithSameTagOn
-
 # Add text widget to display the Tcl example source
 
 source_panel AddPage "Tcl Source" "Display the Tcl example source" ""
@@ -88,9 +85,12 @@ source_panel RaisePage "Tcl Source"
 # Populate the examples
 # Create a panel for each one, and pass the frame
 
+[win GetViewNotebook] ShowOnlyPagesWithSameTagOn
+
 set widgets [glob -path "[file join [file dirname [info script]] Widgets]/" *.tcl]
 foreach widget $widgets {
     set name [file rootname [file tail $widget]]
+    lappend modules $name
 
     set panel "panel$name"
     vtkKWUserInterfacePanel $panel
@@ -100,17 +100,9 @@ foreach widget $widgets {
     $panel AddPage [$panel GetName] "" ""
     lappend objects $panel
 
-    set framews "framews$name"
-    vtkKWFrameWithScrollbar $framews
-    $framews SetParent [$panel GetPageWidget [$panel GetName]]
-    $framews Create app ""
-    lappend objects $framews
-
-    pack [$framews GetWidgetName] -side top -expand y -fill both
-    
     source $widget
     
-    if {[${name}EntryPoint [$framews GetFrame]]} {
+    if {[${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]} {
         widgets_list AppendUnique $name
         set tcl_source($name) [read [open $widget]]
 
@@ -138,6 +130,8 @@ set ret [app GetExitStatus]
 
 # Deallocate and exit
 
+foreach name $modules { catch {${name}FinalizePoint} }
+
 foreach object $objects { $object Delete }
 win Delete
 widgets_panel Delete
@@ -145,6 +139,7 @@ widgets_list Delete
 source_panel Delete
 tcl_source_text Delete
 cxx_source_text Delete
+
 app Delete
 
 exit $ret

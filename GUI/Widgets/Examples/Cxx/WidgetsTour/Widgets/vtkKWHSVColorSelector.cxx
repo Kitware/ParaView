@@ -1,8 +1,9 @@
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWApplication.h"
 #include "vtkMath.h"
+#include "vtkKWWindow.h"
 
-int vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent)
+int vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

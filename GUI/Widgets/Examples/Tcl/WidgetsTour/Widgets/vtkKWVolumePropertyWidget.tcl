@@ -1,19 +1,25 @@
 package require vtkrendering
 
-proc vtkKWVolumePropertyWidgetEntryPoint {parent} {
+proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
     global objects
     set app [$parent GetApplication]
 
+    # This is a faily big widget, so create a scrolled frame
+
+    vtkKWFrameWithScrollbar framews
+    framews SetParent $parent
+    framews Create app ""
+
+    pack [framews GetWidgetName] -side top -expand y -fill both
+    
     # Create a volume property widget
 
     vtkKWVolumePropertyWidget vpw
-    vpw SetParent $parent
+    vpw SetParent [framews GetFrame]
     vpw Create app ""
     
     pack [vpw GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
-
-    lappend objects vpw
 
     # Create a volume property and assign it
     # We need color tfuncs opacity and gradient
@@ -36,14 +42,17 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent} {
     vp SetScalarOpacity 0 ofun
     vp SetGradientOpacity 0 gfun
 
-    lappend objects cfun
-    lappend objects ofun
-    lappend objects gfun
-
     vpw SetVolumeProperty vp
     vpw SetWindowLevel 128 128
 
-    lappend objects vp
-
     return 1
+}
+
+proc vtkKWVolumePropertyWidgetFinalizePoint {} {
+    framews Delete
+    vpw Delete
+    cfun Delete
+    ofun Delete
+    gfun Delete
+    vp Delete
 }

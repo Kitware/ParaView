@@ -1,4 +1,4 @@
-proc vtkKWHSVColorSelectorEntryPoint {parent} {
+proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
     global objects
     set app [$parent GetApplication]
@@ -16,9 +16,11 @@ proc vtkKWHSVColorSelectorEntryPoint {parent} {
 
     pack [ccb GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
 
-    lappend objects ccb
-
     math Delete
 
     return 1
+}
+
+proc vtkKWHSVColorSelectorFinalizePoint {} {
+    ccb Delete
 }

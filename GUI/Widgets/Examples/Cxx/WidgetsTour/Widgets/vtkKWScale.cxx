@@ -1,7 +1,8 @@
 #include "vtkKWScale.h"
 #include "vtkKWApplication.h"
+#include "vtkKWWindow.h"
 
-int vtkKWScaleEntryPoint(vtkKWWidget *parent)
+int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

@@ -1,17 +1,30 @@
-#include "vtkKWVolumePropertyWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkVolumeProperty.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkColorTransferFunction.h"
+#include "vtkKWApplication.h"
+#include "vtkKWVolumePropertyWidget.h"
+#include "vtkKWWindow.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkVolumeProperty.h"
 
-int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent)
+int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+
+  // This is a faily big widget, so create a scrolled frame
+
+  vtkKWFrameWithScrollbar *framews = vtkKWFrameWithScrollbar::New();
+  framews->SetParent(parent);
+  framews->Create(app, NULL);
+
+  app->Script("pack %s -side top -fill both -expand y", 
+              framews->GetWidgetName());
+    
+  framews->Delete();
 
   // Create a volume property widget
 
   vtkKWVolumePropertyWidget *vpw = vtkKWVolumePropertyWidget::New();
-  vpw->SetParent(parent);
+  vpw->SetParent(framews->GetFrame());
   vpw->Create(app, NULL);
  
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
