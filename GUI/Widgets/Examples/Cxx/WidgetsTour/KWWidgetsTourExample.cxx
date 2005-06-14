@@ -33,6 +33,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWApplication *app = vtkKWApplication::New();
   app->RestoreApplicationSettingsFromRegistry();
+  app->SetName("KWWidgetsTourExample");
 
   // Set a help link. Can be a remote link (URL), or a local file
 
