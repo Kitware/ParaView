@@ -12,12 +12,18 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # the geometry of the user interface so far.
 
 vtkKWApplication app
+app SetName "KWWidgetsTourExample"
 if {$option_test} {
     app SetRegistryLevel 0
     app PromptBeforeExitOff
 }
+app SupportSplashScreenOn
+app ShowSplashScreenOn
 app RestoreApplicationSettingsFromRegistry
-app SetName "KWWidgetsTourExample"
+
+# Setup the splash screen
+
+[app GetSplashScreen] ReadImage [file join [file dirname [info script]] ".." ".." Resources "KWWidgetsSplashScreen.png"]
 
 # Set a help link. Can be a remote link (URL), or a local file
 
@@ -130,6 +136,10 @@ foreach widget $widgets {
     $panel Create app
     $panel AddPage [$panel GetName] "" ""
     lappend objects $panel
+
+    if {[app GetShowSplashScreen]} {
+        [app GetSplashScreen] SetProgressMessage $name
+    }
 
     source $widget
     

@@ -1,1 +1,1 @@
-SUBDIRS(Cxx Tcl Data)
+SUBDIRS(Cxx Tcl Data Resources)

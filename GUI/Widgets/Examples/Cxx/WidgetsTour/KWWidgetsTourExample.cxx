@@ -3,6 +3,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWListBox.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWText.h"
 #include "vtkKWTextLabeled.h"
@@ -42,13 +43,28 @@ int my_main(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = vtkKWApplication::New();
+  app->SetName("KWWidgetsTourExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
     app->PromptBeforeExitOff();
     }
+  app->SupportSplashScreenOn();
+  app->ShowSplashScreenOn();
   app->RestoreApplicationSettingsFromRegistry();
-  app->SetName("KWWidgetsTourExample");
+
+  // Setup the splash screen
+
+  char res_path[2048];
+  sprintf(res_path, "%s/Examples/Resources/KWWidgetsSplashScreen.png", 
+          KWWIDGETS_SOURCE_DIR);
+  if (!vtksys::SystemTools::FileExists(res_path))
+    {
+    sprintf(res_path, 
+            "%s/../share/%s/Examples/Resources/KWWidgetsSplashScreen.png",
+            app->GetInstallationDirectory(), KWWIDGETS_PROJECT_NAME);
+    }
+  app->GetSplashScreen()->ReadImage(res_path);
 
   // Set a help link. Can be a remote link (URL), or a local file
 
@@ -167,6 +183,11 @@ int my_main(int argc, char *argv[])
     panel->Create(app);
     panel->Delete();
     panel->AddPage(panel->GetName(), NULL, NULL);
+
+    if (app->GetShowSplashScreen()) 
+      {
+      app->GetSplashScreen()->SetProgressMessage(node_ptr->Name);
+      }
 
     if ((*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win))
       {
