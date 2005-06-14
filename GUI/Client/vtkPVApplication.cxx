@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.359");
+vtkCxxRevisionMacro(vtkPVApplication, "1.360");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -435,7 +435,7 @@ vtkPVApplication::vtkPVApplication()
   vtkTclUpdateCommand(this->MainInterp, tclname, this);
   delete[] tclname;
 
-  this->HasSplashScreen = 1;
+  this->SupportSplashScreen = 1;
 
   this->TraceFileName = 0;
   this->TraceFile = NULL;

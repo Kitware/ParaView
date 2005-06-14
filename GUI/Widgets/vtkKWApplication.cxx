@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.225");
+vtkCxxRevisionMacro(vtkKWApplication, "1.226");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -184,7 +184,7 @@ vtkKWApplication::vtkKWApplication()
   // Splashscreen
 
   this->SplashScreen = NULL;
-  this->HasSplashScreen = 0;
+  this->SupportSplashScreen = 0;
   this->ShowSplashScreen = 1;
 
   this->PrintTargetDPI        = 100.0;
@@ -963,7 +963,7 @@ void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
 //----------------------------------------------------------------------------
 void vtkKWApplication::ConfigureAboutDialog()
 {
-  if (this->HasSplashScreen)
+  if (this->SupportSplashScreen)
     {
     this->CreateSplashScreen();
     const char *img_name = this->SplashScreen->GetImageName();
@@ -1825,7 +1825,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "BalloonHelpManager: (none)" << endl;
     }
-  os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
+  os << indent << "SupportSplashScreen: " << (this->SupportSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
   os << indent << "PromptBeforeExit: " << (this->GetPromptBeforeExit() ? "on":"off") << endl;
   os << indent << "InstallationDirectory: " 

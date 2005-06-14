@@ -255,8 +255,9 @@ public:
   virtual void SaveApplicationSettingsToRegistry();
 
   // Description:
-  // Query if this application supports a splash screen
-  vtkGetMacro(HasSplashScreen, int);
+  // Set/Get if this application supports a splash screen
+  vtkSetMacro(SupportSplashScreen, int);
+  vtkGetMacro(SupportSplashScreen, int);
 
   // Description:
   // Set/Get if this application should show the splash screen at startup
@@ -445,7 +446,7 @@ protected:
 
   // Description:
   // Flag stating if application supports splash screen, and shows it
-  int HasSplashScreen;
+  int SupportSplashScreen;
   int ShowSplashScreen;
   virtual void CreateSplashScreen() {};
 

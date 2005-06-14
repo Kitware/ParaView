@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.732");
+vtkCxxRevisionMacro(vtkPVWindow, "1.733");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1095,8 +1095,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Init menus
 
-  int use_splash = 
-    (app->GetShowSplashScreen() && app->GetNumberOfWindows() == 1);
+  int use_splash = (app->GetSupportSplashScreen() && 
+                    app->GetShowSplashScreen() && 
+                    app->GetNumberOfWindows() == 1);
   if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
