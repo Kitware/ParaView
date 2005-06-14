@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.39");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.40");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -258,7 +258,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Interface settings : Show splash screen ?
 
-  if (app->GetHasSplashScreen())
+  if (app->GetSupportSplashScreen())
     {
     if (!this->ShowSplashScreenCheckButton)
       {
