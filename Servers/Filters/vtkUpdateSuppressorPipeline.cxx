@@ -15,9 +15,10 @@
 #include "vtkUpdateSuppressorPipeline.h"
 
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.3");
+vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.4");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 
