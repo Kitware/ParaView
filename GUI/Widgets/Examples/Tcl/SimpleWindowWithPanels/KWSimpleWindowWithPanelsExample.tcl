@@ -2,13 +2,22 @@
 
 package require kwwidgets
 
+# Process some command-line arguments
+
+set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
+
 # Create the application
+# If --test was provided, ignore all registry settings, and exit silently
 # Restore the settings that have been saved to the registry, like
 # the geometry of the user interface so far.
 
 vtkKWApplication app
+if {$option_test} {
+    app SetRegistryLevel 0
+    app PromptBeforeExitOff
+}
 app RestoreApplicationSettingsFromRegistry
-#app SetName "KWSimpleWindowWithPanelsExample"
+app SetName "KWSimpleWindowWithPanelsExample"
 
 # Set a help link. Can be a remote link (URL), or a local file
 
@@ -192,7 +201,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
 
 set ret 0
 win Display
-if {[lsearch -exact $argv "--test"] == -1} {
+if {!$option_test} {
     app Start
     set ret [app GetExitStatus]
 }

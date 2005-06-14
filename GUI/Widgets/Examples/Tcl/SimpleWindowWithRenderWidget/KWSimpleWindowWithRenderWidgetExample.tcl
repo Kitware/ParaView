@@ -4,11 +4,20 @@ package require kwwidgets
 package require vtkio
 package require vtkrendering
 
+# Process some command-line arguments
+
+set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
+
 # Create the application
+# If --test was provided, ignore all registry settings, and exit silently
 # Restore the settings that have been saved to the registry, like
 # the geometry of the user interface so far.
 
 vtkKWApplication app
+if {$option_test} {
+    app SetRegistryLevel 0
+    app PromptBeforeExitOff
+}
 app RestoreApplicationSettingsFromRegistry
 app SetName "KWSimpleWindowWithRenderWidgetExample"
 
@@ -61,7 +70,7 @@ rw ResetCamera
 
 set ret 0
 win Display
-if {[lsearch -exact $argv "--test"] == -1} {
+if {!$option_test} {
     app Start
     set ret [app GetExitStatus]
 }
