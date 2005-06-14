@@ -17,7 +17,7 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.1");
+vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.2");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 
@@ -38,7 +38,10 @@ void vtkUpdateSuppressorPipeline::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request)
+int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
+                                                int forward,
+                                                vtkInformationVector** inInfo,
+                                                vtkInformationVector* outInfo)
 {
   if(this->Algorithm && request->Has(REQUEST_DATA()))
     {
@@ -46,14 +49,15 @@ int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request)
     }
   if(request->Has(REQUEST_UPDATE_EXTENT()))
     {
-    vtkInformation* info = this->GetOutputInformation(0);
+    vtkInformation* info = outInfo->GetInformationObject(0);
     if(!info->Has(MAXIMUM_NUMBER_OF_PIECES()))
       {
       info->Set(MAXIMUM_NUMBER_OF_PIECES(), -1);
       }
     return 1;
     }
-  return this->Superclass::ProcessRequest(request);
+  return this->Superclass::ProcessRequest(request,forward,
+                                          inInfoVec,outInfoVec);
 }
 
 
