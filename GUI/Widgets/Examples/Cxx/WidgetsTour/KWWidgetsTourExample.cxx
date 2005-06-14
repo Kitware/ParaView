@@ -27,11 +27,26 @@ int my_main(int argc, char *argv[])
     return 1;
     }
 
+  // Process some command-line arguments
+
+  int option_test = 0;
+  vtksys::CommandLineArguments args;
+  args.Initialize(argc, argv);
+  args.AddArgument(
+    "--test", vtksys::CommandLineArguments::NO_ARGUMENT, &option_test, "");
+  args.Parse();
+  
   // Create the application
+  // If --test was provided, ignore all registry settings, and exit silently
   // Restore the settings that have been saved to the registry, like
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = vtkKWApplication::New();
+  if (option_test)
+    {
+    app->SetRegistryLevel(0);
+    app->PromptBeforeExitOff();
+    }
   app->RestoreApplicationSettingsFromRegistry();
   app->SetName("KWWidgetsTourExample");
 
@@ -225,15 +240,6 @@ int my_main(int argc, char *argv[])
           widgets_list->GetTclName());
 
   widgets_list->SetSingleClickCallback(NULL, buffer);
-  
-  // Process some command-line arguments
-
-  int option_test = 0;
-  vtksys::CommandLineArguments args;
-  args.Initialize(argc, argv);
-  args.AddArgument(
-    "--test", vtksys::CommandLineArguments::NO_ARGUMENT, &option_test, "");
-  args.Parse();
   
   // Start the application
   // If --test was provided, do not enter the event loop
