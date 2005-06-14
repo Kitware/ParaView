@@ -40,13 +40,13 @@ int my_main(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = vtkKWApplication::New();
+  app->SetName("KWSimpleWindowWithRenderWidgetExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
     app->PromptBeforeExitOff();
     }
   app->RestoreApplicationSettingsFromRegistry();
-  app->SetName("KWSimpleWindowWithRenderWidgetExample");
 
   // Set a help link. Can be a remote link (URL), or a local file
 

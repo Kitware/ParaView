@@ -12,12 +12,12 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # the geometry of the user interface so far.
 
 vtkKWApplication app
+app SetName "KWSimpleWindowWithPanelsExample"
 if {$option_test} {
     app SetRegistryLevel 0
     app PromptBeforeExitOff
 }
 app RestoreApplicationSettingsFromRegistry
-app SetName "KWSimpleWindowWithPanelsExample"
 
 # Set a help link. Can be a remote link (URL), or a local file
 
