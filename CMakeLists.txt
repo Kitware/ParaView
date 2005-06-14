@@ -353,6 +353,8 @@ ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
 # Configure Xdmf
+
+
 SET(XDMF_NOT_INSTALL_INCLUDE_FILES ON)
 SET(XDMF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(XDMF_REGENERATE_YACCLEX OFF CACHE INTERNAL "" FORCE)
@@ -365,6 +367,7 @@ SET(XDMF_INCLUDE_DIRS
   "${ParaView_BINARY_DIR}/Utilities/Xdmf/vtk")
 SET(PARAVIEW_LINK_XDMF ON)
 SUBDIRS(Utilities/Xdmf)
+
 
 #########################################################################
 # Configure mpeg2 encoding
@@ -475,7 +478,7 @@ ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external EXODUS SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external EXODUS SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})

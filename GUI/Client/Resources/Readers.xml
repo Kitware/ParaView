@@ -592,6 +592,8 @@
                  type="int"
                  help="Set the number of ghost levels to read."/>
   </Module>
+
+
 #ifdef PARAVIEW_USE_SAF
   <Module name="SAFReader"
           root_name="SAFReader"
@@ -617,6 +619,34 @@
                       help="Apply basic time filtering"/>
   </Module>
 #endif
+#ifdef PARAVIEW_USE_SSLIB_SAF
+  <Module name="SAFReader"
+          root_name="SAFReader"
+          output="vtkUnstructuredGrid"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader" extensions=".saf"
+          file_description="SAF2 Reader">
+    <Source class="vtkSAFPVReader"/>
+
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           help="Set the current timestep."
+           keeps_timesteps="1"
+           range_source="TimeStepRange" />
+
+    <ArraySelection trace_name="variable_sel"
+                    property="VariableArrayStatus"
+                    label_text="Variable Arrays"  />
+    <ArraySelection trace_name="block_sel"
+                    property="BlockArrayStatus"
+                    label_text="Block Arrays"  />
+    <BasicDSPFilterWidget trace_name="Apply basic time filtering"
+                      help="Apply basic time filtering"/>
+  </Module>
+#endif
+
+
+
   <Module name="AVSucdReader"
           class="vtkPVAdvancedReaderModule"
           root_name="UCD"

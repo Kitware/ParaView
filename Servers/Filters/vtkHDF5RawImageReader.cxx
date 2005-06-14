@@ -38,7 +38,7 @@
 #define VTK_HDF5_DEBUG 1
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.13");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.14");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -313,8 +313,13 @@ void vtkHDF5RawImageReader::Execute()
     vtkHDF5RawImageReaderVTKtoHDF5(this->Rank, this->Total, h_total);
     
     hid_t dataspace = H5Screate_simple(this->Rank, h_total, 0);
+
     if(H5Sselect_hyperslab(dataspace, H5S_SELECT_SET,
+#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >= 6 && H5_VERS_RELEASE >= 4
+                              (hsize_t *)h_start, h_stride, h_count, 0) < 0)
+#else
                               h_start, h_stride, h_count, 0) < 0)
+#endif
       {
       vtkErrorMacro("Cannot select file hyperslab.");
 #ifdef VTK_HDF5_DEBUG
@@ -324,8 +329,13 @@ void vtkHDF5RawImageReader::Execute()
       }
     hid_t memspace = H5Screate_simple(this->Rank, h_count, 0);
     hssize_t moffset[3] = {0, 0, 0};
+
     if(H5Sselect_hyperslab(memspace, H5S_SELECT_SET,
+#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >= 6 && H5_VERS_RELEASE >= 4
+                              (hsize_t *)moffset, 0, h_count, 0) < 0)
+#else
                               moffset, 0, h_count, 0) < 0)
+#endif
       {
       vtkErrorMacro("Cannot select memory hyperslab.");
 #ifdef VTK_HDF5_DEBUG
