@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.33");
+vtkCxxRevisionMacro(vtkKWText, "1.34");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -48,8 +48,8 @@ public:
     vtksys_stl::string Tag;
   };
 
-  typedef vtksys_stl::list<vtkKWTextInternals::TagMatcher> TagMatchersContainer;
-  typedef vtksys_stl::list<vtkKWTextInternals::TagMatcher>::iterator TagMatchersContainerIterator;
+  typedef vtksys_stl::list<TagMatcher> TagMatchersContainer;
+  typedef vtksys_stl::list<TagMatcher>::iterator TagMatchersContainerIterator;
 
   TagMatchersContainer TagMatchers;
 };
