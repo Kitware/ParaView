@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.227");
+vtkCxxRevisionMacro(vtkKWApplication, "1.228");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -651,7 +651,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
   // As a convenience, hide any splash screen
 
-  if (this->SupportSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreen)
     {
     this->GetSplashScreen()->Withdraw();
     }
