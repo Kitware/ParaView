@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.19");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -528,6 +528,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   if (!this->ResolutionEntriesToolbar)
     {
     this->ResolutionEntriesToolbar = vtkKWToolbar::New();
+    this->ResolutionEntriesToolbar->SetName("Window Layout");
     }
 
   if (!this->ResolutionEntriesToolbar->IsCreated())
