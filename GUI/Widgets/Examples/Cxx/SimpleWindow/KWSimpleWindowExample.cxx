@@ -4,6 +4,7 @@
 #include "vtkKWFrame.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/CommandLineArguments.hxx>
 
 int my_main(int argc, char *argv[])
 {
@@ -47,10 +48,26 @@ int my_main(int argc, char *argv[])
               hello_label->GetWidgetName());
   hello_label->Delete();
 
-  // Start the application
+  // Process some command-line arguments
 
-  app->Start(argc, argv);
-  int ret = app->GetExitStatus();
+  int option_test = 0;
+  vtksys::CommandLineArguments args;
+  args.Initialize(argc, argv);
+  args.AddArgument(
+    "--test", vtksys::CommandLineArguments::NO_ARGUMENT, &option_test, "");
+  args.Parse();
+  
+  // Start the application
+  // If --test was provided, do not enter the event loop
+
+  int ret = 0;
+  win->Display();
+  if (!option_test)
+    {
+    app->Start(argc, argv);
+    ret = app->GetExitStatus();
+    }
+  win->Close();
 
   // Deallocate and exit
 
