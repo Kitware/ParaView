@@ -33,6 +33,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Read an image given its 'filename'.
+  // On success, modifies 'width', 'height', 'pixel_size' and 'pixels' 
+  // accordingly. Note that 'pixels' is allocated automatically using the
+  // 'new' operator (i.e. it is up to the caller to free the memory using
+  // the 'delete' operator).
+  // The following formats are recognized (given the file extension):
+  // - PNG (.png)
+  // Return 1 on success, 0 otherwise.
+  static int ReadImage(const char *filename,
+                       int *width, int *height, 
+                       int *pixel_size,
+                       unsigned char **pixels);
+
+  // Description:
   // Read a PNG file given its 'filename'.
   // On success, modifies 'width', 'height', 'pixel_size' and 'pixels' 
   // accordingly. Note that 'pixels' is allocated automatically using the

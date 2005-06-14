@@ -32,7 +32,31 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.7");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.8");
+
+//----------------------------------------------------------------------------
+int vtkKWResourceUtilities::ReadImage(
+  const char *filename,
+  int *widthp, int *heightp, 
+  int *pixel_size,
+  unsigned char **pixels)
+{
+  if (!filename || !vtksys::SystemTools::FileExists(filename))
+    {
+    return 0;
+    }
+
+  vtksys_stl::string ext = vtksys::SystemTools::LowerCase(
+    vtksys::SystemTools::GetFilenameExtension(filename));
+
+  if (!strcmp(ext.c_str(), ".png"))
+    {
+    return vtkKWResourceUtilities::ReadPNGImage(
+      filename, widthp, heightp, pixel_size, pixels);
+    }
+
+  return 0;
+}
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
