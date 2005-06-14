@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.361");
+vtkCxxRevisionMacro(vtkPVApplication, "1.362");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1197,6 +1197,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   char traceName[128];
   int foundTrace = this->CheckForTraceFile(traceName, 128);
+
+  if (this->SupportSplashScreen && this->ShowSplashScreen)
+    {
+    this->GetSplashScreen()->Withdraw();
+    }
 
   const char* loadedTraceName = 0;
 
