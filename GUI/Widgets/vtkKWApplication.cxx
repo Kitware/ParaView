@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.228");
+vtkCxxRevisionMacro(vtkKWApplication, "1.229");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -973,7 +973,8 @@ void vtkKWApplication::ConfigureAboutDialog()
   if (this->SupportSplashScreen)
     {
     this->CreateSplashScreen();
-    const char *img_name = this->SplashScreen->GetImageName();
+    const char *img_name = 
+      this->SplashScreen ? this->SplashScreen->GetImageName() : NULL;
     if (img_name)
       {
       if (!this->AboutDialogImage)
