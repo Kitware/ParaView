@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.360");
+vtkCxxRevisionMacro(vtkPVApplication, "1.361");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1108,7 +1108,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Splash screen ?
 
-  if (this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->ShowSplashScreen)
     {
     this->CreateSplashScreen();
     this->GetSplashScreen()->SetProgressMessage("Initializing application...");
@@ -1133,7 +1133,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   ui->AddObserver(vtkKWEvent::ErrorMessageEvent, ccm);
   ccm->Delete();
 
-  if (this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->ShowSplashScreen)
     {
     this->GetSplashScreen()->SetProgressMessage("Creating icons...");
     }
@@ -1145,7 +1145,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     ui->InitializeDefaultInterfacesOff();
     }
 
-  if (this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->ShowSplashScreen)
     {
     this->GetSplashScreen()->SetProgressMessage("Creating UI...");
     }
@@ -1190,17 +1190,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
     "}\n");
 
   // Check if there is an existing ParaViewTrace file.
-  if (this->ShowSplashScreen)
+
+  if (this->SupportSplashScreen && this->ShowSplashScreen)
     {
     this->GetSplashScreen()->SetProgressMessage("Looking for old trace files...");
     }
   char traceName[128];
   int foundTrace = this->CheckForTraceFile(traceName, 128);
-
-  if (this->ShowSplashScreen)
-    {
-    this->GetSplashScreen()->Withdraw();
-    }
 
   const char* loadedTraceName = 0;
 
