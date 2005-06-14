@@ -1,6 +1,6 @@
 # KWWidgets Tcl package configuration.
 
-package ifneeded kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} {
+package ifneeded kwwidgetsinit {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@} {
   namespace eval ::kwwidgets::init {
     proc load_library_package {libName libPath {libPrefix {@KWWIDGETS_TCL_LIBNAME_PREFIX@}}} {
       set libExt [info sharedlibextension]
@@ -11,9 +11,9 @@ package ifneeded kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MIN
       }
       cd $currentDirectory
     }
-    set version {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+    set version {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@}
   }
-  package provide kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+  package provide kwwidgetsinit {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@}
 }
 
 # Note that we @KWWIDGETS_TCL_LIBRARY_DIR@ will be set for install targets
@@ -26,16 +26,16 @@ package ifneeded kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MIN
 
 # The is the C++ DLL itself
 # Do not mess up with the quoting
-package ifneeded KWWidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} "
-    package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+package ifneeded KWWidgets {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@} "
+    package require -exact kwwidgetsinit {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@}
     ::kwwidgets::init::load_library_package KWWidgets {@KWWIDGETS_TCL_LIBRARY_DIR@}
 "
 
 # The is the Tcl package itself
 # Do not mess up with the quoting
 
-package ifneeded kwwidgets {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@} "
-    package require -exact kwwidgetsinit {@KWWIDGETS_RES_MAJOR_VERSION@.@KWWIDGETS_RES_MINOR_VERSION@}
+package ifneeded kwwidgets {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@} "
+    package require -exact kwwidgetsinit {@KWWIDGETS_MAJOR_VERSION@.@KWWIDGETS_MINOR_VERSION@}
     if {\[catch {source \[file join {@KWWIDGETS_TCL_SCRIPT_DIR@} kwwidgets kwwidgets.tcl\]} errorMessage\]} {
         puts \$errorMessage
     }
