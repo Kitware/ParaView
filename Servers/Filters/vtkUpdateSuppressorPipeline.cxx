@@ -17,7 +17,7 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.2");
+vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.3");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 
@@ -57,7 +57,7 @@ int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
     return 1;
     }
   return this->Superclass::ProcessRequest(request,forward,
-                                          inInfoVec,outInfoVec);
+                                          inInfo,outInfo);
 }
 
 
