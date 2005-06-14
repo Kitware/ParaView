@@ -258,6 +258,7 @@ public:
   // Set/Get if this application supports a splash screen
   vtkSetMacro(SupportSplashScreen, int);
   vtkGetMacro(SupportSplashScreen, int);
+  vtkBooleanMacro(SupportSplashScreen, int);
 
   // Description:
   // Set/Get if this application should show the splash screen at startup
@@ -267,6 +268,8 @@ public:
 
   // Description:
   // Retrieve the splash screen object
+  // As a convenience, this will also call vtkKWSplashScreen::Create() to
+  // create the splash screen widget itself.
   virtual vtkKWSplashScreen* GetSplashScreen();
 
   // Description:

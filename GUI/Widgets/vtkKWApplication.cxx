@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.226");
+vtkCxxRevisionMacro(vtkKWApplication, "1.227");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -649,6 +649,13 @@ void vtkKWApplication::Start()
 //----------------------------------------------------------------------------
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
+  // As a convenience, hide any splash screen
+
+  if (this->SupportSplashScreen)
+    {
+    this->GetSplashScreen()->Withdraw();
+    }
+
   // If no windows has been mapped so far, then as a convenience,
   // map the first one
 
@@ -1074,6 +1081,7 @@ vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
   if (!this->SplashScreen)
     {
     this->SplashScreen = vtkKWSplashScreen::New();
+    this->SplashScreen->Create(this, NULL);
     }
   return this->SplashScreen;
 }
