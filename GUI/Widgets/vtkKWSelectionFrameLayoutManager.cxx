@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.18");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -453,8 +453,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
 
   // Allowed resolutions
 
-  char *rbv = 
-    this->ResolutionEntriesMenu->CreateRadioButtonVariable(this, "reschoice");
+  vtksys_stl::string rbv(this->GetWidgetName());
+  rbv += "reschoice";
 
   char label[64], command[128], help[128];  
 
@@ -469,10 +469,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
     int value = 
       ((res[idx][0] - 1) * VTK_KW_SFLMGR_MAX_SIZE + res[idx][1] - 1);
     this->ResolutionEntriesMenu->AddRadioButton(
-      value, label, rbv, this, command, 0, help);
+      value, label, rbv.c_str(), this, command, 0, help);
     }
-
-  delete [] rbv;
 
   this->UpdateResolutionEntriesMenu();
 }
@@ -509,7 +507,13 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
 
   int value = 
     (this->Resolution[0]-1) * VTK_KW_SFLMGR_MAX_SIZE + this->Resolution[1]-1;
-  this->ResolutionEntriesMenu->CheckRadioButton(this, "reschoice", value);
+
+  vtksys_stl::string rbv(this->GetWidgetName());
+  rbv += "reschoice";
+  if (atoi(this->Script("set %s", rbv.c_str())) != value)
+    {
+    this->Script("set %s %d", rbv.c_str(), value);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -668,8 +672,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
 
   // Allowed resolutions
 
-  char *rbv = 
-    this->ResolutionEntriesMenu->CreateRadioButtonVariable(this, "reschoice");
+  vtksys_stl::string rbv(this->GetWidgetName());
+  rbv += "reschoice";
 
   char command[128], help[128], icon[128], icon_selected[128];  
 
@@ -688,10 +692,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     int value = 
       ((res[idx][0] - 1) * VTK_KW_SFLMGR_MAX_SIZE + res[idx][1] - 1);
     this->ResolutionEntriesToolbar->AddRadioButtonImage(
-      value, icon, icon_selected, rbv, this, command, help);
+      value, icon, icon_selected, rbv.c_str(), this, command, help);
     }
-
-  delete [] rbv;
 
   this->UpdateResolutionEntriesToolbar();
 }
@@ -728,7 +730,13 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesToolbar()
 
   int value = 
     (this->Resolution[0]-1) * VTK_KW_SFLMGR_MAX_SIZE + this->Resolution[1]-1;
-  this->ResolutionEntriesMenu->CheckRadioButton(this, "reschoice", value);
+
+  vtksys_stl::string rbv(this->GetWidgetName());
+  rbv += "reschoice";
+  if (atoi(this->Script("set %s", rbv.c_str())) != value)
+    {
+    this->Script("set %s %d", rbv.c_str(), value);
+    }
 }
 
 //----------------------------------------------------------------------------
