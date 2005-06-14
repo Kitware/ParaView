@@ -8,8 +8,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
-#include "KWWidgetsTourExamplePath.h"
-
 #include <vtksys/SystemTools.hxx>
 
 int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
