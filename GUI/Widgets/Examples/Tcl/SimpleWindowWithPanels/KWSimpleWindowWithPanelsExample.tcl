@@ -188,9 +188,15 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
 }
 
 # Start the application
+# If --test was provided, do not enter the event loop
 
-app Start
-set ret [app GetExitStatus]
+set ret 0
+win Display
+if {[lsearch -exact $argv "--test"] == -1} {
+    app Start
+    set ret [app GetExitStatus]
+}
+win Close
 
 # Deallocate and exit
 
