@@ -16,10 +16,14 @@
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWResourceUtilities.h"
+#include "vtkKWTkUtilities.h"
+
+#include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.29");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -172,10 +176,61 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
 
   if (this->ImageName && this->Canvas && this->Canvas->IsCreated())
     {
-    this->Canvas->Script("%s itemconfigure image -image %s", 
-                         this->Canvas->GetWidgetName(), this->ImageName);
+    const char *res = this->Canvas->Script(
+      "%s itemconfigure image -image %s", 
+      this->Canvas->GetWidgetName(), this->ImageName);
+    if (res && *res)
+      {
+      vtkErrorMacro("Error setting ImageName: " << res);
+      }
     }
 } 
+
+//----------------------------------------------------------------------------
+int vtkKWSplashScreen::ReadImage(const char *filename)
+{
+  int width, height, pixel_size;
+  unsigned char *image_buffer = NULL;
+
+  // Try to load the image
+
+  if (!vtkKWResourceUtilities::ReadImage(
+        filename, &width, &height, &pixel_size, &image_buffer))
+    {
+    vtkErrorMacro("Error reading image: " << (filename ? filename : ""));
+    return 0;
+    }
+
+  // If no image name, make up one
+
+  vtksys_stl::string new_image_name;
+  if (!this->ImageName)
+    {
+    new_image_name = this->GetTclName();
+    new_image_name += "Photo";
+    }
+  const char *image_name = 
+    (this->ImageName ? this->ImageName : new_image_name.c_str());
+
+  // Update the Tk image (or create it if it did not exist)
+
+  int res = vtkKWTkUtilities::UpdatePhoto(
+    this->GetApplication(), image_name, image_buffer,width,height,pixel_size);
+  if (!res)
+    {
+    vtkErrorMacro("Error updating photo: " << image_name);
+    }
+
+  // Assign the new image name (now that it has been created)
+
+  if (new_image_name.size())
+    {
+    this->SetImageName(new_image_name.c_str());
+    }
+
+  delete [] image_buffer;
+  return res;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::SetProgressMessage(const char *txt)

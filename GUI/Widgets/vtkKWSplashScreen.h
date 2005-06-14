@@ -49,9 +49,19 @@ public:
   vtkGetMacro(ProgressMessageVerticalOffset, int);
 
   // Description:
-  // Set/Get the name of the splash image (Tk image name)
+  // Set/Get the name of the splash image (a Tk image name)
   vtkGetStringMacro(ImageName);
   virtual void SetImageName(const char*);
+  
+  // Description:
+  // Convenience method to read an image and use it as the splash image
+  // If ImageName is set, this method will update the corresponding
+  // Tk image, otherwise it will create a new one and assign its name to
+  // ImageName.
+  // Check vtkKWResourceUtilities::ReadImage for the list of supported
+  // image format
+  // Return 1 on success, 0 otherwise
+  virtual int ReadImage(const char *filename);
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
