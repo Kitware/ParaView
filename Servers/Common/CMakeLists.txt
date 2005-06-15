@@ -4,29 +4,30 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 SET(Common_SRCS
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
-  vtkPVProcessModule.cxx
-  vtkPVMPIProcessModule.cxx
+  vtkMPIMToNSocketConnection.cxx
+  vtkMPIMToNSocketConnectionPortInformation.cxx
+  vtkPVArrayInformation.cxx
+  vtkPVClassNameInformation.cxx
   vtkPVClientServerModule.cxx
+  vtkPVCompositeDataInformation.cxx
+  vtkPVCreateProcessModule.cxx
+  vtkPVDataInformation.cxx
+  vtkPVDataSetAttributesInformation.cxx
+  vtkPVGenericAttributeInformation.cxx
+  vtkPVInformation.cxx
+  vtkPVLODPartDisplayInformation.cxx
+  vtkPVMPIProcessModule.cxx
+  vtkPVNumberOfOutputsInformation.cxx
+  vtkPVOptions.cxx
+  vtkPVOptionsXMLParser.cxx
+  vtkPVProcessModule.cxx
+  vtkPVProgressHandler.cxx
+  vtkPVServerInformation.cxx
+  vtkPVServerOptions.cxx
+  vtkPVTimerInformation.cxx
   vtkProcessModule.cxx
   vtkProcessModuleGUIHelper.cxx
   vtkStringList.cxx  
-  vtkPVInformation.cxx
-  vtkPVTimerInformation.cxx
-  vtkPVNumberOfOutputsInformation.cxx
-  vtkPVLODPartDisplayInformation.cxx
-  vtkPVDataSetAttributesInformation.cxx
-  vtkPVDataInformation.cxx
-  vtkPVArrayInformation.cxx
-  vtkPVClassNameInformation.cxx
-  vtkPVServerInformation.cxx
-  vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkMPIMToNSocketConnection.cxx
-  vtkPVProgressHandler.cxx
-  vtkPVOptions.cxx
-  vtkPVServerOptions.cxx
-  vtkPVOptionsXMLParser.cxx
-  vtkPVCreateProcessModule.cxx
-  vtkPVGenericAttributeInformation.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(

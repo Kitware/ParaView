@@ -21,6 +21,7 @@
 #include "vtkPVMPIProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModuleGUIHelper.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVTimerInformation.h"
@@ -56,6 +57,7 @@ int main(int, char * [])
   c = vtkPVInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVProgressHandler::New(); c->Print(cout); c->Delete();
   c = vtkPVOptions::New(); c->Print(cout); c->Delete();
+  c = vtkPVCompositeDataInformation::New(); c->Print(cout); c->Delete();
 
   return 0;
 }

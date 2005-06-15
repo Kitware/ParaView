@@ -20,26 +20,28 @@
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
+#include "vtkGenericDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSource.h"
 #include "vtkStructuredGrid.h"
-#include "vtkGenericDataSet.h"
+#include "vtkUniformGrid.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -55,11 +57,14 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
+
+  this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
   
   this->Name = 0;
   this->DataClassName = 0;
   this->BaseDataClassName = 0;
   this->NumberOfDataSets = 0;
+  this->NameSetToDefault = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -69,6 +74,8 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->PointDataInformation = NULL;
   this->CellDataInformation->Delete();
   this->CellDataInformation = NULL;
+  this->CompositeDataInformation->Delete();
+  this->CompositeDataInformation = NULL;
   
   this->SetName(0);
   this->SetDataClassName(0);
@@ -128,6 +135,7 @@ void vtkPVDataInformation::Initialize()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
+  this->CompositeDataInformation->Initialize();
   
   this->SetName(0);
   this->SetDataClassName(0);
@@ -166,6 +174,8 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   // Copy attribute information.
   this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
+  this->CompositeDataInformation->AddInformation(
+    dataInfo->GetCompositeDataInformation());
 
   this->SetName(dataInfo->GetName());
 }
@@ -173,6 +183,10 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 {
+  this->Initialize();
+
+  this->CompositeDataInformation->CopyFromObject(data);
+
   int numDataSets = 0;
   vtkCompositeDataIterator* iter = data->NewIterator();
   iter->GoToFirstItem();
@@ -258,6 +272,10 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   if (this->DataSetType == VTK_RECTILINEAR_GRID)
     {
     ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
+    }
+  if (this->DataSetType == VTK_UNIFORM_GRID)
+    {
+    ext = static_cast<vtkUniformGrid*>(data)->GetExtent();
     }
   if (ext)
     {
@@ -383,7 +401,9 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
     return;
     }
 
-  if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 && this->NumberOfDataSets == 0)
+  if (this->NumberOfPoints == 0 && 
+      this->NumberOfCells == 0 && 
+      this->NumberOfDataSets == 0)
     { // Just copy the other array information.
     this->DeepCopy(info);
     return;
@@ -462,6 +482,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
   // Now for the messy part, all of the arrays.
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+  this->CompositeDataInformation->AddInformation(info->CompositeDataInformation);
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
 
   if (this->Name == NULL)
@@ -470,6 +491,106 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::SetName(const char* name)
+{
+  if (!this->Name && !name) { return;}
+  if ( this->Name && name && (!strcmp(this->Name, name))) 
+    { 
+    return;
+    }
+  if (this->Name) { delete [] this->Name; }
+  if (name) 
+    { 
+    this->Name = new char[strlen(name)+1];
+    strcpy(this->Name, name);
+    } 
+  else 
+    { 
+    this->Name = 0; 
+    } 
+  this->Modified(); 
+  this->NameSetToDefault = 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVDataInformation::GetName()
+{
+  if (!this->Name || this->Name[0] == '\0' || this->NameSetToDefault)
+    {
+    if (this->Name)
+      {
+      delete[] this->Name;
+      }
+    char str[256];
+    if (this->GetDataSetType() == VTK_POLY_DATA)
+      {
+      long nc = this->GetNumberOfCells();
+      sprintf(str, "Polygonal: %ld cells", nc);
+      }
+    else if (this->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
+      {
+      long nc = this->GetNumberOfCells();
+      sprintf(str, "Unstructured Grid: %ld cells", nc);
+      }
+    else if (this->GetDataSetType() == VTK_IMAGE_DATA)
+      {
+      int *ext = this->GetExtent();
+      if (ext)
+        {
+        sprintf(str, "Uniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+        }
+      else
+        {
+        sprintf(str, "Uniform Rectilinear: invalid extent");
+        }
+      }
+    else if (this->GetDataSetType() == VTK_UNIFORM_GRID)
+      {
+      int *ext = this->GetExtent();
+      sprintf(str, 
+              "Uniform Rectilinear (with blanking): "
+              "extent (%d, %d) (%d, %d) (%d, %d)", 
+              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      }
+    else if (this->GetDataSetType() == VTK_RECTILINEAR_GRID)
+      {
+      int *ext = this->GetExtent();
+      if (ext)
+        {
+        sprintf(str, 
+                "Nonuniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+        }
+      else
+        {
+        sprintf(str, "Nonuniform Rectilinear: invalid extent");
+        }
+      }
+    else if (this->GetDataSetType() == VTK_STRUCTURED_GRID)
+      {
+      int *ext = this->GetExtent();
+      if (ext)
+        {
+        sprintf(str, "Curvilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+        }
+      else
+        {
+        sprintf(str, "Curvilinear: invalid extent");
+        }
+      }
+    else
+      {
+      sprintf(str, "Part of unknown type");
+      }
+    this->Name = new char[256];
+    strncpy(this->Name, str, 256);
+    this->NameSetToDefault = 1;
+    }
+  return this->Name;
+}
 
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetDataSetTypeAsString()
@@ -605,6 +726,12 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
   *css << this->BaseDataClassName;
   *css << this->BaseDataSetType;
 
+  dcss.Reset();
+
+  this->CompositeDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
+
   *css << vtkClientServerStream::End;
 }
 
@@ -708,4 +835,19 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
+
+  // Composite data information.
+  if(!css->GetArgumentLength(0, 13, &length))
+    {
+    vtkErrorMacro("Error parsing length of cell data information.");
+    return;
+    }
+  data.resize(length);
+  if(!css->GetArgument(0, 13, &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing cell data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
+  this->CompositeDataInformation->CopyFromStream(&dcss);
 }

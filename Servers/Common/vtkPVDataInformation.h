@@ -28,6 +28,7 @@
 class vtkCollection;
 class vtkCompositeDataSet;
 class vtkDataSet;
+class vtkPVCompositeDataInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkGenericDataSet;
 
@@ -79,13 +80,18 @@ public:
   vtkGetObjectMacro(CellDataInformation,vtkPVDataSetAttributesInformation);
 
   // Description:
+  // If data is composite, this provides information specific to
+  // composite datasets.
+  vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);
+
+  // Description:
   // Name stored in field data.
-  vtkGetStringMacro(Name);
+  const char* GetName();
 
   // Description:
   // We allow the name to be set so paraview can set a default value
   // if the data has no name.
-  vtkSetStringMacro(Name);
+  void SetName(const char* name);
 
   // Description:
   // ClassName of the data represented by information object.
@@ -126,7 +132,11 @@ protected:
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
 
+  vtkPVCompositeDataInformation* CompositeDataInformation;
+
 private:
+  int NameSetToDefault;
+
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented
 };
