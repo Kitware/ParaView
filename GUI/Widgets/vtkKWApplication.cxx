@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.229");
+vtkCxxRevisionMacro(vtkKWApplication, "1.230");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -87,6 +87,42 @@ public:
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
+  //  Do *ALL* simple inits *first* before a possible
+  //  early return due to an error condition. Avoids
+  //  crashing during destructor when some members have
+  //  not been properly NULL initialized...
+  //
+  this->CommandFunction = NULL;
+  this->Internals = NULL;
+  this->MajorVersion = 1;
+  this->MinorVersion = 0;
+  this->Name = NULL;
+  this->VersionName = NULL;
+  this->ReleaseName = NULL;
+  this->PrettyName = NULL;
+  this->LimitedEditionMode = 0;
+  this->LimitedEditionModeName = NULL;
+  this->HelpDialogStartingPage = NULL;
+  this->InstallationDirectory = NULL;
+  this->EmailFeedbackAddress  = NULL;
+  this->InExit     = 0;
+  this->ExitStatus = 0;
+  this->ExitAfterLoadScript = 0;
+  this->PromptBeforeExit = 1;
+  this->DialogUp = 0;
+  this->SaveUserInterfaceGeometry = 1;
+  this->RegistryHelper = NULL;
+  this->RegistryLevel = 10;
+  this->BalloonHelpManager = NULL;
+  this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
+  this->AboutDialog      = NULL;
+  this->AboutDialogImage = NULL;
+  this->AboutRuntimeInfo = NULL;
+  this->SplashScreen = NULL;
+  this->HasSplashScreen = 0;
+  this->ShowSplashScreen = 1;
+  this->PrintTargetDPI        = 100.0;
+
   // Setup Tcl
 
   this->MainInterp = Et_Interp;
@@ -99,20 +135,16 @@ vtkKWApplication::vtkKWApplication()
     }
 
   this->CommandFunction = vtkKWApplicationCommand;
-  
+
   // Instantiate the PIMPL Encapsulation for STL containers
 
   this->Internals = new vtkKWApplicationInternals;
 
   // Application name and version
 
-  this->MajorVersion = 1;
-  this->MinorVersion = 0;
-
   // Try to find if we are running from a script and set the application name
   // accordingly. Otherwise try to find the executable name.
 
-  this->Name = NULL;
   const char *script = this->Script("file rootname [file tail [info script]]");
   if (script && *script)
     {
@@ -144,50 +176,9 @@ vtkKWApplication::vtkKWApplication()
       vtksys::SystemTools::DuplicateString("Sample Application");
     }
 
-  this->VersionName = NULL;
-  this->ReleaseName = NULL;
-  this->PrettyName = NULL;
+  // Encoding...
 
-  // Limited Edition Mode name
-
-  this->LimitedEditionMode = 0;
-  this->LimitedEditionModeName = NULL;
-
-  this->HelpDialogStartingPage = NULL;
-
-  this->InstallationDirectory = NULL;
-  this->EmailFeedbackAddress  = NULL;
-
-  this->InExit     = 0;
-  this->ExitStatus = 0;
-  this->ExitAfterLoadScript = 0;
-  this->PromptBeforeExit = 1;
-
-  this->DialogUp = 0;
-
-  this->SaveUserInterfaceGeometry = 1;
-
-  this->RegistryHelper = NULL;
-  this->RegistryLevel = 10;
-
-  this->BalloonHelpManager = NULL;
-
-  this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
-
-  // About dialog
-
-  this->AboutDialog      = NULL;
-  this->AboutDialogImage = NULL;
-  this->AboutRuntimeInfo = NULL;
-
-  // Splashscreen
-
-  this->SplashScreen = NULL;
-  this->SupportSplashScreen = 0;
-  this->ShowSplashScreen = 1;
-
-  this->PrintTargetDPI        = 100.0;
 
   // As a convenience, set the 'Application' Tcl variable to ourself
 
