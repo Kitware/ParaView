@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.15");
+vtkCxxRevisionMacro(vtkSMPart, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -90,47 +90,6 @@ void vtkSMPart::GatherDataInformation()
   pm->SendCleanupPendingProgress();
 
   pm->GatherInformation(this->DataInformation, this->GetID(0));
-
-  // I would like to have all sources generate names and all filters
-  // Pass the field data, but until all is working well, this is a default.
-  const char* name = this->DataInformation->GetName();
-  if (name == NULL || name[0] == '\0')
-    {
-    char str[256];
-    if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
-      {
-      long nc = this->DataInformation->GetNumberOfCells();
-      sprintf(str, "Polygonal: %ld cells", nc);
-      }
-    else if (this->DataInformation->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
-      {
-      long nc = this->DataInformation->GetNumberOfCells();
-      sprintf(str, "Unstructured Grid: %ld cells", nc);
-      }
-    else if (this->DataInformation->GetDataSetType() == VTK_IMAGE_DATA)
-      {
-      int *ext = this->DataInformation->GetExtent();
-      sprintf(str, "Uniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-      }
-    else if (this->DataInformation->GetDataSetType() == VTK_RECTILINEAR_GRID)
-      {
-      int *ext = this->DataInformation->GetExtent();
-      sprintf(str, "Nonuniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-      }
-    else if (this->DataInformation->GetDataSetType() == VTK_STRUCTURED_GRID)
-      {
-      int *ext = this->DataInformation->GetExtent();
-      sprintf(str, "Curvilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-      }
-    else
-      {
-      sprintf(str, "Part of unknown type");
-      }    
-    this->DataInformation->SetName(str);
-    }
 
   this->DataInformationValid = 1;
 }
