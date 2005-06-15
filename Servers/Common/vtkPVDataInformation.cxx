@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.9");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -104,6 +104,8 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->PointDataInformation->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
   this->CellDataInformation->PrintSelf(os, i2);
+  os << indent << "CompositeDataInformation " << endl;
+  this->CompositeDataInformation->PrintSelf(os, i2);
 
   if (this->Name)
     {
