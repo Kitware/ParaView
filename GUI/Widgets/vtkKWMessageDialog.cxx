@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.75");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.76");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -121,8 +121,8 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
 
   this->Label->SetParent(this->MessageDialogFrame);
   this->Label->SetLineType(vtkKWLabel::MultiLine);
-  this->Label->SetWidth(300);
   this->Label->Create(app);
+  this->Label->SetWidth(300);
   if ( this->DialogText )
     {
     this->Label->SetText(this->DialogText);
@@ -180,6 +180,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->OKFrame->SetParent(this->ButtonFrame);
     this->OKFrame->Create(app);
     this->OKFrame->SetBorderWidth(3);
+    this->OKFrame->SetReliefToFlat();
     this->OKButton->SetParent(this->OKFrame);
     this->OKButton->Create(app);
     this->OKButton->SetWidth(16);
@@ -195,6 +196,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->OtherFrame->SetParent(this->ButtonFrame);  
     this->OtherFrame->Create(app);
     this->OtherFrame->SetBorderWidth(3);
+    this->OtherFrame->SetReliefToFlat();
     this->OtherButton->SetParent(this->OtherFrame);
     this->OtherButton->Create(app);
     this->OtherButton->SetWidth(16);
@@ -210,6 +212,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->CancelFrame->SetParent(this->ButtonFrame);  
     this->CancelFrame->Create(app);
     this->CancelFrame->SetBorderWidth(3);
+    this->CancelFrame->SetReliefToFlat();
     this->CancelButton->SetParent(this->CancelFrame);
     this->CancelButton->Create(app);
     this->CancelButton->SetWidth(16);
