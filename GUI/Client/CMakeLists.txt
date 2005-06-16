@@ -112,6 +112,7 @@ SET( ParaViewClient_SRCS
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
+  vtkPVExtractDataSetsWidget.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
