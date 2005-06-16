@@ -64,7 +64,7 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
 
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app) {}
+  virtual void Create(vtkKWApplication *) {}
 
   // Description:
   // Sets up some default event handlers to allow
