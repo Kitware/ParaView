@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.36");
+vtkCxxRevisionMacro(vtkKWListBox, "1.37");
 
 
 //----------------------------------------------------------------------------
@@ -355,13 +355,13 @@ int vtkKWListBox::GetSelectionMode()
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetExportSelection(int arg)
 {
-  this->SetConfigurationOptionAsInt("-exportselection", arg);
+  this->Listbox->SetConfigurationOptionAsInt("-exportselection", arg);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetExportSelection()
 {
-  return this->GetConfigurationOptionAsInt("-exportselection");
+  return this->Listbox->GetConfigurationOptionAsInt("-exportselection");
 }
 
 //----------------------------------------------------------------------------
