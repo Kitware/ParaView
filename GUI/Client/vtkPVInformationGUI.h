@@ -37,8 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the user interface.
-  void Create(vtkKWApplication* app, const char* options);
+  // Create the widget.
+  void Create(vtkKWApplication* app);
   
   // Description:
   // This updates the user interface.  It checks first to see if the

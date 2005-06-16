@@ -108,10 +108,9 @@ public:
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
   // Description:
+  // Create the widgets.
   // Overloaded to create the ImplicitFunction proxy
-  //BTX
   virtual void Create(vtkKWApplication *app);
-  //ETX
 
   // Description:
   // Register the animatable proxies and make them avaiblable for animation.

@@ -44,9 +44,8 @@ class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app,
-                      const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Invoke the dialog and display it in a modal manner. 

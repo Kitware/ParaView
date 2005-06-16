@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.4");
 
 int vtkPVComparativeVisDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -136,14 +136,14 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   vtkKWFrame* f1 = vtkKWFrame::New();
   this->Internal->PropertyFrames.push_back(f1);
   f1->SetParent(this->VisualizationListFrame->GetFrame());
-  f1->Create(this->GetApplication(), "");
+  f1->Create(this->GetApplication());
   this->Script("pack %s -side top -pady 2 -padx 4", f1->GetWidgetName());
   
   vtkKWRadioButton* r1 = vtkKWRadioButton::New();
   this->Internal->RadioButtons.push_back(r1);
   r1->SetParent(f1);
   r1->SetVariableName("vtkPVComparativeVisDialogVar");
-  r1->Create(this->GetApplication(), "");
+  r1->Create(this->GetApplication());
   unsigned int value = this->Internal->RadioButtons.size() - 1;
   r1->SetValue(value);
   ostrstream comm;
@@ -160,7 +160,7 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   w1->AddObserver(vtkCommand::WidgetModifiedEvent, command);
   command->Delete();
   w1->SetParent(f1);
-  w1->Create(this->GetApplication(), "");
+  w1->Create(this->GetApplication());
   this->Script("pack %s -side left", w1->GetWidgetName());
 
   f1->Delete();
@@ -198,7 +198,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisDialog::Create(vtkKWApplication *app, const char *args)
+void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -206,22 +206,22 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app, const char *args)
     return;
     }
 
-  this->Superclass::Create(app,args);
+  this->Superclass::Create(app);
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app, "");
+  this->MainFrame->Create(app);
   this->Script("pack %s -expand t -fill both -padx 5 -pady 5", 
                this->MainFrame->GetWidgetName());
 
   this->NameEntry->SetParent(this->MainFrame);
-  this->NameEntry->Create(app, "");
+  this->NameEntry->Create(app);
   this->NameEntry->SetLabelText("Visualization Name:");
   vtkKWTkUtilities::ChangeFontWeightToBold(this->NameEntry->GetLabel());
   this->Script("pack %s -side top -fill x -anchor n -pady 5", 
                this->NameEntry->GetWidgetName());
 
   this->VisualizationListFrame->SetParent(this->MainFrame);
-  this->VisualizationListFrame->Create(app, "");
+  this->VisualizationListFrame->Create(app);
   this->VisualizationListFrame->SetLabelText("Comparative Vis Properties");
   this->Script(
     "pack %s -side top -fill x -anchor n -pady 5", 
@@ -233,12 +233,12 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app, const char *args)
   this->TrackEditor->SetAnimationManager(pvAM);
 
   this->TrackEditor->SetParent(this->MainFrame);
-  this->TrackEditor->Create(app, "");
+  this->TrackEditor->Create(app);
   this->Script("pack %s -side top -expand t -fill both", 
                this->TrackEditor->GetWidgetName());
 
   this->CloseButton->SetParent(this->MainFrame);
-  this->CloseButton->Create(app, "");
+  this->CloseButton->Create(app);
   this->CloseButton->SetCommand(this, "OK");
   this->CloseButton->SetText("Done");
   this->Script("pack %s -side top -fill x -pady 5", 

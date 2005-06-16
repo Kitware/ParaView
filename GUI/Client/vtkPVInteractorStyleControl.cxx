@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.48");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -520,36 +520,37 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
+void vtkPVInteractorStyleControl::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app, 0);
+  this->LabeledFrame->Create(app);
   this->LabeledFrame->SetLabelText("Camera Manipulators Control");
 
   this->OuterFrame = vtkKWFrame::New();
   this->OuterFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->OuterFrame->Create(app, 0);
+  this->OuterFrame->Create(app);
   
   int cc;
 
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->Labels[cc]->SetParent(this->OuterFrame);
-    this->Labels[cc]->Create(app, "");
+    this->Labels[cc]->Create(app);
     }
 
   for ( cc = 0; cc < 9; cc ++ )
     {
     this->Menus[cc]->SetParent(this->OuterFrame);
-    this->Menus[cc]->Create(app, "-anchor w");
+    this->Menus[cc]->Create(app);
+    this->Menus[cc]->SetAnchorToWest();
     }
 
   this->Labels[0]->SetText("Left Button");
@@ -601,7 +602,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->UpdateMenus();
 
   this->ArgumentsFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->ArgumentsFrame->Create(app, 0);
+  this->ArgumentsFrame->Create(app);
   this->Script("pack %s -expand true -fill x -side top", 
                this->ArgumentsFrame->GetWidgetName());
 }

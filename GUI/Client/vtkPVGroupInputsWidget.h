@@ -40,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set up the UI for this source
+  // Create the widget.
   void Create(vtkKWApplication *app);
 
   // Description:

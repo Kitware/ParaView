@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.19");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.20");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -110,10 +110,9 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
-  const char* args)
+void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::Create(app, "frame", args ))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -125,7 +124,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
     return;
     }
   this->TopFrame->SetParent(this);
-  this->TopFrame->Create(app, 0);
+  this->TopFrame->Create(app);
   this->Script(
     // "pack %s -side top -expand t", // -fill both  -anchor center",
     "pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -133,7 +132,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
 
   this->ScenePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->ScenePropertiesFrame->ShowHideFrameOn();
-  this->ScenePropertiesFrame->Create(app, 0);
+  this->ScenePropertiesFrame->Create(app);
   this->ScenePropertiesFrame->SetLabelText("Animation Control");
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
@@ -142,7 +141,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   // SELECTOR FRAME
   this->SelectorFrame->SetParent(this->TopFrame->GetFrame());
   this->SelectorFrame->ShowHideFrameOn();
-  this->SelectorFrame->Create(app, 0);
+  this->SelectorFrame->Create(app);
   this->SelectorFrame->SetLabelText(VTK_PV_SELECTOR_DEFAULT_LABEL); 
   this->Script(
     "pack %s -side top -anchor nw  -fill x -expand y -padx 2 -pady 2",
@@ -151,7 +150,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   // KEYFRAME PROPERTIES FRAME
   this->TrackEditor->SetParent(this->TopFrame->GetFrame());
   this->TrackEditor->SetAnimationManager(this->AnimationManager);
-  this->TrackEditor->Create(app, 0);
+  this->TrackEditor->Create(app);
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", 
     this->TrackEditor->GetWidgetName());
@@ -160,14 +159,14 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->ShowHideFrameOn();
   this->SaveFrame->SetLabelText("Animation Settings");
-  this->SaveFrame->Create(app, 0);
+  this->SaveFrame->Create(app);
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->SaveFrame->GetWidgetName());
 
 
   this->CacheGeometryCheck->SetParent(this->SaveFrame->GetFrame());
-  this->CacheGeometryCheck->Create(app, 0);
+  this->CacheGeometryCheck->Create(app);
   this->CacheGeometryCheck->SetText("Cache Geometry");
   this->CacheGeometryCheck->SetCommand(this, "CacheGeometryCheckCallback");
   this->CacheGeometryCheck->SetState(this->CacheGeometry);
@@ -177,7 +176,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("grid %s x -sticky w", this->CacheGeometryCheck->GetWidgetName());
 
   this->RecordAllButton->SetParent(this->SaveFrame->GetFrame());
-  this->RecordAllButton->Create(app, 0);
+  this->RecordAllButton->Create(app);
   this->RecordAllButton->SetText("Record All properties");
   this->RecordAllButton->SetState(this->AnimationManager->GetRecordAll());
   this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
@@ -186,7 +185,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("grid %s x -sticky w", this->RecordAllButton->GetWidgetName());
 
   this->AdvancedAnimationCheck->SetParent(this->SaveFrame->GetFrame());
-  this->AdvancedAnimationCheck->Create(app, 0);
+  this->AdvancedAnimationCheck->Create(app);
   this->AdvancedAnimationCheck->SetText("Show all animatable properties");
   this->AdvancedAnimationCheck->SetCommand(this, "AdvancedAnimationViewCallback");
   this->AdvancedAnimationCheck->SetState(this->AnimationManager->GetAdvancedView());

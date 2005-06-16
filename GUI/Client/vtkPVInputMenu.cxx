@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.72");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.73");
 
 
 //----------------------------------------------------------------------------
@@ -85,18 +85,20 @@ void vtkPVInputMenu::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->Label->SetParent(this);
-  this->Label->Create(app, "-width 18 -justify right");
+  this->Label->Create(app);
+  this->Label->SetWidth(18);
+  this->Label->SetJustificationToRight();
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app, "");
+  this->Menu->Create(app);
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 }
 

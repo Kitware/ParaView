@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.3");
 
 int vtkPVIceTDesktopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -43,7 +43,7 @@ vtkPVIceTDesktopRenderModuleUI::~vtkPVIceTDesktopRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app, const char *)
+void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
 {
   // Skip over LOD res and threshold.
   
@@ -53,7 +53,7 @@ void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app, const char *)
     return;
     }
 
-  this->Superclass::Create(app, NULL);
+  this->Superclass::Create(app);
 
   this->Script("pack forget %s",
                this->ParallelRenderParametersFrame->GetWidgetName());

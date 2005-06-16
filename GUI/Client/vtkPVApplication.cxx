@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.362");
+vtkCxxRevisionMacro(vtkPVApplication, "1.363");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -893,7 +893,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this->GetMainWindow());
-  exportDialog->Create(this, 0);
+  exportDialog->Create(this);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
@@ -1150,7 +1150,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->GetSplashScreen()->SetProgressMessage("Creating UI...");
     }
 
-  ui->Create(this,"");
+  ui->Create(this);
 
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
@@ -1211,7 +1211,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     vtkPVTraceFileDialog *dlg2 = vtkPVTraceFileDialog::New();
     dlg2->SetMasterWindow(ui);
-    dlg2->Create(this,"");
+    dlg2->Create(this);
     ostrstream str;
     str << "Do you want to save the existing tracefile?\n\n"
         << "A tracefile called " << traceName << " was found in "
@@ -1514,7 +1514,7 @@ void vtkPVApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
-  dlg->Create(this,"");
+  dlg->Create(this);
   dlg->SetText("\"The ParaView Guide\", covering both the use and development of ParaView, is available for purchase from Kitware's online store at http://store.yahoo.com/kitware/paraviewguide.html");
   dlg->Invoke();  
   dlg->Delete();

@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.36");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.37");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -246,7 +246,7 @@ void vtkPVAnimationScene::SetWindow(vtkPVWindow *window)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
+void vtkPVAnimationScene::Create(vtkKWApplication* app)
 {
   if (this->IsCreated())
     {
@@ -268,7 +268,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     vtkErrorMacro("RenderView must be set before create.");
     return;
     }
-  this->Superclass::Create(app, "frame", args);
+  this->Superclass::CreateSpecificTkWidget(app, "frame");
 
   this->CreateProxy();
 
@@ -311,11 +311,11 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
 
   // Animation Control: Time scale
   this->TimeLabel->SetParent(this);
-  this->TimeLabel->Create(app, 0);
+  this->TimeLabel->Create(app);
   this->TimeLabel->SetText("Current Time:");
 
   this->TimeScale->SetParent(this);
-  this->TimeScale->Create(app, "");
+  this->TimeScale->Create(app);
   this->TimeScale->DisplayEntry();
   this->TimeScale->DisplayEntryAndLabelOnTopOff();
   this->TimeScale->SetResolution(0.01);
@@ -329,14 +329,14 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
 
 
   this->DurationLabel->SetParent(this);
-  this->DurationLabel->Create(app, 0);
+  this->DurationLabel->Create(app);
   this->DurationLabel->SetText("Duration:");
   
   this->DurationThumbWheel->SetParent(this);
   this->DurationThumbWheel->PopupModeOn();
   this->DurationThumbWheel->ClampMinimumValueOn();
   this->DurationThumbWheel->SetMinimumValue(1.0);
-  this->DurationThumbWheel->Create(app, NULL);
+  this->DurationThumbWheel->Create(app);
   this->DurationThumbWheel->DisplayEntryOn();
   this->DurationThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->DurationThumbWheel->ExpandEntryOn();
@@ -355,10 +355,10 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
 
   // Animation Control: Play Mode
   this->PlayModeLabel->SetParent(this);
-  this->PlayModeLabel->Create(app, 0);
+  this->PlayModeLabel->Create(app);
   this->PlayModeLabel->SetText("Play Mode:" );
   this->PlayModeMenuButton->SetParent(this);
-  this->PlayModeMenuButton->Create(app, 0);
+  this->PlayModeMenuButton->Create(app);
   this->PlayModeMenuButton->SetBalloonHelpString("Change the mode in which the "
     "animation is played.");
   this->PlayModeMenuButton->AddCommand(VTK_PV_PLAYMODE_SEQUENCE_TITLE, this,

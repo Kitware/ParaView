@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.383");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.384");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -613,17 +613,15 @@ void vtkPVRenderView::Close()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
+void vtkPVRenderView::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->ConfigureOptions(args);
 
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.
@@ -635,15 +633,19 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Create the frames
 
-  this->Frame->Create(app,"frame","-bd 0 -relief ridge");
+  this->Frame->Create(app);
+  this->Frame->SetReliefToRidge();
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->Frame->GetWidgetName());
 
-  this->Frame2->Create(app,"frame","-bd 0");
+  this->Frame2->Create(app);
   this->Script("pack %s -fill x -side top -anchor nw",
                this->Frame2->GetWidgetName());
 
-  this->Label->Create(app, "-fg #fff -text {3D View} -bd 0");
+  this->Label->Create(app);
+  this->Label->SetText("3D View");
+  this->Label->SetBorderWidth(0);
+  this->Label->SetForegroundColor(0.94, 0.94, 0.94);
 
   this->Script("pack %s -side left -anchor w",
                this->Label->GetWidgetName());
@@ -658,8 +660,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // changed when it's active (it's not active at the moment). But inside
   // paraview tehre is only one view, and it's always active, so use the
   // active color.
-  this->PropertiesButton->Create(
-    app, "-bd 0 -bg #008 -padx 0 -pady 0 -highlightthickness 0 -relief flat");
+  this->PropertiesButton->Create(app);
+  this->PropertiesButton->SetForegroundColor(0, 0, 0.5);
+  this->PropertiesButton->SetBorderWidth(0);
+  this->PropertiesButton->SetPadX(0);
+  this->PropertiesButton->SetPadY(0);
+  this->PropertiesButton->SetHighlightThickness(0);
+  this->PropertiesButton->SetReliefToFlat();
   this->PropertiesButton->SetCommand(this, "SwitchBackAndForthToViewProperties");
   this->PropertiesButton->SetBalloonHelpString(
     "Switch back and forth between the current view properties and the" 
@@ -680,7 +687,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Create the control frame - only pack it if support option enabled
 
-  this->ControlFrame->Create(app,"frame","-bd 0");
+  this->ControlFrame->Create(app);
   if (this->SupportControlFrame)
     {
     this->Script("pack %s -expand t -fill both -side top -anchor nw",
@@ -691,7 +698,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
-    this->TopLevelRenderWindow->Create(app, "toplevel", "");
+    this->TopLevelRenderWindow->CreateSpecificTkWidget(app, "toplevel");
     this->Script("wm title %s %s", 
                  this->TopLevelRenderWindow->GetWidgetName(),
                  app->GetName());
@@ -699,8 +706,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Add the -rw argument
 
-  char *local = new char [strlen(args)+100];
-  sprintf(local,"%s -rw Addr=%p",args,this->GetRenderWindow());
+  char local[256];
+  sprintf(local, "-rw Addr=%p", this->GetRenderWindow());
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(),local);
 
@@ -745,7 +752,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->NavigationFrame->SetParent(this->SplitFrame->GetFrame2());
   this->NavigationFrame->ShowHideFrameOff();
-  this->NavigationFrame->Create(app, 0);
+  this->NavigationFrame->Create(app);
   this->NavigationFrame->SetLabelText("Navigation");
   this->Script("pack %s -fill both -expand t -side top", 
                this->NavigationFrame->GetWidgetName());
@@ -755,21 +762,25 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindow->SetParent(this->NavigationFrame->GetFrame());
   this->NavigationWindow->SetWidth(341);
   this->NavigationWindow->SetHeight(545);
-  this->NavigationWindow->Create(app, 0); 
+  this->NavigationWindow->Create(app); 
 
   // Configure the selection window
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
   this->SelectionWindow->SetWidth(341);
   this->SelectionWindow->SetHeight(545);
-  this->SelectionWindow->Create(app, 0); 
+  this->SelectionWindow->Create(app); 
 
   this->SelectionWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
-  this->SelectionWindowButton->Create(
-    app, 
-    "-indicatoron 0 -highlightthickness 0 -image PVSelectionWindowButton "
-    "-selectimage PVSelectionWindowButton");
+  this->SelectionWindowButton->Create(app);
+  this->SelectionWindowButton->SetHighlightThickness(0);
+  this->SelectionWindowButton->SetIndicator(0);
+  this->SelectionWindowButton->SetImageOption(
+    "PVSelectionWindowButton");
+  this->SelectionWindowButton->SetImageOption(
+    "PVSelectionWindowButton", "-selectimage");
+
   this->SelectionWindowButton->SetBalloonHelpString(
     "Switch to selection window mode.");
   this->SelectionWindowButton->SetCommand(
@@ -777,10 +788,14 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   
   this->NavigationWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
-  this->NavigationWindowButton->Create(
-    app, 
-    "-indicatoron 0 -highlightthickness 0 -image PVNavigationWindowButton "
-    "-selectimage PVNavigationWindowButton");
+  this->NavigationWindowButton->Create(app);
+  this->NavigationWindowButton->SetHighlightThickness(0);
+  this->NavigationWindowButton->SetIndicator(0);
+  this->NavigationWindowButton->SetImageOption(
+    "PVNavigationWindowButton");
+  this->NavigationWindowButton->SetImageOption(
+    "PVNavigationWindowButton", "-selectimage");
+
   this->NavigationWindowButton->SetBalloonHelpString(
     "Switch to navigation window mode.");
   this->NavigationWindowButton->SetCommand(
@@ -820,7 +835,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // These should be create in application or window.
   this->SourceNotebook = vtkPVSourceNotebook::New();
   this->SourceNotebook->SetParent(this->GetSourceParent());
-  this->SourceNotebook->Create(app,"");
+  this->SourceNotebook->Create(app);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->SourceNotebook->GetWidgetName());
 
@@ -830,7 +845,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   //this->GetSourceParent()->GetTraceHelper()->SetReferenceCommand("GetParametersParent");
 
   this->EventuallyRender();
-  delete [] local;
 }
 
 //----------------------------------------------------------------------------
@@ -955,7 +969,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->RenderParametersFrame->SetParent(
     this->GeneralPropertiesFrame->GetFrame());
   this->RenderParametersFrame->ShowHideFrameOn();
-  this->RenderParametersFrame->Create(this->GetApplication(),0);
+  this->RenderParametersFrame->Create(this->GetApplication());
   this->RenderParametersFrame->SetLabelText("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
@@ -964,7 +978,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->ParallelProjectionCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
-  this->ParallelProjectionCheck->Create(this->GetApplication(), "");
+  this->ParallelProjectionCheck->Create(this->GetApplication());
   this->ParallelProjectionCheck->SetText("Use parallel projection");
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseParallelProjection", 0))
@@ -988,7 +1002,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->TriangleStripsCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
-  this->TriangleStripsCheck->Create(this->GetApplication(), "");
+  this->TriangleStripsCheck->Create(this->GetApplication());
   this->TriangleStripsCheck->SetText("Use triangle strips");
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseStrips", 0))
@@ -1009,8 +1023,8 @@ void vtkPVRenderView::CreateViewProperties()
   // Render parameters: immediate mode
 
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->ImmediateModeCheck->Create(this->GetApplication(), 
-                                   "-text \"Use immediate mode rendering\"");
+  this->ImmediateModeCheck->Create(this->GetApplication());
+  this->ImmediateModeCheck->SetText("Use immediate mode rendering");
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseImmediateMode", 0))
@@ -1049,7 +1063,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->RenderModuleUI = rmuio;
     this->RenderModuleUI->SetRenderModuleProxy(this->RenderModuleProxy);
     this->RenderModuleUI->SetParent(this->GeneralPropertiesFrame->GetFrame());
-    this->RenderModuleUI->Create(this->GetApplication(),0);
+    this->RenderModuleUI->Create(this->GetApplication());
     this->RenderModuleUI->GetTraceHelper()->SetReferenceHelper(
       this->GetTraceHelper());
     this->RenderModuleUI->GetTraceHelper()->SetReferenceCommand(
@@ -1070,7 +1084,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->InterfaceSettingsFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
-  this->InterfaceSettingsFrame->Create(this->GetApplication(),0);
+  this->InterfaceSettingsFrame->Create(this->GetApplication());
   this->InterfaceSettingsFrame->SetLabelText("3D Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
@@ -1080,7 +1094,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->Display3DWidgets->SetParent(
     this->InterfaceSettingsFrame->GetFrame());
-  this->Display3DWidgets->Create(this->GetApplication(), 0);
+  this->Display3DWidgets->Create(this->GetApplication());
   this->Display3DWidgets->SetText("Display 3D widgets automatically");
   this->Display3DWidgets->SetBalloonHelpString(
     "When this advanced option is on, all 3D widgets (manipulators) are "
@@ -1113,14 +1127,14 @@ void vtkPVRenderView::CreateViewProperties()
   // Setup the frame
   this->LightParameterFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
   this->LightParameterFrame->ShowHideFrameOn();
-  this->LightParameterFrame->Create(this->GetApplication(),0);
+  this->LightParameterFrame->Create(this->GetApplication());
   this->LightParameterFrame->SetLabelText("Light Kit Parameter");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LightParameterFrame->GetWidgetName());
 
   // First thing to do is a check button, so that we can remove it (make all paraview tests pass)
   this->UseLightButton->SetParent(this->LightParameterFrame->GetFrame()); 
-  this->UseLightButton->Create(this->GetApplication(), 0);
+  this->UseLightButton->Create(this->GetApplication());
   this->UseLightButton->SetText("Use Light Kit");
   this->UseLightButton->SetCommand(this, "UseLightCallback");
   this->UseLightButton->SetBalloonHelpString( 
@@ -1131,7 +1145,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Set every different lights from the light kit
   this->KeyLightLabel->SetParent(this->LightParameterFrame->GetFrame());
-  this->KeyLightLabel->Create(this->GetApplication(), 0);
+  this->KeyLightLabel->Create(this->GetApplication());
   this->KeyLightLabel->SetText("Key :");
   this->KeyLightLabel->SetWidth(4);
   this->KeyLightLabel->SetBalloonHelpString(
@@ -1144,7 +1158,7 @@ void vtkPVRenderView::CreateViewProperties()
      "modeling of object features.");
 
   this->FillLightLabel->SetParent(this->LightParameterFrame->GetFrame());
-  this->FillLightLabel->Create(this->GetApplication(), 0);
+  this->FillLightLabel->Create(this->GetApplication());
   this->FillLightLabel->SetText("Fill:");
   this->FillLightLabel->SetWidth(4);
   this->FillLightLabel->SetBalloonHelpString(
@@ -1154,7 +1168,7 @@ void vtkPVRenderView::CreateViewProperties()
      "in the scene." );
 
   this->BackLightLabel->SetParent(this->LightParameterFrame->GetFrame());
-  this->BackLightLabel->Create(this->GetApplication(), 0);
+  this->BackLightLabel->Create(this->GetApplication());
   this->BackLightLabel->SetText("Back:");
   this->BackLightLabel->SetWidth(4);
   this->BackLightLabel->SetBalloonHelpString(
@@ -1163,7 +1177,7 @@ void vtkPVRenderView::CreateViewProperties()
      "areas behind the object." );
 
   this->HeadLightLabel->SetParent(this->LightParameterFrame->GetFrame());
-  this->HeadLightLabel->Create(this->GetApplication(), 0);
+  this->HeadLightLabel->Create(this->GetApplication());
   this->HeadLightLabel->SetText("Head:");
   this->HeadLightLabel->SetWidth(4);
   this->HeadLightLabel->SetBalloonHelpString(
@@ -1213,7 +1227,7 @@ void vtkPVRenderView::CreateViewProperties()
     subtype = vtkLightKit::GetSubType(vtkLightKit::TKeyLight, cc);
     this->KeyLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->KeyLightScale[cc]->PopupScaleOn();
-    this->KeyLightScale[cc]->Create(this->GetApplication(), 0);
+    this->KeyLightScale[cc]->Create(this->GetApplication());
     this->KeyLightScale[cc]->DisplayEntry();
     this->KeyLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->KeyLightScale[cc]->ExpandEntryOn();
@@ -1235,7 +1249,7 @@ void vtkPVRenderView::CreateViewProperties()
     subtype = vtkLightKit::GetSubType(vtkLightKit::TFillLight, cc);
     this->FillLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->FillLightScale[cc]->PopupScaleOn();
-    this->FillLightScale[cc]->Create(this->GetApplication(), 0);
+    this->FillLightScale[cc]->Create(this->GetApplication());
     this->FillLightScale[cc]->DisplayEntry();
     this->FillLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->FillLightScale[cc]->ExpandEntryOn();
@@ -1257,7 +1271,7 @@ void vtkPVRenderView::CreateViewProperties()
     subtype = vtkLightKit::GetSubType(vtkLightKit::TBackLight, cc);
     this->BackLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->BackLightScale[cc]->PopupScaleOn();
-    this->BackLightScale[cc]->Create(this->GetApplication(), 0);
+    this->BackLightScale[cc]->Create(this->GetApplication());
     this->BackLightScale[cc]->DisplayEntry();
     this->BackLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->BackLightScale[cc]->ExpandEntryOn();
@@ -1281,7 +1295,7 @@ void vtkPVRenderView::CreateViewProperties()
       subtype = vtkLightKit::GetSubType(vtkLightKit::THeadLight, cc);
       this->HeadLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
       this->HeadLightScale[cc]->PopupScaleOn();
-      this->HeadLightScale[cc]->Create(this->GetApplication(), 0);
+      this->HeadLightScale[cc]->Create(this->GetApplication());
       this->HeadLightScale[cc]->DisplayEntry();
       this->HeadLightScale[cc]->DisplayEntryAndLabelOnTopOff();
       this->HeadLightScale[cc]->ExpandEntryOn();
@@ -1305,7 +1319,7 @@ void vtkPVRenderView::CreateViewProperties()
   // Maintain Luminance
   // This would be nice if there was an InitializeScale'function like for KWCheckButton too
   this->MaintainLuminanceButton->SetParent(this->LightParameterFrame->GetFrame()); 
-  this->MaintainLuminanceButton->Create(this->GetApplication(), 0);
+  this->MaintainLuminanceButton->Create(this->GetApplication());
   this->MaintainLuminanceButton->SetText("Maintain Luminance");
   this->MaintainLuminanceButton->SetCommand(this, "MaintainLuminanceCallback");
   this->MaintainLuminanceButton->SetBalloonHelpString( 
@@ -1366,7 +1380,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesFrame->SetParent(this->AnnotationPropertiesFrame->GetFrame());
   this->OrientationAxesFrame->ShowHideFrameOn();
-  this->OrientationAxesFrame->Create(this->GetApplication(), 0);
+  this->OrientationAxesFrame->Create(this->GetApplication());
   this->OrientationAxesFrame->SetLabelText("Orientation Axes");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->OrientationAxesFrame->GetWidgetName());
@@ -1374,7 +1388,7 @@ void vtkPVRenderView::CreateViewProperties()
   // Orientation axes settings: visibility check
   
   this->OrientationAxesCheck->SetParent(this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesCheck->Create(this->GetApplication(), 0);
+  this->OrientationAxesCheck->Create(this->GetApplication());
   this->OrientationAxesCheck->SetText("Display orientation axes");
   this->OrientationAxesCheck->SetCommand(this, "OrientationAxesCheckCallback");
   this->OrientationAxesCheck->SetBalloonHelpString(
@@ -1396,7 +1410,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesInteractiveCheck->SetParent(
     this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesInteractiveCheck->Create(this->GetApplication(), 0);
+  this->OrientationAxesInteractiveCheck->Create(this->GetApplication());
   this->OrientationAxesInteractiveCheck->SetText("Interactive");
   this->OrientationAxesInteractiveCheck->SetCommand(this, "OrientationAxesInteractiveCallback");
   this->OrientationAxesInteractiveCheck->SetBalloonHelpString(
@@ -1421,7 +1435,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesOutlineColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
   this->OrientationAxesOutlineColor->GetLabel()->SetText("Set Outline Color");
-  this->OrientationAxesOutlineColor->Create(this->GetApplication(), 0);
+  this->OrientationAxesOutlineColor->Create(this->GetApplication());
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
   this->OrientationAxesOutlineColor->SetBalloonHelpString(
     "Choose the color of the outline for resizing the orientation axes.");
@@ -1448,7 +1462,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesTextColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
   this->OrientationAxesTextColor->GetLabel()->SetText("Set Axis Label Color");
-  this->OrientationAxesTextColor->Create(this->GetApplication(), 0);
+  this->OrientationAxesTextColor->Create(this->GetApplication());
   this->OrientationAxesTextColor->SetCommand(this, "SetOrientationAxesTextColor");
   this->OrientationAxesTextColor->SetBalloonHelpString(
     "Choose the color of the X, Y, Z labels of the orientation axes.");
@@ -1510,21 +1524,21 @@ void vtkPVRenderView::CreateViewProperties()
 
   vtkKWFrameWithScrollbar* frame = vtkKWFrameWithScrollbar::New();
   frame->SetParent(page);
-  frame->Create(this->GetApplication(),0);
+  frame->Create(this->GetApplication());
   this->Script("pack %s -fill both -expand yes", frame->GetWidgetName());
 
   // Camera: standard views
 
   this->StandardViewsFrame->SetParent( frame->GetFrame() );
   this->StandardViewsFrame->ShowHideFrameOn();
-  this->StandardViewsFrame->Create(this->GetApplication(), 0);
+  this->StandardViewsFrame->Create(this->GetApplication());
   this->StandardViewsFrame->SetLabelText("Standard Views");
 
   const char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
 
   this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMaxViewButton->SetText("+X");
-  this->XMaxViewButton->Create(this->GetApplication(), "");
+  this->XMaxViewButton->Create(this->GetApplication());
   this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
   this->XMaxViewButton->SetBalloonHelpString(
     "Looking down X axis from (1,0,0)");
@@ -1533,7 +1547,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMinViewButton->SetText("-X");
-  this->XMinViewButton->Create(this->GetApplication(), "");
+  this->XMinViewButton->Create(this->GetApplication());
   this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
   this->XMinViewButton->SetBalloonHelpString(
     "Looking down X axis from (-1,0,0)");
@@ -1542,7 +1556,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->YMaxViewButton->SetText("+Y");
-  this->YMaxViewButton->Create(this->GetApplication(), "");
+  this->YMaxViewButton->Create(this->GetApplication());
   this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
   this->YMaxViewButton->SetBalloonHelpString(
     "Looking down Y axis from (0,1,0)");
@@ -1551,7 +1565,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->YMinViewButton->SetText("-Y");
-  this->YMinViewButton->Create(this->GetApplication(), "");
+  this->YMinViewButton->Create(this->GetApplication());
   this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
   this->YMinViewButton->SetBalloonHelpString(
     "Looking down Y axis from (0,-1,0)");
@@ -1560,7 +1574,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->ZMaxViewButton->SetText("+Z");
-  this->ZMaxViewButton->Create(this->GetApplication(), "");
+  this->ZMaxViewButton->Create(this->GetApplication());
   this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
   this->ZMaxViewButton->SetBalloonHelpString(
     "Looking down Z axis from (0,0,1)");
@@ -1569,7 +1583,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->ZMinViewButton->SetText("-Z");
-  this->ZMinViewButton->Create(this->GetApplication(), "");
+  this->ZMinViewButton->Create(this->GetApplication());
   this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
   this->ZMinViewButton->SetBalloonHelpString(
     "Looking down Z axis from (0,0,-1)");
@@ -1580,7 +1594,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
-  this->CameraIconsFrame->Create(this->GetApplication(), 0);
+  this->CameraIconsFrame->Create(this->GetApplication());
   this->CameraIconsFrame->SetLabelText("Stored Camera Positions");
 
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
@@ -1589,7 +1603,7 @@ void vtkPVRenderView::CreateViewProperties()
     int x, y;
     this->CameraIcons[cc]->SetRenderView(this);
     this->CameraIcons[cc]->SetParent(cframe);
-    this->CameraIcons[cc]->Create(this->GetApplication(), "");
+    this->CameraIcons[cc]->Create(this->GetApplication());
 
     x = cc % 3;
     y = cc / 3;
@@ -1604,7 +1618,7 @@ void vtkPVRenderView::CreateViewProperties()
   // Camera: manipulators
 
   this->ManipulatorControl2D->SetParent(frame->GetFrame());
-  this->ManipulatorControl2D->Create(pvapp, 0);
+  this->ManipulatorControl2D->Create(pvapp);
   this->ManipulatorControl2D->SetLabel("2D Movements");
   this->ManipulatorControl2D->GetTraceHelper()->SetReferenceHelper(
     this->GetTraceHelper());
@@ -1612,7 +1626,7 @@ void vtkPVRenderView::CreateViewProperties()
     "GetManipulatorControl2D");
   
   this->ManipulatorControl3D->SetParent(frame->GetFrame());
-  this->ManipulatorControl3D->Create(pvapp, 0);
+  this->ManipulatorControl3D->Create(pvapp);
   this->ManipulatorControl3D->SetLabel("3D Movements");
   this->ManipulatorControl3D->GetTraceHelper()->SetReferenceHelper(
     this->GetTraceHelper());
@@ -1623,13 +1637,13 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->CameraControlFrame->SetParent(frame->GetFrame());
   this->CameraControlFrame->ShowHideFrameOn();
-  this->CameraControlFrame->Create(this->GetApplication(), 0);
+  this->CameraControlFrame->Create(this->GetApplication());
   this->CameraControlFrame->SetLabelText("Camera Orientation");
   
   // Camera: camera control
   
   this->CameraControl->SetParent(this->CameraControlFrame->GetFrame());
-  this->CameraControl->Create(this->GetApplication(), 0);
+  this->CameraControl->Create(this->GetApplication());
   this->CameraControl->SetInteractorStyle(this->GetPVWindow()->GetCenterOfRotationStyle());
   this->CameraControl->SetRenderView(this);
   this->CameraControl->GetTraceHelper()->SetReferenceHelper(
@@ -2917,7 +2931,7 @@ void vtkPVRenderView::PrintView()
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->ParentWindow);
-    dlg->Create(this->GetApplication(),"");
+    dlg->Create(this->GetApplication());
     dlg->SetText(
       "A postscript file has been generated. You will need to\n"
       "print this file using a print command appropriate for\n"

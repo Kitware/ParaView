@@ -27,6 +27,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWTkUtilities.h"
 
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.19");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.20");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -51,14 +52,14 @@ vtkPVSourceNotebook::vtkPVSourceNotebook()
   this->DisplayGUI = vtkPVDisplayGUI::New();
   this->InformationGUI = vtkPVInformationGUI::New();
 
-  this->DescriptionFrame = vtkKWWidget::New();
+  this->DescriptionFrame = vtkKWFrame::New();
   this->NameLabel = vtkKWLabelLabeled::New();
   this->TypeLabel = vtkKWLabelLabeled::New();
   this->LongHelpLabel = vtkKWLabelLabeled::New();
   this->LabelEntry = vtkKWEntryLabeled::New();
 
-  this->ButtonFrame = vtkKWWidget::New();
-  this->MainParameterFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
+  this->MainParameterFrame = vtkKWFrame::New();
   this->AcceptButton = vtkKWPushButtonWithMenu::New();
   this->AcceptPullDownArrow = vtkKWPushButton::New();
   this->ResetButton = vtkKWPushButton::New();
@@ -206,16 +207,16 @@ void vtkPVSourceNotebook::ShowPage(const char* pageName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
+void vtkPVSourceNotebook::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
     
   this->Notebook->SetParent(this);
-  this->Notebook->Create(app, args);
+  this->Notebook->Create(app);
   this->Notebook->AddPage("Parameters");
   this->Notebook->AddPage("Display");
   this->Notebook->AddPage("Information");
@@ -225,13 +226,13 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   // Create the easiest (modular) pages first
   // Create the display GUI.
   this->DisplayGUI->SetParent(this->Notebook->GetFrame("Display"));
-  this->DisplayGUI->Create(app, 0);
+  this->DisplayGUI->Create(app);
   this->Script("pack %s -fill both -expand yes -side top",
                 this->DisplayGUI->GetWidgetName());
   // Create the information page.
   this->InformationGUI->SetParent(
         this->Notebook->GetFrame("Information"));
-  this->InformationGUI->Create(app, 0);
+  this->InformationGUI->Create(app);
   this->Script("pack %s -fill both -expand yes -side top",
                this->InformationGUI->GetWidgetName());
 
@@ -239,7 +240,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   // Now create the parameters page item by item.
   // one frame is left blank for the source to pack when selected.
   this->DescriptionFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->DescriptionFrame->Create(this->GetApplication(), "frame", "");
+  this->DescriptionFrame->Create(this->GetApplication());
   this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
                this->DescriptionFrame->GetWidgetName());
 
@@ -305,18 +306,18 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
                this->LongHelpLabel->GetParent()->GetWidgetName());
                
   this->ButtonFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->ButtonFrame->Create(this->GetApplication(), "frame", "");
+  this->ButtonFrame->Create(this->GetApplication());
   this->Script("pack %s -fill both -expand t -side top", 
                this->ButtonFrame->GetWidgetName());
 
   // Why do the buttons need two nested frames?
-  vtkKWWidget *frame = vtkKWWidget::New();
+  vtkKWFrame *frame = vtkKWFrame::New();
   frame->SetParent(this->ButtonFrame);
-  frame->Create(this->GetApplication(), "frame", "");
+  frame->Create(this->GetApplication());
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->GetApplication(), "");
+  this->AcceptButton->Create(this->GetApplication());
   if (this->AutoAccept)
     {
     this->AcceptButton->SetText("Auto Accept");
@@ -333,8 +334,8 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
     "(key shortcut: Ctrl+Enter)");
 
   this->AcceptPullDownArrow->SetParent(this->AcceptButton);
-  this->AcceptPullDownArrow->Create(this->GetApplication(), 
-                                    "-image PVPullDownArrow");
+  this->AcceptPullDownArrow->Create(this->GetApplication());
+  this->AcceptPullDownArrow->SetImageOption("PVPullDownArrow");
   this->Script("place %s -relx 0 -rely 1 -x -5 -y 5 -anchor se", 
                 this->AcceptPullDownArrow->GetWidgetName());
 
@@ -360,13 +361,15 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   delete [] var;
 
   this->ResetButton->SetParent(frame);
-  this->ResetButton->Create(this->GetApplication(), "-text Reset");
+  this->ResetButton->Create(this->GetApplication());
+  this->ResetButton->SetText("Reset");
   this->ResetButton->SetCommand(this, "ResetButtonCallback");
   this->ResetButton->SetBalloonHelpString(
     "Revert to the previous parameters of the module.");
 
   this->DeleteButton->SetParent(frame);
-  this->DeleteButton->Create(this->GetApplication(), "-text Delete");
+  this->DeleteButton->Create(this->GetApplication());
+  this->DeleteButton->SetText("Delete");
   this->DeleteButton->SetCommand(this, "DeleteButtonCallback");
   this->DeleteButton->SetBalloonHelpString(
     "Remove the current module.  "
@@ -384,7 +387,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
  
   // This is left blank for the source to pack when selected.
   this->MainParameterFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->MainParameterFrame->Create(this->GetApplication(), "frame", "");
+  this->MainParameterFrame->Create(this->GetApplication());
   this->Script("pack %s -fill both -expand t -side top", 
                this->MainParameterFrame->GetWidgetName());
 }

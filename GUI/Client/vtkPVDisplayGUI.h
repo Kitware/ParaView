@@ -123,8 +123,8 @@ public:
   void OpacityChangedEndCallback();
 
   // Description:
-  // Create the user interface.
-  void Create(vtkKWApplication* app, const char* options);
+  // Create the widget.
+  void Create(vtkKWApplication* app);
   
   // Description:
   // This updates the user interface.  It checks first to see if the
@@ -318,7 +318,7 @@ protected:
   vtkPVColorSelectionWidget* ColorSelectionMenu;
   
   vtkKWChangeColorButton* ColorButton;
-  vtkKWWidget*     EditColorMapButtonFrame;
+  vtkKWFrame*     EditColorMapButtonFrame;
   vtkKWPushButton* EditColorMapButton;
   vtkKWPushButton* DataColorRangeButton;
 

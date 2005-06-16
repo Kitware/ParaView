@@ -26,6 +26,7 @@ class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWText;
+class vtkKWFrame;
 class vtkKWWindow;
 class vtkKWOptionMenu;
 class vtkKWCheckButton;
@@ -39,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create a Tk widget
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
   
   // Description:
@@ -117,7 +118,7 @@ protected:
   
   vtkKWWindow*      MasterWindow;
 
-  vtkKWWidget*      ControlFrame;
+  vtkKWFrame*      ControlFrame;
   vtkKWPushButton*  SaveButton;
   vtkKWPushButton*  ClearButton;
   vtkKWPushButton*  RefreshButton;
@@ -130,7 +131,7 @@ protected:
 
   vtkKWText*        DisplayText;
 
-  vtkKWWidget*     ButtonFrame;
+  vtkKWFrame*     ButtonFrame;
   vtkKWPushButton* DismissButton;
     
   char*   Title;

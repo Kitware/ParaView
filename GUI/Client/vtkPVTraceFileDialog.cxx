@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.10");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.11");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -58,7 +58,7 @@ vtkPVTraceFileDialog::~vtkPVTraceFileDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
+void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -69,11 +69,14 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
     }
 
   // invoke super method
-  this->Superclass::Create(app,args);
+  this->Superclass::Create(app);
 
-  this->SaveFrame->Create(app, "-bd 3 -relief flat");
+  this->SaveFrame->Create(app);
+  this->SaveFrame->SetBorderWidth(3);
 
-  this->SaveButton->Create(app, "-text Save -width 16");
+  this->SaveButton->Create(app);
+  this->SaveButton->SetText("Save");
+  this->SaveButton->SetWidth(16);
   this->SaveButton->SetCommand(this, "Save");
 
   this->Script("pack %s -side left -expand yes",
@@ -89,9 +92,12 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
                             "configure -relief flat");
     this->SaveButton->SetBind(this, "<Return>", "Save");
     }
-  this->RetraceFrame->Create(app, "-bd 3 -relief flat");
+  this->RetraceFrame->Create(app);
+  this->SaveFrame->SetBorderWidth(3);
 
-  this->RetraceButton->Create(app, "-text Recover -width 16");
+  this->RetraceButton->Create(app);
+  this->RetraceButton->SetText("Recover");
+  this->RetraceButton->SetWidth(16);
   this->RetraceButton->SetCommand(this, "Retrace");
 
   this->Script("pack %s -side left -expand yes",

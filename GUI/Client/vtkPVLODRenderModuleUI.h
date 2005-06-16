@@ -26,6 +26,7 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkKWFrameLabeled;
+class vtkKWFrame;
 class vtkKWScale;
 class vtkKWCheckButton;
 class vtkLabeledFrame;
@@ -49,8 +50,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Create the TK widgets associated with the view.
-  virtual void Create(vtkKWApplication *app, const char *);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Callback for the interrupt render check button
@@ -126,7 +127,7 @@ protected:
   vtkKWFrameLabeled *LODFrame;
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
 
-  vtkKWWidget*      LODScalesFrame;
+  vtkKWFrame*       LODScalesFrame;
   vtkKWLabel*       LODThresholdLabel;
   vtkKWCheckButton* LODCheck;
   vtkKWScale*       LODThresholdScale;

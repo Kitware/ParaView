@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.4");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.5");
 
 int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -81,8 +81,7 @@ vtkPVComparativeVisManagerGUI::~vtkPVComparativeVisManagerGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeVisManagerGUI::Create(
-  vtkKWApplication *app, const char *args)
+void vtkPVComparativeVisManagerGUI::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -93,21 +92,21 @@ void vtkPVComparativeVisManagerGUI::Create(
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app, "");
+  this->MainFrame->Create(app);
   this->Script("pack %s -padx 5 -pady 5 -expand t -fill both", 
                this->MainFrame->GetWidgetName());
 
   this->ListFrame->SetParent(this->MainFrame);
-  this->ListFrame->Create(app, "");
+  this->ListFrame->Create(app);
   this->ListFrame->SetLabelText("Current Visualizations");
   this->Script("pack %s -side top -expand t -fill both", 
                this->ListFrame->GetWidgetName());
 
   this->ComparativeVisList->SetParent(this->ListFrame->GetFrame());
-  this->ComparativeVisList->Create(app, "");
+  this->ComparativeVisList->Create(app);
   this->Script("pack %s -side top -pady 5 -expand t -fill both", 
                this->ComparativeVisList->GetWidgetName());
 
@@ -115,13 +114,13 @@ void vtkPVComparativeVisManagerGUI::Create(
   this->ComparativeVisList->SetSingleClickCallback(this, "ItemSelected");
 
   this->CommandFrame->SetParent(this->MainFrame);
-  this->CommandFrame->Create(app, "");
+  this->CommandFrame->Create(app);
   this->Script("pack %s -side top -pady 5 -expand t -fill x", 
                this->CommandFrame->GetWidgetName());
 
   this->CreateButton->SetParent(this->CommandFrame);
   this->CreateButton->SetBalloonHelpString("Create a visualization");
-  this->CreateButton->Create(app, "");
+  this->CreateButton->Create(app);
   this->CreateButton->SetWidth(7);
   this->CreateButton->SetCommand(this, "AddVisualization");
   this->CreateButton->SetText("Create");
@@ -129,7 +128,7 @@ void vtkPVComparativeVisManagerGUI::Create(
 
   this->DeleteButton->SetParent(this->CommandFrame);
   this->DeleteButton->SetBalloonHelpString("Delete a visualization");
-  this->DeleteButton->Create(app, "");
+  this->DeleteButton->Create(app);
   this->DeleteButton->SetWidth(7);
   this->DeleteButton->SetCommand(this, "DeleteVisualization");
   this->DeleteButton->SetText("Delete");
@@ -138,7 +137,7 @@ void vtkPVComparativeVisManagerGUI::Create(
 
   this->EditButton->SetParent(this->CommandFrame);
   this->EditButton->SetBalloonHelpString("Edit a visualization");
-  this->EditButton->Create(app, "");
+  this->EditButton->Create(app);
   this->EditButton->SetWidth(7);
   this->EditButton->SetCommand(this, "EditVisualization");
   this->EditButton->SetText("Edit");
@@ -146,7 +145,7 @@ void vtkPVComparativeVisManagerGUI::Create(
 
   this->ShowButton->SetParent(this->CommandFrame);
   this->ShowButton->SetBalloonHelpString("Show a visualization");
-  this->ShowButton->Create(app, "");
+  this->ShowButton->Create(app);
   this->ShowButton->SetWidth(7);
   this->ShowButton->SetCommand(this, "ShowVisualization");
   this->ShowButton->SetText("Show");
@@ -154,7 +153,7 @@ void vtkPVComparativeVisManagerGUI::Create(
 
   this->HideButton->SetParent(this->CommandFrame);
   this->HideButton->SetBalloonHelpString("Hide a visualization");
-  this->HideButton->Create(app, "");
+  this->HideButton->Create(app);
   this->HideButton->SetWidth(7);
   this->HideButton->SetCommand(this, "HideVisualization");
   this->HideButton->SetText("Hide");
@@ -162,7 +161,7 @@ void vtkPVComparativeVisManagerGUI::Create(
 
   this->CloseButton->SetParent(this->MainFrame);
   this->CloseButton->SetBalloonHelpString("Close the visualization dialog");
-  this->CloseButton->Create(app, "");
+  this->CloseButton->Create(app);
   this->CloseButton->SetCommand(this, "Withdraw");
   this->CloseButton->SetText("Close");
   this->Script("pack %s -side top -expand t -fill x", 
@@ -171,7 +170,7 @@ void vtkPVComparativeVisManagerGUI::Create(
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   this->Manager->SetApplication(pvApp);
 
-  this->EditDialog->Create(app, "");
+  this->EditDialog->Create(app);
   this->EditDialog->SetMasterWindow(pvApp->GetMainWindow());
   this->EditDialog->SetTitle("Edit visualization");
 

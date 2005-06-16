@@ -44,7 +44,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.17");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.18");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 
 //*****************************************************************************
@@ -160,7 +160,7 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::Create(vtkKWApplication* app, const char* args)
+void vtkPVKeyFrame::Create(vtkKWApplication* app)
 {
   if (!this->KeyFrameProxyXMLName)
     {
@@ -174,7 +174,7 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app, const char* args)
     return;
     }
   
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed to create the widget");
     return;
@@ -209,7 +209,7 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app, const char* args)
 void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 {
   this->TimeLabel->SetParent(this);
-  this->TimeLabel->Create(app, 0);
+  this->TimeLabel->Create(app);
   this->TimeLabel->SetText("Time:");
   
   this->TimeThumbWheel->SetParent(this);
@@ -217,7 +217,7 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->TimeThumbWheel->SetValue(0.0);
   this->TimeThumbWheel->SetMinimumValue(0.0);
   this->TimeThumbWheel->SetResolution(0.01);
-  this->TimeThumbWheel->Create(app, NULL);
+  this->TimeThumbWheel->Create(app);
   this->TimeThumbWheel->DisplayEntryOn();
   this->TimeThumbWheel->DisplayLabelOff();
   this->TimeThumbWheel->DisplayEntryAndLabelOnTopOff();
@@ -226,19 +226,19 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->TimeThumbWheel->SetEndCommand(this, "TimeChangedCallback");
 
   this->ValueLabel->SetParent(this);
-  this->ValueLabel->Create(app, 0);
+  this->ValueLabel->Create(app);
   this->ValueLabel->SetText("Value:");
   this->CreateValueWidget();
 
   this->MinButton->SetParent(this);
-  this->MinButton->Create(this->GetApplication(),0);
+  this->MinButton->Create(this->GetApplication());
   this->MinButton->SetText("min");
   this->MinButton->SetBalloonHelpString(
     "Set the value to the minimum possible, given the "
     "current state of the system.");
   this->MinButton->SetCommand(this,"MinimumCallback");
   this->MaxButton->SetParent(this);
-  this->MaxButton->Create(this->GetApplication(),0);
+  this->MaxButton->Create(this->GetApplication());
   this->MaxButton->SetText("max");
   this->MaxButton->SetBalloonHelpString(
     "Set the value to the maximum possible, given the "
@@ -321,7 +321,7 @@ void vtkPVKeyFrame::CreateValueWidget()
       vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
       pvWheel->SetParent(this);
       pvWheel->PopupModeOn();
-      pvWheel->Create(this->GetApplication(), 0);
+      pvWheel->Create(this->GetApplication());
       pvWheel->DisplayEntryOn();
       pvWheel->DisplayLabelOff();
       pvWheel->DisplayEntryAndLabelOnTopOff();

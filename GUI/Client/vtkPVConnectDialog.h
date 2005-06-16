@@ -45,7 +45,9 @@ public:
   vtkTypeRevisionMacro(vtkPVConnectDialog, vtkKWMessageDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication* app, const char* opts);
+  // Create the widget.
+  void Create(vtkKWApplication* app);
+
   void OK();
   void SetHostname(const char* hn);
   const char* GetHostName();

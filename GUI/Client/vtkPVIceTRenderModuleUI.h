@@ -31,7 +31,9 @@ public:
   vtkTypeRevisionMacro(vtkPVIceTRenderModuleUI,vtkPVMultiDisplayRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication *app, const char *);
+  // Description:
+  // Create the widget.
+  void Create(vtkKWApplication *app);
 
   // Description:
   // Threshold for collecting geometry to the client (vs. showing the outline

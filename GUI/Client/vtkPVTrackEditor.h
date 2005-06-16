@@ -40,7 +40,9 @@ public:
   vtkTypeRevisionMacro(vtkPVTrackEditor, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void Create(vtkKWApplication* app, const char*args);
+  // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app);
 
   // Description:
   // Animation Manager must be set before calling create.

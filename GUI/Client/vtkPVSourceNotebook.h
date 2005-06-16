@@ -36,6 +36,7 @@ class vtkPVApplication;
 class vtkPVInformationGUI;
 class vtkPVDisplayGUI;
 class vtkKWLabel;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVSourceNotebook : public vtkKWWidget
 {
@@ -47,7 +48,7 @@ public:
     
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Since thie GUI is shared, the call backs need a source
@@ -91,7 +92,7 @@ public:
   // Description:
   // This is where the source will put its custom widgets.
   // Parent of sources parameter frames.
-  vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
+  vtkGetObjectMacro(MainParameterFrame, vtkKWFrame);
 
   // Description:
   // Just a safe down cast of application.
@@ -125,16 +126,16 @@ protected:
   vtkKWNotebook* Notebook;
   vtkPVDisplayGUI* DisplayGUI;
   vtkPVInformationGUI* InformationGUI;
-  vtkKWWidget *DescriptionFrame;
+  vtkKWFrame *DescriptionFrame;
   vtkKWLabelLabeled *NameLabel;
   vtkKWLabelLabeled *TypeLabel;
   vtkKWEntryLabeled *LabelEntry;
   vtkKWLabelLabeled *LongHelpLabel;
-  vtkKWWidget *ButtonFrame;
+  vtkKWFrame *ButtonFrame;
   vtkKWPushButtonWithMenu *AcceptButton;
   vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;
-  vtkKWWidget *MainParameterFrame;
+  vtkKWFrame *MainParameterFrame;
 
   vtkKWPushButton* AcceptPullDownArrow;
   

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.37");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -67,18 +67,20 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
   // Now a label
-  this->Label->Create(pvApp, "-width 18 -justify right");
+  this->Label->Create(pvApp);
+  this->Label->SetWidth(18);
+  this->Label->SetJustificationToRight();
   this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the check button
-  this->CheckButton->Create(pvApp, "");
+  this->CheckButton->Create(pvApp);
   this->CheckButton->SetCommand(this, "ModifiedCallback");
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
 }

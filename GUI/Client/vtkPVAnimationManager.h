@@ -93,7 +93,9 @@ public:
   vtkTypeRevisionMacro(vtkPVAnimationManager, vtkPVTracedWidget);
   void PrintSelf(ostream& os ,vtkIndent indent);
 
-  virtual void Create(vtkKWApplication* app, const char* args);
+  // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app);
   
   // Description:
   // Set the parent frames for the vertical and horizontal animation guis.

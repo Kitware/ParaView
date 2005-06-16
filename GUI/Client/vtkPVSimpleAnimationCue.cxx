@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.8");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.9");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -174,10 +174,10 @@ void vtkPVSimpleAnimationCue::Observe(vtkObject* toObserve, unsigned long event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSimpleAnimationCue::CreateWidget(vtkKWApplication* app, const char* type, 
-  const char* args)
+void vtkPVSimpleAnimationCue::CreateWidget(vtkKWApplication* app, 
+                                           const char* command)
 {
-  if (!this->Superclass::Create(app, type, args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, command))
     {
     return;
     }
@@ -645,7 +645,7 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->SetAnimationCueProxy(this->GetCueProxy()); 
   // provide a pointer to cue, so that the interace
   // can be in accordance with the animated proeprty.
-  keyframe->Create(this->GetApplication(),NULL);
+  keyframe->Create(this->GetApplication());
   keyframe->SetDuration(this->Duration);
   keyframe->SetKeyTime(time);
   keyframe->SetKeyValue(0);

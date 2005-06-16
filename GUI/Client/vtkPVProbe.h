@@ -23,6 +23,7 @@
 
 class vtkKWCheckButton;
 class vtkKWLabel;
+class vtkKWFrame;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkSMXYPlotDisplayProxy;
@@ -69,9 +70,9 @@ protected:
 
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
-  vtkKWWidget *ProbeFrame;
+  vtkKWFrame *ProbeFrame;
 
-  vtkKWWidget *SelectedPointFrame;
+  vtkKWFrame *SelectedPointFrame;
   vtkKWLabel *SelectedPointLabel;
   vtkKWLabel *PointDataLabel;
   

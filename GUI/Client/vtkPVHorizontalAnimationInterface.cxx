@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.19");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -64,18 +64,18 @@ vtkPVHorizontalAnimationInterface::~vtkPVHorizontalAnimationInterface()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char* args)
+void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
-  if (!this->Superclass::Create(pvApp, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
  
   this->ScrollFrame->SetParent(this);
-  this->ScrollFrame->Create(app, "");
+  this->ScrollFrame->Create(app);
   this->Script("pack %s -side top -fill both -expand t",
     this->ScrollFrame->GetWidgetName());
   
@@ -89,11 +89,11 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
 
   
   this->TimeLineFrame->SetParent(this->SplitFrame->GetFrame2());
-  this->TimeLineFrame->Create(app, "-relief flat");
+  this->TimeLineFrame->Create(app);
   this->Script("pack %s -anchor n -side top -fill x -expand t",
     this->TimeLineFrame->GetWidgetName());
   this->PropertiesFrame->SetParent(this->SplitFrame->GetFrame1());
-  this->PropertiesFrame->Create(app,"-relief flat");
+  this->PropertiesFrame->Create(app);
   this->Script("pack %s -anchor n -side top -fill x -expand t",
     this->PropertiesFrame->GetWidgetName());
 
@@ -101,7 +101,7 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
   this->ParentTree->SetTimeLineParent(this->TimeLineFrame);
   this->ParentTree->SetLabelText("Animation Tracks");
   this->ParentTree->SetEnableZoom(1);
-  this->ParentTree->Create(app, "-relief flat");
+  this->ParentTree->Create(app);
   this->InitializeObservers(this->ParentTree);
   this->ParentTree->PackWidget(); 
   this->ParentTree->SetExpanded(1);
@@ -202,6 +202,11 @@ void vtkPVHorizontalAnimationInterface::ExecuteEvent(vtkObject* ,
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::ResizeCallback()
 {
+  // Not sure this code is still needed, please get back to me
+  // if it does not behave correctly, but since the animation stuff has
+  // been parented to the secondary split frame / interface manager,
+  // and several layout behavior have been checked, this might just work
+
   if (!this->IsCreated())
     {
     return;
@@ -224,11 +229,7 @@ void vtkPVHorizontalAnimationInterface::ResizeCallback()
  
   int height = splitframeheight; //(parentheight > splitframeheight)? parentheight : splitframeheight;
 
-  ostrstream str;
-  str << "-height " << height << ends;
-  this->SplitFrame->ConfigureOptions(str.str());
-  
-  str.rdbuf()->freeze(0);
+  this->SplitFrame->SetConfigurationOptionAsInt("-height", height);
 }
 
 //-----------------------------------------------------------------------------

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.8");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.9");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -167,7 +167,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
     return;
     }
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -180,16 +180,16 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->Script("frame %s -borderwidth 0", wname);
 
   this->LmkFrame->SetParent(this);
-  this->LmkFrame->Create(app,0);
+  this->LmkFrame->Create(app);
 
   this->Checkbox->SetParent(this->LmkFrame);
   this->Checkbox->SetIndicator(1);
-  this->Checkbox->Create(app, "");
+  this->Checkbox->Create(app);
   this->Checkbox->SetState(0);
 
   this->LmkMainFrame->SetParent(this->LmkFrame);
   this->LmkMainFrame->ShowHideFrameOn();
-  this->LmkMainFrame->Create(app, 0);
+  this->LmkMainFrame->Create(app);
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
 
@@ -197,17 +197,17 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
     this->LmkMainFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
-  this->SeparatorFrame->Create(app,"");
+  this->SeparatorFrame->Create(app);
 
 
   this->LmkLeftFrame->SetParent(this->LmkMainFrame->GetFrame());
-  this->LmkLeftFrame->Create(app,0);
+  this->LmkLeftFrame->Create(app);
 
   this->LmkRightFrame->SetParent(this->LmkMainFrame->GetFrame());
-  this->LmkRightFrame->Create(app,0);
+  this->LmkRightFrame->Create(app);
 
   this->LmkIcon->SetParent(this->LmkLeftFrame);
-  this->LmkIcon->Create(app, "");
+  this->LmkIcon->Create(app);
 
   this->LmkIcon->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
@@ -233,29 +233,29 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
 
   this->LmkDatasetFrame->SetParent(this->LmkRightFrame);
-  this->LmkDatasetFrame->Create(app, 0);
+  this->LmkDatasetFrame->Create(app);
 
 
   this->LmkDatasetLabel->SetParent(this->LmkDatasetFrame);
-  this->LmkDatasetLabel->Create(app, "");
+  this->LmkDatasetLabel->Create(app);
   this->LmkDatasetLabel->SetText("Dataset: ");
 
   this->LmkDatasetCheckbox->SetParent(this->LmkDatasetFrame);
-  this->LmkDatasetCheckbox->Create(app, "");
+  this->LmkDatasetCheckbox->Create(app);
   this->LmkDatasetCheckbox->GetWidget()->SetIndicator(1);
   this->LmkDatasetCheckbox->GetWidget()->SetState(1);
   this->LmkDatasetCheckbox->GetLabel()->SetText("Lock to Dataset");
 
   this->LmkCommentsFrame->SetParent(this->LmkRightFrame);
   this->LmkCommentsFrame->ShowHideFrameOn();
-  this->LmkCommentsFrame->Create(app, 0);
+  this->LmkCommentsFrame->Create(app);
   this->LmkCommentsFrame->SetLabelText("Comments:");
 
   this->LmkCommentsText->SetParent(this->LmkCommentsFrame->GetFrame());
-  this->LmkCommentsText->Create(app, "");
+  this->LmkCommentsText->Create(app);
 
   this->LmkNameField->SetParent(this->LmkMainFrame->GetLabelFrame());
-  this->LmkNameField->Create(app, "");
+  this->LmkNameField->Create(app);
 
   this->Pack();
 

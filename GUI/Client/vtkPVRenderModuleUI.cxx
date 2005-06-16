@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.12");
 vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
 //----------------------------------------------------------------------------
 
@@ -69,11 +69,11 @@ vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
+void vtkPVRenderModuleUI::Create(vtkKWApplication* app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

@@ -17,6 +17,7 @@
 #include "vtkKWApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
@@ -29,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.16");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.17");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -42,19 +43,19 @@ vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
   this->FilePath = NULL;
   this->FileRoot = NULL;
 
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->AcceptButton = vtkKWPushButton::New();
   this->CancelButton = vtkKWPushButton::New();
   
   this->OffScreenCheck = vtkKWCheckButton::New();
 
   this->SaveImagesCheck = vtkKWCheckButton::New();
-  this->ImageFileNameFrame = vtkKWWidget::New();
+  this->ImageFileNameFrame = vtkKWFrame::New();
   this->ImageFileNameEntry = vtkKWEntry::New();
   this->ImageFileNameBrowseButton = vtkKWPushButton::New();
 
   this->SaveGeometryCheck = vtkKWCheckButton::New();
-  this->GeometryFileNameFrame = vtkKWWidget::New();
+  this->GeometryFileNameFrame = vtkKWFrame::New();
   this->GeometryFileNameEntry = vtkKWEntry::New();
   this->GeometryFileNameBrowseButton = vtkKWPushButton::New();
 
@@ -134,7 +135,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "toplevel", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "toplevel"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -146,24 +147,24 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->Script("wm iconname %s \"vtk\"", wname);
 
   this->OffScreenCheck->SetParent(this);
-  this->OffScreenCheck->Create(app, 0);
+  this->OffScreenCheck->Create(app);
   this->OffScreenCheck->SetText("Offscreen");
 
   this->SaveImagesCheck->SetParent(this);
-  this->SaveImagesCheck->Create(app, 0);
+  this->SaveImagesCheck->Create(app);
   this->SaveImagesCheck->SetState(1);
   this->SaveImagesCheck->SetText("Save Images");
   this->SaveImagesCheck->SetCommand(this, "SaveImagesCheckCallback");
   this->ImageFileNameFrame->SetParent(this);
-  this->ImageFileNameFrame->Create(app, "frame", 0);
+  this->ImageFileNameFrame->Create(app);
 
   this->SaveGeometryCheck->SetParent(this);
-  this->SaveGeometryCheck->Create(app, 0);
+  this->SaveGeometryCheck->Create(app);
   this->SaveGeometryCheck->SetState(0);
   this->SaveGeometryCheck->SetText("Save Geometry");
   this->SaveGeometryCheck->SetCommand(this, "SaveGeometryCheckCallback");
   this->GeometryFileNameFrame->SetParent(this);
-  this->GeometryFileNameFrame->Create(app, "frame", 0);
+  this->GeometryFileNameFrame->Create(app);
 
   this->Script("pack %s %s -side top -padx 2 -anchor w",
                this->OffScreenCheck->GetWidgetName(),
@@ -182,14 +183,14 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
     }
    
   this->ImageFileNameEntry->SetParent(this->ImageFileNameFrame);
-  this->ImageFileNameEntry->Create(app, 0);
+  this->ImageFileNameEntry->Create(app);
   if (fileName)
     {
     sprintf(fileName, "%s/%s.jpg", this->FilePath, this->FileRoot);
     this->ImageFileNameEntry->SetValue(fileName);
     }
   this->ImageFileNameBrowseButton->SetParent(this->ImageFileNameFrame);
-  this->ImageFileNameBrowseButton->Create(app, 0);
+  this->ImageFileNameBrowseButton->Create(app);
   this->ImageFileNameBrowseButton->SetText("Browse");
   this->ImageFileNameBrowseButton->SetCommand(this, "ImageFileNameBrowseButtonCallback");
   this->Script("pack %s -side right -expand 0 -padx 2",
@@ -199,14 +200,14 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 
 
   this->GeometryFileNameEntry->SetParent(this->GeometryFileNameFrame);
-  this->GeometryFileNameEntry->Create(app, 0);
+  this->GeometryFileNameEntry->Create(app);
   if (fileName)
     {
     sprintf(fileName, "%s/%s.vtp", this->FilePath, this->FileRoot);
     this->GeometryFileNameEntry->SetValue(fileName);
     }
   this->GeometryFileNameBrowseButton->SetParent(this->GeometryFileNameFrame);
-  this->GeometryFileNameBrowseButton->Create(app, 0);
+  this->GeometryFileNameBrowseButton->Create(app);
   this->GeometryFileNameBrowseButton->SetText("Browse");
   this->GeometryFileNameBrowseButton->SetCommand(this, "GeometryFileNameBrowseButtonCallback");
 
@@ -221,15 +222,15 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(app, "frame", "");
+  this->ButtonFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
   this->AcceptButton->SetParent(this->ButtonFrame);
-  this->AcceptButton->Create(app, "");
+  this->AcceptButton->Create(app);
   this->AcceptButton->SetCommand(this, "Accept");
   this->AcceptButton->SetText("Accept");
   this->CancelButton->SetParent(this->ButtonFrame);
-  this->CancelButton->Create(app, "");
+  this->CancelButton->Create(app);
   this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetText("Cancel");
   this->Script("pack %s %s -side left -expand 1 -fill x -padx 2",
@@ -329,7 +330,7 @@ void vtkPVSaveBatchScriptDialog::ImageFileNameBrowseButtonCallback()
 {
   ostrstream str;
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
-  loadDialog->Create(this->GetPVApplication(), 0);
+  loadDialog->Create(this->GetPVApplication());
   loadDialog->SetTitle("Select File Pattern");
 
   // Look for the current extension.
@@ -378,7 +379,7 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
 {
   ostrstream str;
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
-  loadDialog->Create(this->GetPVApplication(), 0);
+  loadDialog->Create(this->GetPVApplication());
   loadDialog->SetTitle("Select Geometry File Pattern");
 
   // Look for the current extension.

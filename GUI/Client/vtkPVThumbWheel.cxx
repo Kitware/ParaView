@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.16");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -56,14 +56,15 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
   // Now a label
-  this->Label->Create(pvApp, "-justify right");
+  this->Label->Create(pvApp);
+  this->Label->SetJustificationToRight();
   if (strlen(this->Label->GetText()) > 0)
     {
     this->Label->SetWidth(18);
@@ -72,7 +73,7 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
   
   // Now the thumb wheel
   this->ThumbWheel->PopupModeOn();
-  this->ThumbWheel->Create(pvApp, "");
+  this->ThumbWheel->Create(pvApp);
   this->ThumbWheel->DisplayEntryOn();
   this->ThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->ThumbWheel->ExpandEntryOn();

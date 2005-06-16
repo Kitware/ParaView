@@ -46,7 +46,7 @@ public:
   
   // Desription:
   // Create the widget.
-  void Create(vtkKWApplication *app, const char *args);
+  void Create(vtkKWApplication *app);
   
   // Description:
   // Callbacks for the 3 buttons.

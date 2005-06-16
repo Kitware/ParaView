@@ -17,6 +17,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWLabel.h"
+#include "vtkKWFrame.h"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWWidget.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.29");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -42,7 +43,7 @@ vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 {
   this->CommandFunction = vtkPVExtractPartsWidgetCommand;
   
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();
 
@@ -71,7 +72,7 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -80,17 +81,17 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(pvApp, "frame", "");
+  this->ButtonFrame->Create(pvApp);
   this->Script("pack %s -side top -fill x",
                this->ButtonFrame->GetWidgetName());
 
   this->AllOnButton->SetParent(this->ButtonFrame);
-  this->AllOnButton->Create(pvApp, "");
+  this->AllOnButton->Create(pvApp);
   this->AllOnButton->SetText("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
 
   this->AllOffButton->SetParent(this->ButtonFrame);
-  this->AllOffButton->Create(pvApp, "");
+  this->AllOffButton->Create(pvApp);
   this->AllOffButton->SetText("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
 
@@ -99,11 +100,11 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
                this->AllOffButton->GetWidgetName());
 
   this->PartSelectionList->SetParent(this);
-  this->PartSelectionList->Create(app, "");
+  this->PartSelectionList->Create(app);
   this->PartSelectionList->SetSingleClickCallback(this, "PartSelectionCallback");
   this->PartSelectionList->ScrollbarOff();
-  this->PartSelectionList->GetListbox()->
-    ConfigureOptions("-selectmode extended -exportselection 0");
+  this->PartSelectionList->SetSelectionModeToExtended();
+  this->PartSelectionList->ExportSelectionOff();
   this->PartSelectionList->SetSelectState(0,1); //By default take first one
   this->PartSelectionList->SetHeight(0);
   // I assume we need focus for control and alt modifiers.
@@ -142,7 +143,7 @@ void vtkPVExtractPartsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(this->PartSelectionList->GetItem(idx));
-      label->Create(this->GetApplication(), "");
+      label->Create(this->GetApplication());
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

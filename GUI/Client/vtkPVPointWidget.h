@@ -77,6 +77,7 @@ public:
   void SetVisibility(int v);  
 
   // Description:
+  // Create the widget.
   // Overridden to set up control dependencies among properties.
   virtual void Create(vtkKWApplication* app);
 

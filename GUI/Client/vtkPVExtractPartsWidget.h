@@ -25,10 +25,12 @@
 #define __vtkPVExtractPartsWidget_h
 
 #include "vtkPVWidget.h"
+
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
 class vtkCollection;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVExtractPartsWidget : public vtkPVWidget
 {
@@ -38,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set up the UI for this source
+  // Create the widget.
   void Create(vtkKWApplication *app);
 
   // Description:
@@ -83,7 +85,7 @@ protected:
   vtkPVExtractPartsWidget();
   ~vtkPVExtractPartsWidget();
 
-  vtkKWWidget* ButtonFrame;
+  vtkKWFrame* ButtonFrame;
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
 

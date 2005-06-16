@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.27");
+vtkCxxRevisionMacro(vtkPVValueList, "1.28");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -147,23 +147,23 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->ContourValuesFrame->SetParent(this); 
-  this->ContourValuesFrame->Create(app, "");
+  this->ContourValuesFrame->Create(app);
   this->Script("pack %s -expand yes -fill x",
                this->ContourValuesFrame->GetWidgetName());
 
   this->ContourValuesFrame2->SetParent(this->ContourValuesFrame->GetFrame()); 
-  this->ContourValuesFrame2->Create(app, "");
+  this->ContourValuesFrame2->Create(app);
   this->Script("pack %s", this->ContourValuesFrame2->GetWidgetName());
 
   this->ContourValuesList->SetParent(this->ContourValuesFrame2);
-  this->ContourValuesList->Create(app, "");
+  this->ContourValuesList->Create(app);
   this->ContourValuesList->SetHeight(5);
   this->Script("bind %s <Delete> {%s DeleteValueCallback}",
                this->ContourValuesList->GetWidgetName(),
@@ -171,18 +171,20 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 
   this->ContourValuesButtonsFrame->SetParent(
     this->ContourValuesFrame2);
-  this->ContourValuesButtonsFrame->Create(app, "");
+  this->ContourValuesButtonsFrame->Create(app);
 
   this->DeleteValueButton->SetParent(
     this->ContourValuesButtonsFrame);
-  this->DeleteValueButton->Create(app, "-text {Delete}");
+  this->DeleteValueButton->Create(app);
+  this->DeleteValueButton->SetText("Delete");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
   this->DeleteValueButton->SetBalloonHelpString(
     "Remove the currently selected value from the list");
 
   this->DeleteAllButton->SetParent(
     this->ContourValuesButtonsFrame);
-  this->DeleteAllButton->Create(app, "-text {Delete All}");
+  this->DeleteAllButton->Create(app);
+  this->DeleteAllButton->SetText("Delete All");
   this->DeleteAllButton->SetCommand(this, "RemoveAllValues");
   this->DeleteAllButton->SetBalloonHelpString(
     "Remove all entries from the list");
@@ -203,13 +205,13 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->NewValueFrame->SetParent(this);
   this->NewValueFrame->SetLabelText("Add value");
-  this->NewValueFrame->Create(app, "");
+  this->NewValueFrame->Create(app);
   
   this->Script("pack %s -expand yes -fill x",
                this->NewValueFrame->GetWidgetName());
   
   this->NewValueLabel->SetParent(this->NewValueFrame->GetFrame());
-  this->NewValueLabel->Create(app, "");
+  this->NewValueLabel->Create(app);
   this->NewValueLabel->SetText("New Value");
   this->NewValueLabel->SetBalloonHelpString("Enter a new value");
   this->NewValueLabel->SetWidth(17);
@@ -217,7 +219,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
     "Add a single value to the list");
   
   this->NewValueEntry->SetParent(this->NewValueFrame->GetFrame());
-  this->NewValueEntry->Create(app, "");
+  this->NewValueEntry->Create(app);
   this->NewValueEntry->SetDisplayEntryAndLabelOnTop(0);
   this->NewValueEntry->DisplayEntry();
   this->NewValueEntry->SetRange(-VTK_LARGE_FLOAT, 
@@ -231,7 +233,8 @@ void vtkPVValueList::Create(vtkKWApplication *app)
     "Add a single value to the list");
   
   this->AddValueButton->SetParent(this->NewValueFrame->GetFrame());
-  this->AddValueButton->Create(app, "-text {Add}");
+  this->AddValueButton->Create(app);
+  this->AddValueButton->SetText("Add");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
   this->AddValueButton->SetBalloonHelpString("Add the new value to the list");
   this->AddValueButton->SetWidth(10);
@@ -247,24 +250,24 @@ void vtkPVValueList::Create(vtkKWApplication *app)
                this->AddValueButton->GetWidgetName());
   
   this->GenerateFrame->SetParent(this);
-  this->GenerateFrame->Create(app, "");
+  this->GenerateFrame->Create(app);
   this->GenerateFrame->SetLabelText("Generate range of values");
   
   this->Script("pack %s -fill x -expand yes", 
                this->GenerateFrame->GetWidgetName());
 
   this->GenerateNumberFrame->SetParent(this->GenerateFrame->GetFrame());
-  this->GenerateNumberFrame->Create(app, "");
+  this->GenerateNumberFrame->Create(app);
   this->Script("pack %s -fill x -expand yes", 
                this->GenerateNumberFrame->GetWidgetName());
   
   this->GenerateLabel->SetParent(this->GenerateNumberFrame);
-  this->GenerateLabel->Create(app, "");
+  this->GenerateLabel->Create(app);
   this->GenerateLabel->SetText("Number of Values");
   this->GenerateLabel->SetWidth(17);
   
   this->GenerateEntry->SetParent(this->GenerateNumberFrame);
-  this->GenerateEntry->Create(app, "");
+  this->GenerateEntry->Create(app);
   this->GenerateEntry->SetDisplayEntryAndLabelOnTop(0);
   this->GenerateEntry->DisplayEntry();
   this->GenerateEntry->SetRange(1, vtkPVValueList::MAX_NUMBER_ENTRIES);
@@ -275,7 +278,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
     "The number of values to be added to the list");
   
   this->GenerateButton->SetParent(this->GenerateNumberFrame);
-  this->GenerateButton->Create(app, "");
+  this->GenerateButton->Create(app);
   this->GenerateButton->SetText("Generate");
   this->GenerateButton->SetWidth(10);
   this->GenerateButton->SetCommand(this, "GenerateValuesCallback");
@@ -293,19 +296,19 @@ void vtkPVValueList::Create(vtkKWApplication *app)
                this->GenerateButton->GetWidgetName());
   
   this->GenerateRangeFrame->SetParent(this->GenerateFrame->GetFrame());
-  this->GenerateRangeFrame->Create(app, "");
+  this->GenerateRangeFrame->Create(app);
   this->Script("pack %s -fill x -expand yes -pady 3", 
                this->GenerateRangeFrame->GetWidgetName());
 
   this->GenerateRangeLabel->SetParent(this->GenerateRangeFrame);
-  this->GenerateRangeLabel->Create(app, "");
+  this->GenerateRangeLabel->Create(app);
   this->GenerateRangeLabel->SetText("Range");
   this->GenerateRangeLabel->SetWidth(17);
   this->GenerateRangeLabel->SetBalloonHelpString(
     "Set the minimum and maximum of the values to be added");
 
   this->GenerateRangeWidget->SetParent(this->GenerateRangeFrame);
-  this->GenerateRangeWidget->Create(app, "");
+  this->GenerateRangeWidget->Create(app);
   this->GenerateRangeWidget->SetWholeRange(
     -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
   this->GenerateRangeWidget->ShowEntriesOn();

@@ -30,6 +30,7 @@ class vtkKWLabel;
 class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkPVArraySelectionArraySet;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
@@ -63,7 +64,7 @@ public:
   vtkGetStringMacro(LabelText);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
@@ -119,11 +120,11 @@ protected:
  
   vtkKWFrameLabeled* LabeledFrame;
  
-  vtkKWWidget* ButtonFrame;
+  vtkKWFrame* ButtonFrame;
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
 
-  vtkKWWidget *CheckFrame;
+  vtkKWFrame *CheckFrame;
   vtkCollection* ArrayCheckButtons;
   vtkKWLabel *NoArraysLabel;
 

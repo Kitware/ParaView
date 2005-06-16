@@ -38,8 +38,8 @@ public:
   virtual void Initialize();
   
   // Description:
-  // Create the TK widgets associated with the view.
-  virtual void Create(vtkKWApplication *app, const char *);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
       
   // Description:
   // Callback for the use char check button.  

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.64");
+vtkCxxRevisionMacro(vtkPVScale, "1.65");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -147,7 +147,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -167,19 +167,16 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   
   // Now a label
   this->LabelWidget->SetParent(this);
-  this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+  this->LabelWidget->Create(pvApp);
+  this->LabelWidget->SetWidth(18);
+  this->LabelWidget->SetJustificationToRight();
   this->LabelWidget->SetText(this->EntryLabel);
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
 
   this->Scale->SetParent(this);
-  if (this->DisplayValueFlag)
-    {
-    this->Scale->Create(this->GetApplication(), "-showvalue 1");
-    }
-  else
-    {
-    this->Scale->Create(this->GetApplication(), "-showvalue 0");
-    }
+  this->Scale->Create(this->GetApplication());
+  this->Scale->GetScale()->SetConfigurationOptionAsInt(
+    "-showvalue", this->DisplayValueFlag ? 1 : 0);
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");
   if (this->TraceSliderMovement)

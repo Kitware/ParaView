@@ -42,11 +42,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the 3DWidget. 
+  // Create the widget. 
   // Creates a SM3DWidgetProxy. The actual proxy XML name is
   // determined using WidgetProxyXMLName which is set by derrived
   // clases of this class.
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Set the widget visibility. 

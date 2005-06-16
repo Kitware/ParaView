@@ -31,6 +31,8 @@ public:
   vtkTypeRevisionMacro(vtkPVStringEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Create the widgets.
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:

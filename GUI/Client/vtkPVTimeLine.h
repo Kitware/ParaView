@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app, const char* args);
+  virtual void Create(vtkKWApplication* app);
   
   virtual int HasFunction();
   virtual int GetFunctionSize();

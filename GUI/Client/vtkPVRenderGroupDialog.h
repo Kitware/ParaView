@@ -20,9 +20,11 @@
 #define __vtkPVRenderGroupDialog_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 class vtkKWPushButton;
 class vtkKWEntry;
+class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWWindow;
 class vtkKWEntry;
@@ -36,7 +38,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create a Tk widget
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
   
   // Description:
@@ -87,14 +89,14 @@ protected:
   
   vtkKWWindow*      MasterWindow;
 
-  vtkKWWidget*      ControlFrame;
+  vtkKWFrame*      ControlFrame;
   vtkKWPushButton*  SaveButton;
   vtkKWPushButton*  ClearButton;
   vtkKWLabel*       NumberLabel;
   vtkKWEntry*       NumberEntry;
 
   int               DisplayFlag;
-  vtkKWWidget*      DisplayFrame;
+  vtkKWFrame*      DisplayFrame;
   vtkKWLabel*       Display0Label;
   vtkKWEntry**      DisplayEntries;
   char*             DisplayStringRoot;

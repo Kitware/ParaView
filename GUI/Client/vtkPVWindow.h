@@ -61,6 +61,7 @@ class vtkCollection;
 class vtkPVGenericRenderWindowInteractor;
 class vtkKWCheckButton;
 class vtkKWEntry;
+class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
@@ -117,7 +118,7 @@ public:
   // Create the window and all of the associated widgets. This
   // essentially creates the whole user interface. ParaView supports
   // only one window.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Access to the RenderView.
@@ -651,7 +652,7 @@ protected:
   vtkKWPushButton *ResetCenterButton;
   vtkKWPushButton *HideCenterButton;
   vtkKWPushButton *CenterEntryOpenCloseButton;
-  vtkKWWidget *CenterEntryFrame;
+  vtkKWFrame *CenterEntryFrame;
   vtkKWLabel *CenterXLabel;
   vtkKWEntry *CenterXEntry;
   vtkKWLabel *CenterYLabel;

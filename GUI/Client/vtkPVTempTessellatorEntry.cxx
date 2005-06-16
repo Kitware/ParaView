@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.22");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.23");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -117,7 +117,7 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -127,10 +127,10 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
 
   d->CriteriaFrame->SetParent( this );
   d->CriteriaFrame->SetLabelText( "Tessellation Criteria" );
-  d->CriteriaFrame->Create( app, "" );
+  d->CriteriaFrame->Create( app);
 
   d->CriteriaInstructions->SetParent( d->CriteriaFrame->GetFrame() );
-  d->CriteriaInstructions->Create( app, "" );
+  d->CriteriaInstructions->Create(app);
   d->CriteriaInstructions->SetLineType( vtkKWLabel::MultiLine );
   d->CriteriaInstructions->AdjustWrapLengthToWidthOn();
   d->CriteriaInstructions->SetText(
@@ -141,24 +141,24 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   this->Script( "%s configure -anchor w", d->CriteriaInstructions->GetWidgetName() );
 
   d->ScalarFieldList->SetParent( d->CriteriaFrame->GetFrame() );
-  d->ScalarFieldList->Create( app, "" );
+  d->ScalarFieldList->Create(app);
   d->ScalarFieldList->SetHeight( 5 );
   d->ScalarFieldList->SetSingleClickCallback( this, "PointDataSelectedCallback" );
   d->LastSelectionIndex = -1;
   this->Script( "%s configure -font {Helvetica -12 bold}", d->ScalarFieldList->GetListbox()->GetWidgetName() );
 
   d->EditSubframe->SetParent( d->CriteriaFrame->GetFrame() );
-  d->EditSubframe->Create( app, "" );
+  d->EditSubframe->Create(app);
 
   d->CriterionEnable->SetParent( d->EditSubframe );
-  d->CriterionEnable->Create( app, "" );
+  d->CriterionEnable->Create(app);
   d->CriterionEnable->SetText( "" );
   d->CriterionEnable->SetEnabled( 0 );
   d->CriterionEnable->SetCommand( this, "ToggleCriterionCallback" );
   this->Script( "%s configure -anchor w", d->CriterionEnable->GetWidgetName() );
 
   d->CriterionValue->SetParent( d->EditSubframe );
-  d->CriterionValue->Create( app, "" );
+  d->CriterionValue->Create(app);
   this->Script( "bind %s <KeyPress-Return> {+%s ChangeCriterionCallback }", d->CriterionValue->GetWidgetName(), this->GetTclName() );
   this->Script( "bind %s <KeyPress-Tab>    {+%s ChangeCriterionCallback }", d->CriterionValue->GetWidgetName(), this->GetTclName() );
 

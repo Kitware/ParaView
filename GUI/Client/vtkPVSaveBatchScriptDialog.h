@@ -20,6 +20,7 @@
 #define __vtkPVSaveBatchScriptDialog_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 class vtkKWPushButton;
 class vtkKWEntry;
@@ -28,6 +29,7 @@ class vtkKWWindow;
 class vtkKWEntry;
 class vtkKWCheckButton;
 class vtkPVApplication;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVSaveBatchScriptDialog : public vtkKWWidget
 {
@@ -37,7 +39,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create a Tk widget
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
   
   // Description:
@@ -94,16 +96,16 @@ protected:
   vtkKWCheckButton* OffScreenCheck;
 
   vtkKWCheckButton* SaveImagesCheck;
-  vtkKWWidget*      ImageFileNameFrame;
+  vtkKWFrame*      ImageFileNameFrame;
   vtkKWEntry*       ImageFileNameEntry;
   vtkKWPushButton*  ImageFileNameBrowseButton;
 
   vtkKWCheckButton* SaveGeometryCheck;
-  vtkKWWidget*      GeometryFileNameFrame;
+  vtkKWFrame*      GeometryFileNameFrame;
   vtkKWEntry*       GeometryFileNameEntry;
   vtkKWPushButton*  GeometryFileNameBrowseButton;
 
-  vtkKWWidget*      ButtonFrame;
+  vtkKWFrame*      ButtonFrame;
   vtkKWPushButton*  AcceptButton;
   vtkKWPushButton*  CancelButton;
   int               AcceptedFlag;

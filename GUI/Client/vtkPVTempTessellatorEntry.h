@@ -56,7 +56,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the actual widget
+  // Create the widget.
   virtual void Create( vtkKWApplication* app );
 
   // Description:

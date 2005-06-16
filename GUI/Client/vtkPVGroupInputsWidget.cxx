@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.32");
 
 class vtkPVSourceVectorInternals
 {
@@ -71,7 +71,7 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -79,7 +79,8 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 
   this->PartSelectionList->SetParent(this);
   this->PartSelectionList->ScrollbarOff();
-  this->PartSelectionList->Create(app, "-selectmode extended");
+  this->PartSelectionList->Create(app);
+  this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->SetHeight(0);
   // I assume we need focus for control and alt modifiers.
   this->Script("bind %s <Enter> {focus %s}",
@@ -191,7 +192,7 @@ void vtkPVGroupInputsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(this->PartSelectionList->GetItem(idx));
-      label->Create(this->GetApplication(), "");
+      label->Create(this->GetApplication());
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.46");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.47");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -80,7 +80,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -101,13 +101,15 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
   // Now a label
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+    this->LabelWidget->Create(pvApp);
+    this->LabelWidget->SetWidth(18);
+    this->LabelWidget->SetJustificationToRight();
     this->LabelWidget->SetText(this->EntryLabel);
     this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
   
   // Now the entry
-  this->Entry->Create(pvApp, "");
+  this->Entry->Create(pvApp);
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
   this->Script("pack %s -side left -fill x -expand t",

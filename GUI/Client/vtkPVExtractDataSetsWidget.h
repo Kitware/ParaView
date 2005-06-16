@@ -34,9 +34,11 @@
 #define __vtkPVExtractDataSetsWidget_h
 
 #include "vtkPVWidget.h"
+
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
+class vtkKWFrame;
 
 //BTX
 struct vtkPVExtractDataSetsWidgetInternals;
@@ -98,7 +100,7 @@ protected:
   vtkPVExtractDataSetsWidget();
   ~vtkPVExtractDataSetsWidget();
 
-  vtkKWWidget* ButtonFrame;
+  vtkKWFrame* ButtonFrame;
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
 

@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.7");
 
 int vtkPVPluginsDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -69,7 +69,7 @@ vtkPVPluginsDialog::~vtkPVPluginsDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
+void vtkPVPluginsDialog::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -78,37 +78,38 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
     }
 
   // Invoke super method
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   SetTitle("Kitware Paraview Plugins");
 
   this->PluginsFrame->SetParent(this);
-  this->PluginsFrame->Create(app,"-bd 10");
+  this->PluginsFrame->Create(app);
+  this->PluginsFrame->GetFrame()->SetBorderWidth(10);
   this->PluginsFrame->SetLabelText("Plugins");
   this->Script("grid config %s -column 0 -row 0 -columnspan 1 -rowspan 1 -sticky \"nw\"",this->PluginsFrame->GetWidgetName());
 
   this->NameButton->SetParent(this->PluginsFrame->GetFrame());
-  this->NameButton->Create(app,0);
+  this->NameButton->Create(app);
   this->NameButton->SetText("Name");
 
   this->TypeButton->SetParent(this->PluginsFrame->GetFrame());
-  this->TypeButton->Create(app,0);
+  this->TypeButton->Create(app);
   this->TypeButton->SetText("Type");
   
   this->LoadedButton->SetParent(this->PluginsFrame->GetFrame());
-  this->LoadedButton->Create(app,0);
+  this->LoadedButton->Create(app);
   this->LoadedButton->SetText("Loaded");
 
   this->AutoLoadButton->SetParent(this->PluginsFrame->GetFrame());
-  this->AutoLoadButton->Create(app,0);
+  this->AutoLoadButton->Create(app);
   this->AutoLoadButton->SetText("Auto load");
 
   this->PathButton->SetParent(this->PluginsFrame->GetFrame());
-  this->PathButton->Create(app,0);
+  this->PathButton->Create(app);
   this->PathButton->SetText("Path");
 
   this->InfoButton->SetParent(this->PluginsFrame->GetFrame());
-  this->InfoButton->Create(app,0);
+  this->InfoButton->Create(app);
   this->InfoButton->SetText("Information");
 
 
@@ -124,22 +125,23 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 
   // bottom buttons: Add a plugin, Help, Close
   this->ButtonsFrame->SetParent(this);
-  this->ButtonsFrame->Create(app,"-bd 10");
+  this->ButtonsFrame->Create(app);
+  this->ButtonsFrame->SetBorderWidth(10);
   this->Script("grid config %s -column 0 -row 1 -columnspan 1 -rowspan 1 -sticky \"news\"",this->ButtonsFrame->GetWidgetName());
 
   this->AddPluginButton->SetParent(this->ButtonsFrame);
-  this->AddPluginButton->Create(app,0);
+  this->AddPluginButton->Create(app);
   this->AddPluginButton->SetText("Add a plug-in");
   this->Script("pack %s -side left -expand true -fill x",this->AddPluginButton->GetWidgetName());
 
   this->CloseButton->SetParent(this->ButtonsFrame);
-  this->CloseButton->Create(app,0);
+  this->CloseButton->Create(app);
   this->CloseButton->SetText("Close");
   this->Script("pack %s -side right -expand true -fill x",this->CloseButton->GetWidgetName());
   this->CloseButton->SetCommand(this, "Cancel"); // Cannot be OK: closing the dialog with the window X button returns Cancel.
 
   this->HelpButton->SetParent(this->ButtonsFrame);
-  this->HelpButton->Create(app,0);
+  this->HelpButton->Create(app);
   this->HelpButton->SetText("Help");
   this->Script("pack %s -side right -expand true -fill x",this->HelpButton->GetWidgetName());
 
@@ -159,13 +161,13 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 
   vtkKWLabel *PluginName=vtkKWLabel::New();
   PluginName->SetParent(this->PluginsFrame->GetFrame());
-  PluginName->Create(app,0);
+  PluginName->Create(app);
   PluginName->SetText(FooFilename);
   this->Script("grid config %s -column 0 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginName->GetWidgetName(),PluginIndex);
   
   vtkKWLabel *PluginType=vtkKWLabel::New();
   PluginType->SetParent(this->PluginsFrame->GetFrame());
-  PluginType->Create(app,0);
+  PluginType->Create(app);
   switch(FooType)
     {
     case 1:
@@ -182,25 +184,26 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 
   vtkKWCheckButton *PluginIsLoaded=vtkKWCheckButton::New();
   PluginIsLoaded->SetParent(this->PluginsFrame->GetFrame());
-  PluginIsLoaded->Create(app,0);
+  PluginIsLoaded->Create(app);
   PluginIsLoaded->SetState(FooIsLoaded);
   this->Script("grid config %s -column 2 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginIsLoaded->GetWidgetName(),PluginIndex);
 
   vtkKWCheckButton *PluginAutoLoad=vtkKWCheckButton::New();
   PluginAutoLoad->SetParent(this->PluginsFrame->GetFrame());
-  PluginAutoLoad->Create(app,0);
+  PluginAutoLoad->Create(app);
   PluginAutoLoad->SetState(FooAutoLoad);
   this->Script("grid config %s -column 3 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginAutoLoad->GetWidgetName(),PluginIndex);
   
   vtkKWLabel *PluginPath=vtkKWLabel::New();
   PluginPath->SetParent(this->PluginsFrame->GetFrame());
-  PluginPath->Create(app,0);
+  PluginPath->Create(app);
   PluginPath->SetText(FooPath);
   this->Script("grid config %s -column 4 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginPath->GetWidgetName(),PluginIndex);
 
   vtkKWPushButton *PluginInfo=vtkKWPushButton::New();
   PluginInfo->SetParent(this->PluginsFrame->GetFrame());
-  PluginInfo->Create(app,"-bitmap info -foreground #0a0");
+  PluginInfo->Create(app);
+  PluginInfo->ConfigureOptions("-bitmap info -foreground #0a0");
   this->Script("grid config %s -column 5 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginInfo->GetWidgetName(),PluginIndex);
 #endif
 }

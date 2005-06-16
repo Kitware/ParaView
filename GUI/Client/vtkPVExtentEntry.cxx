@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.55");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -142,7 +142,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -161,7 +161,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  this->LabeledFrame->Create(pvApp, 0);
+  this->LabeledFrame->Create(pvApp);
 
   // Now a label
 

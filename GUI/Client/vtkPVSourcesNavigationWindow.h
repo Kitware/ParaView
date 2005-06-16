@@ -28,6 +28,7 @@ class vtkKWCanvas;
 class vtkKWMenu;
 class vtkKWWidget;
 class vtkPVSource;
+class vtkKWScrollbar;
 
 class VTK_EXPORT vtkPVSourcesNavigationWindow : public vtkKWWidget
 {
@@ -37,8 +38,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the width and the height of the underlying canvas
@@ -146,7 +147,7 @@ protected:
   int Width;
   int Height;
   vtkKWCanvas* Canvas;
-  vtkKWWidget* ScrollBar;
+  vtkKWScrollbar* ScrollBar;
   vtkKWMenu* PopupMenu;
   // Set while the popup is active so we know which module to modify.
   vtkPVSource* PopupModule;

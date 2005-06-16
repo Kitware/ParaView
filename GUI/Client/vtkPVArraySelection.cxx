@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.69");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.70");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -60,11 +60,11 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->LabelText = 0;
   
   this->LabeledFrame = vtkKWFrameLabeled::New();
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();
 
-  this->CheckFrame = vtkKWWidget::New();
+  this->CheckFrame = vtkKWFrame::New();
   this->ArrayCheckButtons = vtkCollection::New();
 
   this->ArraySet = new vtkPVArraySelectionArraySet;
@@ -111,7 +111,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -119,7 +119,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app, 0);
+  this->LabeledFrame->Create(app);
   if (this->LabelText)
     {
     this->LabeledFrame->SetLabelText(this->LabelText);
@@ -132,17 +132,17 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
               this->LabeledFrame->GetWidgetName());
 
   this->ButtonFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->ButtonFrame->Create(app, "frame", "");
+  this->ButtonFrame->Create(app);
   app->Script("pack %s -fill x -side top -expand t",
               this->ButtonFrame->GetWidgetName());
 
   this->AllOnButton->SetParent(this->ButtonFrame);
-  this->AllOnButton->Create(app, "");
+  this->AllOnButton->Create(app);
   this->AllOnButton->SetText("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
 
   this->AllOffButton->SetParent(this->ButtonFrame);
-  this->AllOffButton->Create(app, "");
+  this->AllOffButton->Create(app);
   this->AllOffButton->SetText("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
 
@@ -151,13 +151,13 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
               this->AllOffButton->GetWidgetName());
 
   this->CheckFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->CheckFrame->Create(app, "frame", "");
+  this->CheckFrame->Create(app);
 
   app->Script("pack %s -side top -expand f -anchor w",
               this->CheckFrame->GetWidgetName());
 
   this->NoArraysLabel->SetParent(this->CheckFrame);
-  this->NoArraysLabel->Create(app, 0);
+  this->NoArraysLabel->Create(app);
   this->NoArraysLabel->SetText("No arrays");
 
   // This creates the check buttons and packs the button frame.
@@ -286,7 +286,7 @@ void vtkPVArraySelection::UpdateGUI()
         {
         checkButton = vtkKWCheckButton::New();
         checkButton->SetParent(this->CheckFrame);
-        checkButton->Create(this->GetApplication(), "");
+        checkButton->Create(this->GetApplication());
         this->Script("%s SetText {%s}", checkButton->GetTclName(), 
                      this->Selection->GetArrayName(idx));
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);

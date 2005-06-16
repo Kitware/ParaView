@@ -30,6 +30,7 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
 class vtkPVInputMenu;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVImplicitPlaneWidget : public vtkPV3DWidget
 {
@@ -121,10 +122,9 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
+  // Create the widget.
   // Overloaded to create the ImplicitFunctionProxy
-  // BTX
   virtual void Create(vtkKWApplication *app);
-  //ETX
 
   // Description:
   // Updates the Offset property of the plane proxy 
@@ -170,7 +170,7 @@ protected:
   vtkKWEntry *NormalEntry[3];
   vtkKWEntry *OffsetEntry;
 
-  vtkKWWidget *NormalButtonFrame;
+  vtkKWFrame *NormalButtonFrame;
   vtkKWPushButton *NormalCameraButton;
   vtkKWPushButton *NormalXButton;
   vtkKWPushButton *NormalYButton;

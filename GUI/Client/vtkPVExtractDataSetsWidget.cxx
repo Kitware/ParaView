@@ -18,6 +18,7 @@
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWWidget.h"
+#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -33,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.2");
 
 int vtkPVExtractDataSetsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -49,7 +50,7 @@ vtkPVExtractDataSetsWidget::vtkPVExtractDataSetsWidget()
 {
   this->CommandFunction = vtkPVExtractDataSetsWidgetCommand;
   
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();
 
@@ -79,7 +80,7 @@ void vtkPVExtractDataSetsWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -88,17 +89,17 @@ void vtkPVExtractDataSetsWidget::Create(vtkKWApplication *app)
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(pvApp, "frame", "");
+  this->ButtonFrame->Create(pvApp);
   this->Script("pack %s -side top -fill x",
                this->ButtonFrame->GetWidgetName());
 
   this->AllOnButton->SetParent(this->ButtonFrame);
-  this->AllOnButton->Create(pvApp, "");
+  this->AllOnButton->Create(pvApp);
   this->AllOnButton->SetText("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
 
   this->AllOffButton->SetParent(this->ButtonFrame);
-  this->AllOffButton->Create(pvApp, "");
+  this->AllOffButton->Create(pvApp);
   this->AllOffButton->SetText("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
 
@@ -107,11 +108,11 @@ void vtkPVExtractDataSetsWidget::Create(vtkKWApplication *app)
                this->AllOffButton->GetWidgetName());
 
   this->PartSelectionList->SetParent(this);
-  this->PartSelectionList->Create(app, "");
+  this->PartSelectionList->Create(app);
   this->PartSelectionList->SetSingleClickCallback(this, "PartSelectionCallback");
   this->PartSelectionList->ScrollbarOff();
-  this->PartSelectionList->GetListbox()->
-    ConfigureOptions("-selectmode extended -exportselection 0");
+  this->PartSelectionList->SetSelectionModeToExtended();
+  this->PartSelectionList->ExportSelectionOff();
   this->PartSelectionList->SetHeight(0);
 
   this->Script("pack %s -side top -fill both -expand t",

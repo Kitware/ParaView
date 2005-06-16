@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.9");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.10");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -106,7 +106,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     return;
     }
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -119,19 +119,19 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->Script("frame %s -borderwidth 0", wname);
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app,0);
+  this->MainFrame->Create(app);
   this->Script("pack %s -fill x -expand t -anchor nw", this->MainFrame->GetWidgetName());
 
   this->Checkbox->SetParent(this->MainFrame);
   this->Checkbox->SetIndicator(1);
-  this->Checkbox->Create(app, "");
+  this->Checkbox->Create(app);
   this->Checkbox->SetState(0);
   this->Checkbox->SetCommand(this, "SelectCallback");
   this->Script("pack %s -anchor nw -side left", this->Checkbox->GetWidgetName());
 
   this->LabelFrame->SetParent(this->MainFrame);
   this->LabelFrame->ShowHideFrameOn();
-  this->LabelFrame->Create(app, 0);
+  this->LabelFrame->Create(app);
   this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->Script("pack %s -fill x -expand t -side left", this->LabelFrame->GetWidgetName());
@@ -144,13 +144,13 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     this->LabelFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
-  this->SeparatorFrame->Create(app,"");
+  this->SeparatorFrame->Create(app);
   this->Script("pack %s -anchor nw -expand t -fill x",
                  this->SeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",this->SeparatorFrame->GetWidgetName());
 
   this->NestedSeparatorFrame->SetParent(this->LabelFrame->GetFrame());
-  this->NestedSeparatorFrame->Create(app,"");
+  this->NestedSeparatorFrame->Create(app);
   this->Script("pack %s -anchor nw -expand t -fill x",
                  this->NestedSeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",this->NestedSeparatorFrame->GetWidgetName()); 
@@ -158,7 +158,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
 
   this->NameField->SetParent(this->LabelFrame->GetLabelFrame());
-  this->NameField->Create(app,"");
+  this->NameField->Create(app);
 
   this->UpdateEnableState();
 

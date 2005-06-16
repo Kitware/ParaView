@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.35");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.36");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -136,23 +136,24 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->SetTitle("Domain and Grids Selection");
     dlg->SetStyleToOkCancel();
     dlg->SetMasterWindow(this->GetPVWindow());
-    dlg->Create(pvApp,0);
+    dlg->Create(pvApp);
     dlg->SetText("Select Domain and Grids");
 
     this->DomainGridFrame = vtkKWFrameLabeled::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
-    this->DomainGridFrame->Create(pvApp, 0);
+    this->DomainGridFrame->Create(pvApp);
     this->DomainGridFrame->SetLabelText("Domain and Grids Selection");
 
     this->DomainMenu = vtkKWOptionMenu::New();
     this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
-    this->DomainMenu->Create(pvApp, 0);
+    this->DomainMenu->Create(pvApp);
     this->UpdateDomains();
 
     this->GridSelection = vtkKWListBox::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
     this->GridSelection->ScrollbarOn();
-    this->GridSelection->Create(pvApp, "-selectmode extended");
+    this->GridSelection->Create(pvApp);
+    this->GridSelection->SetSelectionModeToExtended();
     this->GridSelection->SetHeight(0);
     this->UpdateGrids();
 
@@ -173,7 +174,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
         vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
         selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
         selectAllButton->SetText("Select All Grids");
-        selectAllButton->Create(pvApp, 0);
+        selectAllButton->Create(pvApp);
         selectAllButton->SetCommand(this, "EnableAllGrids");
         this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
           selectAllButton->GetWidgetName());

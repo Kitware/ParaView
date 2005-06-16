@@ -33,7 +33,8 @@ public:
   vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void Create(vtkKWApplication *pvApp, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Set the current render view.

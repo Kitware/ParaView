@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.31");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.32");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -141,7 +141,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -159,7 +159,8 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   // Back button
   this->BackButton = vtkKWPushButton::New();
   this->BackButton->SetParent(this);
-  this->BackButton->Create(this->GetApplication(), "-text {Back}");
+  this->BackButton->Create(this->GetApplication());
+  this->BackButton->SetText("Back");
   this->BackButton->SetCommand(this, "BackButtonCallback");
 
 
@@ -171,7 +172,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->VolumePropertyWidget->ShowGradientOpacityFunctionOff();
   this->VolumePropertyWidget->ShowComponentWeightsOff();
   this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->ShowWindowLevelModeButtonOff();
-  this->VolumePropertyWidget->Create(pvApp, 0);
+  this->VolumePropertyWidget->Create(pvApp);
   this->VolumePropertyWidget->AddObserver(
     vtkKWEvent::VolumePropertyChangedEvent, this->VolumeAppearanceObserver);
   this->VolumePropertyWidget->AddObserver(

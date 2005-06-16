@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.13");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -78,14 +78,14 @@ vtkPVAnimationCueTree::~vtkPVAnimationCueTree()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::Create(vtkKWApplication* app, const char* args)
+void vtkPVAnimationCueTree::Create(vtkKWApplication* app)
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("Widget already created");
     return;
     }
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   if (!this->IsCreated())
     {
@@ -93,16 +93,18 @@ void vtkPVAnimationCueTree::Create(vtkKWApplication* app, const char* args)
     }
  
   this->NavigatorContainer->SetParent(this);
-  this->NavigatorContainer->Create(app, NULL);
+  this->NavigatorContainer->Create(app);
 
   this->NavigatorCanvas->SetParent(this->NavigatorContainer);
-  this->NavigatorCanvas->Create(app, "-width 15 -height 0");
+  this->NavigatorCanvas->Create(app);
+  this->NavigatorCanvas->SetWidth(15);
+  this->NavigatorCanvas->SetHeight(0);
 
   this->NavigatorChildrenFrame->SetParent(this->NavigatorContainer);
-  this->NavigatorChildrenFrame->Create(app, NULL);
+  this->NavigatorChildrenFrame->Create(app);
 
   this->TimeLineChildrenFrame->SetParent(this->TimeLineContainer);
-  this->TimeLineChildrenFrame->Create(app, NULL);
+  this->TimeLineChildrenFrame->Create(app);
 
   this->Script("bind %s <ButtonPress-1> {%s ToggleExpandedState}",
     this->Image->GetWidgetName(),
@@ -139,7 +141,8 @@ void vtkPVAnimationCueTree::AddChildCue(vtkPVAnimationCue* child)
   child->GetTraceHelper()->SetReferenceCommand(str.str());
   child->SetParentAnimationCue(this);
   str.rdbuf()->freeze(0);
-  child->Create(this->GetApplication(), "-relief flat");
+  child->Create(this->GetApplication());
+  child->SetReliefToFlat();
   child->PackWidget();
   // Set the time marker for the child so it's not out of sync.
   child->SetTimeMarker(this->GetTimeMarker());

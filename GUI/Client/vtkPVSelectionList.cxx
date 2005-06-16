@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.56");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.57");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -94,29 +94,26 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->Label->SetParent(this);
-  this->Label->Create(app, "-width 18 -justify right");
+  this->Label->Create(app);
+  this->Label->SetWidth(18);
+  this->Label->SetJustificationToRight();
   if (this->LabelVisibility)
     {
     this->Script("pack %s -side left", this->Label->GetWidgetName());
     }
 
   this->Menu->SetParent(this);
+  this->Menu->Create(app);
   if (this->OptionWidth > 0)
     {
-    char arg[128];
-    sprintf(arg, "-width %d", this->OptionWidth);
-    this->Menu->Create(app, arg);
-    }
-  else
-    {
-    this->Menu->Create(app, "");
+    this->Menu->SetWidth(this->OptionWidth);
     }
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 

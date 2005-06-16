@@ -29,6 +29,7 @@
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWFrameLabeled;
+class vtkKWFrame;
 class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
@@ -43,7 +44,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set up the UI for this source
+  // Create the widget.
   void Create(vtkKWApplication *app);
 
   // Description:
@@ -107,7 +108,7 @@ protected:
   vtkPVCalculatorWidget();
   ~vtkPVCalculatorWidget();
 
-  vtkKWWidget* AttributeModeFrame;
+  vtkKWFrame* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;
   

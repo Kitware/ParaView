@@ -120,10 +120,10 @@ public:
   virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
 
   // Description:
+  // Create the widget.
   // Overloaded to create the ImplicitFunction proxy
-  //BTX
   virtual void Create(vtkKWApplication *app);
-  //ETX
+
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();

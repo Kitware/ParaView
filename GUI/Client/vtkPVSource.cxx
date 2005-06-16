@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.444");
+vtkCxxRevisionMacro(vtkPVSource, "1.445");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -532,7 +532,7 @@ void vtkPVSource::CreateProperties()
 
   this->ParameterFrame->SetParent(this->Notebook->GetMainParameterFrame());
 
-  this->ParameterFrame->Create(this->GetApplication(),0);
+  this->ParameterFrame->Create(this->GetApplication());
 
   this->UpdateProperties();
 

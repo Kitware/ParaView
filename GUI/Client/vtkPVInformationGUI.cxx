@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.6");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.7");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -75,7 +75,7 @@ vtkPVInformationGUI::~vtkPVInformationGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInformationGUI::Create(vtkKWApplication* app, const char* options)
+void vtkPVInformationGUI::Create(vtkKWApplication* app)
 {  
   if (this->GetApplication())
     {
@@ -83,33 +83,33 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app, const char* options)
     return;
     }
   
-  this->Superclass::Create(app, options);
+  this->Superclass::Create(app);
 
   this->StatsFrame->SetParent(this->GetFrame());
   this->StatsFrame->ShowHideFrameOn();
-  this->StatsFrame->Create(this->GetApplication(), 0);
+  this->StatsFrame->Create(this->GetApplication());
   this->StatsFrame->SetLabelText("Statistics");
 
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
-  this->TypeLabel->Create(this->GetApplication(), "");
+  this->TypeLabel->Create(this->GetApplication());
 
   this->NumDataSetsLabel->SetParent(this->StatsFrame->GetFrame());
-  this->NumDataSetsLabel->Create(this->GetApplication(), "");
+  this->NumDataSetsLabel->Create(this->GetApplication());
 
   this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
-  this->NumCellsLabel->Create(this->GetApplication(), "");
+  this->NumCellsLabel->Create(this->GetApplication());
 
   this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
-  this->NumPointsLabel->Create(this->GetApplication(), "");
+  this->NumPointsLabel->Create(this->GetApplication());
   
   this->MemorySizeLabel->SetParent(this->StatsFrame->GetFrame());
-  this->MemorySizeLabel->Create(this->GetApplication(), "");
+  this->MemorySizeLabel->Create(this->GetApplication());
 
   this->BoundsDisplay->SetParent(this->GetFrame());
-  this->BoundsDisplay->Create(this->GetApplication(), "");
+  this->BoundsDisplay->Create(this->GetApplication());
   
   this->ExtentDisplay->SetParent(this->GetFrame());
-  this->ExtentDisplay->Create(this->GetApplication(), "");
+  this->ExtentDisplay->Create(this->GetApplication());
   this->ExtentDisplay->SetLabelText("Extents");
   
   this->Script("pack %s %s %s %s %s -side top -anchor nw",

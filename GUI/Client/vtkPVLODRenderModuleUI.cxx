@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.27");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.28");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -76,7 +76,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 
   this->LODFrame = vtkKWFrameLabeled::New();
  
-  this->LODScalesFrame = vtkKWWidget::New();
+  this->LODScalesFrame = vtkKWFrame::New();
   this->LODThresholdLabel = vtkKWLabel::New();
   this->LODCheck = vtkKWCheckButton::New();
   this->LODThresholdScale = vtkKWScale::New();
@@ -149,7 +149,7 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
+void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -157,40 +157,42 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     return;
     }
 
-  this->Superclass::Create(app, NULL);  
+  this->Superclass::Create(app);
 
   vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
   
   // LOD parameters
   this->LODFrame->SetParent(this);
   this->LODFrame->ShowHideFrameOn();
-  this->LODFrame->Create(app,0);
+  this->LODFrame->Create(app);
   this->LODFrame->SetLabelText("LOD Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LODFrame->GetWidgetName());
 
   // LOD parameters: the frame that will pack all scales
   this->LODScalesFrame->SetParent(this->LODFrame->GetFrame());
-  this->LODScalesFrame->Create(app, "frame", "");
+  this->LODScalesFrame->Create(app);
 
   // LOD parameters: threshold
   this->LODThresholdLabel->SetParent(this->LODScalesFrame);
-  this->LODThresholdLabel->Create(app, "-anchor w");
+  this->LODThresholdLabel->Create(app);
+  this->LODThresholdLabel->SetAnchorToWest();
   this->LODThresholdLabel->SetText("LOD threshold:");
 
   this->LODCheck->SetParent(this->LODScalesFrame);
-  this->LODCheck->Create(app, "");
+  this->LODCheck->Create(app);
   this->LODCheck->SetCommand(this, "LODCheckCallback");
 
   this->LODThresholdScale->SetParent(this->LODScalesFrame);
-  this->LODThresholdScale->Create(app, 
-                                  "-resolution 0.1 -orient horizontal");
+  this->LODThresholdScale->Create(app);
+  this->LODThresholdScale->SetResolution(0.1);
   this->LODThresholdScale->SetRange(0.0, 100.0);
   this->LODThresholdScale->SetResolution(0.1);
 
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);
-  this->LODThresholdValue->Create(app, "-anchor w");
+  this->LODThresholdValue->Create(app);
+  this->LODThresholdValue->SetAnchorToWest();
 
   if (pvapp &&
       pvapp->GetRegistryValue(2, "RunTime", "LODThreshold", 0))
@@ -227,16 +229,18 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // LOD parameters: resolution
 
   this->LODResolutionLabel->SetParent(this->LODScalesFrame);
-  this->LODResolutionLabel->Create(app, "-anchor w");
+  this->LODResolutionLabel->Create(app);
+  this->LODResolutionLabel->SetAnchorToWest();
   this->LODResolutionLabel->SetText("LOD resolution:");
 
   this->LODResolutionScale->SetParent(this->LODScalesFrame);
-  this->LODResolutionScale->Create(app, "-orient horizontal");
+  this->LODResolutionScale->Create(app);
   this->LODResolutionScale->SetRange(10, 160);
   this->LODResolutionScale->SetResolution(1.0);
 
   this->LODResolutionValue->SetParent(this->LODScalesFrame);
-  this->LODResolutionValue->Create(app, "-anchor w");
+  this->LODResolutionValue->Create(app);
+  this->LODResolutionValue->SetAnchorToWest();
 
   if (pvapp &&
       pvapp->GetRegistryValue(2, "RunTime", "LODResolution", 0))
@@ -268,16 +272,18 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // LOD parameters: resolution
 
   this->OutlineThresholdLabel->SetParent(this->LODScalesFrame);
-  this->OutlineThresholdLabel->Create(app, "-anchor w");
+  this->OutlineThresholdLabel->Create(app);
+  this->OutlineThresholdLabel->SetAnchorToWest();
   this->OutlineThresholdLabel->SetText("Outline Threshold:");
 
   this->OutlineThresholdScale->SetParent(this->LODScalesFrame);
-  this->OutlineThresholdScale->Create(app, "-orient horizontal");
+  this->OutlineThresholdScale->Create(app);
   this->OutlineThresholdScale->SetRange(0, 500);
   this->OutlineThresholdScale->SetResolution(0.1);
 
   this->OutlineThresholdValue->SetParent(this->LODScalesFrame);
-  this->OutlineThresholdValue->Create(app, "-anchor w");
+  this->OutlineThresholdValue->Create(app);
+  this->OutlineThresholdValue->SetAnchorToWest();
 
   if (pvapp &&
       pvapp->GetRegistryValue(2, "RunTime", "OutlineThreshold", 0))
@@ -310,8 +316,8 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // LOD parameters: rendering interrupts
 
   this->RenderInterruptsEnabledCheck->SetParent(this->LODFrame->GetFrame());
-  this->RenderInterruptsEnabledCheck->Create(app, 
-                                             "-text \"Allow rendering interrupts\"");
+  this->RenderInterruptsEnabledCheck->Create(app);
+  this->RenderInterruptsEnabledCheck->SetText("Allow rendering interrupts");
   this->RenderInterruptsEnabledCheck->SetCommand(this, "RenderInterruptsEnabledCheckCallback");
   
   if (pvapp && pvapp->GetRegistryValue(2, "RunTime", 

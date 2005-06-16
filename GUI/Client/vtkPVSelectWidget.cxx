@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.68");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.69");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -80,7 +80,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -88,7 +88,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app, 0);
+  this->LabeledFrame->Create(app);
   if (this->EntryLabel)
     {
     this->LabeledFrame->SetLabelText(this->EntryLabel);
@@ -96,14 +96,14 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true", 
                this->LabeledFrame->GetWidgetName());
 
-  vtkKWWidget *justifyFrame = vtkKWWidget::New();
+  vtkKWFrame *justifyFrame = vtkKWFrame::New();
   justifyFrame->SetParent(this->LabeledFrame->GetFrame());
-  justifyFrame->Create(app, "frame", "");
+  justifyFrame->Create(app);
   this->Script("pack %s -side top -fill x -expand true", 
                justifyFrame->GetWidgetName());
 
   this->Menu->SetParent(justifyFrame);
-  this->Menu->Create(app, "");
+  this->Menu->Create(app);
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   justifyFrame->Delete();

@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.28");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.29");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -274,7 +274,7 @@ vtkPVApplication* vtkPVLookmarkManager::GetPVApplication()
 void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 {
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -308,7 +308,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->Menu->SetParent(this);
   this->Menu->SetTearOff(0);
-  this->Menu->Create(app, "");
+  this->Menu->Create(app);
   this->Script("%s configure -menu %s", this->GetWidgetName(),
                this->Menu->GetWidgetName());
 
@@ -316,11 +316,11 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->MenuFile->SetParent(this->Menu);
   this->MenuFile->SetTearOff(0);
-  this->MenuFile->Create(app, "");
+  this->MenuFile->Create(app);
 
   this->MenuImport->SetParent(this->MenuFile);
   this->MenuImport->SetTearOff(0);
-  this->MenuImport->Create(app, "");
+  this->MenuImport->Create(app);
   char* rbv = 
     this->MenuImport->CreateRadioButtonVariable(this, "Import");
   this->Script( "set %s 0", rbv );
@@ -338,7 +338,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->MenuEdit->SetParent(this->Menu);
   this->MenuEdit->SetTearOff(0);
-  this->MenuEdit->Create(app, "");
+  this->MenuEdit->Create(app);
   this->Menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
   this->MenuEdit->AddSeparator();
@@ -359,30 +359,32 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->MenuHelp->SetParent(this->Menu);
   this->MenuHelp->SetTearOff(0);
-  this->MenuHelp->Create(app, "");
+  this->MenuHelp->Create(app);
   this->Menu->AddCascade("Help", this->MenuHelp, 0);
   this->MenuHelp->AddCommand("Quick Start Guide", this, "DisplayQuickStartGuide");
   this->MenuHelp->AddCommand("User's Tutorial", this, "DisplayUsersTutorial");
 
   this->LmkPanelFrame->SetParent(this);
-  this->LmkPanelFrame->Create(this->GetPVApplication(),0);
+  this->LmkPanelFrame->Create(this->GetPVApplication());
 
   this->LmkScrollFrame->SetParent(this->LmkPanelFrame);
-  this->LmkScrollFrame->Create(this->GetPVApplication(),0);
+  this->LmkScrollFrame->Create(this->GetPVApplication());
 
   this->SeparatorFrame->SetParent(this->LmkPanelFrame);
-  this->SeparatorFrame->Create(this->GetPVApplication(),"-bd 2 -relief groove");
+  this->SeparatorFrame->Create(this->GetPVApplication());
+  this->SeparatorFrame->SetBorderWidth(2);
+  this->SeparatorFrame->SetReliefToGroove();
 
   this->CreateLmkButton->SetParent(this->LmkPanelFrame);
-  this->CreateLmkButton->Create(this->GetPVApplication(), "");
+  this->CreateLmkButton->Create(this->GetPVApplication());
   this->CreateLmkButton->SetText("Create Lookmark");
   this->CreateLmkButton->SetCommand(this,"CreateLookmarkCallback");
 
   this->TopDragAndDropTarget->SetParent(this->LmkScrollFrame->GetFrame());
-  this->TopDragAndDropTarget->Create(this->GetPVApplication(),0);
+  this->TopDragAndDropTarget->Create(this->GetPVApplication());
 
   this->BottomDragAndDropTarget->SetParent(this->LmkScrollFrame->GetFrame());
-  this->BottomDragAndDropTarget->Create(this->GetPVApplication(),0);
+  this->BottomDragAndDropTarget->Create(this->GetPVApplication());
 
   this->Script("pack %s -padx 2 -pady 4 -expand t", 
                 this->CreateLmkButton->GetWidgetName());
@@ -454,7 +456,9 @@ void vtkPVLookmarkManager::DisplayQuickStartGuide()
   if (!this->QuickStartGuideDialog->IsCreated())
     {
     this->QuickStartGuideDialog->SetMasterWindow(this->MasterWindow);
-    this->QuickStartGuideDialog->Create(this->GetPVApplication(), "-bd 1 -relief solid");
+    this->QuickStartGuideDialog->Create(this->GetPVApplication());
+    this->QuickStartGuideDialog->SetReliefToSolid();
+    this->QuickStartGuideDialog->SetBorderWidth(1);
     }
 
   this->ConfigureQuickStartGuide();
@@ -478,7 +482,8 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
   if (!this->QuickStartGuideTxt->IsCreated())
     {
     this->QuickStartGuideTxt->SetParent(this->QuickStartGuideDialog->GetBottomFrame());
-    this->QuickStartGuideTxt->Create(app, "-setgrid true");
+    this->QuickStartGuideTxt->Create(app);
+    this->QuickStartGuideTxt->ResizeToGridOn();
     this->QuickStartGuideTxt->SetWidth(60);
     this->QuickStartGuideTxt->SetHeight(20);
     this->QuickStartGuideTxt->SetWrapToWord();
@@ -536,7 +541,9 @@ void vtkPVLookmarkManager::DisplayUsersTutorial()
   if (!this->UsersTutorialDialog->IsCreated())
     {
     this->UsersTutorialDialog->SetMasterWindow(this->MasterWindow);
-    this->UsersTutorialDialog->Create(this->GetPVApplication(), "-bd 1 -relief solid");
+    this->UsersTutorialDialog->Create(this->GetPVApplication());
+    this->UsersTutorialDialog->SetReliefToSolid();
+    this->UsersTutorialDialog->SetBorderWidth(1);
     }
 
   this->ConfigureUsersTutorial();
@@ -559,7 +566,8 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   if (!this->UsersTutorialTxt->IsCreated())
     {
     this->UsersTutorialTxt->SetParent(this->UsersTutorialDialog->GetBottomFrame());
-    this->UsersTutorialTxt->Create(app, "-setgrid true");
+    this->UsersTutorialTxt->Create(app);
+    this->UsersTutorialTxt->ResizeToGridOn();
     this->UsersTutorialTxt->SetWidth(60);
     this->UsersTutorialTxt->SetHeight(20);
     this->UsersTutorialTxt->SetWrapToWord();
@@ -1233,7 +1241,7 @@ char* vtkPVLookmarkManager::PromptForLookmarkFile(int saveFlag)
   if(saveFlag)
     dialog->SaveDialogOn();
 
-  dialog->Create(this->GetPVApplication(), 0);
+  dialog->Create(this->GetPVApplication());
 
   if (win)
     {

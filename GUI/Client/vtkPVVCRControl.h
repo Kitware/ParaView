@@ -48,6 +48,8 @@ public:
   void SetRecordStateCommand(vtkKWObject* calledObject, const char* commandString);
   void SetSaveAnimationCommand(vtkKWObject* calledObject, const char* commandString);
 
+  // Description:
+  // Create the widget.
   virtual void Create(vtkKWApplication* app);
   virtual void UpdateEnableState();
 

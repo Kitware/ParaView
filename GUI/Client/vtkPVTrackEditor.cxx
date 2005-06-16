@@ -37,7 +37,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.6");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -131,7 +131,7 @@ vtkPVTrackEditor::~vtkPVTrackEditor()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
+void vtkPVTrackEditor::Create(vtkKWApplication* app)
 {
   if (!this->AnimationManager)
     {
@@ -139,7 +139,7 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
     return;
     }
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -147,7 +147,7 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
   
   this->KeyFramePropertiesFrame->SetParent(this);
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
-  this->KeyFramePropertiesFrame->Create(app, 0);
+  this->KeyFramePropertiesFrame->Create(app);
   this->KeyFramePropertiesFrame->SetLabelText(
     VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
   this->Script(
@@ -155,21 +155,21 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
     this->KeyFramePropertiesFrame->GetWidgetName());
 
   this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->TitleLabelLabel->Create(app,"-relief flat");
+  this->TitleLabelLabel->Create(app);
   this->TitleLabelLabel->SetText("Current Track:");
   
   this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->TitleLabel->Create(app,"-relief flat");
+  this->TitleLabel->Create(app);
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->GetApplication()->GetMainInterp(), 
     this->TitleLabel->GetWidgetName());
 
 
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->PropertiesFrame->Create(app, 0);
+  this->PropertiesFrame->Create(app);
 
   this->IndexScale->SetParent(this->PropertiesFrame);
-  this->IndexScale->Create(app,0);
+  this->IndexScale->Create(app);
   this->IndexScale->DisplayEntry();
   this->IndexScale->DisplayEntryAndLabelOnTopOff();
   this->IndexScale->SetResolution(1);
@@ -182,17 +182,19 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
     "current track");
 
   this->TypeLabel->SetParent(this->PropertiesFrame);
-  this->TypeLabel->Create(app, 0);
+  this->TypeLabel->Create(app);
   this->TypeLabel->SetText("Interpolation:");
 
   this->TypeImage->SetParent(this->PropertiesFrame);
-  this->TypeImage->Create(app, "-relief flat");
+  this->TypeImage->Create(app);
+  this->TypeImage->SetReliefToFlat();
   this->TypeImage->SetBalloonHelpString("Specify the type of interpolation "
                                         "starting at the active key frame.");
 
   this->TypeMenuButton->SetParent(this->PropertiesFrame);
-  this->TypeMenuButton->Create(
-    app, "-image PVToolbarPullDownArrow -relief flat");
+  this->TypeMenuButton->Create(app);
+  this->TypeMenuButton->SetReliefToFlat();
+  this->TypeMenuButton->SetImageOption("PVToolbarPullDownArrow");
   this->TypeMenuButton->SetBalloonHelpString(
     "Specify the type of interpolation "
     "starting at the active key frame.");
@@ -201,14 +203,14 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
   this->BuildTypeMenu();
 
   this->AddKeyFrameButton->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->AddKeyFrameButton->Create(app, 0);
+  this->AddKeyFrameButton->Create(app);
   this->AddKeyFrameButton->SetBalloonHelpString("Append a new key frame");
   this->AddKeyFrameButton->SetText("Add KeyFrame");
   this->AddKeyFrameButton->SetCommand(this, "AddKeyFrameButtonCallback");
 
   this->DeleteKeyFrameButton->SetParent(
     this->KeyFramePropertiesFrame->GetFrame());
-  this->DeleteKeyFrameButton->Create(app, 0);
+  this->DeleteKeyFrameButton->Create(app);
   this->DeleteKeyFrameButton->SetBalloonHelpString("Delete active key frame");
   this->DeleteKeyFrameButton->SetText("Delete KeyFrame");
   this->DeleteKeyFrameButton->SetCommand(this, "DeleteKeyFrameButtonCallback");
@@ -218,7 +220,8 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app, const char* args)
   this->SelectKeyFrameLabel->SetText("No source selected.");
   
   
-  this->SelectKeyFrameLabel->Create(app, "-justify left");
+  this->SelectKeyFrameLabel->Create(app);
+  this->SelectKeyFrameLabel->SetJustificationToLeft();
   this->Script("grid %s - -row 1 -sticky ew", 
                this->SelectKeyFrameLabel->GetWidgetName());
 
@@ -395,25 +398,25 @@ void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_RAMP_INDEX);
-    this->TypeImage->ConfigureOptions("-image PVRamp");
+    this->TypeImage->SetImageOption("PVRamp");
     }
   else if (vtkPVBooleanKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_STEP_INDEX);
-    this->TypeImage->ConfigureOptions("-image PVStep");
+    this->TypeImage->SetImageOption("PVStep");
     }
   else if (vtkPVExponentialKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_EXPONENTIAL_INDEX);
-    this->TypeImage->ConfigureOptions("-image PVExponential");
+    this->TypeImage->SetImageOption("PVExponential");
     }
   else if (vtkPVSinusoidKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio",
       VTK_PV_SINUSOID_INDEX);
-    this->TypeImage->ConfigureOptions("-image PVSinusoid");
+    this->TypeImage->SetImageOption("PVSinusoid");
     }
 }
 

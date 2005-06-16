@@ -82,8 +82,8 @@ public:
   virtual void CreateViewProperties();
   
   // Description:
-  // Create the TK widgets associated with the view.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Method called by the toolbar reset camera button.

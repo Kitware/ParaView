@@ -33,6 +33,7 @@ class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
+class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWMenuButton;
 class vtkKWOptionMenu;
@@ -307,12 +308,12 @@ protected:
   vtkKWFrameLabeled* ColorMapFrame;
   vtkKWLabel*        ArrayNameLabel;
   // Stuff for setting the range of the color map.
-  vtkKWWidget*       ScalarRangeFrame;
+  vtkKWFrame*       ScalarRangeFrame;
   vtkKWCheckButton*  ScalarRangeLockCheck;
   vtkKWRange*        ScalarRangeWidget;
   vtkKWScale*        NumberOfColorsScale;
   // Stuff for selecting start and end colors.
-  vtkKWWidget*            ColorEditorFrame;
+  vtkKWFrame*            ColorEditorFrame;
   vtkKWChangeColorButton* StartColorButton;
   vtkKWLabel*        Map;
   vtkKWChangeColorButton* EndColorButton;
@@ -324,10 +325,10 @@ protected:
 
   vtkKWFrameLabeled* ScalarBarFrame;
   vtkKWCheckButton*  ScalarBarCheck;
-  vtkKWWidget*       ScalarBarTitleFrame;
+  vtkKWFrame*        ScalarBarTitleFrame;
   vtkKWLabel*        ScalarBarTitleLabel;
   vtkKWEntry*        ScalarBarTitleEntry;
-  vtkKWWidget*       ScalarBarLabelFormatFrame;
+  vtkKWFrame*        ScalarBarLabelFormatFrame;
   vtkKWLabel*        ScalarBarLabelFormatLabel;
   vtkKWEntry*        ScalarBarLabelFormatEntry;
   

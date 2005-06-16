@@ -27,7 +27,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.8");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -199,59 +199,59 @@ void vtkPVCameraControl::Roll(double angle)
   this->GetTraceHelper()->AddEntry("$kw(%s) Roll %f", this->GetTclName(), angle);
 }
 
-void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
+void vtkPVCameraControl::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
   this->ElevationButton->SetParent(this);
-  this->ElevationButton->Create(app, 0);
+  this->ElevationButton->Create(app);
   this->ElevationButton->SetText("Apply Elevation");
   this->ElevationButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->ElevationButton->SetCommand(this, "ElevationButtonCallback");
 
   this->ElevationEntry->SetParent(this);
-  this->ElevationEntry->Create(app, 0);
+  this->ElevationEntry->Create(app);
   this->ElevationEntry->SetValue(0);
   this->ElevationEntry->SetWidth(5);
   
   this->ElevationLabel->SetParent(this);
-  this->ElevationLabel->Create(app, 0);
+  this->ElevationLabel->Create(app);
   this->ElevationLabel->SetText("degrees");
   
   this->AzimuthButton->SetParent(this);
-  this->AzimuthButton->Create(app, 0);
+  this->AzimuthButton->Create(app);
   this->AzimuthButton->SetText("Apply Azimuth");
   this->AzimuthButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->AzimuthButton->SetCommand(this, "AzimuthButtonCallback");
 
   this->AzimuthEntry->SetParent(this);
-  this->AzimuthEntry->Create(app, 0);
+  this->AzimuthEntry->Create(app);
   this->AzimuthEntry->SetValue(0);
   this->AzimuthEntry->SetWidth(5);
   
   this->AzimuthLabel->SetParent(this);
-  this->AzimuthLabel->Create(app, 0);
+  this->AzimuthLabel->Create(app);
   this->AzimuthLabel->SetText("degrees");
   
   this->RollButton->SetParent(this);
-  this->RollButton->Create(app, 0);
+  this->RollButton->Create(app);
   this->RollButton->SetText("Apply Roll");
   this->RollButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->RollButton->SetCommand(this, "RollButtonCallback");
 
   this->RollEntry->SetParent(this);
-  this->RollEntry->Create(app, 0);
+  this->RollEntry->Create(app);
   this->RollEntry->SetValue(0);
   this->RollEntry->SetWidth(5);
   
   this->RollLabel->SetParent(this);
-  this->RollLabel->Create(app, 0);
+  this->RollLabel->Create(app);
   this->RollLabel->SetText("degrees");
   
   this->Script("grid %s -row 0 -column 0 -padx 3",

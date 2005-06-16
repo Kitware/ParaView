@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.2");
 
 int vtkPVComparativeVisPropertyWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -68,10 +68,9 @@ vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisPropertyWidget::Create(
-  vtkKWApplication *app, const char *)
+void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
 {
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -83,7 +82,7 @@ void vtkPVComparativeVisPropertyWidget::Create(
 
   this->TrackSelector->SetParent(this);
   this->TrackSelector->SetPackHorizontally(1);
-  this->TrackSelector->Create(app, "");
+  this->TrackSelector->Create(app);
   this->TrackSelector->ShallowCopy(pvAM->GetActiveTrackSelector());
   this->TrackSelector->SetFocusCurrentCue(0);
   this->TrackSelector->GetSourceMenuButton()->SetWidth(15);
@@ -91,7 +90,7 @@ void vtkPVComparativeVisPropertyWidget::Create(
   this->Script("pack %s -side left", this->TrackSelector->GetWidgetName());
 
   this->NumberOfFramesEntry->SetParent(this);
-  this->NumberOfFramesEntry->Create(app, "");
+  this->NumberOfFramesEntry->Create(app);
   this->NumberOfFramesEntry->GetWidget()->SetValue(5);
   this->NumberOfFramesEntry->GetWidget()->SetWidth(3);
   this->NumberOfFramesEntry->SetLabelText("Number of Frames:");;
@@ -149,7 +148,7 @@ void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
       this->LastCueEditor = vtkPVSimpleAnimationCue::New();
       this->LastCueEditor->SetDuration(5);
       this->LastCueEditor->SetKeyFrameParent(trackE->GetPropertiesFrame());
-      this->LastCueEditor->CreateWidget(this->GetApplication(), 0, 0);
+      this->LastCueEditor->CreateSpecificTkWidget(this->GetApplication(), 0);
 
       this->LastCueEditor->SetAnimatedProxy(
         this->LastCue->GetAnimatedProxy());

@@ -31,10 +31,10 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.22");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.23");
 
 //----------------------------------------------------------------------------
-void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
+void vtkPVConnectDialog::Create(vtkKWApplication* app)
 {
   if (this->IsCreated())
     {
@@ -47,7 +47,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
     vtkKWMessageDialog::WarningIcon );
   this->SetStyleToOkCancel();
 
-  this->Superclass::Create(app, 0);
+  this->Superclass::Create(app);
 
   char buffer[1024];
   sprintf(buffer, 
@@ -59,18 +59,19 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->SetText(buffer);
   this->SetTitle("ParaView Connection Warning");
   this->Label->SetParent(this->BottomFrame);
-  this->Label->Create(app, "-text {Hostname}");
+  this->Label->Create(app);
+  this->Label->SetText("Hostname");
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this->BottomFrame);
-  frame->Create(app, 0);
+  frame->Create(app);
   this->Username->SetParent(frame);
-  this->Username->Create(app, 0);
+  this->Username->Create(app);
   this->Username->SetValue(this->SSHUser);
   this->Hostname->SetParent(frame);
-  this->Hostname->Create(app, 0);
+  this->Hostname->Create(app);
   this->Hostname->GetLabel()->SetText("@");
   this->Port->SetParent(frame);
-  this->Port->Create(app,0);
+  this->Port->Create(app);
   this->Port->GetLabel()->SetText(":");
   this->Port->GetWidget()->SetWidth(4);
   this->Username->SetWidth(7);
@@ -85,10 +86,10 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   frame->Delete();
   frame = vtkKWFrame::New();
   frame->SetParent(this->BottomFrame);
-  frame->Create(app, 0);
+  frame->Create(app);
 
   this->MPIMode->SetParent(frame);
-  this->MPIMode->Create(app, 0);
+  this->MPIMode->Create(app);
   this->MPIMode->GetLabel()->SetText("Use MPI");
   if ( this->MultiProcessMode == 1 )
     {
@@ -101,7 +102,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->MPIMode->GetWidget()->SetCommand(this, "MPICheckBoxCallback");
   this->MPINumberOfServers->SetParent(frame);
   this->MPINumberOfServers->PopupScaleOn();
-  this->MPINumberOfServers->Create(app, 0);
+  this->MPINumberOfServers->Create(app);
   this->MPINumberOfServers->DisplayEntry();
   this->MPINumberOfServers->DisplayLabel("Number of processes");
   this->MPINumberOfServers->SetRange(2, 10);

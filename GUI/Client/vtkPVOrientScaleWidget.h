@@ -29,6 +29,7 @@ class vtkKWFrameLabeled;
 class vtkKWOptionMenu;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProperty;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVOrientScaleWidget : public vtkPVWidget
 {
@@ -96,19 +97,19 @@ protected:
   ~vtkPVOrientScaleWidget();
 
   vtkKWFrameLabeled *LabeledFrame;
-  vtkKWWidget *ScalarsFrame;
+  vtkKWFrame *ScalarsFrame;
   vtkKWLabel *ScalarsLabel;
   vtkKWOptionMenu *ScalarsMenu;
-  vtkKWWidget *VectorsFrame;
+  vtkKWFrame *VectorsFrame;
   vtkKWLabel *VectorsLabel;
   vtkKWOptionMenu *VectorsMenu;
-  vtkKWWidget *OrientModeFrame;
+  vtkKWFrame *OrientModeFrame;
   vtkKWLabel *OrientModeLabel;
   vtkKWOptionMenu *OrientModeMenu;
-  vtkKWWidget *ScaleModeFrame;
+  vtkKWFrame *ScaleModeFrame;
   vtkKWLabel *ScaleModeLabel;
   vtkKWOptionMenu *ScaleModeMenu;
-  vtkKWWidget *ScaleFactorFrame;
+  vtkKWFrame *ScaleFactorFrame;
   vtkKWLabel *ScaleFactorLabel;
   vtkKWEntry *ScaleFactorEntry;
 

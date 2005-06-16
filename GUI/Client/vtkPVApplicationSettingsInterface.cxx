@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.23");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.24");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -110,7 +110,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     this->AutoAcceptCheckButton = vtkKWCheckButton::New();
     }
   this->AutoAcceptCheckButton->SetParent(frame);
-  this->AutoAcceptCheckButton->Create(app, 0);
+  this->AutoAcceptCheckButton->Create(app);
   this->AutoAcceptCheckButton->SetText("AutoAccept");
   this->AutoAcceptCheckButton->SetCommand(
     this, "AutoAcceptCallback");
@@ -133,7 +133,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesDescriptionCheckButton->SetParent(frame);
-  this->ShowSourcesDescriptionCheckButton->Create(app, 0);
+  this->ShowSourcesDescriptionCheckButton->Create(app);
   this->ShowSourcesDescriptionCheckButton->SetText("Show source descriptions");
   this->ShowSourcesDescriptionCheckButton->SetCommand(
     this, "ShowSourcesDescriptionCallback");
@@ -153,7 +153,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesNameCheckButton->SetParent(frame);
-  this->ShowSourcesNameCheckButton->Create(app, 0);
+  this->ShowSourcesNameCheckButton->Create(app);
   this->ShowSourcesNameCheckButton->SetText(
     "Show source names in browsers");
   this->ShowSourcesNameCheckButton->SetCommand(
@@ -172,7 +172,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowTraceFilesCheckButton->SetParent(frame);
-  this->ShowTraceFilesCheckButton->Create(app, 0);
+  this->ShowTraceFilesCheckButton->Create(app);
   this->ShowTraceFilesCheckButton->SetText(
     "Show trace files on ParaView startup");
   this->ShowTraceFilesCheckButton->SetCommand(
@@ -205,7 +205,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->CreateLogFilesCheckButton->SetParent(frame);
-  this->CreateLogFilesCheckButton->Create(app, 0);
+  this->CreateLogFilesCheckButton->Create(app);
   this->CreateLogFilesCheckButton->SetText(
     "Create per node log files on ParaView startup");
   this->CreateLogFilesCheckButton->SetCommand(

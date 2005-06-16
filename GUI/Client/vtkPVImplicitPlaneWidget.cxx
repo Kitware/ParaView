@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -72,7 +72,7 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->OffsetLabel = vtkKWLabel::New();
   this->OffsetEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
-  this->NormalButtonFrame = vtkKWWidget::New();
+  this->NormalButtonFrame = vtkKWFrame::New();
   this->NormalCameraButton = vtkKWPushButton::New();
   this->NormalXButton = vtkKWPushButton::New();
   this->NormalYButton = vtkKWPushButton::New();
@@ -569,17 +569,17 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 
   this->SetFrameLabel("Plane Widget");
   this->Labels[0]->SetParent(this->Frame);
-  this->Labels[0]->Create(pvApp, "");
+  this->Labels[0]->Create(pvApp);
   this->Labels[0]->SetText("Center");
   this->Labels[1]->SetParent(this->Frame);
-  this->Labels[1]->Create(pvApp, "");
+  this->Labels[1]->Create(pvApp);
   this->Labels[1]->SetText("Normal");
 
   int i;
   for (i=0; i<3; i++)
     {
     this->CoordinateLabel[i]->SetParent(this->Frame);
-    this->CoordinateLabel[i]->Create(pvApp, "");
+    this->CoordinateLabel[i]->Create(pvApp);
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
     this->CoordinateLabel[i]->SetText(buffer);
@@ -587,21 +587,21 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   for (i=0; i<3; i++)
     {
     this->CenterEntry[i]->SetParent(this->Frame);
-    this->CenterEntry[i]->Create(pvApp, "");
+    this->CenterEntry[i]->Create(pvApp);
     }
 
   for (i=0; i<3; i++)    
     {
     this->NormalEntry[i]->SetParent(this->Frame);
-    this->NormalEntry[i]->Create(pvApp, "");
+    this->NormalEntry[i]->Create(pvApp);
     }
 
   this->OffsetLabel->SetParent(this->Frame);
   this->OffsetLabel->SetText("Offset");
-  this->OffsetLabel->Create(pvApp, "");
+  this->OffsetLabel->Create(pvApp);
 
   this->OffsetEntry->SetParent(this->Frame);
-  this->OffsetEntry->Create(pvApp, "");
+  this->OffsetEntry->Create(pvApp);
 
   this->Script("grid propagate %s 1",
     this->Frame->GetWidgetName());
@@ -660,37 +660,37 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
                this->GetTclName());
 
   this->CenterResetButton->SetParent(this->Frame);
-  this->CenterResetButton->Create(pvApp, "");
+  this->CenterResetButton->Create(pvApp);
   this->CenterResetButton->SetText("Set Plane Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
     this->CenterResetButton->GetWidgetName());
 
   this->NormalButtonFrame->SetParent(this->Frame);
-  this->NormalButtonFrame->Create(pvApp, "frame", "");
+  this->NormalButtonFrame->Create(pvApp);
   this->Script("grid %s - - - - -sticky ew", 
     this->NormalButtonFrame->GetWidgetName());
 
   this->NormalCameraButton->SetParent(this->NormalButtonFrame);
-  this->NormalCameraButton->Create(pvApp, "");
+  this->NormalCameraButton->Create(pvApp);
   this->NormalCameraButton->SetText("Use Camera Normal");
   this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
     this->NormalCameraButton->GetWidgetName());
   this->NormalXButton->SetParent(this->NormalButtonFrame);
-  this->NormalXButton->Create(pvApp, "");
+  this->NormalXButton->Create(pvApp);
   this->NormalXButton->SetText("X Normal");
   this->NormalXButton->SetCommand(this, "NormalXCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
     this->NormalXButton->GetWidgetName());
   this->NormalYButton->SetParent(this->NormalButtonFrame);
-  this->NormalYButton->Create(pvApp, "");
+  this->NormalYButton->Create(pvApp);
   this->NormalYButton->SetText("Y Normal");
   this->NormalYButton->SetCommand(this, "NormalYCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
     this->NormalYButton->GetWidgetName());
   this->NormalZButton->SetParent(this->NormalButtonFrame);
-  this->NormalZButton->Create(pvApp, "");
+  this->NormalZButton->Create(pvApp);
   this->NormalZButton->SetText("Z Normal");
   this->NormalZButton->SetCommand(this, "NormalZCallback"); 
   this->Script("pack %s -side left -fill x -expand t",

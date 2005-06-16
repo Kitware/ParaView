@@ -18,20 +18,20 @@
 #include "vtkKWView.h"
 
 #include "vtkBMPWriter.h"
+#include "vtkCallbackCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkPVCornerAnnotationEditor.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
@@ -40,12 +40,13 @@
 #include "vtkKWSegmentedProgressGauge.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
-#include "vtkCallbackCommand.h"
+#include "vtkPVCornerAnnotationEditor.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
-#include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
@@ -53,7 +54,6 @@
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkPVTraceHelper.h"
 
 #if defined(PARAVIEW_USE_WIN32_RW)
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.16");
+vtkCxxRevisionMacro(vtkKWView, "1.17");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -120,11 +120,11 @@ vtkKWView::vtkKWView()
   this->SupportCopy         = 1;
   this->SupportControlFrame = 0;
   
-  this->Frame = vtkKWWidget::New();
+  this->Frame = vtkKWFrame::New();
   this->Frame->SetParent(this);
-  this->Frame2 = vtkKWWidget::New();
+  this->Frame2 = vtkKWFrame::New();
   this->Frame2->SetParent(this->Frame);
-  this->ControlFrame = vtkKWWidget::New();
+  this->ControlFrame = vtkKWFrame::New();
   this->ControlFrame->SetParent(this->Frame);
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->Frame2);
@@ -349,7 +349,7 @@ void vtkKWView::CreateViewProperties()
   vtkKWApplication *app = this->GetApplication();
 
   this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(app,"");
+  this->Notebook->Create(app);
 
   vtkKWIcon *ico = vtkKWIcon::New();
   this->Notebook->AddPage(
@@ -358,8 +358,9 @@ void vtkKWView::CreateViewProperties()
     "Annotate", "Set the corner annotation", ico);
   ico->Delete();
   
-  this->AnnotationPropertiesFrame->SetParent(this->Notebook->GetFrame("Annotate"));
-  this->AnnotationPropertiesFrame->Create(app,0);
+  this->AnnotationPropertiesFrame->SetParent(
+    this->Notebook->GetFrame("Annotate"));
+  this->AnnotationPropertiesFrame->Create(app);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -371,13 +372,13 @@ void vtkKWView::CreateViewProperties()
     this->AnnotationPropertiesFrame->GetFrame());
   this->CornerAnnotation->SetView(this);
   this->CornerAnnotation->GetFrame()->ShowHideFrameOn();
-  this->CornerAnnotation->Create(app, "");
+  this->CornerAnnotation->Create(app);
   this->CornerAnnotation->GetFrame()->SetLabelText("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
 
   this->GeneralPropertiesFrame->SetParent(this->Notebook->GetFrame("General"));
-  this->GeneralPropertiesFrame->Create(app,0);
+  this->GeneralPropertiesFrame->Create(app);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -386,7 +387,7 @@ void vtkKWView::CreateViewProperties()
   this->ColorsFrame->SetParent(
     this->GeneralPropertiesFrame->GetFrame());
   this->ColorsFrame->ShowHideFrameOn();
-  this->ColorsFrame->Create( app,0 );
+  this->ColorsFrame->Create(app);
   this->ColorsFrame->SetLabelText("Colors");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ColorsFrame->GetWidgetName());
@@ -395,7 +396,7 @@ void vtkKWView::CreateViewProperties()
   this->RendererBackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
   this->RendererBackgroundColor->SetColor( c );
   this->RendererBackgroundColor->GetLabel()->SetText("Set Background Color");
-  this->RendererBackgroundColor->Create( app, "" );
+  this->RendererBackgroundColor->Create(app);
   this->RendererBackgroundColor->SetCommand(
     this, "SetRendererBackgroundColor");
   this->RendererBackgroundColor->SetBalloonHelpString(
@@ -408,7 +409,7 @@ void vtkKWView::CreateViewProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::SetPropertiesParent(vtkKWWidget *args)
+void vtkKWView::SetPropertiesParent(vtkKWFrame *args)
 {
   if (this->PropertiesParent != args)
     {
@@ -427,7 +428,7 @@ void vtkKWView::SetPropertiesParent(vtkKWWidget *args)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWView::GetPropertiesParent()
+vtkKWFrame *vtkKWView::GetPropertiesParent()
 {
   // if already set then return
   if (this->PropertiesParent)
@@ -437,10 +438,10 @@ vtkKWWidget *vtkKWView::GetPropertiesParent()
   
   // if the window has defined one then use it
 
-  this->PropertiesParent = vtkKWWidget::New();
+  this->PropertiesParent = vtkKWFrame::New();
   this->PropertiesParent->SetParent
     (this->ParentWindow->GetMainPanelFrame());
-  this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
+  this->PropertiesParent->Create(this->GetApplication());
   this->SharedPropertiesParent = 1;
 
   return this->PropertiesParent;
@@ -453,9 +454,9 @@ void vtkKWView::CreateDefaultPropertiesParent()
 {
   if (!this->PropertiesParent)
     {
-    this->PropertiesParent = vtkKWWidget::New();
+    this->PropertiesParent = vtkKWFrame::New();
     this->PropertiesParent->SetParent(this);
-    this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
+    this->PropertiesParent->Create(this->GetApplication());
     this->Script("pack %s -before %s -fill y -side left -anchor nw",
                  this->PropertiesParent->GetWidgetName(),
                  this->Frame->GetWidgetName());
@@ -752,7 +753,7 @@ void vtkKWView::SaveAsImage()
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
   dlg->SetParent(window);
-  dlg->Create(this->GetApplication(),"");  
+  dlg->Create(this->GetApplication());
   int enabled = 0;
   if (window)
     {

@@ -101,7 +101,7 @@ public:
       scale->SetParent(parent->GetFrame()->GetFrame());
       scale->SetRange(p->Min, p->Max);
       scale->SetResolution(1);
-      scale->Create(parent->GetApplication(), 0);
+      scale->Create(parent->GetApplication());
       scale->DisplayRangeOn();
       scale->DisplayEntry();
       scale->SetValue(p->Value);
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.36");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -198,7 +198,7 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -206,7 +206,7 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 
   this->Frame = vtkKWFrameLabeled::New();
   this->Frame->SetParent(this);
-  this->Frame->Create(pvApp, 0);
+  this->Frame->Create(pvApp);
   this->Frame->SetLabelText(this->FrameLabel);
   this->Script("pack %s -fill both -expand 1", this->Frame->GetWidgetName());
 }

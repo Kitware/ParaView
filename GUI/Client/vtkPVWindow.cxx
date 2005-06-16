@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.733");
+vtkCxxRevisionMacro(vtkPVWindow, "1.734");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -217,7 +217,7 @@ vtkPVWindow::vtkPVWindow()
   this->ResetCenterButton = vtkKWPushButton::New();
   this->HideCenterButton = vtkKWPushButton::New();
   this->CenterEntryOpenCloseButton = vtkKWPushButton::New();
-  this->CenterEntryFrame = vtkKWWidget::New();
+  this->CenterEntryFrame = vtkKWFrame::New();
   this->CenterXLabel = vtkKWLabel::New();
   this->CenterXEntry = vtkKWEntry::New();
   this->CenterYLabel = vtkKWLabel::New();
@@ -805,18 +805,21 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Create the select menu (for selecting user created and default
   // (i.e. glyphs) data objects/sources)
   this->SelectMenu->SetParent(this->GetMenu());
-  this->SelectMenu->Create(this->GetApplication(), "-tearoff 0");
+  this->SelectMenu->Create(this->GetApplication());
+  this->SelectMenu->SetTearOff(0);
   this->GetMenu()->InsertCascade(2, VTK_PV_SELECT_SOURCE_MENU_LABEL, this->SelectMenu, 0);
   
   // Create the menu for selecting the glyphs.  
   this->GlyphMenu->SetParent(this->SelectMenu);
-  this->GlyphMenu->Create(this->GetApplication(), "-tearoff 0");
+  this->GlyphMenu->Create(this->GetApplication());
+  this->GlyphMenu->SetTearOff(0);
   this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
 
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->GetMenu());
-  this->SourceMenu->Create(this->GetApplication(), "-tearoff 0");
+  this->SourceMenu->Create(this->GetApplication());
+  this->SourceMenu->SetTearOff(0);
   this->GetMenu()->InsertCascade(3, VTK_PV_VTK_SOURCES_MENU_LABEL, 
                             this->SourceMenu, 0,
                             "Choose a source from a list of "
@@ -824,7 +827,8 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   
   // Create the menu for creating data sources (filters).  
   this->FilterMenu->SetParent(this->GetMenu());
-  this->FilterMenu->Create(this->GetApplication(), "-tearoff 0");
+  this->FilterMenu->Create(this->GetApplication());
+  this->FilterMenu->SetTearOff(0);
   this->GetMenu()->InsertCascade(4, VTK_PV_VTK_FILTERS_MENU_LABEL, 
                             this->FilterMenu, 2,
                             "Choose a filter from a list of "
@@ -895,7 +899,8 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   // Set up the button to reset the camera.
   
   this->ResetCameraButton->SetParent(this->InteractorToolbar->GetFrame());
-  this->ResetCameraButton->Create(app, "-image PVResetViewButton");
+  this->ResetCameraButton->Create(app);
+  this->ResetCameraButton->SetImageOption("PVResetViewButton");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   this->ResetCameraButton->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(this->ResetCameraButton);
@@ -922,10 +927,12 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   // Rotate camera interactor style
 
   this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
-  this->RotateCameraButton->Create(
-    app, 
-    "-indicatoron 0 -highlightthickness 0 -image PVRotateViewButton "
-    "-selectimage PVRotateViewButtonActive");
+  this->RotateCameraButton->Create(app);
+  this->RotateCameraButton->SetIndicator(0);
+  this->RotateCameraButton->SetHighlightThickness(0);
+  this->RotateCameraButton->SetImageOption("PVRotateViewButton");
+  this->RotateCameraButton->SetImageOption(
+    "PVRotateViewButtonActive", "-selectimage");
   this->RotateCameraButton->SetBalloonHelpString(
     "3D Movements Interaction Mode\nThis interaction mode can be configured "
     "from View->3D View Properties->Camera");
@@ -939,10 +946,13 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   // Translate camera interactor style
 
   this->TranslateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
-  this->TranslateCameraButton->Create(
-    app, 
-    "-indicatoron 0 -highlightthickness 0 -image PVTranslateViewButton "
-    "-selectimage PVTranslateViewButtonActive");
+  this->TranslateCameraButton->Create(app);
+  this->TranslateCameraButton->SetIndicator(0);
+  this->TranslateCameraButton->SetHighlightThickness(0);
+  this->TranslateCameraButton->SetImageOption("PVTranslateViewButton");
+  this->TranslateCameraButton->SetImageOption(
+    "PVTranslateViewButtonActive", "-selectimage");
+
   this->TranslateCameraButton->SetBalloonHelpString(
     "2D Movements Interaction Mode\nThis mode can be used in conjunction with "
     "the Parallel Projection setting (View->3D View Properties->General) to "
@@ -973,9 +983,8 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
     }
   vtkKWPushButton* button = vtkKWPushButton::New();
   button->SetParent(this->Toolbar->GetFrame());
-  ostrstream opts;
-  opts << "-image " << imageName << ends;
-  button->Create(this->GetPVApplication(), opts.str());
+  button->Create(this->GetPVApplication());
+  button->SetImageOption(imageName);
   // Add the button to the toolbar configuration menu.
   vtkKWMenu* menu = this->ToolbarMenuButton->GetMenu();
   char* var = menu->CreateCheckButtonVariable(this, buttonName);
@@ -993,6 +1002,8 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
 
   // Lets see if we can put an image with the check button.
   int index = menu->GetNumberOfItems()-1;
+  ostrstream opts;
+  opts << "-image " << imageName << ends;
   menu->ConfigureItem(index, opts.str());  
   checkCommand.rdbuf()->freeze(0);
   delete[] var;
@@ -1053,7 +1064,7 @@ void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
+void vtkPVWindow::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -1079,7 +1090,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Invoke super method
 
-  this->Superclass::Create(app, NULL);
+  this->Superclass::Create(app);
 
   // Hide the main window until after all user interface is initialized.
 
@@ -1121,8 +1132,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->GetMainToolbarSet()->AddToolbar(this->Toolbar);
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);
-  this->ToolbarMenuButton->Create(
-    app,  "-image PVToolbarPullDownArrow -relief flat");
+  this->ToolbarMenuButton->Create(app);
+  this->ToolbarMenuButton->SetImageOption("PVToolbarPullDownArrow");
+  this->ToolbarMenuButton->SetReliefToFlat();
   this->ToolbarMenuButton->IndicatorOff();
 
   this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
@@ -1144,7 +1156,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->PickCenterToolbar->Create(app);
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
-  this->PickCenterButton->Create(app, "-image PVPickCenterButton");
+  this->PickCenterButton->Create(app);
+  this->PickCenterButton->SetImageOption("PVPickCenterButton");
   ostrstream command;
   command << "SetInteractorStyle " << INTERACTOR_STYLE_CENTER_OF_ROTATION 
           << ends;
@@ -1155,14 +1168,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->PickCenterToolbar->AddWidget(this->PickCenterButton);
   
   this->ResetCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
-  this->ResetCenterButton->Create(app, "-image PVResetCenterButton");
+  this->ResetCenterButton->Create(app);
+  this->ResetCenterButton->SetImageOption("PVResetCenterButton");
   this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
   this->ResetCenterButton->SetBalloonHelpString(
     "Reset the center of rotation to the center of the current data set.");
   this->PickCenterToolbar->AddWidget(this->ResetCenterButton);
 
   this->HideCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
-  this->HideCenterButton->Create(app, "-image PVHideCenterButton");
+  this->HideCenterButton->Create(app);
+  this->HideCenterButton->SetImageOption("PVHideCenterButton");
   this->HideCenterButton->SetCommand(this, "ToggleCenterActorCallback");
   this->HideCenterButton->SetBalloonHelpString(
     "Hide the center of rotation to the center of the current data set.");
@@ -1170,7 +1185,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   this->CenterEntryOpenCloseButton->SetParent(
     this->PickCenterToolbar->GetFrame());
-  this->CenterEntryOpenCloseButton->Create(app, "-image PVEditCenterButtonOpen");
+  this->CenterEntryOpenCloseButton->Create(app);
+  this->CenterEntryOpenCloseButton->SetImageOption("PVEditCenterButtonOpen");
   this->CenterEntryOpenCloseButton->SetBalloonHelpString(
     "Edit the center of rotation xyz coordinates.");
   this->CenterEntryOpenCloseButton->SetCommand(this, "CenterEntryOpenCallback");
@@ -1200,36 +1216,39 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     }
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
-  this->CenterEntryFrame->Create(app, "frame", "");
+  this->CenterEntryFrame->Create(app);
   
   this->CenterXLabel->SetParent(this->CenterEntryFrame);
-  this->CenterXLabel->Create(app, "");
+  this->CenterXLabel->Create(app);
   this->CenterXLabel->SetText("X");
   
   this->CenterXEntry->SetParent(this->CenterEntryFrame);
-  this->CenterXEntry->Create(app, "-width 7");
+  this->CenterXEntry->Create(app);
+  this->CenterXEntry->SetWidth(7);
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
   //this->CenterXEntry->SetValue(this->CameraStyle3D->GetCenter()[0], 3);
   this->CenterXEntry->SetValue(0.0);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
-  this->CenterYLabel->Create(app, "");
+  this->CenterYLabel->Create(app);
   this->CenterYLabel->SetText("Y");
   
   this->CenterYEntry->SetParent(this->CenterEntryFrame);
-  this->CenterYEntry->Create(app, "-width 7");
+  this->CenterYEntry->Create(app);
+  this->CenterYEntry->SetWidth(7);
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
   //this->CenterYEntry->SetValue(this->CameraStyle3D->GetCenter()[1], 3);
   this->CenterYEntry->SetValue(0.0);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
-  this->CenterZLabel->Create(app, "");
+  this->CenterZLabel->Create(app);
   this->CenterZLabel->SetText("Z");
   
   this->CenterZEntry->SetParent(this->CenterEntryFrame);
-  this->CenterZEntry->Create(app, "-width 7");
+  this->CenterZEntry->Create(app);
+  this->CenterZEntry->SetWidth(7);
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
   //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
@@ -1330,7 +1349,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     this->GetSecondaryNotebook()->GetFrame(
       this->GetSecondaryNotebook()->AddPage("Animation")));
   this->AnimationManager->SetVerticalParent(this->GetMainPanelFrame());
-  this->AnimationManager->Create(app, "-relief flat");
+  this->AnimationManager->Create(app);
   this->AnimationManager->ShowHAnimationInterface();
   
   // File->Open Data File is disabled unless reader modules are loaded.
@@ -1958,7 +1977,9 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->SetParent(this->GetViewFrame());
   this->MainView->SetPropertiesParent(this->GetMainPanelFrame());
   this->MainView->SetParentWindow(this);
-  this->MainView->Create(this->GetApplication(),"-width 200 -height 200");
+  this->MainView->Create(this->GetApplication());
+  this->MainView->SetConfigurationOptionAsInt("-width", 200);
+  this->MainView->SetConfigurationOptionAsInt("-height", 200);
   this->MainView->CreateRenderObjects(pvApp);
   this->MainView->MakeSelected();
   this->MainView->Select(this);
@@ -2050,7 +2071,7 @@ void vtkPVWindow::OpenCallback()
 
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "OpenPath");
-  loadDialog->Create(this->GetApplication(),0);
+  loadDialog->Create(this->GetApplication());
   loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
 
@@ -2517,7 +2538,7 @@ void vtkPVWindow::WriteData()
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetFileTypes(types);
   delete [] types;
-  saveDialog->Create(this->GetApplication(), 0);
+  saveDialog->Create(this->GetApplication());
   // Ask the user for the filename.
 
   int enabled = this->GetEnabled();
@@ -2546,7 +2567,7 @@ void vtkPVWindow::WriteData()
     if(parallel)
       {
       vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
-      dlg->Create(this->GetApplication(), "");
+      dlg->Create(this->GetApplication());
       dlg->SetMasterWindow(this);
       dlg->SetTitle("Select ghost levels");
 
@@ -2630,7 +2651,7 @@ void vtkPVWindow::SaveSMState()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveSMStatePath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->GetApplication(),0);
+  exportDialog->Create(this->GetApplication());
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save SM State");
   exportDialog->SetDefaultExtension(".pvsm");
@@ -2661,7 +2682,7 @@ void vtkPVWindow::SaveBatchScript()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveBatchLastPath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->GetApplication(),0);
+  exportDialog->Create(this->GetApplication());
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save Batch Script");
   exportDialog->SetDefaultExtension(".pvb");
@@ -3014,7 +3035,7 @@ void vtkPVWindow::SaveState()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveStateLastPath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->GetApplication(),0);
+  exportDialog->Create(this->GetApplication());
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save State");
   exportDialog->SetDefaultExtension(".pvs");
@@ -3899,7 +3920,7 @@ void vtkPVWindow::CreateComparativeVisManagerGUI()
     this->ComparativeVisManagerGUI = vtkPVComparativeVisManagerGUI::New();
     this->ComparativeVisManagerGUI->SetTitle("Comparative Visualizations");
     this->ComparativeVisManagerGUI->SetMasterWindow(this);
-    this->ComparativeVisManagerGUI->Create(this->GetPVApplication(), 0);
+    this->ComparativeVisManagerGUI->Create(this->GetPVApplication());
     }  
 }
 
@@ -3909,7 +3930,7 @@ void vtkPVWindow::SaveTrace()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->GetApplication(),0);
+  exportDialog->Create(this->GetApplication());
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
@@ -4112,7 +4133,7 @@ int vtkPVWindow::OpenPackage()
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "PackagePath");
   loadDialog->SetParent(this);
-  loadDialog->Create(this->GetApplication(),0);
+  loadDialog->Create(this->GetApplication());
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExtension(".xml");
   loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*}}");

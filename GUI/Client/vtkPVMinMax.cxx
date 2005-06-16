@@ -16,6 +16,7 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWLabel.h"
+#include "vtkKWFrame.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -33,16 +34,16 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.48");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
 {
-  this->MinFrame = vtkKWWidget::New();
+  this->MinFrame = vtkKWFrame::New();
   this->MinFrame->SetParent(this);
-  this->MaxFrame = vtkKWWidget::New();
+  this->MaxFrame = vtkKWFrame::New();
   this->MaxFrame->SetParent(this);
   this->MinLabel = vtkKWLabel::New();
   this->MaxLabel = vtkKWLabel::New();
@@ -133,7 +134,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -153,12 +154,12 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  this->MinFrame->Create(pvApp, "frame", "");
+  this->MinFrame->Create(pvApp);
   this->Script("pack %s -side top -fill x -expand t", 
                this->MinFrame->GetWidgetName());
   if (this->PackVertically)
     {
-    this->MaxFrame->Create(pvApp, "frame", "");
+    this->MaxFrame->Create(pvApp);
     this->Script("pack %s -side top -fill x -expand t", 
                  this->MaxFrame->GetWidgetName());
     }
@@ -167,16 +168,15 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
   if ( this->ShowMinLabel )
     {
     this->MinLabel->SetParent(this->MinFrame);
-    ostrstream opts;
-    opts << "-width " << this->MinLabelWidth << " -justify right" << ends;
-    this->MinLabel->Create(pvApp, opts.str());
-    opts.rdbuf()->freeze(0);
+    this->MinLabel->Create(pvApp);
+    this->MinLabel->SetWidth(this->MinLabelWidth);
+    this->MinLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 
                  this->MinLabel->GetWidgetName());
     }
 
   this->MinScale->SetParent(this->MinFrame);
-  this->MinScale->Create(this->GetApplication(), "");
+  this->MinScale->Create(this->GetApplication());
   this->MinScale->SetDisplayEntryAndLabelOnTop(0);
   this->MinScale->DisplayEntry();
   this->MinScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
@@ -194,10 +194,9 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
       {
       this->MaxLabel->SetParent(this->MinFrame);
       }
-    ostrstream opts;
-    opts << "-width " << this->MaxLabelWidth << " -justify right" << ends;
-    this->MaxLabel->Create(pvApp, opts.str());
-    opts.rdbuf()->freeze(0);
+    this->MaxLabel->Create(pvApp);
+    this->MaxLabel->SetWidth(this->MaxLabelWidth);
+    this->MaxLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 
                  this->MaxLabel->GetWidgetName());
     }
@@ -210,7 +209,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     {
     this->MaxScale->SetParent(this->MinFrame);
     }
-  this->MaxScale->Create(this->GetApplication(), "");
+  this->MaxScale->Create(this->GetApplication());
   this->MaxScale->SetDisplayEntryAndLabelOnTop(0);
   this->MaxScale->DisplayEntry();
   this->MaxScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);

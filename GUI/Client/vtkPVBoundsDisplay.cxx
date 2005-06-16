@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.25");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -62,7 +62,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -70,7 +70,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
 
   this->Widget->SetParent(this);
   this->Widget->SetShowHideFrame( this->GetShowHideFrame() );
-  this->Widget->Create(app, "");
+  this->Widget->Create(app);
   if (this->FrameLabel)
     {
     this->Widget->SetLabelText(this->FrameLabel);

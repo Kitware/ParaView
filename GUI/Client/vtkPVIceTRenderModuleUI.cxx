@@ -16,6 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrame.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkPVTraceHelper.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.7");
 
 int vtkPVIceTRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -68,7 +69,7 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app, const char *)
+void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -76,23 +77,24 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app, const char *)
     return;
     }
 
-  this->Superclass::Create(app, NULL);
+  this->Superclass::Create(app);
 
   vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
   // Skip over LOD res and threshold, composite threshold, and subsample rate.
   int row = 10;
 
   this->CollectLabel->SetParent(this->LODScalesFrame);
-  this->CollectLabel->Create(app, "-anchor w");
+  this->CollectLabel->Create(app);
+  this->CollectLabel->SetAnchorToWest();
   this->CollectLabel->SetText("Client Collect:");
 
   this->CollectCheck->SetParent(this->LODScalesFrame);
-  this->CollectCheck->Create(app, "");
+  this->CollectCheck->Create(app);
   this->CollectCheck->SetState(1);
   this->CollectCheck->SetCommand(this, "CollectCheckCallback");
 
   this->CollectThresholdScale->SetParent(this->LODScalesFrame);
-  this->CollectThresholdScale->Create(app, "-orient horizontal");
+  this->CollectThresholdScale->Create(app);
   this->CollectThresholdScale->SetRange(0.0, 1000.0);
   this->CollectThresholdScale->SetResolution(10.0);
   this->CollectThresholdScale->SetValue(this->CollectThreshold);
@@ -108,7 +110,8 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app, const char *)
     "Right: Collect larger geometry on client.");
 
   this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
-  this->CollectThresholdLabel->Create(app, "-anchor w");
+  this->CollectThresholdLabel->Create(app);
+  this->CollectThresholdLabel->SetAnchorToWest();
   if (pvapp->GetRegistryValue(2, "RunTime", "CollectThreshold", 0))
     {
     this->CollectThreshold

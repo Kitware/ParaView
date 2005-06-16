@@ -23,6 +23,7 @@
 class vtkKWScale;
 class vtkKWLabel;
 class vtkPVArrayMenu;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVMinMax : public vtkPVWidget
 {
@@ -31,6 +32,8 @@ public:
   vtkTypeRevisionMacro(vtkPVMinMax, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Create the widget.
   virtual void Create(vtkKWApplication *pvApp);
 
   // Description:
@@ -161,8 +164,8 @@ protected:
   vtkKWLabel *MaxLabel;
   vtkKWScale *MinScale;
   vtkKWScale *MaxScale;
-  vtkKWWidget *MinFrame;
-  vtkKWWidget *MaxFrame;
+  vtkKWFrame *MinFrame;
+  vtkKWFrame *MaxFrame;
 
   char* MinHelp;
   char* MaxHelp;

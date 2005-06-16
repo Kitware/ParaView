@@ -31,7 +31,7 @@ class vtkPVSource;
 class vtkKWLabel;
 class vtkKWCheckButton;
 class vtkStringList;
-
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVSelectArrays : public vtkPVWidget
 {
@@ -41,7 +41,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set up the UI for this source
+  // Create the widget.
   void Create(vtkKWApplication *app);
 
   // Description:
@@ -109,7 +109,7 @@ protected:
   vtkPVSelectArrays();
   ~vtkPVSelectArrays();
 
-  vtkKWWidget*      ButtonFrame;
+  vtkKWFrame*      ButtonFrame;
   vtkKWLabel*       ShowAllLabel;
   vtkKWCheckButton* ShowAllCheck;
 

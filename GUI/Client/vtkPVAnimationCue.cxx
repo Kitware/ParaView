@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.32");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.33");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -255,7 +255,7 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
+void vtkPVAnimationCue::Create(vtkKWApplication* app)
 {
   if (this->IsCreated())
     {
@@ -269,10 +269,10 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
     return;
     }
 
-  this->CreateWidget(app, "frame", args);
+  this->CreateWidget(app, "frame");
   
   this->TimeLineContainer->SetParent(this->TimeLineParent);
-  this->TimeLineContainer->Create(app, NULL);
+  this->TimeLineContainer->Create(app);
   
   this->TimeLineFrame->SetParent(this->TimeLineContainer);
   this->TimeLine->SetParameterCursorInteractionStyle(
@@ -280,10 +280,8 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
     vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithRighButton |
     vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithControlLeftButton);
 
-  ostrstream tf_options;
-  tf_options << "-height " << VTK_PV_ANIMATON_ENTRY_HEIGHT << ends;
-  this->TimeLineFrame->Create(app, tf_options.str());
-  tf_options.rdbuf()->freeze(0);
+  this->TimeLineFrame->Create(app);
+  this->TimeLineFrame->SetHeight(VTK_PV_ANIMATON_ENTRY_HEIGHT);
   
   // Create the time line associated with this entry.
   this->TimeLine->SetShowLabel(0);
@@ -292,29 +290,25 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
     vtkKWParameterValueFunctionEditor::PointMarginHorizontalSides);
   this->TimeLine->SetAnimationCue(this);
   this->TimeLine->SetParent(this->TimeLineFrame);
-  this->TimeLine->Create(app, 0);
+  this->TimeLine->Create(app);
   this->TimeLine->SetCanvasOutlineStyle(
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleHorizontalSides |
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide);
 
   this->Frame->SetParent(this);
-  ostrstream frame_options;
+  this->Frame->Create(app);
   int height = (this->TimeLine->GetShowParameterRange())? 
     this->TimeLine->GetParameterRange()->GetThickness() : 0;
-  frame_options << "-relief flat -height " 
-    << this->TimeLine->GetCanvasHeight() + height
-    << ends;
-  this->Frame->Create(app,frame_options.str());
-  frame_options.rdbuf()->freeze(0);
-  
+  this->Frame->SetHeight(this->TimeLine->GetCanvasHeight() + height);
+
   this->Label->SetParent(this->Frame);
-  this->Label->Create(app, args);
+  this->Label->Create(app);
 
   this->Script("pack propagate %s 0", this->Frame->GetWidgetName());
   this->Script("bind %s <ButtonPress-1> {%s GetFocus}",
     this->Label->GetWidgetName(), this->GetTclName());
   this->Image->SetParent(this->Frame);
-  this->Image->Create(app, "-relief flat");
+  this->Image->Create(app);
   this->SetImageType(this->ImageType);
   this->InitializeObservers(this->TimeLine);
 }
@@ -459,12 +453,9 @@ void vtkPVAnimationCue::PackWidget()
   // containig the label.
   if (label_frame_width != 1)
     {
-    ostrstream str;
     // the addition 50 is added to take care for the expansion of label 
     // when it becomes bold.
-    str << "-width " << (label_frame_width + 50) << ends;
-    this->Frame->ConfigureOptions(str.str());
-    str.rdbuf()->freeze(0);
+    this->Frame->SetWidth(label_frame_width + 50);
     }
 }
 

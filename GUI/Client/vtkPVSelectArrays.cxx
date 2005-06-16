@@ -18,6 +18,7 @@
 #include "vtkDataSet.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
+#include "vtkKWFrame.h"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWWidget.h"
@@ -39,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.6");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.7");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -54,7 +55,7 @@ vtkPVSelectArrays::vtkPVSelectArrays()
   this->Deactivate = 0;
   this->FilterArrays = 0;
 
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->ShowAllLabel = vtkKWLabel::New();
   this->ShowAllCheck = vtkKWCheckButton::New();
 
@@ -91,7 +92,7 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -100,14 +101,14 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(pvApp, "frame", "");
+  this->ButtonFrame->Create(pvApp);
   this->Script("pack %s -side top -fill x",
                this->ButtonFrame->GetWidgetName());
   this->ShowAllLabel->SetParent(this->ButtonFrame);
-  this->ShowAllLabel->Create(pvApp, "");
+  this->ShowAllLabel->Create(pvApp);
   this->ShowAllLabel->SetText("Show All");
   this->ShowAllCheck->SetParent(this->ButtonFrame);
-  this->ShowAllCheck->Create(pvApp, "");
+  this->ShowAllCheck->Create(pvApp);
   this->ShowAllCheck->SetState(0);
   this->ShowAllCheck->SetCommand(this, "ShowAllArraysCheckCallback");
 
@@ -122,7 +123,8 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
     
   this->ArraySelectionList->SetParent(this);
   this->ArraySelectionList->ScrollbarOff();
-  this->ArraySelectionList->Create(app, "-selectmode extended");
+  this->ArraySelectionList->Create(app);
+  this->ArraySelectionList->SetSelectionModeToExtended();
   this->ArraySelectionList->SetHeight(0);
   this->ArraySelectionList->SetSingleClickCallback(this,"ModifiedCallback");
   // I assume we need focus for control and alt modifiers.
@@ -163,7 +165,7 @@ void vtkPVSelectArrays::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(arrayName);
-      label->Create(this->GetApplication(), "");
+      label->Create(this->GetApplication());
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->ArrayLabelCollection->AddItem(label);

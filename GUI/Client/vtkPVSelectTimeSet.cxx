@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.55");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.56");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -102,11 +102,12 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 2 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
+  this->SetBorderWidth(2);
 
   // For getting the widget in a script.
   if ((this->GetTraceHelper()->GetObjectNameState() == 
@@ -119,24 +120,32 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   
-  this->LabeledFrame->Create(this->GetApplication(), 0);
+  this->LabeledFrame->Create(this->GetApplication());
   if (this->FrameLabel)
     {
     this->LabeledFrame->SetLabelText(this->FrameLabel);
     }
-  this->TimeLabel->Create(this->GetApplication(), "");
+  this->TimeLabel->Create(this->GetApplication());
 
   char label[32];
   sprintf(label, "Time value: %12.5e", 0.0);
   this->TimeLabel->SetText(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
-  this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow", 
-                          "-relief sunken -bd 2");
+  this->TreeFrame->CreateSpecificTkWidget(
+    this->GetApplication(), "ScrolledWindow");
+  this->TreeFrame->SetReliefToSunken();
+  this->TreeFrame->SetBorderWidth(2);
 
-  this->Tree->Create(this->GetApplication(), "Tree", 
-                     "-background white -bd 0 -width 15 -padx 2 "
-                     "-redraw 1 -relief flat -selectbackground red");
+  this->Tree->CreateSpecificTkWidget(this->GetApplication(), "Tree");
+  this->Tree->SetBackgroundColor(1.0, 1.0, 1.0);
+  this->Tree->SetBorderWidth(0);
+  this->Tree->SetReliefToFlat();
+  this->Tree->SetPadX(2);
+  this->Tree->SetConfigurationOptionAsInt("-width", 15);
+  this->Tree->SetConfigurationOptionAsInt("-redraw", 1);
+  this->Tree->SetConfigurationOption("-selectbackground", "red");
+
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
                this->Tree->GetWidgetName(), this->GetTclName());
   this->Script("%s setwidget %s", this->TreeFrame->GetWidgetName(),

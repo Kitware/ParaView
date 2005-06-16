@@ -42,8 +42,8 @@ public:
   static vtkPVHorizontalAnimationInterface* New();
 
   // Description:
-  // Creates the widget.
-  virtual void Create(vtkKWApplication* app, const char* frameArgs);
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app);
 
   virtual void ResizeCallback();
 

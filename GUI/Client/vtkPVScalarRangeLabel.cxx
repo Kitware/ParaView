@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.26");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -60,7 +60,7 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -68,7 +68,7 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 
   this->Label->SetParent(this);
   this->Label->SetText("");
-  this->Label->Create(app, "");
+  this->Label->Create(app);
   this->Script("pack %s -side top -expand t -fill x", 
                this->Label->GetWidgetName());
 }

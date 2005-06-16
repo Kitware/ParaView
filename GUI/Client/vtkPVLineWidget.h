@@ -37,6 +37,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Create the widget.
   // Overridden to set up control dependencies among properties.
   virtual void Create(vtkKWApplication* app);
 

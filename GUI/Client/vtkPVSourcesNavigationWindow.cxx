@@ -19,6 +19,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
+#include "vtkKWScrollbar.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
@@ -30,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.22");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -38,7 +39,7 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->Width     = -1;
   this->Height    = -1;
   this->Canvas    = vtkKWCanvas::New();
-  this->ScrollBar = vtkKWWidget::New();
+  this->ScrollBar = vtkKWScrollbar::New();
   this->PopupMenu = vtkKWMenu::New();
   this->PopupModule = 0;
   this->AlwaysShowName = 0;
@@ -129,46 +130,39 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *args)
+void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(app, "frame", args))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   const char *wname = this->GetWidgetName();
-  ostrstream opts;
   
-  if (this->Width > 0 && this->Height > 0)
-    {
-    opts << " -width " << this->Width << " -height " << this->Height;
-    }
-  else if (this->Width > 0)
-    {
-    opts << " -width " << this->Width;
-    }
-  else if (this->Height > 0)
-    {
-    opts << " -height " << this->Height;
-    }
-
-  opts << " -highlightthickness 0";
-  opts << " -bg white" << ends;
-
-  char* optstr = opts.str();
   this->Canvas->SetParent(this);
-  this->Canvas->Create(this->GetApplication(), optstr); 
-  delete[] optstr;
+  this->Canvas->Create(this->GetApplication()); 
+  this->Canvas->SetHighlightThickness(0);
+  this->Canvas->SetBackgroundColor(1.0, 1.0, 1.0);
+
+  if (this->Width > 0)
+    {
+    this->Canvas->SetWidth(this->Width);
+    }
+  if (this->Height > 0)
+    {
+    this->Canvas->SetHeight(this->Height);
+    }
 
   ostrstream command;
   this->ScrollBar->SetParent(this);
-  command << "-command \"" <<  this->Canvas->GetWidgetName()
-          << " yview\"" << ends;
+  command << "{" <<  this->Canvas->GetWidgetName()
+          << " yview}" << ends;
   char* commandStr = command.str();
-  this->ScrollBar->Create(this->GetApplication(), "scrollbar", commandStr);
+  this->ScrollBar->Create(this->GetApplication());
+  this->ScrollBar->SetConfigurationOption("-command", commandStr);
   delete[] commandStr;
 
   this->Script("%s configure -yscrollcommand \"%s set\"", 
@@ -182,7 +176,8 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->Script("grid columnconfig %s 0 -weight 1", wname);
   this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
-  this->PopupMenu->Create(this->GetApplication(), "-tearoff 0");
+  this->PopupMenu->Create(this->GetApplication());
+  this->PopupMenu->SetTearOff(0);
   this->PopupMenu->AddCommand("Delete", this, "PopupDeleteCallback", 0, 
        "Delete the module.  Module that are used by filters cannot be deleted.");
   char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");

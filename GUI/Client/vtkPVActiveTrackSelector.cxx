@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.4");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -68,9 +68,9 @@ vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
+void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating the widget");
     return;
@@ -78,19 +78,19 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app, const char* args)
   
   this->SourceLabel->SetParent(this);
   this->SourceLabel->SetText("Source:");
-  this->SourceLabel->Create(app, 0);
+  this->SourceLabel->Create(app);
   
   this->SourceMenuButton->SetParent(this);
-  this->SourceMenuButton->Create(app, 0);
+  this->SourceMenuButton->Create(app);
   this->SourceMenuButton->SetBalloonHelpString("Select a Source to animate.");
   this->SourceMenuButton->SetButtonText("Unselected"); 
   
   this->PropertyLabel->SetParent(this);
   this->PropertyLabel->SetText("Property:");
-  this->PropertyLabel->Create(app, 0);
+  this->PropertyLabel->Create(app);
 
   this->PropertyMenuButton->SetParent(this);
-  this->PropertyMenuButton->Create(app, 0);
+  this->PropertyMenuButton->Create(app);
   this->PropertyMenuButton->SetBalloonHelpString(
     "Select a Property to animate for the choosen Source.");
   this->PropertyMenuButton->SetButtonText("Unselected"); 

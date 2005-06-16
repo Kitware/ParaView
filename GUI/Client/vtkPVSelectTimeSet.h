@@ -35,6 +35,8 @@ public:
   vtkTypeRevisionMacro(vtkPVSelectTimeSet, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Create the widget.
   virtual void Create(vtkKWApplication *pvApp);
 
   //BTX

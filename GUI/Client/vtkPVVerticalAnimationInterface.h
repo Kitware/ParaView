@@ -42,8 +42,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Creates the widget.
-  virtual void Create(vtkKWApplication* app, const char* args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app);
 
   // Description:
   // Set active PVAnimationCue.

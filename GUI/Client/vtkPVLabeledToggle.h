@@ -36,6 +36,8 @@ public:
   void SetLabel(const char *str);
   const char* GetLabel();
 
+  // Description:
+  // Create the widget.
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:

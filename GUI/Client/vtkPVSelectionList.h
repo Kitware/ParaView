@@ -38,7 +38,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Creates common widgets.
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
   // Add items to the possible selection.

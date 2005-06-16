@@ -49,7 +49,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.144");
+vtkCxxRevisionMacro(vtkPVProbe, "1.145");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -63,14 +63,14 @@ vtkPVProbe::vtkPVProbe()
 {
   this->CommandFunction = vtkPVProbeCommand;
 
-  this->SelectedPointFrame = vtkKWWidget::New();
+  this->SelectedPointFrame = vtkKWFrame::New();
   this->SelectedPointLabel = vtkKWLabel::New();
   this->PointDataLabel = vtkKWLabel::New();
   
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
 
   
-  this->ProbeFrame = vtkKWWidget::New();
+  this->ProbeFrame = vtkKWFrame::New();
   
   
   this->ReplaceInputOff();
@@ -139,27 +139,28 @@ void vtkPVProbe::CreateProperties()
   pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
   this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->ProbeFrame->Create(pvApp, "frame", "");
+  this->ProbeFrame->Create(pvApp);
   
   this->Script("pack %s",
                this->ProbeFrame->GetWidgetName());
 
   // widgets for points
   this->SelectedPointFrame->SetParent(this->ProbeFrame);
-  this->SelectedPointFrame->Create(pvApp, "frame", "");
+  this->SelectedPointFrame->Create(pvApp);
 
   this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
-  this->SelectedPointLabel->Create(pvApp, "");
+  this->SelectedPointLabel->Create(pvApp);
   this->SelectedPointLabel->SetText("Point");
 
   this->Script("pack %s -side left",
                this->SelectedPointLabel->GetWidgetName());
   
   this->PointDataLabel->SetParent(this->ProbeFrame);
-  this->PointDataLabel->Create(pvApp, "");
+  this->PointDataLabel->Create(pvApp);
 
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
-  this->ShowXYPlotToggle->Create(pvApp, "-text \"Show XY-Plot\"");
+  this->ShowXYPlotToggle->Create(pvApp);
+  this->ShowXYPlotToggle->SetText("Show XY-Plot");
   this->ShowXYPlotToggle->SetState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());

@@ -486,7 +486,7 @@ void vtkPVApplication::CreateSplashScreen()
 
   if (!this->GetSplashScreen()->IsCreated())
     {
-    this->GetSplashScreen()->Create(this, NULL);
+    this->GetSplashScreen()->Create(this);
     }
   this->GetSplashScreen()->SetProgressMessageVerticalOffset(-17);
   this->GetSplashScreen()->SetImageName("PVSplashScreen");
@@ -506,14 +506,15 @@ void vtkPVApplication::ConfigureAboutDialog()
     this->SaveRuntimeInfoButton->SetParent(
       this->AboutDialog->GetBottomFrame());
     this->SaveRuntimeInfoButton->SetText("Save Information");
-    this->SaveRuntimeInfoButton->Create(this, "-width 16");
+    this->SaveRuntimeInfoButton->Create(this);
+    this->SaveRuntimeInfoButton->SetWidth(16);
     this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
     }
   this->Script("pack %s -side bottom",
                this->SaveRuntimeInfoButton->GetWidgetName());
   this->AboutRuntimeInfo->SetHeight(14);
-  this->AboutRuntimeInfo->GetTextWidget()->ConfigureOptions(
-    "-font {Helvetica 9}");
+  this->AboutRuntimeInfo->GetTextWidget()->SetConfigurationOption(
+    "-font", "{Helvetica 9}");
 }
 
 //----------------------------------------------------------------------------
@@ -525,7 +526,7 @@ void vtkPVApplication::SaveRuntimeInformation()
   dialog->SetParent(this->AboutDialog);
   dialog->SetTitle("Save Runtime Information");
   dialog->SetFileTypes("{{text file} {.txt}}");
-  dialog->Create(this, 0);
+  dialog->Create(this);
 
   if (dialog->Invoke() &&
       strlen(dialog->GetFileName()) > 0)

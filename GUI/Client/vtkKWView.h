@@ -63,9 +63,8 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a View
-  virtual void Create(vtkKWApplication* vtkNotUsed(app), 
-                      const char* vtkNotUsed(args)) {}
+  // Create the widget
+  virtual void Create(vtkKWApplication *app) {}
 
   // Description:
   // Sets up some default event handlers to allow
@@ -155,8 +154,8 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
   // Get the attachment point for the Composits properties.
   // This attachment point may be obtained from the parent window
   // if it has been set.
-  virtual vtkKWWidget *GetPropertiesParent();
-  void SetPropertiesParent(vtkKWWidget*);
+  virtual vtkKWFrame *GetPropertiesParent();
+  void SetPropertiesParent(vtkKWFrame*);
 
   // Description:
   // Make the properties show up in the view instead of the window
@@ -287,7 +286,7 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
 
   // Description:
   // Get the control frame to put custom controls within
-  vtkGetObjectMacro( ControlFrame, vtkKWWidget );
+  vtkGetObjectMacro( ControlFrame, vtkKWFrame );
   
   //BTX
   // Description:
@@ -337,14 +336,14 @@ protected:
   int SharedPropertiesParent;
   float Center[2];
   vtkKWWindow *ParentWindow;
-  vtkKWWidget *PropertiesParent;
+  vtkKWFrame *PropertiesParent;
   vtkKWWidget *VTKWidget;
   vtkKWLabel *Label;
   int UseProgressGauge;
   vtkKWSegmentedProgressGauge *ProgressGauge;
-  vtkKWWidget *Frame;
-  vtkKWWidget *Frame2;
-  vtkKWWidget *ControlFrame;
+  vtkKWFrame *Frame;
+  vtkKWFrame *Frame2;
+  vtkKWFrame *ControlFrame;
 
   vtkKWFrameWithScrollbar *AnnotationPropertiesFrame;
 

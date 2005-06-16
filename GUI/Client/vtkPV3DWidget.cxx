@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.69");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.70");
 
 //===========================================================================
 //***************************************************************************
@@ -123,7 +123,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -134,7 +134,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   if (this->UseLabel)
     {
     this->LabeledFrame->SetParent(this);
-    this->LabeledFrame->Create(pvApp, 0);
+    this->LabeledFrame->Create(pvApp);
     this->LabeledFrame->SetLabelText("3D Widget");
     
     this->Script("pack %s -fill both -expand 1", 
@@ -144,13 +144,13 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     }
 
   this->Frame->SetParent(parent);
-  this->Frame->Create(pvApp, 0);
+  this->Frame->Create(pvApp);
   this->Script("pack %s -fill both -expand 1", 
                this->Frame->GetWidgetName());
   
   this->Visible = pvApp->GetDisplay3DWidgets();
   this->Visibility->SetParent(parent);
-  this->Visibility->Create(pvApp, "");
+  this->Visibility->Create(pvApp);
   this->Visibility->SetText("Visibility");
   this->Visibility->SetBalloonHelpString(
     "Toggle the visibility of the 3D widget on/off.");

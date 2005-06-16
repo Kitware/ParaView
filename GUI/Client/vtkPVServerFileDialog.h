@@ -33,6 +33,7 @@ class vtkKWLabel;
 class vtkKWListBox;
 class vtkKWMenuButton;
 class vtkKWPushButton;
+class vtkKWScrollbar;
 class vtkKWWindow;
 class vtkPVApplication;
 class vtkStringList;
@@ -53,8 +54,8 @@ public:
   void SetMasterWindow(vtkKWWindow* win);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Invoke the dialog and display it in a modal manner. 
@@ -98,10 +99,10 @@ protected:
   
   vtkKWWindow*      MasterWindow;
 
-  vtkKWWidget*      TopFrame;
+  vtkKWFrame*      TopFrame;
   vtkKWFrame*       MiddleFrame;
   vtkKWCanvas*      FileList;
-  vtkKWWidget*      BottomFrame;
+  vtkKWFrame*      BottomFrame;
 
   vtkKWLabel*       DirectoryDisplay;
   vtkKWMenuButton*  DirectoryMenuButton;
@@ -111,7 +112,7 @@ protected:
   vtkKWMenuButton*  FileNameMenuButton;
 
   vtkKWLabel*       ExtensionsLabel;
-  vtkKWWidget*      ExtensionsDisplayFrame;
+  vtkKWFrame*      ExtensionsDisplayFrame;
   vtkKWLabel*       ExtensionsDisplay;
   vtkKWMenuButton*  ExtensionsMenuButton;
 
@@ -137,7 +138,8 @@ protected:
 
   vtkSMProxy* ServerFileListingProxy;
 
-  vtkKWWidget* ScrollBar;
+  vtkKWScrollbar* ScrollBar;
+
   // Description:
   // This method calculates the bounding box of object "name". 
   void CalculateBBox(vtkKWWidget* canvas, const char* name, int bbox[4]);

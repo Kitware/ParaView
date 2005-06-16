@@ -35,7 +35,9 @@ public:
   vtkTypeRevisionMacro(vtkPVMultiDisplayRenderModuleUI,vtkPVCompositeRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication *app, const char *);
+  // Description:
+  // Create the widget.
+  void Create(vtkKWApplication *app);
 
 protected:
   vtkPVMultiDisplayRenderModuleUI();

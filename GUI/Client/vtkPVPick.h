@@ -69,7 +69,7 @@ protected:
   int PickLabelDisplayProxyInitialized; // flag to know if the PickLabelDisplayProxy's
     //input has been set.
   vtkSMPointLabelDisplayProxy* PickLabelDisplayProxy;
-  vtkKWWidget *DataFrame;
+  vtkKWFrame *DataFrame;
 
   vtkCollection* LabelCollection;
   virtual void Select();

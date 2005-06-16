@@ -42,7 +42,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char* args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Copy the values of the widget to the given vis.

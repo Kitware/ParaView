@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.18");
+vtkCxxRevisionMacro(vtkPVPick, "1.19");
 
 
 //----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ vtkPVPick::vtkPVPick()
   this->PickLabelDisplayProxyName = 0;
   this->PickLabelDisplayProxyInitialized = 0;
 
-  this->DataFrame = vtkKWWidget::New();
+  this->DataFrame = vtkKWFrame::New();
   this->LabelCollection = vtkCollection::New();
 }
 
@@ -122,7 +122,7 @@ void vtkPVPick::CreateProperties()
   this->Superclass::CreateProperties();
 
   this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->DataFrame->Create(pvApp, "frame", "");
+  this->DataFrame->Create(pvApp);
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
 
@@ -317,7 +317,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   // First the point/cell index label.
   kwl = vtkKWLabel::New();
   kwl->SetParent(this->DataFrame);
-  kwl->Create(this->GetPVApplication(), "");
+  kwl->Create(this->GetPVApplication());
   ostrstream kwlStr;
   kwlStr << labelArg  << ": " << idx << ends;
   kwl->SetText(kwlStr.str());
@@ -398,7 +398,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
 
   kwl = vtkKWLabel::New();
   kwl->SetParent(this->DataFrame);
-  kwl->Create(this->GetPVApplication(), "");
+  kwl->Create(this->GetPVApplication());
   kwl->SetText( label.c_str() );
   this->LabelCollection->AddItem(kwl);
   this->Script("grid %s -column 2 -row %d -sticky nw",
