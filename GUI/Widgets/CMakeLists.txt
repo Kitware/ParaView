@@ -130,6 +130,7 @@ SET(KWWidgets_SRCS
   vtkKWScalarBarAnnotation.cxx 
   vtkKWScalarComponentSelectionWidget.cxx
   vtkKWScale.cxx 
+  vtkKWScrollbar.cxx 
   vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
@@ -141,6 +142,7 @@ SET(KWWidgets_SRCS
   vtkKWTextPropertyEditor.cxx
   vtkKWThumbWheel.cxx
   vtkKWTkUtilities.cxx
+  vtkKWTkOptions.cxx
   vtkKWToolbar.cxx 
   vtkKWToolbarSet.cxx 
   vtkKWTopLevel.cxx 
