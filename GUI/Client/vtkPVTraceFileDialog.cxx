@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.11");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.12");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -44,7 +44,7 @@ vtkPVTraceFileDialog::vtkPVTraceFileDialog()
     vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault );
   this->SetOKButtonText("Delete");
-  this->SetCancelButtonText("{Do Nothing}");
+  this->SetCancelButtonText("Do Nothing");
 
 }
 
