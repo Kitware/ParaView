@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.3");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -182,12 +182,12 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
     for (unsigned int j=0; j < otherNumDataSets; j++)
       {
       vtkPVDataInformation* otherInfo = otherldata[j];
-      vtkPVDataInformation* info = ldata[j];
+      vtkPVDataInformation* localInfo = ldata[j];
       if (otherInfo)
         {
-        if (info)
+        if (localInfo)
           {
-          info->AddInformation(otherInfo);
+          localInfo->AddInformation(otherInfo);
           }
         else
           {
