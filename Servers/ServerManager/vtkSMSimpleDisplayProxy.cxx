@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -316,10 +316,10 @@ void vtkSMSimpleDisplayProxy::SetupDefaults()
   ivp->SetElement(0, pm->GetUseTriangleStrips());
 
   //TODO: stuff for logging geometry filter times.
-  for (i = 0; i < this->GeometryFilterProxy->GetNumberOfIDs(); ++i)
+  vtkClientServerStream stream;
+  for (i = 0; i < this->GeometryFilterProxy->GetNumberOfIDs(); i++)
     {  
     // Keep track of how long each geometry filter takes to execute.
-    vtkClientServerStream stream;
     vtkClientServerStream start;
     start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
       << "LogStartEvent" << "Execute Geometry" 
@@ -340,111 +340,111 @@ void vtkSMSimpleDisplayProxy::SetupDefaults()
       << "EndEvent"
       << end
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-    // Init Mapper properties.
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
+    }
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  // Init Mapper properties.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->MapperProxy->GetProperty("UseLookupTableScalarRange"));
-    if (!ivp)
+  if (!ivp)
     {
-      vtkErrorMacro("Failed to find property UseLookupTableScalarRange "
-        "on MapperProxy.");
-      return;
+    vtkErrorMacro("Failed to find property UseLookupTableScalarRange "
+      "on MapperProxy.");
+    return;
     }
-    ivp->SetElement(0, 1);
-    
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->MapperProxy->GetProperty("InterpolateScalarsBeforeMapping"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property InterpolateScalarsBeforeMapping "
-        "on MapperProxy.");
-      return;
-      }
-    ivp->SetElement(0, 1);
+  ivp->SetElement(0, 1);
 
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->MapperProxy->GetProperty("ImmediateModeRendering"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property ImmediateModeRendering on MapperProxy.");
-      return;
-      }
-    ivp->SetElement(0, pm->GetUseImmediateMode());
-
-    // Init Property properties.
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PropertyProxy->GetProperty("Ambient"));
-    if (!dvp)
-      {
-      vtkErrorMacro("Failed to find property Ambient on PropertyProxy.");
-      return;
-      }
-    dvp->SetElement(0, 0.0);
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PropertyProxy->GetProperty("Diffuse"));
-    if (!dvp)
-      {
-      vtkErrorMacro("Failed to find property Diffuse on PropertyProxy.");
-      return;
-      }
-    dvp->SetElement(0, 1.0);
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PropertyProxy->GetProperty("Specular"));
-    if (!dvp)
-      {
-      vtkErrorMacro("Failed to find property Specular on PropertyProxy.");
-      return;
-      }
-    dvp->SetElement(0, 0.1);
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PropertyProxy->GetProperty("SpecularPower"));
-    if (!dvp)
-      {
-      vtkErrorMacro("Failed to find property SpecularPower on PropertyProxy.");
-      return;
-      }
-    dvp->SetElement(0, 100);
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PropertyProxy->GetProperty("SpecularColor"));
-    if (!dvp)
-      {
-      vtkErrorMacro("Failed to find property SpecularColor on PropertyProxy.");
-      return;
-      }
-    dvp->SetElement(0, 1.0);
-    dvp->SetElement(1, 1.0);
-    dvp->SetElement(2, 1.0);
-
-    // Init UpdateSuppressor properties.
-    // Seems like we can't use properties for this 
-    // to work properly.
-    for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetNumberOfPartitions"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetPartitionId"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
-    pm->SendStream(this->UpdateSuppressorProxy->GetServers(), stream);
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->MapperProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property InterpolateScalarsBeforeMapping "
+      "on MapperProxy.");
+    return;
     }
+  ivp->SetElement(0, 1);
 
-//  this->UpdateVTKObjects();
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->MapperProxy->GetProperty("ImmediateModeRendering"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ImmediateModeRendering on MapperProxy.");
+    return;
+    }
+  ivp->SetElement(0, pm->GetUseImmediateMode());
+
+  // Init Property properties.
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Ambient"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Ambient on PropertyProxy.");
+    return;
+    }
+  dvp->SetElement(0, 0.0);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Diffuse"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Diffuse on PropertyProxy.");
+    return;
+    }
+  dvp->SetElement(0, 1.0);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Specular"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Specular on PropertyProxy.");
+    return;
+    }
+  dvp->SetElement(0, 0.1);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("SpecularPower"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property SpecularPower on PropertyProxy.");
+    return;
+    }
+  dvp->SetElement(0, 100);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("SpecularColor"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property SpecularColor on PropertyProxy.");
+    return;
+    }
+  dvp->SetElement(0, 1.0);
+  dvp->SetElement(1, 1.0);
+  dvp->SetElement(2, 1.0);
+
+  // Init UpdateSuppressor properties.
+  // Seems like we can't use properties for this 
+  // to work properly.
+  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(this->UpdateSuppressorProxy->GetServers(), stream);
+
+  //  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
