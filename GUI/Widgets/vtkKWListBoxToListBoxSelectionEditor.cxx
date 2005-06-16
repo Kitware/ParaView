@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -63,43 +63,43 @@ vtkKWListBoxToListBoxSelectionEditor::~vtkKWListBoxToListBoxSelectionEditor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const char *args)
+void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->SourceList->SetParent(this);
-  this->SourceList->Create(app, 0);
-  this->SourceList->GetListbox()->ConfigureOptions("-selectmode multiple");
+  this->SourceList->Create(app);
+  this->SourceList->SetSelectionModeToMultiple();
   this->Script("pack %s -side left -expand true -fill both",
     this->SourceList->GetWidgetName());
 
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
-  frame->Create(app, 0);
+  frame->Create(app);
 
   this->AddButton->SetParent(frame);
-  this->AddButton->Create(app,0);
+  this->AddButton->Create(app);
   this->AddButton->SetText("Add");
   this->AddButton->SetCommand(this, "AddCallback");
 
   this->AddAllButton->SetParent(frame);
-  this->AddAllButton->Create(app,0);
+  this->AddAllButton->Create(app);
   this->AddAllButton->SetText("Add All");
   this->AddAllButton->SetCommand(this, "AddAllCallback");
 
   this->RemoveButton->SetParent(frame);
-  this->RemoveButton->Create(app,0);
+  this->RemoveButton->Create(app);
   this->RemoveButton->SetText("Remove");
   this->RemoveButton->SetCommand(this, "RemoveCallback");
 
   this->RemoveAllButton->SetParent(frame);
-  this->RemoveAllButton->Create(app,0);
+  this->RemoveAllButton->Create(app);
   this->RemoveAllButton->SetText("RemoveAll");
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
 
@@ -115,26 +115,26 @@ void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const c
 
   frame = vtkKWFrame::New();
   frame->SetParent(this);
-  frame->Create(app, 0);
+  frame->Create(app);
 
   this->FinalList->SetParent(frame);
-  this->FinalList->Create(app, 0);
-  this->FinalList->GetListbox()->ConfigureOptions("-selectmode multiple");
+  this->FinalList->Create(app);
+  this->FinalList->SetSelectionModeToMultiple();
 
   this->Script("pack %s -side top -expand true -fill both",
     this->FinalList->GetWidgetName());
 
   vtkKWFrame* btframe = vtkKWFrame::New();
   btframe->SetParent(frame);
-  btframe->Create(app, 0);
+  btframe->Create(app);
 
   this->UpButton->SetParent(btframe);
-  this->UpButton->Create(app, 0);
+  this->UpButton->Create(app);
   this->UpButton->SetText("Up");
   this->UpButton->SetCommand(this, "UpCallback");
 
   this->DownButton->SetParent(btframe);
-  this->DownButton->Create(app, 0);
+  this->DownButton->Create(app);
   this->DownButton->SetText("Down");
   this->DownButton->SetCommand(this, "DownCallback");
 

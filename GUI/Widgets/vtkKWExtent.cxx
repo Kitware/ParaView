@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.34");
+vtkCxxRevisionMacro(vtkKWExtent, "1.35");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -62,22 +62,20 @@ vtkKWExtent::~vtkKWExtent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
+void vtkKWExtent::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->ConfigureOptions(args);
-
   this->XRange->SetParent(this);
   this->XRange->ShowLabelOn();
   this->XRange->ShowEntriesOn();
-  this->XRange->Create(app, "");
+  this->XRange->Create(app);
   this->XRange->SetCommand(this, "ExtentChangedCallback");
   this->XRange->AdjustResolutionOn();
   this->XRange->GetLabel()->SetText("X (Units)");
@@ -85,7 +83,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->YRange->SetParent(this);
   this->YRange->ShowLabelOn();
   this->YRange->ShowEntriesOn();
-  this->YRange->Create(app, "");
+  this->YRange->Create(app);
   this->YRange->AdjustResolutionOn();
   this->YRange->SetCommand(this, "ExtentChangedCallback");
   this->YRange->GetLabel()->SetText("Y (Units)");
@@ -93,7 +91,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->ZRange->SetParent(this);
   this->ZRange->ShowLabelOn();
   this->ZRange->ShowEntriesOn();
-  this->ZRange->Create(app, "");
+  this->ZRange->Create(app);
   this->ZRange->AdjustResolutionOn();
   this->ZRange->SetCommand(this, "ExtentChangedCallback");
   this->ZRange->GetLabel()->SetText("Z (Units)");

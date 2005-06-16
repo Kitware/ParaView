@@ -42,7 +42,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.255");
+vtkCxxRevisionMacro(vtkKWWindow, "1.256");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -197,7 +197,7 @@ void vtkKWWindow::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
+void vtkKWWindow::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -209,7 +209,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   vtksys_stl::string cmd, event;
   vtkKWMenu *menu = NULL;
@@ -252,7 +252,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Create the view notebook
 
   this->ViewNotebook->SetParent(this->GetViewPanelFrame());
-  this->ViewNotebook->Create(app, NULL);
+  this->ViewNotebook->Create(app);
 
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->ViewNotebook->GetWidgetName());
@@ -292,7 +292,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Create the main notebook
 
   this->MainNotebook->SetParent(this->GetMainPanelFrame());
-  this->MainNotebook->Create(app, NULL);
+  this->MainNotebook->Create(app);
 
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->MainNotebook->GetWidgetName());
@@ -308,7 +308,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Create the secondary notebook
 
   this->SecondaryNotebook->SetParent(this->GetSecondaryPanelFrame());
-  this->SecondaryNotebook->Create(app, NULL);
+  this->SecondaryNotebook->Create(app);
 
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->SecondaryNotebook->GetWidgetName());
@@ -356,7 +356,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Secondary toolbar
 
   this->SecondaryToolbarSet->SetParent(this->MainSplitFrame->GetFrame2());
-  this->SecondaryToolbarSet->Create(app, NULL);
+  this->SecondaryToolbarSet->Create(app);
   this->SecondaryToolbarSet->ShowTopSeparatorOn();
   this->SecondaryToolbarSet->ShowBottomSeparatorOff();
   this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();

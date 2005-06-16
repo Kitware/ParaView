@@ -15,11 +15,11 @@
 
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWScrollbar.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.35");
+vtkCxxRevisionMacro(vtkKWListBox, "1.36");
 
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ vtkKWListBox::vtkKWListBox()
   this->Item = 0; 
   this->CommandFunction = vtkKWListBoxCommand;
   
-  this->Scrollbar = vtkKWWidget::New();
+  this->Scrollbar = vtkKWScrollbar::New();
   this->Scrollbar->SetParent(this);
   
   this->Listbox = vtkKWWidget::New();
@@ -257,19 +257,19 @@ int vtkKWListBox::AppendUnique(const char* name)
 
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
+void vtkKWListBox::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->Scrollbar->Create(app, "scrollbar", NULL);
+  this->Scrollbar->Create(app);
   
-  this->Listbox->Create(app, "listbox", args);
+  this->Listbox->CreateSpecificTkWidget(app, "listbox");
   
   this->Script("%s configure -yscroll {%s set}", 
                this->Listbox->GetWidgetName(),
@@ -336,6 +336,32 @@ void vtkKWListBox::SetBalloonHelpString(const char *str)
 {
   this->Listbox->SetBalloonHelpString( str );
   this->Scrollbar->SetBalloonHelpString( str );
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetSelectionMode(int relief)
+{
+  this->Listbox->SetConfigurationOption(
+    "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetSelectionMode()
+{
+  return vtkKWTkOptions::GetSelectionModeFromTkOptionValue(
+    this->Listbox->GetConfigurationOption("-selectmode"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetExportSelection(int arg)
+{
+  this->SetConfigurationOptionAsInt("-exportselection", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetExportSelection()
+{
+  return this->GetConfigurationOptionAsInt("-exportselection");
 }
 
 //----------------------------------------------------------------------------

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.74");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.75");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -89,7 +89,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
+void vtkKWMessageDialog::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -99,22 +99,22 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     return;
     }
 
-  this->Superclass::Create(app,args);
+  this->Superclass::Create(app);
   
   this->MessageDialogFrame->SetParent(this);
-  this->MessageDialogFrame->Create(app, NULL);
+  this->MessageDialogFrame->Create(app);
 
   this->Script("pack %s -side right -fill both -expand true -pady 0",
                this->MessageDialogFrame->GetWidgetName());
 
   this->TopFrame->SetParent(this->MessageDialogFrame);
-  this->TopFrame->Create(app, NULL);
+  this->TopFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand true",
                this->TopFrame->GetWidgetName());
 
   this->BottomFrame->SetParent(this->MessageDialogFrame);
-  this->BottomFrame->Create(app, NULL);
+  this->BottomFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand true",
                this->BottomFrame->GetWidgetName());
@@ -122,7 +122,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Label->SetParent(this->MessageDialogFrame);
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
-  this->Label->Create(app,NULL);
+  this->Label->Create(app);
   if ( this->DialogText )
     {
     this->Label->SetText(this->DialogText);
@@ -132,7 +132,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                this->Label->GetWidgetName());
 
   this->CheckButton->SetParent(this->MessageDialogFrame);
-  this->CheckButton->Create(app, NULL);
+  this->CheckButton->Create(app);
 
   if ( this->GetDialogName() )
     {
@@ -142,7 +142,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     }
 
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
-  this->ButtonFrame->Create(app, NULL);
+  this->ButtonFrame->Create(app);
   
   this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
@@ -178,9 +178,11 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 1)
     {
     this->OKFrame->SetParent(this->ButtonFrame);
-    this->OKFrame->Create(app, "-bd 3 -relief flat");
+    this->OKFrame->Create(app);
+    this->OKFrame->SetBorderWidth(3);
     this->OKButton->SetParent(this->OKFrame);
-    this->OKButton->Create(app, "-width 16");
+    this->OKButton->Create(app);
+    this->OKButton->SetWidth(16);
     this->OKButton->SetTextOption(this->OKButtonText);
     this->OKButton->SetCommand(this, "OK");
     this->Script("pack %s %s %s",
@@ -191,9 +193,11 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 3)
     {
     this->OtherFrame->SetParent(this->ButtonFrame);  
-    this->OtherFrame->Create(app, "-bd 3 -relief flat");
+    this->OtherFrame->Create(app);
+    this->OtherFrame->SetBorderWidth(3);
     this->OtherButton->SetParent(this->OtherFrame);
-    this->OtherButton->Create(app, "-width 16");
+    this->OtherButton->Create(app);
+    this->OtherButton->SetWidth(16);
     this->OtherButton->SetTextOption(this->OtherButtonText);
     this->OtherButton->SetCommand(this, "Other");
     this->Script("pack %s %s %s",
@@ -204,9 +208,11 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 2)
     {
     this->CancelFrame->SetParent(this->ButtonFrame);  
-    this->CancelFrame->Create(app, "-bd 3 -relief flat");
+    this->CancelFrame->Create(app);
+    this->CancelFrame->SetBorderWidth(3);
     this->CancelButton->SetParent(this->CancelFrame);
-    this->CancelButton->Create(app, "-width 16");
+    this->CancelButton->Create(app);
+    this->CancelButton->SetWidth(16);
     this->CancelButton->SetTextOption(this->CancelButtonText);
     this->CancelButton->SetCommand(this, "Cancel");
     this->Script("pack %s %s %s",
@@ -254,7 +260,12 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // Icon
   
   this->Icon->SetParent(this);
-  this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -bd 0");
+  this->Icon->Create(app);
+  this->Icon->SetWidth(0);
+  this->Icon->SetPadX(0);
+  this->Icon->SetPadY(0);
+  this->Icon->SetBorderWidth(0);
+
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
@@ -414,7 +425,7 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindowBase *wi
   dlg2->SetMasterWindow(win);
   dlg2->SetOptions(
     options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
-  dlg2->Create(app,NULL);
+  dlg2->Create(app);
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon();
@@ -435,7 +446,7 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
   dlg2->SetOptions(
     options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dlg2->SetDialogName(name);
-  dlg2->Create(app,NULL);
+  dlg2->Create(app);
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon();
@@ -464,7 +475,7 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *wi
   dlg2->SetOptions(
     options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dlg2->SetMasterWindow(win);
-  dlg2->Create(app,NULL);
+  dlg2->Create(app);
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon();

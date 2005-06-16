@@ -53,7 +53,7 @@ public:
   // If MasterWindow is set and is a vtkKWTopLevel, its class will be used
   // to set our own WindowClass.
   // Withdraw() is called at the end of the creation.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Display the toplevel. Hide it with the Withdraw() method.

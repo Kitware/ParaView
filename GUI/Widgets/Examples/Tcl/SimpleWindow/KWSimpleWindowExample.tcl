@@ -29,13 +29,13 @@ app SetHelpDialogStartingPage "http://www.kitware.com"
 vtkKWWindowBase win
 win SupportHelpOn
 app AddWindow win
-win Create app ""
+win Create app
 
 # Add a label, attach it to the view frame, and pack
 
 vtkKWLabel hello_label
 hello_label SetParent [win GetViewFrame]
-hello_label Create app ""
+hello_label Create app
 hello_label SetText "Hello, World!"
 pack [hello_label GetWidgetName] -side left -anchor c -expand y
 hello_label Delete

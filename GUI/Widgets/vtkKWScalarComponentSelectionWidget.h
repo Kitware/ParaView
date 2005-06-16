@@ -30,8 +30,8 @@ public:
   vtkTypeRevisionMacro(vtkKWScalarComponentSelectionWidget,vtkKWWidget);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Are the components independent of each other?

@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set/Get the hue/saturation wheel radius in pixels.

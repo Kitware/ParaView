@@ -28,6 +28,8 @@
 
 #include "vtkKWWidget.h"
 
+class vtkKWScrollbar;
+
 class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWWidget
 {
 public:
@@ -36,10 +38,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
+  // Create the widget.
   // This will create a frame, inside which a 'tablelist' widget
   // will be packed. Use GetTableList() to access/configure it.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the width (in chars) and height (in lines).
@@ -275,8 +277,8 @@ public:
   // Description:
   // Access the internal 'tablelist' widget and the scrollbars.
   vtkGetObjectMacro(TableList, vtkKWWidget);
-  vtkGetObjectMacro(VerticalScrollBar, vtkKWWidget);
-  vtkGetObjectMacro(HorizontalScrollBar, vtkKWWidget);
+  vtkGetObjectMacro(VerticalScrollBar, vtkKWScrollbar);
+  vtkGetObjectMacro(HorizontalScrollBar, vtkKWScrollbar);
 
   // Description:
   // Callbacks
@@ -296,8 +298,8 @@ protected:
   ~vtkKWMultiColumnList();
 
   vtkKWWidget *TableList;
-  vtkKWWidget *VerticalScrollBar;
-  vtkKWWidget *HorizontalScrollBar;
+  vtkKWScrollbar *VerticalScrollBar;
+  vtkKWScrollbar *HorizontalScrollBar;
 
   int UseVerticalScrollbar;
   int UseHorizontalScrollbar;

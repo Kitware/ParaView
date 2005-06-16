@@ -34,8 +34,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the text of the message (and the width of a line, in pixels)

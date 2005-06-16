@@ -10,7 +10,7 @@ int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScale *scale1 = vtkKWScale::New();
   scale1->SetParent(parent);
-  scale1->Create(app, NULL);
+  scale1->Create(app);
   scale1->SetRange(0.0, 100.0);
   scale1->SetResolution(1.0);
   scale1->SetLength(150);
@@ -28,7 +28,7 @@ int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScale *scale2 = vtkKWScale::New();
   scale2->SetParent(parent);
-  scale2->Create(app, NULL);
+  scale2->Create(app);
   scale2->SetRange(0.0, 100.0);
   scale2->SetResolution(1.0);
   scale2->SetLength(350);
@@ -48,7 +48,7 @@ int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   vtkKWScale *scale3 = vtkKWScale::New();
   scale3->SetParent(parent);
   scale3->PopupScaleOn();
-  scale3->Create(app, NULL);
+  scale3->Create(app);
   scale3->SetRange(0.0, 100.0);
   scale3->SetResolution(1.0);
   scale3->DisplayEntry();

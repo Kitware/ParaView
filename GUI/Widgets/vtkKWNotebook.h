@@ -37,8 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Add a new page to the notebook. By setting balloon string, the page will
@@ -317,9 +317,9 @@ protected:
   int PagesCanBePinned;
   int EnablePageTabContextMenu;
 
-  vtkKWWidget *TabsFrame;
-  vtkKWWidget *Body;
-  vtkKWWidget *Mask;
+  vtkKWFrame *TabsFrame;
+  vtkKWFrame *Body;
+  vtkKWFrame *Mask;
   vtkKWMenu   *TabPopupMenu;
 
   //BTX

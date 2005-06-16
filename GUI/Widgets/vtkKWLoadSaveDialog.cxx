@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.41");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.42");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -52,11 +52,11 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
+void vtkKWLoadSaveDialog::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

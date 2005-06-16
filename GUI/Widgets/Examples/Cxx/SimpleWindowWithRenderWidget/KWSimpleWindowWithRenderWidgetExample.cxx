@@ -58,13 +58,13 @@ int my_main(int argc, char *argv[])
   vtkKWWindowBase *win = vtkKWWindowBase::New();
   win->SupportHelpOn();
   app->AddWindow(win);
-  win->Create(app, NULL);
+  win->Create(app);
 
   // Add a render widget, attach it to the view frame, and pack
   
   vtkKWRenderWidget *rw = vtkKWRenderWidget::New();
   rw->SetParent(win->GetViewFrame());
-  rw->Create(app, NULL);
+  rw->Create(app);
 
   app->Script("pack %s -expand y -fill both -anchor c -expand y", 
               rw->GetWidgetName());

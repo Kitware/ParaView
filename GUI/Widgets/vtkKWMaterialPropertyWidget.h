@@ -47,7 +47,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Refresh the interface given the value extracted from the current widget.

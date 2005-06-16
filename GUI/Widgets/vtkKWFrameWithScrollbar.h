@@ -32,8 +32,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a the widget
-  virtual void Create(vtkKWApplication *app, const char* args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Get the the internal widget (technically a Tk frame).

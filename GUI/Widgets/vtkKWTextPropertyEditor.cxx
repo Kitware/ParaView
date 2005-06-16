@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.3");
 
 int vtkKWTextPropertyEditorCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -196,7 +196,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -205,13 +205,13 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   // Label
 
   this->Label->SetParent(this);
-  this->Label->Create(app, "");
+  this->Label->Create(app);
 
   // Color
 
   this->ChangeColorButton->SetParent(this);
   this->ChangeColorButton->LabelOutsideButtonOn();
-  this->ChangeColorButton->Create(app, "");
+  this->ChangeColorButton->Create(app);
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
   this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
   this->ChangeColorButton->SetDialogText("Text Color");
@@ -285,7 +285,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   this->OpacityScale->PopupScaleOn();
   this->OpacityScale->SetResolution(0.01);
   this->OpacityScale->SetRange(0.0, 1.0);
-  this->OpacityScale->Create(app, "");
+  this->OpacityScale->Create(app);
   this->OpacityScale->DisplayEntry();
   this->OpacityScale->DisplayLabel("");
   this->OpacityScale->SetEntryWidth(4);

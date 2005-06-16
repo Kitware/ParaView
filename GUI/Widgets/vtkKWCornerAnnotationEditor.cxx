@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.3");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.4");
 
 int vtkKWCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -171,8 +171,7 @@ void vtkKWCornerAnnotationEditor::Close()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app, 
-                                   const char *args)
+void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
 {
   // Create the superclass widgets
 
@@ -182,7 +181,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
     return;
     }
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
@@ -212,7 +211,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
   // Corners text
 
   this->CornerFrame->SetParent(this->Frame->GetFrame());
-  this->CornerFrame->Create(app, 0);
+  this->CornerFrame->Create(app);
 
   this->Script("pack %s -side top -padx 2 -expand t -fill x -anchor nw",
                this->CornerFrame->GetWidgetName());
@@ -221,7 +220,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
   for (i = 0; i < 4; i++)
     {
     this->CornerText[i]->SetParent(this->CornerFrame);
-    this->CornerText[i]->Create( app, 0);
+    this->CornerText[i]->Create(app);
     this->CornerText[i]->SetLabelPositionToTop();
     vtkKWText *text = this->CornerText[i]->GetWidget();
     text->SetHeight(3);
@@ -274,7 +273,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
   // Properties frame
 
   this->PropertiesFrame->SetParent(this->Frame->GetFrame());
-  this->PropertiesFrame->Create(app, 0);
+  this->PropertiesFrame->Create(app);
 
   this->Script("pack %s -side top -padx 2 -expand t -fill both -anchor nw",
                this->PropertiesFrame->GetWidgetName());
@@ -286,7 +285,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->PopupScaleOn();
-  this->MaximumLineHeightScale->Create(app, "");
+  this->MaximumLineHeightScale->Create(app);
   this->MaximumLineHeightScale->DisplayEntry();
   this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
   this->MaximumLineHeightScale->DisplayLabel("Max line height:");

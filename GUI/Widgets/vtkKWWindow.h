@@ -103,6 +103,7 @@
 // STBS: GetSecondaryToolbarSet()
 // SF:   GetStatusFrame() (see superclass)
 // 
+// @verbatim
 // +----------------------+  +----------------------+  +----------------------+
 // |           MB         |  |        MB            |  |        MB            |
 // +----------------------+  +----------------------+  +----------------------+
@@ -128,6 +129,7 @@
 // |            SF        |  |            SF        |  |            SF        |
 // +----------------------+  +----------------------+  +----------------------+
 //   Secondary below View      Secondary below Main      Secondary below Both
+// @endverbatim
 
 #ifndef __vtkKWWindow_h
 #define __vtkKWWindow_h
@@ -153,8 +155,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the window
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Main panel. 

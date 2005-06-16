@@ -37,8 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set/Get the current color
@@ -111,11 +111,11 @@ protected:
   
   // Description:
   // Create the label (override the superclass)
-  virtual void CreateLabel(vtkKWApplication *app, const char *args = 0);
+  virtual void CreateLabel(vtkKWApplication *app);
 
   // Description:
   // Create the button frame
-  virtual void CreateButtonFrame(vtkKWApplication *app, const char *args = 0);
+  virtual void CreateButtonFrame(vtkKWApplication *app);
 
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented

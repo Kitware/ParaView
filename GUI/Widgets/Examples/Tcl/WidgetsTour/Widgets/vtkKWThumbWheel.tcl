@@ -7,7 +7,7 @@ proc vtkKWThumbWheelEntryPoint {parent win} {
 
     vtkKWThumbWheel thumbwheel1
     thumbwheel1 SetParent $parent
-    thumbwheel1 Create app ""
+    thumbwheel1 Create app
     thumbwheel1 SetLength 150
     thumbwheel1 DisplayEntryOn
     thumbwheel1 DisplayEntryAndLabelOnTopOff
@@ -20,7 +20,7 @@ proc vtkKWThumbWheelEntryPoint {parent win} {
 
     vtkKWThumbWheel thumbwheel2
     thumbwheel2 SetParent $parent
-    thumbwheel2 Create app ""
+    thumbwheel2 Create app
     thumbwheel2 SetRange -10.0 10.0
     thumbwheel2 ClampMinimumValueOn
     thumbwheel2 ClampMaximumValueOn
@@ -39,7 +39,7 @@ proc vtkKWThumbWheelEntryPoint {parent win} {
     vtkKWThumbWheel thumbwheel3
     thumbwheel3 SetParent $parent
     thumbwheel3 PopupModeOn
-    thumbwheel3 Create app ""
+    thumbwheel3 Create app
     thumbwheel3 SetRange 0.0 100.0
     thumbwheel3 SetResolution 1.0
     thumbwheel3 DisplayEntryOn

@@ -9,7 +9,7 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
     vtkKWFrameWithScrollbar framews
     framews SetParent $parent
-    framews Create app ""
+    framews Create app
 
     pack [framews GetWidgetName] -side top -expand y -fill both
     
@@ -17,7 +17,7 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
     vtkKWVolumePropertyWidget vpw
     vpw SetParent [framews GetFrame]
-    vpw Create app ""
+    vpw Create app
     
     pack [vpw GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
 

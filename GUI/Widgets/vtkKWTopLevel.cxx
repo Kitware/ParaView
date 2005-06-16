@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.14");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.15");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -55,14 +55,15 @@ vtkKWTopLevel::~vtkKWTopLevel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTopLevel::Create(vtkKWApplication *app, const char *args)
+void vtkKWTopLevel::Create(vtkKWApplication *app)
 {
-  vtksys_stl::string str;
+  vtksys_stl::string opts;
+
   if (this->GetWindowClass())
     {
-    str += " -class ";
-    str += this->GetWindowClass();
-    str += " ";
+    opts += " -class ";
+    opts += this->GetWindowClass();
+    opts += " ";
     }
   else if (this->GetMasterWindow())
     {
@@ -70,20 +71,16 @@ void vtkKWTopLevel::Create(vtkKWApplication *app, const char *args)
       vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
     if (master_top && master_top->GetWindowClass())
       {
-      str += " -class ";
-      str += master_top->GetWindowClass();
-      str += " ";
+      opts += " -class ";
+      opts += master_top->GetWindowClass();
+      opts += " ";
       }
     }
-  str += " -visual best ";
-  if (args)
-    {
-    str += args;
-    }
+  opts += " -visual best ";
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::Create(app, "toplevel", str.c_str()))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "toplevel", opts.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -467,7 +464,7 @@ vtkKWMenu *vtkKWTopLevel::GetMenu()
     {
     this->Menu->SetParent(this);
     this->Menu->SetTearOff(0);
-    this->Menu->Create(this->GetApplication(), NULL);
+    this->Menu->Create(this->GetApplication());
 
     this->Script("%s configure -menu %s", 
                  this->GetWidgetName(),

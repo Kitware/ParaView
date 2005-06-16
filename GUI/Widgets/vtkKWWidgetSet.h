@@ -37,8 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Get the number of vtkKWWidget in the set.
@@ -82,8 +82,12 @@ public:
   vtkGetMacro(MaximumNumberOfWidgetsInPackingDirection, int);
 
   // Description:
-  // Set the widgets padding.
-  virtual void SetPadding(int x, int y);
+  // Set/Get the padding that will be applied around each widget.
+  // (default to 0).
+  virtual void SetWidgetsPadX(int);
+  vtkGetMacro(WidgetsPadX, int);
+  virtual void SetWidgetsPadY(int);
+  vtkGetMacro(WidgetsPadY, int);
 
   // Description:
   // Set the layout to allow the widgets to expand automatically 
@@ -106,8 +110,8 @@ protected:
 
   int PackHorizontally;
   int MaximumNumberOfWidgetsInPackingDirection;
-  int PadX;
-  int PadY;
+  int WidgetsPadX;
+  int WidgetsPadY;
   int ExpandWidgets;
 
   

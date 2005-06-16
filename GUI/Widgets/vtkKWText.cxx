@@ -15,6 +15,7 @@
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWScrollbar.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/list>
@@ -34,7 +35,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.34");
+vtkCxxRevisionMacro(vtkKWText, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -291,11 +292,11 @@ void vtkKWText::AppendValueInternal(const char *s, const char *tag)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::Create(vtkKWApplication *app, const char *args)
+void vtkKWText::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -308,13 +309,11 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
     this->TextWidget = vtkKWWidget::New();
     }
 
-  vtksys_stl::string all_args("-width 20 -wrap word ");
-  if (args)
-    {
-    all_args += args;
-    }
   this->TextWidget->SetParent(this);
-  this->TextWidget->Create(app, "text", all_args.c_str());
+  this->TextWidget->CreateSpecificTkWidget(app, "text");
+
+  this->SetWidth(20);
+  this->SetWrapToWord();
 
   // Create the default tags
 
@@ -369,23 +368,26 @@ void vtkKWText::CreateVerticalScrollbar(vtkKWApplication *app)
 {
   if (!this->VerticalScrollBar)
     {
-    this->VerticalScrollBar = vtkKWWidget::New();
+    this->VerticalScrollBar = vtkKWScrollbar::New();
     }
 
   if (!this->VerticalScrollBar->IsCreated() && this->IsCreated())
     {
     this->VerticalScrollBar->SetParent(this);
-    this->VerticalScrollBar->Create(app, "scrollbar", "-orient vertical");
+    this->VerticalScrollBar->Create(app);
+    this->VerticalScrollBar->SetOrientationToVertical();
     if (this->TextWidget && this->TextWidget->IsCreated())
       {
-      vtksys_stl::string command("-command {");
+      vtksys_stl::string command("{");
       command += this->TextWidget->GetWidgetName();
       command += " yview}";
-      this->VerticalScrollBar->ConfigureOptions(command.c_str());
-      command = "-yscrollcommand {";
+      this->VerticalScrollBar->SetConfigurationOption(
+        "-command", command.c_str());
+      command = "{";
       command += this->VerticalScrollBar->GetWidgetName();
       command += " set}";
-      this->TextWidget->ConfigureOptions(command.c_str());
+      this->TextWidget->SetConfigurationOption(
+        "-yscrollcommand", command.c_str());
       }
     }
 }
@@ -515,6 +517,26 @@ void vtkKWText::SetWrapToWord()
     {
     this->Script("%s configure -wrap word", this->TextWidget->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWText::SetResizeToGrid(int arg)
+{
+  if (this->TextWidget && this->TextWidget->IsCreated())
+    {
+    this->Script("%s configure -setgrid %d", 
+                 this->TextWidget->GetWidgetName(), arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWText::GetResizeToGrid()
+{
+  if (this->TextWidget)
+    {
+    return this->TextWidget->GetConfigurationOptionAsInt("-setgrid");
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

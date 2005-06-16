@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.21");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.22");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -135,11 +135,11 @@ vtkKWToolbarSet::GetToolbarSlot(vtkKWToolbar *toolbar)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
+void vtkKWToolbarSet::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -148,12 +148,14 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
   // Create the toolbars frame container
 
   this->ToolbarsFrame->SetParent(this);  
-  this->ToolbarsFrame->Create(app, NULL);
+  this->ToolbarsFrame->Create(app);
 
   // Bottom separator
 
   this->BottomSeparatorFrame->SetParent(this);  
-  this->BottomSeparatorFrame->Create(app, "-height 2 -bd 1");
+  this->BottomSeparatorFrame->Create(app);
+  this->BottomSeparatorFrame->SetHeight(2);
+  this->BottomSeparatorFrame->SetBorderWidth(1);
 
   this->Script("%s config -relief %s", 
                this->BottomSeparatorFrame->GetWidgetName(), 
@@ -162,7 +164,9 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
   // Top separator
 
   this->TopSeparatorFrame->SetParent(this);  
-  this->TopSeparatorFrame->Create(app, "-height 2 -bd 1");
+  this->TopSeparatorFrame->Create(app);
+  this->TopSeparatorFrame->SetHeight(2);
+  this->TopSeparatorFrame->SetBorderWidth(1);
 
   this->Script("%s config -relief %s", 
                this->TopSeparatorFrame->GetWidgetName(), 
@@ -383,8 +387,9 @@ void vtkKWToolbarSet::PackToolbars()
           if (!(*it)->SeparatorFrame->IsCreated())
             {
             (*it)->SeparatorFrame->SetParent(this->ToolbarsFrame);
-            (*it)->SeparatorFrame->Create(
-              this->GetApplication(), "-width 2 -bd 1");
+            (*it)->SeparatorFrame->Create(this->GetApplication());
+            (*it)->SeparatorFrame->SetWidth(2);
+            (*it)->SeparatorFrame->SetBorderWidth(1);
             this->Script("%s config -relief %s", 
                          (*it)->SeparatorFrame->GetWidgetName(), 
                          VTK_KW_TOOLBAR_RELIEF_SEP);

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.17");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.18");
 
 int vtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -60,7 +60,7 @@ vtkKWWidget* vtkKWRadioButtonSet::AllocateAndCreateWidget()
 {
   vtkKWRadioButton *widget = vtkKWRadioButton::New();
   widget->SetParent(this);
-  widget->Create(this->GetApplication(), 0);
+  widget->Create(this->GetApplication());
 
   // For convenience, all radiobuttons share the same var name
 

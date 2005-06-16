@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.18");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.19");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -182,8 +182,7 @@ void vtkKWScalarBarAnnotation::SetVolumeProperty(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app, 
-                                   const char *args)
+void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
 {
   // Create the superclass widgets
 
@@ -193,7 +192,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     return;
     }
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
@@ -226,7 +225,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   // Component selection
 
   this->ComponentSelectionWidget->SetParent(frame);
-  this->ComponentSelectionWidget->Create(app, 0);
+  this->ComponentSelectionWidget->Create(app);
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
@@ -237,7 +236,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   // Title frame
 
   this->TitleFrame->SetParent(frame);
-  this->TitleFrame->Create(app, 0);
+  this->TitleFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand y", 
                this->TitleFrame->GetWidgetName());
@@ -246,7 +245,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   // Scalar Bar title
 
   this->TitleEntry->SetParent(this->TitleFrame);
-  this->TitleEntry->Create(app, 0);
+  this->TitleEntry->Create(app);
   this->TitleEntry->GetLabel()->SetText("Title:");
   this->TitleEntry->GetWidget()->SetWidth(20);
   this->TitleEntry->GetWidget()->BindCommand(this, "ScalarBarTitleCallback");
@@ -306,7 +305,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   // Label frame
 
   this->LabelFrame->SetParent(frame);
-  this->LabelFrame->Create(app, 0);
+  this->LabelFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand y -pady %d", 
                this->LabelFrame->GetWidgetName(),
@@ -316,7 +315,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   // Scalar Bar label format
 
   this->LabelFormatEntry->SetParent(this->LabelFrame);
-  this->LabelFormatEntry->Create(app, 0);
+  this->LabelFormatEntry->Create(app);
   this->LabelFormatEntry->GetLabel()->SetText("Label format:");
   this->LabelFormatEntry->GetWidget()->SetWidth(20);
   this->LabelFormatEntry->GetWidget()->BindCommand(
@@ -376,7 +375,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     //    foo->GetMaximumNumberOfColorsMaxValue());
   this->MaximumNumberOfColorsThumbWheel->ClampMaximumValueOn();
   this->MaximumNumberOfColorsThumbWheel->SetResolution(1);
-  this->MaximumNumberOfColorsThumbWheel->Create(app, "");
+  this->MaximumNumberOfColorsThumbWheel->Create(app);
   this->MaximumNumberOfColorsThumbWheel->DisplayLabelOn();
   this->MaximumNumberOfColorsThumbWheel->GetLabel()->SetText("Maximum number of colors:");
   this->MaximumNumberOfColorsThumbWheel->DisplayEntryOn();
@@ -400,7 +399,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     foo->GetNumberOfLabelsMinValue(), foo->GetNumberOfLabelsMaxValue());
   this->NumberOfLabelsScale->SetResolution(1);
   this->NumberOfLabelsScale->PopupScaleOn();
-  this->NumberOfLabelsScale->Create(app, "");
+  this->NumberOfLabelsScale->Create(app);
   this->NumberOfLabelsScale->DisplayEntry();
   this->NumberOfLabelsScale->DisplayEntryAndLabelOnTopOff();
   this->NumberOfLabelsScale->DisplayLabel("Number of labels:");

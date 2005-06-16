@@ -32,8 +32,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Get the internal label.
@@ -129,7 +129,7 @@ protected:
 
   // Description:
   // Create the label
-  virtual void CreateLabel(vtkKWApplication *app, const char *args = 0);
+  virtual void CreateLabel(vtkKWApplication *app);
 
 private:
 

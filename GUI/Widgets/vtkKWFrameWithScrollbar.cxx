@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.4");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -42,12 +42,11 @@ vtkKWFrameWithScrollbar::~vtkKWFrameWithScrollbar()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
+void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-#if 1
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "ScrolledWindow"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -55,28 +54,17 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
 
   // The widget itself is a BWidget's ScrolledWindow
 
-  const char *wname = this->GetWidgetName();
-  const char *res = this->Script("ScrolledWindow %s -relief flat -bd 2",wname);
-  if (strcmp(res, wname)) 
-    {
-    vtkErrorMacro("Failed creating a ScrolledWindow for " << wname);
-    return;
-    }
+  this->SetReliefToFlat();
+  this->SetBorderWidth(2);
 
   // ScrollableFrame is a BWidget's ScrollableFrame
   // attached to the ScrolledWindow
 
   this->ScrollableFrame = vtkKWWidget::New();
   this->ScrollableFrame->SetParent(this);
-  ostrstream options;
-  options << "-height 1024 -constrainedwidth 1 ";
-  if (args)
-    {
-    options << args;
-    }
-  options << ends;
-  this->ScrollableFrame->Create(app, "ScrollableFrame",  options.str());
-  options.rdbuf()->freeze(0);
+  this->ScrollableFrame->CreateSpecificTkWidget(app, "ScrollableFrame");
+  this->ScrollableFrame->SetConfigurationOptionAsInt("-height", 1024);
+  this->ScrollableFrame->SetConfigurationOptionAsInt("-constrainedwidth", 1);
 
   this->Script("%s setwidget %s", 
                this->GetWidgetName(), this->ScrollableFrame->GetWidgetName());
@@ -87,20 +75,7 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
   this->Frame->SetParent(this->ScrollableFrame);
   this->Frame->SetWidgetName(
     this->Script("%s getframe", this->ScrollableFrame->GetWidgetName()));
-  this->Frame->Create(app, NULL, NULL);
-#else
-
-  if (!this->Superclass::Create(app, "frame", NULL))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
-
-  this->Frame = vtkKWWidget::New();
-  this->Frame->SetParent(this);
-  this->Frame->Create(app, "frame", NULL);
-  this->Script("pack %s -expand yes -fill both", this->Frame->GetWidgetName());
-#endif
+  this->Frame->Create(app);
 
   // Update enable state
 

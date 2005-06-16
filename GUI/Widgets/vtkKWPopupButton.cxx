@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.20");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.21");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -68,7 +68,7 @@ vtkKWPopupButton::~vtkKWPopupButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
+void vtkKWPopupButton::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -81,14 +81,16 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   ostrstream tk_cmd;
 
   // Create  top level window
 
   this->PopupTopLevel->SetMasterWindow(this);
-  this->PopupTopLevel->Create(app, "-bd 2 -relief flat");
+  this->PopupTopLevel->Create(app);
+  this->PopupTopLevel->SetBorderWidth(2);
+  this->PopupTopLevel->SetReliefToFlat();
   this->PopupTopLevel->Withdraw();
 
   if (!this->PopupTopLevel->GetTitle())
@@ -103,7 +105,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   // Create the frame
 
   this->PopupFrame->SetParent(PopupTopLevel);
-  this->PopupFrame->Create(app, "-bd 2 -relief flat");
+  this->PopupFrame->Create(app);
+  this->PopupFrame->SetBorderWidth(2);
 
   tk_cmd << "pack " << this->PopupFrame->GetWidgetName() 
          << " -side top -expand y -fill both" << endl;
@@ -111,7 +114,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   // Create the close button
 
   this->PopupCloseButton->SetParent(PopupTopLevel);
-  this->PopupCloseButton->Create(app, 0);
+  this->PopupCloseButton->Create(app);
   this->PopupCloseButton->SetText("Close");
 
   tk_cmd << "pack " << this->PopupCloseButton->GetWidgetName() 

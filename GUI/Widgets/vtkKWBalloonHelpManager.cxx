@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.3");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.4");
 
 int vtkKWBalloonHelpManagerCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -85,15 +85,20 @@ void vtkKWBalloonHelpManager::CreateBalloon()
     if (!this->TopLevel->IsCreated())
       {
       this->TopLevel->HideDecorationOn();
-      this->TopLevel->Create(app, "-background black -bd 1 -relief flat");
+      this->TopLevel->Create(app);
+      this->TopLevel->SetBackgroundColor(0.0, 0.0, 0.0);
+      this->TopLevel->SetBorderWidth(1);
+      this->TopLevel->SetReliefToFlat();
       }
 
     if (!this->Label->IsCreated() && this->TopLevel)
       {
       this->Label->SetParent(this->TopLevel);    
-      this->Label->Create(
-        app, 
-        "-bg LightYellow -foreground black -justify left -wraplength 2i");
+      this->Label->Create(app);
+      this->Label->SetBackgroundColor(1.0, 1.0, 0.88);
+      this->Label->SetForegroundColor(0.0, 0.0, 0.0);
+      this->Label->SetJustificationToLeft();
+      this->Label->SetWrapLength("2i");
       app->Script("pack %s", this->Label->GetWidgetName());
       }
     }

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.67");
+vtkCxxRevisionMacro(vtkKWMenu, "1.68");
 
 
 
@@ -42,11 +42,11 @@ vtkKWMenu::~vtkKWMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
+void vtkKWMenu::Create(vtkKWApplication* app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "menu", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "menu"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

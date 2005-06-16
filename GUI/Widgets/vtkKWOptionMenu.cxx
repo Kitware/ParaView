@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.36");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -213,25 +213,32 @@ void vtkKWOptionMenu::DeleteAllEntries()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
+void vtkKWOptionMenu::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "menubutton", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "menubutton"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app, "-tearoff 0");
+  this->Menu->Create(app);
+  this->Menu->SetTearOff(0);
 
   const char *wname = this->GetWidgetName();
   
-  this->Script("%s configure -indicatoron 1 -menu %s "
-               "-relief raised -bd 2 -highlightthickness 0 -anchor c "
-               "-direction flush %s", 
-               wname, this->Menu->GetWidgetName(), (args ? args : ""));
+  this->IndicatorOn();
+  this->SetReliefToRaised();
+  this->SetBorderWidth(2);
+  this->SetHighlightThickness(0);
+  this->SetAnchorToCenter();
+
+  this->SetConfigurationOption("-direction", "flush");
+
+  this->Script("%s configure -menu %s ",
+               wname, this->Menu->GetWidgetName());
 
   this->Script("set %sValue {}", this->GetWidgetName());
   this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",

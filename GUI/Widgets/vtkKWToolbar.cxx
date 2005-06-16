@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.52");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.53");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -85,11 +85,11 @@ vtkKWToolbar::vtkKWToolbar()
   this->WidgetsFlatAdditionalPadY = 0;
 
 #if defined(WIN32)
-  this->PadX = 0;
-  this->PadY = 0;
+  this->WidgetsPadX = 0;
+  this->WidgetsPadY = 0;
 #else
-  this->PadX = 1;
-  this->PadY = 1;
+  this->WidgetsPadX = 1;
+  this->WidgetsPadY = 1;
 #endif
 
   // This widget is used to keep track of default options
@@ -156,7 +156,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -167,18 +167,20 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   // Create the widgets container itself
 
   this->Frame->SetParent(this);
-  this->Frame->Create(app, "");
+  this->Frame->Create(app);
   
   // Create a "toolbar handle"
 
   this->Handle->SetParent(this);
-  this->Handle->Create(app, "-bd 2 -relief raised");
+  this->Handle->Create(app);
+  this->Handle->SetBorderWidth(2);
+  this->Handle->SetReliefToRaised();
 
   // Create the default options repository (never packed, just a way
   // to keep track of default options)
 
   this->DefaultOptionsWidget->SetParent(this);
-  this->DefaultOptionsWidget->Create(app, "");
+  this->DefaultOptionsWidget->Create(app);
 
   // Update aspect
 
@@ -324,8 +326,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
                                                const char *variable_name, 
                                                vtkKWObject *object, 
                                                const char *method,
-                                               const char *help,
-                                               const char *extra)
+                                               const char *help)
 {
   if (!this->IsCreated())
     {
@@ -335,7 +336,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   vtkKWRadioButton *rb = vtkKWRadioButton::New();
 
   rb->SetParent(this->GetFrame());
-  rb->Create(this->GetApplication(), NULL);
+  rb->Create(this->GetApplication());
   rb->SetIndicator(0);
   rb->SetValue(value);
 
@@ -362,8 +363,6 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
     rb->SetBalloonHelpString(help);
     }
 
-  this->ConfigureOptions(extra);
-
   this->AddWidget(rb);
 
   rb->Delete();
@@ -377,8 +376,7 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
                                                const char *variable_name, 
                                                vtkKWObject *object, 
                                                const char *method,
-                                               const char *help,
-                                               const char *extra)
+                                               const char *help)
 {
   if (!this->IsCreated())
     {
@@ -388,7 +386,7 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
   vtkKWCheckButton *cb = vtkKWCheckButton::New();
 
   cb->SetParent(this->GetFrame());
-  cb->Create(this->GetApplication(), NULL);
+  cb->Create(this->GetApplication());
   cb->SetIndicator(0);
 
   if (image_name)
@@ -413,8 +411,6 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
     {
     cb->SetBalloonHelpString(help);
     }
-
-  this->ConfigureOptions(extra);
 
   this->AddWidget(cb);
 
@@ -552,7 +548,7 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
     {
     if (*it)
       {
-      totReqWidth += this->PadX + atoi(
+      totReqWidth += this->WidgetsPadX + atoi(
         this->Script("winfo reqwidth %s", (*it)->GetWidgetName()));
       if (this->WidgetsFlatAspect)
         {
@@ -580,10 +576,10 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
         s << "grid " << (*it)->GetWidgetName() << " -row " 
           << row << " -column " << num << " -sticky news "
           << " -padx " 
-          << (this->PadX + (this->WidgetsFlatAspect ? 
+          << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
                             this->WidgetsFlatAdditionalPadX : 0))
           << " -pady "
-          << (this->PadY + (this->WidgetsFlatAspect ? 
+          << (this->WidgetsPadY + (this->WidgetsFlatAspect ? 
                             this->WidgetsFlatAdditionalPadY : 0))
           << endl;
         num++;
@@ -636,10 +632,10 @@ void vtkKWToolbar::UpdateWidgetsLayout()
 
   s << " -sticky news -row 0 "
     << " -padx " 
-    << (this->PadX + (this->WidgetsFlatAspect ? 
+    << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadX : 0))
     << " -pady "
-    << (this->PadY + (this->WidgetsFlatAspect ? 
+    << (this->WidgetsPadY + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadY : 0))
     << ends;
 
@@ -655,28 +651,28 @@ void vtkKWToolbar::UpdateWidgets()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::SetPadX(int arg)
+void vtkKWToolbar::SetWidgetsPadX(int arg)
 {
-  if (arg == this->PadX)
+  if (arg == this->WidgetsPadX)
     {
     return;
     }
 
-  this->PadX = arg;
+  this->WidgetsPadX = arg;
   this->Modified();
 
   this->UpdateWidgetsLayout();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::SetPadY(int arg)
+void vtkKWToolbar::SetWidgetsPadY(int arg)
 {
-  if (arg == this->PadX)
+  if (arg == this->WidgetsPadX)
     {
     return;
     }
 
-  this->PadY = arg;
+  this->WidgetsPadY = arg;
   this->Modified();
 
   this->UpdateWidgetsLayout();
@@ -810,8 +806,8 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
   os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
   os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
-  os << indent << "PadX: " << this->PadX << endl;
-  os << indent << "PadY: " << this->PadY << endl;
+  os << indent << "WidgetsPadX: " << this->WidgetsPadX << endl;
+  os << indent << "WidgetsPadY: " << this->WidgetsPadY << endl;
   os << indent << "WidgetsFlatAdditionalPadX: " << this->WidgetsFlatAdditionalPadX << endl;
   os << indent << "WidgetsFlatAdditionalPadY: " << this->WidgetsFlatAdditionalPadY << endl;
   os << indent << "Name: " << (this->Name ? this->Name : "None") << endl;

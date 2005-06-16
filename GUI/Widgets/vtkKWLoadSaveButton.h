@@ -34,8 +34,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Access to sub-widgets.

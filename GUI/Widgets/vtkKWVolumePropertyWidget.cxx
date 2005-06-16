@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.9");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -223,17 +223,15 @@ vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
+void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-relief flat -bd 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->ConfigureOptions(args);
 
   ostrstream tk_cmd;
 
@@ -246,7 +244,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
 
   this->EditorFrame->SetParent(this);
   this->EditorFrame->ShowHideFrameOn();
-  this->EditorFrame->Create(app,0);
+  this->EditorFrame->Create(app);
   this->EditorFrame->SetLabelText("Volume Appearance Settings");
 
   vtkKWFrame *frame = this->EditorFrame->GetFrame();
@@ -255,7 +253,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   // Component selection
 
   this->ComponentSelectionWidget->SetParent(frame);
-  this->ComponentSelectionWidget->Create(app, 0);
+  this->ComponentSelectionWidget->Create(app);
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
@@ -295,7 +293,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   // Enable shading
 
   this->EnableShadingCheckButton->SetParent(frame);
-  this->EnableShadingCheckButton->Create(app, "");
+  this->EnableShadingCheckButton->Create(app);
   this->EnableShadingCheckButton->SetText("Enable Shading");
   this->EnableShadingCheckButton->SetBalloonHelpString(
     "Enable shading (for all components).");
@@ -307,7 +305,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
 
   this->MaterialPropertyWidget->SetParent(frame);
   this->MaterialPropertyWidget->PopupModeOn();
-  this->MaterialPropertyWidget->Create(app, 0);
+  this->MaterialPropertyWidget->Create(app);
   this->MaterialPropertyWidget->GetPopupButton()->SetLabelWidth(label_width);
   this->MaterialPropertyWidget->GetComponentSelectionWidget()
     ->AllowComponentSelectionOff();
@@ -320,7 +318,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   // Interactive Apply
 
   this->InteractiveApplyCheckButton->SetParent(frame);
-  this->InteractiveApplyCheckButton->Create(app, "");
+  this->InteractiveApplyCheckButton->Create(app);
   this->InteractiveApplyCheckButton->SetText("Interactive Apply");
   this->InteractiveApplyCheckButton->SetBalloonHelpString(
     "Toggle whether changes are applied to the volume window and image "
@@ -340,7 +338,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
     vtkKWParameterValueFunctionEditor::RangeLabelPositionTop);
   this->ScalarOpacityFunctionEditor->ShowValueRangeOff();
   this->ScalarOpacityFunctionEditor->ShowWindowLevelModeButtonOn();
-  this->ScalarOpacityFunctionEditor->Create(app, "");
+  this->ScalarOpacityFunctionEditor->Create(app);
 
   this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()->SetText("S:");
   this->ScalarOpacityFunctionEditor->GetValueEntry()->GetLabel()->SetText("O:");
@@ -359,7 +357,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->ScalarOpacityUnitDistanceScale->SetParent(
     this->ScalarOpacityFunctionEditor->GetUserFrame());
   this->ScalarOpacityUnitDistanceScale->PopupScaleOn();
-  this->ScalarOpacityUnitDistanceScale->Create(app, "");
+  this->ScalarOpacityUnitDistanceScale->Create(app);
   this->ScalarOpacityUnitDistanceScale->DisplayEntry();
   this->ScalarOpacityUnitDistanceScale->DisplayLabel("Scale:");
   this->ScalarOpacityUnitDistanceScale->DisplayEntryAndLabelOnTopOff();
@@ -392,7 +390,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->ScalarColorFunctionEditor->SetRangeLabelPosition(
     this->ScalarOpacityFunctionEditor->GetRangeLabelPosition());
-  this->ScalarColorFunctionEditor->Create(app, "");
+  this->ScalarColorFunctionEditor->Create(app);
 
   this->ScalarColorFunctionEditor->GetParameterEntry()->GetLabel()->SetText(
     this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()
@@ -411,8 +409,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->ScalarColorFunctionEditor->ShowUserFrameOn();
   this->LockOpacityAndColorCheckButton->SetParent(
     this->ScalarColorFunctionEditor->GetUserFrame());
-  this->LockOpacityAndColorCheckButton->Create(
-    app, "-padx 0 -pady 0 -highlightthickness 0");
+  this->LockOpacityAndColorCheckButton->Create(app);
+  this->LockOpacityAndColorCheckButton->SetPadX(0);
+  this->LockOpacityAndColorCheckButton->SetPadY(0);
+  this->LockOpacityAndColorCheckButton->SetHighlightThickness(0);
   this->LockOpacityAndColorCheckButton->SetIndicator(0);
   this->LockOpacityAndColorCheckButton->SetText("Lock");
   this->LockOpacityAndColorCheckButton->SetBalloonHelpString(
@@ -443,7 +443,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->GradientOpacityFunctionEditor->SetRangeLabelPosition(
     this->ScalarOpacityFunctionEditor->GetRangeLabelPosition());
-  this->GradientOpacityFunctionEditor->Create(app, "");
+  this->GradientOpacityFunctionEditor->Create(app);
 
   this->GradientOpacityFunctionEditor->GetParameterEntry()->GetLabel()->SetText(
     this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()
@@ -461,7 +461,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->GradientOpacityFunctionEditor->ShowUserFrameOn();
   this->EnableGradientOpacityOptionMenu->SetParent(
     this->GradientOpacityFunctionEditor->GetUserFrame());
-  this->EnableGradientOpacityOptionMenu->Create(app, "-padx 1 -pady 0");
+  this->EnableGradientOpacityOptionMenu->Create(app);
+  this->EnableGradientOpacityOptionMenu->SetPadX(1);
+  this->EnableGradientOpacityOptionMenu->SetPadY(0);
   this->EnableGradientOpacityOptionMenu->IndicatorOff();
   this->EnableGradientOpacityOptionMenu->SetBalloonHelpString(
     "Enable modulation of the opacity by the magnitude of the gradient "
@@ -478,14 +480,14 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   // Component weights
 
   this->ComponentWeightScaleSet->SetParent(frame);
-  this->ComponentWeightScaleSet->Create(app, "");
+  this->ComponentWeightScaleSet->Create(app);
   this->ComponentWeightScaleSet->GetLabel()->SetText("Component Weights:");
 
   vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
 
   scaleset->PackHorizontallyOn();
   scaleset->SetMaximumNumberOfWidgetsInPackingDirection(2);
-  scaleset->SetPadding(2, 0);
+  scaleset->SetWidgetsPadX(2);
 
   int i;
   char label[15];
@@ -512,7 +514,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   // HSV Color Selector
 
   this->HSVColorSelector->SetParent(frame);
-  this->HSVColorSelector->Create(app, "");
+  this->HSVColorSelector->Create(app);
   this->HSVColorSelector->ModificationOnlyOn();
   this->HSVColorSelector->SetHueSatWheelRadius(54);
   this->HSVColorSelector->SetSelectionChangedCommand(

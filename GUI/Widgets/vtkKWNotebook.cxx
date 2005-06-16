@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.79");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.80");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -163,9 +163,9 @@ vtkKWNotebook::vtkKWNotebook()
   this->CurrentId       = -1;
   this->Expanding       = 0;
 
-  this->Body            = vtkKWWidget::New();
-  this->Mask            = vtkKWWidget::New();
-  this->TabsFrame       = vtkKWWidget::New();
+  this->Body            = vtkKWFrame::New();
+  this->Mask            = vtkKWFrame::New();
+  this->TabsFrame       = vtkKWFrame::New();
   this->TabPopupMenu    = 0;
 
   // Internal structs
@@ -221,11 +221,11 @@ vtkKWNotebook::~vtkKWNotebook()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
+void vtkKWNotebook::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -234,13 +234,12 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   ostrstream cmd;
 
   cmd << this->GetWidgetName() << " configure -width " << this->MinimumWidth 
-      <<  " -height " << this->MinimumHeight << " -bd 0 -relief flat " 
-      << (args ? args : "") << endl;
+      <<  " -height " << this->MinimumHeight << " -bd 0 -relief flat " << endl;
 
   // Create the frame that stores the tabs button
 
   this->TabsFrame->SetParent(this);
-  this->TabsFrame->Create(app, "frame", "-bd 0 -relief flat");
+  this->TabsFrame->Create(app);
 
   cmd << "pack " << this->TabsFrame->GetWidgetName() 
       << " -fill x -expand y -side top -anchor n " 
@@ -249,7 +248,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   // Create the frame where each page will be mapped
 
   this->Body->SetParent(this);
-  this->Body->Create(app, "frame", "");
+  this->Body->Create(app);
 
   cmd << this->Body->GetWidgetName() << " config -relief raised "
       << " -bd " << VTK_KW_NB_TAB_BD << endl;
@@ -258,7 +257,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   // the body (i.e. between the tab and the corresponding page under the tab).
 
   this->Mask->SetParent(this);
-  this->Mask->Create(app, "frame","-bd 0 -relief flat");
+  this->Mask->Create(app);
 
   // Bind <Configure> event to both the tabs frame (in case a tab is added
   // and its size requires the whole widget to be resized) and the body.
@@ -674,7 +673,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Frame = vtkKWFrame::New();
   page->Frame->SetParent(this->Body);
-  page->Frame->Create(this->GetApplication(), 0);
+  page->Frame->Create(this->GetApplication());
 
   // Store the page title for fast page retrieval on title
 
@@ -685,7 +684,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->TabFrame = vtkKWFrame::New();
   page->TabFrame->SetParent(this->TabsFrame);
-  page->TabFrame->Create(this->GetApplication(), 0);
+  page->TabFrame->Create(this->GetApplication());
 
   cmd << page->TabFrame->GetWidgetName() << " config -relief raised "
       << " -bd " << VTK_KW_NB_TAB_BD << endl;
@@ -694,7 +693,8 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Label = vtkKWLabel::New();
   page->Label->SetParent(page->TabFrame);
-  page->Label->Create(this->GetApplication(), "-highlightthickness 0");
+  page->Label->Create(this->GetApplication());
+  page->Label->SetHighlightThickness(0);
   page->Label->SetText(page->Title);
   if (balloon)
     {
@@ -718,7 +718,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
     page->ImageLabel = vtkKWLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);
-    page->ImageLabel->Create(this->GetApplication(), "");
+    page->ImageLabel->Create(this->GetApplication());
     page->ImageLabel->SetImageOption(page->Icon);
 
     if (this->ShowIcons)
@@ -1942,7 +1942,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     this->TabPopupMenu = vtkKWMenu::New();
     this->TabPopupMenu->SetParent(this);
     this->TabPopupMenu->TearOffOff();
-    this->TabPopupMenu->Create(this->GetApplication(), 0);
+    this->TabPopupMenu->Create(this->GetApplication());
     }
 
   this->TabPopupMenu->DeleteAllMenuItems();

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.40");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.41");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -206,7 +206,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
-  this->InterfaceSettingsFrame->Create(app, 0);
+  this->InterfaceSettingsFrame->Create(app);
   this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
@@ -224,7 +224,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ConfirmExitCheckButton->SetParent(frame);
-  this->ConfirmExitCheckButton->Create(app, 0);
+  this->ConfirmExitCheckButton->Create(app);
   this->ConfirmExitCheckButton->SetText("Confirm on exit");
   this->ConfirmExitCheckButton->SetCommand(this, "ConfirmExitCallback");
   this->ConfirmExitCheckButton->SetBalloonHelpString(
@@ -242,7 +242,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->SaveUserInterfaceGeometryCheckButton->SetParent(frame);
-  this->SaveUserInterfaceGeometryCheckButton->Create(app, 0);
+  this->SaveUserInterfaceGeometryCheckButton->Create(app);
   this->SaveUserInterfaceGeometryCheckButton->SetText(
     "Save user interface geometry on exit");
   this->SaveUserInterfaceGeometryCheckButton->SetCommand(
@@ -266,7 +266,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
       }
 
     this->ShowSplashScreenCheckButton->SetParent(frame);
-    this->ShowSplashScreenCheckButton->Create(app, 0);
+    this->ShowSplashScreenCheckButton->Create(app);
     this->ShowSplashScreenCheckButton->SetText("Show splash screen");
     this->ShowSplashScreenCheckButton->SetCommand(
       this, "ShowSplashScreenCallback");
@@ -286,7 +286,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowBalloonHelpCheckButton->SetParent(frame);
-  this->ShowBalloonHelpCheckButton->Create(app, 0);
+  this->ShowBalloonHelpCheckButton->Create(app);
   this->ShowBalloonHelpCheckButton->SetText("Show balloon help");
   this->ShowBalloonHelpCheckButton->SetCommand(
     this, "ShowBalloonHelpCallback");
@@ -307,7 +307,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceCustomizationFrame->ShowHideFrameOn();
-  this->InterfaceCustomizationFrame->Create(app, 0);
+  this->InterfaceCustomizationFrame->Create(app);
   this->InterfaceCustomizationFrame->SetLabelText("Interface Customization");
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
@@ -325,7 +325,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ResetDragAndDropButton->SetParent(frame);
-  this->ResetDragAndDropButton->Create(app, 0);
+  this->ResetDragAndDropButton->Create(app);
   this->ResetDragAndDropButton->SetText("Reset Interface To Default State");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
@@ -351,7 +351,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->ToolbarSettingsFrame->ShowHideFrameOn();
-  this->ToolbarSettingsFrame->Create(app, 0);
+  this->ToolbarSettingsFrame->Create(app);
   this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
@@ -369,7 +369,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->FlatFrameCheckButton->SetParent(frame);
-  this->FlatFrameCheckButton->Create(app, 0);
+  this->FlatFrameCheckButton->Create(app);
   this->FlatFrameCheckButton->SetText("Flat frame");
   this->FlatFrameCheckButton->SetCommand(this, "FlatFrameCallback");
   this->FlatFrameCheckButton->SetBalloonHelpString(
@@ -387,7 +387,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->FlatButtonsCheckButton->SetParent(frame);
-  this->FlatButtonsCheckButton->Create(app, 0);
+  this->FlatButtonsCheckButton->Create(app);
   this->FlatButtonsCheckButton->SetText("Flat buttons");
   this->FlatButtonsCheckButton->SetCommand(this, "FlatButtonsCallback");
   this->FlatButtonsCheckButton->SetBalloonHelpString(
@@ -406,7 +406,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->PrintSettingsFrame->ShowHideFrameOn();
-  this->PrintSettingsFrame->Create(app, 0);
+  this->PrintSettingsFrame->Create(app);
   this->PrintSettingsFrame->SetLabelText("Print Settings");
     
   tk_cmd << "pack " << this->PrintSettingsFrame->GetWidgetName()

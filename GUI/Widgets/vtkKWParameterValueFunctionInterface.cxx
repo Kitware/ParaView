@@ -17,15 +17,14 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.2");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.3");
 
 int vtkKWParameterValueFunctionInterfaceCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionInterface::Create(vtkKWApplication *app, 
-                                                  const char *args)
+void vtkKWParameterValueFunctionInterface::Create(vtkKWApplication *app)
 {
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 }
 
 //----------------------------------------------------------------------------

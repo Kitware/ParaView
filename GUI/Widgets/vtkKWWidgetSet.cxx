@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.6");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.7");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -50,8 +50,8 @@ vtkKWWidgetSet::vtkKWWidgetSet()
   this->CommandFunction = vtkKWWidgetSetCommand;
   this->PackHorizontally = 0;
   this->MaximumNumberOfWidgetsInPackingDirection = 0;
-  this->PadX = 0;
-  this->PadY = 0;
+  this->WidgetsPadX = 0;
+  this->WidgetsPadY = 0;
   this->ExpandWidgets = 0;
 
   // Internal structs
@@ -141,11 +141,11 @@ int vtkKWWidgetSet::GetNthWidgetId(int rank)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetSet::Create(vtkKWApplication *app, const char *args)
+void vtkKWWidgetSet::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -238,8 +238,8 @@ void vtkKWWidgetSet::Pack()
       << " -sticky " << sticky
       << " -column " << (this->PackHorizontally ? col : row)
       << " -row " << (this->PackHorizontally ? row : col)
-      << " -padx " << this->PadX
-      << " -pady " << this->PadY
+      << " -padx " << this->WidgetsPadX
+      << " -pady " << this->WidgetsPadY
       << endl;
     col++;
     if (this->MaximumNumberOfWidgetsInPackingDirection &&
@@ -300,17 +300,29 @@ void vtkKWWidgetSet::SetMaximumNumberOfWidgetsInPackingDirection(int _arg)
   this->Pack();
 }
 
-// ----------------------------------------------------------------------------
-void vtkKWWidgetSet::SetPadding(int x, int y)
+//----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetWidgetsPadX(int arg)
 {
-  if (this->PadX == x && this->PadY == y)
+  if (arg == this->WidgetsPadX)
     {
     return;
     }
 
-  this->PadX = x;
-  this->PadY = y;
+  this->WidgetsPadX = arg;
+  this->Modified();
 
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetWidgetsPadY(int arg)
+{
+  if (arg == this->WidgetsPadX)
+    {
+    return;
+    }
+
+  this->WidgetsPadY = arg;
   this->Modified();
 
   this->Pack();
@@ -377,6 +389,9 @@ int vtkKWWidgetSet::GetNumberOfVisibleWidgets()
 void vtkKWWidgetSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "WidgetsPadX: " << this->WidgetsPadX << endl;
+  os << indent << "WidgetsPadY: " << this->WidgetsPadY << endl;
 
   os << indent << "ExpandWidgets: " 
      << (this->ExpandWidgets ? "On" : "Off") << endl;

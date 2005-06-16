@@ -21,7 +21,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.35");
+vtkCxxRevisionMacro(vtkKWLabel, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -96,29 +96,20 @@ void vtkKWLabel::UpdateText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
+void vtkKWLabel::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, this->LineType == vtkKWLabel::MultiLine ? "message" : "label"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-
-  if (this->LineType == vtkKWLabel::MultiLine)
-    {
-    this->Script("message %s -width %d", wname, this->Width);
-    }
-  else
-    {
-    this->Script("label %s -justify left -width %d", wname, this->Width);
-    }
+  this->SetWidth(this->Width);
+  this->SetJustificationToLeft();
 
   this->UpdateText();
-  this->ConfigureOptions(args);
 
   // Set bindings (if any)
   
@@ -228,7 +219,34 @@ void vtkKWLabel::UpdateBindings()
     }
 }
 
-// ---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetJustification(int justification)
+{
+  this->SetConfigurationOption(
+    "-justify", 
+    vtkKWTkOptions::GetJustificationAsTkOptionValue(justification));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetJustification()
+{
+  return vtkKWTkOptions::GetJustificationFromTkOptionValue(
+    this->GetConfigurationOption("-justify"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetWrapLength(const char *wraplength)
+{
+  this->SetConfigurationOption("-wraplength", wraplength);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWLabel::GetWrapLength()
+{
+  return this->GetConfigurationOption("-wraplength");
+}
+
+//---------------------------------------------------------------------------
 void vtkKWLabel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();

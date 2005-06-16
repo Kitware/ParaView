@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.51");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.52");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -251,7 +251,7 @@ void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
                                           const char *widget,
                                           double *r, double *g, double *b)
 {
-  vtkKWTkUtilities::GetOptionColor(interp, widget, "-bg", r, g, b);
+  vtkKWTkUtilities::GetOptionColor(interp, widget, "-background", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -544,7 +544,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       {
       vtkKWTkUtilities::GetOptionColor(interp, 
                                        blend_with_name, 
-                                       (color_option ? color_option : "-bg"), 
+                                       (color_option ? color_option : "-background"), 
                                        &r, &g, &b);
       }
     else

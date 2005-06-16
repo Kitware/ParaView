@@ -29,7 +29,7 @@ app SetHelpDialogStartingPage "http://www.kitware.com"
 vtkKWWindow win
 win SupportHelpOn
 app AddWindow win
-win Create app ""
+win Create app
 
 [win GetViewFrame] SetBackgroundColor 0.92 0.87 0.69
 
@@ -37,7 +37,7 @@ win Create app ""
 
 vtkKWLabel hello_label
 hello_label SetParent [win GetViewFrame]
-hello_label Create app ""
+hello_label Create app
 hello_label SetWidth 50
 hello_label SetForegroundColor 1.0 1.0 1.0
 hello_label SetBackgroundColor 0.2 0.2 0.4
@@ -66,7 +66,7 @@ set page_widget [label_panel GetPageWidget "Language"]
 
 vtkKWRadioButtonSet rbs
 rbs SetParent $page_widget
-rbs Create app ""
+rbs Create app
 
 pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
 
@@ -102,14 +102,14 @@ set page_widget [frame_panel GetPageWidget "View Colors"]
 
 vtkKWFrameLabeled ccb_frame
 ccb_frame SetParent $page_widget
-ccb_frame Create app ""
+ccb_frame Create app
 ccb_frame SetLabelText "View Background Color"
 
 pack [ccb_frame GetWidgetName] -side top -anchor nw -expand y -fill x -padx 2 -pady 2
 
 vtkKWHSVColorSelector ccb
 ccb SetParent [ccb_frame GetFrame]
-ccb Create app ""
+ccb Create app
 ccb SetSelectionChangingCommand [hello_label GetParent] "SetBackgroundColor"
 ccb InvokeCommandsWithRGBOn
 ccb SetBalloonHelpString "Set the view background color"
@@ -137,7 +137,7 @@ fg_toolbar Create app
 
 vtkKWLabel fg_toolbar_label
 fg_toolbar_label SetParent [fg_toolbar GetFrame]
-fg_toolbar_label Create app ""
+fg_toolbar_label Create app
 fg_toolbar_label SetText "Label Foreground:"
 fg_toolbar AddWidget fg_toolbar_label
 fg_toolbar_label Delete
@@ -158,7 +158,7 @@ bg_toolbar Create app
 
 vtkKWLabel bg_toolbar_label
 bg_toolbar_label SetParent [bg_toolbar GetFrame]
-bg_toolbar_label Create app ""
+bg_toolbar_label Create app
 bg_toolbar_label SetText "Label Background:"
 bg_toolbar AddWidget bg_toolbar_label
 bg_toolbar_label Delete
@@ -175,7 +175,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
     set fg_button "fg_button$i"
     vtkKWPushButton $fg_button
     $fg_button SetParent [fg_toolbar GetFrame]
-    $fg_button Create app ""
+    $fg_button Create app
     $fg_button SetCommand hello_label "SetForegroundColor $rgb"
     $fg_button SetWidth 2
     eval $fg_button SetBackgroundColor $rgb
@@ -187,7 +187,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
     set bg_button "bg_button$i"
     vtkKWPushButton $bg_button
     $bg_button SetParent [bg_toolbar GetFrame]
-    $bg_button Create app ""
+    $bg_button Create app
     $bg_button SetCommand hello_label "SetBackgroundColor $rgb"
     $bg_button SetWidth 2
     eval $bg_button SetBackgroundColor $rgb

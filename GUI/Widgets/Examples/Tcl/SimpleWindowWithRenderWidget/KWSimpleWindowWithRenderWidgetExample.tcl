@@ -31,7 +31,7 @@ app SetHelpDialogStartingPage "http://www.kitware.com"
 vtkKWWindowBase win
 win SupportHelpOn
 app AddWindow win
-win Create app ""
+win Create app
 
 # Add a render widget, attach it to the view frame, and pack
   
@@ -39,7 +39,7 @@ win Create app ""
 
 vtkKWRenderWidget rw
 rw SetParent [win GetViewFrame]
-rw Create app ""
+rw Create app
 
 pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 

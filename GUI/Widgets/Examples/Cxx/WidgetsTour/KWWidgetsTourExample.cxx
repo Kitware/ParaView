@@ -77,7 +77,7 @@ int my_main(int argc, char *argv[])
   win->SupportHelpOn();
   win->SetPanelLayoutToSecondaryBelowMainAndView();
   app->AddWindow(win);
-  win->Create(app, NULL);
+  win->Create(app);
 
   // Add a user interface panel to the main user interface manager
 
@@ -95,7 +95,7 @@ int my_main(int argc, char *argv[])
   vtkKWListBox *widgets_list = vtkKWListBox::New();
   widgets_list->SetParent(page_widget);
   widgets_list->ScrollbarOn();
-  widgets_list->Create(app, NULL);
+  widgets_list->Create(app);
   widgets_list->SetHeight(300);
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
@@ -129,7 +129,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWTextLabeled *tcl_source_text = vtkKWTextLabeled::New();
   tcl_source_text->SetParent(source_split->GetFrame1());
-  tcl_source_text->Create(app, NULL);
+  tcl_source_text->Create(app);
   tcl_source_text->SetLabelPositionToTop();
   tcl_source_text->SetLabelText("Tcl Source");
 
@@ -149,7 +149,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWTextLabeled *cxx_source_text = vtkKWTextLabeled::New();
   cxx_source_text->SetParent(source_split->GetFrame2());
-  cxx_source_text->Create(app, NULL);
+  cxx_source_text->Create(app);
   cxx_source_text->SetLabelPositionToTop();
   cxx_source_text->SetLabelText("C++ Source");
 

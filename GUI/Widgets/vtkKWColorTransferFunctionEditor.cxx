@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.31");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.32");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -484,8 +484,7 @@ void vtkKWColorTransferFunctionEditor::UpdateColorSpaceOptionMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app, 
-                                               const char *args)
+void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -497,7 +496,7 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app,
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Add the color space option menu
 
@@ -537,7 +536,9 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
     {
     this->CreateTopLeftFrame(app);
     this->ColorSpaceOptionMenu->SetParent(this->TopLeftFrame);
-    this->ColorSpaceOptionMenu->Create(app, "-padx 1 -pady 0");
+    this->ColorSpaceOptionMenu->Create(app);
+    this->ColorSpaceOptionMenu->SetPadX(1);
+    this->ColorSpaceOptionMenu->SetPadY(0);
     this->ColorSpaceOptionMenu->IndicatorOff();
     this->ColorSpaceOptionMenu->SetBalloonHelpString(
       "Change the interpolation color space to RGB or HSV.");
@@ -563,7 +564,9 @@ void vtkKWColorTransferFunctionEditor::CreateColorRamp(
   if (this->ColorRamp && !this->ColorRamp->IsCreated())
     {
     this->ColorRamp->SetParent(this);
-    this->ColorRamp->Create(app, "-bd 0 -anchor nw -highlightthickness 0");
+    this->ColorRamp->Create(app);
+    this->ColorRamp->SetBorderWidth(0);
+    this->ColorRamp->SetAnchorToNorthWest();
     if (!this->IsColorRampUpToDate())
       {
       this->RedrawColorRamp();
@@ -582,7 +585,7 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
       this->ValueEntries[i]->SetParent(this->TopRightFrame);
-      this->ValueEntries[i]->Create(app, "");
+      this->ValueEntries[i]->Create(app);
       this->ValueEntries[i]->GetWidget()->SetWidth(4);
       this->ValueEntries[i]->GetWidget()->BindCommand(
         this, "ValueEntriesCallback");

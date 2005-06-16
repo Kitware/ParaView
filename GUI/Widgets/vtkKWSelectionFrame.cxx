@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.36");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -162,11 +162,11 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
+void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -177,19 +177,19 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   // The title bar
 
   this->TitleBar->SetParent(this);
-  this->TitleBar->Create(app, NULL);
+  this->TitleBar->Create(app);
 
   // The selection button
 
   this->SelectionList->SetParent(this->TitleBar);
-  this->SelectionList->Create(app, NULL);
+  this->SelectionList->Create(app);
   this->SelectionList->IndicatorOff();
   this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
 
   // The close button
 
   this->CloseButton->SetParent(this->TitleBar);
-  this->CloseButton->Create(app, NULL);
+  this->CloseButton->Create(app);
   this->CloseButton->SetImageOption(vtkKWIcon::ICON_SHRINK);
   this->CloseButton->SetCommand(this, "CloseCallback");
   this->CloseButton->SetBalloonHelpString("Close window");
@@ -197,24 +197,27 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   // The title itself
 
   this->Title->SetParent(this->TitleBar);
-  this->Title->Create(app, "-justify left -anchor w");
+  this->Title->Create(app);
+  this->Title->SetJustificationToLeft();
+  this->Title->SetAnchorToWest();
   this->Title->SetText("<Click to Select>");
   
   // The subframe on the right
 
   this->TitleBarRightSubframe->SetParent(this->TitleBar);
-  this->TitleBarRightSubframe->Create(app, "");
+  this->TitleBarRightSubframe->Create(app);
 
   // The toobar
 
   this->ToolbarSet->SetParent(this);
   this->ToolbarSet->ShowBottomSeparatorOff();
-  this->ToolbarSet->Create(app, NULL);
+  this->ToolbarSet->Create(app);
 
   // The body frame
 
   this->BodyFrame->SetParent(this);
-  this->BodyFrame->Create(app, "-bg black");
+  this->BodyFrame->Create(app);
+  this->BodyFrame->SetBackgroundColor(0.0, 0.0, 0.0);
 
   // Pack
 

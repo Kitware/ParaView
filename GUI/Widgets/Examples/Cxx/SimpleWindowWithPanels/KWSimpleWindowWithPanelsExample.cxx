@@ -63,7 +63,7 @@ int my_main(int argc, char *argv[])
   vtkKWWindow *win = vtkKWWindow::New();
   win->SupportHelpOn();
   app->AddWindow(win);
-  win->Create(app, NULL);
+  win->Create(app);
 
   win->GetViewFrame()->SetBackgroundColor(0.92, 0.87, 0.69);
 
@@ -71,7 +71,7 @@ int my_main(int argc, char *argv[])
   
   vtkKWLabel *hello_label = vtkKWLabel::New();
   hello_label->SetParent(win->GetViewFrame());
-  hello_label->Create(app, NULL);
+  hello_label->Create(app);
   hello_label->SetWidth(50);
   hello_label->SetForegroundColor(1.0, 1.0, 1.0);
   hello_label->SetBackgroundColor(0.2, 0.2, 0.4);
@@ -103,7 +103,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWRadioButtonSet *rbs = vtkKWRadioButtonSet::New();
   rbs->SetParent(page_widget);
-  rbs->Create(app, NULL);
+  rbs->Create(app);
 
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               rbs->GetWidgetName());
@@ -143,7 +143,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWFrameLabeled *ccb_frame = vtkKWFrameLabeled::New();
   ccb_frame->SetParent(page_widget);
-  ccb_frame->Create(app, NULL);
+  ccb_frame->Create(app);
   ccb_frame->SetLabelText("View Background Color");
 
   app->Script(
@@ -152,7 +152,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWHSVColorSelector *ccb = vtkKWHSVColorSelector::New();
   ccb->SetParent(ccb_frame->GetFrame());
-  ccb->Create(app, NULL);
+  ccb->Create(app);
   ccb->SetSelectionChangingCommand(
     hello_label->GetParent(), "SetBackgroundColor");
   ccb->InvokeCommandsWithRGBOn();
@@ -182,7 +182,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWLabel *fg_toolbar_label = vtkKWLabel::New();
   fg_toolbar_label->SetParent(fg_toolbar->GetFrame());
-  fg_toolbar_label->Create(app, NULL);
+  fg_toolbar_label->Create(app);
   fg_toolbar_label->SetText("Label Foreground:");
   fg_toolbar->AddWidget(fg_toolbar_label);
   fg_toolbar_label->Delete();
@@ -203,7 +203,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWLabel *bg_toolbar_label = vtkKWLabel::New();
   bg_toolbar_label->SetParent(bg_toolbar->GetFrame());
-  bg_toolbar_label->Create(app, NULL);
+  bg_toolbar_label->Create(app);
   bg_toolbar_label->SetText("Label Background:");
   bg_toolbar->AddWidget(bg_toolbar_label);
   bg_toolbar_label->Delete();
@@ -222,7 +222,7 @@ int my_main(int argc, char *argv[])
     rgb = vtkMath::HSVToRGB(hsv);
     vtkKWPushButton *fg_button = vtkKWPushButton::New();
     fg_button->SetParent(fg_toolbar->GetFrame());
-    fg_button->Create(app, NULL);
+    fg_button->Create(app);
     sprintf(buffer, "SetForegroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     fg_button->SetCommand(hello_label, buffer);
     fg_button->SetWidth(2);
@@ -235,7 +235,7 @@ int my_main(int argc, char *argv[])
     rgb = vtkMath::HSVToRGB(hsv);
     vtkKWPushButton *bg_button = vtkKWPushButton::New();
     bg_button->SetParent(bg_toolbar->GetFrame());
-    bg_button->Create(app, NULL);
+    bg_button->Create(app);
     sprintf(buffer, "SetBackgroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     bg_button->SetCommand(hello_label, buffer);
     bg_button->SetWidth(2);

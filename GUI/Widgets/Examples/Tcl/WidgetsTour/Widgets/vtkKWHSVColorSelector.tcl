@@ -7,7 +7,7 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
     vtkKWHSVColorSelector ccb
     ccb SetParent $parent
-    ccb Create app ""
+    ccb Create app
     ccb SetSelectionChangingCommand $parent "SetBackgroundColor"
     ccb InvokeCommandsWithRGBOn
 

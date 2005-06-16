@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.10");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -59,18 +59,15 @@ vtkKWScalarComponentSelectionWidget::~vtkKWScalarComponentSelectionWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarComponentSelectionWidget::Create(
-  vtkKWApplication *app, const char *args)
+void vtkKWScalarComponentSelectionWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->ConfigureOptions(args);
 
   // --------------------------------------------------------------
   // Component selection

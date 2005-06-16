@@ -36,8 +36,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create a Tk widget
-  void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  void Create(vtkKWApplication *app);
   
   // Description:
   // Set the percentage complete for a particular segment.  All earlier

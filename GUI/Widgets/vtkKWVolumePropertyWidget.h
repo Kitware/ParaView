@@ -46,8 +46,8 @@ public:
   vtkTypeRevisionMacro(vtkKWVolumePropertyWidget,vtkKWWidget);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Get/Set the transfer function mapping scalar value to color

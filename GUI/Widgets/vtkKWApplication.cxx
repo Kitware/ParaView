@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.231");
+vtkCxxRevisionMacro(vtkKWApplication, "1.232");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -834,7 +834,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
   dialog->SetDialogName(vtkKWApplication::ExitDialogName);
-  dialog->Create(this, NULL);
+  dialog->Create(this);
   dialog->SetText(msg.c_str());
   dialog->SetTitle(title.c_str());
 
@@ -950,7 +950,9 @@ void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
     {
     this->AboutDialog->SetMasterWindow(master);
     this->AboutDialog->HideDecorationOn();
-    this->AboutDialog->Create(this, "-bd 1 -relief solid");
+    this->AboutDialog->Create(this);
+    this->AboutDialog->SetBorderWidth(1);
+    this->AboutDialog->SetReliefToSolid();
     }
 
   this->ConfigureAboutDialog();
@@ -975,7 +977,7 @@ void vtkKWApplication::ConfigureAboutDialog()
       if (!this->AboutDialogImage->IsCreated())
         {
         this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
-        this->AboutDialogImage->Create(this, 0);
+        this->AboutDialogImage->Create(this);
         }
       this->Script("%s config -image {%s}",
                    this->AboutDialogImage->GetWidgetName(), img_name);
@@ -1002,7 +1004,8 @@ void vtkKWApplication::ConfigureAboutDialog()
   if (!this->AboutRuntimeInfo->IsCreated())
     {
     this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
-    this->AboutRuntimeInfo->Create(this, "-setgrid true");
+    this->AboutRuntimeInfo->Create(this);
+    this->AboutRuntimeInfo->ResizeToGridOn();
     this->AboutRuntimeInfo->SetWidth(60);
     this->AboutRuntimeInfo->SetHeight(8);
     this->AboutRuntimeInfo->SetWrapToWord();
@@ -1073,7 +1076,7 @@ vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
   if (!this->SplashScreen)
     {
     this->SplashScreen = vtkKWSplashScreen::New();
-    this->SplashScreen->Create(this, NULL);
+    this->SplashScreen->Create(this);
     }
   return this->SplashScreen;
 }

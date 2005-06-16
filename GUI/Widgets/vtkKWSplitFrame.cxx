@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.28");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.29");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -79,21 +79,25 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(
-        app, "frame", "-bd 0 -relief flat -width 200 -height 100"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
+  this->SetConfigurationOptionAsInt("-width", 200);
+  this->SetConfigurationOptionAsInt("-height", 100);
+
   this->Frame1->SetParent(this);
-  this->Frame1->Create(app, NULL);
+  this->Frame1->Create(app);
 
   this->Separator->SetParent(this);
-  this->Separator->Create(app, "-bd 2 -relief raised");
+  this->Separator->Create(app);
+  this->Separator->SetBorderWidth(2);
+  this->Separator->SetReliefToRaised();
 
   this->Frame2->SetParent(this);
-  this->Frame2->Create(app, NULL);
+  this->Frame2->Create(app);
   
   this->Update();
 

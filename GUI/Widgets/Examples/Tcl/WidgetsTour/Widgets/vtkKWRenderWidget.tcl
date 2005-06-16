@@ -10,7 +10,7 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
     vtkKWRenderWidget rw
     rw SetParent $parent
-    rw Create app ""
+    rw Create app
 
     pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 

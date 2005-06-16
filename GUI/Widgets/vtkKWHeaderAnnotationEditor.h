@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char* args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set/Get the vtkKWRenderWidget that owns the header annotation.

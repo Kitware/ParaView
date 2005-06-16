@@ -36,8 +36,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char* args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the label for the frame.
@@ -138,9 +138,9 @@ protected:
   vtkKWFrame        *LabelFrame;
   vtkKWLabelLabeled *Label;
 
-  vtkKWWidget       *Border;
-  vtkKWWidget       *Border2;
-  vtkKWWidget       *Groove;
+  vtkKWFrame       *Border;
+  vtkKWFrame       *Border2;
+  vtkKWFrame       *Groove;
   vtkKWLabel        *Icon;
   vtkKWIcon         *IconData;
 

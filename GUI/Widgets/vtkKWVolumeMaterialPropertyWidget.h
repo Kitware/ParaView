@@ -33,7 +33,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Set/get the volume property observed by this widget

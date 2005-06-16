@@ -17,15 +17,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWFrame);
-vtkCxxRevisionMacro(vtkKWFrame, "1.26");
+vtkCxxRevisionMacro(vtkKWFrame, "1.27");
 
 //----------------------------------------------------------------------------
-void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
+void vtkKWFrame::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::Create(
-        app, "frame", (args ? args : "-bd 0 -relief flat")))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

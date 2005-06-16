@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.9");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.10");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -40,9 +40,9 @@ vtkKWFrameLabeled::vtkKWFrameLabeled()
 {
   this->CommandFunction = vtkKWFrameLabeledCommand;
 
-  this->Border     = vtkKWWidget::New();
-  this->Groove     = vtkKWWidget::New();
-  this->Border2    = vtkKWWidget::New();
+  this->Border     = vtkKWFrame::New();
+  this->Groove     = vtkKWFrame::New();
+  this->Border2    = vtkKWFrame::New();
   this->Frame      = vtkKWFrame::New();
   this->LabelFrame = vtkKWFrame::New();
   this->Label      = vtkKWLabelLabeled::New();
@@ -172,35 +172,36 @@ void vtkKWFrameLabeled::AdjustMargin()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::Create(vtkKWApplication *app, const char* args)
+void vtkKWFrameLabeled::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->ConfigureOptions(args);
-
   this->Border->SetParent(this);
-  this->Border->Create(app, "frame", "-bd 0 -relief flat");
+  this->Border->Create(app);
 
   this->Groove->SetParent(this);
-  this->Groove->Create(app, "frame", "-bd 2 -relief groove");
+  this->Groove->Create(app);
+  this->Groove->SetReliefToGroove();
+  this->Groove->SetBorderWidth(2);
 
   this->Border2->SetParent(this->Groove);
-  this->Border2->Create(app, "frame", "-bd 0 -relief flat");
+  this->Border2->Create(app);
 
   this->Frame->SetParent(this->Groove);
-  this->Frame->Create(app, "");
+  this->Frame->Create(app);
 
   this->LabelFrame->SetParent(this);
-  this->LabelFrame->Create(app, "");
+  this->LabelFrame->Create(app);
 
   this->Label->SetParent(this->LabelFrame);
-  this->Label->Create(app, "-bd 0");
+  this->Label->Create(app);
+  this->Label->SetBorderWidth(0);
   this->Label->ExpandWidgetOff();
 
   this->Script("%s config -bd 1 -pady 0 -padx 0", 
@@ -234,7 +235,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app, const char* args)
   this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
 
   this->Icon->SetParent(this);
-  this->Icon->Create(app, "");
+  this->Icon->Create(app);
   this->Icon->SetImageOption(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   

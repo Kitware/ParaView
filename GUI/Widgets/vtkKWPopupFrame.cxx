@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.7");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.8");
 
 int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -57,12 +57,11 @@ vtkKWPopupFrame::~vtkKWPopupFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrame::Create(vtkKWApplication *app, 
-                             const char* vtkNotUsed(args))
+void vtkKWPopupFrame::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -79,7 +78,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app,
       }
     
     this->PopupButton->SetParent(this);
-    this->PopupButton->Create(app, 0);
+    this->PopupButton->Create(app);
     }
 
   // --------------------------------------------------------------
@@ -95,7 +94,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app,
     this->Frame->SetParent(this);
     }
 
-  this->Frame->Create(app, 0);
+  this->Frame->Create(app);
 
   this->Script("pack %s -side top -anchor nw -fill both -expand y",
                this->Frame->GetWidgetName());

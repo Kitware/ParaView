@@ -36,7 +36,7 @@ vtkKWWindow win
 win SupportHelpOn
 win SetPanelLayoutToSecondaryBelowMainAndView
 app AddWindow win
-win Create app ""
+win Create app
 
 # Add a user interface panel to the main user interface manager
 
@@ -53,7 +53,7 @@ set page_widget [widgets_panel GetPageWidget "Widgets"]
 vtkKWListBox widgets_list
 widgets_list SetParent $page_widget
 widgets_list ScrollbarOn
-widgets_list Create app ""
+widgets_list Create app
 widgets_list SetHeight 300
 
 pack [widgets_list GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
@@ -83,7 +83,7 @@ pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 
 vtkKWTextLabeled tcl_source_text
 tcl_source_text SetParent [source_split GetFrame1]
-tcl_source_text Create app ""
+tcl_source_text Create app
 tcl_source_text SetLabelPositionToTop
 tcl_source_text SetLabelText "Tcl Source"
 
@@ -102,7 +102,7 @@ pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pad
 
 vtkKWTextLabeled cxx_source_text
 cxx_source_text SetParent [source_split GetFrame2]
-cxx_source_text Create app ""
+cxx_source_text Create app
 cxx_source_text SetLabelPositionToTop
 cxx_source_text SetLabelText "C++ Source"
 

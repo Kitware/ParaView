@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.8");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.9");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -107,43 +107,46 @@ vtkKWHSVColorSelector::~vtkKWHSVColorSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::Create(vtkKWApplication *app, 
-                                   const char *args)
+void vtkKWHSVColorSelector::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(
-        app, "frame", "-relief flat -bd 0 -highlightthickness 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->ConfigureOptions(args);
-
   // Create the Hue/Sat canvas
 
-  const char *canv_options = 
-    "-height 0 -width 0 -highlightthickness 0 -relief solid -bd 0";
-
   this->HueSatWheelCanvas->SetParent(this);
-  this->HueSatWheelCanvas->Create(app, canv_options);
+  this->HueSatWheelCanvas->Create(app);
+  this->HueSatWheelCanvas->SetHeight(0);
+  this->HueSatWheelCanvas->SetWidth(0);
+  this->HueSatWheelCanvas->SetReliefToSolid();
+  this->HueSatWheelCanvas->SetBorderWidth(0);
 
   // Create the Value canvas
 
   this->ValueBoxCanvas->SetParent(this);
-  this->ValueBoxCanvas->Create(app, canv_options);
+  this->ValueBoxCanvas->Create(app);
+  this->ValueBoxCanvas->SetHeight(0);
+  this->ValueBoxCanvas->SetWidth(0);
+  this->ValueBoxCanvas->SetReliefToSolid();
+  this->ValueBoxCanvas->SetBorderWidth(0);
 
   // Create the Hue/Sat label
 
   this->HueSatLabel->SetParent(this);
-  this->HueSatLabel->Create(app, "-bd 0");
+  this->HueSatLabel->Create(app);
+  this->HueSatLabel->SetBorderWidth(0);
   this->HueSatLabel->SetText("Hue/Saturation:");
 
   // Create the Value label
 
   this->ValueLabel->SetParent(this);
-  this->ValueLabel->Create(app, "-bd 0");
+  this->ValueLabel->Create(app);
+  this->ValueLabel->SetBorderWidth(0);
   this->ValueLabel->SetText("Value:");
 
   // Set the bindings

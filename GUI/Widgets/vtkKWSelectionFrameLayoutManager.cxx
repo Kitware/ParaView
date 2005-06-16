@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.20");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -132,18 +132,17 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::Create(vtkKWApplication *app, 
-                                             const char *args)
+void vtkKWSelectionFrameLayoutManager::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bg #333333"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->ConfigureOptions(args);
+  this->SetBackgroundColor(0.2, 0.2, 0.2);
 
   // Pack
 
@@ -448,7 +447,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
   if (!this->ResolutionEntriesMenu->IsCreated())
     {
     this->ResolutionEntriesMenu->SetParent(parent);
-    this->ResolutionEntriesMenu->Create(parent->GetApplication(), NULL);
+    this->ResolutionEntriesMenu->Create(parent->GetApplication());
     }
 
   // Allowed resolutions
@@ -947,7 +946,9 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
   if (this->IsCreated() && widget && !widget->IsCreated())
     {
     widget->SetParent(this);
-    widget->Create(this->GetApplication(), "-width 350 -height 350");
+    widget->Create(this->GetApplication());
+    widget->SetConfigurationOptionAsInt("-width", 350);
+    widget->SetConfigurationOptionAsInt("-height", 350);
     this->PropagateEnableState(widget);
     widget->SetCloseCommand(
       this, "CloseWidgetCallback");
@@ -1237,7 +1238,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   dlg->SetDisplayPositionToPointer();
   dlg->SetTitle("Change frame title");
   dlg->SetStyleToOkCancel();
-  dlg->Create(this->GetApplication(), 0);
+  dlg->Create(this->GetApplication());
   dlg->GetEntry()->GetLabel()->SetText("Name:");
   dlg->SetText("Enter a new value for this frame title");
 
@@ -1484,7 +1485,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
 
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
   save_dialog->SetParent(this->GetWindow());
-  save_dialog->Create(this->GetApplication(), NULL);
+  save_dialog->Create(this->GetApplication());
   save_dialog->SetTitle("Save Screenshot");
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     save_dialog, "SavePath");

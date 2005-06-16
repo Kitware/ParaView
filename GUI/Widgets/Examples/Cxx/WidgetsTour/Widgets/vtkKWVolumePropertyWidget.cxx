@@ -14,7 +14,7 @@ int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWFrameWithScrollbar *framews = vtkKWFrameWithScrollbar::New();
   framews->SetParent(parent);
-  framews->Create(app, NULL);
+  framews->Create(app);
 
   app->Script("pack %s -side top -fill both -expand y", 
               framews->GetWidgetName());
@@ -25,7 +25,7 @@ int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWVolumePropertyWidget *vpw = vtkKWVolumePropertyWidget::New();
   vpw->SetParent(framews->GetFrame());
-  vpw->Create(app, NULL);
+  vpw->Create(app);
  
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               vpw->GetWidgetName());

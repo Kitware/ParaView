@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.27");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.28");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -80,7 +80,7 @@ int vtkKWSaveImageDialog::Invoke()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* args)
+void vtkKWSaveImageDialog::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -90,7 +90,7 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* args)
 
   // Call the superclass to create the dialog
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   this->SetTitle("Save As Image");
 }

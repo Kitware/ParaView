@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.22");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.23");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -39,24 +39,26 @@ vtkKWMenuButton::~vtkKWMenuButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::Create(vtkKWApplication *app, const char *args)
+void vtkKWMenuButton::Create(vtkKWApplication *app)
 { 
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "menubutton", NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "menubutton"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app, NULL);  
+  this->Menu->Create(app);  
 
-  this->Script("%s config -menu %s -indicatoron 1 -relief raised -bd 2 "
-               "-direction flush %s", 
-               this->GetWidgetName(), 
-               this->Menu->GetWidgetName(), 
-               (args ? args : ""));
+  this->Script("%s config -menu %s", 
+               this->GetWidgetName(), this->Menu->GetWidgetName());
+
+  this->IndicatorOn();
+  this->SetReliefToRaised();
+  this->SetBorderWidth(2);
+  this->SetConfigurationOption("-direction", "flush");
 
   // Update enable state
 

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.3");
 
 int vtkKWHeaderAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -116,8 +116,7 @@ void vtkKWHeaderAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app, 
-                                   const char *args)
+void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
 {
   // Create the superclass widgets
 
@@ -127,7 +126,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app,
     return;
     }
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
@@ -159,7 +158,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app,
   // Text frame
 
   this->TextFrame->SetParent(frame);
-  this->TextFrame->Create(app, 0);
+  this->TextFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand y", 
                this->TextFrame->GetWidgetName());
@@ -168,7 +167,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app,
   // Header text
 
   this->TextEntry->SetParent(this->TextFrame);
-  this->TextEntry->Create(app, 0);
+  this->TextEntry->Create(app);
   this->TextEntry->GetLabel()->SetText("Header:");
   this->TextEntry->GetWidget()->SetWidth(20);
   this->TextEntry->GetWidget()->BindCommand(this, "HeaderTextCallback");

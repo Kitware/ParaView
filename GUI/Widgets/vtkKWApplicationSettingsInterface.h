@@ -44,7 +44,7 @@ public:
   virtual void SetWindow(vtkKWWindow*);
 
   // Description:
-  // Create the interface objects.
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
   // Description:

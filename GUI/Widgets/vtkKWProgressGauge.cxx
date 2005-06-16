@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.28");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.29");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -51,11 +51,11 @@ vtkKWProgressGauge::~vtkKWProgressGauge()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
+void vtkKWProgressGauge::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -63,7 +63,11 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
 
   this->Canvas = vtkKWCanvas::New();
   this->Canvas->SetParent(this);
-  this->Canvas->Create(app, "-bd 0  -highlightthickness 0 -width 0 -height 0");
+  this->Canvas->Create(app);
+  this->Canvas->SetBorderWidth(0);
+  this->Canvas->SetHighlightThickness(0);
+  this->Canvas->SetWidth(0);
+  this->Canvas->SetHeight(0);
 
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
                this->Canvas->GetWidgetName(), this->GetTclName());

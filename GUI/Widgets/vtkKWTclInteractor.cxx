@@ -25,7 +25,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.34");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.35");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -70,7 +70,7 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTclInteractor::Create(vtkKWApplication *app, const char *args)
+void vtkKWTclInteractor::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -82,29 +82,31 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app, const char *args)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(app, "");
+  this->ButtonFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
   
   this->DismissButton->SetParent(this->ButtonFrame);
-  this->DismissButton->Create(app, NULL);
+  this->DismissButton->Create(app);
   this->DismissButton->SetCommand(this, "Withdraw");
   this->DismissButton->SetText("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
   this->CommandFrame->SetParent(this);
-  this->CommandFrame->Create(app, "");
+  this->CommandFrame->Create(app);
   
   this->CommandLabel->SetParent(this->CommandFrame);
-  this->CommandLabel->Create(app, "");
+  this->CommandLabel->Create(app);
   this->CommandLabel->SetText("Command:");
   
   this->CommandEntry->SetParent(this->CommandFrame);
-  this->CommandEntry->Create(app, "-width 40 -highlightthickness 1");
+  this->CommandEntry->Create(app);
+  this->CommandEntry->SetWidth(40);
+  this->CommandEntry->SetHighlightThickness(1);
   this->Script("bind %s <Return> {%s Evaluate}",
                this->CommandEntry->GetWidgetName(), this->GetTclName());
   
@@ -113,7 +115,8 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app, const char *args)
                this->CommandEntry->GetWidgetName());
   
   this->DisplayText->SetParent(this);
-  this->DisplayText->Create(app, "-setgrid true");
+  this->DisplayText->Create(app);
+  this->DisplayText->ResizeToGridOn();
   this->DisplayText->SetWidth(100);
   this->DisplayText->SetHeight(20);
   this->DisplayText->SetWrapToWord();

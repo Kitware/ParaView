@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.5");
+vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.6");
 
 int vtkKWPopupFrameCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -51,8 +51,7 @@ vtkKWPopupFrameCheckButton::~vtkKWPopupFrameCheckButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app, 
-                                        const char *args)
+void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app)
 {
   // Create the superclass widgets
 
@@ -62,7 +61,7 @@ void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app,
     return;
     }
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // --------------------------------------------------------------
   // Annotation visibility
@@ -76,7 +75,7 @@ void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app,
     this->CheckButton->SetParent(this->Frame->GetFrame());
     }
 
-  this->CheckButton->Create(app, "");
+  this->CheckButton->Create(app);
 
   this->CheckButton->SetCommand(this, "CheckButtonCallback");
 

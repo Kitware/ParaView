@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.5");
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.6");
 
 int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -64,18 +64,15 @@ int vtkKWWidgetLabeled::HasLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::Create(vtkKWApplication *app, const char *args)
+void vtkKWWidgetLabeled::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(
-        app, "frame", "-relief flat -bd 0 -highlightthickness 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->ConfigureOptions(args);
 
   // Create the label subwidget now if it has to be shown now
 
@@ -93,7 +90,7 @@ void vtkKWWidgetLabeled::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
+void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app)
 {
   // Create the label. If the parent has been set before (i.e. by the subclass)
   // do not set it.
@@ -110,8 +107,8 @@ void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
     label->SetParent(this);
     }
 
-  label->Create(app, "-anchor w");
-  label->ConfigureOptions(args);
+  label->Create(app);
+  label->SetAnchorToWest();
   // -bd 0 -highlightthickness 0 -padx 0 -pady 0");
 
   label->SetBalloonHelpString(this->GetBalloonHelpString());

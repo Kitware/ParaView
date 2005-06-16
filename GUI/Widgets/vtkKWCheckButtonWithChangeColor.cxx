@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.7");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.8");
 
 int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
                                            int argc, char *argv[]);
@@ -53,28 +53,26 @@ vtkKWCheckButtonWithChangeColor::~vtkKWCheckButtonWithChangeColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app, const char *args)
+void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(
-        app, "frame", "-relief flat -bd 0 -highlightthickness 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->ConfigureOptions(args);
-  
   // Create the checkbutton. 
   
   this->CheckButton->SetParent(this);
-  this->CheckButton->Create(app, "-anchor w");
+  this->CheckButton->Create(app);
+  this->CheckButton->SetAnchorToWest();
 
   // Create the change color button
 
   this->ChangeColorButton->SetParent(this);
-  this->ChangeColorButton->Create(app, "");
+  this->ChangeColorButton->Create(app);
 
   // Pack the checkbutton and the change color button
 

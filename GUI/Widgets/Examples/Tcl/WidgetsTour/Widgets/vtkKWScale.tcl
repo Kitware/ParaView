@@ -21,7 +21,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
     vtkKWScale scale2
     scale2 SetParent $parent
-    scale2 Create app ""
+    scale2 Create app
     scale2 SetRange 0.0 100.0
     scale2 SetResolution 1.0
     scale2 SetLength 350
@@ -37,7 +37,7 @@ proc vtkKWScaleEntryPoint {parent win} {
     vtkKWScale scale3
     scale3 SetParent $parent
     scale3 PopupScaleOn
-    scale3 Create app ""
+    scale3 Create app
     scale3 SetRange 0.0 100.0
     scale3 SetResolution 1.0
     scale3 DisplayEntry

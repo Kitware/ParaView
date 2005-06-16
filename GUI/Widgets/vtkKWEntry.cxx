@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.59");
+vtkCxxRevisionMacro(vtkKWEntry, "1.60");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -206,26 +206,17 @@ void vtkKWEntry::SetValue(double f, int size)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
+void vtkKWEntry::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (!this->Superclass::CreateSpecificTkWidget(
+        app, this->PullDown ? "combobox" : "entry"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-
-  if (this->PullDown)
-    {
-    this->Script("combobox %s %s", wname, (args ? args : ""));
-    }
-  else
-    {
-    this->Script("entry %s %s", wname, (args ? args : ""));
-    }
   this->Entry = this;
 
   const char* entry_wname = this->Entry->GetWidgetName();

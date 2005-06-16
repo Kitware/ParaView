@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.10");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.11");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -253,12 +253,11 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
-                                         const char *args)
+void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -277,7 +276,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
       }
     
     this->PopupButton->SetParent(this);
-    this->PopupButton->Create(app, 0);
+    this->PopupButton->Create(app);
     this->PopupButton->GetLabel()->SetText("Edit material:");
     this->PopupButton->GetWidget()->SetText("");
     this->PopupButton->GetWidget()->SetPopupTitle("Material Properties");
@@ -300,7 +299,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
     this->MaterialPropertiesFrame->ShowHideFrameOn();
     this->MaterialPropertiesFrame->SetParent(this);
     }
-  this->MaterialPropertiesFrame->Create(app, 0);
+  this->MaterialPropertiesFrame->Create(app);
   this->MaterialPropertiesFrame->SetLabelText("Material Properties");
 
   this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
@@ -312,7 +311,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Lighting frame
 
   this->LightingFrame->SetParent(frame);
-  this->LightingFrame->Create(app, 0);
+  this->LightingFrame->Create(app);
 
   this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
                this->LightingFrame->GetWidgetName());
@@ -325,7 +324,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   int row = 0;
 
   this->AmbientScale->SetParent(this->LightingFrame);
-  this->AmbientScale->Create(app, "");
+  this->AmbientScale->Create(app);
   this->AmbientScale->DisplayEntryAndLabelOnTopOff();
   this->AmbientScale->SetCommand(this, "PropertyChangingCallback");
   this->AmbientScale->SetEndCommand(this, "PropertyChangedCallback");
@@ -348,7 +347,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Diffuse
 
   this->DiffuseScale->SetParent(this->LightingFrame);
-  this->DiffuseScale->Create(app, "");
+  this->DiffuseScale->Create(app);
   this->DiffuseScale->DisplayEntryAndLabelOnTopOff();
   this->DiffuseScale->SetCommand(this, "PropertyChangingCallback");
   this->DiffuseScale->SetEndCommand(this, "PropertyChangedCallback");
@@ -368,7 +367,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Specular
 
   this->SpecularScale->SetParent(this->LightingFrame);
-  this->SpecularScale->Create(app, "");
+  this->SpecularScale->Create(app);
   this->SpecularScale->DisplayEntryAndLabelOnTopOff();
   this->SpecularScale->SetCommand(this, "PropertyChangingCallback");
   this->SpecularScale->SetEndCommand(this, "PropertyChangedCallback");
@@ -388,7 +387,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Specular power
 
   this->SpecularPowerScale->SetParent(this->LightingFrame);
-  this->SpecularPowerScale->Create(app, "");
+  this->SpecularPowerScale->Create(app);
   this->SpecularPowerScale->DisplayEntryAndLabelOnTopOff();
   this->SpecularPowerScale->SetCommand(this, "PropertyChangingCallback");
   this->SpecularPowerScale->SetEndCommand(this, "PropertyChangedCallback");
@@ -408,7 +407,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Presets + Preview frame
 
   this->PresetsFrame->SetParent(frame);
-  this->PresetsFrame->Create(app, 0);
+  this->PresetsFrame->Create(app);
   
   this->Script("pack %s -anchor w -fill x -expand y",
                this->PresetsFrame->GetWidgetName());
@@ -419,7 +418,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   this->PreviewLabel->SetParent(this->PresetsFrame);
   this->PreviewLabel->SetLabelPositionToTop();
   this->PreviewLabel->ExpandWidgetOff();
-  this->PreviewLabel->Create(app, "");
+  this->PreviewLabel->Create(app);
   this->PreviewLabel->GetLabel()->SetText("Preview:");
   
   this->Script("pack %s -side left -padx 2 -pady 2 -anchor nw",

@@ -449,7 +449,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set/Get if the end-points of the function are locked in the parameter
@@ -1047,7 +1047,7 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateLabel(vtkKWApplication *app, const char *args = 0);
+  virtual void CreateLabel(vtkKWApplication *app);
   virtual void CreateParameterRange(vtkKWApplication *app);
   virtual void CreateValueRange(vtkKWApplication *app);
   virtual void CreateRangeLabel(vtkKWApplication *app);

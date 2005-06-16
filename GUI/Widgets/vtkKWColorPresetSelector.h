@@ -124,8 +124,8 @@ public:
   virtual void SetHideGradientPresets(int);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set/Get the command executed when a preset a selected.

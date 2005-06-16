@@ -15,12 +15,13 @@
 #include "vtkKWMultiColumnList.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWScrollbar.h"
 
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.3");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -60,15 +61,17 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::Create(vtkKWApplication *app, const char *args)
+void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 2 -relief sunken"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
+  this->SetBorderWidth(2);
+  this->SetReliefToSunken();
 
   // Create the tablelist
 
@@ -79,23 +82,24 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app, const char *args)
     this->TableList = vtkKWWidget::New();
     }
 
-  vtksys_stl::string all_args(
-    "-bd 0 "
-    "-stretch all "
-    "-labelcommand tablelist::sortByColumn "
-    "-background gray98 "
-    "-stripebackground #e0e8f0 "
-    "-highlightthickness 0 "
-    "-height 15 "
-    "-activestyle frame "
-    "-showseparators 0"
-    );
-  if (args)
-    {
-    all_args += args;
-    }
   this->TableList->SetParent(this);
-  this->TableList->Create(app, "tablelist::tablelist", all_args.c_str());
+  this->TableList->CreateSpecificTkWidget(app, "tablelist::tablelist");
+  this->TableList->SetBorderWidth(0);
+  this->TableList->SetBackgroundColor(0.98, 0.98, 0.98);
+
+  this->SetHeight(15);
+  this->SetShowSeparators(0);
+
+  this->TableList->SetConfigurationOption(
+    "-stretch", "all");
+  this->TableList->SetConfigurationOption(
+    "-labelcommand", "tablelist::sortByColumn");
+  this->TableList->SetConfigurationOption(
+    "-stripebackground", "#e0e8f0");
+  this->TableList->SetConfigurationOptionAsInt(
+    "-highlightthickness", 0);
+  this->TableList->SetConfigurationOption(
+    "-activestyle", "frame");
 
   this->Script("bind %s <<TablelistSelect>> {+ %s SelectionChangedCallback}",
                this->TableList->GetWidgetName(), this->GetTclName());
@@ -126,23 +130,26 @@ void vtkKWMultiColumnList::CreateVerticalScrollbar(vtkKWApplication *app)
 {
   if (!this->VerticalScrollBar)
     {
-    this->VerticalScrollBar = vtkKWWidget::New();
+    this->VerticalScrollBar = vtkKWScrollbar::New();
     }
 
   if (!this->VerticalScrollBar->IsCreated())
     {
     this->VerticalScrollBar->SetParent(this);
-    this->VerticalScrollBar->Create(app, "scrollbar", "-orient vertical");
+    this->VerticalScrollBar->Create(app);
+    this->VerticalScrollBar->SetOrientationToVertical();
     if (this->TableList && this->TableList->IsCreated())
       {
-      vtksys_stl::string command("-command {");
+      vtksys_stl::string command("{");
       command += this->TableList->GetWidgetName();
       command += " yview}";
-      this->VerticalScrollBar->ConfigureOptions(command.c_str());
-      command = "-yscrollcommand {";
+      this->VerticalScrollBar->SetConfigurationOption(
+        "-command", command.c_str());
+      command = "{";
       command += this->VerticalScrollBar->GetWidgetName();
       command += " set}";
-      this->TableList->ConfigureOptions(command.c_str());
+      this->TableList->SetConfigurationOption(
+        "-yscrollcommand", command.c_str());
       }
     }
 }
@@ -152,23 +159,25 @@ void vtkKWMultiColumnList::CreateHorizontalScrollbar(vtkKWApplication *app)
 {
   if (!this->HorizontalScrollBar)
     {
-    this->HorizontalScrollBar = vtkKWWidget::New();
+    this->HorizontalScrollBar = vtkKWScrollbar::New();
     }
 
   if (!this->HorizontalScrollBar->IsCreated())
     {
     this->HorizontalScrollBar->SetParent(this);
-    this->HorizontalScrollBar->Create(app, "scrollbar", "-orient horizontal");
+    this->HorizontalScrollBar->Create(app);
     if (this->TableList && this->TableList->IsCreated())
       {
-      vtksys_stl::string command("-command {");
+      vtksys_stl::string command("{");
       command += this->TableList->GetWidgetName();
       command += " xview}";
-      this->HorizontalScrollBar->ConfigureOptions(command.c_str());
-      command = "-xscrollcommand {";
+      this->HorizontalScrollBar->SetConfigurationOption(
+        "-command", command.c_str());
+      command = "{";
       command += this->HorizontalScrollBar->GetWidgetName();
       command += " set}";
-      this->TableList->ConfigureOptions(command.c_str());
+      this->TableList->SetConfigurationOption(
+        "-xscrollcommand", command.c_str());
       }
     }
 }

@@ -11,7 +11,7 @@ int vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWHSVColorSelector *ccb = vtkKWHSVColorSelector::New();
   ccb->SetParent(parent);
-  ccb->Create(app, NULL);
+  ccb->Create(app);
   ccb->SetSelectionChangingCommand(parent, "SetBackgroundColor");
   ccb->InvokeCommandsWithRGBOn();
 

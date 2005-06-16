@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.11");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.12");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -47,20 +47,21 @@ vtkKWSegmentedProgressGauge::~vtkKWSegmentedProgressGauge()
   this->ProgressCanvas->Delete();
 }
 
-void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
-                                         const char *args)
+void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
  
-  this->ProgressFrame->Create(app, "-bd 1 -relief sunken");
+  this->ProgressFrame->Create(app);
+  this->ProgressFrame->SetBorderWidth(1);
+  this->ProgressFrame->SetReliefToSunken();
   
-  this->ProgressCanvas->Create(app, "");
+  this->ProgressCanvas->Create(app);
   this->Script("%s configure -bd 0 -highlightthickness 0 -background #008 -width %d -height %d",
                this->ProgressCanvas->GetWidgetName(),
                this->Width, this->Height);

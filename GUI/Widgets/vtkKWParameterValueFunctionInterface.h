@@ -55,7 +55,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Return 1 if there is a function associated to the editor.

@@ -23,6 +23,7 @@
 
 class vtkKWApplication;
 class vtkKWTextInternals;
+class vtkKWScrollbar;
 
 class KWWIDGETS_EXPORT vtkKWText : public vtkKWWidget
 {
@@ -32,15 +33,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
+  // Create the widget.
   // This will create a frame, inside which a 'text' Tk widget
   // will be packed. Use GetTextWidget() to access/configure it.
-  virtual void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Access the internal 'text' Tk widget and the scrollbar.
   vtkGetObjectMacro(TextWidget, vtkKWWidget);
-  vtkGetObjectMacro(VerticalScrollBar, vtkKWWidget);
+  vtkGetObjectMacro(VerticalScrollBar, vtkKWScrollbar);
 
   // Description:
   // Set/Get the value of the text. AppendValue() is a convenience function
@@ -93,6 +94,22 @@ public:
   virtual void AddTagMatcher(const char *regexp, const char *tag);
 
   // Description:
+  // Convenience method to set the resize-to-grid flag.
+  // Specifies a boolean value that determines whether this widget controls
+  // the resizing grid for its top-level window. This option is typically
+  // used in text widgets, where the information in the widget has a natural
+  // size (the size of a character) and it makes sense for the window's
+  // dimensions to be integral numbers of these units. These natural window
+  // sizes form a grid. If the setGrid option is set to true then the widget
+  // will communicate with the window manager so that when the user 
+  // interactively resizes the top-level window that contains the widget, 
+  // the dimensions of the window will be displayed to the user in grid units
+  // and the window size will be constrained to integral numbers of grid units.
+  vtkBooleanMacro(ResizeToGrid, int);
+  virtual void SetResizeToGrid(int);
+  virtual int GetResizeToGrid();
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -125,7 +142,7 @@ protected:
   vtkSetStringMacro(ValueString);
 
   vtkKWWidget *TextWidget;
-  vtkKWWidget *VerticalScrollBar;
+  vtkKWScrollbar *VerticalScrollBar;
 
   int EditableText;
   int QuickFormatting;

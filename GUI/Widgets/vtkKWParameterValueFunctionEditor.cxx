@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.45");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.46");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1096,8 +1096,7 @@ void vtkKWParameterValueFunctionEditor::UpdatePointEntries(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app, 
-                                               const char *args)
+void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -1107,12 +1106,15 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Create the canvas
 
   this->Canvas->SetParent(this);
-  this->Canvas->Create(app, "-highlightthickness 0 -relief solid -bd 0");
+  this->Canvas->Create(app);
+  this->Canvas->SetHighlightThickness(0);
+  this->Canvas->SetReliefToSolid();
+  this->Canvas->SetBorderWidth(0);
 
   this->Script("%s config -height %d -width %d",
                this->Canvas->GetWidgetName(), 
@@ -1264,14 +1266,14 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app, const char *args)
+void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
 {
   if (this->HasLabel() && this->GetLabel()->IsCreated())
     {
     return;
     }
 
-  this->Superclass::CreateLabel(app, args);
+  this->Superclass::CreateLabel(app);
   vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
 }
 
@@ -1304,7 +1306,9 @@ void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
   if (this->RangeLabel && !this->RangeLabel->IsCreated())
     {
     this->RangeLabel->SetParent(this);
-    this->RangeLabel->Create(app, "-bd 0 -anchor w");
+    this->RangeLabel->Create(app);
+    this->RangeLabel->SetBorderWidth(0);
+    this->RangeLabel->SetAnchorToWest();
     this->UpdateRangeLabel();
     }
 }
@@ -1316,7 +1320,7 @@ void vtkKWParameterValueFunctionEditor::CreateTopRightFrame(
   if (this->TopRightFrame && !this->TopRightFrame->IsCreated())
     {
     this->TopRightFrame->SetParent(this);
-    this->TopRightFrame->Create(app, NULL);
+    this->TopRightFrame->Create(app);
     }
 }
 
@@ -1327,7 +1331,7 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
   if (this->ParameterEntry && !this->ParameterEntry->IsCreated())
     {
     this->ParameterEntry->SetParent(this);
-    this->ParameterEntry->Create(app, "");
+    this->ParameterEntry->Create(app);
     this->ParameterEntry->GetWidget()->SetWidth(9);
     this->ParameterEntry->GetLabel()->SetText("P:");
 
@@ -1348,7 +1352,9 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     this->CreateTopLeftFrame(app);
 
     this->HistogramLogModeOptionMenu->SetParent(this->TopLeftFrame);
-    this->HistogramLogModeOptionMenu->Create(app, "-padx 1 -pady 0");
+    this->HistogramLogModeOptionMenu->Create(app);
+    this->HistogramLogModeOptionMenu->SetPadX(1);
+    this->HistogramLogModeOptionMenu->SetPadY(0);
     this->HistogramLogModeOptionMenu->IndicatorOff();
     this->HistogramLogModeOptionMenu->SetBalloonHelpString(
       "Change the histogram mode from log to linear.");
@@ -1395,7 +1401,7 @@ void vtkKWParameterValueFunctionEditor::CreateTopLeftContainer(
   if (this->TopLeftContainer && !this->TopLeftContainer->IsCreated())
     {
     this->TopLeftContainer->SetParent(this);
-    this->TopLeftContainer->Create(app, NULL);
+    this->TopLeftContainer->Create(app);
     }
 }
 
@@ -1428,7 +1434,7 @@ void vtkKWParameterValueFunctionEditor::CreateTopLeftFrame(
     {
     this->CreateTopLeftContainer(app);
     this->TopLeftFrame->SetParent(this->TopLeftContainer);
-    this->TopLeftFrame->Create(app, NULL);
+    this->TopLeftFrame->Create(app);
     }
 }
 
@@ -1440,7 +1446,7 @@ void vtkKWParameterValueFunctionEditor::CreateUserFrame(
     {
     this->CreateTopLeftContainer(app);
     this->UserFrame->SetParent(this->TopLeftContainer);
-    this->UserFrame->Create(app, NULL);
+    this->UserFrame->Create(app);
     }
 }
 
@@ -1451,8 +1457,11 @@ void vtkKWParameterValueFunctionEditor::CreateValueTicksCanvas(
   if (this->ValueTicksCanvas && !this->ValueTicksCanvas->IsCreated())
     {
     this->ValueTicksCanvas->SetParent(this);
-    this->ValueTicksCanvas->Create(
-      app, "-highlightthickness 0 -relief solid -height 0 -bd 0");
+    this->ValueTicksCanvas->Create(app);
+    this->ValueTicksCanvas->SetHighlightThickness(0);
+    this->ValueTicksCanvas->SetReliefToSolid();
+    this->ValueTicksCanvas->SetHeight(0);
+    this->ValueTicksCanvas->SetBorderWidth(0);
     }
 }
 
@@ -1463,11 +1472,13 @@ void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas(
   if (this->ParameterTicksCanvas && !this->ParameterTicksCanvas->IsCreated())
     {
     this->ParameterTicksCanvas->SetParent(this);
-    this->ParameterTicksCanvas->Create(
-      app, "-highlightthickness 0 -relief solid -width 0 -bd 0");
-    this->Script("%s config -height %d",
-                 this->ParameterTicksCanvas->GetWidgetName(), 
-                 VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
+    this->ParameterTicksCanvas->Create(app);
+    this->ParameterTicksCanvas->SetHighlightThickness(0);
+    this->ParameterTicksCanvas->SetReliefToSolid();
+    this->ParameterTicksCanvas->SetWidth(0);
+    this->ParameterTicksCanvas->SetBorderWidth(0);
+    this->ParameterTicksCanvas->SetHeight(
+      VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
     }
 }
 

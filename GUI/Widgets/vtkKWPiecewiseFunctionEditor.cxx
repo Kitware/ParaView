@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.23");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -379,8 +379,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app, 
-                                          const char *args)
+void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -392,7 +391,7 @@ void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app,
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Create the value entry
 
@@ -426,8 +425,10 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
     {
     this->CreateTopLeftFrame(app);
     this->WindowLevelModeCheckButton->SetParent(this->TopLeftFrame);
-    this->WindowLevelModeCheckButton->Create(
-      app, "-padx 0 -pady 0 -highlightthickness 0");
+    this->WindowLevelModeCheckButton->Create(app);
+    this->WindowLevelModeCheckButton->SetPadX(0);
+    this->WindowLevelModeCheckButton->SetPadY(0);
+    this->WindowLevelModeCheckButton->SetHighlightThickness(0);
     this->WindowLevelModeCheckButton->SetIndicator(0);
     this->WindowLevelModeCheckButton->SetBalloonHelpString(
       "Place the editor in window/level mode.");
@@ -446,7 +447,7 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
     {
     this->CreateTopRightFrame(app);
     this->ValueEntry->SetParent(this->TopRightFrame);
-    this->ValueEntry->Create(app, "");
+    this->ValueEntry->Create(app);
     this->ValueEntry->GetWidget()->SetWidth(6);
     this->ValueEntry->GetLabel()->SetText("V:");
 

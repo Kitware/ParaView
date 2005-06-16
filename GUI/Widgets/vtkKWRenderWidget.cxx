@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.90");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.91");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -262,11 +262,11 @@ void vtkKWRenderWidget::SetDistanceUnits(const char* _arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
+void vtkKWRenderWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", args))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -274,13 +274,11 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   
   // Create the VTK Tk render widget in VTKWidget
 
-  char *local = new char[(args ? strlen(args) : 0) + 100];
-  sprintf(local, "%s -rw Addr=%p", (args ? args : ""), this->RenderWindow);
+  char opts[256];
+  sprintf(opts, "-rw Addr=%p", this->RenderWindow);
 
   this->VTKWidget->SetParent(this);
-  this->VTKWidget->Create(app, "vtkTkRenderWidget", local);
-
-  delete [] local;
+  this->VTKWidget->CreateSpecificTkWidget(app, "vtkTkRenderWidget", opts);
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());

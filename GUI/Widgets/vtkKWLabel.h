@@ -30,8 +30,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Set the text on the label.
@@ -42,6 +42,13 @@ public:
   // Set the way label treats long text. 
   // Multiline will wrap text. You have to specify width
   // when using multiline label.
+  //BTX
+  enum 
+  {
+    SingleLine,
+    MultiLine
+  };
+  //ETX
   virtual void SetLineType(int type);
 
   // Description:
@@ -50,20 +57,36 @@ public:
   vtkGetMacro(Width, int);
 
   // Description:
+  // Set/Get the justification mode.
+  // When there are multiple lines of text displayed in a widget, this option
+  // determines how the lines line up with each other.
+  // Valid constants can be found in vtkKWTkOptions::JustificationType.
+  virtual void SetJustification(int);
+  virtual int GetJustification();
+  virtual void SetJustificationToLeft() 
+    { this->SetJustification(vtkKWTkOptions::JustificationLeft); };
+  virtual void SetJustificationToCenter() 
+    { this->SetJustification(vtkKWTkOptions::JustificationCenter); };
+  virtual void SetJustificationToRight() 
+    { this->SetJustification(vtkKWTkOptions::JustificationRight); };
+
+  // Description:
+  // Set/Get the wrap length mode.
+  // For widgets that can perform word-wrapping, this option specifies the
+  // maximum line length. Lines that would exceed this length are wrapped onto
+  // the next line, so that no line is longer than the specified length. 
+  // The value may be specified in any of the standard forms for screen
+  // distances.
+  virtual void SetWrapLength(const char *length);
+  virtual const char* GetWrapLength();
+  
+  // Description:
   // Adjust the -wraplength argument so that it matches the width of
   // the widget automatically (through the <Configure> event).
   virtual void SetAdjustWrapLengthToWidth(int);
   vtkGetMacro(AdjustWrapLengthToWidth, int);
   vtkBooleanMacro(AdjustWrapLengthToWidth, int);
   virtual void AdjustWrapLengthToWidthCallback();
-
-  //BTX
-  enum 
-  {
-    SingleLine,
-    MultiLine
-  };
-  //ETX
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

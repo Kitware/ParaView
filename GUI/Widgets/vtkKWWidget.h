@@ -24,6 +24,7 @@
 #define __vtkKWWidget_h
 
 #include "vtkKWObject.h"
+#include "vtkKWTkOptions.h" // For option constants
 
 class vtkKWIcon;
 class vtkKWWindowBase;
@@ -38,47 +39,40 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the corresponding Tk widget.
-  // This should be called by all subclasses to ensure that flags are set
-  // correctly.
-  // If 'type' is NULL, this method will only set the proper flags indicating
-  // that the widget has been created and perform some checkings. It will be
-  // up to the subclass to create the appropriate Tk widget after calling
-  // the superclass's Create().
-  // Return 1 on success, 0 otherwise.
-  int Create(vtkKWApplication *app, const char *type, const char *args);
-  int IsCreated();
-
-  // Description:
-  // Set tk configuration options of the widget
-  void ConfigureOptions(const char* opts);
-
-  // Description:
-  // Query if widget is "alive" (i.e. is created and not deleted as far as
-  // Tk is concered, i.e. 'winfo exists')
-  int IsAlive();
-  
-  // Description:
-  // Query if widget is mapped (on screen)
-  int IsMapped();
-  
-  // Description:
-  // Get the name of the underlying Tk widget being used.
-  // The parent should be set before calling this method, as it uses
-  // the parent's widget name and appends a number.
-  // Note that setting the widget name manually is *not* recommended, use
-  // this method only if you know what you are doing, say, for example, if
-  // you have to map a external pure Tk widget to a vtkKWWidget object.
-  const char *GetWidgetName();
-  vtkSetStringMacro(WidgetName);
-
-  // Description:
   // Set/Get the parent widget for this widget
-  void SetParent(vtkKWWidget *p);
+  virtual void SetParent(vtkKWWidget *p);
   vtkGetObjectMacro(Parent, vtkKWWidget);
 
   // Description:
-  // Add/Remove/Get a child to this Widget
+  // Create the widget.
+  // The parent should be set before calling this method.
+  // Subclasses should implement a Create() method.
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Get the name of the underlying Tk widget being used.
+  // The Create() method should be called before invoking this method.
+  // Note that setting the widget name manually is *not* recommended ; use
+  // it only if you know what you are doing, say, for example, if
+  // you have to map an external pure Tk widget to a vtkKWWidget object.
+  virtual const char *GetWidgetName();
+  vtkSetStringMacro(WidgetName);
+
+  // Description:
+  // Query if the widget was created successfully.
+  virtual int IsCreated();
+
+  // Description:
+  // Query if the widget is "alive" (i.e. IsCreate() and has not been deleted
+  // as far as Tk is concerned)
+  virtual int IsAlive();
+  
+  // Description:
+  // Query if the widget is mapped (i.e, on screen)
+  virtual int IsMapped();
+  
+  // Description:
+  // Add/Remove/Get a child to/from this widget
   virtual void AddChild(vtkKWWidget *w);
   virtual void RemoveChild(vtkKWWidget *w);
   virtual int HasChild(vtkKWWidget *w);
@@ -87,15 +81,6 @@ public:
   virtual vtkKWWidget* GetNthChild(int rank);
   virtual vtkKWWidget* GetChildWidgetWithName(const char *);
 
-  // Description::
-  // Override Unregister since widgets have loops.
-  virtual void UnRegister(vtkObjectBase *o);
-
-  // Description:
-  // Get the net reference count of this widget. That is the
-  // reference count of this widget minus its children.
-  virtual int  GetNetReferenceCount();
-
   // Description:
   // A method to set callback functions on objects.  The first argument is
   // the KWObject that will have the method called on it.  The second is the
@@ -103,10 +88,6 @@ public:
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand(vtkKWObject* Object, const char* MethodAndArgString);
 
-  // Description:
-  // Get the Tk string type of a widget.
-  virtual const char* GetType();
-  
   // Description:
   // A method to set binding on the object.
   // This method sets binding:
@@ -149,7 +130,7 @@ public:
 
   // Description:
   // Set focus to this widget.
-  void Focus();
+  virtual void Focus();
 
   // Description:
   // Get the containing vtkKWWindowBase for this Widget if there is one.
@@ -171,10 +152,17 @@ public:
     { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Query if widget has a given Tk configuration option (ex: "-state"), 
-  // and get the option as int
-  int HasConfigurationOption(const char* option);
-  int GetConfigurationOptionAsInt(const char* option);
+  // Set/Get Tk configuration option (ex: "-state") 
+  // Please make sure you check the class (and subclasses) API for
+  // a C++ method acting as a front-end for the corresponding Tk option.
+  // For example, the SetBackgroundColor() method can be used to set the 
+  // corresponding -bg Tk option. 
+  // SetConfigurationOption returns 1 on success, 0 otherwise.
+  virtual int SetConfigurationOption(const char* option, const char *value);
+  virtual int SetConfigurationOptionAsInt(const char* option, int value);
+  virtual int HasConfigurationOption(const char* option);
+  virtual const char* GetConfigurationOption(const char* option);
+  virtual int GetConfigurationOptionAsInt(const char* option);
 
   // Description:
   // Set/Get the textual value of a Tk option (defaut is -text option) given a
@@ -183,26 +171,26 @@ public:
   // the widget's application CharacterEncoding ivar. Conversion from that
   // encoding to Tk internal encoding will be performed automatically.
   //BTX
-  void SetTextOption(const char *text, const char *option = "-text");
-  const char* GetTextOption(const char *option = "-text");
+  virtual void SetTextOption(const char *text, const char *option = "-text");
+  virtual const char* GetTextOption(const char *option = "-text");
   //ETX
 
   // Description:
   // Convenience method to Set/Get the -state option to "normal" (if true) or
   // "disabled" (if false).
-  void SetStateOption(int flag);
-  int GetStateOption();
+  virtual void SetStateOption(int flag);
+  virtual int GetStateOption();
 
   // Description:
   // Query if widget is packed
-  int IsPacked();
-  int GetNumberOfPackedChildren();
+  virtual int IsPacked();
+  virtual int GetNumberOfPackedChildren();
 
   // Description:
   // Unpack widget, unpack siblings (slave's of parent widget), unpack children
-  void Unpack();
-  void UnpackSiblings();
-  void UnpackChildren();
+  virtual void Unpack();
+  virtual void UnpackSiblings();
+  virtual void UnpackChildren();
   
   // Description:
   // Setting this string enables balloon help for this widget.
@@ -220,22 +208,79 @@ public:
   virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
   // Description:
-  // Some constant that can be used to specify anchoring
-  //BTX
-  enum
-  {
-    ANCHOR_N      = 0,
-    ANCHOR_NE     = 1,
-    ANCHOR_E      = 2,
-    ANCHOR_SE     = 3,
-    ANCHOR_S      = 4,
-    ANCHOR_SW     = 5,
-    ANCHOR_W      = 6,
-    ANCHOR_NW     = 7,
-    ANCHOR_CENTER = 8
-  };
-  //ETX
-  static const char* GetAnchorAsString(int);
+  // Set/Get the anchoring.
+  // Specifies how the information in a widget (e.g. text or a bitmap) is to
+  // be displayed in the widget.
+  // Valid constants can be found in vtkKWTkOptions::AnchorType.
+  virtual void SetAnchor(int);
+  virtual int GetAnchor();
+  virtual void SetAnchorToNorth() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorNorth); };
+  virtual void SetAnchorToNorthEast() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); };
+  virtual void SetAnchorToEast() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorEast); };
+  virtual void SetAnchorToSouthEast() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); };
+  virtual void SetAnchorToSouth() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorSouth); };
+  virtual void SetAnchorToSouthWest() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); };
+  virtual void SetAnchorToWest() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorWest); };
+  virtual void SetAnchorToNorthWest() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); };
+  virtual void SetAnchorToCenter() 
+    { this->SetAnchor(vtkKWTkOptions::AnchorCenter); };
+
+  // Description:
+  // Set/get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/get the border width, a non-negative value
+  // indicating the width of the 3-D border to draw around the outside of
+  // the widget (if such a border is being drawn; the Relief option typically
+  // determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised() 
+    { this->SetRelief(vtkKWTkOptions::ReliefRaised); };
+  virtual void SetReliefToSunken() 
+    { this->SetRelief(vtkKWTkOptions::ReliefSunken); };
+  virtual void SetReliefToFlat() 
+    { this->SetRelief(vtkKWTkOptions::ReliefFlat); };
+  virtual void SetReliefToRidge() 
+    { this->SetRelief(vtkKWTkOptions::ReliefRidge); };
+  virtual void SetReliefToSolid() 
+    { this->SetRelief(vtkKWTkOptions::ReliefSolid); };
+  virtual void SetReliefToGroove() 
+    { this->SetRelief(vtkKWTkOptions::ReliefGroove); };
+
+  // Description:
+  // Set/Get the padding that will be applied around each widget (in pixels).
+  // Specifies a non-negative value indicating how much extra space to request
+  // for the widget in the X and Y-direction. When computing how large a
+  // window it needs, the widget will add this amount to the width it would
+  // normally need (as determined by the width of the things displayed
+  // in the widget); if the geometry manager can satisfy this request, the 
+  // widget will end up with extra internal space around what it displays 
+  // inside. 
+  virtual void SetPadX(int);
+  virtual int GetPadX();
+  virtual void SetPadY(int);
+  virtual int GetPadY();
 
   // Description:
   // Set image option using either icon, predefined icon index (see 
@@ -284,21 +329,58 @@ public:
   int TakeScreenDump(const char *fname,
                      int top=0, int bottom=0, int left=0, int right=0);
 
+  // Description::
+  // Override Unregister since widgets have loops.
+  virtual void UnRegister(vtkObjectBase *o);
+
+  // Description:
+  // Get the net reference count of this widget. That is the
+  // reference count of this widget minus its children.
+  virtual int  GetNetReferenceCount();
+
+  // Description:
+  // Create a specific Tk widget of type 'type', with optional arguments 
+  // 'args' and map it to this instance.
+  // Use the Create() method to create this widget instance instead, do *not*
+  // use the CreateWidget() method unless you are calling from a subclass to
+  // implement a specific kind of Tk widget as a vtkKWWidget subclass, or
+  // unless you have to map an external pure Tk widget into a vtkKWWidget.
+  // This method should be called by all subclasses to ensure that flags are
+  // set correctly (typically from the subclass's Create() method).
+  // If 'type' is NULL, this method will still perform some checkings and
+  // set the proper flags indicating that the widget has been created. It will
+  // then be up to the subclass to create the appropriate Tk widget after
+  // calling the superclass's Create().
+  // Please *do* refrain from using 'args' to pass arbitrary Tk
+  // option settings, let the user call SetConfigurationOption() instead, 
+  // or much better, create C++ methods as front-ends to those settings. 
+  // For example, the SetBackgroundColor() method can/should be used to set
+  // the corresponding -bg Tk option. 
+  // Ideally, the 'args' parameter should only be used to specify options that
+  // can *not* be changed using Tk's 'configure' 
+  // (i.e. SetConfigurationOptions()), and therefore that have to be passed
+  // at widget's creation time. For example the -visual and -class options 
+  // of the 'toplevel' widget.
+  // Return 1 on success, 0 otherwise.
+  virtual int CreateSpecificTkWidget(
+    vtkKWApplication *app, const char *type, const char *args = NULL);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
 
-  char        *WidgetName;
+  char *WidgetName;
 
   vtkKWWidget *Parent;
 
   // Ballon help
 
-  char  *BalloonHelpString;
+  char *BalloonHelpString;
   
-  // Encoding methods
-  static const char* GetTclCharacterEncodingAsString(int);
-
+  // Description:
+  // Get the Tk string type of the widget.
+  virtual const char* GetType();
+  
   // Description:
   // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
   // internal format (given the widget's application CharacterEncoding), 
@@ -322,6 +404,10 @@ protected:
     const char *source, int options = 0);
   //ETX
 
+  // Description:
+  // Convenience function to that propagates the Enabled state of
+  // the instance to another subwidget (preferably a sub-widget).
+  // It calls SetEnabled(this->GetEnabled()) on the 'widget' parameter
   virtual void PropagateEnableState(vtkKWWidget* widget);
 
   // PIMPL Encapsulation for STL containers

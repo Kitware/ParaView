@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKW@WidgetType@Labeled);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.3");
+vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.4");
 
 int vtkKW@WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -50,7 +50,7 @@ vtkKW@WidgetType@* vtkKW@WidgetType@Labeled::GetWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app, const char *args)
+void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -62,12 +62,12 @@ void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app, const char *args)
 
   // Call the superclass
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Create the widget
 
   this->Widget->SetParent(this);
-  this->Widget->Create(app, NULL);
+  this->Widget->Create(app);
 
   // Pack
 

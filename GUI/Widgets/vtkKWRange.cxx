@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.43");
+vtkCxxRevisionMacro(vtkKWRange, "1.44");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -160,7 +160,7 @@ vtkKWRange::~vtkKWRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::Create(vtkKWApplication *app, const char *args)
+void vtkKWRange::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -173,7 +173,7 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
   // Call the superclass, this will set the application,
   // create the frame and the Label
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Now we need the canvas
 
@@ -182,14 +182,18 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
     this->CanvasFrame = vtkKWFrame::New();
     }
   this->CanvasFrame->SetParent(this);
-  this->CanvasFrame->Create(app, "");
+  this->CanvasFrame->Create(app);
 
   if (!this->Canvas)
     {
     this->Canvas = vtkKWCanvas::New();
     }
   this->Canvas->SetParent(this->CanvasFrame);
-  this->Canvas->Create(app, "-bd 0 -highlightthickness 0 -width 0 -height 0");
+  this->Canvas->Create(app);
+  this->Canvas->SetBorderWidth(0);
+  this->Canvas->SetHighlightThickness(0);
+  this->Canvas->SetWidth(0);
+  this->Canvas->SetHeight(0);
 
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
                this->CanvasFrame->GetWidgetName(), this->GetTclName());
@@ -227,7 +231,7 @@ void vtkKWRange::CreateEntries()
     if (!this->Entries[i]->IsCreated() && this->IsCreated())
       {
       this->Entries[i]->SetParent(this);
-      this->Entries[i]->Create(this->GetApplication(), "");
+      this->Entries[i]->Create(this->GetApplication());
       this->Entries[i]->SetWidth(this->EntriesWidth);
       this->PropagateEnableState(this->Entries[i]);
       this->Script("bind %s <Return> {%s EntriesUpdateCallback %d}",

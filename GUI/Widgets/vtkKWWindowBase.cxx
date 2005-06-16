@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.15");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.16");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -257,7 +257,7 @@ void vtkKWWindowBase::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
+void vtkKWWindowBase::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -269,7 +269,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   vtksys_stl::string cmd;
   vtksys_stl::string label;
@@ -323,10 +323,13 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Menubar separator
 
   this->MenuBarSeparatorFrame->SetParent(this);  
+  this->MenuBarSeparatorFrame->Create(app);
+  this->MenuBarSeparatorFrame->SetHeight(2);
+  this->MenuBarSeparatorFrame->SetBorderWidth(2);
 #if defined(_WIN32)
-  this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief groove");
+  this->MenuBarSeparatorFrame->SetReliefToGroove();
 #else
-  this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief sunken");
+  this->MenuBarSeparatorFrame->SetReliefToSunken();
 #endif
 
   this->Script("pack %s -side top -fill x -pady 2",
@@ -335,7 +338,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Toolbars
 
   this->MainToolbarSet->SetParent(this);  
-  this->MainToolbarSet->Create(app, NULL);
+  this->MainToolbarSet->Create(app);
   this->MainToolbarSet->ShowTopSeparatorOff();
   this->MainToolbarSet->ShowBottomSeparatorOn();
   this->MainToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
@@ -352,7 +355,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Main frame
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app, NULL);
+  this->MainFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand t",
                this->MainFrame->GetWidgetName());
@@ -371,7 +374,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame
 
   this->StatusFrame->SetParent(this);
-  this->StatusFrame->Create(app, NULL);
+  this->StatusFrame->Create(app);
   
   this->Script("pack %s -side bottom -fill x -pady 0",
                this->StatusFrame->GetWidgetName());
@@ -379,11 +382,13 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame separator
 
   this->StatusFrameSeparator->SetParent(this);
-  this->StatusFrameSeparator->Create(app, "-height 2 -bd 1");
+  this->StatusFrameSeparator->Create(app);
+  this->StatusFrameSeparator->SetHeight(2);
+  this->StatusFrameSeparator->SetBorderWidth(2);
 #if defined(_WIN32)
-  this->StatusFrameSeparator->ConfigureOptions("-relief groove");
+  this->StatusFrameSeparator->SetReliefToGroove();
 #else
-  this->StatusFrameSeparator->ConfigureOptions("-relief sunken");
+  this->StatusFrameSeparator->SetReliefToSunken();
 #endif
 
   this->Script("pack %s -side bottom -fill x -pady 2",
@@ -396,7 +401,11 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame : label
 
   this->StatusLabel->SetParent(this->StatusFrame);
-  this->StatusLabel->Create(app, "-relief sunken -bd 0 -padx 3 -anchor w");
+  this->StatusLabel->Create(app);
+  this->StatusLabel->SetReliefToSunken();
+  this->StatusLabel->SetBorderWidth(0);
+  this->StatusLabel->SetPadX(3);
+  this->StatusLabel->SetAnchorToWest();
 
   this->Script("pack %s -side left -padx 1 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
@@ -404,7 +413,9 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame : progress frame
 
   this->ProgressFrame->SetParent(this->StatusFrame);
-  this->ProgressFrame->Create(app, "-relief sunken -bd 1");
+  this->ProgressFrame->Create(app);
+  this->ProgressFrame->SetBorderWidth(1);
+  this->ProgressFrame->SetReliefToSunken();
 
   this->Script("pack %s -side left -padx 0 -fill y", 
                this->ProgressFrame->GetWidgetName());
@@ -415,7 +426,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   this->ProgressGauge->SetParent(this->ProgressFrame);
   this->ProgressGauge->SetWidth(200);
   this->ProgressGauge->ExpandHeightOn();
-  this->ProgressGauge->Create(app, NULL);
+  this->ProgressGauge->Create(app);
 
   this->Script("pack %s -side right -padx 2 -pady 2 -expand y -fill y",
                this->ProgressGauge->GetWidgetName());
@@ -423,7 +434,9 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame : tray frame
 
   this->TrayFrame->SetParent(this->StatusFrame);
-  this->TrayFrame->Create(app, "-relief sunken -bd 1");
+  this->TrayFrame->Create(app);
+  this->TrayFrame->SetBorderWidth(1);
+  this->TrayFrame->SetReliefToSunken();
 
   this->Script(
     "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both",
@@ -432,7 +445,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   // Status frame : tray frame : error image
 
   this->TrayImageError->SetParent(this->TrayFrame);
-  this->TrayImageError->Create(app, NULL);
+  this->TrayImageError->Create(app);
 
   this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
   
@@ -459,7 +472,7 @@ int vtkKWWindowBase::DisplayCloseDialog()
     vtkKWMessageDialog::QuestionIcon | 
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
-  dialog->Create(this->GetApplication(), NULL);
+  dialog->Create(this->GetApplication());
   dialog->SetText("Are you sure you want to close this window?");
   dialog->SetTitle(vtkKWWindowBase::FileCloseMenuLabel);
   int ret = dialog->Invoke();
@@ -562,7 +575,7 @@ vtkKWMenu *vtkKWWindowBase::GetFileMenu()
     {
     this->FileMenu->SetParent(this->GetMenu());
     this->FileMenu->SetTearOff(0);
-    this->FileMenu->Create(this->GetApplication(), NULL);
+    this->FileMenu->Create(this->GetApplication());
     this->GetMenu()->InsertCascade(
       0, vtkKWWindowBase::FileMenuLabel, this->FileMenu, 0);
     }
@@ -614,7 +627,7 @@ vtkKWMenu *vtkKWWindowBase::GetEditMenu()
     {
     this->EditMenu->SetParent(this->GetMenu());
     this->EditMenu->SetTearOff(0);
-    this->EditMenu->Create(this->GetApplication(), NULL);
+    this->EditMenu->Create(this->GetApplication());
     // Usually after the File Menu (i.e., pos 1)
     this->GetMenu()->InsertCascade(
       1, vtkKWWindowBase::EditMenuLabel, this->EditMenu, 0);
@@ -635,7 +648,7 @@ vtkKWMenu *vtkKWWindowBase::GetViewMenu()
     {
     this->ViewMenu->SetParent(this->GetMenu());
     this->ViewMenu->SetTearOff(0);
-    this->ViewMenu->Create(this->GetApplication(), NULL);
+    this->ViewMenu->Create(this->GetApplication());
     // Usually after the Edit Menu (do not use GetEditMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0), 
@@ -663,7 +676,7 @@ vtkKWMenu *vtkKWWindowBase::GetWindowMenu()
     {
     this->WindowMenu->SetParent(this->GetMenu());
     this->WindowMenu->SetTearOff(0);
-    this->WindowMenu->Create(this->GetApplication(), NULL);
+    this->WindowMenu->Create(this->GetApplication());
     // Usually after View Menu (do not use GetEditMenu()/GetViewMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0) + (this->ViewMenu ? 1 : 0), 
@@ -685,7 +698,7 @@ vtkKWMenu *vtkKWWindowBase::GetHelpMenu()
     {
     this->HelpMenu->SetParent(this->GetMenu());
     this->HelpMenu->SetTearOff(0);
-    this->HelpMenu->Create(this->GetApplication(), NULL);
+    this->HelpMenu->Create(this->GetApplication());
     // Usually at the end
     this->GetMenu()->AddCascade(
       vtkKWWindowBase::HelpMenuLabel, this->HelpMenu, 0);
@@ -726,7 +739,7 @@ vtkKWMenu *vtkKWWindowBase::GetToolbarsVisibilityMenu()
     {
     this->ToolbarsVisibilityMenu->SetParent(this->GetWindowMenu());
     this->ToolbarsVisibilityMenu->SetTearOff(0);
-    this->ToolbarsVisibilityMenu->Create(this->GetApplication(), NULL);
+    this->ToolbarsVisibilityMenu->Create(this->GetApplication());
     this->GetWindowMenu()->InsertCascade(
       2, vtkKWWindowBase::ToolbarsVisibilityMenuLabel, 
       this->ToolbarsVisibilityMenu, 1, "Set Toolbars Visibility");
@@ -751,7 +764,7 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
     {
     mrf_menu->SetParent(this->GetFileMenu());
     mrf_menu->SetTearOff(0);
-    mrf_menu->Create(this->GetApplication(), NULL);
+    mrf_menu->Create(this->GetApplication());
     }
 
   // Remove the menu if already there (in case that function was used to
@@ -810,7 +823,7 @@ void vtkKWWindowBase::LoadScript()
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     load_dialog, "LoadScriptLastPath");
   load_dialog->SetParent(this);
-  load_dialog->Create(this->GetApplication(), NULL);
+  load_dialog->Create(this->GetApplication());
   load_dialog->SaveDialogOff();
   load_dialog->SetTitle("Load Script");
   load_dialog->SetDefaultExtension(this->ScriptExtension);
@@ -928,7 +941,7 @@ vtkKWTclInteractor* vtkKWWindowBase::GetTclInteractor()
   if (!this->TclInteractor->IsCreated() && this->IsCreated())
     {
     this->TclInteractor->SetMasterWindow(this);
-    this->TclInteractor->Create(this->GetApplication(), NULL);
+    this->TclInteractor->Create(this->GetApplication());
     }
   
   return this->TclInteractor;
@@ -964,8 +977,9 @@ vtkKWLabel* vtkKWWindowBase::GetStatusImage()
       this->StatusFrame && this->StatusFrame->IsCreated())
     {
     this->StatusImage->SetParent(this->StatusFrame);
-    this->StatusImage->Create(
-      this->StatusFrame->GetApplication(), "-relief sunken -bd 1");
+    this->StatusImage->Create(this->StatusFrame->GetApplication());
+    this->StatusImage->SetBorderWidth(1);
+    this->StatusImage->SetReliefToSunken();
     vtksys_stl::string before;
     if (this->StatusLabel && this->StatusLabel->IsCreated())
       {

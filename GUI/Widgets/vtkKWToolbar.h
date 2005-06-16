@@ -35,7 +35,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a the widget
+  // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
@@ -82,15 +82,13 @@ public:
                                    const char *variable_name,
                                    vtkKWObject *object, 
                                    const char *method, 
-                                   const char *help = 0,
-                                   const char *extra = 0);
+                                   const char *help = 0);
   vtkKWWidget* AddCheckButtonImage(const char *image_name, 
                                    const char *select_image_name, 
                                    const char *variable_name,
                                    vtkKWObject *object, 
                                    const char *method, 
-                                   const char *help = 0,
-                                   const char *extra = 0);
+                                   const char *help = 0);
   
   // Description:
   // Update/refresh the widgets layout/aspect
@@ -129,12 +127,12 @@ public:
     { vtkKWToolbar::SetGlobalWidgetsFlatAspect(0); };
 
   // Description:
-  // Set/Get the internal padding that will be applied around each widget.
+  // Set/Get the padding that will be applied around each widget.
   // (default to 0 on Windows, 1 otherwise).
-  virtual void SetPadX(int);
-  vtkGetMacro(PadX, int);
-  virtual void SetPadY(int);
-  vtkGetMacro(PadY, int);
+  virtual void SetWidgetsPadX(int);
+  vtkGetMacro(WidgetsPadX, int);
+  virtual void SetWidgetsPadY(int);
+  vtkGetMacro(WidgetsPadY, int);
 
   // Description:
   // Set/Get the additional internal padding that will be applied around 
@@ -193,8 +191,8 @@ protected:
 
   //ETX
 
-  int PadX;
-  int PadY;
+  int WidgetsPadX;
+  int WidgetsPadY;
   int WidgetsFlatAdditionalPadX;
   int WidgetsFlatAdditionalPadY;
 

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.2");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.3");
 
 int vtkKWPushButtonWithMenuCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -39,13 +39,13 @@ vtkKWPushButtonWithMenu::~vtkKWPushButtonWithMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButtonWithMenu::Create(vtkKWApplication *app, const char *args)
+void vtkKWPushButtonWithMenu::Create(vtkKWApplication *app)
 { 
   // Call the superclass to create the widget and set the appropriate flags
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
   this->Menu->SetParent(this);
-  this->Menu->Create(app, NULL);  
+  this->Menu->Create(app);  
 
   this->Script("bind %s <ButtonPress-3> {%s PopupCallback %%X %%Y}",
                this->GetWidgetName(), this->GetTclName()); 

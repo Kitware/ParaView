@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.87");
+vtkCxxRevisionMacro(vtkKWScale, "1.88");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -168,11 +168,11 @@ vtkKWScale::~vtkKWScale()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWScale::Create(vtkKWApplication *app, const char *args)
+void vtkKWScale::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-bd 0"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -184,14 +184,19 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   if (this->PopupScale)
     {
     this->TopLevel = vtkKWTopLevel::New();
-    this->TopLevel->Create(app, "-bg black -bd 2 -relief flat");
+    this->TopLevel->Create(app);
+    this->TopLevel->SetBackgroundColor(0.0, 0.0, 0.0);
+    this->TopLevel->SetBorderWidth(2);
+    this->TopLevel->SetReliefToFlat();
     this->TopLevel->HideDecorationOn();
     this->TopLevel->Withdraw();
     this->TopLevel->SetMasterWindow(this);
 
     this->PopupPushButton = vtkKWPushButton::New();
     this->PopupPushButton->SetParent(this);
-    this->PopupPushButton->Create(app, "-padx 0 -pady 0");
+    this->PopupPushButton->Create(app);
+    this->PopupPushButton->SetPadX(0);
+    this->PopupPushButton->SetPadY(0);
 
     this->PopupPushButton->SetImageOption(image_arrow, 
                                           image_arrow_width, 
@@ -208,13 +213,14 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   // Create the scale
 
-  this->Scale->Create(app, "scale", NULL);
+  this->Scale->Create(app);
+  this->Script("scale %s", this->Scale->GetWidgetName());
+
   this->Script("%s configure -orient horizontal -showvalue no -bd 2 "
-               "-highlightthickness 0 -resolution %g -from %g -to %g %s", 
+               "-highlightthickness 0 -resolution %g -from %g -to %g", 
                this->Scale->GetWidgetName(), 
                this->Resolution,
-               this->Range[0], this->Range[1],
-               (args ? args : ""));
+               this->Range[0], this->Range[1]);
 
   this->PackWidget();
   this->Bind();
@@ -234,7 +240,7 @@ void vtkKWScale::DisplayEntry()
 
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->Entry->Create(this->GetApplication(), 0);
+  this->Entry->Create(this->GetApplication());
   this->Entry->SetWidth(11);
   this->PropagateEnableState(this->Entry);
   this->Entry->SetValue(this->GetValue());
@@ -261,7 +267,8 @@ void vtkKWScale::DisplayLabel(const char *label)
   if (!this->Label->IsCreated())
     {
     this->Label->SetParent(this);
-    this->Label->Create(this->GetApplication(), "-anchor w");
+    this->Label->Create(this->GetApplication());
+    this->Label->SetAnchorToWest();
     this->PropagateEnableState(this->Label);
     }
 
@@ -907,7 +914,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMinLabel = vtkKWLabel::New();
     this->RangeMinLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[0]);
-    this->RangeMinLabel->Create(this->GetApplication(), "");
+    this->RangeMinLabel->Create(this->GetApplication());
     this->RangeMinLabel->SetText(labelText);
     this->PropagateEnableState(this->RangeMinLabel);
     }
@@ -916,7 +923,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMaxLabel = vtkKWLabel::New();
     this->RangeMaxLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[1]);
-    this->RangeMaxLabel->Create(this->GetApplication(), "");
+    this->RangeMaxLabel->Create(this->GetApplication());
     this->RangeMaxLabel->SetText(labelText);
     this->PropagateEnableState(this->RangeMaxLabel);
     }

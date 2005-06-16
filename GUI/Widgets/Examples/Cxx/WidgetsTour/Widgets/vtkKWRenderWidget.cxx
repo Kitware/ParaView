@@ -18,7 +18,7 @@ int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWRenderWidget *rw = vtkKWRenderWidget::New();
   rw->SetParent(parent);
-  rw->Create(app, NULL);
+  rw->Create(app);
 
   app->Script("pack %s -side top -fill both -expand y -padx 0 -pady 0", 
               rw->GetWidgetName());

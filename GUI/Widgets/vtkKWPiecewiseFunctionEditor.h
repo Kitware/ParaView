@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app, const char *args = 0);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Update the whole UI depending on the value of the Ivars

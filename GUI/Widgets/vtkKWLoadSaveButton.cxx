@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.9");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.10");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -53,7 +53,7 @@ vtkKWLoadSaveButton::~vtkKWLoadSaveButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::Create(vtkKWApplication *app, const char *args)
+void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -66,7 +66,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app, const char *args)
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create(app, args);
+  this->Superclass::Create(app);
 
   // Do not use SetCommand (we override it to get max compatibility)
   // Save the old command, if any
@@ -94,7 +94,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app, const char *args)
 
   // Create the load/save dialog
 
-  this->LoadSaveDialog->Create(app, "");
+  this->LoadSaveDialog->Create(app);
 
   // Update enable state
 
