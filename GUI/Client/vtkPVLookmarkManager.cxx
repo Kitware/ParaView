@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6.2.2");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6.2.3");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -647,7 +647,7 @@ void vtkPVLookmarkManager::UndoCallback()
 
   #ifndef _WIN32
 
-  if ( getenv("HOME") )
+  if ( !getenv("HOME") )
     {
     return;
     }
