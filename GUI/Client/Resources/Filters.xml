@@ -3102,4 +3102,25 @@ Tessellate a higher-order dataset.
     </Documentation>
   </Module>
 
+  <Module name="ExtractDataSets"
+          menu_name="Extract Datasets"
+          root_name="ExtDS"
+          module_type="Filter"
+          long_help="This filter extracts a list of datasets from hierarchical datasets."
+          short_help="Extract datasets.">
+    <Filter class="vtkHierarchicalDataExtractDataSets">
+      <Input name="Input"
+             class="vtkHierarchicalDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ExtractDataSetsWidget trace_name="datasets"
+                           property="SelectedDataSets"
+                           help="Choose the datasets to extract."/>
+
+    <Documentation>
+    </Documentation>
+  </Module>
 </ModuleInterfaces>
