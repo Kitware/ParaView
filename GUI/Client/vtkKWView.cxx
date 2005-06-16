@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.17");
+vtkCxxRevisionMacro(vtkKWView, "1.18");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -623,7 +623,7 @@ void vtkKWView::PrintView()
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->ParentWindow);
-    dlg->Create(this->GetApplication(),"");
+    dlg->Create(this->GetApplication());
     dlg->SetText(
       "A postscript file has been generated. You will need to\n"
       "print this file using a print command appropriate for\n"
