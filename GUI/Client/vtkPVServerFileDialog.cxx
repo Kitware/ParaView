@@ -43,10 +43,10 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.42");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.43");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+                                 int argc, char *argv[]);
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -131,8 +131,6 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->LoadSaveButton = vtkKWPushButton::New();
   this->CancelButton = vtkKWPushButton::New();
 
-  this->MasterWindow = 0;
-
   this->SelectBoxId = NULL;
   this->SelectedDirectory = NULL;
 
@@ -185,8 +183,6 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
   this->CancelButton->Delete();
   this->CancelButton = NULL;
 
-  this->SetMasterWindow(0);
-  
   this->SetSelectBoxId(NULL);
 
   this->FileTypeStrings->Delete();
@@ -230,45 +226,19 @@ void vtkPVServerFileDialog::CreateServerSide()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
-{
-  if (this->MasterWindow != win) 
-    { 
-    this->MasterWindow = win; 
-    if (this->MasterWindow) 
-      { 
-      if (this->IsCreated())
-        {
-        this->Script("wm transient %s %s", this->GetWidgetName(), 
-                     this->MasterWindow->GetWidgetName());
-        }
-      } 
-    this->Modified(); 
-    }   
-}
-
-//----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 {
-  // Call the superclass to set the appropriate flags then create manually
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  if (this->MasterWindow)
-    {
-    this->Script("toplevel %s -class %s", 
-                 wname, 
-                 this->MasterWindow->GetClassName());
-    }
-  else
-    {
-    this->Script("toplevel %s", wname);
-    }
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   if (this->SaveDialog)
     {
@@ -278,24 +248,13 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     {
     this->SetTitle("ParaView Load File");
     }
-  this->Script("wm title %s \"%s\"", wname, this->Title);
-  this->Script("wm iconname %s \"vtk\"", wname);
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
 
-
-  this->Script("wm protocol %s WM_DELETE_WINDOW {%s CancelCallback}",
-               wname, this->GetTclName());
-    
-  this->TopFrame->SetParent(this);
+  this->TopFrame->SetParent(this->GetFrame());
   this->TopFrame->Create(app);
   this->Script("grid %s -column 0 -row 0 -padx 2m -sticky ew",
                this->TopFrame->GetWidgetName());
 
-  this->MiddleFrame->SetParent(this);
+  this->MiddleFrame->SetParent(this->GetFrame());
   this->MiddleFrame->Create(app);
   this->Script("grid %s -column 0 -row 1 -padx 2m -sticky ewns",
                this->MiddleFrame->GetWidgetName());
@@ -329,8 +288,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                this->ScrollBar->GetWidgetName());
   this->FileList->SetBind(this, "<Configure>", "Reconfigure");
 
-
-  this->BottomFrame->SetParent(this);
+  this->BottomFrame->SetParent(this->GetFrame());
   this->BottomFrame->Create(app);
   this->Script("grid %s -column 0 -row 2 -pady 1m  -padx 2m -sticky ew",
                this->BottomFrame->GetWidgetName());
@@ -369,7 +327,6 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->Script("grid columnconfigure %s 0 -weight 1",
                this->TopFrame->GetWidgetName());
 
-
   this->FileNameLabel->SetParent(this->BottomFrame);
   this->FileNameLabel->SetText("File name:");
   this->FileNameLabel->Create(app);
@@ -383,7 +340,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 
   this->LoadSaveButton->SetParent(this->BottomFrame);
   this->LoadSaveButton->Create(app);
-  this->LoadSaveButton->SetCommand(this, "LoadSaveCallback");
+  this->LoadSaveButton->SetCommand(this, "OK");
 
   if (this->SaveDialog)
     {
@@ -395,7 +352,6 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     }
   this->Script("grid %s -row 0 -column 2 -sticky ew -ipadx 2m", 
                this->LoadSaveButton->GetWidgetName());
-
 
   this->ExtensionsLabel->SetParent(this->BottomFrame);
   if (this->SaveDialog)
@@ -431,7 +387,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->CancelButton->SetParent(this->BottomFrame);
   this->CancelButton->Create(app);
   this->CancelButton->SetPadY(0);
-  this->CancelButton->SetCommand(this, "CancelCallback");
+  this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetText("Cancel");
   this->Script("grid %s -row 1 -column 2 -sticky ew -ipadx 2m", 
                this->CancelButton->GetWidgetName());
@@ -439,10 +395,8 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->Script("grid columnconfigure %s 1 -weight 1",
                this->BottomFrame->GetWidgetName());
 
-  this->Script("wm withdraw %s", wname);
-
-
   // Icons
+
   ostrstream folder;
   folder << this->GetWidgetName() << ".folderimg" << ends;
   if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
@@ -472,79 +426,21 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     vtkWarningMacro(<< "Error creating photo (eye gray)");
     }
   document.rdbuf()->freeze(0);
-
 }
 
 //----------------------------------------------------------------------------
 int vtkPVServerFileDialog::Invoke()
-{   
+{
   // Get rid of back slashes.
+
   this->ConvertLastPath();
-
-  this->GetApplication()->RegisterDialogUp(this);
   this->UpdateExtensionsMenu();
-  // Side effect of UpdateExtensionsMenu is to Update.
-  //this->Update();
 
-  int width, height;
+  // Invoke vtkKWDialog's Invoke. Do not invoke the superclass
+  // actually, since it uses a native file browser.
 
-  int x, y;
-  int sw, sh;
-  sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
-         "%d %d", &sw, &sh);
-  
-  if (this->MasterWindow)
-    {
-    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-           &width, &height, &x, &y);
-    
-    x += width / 2;
-    y += height / 2;
-    
-    if (x > sw - 200)
-      {
-      x = sw / 2;
-      }
-    if (y > sh - 200)
-      {
-      y = sh / 2;
-      }
-    }
-  else
-    {
-    x = sw / 2;
-    y = sh / 2;
-    }
-
-  sscanf(this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]", 
-                      this->GetWidgetName(), this->GetWidgetName()), 
-         "%d %d", &width, &height);
-
-  if (x > width / 2)
-    {
-    x -= width / 2;
-    }
-  if (y > height / 2)
-    {
-    y -= height / 2;
-    }
-
-  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-               x, y);
-
-  this->Script("wm deiconify %s", this->GetWidgetName());
-  this->Script("grab %s", this->GetWidgetName());
-
-  this->Done = 0;
-  while ( ! this->Done)
-    {
-    this->Script("after 100; update");
-    }
-  this->GetApplication()->UnRegisterDialogUp(this);
-  return this->ReturnValue;
+  return this->vtkKWDialog::Invoke();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::ConvertLastPath()
@@ -569,7 +465,7 @@ void vtkPVServerFileDialog::ConvertLastPath()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerFileDialog::LoadSaveCallback()
+void vtkPVServerFileDialog::OK()
 {
   int last;
   const char* dir;
@@ -656,20 +552,12 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     }
   this->SetFileName(fullpath.str());
   fullpath.rdbuf()->freeze(0);
-   
-  this->Done = 1;
-  this->Script("grab release %s", this->GetWidgetName());
-  this->Script("wm withdraw %s", this->GetWidgetName());
-  this->ReturnValue = 1;
-}
 
-//----------------------------------------------------------------------------
-void vtkPVServerFileDialog::CancelCallback()
-{
-  this->Done = 1;
-  this->Script("grab release %s", this->GetWidgetName());
-  this->Script("wm withdraw %s", this->GetWidgetName());
-  this->ReturnValue = 0;
+  // We really chose a file, so let's invoke vtkKWDialog's OK. 
+  // Do not invoke the superclass actually, since it uses a native file
+  // browser.
+
+  this->vtkKWDialog::OK();
 }
 
 //----------------------------------------------------------------------------
@@ -987,7 +875,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
       this->Script("%s bind %s <ButtonPress-1> {%s SelectDirectory {%s} %s}",
                    this->FileList->GetWidgetName(), tmp,
                    this->GetTclName(), name, tmp);
-      this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectDirectory {%s} %s; %s LoadSaveCallback}",
+      this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectDirectory {%s} %s; %s OK}",
                    this->FileList->GetWidgetName(), tmp,
                    this->GetTclName(), name, tmp, this->GetTclName());
       this->Script("%s itemconfigure %s -image %s.folderimg",
@@ -999,7 +887,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
       this->Script("%s bind %s <ButtonPress-1> {%s SelectFile {%s} %s}",
                    this->FileList->GetWidgetName(), tmp,
                    this->GetTclName(), name, tmp);
-      this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectFile {%s} %s; %s LoadSaveCallback}",
+      this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectFile {%s} %s; %s OK}",
                    this->FileList->GetWidgetName(), tmp,
                    this->GetTclName(), name, tmp, this->GetTclName());
       this->Script("%s itemconfigure %s -image %s.documentimg",
@@ -1026,7 +914,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
     this->Script("%s bind %s <ButtonPress-1> {%s SelectDirectory {%s} %s}",
                  this->FileList->GetWidgetName(), tmp,
                  this->GetTclName(), name, tmp);
-    this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectDirectory {%s} %s; %s LoadSaveCallback}",
+    this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectDirectory {%s} %s; %s OK}",
                  this->FileList->GetWidgetName(), tmp,
                  this->GetTclName(), name, tmp, this->GetTclName());
     }
@@ -1035,7 +923,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
     this->Script("%s bind %s <ButtonPress-1> {%s SelectFile {%s} %s}",
                  this->FileList->GetWidgetName(), tmp,
                  this->GetTclName(), name, tmp);
-    this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectFile {%s} %s; %s LoadSaveCallback}",
+    this->Script("%s bind %s <Double-ButtonPress-1> {%s SelectFile {%s} %s; %s OK}",
                  this->FileList->GetWidgetName(), tmp,
                  this->GetTclName(), name, tmp, this->GetTclName());
     }

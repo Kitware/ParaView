@@ -47,26 +47,23 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set the window to which the dialog will be slave.
-  // If set, this dialog will always be on top of the master
-  // window and will minimize with it (assuming that the windowing
-  // system supports this)
-  void SetMasterWindow(vtkKWWindow* win);
-
-  // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Invoke the dialog and display it in a modal manner. 
-  // This method returns a zero if the dilaog was killed or 
+  // Invoke the dialog, display it and enter an event loop until the user
+  // confirm (OK) or cancel the dialog.
+  // Note that a dialog is a modal toplevel by default.
+  // This method returns a zero if the dialog was killed or 
   // canceled, nonzero otherwise.
   virtual int Invoke();
   
   // Description:
-  // Button callbacks;
-  void LoadSaveCallback();
-  void CancelCallback();
+  // Confirm the action (load/save the file) and close this Dialog
+  virtual void OK();
+
+  // Description:
+  // Button callbacks
   void SelectFile(const char* name, const char* id);
   void SelectDirectory(const char* name, const char* id);
   void DownDirectoryCallback();
@@ -94,10 +91,6 @@ protected:
 
   // Get rid of backslashes.
   void ConvertLastPath();
-
-  int ReturnValue;
-  
-  vtkKWWindow*      MasterWindow;
 
   vtkKWFrame*      TopFrame;
   vtkKWFrame*       MiddleFrame;
