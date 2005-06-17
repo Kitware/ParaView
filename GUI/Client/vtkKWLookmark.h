@@ -29,7 +29,7 @@
 #ifndef __vtkKWLookmark_h
 #define __vtkKWLookmark_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWCheckButtonLabeled;
 class vtkKWApplication;
@@ -43,11 +43,11 @@ class vtkKWCheckButtonLabeled;
 class vtkKWRadioButtonSet;
 
 
-class VTK_EXPORT vtkKWLookmark : public vtkKWWidget
+class VTK_EXPORT vtkKWLookmark : public vtkKWCompositeWidget
 {
 public:
   static vtkKWLookmark* New();
-  vtkTypeRevisionMacro(vtkKWLookmark,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLookmark,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

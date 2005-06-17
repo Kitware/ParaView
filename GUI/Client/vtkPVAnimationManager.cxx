@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.52");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.53");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -165,18 +165,23 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::Create(vtkKWApplication* app)
 {
-
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("Widget already created.");
-    return;
-    }
   if (!this->VerticalParent || !this->HorizantalParent)
     {
     vtkErrorMacro("VerticalParent and HorizantalParent must be set before calling create.");
     return;
     }
-  this->Superclass::CreateSpecificTkWidget(app, NULL);
+
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();

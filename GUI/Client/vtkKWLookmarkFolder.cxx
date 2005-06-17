@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.10");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.11");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -100,23 +100,17 @@ void vtkKWLookmarkFolder::RemoveFolder()
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 {
+  // Check if already created
+
   if (this->IsCreated())
     {
-    vtkErrorMacro("Lookmark Folder Widget already created");
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
+  // Call the superclass to create the whole widget
 
-  this->SetApplication(app);
-
-  const char *wname = this->GetWidgetName();
-
-  this->Script("frame %s -borderwidth 0", wname);
+  this->Superclass::Create(app);
 
   this->MainFrame->SetParent(this);
   this->MainFrame->Create(app);

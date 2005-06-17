@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.9");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.10");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -161,23 +161,17 @@ vtkKWLookmark::~vtkKWLookmark()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::Create(vtkKWApplication *app)
 {
+  // Check if already created
+
   if (this->IsCreated())
     {
-    vtkErrorMacro("Lookmark Widget already created");
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
+  // Call the superclass to create the whole widget
 
-  this->SetApplication(app);
-
-  const char *wname = this->GetWidgetName();
-
-  this->Script("frame %s -borderwidth 0", wname);
+  this->Superclass::Create(app);
 
   this->LmkFrame->SetParent(this);
   this->LmkFrame->Create(app);

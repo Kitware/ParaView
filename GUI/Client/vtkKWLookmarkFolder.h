@@ -26,7 +26,7 @@
 #ifndef __vtkKWLookmarkFolder_h
 #define __vtkKWLookmarkFolder_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
@@ -35,11 +35,11 @@ class vtkKWCheckButton;
 class vtkKWText;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkKWLookmarkFolder : public vtkKWWidget
+class VTK_EXPORT vtkKWLookmarkFolder : public vtkKWCompositeWidget
 {
 public:
   static vtkKWLookmarkFolder* New();
-  vtkTypeRevisionMacro(vtkKWLookmarkFolder,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLookmarkFolder,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
