@@ -418,6 +418,10 @@
                    property="DistributeFiles"
                    trace_name="file_flag"
                    help="Select whether, in parallel mode, if the reader distributes files or blocks"/>
+ <LabeledToggle label="Generate level array"
+                   property="GenerateLevelArray"
+                   trace_name="level_flag"
+                   help="Generate a cell array storing the level of each block"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            keeps_timesteps="1"

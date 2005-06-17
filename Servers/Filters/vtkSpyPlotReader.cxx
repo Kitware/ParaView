@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.13");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.14");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -558,6 +558,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->SetController(vtkMultiProcessController::GetGlobalController());
   
   this->DistributeFiles=0; // by default, distribute blocks, not files.
+  this->GenerateLevelArray=0; // by default, do not generate level array.
 }
 
 //-----------------------------------------------------------------------------
@@ -1125,9 +1126,10 @@ int vtkSpyPlotReader::RequestData(
     int realExtents[6];
     int realDims[3];
       
+    int level;
     if(this->IsAMR)
       {
-      int level = spcth_getDataBlockLevel(spcth, block);
+      level = spcth_getDataBlockLevel(spcth, block);
       spcth_getDataBlockBounds(spcth, block, bounds);
       
       // add at the end of the level list.
@@ -1201,6 +1203,7 @@ int vtkSpyPlotReader::RequestData(
       }
     else
       {
+      level=0;
       vtkRectilinearGrid *rg=vtkRectilinearGrid::New();
       vtkDoubleArray *coordinates[3];
       double *rawvector[3];
@@ -1342,6 +1345,34 @@ int vtkSpyPlotReader::RequestData(
             }
           }
         }
+      // Add a level array, for debugging
+      if(this->GenerateLevelArray)
+        {
+        cout<<"cool1"<<endl;
+        vtkDataArray *array=cd->GetArray("levels");
+        if(array!=0)
+          {
+          cd->RemoveArray("levels"); // if this is not the first step,
+          // make sure we have a clean array
+          }
+        
+        array = vtkIntArray::New();
+        cd->AddArray(array);
+        array->Delete();
+        
+        array->SetName("levels");
+        array->SetNumberOfComponents(1);
+        int c=dims[0]*dims[1]*dims[2];
+        array->SetNumberOfTuples(c);
+        int *ptr=static_cast<int *>(array->GetVoidPointer(0));
+        int i=0;
+        while(i<c)
+          {
+          ptr[i]=level;
+          ++i;
+          }
+        
+        }
       // Mark the bounding cells as ghost cells of level 1.
       vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
       ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
@@ -1470,8 +1501,35 @@ int vtkSpyPlotReader::RequestData(
             }
           }
         }
-      
       delete[] tmp;
+      
+      // Add a level array, for debugging
+      if(this->GenerateLevelArray)
+        {
+        cout<<"cool2"<<endl;
+        vtkDataArray *array=cd->GetArray("levels");
+        if(array!=0)
+          {
+          cd->RemoveArray("levels"); // if this is not the first step,
+          // make sure we have a clean array
+          }
+        
+        array = vtkIntArray::New();
+        cd->AddArray(array);
+        array->Delete();
+        
+        array->SetName("levels");
+        array->SetNumberOfComponents(1);
+        int c=realDims[0]*realDims[1]*realDims[2];
+        array->SetNumberOfTuples(c);
+        int *ptr=static_cast<int *>(array->GetVoidPointer(0));
+        int i=0;
+        while(i<c)
+          {
+          ptr[i]=level;
+          ++i;
+          }
+        }
       
       // Mark the remains ghost cell as real ghost cells of level 1.
       vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
@@ -2227,6 +2285,17 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "false"<<endl;
     }
+  
+  os << "GenerateLevelArray: ";
+  if(this->GenerateLevelArray)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
+  
   os << "TimeStep: " << this->TimeStep << endl;
   os << "TimeStepRange: " << this->TimeStepRange[0] << " " << this->TimeStepRange[1] << endl;
   if ( this->CellDataArraySelection )

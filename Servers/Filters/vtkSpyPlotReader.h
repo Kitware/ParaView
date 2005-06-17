@@ -88,6 +88,14 @@ public:
   vtkBooleanMacro(DistributeFiles,int);
   
   // Description:
+  // If true, the reader generate a cell array in each block that
+  // stores the level in the hierarchy, starting from 0.
+  // False by default.
+  vtkSetMacro(GenerateLevelArray,int);
+  vtkGetMacro(GenerateLevelArray,int);
+  vtkBooleanMacro(GenerateLevelArray,int);
+  
+  // Description:
   // Get the time step range.
   vtkGetVector2Macro(TimeStepRange, int);
 
@@ -195,6 +203,8 @@ protected:
   int DistributeFiles;
   
   double Bounds[6]; // bounds of the hierarchy without the bad ghostcells.
+  
+  int GenerateLevelArray; // user flag
   
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
