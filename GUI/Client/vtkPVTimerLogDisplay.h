@@ -19,7 +19,8 @@
 #ifndef __vtkPVTimerLogDisplay_h
 #define __vtkPVTimerLogDisplay_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWTopLevel.h"
+
 class vtkKWApplication;
 class vtkPVApplication;
 class vtkKWPushButton;
@@ -32,11 +33,11 @@ class vtkKWOptionMenu;
 class vtkKWCheckButton;
 class vtkPVTimerInformation;
 
-class VTK_EXPORT vtkPVTimerLogDisplay : public vtkKWWidget
+class VTK_EXPORT vtkPVTimerLogDisplay : public vtkKWTopLevel
 {
 public:
   static vtkPVTimerLogDisplay* New();
-  vtkTypeRevisionMacro(vtkPVTimerLogDisplay, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVTimerLogDisplay, vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -44,24 +45,9 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
-  // Display the interactor
-  void Display();
+  // Display the toplevel.
+  virtual void Display();
 
-  // Description:
-  // Callback from the dismiss button that closes the window.
-  void Dismiss();
-
-  // Description:
-  // Set the title of the TclInteractor to appear in the titlebar
-  vtkSetStringMacro(Title);
-  
-  // Description:
-  // Set the window to which the dialog will be slave.
-  // If set, this dialog will always be on top of the master
-  // window and will minimize with it (assuming that the windowing
-  // system supports this)
-  void SetMasterWindow(vtkKWWindow* win);
-  
   // Description:
   // This threshold eliminates the shosrt duration events fro the display.
   void SetThreshold(float val);
@@ -116,8 +102,6 @@ protected:
 
   void Append(const char*);
   
-  vtkKWWindow*      MasterWindow;
-
   vtkKWFrame*      ControlFrame;
   vtkKWPushButton*  SaveButton;
   vtkKWPushButton*  ClearButton;
@@ -134,7 +118,6 @@ protected:
   vtkKWFrame*     ButtonFrame;
   vtkKWPushButton* DismissButton;
     
-  char*   Title;
   float   Threshold;
 
   vtkPVTimerInformation* TimerInformation;

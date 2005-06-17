@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.29");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.30");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -58,15 +58,14 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->EnableLabel = vtkKWLabel::New();
   this->EnableCheck = vtkKWCheckButton::New();
 
-  this->Title = NULL;
   this->SetTitle("Log");
   
   //this->TagNumber = 1;
   //this->CommandIndex = 0;
-  this->MasterWindow = 0;
   this->Threshold = 0.01;
 
   this->TimerInformation = NULL;
+  this->Modal = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -101,9 +100,6 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
   this->EnableCheck->Delete();
   this->EnableCheck = NULL;
   
-  this->SetTitle(NULL);
-  this->SetMasterWindow(0);
-
   if (this->TimerInformation)
     {
     this->TimerInformation->Delete();
@@ -112,60 +108,20 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::SetMasterWindow(vtkKWWindow* win)
-{
-  if (this->MasterWindow != win) 
-    { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
-    this->MasterWindow = win; 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->Register(this); 
-      if (this->IsCreated())
-        {
-        this->Script("wm transient %s %s", this->GetWidgetName(), 
-                     this->MasterWindow->GetWidgetName());
-        }
-      } 
-    this->Modified(); 
-    } 
-  
-}
-
-//----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 {
-  // Call the superclass to set the appropriate flags then create manually
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  if (this->MasterWindow)
-    {
-    this->Script("toplevel %s -class %s", 
-                 wname, 
-                 this->MasterWindow->GetClassName());
-    }
-  else
-    {
-    this->Script("toplevel %s", wname);
-    }
-  this->Script("wm withdraw %s", wname);
-  this->Script("wm title %s \"%s\"", wname, this->Title);
-  this->Script("wm iconname %s \"vtk\"", wname);
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
-  
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
@@ -173,14 +129,11 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->DismissButton->SetParent(this->ButtonFrame);
   this->DismissButton->Create(app);
-  this->DismissButton->SetCommand(this, "Dismiss");
+  this->DismissButton->SetCommand(this, "Withdraw");
   this->DismissButton->SetText("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
-  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Dismiss}",
-               wname, this->GetTclName());
-    
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app);
   this->DisplayText->ResizeToGridOn();
@@ -272,7 +225,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Display()
 {   
-  this->Script("wm deiconify %s", this->GetWidgetName());
+  this->Superclass::Display();
 
   this->Update();
 }
@@ -522,14 +475,6 @@ void vtkPVTimerLogDisplay::DisplayLog()
 
 
 //----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::Dismiss()
-{
-  this->Script("grab release %s", this->GetWidgetName());
-  this->Script("wm withdraw %s", this->GetWidgetName());
-}
-
-
-//----------------------------------------------------------------------------
 vtkPVTimerInformation* vtkPVTimerLogDisplay::GetTimerInformation()
 {
   return this->TimerInformation;
@@ -546,11 +491,6 @@ vtkPVApplication* vtkPVTimerLogDisplay::GetPVApplication()
 void vtkPVTimerLogDisplay::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-
-  // DO NOT DO THAT ! this is evil, Update the state of the children, 
-  // not the parents (the master window is the vtkPVWindow, which itself
-  // update the state of this object, etc.)
-  // this->PropagateEnableState(this->MasterWindow);
 
   this->PropagateEnableState(this->ControlFrame);
   this->PropagateEnableState(this->SaveButton);
@@ -574,7 +514,6 @@ void vtkPVTimerLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
   os << indent << "Threshold: " << this->Threshold << endl;
   vtkIndent i2 = indent.GetNextIndent();
   os << indent << "TimerInformation:";
