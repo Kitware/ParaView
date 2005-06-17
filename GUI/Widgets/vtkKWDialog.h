@@ -47,16 +47,18 @@ public:
   virtual void Display();
 
   // Description:
-  // Close this Dialog
+  // Cancel the action and close this dialog
   virtual void Cancel();
 
   // Description:
-  // Close this Dialog
+  // Confirm the action and close this dialog
   virtual void OK();
 
   // Description:
-  // Returns 0 if the dialog is active e.g. displayed
-  // 1 if it was Canceled 2 if it was OK.
+  // Returns:
+  // 0 if the dialog is active e.g. displayed
+  // 1 if it was Canceled 
+  // 2 if it was OK.
   int GetStatus() { return this->Done; };
 
   // Description:
