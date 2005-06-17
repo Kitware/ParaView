@@ -2,11 +2,13 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWListBox.h"
+#include "vtkKWListBoxWithScrollbars.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWText.h"
-#include "vtkKWTextLabeled.h"
+#include "vtkKWTextWithScrollbars.h"
+#include "vtkKWTextWithScrollbarsLabeled.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
@@ -92,11 +94,12 @@ int my_main(int argc, char *argv[])
 
   // Add a list box to pick a widget example
 
-  vtkKWListBox *widgets_list = vtkKWListBox::New();
+  vtkKWListBoxWithScrollbars *widgets_list = vtkKWListBoxWithScrollbars::New();
   widgets_list->SetParent(page_widget);
-  widgets_list->ScrollbarOn();
+  widgets_list->ShowVerticalScrollbarOn();
+  widgets_list->ShowHorizontalScrollbarOff();
   widgets_list->Create(app);
-  widgets_list->SetHeight(300);
+  widgets_list->GetWidget()->SetHeight(300);
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               widgets_list->GetWidgetName());
@@ -127,42 +130,48 @@ int my_main(int argc, char *argv[])
 
   // Add text widget to display the Tcl example source
 
-  vtkKWTextLabeled *tcl_source_text = vtkKWTextLabeled::New();
+  vtkKWTextWithScrollbarsLabeled *tcl_source_text = 
+    vtkKWTextWithScrollbarsLabeled::New();
   tcl_source_text->SetParent(source_split->GetFrame1());
   tcl_source_text->Create(app);
   tcl_source_text->SetLabelPositionToTop();
   tcl_source_text->SetLabelText("Tcl Source");
 
-  vtkKWText *text_widget = tcl_source_text->GetWidget();
-  text_widget->EditableTextOff();
-  text_widget->UseVerticalScrollbarOn();
-  text_widget->SetWrapToNone();
-  text_widget->SetHeight(3000);
-  text_widget->AddTagMatcher("#[^\n]*", "_fg_navy_tag_");
-  text_widget->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
-  text_widget->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
+  vtkKWTextWithScrollbars *text_widget = tcl_source_text->GetWidget();
+  text_widget->ShowVerticalScrollbarOn();
+
+  vtkKWText *text = text_widget->GetWidget();
+  text->EditableTextOff();
+  text->SetWrapToNone();
+  text->SetHeight(3000);
+  text->AddTagMatcher("#[^\n]*", "_fg_navy_tag_");
+  text->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  text->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               tcl_source_text->GetWidgetName());
 
   // Add text widget to display the C++ example source
 
-  vtkKWTextLabeled *cxx_source_text = vtkKWTextLabeled::New();
+  vtkKWTextWithScrollbarsLabeled *cxx_source_text = 
+    vtkKWTextWithScrollbarsLabeled::New();
   cxx_source_text->SetParent(source_split->GetFrame2());
   cxx_source_text->Create(app);
   cxx_source_text->SetLabelPositionToTop();
   cxx_source_text->SetLabelText("C++ Source");
 
   text_widget = cxx_source_text->GetWidget();
-  text_widget->EditableTextOff();
-  text_widget->UseVerticalScrollbarOn();
-  text_widget->SetWrapToNone();
-  text_widget->SetHeight(3000);
-  text_widget->AddTagMatcher("#[a-z]+", "_fg_red_tag_");
-  text_widget->AddTagMatcher("//[^\n]*", "_fg_navy_tag_");
-  text_widget->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
-  text_widget->AddTagMatcher("<[^>]*>", "_fg_blue_tag_");
-  text_widget->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
+  text_widget->ShowVerticalScrollbarOn();
+
+  text = text_widget->GetWidget();
+  text->EditableTextOff();
+  text->SetWrapToNone();
+  text->SetHeight(3000);
+  text->AddTagMatcher("#[a-z]+", "_fg_red_tag_");
+  text->AddTagMatcher("//[^\n]*", "_fg_navy_tag_");
+  text->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  text->AddTagMatcher("<[^>]*>", "_fg_blue_tag_");
+  text->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               cxx_source_text->GetWidgetName());
@@ -191,7 +200,7 @@ int my_main(int argc, char *argv[])
 
     if ((*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win))
       {
-      widgets_list->AppendUnique(node_ptr->Name);
+      widgets_list->GetWidget()->AppendUnique(node_ptr->Name);
 
       // Try to find the C++ source
 
@@ -254,13 +263,13 @@ int my_main(int argc, char *argv[])
           "%s SetValue $cxx_source([%s GetSelection]) ; "
           "%s SetValue $tcl_source([%s GetSelection]) ; ",
           win->GetTclName(),
-          widgets_list->GetTclName(),
-          cxx_source_text->GetWidget()->GetTclName(),
-          widgets_list->GetTclName(),
-          tcl_source_text->GetWidget()->GetTclName(),
-          widgets_list->GetTclName());
+          widgets_list->GetWidget()->GetTclName(),
+          cxx_source_text->GetWidget()->GetWidget()->GetTclName(),
+          widgets_list->GetWidget()->GetTclName(),
+          tcl_source_text->GetWidget()->GetWidget()->GetTclName(),
+          widgets_list->GetWidget()->GetTclName());
 
-  widgets_list->SetSingleClickCallback(NULL, buffer);
+  widgets_list->GetWidget()->SetSingleClickCallback(NULL, buffer);
   
   // Start the application
   // If --test was provided, do not enter the event loop

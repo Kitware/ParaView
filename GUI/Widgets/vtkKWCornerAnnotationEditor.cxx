@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.5");
 
 int vtkKWCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -228,10 +228,10 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     text->SetWrapToNone();
     this->Script(
       "bind %s <Return> {%s CornerTextCallback %i}",
-      text->GetTextWidget()->GetWidgetName(), this->GetTclName(), i);
+      text->GetWidgetName(), this->GetTclName(), i);
     this->Script(
       "bind %s <FocusOut> {%s CornerTextCallback %i}",
-      text->GetTextWidget()->GetWidgetName(), this->GetTclName(), i);
+      text->GetWidgetName(), this->GetTclName(), i);
     }
 
   this->CornerText[0]->GetLabel()->SetText("Lower left:");

@@ -25,7 +25,7 @@ class vtkKWFrame;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWText;
+class vtkKWTextWithScrollbars;
 
 class KWWIDGETS_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
 {
@@ -74,7 +74,7 @@ protected:
   vtkKWFrame      *CommandFrame;
   vtkKWLabel      *CommandLabel;
   vtkKWEntry      *CommandEntry;
-  vtkKWText       *DisplayText;
+  vtkKWTextWithScrollbars *DisplayText;
   
   int TagNumber;
   int CommandIndex;

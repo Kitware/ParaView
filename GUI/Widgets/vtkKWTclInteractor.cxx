@@ -19,13 +19,14 @@
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/string>
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.35");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.36");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -42,7 +43,7 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   this->CommandLabel = vtkKWLabel::New();
   this->CommandEntry = vtkKWEntry::New();
   
-  this->DisplayText = vtkKWText::New();
+  this->DisplayText = vtkKWTextWithScrollbars::New();
   
   this->SetTitle("Tcl Interactor");
   
@@ -116,12 +117,14 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app);
-  this->DisplayText->ResizeToGridOn();
-  this->DisplayText->SetWidth(100);
-  this->DisplayText->SetHeight(20);
-  this->DisplayText->SetWrapToWord();
-  this->DisplayText->EditableTextOff();
-  this->DisplayText->UseVerticalScrollbarOn();
+  this->DisplayText->ShowVerticalScrollbarOn();
+
+  vtkKWText *text = this->DisplayText->GetWidget();
+  text->ResizeToGridOn();
+  text->SetWidth(100);
+  text->SetHeight(20);
+  text->SetWrapToWord();
+  text->EditableTextOff();
 
   this->Script("pack %s -side bottom -expand 1 -fill both",
                this->DisplayText->GetWidgetName());
@@ -148,9 +151,9 @@ void vtkKWTclInteractor::Evaluate()
   char buffer_tag[32];
   sprintf(buffer_tag, "%d", this->CommandIndex);
 
-  this->DisplayText->AppendValue(this->CommandEntry->GetValue(),
+  this->DisplayText->GetWidget()->AppendValue(this->CommandEntry->GetValue(),
                                  buffer_tag);
-  this->DisplayText->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendValue("\n");
 
   this->Script("set commandList [linsert $commandList end [concat {%s}]]",
                this->CommandEntry->GetValue());
@@ -168,11 +171,11 @@ void vtkKWTclInteractor::Evaluate()
   this->UnRegister(this);
 
   vtksys_stl::string res(this->Script("set _tmp_err"));
-  this->DisplayText->AppendValue(res.c_str());
-  this->DisplayText->AppendValue("\n\n");
+  this->DisplayText->GetWidget()->AppendValue(res.c_str());
+  this->DisplayText->GetWidget()->AppendValue("\n\n");
 
   this->Script("%s yview end", 
-               this->DisplayText->GetTextWidget()->GetWidgetName());
+               this->DisplayText->GetWidget()->GetWidgetName());
   
   this->CommandEntry->SetValue("");
 }
@@ -180,8 +183,8 @@ void vtkKWTclInteractor::Evaluate()
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::AppendText(const char* text)
 {
-  this->DisplayText->AppendValue(text);
-  this->DisplayText->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendValue(text);
+  this->DisplayText->GetWidget()->AppendValue("\n");
 }
 
 //----------------------------------------------------------------------------

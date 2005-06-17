@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.10");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.11");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -325,9 +325,9 @@ void vtkKWLookmark::EditLookmarkCallback()
   strcpy(temp,this->LmkMainFrame->GetLabel()->GetText());
   this->LmkMainFrame->SetLabelText("");
   this->Script("pack %s", this->LmkNameField->GetWidgetName());
-  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetTextWidget()->GetWidgetName(),strlen(temp));
+  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetWidgetName(),strlen(temp));
   this->LmkNameField->SetValue(temp);
-  this->LmkNameField->GetTextWidget()->SetBind(this, "<KeyPress-Return>", "ChangeLookmarkName");
+  this->LmkNameField->SetBind(this, "<KeyPress-Return>", "ChangeLookmarkName");
 
   delete [] temp;
 }
@@ -387,7 +387,7 @@ void vtkKWLookmark::Pack()
   this->Script("pack %s -anchor w", this->LmkDatasetCheckbox->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
   this->Script("pack %s -anchor w", this->LmkCommentsText->GetWidgetName());
-  this->Script("%s configure -bg white -height 3 -width 50 -wrap none", this->LmkCommentsText->GetTextWidget()->GetWidgetName());
+  this->Script("%s configure -bg white -height 3 -width 50 -wrap none", this->LmkCommentsText->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->LmkCommentsFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -side left", this->LmkLeftFrame->GetWidgetName());
   this->Script("pack %s -anchor w -side left -expand true -fill x -padx 3", this->LmkRightFrame->GetWidgetName());

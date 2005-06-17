@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.8");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.9");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -126,7 +126,6 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
     }
     
   this->ArraySelectionList->SetParent(this);
-  this->ArraySelectionList->ScrollbarOff();
   this->ArraySelectionList->Create(app);
   this->ArraySelectionList->SetSelectionModeToExtended();
   this->ArraySelectionList->SetHeight(0);

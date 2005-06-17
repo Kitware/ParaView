@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.24");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.25");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -149,7 +149,7 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   d->ScalarFieldList->SetHeight( 5 );
   d->ScalarFieldList->SetSingleClickCallback( this, "PointDataSelectedCallback" );
   d->LastSelectionIndex = -1;
-  this->Script( "%s configure -font {Helvetica -12 bold}", d->ScalarFieldList->GetListbox()->GetWidgetName() );
+  this->Script( "%s configure -font {Helvetica -12 bold}", d->ScalarFieldList->GetWidgetName() );
 
   d->EditSubframe->SetParent( d->CriteriaFrame->GetFrame() );
   d->EditSubframe->Create(app);
@@ -212,7 +212,7 @@ void vtkPVTempTessellatorEntry::Update()
     char *listEntry = new char[strlen(name) + 20];
     sprintf( listEntry, "%s: inactive", name );
     d->ScalarFieldList->AppendUnique( listEntry );
-    this->Script( "%s itemconfigure %d -foreground " PLAIN , d->ScalarFieldList->GetListbox()->GetWidgetName(), a );
+    this->Script( "%s itemconfigure %d -foreground " PLAIN , d->ScalarFieldList->GetWidgetName(), a );
     delete[] listEntry;
     }
 
@@ -270,7 +270,7 @@ void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
       this->Data->ScalarFieldList->InsertEntry( fnum, listEntry );
       this->Data->ScalarFieldList->SetSelectionIndex( fnum );
       delete [] listEntry;
-      this->Script( "%s itemconfigure %d -foreground " EMPHS, this->Data->ScalarFieldList->GetListbox()->GetWidgetName(), fnum );
+      this->Script( "%s itemconfigure %d -foreground " EMPHS, this->Data->ScalarFieldList->GetWidgetName(), fnum );
       }
     }
   else
@@ -285,7 +285,7 @@ void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
       this->Data->ScalarFieldList->InsertEntry( fnum, listEntry );
       this->Data->ScalarFieldList->SetSelectionIndex( fnum );
       delete [] listEntry;
-      this->Script( "%s itemconfigure %d -foreground " PLAIN, this->Data->ScalarFieldList->GetListbox()->GetWidgetName(), fnum );
+      this->Script( "%s itemconfigure %d -foreground " PLAIN, this->Data->ScalarFieldList->GetWidgetName(), fnum );
       }
     }
   this->ModifiedCallback();
@@ -332,7 +332,7 @@ void vtkPVTempTessellatorEntry::ChangeCriterionCallback()
     this->Data->ScalarFieldList->DeleteRange( idx, idx );
     this->Data->ScalarFieldList->InsertEntry( idx, label );
     this->Data->ScalarFieldList->SetSelectionIndex( idx );
-    this->Script( "%s itemconfigure %d -foreground " EMPHS, this->Data->ScalarFieldList->GetListbox()->GetWidgetName(), idx );
+    this->Script( "%s itemconfigure %d -foreground " EMPHS, this->Data->ScalarFieldList->GetWidgetName(), idx );
     }
 
   delete [] label;
@@ -427,7 +427,7 @@ void vtkPVTempTessellatorEntry::ResetFieldCriteria()
     {
     sprintf( listEntry, "%s: inactive", pdi->GetArrayInformation( a )->GetName() );
     d->ScalarFieldList->AppendUnique( listEntry );
-    this->Script( "%s itemconfigure %d -foreground " PLAIN, d->ScalarFieldList->GetListbox()->GetWidgetName(), a );
+    this->Script( "%s itemconfigure %d -foreground " PLAIN, d->ScalarFieldList->GetWidgetName(), a );
     }
 }
 
@@ -543,7 +543,7 @@ void vtkPVTempTessellatorEntry::Initialize()
     
     d->ScalarFieldList->AppendUnique( listEntry );
     this->Script( "%s itemconfigure %d -foreground #%s",
-                  d->ScalarFieldList->GetListbox()->GetWidgetName(), a,
+                  d->ScalarFieldList->GetWidgetName(), a,
                   active ? "006600" : "777744" );
     delete[] listEntry;
     }

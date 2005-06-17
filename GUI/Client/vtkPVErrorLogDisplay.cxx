@@ -19,6 +19,7 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.11");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -101,7 +102,7 @@ void vtkPVErrorLogDisplay::Create(vtkKWApplication *app)
 void vtkPVErrorLogDisplay::Update()
 {
   int cc;
-  this->DisplayText->SetValue("");
+  this->DisplayText->GetWidget()->SetValue("");
   if ( this->ErrorMessages )
     {
     for ( cc = 0; cc < this->ErrorMessages->GetNumberOfItems(); cc ++ )
@@ -115,7 +116,7 @@ void vtkPVErrorLogDisplay::Update()
     }
   else
     {
-    this->DisplayText->SetValue("");
+    this->DisplayText->GetWidget()->SetValue("");
     this->Append("No errors");
     }
 }

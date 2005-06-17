@@ -26,7 +26,7 @@ class vtkPVApplication;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWText;
+class vtkKWTextWithScrollbars;
 class vtkKWFrame;
 class vtkKWWindow;
 class vtkKWOptionMenu;
@@ -113,7 +113,7 @@ protected:
   vtkKWLabel*       EnableLabel;
   vtkKWCheckButton* EnableCheck;
 
-  vtkKWText*        DisplayText;
+  vtkKWTextWithScrollbars*  DisplayText;
 
   vtkKWFrame*     ButtonFrame;
   vtkKWPushButton* DismissButton;

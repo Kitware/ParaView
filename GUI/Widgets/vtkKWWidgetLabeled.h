@@ -14,7 +14,7 @@
 // .NAME vtkKWWidgetLabeled - an abstract class widget with a label
 // .SECTION Description
 // This class implements an abstract superclass for composite widgets
-//  associating a label to a widget.
+// associating a label to a widget.
 
 #ifndef __vtkKWWidgetLabeled_h
 #define __vtkKWWidgetLabeled_h

@@ -33,6 +33,7 @@ class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindowBase;
 class vtkKWText;
+class vtkKWTextWithScrollbars;
 class vtkKWApplicationInternals;
 class vtkKWLoadSaveDialog;
 
@@ -466,7 +467,7 @@ protected:
   virtual void AddAboutCopyrights(ostream &);
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
-  vtkKWText          *AboutRuntimeInfo;
+  vtkKWTextWithScrollbars *AboutRuntimeInfo;
 
   // Description:
   // Character encoding (is passed to Tcl)

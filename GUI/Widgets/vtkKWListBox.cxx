@@ -15,12 +15,10 @@
 
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWScrollbar.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.38");
-
+vtkCxxRevisionMacro(vtkKWListBox, "1.39");
 
 //----------------------------------------------------------------------------
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -32,14 +30,6 @@ vtkKWListBox::vtkKWListBox()
   this->CurrentSelection = 0;
   this->Item = 0; 
   this->CommandFunction = vtkKWListBoxCommand;
-  
-  this->Scrollbar = vtkKWScrollbar::New();
-  this->Scrollbar->SetParent(this);
-  
-  this->Listbox = vtkKWWidget::New();
-  this->Listbox->SetParent(this);
-
-  this->ScrollbarFlag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -47,21 +37,16 @@ vtkKWListBox::~vtkKWListBox()
 {
   delete [] this->Item;
   delete [] this->CurrentSelection;
-  
-  this->Scrollbar->Delete();
-  this->Listbox->Delete();
-  
 }
-
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetNumberOfItems()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
-  return atoi(this->Script("%s size", this->Listbox->GetWidgetName()));
+  return atoi(this->Script("%s size", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +54,7 @@ void vtkKWListBox::DeleteRange(int start, int end)
 {
   int enabled = this->GetEnabled();
   this->SetEnabled(1);
-  this->Script("%s delete %d %d", this->Listbox->GetWidgetName(), start, end);
+  this->Script("%s delete %d %d", this->GetWidgetName(), start, end);
   this->SetEnabled(enabled);
 }
 
@@ -77,7 +62,7 @@ void vtkKWListBox::DeleteRange(int start, int end)
 const char* vtkKWListBox::GetItem(int index)
 {
   const char* result = 
-    this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
+    this->Script("%s get %d", this->GetWidgetName(), index);
   delete [] this->Item;
   this->Item = strcpy(new char[strlen(result) + 1], result);
   return this->Item;
@@ -90,7 +75,7 @@ void vtkKWListBox::SetSelectionIndex(int sel)
     {
     return;
     }
-  this->Script("%s selection set %d", this->Listbox->GetWidgetName(), sel);
+  this->Script("%s selection set %d", this->GetWidgetName(), sel);
 }
 
 //----------------------------------------------------------------------------
@@ -101,7 +86,7 @@ int vtkKWListBox::GetSelectionIndex()
     return 0;
     }
   const char* result = this->Script(
-    "%s curselection", this->Listbox->GetWidgetName(), this->GetWidgetName());
+    "%s curselection", this->GetWidgetName(), this->GetWidgetName());
   if ( strlen(result)>0 )
     {
     return atoi(result);
@@ -123,8 +108,8 @@ const char *vtkKWListBox::GetSelection()
     }
   const char* result = this->Script(
     "%s get [%s curselection]", 
-    this->Listbox->GetWidgetName(),
-    this->Listbox->GetWidgetName());
+    this->GetWidgetName(),
+    this->GetWidgetName());
 
   if (this->CurrentSelection)
     {
@@ -150,11 +135,11 @@ void vtkKWListBox::SetSelectState(int idx, int state)
     }
   if (state)
     {
-    this->Script("%s selection set %d", this->Listbox->GetWidgetName(), idx);
+    this->Script("%s selection set %d", this->GetWidgetName(), idx);
     }
   else
     {
-    this->Script("%s selection clear %d", this->Listbox->GetWidgetName(), idx);
+    this->Script("%s selection clear %d", this->GetWidgetName(), idx);
     }
   if (was_disabled)
     {
@@ -188,7 +173,7 @@ int vtkKWListBox::GetSelectState(int idx)
     return 0;
     }
   return atoi(this->Script("%s selection includes %d", 
-                           this->Listbox->GetWidgetName(), idx));
+                           this->GetWidgetName(), idx));
 
 }
 
@@ -204,7 +189,7 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
     {
     this->SetEnabled(1);
     }
-  this->Script("%s insert %d {%s}", this->Listbox->GetWidgetName(), index, name);
+  this->Script("%s insert %d {%s}", this->GetWidgetName(), index, name);
   if ( !enabled )
     {
     this->SetEnabled(0);
@@ -218,7 +203,7 @@ void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj,
                                           const char* methodAndArgs)
 {
   this->Script("bind %s <Double-1> {%s %s}", 
-               this->Listbox->GetWidgetName(),
+               this->GetWidgetName(),
                (obj ? obj->GetTclName() : ""), 
                (methodAndArgs ? methodAndArgs : ""));
 }
@@ -228,7 +213,7 @@ void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj,
                                           const char* methodAndArgs)
 {
   this->Script("bind %s <ButtonRelease-1> {%s %s}", 
-               this->Listbox->GetWidgetName(),
+               this->GetWidgetName(),
                (obj ? obj->GetTclName() : ""), 
                (methodAndArgs ? methodAndArgs : ""));
 }
@@ -259,73 +244,29 @@ int vtkKWListBox::AppendUnique(const char* name)
 //----------------------------------------------------------------------------
 void vtkKWListBox::Create(vtkKWApplication *app)
 {
-  // Check if already created
+  // Call the superclass to set the appropriate flags then create manually
 
-  if (this->IsCreated())
+  if (!this->Superclass::CreateSpecificTkWidget(app, "listbox"))
     {
-    vtkErrorMacro(<< this->GetClassName() << " already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  // Call the superclass to create the whole widget
-
-  this->Superclass::Create(app);
-
-  this->Scrollbar->Create(app);
-  
-  this->Listbox->CreateSpecificTkWidget(app, "listbox");
-  
-  this->Script("%s configure -yscroll {%s set}", 
-               this->Listbox->GetWidgetName(),
-               this->Scrollbar->GetWidgetName());
-  
-  this->Script("%s configure -command {%s yview}", 
-               this->Scrollbar->GetWidgetName(),
-               this->Listbox->GetWidgetName());
-    
-  if (this->ScrollbarFlag)
-    {
-    this->Script("pack %s -side right -fill y", 
-                 this->Scrollbar->GetWidgetName());
-    }
-  this->Script("pack %s -side left -expand 1 -fill both", 
-               this->Listbox->GetWidgetName());
 
   // Update enable state
 
   this->UpdateEnableState();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetWidth(int w)
 {
-  this->Script("%s configure -width %d", this->Listbox->GetWidgetName(), w);
+  this->Script("%s configure -width %d", this->GetWidgetName(), w);
 }
-
-//----------------------------------------------------------------------------
-void vtkKWListBox::SetScrollbarFlag(int v)
-{
-  this->ScrollbarFlag = v;
-
-  if (this->IsCreated())
-    {
-    this->Script("pack forget %s", this->Scrollbar->GetWidgetName());
-    this->Script("pack forget %s", this->Listbox->GetWidgetName());
-    if (this->ScrollbarFlag)
-      {
-      this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
-      }
-    this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
-    }
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetHeight(int h)
 {
-  this->Script("%s configure -height %d", this->Listbox->GetWidgetName(), h);
+  this->Script("%s configure -height %d", this->GetWidgetName(), h);
 }
 
 //----------------------------------------------------------------------------
@@ -336,16 +277,9 @@ void vtkKWListBox::DeleteAll()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::SetBalloonHelpString(const char *str)
-{
-  this->Listbox->SetBalloonHelpString( str );
-  this->Scrollbar->SetBalloonHelpString( str );
-}
-
-//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionMode(int relief)
 {
-  this->Listbox->SetConfigurationOption(
+  this->SetConfigurationOption(
     "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
 }
 
@@ -353,37 +287,32 @@ void vtkKWListBox::SetSelectionMode(int relief)
 int vtkKWListBox::GetSelectionMode()
 {
   return vtkKWTkOptions::GetSelectionModeFromTkOptionValue(
-    this->Listbox->GetConfigurationOption("-selectmode"));
+    this->GetConfigurationOption("-selectmode"));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetExportSelection(int arg)
 {
-  this->Listbox->SetConfigurationOptionAsInt("-exportselection", arg);
+  this->SetConfigurationOptionAsInt("-exportselection", arg);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetExportSelection()
 {
-  return this->Listbox->GetConfigurationOptionAsInt("-exportselection");
+  return this->GetConfigurationOptionAsInt("-exportselection");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::UpdateEnableState()
 {
-  //  this->Superclass::UpdateEnableState();
+  this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->Scrollbar);
-  this->PropagateEnableState(this->Listbox);
-  if (this->Listbox)
-    {
-    this->Listbox->SetStateOption(this->GetEnabled());
-    }
+  this->SetStateOption(this->GetEnabled());
 }
+
 //----------------------------------------------------------------------------
 void vtkKWListBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << "Listbox " << this->Listbox << endl;
 }
 

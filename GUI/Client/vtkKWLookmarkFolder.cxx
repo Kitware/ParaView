@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.11");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.12");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -214,10 +214,10 @@ void vtkKWLookmarkFolder::EditCallback()
   strcpy(temp,this->LabelFrame->GetLabel()->GetText());
   this->LabelFrame->SetLabelText("");
   this->Script("pack %s", this->NameField->GetWidgetName());
-  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetTextWidget()->GetWidgetName(), strlen(temp));
+  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetWidgetName(), strlen(temp));
   if(this->NameField)
     this->NameField->SetValue(temp);
-  this->NameField->GetTextWidget()->SetBind(this, "<KeyPress-Return>", "ChangeName");
+  this->NameField->SetBind(this, "<KeyPress-Return>", "ChangeName");
 
   delete [] temp;
 }

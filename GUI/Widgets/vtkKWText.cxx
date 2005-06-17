@@ -15,7 +15,6 @@
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWScrollbar.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/list>
@@ -35,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.36");
+vtkCxxRevisionMacro(vtkKWText, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -58,12 +57,9 @@ public:
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
 {
-  this->TextWidget           = NULL;
   this->ValueString          = NULL;
-  this->VerticalScrollBar    = NULL;
   this->EditableText         = 1;
   this->QuickFormatting      = 0;
-  this->UseVerticalScrollbar = 0;
 
   this->Internals = new vtkKWTextInternals;
 }
@@ -71,18 +67,6 @@ vtkKWText::vtkKWText()
 //----------------------------------------------------------------------------
 vtkKWText::~vtkKWText()
 {
-  if (this->TextWidget)
-    {
-    this->TextWidget->Delete();
-    this->TextWidget = NULL;
-    }
-
-  if (this->VerticalScrollBar)
-    {
-    this->VerticalScrollBar->Delete();
-    this->VerticalScrollBar = NULL;
-    }
-
   this->SetValueString(NULL);
 
   // Delete all presets
@@ -103,7 +87,7 @@ char *vtkKWText::GetValue()
     }
 
   const char *val = this->Script("%s get 1.0 {end -1 chars}", 
-                                 this->TextWidget->GetWidgetName());
+                                 this->GetWidgetName());
   this->SetValueString(
     this->ConvertTclStringToInternalString(val));
   return this->GetValueString();
@@ -125,12 +109,12 @@ void vtkKWText::SetValue(const char *s, const char *tag)
 
   // Delete everything
 
-  int state = this->TextWidget->GetStateOption();
-  this->TextWidget->SetStateOption(1);
+  int state = this->GetStateOption();
+  this->SetStateOption(1);
 
-  this->Script("%s delete 1.0 end", this->TextWidget->GetWidgetName());
+  this->Script("%s delete 1.0 end", this->GetWidgetName());
 
-  this->TextWidget->SetStateOption(state);
+  this->SetStateOption(state);
 
   // Append to the end
 
@@ -151,12 +135,12 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
     return;
     }
 
-  int state = this->TextWidget->GetStateOption();
-  this->TextWidget->SetStateOption(1);
+  int state = this->GetStateOption();
+  this->SetStateOption(1);
 
   this->AppendValueInternalTagging(s, tag);
   
-  this->TextWidget->SetStateOption(state);
+  this->SetStateOption(state);
 }
 
 //----------------------------------------------------------------------------
@@ -287,41 +271,27 @@ void vtkKWText::AppendValueInternal(const char *s, const char *tag)
     s, vtkKWWidget::ConvertStringEscapeInterpretable);
 
   this->Script("%s insert end \"%s\" %s", 
-               this->TextWidget->GetWidgetName(),
+               this->GetWidgetName(),
                val ? val : "", tag ? tag : "");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::Create(vtkKWApplication *app)
 {
-  // Check if already created
+  // Call the superclass to set the appropriate flags then create manually
 
-  if (this->IsCreated())
+  if (!this->Superclass::CreateSpecificTkWidget(app, "text"))
     {
-    vtkErrorMacro(<< this->GetClassName() << " already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  // Call the superclass to create the whole widget
-
-  this->Superclass::Create(app);
-
-  // Create the text
-
-  if (!this->TextWidget)
-    {
-    this->TextWidget = vtkKWWidget::New();
-    }
-
-  this->TextWidget->SetParent(this);
-  this->TextWidget->CreateSpecificTkWidget(app, "text");
 
   this->SetWidth(20);
   this->SetWrapToWord();
 
   // Create the default tags
 
-  const char *wname = this->TextWidget->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   vtksys_stl::string font(this->Script("%s cget -font", wname));
 
   char bold_font[512], italic_font[512];
@@ -351,96 +321,9 @@ void vtkKWText::Create(vtkKWApplication *app)
   this->Script("%s tag config %s -foreground #006400", 
                wname, vtkKWText::TagFgDarkGreen);
   
-  // Create the scrollbars
-
-  if (this->UseVerticalScrollbar)
-    {
-    this->CreateVerticalScrollbar(app);
-    }
-
-  // Pack
-
-  this->Pack();
-
   // Update enable state
 
   this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWText::CreateVerticalScrollbar(vtkKWApplication *app)
-{
-  if (!this->VerticalScrollBar)
-    {
-    this->VerticalScrollBar = vtkKWScrollbar::New();
-    }
-
-  if (!this->VerticalScrollBar->IsCreated() && this->IsCreated())
-    {
-    this->VerticalScrollBar->SetParent(this);
-    this->VerticalScrollBar->Create(app);
-    this->VerticalScrollBar->SetOrientationToVertical();
-    if (this->TextWidget && this->TextWidget->IsCreated())
-      {
-      vtksys_stl::string command("{");
-      command += this->TextWidget->GetWidgetName();
-      command += " yview}";
-      this->VerticalScrollBar->SetConfigurationOption(
-        "-command", command.c_str());
-      command = "{";
-      command += this->VerticalScrollBar->GetWidgetName();
-      command += " set}";
-      this->TextWidget->SetConfigurationOption(
-        "-yscrollcommand", command.c_str());
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWText::Pack()
-{
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  this->UnpackChildren();
-
-  ostrstream tk_cmd;
-
-  if (this->TextWidget && this->TextWidget->IsCreated())
-    {
-    tk_cmd << "pack " << this->TextWidget->GetWidgetName() 
-           << " -side left -expand t -fill both" << endl;
-    }
-
-  if (this->UseVerticalScrollbar && 
-      this->VerticalScrollBar && this->VerticalScrollBar->IsCreated())
-    {
-    tk_cmd << "pack " << this->VerticalScrollBar->GetWidgetName() 
-           << " -side right -expand no -fill y -padx 2" << endl;
-    }
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWText::SetUseVerticalScrollbar(int arg)
-{
-  if (this->UseVerticalScrollbar == arg)
-    {
-    return;
-    }
-
-  this->UseVerticalScrollbar = arg;
-  if (this->UseVerticalScrollbar)
-    {
-    this->CreateVerticalScrollbar(this->GetApplication());
-    }
-  this->Pack();
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -459,88 +342,76 @@ void vtkKWText::SetEditableText(int arg)
 //----------------------------------------------------------------------------
 void vtkKWText::SetWidth(int width)
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -width %d", 
-                 this->TextWidget->GetWidgetName(), width);
+                 this->GetWidgetName(), width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWText::GetWidth()
 {
-  if (this->TextWidget)
-    {
-    return this->TextWidget->GetConfigurationOptionAsInt("-width");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetHeight(int height)
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -height %d", 
-                 this->TextWidget->GetWidgetName(), height);
+                 this->GetWidgetName(), height);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWText::GetHeight()
 {
-  if (this->TextWidget)
-    {
-    return this->TextWidget->GetConfigurationOptionAsInt("-height");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToNone()
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
-    this->Script("%s configure -wrap none", this->TextWidget->GetWidgetName());
+    this->Script("%s configure -wrap none", this->GetWidgetName());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToChar()
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
-    this->Script("%s configure -wrap char", this->TextWidget->GetWidgetName());
+    this->Script("%s configure -wrap char", this->GetWidgetName());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToWord()
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
-    this->Script("%s configure -wrap word", this->TextWidget->GetWidgetName());
+    this->Script("%s configure -wrap word", this->GetWidgetName());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetResizeToGrid(int arg)
 {
-  if (this->TextWidget && this->TextWidget->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -setgrid %d", 
-                 this->TextWidget->GetWidgetName(), arg);
+                 this->GetWidgetName(), arg);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWText::GetResizeToGrid()
 {
-  if (this->TextWidget)
-    {
-    return this->TextWidget->GetConfigurationOptionAsInt("-setgrid");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-setgrid");
 }
 
 //----------------------------------------------------------------------------
@@ -548,11 +419,8 @@ void vtkKWText::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->TextWidget)
-    {
-    this->TextWidget->SetStateOption(
-      this->EditableText ? this->GetEnabled() : 0);
-    }
+  this->SetStateOption(
+    this->EditableText ? this->GetEnabled() : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -578,23 +446,4 @@ void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)
      << (this->EditableText ? "On" : "Off") << endl;
   os << indent << "QuickFormatting: " 
      << (this->QuickFormatting ? "On" : "Off") << endl;
-  os << indent << "UseVerticalScrollbar: " 
-     << (this->UseVerticalScrollbar ? "On" : "Off") << endl;
-  os << indent << "TextWidget: ";
-  if (this->TextWidget)
-    {
-    os << this->TextWidget << endl;
-    }
-  else
-    {
-    os << "(None)" << endl;
-    }
-  if (this->VerticalScrollBar)
-    {
-    os << this->VerticalScrollBar << endl;
-    }
-  else
-    {
-    os << "(None)" << endl;
-    }
 }

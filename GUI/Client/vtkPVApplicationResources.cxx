@@ -21,6 +21,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 
@@ -512,8 +513,8 @@ void vtkPVApplication::ConfigureAboutDialog()
     }
   this->Script("pack %s -side bottom",
                this->SaveRuntimeInfoButton->GetWidgetName());
-  this->AboutRuntimeInfo->SetHeight(14);
-  this->AboutRuntimeInfo->GetTextWidget()->SetConfigurationOption(
+  this->AboutRuntimeInfo->GetWidget()->SetHeight(14);
+  this->AboutRuntimeInfo->GetWidget()->SetConfigurationOption(
     "-font", "{Helvetica 9}");
 }
 

@@ -15,44 +15,22 @@
 #include "vtkKWMultiColumnList.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWScrollbar.h"
 
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.5");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
 {
-  this->TableList           = NULL;
-  this->VerticalScrollBar   = NULL;
-  this->HorizontalScrollBar = NULL;
   this->SelectionChangedCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::~vtkKWMultiColumnList()
 {
-  if (this->TableList)
-    {
-    this->TableList->Delete();
-    this->TableList = NULL;
-    }
-
-  if (this->VerticalScrollBar)
-    {
-    this->VerticalScrollBar->Delete();
-    this->VerticalScrollBar = NULL;
-    }
-
-  if (this->HorizontalScrollBar)
-    {
-    this->HorizontalScrollBar->Delete();
-    this->HorizontalScrollBar = NULL;
-    }
-
   if (this->SelectionChangedCommand)
     {
     delete [] this->SelectionChangedCommand;
@@ -63,204 +41,39 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 {
-  // Check if already created
+  this->Script("package require tablelist");
 
-  if (this->IsCreated())
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->Superclass::CreateSpecificTkWidget(app, "tablelist::tablelist"))
     {
-    vtkErrorMacro(<< this->GetClassName() << " already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  // Call the superclass to create the whole widget
-
-  this->Superclass::Create(app);
-
-  this->SetBorderWidth(2);
-  this->SetReliefToSunken();
-
-  // Create the tablelist
-
-  this->Script("package require tablelist");
-
-  if (!this->TableList)
-    {
-    this->TableList = vtkKWWidget::New();
-    }
-
-  this->TableList->SetParent(this);
-  this->TableList->CreateSpecificTkWidget(app, "tablelist::tablelist");
-  this->TableList->SetBorderWidth(0);
-  this->TableList->SetBackgroundColor(0.98, 0.98, 0.98);
+  this->SetBorderWidth(0);
+  this->SetBackgroundColor(0.98, 0.98, 0.98);
 
   this->SetHeight(15);
   this->SetShowSeparators(0);
 
-  this->TableList->SetConfigurationOption(
+  this->SetConfigurationOption(
     "-stretch", "all");
-  this->TableList->SetConfigurationOption(
+  this->SetConfigurationOption(
     "-labelcommand", "tablelist::sortByColumn");
-  this->TableList->SetConfigurationOption(
+  this->SetConfigurationOption(
     "-stripebackground", "#e0e8f0");
-  this->TableList->SetConfigurationOptionAsInt(
+  this->SetConfigurationOptionAsInt(
     "-highlightthickness", 0);
-  this->TableList->SetConfigurationOption(
+  this->SetConfigurationOption(
     "-activestyle", "frame");
 
   this->Script("bind %s <<TablelistSelect>> {+ %s SelectionChangedCallback}",
-               this->TableList->GetWidgetName(), this->GetTclName());
+               this->GetWidgetName(), this->GetTclName());
   
-  // Create the scrollbars
-
-  if (this->UseVerticalScrollbar)
-    {
-    this->CreateVerticalScrollbar(app);
-    }
-
-  if (this->UseHorizontalScrollbar)
-    {
-    this->CreateHorizontalScrollbar(app);
-    }
-
-  // Pack
-
-  this->Pack();
-
   // Update enable state
 
   this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::CreateVerticalScrollbar(vtkKWApplication *app)
-{
-  if (!this->VerticalScrollBar)
-    {
-    this->VerticalScrollBar = vtkKWScrollbar::New();
-    }
-
-  if (!this->VerticalScrollBar->IsCreated())
-    {
-    this->VerticalScrollBar->SetParent(this);
-    this->VerticalScrollBar->Create(app);
-    this->VerticalScrollBar->SetOrientationToVertical();
-    if (this->TableList && this->TableList->IsCreated())
-      {
-      vtksys_stl::string command("{");
-      command += this->TableList->GetWidgetName();
-      command += " yview}";
-      this->VerticalScrollBar->SetConfigurationOption(
-        "-command", command.c_str());
-      command = "{";
-      command += this->VerticalScrollBar->GetWidgetName();
-      command += " set}";
-      this->TableList->SetConfigurationOption(
-        "-yscrollcommand", command.c_str());
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::CreateHorizontalScrollbar(vtkKWApplication *app)
-{
-  if (!this->HorizontalScrollBar)
-    {
-    this->HorizontalScrollBar = vtkKWScrollbar::New();
-    }
-
-  if (!this->HorizontalScrollBar->IsCreated())
-    {
-    this->HorizontalScrollBar->SetParent(this);
-    this->HorizontalScrollBar->Create(app);
-    if (this->TableList && this->TableList->IsCreated())
-      {
-      vtksys_stl::string command("{");
-      command += this->TableList->GetWidgetName();
-      command += " xview}";
-      this->HorizontalScrollBar->SetConfigurationOption(
-        "-command", command.c_str());
-      command = "{";
-      command += this->HorizontalScrollBar->GetWidgetName();
-      command += " set}";
-      this->TableList->SetConfigurationOption(
-        "-xscrollcommand", command.c_str());
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::Pack()
-{
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  this->UnpackChildren();
-
-  ostrstream tk_cmd;
-
-  if (this->TableList && this->TableList->IsCreated())
-    {
-    tk_cmd << "grid " << this->TableList->GetWidgetName() 
-           << " -row 0 -column 0 -sticky news" << endl;
-    }
-
-  if (this->UseVerticalScrollbar && 
-      this->VerticalScrollBar && this->VerticalScrollBar->IsCreated())
-    {
-    tk_cmd << "grid " << this->VerticalScrollBar->GetWidgetName() 
-           << " -row 0 -column 1 -sticky ns" << endl;
-    }
-
-  if (this->UseHorizontalScrollbar && 
-      this->HorizontalScrollBar && this->HorizontalScrollBar->IsCreated())
-    {
-    tk_cmd << "grid " << this->HorizontalScrollBar->GetWidgetName() 
-           << " -row 1 -column 0 -sticky ew" << endl;
-    }
-
-  tk_cmd << "grid rowconfigure " << this->GetWidgetName() << " 0 -weight 1" 
-         << endl;
-  tk_cmd << "grid columnconfigure " << this->GetWidgetName() << " 0 -weight 1" 
-         << endl;
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetUseVerticalScrollbar(int arg)
-{
-  if (this->UseVerticalScrollbar == arg)
-    {
-    return;
-    }
-
-  this->UseVerticalScrollbar = arg;
-  if (this->UseVerticalScrollbar)
-    {
-    this->CreateVerticalScrollbar(this->GetApplication());
-    }
-  this->Pack();
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetUseHorizontalScrollbar(int arg)
-{
-  if (this->UseHorizontalScrollbar == arg)
-    {
-    return;
-    }
-
-  this->UseHorizontalScrollbar = arg;
-  if (this->UseHorizontalScrollbar)
-    {
-    this->CreateHorizontalScrollbar(this->GetApplication());
-    }
-  this->Pack();
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -268,7 +81,7 @@ void vtkKWMultiColumnList::AddColumn(const char *title,
                                      int width, 
                                      int align)
 {
-  if (this->TableList && this->TableList->IsCreated() && title)
+  if (this->IsCreated() && title)
     {
     const char *alignment_opt;
     switch (align)
@@ -286,7 +99,7 @@ void vtkKWMultiColumnList::AddColumn(const char *title,
         alignment_opt = "";
       }
     this->Script("%s insertcolumns end %d {%s} %s", 
-                 this->TableList->GetWidgetName(), 
+                 this->GetWidgetName(), 
                  width, title, alignment_opt);
     }
 }
@@ -294,20 +107,20 @@ void vtkKWMultiColumnList::AddColumn(const char *title,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnWidth(int col_index, int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s columnconfigure %d -width %d", 
-                 this->TableList->GetWidgetName(), col_index, width);
+                 this->GetWidgetName(), col_index, width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetColumnWidth(int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = this->Script("%s columncget %d -width", 
-                                   this->TableList->GetWidgetName(),col_index);
+                                   this->GetWidgetName(),col_index);
     if (val && *val)
       {
       return atoi(val);
@@ -319,20 +132,20 @@ int vtkKWMultiColumnList::GetColumnWidth(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnMaximumWidth(int col_index, int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s columnconfigure %d -maxwidth %d", 
-                 this->TableList->GetWidgetName(), col_index, width);
+                 this->GetWidgetName(), col_index, width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetColumnMaximumWidth(int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = this->Script("%s columncget %d -maxwidth", 
-                                   this->TableList->GetWidgetName(),col_index);
+                                   this->GetWidgetName(),col_index);
     if (val && *val)
       {
       return atoi(val);
@@ -344,20 +157,20 @@ int vtkKWMultiColumnList::GetColumnMaximumWidth(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnResizable(int col_index, int flag)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s columnconfigure %d -resizable %d", 
-                 this->TableList->GetWidgetName(), col_index, flag);
+                 this->GetWidgetName(), col_index, flag);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetColumnResizable(int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = this->Script("%s columncget %d -resizable", 
-                                   this->TableList->GetWidgetName(),col_index);
+                                   this->GetWidgetName(),col_index);
     if (val && *val)
       {
       return atoi(val) ? 1 : 0;
@@ -369,20 +182,20 @@ int vtkKWMultiColumnList::GetColumnResizable(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnEditable(int col_index, int flag)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s columnconfigure %d -editable %d", 
-                 this->TableList->GetWidgetName(), col_index, flag);
+                 this->GetWidgetName(), col_index, flag);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetColumnEditable(int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = this->Script("%s columncget %d -editable", 
-                                   this->TableList->GetWidgetName(),col_index);
+                                   this->GetWidgetName(),col_index);
     if (val && *val)
       {
       return atoi(val) ? 1 : 0;
@@ -394,51 +207,43 @@ int vtkKWMultiColumnList::GetColumnEditable(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetWidth(int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -width %d", 
-                 this->TableList->GetWidgetName(), width);
+                 this->GetWidgetName(), width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetWidth()
 {
-  if (this->TableList)
-    {
-    return this->TableList->GetConfigurationOptionAsInt("-width");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetHeight(int height)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -height %d", 
-                 this->TableList->GetWidgetName(), height);
+                 this->GetWidgetName(), height);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetHeight()
 {
-  if (this->TableList)
-    {
-    return this->TableList->GetConfigurationOptionAsInt("-height");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetEditStartCommand(vtkKWObject* object, 
                                                const char *method)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -editstartcommand {%s %s}", 
-                 this->TableList->GetWidgetName(),
+                 this->GetWidgetName(),
                  object->GetTclName(), method);
     }
 }
@@ -447,10 +252,10 @@ void vtkKWMultiColumnList::SetEditStartCommand(vtkKWObject* object,
 void vtkKWMultiColumnList::SetEditEndCommand(vtkKWObject* object, 
                                              const char *method)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -editendcommand {%s %s}", 
-                 this->TableList->GetWidgetName(),
+                 this->GetWidgetName(),
                  object->GetTclName(), method);
     }
 }
@@ -459,10 +264,10 @@ void vtkKWMultiColumnList::SetEditEndCommand(vtkKWObject* object,
 void vtkKWMultiColumnList::SetLabelCommand(vtkKWObject* object, 
                                              const char *method)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -labelcommand {%s %s}", 
-                 this->TableList->GetWidgetName(),
+                 this->GetWidgetName(),
                  object->GetTclName(), method);
     }
 }
@@ -471,10 +276,10 @@ void vtkKWMultiColumnList::SetLabelCommand(vtkKWObject* object,
 void vtkKWMultiColumnList::SetSortCommand(vtkKWObject* object, 
                                              const char *method)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -sortcommand {%s %s}", 
-                 this->TableList->GetWidgetName(),
+                 this->GetWidgetName(),
                  object->GetTclName(), method);
     }
 }
@@ -482,71 +287,59 @@ void vtkKWMultiColumnList::SetSortCommand(vtkKWObject* object,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetMovableColumns(int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -movablecolumns %d", 
-                 this->TableList->GetWidgetName(), width);
+                 this->GetWidgetName(), width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetMovableColumns()
 {
-  if (this->TableList)
-    {
-    return this->TableList->GetConfigurationOptionAsInt("-movablecolumns");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-movablecolumns");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetResizableColumns(int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -resizablecolumns %d", 
-                 this->TableList->GetWidgetName(), width);
+                 this->GetWidgetName(), width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetResizableColumns()
 {
-  if (this->TableList)
-    {
-    return this->TableList->GetConfigurationOptionAsInt("-resizablecolumns");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-resizablecolumns");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetShowSeparators(int width)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s configure -showseparators %d", 
-                 this->TableList->GetWidgetName(), width);
+                 this->GetWidgetName(), width);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetShowSeparators()
 {
-  if (this->TableList)
-    {
-    return this->TableList->GetConfigurationOptionAsInt("-showseparators");
-    }
-  return 0;
+  return this->GetConfigurationOptionAsInt("-showseparators");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::ConfigureColumnOptions(int col_index, 
                                                   const char *options)
 {
-  if (this->TableList && this->TableList->IsCreated() && options)
+  if (this->IsCreated() && options)
     {
     this->Script("%s columnconfigure %d %s", 
-                 this->TableList->GetWidgetName(), col_index, options);
+                 this->GetWidgetName(), col_index, options);
     }
 }
 
@@ -554,10 +347,10 @@ void vtkKWMultiColumnList::ConfigureColumnOptions(int col_index,
 void vtkKWMultiColumnList::ConfigureRowOptions(int row_index, 
                                                const char *options)
 {
-  if (this->TableList && this->TableList->IsCreated() && options)
+  if (this->IsCreated() && options)
     {
     this->Script("%s rowconfigure %d %s", 
-                 this->TableList->GetWidgetName(), row_index, options);
+                 this->GetWidgetName(), row_index, options);
     }
 }
 
@@ -566,10 +359,10 @@ void vtkKWMultiColumnList::ConfigureCellOptions(int row_index,
                                                 int col_index, 
                                                 const char *options)
 {
-  if (this->TableList && this->TableList->IsCreated() && options)
+  if (this->IsCreated() && options)
     {
     this->Script("%s cellconfigure %d,%d %s", 
-                 this->TableList->GetWidgetName(), 
+                 this->GetWidgetName(), 
                  row_index, col_index, options);
     }
 }
@@ -580,10 +373,10 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
                                                 vtkKWObject* object, 
                                                 const char *method)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s cellconfigure %d,%d -window {%s %s}", 
-                 this->TableList->GetWidgetName(), 
+                 this->GetWidgetName(), 
                  row_index, col_index,
                  object->GetTclName(), method);
     }
@@ -593,7 +386,7 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
 void vtkKWMultiColumnList::InsertCellText(
   int row_index, int col_index, const char *text)
 {
-  if (this->TableList && this->TableList->IsCreated() && text)
+  if (this->IsCreated() && text)
     {
     while (row_index > this->GetNumberOfRows() - 1)
       {
@@ -607,20 +400,20 @@ void vtkKWMultiColumnList::InsertCellText(
 void vtkKWMultiColumnList::SetCellText(
   int row_index, int col_index, const char *text)
 {
-  if (this->TableList && this->TableList->IsCreated() && text)
+  if (this->IsCreated() && text)
     {
     this->Script("%s cellconfigure %d,%d -text {%s}", 
-                 this->TableList->GetWidgetName(), row_index, col_index, text);
+                 this->GetWidgetName(), row_index, col_index, text);
     }
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWMultiColumnList::GetCellText(int row_index, int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     return this->Script("%s cellcget %d,%d -text", 
-                        this->TableList->GetWidgetName(), 
+                        this->GetWidgetName(), 
                         row_index, col_index);
     }
   return NULL;
@@ -630,7 +423,7 @@ const char* vtkKWMultiColumnList::GetCellText(int row_index, int col_index)
 int vtkKWMultiColumnList::FindCellText(
   const char *text, int *row_index, int *col_index)
 {
-  if (this->TableList && this->TableList->IsCreated() && 
+  if (this->IsCreated() && 
       text && row_index && col_index)
     {
     int nb_cols = this->GetNumberOfColumns();
@@ -658,7 +451,7 @@ int vtkKWMultiColumnList::FindCellText(
 int vtkKWMultiColumnList::FindCellTextInColumn(
   int col_index, const char *text, int *row_index)
 {
-  if (this->TableList && this->TableList->IsCreated() && 
+  if (this->IsCreated() && 
       text && row_index)
     {
     int nb_rows = this->GetNumberOfRows();
@@ -680,10 +473,10 @@ int vtkKWMultiColumnList::FindCellTextInColumn(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::EditCellText(int row_index, int col_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s editcell %d,%d", 
-                 this->TableList->GetWidgetName(), 
+                 this->GetWidgetName(), 
                  row_index, col_index);
     }
 }
@@ -691,7 +484,7 @@ void vtkKWMultiColumnList::EditCellText(int row_index, int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InsertRow(int row_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     int nb_cols = this->GetNumberOfColumns();
     if (nb_cols > 0)
@@ -702,7 +495,7 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         item += "\"\" ";
         }
       this->Script("%s insert %d {%s}", 
-                   this->TableList->GetWidgetName(), row_index, item.c_str());
+                   this->GetWidgetName(), row_index, item.c_str());
       }
     }
 }
@@ -716,31 +509,31 @@ void vtkKWMultiColumnList::AddRow()
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::ClearSelection()
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s selection clear 0 end", 
-                 this->TableList->GetWidgetName());
+                 this->GetWidgetName());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectSingleRow(int row_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->ClearSelection();
     this->Script("%s selection set %d %d", 
-                 this->TableList->GetWidgetName(), row_index, row_index);
+                 this->GetWidgetName(), row_index, row_index);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetIndexOfFirstSelectedRow()
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *sel = this->Script("lindex [%s curselection] 0", 
-                                   this->TableList->GetWidgetName());
+                                   this->GetWidgetName());
     if (sel && *sel)
       {
       return atoi(sel);
@@ -769,20 +562,20 @@ void vtkKWMultiColumnList::SelectionChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::ActivateRow(int row_index)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s activate %d", 
-                 this->TableList->GetWidgetName(), row_index);
+                 this->GetWidgetName(), row_index);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetNumberOfRows()
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = 
-      this->Script("%s size", this->TableList->GetWidgetName());
+      this->Script("%s size", this->GetWidgetName());
     if (val && *val)
       {
       return atoi(val);
@@ -795,10 +588,10 @@ int vtkKWMultiColumnList::GetNumberOfRows()
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetNumberOfColumns()
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     const char *val = this->Script("%s columncount", 
-                                   this->TableList->GetWidgetName());
+                                   this->GetWidgetName());
     if (val && *val)
       {
       return atoi(val);
@@ -811,9 +604,9 @@ int vtkKWMultiColumnList::GetNumberOfColumns()
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::DeleteAllRows()
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
-    this->Script("%s delete 0 end", this->TableList->GetWidgetName());
+    this->Script("%s delete 0 end", this->GetWidgetName());
     }
 }
 
@@ -821,57 +614,17 @@ void vtkKWMultiColumnList::DeleteAllRows()
 void vtkKWMultiColumnList::SortByColumn(int col_index, 
                                         int increasing_order)
 {
-  if (this->TableList && this->TableList->IsCreated())
+  if (this->IsCreated())
     {
     this->Script("%s sortbycolumn %d %s", 
-                 this->TableList->GetWidgetName(), 
+                 this->GetWidgetName(), 
                  col_index, 
                  (increasing_order ? "-increasing" : "-decreasing"));
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::UpdateEnableState()
-{
-  this->Superclass::UpdateEnableState();
-
-  this->PropagateEnableState(this->TableList);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "UseVerticalScrollbar: " 
-     << (this->UseVerticalScrollbar ? "On" : "Off") << endl;
-  os << indent << "UseHorizontalScrollbar: " 
-     << (this->UseHorizontalScrollbar ? "On" : "Off") << endl;
-  os << indent << "TableList: ";
-  if (this->TableList)
-    {
-    os << this->TableList << endl;
-    }
-  else
-    {
-    os << "(None)" << endl;
-    }
-  os << indent << "VerticalScrollBar: ";
-  if (this->VerticalScrollBar)
-    {
-    os << this->VerticalScrollBar << endl;
-    }
-  else
-    {
-    os << "(None)" << endl;
-    }
-  os << indent << "HorizontalScrollBar: ";
-  if (this->HorizontalScrollBar)
-    {
-    os << this->HorizontalScrollBar << endl;
-    }
-  else
-    {
-    os << "(None)" << endl;
-    }
 }

@@ -5,7 +5,7 @@ PROJECT(KWWidgets)
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
 SET (KWWidgets_INCLUDE_PATH 
-  "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR}/Templates;${CMAKE_CURRENT_BINARY_DIR}"
   CACHE INTERNAL "include paths for KWWidgets"
   )
 
@@ -155,6 +155,7 @@ SET(KWWidgets_SRCS
   vtkKWWidget.cxx 
   vtkKWWidgetLabeled.cxx 
   vtkKWWidgetSet.cxx 
+  vtkKWWidgetWithScrollbars.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx
@@ -168,6 +169,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx
+  vtkKWWidgetWithScrollbars.cxx 
   ABSTRACT
   )
 
@@ -196,62 +198,84 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 # The "set of widgets" are automatically generated from some core widgets
-# (i.e., CheckButton => vtkKWCheckButtonSet).
+# (i.e., vtkKWCheckButton => vtkKWCheckButtonSet).
 # If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
-    CheckButton 
-    Entry
-    Label
-    LabelLabeled
-    PushButton
-    Scale
+    vtkKWCheckButton 
+    vtkKWEntry
+    vtkKWLabel
+    vtkKWLabelLabeled
+    vtkKWPushButton
+    vtkKWScale
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (
     ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSetSubclass.h.in 
-    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.h IMMEDIATE)
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Set.h IMMEDIATE)
   CONFIGURE_FILE (
     ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSetSubclass.cxx.in 
-    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx IMMEDIATE)
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Set.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
-    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx)
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Set.cxx)
 ENDFOREACH (WidgetType)
 
 # The "labeled widgets" are automatically generated from some core widgets
-# (i.e., CheckButton => vtkKWCheckButtonLabeled)
+# (i.e., vtkKWCheckButton => vtkKWCheckButtonLabeled)
 # If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
-    CheckButton 
-    CheckButtonSet
-    Entry
-    Label
-    LoadSaveButton
-    OptionMenu
-    PopupButton
-    PushButton
-    PushButtonSet
-    Text
-    RadioButtonSet
-    ScaleSet
+    vtkKWCheckButton 
+    vtkKWCheckButtonSet
+    vtkKWEntry
+    vtkKWLabel
+    vtkKWLoadSaveButton
+    vtkKWOptionMenu
+    vtkKWPopupButton
+    vtkKWPushButton
+    vtkKWPushButtonSet
+    vtkKWText
+    vtkKWTextWithScrollbars
+    vtkKWRadioButtonSet
+    vtkKWScaleSet
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (
     ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.h.in 
-    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.h IMMEDIATE)
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.h IMMEDIATE)
   CONFIGURE_FILE (
     ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.cxx.in 
-    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx IMMEDIATE)
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
-    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx)
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.cxx)
+ENDFOREACH (WidgetType)
+
+# The "widgets with scrollbars" are automatically generated from some core
+# widgets
+# (i.e., vtkKWText => vtkKWTextWithScrollbars)
+# If you modify this list, please update the README.txt file accordingly.
+
+FOREACH (WidgetType 
+    vtkKWCanvas
+    vtkKWListBox
+    vtkKWMultiColumnList
+    vtkKWText 
+    )
+  SET (WidgetType ${WidgetType})
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithScrollbarsSubclass.h.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.h IMMEDIATE)
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithScrollbarsSubclass.cxx.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx IMMEDIATE)
+  SET (KWWidgets_SRCS 
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx)
 ENDFOREACH (WidgetType)
 
 # Include dirs
 
 INCLUDE_DIRECTORIES(
-  ${KWWidgets_BINARY_DIR}
-  ${KWWidgets_SOURCE_DIR}
+  ${KWWidgets_INCLUDE_PATH}
   ${VTK_INCLUDE_DIR}
   )
 

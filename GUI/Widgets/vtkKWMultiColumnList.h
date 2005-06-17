@@ -22,25 +22,24 @@
 // text contained in a cell. The header consists of label widgets displaying 
 // the column titles. The labels can be used, among others, for interactive
 // column resizing and column-based sorting of the items.
+// Use vtkKWMultiColumnListWithScrollbars if you need scrollbars.
+// .SECTION See Also
+// vtkKWMultiColumnListWithScrollbars
 
 #ifndef __vtkKWMultiColumnList_h
 #define __vtkKWMultiColumnList_h
 
-#include "vtkKWCompositeWidget.h"
+#include "vtkKWWidget.h"
 
-class vtkKWScrollbar;
-
-class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWWidget
 {
 public:
   static vtkKWMultiColumnList* New();
-  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWCompositeWidget);
+  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the widget.
-  // This will create a frame, inside which a 'tablelist' widget
-  // will be packed. Use GetTableList() to access/configure it.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
@@ -49,18 +48,6 @@ public:
   virtual int GetWidth();
   virtual void SetHeight(int height);
   virtual int GetHeight();
-
-  // Description:
-  // Use vertical scrollbar (default to On).
-  virtual void SetUseVerticalScrollbar(int val);
-  vtkGetMacro(UseVerticalScrollbar, int);
-  vtkBooleanMacro(UseVerticalScrollbar, int);
-
-  // Description:
-  // Use horizontal scrollbar (default to On).
-  virtual void SetUseHorizontalScrollbar(int val);
-  vtkGetMacro(UseHorizontalScrollbar, int);
-  vtkBooleanMacro(UseHorizontalScrollbar, int);
 
   // Description:
   // Add a column at the end.
@@ -275,45 +262,14 @@ public:
   virtual void SetSortCommand(vtkKWObject* object, const char *method);
 
   // Description:
-  // Access the internal 'tablelist' widget and the scrollbars.
-  vtkGetObjectMacro(TableList, vtkKWWidget);
-  vtkGetObjectMacro(VerticalScrollBar, vtkKWScrollbar);
-  vtkGetObjectMacro(HorizontalScrollBar, vtkKWScrollbar);
-
-  // Description:
   // Callbacks
   virtual void SelectionChangedCallback();
-
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
 
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
 
-  vtkKWWidget *TableList;
-  vtkKWScrollbar *VerticalScrollBar;
-  vtkKWScrollbar *HorizontalScrollBar;
-
-  int UseVerticalScrollbar;
-  int UseHorizontalScrollbar;
-
   char  *SelectionChangedCommand;
-
-  // Description:
-  // Create scrollbars
-  virtual void CreateHorizontalScrollbar(vtkKWApplication *app);
-  virtual void CreateVerticalScrollbar(vtkKWApplication *app);
-
-  // Description:
-  // Pack.
-  virtual void Pack();
 
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented

@@ -23,6 +23,7 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.30");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.31");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -45,7 +46,7 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->ButtonFrame = vtkKWFrame::New();
   this->DismissButton = vtkKWPushButton::New();
   
-  this->DisplayText = vtkKWText::New();
+  this->DisplayText = vtkKWTextWithScrollbars::New();
 
   this->ControlFrame = vtkKWFrame::New();
   this->SaveButton = vtkKWPushButton::New();
@@ -136,12 +137,14 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app);
-  this->DisplayText->ResizeToGridOn();
-  this->DisplayText->SetWidth(100);
-  this->DisplayText->SetHeight(40);
-  this->DisplayText->SetWrapToWord();
-  this->DisplayText->EditableTextOff();
-  this->DisplayText->UseVerticalScrollbarOn();
+  this->DisplayText->ShowVerticalScrollbarOn();
+
+  vtkKWText *text = this->DisplayText->GetWidget();
+  text->ResizeToGridOn();
+  text->SetWidth(100);
+  text->SetHeight(40);
+  text->SetWrapToWord();
+  text->EditableTextOff();
 
   this->Script("pack %s -side bottom -expand 1 -fill both",
                this->DisplayText->GetWidgetName());
@@ -341,7 +344,7 @@ void vtkPVTimerLogDisplay::Save(const char *fileName)
 
   // Read back the log from the list.
   this->Update();
-  *fptr << this->DisplayText->GetValue() << endl;
+  *fptr << this->DisplayText->GetWidget()->GetValue() << endl;
 
   fptr->close();
   delete fptr;
@@ -368,13 +371,13 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
       }
     ++str;
     }
-  this->DisplayText->AppendValue(newStr);
-  this->DisplayText->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendValue(newStr);
+  this->DisplayText->GetWidget()->AppendValue("\n");
   delete [] newStr;
 
   // Try to get the scroll bar to initialize properly (show correct portion).
   this->Script("%s yview end", 
-               this->DisplayText->GetTextWidget()->GetWidgetName());
+               this->DisplayText->GetWidget()->GetWidgetName());
   this->Script("update");                   
 }
 
@@ -421,7 +424,7 @@ void vtkPVTimerLogDisplay::DisplayLog()
  
   numLogs = this->TimerInformation->GetNumberOfLogs();
 
-  this->DisplayText->SetValue("");
+  this->DisplayText->GetWidget()->SetValue("");
   for (id = 0; id < numLogs; ++id)
     {
     char* str = this->TimerInformation->GetLog(id);

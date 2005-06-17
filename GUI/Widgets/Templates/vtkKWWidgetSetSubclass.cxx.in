@@ -12,48 +12,48 @@
 
 =========================================================================*/
 
-#include "vtkKW@WidgetType@Set.h"
+#include "@WidgetType@Set.h"
 
-#include "vtkKW@WidgetType@.h"
+#include "@WidgetType@.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 
-vtkStandardNewMacro(vtkKW@WidgetType@Set);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Set, "1.3");
+vtkStandardNewMacro(@WidgetType@Set);
+vtkCxxRevisionMacro(@WidgetType@Set, "1.4");
 
-int vtkKW@WidgetType@SetCommand(ClientData cd, Tcl_Interp *interp,
+int @WidgetType@SetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@Set::vtkKW@WidgetType@Set()
+@WidgetType@Set::@WidgetType@Set()
 {
-  this->CommandFunction = vtkKW@WidgetType@SetCommand;
+  this->CommandFunction = @WidgetType@SetCommand;
 }
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@* vtkKW@WidgetType@Set::GetWidget(int id)
+@WidgetType@* @WidgetType@Set::GetWidget(int id)
 {
-  return static_cast<vtkKW@WidgetType@*>(this->GetWidgetInternal(id));
+  return static_cast<@WidgetType@*>(this->GetWidgetInternal(id));
 }
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@* vtkKW@WidgetType@Set::AddWidget(int id)
+@WidgetType@* @WidgetType@Set::AddWidget(int id)
 {
-  return static_cast<vtkKW@WidgetType@*>(this->AddWidgetInternal(id));
+  return static_cast<@WidgetType@*>(this->AddWidgetInternal(id));
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKW@WidgetType@Set::AllocateAndCreateWidget()
+vtkKWWidget* @WidgetType@Set::AllocateAndCreateWidget()
 {
-  vtkKW@WidgetType@ *widget = vtkKW@WidgetType@::New();
+  @WidgetType@ *widget = @WidgetType@::New();
   widget->SetParent(this);
   widget->Create(this->GetApplication());
   return static_cast<vtkKWWidget*>(widget);
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Set::PrintSelf(ostream& os, vtkIndent indent)
+void @WidgetType@Set::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

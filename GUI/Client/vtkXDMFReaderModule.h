@@ -35,7 +35,7 @@
 #include "vtkPVAdvancedReaderModule.h"
 
 class vtkKWOptionMenu;
-class vtkKWListBox;
+class vtkKWListBoxWithScrollbars;
 class vtkXDMFReaderModuleInternal;
 class vtkKWFrameLabeled;
 
@@ -79,7 +79,7 @@ protected:
 
   vtkKWFrameLabeled *DomainGridFrame;
   vtkKWOptionMenu *DomainMenu;
-  vtkKWListBox* GridSelection;
+  vtkKWListBoxWithScrollbars* GridSelection;
 
   char *Domain;
   vtkXDMFReaderModuleInternal* Internals;

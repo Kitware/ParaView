@@ -15,33 +15,28 @@
 // .SECTION Description
 // A simple widget used for collecting keyboard input from the user. This
 // widget provides support for multi-line input.
+// Use vtkKWTextWithScrollbars if you need scrollbars.
+// .SECTION See Also
+// vtkKWTextWithScrollbars
 
 #ifndef __vtkKWText_h
 #define __vtkKWText_h
 
-#include "vtkKWCompositeWidget.h"
+#include "vtkKWWidget.h"
 
 class vtkKWApplication;
 class vtkKWTextInternals;
-class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWText : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWText : public vtkKWWidget
 {
 public:
   static vtkKWText* New();
-  vtkTypeRevisionMacro(vtkKWText,vtkKWCompositeWidget);
+  vtkTypeRevisionMacro(vtkKWText,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the widget.
-  // This will create a frame, inside which a 'text' Tk widget
-  // will be packed. Use GetTextWidget() to access/configure it.
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // Access the internal 'text' Tk widget and the scrollbar.
-  vtkGetObjectMacro(TextWidget, vtkKWWidget);
-  vtkGetObjectMacro(VerticalScrollBar, vtkKWScrollbar);
 
   // Description:
   // Set/Get the value of the text. AppendValue() is a convenience function
@@ -68,12 +63,6 @@ public:
   vtkSetMacro(QuickFormatting, int);
   vtkGetMacro(QuickFormatting, int);
   vtkBooleanMacro(QuickFormatting, int);
-
-  // Description:
-  // Use vertical scrollbar.
-  virtual void SetUseVerticalScrollbar(int val);
-  vtkGetMacro(UseVerticalScrollbar, int);
-  vtkBooleanMacro(UseVerticalScrollbar, int);
 
   // Description:
   // Convenience method to set the width/height.
@@ -141,24 +130,11 @@ protected:
   vtkGetStringMacro(ValueString);
   vtkSetStringMacro(ValueString);
 
-  vtkKWWidget *TextWidget;
-  vtkKWScrollbar *VerticalScrollBar;
-
   int EditableText;
   int QuickFormatting;
-  int UseVerticalScrollbar;
-
-  // Description:
-  // Create horizontal scrollbar
-  virtual void CreateVerticalScrollbar(vtkKWApplication *app);
-
-  // Description:
-  // Pack.
-  virtual void Pack();
 
   //BTX
   // PIMPL Encapsulation for STL containers
-
   vtkKWTextInternals *Internals;
   //ETX
 

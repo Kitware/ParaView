@@ -54,6 +54,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -110,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.30");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.31");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -418,23 +419,24 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
 
   if (!this->QuickStartGuideTxt)
     {
-    this->QuickStartGuideTxt = vtkKWText::New();
+    this->QuickStartGuideTxt = vtkKWTextWithScrollbars::New();
     }
 
   if (!this->QuickStartGuideTxt->IsCreated())
     {
     this->QuickStartGuideTxt->SetParent(this->QuickStartGuideDialog->GetBottomFrame());
     this->QuickStartGuideTxt->Create(app);
-    this->QuickStartGuideTxt->ResizeToGridOn();
-    this->QuickStartGuideTxt->SetWidth(60);
-    this->QuickStartGuideTxt->SetHeight(20);
-    this->QuickStartGuideTxt->SetWrapToWord();
-    this->QuickStartGuideTxt->EditableTextOff();
-    this->QuickStartGuideTxt->UseVerticalScrollbarOn();
+    this->QuickStartGuideTxt->ShowVerticalScrollbarOn();
+
+    vtkKWText *text = this->QuickStartGuideTxt->GetWidget();
+    text->ResizeToGridOn();
+    text->SetWidth(60);
+    text->SetHeight(20);
+    text->SetWrapToWord();
+    text->EditableTextOff();
     double r, g, b;
-    this->QuickStartGuideTxt->GetTextWidget()->GetParent()
-      ->GetBackgroundColor(&r, &g, &b);
-    this->QuickStartGuideTxt->GetTextWidget()->SetBackgroundColor(r, g, b);
+    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    text->SetBackgroundColor(r, g, b);
     }
 
   this->Script("pack %s -side left -padx 2 -expand 1 -fill both",
@@ -467,7 +469,7 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
   str << "- Save and import lookmarks to and from disk." << endl << endl;
   str << "- Apply a lookmark to a dataset different from the one with which it was created." << endl << endl;
   str << ends;
-  this->QuickStartGuideTxt->SetValue( str.str() );
+  this->QuickStartGuideTxt->GetWidget()->SetValue( str.str() );
   str.rdbuf()->freeze(0);
 }
 
@@ -503,22 +505,23 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
 
   if (!this->UsersTutorialTxt)
     {
-    this->UsersTutorialTxt = vtkKWText::New();
+    this->UsersTutorialTxt = vtkKWTextWithScrollbars::New();
     }
   if (!this->UsersTutorialTxt->IsCreated())
     {
     this->UsersTutorialTxt->SetParent(this->UsersTutorialDialog->GetBottomFrame());
     this->UsersTutorialTxt->Create(app);
-    this->UsersTutorialTxt->ResizeToGridOn();
-    this->UsersTutorialTxt->SetWidth(60);
-    this->UsersTutorialTxt->SetHeight(20);
-    this->UsersTutorialTxt->SetWrapToWord();
-    this->UsersTutorialTxt->EditableTextOff();
-    this->UsersTutorialTxt->UseVerticalScrollbarOn();
+    this->UsersTutorialTxt->ShowVerticalScrollbarOn();
+
+    vtkKWText *text = this->QuickStartGuideTxt->GetWidget();
+    text->ResizeToGridOn();
+    text->SetWidth(60);
+    text->SetHeight(20);
+    text->SetWrapToWord();
+    text->EditableTextOff();
     double r, g, b;
-    this->UsersTutorialTxt->GetTextWidget()->GetParent()
-      ->GetBackgroundColor(&r, &g, &b);
-    this->UsersTutorialTxt->GetTextWidget()->SetBackgroundColor(r, g, b);
+    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    text->SetBackgroundColor(r, g, b);
     }
 
   this->Script("pack %s -side left -padx 2 -expand 1 -fill both",
@@ -558,7 +561,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "Expand/collapse lookmarks, folders, and the comments field - The frames that encapsulate lookmarks, folders, and the comments field can be expanded or collapsed by clicking on the \"x\" or the \"v\", respectively, in the upper right hand corner of the frame. " << endl << endl;
   str << "Undo a change to the Lookmark Manager - Press \"Edit\" >> \"Undo\". This will return the Lookmark Manager's contents to its state before the previous action was performed." << endl << endl;
   str << ends;
-  this->UsersTutorialTxt->SetValue( str.str() );
+  this->UsersTutorialTxt->GetWidget()->SetValue( str.str() );
   str.rdbuf()->freeze(0);
 }
 

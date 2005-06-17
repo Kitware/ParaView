@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.4");
 
 int vtkPVExtractDataSetsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -114,7 +114,6 @@ void vtkPVExtractDataSetsWidget::Create(vtkKWApplication *app)
   this->PartSelectionList->SetParent(this);
   this->PartSelectionList->Create(app);
   this->PartSelectionList->SetSingleClickCallback(this, "PartSelectionCallback");
-  this->PartSelectionList->ScrollbarOff();
   this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->ExportSelectionOff();
   this->PartSelectionList->SetHeight(0);

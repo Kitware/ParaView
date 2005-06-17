@@ -26,6 +26,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkTclUtil.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWToolbar.h"
@@ -65,7 +66,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.232");
+vtkCxxRevisionMacro(vtkKWApplication, "1.233");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
@@ -999,22 +1000,25 @@ void vtkKWApplication::ConfigureAboutDialog()
 
   if (!this->AboutRuntimeInfo)
     {
-    this->AboutRuntimeInfo = vtkKWText::New();
+    this->AboutRuntimeInfo = vtkKWTextWithScrollbars::New();
     }
   if (!this->AboutRuntimeInfo->IsCreated())
     {
     this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
     this->AboutRuntimeInfo->Create(this);
-    this->AboutRuntimeInfo->ResizeToGridOn();
-    this->AboutRuntimeInfo->SetWidth(60);
-    this->AboutRuntimeInfo->SetHeight(8);
-    this->AboutRuntimeInfo->SetWrapToWord();
-    this->AboutRuntimeInfo->EditableTextOff();
-    this->AboutRuntimeInfo->UseVerticalScrollbarOn();
+    this->AboutRuntimeInfo->ShowVerticalScrollbarOn();
+    this->AboutRuntimeInfo->ShowHorizontalScrollbarOff();
+
+    vtkKWText *text = this->AboutRuntimeInfo->GetWidget();
+    text->ResizeToGridOn();
+    text->SetWidth(60);
+    text->SetHeight(8);
+    text->SetWrapToWord();
+    text->EditableTextOff();
+
     double r, g, b;
-    this->AboutRuntimeInfo->GetTextWidget()->GetParent()
-      ->GetBackgroundColor(&r, &g, &b);
-    this->AboutRuntimeInfo->GetTextWidget()->SetBackgroundColor(r, g, b);
+    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    text->SetBackgroundColor(r, g, b);
     this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
                  this->AboutRuntimeInfo->GetWidgetName());
     }
@@ -1029,7 +1033,7 @@ void vtkKWApplication::ConfigureAboutDialog()
   str << endl;
   this->AddAboutCopyrights(str);
   str << ends;
-  this->AboutRuntimeInfo->SetValue( str.str() );
+  this->AboutRuntimeInfo->GetWidget()->SetValue( str.str() );
   str.rdbuf()->freeze(0);
 }
 

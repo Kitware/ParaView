@@ -51,7 +51,7 @@ class vtkRenderWindow;
 class vtkKWMenu;
 class vtkKWMessageDialog;
 class vtkKWWindow;
-class vtkKWText;
+class vtkKWTextWithScrollbars;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -273,9 +273,9 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWPushButton *CreateLmkButton;
 
   vtkKWMessageDialog *QuickStartGuideDialog;
-  vtkKWText *QuickStartGuideTxt;
+  vtkKWTextWithScrollbars *QuickStartGuideTxt;
   vtkKWMessageDialog *UsersTutorialDialog;
-  vtkKWText *UsersTutorialTxt;
+  vtkKWTextWithScrollbars *UsersTutorialTxt;
 };
 
 #endif

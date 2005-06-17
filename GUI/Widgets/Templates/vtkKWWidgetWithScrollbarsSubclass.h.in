@@ -1,0 +1,79 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetWithScrollbarsSubclass.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME @WidgetType@WithScrollbars - a @WidgetType@ associated to two vtkKWScrollbar's
+// .SECTION Description
+// This composite widget provides horizontal and vertical scrolling
+// capabilities to a core widget. They can be enabled or disabled separately.
+// As a subclass of vtkKWWidgetWithScrollbars, it inherits methods to
+// retrieve the scrollbars and set their visibility and layout.
+// .SECTION See Also
+// vtkKWWidgetWithScrollbars @WidgetType@
+
+#ifndef __@WidgetType@WithScrollbars_h
+#define __@WidgetType@WithScrollbars_h
+
+#include "vtkKWWidgetWithScrollbars.h"
+
+class vtkKWScrollbar;
+class @WidgetType@;
+
+class KWWIDGETS_EXPORT @WidgetType@WithScrollbars : public vtkKWWidgetWithScrollbars
+{
+public:
+  static @WidgetType@WithScrollbars* New();
+  vtkTypeRevisionMacro(@WidgetType@WithScrollbars,vtkKWWidgetWithScrollbars);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Get the @WidgetType@ for which we addded the scrollbars
+  virtual @WidgetType@* GetWidget();
+  
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
+protected:
+  @WidgetType@WithScrollbars();
+  ~@WidgetType@WithScrollbars();
+
+  // Description:
+  // Internal widget
+  @WidgetType@ *Widget;
+
+  // Description:
+  // Create scrollbars and associate the scrollbars to a widget by
+  // setting up the callbacks between both instances.
+  // Re-implemented to set the associated now that we know the internal widget
+  virtual void CreateHorizontalScrollbar(vtkKWApplication *app);
+  virtual void CreateVerticalScrollbar(vtkKWApplication *app);
+
+  // Description:
+  // Pack.
+  virtual void Pack();
+
+private:
+  @WidgetType@WithScrollbars(const @WidgetType@WithScrollbars&); // Not implemented
+  void operator=(const @WidgetType@WithScrollbars&); // Not implemented
+};
+
+#endif

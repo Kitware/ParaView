@@ -11,30 +11,30 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKW@WidgetType@Labeled - a vtkKW@WidgetType@ associated to a vtkKWLabel
+// .NAME @WidgetType@Labeled - a @WidgetType@ associated to a vtkKWLabel
 // .SECTION Description
-// This class creates a composite widget associating a vtkKW@WidgetType@ to a
+// This class creates a composite widget associating a @WidgetType@ to a
 // vtkKWLabel.
 // As a subclass of vtkKWWidgetLabeled, it inherits a label and methods to
 // set its position and visibility. Note that the default label position 
-// implemented in this class is on the left of the vtkKW@WidgetType@, but 
+// implemented in this class is on the left of the @WidgetType@, but 
 // specific positions listed in vtkKWWidgetLabeled are supported as well.
 // .SECTION See Also
-// vtkKWWidgetLabeled
+// vtkKWWidgetLabeled @WidgetType@
 
-#ifndef __vtkKW@WidgetType@Labeled_h
-#define __vtkKW@WidgetType@Labeled_h
+#ifndef __@WidgetType@Labeled_h
+#define __@WidgetType@Labeled_h
 
 #include "vtkKWWidgetLabeled.h"
 
 class vtkKWApplication;
-class vtkKW@WidgetType@;
+class @WidgetType@;
 
-class KWWIDGETS_EXPORT vtkKW@WidgetType@Labeled : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT @WidgetType@Labeled : public vtkKWWidgetLabeled
 {
 public:
-  static vtkKW@WidgetType@Labeled* New();
-  vtkTypeRevisionMacro(vtkKW@WidgetType@Labeled, vtkKWWidgetLabeled);
+  static @WidgetType@Labeled* New();
+  vtkTypeRevisionMacro(@WidgetType@Labeled, vtkKWWidgetLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -42,8 +42,8 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Get the vtkKW@WidgetType@ that is being labeled
-  virtual vtkKW@WidgetType@* GetWidget();
+  // Get the @WidgetType@ that is being labeled
+  virtual @WidgetType@* GetWidget();
   
   // Description:
   // Set the layout to allow the widget that is labeled to expand
@@ -67,8 +67,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKW@WidgetType@Labeled();
-  ~vtkKW@WidgetType@Labeled();
+  @WidgetType@Labeled();
+  ~@WidgetType@Labeled();
 
   // Description:
   // Expand the widget that is being labeled
@@ -80,12 +80,12 @@ protected:
 
   // Description:
   // Internal widget
-  vtkKW@WidgetType@ *Widget;
+  @WidgetType@ *Widget;
 
 private:
 
-  vtkKW@WidgetType@Labeled(const vtkKW@WidgetType@Labeled&); // Not implemented
-  void operator=(const vtkKW@WidgetType@Labeled&); // Not implemented
+  @WidgetType@Labeled(const @WidgetType@Labeled&); // Not implemented
+  void operator=(const @WidgetType@Labeled&); // Not implemented
 };
 
 #endif

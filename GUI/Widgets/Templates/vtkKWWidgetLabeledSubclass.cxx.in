@@ -12,29 +12,29 @@
 
 =========================================================================*/
 
-#include "vtkKW@WidgetType@Labeled.h"
+#include "@WidgetType@Labeled.h"
 
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
-#include "vtkKW@WidgetType@.h"
+#include "@WidgetType@.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKW@WidgetType@Labeled);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.4");
+vtkStandardNewMacro(@WidgetType@Labeled);
+vtkCxxRevisionMacro(@WidgetType@Labeled, "1.5");
 
-int vtkKW@WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
+int @WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@Labeled::vtkKW@WidgetType@Labeled()
+@WidgetType@Labeled::@WidgetType@Labeled()
 {
-  this->CommandFunction = vtkKW@WidgetType@LabeledCommand;
+  this->CommandFunction = @WidgetType@LabeledCommand;
   this->ExpandWidget    = 1;
-  this->Widget          = vtkKW@WidgetType@::New();
+  this->Widget          = @WidgetType@::New();
 }
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@Labeled::~vtkKW@WidgetType@Labeled()
+@WidgetType@Labeled::~@WidgetType@Labeled()
 {
   if (this->Widget)
     {
@@ -44,19 +44,19 @@ vtkKW@WidgetType@Labeled::~vtkKW@WidgetType@Labeled()
 }
 
 //----------------------------------------------------------------------------
-vtkKW@WidgetType@* vtkKW@WidgetType@Labeled::GetWidget()
+@WidgetType@* @WidgetType@Labeled::GetWidget()
 {
   return this->Widget;
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app)
+void @WidgetType@Labeled::Create(vtkKWApplication *app)
 {
   // Check if already created
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("vtkKW@WidgetType@Labeled already created");
+    vtkErrorMacro("@WidgetType@Labeled already created");
     return;
     }
 
@@ -79,7 +79,7 @@ void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::Pack()
+void @WidgetType@Labeled::Pack()
 {
   if (!this->IsCreated())
     {
@@ -135,7 +135,7 @@ void vtkKW@WidgetType@Labeled::Pack()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::SetExpandWidget(int _arg)
+void @WidgetType@Labeled::SetExpandWidget(int _arg)
 {
   if (this->ExpandWidget == _arg)
     {
@@ -150,7 +150,7 @@ void vtkKW@WidgetType@Labeled::SetExpandWidget(int _arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::UpdateEnableState()
+void @WidgetType@Labeled::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
   
@@ -158,7 +158,7 @@ void vtkKW@WidgetType@Labeled::UpdateEnableState()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::SetBalloonHelpString(const char *string)
+void @WidgetType@Labeled::SetBalloonHelpString(const char *string)
 {
   this->Superclass::SetBalloonHelpString(string);
 
@@ -169,7 +169,7 @@ void vtkKW@WidgetType@Labeled::SetBalloonHelpString(const char *string)
 }
 
 //----------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::PrintSelf(ostream& os, vtkIndent indent)
+void @WidgetType@Labeled::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

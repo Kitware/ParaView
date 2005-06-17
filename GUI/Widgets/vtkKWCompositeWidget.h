@@ -15,19 +15,20 @@
 // .SECTION Description
 // A superclass for all composite widgets, i.e. widgets made of
 // an assembly of sub-widgets.
-// This superclass provides the container for the sub-widgets, by
-// subclassing from a vtkKWFrame.
+// This superclass provides the container for the sub-widgets.
+// Right now, it can be safely assumed to be a frame (similar to a
+// vtkKWFrame).
 
 #ifndef __vtkKWCompositeWidget_h
 #define __vtkKWCompositeWidget_h
 
-#include "vtkKWFrame.h"
+#include "vtkKWWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWCompositeWidget : public vtkKWFrame
+class KWWIDGETS_EXPORT vtkKWCompositeWidget : public vtkKWWidget
 {
 public:
   static vtkKWCompositeWidget* New();
-  vtkTypeRevisionMacro(vtkKWCompositeWidget, vtkKWFrame);
+  vtkTypeRevisionMacro(vtkKWCompositeWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

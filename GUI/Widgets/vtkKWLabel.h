@@ -120,8 +120,4 @@ private:
   void operator=(const vtkKWLabel&); // Not implemented
 };
 
-
 #endif
-
-
-

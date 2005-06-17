@@ -23,8 +23,9 @@
 #include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
-class vtkKWListBox;
+class vtkKWListBoxWithScrollbars;
 class vtkKWPushButton;
+class vtkKWListBox;
 
 class KWWIDGETS_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWCompositeWidget
 {
@@ -98,8 +99,8 @@ protected:
   vtkKWListBoxToListBoxSelectionEditor();
   ~vtkKWListBoxToListBoxSelectionEditor();
 
-  vtkKWListBox* SourceList;
-  vtkKWListBox* FinalList;
+  vtkKWListBoxWithScrollbars* SourceList;
+  vtkKWListBoxWithScrollbars* FinalList;
 
   vtkKWPushButton* AddButton;
   vtkKWPushButton* AddAllButton;

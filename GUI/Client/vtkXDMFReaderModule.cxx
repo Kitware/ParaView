@@ -27,6 +27,7 @@
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkKWListBox.h"
+#include "vtkKWListBoxWithScrollbars.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVTraceHelper.h"
@@ -37,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.36");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.37");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -149,12 +150,15 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainMenu->Create(pvApp);
     this->UpdateDomains();
 
-    this->GridSelection = vtkKWListBox::New();
+    this->GridSelection = vtkKWListBoxWithScrollbars::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
-    this->GridSelection->ScrollbarOn();
+    this->GridSelection->ShowVerticalScrollbarOn();
+    this->GridSelection->ShowHorizontalScrollbarOff();
     this->GridSelection->Create(pvApp);
-    this->GridSelection->SetSelectionModeToExtended();
-    this->GridSelection->SetHeight(0);
+
+    this->GridSelection->GetWidget()->SetSelectionModeToExtended();
+    this->GridSelection->GetWidget()->SetHeight(0);
+
     this->UpdateGrids();
 
 
@@ -169,7 +173,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
       {
       this->Script("pack %s -expand yes -fill x -side top -pady 2", 
         this->DomainGridFrame->GetWidgetName());
-      if ( this->GridSelection->GetNumberOfItems() > 1 )
+      if ( this->GridSelection->GetWidget()->GetNumberOfItems() > 1 )
         {
         vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
         selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
@@ -192,11 +196,11 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     if ( dlg->Invoke() )
       {
       this->SetDomain(this->DomainMenu->GetValue());
-      for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+      for ( cc = 0; cc < this->GridSelection->GetWidget()->GetNumberOfItems(); cc ++ )
         {
-        if ( this->GridSelection->GetSelectState(cc) )
+        if ( this->GridSelection->GetWidget()->GetSelectState(cc) )
           {
-          this->Internals->GridList[this->GridSelection->GetItem(cc)] = 1;
+          this->Internals->GridList[this->GridSelection->GetWidget()->GetItem(cc)] = 1;
           }
         }
       }
@@ -304,7 +308,7 @@ void vtkXDMFReaderModule::UpdateGrids()
     }
 
   // Fill the grid selection list with all the grid names.
-  this->GridSelection->DeleteAll();
+  this->GridSelection->GetWidget()->DeleteAll();
   for(int i = 0; i < numGrids; ++i)
     {
     stream << vtkClientServerStream::Invoke
@@ -314,7 +318,7 @@ void vtkXDMFReaderModule::UpdateGrids()
     const char* gname;
     if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &gname))
       {
-      this->GridSelection->InsertEntry(i, gname);
+      this->GridSelection->GetWidget()->InsertEntry(i, gname);
       }
     else
       {
@@ -323,16 +327,17 @@ void vtkXDMFReaderModule::UpdateGrids()
     }
 
   // Set the default selection and enable the scrollbar if necessary.
-  this->GridSelection->SetSelectState(0, 1);
-  if ( this->GridSelection->GetNumberOfItems() < 6 )
+  this->GridSelection->GetWidget()->SetSelectState(0, 1);
+  if ( this->GridSelection->GetWidget()->GetNumberOfItems() < 6 )
     {
-    this->GridSelection->SetHeight(this->GridSelection->GetNumberOfItems());
-    this->GridSelection->ScrollbarOff();
+    this->GridSelection->GetWidget()->SetHeight(
+      this->GridSelection->GetWidget()->GetNumberOfItems());
+    this->GridSelection->ShowVerticalScrollbarOff();
     }
   else
     {
-    this->GridSelection->SetHeight(6);
-    this->GridSelection->ScrollbarOn();
+    this->GridSelection->GetWidget()->SetHeight(6);
+    this->GridSelection->ShowVerticalScrollbarOn();
     }
 }
 
@@ -437,9 +442,9 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
 void vtkXDMFReaderModule::EnableAllGrids()
 {
   int cc;
-  for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+  for ( cc = 0; cc < this->GridSelection->GetWidget()->GetNumberOfItems(); cc ++ )
     {
-    this->GridSelection->SetSelectState(cc, 1);
+    this->GridSelection->GetWidget()->SetSelectState(cc, 1);
     }
 }
 

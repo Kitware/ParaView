@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.34");
 
 class vtkPVSourceVectorInternals
 {
@@ -82,7 +82,6 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   this->PartSelectionList->SetParent(this);
-  this->PartSelectionList->ScrollbarOff();
   this->PartSelectionList->Create(app);
   this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->SetHeight(0);

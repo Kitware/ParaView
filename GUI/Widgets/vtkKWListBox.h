@@ -13,26 +13,27 @@
 =========================================================================*/
 // .NAME vtkKWListBox - List Box
 // .SECTION Description
-// A widget that can have a list of items with a scroll bar. 
-// It uses a scrollbar (yscroll only) and listbox
+// A widget that can have a list of items. 
+// Use vtkKWListBoxWithScrollbars if you need scrollbars.
 // You can configure it into: single, browse, multiple, or extended
 // Another important configuration option is: -exportselection 0
 // Therefore it does not collide with let say tk_getSaveFile 
 // selection
+// .SECTION See Also
+// vtkKWListBoxWithScrollbars
 
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h
 
-#include "vtkKWCompositeWidget.h"
+#include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWWidget
 {
 public:
   static vtkKWListBox* New();
-  vtkTypeRevisionMacro(vtkKWListBox,vtkKWCompositeWidget);
+  vtkTypeRevisionMacro(vtkKWListBox,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -124,20 +125,6 @@ public:
   virtual void SetHeight(int);
 
   // Description:
-  // Setting this string enables balloon help for this widget.
-  // Override to pass down to children for cleaner behavior
-  virtual void SetBalloonHelpString(const char *str);
-    
-  // Description:
-  // Specify whether you want a scrollbar (default on) before you call Create.
-  virtual void ScrollbarOn() { this->SetScrollbarFlag(1); }
-  virtual void ScrollbarOff() { this->SetScrollbarFlag(0); }
-
-  // Description:
-  // Get the listbox widget.
-  vtkGetObjectMacro(Listbox, vtkKWWidget);
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -149,14 +136,9 @@ public:
 protected:
   vtkKWListBox();
   ~vtkKWListBox();
+
   char* CurrentSelection;       // store last call of CurrentSelection
   char* Item;                   // store last call of GetItem
-  
-  vtkKWScrollbar *Scrollbar;
-  vtkKWWidget *Listbox;
-  int ScrollbarFlag;
-
-  virtual void SetScrollbarFlag(int v);
   
 private:
   vtkKWListBox(const vtkKWListBox&); // Not implemented

@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for KWWidgets
-# modified by S. Barre (Time-stamp: <2005-06-16 17:28:42 barre>
+# modified by S. Barre (Time-stamp: <2005-06-17 15:14:31 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = KWWidgets
@@ -38,6 +38,7 @@ OUTPUT_DIRECTORY     = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/doc"
 
 INPUT                = \
  "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox" \
+ "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/Templates" \
  "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/doc_KWWidgets_index.dox" 
 
 TAGFILES             = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"

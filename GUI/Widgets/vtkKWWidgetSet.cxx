@@ -21,8 +21,7 @@
 #include <vtksys/stl/list>
 
 //----------------------------------------------------------------------------
-
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.8");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.9");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
