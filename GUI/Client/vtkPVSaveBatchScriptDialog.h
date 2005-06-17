@@ -19,7 +19,7 @@
 #ifndef __vtkPVSaveBatchScriptDialog_h
 #define __vtkPVSaveBatchScriptDialog_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWDialog.h"
 
 class vtkKWApplication;
 class vtkKWPushButton;
@@ -31,11 +31,11 @@ class vtkKWCheckButton;
 class vtkPVApplication;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkPVSaveBatchScriptDialog : public vtkKWWidget
+class VTK_EXPORT vtkPVSaveBatchScriptDialog : public vtkKWDialog
 {
 public:
   static vtkPVSaveBatchScriptDialog* New();
-  vtkTypeRevisionMacro(vtkPVSaveBatchScriptDialog, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVSaveBatchScriptDialog, vtkKWDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -43,35 +43,15 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
-  // Display the interactor
-  int Invoke();
-
-  // Description:
   // Access to the results of the dialog.
   int GetOffScreen();
   const char* GetImagesFileName();
   const char* GetGeometryFileName();
 
   // Description:
-  // Set the title of the TclInteractor to appear in the titlebar
-  vtkSetStringMacro(Title);
-  
-  // Description:
-  // Set the window to which the dialog will be slave.
-  // If set, this dialog will always be on top of the master
-  // window and will minimize with it (assuming that the windowing
-  // system supports this)
-  void SetMasterWindow(vtkKWWindow* win);
-  
-  // Description:
   // Path and root to use as default file names.
   vtkSetStringMacro(FilePath);
   vtkSetStringMacro(FileRoot);
-
-  // Description:
-  // Callback from the accept/dismiss button that closes the window.
-  void Accept();
-  void Cancel();
 
   // Description:
   // Callback used by widgets.
@@ -91,8 +71,6 @@ protected:
   char* FilePath;
   char* FileRoot;
   
-  vtkKWWindow*      MasterWindow;
-
   vtkKWCheckButton* OffScreenCheck;
 
   vtkKWCheckButton* SaveImagesCheck;
@@ -108,11 +86,7 @@ protected:
   vtkKWFrame*      ButtonFrame;
   vtkKWPushButton*  AcceptButton;
   vtkKWPushButton*  CancelButton;
-  int               AcceptedFlag;
-  int               Exit;
     
-  char*   Title;
-
 private:
   vtkPVSaveBatchScriptDialog(const vtkPVSaveBatchScriptDialog&); // Not implemented
   void operator=(const vtkPVSaveBatchScriptDialog&); // Not implemented

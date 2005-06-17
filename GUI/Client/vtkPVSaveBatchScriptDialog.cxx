@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.17");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.18");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -59,13 +59,7 @@ vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
   this->GeometryFileNameEntry = vtkKWEntry::New();
   this->GeometryFileNameBrowseButton = vtkKWPushButton::New();
 
-  this->Title = NULL;
   this->SetTitle("Batch File Elements");
-  
-  this->MasterWindow = 0;
-
-  this->Exit = 1;
-  this->AcceptedFlag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -101,50 +95,22 @@ vtkPVSaveBatchScriptDialog::~vtkPVSaveBatchScriptDialog()
   this->CancelButton = NULL;
   this->ButtonFrame->Delete();
   this->ButtonFrame = NULL;
-  
-  this->SetTitle(NULL);
-  this->SetMasterWindow(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::SetMasterWindow(vtkKWWindow* win)
-{
-  if (this->MasterWindow != win) 
-    { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
-    this->MasterWindow = win; 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->Register(this); 
-      if (this->IsCreated())
-        {
-        this->Script("wm transient %s %s", this->GetWidgetName(), 
-                     this->MasterWindow->GetWidgetName());
-        }
-      } 
-    this->Modified(); 
-    } 
-  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "toplevel"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
-  
-  const char *wname = this->GetWidgetName();
 
-  this->Script("wm title %s \"%s\"", wname, this->Title);
-  this->Script("wm iconname %s \"vtk\"", wname);
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   this->OffScreenCheck->SetParent(this);
   this->OffScreenCheck->Create(app);
@@ -155,6 +121,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->SaveImagesCheck->SetState(1);
   this->SaveImagesCheck->SetText("Save Images");
   this->SaveImagesCheck->SetCommand(this, "SaveImagesCheckCallback");
+
   this->ImageFileNameFrame->SetParent(this);
   this->ImageFileNameFrame->Create(app);
 
@@ -163,6 +130,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->SaveGeometryCheck->SetState(0);
   this->SaveGeometryCheck->SetText("Save Geometry");
   this->SaveGeometryCheck->SetCommand(this, "SaveGeometryCheckCallback");
+
   this->GeometryFileNameFrame->SetParent(this);
   this->GeometryFileNameFrame->Create(app);
 
@@ -171,6 +139,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
                this->SaveImagesCheck->GetWidgetName());
   this->Script("pack %s -side top -expand 1 -fill x -padx 2",
                this->ImageFileNameFrame->GetWidgetName());
+
   //this->Script("pack %s -side top -expand 0 -padx 2 -anchor w",
   //this->SaveGeometryCheck->GetWidgetName());
   //this->Script("pack %s -side top -expand 1 -fill x -padx 2",
@@ -189,6 +158,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
     sprintf(fileName, "%s/%s.jpg", this->FilePath, this->FileRoot);
     this->ImageFileNameEntry->SetValue(fileName);
     }
+
   this->ImageFileNameBrowseButton->SetParent(this->ImageFileNameFrame);
   this->ImageFileNameBrowseButton->Create(app);
   this->ImageFileNameBrowseButton->SetText("Browse");
@@ -206,6 +176,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
     sprintf(fileName, "%s/%s.vtp", this->FilePath, this->FileRoot);
     this->GeometryFileNameEntry->SetValue(fileName);
     }
+
   this->GeometryFileNameBrowseButton->SetParent(this->GeometryFileNameFrame);
   this->GeometryFileNameBrowseButton->Create(app);
   this->GeometryFileNameBrowseButton->SetText("Browse");
@@ -219,52 +190,24 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side right -expand 1 -fill x -padx 2",
                this->GeometryFileNameEntry->GetWidgetName());
 
-
-
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
+
   this->AcceptButton->SetParent(this->ButtonFrame);
   this->AcceptButton->Create(app);
-  this->AcceptButton->SetCommand(this, "Accept");
+  this->AcceptButton->SetCommand(this, "OK");
   this->AcceptButton->SetText("Accept");
+
   this->CancelButton->SetParent(this->ButtonFrame);
   this->CancelButton->Create(app);
   this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetText("Cancel");
+
   this->Script("pack %s %s -side left -expand 1 -fill x -padx 2",
                this->AcceptButton->GetWidgetName(),
                this->CancelButton->GetWidgetName());
-
-  this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
-               wname, wname);
-
-  this->Script("wm withdraw %s", wname);
-
-  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Cancel}",
-               this->GetWidgetName(), this->GetTclName());
-
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
-  else
-    {
-    int sw, sh;
-    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
-                 this->GetWidgetName(), this->GetWidgetName());
-    sscanf(app->GetMainInterp()->result, "%d %d", &sw, &sh);
-
-    int ww, wh;
-    this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]",
-                 this->GetWidgetName(), this->GetWidgetName());
-    sscanf(app->GetMainInterp()->result, "%d %d", &ww, &wh);
-    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), 
-                 (sw-ww)/2, (sh-wh)/2);
-    }
-
 }
 
 //----------------------------------------------------------------------------
@@ -417,108 +360,17 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
   loadDialog->Delete();
 }
 
-
-
-//----------------------------------------------------------------------------
-int vtkPVSaveBatchScriptDialog::Invoke()
-{   
-  int sw, sh;
-  sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
-         "%d %d", &sw, &sh);
-  
-  int width, height;
-
-  int x, y;
-
-  if (this->MasterWindow)
-    {
-    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-           &width, &height, &x, &y);
-    
-    x += width / 2;
-    y += height / 2;
-    
-    if (x > sw - 200)
-      {
-      x = sw / 2;
-      }
-    if (y > sh - 200)
-      {
-      y = sh / 2;
-      }
-    }
-  else
-    {
-    x = sw / 2;
-    y = sh / 2;
-    }
-
-  width = atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
-  height = atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
-  
-  if (x > width / 2)
-    {
-    x -= width / 2;
-    }
-  if (y > height / 2)
-    {
-    y -= height / 2;
-    }
-
-  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-               x, y);
-
-  this->Script("wm deiconify %s", this->GetWidgetName());
-  this->Script("grab %s", this->GetWidgetName());
-
-  this->Exit = 0;
-  this->AcceptedFlag = 0;
-  while (this->Exit == 0)
-    {
-    // I assume the update will process multiple events.
-    this->Script("update");
-    if (this->Exit == 0)
-      {
-      this->Script("after 100");
-      }
-    }
-
-  this->Script("grab release %s", this->GetWidgetName());
-  this->Script("wm withdraw %s", this->GetWidgetName());
-
-  return this->AcceptedFlag;
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::Accept()
-{
-  this->Exit = 1;
-  this->AcceptedFlag = 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::Cancel()
-{
-  this->Exit = 1;
-  this->AcceptedFlag = 0;
-}
-
 //----------------------------------------------------------------------------
 vtkPVApplication *vtkPVSaveBatchScriptDialog::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVSaveBatchScriptDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   
-  os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
   os << indent << "FilePath: " << (this->FilePath ? this->FilePath : "(none)") << endl;
   os << indent << "FileRoot: " << (this->FileRoot ? this->FileRoot : "(none)") << endl;
 }
