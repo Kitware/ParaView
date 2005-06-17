@@ -177,8 +177,8 @@ FOREACH (tfile ${PROJECT_TESTS})
       ${PARAVIEW_CS_EXECUTABLE}     
       --test-server
       ${TIMEOUT}
-      --server-preflags ${VTK_MPI_SERVER_PREFLAGS}
-      --client-postflags ${VTK_MPI_CLIENT_POSTFLAGS}
+      --server-preflags ${VTK_MPI_SERVER_TD_PREFLAGS}
+      --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
       --disable-registry 
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -UC
@@ -186,6 +186,8 @@ FOREACH (tfile ${PROJECT_TESTS})
       -C ${PVCompareImages}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
       -V ${PVClientTestData}/Baseline/${tfile}.png
+      -FrontBuffer
+      -NoRerender
       )
   ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 ENDFOREACH (tfile)
