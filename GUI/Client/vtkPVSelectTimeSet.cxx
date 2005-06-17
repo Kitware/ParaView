@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.56");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.57");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -98,15 +98,20 @@ const char* vtkPVSelectTimeSet::GetLabel()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
+void vtkPVSelectTimeSet::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->SetBorderWidth(2);
 
   // For getting the widget in a script.

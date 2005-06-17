@@ -65,7 +65,7 @@ public:
 
   // Description:
   // Given properties, generate comparative visualization. This
-  // actually generates each "frame" by creating appropriate animation
+  // actually generates each frame by creating appropriate animation
   // objects and playing different cases. As a result, new
   // geometry is created and stored.
   void Generate();

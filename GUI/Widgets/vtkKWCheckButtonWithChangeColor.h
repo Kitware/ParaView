@@ -18,16 +18,16 @@
 #ifndef __vtkKWCheckButtonWithChangeColor_h
 #define __vtkKWCheckButtonWithChangeColor_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 
-class KWWIDGETS_EXPORT vtkKWCheckButtonWithChangeColor : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCheckButtonWithChangeColor : public vtkKWCompositeWidget
 {
 public:
   static vtkKWCheckButtonWithChangeColor* New();
-  vtkTypeRevisionMacro(vtkKWCheckButtonWithChangeColor, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCheckButtonWithChangeColor, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

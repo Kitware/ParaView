@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.23");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.24");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -132,13 +132,17 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   const char *wname = this->GetWidgetName();
   

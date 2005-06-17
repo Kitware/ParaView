@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.8");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.9");
 
 int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
                                            int argc, char *argv[]);
@@ -55,13 +55,17 @@ vtkKWCheckButtonWithChangeColor::~vtkKWCheckButtonWithChangeColor()
 //----------------------------------------------------------------------------
 void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   // Create the checkbutton. 
   

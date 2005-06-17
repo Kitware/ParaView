@@ -11,24 +11,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTracedWidget - a vtkKWWidget with trace capabilities
+// .NAME vtkPVTracedWidget - a vtkKWCompositeWidget with trace capabilities
 // .SECTION Description
-// This class is a subclass of vtkKWWidget with trace methods..
+// This class is a subclass of vtkKWCompositeWidget with trace methods..
 // .SECTION See Also
 // vtkPVTraceHelper
 
 #ifndef __vtkPVTracedWidget_h
 #define __vtkPVTracedWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkPVTraceHelper;
 
-class VTK_EXPORT vtkPVTracedWidget : public vtkKWWidget
+class VTK_EXPORT vtkPVTracedWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkPVTracedWidget* New();
-  vtkTypeRevisionMacro(vtkPVTracedWidget,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVTracedWidget,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

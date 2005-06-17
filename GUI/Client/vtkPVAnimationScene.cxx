@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.37");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.38");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -248,11 +248,6 @@ void vtkPVAnimationScene::SetWindow(vtkPVWindow *window)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::Create(vtkKWApplication* app)
 {
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("Widget already created.");
-    return;
-    }
   if (!this->AnimationManager)
     {
     vtkErrorMacro("AnimationManager must be set");
@@ -268,7 +263,18 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
     vtkErrorMacro("RenderView must be set before create.");
     return;
     }
-  this->Superclass::CreateSpecificTkWidget(app, "frame");
+
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   this->CreateProxy();
 

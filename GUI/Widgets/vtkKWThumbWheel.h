@@ -19,7 +19,7 @@
 #ifndef __vtkKWThumbWheel_h
 #define __vtkKWThumbWheel_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWLabel;
@@ -27,11 +27,11 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-class KWWIDGETS_EXPORT vtkKWThumbWheel : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWThumbWheel : public vtkKWCompositeWidget
 {
 public:
   static vtkKWThumbWheel* New();
-  vtkTypeRevisionMacro(vtkKWThumbWheel,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWThumbWheel,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

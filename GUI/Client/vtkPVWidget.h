@@ -50,6 +50,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Create the widget. All sub-classes should re-implement this
+  // signature because widgets are created using vtkPVWidget
+  // pointers after cloning.
+  virtual void Create(vtkKWApplication *app)
+    { this->Superclass::Create(app); };
+
+  // Description:
   // These methods are called when the Accept and Reset buttons are pressed.
   // The copy state from VTK/PV objects to the widget and back.
   // Most subclasses do not have to implement these methods.  They implement
@@ -143,12 +150,6 @@ public:
   // this method.  Subclasses define the interal "Trace" which works for
   // saving state and tracing.
   void SaveState(ofstream *file);
-
-  // Description:
-  // Create the widget. All sub-classes should use this
-  // signature because widgets are created using vtkPVWidget
-  // pointers after cloning.
-  virtual void Create(vtkKWApplication* app) = 0;
 
   // Description:
   // Need the source to get the input.

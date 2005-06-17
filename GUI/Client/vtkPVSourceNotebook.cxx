@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.20");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.21");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -209,11 +209,17 @@ void vtkPVSourceNotebook::ShowPage(const char* pageName)
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  // Check if already created
+
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
     
   this->Notebook->SetParent(this);
   this->Notebook->Create(app);

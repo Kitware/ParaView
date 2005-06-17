@@ -21,20 +21,19 @@
 #ifndef __vtkPVSourcesNavigationWindow_h
 #define __vtkPVSourcesNavigationWindow_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWCanvas;
 class vtkKWMenu;
-class vtkKWWidget;
 class vtkPVSource;
 class vtkKWScrollbar;
 
-class VTK_EXPORT vtkPVSourcesNavigationWindow : public vtkKWWidget
+class VTK_EXPORT vtkPVSourcesNavigationWindow : public vtkKWCompositeWidget
 {
 public:
   static vtkPVSourcesNavigationWindow* New();
-  vtkTypeRevisionMacro(vtkPVSourcesNavigationWindow,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVSourcesNavigationWindow,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

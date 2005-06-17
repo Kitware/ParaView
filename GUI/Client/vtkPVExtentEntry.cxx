@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.56");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -138,15 +138,19 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
+void vtkPVExtentEntry::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   // For getting the widget in a script.
 
@@ -161,7 +165,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  this->LabeledFrame->Create(pvApp);
+  this->LabeledFrame->Create(app);
 
   // Now a label
 
@@ -182,7 +186,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->PackVerticallyOff();
     this->MinMax[i]->ShowMaxLabelOff();
     this->MinMax[i]->SetMinLabelWidth(2);
-    this->MinMax[i]->Create(pvApp);
+    this->MinMax[i]->Create(app);
     this->MinMax[i]->SetRange(this->Range[i*2], this->Range[i*2+1]);
     this->MinMax[i]->SetMinimumLabel(labels[i]);
     this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");

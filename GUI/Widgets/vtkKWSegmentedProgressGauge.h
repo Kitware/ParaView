@@ -21,18 +21,18 @@
 #ifndef __vtkKWSegmentedProgressGauge_h
 #define __vtkKWSegmentedProgressGauge_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWFrame;
 class vtkKWCanvas;
 
-class KWWIDGETS_EXPORT vtkKWSegmentedProgressGauge : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSegmentedProgressGauge : public vtkKWCompositeWidget
 {
 public:
   // Description:
   // Standard New and type methods
   static vtkKWSegmentedProgressGauge *New();
-  vtkTypeRevisionMacro(vtkKWSegmentedProgressGauge, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSegmentedProgressGauge, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

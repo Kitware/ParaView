@@ -36,7 +36,7 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.9");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.10");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -174,17 +174,25 @@ void vtkPVSimpleAnimationCue::Observe(vtkObject* toObserve, unsigned long event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSimpleAnimationCue::CreateWidget(vtkKWApplication* app, 
-                                           const char* command)
+void vtkPVSimpleAnimationCue::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, command))
-    {
-    return;
-    }
   if (!this->KeyFrameParent)
     {
     vtkDebugMacro("KeyFrameParent must be set to be able to create KeyFrames");
     }
+
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->CreateProxy();
 }
 
@@ -328,15 +336,15 @@ void vtkPVSimpleAnimationCue::UnregisterProxies()
 //-----------------------------------------------------------------------------
 unsigned long vtkPVSimpleAnimationCue::GetKeyFramesMTime()
 {
-  return (this->Virtual)? this->GetMTime() :
-      this->KeyFrameManipulatorProxy->GetMTime();
+  return this->Virtual ? this->GetMTime() :
+    (this->KeyFrameManipulatorProxy ? this->KeyFrameManipulatorProxy->GetMTime() : 0);
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVSimpleAnimationCue::GetNumberOfKeyFrames()
 {
-  return (this->Virtual)? this->NumberOfPoints :
-    this->KeyFrameManipulatorProxy->GetNumberOfKeyFrames();
+  return this->Virtual ? this->NumberOfPoints :
+    (this->KeyFrameManipulatorProxy ? this->KeyFrameManipulatorProxy->GetNumberOfKeyFrames() : 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -351,7 +359,7 @@ double vtkPVSimpleAnimationCue::GetKeyFrameTime(int id)
     {
     return this->PointParameters[id];
     }
-  else
+  else if (this->KeyFrameManipulatorProxy)
     {
     vtkSMKeyFrameProxy* keyframe = this->KeyFrameManipulatorProxy->
       GetKeyFrameAtIndex(id);
@@ -362,6 +370,7 @@ double vtkPVSimpleAnimationCue::GetKeyFrameTime(int id)
       }
     return keyframe->GetKeyTime();
     }
+  return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -379,7 +388,7 @@ void vtkPVSimpleAnimationCue::SetKeyFrameTime(int id, double time)
                       // PVCue modified time.
     this->InvokeEvent(vtkPVSimpleAnimationCue::KeysModifiedEvent);
     }
-  else
+  else if (this->KeyFrameManipulatorProxy)
     {
     vtkSMKeyFrameProxy* keyframe = this->KeyFrameManipulatorProxy->
       GetKeyFrameAtIndex(id);
@@ -390,6 +399,7 @@ void vtkPVSimpleAnimationCue::SetKeyFrameTime(int id, double time)
       }
      keyframe->SetKeyTime(time);
     }
+  return;
 }
 
 //-----------------------------------------------------------------------------
@@ -432,7 +442,7 @@ int vtkPVSimpleAnimationCue::AddNewKeyFrame(double time)
       }
     id = this->CreateAndAddKeyFrame(time, vtkPVAnimationManager::RAMP);
     vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
-    if (!this->InRecording)
+    if (keyframe && !this->InRecording)
       {
       if (id == 0)
         {
@@ -680,7 +690,10 @@ int vtkPVSimpleAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
     vtkErrorMacro("Key frame already exists");
     return -1;
     }
-
+  if (!this->KeyFrameManipulatorProxy)
+    {
+    return -1;
+    }
   this->PVKeyFrames->AddItem(keyframe);
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
@@ -745,6 +758,10 @@ void vtkPVSimpleAnimationCue::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
     return;
     }
   if (!keyframe)
+    {
+    return;
+    }
+  if (!this->KeyFrameManipulatorProxy)
     {
     return;
     }
@@ -829,6 +846,10 @@ vtkPVKeyFrame* vtkPVSimpleAnimationCue::GetKeyFrame(int id)
     vtkErrorMacro("Cue has no actual keyframes");
     return NULL;
     }
+  if (!this->KeyFrameManipulatorProxy)
+    {
+    return NULL;
+    }
   vtkSMKeyFrameProxy* kfProxy = this->KeyFrameManipulatorProxy->
     GetKeyFrameAtIndex(id);
   if (!kfProxy)
@@ -858,6 +879,12 @@ void vtkPVSimpleAnimationCue::SetAnimatedProxy(vtkSMProxy *proxy)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
+
+  if (!this->CueProxy)
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->CueProxy->GetProperty("AnimatedProxy"));
   if (!pp)
@@ -900,6 +927,12 @@ void vtkPVSimpleAnimationCue::SetAnimatedPropertyName(const char* name)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
+
+  if (!this->CueProxy)
+    {
+    return;
+    }
+
   StringVectPropertySetElement(this->CueProxy, "AnimatedPropertyName", name);
   this->CueProxy->UpdateVTKObjects();
   if (!this->PropertyStatusManager)
@@ -930,6 +963,12 @@ void vtkPVSimpleAnimationCue::SetAnimatedDomainName(const char* name)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
+
+  if (!this->CueProxy)
+    {
+    return;
+    }
+
   StringVectPropertySetElement(this->CueProxy, "AnimatedDomainName", name);
   this->CueProxy->UpdateVTKObjects();
 }
@@ -968,6 +1007,12 @@ void vtkPVSimpleAnimationCue::SetAnimatedElement(int index)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
+
+  if (!this->CueProxy)
+    {
+    return;
+    }
+
   IntVectPropertySetElement(this->CueProxy,"AnimatedElement", index);
   this->CueProxy->UpdateVTKObjects();
 }
@@ -981,6 +1026,11 @@ int vtkPVSimpleAnimationCue::GetAnimatedElement()
     return -1;
     }
   
+  if (!this->CueProxy)
+    {
+    return - 1;
+    }
+
   vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
     this->CueProxy->GetProperty("AnimatedElement"));
   if (!dvp)

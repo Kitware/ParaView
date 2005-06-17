@@ -18,7 +18,7 @@
 #ifndef __vtkKWToolbarSet_h
 #define __vtkKWToolbarSet_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
@@ -26,11 +26,11 @@ class vtkKWToolbar;
 class vtkKWToolbarSetInternals;
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWToolbarSet : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWToolbarSet : public vtkKWCompositeWidget
 {
 public:
   static vtkKWToolbarSet* New();
-  vtkTypeRevisionMacro(vtkKWToolbarSet,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWToolbarSet,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

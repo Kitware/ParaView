@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.3");
 
 int vtkPVComparativeVisPropertyWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -70,11 +70,17 @@ vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  // Check if already created
+
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   vtkPVWindow* pvWin = pvApp->GetMainWindow();

@@ -17,7 +17,7 @@
 #ifndef __vtkKWRenderWidget_h
 #define __vtkKWRenderWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 #include "vtkWindows.h" // needed for RECT HDC
 
 class vtkCamera;
@@ -31,11 +31,11 @@ class vtkRenderer;
 class vtkTextActor;
 class vtkTextMapper;
 
-class KWWIDGETS_EXPORT vtkKWRenderWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWRenderWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWRenderWidget* New();
-  vtkTypeRevisionMacro(vtkKWRenderWidget, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWRenderWidget, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

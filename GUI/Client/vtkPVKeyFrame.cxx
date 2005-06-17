@@ -44,7 +44,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.18");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.19");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 
 //*****************************************************************************
@@ -173,12 +173,18 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app)
     vtkErrorMacro("AnimationCueProxy must be set before calling Create");
     return;
     }
-  
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+
+  // Check if already created
+
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed to create the widget");
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   static int proxyNum = 0;
@@ -712,9 +718,12 @@ void vtkPVKeyFrame::SetDuration(double duration)
     this->Duration = duration;
     this->Modified();
     }
-  double ntime = this->GetNormalizedTime(
-    this->TimeThumbWheel->GetEntry()->GetValueAsFloat());
-  this->SetKeyTime(ntime);
+  if (this->TimeThumbWheel && this->TimeThumbWheel->GetEntry())
+    {
+    double ntime = this->GetNormalizedTime(
+      this->TimeThumbWheel->GetEntry()->GetValueAsFloat());
+    this->SetKeyTime(ntime);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -779,6 +788,10 @@ void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetKeyTime(double time)
 {
+  if (!this->KeyFrameProxy)
+    {
+    return;
+    }
   DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyTime", time);
   this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", 
@@ -788,12 +801,20 @@ void vtkPVKeyFrame::SetKeyTime(double time)
 //-----------------------------------------------------------------------------
 double vtkPVKeyFrame::GetKeyTime()
 {
+  if (!this->KeyFrameProxy)
+    {
+    return 0;
+    }
   return this->KeyFrameProxy->GetKeyTime();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetKeyValue(int index, double val)
 {
+  if (!this->KeyFrameProxy)
+    {
+    return;
+    }
   DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyValues", val, index);
   this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %d %f", 
@@ -803,6 +824,10 @@ void vtkPVKeyFrame::SetKeyValue(int index, double val)
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetNumberOfKeyValues(int num)
 {
+  if (!this->KeyFrameProxy)
+    {
+    return;
+    }
   IntVectPropertySetElement(this->KeyFrameProxy, "NumberOfKeyValues", num);
   this->KeyFrameProxy->UpdateVTKObjects();
 
@@ -817,6 +842,10 @@ void vtkPVKeyFrame::SetNumberOfKeyValues(int num)
 //-----------------------------------------------------------------------------
 double vtkPVKeyFrame::GetKeyValue(int index)
 {
+  if (!this->KeyFrameProxy)
+    {
+    return 0;
+    }
   return this->KeyFrameProxy->GetKeyValue(index);
 }
 

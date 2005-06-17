@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.20");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.21");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -112,17 +112,24 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
-
   if (!this->AnimationManager)
     {
     vtkErrorMacro("AnimationManager must be set");
     return;
     }
+
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->TopFrame->SetParent(this);
   this->TopFrame->Create(app);
   this->Script(

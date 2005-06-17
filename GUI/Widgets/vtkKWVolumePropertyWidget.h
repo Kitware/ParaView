@@ -21,7 +21,7 @@
 #ifndef __vtkKWVolumePropertyWidget_h
 #define __vtkKWVolumePropertyWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkDataSet;
 class vtkKWCheckButton;
@@ -38,12 +38,12 @@ class vtkKWScale;
 class vtkKWVolumeMaterialPropertyWidget;
 class vtkVolumeProperty;
 
-class KWWIDGETS_EXPORT vtkKWVolumePropertyWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWVolumePropertyWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWVolumePropertyWidget* New();
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeRevisionMacro(vtkKWVolumePropertyWidget,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWVolumePropertyWidget,vtkKWCompositeWidget);
 
   // Description:
   // Create the widget.

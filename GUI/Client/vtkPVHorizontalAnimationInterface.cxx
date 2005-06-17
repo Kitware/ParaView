@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.20");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -66,14 +66,20 @@ vtkPVHorizontalAnimationInterface::~vtkPVHorizontalAnimationInterface()
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
  
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
   this->ScrollFrame->SetParent(this);
   this->ScrollFrame->Create(app);
   this->Script("pack %s -side top -fill both -expand t",

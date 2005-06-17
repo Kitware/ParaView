@@ -23,7 +23,7 @@
 #ifndef __vtkPVSourceNotebook_h
 #define __vtkPVSourceNotebook_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWNotebook;
@@ -38,11 +38,11 @@ class vtkPVDisplayGUI;
 class vtkKWLabel;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkPVSourceNotebook : public vtkKWWidget
+class VTK_EXPORT vtkPVSourceNotebook : public vtkKWCompositeWidget
 {
 public:
   static vtkPVSourceNotebook* New();
-  vtkTypeRevisionMacro(vtkPVSourceNotebook,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVSourceNotebook,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   void Close();
     

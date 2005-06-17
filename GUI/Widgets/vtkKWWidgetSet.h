@@ -24,16 +24,16 @@
 #ifndef __vtkKWWidgetSet_h
 #define __vtkKWWidgetSet_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWWidget;
 class vtkKWWidgetSetInternals;
 
-class KWWIDGETS_EXPORT vtkKWWidgetSet : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWWidgetSet : public vtkKWCompositeWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkKWWidgetSet,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWWidgetSet,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

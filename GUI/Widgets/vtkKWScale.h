@@ -19,7 +19,7 @@
 #ifndef __vtkKWScale_h
 #define __vtkKWScale_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWEntry;
@@ -27,11 +27,11 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-class KWWIDGETS_EXPORT vtkKWScale : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWScale : public vtkKWCompositeWidget
 {
 public:
   static vtkKWScale* New();
-  vtkTypeRevisionMacro(vtkKWScale,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWScale,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

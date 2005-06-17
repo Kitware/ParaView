@@ -18,16 +18,16 @@
 #ifndef __vtkKWHSVColorSelector_h
 #define __vtkKWHSVColorSelector_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWCanvas;
 class vtkKWLabel;
 
-class KWWIDGETS_EXPORT vtkKWHSVColorSelector : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWHSVColorSelector : public vtkKWCompositeWidget
 {
 public:
   static vtkKWHSVColorSelector* New();
-  vtkTypeRevisionMacro(vtkKWHSVColorSelector,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWHSVColorSelector,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

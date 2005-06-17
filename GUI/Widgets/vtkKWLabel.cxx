@@ -21,7 +21,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.36");
+vtkCxxRevisionMacro(vtkKWLabel, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -106,7 +106,6 @@ void vtkKWLabel::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetWidth(this->Width);
   this->SetJustificationToLeft();
 
   this->UpdateText();
@@ -121,44 +120,15 @@ void vtkKWLabel::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::SetLineType( int type )
+void vtkKWLabel::SetWidth(int width)
 {
-  if (this->IsCreated())
-    {
-    if (this->LineType != type)
-      {
-      const char *wname = this->GetWidgetName();
-      this->SetText(this->GetTextOption());
-      this->Script("destroy %s", wname);
-      if (this->LineType == vtkKWLabel::MultiLine)
-        {
-        this->Script("message %s -width %d", wname, this->Width);
-        }
-      else
-        {
-        this->Script("label %s -justify left -width %d", wname, this->Width);
-        }
-      this->UpdateText();
-      }
-    }
-  this->LineType = type;
+  this->SetConfigurationOptionAsInt("-width", width);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::SetWidth(int width)
+int vtkKWLabel::GetWidth()
 {
-  if (this->Width == width)
-    {
-    return;
-    }
-
-  this->Width = width;
-  this->Modified();
-
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -width %d", this->GetWidgetName(), width);
-    }
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
@@ -261,7 +231,7 @@ void vtkKWLabel::UpdateEnableState()
 void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Width: " << this->GetWidth() << endl;
+  os << indent << "LineType: " << this->LineType << endl;
   os << indent << "AdjustWrapLengthToWidth: " 
      << (this->AdjustWrapLengthToWidth ? "On" : "Off") << endl;
   os << indent << "Label: ";

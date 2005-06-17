@@ -19,15 +19,15 @@
 #ifndef __vtkKWProgressGauge_h
 #define __vtkKWProgressGauge_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWCanvas;
 
-class KWWIDGETS_EXPORT vtkKWProgressGauge : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWProgressGauge : public vtkKWCompositeWidget
 {
 public:
   static vtkKWProgressGauge* New();
-  vtkTypeRevisionMacro(vtkKWProgressGauge,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWProgressGauge,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

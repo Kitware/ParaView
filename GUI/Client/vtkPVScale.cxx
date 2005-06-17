@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.65");
+vtkCxxRevisionMacro(vtkPVScale, "1.66");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -143,15 +143,19 @@ void vtkPVScale::EntryCheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Create(vtkKWApplication *pvApp)
+void vtkPVScale::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
@@ -167,7 +171,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   
   // Now a label
   this->LabelWidget->SetParent(this);
-  this->LabelWidget->Create(pvApp);
+  this->LabelWidget->Create(app);
   this->LabelWidget->SetWidth(18);
   this->LabelWidget->SetJustificationToRight();
   this->LabelWidget->SetText(this->EntryLabel);

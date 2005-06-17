@@ -42,6 +42,7 @@ public:
   // Set the way label treats long text. 
   // Multiline will wrap text. You have to specify width
   // when using multiline label.
+  // Call this method before Create()
   //BTX
   enum 
   {
@@ -49,12 +50,17 @@ public:
     MultiLine
   };
   //ETX
-  virtual void SetLineType(int type);
+  vtkGetMacro(LineType, int);
+  vtkSetMacro(LineType, int);
+  virtual void SetLineTypeToSingleLine()
+    { this->SetLineType(vtkKWLabel::SingleLine); };
+  virtual void SetLineTypeToMultiLine()
+    { this->SetLineType(vtkKWLabel::MultiLine); };
 
   // Description:
   // Set/Get width of the label.
   virtual void SetWidth(int);
-  vtkGetMacro(Width, int);
+  virtual int GetWidth();
 
   // Description:
   // Set/Get the justification mode.

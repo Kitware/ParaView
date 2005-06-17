@@ -342,9 +342,10 @@ public:
   // Create a specific Tk widget of type 'type', with optional arguments 
   // 'args' and map it to this instance.
   // Use the Create() method to create this widget instance instead, do *not*
-  // use the CreateWidget() method unless you are calling from a subclass to
-  // implement a specific kind of Tk widget as a vtkKWWidget subclass, or
-  // unless you have to map an external pure Tk widget into a vtkKWWidget.
+  // use the CreateSpecificTkWidget() method unless you are calling from
+  // a subclass to implement a specific kind of Tk widget as a vtkKWWidget
+  // subclass, or unless you have to map an external pure Tk widget into a
+  // vtkKWWidget.
   // This method should be called by all subclasses to ensure that flags are
   // set correctly (typically from the subclass's Create() method).
   // If 'type' is NULL, this method will still perform some checkings and

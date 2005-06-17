@@ -20,18 +20,18 @@
 #ifndef __vtkKWToolbar_h
 #define __vtkKWToolbar_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWRadioButton;
 class vtkKWToolbarInternals;
 
-class KWWIDGETS_EXPORT vtkKWToolbar : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWToolbar : public vtkKWCompositeWidget
 {
 public:
   static vtkKWToolbar* New();
-  vtkTypeRevisionMacro(vtkKWToolbar, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWToolbar, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

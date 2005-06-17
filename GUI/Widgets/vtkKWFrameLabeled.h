@@ -20,7 +20,7 @@
 #ifndef __vtkKWFrameLabeled_h
 #define __vtkKWFrameLabeled_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
@@ -28,11 +28,11 @@ class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWLabelLabeled;
 
-class KWWIDGETS_EXPORT vtkKWFrameLabeled : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWFrameLabeled : public vtkKWCompositeWidget
 {
 public:
   static vtkKWFrameLabeled* New();
-  vtkTypeRevisionMacro(vtkKWFrameLabeled,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWFrameLabeled,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

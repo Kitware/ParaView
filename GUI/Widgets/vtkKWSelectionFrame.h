@@ -20,7 +20,7 @@
 #ifndef __vtkKWSelectionFrame_h
 #define __vtkKWSelectionFrame_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWFrame;
 class vtkKWLabel;
@@ -29,11 +29,11 @@ class vtkKWPushButton;
 class vtkKWToolbarSet;
 class vtkKWSelectionFrameInternals;
 
-class KWWIDGETS_EXPORT vtkKWSelectionFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSelectionFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSelectionFrame* New();
-  vtkTypeRevisionMacro(vtkKWSelectionFrame, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSelectionFrame, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

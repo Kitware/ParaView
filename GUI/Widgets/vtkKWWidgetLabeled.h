@@ -19,16 +19,16 @@
 #ifndef __vtkKWWidgetLabeled_h
 #define __vtkKWWidgetLabeled_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWLabel;
 
-class KWWIDGETS_EXPORT vtkKWWidgetLabeled : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWWidgetLabeled : public vtkKWCompositeWidget
 {
 public:
   static vtkKWWidgetLabeled* New();
-  vtkTypeRevisionMacro(vtkKWWidgetLabeled, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWWidgetLabeled, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -17,7 +17,7 @@
 #ifndef __vtkKWMaterialPropertyWidget_h
 #define __vtkKWMaterialPropertyWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
@@ -30,10 +30,10 @@ class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWMaterialPropertyWidgetInternals;
 
-class KWWIDGETS_EXPORT vtkKWMaterialPropertyWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMaterialPropertyWidget : public vtkKWCompositeWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkKWMaterialPropertyWidget, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMaterialPropertyWidget, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

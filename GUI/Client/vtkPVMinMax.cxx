@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.49");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -130,15 +130,19 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Create(vtkKWApplication *pvApp)
+void vtkPVMinMax::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   // For getting the widget in a script.
 
@@ -154,12 +158,12 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  this->MinFrame->Create(pvApp);
+  this->MinFrame->Create(app);
   this->Script("pack %s -side top -fill x -expand t", 
                this->MinFrame->GetWidgetName());
   if (this->PackVertically)
     {
-    this->MaxFrame->Create(pvApp);
+    this->MaxFrame->Create(app);
     this->Script("pack %s -side top -fill x -expand t", 
                  this->MaxFrame->GetWidgetName());
     }
@@ -168,7 +172,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
   if ( this->ShowMinLabel )
     {
     this->MinLabel->SetParent(this->MinFrame);
-    this->MinLabel->Create(pvApp);
+    this->MinLabel->Create(app);
     this->MinLabel->SetWidth(this->MinLabelWidth);
     this->MinLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 
@@ -194,7 +198,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
       {
       this->MaxLabel->SetParent(this->MinFrame);
       }
-    this->MaxLabel->Create(pvApp);
+    this->MaxLabel->Create(app);
     this->MaxLabel->SetWidth(this->MaxLabelWidth);
     this->MaxLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 

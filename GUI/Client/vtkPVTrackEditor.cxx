@@ -37,7 +37,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.6");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.7");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -138,13 +138,19 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
     vtkErrorMacro("AnimationManager must be set");
     return;
     }
+  
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
-  
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->KeyFramePropertiesFrame->SetParent(this);
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app);

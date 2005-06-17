@@ -26,15 +26,15 @@
 #ifndef __vtkKWMultiColumnList_h
 #define __vtkKWMultiColumnList_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWCompositeWidget
 {
 public:
   static vtkKWMultiColumnList* New();
-  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

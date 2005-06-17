@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.33");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.34");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -257,20 +257,24 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::Create(vtkKWApplication* app)
 {
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("Widget already created.");
-    return;
-    }
-
   if (!this->TimeLineParent)
     {
     vtkErrorMacro("TimeLineParent must be set");
     return;
     }
-
-  this->CreateWidget(app, "frame");
   
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->TimeLineContainer->SetParent(this->TimeLineParent);
   this->TimeLineContainer->Create(app);
   
@@ -667,6 +671,11 @@ void vtkPVAnimationCue::UpdateCueVisibility(int advanced)
     return;
     }
   
+  if (!this->CueProxy)
+    {
+    return;
+    }
+
   vtkSMProperty* property = this->CueProxy->GetAnimatedProperty();
   if (!property)
     {

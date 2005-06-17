@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.37");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -164,13 +164,17 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   this->Script("%s config -bd 1 -relief ridge",  this->GetWidgetName());
 

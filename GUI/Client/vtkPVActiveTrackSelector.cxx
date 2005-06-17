@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.5");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -70,11 +70,17 @@ vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  // Check if already created
+
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating the widget");
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
   
   this->SourceLabel->SetParent(this);
   this->SourceLabel->SetText("Source:");

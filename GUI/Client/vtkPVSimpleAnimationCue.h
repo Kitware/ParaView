@@ -42,7 +42,9 @@ public:
   vtkTypeRevisionMacro(vtkPVSimpleAnimationCue, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void CreateWidget(vtkKWApplication* app, const char* command);
+  // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app);
 
   // Description:
   // Virtual indicates if this cue is a actual cue, which has a proxy

@@ -20,15 +20,15 @@
 #ifndef __vtkKWSplitFrame_h
 #define __vtkKWSplitFrame_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 class vtkKWApplication;
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWSplitFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSplitFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSplitFrame* New();
-  vtkTypeRevisionMacro(vtkKWSplitFrame,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSplitFrame,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

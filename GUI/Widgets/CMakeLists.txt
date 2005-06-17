@@ -80,6 +80,7 @@ SET(KWWidgets_SRCS
   vtkKWCheckButtonWithChangeColor.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
+  vtkKWCompositeWidget.cxx
   vtkKWCornerAnnotationEditor.cxx 
   vtkKWDialog.cxx 
   vtkKWDragAndDropTargetSet.cxx

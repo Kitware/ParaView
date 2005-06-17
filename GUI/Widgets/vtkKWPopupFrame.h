@@ -18,16 +18,16 @@
 #ifndef __vtkKWPopupFrame_h
 #define __vtkKWPopupFrame_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWFrameLabeled;
 class vtkKWPopupButton;
 
-class KWWIDGETS_EXPORT vtkKWPopupFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWPopupFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWPopupFrame* New();
-  vtkTypeRevisionMacro(vtkKWPopupFrame,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWPopupFrame,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

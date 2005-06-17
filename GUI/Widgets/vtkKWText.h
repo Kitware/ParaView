@@ -19,17 +19,17 @@
 #ifndef __vtkKWText_h
 #define __vtkKWText_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWTextInternals;
 class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWText : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWText : public vtkKWCompositeWidget
 {
 public:
   static vtkKWText* New();
-  vtkTypeRevisionMacro(vtkKWText,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWText,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

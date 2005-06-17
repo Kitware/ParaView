@@ -19,7 +19,7 @@
 #ifndef __vtkKWNotebook_h
 #define __vtkKWNotebook_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWFrame;
@@ -28,12 +28,12 @@ class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWNotebookInternals;
 
-class KWWIDGETS_EXPORT vtkKWNotebook : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWNotebook : public vtkKWCompositeWidget
 {
 public:
 
   static vtkKWNotebook* New();
-  vtkTypeRevisionMacro(vtkKWNotebook,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWNotebook,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

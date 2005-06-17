@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.37");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -194,19 +194,23 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
+void vtkPVXDMFParameters::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
   this->Frame = vtkKWFrameLabeled::New();
   this->Frame->SetParent(this);
-  this->Frame->Create(pvApp);
+  this->Frame->Create(app);
   this->Frame->SetLabelText(this->FrameLabel);
   this->Script("pack %s -fill both -expand 1", this->Frame->GetWidgetName());
 }

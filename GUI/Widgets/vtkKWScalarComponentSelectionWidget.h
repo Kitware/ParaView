@@ -18,16 +18,16 @@
 #ifndef __vtkKWScalarComponentSelectionWidget_h
 #define __vtkKWScalarComponentSelectionWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWOptionMenuLabeled;
 
-class KWWIDGETS_EXPORT vtkKWScalarComponentSelectionWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWScalarComponentSelectionWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWScalarComponentSelectionWidget* New();
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeRevisionMacro(vtkKWScalarComponentSelectionWidget,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWScalarComponentSelectionWidget,vtkKWCompositeWidget);
 
   // Description:
   // Create the widget.

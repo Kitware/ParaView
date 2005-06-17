@@ -65,7 +65,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.121");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.122");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -357,16 +357,20 @@ vtkPVColorMap::~vtkPVColorMap()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  // Check if already created
 
-  // Call the superclass to create the widget and set the appropriate flags
-
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
   
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
   this->CreateParallelTclObjects(pvApp);
 
   // Now for the UI.

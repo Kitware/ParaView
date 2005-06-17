@@ -41,7 +41,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.4");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.5");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
@@ -295,7 +295,7 @@ void vtkPVComparativeVis::ExecuteEvent(
           {
           this->PlayOne(paramIndex+1);
           }
-        // If last property, render the "frame" and store the geometry
+        // If last property, render the frame and store the geometry
         else
           {
           vtkTimerLog::MarkStartEvent("Force Render");

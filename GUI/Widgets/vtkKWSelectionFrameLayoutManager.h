@@ -27,7 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkKWSelectionFrameLayoutManager_h
 #define __vtkKWSelectionFrameLayoutManager_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWSelectionFrame;
 class vtkKWSelectionFrameLayoutManagerInternals;
@@ -36,11 +36,11 @@ class vtkImageData;
 class vtkKWMenu;
 class vtkKWToolbar;
 
-class KWWIDGETS_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSelectionFrameLayoutManager* New();
-  vtkTypeRevisionMacro(vtkKWSelectionFrameLayoutManager, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSelectionFrameLayoutManager, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

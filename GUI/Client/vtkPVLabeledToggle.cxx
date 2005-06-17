@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.38");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -63,24 +63,28 @@ void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
+void vtkPVLabeledToggle::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
   
   // Now a label
-  this->Label->Create(pvApp);
+  this->Label->Create(app);
   this->Label->SetWidth(18);
   this->Label->SetJustificationToRight();
   this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the check button
-  this->CheckButton->Create(pvApp);
+  this->CheckButton->Create(app);
   this->CheckButton->SetCommand(this, "ModifiedCallback");
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
 }

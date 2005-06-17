@@ -20,17 +20,17 @@
 #ifndef __vtkKWListBoxToListBoxSelectionEditor_h
 #define __vtkKWListBoxToListBoxSelectionEditor_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWListBox;
 class vtkKWPushButton;
 
-class KWWIDGETS_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWCompositeWidget
 {
 public:
   static vtkKWListBoxToListBoxSelectionEditor* New();
-  vtkTypeRevisionMacro(vtkKWListBoxToListBoxSelectionEditor,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWListBoxToListBoxSelectionEditor,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

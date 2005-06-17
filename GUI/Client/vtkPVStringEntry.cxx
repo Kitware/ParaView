@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -76,15 +76,19 @@ void vtkPVStringEntry::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
+void vtkPVStringEntry::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(pvApp, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
@@ -101,7 +105,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
   // Now a label
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->LabelWidget->Create(pvApp);
+    this->LabelWidget->Create(app);
     this->LabelWidget->SetWidth(18);
     this->LabelWidget->SetJustificationToRight();
     this->LabelWidget->SetText(this->EntryLabel);
@@ -109,7 +113,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
     }
   
   // Now the entry
-  this->Entry->Create(pvApp);
+  this->Entry->Create(app);
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
   this->Script("pack %s -side left -fill x -expand t",

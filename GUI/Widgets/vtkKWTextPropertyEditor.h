@@ -20,7 +20,7 @@
 #ifndef __vtkKWTextPropertyEditor_h
 #define __vtkKWTextPropertyEditor_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkActor2D;
 class vtkKWApplication;
@@ -33,11 +33,11 @@ class vtkKWPushButton;
 class vtkKWScale;
 class vtkTextProperty;
 
-class KWWIDGETS_EXPORT vtkKWTextPropertyEditor : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWTextPropertyEditor : public vtkKWCompositeWidget
 {
 public:
   static vtkKWTextPropertyEditor* New();
-  vtkTypeRevisionMacro(vtkKWTextPropertyEditor,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWTextPropertyEditor,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

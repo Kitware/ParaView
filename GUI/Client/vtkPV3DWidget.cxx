@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.70");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.71");
 
 //===========================================================================
 //***************************************************************************
@@ -121,13 +121,17 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   vtkKWWidget* parent = this;
 

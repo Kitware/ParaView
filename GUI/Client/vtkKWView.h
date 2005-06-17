@@ -63,10 +63,6 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create(vtkKWApplication *) {}
-
-  // Description:
   // Sets up some default event handlers to allow
   // users to manipulate the view etc.
   virtual void SetupBindings();

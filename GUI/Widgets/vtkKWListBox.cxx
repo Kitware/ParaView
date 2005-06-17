@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.37");
+vtkCxxRevisionMacro(vtkKWListBox, "1.38");
 
 
 //----------------------------------------------------------------------------
@@ -259,13 +259,17 @@ int vtkKWListBox::AppendUnique(const char* name)
 //----------------------------------------------------------------------------
 void vtkKWListBox::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
 
   this->Scrollbar->Create(app);
   

@@ -23,16 +23,16 @@
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWCompositeWidget
 {
 public:
   static vtkKWListBox* New();
-  vtkTypeRevisionMacro(vtkKWListBox,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWListBox,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
