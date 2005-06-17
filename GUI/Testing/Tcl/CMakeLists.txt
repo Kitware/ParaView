@@ -185,7 +185,7 @@ FOREACH (tfile ${PROJECT_TESTS})
       -D ${PVClientTestData}
       -C ${PVCompareImages}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVClientTestData}/Baseline/${tfile}.png
+      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
       -FrontBuffer
       -NoRerender
       )
