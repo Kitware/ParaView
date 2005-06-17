@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.734");
+vtkCxxRevisionMacro(vtkPVWindow, "1.735");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -835,8 +835,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                             "VTK filters");  
 
   // Window menu:
-
-  this->GetWindowMenu()->AddSeparator();
 
   // Log stuff (not traced)
   this->GetWindowMenu()->InsertCommand(
