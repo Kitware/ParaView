@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.4");
 
 int vtkPVComparativeVisPropertyWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -154,7 +154,7 @@ void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
       this->LastCueEditor = vtkPVSimpleAnimationCue::New();
       this->LastCueEditor->SetDuration(5);
       this->LastCueEditor->SetKeyFrameParent(trackE->GetPropertiesFrame());
-      this->LastCueEditor->CreateSpecificTkWidget(this->GetApplication(), 0);
+      this->LastCueEditor->Create(this->GetApplication());
 
       this->LastCueEditor->SetAnimatedProxy(
         this->LastCue->GetAnimatedProxy());
