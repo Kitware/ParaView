@@ -81,7 +81,8 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleRangeDomain.h"
-  
+#include "vtkKWTopLevel.h"
+
 #include <vtkstd/string>
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMIntVectorProperty.h"
@@ -141,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.385");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.386");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -155,7 +156,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
-    this->TopLevelRenderWindow = vtkKWWidget::New();
+    this->TopLevelRenderWindow = vtkKWTopLevel::New();
     this->TopLevelRenderWindow->SetParent(this->Frame);
     this->VTKWidget->SetParent(NULL);
     this->VTKWidget->SetParent(this->TopLevelRenderWindow);
@@ -702,10 +703,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
-    this->TopLevelRenderWindow->CreateSpecificTkWidget(app, "toplevel");
-    this->Script("wm title %s %s", 
-                 this->TopLevelRenderWindow->GetWidgetName(),
-                 app->GetName());
+    this->TopLevelRenderWindow->Create(app);
+    this->TopLevelRenderWindow->SetTitle(app->GetName());
     }
 
   // Add the -rw argument

@@ -36,6 +36,7 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkKWScale;
+class vtkKWTopLevel;
 class vtkPVSourceNotebook;
 class vtkKWSplitFrame;
 class vtkLabeledFrame;
@@ -413,7 +414,7 @@ protected:
   int ShowNavigationWindow;
 
   // For the renderer in a separate toplevel window.
-  vtkKWWidget *TopLevelRenderWindow;
+  vtkKWTopLevel *TopLevelRenderWindow;
 
   vtkPVInteractorStyleControl *ManipulatorControl2D;
   vtkPVInteractorStyleControl *ManipulatorControl3D;
