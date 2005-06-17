@@ -33,7 +33,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.2");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -698,7 +698,7 @@ void vtkHierarchicalFractal::AddFractalArray(vtkHierarchicalDataSet *output)
     while(block<blocks)
       {
       vtkUniformGrid *grid;
-      grid==vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
       assert("check: grid_exists" && grid!=0);
       
       
@@ -769,7 +769,7 @@ void vtkHierarchicalFractal::AddBlockIdArray(vtkHierarchicalDataSet *output)
     while(block<blocks)
       {
       vtkUniformGrid *grid;
-      grid==vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
       assert("check: grid_exists" && grid!=0);
       
       
@@ -806,7 +806,7 @@ void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalDataSet *output)
     while(block<blocks)
       {
       vtkUniformGrid *grid;
-      grid==vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
       assert("check: grid_exists" && grid!=0);
       
       
@@ -841,7 +841,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkHierarchicalDataSet *output)
     while(block<blocks)
       {
       vtkUniformGrid *grid;
-      grid==vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
       assert("check: grid_exists" && grid!=0);
       
       vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
