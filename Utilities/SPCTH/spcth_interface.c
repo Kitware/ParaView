@@ -7,7 +7,6 @@
  * modification, are permitted provided that this Notice and any statement
  * of authorship are reproduced on all copies.
  */
-/* Author: Brian Wylie bnwylie@sandia.gov */
 
 #include <stdio.h>
 #include <stdlib.h>

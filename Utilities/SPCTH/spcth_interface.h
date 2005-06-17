@@ -7,7 +7,7 @@
  * modification, are permitted provided that this Notice and any statement
  * of authorship are reproduced on all copies.
  *
- * Author: Brian Wylie bnwylie@sandia.gov */
+ */
 
 #ifndef SPCTH_INTERFACE_H
 #define SPCTH_INTERFACE_H
