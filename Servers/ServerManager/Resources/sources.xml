@@ -258,6 +258,58 @@
    <!-- End CTHAMRFractal -->
    </SourceProxy>
 
+   <SourceProxy name="HierarchicalFractal" class="vtkHierarchicalFractal">
+      <IntVectorProperty
+         name="Dimensions"
+         command="SetDimensions"
+         number_of_elements="1"
+         default_values="10" >
+        <IntRangeDomain name="range" min="2" max="64" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="FractalValue"
+         command="SetFractalValue"
+         number_of_elements="1"
+         default_values="9.5" >
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="MaximumLevel"
+         command="SetMaximumLevel"
+         number_of_elements="1"
+         default_values="5" >
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GhostLevels"
+         command="SetGhostLevels"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="TwoDimensional"
+         command="SetTwoDimensional"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="Asymetric"
+         command="SetAsymetric"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+   <!-- End HierarchicalFractal -->
+   </SourceProxy>
+
    <SourceProxy name="CylinderSource" class="vtkCylinderSource">
       <IntVectorProperty
          name="Resolution"

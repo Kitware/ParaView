@@ -27,6 +27,7 @@ SET(Filters_SRCS
   vtkDesktopDeliveryServer.cxx
   vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
+  vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
