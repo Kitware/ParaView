@@ -34,7 +34,7 @@
 #ifndef __vtkPVLookmarkManager_h
 #define __vtkPVLookmarkManager_h
 
-#include "vtkPVTracedWidget.h"
+#include "vtkKWTopLevel.h"
 
 class vtkKWLookmarkFolder;
 class vtkKWLookmark;
@@ -57,11 +57,11 @@ class vtkKWText;
 template<class DataType> class vtkVector;
 //ETX
 
-class VTK_EXPORT vtkPVLookmarkManager : public vtkPVTracedWidget
+class VTK_EXPORT vtkPVLookmarkManager : public vtkKWTopLevel
 {
 public:
   static vtkPVLookmarkManager* New();
-  vtkTypeRevisionMacro(vtkPVLookmarkManager, vtkPVTracedWidget);
+  vtkTypeRevisionMacro(vtkPVLookmarkManager, vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -69,16 +69,12 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Close/Display the window
-  void Display();
-  void Close();
+  // Display the toplevel.
+  virtual void Display();
 
   // Description:
-  // Set the window to which the dialog will be slave.
-  // If set, this dialog will always be on top of the master
-  // window and will minimize with it (assuming that the windowing
-  // system supports this)
-  void SetMasterWindow(vtkKWWindow* win);
+  // Close the toplevel.
+  virtual void Withdraw();
 
   // Callbacks to interface widgets
 
@@ -252,10 +248,6 @@ protected:
   // in the current directory of the current state of the lookmark manager. The file name is "LookmarkManager.lmk" by default until a lookmark file is imported or one is saved out
   void Checkpoint();
 
-  // Description:
-  // Set the title of the window
-  vtkSetStringMacro(Title);
-
 private:
 
 vtkPVLookmarkManager(const vtkPVLookmarkManager&); // Not implemented
@@ -273,7 +265,6 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWFrame *TopDragAndDropTarget;
   vtkKWFrame *BottomDragAndDropTarget;
 
-  vtkKWMenu *Menu;
   vtkKWMenu *MenuFile;
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuImport;
@@ -285,10 +276,6 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWText *QuickStartGuideTxt;
   vtkKWMessageDialog *UsersTutorialDialog;
   vtkKWText *UsersTutorialTxt;
-
-  char *Title;
-  vtkKWWindow* MasterWindow;
-
 };
 
 #endif

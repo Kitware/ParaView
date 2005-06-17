@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.29");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.30");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -128,7 +128,6 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->BottomDragAndDropTarget= vtkKWFrame::New();
   this->CreateLmkButton = vtkKWPushButton::New();
 
-  this->Menu = vtkKWMenu::New();
   this->MenuFile = vtkKWMenu::New();
   this->MenuEdit = vtkKWMenu::New();
   this->MenuImport = vtkKWMenu::New();
@@ -139,8 +138,6 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->UsersTutorialDialog = 0;
   this->UsersTutorialTxt = 0;
 
-  this->MasterWindow = 0;
-  this->Title = NULL;
   this->SetTitle("Lookmark Manager");
 }
 
@@ -158,7 +155,6 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
   this->BottomDragAndDropTarget->Delete();
   this->BottomDragAndDropTarget= NULL;
 
-  this->Menu->Delete();
   this->MenuEdit->Delete();
   this->MenuImport->Delete();
   this->MenuFile->Delete();
@@ -226,40 +222,12 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
   this->LmkScrollFrame = NULL;
   this->LmkPanelFrame->Delete();
   this->LmkPanelFrame= NULL;
-  
-  this->SetTitle(NULL);
-  this->SetMasterWindow(0);
-
 }
 
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVLookmarkManager::GetPVRenderView()
 {
   return this->GetPVApplication()->GetMainView();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SetMasterWindow(vtkKWWindow* win)
-{
-
-  if (this->MasterWindow != win) 
-    { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
-    this->MasterWindow = win; 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->Register(this); 
-      if (this->IsCreated())
-        {
-        this->Script("wm transient %s %s", this->GetWidgetName(), 
-                     this->MasterWindow->GetWidgetName());
-        }
-      } 
-    this->Modified(); 
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -273,48 +241,25 @@ vtkPVApplication* vtkPVLookmarkManager::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 {
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  if (this->MasterWindow)
-    {
-    this->Script("toplevel %s -class %s",
-                 wname,
-                 this->MasterWindow->GetWindowClass());
-    }
-  else
-    {
-    this->Script("toplevel %s" ,wname);
-    }
+  // Call the superclass to create the whole widget
 
-  this->Script("wm title %s \"%s\"", wname, this->Title);
-  this->Script("wm iconname %s \"vtk\"", wname);
-  this->Script("wm geometry %s 380x700+0+0", wname);
-  this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
-               wname, wname);
+  this->Superclass::Create(app);
 
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
-
-  // Set up standard menus
-
-  this->Menu->SetParent(this);
-  this->Menu->SetTearOff(0);
-  this->Menu->Create(app);
-  this->Script("%s configure -menu %s", this->GetWidgetName(),
-               this->Menu->GetWidgetName());
+  this->SetGeometry("380x700+0+0");
 
   // Menu : File
 
-  this->MenuFile->SetParent(this->Menu);
+  vtkKWMenu *root_menu = this->GetMenu();
+
+  this->MenuFile->SetParent(root_menu);
   this->MenuFile->SetTearOff(0);
   this->MenuFile->Create(app);
 
@@ -328,18 +273,18 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuImport->AddRadioButton(1, "Replace", rbv, this, "ImportCallback", 1);
   delete [] rbv;
 
-  this->Menu->AddCascade("File", this->MenuFile, 0);
+  root_menu->AddCascade("File", this->MenuFile, 0);
   this->MenuFile->AddCascade("Import", this->MenuImport,0);
   this->MenuFile->AddCommand("Save As", this, "SaveAllCallback");
   this->MenuFile->AddCommand("Export Folder", this, "ExportFolderCallback");
-  this->MenuFile->AddCommand("Close", this, "Close");
+  this->MenuFile->AddCommand("Close", this, "Withdraw");
 
   // Menu : Edit
 
-  this->MenuEdit->SetParent(this->Menu);
+  this->MenuEdit->SetParent(root_menu);
   this->MenuEdit->SetTearOff(0);
   this->MenuEdit->Create(app);
-  this->Menu->AddCascade("Edit", this->MenuEdit, 0);
+  root_menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
   this->MenuEdit->AddSeparator();
   this->MenuEdit->AddCommand("Create Lookmark", this, "CreateLookmarkCallback");
@@ -357,10 +302,10 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   // Menu : Help
 
-  this->MenuHelp->SetParent(this->Menu);
+  this->MenuHelp->SetParent(root_menu);
   this->MenuHelp->SetTearOff(0);
   this->MenuHelp->Create(app);
-  this->Menu->AddCascade("Help", this->MenuHelp, 0);
+  root_menu->AddCascade("Help", this->MenuHelp, 0);
   this->MenuHelp->AddCommand("Quick Start Guide", this, "DisplayQuickStartGuide");
   this->MenuHelp->AddCommand("User's Tutorial", this, "DisplayUsersTutorial");
 
@@ -422,27 +367,24 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
     {
     this->Import(str.str(),0);
     }
-
-
-  this->Script("wm withdraw %s", wname);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::Close()
+void vtkPVLookmarkManager::Withdraw()
 {
-//  this->GetTraceHelper()->AddEntry("$kw(%s) Close",
-//                      this->GetTclName());
+  this->Superclass::Withdraw();
 
-  this->Script("wm withdraw %s", this->GetWidgetName());
+//  this->GetTraceHelper()->AddEntry("$kw(%s) Withdraw",
+//                      this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::Display()
 {
+  this->Superclass::Display();
+
 //  this->GetTraceHelper()->AddEntry("$kw(%s) Display",
 //                      this->GetTclName());
-
-  this->Script("wm deiconify %s", this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -465,7 +407,7 @@ void vtkPVLookmarkManager::DisplayQuickStartGuide()
 
   this->QuickStartGuideDialog->Invoke();
 
-  this->Script("focus %s",this->GetWidgetName());
+  this->Focus();
 }
 
 
@@ -550,7 +492,7 @@ void vtkPVLookmarkManager::DisplayUsersTutorial()
 
   this->UsersTutorialDialog->Invoke();
 
-  this->Script("focus %s",this->GetWidgetName());
+  this->Focus();
 }
 
 
@@ -764,7 +706,7 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -819,11 +761,13 @@ void vtkPVLookmarkManager::DragAndDropPerformCommand(int x, int y, vtkKWWidget *
         this->TopDragAndDropTarget->GetWidgetName(),
         x, y))
     {
-    this->Script("%s configure -bd 2 -relief groove", this->TopDragAndDropTarget->GetWidgetName());
+    this->TopDragAndDropTarget->SetBorderWidth(2);
+    this->TopDragAndDropTarget->SetReliefToGroove();
     }
   else
     {
-    this->Script("%s configure -bd 0 -relief flat", this->TopDragAndDropTarget->GetWidgetName());
+    this->TopDragAndDropTarget->SetBorderWidth(0);
+    this->TopDragAndDropTarget->SetReliefToFlat();
     }
 }
 
@@ -1019,7 +963,8 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
     {
     this->DragAndDropWidget(widget, this->TopDragAndDropTarget);
     this->PackChildrenBasedOnLocation(this->TopDragAndDropTarget->GetParent());
-    this->Script("%s configure -bd 0 -relief flat", this->TopDragAndDropTarget->GetWidgetName());
+    this->TopDragAndDropTarget->SetBorderWidth(0);
+    this->TopDragAndDropTarget->SetReliefToFlat();
     }
 
   this->DestroyUnusedLmkWidgets(this->LmkScrollFrame);
@@ -1259,7 +1204,7 @@ char* vtkPVLookmarkManager::PromptForLookmarkFile(int saveFlag)
     return 0;
     }
 
-  this->Script("focus %s",this->GetWidgetName());
+  this->Focus();
 
 
   dialog->Delete();
@@ -1375,7 +1320,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
       this->GetPVApplication(), win, "No Lookmark Selected", 
       "To update a lookmark with a new view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1385,7 +1330,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
       this->GetPVApplication(), win, "Multiple Lookmarks Selected", 
       "To update a lookmark with a new view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1427,7 +1372,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
       this->GetPVApplication(), win, "No Data Loaded", 
       "To create a lookmark you must first open your data and view some feature of interest. Then press \"Create Lookmark\" in either the main window or in the \"Edit\" menu.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1452,7 +1397,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
       this->GetPVApplication(), win, "Error Creating Lookmark", 
       "Lookmarking ParaView source is not yet supported", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1638,7 +1583,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Multiple Folders Selected", 
       "To export a folder of lookmarks to a lookmark file, first select a folder by checking its box. Then go to \"File\" --> \"Export Folder\"",
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
     this->SetButtonFrameState(1);
 
     return;
@@ -1659,7 +1604,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
             this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Multiple Lookmarks and Folders Selected", 
             "To export a folder of lookmarks to a lookmark file, first select a folder by checking its box. Then go to \"File\" --> \"Export Folder\"",
             vtkKWMessageDialog::ErrorIcon);
-          this->Script("focus %s",this->GetWidgetName());
+          this->Focus();
           this->SetButtonFrameState(1);
 
           return;
@@ -1703,7 +1648,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1713,7 +1658,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1728,7 +1673,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1738,7 +1683,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1758,7 +1703,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1768,7 +1713,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1797,7 +1742,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1807,7 +1752,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1822,7 +1767,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1832,7 +1777,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1903,7 +1848,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1913,7 +1858,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1943,7 +1888,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(ostream *os)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1953,7 +1898,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(ostream *os)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1968,7 +1913,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(ostream *os)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -1978,7 +1923,7 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(ostream *os)
       this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
-    this->Script("focus %s",this->GetWidgetName());
+    this->Focus();
 
     return;
     }
@@ -2869,20 +2814,15 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-
 }
-
  
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
 }
 
