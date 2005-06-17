@@ -50,11 +50,12 @@ set page_widget [widgets_panel GetPageWidget "Widgets"]
 
 # Add a list box to pick a widget example
 
-vtkKWListBox widgets_list
+vtkKWListBoxWithScrollbars widgets_list
 widgets_list SetParent $page_widget
-widgets_list ScrollbarOn
+widgets_list ShowVerticalScrollbarOn
+widgets_list ShowHorizontalScrollbarOff
 widgets_list Create app
-widgets_list SetHeight 300
+[widgets_list GetWidget] SetHeight 300
 
 pack [widgets_list GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
@@ -81,41 +82,45 @@ source_split Create app
 pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 # Add text widget to display the Tcl example source
 
-vtkKWTextLabeled tcl_source_text
+vtkKWTextWithScrollbarsLabeled tcl_source_text
 tcl_source_text SetParent [source_split GetFrame1]
 tcl_source_text Create app
 tcl_source_text SetLabelPositionToTop
 tcl_source_text SetLabelText "Tcl Source"
 
 set text_widget [tcl_source_text GetWidget]
-$text_widget EditableTextOff
-$text_widget UseVerticalScrollbarOn
-$text_widget SetWrapToNone
-$text_widget SetHeight 3000
-$text_widget AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
-$text_widget AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
-$text_widget AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
+$text_widget ShowVerticalScrollbarOn
+
+set text [$text_widget GetWidget]
+$text EditableTextOff
+$text SetWrapToNone
+$text SetHeight 3000
+$text AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
+$text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
+$text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
 pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 # Add text widget to display the C++ example source
 
-vtkKWTextLabeled cxx_source_text
+vtkKWTextWithScrollbarsLabeled cxx_source_text
 cxx_source_text SetParent [source_split GetFrame2]
 cxx_source_text Create app
 cxx_source_text SetLabelPositionToTop
 cxx_source_text SetLabelText "C++ Source"
 
 set text_widget [cxx_source_text GetWidget]
-$text_widget EditableTextOff
-$text_widget UseVerticalScrollbarOn
-$text_widget SetWrapToNone
-$text_widget SetHeight 3000
-$text_widget AddTagMatcher "#\[a-z\]+" "_fg_red_tag_"
-$text_widget AddTagMatcher "//\[^\n\]*" "_fg_navy_tag_"
-$text_widget AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
-$text_widget AddTagMatcher "<\[^>\]*>" "_fg_blue_tag_"
-$text_widget AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
+$text_widget ShowVerticalScrollbarOn
+
+set text [$text_widget GetWidget]
+$text EditableTextOff
+$text SetWrapToNone
+$text SetHeight 3000
+$text AddTagMatcher "#\[a-z\]+" "_fg_red_tag_"
+$text AddTagMatcher "//\[^\n\]*" "_fg_navy_tag_"
+$text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
+$text AddTagMatcher "<\[^>\]*>" "_fg_blue_tag_"
+$text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
 pack [cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
@@ -144,7 +149,7 @@ foreach widget $widgets {
     source $widget
     
     if {[${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]} {
-        widgets_list AppendUnique $name
+        [widgets_list GetWidget] AppendUnique $name
         set tcl_source($name) [read [open $widget]]
 
         # Try to find the C++ source too
@@ -160,9 +165,9 @@ foreach widget $widgets {
 
 # Raise the example panel
 
-set cmd {win ShowViewUserInterface [widgets_list GetSelection] ; [tcl_source_text GetWidget] SetValue $tcl_source([widgets_list GetSelection]) ; [cxx_source_text GetWidget] SetValue $cxx_source([widgets_list GetSelection])}
+set cmd {win ShowViewUserInterface [[widgets_list GetWidget] GetSelection] ; [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_list GetWidget] GetSelection]) ; [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_list GetWidget] GetSelection])}
 
-widgets_list SetSingleClickCallback "" $cmd
+[widgets_list GetWidget] SetSingleClickCallback "" $cmd
 
 # Start the application
 # If --test was provided, do not enter the event loop
