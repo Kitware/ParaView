@@ -21,14 +21,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.42");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.43");
 
+//----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
-  this->Done             = 1;
   this->FileTypes        = NULL;
   this->InitialFileName  = NULL;
-  this->Title            = NULL;
   this->FileName         = NULL;
   this->LastPath         = NULL;
   this->DefaultExtension = NULL;
@@ -45,7 +44,6 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 {
   this->SetFileTypes(NULL);
   this->SetInitialFileName(NULL);
-  this->SetTitle(NULL);
   this->SetFileName(NULL);
   this->SetDefaultExtension(NULL);
   this->SetLastPath(NULL);
@@ -54,15 +52,26 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 //----------------------------------------------------------------------------
 void vtkKWLoadSaveDialog::Create(vtkKWApplication *app)
 {
-  // Call the superclass to set the appropriate flags then create manually
+  // Check if already created
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  // Nothing else here for now
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app);
+
+  // Note that for this specific class, we are not really going to
+  // display or use the toplevel that has been just created, we
+  // are going to use a native file browser, created in Invoke()
+  // We also could have yanked out the whole code here, but this
+  // is not critical since the toplevel is created in a hidden state
+  // and I want to make sure that subclass can safely rely on
+  // calling our Create() and expect the whole dialog to be created
+  // correctly. So let's not break the creation chain.
 }
 
 //----------------------------------------------------------------------------
@@ -141,6 +150,8 @@ int vtkKWLoadSaveDialog::Invoke()
   this->GetApplication()->UnRegisterDialogUp(this);
   this->Script("update");
 
+  this->Done = res + 1;
+
   return res;
 }
 
@@ -184,6 +195,5 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "SaveDialog: " << this->GetSaveDialog() << endl;
   os << indent << "ChooseDirectory: " << this->GetChooseDirectory() << endl;
-  os << indent << "Title: " << (this->Title?this->Title:"none") << endl;
 }
 

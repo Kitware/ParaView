@@ -19,14 +19,15 @@
 #ifndef __vtkKWLoadSaveDialog_h
 #define __vtkKWLoadSaveDialog_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWDialog.h"
+
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWLoadSaveDialog : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWLoadSaveDialog : public vtkKWDialog
 {
 public:
   static vtkKWLoadSaveDialog* New();
-  vtkTypeRevisionMacro(vtkKWLoadSaveDialog,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLoadSaveDialog,vtkKWDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -34,15 +35,17 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Invoke the dialog and display it in a modal manner. 
-  // This method returns a zero if the dilaog was killed or 
+  // Invoke the dialog, display it and enter an event loop until the user
+  // confirm (OK) or cancel the dialog.
+  // Note that a dialog is a modal toplevel by default.
+  // Important: this implementation does not actually create any UI but use
+  // a  native file browser instantiated and deleted in Invoke().
+  // If you implement your own UI to create a file dialog in a subclass,
+  // reimplement your own Invoke() and do not call this class's Invoke(), 
+  // call vtkKWDialog::Invoke() instead.
+  // This method returns a zero if the dialog was killed or 
   // canceled, nonzero otherwise.
   virtual int Invoke();
-
-  // Description:
-  // Returns 0 if the dialog is active e.g. displayed
-  // 1 if it was Canceled 2 if it was OK.
-  int GetStatus() { return this->Done; };
 
   // Description:
   // Set/Get the file types the dialog will open or save
@@ -80,12 +83,6 @@ public:
   vtkGetMacro(ChooseDirectory, int);
 
   // Description:
-  // Set the title string of the dialog window. Should be called before
-  // create otherwise it will have no effect.
-  vtkSetStringMacro(Title);
-  vtkGetStringMacro(Title);  
-
-  // Description:
   // Set/Get last path
   vtkGetStringMacro(LastPath);
   vtkSetStringMacro(LastPath);
@@ -100,7 +97,6 @@ protected:
 
   char *FileTypes;
   char *InitialFileName;
-  char *Title;
   char *FileName;
   char *DefaultExtension;
   char *LastPath;
