@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.21");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.22");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -78,8 +78,6 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
 
   this->Superclass::Create(app);
  
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
   this->ScrollFrame->SetParent(this);
   this->ScrollFrame->Create(app);
   this->Script("pack %s -side top -fill both -expand t",
