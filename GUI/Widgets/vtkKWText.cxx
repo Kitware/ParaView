@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.37");
+vtkCxxRevisionMacro(vtkKWText, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -342,11 +342,7 @@ void vtkKWText::SetEditableText(int arg)
 //----------------------------------------------------------------------------
 void vtkKWText::SetWidth(int width)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -width %d", 
-                 this->GetWidgetName(), width);
-    }
+  this->SetConfigurationOptionAsInt("-width", width);
 }
 
 //----------------------------------------------------------------------------
@@ -358,11 +354,7 @@ int vtkKWText::GetWidth()
 //----------------------------------------------------------------------------
 void vtkKWText::SetHeight(int height)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -height %d", 
-                 this->GetWidgetName(), height);
-    }
+  this->SetConfigurationOptionAsInt("-height", height);
 }
 
 //----------------------------------------------------------------------------

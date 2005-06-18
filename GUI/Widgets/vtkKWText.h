@@ -65,7 +65,7 @@ public:
   vtkBooleanMacro(QuickFormatting, int);
 
   // Description:
-  // Convenience method to set the width/height.
+  // Convenience method to get/set the width/height.
   virtual void SetWidth(int);
   virtual int GetWidth();
   virtual void SetHeight(int);
