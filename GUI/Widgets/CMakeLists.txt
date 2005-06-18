@@ -148,6 +148,7 @@ SET(KWWidgets_SRCS
   vtkKWToolbar.cxx 
   vtkKWToolbarSet.cxx 
   vtkKWTopLevel.cxx 
+  vtkKWTree.cxx 
   vtkKWUserInterfaceManager.cxx
   vtkKWUserInterfaceNotebookManager.cxx
   vtkKWUserInterfacePanel.cxx
