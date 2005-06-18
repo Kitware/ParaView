@@ -18,15 +18,15 @@
 #ifndef __vtkKWTopLevel_h
 #define __vtkKWTopLevel_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWTopLevel : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWTopLevel : public vtkKWCoreWidget
 {
 public:
   static vtkKWTopLevel* New();
-  vtkTypeRevisionMacro(vtkKWTopLevel,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWTopLevel,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

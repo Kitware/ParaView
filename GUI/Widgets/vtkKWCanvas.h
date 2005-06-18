@@ -40,13 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWCanvas_h
 #define __vtkKWCanvas_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWCanvas : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCanvas : public vtkKWCoreWidget
 {
 public:
   static vtkKWCanvas* New();
-  vtkTypeRevisionMacro(vtkKWCanvas,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCanvas,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

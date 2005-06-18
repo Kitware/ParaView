@@ -18,14 +18,14 @@
 #ifndef __vtkKWPushButton_h
 #define __vtkKWPushButton_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWPushButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWPushButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWPushButton* New();
-  vtkTypeRevisionMacro(vtkKWPushButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWPushButton,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

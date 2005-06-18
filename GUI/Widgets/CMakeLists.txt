@@ -81,6 +81,7 @@ SET(KWWidgets_SRCS
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCompositeWidget.cxx
+  vtkKWCoreWidget.cxx
   vtkKWCornerAnnotationEditor.cxx 
   vtkKWDialog.cxx 
   vtkKWDragAndDropTargetSet.cxx

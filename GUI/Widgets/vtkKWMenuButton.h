@@ -15,15 +15,15 @@
 #ifndef __vtkKWMenuButton_h
 #define __vtkKWMenuButton_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWMenuButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMenuButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWMenuButton* New();
-  vtkTypeRevisionMacro(vtkKWMenuButton, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMenuButton, vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

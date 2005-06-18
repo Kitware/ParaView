@@ -19,13 +19,13 @@
 #ifndef __vtkKWFrame_h
 #define __vtkKWFrame_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWFrame : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWFrame : public vtkKWCoreWidget
 {
 public:
   static vtkKWFrame* New();
-  vtkTypeRevisionMacro(vtkKWFrame,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWFrame,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

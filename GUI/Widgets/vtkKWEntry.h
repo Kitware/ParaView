@@ -19,15 +19,15 @@
 #ifndef __vtkKWEntry_h
 #define __vtkKWEntry_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWEntry : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWEntry : public vtkKWCoreWidget
 {
 public:
   static vtkKWEntry* New();
-  vtkTypeRevisionMacro(vtkKWEntry,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWEntry,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

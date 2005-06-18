@@ -19,16 +19,16 @@
 #ifndef __vtkKWOptionMenu_h
 #define __vtkKWOptionMenu_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWApplication;
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWOptionMenu : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWOptionMenu : public vtkKWCoreWidget
 {
 public:
   static vtkKWOptionMenu* New();
-  vtkTypeRevisionMacro(vtkKWOptionMenu,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWOptionMenu,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

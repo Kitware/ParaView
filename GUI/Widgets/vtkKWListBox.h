@@ -25,15 +25,15 @@
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWCoreWidget
 {
 public:
   static vtkKWListBox* New();
-  vtkTypeRevisionMacro(vtkKWListBox,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWListBox,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

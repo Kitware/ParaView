@@ -19,13 +19,13 @@
 #ifndef __vtkKWScrollbar_h
 #define __vtkKWScrollbar_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWScrollbar : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWScrollbar : public vtkKWCoreWidget
 {
 public:
   static vtkKWScrollbar* New();
-  vtkTypeRevisionMacro(vtkKWScrollbar,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWScrollbar,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

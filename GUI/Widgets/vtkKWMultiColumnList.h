@@ -29,13 +29,13 @@
 #ifndef __vtkKWMultiColumnList_h
 #define __vtkKWMultiColumnList_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWCoreWidget
 {
 public:
   static vtkKWMultiColumnList* New();
-  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMultiColumnList,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

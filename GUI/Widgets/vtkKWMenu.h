@@ -20,13 +20,13 @@
 #ifndef __vtkKWMenu_h
 #define __vtkKWMenu_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWMenu : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWMenu : public vtkKWCoreWidget
 {
 public:
   static vtkKWMenu* New();
-  vtkTypeRevisionMacro(vtkKWMenu,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMenu,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description: 

@@ -19,14 +19,14 @@
 #ifndef __vtkKWCheckButton_h
 #define __vtkKWCheckButton_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWCheckButton : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCheckButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWCheckButton* New();
-  vtkTypeRevisionMacro(vtkKWCheckButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCheckButton,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

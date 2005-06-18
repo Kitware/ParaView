@@ -19,14 +19,14 @@
 #ifndef __vtkKWLabel_h
 #define __vtkKWLabel_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 class vtkKWApplication;
 
-class KWWIDGETS_EXPORT vtkKWLabel : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWLabel : public vtkKWCoreWidget
 {
 public:
   static vtkKWLabel* New();
-  vtkTypeRevisionMacro(vtkKWLabel,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLabel,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
