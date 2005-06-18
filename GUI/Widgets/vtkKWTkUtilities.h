@@ -91,15 +91,17 @@ public:
                              double *r, double *g, double *b);
   
   // Description:
-  // Get the RGB components of the background color
-  // of the widget given by 'widget' (say, .foo.bar).
+  // Set the RGB components of the color 'option'
+  // (say -bg, -fg, etc.) of the widget given by 'widget' (say, .foo.bar).
   // A convenience method is provided to query a vtkKWWidget directly.
-  static void GetBackgroundColor(Tcl_Interp *interp,
-                                 const char *widget, 
-                                 double *r, double *g, double *b);
-  static void GetBackgroundColor(vtkKWWidget *widget,
-                                 double *r, double *g, double *b);
-
+  static void SetOptionColor(Tcl_Interp *interp,
+                             const char *widget, 
+                             const char *option, 
+                             double r, double g, double b);
+  static void SetOptionColor(vtkKWWidget *widget,
+                             const char *option, 
+                             double r, double g, double b);
+  
   // Description:
   // Get the geometry of a widget given by 'widget' (say, .foo.bar).
   // The geometry is the width, height and position of the widget. 

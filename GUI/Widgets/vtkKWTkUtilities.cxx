@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.52");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.53");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -247,26 +247,44 @@ void vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
-                                          const char *widget,
-                                          double *r, double *g, double *b)
+void vtkKWTkUtilities::SetOptionColor(Tcl_Interp *interp,
+                                      const char *widget,
+                                      const char *option,
+                                      double r, double g, double b)
 {
-  vtkKWTkUtilities::GetOptionColor(interp, widget, "-background", r, g, b);
+  if (!interp || !widget || !option)
+    {
+    return;
+    }
+
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", 
+          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+
+  ostrstream command;
+  command << widget << " configure " << option << " " << color << ends;
+  if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to set " << option << " option: " << interp->result);
+    }
+  command.rdbuf()->freeze(0);     
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTkUtilities::GetBackgroundColor(vtkKWWidget *widget, 
-                                          double *r, double *g, double *b)
+void vtkKWTkUtilities::SetOptionColor(vtkKWWidget *widget, 
+                                      const char *option,
+                                      double r, double g, double b)
 {
   if (!widget || !widget->IsCreated())
     {
     return;
     }
-
-  vtkKWTkUtilities::GetBackgroundColor(
-    widget->GetApplication()->GetMainInterp(),
-    widget->GetWidgetName(),
-    r, g, b);
+  
+  vtkKWTkUtilities::SetOptionColor(widget->GetApplication()->GetMainInterp(),
+                                   widget->GetWidgetName(),
+                                   option,
+                                   r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -549,7 +567,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       }
     else
       {
-      vtkKWTkUtilities::GetBackgroundColor(interp, ".", &r, &g, &b);
+      vtkKWTkUtilities::GetOptionColor(interp, ".", "-background", &r, &g, &b);
       }
     
     r *= 255.0;

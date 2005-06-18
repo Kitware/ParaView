@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.129");
+vtkCxxRevisionMacro(vtkKWWidget, "1.130");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -561,7 +561,7 @@ int vtkKWWidget::GetStateOption()
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
 {
-  vtkKWTkUtilities::GetBackgroundColor(this, r, g, b);
+  vtkKWTkUtilities::GetOptionColor(this, "-background", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -575,10 +575,7 @@ double* vtkKWWidget::GetBackgroundColor()
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetConfigurationOption("-background", color);
+  vtkKWTkUtilities::SetOptionColor(this, "-background", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -598,10 +595,7 @@ double* vtkKWWidget::GetForegroundColor()
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetForegroundColor(double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetConfigurationOption("-fg", color);
+  vtkKWTkUtilities::SetOptionColor(this, "-foreground", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -1128,7 +1122,7 @@ int vtkKWWidget::SetConfigurationOption(
     }
 
   const char *res = 
-    this->Script("%s configure %s %s", this->GetWidgetName(), option, value);
+    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
 
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
