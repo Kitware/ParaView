@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.68");
+vtkCxxRevisionMacro(vtkKWMenu, "1.69");
 
 
 
@@ -764,7 +764,7 @@ int vtkKWMenu::HasItem(const char* menuname)
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetNumberOfItems()
 {
-  if (this->IsCreated())
+  if (this->IsAlive())
     {
     const char *end = this->Script("%s index end", this->GetWidgetName());
     if (strcmp(end, "none"))
