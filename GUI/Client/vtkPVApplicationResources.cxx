@@ -515,7 +515,7 @@ void vtkPVApplication::ConfigureAboutDialog()
                this->SaveRuntimeInfoButton->GetWidgetName());
   this->AboutRuntimeInfo->GetWidget()->SetHeight(14);
   this->AboutRuntimeInfo->GetWidget()->SetConfigurationOption(
-    "-font", "{Helvetica 9}");
+    "-font", "Helvetica 9");
 }
 
 //----------------------------------------------------------------------------

@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.43");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.44");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -278,8 +278,8 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->ScrollBar->SetParent(this->MiddleFrame);
   this->ScrollBar->Create(this->GetApplication());
   ostrstream command;
-  command << "{" <<  this->FileList->GetWidgetName()
-          << " yview}" << ends;
+  command << this->FileList->GetWidgetName()
+          << " yview" << ends;
   char* commandStr = command.str();
   this->ScrollBar->SetConfigurationOption("-command", command.str());
   delete[] commandStr;

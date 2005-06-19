@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.24");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.25");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -162,8 +162,8 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
 
   ostrstream command;
   this->ScrollBar->SetParent(this);
-  command << "{" <<  this->Canvas->GetWidgetName()
-          << " yview}" << ends;
+  command << this->Canvas->GetWidgetName()
+          << " yview" << ends;
   char* commandStr = command.str();
   this->ScrollBar->Create(this->GetApplication());
   this->ScrollBar->SetConfigurationOption("-command", commandStr);

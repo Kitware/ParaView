@@ -19,7 +19,7 @@
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.2");
 
 int vtkKWWidgetWithScrollbarsCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -116,14 +116,12 @@ void vtkKWWidgetWithScrollbars::AssociateVerticalScrollbarToWidget(
   if (this->VerticalScrollBar && this->VerticalScrollBar->IsCreated() &&
       widget && widget->IsCreated())
     {
-    vtksys_stl::string command("{");
-    command += widget->GetWidgetName();
-    command += " yview}";
+    vtksys_stl::string command(widget->GetWidgetName());
+    command += " yview";
     this->VerticalScrollBar->SetConfigurationOption(
       "-command", command.c_str());
-    command = "{";
-    command += this->VerticalScrollBar->GetWidgetName();
-    command += " set}";
+    command = this->VerticalScrollBar->GetWidgetName();
+    command += " set";
     widget->SetConfigurationOption(
       "-yscrollcommand", command.c_str());
     }
@@ -152,14 +150,12 @@ void vtkKWWidgetWithScrollbars::AssociateHorizontalScrollbarToWidget(
   if (this->HorizontalScrollBar && this->HorizontalScrollBar->IsCreated() &&
       widget && widget->IsCreated())
     {
-    vtksys_stl::string command("{");
-    command += widget->GetWidgetName();
-    command += " xview}";
+    vtksys_stl::string command(widget->GetWidgetName());
+    command += " xview";
     this->HorizontalScrollBar->SetConfigurationOption(
       "-command", command.c_str());
-    command = "{";
-    command += this->HorizontalScrollBar->GetWidgetName();
-    command += " set}";
+    command = this->HorizontalScrollBar->GetWidgetName();
+    command += " set";
     widget->SetConfigurationOption(
       "-xscrollcommand", command.c_str());
     }

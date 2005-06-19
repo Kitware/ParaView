@@ -157,6 +157,8 @@ public:
   // a C++ method acting as a front-end for the corresponding Tk option.
   // For example, the SetBackgroundColor() method can be used to set the 
   // corresponding -bg Tk option. 
+  // Note that SetConfigurationOption will enclose the value inside
+  // curly braces {} as a convenience.
   // SetConfigurationOption returns 1 on success, 0 otherwise.
   virtual int SetConfigurationOption(const char* option, const char *value);
   virtual int SetConfigurationOptionAsInt(const char* option, int value);
