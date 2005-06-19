@@ -20,7 +20,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.38");
+vtkCxxRevisionMacro(vtkKWLabel, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -147,7 +147,9 @@ void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
 //----------------------------------------------------------------------------
 void vtkKWLabel::AdjustWrapLengthToWidthCallback()
 {
-  if (!this->IsCreated() || !this->AdjustWrapLengthToWidth)
+  if (!this->IsCreated() || 
+      !this->AdjustWrapLengthToWidth || 
+      this->LineType == vtkKWLabel::MultiLine)
     {
     return;
     }
