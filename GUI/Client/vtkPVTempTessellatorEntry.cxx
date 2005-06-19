@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.26");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -134,7 +134,6 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   d->CriteriaFrame->Create( app);
 
   d->CriteriaInstructions->SetParent( d->CriteriaFrame->GetFrame() );
-  d->CriteriaInstructions->SetLineType( vtkKWLabel::MultiLine );
   d->CriteriaInstructions->Create(app);
   d->CriteriaInstructions->AdjustWrapLengthToWidthOn();
   d->CriteriaInstructions->SetText(
