@@ -38,9 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 
+#include <vtksys/stl/string>
+
+int vtkKWTreeCommand(ClientData cd, Tcl_Interp *interp,
+                     int argc, char *argv[]);
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.1");
+vtkCxxRevisionMacro(vtkKWTree, "1.2");
+
+//----------------------------------------------------------------------------
+vtkKWTree::vtkKWTree()
+{
+  this->CommandFunction = vtkKWTreeCommand;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -77,6 +88,44 @@ void vtkKWTree::ClearSelection()
     {
     this->Script("%s selection clear", this->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::AddNode(const char *parent,
+                        const char *node,
+                        const char *text,
+                        const char *data,
+                        int is_open,
+                        int is_selectable)
+{
+  if (!this->IsCreated() || !node)
+    {
+    return;
+    }
+
+  vtksys_stl::string cmd;
+
+  cmd.append(this->GetWidgetName()).append(" insert end ").append(parent ? parent : "root").append(" ").append(node);
+
+  if (text && *text)
+    {
+    cmd.append(" -text {").append(text).append("}");
+    }
+  if (data && *data)
+    {
+    cmd.append(" -data {").append(data).append("}");
+    }
+  if (is_open)
+    {
+    cmd.append(" -open 1");
+    }
+  if (is_selectable)
+    {
+    cmd.append(" -selectable 1");
+    }
+
+  vtkKWTkUtilities::EvaluateSimpleString(
+    this->GetApplication(), cmd.c_str());
 }
 
 //----------------------------------------------------------------------------

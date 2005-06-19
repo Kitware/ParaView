@@ -62,6 +62,20 @@ public:
   virtual void ClearSelection();
 
   // Description:
+  // Add a new node identified by 'node' at the end of the children list of 
+  // 'parent'. If parent is NULL or 'root', insert at the root of the tree.
+  // Provides its text (i.e. the label displayed at the node 
+  // position), an optional user-data field to associate with that node,
+  // its open and selectable status.
+  // On a Pentium M 1.8 GHz, a Debug build could fill about 5000 nodes/s.
+  virtual void AddNode(const char *parent,
+                       const char *node,
+                       const char *text,
+                       const char *data,
+                       int is_open,
+                       int is_selectable);
+
+  // Description:
   // Arrange the tree to see a given node
   virtual void SeeNode(const char *node);
 
@@ -157,7 +171,7 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWTree() {};
+  vtkKWTree();
   ~vtkKWTree() {};
 
 private:
@@ -165,8 +179,4 @@ private:
   void operator=(const vtkKWTree&); // Not implemented
 };
 
-
 #endif
-
-
-
