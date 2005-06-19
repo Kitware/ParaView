@@ -57,10 +57,7 @@ protected:
   // Helper methods
 
   virtual vtkKWWidget* AllocateAndCreateWidget();
-
-  // BTX
   virtual vtkKWWidget* AddWidgetInternal(int id);
-  //ETX
 
 private:
   vtkKWRadioButtonSet(const vtkKWRadioButtonSet&); // Not implemented

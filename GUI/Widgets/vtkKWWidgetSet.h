@@ -125,12 +125,12 @@ protected:
   // PIMPL Encapsulation for STL containers
 
   vtkKWWidgetSetInternals *Internals;
+  //ETX
 
   // Helper methods
 
   virtual vtkKWWidget* GetWidgetInternal(int id);
   virtual vtkKWWidget* AddWidgetInternal(int id);
-  //ETX
 
   // Description:
   // Pack the widgets
