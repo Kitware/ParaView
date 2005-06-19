@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.33");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -47,14 +47,8 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
     return;
     }
 
-  int has_old_state = 0, old_state = 0;
   if (this->VariableName) 
     { 
-    if (_arg)
-      {
-      has_old_state = 1;
-      old_state = this->GetState();
-      }
     delete [] this->VariableName; 
     }
 
@@ -74,10 +68,6 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
     {
     this->Script("%s configure -variable {%s}", 
                  this->GetWidgetName(), this->VariableName);
-    if (has_old_state)
-      {
-      this->SetState(old_state);
-      }
     }
 } 
 
