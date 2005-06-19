@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.10");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.11");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -117,10 +117,6 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 //----------------------------------------------------------------------------
 vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
 {
-  this->SetHistogramSet(NULL);
-  this->SetVolumeProperty(NULL);
-  this->SetDataSet(NULL);
-
   // Commands
 
   if (this->VolumePropertyChangedCommand)
@@ -220,6 +216,10 @@ vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
     this->HSVColorSelector->Delete();
     this->HSVColorSelector = NULL;
     }
+
+  this->SetHistogramSet(NULL);
+  this->SetVolumeProperty(NULL);
+  this->SetDataSet(NULL);
 }
 
 //----------------------------------------------------------------------------

@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.16");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.17");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -252,6 +252,8 @@ void vtkKWWindowBase::PrepareForDelete()
 
   if (this->MainToolbarSet)
     {
+    this->MainToolbarSet->SetToolbarVisibilityChangedCommand(NULL, NULL);
+    this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(NULL, NULL);
     this->MainToolbarSet->RemoveAllToolbars();
     }
 }

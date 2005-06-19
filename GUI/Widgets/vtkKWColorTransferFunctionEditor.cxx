@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.32");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.33");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -71,9 +71,6 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
 //----------------------------------------------------------------------------
 vtkKWColorTransferFunctionEditor::~vtkKWColorTransferFunctionEditor()
 {
-  this->SetColorTransferFunction(NULL);
-  this->SetColorRampTransferFunction(NULL);
-
   if (this->ColorSpaceOptionMenu)
     {
     this->ColorSpaceOptionMenu->Delete();
@@ -95,6 +92,9 @@ vtkKWColorTransferFunctionEditor::~vtkKWColorTransferFunctionEditor()
       this->ValueEntries[i] = NULL;
       }
     }
+
+  this->SetColorTransferFunction(NULL);
+  this->SetColorRampTransferFunction(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -438,22 +438,46 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntriesLabel()
     {
     for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->GetLabel()->SetText("");
+      if (this->ValueEntries[i])
+        {
+        this->ValueEntries[i]->GetLabel()->SetText("");
+        }
       }
     return;
     }
 
-  if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
+  if (this->ColorTransferFunction)
     {
-    this->ValueEntries[0]->GetLabel()->SetText("H:");
-    this->ValueEntries[1]->GetLabel()->SetText("S:");
-    this->ValueEntries[2]->GetLabel()->SetText("V:");
-    }
-  else if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_RGB)
-    {
-    this->ValueEntries[0]->GetLabel()->SetText("R:");
-    this->ValueEntries[1]->GetLabel()->SetText("G:");
-    this->ValueEntries[2]->GetLabel()->SetText("B:");
+    if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
+      {
+      if (this->ValueEntries[0])
+        {
+        this->ValueEntries[0]->GetLabel()->SetText("H:");
+        }
+      if (this->ValueEntries[1])
+        {
+        this->ValueEntries[1]->GetLabel()->SetText("S:");
+        }
+      if (this->ValueEntries[2])
+        {
+        this->ValueEntries[2]->GetLabel()->SetText("V:");
+        }
+      }
+    else if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_RGB)
+      {
+      if (this->ValueEntries[0])
+        {
+        this->ValueEntries[0]->GetLabel()->SetText("R:");
+        }
+      if (this->ValueEntries[1])
+        {
+        this->ValueEntries[1]->GetLabel()->SetText("G:");
+        }
+      if (this->ValueEntries[2])
+        {
+        this->ValueEntries[2]->GetLabel()->SetText("B:");
+        }
+      }
     }
 }
 
@@ -719,7 +743,10 @@ void vtkKWColorTransferFunctionEditor::Update()
     {
     for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->SetEnabled(0);
+      if (this->ValueEntries[i])
+        {
+        this->ValueEntries[i]->SetEnabled(0);
+        }
       }
     }
 }

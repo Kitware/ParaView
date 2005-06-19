@@ -42,7 +42,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.257");
+vtkCxxRevisionMacro(vtkKWWindow, "1.258");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -192,6 +192,8 @@ void vtkKWWindow::PrepareForDelete()
 
   if (this->SecondaryToolbarSet)
     {
+    this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(NULL, NULL);
+    this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(NULL, NULL);
     this->SecondaryToolbarSet->RemoveAllToolbars();
     }
 }

@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.30");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.31");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -53,8 +53,6 @@ vtkKWSplitFrame::vtkKWSplitFrame()
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::~vtkKWSplitFrame()
 {
-  this->RemoveBindings();
-
   if (this->Frame1)
     {
     this->Frame1->Delete();

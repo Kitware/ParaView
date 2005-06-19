@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.69");
+vtkCxxRevisionMacro(vtkKWMenu, "1.70");
 
 
 
@@ -507,12 +507,9 @@ int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object,
 void vtkKWMenu::CheckRadioButton(vtkKWObject* Object, 
                                  const char* varname, int id)
 {
-  char *rbv = 
-    this->CreateRadioButtonVariable(Object,varname);
-  if (atoi(this->Script("set %s",rbv)) != id)
-    {
-    this->Script("set %s %d",rbv,id);
-    }
+  char *rbv = this->CreateRadioButtonVariable(Object,varname);
+  this->Script("if {[info exists %s] && $%s != %d} {set %s %d}",
+               rbv, rbv, id, rbv, id);
   delete [] rbv;
 }
 
@@ -540,12 +537,9 @@ int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object,
 void vtkKWMenu::CheckCheckButton(vtkKWObject* Object, 
                                  const char* name, int id)
 {
-  char *rbv = 
-    this->CreateCheckButtonVariable(Object,name);
-  if (atoi(this->Script("set %s",rbv)) != id)
-    {
-    this->Script("set %s %d",rbv,id);
-    }
+  char *rbv = this->CreateCheckButtonVariable(Object,name);
+  this->Script("if {[info exists %s] && $%s != %d} {set %s %d}",
+               rbv, rbv, id, rbv, id);
   delete [] rbv;
 }
 

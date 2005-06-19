@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.23");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.24");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -54,8 +54,6 @@ vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::~vtkKWPiecewiseFunctionEditor()
 {
-  this->SetPiecewiseFunction(NULL);
-
   if (this->WindowLevelModeChangedCommand)
     {
     delete [] this->WindowLevelModeChangedCommand;
@@ -73,6 +71,8 @@ vtkKWPiecewiseFunctionEditor::~vtkKWPiecewiseFunctionEditor()
     this->WindowLevelModeCheckButton->Delete();
     this->WindowLevelModeCheckButton = NULL;
     }
+
+  this->SetPiecewiseFunction(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -517,7 +517,7 @@ void vtkKWPiecewiseFunctionEditor::Update()
 
   // No selection, disable value entry
 
-  if (!this->HasSelection())
+  if (this->ValueEntry && !this->HasSelection())
     {
     this->ValueEntry->SetEnabled(0);
     }
