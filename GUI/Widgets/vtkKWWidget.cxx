@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.130");
+vtkCxxRevisionMacro(vtkKWWidget, "1.131");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -647,24 +647,6 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
   static vtksys_stl::string dest;
   const char *res = source;
 
-  // Escape
-  
-  vtksys_stl::string escape_chars;
-  if (options)
-    {
-    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
-      {
-      escape_chars += "{}";
-      }
-    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
-      {
-      escape_chars += "[]$\"";
-      }
-    dest = 
-      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
-    res = source = dest.c_str();
-    }
-
   // Handle the encoding
 
   int app_encoding = this->GetApplication()->GetCharacterEncoding();
@@ -686,35 +668,13 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
       Tcl_FreeEncoding(tcl_encoding);
       
       // Convert from that encoding
-      // Doing so will unescape the string, so we have do it again :(
-      // That is the only way to process strings that can have a 
-      // curly brace in them
+      // We need to escape interpretable chars to perform that conversion
 
+      dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
       res = source = this->Script(
-        "encoding convertfrom %s \"%s\"", tcl_encoding_name, source);
-      if (options)
-        {
-        dest = 
-          vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
-        res = source = dest.c_str();
-        }
+        "encoding convertfrom %s \"%s\"", tcl_encoding_name, dest.c_str());
       }
     }
-
-  return res;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertTclStringToInternalString(
-  const char *source, int options)
-{
-  if (!source || !this->IsCreated())
-    {
-    return NULL;
-    }
-
-  static vtksys_stl::string dest;
-  const char *res = source;
 
   // Escape
   
@@ -734,6 +694,21 @@ const char* vtkKWWidget::ConvertTclStringToInternalString(
     res = source = dest.c_str();
     }
 
+  return res;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::ConvertTclStringToInternalString(
+  const char *source, int options)
+{
+  if (!source || !this->IsCreated())
+    {
+    return NULL;
+    }
+
+  static vtksys_stl::string dest;
+  const char *res = source;
+
   // Handle the encoding
 
   int app_encoding = this->GetApplication()->GetCharacterEncoding();
@@ -741,20 +716,31 @@ const char* vtkKWWidget::ConvertTclStringToInternalString(
       app_encoding != VTK_ENCODING_UNKNOWN)
     {
     // Convert from that encoding
-    // Doing so will unescape the string, so we have do it again :(
-    // That is the only way to process strings that can have a 
-    // curly brace in them
+    // We need to escape interpretable chars to perform that conversion
 
+    dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
     res = source = this->Script(
-      "encoding convertfrom identity \"%s\"", source);
-    if (options)
-      {
-      dest = 
-        vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
-      res = source = dest.c_str();
-      }
+      "encoding convertfrom identity \"%s\"", dest.c_str());
     }
   
+  // Escape
+  
+  vtksys_stl::string escape_chars;
+  if (options)
+    {
+    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
+      {
+      escape_chars += "{}";
+      }
+    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
+      {
+      escape_chars += "[]$\"";
+      }
+    dest = 
+      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+    res = source = dest.c_str();
+    }
+
   return res;
 }
 

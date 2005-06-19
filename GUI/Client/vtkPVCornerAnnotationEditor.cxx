@@ -27,9 +27,11 @@
 #include "vtkSMProxyManager.h"
 #include "vtkPVTraceHelper.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.3");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.4");
 
 int vtkPVCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -193,8 +195,7 @@ void vtkPVCornerAnnotationEditor::SetCornerTextInternal(const char* text, int co
       (!this->GetCornerText(corner) ||
        strcmp(this->GetCornerText(corner), text)))
     {
-    this->CornerAnnotation->SetText(
-      corner, this->Script("%s \"%s\"", "set pvCATemp", text));
+    this->CornerAnnotation->SetText(corner, text);
     }
 }
 
@@ -215,8 +216,13 @@ void vtkPVCornerAnnotationEditor::CornerTextCallback(int i)
 
     this->SendChangedEvent();
 
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetCornerText {%s} %d", 
-                        this->GetTclName(), text, i);
+    vtksys_stl::string escaped(
+      this->ConvertInternalStringToTclString(
+        text, vtkKWWidget::ConvertStringEscapeInterpretable));
+    
+    this->GetTraceHelper()->AddEntry(
+      "$kw(%s) SetCornerText \"%s\" %d", 
+      this->GetTclName(), escaped.c_str(), i);
     }
 }
 
@@ -246,8 +252,13 @@ void vtkPVCornerAnnotationEditor::SetCornerText(const char *text, int corner)
 
     this->SendChangedEvent();
 
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetCornerText {%s} %d", 
-                        this->GetTclName(), text, corner);
+    vtksys_stl::string escaped(
+      this->ConvertInternalStringToTclString(
+        text, vtkKWWidget::ConvertStringEscapeInterpretable));
+    
+    this->GetTraceHelper()->AddEntry(
+      "$kw(%s) SetCornerText \"%s\" %d", 
+      this->GetTclName(), escaped.c_str(), corner);
     }
 }
 
