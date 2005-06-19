@@ -64,6 +64,10 @@ public:
   static const char* EvaluateStringFromArgs(
     vtkKWApplication *app, const char *format, 
     va_list var_args1, va_list var_args2);
+  static const char* EvaluateSimpleString(
+    Tcl_Interp *interp, const char *str);
+  static const char* EvaluateSimpleString(
+    vtkKWApplication *app, const char *str);
 
   // Description:
   // Get the RGB components that correspond to 'color' (say, #223344)
@@ -446,8 +450,10 @@ protected:
                              const char *font, char *new_font, int);
 
   static const char* EvaluateStringFromArgsInternal(
-    Tcl_Interp *interp, vtkObject *dummy, const char *format, 
+    Tcl_Interp *interp, vtkObject *obj, const char *format, 
     va_list var_args1, va_list var_args2);
+  static const char* EvaluateSimpleStringInternal(
+    Tcl_Interp *interp, vtkObject *obj, const char *str);
 
 private:
   vtkKWTkUtilities(const vtkKWTkUtilities&); // Not implemented

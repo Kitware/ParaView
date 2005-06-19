@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.53");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.54");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -77,6 +77,25 @@ const char* vtkKWTkUtilities::EvaluateString(
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateStringFromArgs(
+  vtkKWApplication *app,  
+  const char* format,
+  va_list var_args1,
+  va_list var_args2)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+  return vtkKWTkUtilities::EvaluateStringFromArgsInternal(
+    app->GetMainInterp(),
+    app,
+    format,
+    var_args1,
+    var_args2);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateStringFromArgs(
   Tcl_Interp *interp,
   const char* format,
   va_list var_args1,
@@ -91,27 +110,9 @@ const char* vtkKWTkUtilities::EvaluateStringFromArgs(
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkUtilities::EvaluateStringFromArgs(
-  vtkKWApplication *app,  
-  const char* format,
-  va_list var_args1,
-  va_list var_args2)
-{
-  if (!app)
-    {
-    return NULL;
-    }
-  return vtkKWTkUtilities::EvaluateStringFromArgs(
-    app->GetMainInterp(),
-    format,
-    var_args1,
-    var_args2);
-}
-
-//----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateStringFromArgsInternal(
   Tcl_Interp *interp,
-  vtkObject *dummy,
+  vtkObject *obj,
   const char* format,
   va_list var_args1,
   va_list var_args2)
@@ -138,20 +139,56 @@ const char* vtkKWTkUtilities::EvaluateStringFromArgsInternal(
   
   // Evaluate the string in Tcl.
 
-  if (Tcl_GlobalEval(interp, buffer) != TCL_OK && dummy)
-    {
-    vtkErrorWithObjectMacro(
-      dummy, "\n    Script: \n" << buffer
-      << "\n    Returned Error on line "
-      << interp->errorLine << ": \n"  
-      << Tcl_GetStringResult(interp) << endl);
-    }
+  const char *res = 
+    vtkKWTkUtilities::EvaluateSimpleStringInternal(interp, obj, buffer);
   
   // Free the buffer from the heap if we allocated it.
 
   if (buffer != buffer_on_stack)
     {
     delete [] buffer;
+    }
+  
+  // Convert the Tcl result to its string representation.
+
+  return res;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateSimpleString(
+  vtkKWApplication *app,  
+  const char* str)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+  return vtkKWTkUtilities::EvaluateSimpleStringInternal(
+    app->GetMainInterp(), app, str);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateSimpleString(
+  Tcl_Interp *interp,  
+  const char* str)
+{
+  return vtkKWTkUtilities::EvaluateSimpleStringInternal(
+    interp, NULL, str);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateSimpleStringInternal(
+  Tcl_Interp *interp,
+  vtkObject *obj,
+  const char *str)
+{
+ if (Tcl_GlobalEval(interp, str) != TCL_OK && obj)
+    {
+    vtkErrorWithObjectMacro(
+      obj, "\n    Script: \n" << str
+      << "\n    Returned Error on line "
+      << interp->errorLine << ": \n"  
+      << Tcl_GetStringResult(interp) << endl);
     }
   
   // Convert the Tcl result to its string representation.
