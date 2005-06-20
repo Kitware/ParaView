@@ -80,6 +80,7 @@ public:
   // Description:
   // Get/Set the duration for which the scene is played in seconds.
   void SetDuration(double seconds);
+  void SetDurationWithTrace(double s);
   double GetDuration();
 
   // Description:
@@ -95,6 +96,7 @@ public:
   // Description:
   // Set if to play the animation in a loop.
   void SetLoop(int loop);
+  void SetLoopWithTrace(int loop);
   int GetLoop();
   
   // Description:
@@ -102,6 +104,7 @@ public:
   // Note that this time is not normalized time. It extends from
   // [0, Duration].
   void SetCurrentTime( double time);
+  void SetCurrentTimeWithTrace(double time);
 #ifdef VTK_WORKAROUND_WINDOWS_MANGLE
   // Avoid windows name mangling.
 #define GetTickCount() GetCurrentTime()

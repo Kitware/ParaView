@@ -642,6 +642,7 @@
       
       <ProxyProperty name="AnimatedProxy" 
         command="SetAnimatedProxy"
+        clean_command="RemoveAnimatedProxy"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
@@ -827,6 +828,12 @@
       </IntVectorProperty>
     </KeyFrameAnimationCueManipulatorProxy>
 
+    <CameraManipulatorProxy name="CameraManipulator"
+      base_proxygroup="animation_manipulators" 
+      base_proxyname="KeyFrameAnimationCueManipulator">
+      <!-- Not special interface -->
+    </CameraManipulatorProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="animation_keyframes">
@@ -925,6 +932,41 @@
       </DoubleVectorProperty>
 
     </SinusoidKeyFrameProxy>
+
+    <CameraKeyFrameProxy name="CameraKeyFrame"
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
+      <!-- TODO: added interface to set key value using properties -->
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="FocalPoint"
+        command="SetFocalPoint"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ViewUp"
+        command="SetViewUp"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 1.0 0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ViewAngle"
+        command="SetViewAngle"
+        number_of_elements="1"
+        default_values="30">
+      </DoubleVectorProperty> 
+    </CameraKeyFrameProxy>
 
   </ProxyGroup>
 

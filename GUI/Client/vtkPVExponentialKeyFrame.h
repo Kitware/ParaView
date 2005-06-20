@@ -14,34 +14,39 @@
 =========================================================================*/
 // .NAME vtkPVExponentialKeyFrame - gui for exponential key frame. 
 // .SECTION Description
-//
+// GUI for exponential key frame.
 
 #ifndef __vtkPVExponentialKeyFrame_h
 #define __vtkPVExponentialKeyFrame_h
 
-#include "vtkPVKeyFrame.h"
+#include "vtkPVPropertyKeyFrame.h"
 
 class vtkKWThumbWheel;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkPVExponentialKeyFrame : public vtkPVKeyFrame
+class VTK_EXPORT vtkPVExponentialKeyFrame : public vtkPVPropertyKeyFrame
 {
 public:
   static vtkPVExponentialKeyFrame* New();
-  vtkTypeRevisionMacro(vtkPVExponentialKeyFrame, vtkPVKeyFrame);
+  vtkTypeRevisionMacro(vtkPVExponentialKeyFrame, vtkPVPropertyKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Callbacks for GUI
   void BaseChangedCallback();
   void StartPowerChangedCallback();
   void EndPowerChangedCallback();
 
   void SetBase(double base);
+  void SetBaseWithTrace(double base);
   double GetBase();
   
   void SetStartPower(double v);
+  void SetStartPowerWithTrace(double v);
   double GetStartPower();
   
   void SetEndPower(double v);
+  void SetEndPowerWithTrace(double v);
   double GetEndPower();
 
   virtual void SaveState(ofstream* file);

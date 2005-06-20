@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMExponentialKeyFrameProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMExponentialKeyFrameProxy, "1.3");
 vtkStandardNewMacro(vtkSMExponentialKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -41,13 +41,14 @@ vtkSMExponentialKeyFrameProxy::~vtkSMExponentialKeyFrameProxy()
 void vtkSMExponentialKeyFrameProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
-  *file << "  [$pvTemp" << this->SelfID << " GetProperty Base]"
+  const char* name = this->GetName();
+  *file << "  [$" << name << " GetProperty Base]"
     << " SetElements1 " << this->Base << endl;
-  *file << "  [$pvTemp" << this->SelfID << " GetProperty StartPower]"
+  *file << "  [$" << name << " GetProperty StartPower]"
     << " SetElements1 " << this->StartPower << endl;
-  *file << "  [$pvTemp" << this->SelfID << " GetProperty EndPower]"
+  *file << "  [$" << name << " GetProperty EndPower]"
     << " SetElements1 " << this->EndPower << endl;
-  *file << "  $pvTemp" << this->SelfID << " UpdateVTKObjects";
+  *file << "  $" << name << " UpdateVTKObjects";
   *file << endl;
 }
 

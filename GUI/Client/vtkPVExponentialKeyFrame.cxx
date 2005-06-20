@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.7");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.8");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -132,19 +132,30 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::BaseChangedCallback()
 {
-  this->SetBase(this->BaseThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetBaseWithTrace(
+    this->BaseThumbWheel->GetEntry()->GetValueAsFloat());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::EndPowerChangedCallback()
 {
-  this->SetEndPower(this->EndPowerThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetEndPowerWithTrace(
+    this->EndPowerThumbWheel->GetEntry()->GetValueAsFloat());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::StartPowerChangedCallback()
 {
-  this->SetStartPower(this->StartPowerThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetStartPowerWithTrace(
+    this->StartPowerThumbWheel->GetEntry()->GetValueAsFloat());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVExponentialKeyFrame::SetBaseWithTrace(double base)
+{
+  this->SetBase(base);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetBaseWithTrace %f", 
+    this->GetTclName(), base);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +163,6 @@ void vtkPVExponentialKeyFrame::SetBase(double base)
 {
   DoubleVectPropertySetElement(this->KeyFrameProxy, "Base", base);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetBase %f", this->GetTclName(), base);
 }
 
 //-----------------------------------------------------------------------------
@@ -163,11 +173,18 @@ double vtkPVExponentialKeyFrame::GetBase()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVExponentialKeyFrame::SetStartPowerWithTrace(double p)
+{
+  this->SetStartPower(p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetStartPowerWithTrace %f", 
+    this->GetTclName(), p);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::SetStartPower(double p)
 { 
   DoubleVectPropertySetElement(this->KeyFrameProxy, "StartPower", p);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetStartPower %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------
@@ -178,11 +195,18 @@ double vtkPVExponentialKeyFrame::GetStartPower()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVExponentialKeyFrame::SetEndPowerWithTrace(double p)
+{
+  this->SetEndPower(p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetEndPowerWithTrace %f", 
+    this->GetTclName(), p);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::SetEndPower(double p)
 {
   DoubleVectPropertySetElement(this->KeyFrameProxy, "EndPower", p);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetEndPower %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------

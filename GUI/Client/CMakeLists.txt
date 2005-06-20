@@ -71,12 +71,13 @@ SET( ParaViewClient_SRCS
   vtkPVAnimationScene.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx
-  vtkPVKeyFrame.cxx
+  vtkPVAnimationManager.cxx
   vtkPVRampKeyFrame.cxx
   vtkPVBooleanKeyFrame.cxx
+  vtkPVCameraAnimationCue.cxx
+  vtkPVCameraKeyFrame.cxx
   vtkPVExponentialKeyFrame.cxx
   vtkPVSinusoidKeyFrame.cxx
-  vtkPVAnimationManager.cxx
   vtkPVComparativeVis.cxx
   vtkPVComparativeVisDialog.cxx
   vtkPVComparativeVisManager.cxx
@@ -132,6 +133,7 @@ SET( ParaViewClient_SRCS
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
+  vtkPVKeyFrame.cxx
   vtkPVLODRenderModuleUI.cxx
   vtkPVLabeledToggle.cxx
   vtkPVLineSourceWidget.cxx
@@ -147,6 +149,8 @@ SET( ParaViewClient_SRCS
   vtkPVPointWidget.cxx
   vtkPVPick.cxx
   vtkPVProbe.cxx
+  vtkPVPropertyKeyFrame.cxx
+  vtkPVProxyKeyFrame.cxx
   vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
   vtkPVRenderModuleUI.cxx
@@ -250,10 +254,12 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWView.cxx
   vtkPV3DWidget
   vtkPVJoystickFly
+  vtkPVKeyFrame
   vtkPVObjectWidget
+  vtkPVPropertyKeyFrame
+  vtkPVProxyKeyFrame.cxx
   vtkPVValueList
   vtkPVWidget
-  vtkPVKeyFrame
   ABSTRACT
   )
 

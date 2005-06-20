@@ -16,55 +16,54 @@
 #include "vtkObjectFactory.h"
 
 #include "vtkAnimationScene.h"
-#include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
-#include "vtkPVVerticalAnimationInterface.h"
-#include "vtkPVHorizontalAnimationInterface.h"
-#include "vtkPVAnimationScene.h"
-#include "vtkPVActiveTrackSelector.h"
+#include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
+#include "vtkKWEntry.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkSMProxyIterator.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSmartPointer.h"
-#include "vtkPVAnimationCue.h"
-#include "vtkPVAnimationCueTree.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkCommand.h"
-#include "vtkKWEvent.h"
-#include "vtkPVKeyFrame.h"
-#include "vtkPVRampKeyFrame.h"
-#include "vtkPVBooleanKeyFrame.h"
-#include "vtkPVExponentialKeyFrame.h"
-#include "vtkPVSinusoidKeyFrame.h"
-#include "vtkSMArrayListDomain.h"
-#include "vtkSMStringListDomain.h"
-#include "vtkSMDomainIterator.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWEntryLabeled.h"
-#include "vtkPVRenderView.h"
-#include "vtkKWEntry.h"
 #include "vtkProcessModule.h"
+#include "vtkPVActiveTrackSelector.h"
+#include "vtkPVAnimationCue.h"
+#include "vtkPVAnimationCueTree.h"
+#include "vtkPVAnimationScene.h"
+#include "vtkPVApplication.h"
+#include "vtkPVCameraAnimationCue.h"
+#include "vtkPVHorizontalAnimationInterface.h"
 #include "vtkPVReaderModule.h"
-#include "vtkCollectionIterator.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVTraceHelper.h"
+#include "vtkPVVerticalAnimationInterface.h"
 #include "vtkPVWidget.h"
+#include "vtkPVWindow.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMArrayListDomain.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMProxyIterator.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMVectorProperty.h"
+#include "vtkSMXDMFPropertyDomain.h"
+
 #include <vtkstd/map>
 #include <vtkstd/string>
-#include "vtkPVTraceHelper.h"
-#include "vtkSMXDMFPropertyDomain.h"
 
 #include <vtksys/SystemTools.hxx>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
+#define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.53");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.54");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -632,11 +631,12 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTree* parent,
+vtkPVAnimationCue* vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, 
+  vtkPVAnimationCueTree* parent,
   vtkSMProxy* proxy, const char* propertyname, const char* domainname,
-  int element, const char* label)
+  int element, const char* label, vtkPVAnimationCue* cueToSetup /*= NULL*/)
 {
-  vtkPVAnimationCue* cue = vtkPVAnimationCue::New();
+  vtkPVAnimationCue* cue = (cueToSetup)? cueToSetup : vtkPVAnimationCue::New();
   
   if (parent->GetName() == NULL)
     {
@@ -654,43 +654,51 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
   cue->SetLabelText(label);
   cue->SetPVSource(pvSource);
   parent->AddChildCue(cue); //class create internally.
-  cue->Delete();
   cue->SetAnimatedProxy(proxy);
   cue->SetAnimatedPropertyName(propertyname);
   cue->SetAnimatedElement(element);
   cue->SetAnimatedDomainName(domainname); //how to determine the domian.
   this->InitializeObservers(cue);
+  if (!cueToSetup)
+    {
+    cue->Delete();  
+    }
+  return cue;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ValidateAndAddSpecialCues()
 {
-  /*
   // this is the place to add camera cue.
-  ostrstream str;
-  str << "_dont_validate_." << "camera" << ends;
+  const char* camera_cuetree_name =  VTK_PV_CAMERA_PROXYNAME;
 
-  ostrstream name;
-  name << "_Scene_" << "." << str << ends;
-  
-  if (this->Internals->PVAnimationCues.find(str.str()) ==
+  if (this->Internals->PVAnimationCues.find(camera_cuetree_name) ==
     this->Internals->PVAnimationCues.end())
     {
-    // Add the cue.
-    // Or, we create a subclass CueTree to get a special CameraCueTree which
-    // manages all the manipulation.
+    // Add the tree for the Camera.
     vtkPVAnimationCueTree* pvCueTree = vtkPVAnimationCueTree::New();
     pvCueTree->SetLabelText("Active Camera");
     pvCueTree->SetPVSource(NULL);
-    pvCueTree->SetName(name.str());
+    pvCueTree->SetName(camera_cuetree_name);
+    pvCueTree->SetSourceTreeName(camera_cuetree_name);
     this->HAnimationInterface->AddAnimationCueTree(pvCueTree);
-    this->Internals->PVAnimationCues[str.str()] = pvCueTree;
+    char* key = this->GetSourceKey(camera_cuetree_name);
+    this->Internals->PVAnimationCues[key] = pvCueTree;
+    delete[] key;
     pvCueTree->Delete();
+    this->InitializeObservers(pvCueTree);
+    this->ActiveTrackSelector->AddSource(pvCueTree);
+
+    // Now create the Cue that maintains camera keyframes.
+    vtkSMProxy* cameraProxy = vtkPVApplication::SafeDownCast(
+      this->GetApplication())->GetRenderModuleProxy();
+    vtkPVAnimationCue* cue = vtkPVCameraAnimationCue::New();
+    this->SetupCue( NULL, pvCueTree, cameraProxy, "Camera", 0, -1, 
+      "Camera", cue);
+    cue->Delete();
+    cue->SetDefaultKeyFrameType(vtkPVSimpleAnimationCue::CAMERA);
+    cue->SetSourceTreeName(pvCueTree->GetName());
     }
-  
-  name.rdbuf()->freeze(0);
-  str.rdbuf()->freeze(0); 
-  */
 }
 
 //-----------------------------------------------------------------------------
@@ -793,77 +801,6 @@ void vtkPVAnimationManager::ExecuteEvent(vtkObject* obj, unsigned long event,
       }
     }
 }
-
-//-----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVAnimationManager::NewKeyFrame(int type)
-{
-  vtkPVKeyFrame* keyframe = NULL;
-  switch(type)
-    {
-  case vtkPVAnimationManager::RAMP:
-    keyframe = vtkPVRampKeyFrame::New();
-    break;
-  case vtkPVAnimationManager::STEP:
-    keyframe = vtkPVBooleanKeyFrame::New();
-    break;
-  case vtkPVAnimationManager::EXPONENTIAL:
-    keyframe = vtkPVExponentialKeyFrame::New();
-    break;
-  case vtkPVAnimationManager::SINUSOID:
-    keyframe = vtkPVSinusoidKeyFrame::New();
-    break;
-  default:
-    vtkErrorMacro("Unknown type of keyframe requested: " << type);
-    return NULL;
-    }
-  return keyframe;
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationManager::GetKeyFrameType(vtkPVKeyFrame* kf)
-{
-  if (vtkPVRampKeyFrame::SafeDownCast(kf))
-    {
-    return vtkPVAnimationManager::RAMP;
-    }
-  else if (vtkPVBooleanKeyFrame::SafeDownCast(kf))
-    {
-    return vtkPVAnimationManager::STEP;
-    }
-  else if (vtkPVExponentialKeyFrame::SafeDownCast(kf))
-    {
-    return vtkPVAnimationManager::EXPONENTIAL;
-    }
-  else if (vtkPVSinusoidKeyFrame::SafeDownCast(kf))
-    {
-    return vtkPVAnimationManager::SINUSOID;
-    }
-  return vtkPVAnimationManager::LAST_NOT_USED;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVSimpleAnimationCue* pvCue, 
-  int type, vtkPVKeyFrame* replaceFrame)
-{
-  //TODO: This method must be moved to vtkPVSimpleAnimationCue.
-  if (this->GetKeyFrameType(replaceFrame) == type)
-    {
-    // no replace necessary.
-    return replaceFrame;
-    }
-  vtkPVKeyFrame* keyFrame = this->NewKeyFrame(type);
-  if (!keyFrame)
-    {
-    return NULL;
-    }
-  keyFrame->SetParent(pvCue->GetKeyFrameParent());
-  keyFrame->SetAnimationCueProxy(pvCue->GetCueProxy());
-  keyFrame->Create(this->GetApplication());
-  pvCue->ReplaceKeyFrame(replaceFrame, keyFrame);
-  keyFrame->Delete();
-  return keyFrame;
-}
-
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::StartRecording()
@@ -1008,6 +945,22 @@ void vtkPVAnimationManager::UpdateEnableState()
 void vtkPVAnimationManager::PrepareForDelete()
 {
   this->AnimationScene->PrepareForDelete();
+
+  // We need to delete the cue for the camera here since it keeps a
+  // reference to the vtkSMRenderModuleProxy which must be deleted before
+  // the GUI is destroyed.
+  char* sourcekey = this->GetSourceKey(VTK_PV_CAMERA_PROXYNAME);
+  vtkPVAnimationManagerInternals::StringToPVCueMap::iterator iter = 
+    this->Internals->PVAnimationCues.find(sourcekey);
+  if (iter != this->Internals->PVAnimationCues.end())
+    {
+    vtkPVAnimationCueTree* cameraTree = vtkPVAnimationCueTree::SafeDownCast(
+      iter->second);
+    this->HAnimationInterface->RemoveAnimationCueTree(cameraTree);
+    this->ActiveTrackSelector->RemoveSource(cameraTree);
+    this->Internals->PVAnimationCues.erase(this->Internals->PVAnimationCues.find(sourcekey));
+    }
+  delete[] sourcekey;
 }
 
 //-----------------------------------------------------------------------------
@@ -1308,6 +1261,7 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForSource(
 vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForProxy(
   const char* proxyname)
 {
+  //TODO: verify this method...seems obsolete and incorrect!
   char* sourcekey = this->GetSourceKey(proxyname);
   if (!sourcekey)
     {
@@ -1316,6 +1270,8 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForProxy(
     }
   vtkPVAnimationManagerInternals::StringToPVCueMap::iterator iter;
   iter = this->Internals->PVAnimationCues.find(sourcekey);
+  delete[] sourcekey;
+
   if (iter == this->Internals->PVAnimationCues.end())
     {
     vtkErrorMacro("Cannot find source for proxy " << proxyname);

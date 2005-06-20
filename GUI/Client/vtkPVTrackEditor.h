@@ -25,7 +25,6 @@
 class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWLabel;
-class vtkPVAnimationManager;
 class vtkKWPushButton;
 class vtkKWMenuButton;
 class vtkKWScale;
@@ -43,12 +42,6 @@ public:
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication* app);
-
-  // Description:
-  // Animation Manager must be set before calling create.
-  // This is not reference counted.
-  void SetAnimationManager(vtkPVAnimationManager* pvAM) 
-    { this->AnimationManager  = pvAM; }
 
   // Description:
   // This is the frame which should be used as parent for the vtkPVKeyFrame
@@ -89,7 +82,6 @@ protected:
   vtkPVTrackEditor();
   ~vtkPVTrackEditor();
 
-  vtkPVAnimationManager *AnimationManager;
   vtkPVSimpleAnimationCue* SimpleAnimationCue;
   vtkPVKeyFrame* ActiveKeyFrame;
   

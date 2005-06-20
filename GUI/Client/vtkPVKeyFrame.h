@@ -47,28 +47,18 @@ public:
   void SetKeyTime(double time);
   double GetKeyTime();
 
-  void SetKeyValue(double value) { this->SetKeyValue(0, value); }
-  void SetKeyValue(int index, double value);
-  double GetKeyValue() { return this->GetKeyValue(0); }
-  double GetKeyValue(int index);
-
   // Description:
-  // Set the number of key values for this keyt frame.
-  void SetNumberOfKeyValues(int num);
+  // Calls SetKeyTime() and adds it to the trace.
+  void SetKeyTimeWithTrace(double time);
 
   // Description:
   // Initialized Key Value using current animated property value.
-  virtual void InitializeKeyValueUsingCurrentState();
+  virtual void InitializeKeyValueUsingCurrentState() = 0;
 
-  // Description:
-  // Initilizes the Key Value using the property element at given index.
-  virtual void InitializeKeyValueUsingProperty(
-    vtkSMProperty* property, int index);
- 
   // Description:
   // Initialize the Key Value bounds using current animatied property value
   // and domain state.
-  virtual void InitializeKeyValueDomainUsingCurrentState();
+  virtual void InitializeKeyValueDomainUsingCurrentState() =0;
 
   // Description:
   // If set, these ranges can be used to bound the values.
@@ -76,19 +66,15 @@ public:
   void SetTimeMinimumBound(double min);
   void SetTimeMaximumBound(double max);
   void ClearTimeBounds();
-  
-  void ValueChangedCallback();
-  void TimeChangedCallback();
-  void MinimumCallback();
-  void MaximumCallback();
-
  
   // Description:
-  // These methods set the current Key value to min or max if
-  // they exist. Otherwise the value remains unchanged.
-  void SetValueToMinimum();
-  void SetValueToMaximum();
-
+  // Callbacks for GUI
+  void TimeChangedCallback();
+ 
+  // Description:
+  // Prepares the Key frame GUI for display.
+  // Typically, updates the GUI to reflect the state of the 
+  // underlying proxy/property.
   virtual void PrepareForDisplay();
  
   // Description:
@@ -100,8 +86,18 @@ public:
     { this->AnimationCueProxy = cueproxy; }
   vtkGetObjectMacro(AnimationCueProxy, vtkSMAnimationCueProxy);
 
+  // Description:
+  // These methods set the current Key value to min or max if
+  // they exist. Otherwise the value remains unchanged.
+  virtual void SetValueToMinimum() = 0;
+  virtual void SetValueToMaximum() = 0;
+  
+  // Description:
+  // Save state of the GUI.
   virtual void SaveState(ofstream* file);
 
+  // Description:
+  // Propagate widget enable state.
   virtual void UpdateEnableState();
 
   // Description:
@@ -120,6 +116,10 @@ public:
   void SetDuration(double duration);
   vtkGetMacro(Duration, double);
 
+  // Description:
+  // Copies the values from argument.
+  // If the two differ in type, only corresponding properies are copied over;
+  virtual void Copy(vtkPVKeyFrame* fromKF);
 protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
@@ -135,11 +135,6 @@ protected:
   vtkKWLabel* TimeLabel;
   vtkKWThumbWheel* TimeThumbWheel;
 
-  vtkKWLabel* ValueLabel;
-  vtkKWWidget* ValueWidget; // the type of this widget will be decided at runtime.
-  vtkKWPushButton* MinButton;
-  vtkKWPushButton* MaxButton;
-
   vtkSMAnimationCueProxy* AnimationCueProxy;
   char* Name;
 //BTX
@@ -149,17 +144,6 @@ protected:
 //ETX
 
   // Description:
-  // This methods creates the widget to display the keyframe value.
-  // It can be of 3 types: vtkPVSelectionList, vtkKWCheckButton, vtkKWThumbWheel.
-  // Which to create depends on the domain of the animated property.
-  // This merely creates the widget.
-  void CreateValueWidget();  
-
-  // Description:
-  // This method updates the domain for the key frame value using the current domain
-  // for the animated property.
-  void UpdateDomain();
-  // Description:
   // Update the values from the vtkSMKeyFrameProxy.
   virtual void UpdateValuesFromProxy();
 
@@ -167,10 +151,8 @@ protected:
   double GetNormalizedTime(double rtime);
 
   double TimeBounds[2];
-
-  vtkPVAnimationScene* AnimationScene;
-
   double Duration;
+  vtkPVAnimationScene* AnimationScene;
 
 private:
   vtkPVKeyFrame(const vtkPVKeyFrame&); // Not implemented.

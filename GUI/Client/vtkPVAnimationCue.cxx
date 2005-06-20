@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.34");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.35");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -142,6 +142,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->PVSource = NULL;
 
   this->Name = NULL;
+  this->SourceTreeName = 0;
   this->TclNameCommand = 0;
   this->CueVisibility = 1;
   this->DisableSelectionChangedEvent = 0;
@@ -165,6 +166,7 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
   this->SetAnimationScene(NULL);
 
   this->SetName(NULL);
+  this->SetSourceTreeName(0);
   this->SetTclNameCommand(0);
 }
 
@@ -607,6 +609,12 @@ void vtkPVAnimationCue::StopRecording()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationCue::RecordState(double ntime, double offset)
+{
+  this->Superclass::RecordState(ntime, offset);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::RecordState(double ntime, double offset,
   int onlyFocus)
 {
@@ -622,7 +630,7 @@ void vtkPVAnimationCue::RecordState(double ntime, double offset,
     }
 
   this->TimeLine->DisableAddAndRemoveOff();
-  this->Superclass::RecordState(ntime, offset); 
+  this->RecordState(ntime, offset); 
   this->TimeLine->DisableAddAndRemoveOn();
 }
 
@@ -758,18 +766,13 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
   // animations, since the state saves the default animations (if any) also.
   *file << "$kw(" << this->GetTclName() << ") RemoveAllKeyFrames" << endl;
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
-    this->GetApplication());
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
-
   vtkCollectionIterator* iter = this->PVKeyFrames->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkPVKeyFrame* pvKF = vtkPVKeyFrame::SafeDownCast(iter->GetCurrentObject());
     *file << endl; 
     *file << "set tempid [$kw(" << this->GetTclName() << ") CreateAndAddKeyFrame " << pvKF->GetKeyTime()
-      << " " << pvAM->GetKeyFrameType(pvKF) << "]" << endl;
+      << " " << this->GetKeyFrameType(pvKF) << "]" << endl;
     *file << "set kw(" << pvKF->GetTclName() << ") [$kw(" << this->GetTclName() <<
       ") GetKeyFrame $tempid ]" << endl;
     pvKF->SaveState(file);
@@ -790,7 +793,6 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
     this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
   vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
-
   keyf->SetAnimationScene(pvAM->GetAnimationScene());
   return keyid;
 }
@@ -807,4 +809,6 @@ void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PVSource: " << this->PVSource << endl;
   os << indent << "TimeLine: " << this->TimeLine << endl;
   os << indent << "CueVisibility: " << this->CueVisibility << endl;
+  os << indent << "SourceTreeName: " << (this->SourceTreeName?
+    this->SourceTreeName : "(null)") << endl;
 }

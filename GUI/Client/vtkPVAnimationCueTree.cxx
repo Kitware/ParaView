@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.14");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -551,6 +551,12 @@ void vtkPVAnimationCueTree::StopRecording()
   iter->Delete();
   this->Superclass::StopRecording(); 
 }
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCueTree::RecordState(double ntime, double offset)
+{
+  this->Superclass::RecordState(ntime, offset);
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCueTree::RecordState(double ntime, double offset,
   int onlyFocus)

@@ -19,16 +19,16 @@
 #ifndef __vtkPVSinusoidKeyFrame_h
 #define __vtkPVSinusoidKeyFrame_h
 
-#include "vtkPVKeyFrame.h"
+#include "vtkPVPropertyKeyFrame.h"
 
 class vtkKWThumbWheel;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkPVSinusoidKeyFrame : public vtkPVKeyFrame
+class VTK_EXPORT vtkPVSinusoidKeyFrame : public vtkPVPropertyKeyFrame
 {
 public:
   static vtkPVSinusoidKeyFrame* New();
-  vtkTypeRevisionMacro(vtkPVSinusoidKeyFrame, vtkPVKeyFrame);
+  vtkTypeRevisionMacro(vtkPVSinusoidKeyFrame, vtkPVPropertyKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void FrequencyChangedCallback();
@@ -36,11 +36,14 @@ public:
   void OffsetChangedCallback();
 
   void SetFrequency(double base);
+  void SetFrequencyWithTrace(double f);
   double GetFrequency();
   
   void SetPhase(double v);
+  void SetPhaseWithTrace(double p);
   double GetPhase();
   
+  void SetOffsetWithTrace(double o);
   void SetOffset(double v);
   double GetOffset();
 

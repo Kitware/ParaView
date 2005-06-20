@@ -46,6 +46,10 @@ public:
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);
 
   // Description:
+  // Removes the animated proxy reference.
+  void RemoveAnimatedProxy();
+
+  // Description:
   // the XMLName of the property of the AnimatedProxy that is being
   // animated by this cue.
   vtkGetStringMacro(AnimatedPropertyName);

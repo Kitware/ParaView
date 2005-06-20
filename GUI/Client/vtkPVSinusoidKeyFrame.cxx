@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.8");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.9");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -122,9 +122,11 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->OffsetThumbWheel->DisplayLabelOff();
   this->OffsetThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->OffsetThumbWheel->ExpandEntryOn();
-  this->OffsetThumbWheel->SetBalloonHelpString("Specify the positive offset for the crest "
+  this->OffsetThumbWheel->SetBalloonHelpString(
+    "Specify the positive offset for the crest "
     "of the sine waveform.");
-  this->OffsetThumbWheel->GetEntry()->BindCommand(this, "OffsetChangedCallback");
+  this->OffsetThumbWheel->GetEntry()->BindCommand(this, 
+    "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEntryCommand(this, "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEndCommand(this, "OffsetChangedCallback");
 
@@ -142,19 +144,30 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::PhaseChangedCallback()
 {
-  this->SetPhase(this->PhaseThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetPhaseWithTrace(
+    this->PhaseThumbWheel->GetEntry()->GetValueAsFloat());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::OffsetChangedCallback()
 {
-  this->SetOffset(this->OffsetThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetOffsetWithTrace(
+    this->OffsetThumbWheel->GetEntry()->GetValueAsFloat());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::FrequencyChangedCallback()
 {
-  this->SetFrequency(this->FrequencyThumbWheel->GetEntry()->GetValueAsFloat());
+  this->SetFrequencyWithTrace(
+    this->FrequencyThumbWheel->GetEntry()->GetValueAsFloat());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSinusoidKeyFrame::SetPhaseWithTrace(double p)
+{
+  this->SetPhase(p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPhaseWithTrace %f", 
+    this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------
@@ -162,7 +175,6 @@ void vtkPVSinusoidKeyFrame::SetPhase(double base)
 {
   DoubleVectPropertySetElement(this->KeyFrameProxy, "Phase", base);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPhase %f", this->GetTclName(), base);
 }
 
 //-----------------------------------------------------------------------------
@@ -173,11 +185,18 @@ double vtkPVSinusoidKeyFrame::GetPhase()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSinusoidKeyFrame::SetFrequencyWithTrace(double p)
+{
+  this->SetFrequency(p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrequencyWithTrace %f", 
+    this->GetTclName(), p);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::SetFrequency(double p)
 { 
   DoubleVectPropertySetElement(this->KeyFrameProxy, "Frequency", p);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrequency %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------
@@ -188,11 +207,18 @@ double vtkPVSinusoidKeyFrame::GetFrequency()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSinusoidKeyFrame::SetOffsetWithTrace(double p)
+{
+  this->SetOffset(p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOffsetWithTrace %f", 
+    this->GetTclName(), p);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::SetOffset(double p)
 {
   DoubleVectPropertySetElement(this->KeyFrameProxy, "Offset", p);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetOffset %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------

@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.21");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.22");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -156,7 +156,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   
   // KEYFRAME PROPERTIES FRAME
   this->TrackEditor->SetParent(this->TopFrame->GetFrame());
-  this->TrackEditor->SetAnimationManager(this->AnimationManager);
   this->TrackEditor->Create(app);
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", 

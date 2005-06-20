@@ -19,13 +19,13 @@
 #ifndef __vtkPVBooleanKeyFrame_h
 #define __vtkPVBooleanKeyFrame_h
 
-#include "vtkPVKeyFrame.h"
+#include "vtkPVPropertyKeyFrame.h"
 
-class VTK_EXPORT vtkPVBooleanKeyFrame : public vtkPVKeyFrame
+class VTK_EXPORT vtkPVBooleanKeyFrame : public vtkPVPropertyKeyFrame
 {
 public:
   static vtkPVBooleanKeyFrame* New();
-  vtkTypeRevisionMacro(vtkPVBooleanKeyFrame, vtkPVKeyFrame);
+  vtkTypeRevisionMacro(vtkPVBooleanKeyFrame, vtkPVPropertyKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

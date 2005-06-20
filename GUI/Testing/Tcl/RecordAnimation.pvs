@@ -4,80 +4,50 @@ set kw(vtkTemp22) [$kw(vtkTemp4) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp22) $argv $argc
 
-set kw(vtkTemp659) [$kw(vtkTemp4) CreatePVSource SphereSource]
-set kw(vtkTemp660) [$kw(vtkTemp659) GetPVWidget {Center}]
-$kw(vtkTemp660) SetValue 0 0 0
-set kw(vtkTemp666) [$kw(vtkTemp659) GetPVWidget {Radius}]
-$kw(vtkTemp666) SetValue 0.5
-set kw(vtkTemp672) [$kw(vtkTemp659) GetPVWidget {Theta Resolution}]
-$kw(vtkTemp672) SetValue 8
-set kw(vtkTemp677) [$kw(vtkTemp659) GetPVWidget {Start Theta}]
-$kw(vtkTemp677) SetValue 0
-set kw(vtkTemp682) [$kw(vtkTemp659) GetPVWidget {End Theta}]
-$kw(vtkTemp682) SetValue 360
-set kw(vtkTemp687) [$kw(vtkTemp659) GetPVWidget {Phi Resolution}]
-$kw(vtkTemp687) SetValue 8
-set kw(vtkTemp692) [$kw(vtkTemp659) GetPVWidget {Start Phi}]
-$kw(vtkTemp692) SetValue 0
-set kw(vtkTemp697) [$kw(vtkTemp659) GetPVWidget {End Phi}]
-$kw(vtkTemp697) SetValue 180
+set kw(vtkTemp800) [$kw(vtkTemp4) CreatePVSource SphereSource]
+set kw(vtkTemp801) [$kw(vtkTemp800) GetPVWidget {Center}]
+$kw(vtkTemp801) SetValue 0 0 0
+set kw(vtkTemp802) [$kw(vtkTemp800) GetPVWidget {Radius}]
+$kw(vtkTemp802) SetValue 0.5
+set kw(vtkTemp805) [$kw(vtkTemp800) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp805) SetValue 8
+set kw(vtkTemp808) [$kw(vtkTemp800) GetPVWidget {Start Theta}]
+$kw(vtkTemp808) SetValue 0
+set kw(vtkTemp811) [$kw(vtkTemp800) GetPVWidget {End Theta}]
+$kw(vtkTemp811) SetValue 360
+set kw(vtkTemp814) [$kw(vtkTemp800) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp814) SetValue 8
+set kw(vtkTemp817) [$kw(vtkTemp800) GetPVWidget {Start Phi}]
+$kw(vtkTemp817) SetValue 0
+set kw(vtkTemp820) [$kw(vtkTemp800) GetPVWidget {End Phi}]
+$kw(vtkTemp820) SetValue 180
 $kw(vtkTemp4) SetCenterOfRotation 0.000000 0.000000 0.000000
 $kw(vtkTemp4) SetCenterOfRotation 0.000000 0.000000 0.000000
-$kw(vtkTemp659) AcceptCallback
-set kw(vtkTemp727) [$kw(vtkTemp4) GetAnimationManager]
-set kw(vtkTemp481) [$kw(vtkTemp727) GetAnimationScene]
-$kw(vtkTemp481) StartRecording
-$kw(vtkTemp677) SetValue 87.65
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp677) SetValue 178.43
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp677) SetValue 228.52
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp682) SetValue 297.39
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp677) SetValue 62.61
-$kw(vtkTemp682) SetValue 209.74
-$kw(vtkTemp692) SetValue 54.78
-$kw(vtkTemp697) SetValue 136.17
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp677) SetValue 0
-$kw(vtkTemp682) SetValue 360
-$kw(vtkTemp692) SetValue 0
-$kw(vtkTemp697) SetValue 180
-$kw(vtkTemp659) AcceptCallback
-$kw(vtkTemp481) RecordState
-
-$kw(vtkTemp481) StopRecording
-$kw(vtkTemp481) SetCurrentTime 0.000000
-$kw(vtkTemp481) Play
-$kw(vtkTemp481) SetCurrentTime 0.000000
+$kw(vtkTemp800) AcceptCallback
+set kw(vtkTemp855) [$kw(vtkTemp4) GetAnimationManager]
+set kw(vtkTemp539) [$kw(vtkTemp855) GetAnimationScene]
+$kw(vtkTemp539) StartRecording
+$kw(vtkTemp808) SetValue 41.01
+$kw(vtkTemp800) AcceptCallback
+$kw(vtkTemp539) RecordState
+$kw(vtkTemp22) SetCameraState 0.000 0.000 4.857  0.000 0.000 1.567  0.000 1.000 0.000
+$kw(vtkTemp808) SetValue 141.27
+$kw(vtkTemp800) AcceptCallback
+$kw(vtkTemp539) RecordState
+$kw(vtkTemp22) SetCameraState 4.621 -0.224 1.481  1.491 -0.072 0.478  0.024 0.997 0.077
+$kw(vtkTemp808) SetValue 218.73
+$kw(vtkTemp800) AcceptCallback
+$kw(vtkTemp539) RecordState
+$kw(vtkTemp811) SetValue 296.2
+$kw(vtkTemp800) AcceptCallback
+$kw(vtkTemp539) RecordState
+$kw(vtkTemp539) StopRecording
 $kw(vtkTemp4) ShowAnimationPanes
-$kw(vtkTemp4) SetSecondaryPanelVisibility 1
-$kw(vtkTemp481) SetCurrentTime 8.9000 
+$kw(vtkTemp539) SetDurationWithTrace 20
+$kw(vtkTemp539) Play
+$kw(vtkTemp539) SetCurrentTimeWithTrace 17
 
-#Retrace
-update
-$Application StopRecordingScript
-[ $Application GetMainWindow ] DeleteAllSources
-# Source the trace to regenerate the sources.
-if {[catch {set channel [open test.tmp w]}] == 0 } {
-   close $channel
-   file delete -force test.tmp
-   source "[$Application GetTraceFileName]"
-}
-
-
-
+#update
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 

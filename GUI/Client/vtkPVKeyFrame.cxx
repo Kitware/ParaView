@@ -15,38 +15,24 @@
 
 #include "vtkPVKeyFrame.h"
 
-#include "vtkSMKeyFrameProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkSMObject.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMBooleanDomain.h"
-#include "vtkSMEnumerationDomain.h"
-#include "vtkSMDoubleRangeDomain.h"
-#include "vtkSMIntRangeDomain.h"
-#include "vtkPVSelectionList.h"
+#include "vtkCommand.h"
+#include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWThumbWheel.h"
-#include "vtkKWEntry.h"
-#include "vtkCommand.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVAnimationScene.h"
-#include "vtkSMAnimationCueProxy.h"
-#include "vtkSMArrayListDomain.h"
-#include "vtkSMStringListDomain.h"
-#include "vtkSMXDMFPropertyDomain.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkKWPushButton.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
-#include "vtkPVContourEntry.h"
+#include "vtkPVWindow.h"
+#include "vtkSMAnimationCueProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMKeyFrameProxy.h"
+#include "vtkSMObject.h"
+#include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.19");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.20");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
-
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -88,20 +74,6 @@ inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 //-----------------------------------------------------------------------------
-inline static int IntVectPropertySetElement(vtkSMProxy *proxy, 
-  const char* propertyname, int val, int index = 0)
-{
-  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
-    proxy->GetProperty(propertyname));
-  if (!dvp)
-    {
-    return 0;
-    }
-  return dvp->SetElement(index, val);
-}
-
-
-//-----------------------------------------------------------------------------
 vtkPVKeyFrame::vtkPVKeyFrame()
 {
   this->Observer = vtkPVKeyFrameObserver::New();
@@ -111,14 +83,10 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->KeyFrameProxyXMLName = NULL;
   this->TimeLabel = vtkKWLabel::New();
   this->TimeThumbWheel = vtkKWThumbWheel::New();
-  this->ValueLabel = vtkKWLabel::New();
   this->TimeBounds[0] = -0.1;
   this->TimeBounds[1] = 1.1;
-  this->ValueWidget = NULL;
   this->AnimationCueProxy = NULL;
   this->Name = NULL;
-  this->MinButton = vtkKWPushButton::New();
-  this->MaxButton = vtkKWPushButton::New();
   this->AnimationScene = 0;
   this->Duration = 1.0;
 }
@@ -141,21 +109,12 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
     this->KeyFrameProxy = NULL;
     }
 
-  if (this->ValueWidget) 
-    {
-    this->ValueWidget->Delete();
-    this->ValueWidget = NULL;
-    }
   this->SetAnimationCueProxy(NULL);
   this->SetKeyFrameProxyXMLName(0);
 
   this->TimeLabel->Delete();
-  this->ValueLabel->Delete();
   this->TimeThumbWheel->Delete();
-  this->MinButton->Delete();
-  this->MaxButton->Delete();
   this->SetName(NULL);
-
   this->SetAnimationScene(0);
 }
 
@@ -231,35 +190,9 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->TimeThumbWheel->SetEntryCommand(this, "TimeChangedCallback");
   this->TimeThumbWheel->SetEndCommand(this, "TimeChangedCallback");
 
-  this->ValueLabel->SetParent(this);
-  this->ValueLabel->Create(app);
-  this->ValueLabel->SetText("Value:");
-  this->CreateValueWidget();
-
-  this->MinButton->SetParent(this);
-  this->MinButton->Create(this->GetApplication());
-  this->MinButton->SetText("min");
-  this->MinButton->SetBalloonHelpString(
-    "Set the value to the minimum possible, given the "
-    "current state of the system.");
-  this->MinButton->SetCommand(this,"MinimumCallback");
-  this->MaxButton->SetParent(this);
-  this->MaxButton->Create(this->GetApplication());
-  this->MaxButton->SetText("max");
-  this->MaxButton->SetBalloonHelpString(
-    "Set the value to the maximum possible, given the "
-    "current state of the system.");
-  this->MaxButton->SetCommand(this, "MaximumCallback");
-
   this->Script("grid %s %s x x x -sticky w",
     this->TimeLabel->GetWidgetName(),
     this->TimeThumbWheel->GetWidgetName());
-  if (this->ValueWidget)
-    {
-    this->Script("grid %s %s x x x -sticky w",
-      this->ValueLabel->GetWidgetName(),
-      this->ValueWidget->GetWidgetName());
-    }
 
   this->Script("grid columnconfigure %s 0 -weight 0",
     this->GetWidgetName());
@@ -274,423 +207,18 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::CreateValueWidget()
-{
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
-  vtkSMProperty* property = cueProxy->GetAnimatedProperty();
-  vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
-  int animated_element = cueProxy->GetAnimatedElement();
-
-  if (!domain || !property)
-    {
-    vtkErrorMacro("Animated domain/property not specified!");
-    //don't create a value widget.
-    return;
-    }
-  // 4 Types of widgets: SelectionList, Checkbox, Thumbwheel
-  // and PVContourEntry.
-  vtkSMBooleanDomain* bd = vtkSMBooleanDomain::SafeDownCast(domain);
-  vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(domain);
-  vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(domain);
-
-  if (animated_element==-1)
-    {
-    // For now, I will only support multiple value widgets for double vector
-    // property alone (since I use the vtkPVContourEntry (which accepts only
-    // doubles).
-    if (!vtkSMDoubleVectorProperty::SafeDownCast(property))
-      {
-      vtkWarningMacro("Array List domains are currently supported for "
-        " vtkSMDoubleVectorProperty alone.");
-      return;
-      }
-    vtkPVContourEntry* valueList = vtkPVContourEntry::New();
-    valueList->SetParent(this);
-    valueList->SetSMProperty(property);
-    valueList->Create(this->GetApplication());
-    valueList->SetModifiedCommand(this->GetTclName(),"ValueChangedCallback");
-    this->ValueWidget = valueList;
-    }
-  else
-    {
-    if (bd || ed || sld)
-      {
-      vtkPVSelectionList* pvList = vtkPVSelectionList::New();
-      pvList->SetParent(this);
-      pvList->SetLabelVisibility(0);
-      pvList->Create(this->GetApplication());
-      pvList->SetModifiedCommand(this->GetTclName(), "ValueChangedCallback");
-      this->ValueWidget = pvList;
-      }
-    else // even for xdmfd we create a thumbwheel.
-      {
-      vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
-      pvWheel->SetParent(this);
-      pvWheel->PopupModeOn();
-      pvWheel->Create(this->GetApplication());
-      pvWheel->DisplayEntryOn();
-      pvWheel->DisplayLabelOff();
-      pvWheel->DisplayEntryAndLabelOnTopOff();
-      pvWheel->ExpandEntryOn();
-      pvWheel->SetEntryCommand(this, "ValueChangedCallback");
-      pvWheel->SetEndCommand(this, "ValueChangedCallback");
-      this->ValueWidget = pvWheel;
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::SetValueToMinimum()
-{
-  this->UpdateDomain();
-  vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-  vtkPVSelectionList *pvSelect = 
-    vtkPVSelectionList::SafeDownCast(this->ValueWidget);
-  if (pvWheel && pvWheel->GetClampMinimumValue())
-    {
-    this->SetKeyValue(pvWheel->GetMinimumValue());
-    }
-  else if (pvSelect && pvSelect->GetNumberOfItems() > 0)
-    {
-    this->SetKeyValue(0);
-    }
-  this->UpdateValuesFromProxy();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::MinimumCallback()
-{
-  this->SetValueToMinimum();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::SetValueToMaximum()
-{
-  this->UpdateDomain();
-  vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-  vtkPVSelectionList *pvSelect = 
-    vtkPVSelectionList::SafeDownCast(this->ValueWidget);
-  if (pvWheel && pvWheel->GetClampMaximumValue())
-    {
-    this->SetKeyValue(pvWheel->GetMaximumValue());
-    }
-  else if (pvSelect && pvSelect->GetNumberOfItems() > 0)
-    {
-    this->SetKeyValue(pvSelect->GetNumberOfItems()-1);
-    } 
-  this->UpdateValuesFromProxy();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::MaximumCallback()
-{
-  this->SetValueToMaximum();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::InitializeKeyValueUsingProperty(
-  vtkSMProperty* property, int index)
-{
-  if (!property )
-    {
-    vtkErrorMacro("Invalid property");
-    return;
-    }
-
-  if (index == -1)
-    {
-    vtkPVContourEntry* contourEntry = vtkPVContourEntry::SafeDownCast(
-      this->ValueWidget);
-    if (contourEntry)
-      {
-      contourEntry->Initialize(); // since we have set the SMProperty pointer
-        // for this widget properly, it will update itself!
-      this->ValueChangedCallback(); // I call this so that the values in the
-        //contour widget are set as values on the this key frame.
-      }
-    return;
-    }
-  if (vtkSMVectorProperty::SafeDownCast(property))
-    {
-    if (
-      static_cast<int>(
-        (vtkSMVectorProperty::SafeDownCast(property)->GetNumberOfElements())) 
-      <= index)
-      {
-      vtkErrorMacro(<<"Invalid index " << index << " for property : " 
-                    << property->GetXMLName());
-      return;
-      }
-    }
-  if (vtkSMDoubleVectorProperty::SafeDownCast(property))
-    {
-    this->SetKeyValue(
-      vtkSMDoubleVectorProperty::SafeDownCast(property)->GetElement(index));
-    }
-  else if (vtkSMIntVectorProperty::SafeDownCast(property))
-    {
-    this->SetKeyValue(static_cast<double>(vtkSMIntVectorProperty::SafeDownCast(
-          property)->GetElement(index)));
-    }
-  else if (vtkSMIdTypeVectorProperty::SafeDownCast(property))
-    {
-    this->SetKeyValue(
-      static_cast<double>(vtkSMIdTypeVectorProperty::SafeDownCast(
-                            property)->GetElement(index)));
-    }
-  else if (vtkSMStringVectorProperty::SafeDownCast(property))
-    {
-    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-      property);
-    vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
-    vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
-    vtkSMXDMFPropertyDomain* xdmfd = 
-      vtkSMXDMFPropertyDomain::SafeDownCast(domain);
-    if (xdmfd)
-      {
-      const char* name = xdmfd->GetString(index);
-      if (name)
-        {
-        int found = 0;
-        unsigned int idx = svp->GetElementIndex(name, found);
-        if (found)
-          {
-          int val = 0;
-          val = atoi(svp->GetElement(idx + 1));
-          this->SetKeyValue(static_cast<double>(val));
-          }
-        else
-          {
-          vtkErrorMacro("Could not find an appropriate property value "
-            "matching the domain. Can not update keyframe.");
-          }
-        }
-      }
-    else
-      {
-      const char* string = svp->GetElement(index);
-      vtkPVSelectionList* pvList = 
-        vtkPVSelectionList::SafeDownCast(this->ValueWidget); 
-      if (string && pvList)
-        {
-        // find the index for this string in the widget / or domain.
-        int vindex = pvList->GetValue(string);
-        if (vindex != -1)
-          {
-          this->SetKeyValue(static_cast<double>(vindex));
-          }
-        }
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::UpdateDomain()
-{
-  if (!this->ValueWidget)
-    {
-    vtkErrorMacro("ValueWidget must be created before updating domain");
-    return;
-    }
-  
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
-  vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
-  int index = cueProxy->GetAnimatedElement();
-  
-  vtkSMBooleanDomain* bd = vtkSMBooleanDomain::SafeDownCast(domain);
-  vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(domain);
-  vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(domain);
-  vtkSMDoubleRangeDomain* drd = vtkSMDoubleRangeDomain::SafeDownCast(domain);
-  vtkSMIntRangeDomain* ird = vtkSMIntRangeDomain::SafeDownCast(domain);
-  vtkSMXDMFPropertyDomain* xdmfd =
-    vtkSMXDMFPropertyDomain::SafeDownCast(domain);
-  // TODO: Actually, it would have been neat if we could compare the MTimes for the
-  // widgets and the domains, but so happens that none of the
-  // PVWidgets or SMDomains update MTime properly. Should correct that first.
-  if (index == -1)
-    {
-    return;
-    }
-  
-  if (bd)
-    {
-    // Domain does not change for boolean.
-    vtkPVSelectionList* pvList = 
-      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
-    if (pvList->GetNumberOfItems() != 2)
-      {
-      pvList->RemoveAllItems();
-      pvList->AddItem("Off", 0);
-      pvList->AddItem("On", 1);
-      }
-    }
-  else if (ed)
-    {
-    vtkPVSelectionList* pvList = 
-      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
-    // Update PVSelectionList using emumerated elements.
-    if (pvList && (pvList->GetMTime() <= ed->GetMTime() || 
-                   pvList->GetNumberOfItems()==0))
-      {
-      pvList->RemoveAllItems();
-      for (unsigned int cc=0; cc < ed->GetNumberOfEntries(); cc++)
-        {
-        const char* text = ed->GetEntryText(cc);
-        int value = ed->GetEntryValue(cc);
-        pvList->AddItem(text, value);
-        }
-      }
-    }
-  else if (sld)
-    {
-    vtkPVSelectionList* pvList = 
-      vtkPVSelectionList::SafeDownCast(this->ValueWidget);
-    // Update PVSelectionList using strings.
-    if (pvList && (pvList->GetMTime() <= sld->GetMTime() || 
-                   pvList->GetNumberOfItems()==0))
-      {
-      pvList->RemoveAllItems();
-      for (unsigned int cc=0; cc < sld->GetNumberOfStrings(); cc++)
-        {
-        pvList->AddItem(sld->GetString(cc), cc);
-        }
-      }
-    }
-  else if (xdmfd)
-    {
-    vtkKWThumbWheel* wheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-    wheel->SetResolution(1);
-    int minexists, maxexists;
-    int min = xdmfd->GetMinimum(index, minexists);
-    int max = xdmfd->GetMaximum(index, maxexists);
-    const char* name = xdmfd->GetString(index);
-    if (minexists && maxexists && name)
-      {
-      wheel->SetMinimumValue(min);
-      wheel->SetMaximumValue(max);
-      wheel->ClampMinimumValueOn();
-      wheel->ClampMaximumValueOn();
-      }
-    }
-  else if (drd || ird)
-    {
-    int hasmin=0;
-    int hasmax=0;
-    double min;
-    double max;
-    int column = 2;
-    vtkKWThumbWheel* wheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
-    if (drd)
-      {
-      min = drd->GetMinimum(index, hasmin);
-      max = drd->GetMaximum(index, hasmax);
-      wheel->SetResolution(0.01);
-      }
-    else //if(ird)
-      {
-      min = ird->GetMinimum(index, hasmin);
-      max = ird->GetMaximum(index, hasmax);
-      wheel->SetResolution(1);
-      }
-    if (hasmin)
-      {
-      wheel->SetMinimumValue(min);
-      wheel->ClampMinimumValueOn();
-      this->Script("grid %s -column %d -row 1", 
-                   this->MinButton->GetWidgetName(), column);
-      column++;
-      }
-    else
-      {
-      wheel->ClampMinimumValueOff();
-      this->Script("grid forget %s", this->MinButton->GetWidgetName());
-      }
-    if (hasmax)
-      {
-      wheel->SetMaximumValue(max);
-      wheel->ClampMaximumValueOn();
-      this->Script("grid %s -column %d -row 1", 
-                   this->MaxButton->GetWidgetName(), column);
-      }
-    else
-      {
-      wheel->ClampMaximumValueOff();
-      this->Script("grid forget %s", this->MaxButton->GetWidgetName());
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::InitializeKeyValueUsingCurrentState()
-{
-  if (!this->ValueWidget)
-    {
-    return;
-    }
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
-  vtkSMProperty* property = cueProxy->GetAnimatedProperty();
-  int index = cueProxy->GetAnimatedElement();
-  this->InitializeKeyValueUsingProperty(property, index);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::InitializeKeyValueDomainUsingCurrentState()
-{
-  this->UpdateDomain();
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVKeyFrame::PrepareForDisplay()
 {
   this->UpdateValuesFromProxy();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::ValueChangedCallback()
-{
-  if (vtkPVSelectionList::SafeDownCast(this->ValueWidget))
-    {
-    this->SetKeyValue(static_cast<double>(
-      vtkPVSelectionList::SafeDownCast(this->ValueWidget)->GetCurrentValue()));
-    }
-  else if (vtkKWThumbWheel::SafeDownCast(this->ValueWidget))
-    {
-    this->SetKeyValue(
-      vtkKWThumbWheel::SafeDownCast(this->ValueWidget)->GetEntry()->
-      GetValueAsFloat());
-    }
-  else if (vtkPVContourEntry::SafeDownCast(this->ValueWidget))
-    {
-    vtkPVContourEntry* contourEntry = 
-      vtkPVContourEntry::SafeDownCast(this->ValueWidget);
-    
-    int numContours = contourEntry->GetNumberOfValues();
-    this->SetNumberOfKeyValues(numContours);
-    for (int i=0; i < numContours; i++)
-      {
-      this->SetKeyValue(i, contourEntry->GetValue(i));
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVKeyFrame::UpdateValuesFromProxy()
 {
-  double keyvalue = this->KeyFrameProxy->GetKeyValue();
-  if (vtkPVSelectionList::SafeDownCast(this->ValueWidget))
-    {
-    vtkPVSelectionList::SafeDownCast(this->ValueWidget)->SetCurrentValue(
-      static_cast<int>(keyvalue));
-    }
-  else if (vtkKWThumbWheel::SafeDownCast(this->ValueWidget))
-    {
-    vtkKWThumbWheel::SafeDownCast(this->ValueWidget)->SetValue(
-      keyvalue);
-    }
-
   this->TimeThumbWheel->SetValue(
     this->GetRelativeTime(this->KeyFrameProxy->GetKeyTime()));
 }
+
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::TimeChangedCallback()
 {
@@ -706,7 +234,7 @@ void vtkPVKeyFrame::TimeChangedCallback()
     }
   else
     {
-    this->SetKeyTime(ntime);
+    this->SetKeyTimeWithTrace(ntime);
     }
 }
 
@@ -764,8 +292,6 @@ void vtkPVKeyFrame::ExecuteEvent(vtkObject* , unsigned long event, void* )
     }
 }
 
-
-
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::ClearTimeBounds()
 {
@@ -786,6 +312,14 @@ void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVKeyFrame::SetKeyTimeWithTrace(double time)
+{
+  this->SetKeyTime(time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTimeWithTrace %f", 
+    this->GetTclName(), time);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetKeyTime(double time)
 {
   if (!this->KeyFrameProxy)
@@ -794,8 +328,6 @@ void vtkPVKeyFrame::SetKeyTime(double time)
     }
   DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyTime", time);
   this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", 
-                                   this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------
@@ -809,54 +341,19 @@ double vtkPVKeyFrame::GetKeyTime()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::SetKeyValue(int index, double val)
+void vtkPVKeyFrame::Copy(vtkPVKeyFrame* fromKF)
 {
   if (!this->KeyFrameProxy)
     {
     return;
     }
-  DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyValues", val, index);
-  this->KeyFrameProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %d %f", 
-    this->GetTclName(), index, val);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVKeyFrame::SetNumberOfKeyValues(int num)
-{
-  if (!this->KeyFrameProxy)
-    {
-    return;
-    }
-  IntVectPropertySetElement(this->KeyFrameProxy, "NumberOfKeyValues", num);
-  this->KeyFrameProxy->UpdateVTKObjects();
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->KeyFrameProxy->GetProperty("KeyValues"));
-  dvp->SetNumberOfElements(num);
-  
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetNumberOfKeyValues %d", 
-    this->GetTclName(), num);
-}
-
-//-----------------------------------------------------------------------------
-double vtkPVKeyFrame::GetKeyValue(int index)
-{
-  if (!this->KeyFrameProxy)
-    {
-    return 0;
-    }
-  return this->KeyFrameProxy->GetKeyValue(index);
+  this->SetKeyTime(fromKF->GetKeyTime());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-  if (this->ValueWidget)
-    {
-    this->PropagateEnableState(this->ValueWidget);
-    }
   this->PropagateEnableState(this->TimeThumbWheel);
 }
 
@@ -868,12 +365,6 @@ void vtkPVKeyFrame::SaveState(ofstream* file)
     return;
     }
   *file << "#State of a Key Frame " <<endl;
-  
-  for (unsigned int i=0; i < this->KeyFrameProxy->GetNumberOfKeyValues(); i++)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetKeyValue " << i << " "
-      << this->GetKeyValue(i) << endl;
-    }
   *file << "$kw(" << this->GetTclName() << ") SetKeyTime "
     << this->GetKeyTime() << endl;
 }

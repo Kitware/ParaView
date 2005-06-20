@@ -110,6 +110,7 @@ public:
   virtual void StopRecording();
 
   virtual void RecordState(double ntime, double offset, int onlyFocus);
+  virtual void RecordState(double ntime, double offset);
 
   // Description:
   // Set a pointer to the AnimationScene. This is not reference counted. A cue
@@ -120,9 +121,8 @@ public:
 
   // Description:
   // Pointer to the PVSource that this cue stands for.
-  // When the property is modifed (during animation), the cue calls
-  // MarkSourcesForUpdate() on the PVSource so the the pipeline is
-  // re-rendered.
+  // The PVSource is used to generate the tcl name when
+  // GetTclNameCommand is called.
   void SetPVSource(vtkPVSource*);
   vtkGetObjectMacro(PVSource, vtkPVSource);
 
@@ -154,6 +154,15 @@ public:
   // only vtkPVAnimationManager must set the name of the cue.
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
+
+  // Description:
+  // This is the Name of the vtkPVAnimationCueTree for the base of this Cue.
+  // This name need not be set when this Cue has a vtkPVSource 
+  // associated with it. If it does not have a PVSource (like Camera)
+  // in that case this name must be set. It is used by vtkPVActiveTrackSelector
+  // to identify the parent of the cue in case the PVSource is not present.
+  vtkSetStringMacro(SourceTreeName);
+  vtkGetStringMacro(SourceTreeName);
 
   // Description:
   // Enable horizontal zooming of the timeline.
@@ -244,6 +253,7 @@ protected:
   int ShowTimeLine;
 
   char* Name;
+  char* SourceTreeName;
   char* TclNameCommand;
   vtkSetStringMacro(TclNameCommand);
 

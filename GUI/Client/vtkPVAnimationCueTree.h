@@ -128,6 +128,7 @@ public:
 
   // Description:
   // Calls RecordState on all the children cues.
+  virtual void RecordState(double ntime, double offset);
   virtual void RecordState(double ntime, double offset, int onlyFocus);
 
   // Description:

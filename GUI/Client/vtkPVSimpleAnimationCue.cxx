@@ -15,28 +15,32 @@
 
 #include "vtkPVSimpleAnimationCue.h"
 
+#include "vtkAnimationCue.h"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVBooleanKeyFrame.h"
+#include "vtkPVCameraKeyFrame.h"
+#include "vtkPVExponentialKeyFrame.h"
+#include "vtkPVPropertyKeyFrame.h"
+#include "vtkPVRampKeyFrame.h"
+#include "vtkPVSinusoidKeyFrame.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkPVWindow.h"
+#include "vtkSMAnimationCueProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMAnimationCueProxy.h"
 #include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
-#include "vtkCollectionIterator.h"
-#include "vtkCollection.h"
+#include "vtkSMKeyFrameProxy.h"
+#include "vtkSMPropertyStatusManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkAnimationCue.h"
-#include "vtkCommand.h"
-#include "vtkPVKeyFrame.h"
-#include "vtkSMKeyFrameProxy.h"
-#include "vtkPVAnimationManager.h"
-#include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
-#include "vtkSMPropertyStatusManager.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.10");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.11");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -114,6 +118,8 @@ vtkPVSimpleAnimationCue::vtkPVSimpleAnimationCue()
   this->CueProxyName = 0;
   this->KeyFrameManipulatorProxy = 0; 
   this->KeyFrameManipulatorProxyName = 0;
+  this->KeyFrameManipulatorProxyXMLName = 0;
+  this->SetKeyFrameManipulatorProxyXMLName("KeyFrameAnimationCueManipulator");
 
   this->PVKeyFrames = vtkCollection::New();
   this->PVKeyFramesIterator = this->PVKeyFrames->NewIterator();
@@ -131,6 +137,7 @@ vtkPVSimpleAnimationCue::vtkPVSimpleAnimationCue()
   this->Observer = vtkPVSimpleAnimationCueObserver::New();
   this->Observer->SetTarget(this);
 
+  this->DefaultKeyFrameType = vtkPVSimpleAnimationCue::RAMP;
   this->KeyFrameParent = 0;
   this->Duration = 1.0;
 }
@@ -218,10 +225,11 @@ void vtkPVSimpleAnimationCue::CreateProxy()
 
   this->KeyFrameManipulatorProxy = vtkSMKeyFrameAnimationCueManipulatorProxy::
     SafeDownCast(pxm->NewProxy("animation_manipulators",
-        "KeyFrameAnimationCueManipulator"));
+        this->KeyFrameManipulatorProxyXMLName));
   if (!this->KeyFrameManipulatorProxy)
     {
-    vtkErrorMacro("Failed to create proxy KeyFrameAnimationCueManipulator");
+    vtkErrorMacro("Failed to create proxy " << 
+      this->KeyFrameManipulatorProxyXMLName);
     return;
     }
   ostrstream str1;
@@ -440,7 +448,11 @@ int vtkPVSimpleAnimationCue::AddNewKeyFrame(double time)
         return -1;
         }
       }
-    id = this->CreateAndAddKeyFrame(time, vtkPVAnimationManager::RAMP);
+    id = this->CreateAndAddKeyFrame(time, this->DefaultKeyFrameType);
+    if (id == -1)
+      {
+      return -1;
+      }
     vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
     if (keyframe && !this->InRecording)
       {
@@ -624,11 +636,6 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
     return -1;
     }
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
-    this->GetApplication());
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
-
   // First, synchronize the system state to the keyframe time to get proper
   // domain and property values.
   if (!this->InRecording)
@@ -641,16 +648,23 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   ostrstream str ;
   str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
   
-  vtkPVKeyFrame* keyframe = pvAM->NewKeyFrame(type);
+  vtkPVKeyFrame* keyframe = this->NewKeyFrame(type);
+  if (!keyframe)
+    {
+    vtkErrorMacro("Failed to create KeyFrame of type " << type);
+    return -1;
+    }
   keyframe->SetParent(this->KeyFrameParent);
   keyframe->SetName(str.str());
   str.rdbuf()->freeze(0);
   
   keyframe->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-  ostrstream sCommand;
-  sCommand << "GetKeyFrame \"" << keyframe->GetName() << "\"" << ends;
-  keyframe->GetTraceHelper()->SetReferenceCommand(sCommand.str());
-  sCommand.rdbuf()->freeze(0);
+  
+  //ostrstream sCommand;
+  //sCommand << "GetKeyFrame \"" << keyframe->GetName() << "\"" << ends;
+  //keyframe->GetTraceHelper()->SetReferenceCommand(sCommand.str());
+  //sCommand.rdbuf()->freeze(0);
+  keyframe->GetTraceHelper()->SetReferenceCommand("GetSelectedKeyFrame");
 
   keyframe->SetAnimationCueProxy(this->GetCueProxy()); 
   // provide a pointer to cue, so that the interace
@@ -658,7 +672,6 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->Create(this->GetApplication());
   keyframe->SetDuration(this->Duration);
   keyframe->SetKeyTime(time);
-  keyframe->SetKeyValue(0);
   int id = this->AddKeyFrame(keyframe);
   keyframe->Delete();
 
@@ -781,6 +794,20 @@ void vtkPVSimpleAnimationCue::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
 }
 
 //-----------------------------------------------------------------------------
+int vtkPVSimpleAnimationCue::IsKeyFrameTypeSupported(int type)
+{
+  switch(type)
+    {
+  case vtkPVSimpleAnimationCue::RAMP:
+  case vtkPVSimpleAnimationCue::STEP:
+  case vtkPVSimpleAnimationCue::EXPONENTIAL:
+  case vtkPVSimpleAnimationCue::SINUSOID:
+    return 1;
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame, 
   vtkPVKeyFrame* newFrame)
 {
@@ -798,9 +825,8 @@ void vtkPVSimpleAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
   sCommand.rdbuf()->freeze(0);
 
   this->InitializeKeyFrameUsingCurrentState(newFrame);
-  newFrame->SetKeyTime(oldFrame->GetKeyTime());
-  newFrame->SetKeyValue(oldFrame->GetKeyValue());
-  
+  newFrame->Copy(oldFrame);
+
   this->RemoveKeyFrame(oldFrame);
   this->AddKeyFrame(newFrame);
 
@@ -871,6 +897,16 @@ vtkPVKeyFrame* vtkPVSimpleAnimationCue::GetKeyFrame(int id)
   return NULL;
 }
 
+//-----------------------------------------------------------------------------
+vtkPVKeyFrame* vtkPVSimpleAnimationCue::GetSelectedKeyFrame()
+{
+  if (this->SelectedKeyFrameIndex < 0 || 
+    this->SelectedKeyFrameIndex >= this->GetNumberOfKeyFrames())
+    {
+    return NULL;
+    }
+  return this->GetKeyFrame(this->SelectedKeyFrameIndex);
+}
 //-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::SetAnimatedProxy(vtkSMProxy *proxy)
 {
@@ -1120,16 +1156,24 @@ void vtkPVSimpleAnimationCue::RecordState(double ntime, double offset)
       vtkErrorMacro("Failed to add new key frame");
       return;
       }
-    this->GetKeyFrame(id)->InitializeKeyValueUsingProperty(
-      this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
-      index);
-    
+    vtkPVKeyFrame* kf = this->GetKeyFrame(id);
+    if (vtkPVPropertyKeyFrame::SafeDownCast(kf))
+      {
+      vtkPVPropertyKeyFrame::SafeDownCast(kf)->InitializeKeyValueUsingProperty(
+        this->PropertyStatusManager->GetInternalProperty(
+          vtkSMVectorProperty::SafeDownCast(property)), index);
+      }
     if (old_numOfKeyFrames == 0)
       {
       //Pilot keyframe also needs to be initilaized.
-      this->GetKeyFrame(0)->InitializeKeyValueUsingProperty(
-        this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
-        index);
+      kf = this->GetKeyFrame(0);
+      if (vtkPVPropertyKeyFrame::SafeDownCast(kf))
+        {
+
+        vtkPVPropertyKeyFrame::SafeDownCast(kf)->InitializeKeyValueUsingProperty(
+          this->PropertyStatusManager->GetInternalProperty(
+            vtkSMVectorProperty::SafeDownCast(property)), index);
+        }
       }
     }
   int id2 = this->AddNewKeyFrame(ntime + offset);
@@ -1155,6 +1199,82 @@ void vtkPVSimpleAnimationCue::SelectKeyFrameInternal(int id)
 {
   this->SelectedKeyFrameIndex = id;
   this->InvokeEvent(vtkPVSimpleAnimationCue::SelectionChangedEvent);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVKeyFrame* vtkPVSimpleAnimationCue::ReplaceKeyFrame(int type, 
+  vtkPVKeyFrame* replaceFrame /*=NULL*/)
+{
+  if (this->GetKeyFrameType(replaceFrame) == type)
+    {
+    // no replace necessary.
+    return replaceFrame;
+    }
+  vtkPVKeyFrame* keyFrame = this->NewKeyFrame(type);
+  if (!keyFrame)
+    {
+    return NULL;
+    }
+  keyFrame->SetParent(this->GetKeyFrameParent());
+  keyFrame->SetAnimationCueProxy(this->GetCueProxy());
+  keyFrame->Create(this->GetApplication());
+  this->ReplaceKeyFrame(replaceFrame, keyFrame);
+  keyFrame->Delete();
+  return keyFrame;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVKeyFrame* vtkPVSimpleAnimationCue::NewKeyFrame(int type)
+{
+  vtkPVKeyFrame* keyframe = NULL;
+  switch(type)
+    {
+  case vtkPVSimpleAnimationCue::RAMP:
+    keyframe = vtkPVRampKeyFrame::New();
+    break;
+  case vtkPVSimpleAnimationCue::STEP:
+    keyframe = vtkPVBooleanKeyFrame::New();
+    break;
+  case vtkPVSimpleAnimationCue::EXPONENTIAL:
+    keyframe = vtkPVExponentialKeyFrame::New();
+    break;
+  case vtkPVSimpleAnimationCue::SINUSOID:
+    keyframe = vtkPVSinusoidKeyFrame::New();
+    break;
+  case vtkPVSimpleAnimationCue::CAMERA:
+    keyframe = vtkPVCameraKeyFrame::New();
+    break;
+  default:
+    vtkErrorMacro("Unknown type of keyframe requested: " << type);
+    return NULL;
+    }
+  return keyframe;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVSimpleAnimationCue::GetKeyFrameType(vtkPVKeyFrame* kf)
+{
+  if (vtkPVRampKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::RAMP;
+    }
+  else if (vtkPVBooleanKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::STEP;
+    }
+  else if (vtkPVExponentialKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::EXPONENTIAL;
+    }
+  else if (vtkPVSinusoidKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::SINUSOID;
+    }
+  else if (vtkPVCameraKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::CAMERA;
+    }
+  return vtkPVSimpleAnimationCue::LAST_NOT_USED;
 }
 
 //-----------------------------------------------------------------------------
@@ -1185,4 +1305,5 @@ void vtkPVSimpleAnimationCue::PrintSelf(ostream& os ,vtkIndent indent)
     this->KeyFrameManipulatorProxy << endl;
   os << indent << "Duration: " << this->Duration << endl;
   os << indent << "KeyFrameParent: " << this->KeyFrameParent << endl;
+  os << indent << "DefaultKeyFrameType: " << this->DefaultKeyFrameType << endl;
 }

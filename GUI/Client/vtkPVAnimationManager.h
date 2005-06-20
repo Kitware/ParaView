@@ -71,20 +71,19 @@
 
 #include "vtkPVTracedWidget.h"
 
-class vtkPVVerticalAnimationInterface;
-class vtkPVHorizontalAnimationInterface;
-class vtkPVAnimationScene;
-class vtkSMProxyIterator;
-class vtkPVAnimationManagerInternals;
-class vtkSMProxy;
-class vtkPVAnimationCueTree;
-class vtkPVAnimationManagerObserver;
-class vtkPVAnimationCue;
-class vtkPVSource;
-class vtkPVKeyFrame;
-class vtkSMStringVectorProperty;
 class vtkPVActiveTrackSelector;
+class vtkPVAnimationCueTree;
+class vtkPVAnimationCue;
+class vtkPVAnimationManagerInternals;
+class vtkPVAnimationManagerObserver;
+class vtkPVAnimationScene;
+class vtkPVHorizontalAnimationInterface;
 class vtkPVSimpleAnimationCue;
+class vtkPVSource;
+class vtkPVVerticalAnimationInterface;
+class vtkSMProxy;
+class vtkSMProxyIterator;
+class vtkSMStringVectorProperty;
 
 class VTK_EXPORT vtkPVAnimationManager : public vtkPVTracedWidget
 {
@@ -137,36 +136,6 @@ public:
 
   void SaveAnimation();
   void SaveGeometry();
-
-  //BTX
-  // Description:
-  // These are different types of KeyFrames recognized by the Manager.
-  enum {
-    RAMP = 0,
-    STEP,
-    EXPONENTIAL,
-    SINUSOID,
-    LAST_NOT_USED
-  };
-  //ETX
-
-  // Description:
-  // Creates a new key frame of the sepecified type and adds it to the cue.
-  // If replaceFrame is specified, the new key frame replaces that frame in
-  // the cue.  Basic properties from replaceFrame are copied over to the
-  // newly created frame.
-  vtkPVKeyFrame* ReplaceKeyFrame(vtkPVSimpleAnimationCue* pvCue, int type, 
-    vtkPVKeyFrame* replaceFrame = NULL);
-
-
-  // Description:
-  // Returns a new Key frame of the specified type. Note that this method
-  // does not "Create" the key frame (by calling Create).  
-  vtkPVKeyFrame* NewKeyFrame(int type);
-
-  // Description:
-  // Returns the type of the key frame.
-  int GetKeyFrameType(vtkPVKeyFrame* kf);
 
   // Description:
   // Save the animation in batch script.
@@ -312,9 +281,11 @@ protected:
 //ETX
 
   // Helper method to set up the cue for a particular property.
-  void SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTree* parent, vtkSMProxy* proxy, 
+  // Returns the newly created cue.
+  vtkPVAnimationCue* SetupCue(vtkPVSource* pvSource, 
+    vtkPVAnimationCueTree* parent, vtkSMProxy* proxy, 
     const char* propertyname, const char* domainname, int element, 
-    const char* label);
+    const char* label, vtkPVAnimationCue* cueToSetup = NULL);
 
   int AddStringVectorProperty(vtkPVSource* pvSource, vtkSMProxy* proxy, 
     vtkPVAnimationCueTree* pvCueTree, vtkSMStringVectorProperty* svp);

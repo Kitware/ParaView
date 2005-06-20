@@ -26,7 +26,6 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationCue.h"
-#include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVComparativeVis.h"
 #include "vtkPVComparativeVisPropertyWidget.h"
@@ -38,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.5");
 
 int vtkPVComparativeVisDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -226,11 +225,6 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
   this->Script(
     "pack %s -side top -fill x -anchor n -pady 5", 
     this->VisualizationListFrame->GetWidgetName());
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
-  this->TrackEditor->SetAnimationManager(pvAM);
 
   this->TrackEditor->SetParent(this->MainFrame);
   this->TrackEditor->Create(app);

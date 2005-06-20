@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.363");
+vtkCxxRevisionMacro(vtkPVApplication, "1.364");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -587,6 +587,7 @@ int vtkPVApplication::SetupRenderModule()
     p->Delete();
     return 0;
     }
+  rm->SetName("Ren1");
   rm->UpdateVTKObjects();
   this->SetRenderModuleProxy(rm);
   pm->GetOptions()->SetRenderModuleName(renderModuleName);

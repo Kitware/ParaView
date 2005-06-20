@@ -34,10 +34,9 @@
 #include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVSinusoidKeyFrame.h"
 #include "vtkPVTraceHelper.h"
-#include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.7");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.8");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -79,7 +78,6 @@ protected:
 //-----------------------------------------------------------------------------
 vtkPVTrackEditor::vtkPVTrackEditor()
 {
-  this->AnimationManager = NULL;
   this->KeyFramePropertiesFrame = vtkKWFrameLabeled::New();
   this->PropertiesFrame = vtkKWFrame::New();
   this->SelectKeyFrameLabel = vtkKWLabel::New();
@@ -92,7 +90,6 @@ vtkPVTrackEditor::vtkPVTrackEditor()
   this->AddKeyFrameButton = vtkKWPushButton::New();
   this->DeleteKeyFrameButton = vtkKWPushButton::New();
 
-  this->AnimationManager = NULL;
   this->SimpleAnimationCue = NULL;
 
   this->IndexScale = vtkKWScale::New();
@@ -112,7 +109,6 @@ vtkPVTrackEditor::~vtkPVTrackEditor()
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
-  this->SetAnimationManager(NULL);
   this->SetAnimationCue(NULL);
   this->KeyFramePropertiesFrame->Delete();
   this->PropertiesFrame->Delete();
@@ -133,11 +129,6 @@ vtkPVTrackEditor::~vtkPVTrackEditor()
 //-----------------------------------------------------------------------------
 void vtkPVTrackEditor::Create(vtkKWApplication* app)
 {
-  if (!this->AnimationManager)
-    {
-    vtkErrorMacro("AnimationManager must be set");
-    return;
-    }
   
   // Check if already created
 
@@ -424,6 +415,10 @@ void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
       VTK_PV_SINUSOID_INDEX);
     this->TypeImage->SetImageOption("PVSinusoid");
     }
+  else
+    {
+    this->InterpolationValid = 0;
+    }
 }
 
 
@@ -518,9 +513,9 @@ void vtkPVTrackEditor::AddKeyFrameButtonCallback()
     vtkErrorMacro("Cannot delete any keyframe!");
     return;
     }
-  this->SimpleAnimationCue->AppendNewKeyFrame();
   this->GetTraceHelper()->AddEntry("$kw(%s) AddKeyFrameButtonCallback", 
     this->GetTclName());
+  this->SimpleAnimationCue->AppendNewKeyFrame();
 }
 
 //-----------------------------------------------------------------------------
@@ -549,7 +544,7 @@ void vtkPVTrackEditor::DeleteKeyFrameButtonCallback()
 void vtkPVTrackEditor::SetKeyFrameType(int type)
 {
   int id;
-  if (!this->SimpleAnimationCue || !this->AnimationManager ||  
+  if (!this->SimpleAnimationCue ||   
     this->SimpleAnimationCue->GetVirtual() ||
     (id = this->SimpleAnimationCue->GetSelectedKeyFrameIndex())==-1)
     {
@@ -560,8 +555,8 @@ void vtkPVTrackEditor::SetKeyFrameType(int type)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyFrameType %d", this->GetTclName(),
     type);
 
-  this->AnimationManager->ReplaceKeyFrame(this->SimpleAnimationCue,
-    type,  this->SimpleAnimationCue->GetKeyFrame(id));
+  this->SimpleAnimationCue->ReplaceKeyFrame(type,  
+    this->SimpleAnimationCue->GetKeyFrame(id));
   this->Update();
 }
 

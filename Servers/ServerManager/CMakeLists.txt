@@ -32,6 +32,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
+  vtkSMCameraKeyFrameProxy.cxx
+  vtkSMCameraManipulatorProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx

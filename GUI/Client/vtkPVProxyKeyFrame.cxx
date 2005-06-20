@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVRampKeyFrame.cxx
+  Module:    vtkPVProxyKeyFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,32 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVProxyKeyFrame.h"
 
-#include "vtkPVRampKeyFrame.h"
 #include "vtkObjectFactory.h"
 
-vtkStandardNewMacro(vtkPVRampKeyFrame);
-vtkCxxRevisionMacro(vtkPVRampKeyFrame, "1.2");
-
+vtkCxxRevisionMacro(vtkPVProxyKeyFrame, "1.1");
 //-----------------------------------------------------------------------------
-vtkPVRampKeyFrame::vtkPVRampKeyFrame()
-{
-  this->SetKeyFrameProxyXMLName("RampKeyFrame");
-}
-
-//-----------------------------------------------------------------------------
-vtkPVRampKeyFrame::~vtkPVRampKeyFrame()
+vtkPVProxyKeyFrame::vtkPVProxyKeyFrame()
 {
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVRampKeyFrame::ChildCreate(vtkKWApplication* app)
+vtkPVProxyKeyFrame::~vtkPVProxyKeyFrame()
 {
-  this->Superclass::ChildCreate(app);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVRampKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVProxyKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

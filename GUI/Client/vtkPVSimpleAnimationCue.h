@@ -145,7 +145,14 @@ public:
   // Description:
   // Returns a key frame with the givenn name. This is only for trace
   // and should never be used otherwise.
+  // OBSOLETE: trace no longer replies on keyframe names. Instead 
+  // it relies on selection of the appropriate keyframe.
   vtkPVKeyFrame* GetKeyFrame(const char* name);
+
+  // Description:
+  // Returns the currently selected key frame (as indicated by 
+  // SelectedKeyFrameIndex), if any, otherwise NULL.
+  vtkPVKeyFrame* GetSelectedKeyFrame();
 
   // Description:
   // Replaces a keyframe with another. The Key time and key value of
@@ -153,10 +160,16 @@ public:
   virtual void ReplaceKeyFrame(vtkPVKeyFrame* oldFrame, vtkPVKeyFrame* newFrame);
 
   // Description:
+  // Method to query if the animation cue supports the given type of
+  // key frame. Default implementatio returns true for all but
+  // Camera keyframes.
+  virtual int IsKeyFrameTypeSupported(int type);
+  
+  // Description:
   // Methods to set the animated proxy/property/domain/element information.
-  void SetAnimatedProxy(vtkSMProxy* proxy);
+  virtual void SetAnimatedProxy(vtkSMProxy* proxy);
   vtkSMProxy* GetAnimatedProxy();
-  void SetAnimatedPropertyName(const char* name);
+  virtual void SetAnimatedPropertyName(const char* name);
   const char* GetAnimatedPropertyName();
   void SetAnimatedDomainName(const char* name);
   const char* GetAnimatedDomainName();
@@ -172,7 +185,7 @@ public:
   // Stop Recording.
   virtual void StopRecording();
 
-  void RecordState(double ntime, double offset);
+  virtual void RecordState(double ntime, double offset);
 
   // Description:
   // Adds a new key frame is the property animated by this cue has changed
@@ -230,6 +243,42 @@ public:
   void SetDuration(double duration);
   vtkGetMacro(Duration, double);
 
+
+  // Description:
+  // Get/Set the default key frame type created by this Cue.
+  vtkGetMacro(DefaultKeyFrameType, int);
+  vtkSetMacro(DefaultKeyFrameType, int);
+
+  //BTX
+  // Description:
+  // These are different types of KeyFrames.
+  enum {
+    RAMP = 0,
+    STEP,
+    EXPONENTIAL,
+    SINUSOID,
+    CAMERA,
+    LAST_NOT_USED
+  };
+  //ETX
+
+  // Description:
+  // Creates a new key frame of the sepecified type and adds it to the cue.
+  // If replaceFrame is specified, the new key frame replaces that frame in
+  // the cue.  Basic properties from replaceFrame are copied over to the
+  // newly created frame.
+  vtkPVKeyFrame* ReplaceKeyFrame(int type, vtkPVKeyFrame* replaceFrame = NULL);
+
+  // Description:
+  // Returns a new Key frame of the specified type. Note that this method
+  // does not "Create" the key frame (by calling Create), it merely
+  // instantiates the right kind of vtkPVKeyFrame subclass.
+  vtkPVKeyFrame* NewKeyFrame(int type);
+
+  // Description:
+  // Returns the type of the key frame.
+  int GetKeyFrameType(vtkPVKeyFrame* kf);
+
 protected:
   vtkPVSimpleAnimationCue();
   ~vtkPVSimpleAnimationCue();
@@ -267,6 +316,8 @@ protected:
   vtkSMKeyFrameAnimationCueManipulatorProxy* KeyFrameManipulatorProxy;
   char* KeyFrameManipulatorProxyName;
   vtkSetStringMacro(KeyFrameManipulatorProxyName);
+  char* KeyFrameManipulatorProxyXMLName;
+  vtkSetStringMacro(KeyFrameManipulatorProxyXMLName);
 
   char* LabelText;
   int ProxiesRegistered;
@@ -284,6 +335,10 @@ protected:
   // order for the cue in which they are created. KeyFramesCreatedCount
   // keeps track of the order.
   int KeyFramesCreatedCount;
+
+  // Description:
+  // The type of the keyframe created by default.
+  int DefaultKeyFrameType;
 
   // Description:
   // A PVCue registers the proxies and adds it to the AnimationScene iff it

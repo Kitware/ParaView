@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.38");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.39");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -511,7 +511,7 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
 void vtkPVAnimationScene::DurationChangedCallback()
 {
   double duration = this->DurationThumbWheel->GetEntry()->GetValueAsFloat();
-  this->SetDuration(duration);
+  this->SetDurationWithTrace(duration);
 }
 
 //-----------------------------------------------------------------------------
@@ -532,8 +532,17 @@ void vtkPVAnimationScene::DurationChangedKeyReleaseCallback()
   double duration = this->DurationThumbWheel->GetEntry()->GetValueAsFloat();
   if (duration >= 1.0)
     {
-    this->SetDuration(duration);
+    this->SetDurationWithTrace(duration);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetDurationWithTrace(double duration)
+{
+  this->SetDuration(duration);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDurationWithTrace %f", 
+    this->GetTclName(), duration);
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -555,7 +564,6 @@ void vtkPVAnimationScene::SetDuration(double duration)
   this->TimeScale->SetRange(0, duration);
   this->TimeScale->SetValue(duration*ntime);
   this->InvalidateAllGeometries();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetDuration %f", this->GetTclName(), duration);
 }
 
 //-----------------------------------------------------------------------------
@@ -619,13 +627,13 @@ void vtkPVAnimationScene::Stop()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToBeginning()
 {
-  this->SetCurrentTime(0);
+  this->SetCurrentTimeWithTrace(0);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToEnd()
 {
-  this->SetCurrentTime(this->AnimationSceneProxy->GetEndTime());
+  this->SetCurrentTimeWithTrace(this->AnimationSceneProxy->GetEndTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -637,7 +645,7 @@ void vtkPVAnimationScene::GoToNext()
   newtime = (newtime > duration) ? duration : newtime;
   if (newtime != time)
     {
-    this->SetCurrentTime(newtime);
+    this->SetCurrentTimeWithTrace(newtime);
     }
 }
 
@@ -649,7 +657,7 @@ void vtkPVAnimationScene::GoToPrevious()
   newtime = (newtime < 0) ? 0 : newtime;
   if (newtime != time)
     {
-    this->SetCurrentTime(newtime); 
+    this->SetCurrentTimeWithTrace(newtime); 
     }
 }
 
@@ -691,7 +699,8 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
 
   IntVectPropertySetElement(this->AnimationSceneProxy,"PlayMode", mode);
   this->AnimationSceneProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", this->GetTclName(), mode);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", 
+    this->GetTclName(), mode);
 }
 
 //-----------------------------------------------------------------------------
@@ -703,13 +712,13 @@ int vtkPVAnimationScene::GetPlayMode()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::LoopCheckButtonCallback()
 {
-  this->SetLoop(this->VCRControl->GetLoopButtonState());
+  this->SetLoopWithTrace(this->VCRControl->GetLoopButtonState());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::ToolbarLoopCheckButtonCallback()
 {
-  this->SetLoop(this->VCRToolbar->GetLoopButtonState());
+  this->SetLoopWithTrace(this->VCRToolbar->GetLoopButtonState());
 }
 
 
@@ -782,7 +791,9 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", fps);
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->InvalidateAllGeometries();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", this->GetTclName(), fps);
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", 
+    this->GetTclName(), fps);
 }
 
 //-----------------------------------------------------------------------------
@@ -811,6 +822,14 @@ double vtkPVAnimationScene::GetFrameRate()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetLoopWithTrace(int loop)
+{
+  this->SetLoop(loop);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLoopWithTrace %d", 
+    this->GetTclName(), loop);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetLoop(int loop)
 {
   if (this->GetLoop() == loop)
@@ -821,13 +840,20 @@ void vtkPVAnimationScene::SetLoop(int loop)
   this->VCRToolbar->SetLoopButtonState(loop);
   IntVectPropertySetElement(this->AnimationSceneProxy, "Loop", loop);
   this->AnimationSceneProxy->UpdateVTKObjects();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVAnimationScene::GetLoop()
 {
   return this->AnimationSceneProxy->GetLoop();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetCurrentTimeWithTrace(double time)
+{
+  this->SetCurrentTime(time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTimeWithTrace %f", 
+    this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------
@@ -850,7 +876,6 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------
@@ -889,7 +914,7 @@ double vtkPVAnimationScene::GetNormalizedCurrentTime()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::TimeScaleCallback()
 {
-  this->SetCurrentTime(this->TimeScale->GetValue());
+  this->SetCurrentTimeWithTrace(this->TimeScale->GetValue());
 }
 
 //-----------------------------------------------------------------------------

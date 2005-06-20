@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.6");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.7");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -133,7 +133,9 @@ void vtkPVActiveTrackSelector::SelectCue(vtkPVAnimationCue* cue)
     return;
     }
   
-  const char* key = cue->GetPVSource()->GetName();
+  const char* key = (cue->GetPVSource())? cue->GetPVSource()->GetName():
+    cue->GetSourceTreeName();
+
   this->SelectSourceCallbackInternal(key);
   
   vtkPVActiveTrackSelectorInternals::VectorOfCues::iterator iter =
@@ -157,7 +159,8 @@ void vtkPVActiveTrackSelector::AddSource(vtkPVAnimationCueTree* cue)
     return;
     }
  
-  const char* key = cue->GetPVSource()->GetName();
+  const char* key = (cue->GetPVSource())? cue->GetPVSource()->GetName() : 
+    cue->GetName();
   this->Internals->SourceCueTrees[key] = cue;;
   
   ostrstream command;
@@ -174,7 +177,8 @@ void vtkPVActiveTrackSelector::RemoveSource(vtkPVAnimationCueTree* cue)
     return;
     }
 
-  const char*key = cue->GetPVSource()->GetName();
+  const char*key = (cue->GetPVSource())? cue->GetPVSource()->GetName() : 
+    cue->GetName();
   
   vtkPVActiveTrackSelectorInternals::MapOfStringToCueTrees::iterator iter =
     this->Internals->SourceCueTrees.find(key);

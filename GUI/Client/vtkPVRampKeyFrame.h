@@ -19,13 +19,13 @@
 #ifndef __vtkPVRampKeyFrame_h
 #define __vtkPVRampKeyFrame_h
 
-#include "vtkPVKeyFrame.h"
+#include "vtkPVPropertyKeyFrame.h"
 
-class VTK_EXPORT vtkPVRampKeyFrame : public vtkPVKeyFrame
+class VTK_EXPORT vtkPVRampKeyFrame : public vtkPVPropertyKeyFrame
 {
 public:
   static vtkPVRampKeyFrame* New();
-  vtkTypeRevisionMacro(vtkPVRampKeyFrame, vtkPVKeyFrame);
+  vtkTypeRevisionMacro(vtkPVRampKeyFrame, vtkPVPropertyKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
