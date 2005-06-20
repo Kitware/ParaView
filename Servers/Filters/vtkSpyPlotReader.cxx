@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.15");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.16");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -2341,6 +2341,16 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
   
   os << "GenerateLevelArray: ";
   if(this->GenerateLevelArray)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
+  
+  os << "GenerateBlockIdArray: ";
+  if(this->GenerateBlockIdArray)
     {
     os << "true"<<endl;
     }
