@@ -66,8 +66,13 @@ public:
   virtual const char* GetSelection();
 
   // Description:
+  // Return if a node is selected
+  virtual int HasSelection();
+
+  // Description:
   // Add a new node identified by 'node' at the end of the children list of 
-  // 'parent'. If parent is NULL or 'root', insert at the root of the tree.
+  // 'parent'. If parent is NULL, or an emptry string or 'root', insert at the
+  // root of the tree automatically.
   // Provides its text (i.e. the label displayed at the node 
   // position), an optional user-data field to associate with that node,
   // its open and selectable status.

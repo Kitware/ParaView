@@ -45,7 +45,7 @@ int vtkKWTreeCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.3");
+vtkCxxRevisionMacro(vtkKWTree, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
@@ -66,6 +66,10 @@ void vtkKWTree::Create(vtkKWApplication *app)
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
+
+  this->SetReliefToFlat();
+  this->SetBorderWidth(0);
+  this->SetHighlightThickness(0);
 
   // Update enable state
 
@@ -101,6 +105,13 @@ const char* vtkKWTree::GetSelection()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTree::HasSelection()
+{
+  const char *sel = this->GetSelection();
+  return (sel && *sel ? 1 : 0);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::AddNode(const char *parent,
                         const char *node,
                         const char *text,
@@ -115,7 +126,7 @@ void vtkKWTree::AddNode(const char *parent,
 
   vtksys_stl::string cmd;
 
-  cmd.append(this->GetWidgetName()).append(" insert end ").append(parent ? parent : "root").append(" ").append(node);
+  cmd.append(this->GetWidgetName()).append(" insert end ").append(parent && *parent ? parent : "root").append(" ").append(node);
 
   if (text && *text)
     {
