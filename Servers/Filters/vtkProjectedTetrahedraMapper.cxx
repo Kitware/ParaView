@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.9");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.10");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -221,6 +221,12 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
     float max_cell_size2 = 0;
 
     vtkCellArray *cells = input->GetCells();
+    if (!cells)
+      {
+      // Apparently, the input has no cells.  Just do nothing.
+      return;
+      }
+
     vtkIdType npts, *pts;
     cells->InitTraversal();
     for (vtkIdType i = 0; cells->GetNextCell(npts, pts); i++)
