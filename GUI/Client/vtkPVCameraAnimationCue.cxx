@@ -24,7 +24,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkPVCameraAnimationCue);
-vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.2");
+vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.3");
 //------------------------------------------------------------------------------
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
@@ -68,6 +68,18 @@ void vtkPVCameraAnimationCue::SetAnimatedProxy(vtkSMProxy* proxy)
     }
   this->PropertyStatusManager->InitializeStatus();
         
+}
+
+//------------------------------------------------------------------------------
+void vtkPVCameraAnimationCue::StartRecording()
+{
+  if (!this->PropertyStatusManager)
+    {
+    return;
+    }
+  vtkSMProxy* proxy = this->CueProxy->GetAnimatedProxy();
+  proxy->UpdateInformation();
+  this->Superclass::StartRecording();
 }
 
 //------------------------------------------------------------------------------

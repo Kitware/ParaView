@@ -58,6 +58,9 @@ public:
   // which this class initializes on SetAnimatedProxy.
   virtual void SetAnimatedPropertyName(const char*) { }
 
+  // Description:
+  // Recording methods.
+  virtual void StartRecording();
   virtual void RecordState(double ntime, double offset, int onlyfocus);
   virtual void RecordState(double ntime, double offset);
 protected:
