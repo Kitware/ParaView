@@ -18,7 +18,7 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
     math Delete
 
-    return 1
+    return 2
 }
 
 proc vtkKWHSVColorSelectorFinalizePoint {} {

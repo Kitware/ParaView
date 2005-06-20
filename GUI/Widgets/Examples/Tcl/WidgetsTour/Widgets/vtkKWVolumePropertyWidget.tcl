@@ -45,7 +45,7 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
     vpw SetVolumeProperty vp
     vpw SetWindowLevel 128 128
 
-    return 1
+    return 3
 }
 
 proc vtkKWVolumePropertyWidgetFinalizePoint {} {

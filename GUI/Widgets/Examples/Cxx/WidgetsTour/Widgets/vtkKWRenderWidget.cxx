@@ -8,9 +8,11 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
+#include "KWWidgetsTourExampleTypes.h"
+
 #include <vtksys/SystemTools.hxx>
 
-int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+WidgetType vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -64,5 +66,5 @@ int vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   mapper->Delete();
   rw->Delete();
 
-  return 1;
+  return VTKWidget;
 }

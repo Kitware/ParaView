@@ -3,7 +3,9 @@
 #include "vtkMath.h"
 #include "vtkKWWindow.h"
 
-int vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+#include "KWWidgetsTourExampleTypes.h"
+
+WidgetType vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -25,5 +27,5 @@ int vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   ccb->Delete();
 
-  return 1;
+  return CompositeWidget;
 }

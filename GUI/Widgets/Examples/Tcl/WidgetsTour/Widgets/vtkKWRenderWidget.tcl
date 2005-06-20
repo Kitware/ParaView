@@ -36,7 +36,7 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
     rw AddProp actor
     rw ResetCamera
 
-    return 1
+    return 3
 }
 
 proc vtkKWRenderWidgetFinalizePoint {} {

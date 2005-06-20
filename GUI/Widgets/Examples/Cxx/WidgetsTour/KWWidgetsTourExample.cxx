@@ -1,8 +1,8 @@
 #include "vtkKWApplication.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWListBox.h"
-#include "vtkKWListBoxWithScrollbars.h"
+#include "vtkKWTree.h"
+#include "vtkKWTreeWithScrollbars.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
@@ -94,15 +94,29 @@ int my_main(int argc, char *argv[])
 
   // Add a list box to pick a widget example
 
-  vtkKWListBoxWithScrollbars *widgets_list = vtkKWListBoxWithScrollbars::New();
-  widgets_list->SetParent(page_widget);
-  widgets_list->ShowVerticalScrollbarOn();
-  widgets_list->ShowHorizontalScrollbarOff();
-  widgets_list->Create(app);
-  widgets_list->GetWidget()->SetHeight(300);
+  vtkKWTreeWithScrollbars *widgets_tree = vtkKWTreeWithScrollbars::New();
+  widgets_tree->SetParent(page_widget);
+  widgets_tree->ShowVerticalScrollbarOn();
+  widgets_tree->ShowHorizontalScrollbarOff();
+  widgets_tree->Create(app);
 
+  vtkKWTree *tree = widgets_tree->GetWidget();
+  tree->SetPadX(0);
+  tree->SetBackgroundColor(1.0, 1.0, 1.0);
+  tree->RedrawOnIdleOn();
+  tree->SelectionFillOn();
+
+  tree->AddNode(NULL, "core", "Core Widgets", NULL, 1, 0);
+  tree->SetNodeFontWeightToBold("core");
+
+  tree->AddNode(NULL, "composite", "Composite Widgets", NULL, 1, 0);
+  tree->SetNodeFontWeightToBold("composite");
+
+  tree->AddNode(NULL, "vtk", "VTK Widgets", NULL, 1, 0);
+  tree->SetNodeFontWeightToBold("vtk");
+ 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
-              widgets_list->GetWidgetName());
+              widgets_tree->GetWidgetName());
 
   widgets_panel->Raise();
 
@@ -198,9 +212,25 @@ int my_main(int argc, char *argv[])
       app->GetSplashScreen()->SetProgressMessage(node_ptr->Name);
       }
 
-    if ((*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win))
+    WidgetType widget_type = 
+      (*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win);
+    if (widget_type != InvalidWidget)
       {
-      widgets_list->GetWidget()->AppendUnique(node_ptr->Name);
+      const char *parent_node = NULL;
+      switch (widget_type)
+        {
+        case CoreWidget:
+          parent_node = "core";
+          break;
+        case CompositeWidget:
+          parent_node = "composite";
+          break;
+        case VTKWidget:
+          parent_node = "vtk";
+          break;
+        }
+      widgets_tree->GetWidget()->AddNode(
+        parent_node, node_ptr->Name, node_ptr->Name, NULL, 1, 1);
 
       // Try to find the C++ source
 
@@ -259,17 +289,19 @@ int my_main(int argc, char *argv[])
   // bring the C++ and Tcl source for each example
 
   sprintf(buffer, 
-          "%s ShowViewUserInterface [%s GetSelection] ;"
+          "if [%s HasSelection] {"
+          "%s ShowViewUserInterface [%s GetSelection] ; "
           "%s SetValue $cxx_source([%s GetSelection]) ; "
-          "%s SetValue $tcl_source([%s GetSelection]) ; ",
+          "%s SetValue $tcl_source([%s GetSelection]) } ",
+          widgets_tree->GetWidget()->GetTclName(),
           win->GetTclName(),
-          widgets_list->GetWidget()->GetTclName(),
+          widgets_tree->GetWidget()->GetTclName(),
           cxx_source_text->GetWidget()->GetWidget()->GetTclName(),
-          widgets_list->GetWidget()->GetTclName(),
+          widgets_tree->GetWidget()->GetTclName(),
           tcl_source_text->GetWidget()->GetWidget()->GetTclName(),
-          widgets_list->GetWidget()->GetTclName());
+          widgets_tree->GetWidget()->GetTclName());
 
-  widgets_list->GetWidget()->SetSingleClickCallback(NULL, buffer);
+  widgets_tree->GetWidget()->SetSelectionChangedCommand(NULL, buffer);
   
   // Start the application
   // If --test was provided, do not enter the event loop
@@ -287,7 +319,7 @@ int my_main(int argc, char *argv[])
 
   win->Delete();
   widgets_panel->Delete();
-  widgets_list->Delete();
+  widgets_tree->Delete();
   source_panel->Delete();
   source_split->Delete();
   tcl_source_text->Delete();

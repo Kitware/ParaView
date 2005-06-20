@@ -3,7 +3,9 @@
 #include "vtkKWThumbWheel.h"
 #include "vtkKWWindow.h"
 
-int vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+#include "KWWidgetsTourExampleTypes.h"
+
+WidgetType vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -66,5 +68,5 @@ int vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   thumbwheel3->Delete();
 
-  return 1;
+  return CompositeWidget;
 }

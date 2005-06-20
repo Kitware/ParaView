@@ -50,14 +50,24 @@ set page_widget [widgets_panel GetPageWidget "Widgets"]
 
 # Add a list box to pick a widget example
 
-vtkKWListBoxWithScrollbars widgets_list
-widgets_list SetParent $page_widget
-widgets_list ShowVerticalScrollbarOn
-widgets_list ShowHorizontalScrollbarOff
-widgets_list Create app
-[widgets_list GetWidget] SetHeight 300
+vtkKWTreeWithScrollbars widgets_tree
+widgets_tree SetParent $page_widget
+widgets_tree ShowVerticalScrollbarOn
+widgets_tree ShowHorizontalScrollbarOff
+widgets_tree Create app
 
-pack [widgets_list GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
+set tree [widgets_tree GetWidget]
+$tree SetPadX 0;
+$tree SetBackgroundColor 1.0 1.0 1.0
+$tree RedrawOnIdleOn
+$tree SelectionFillOn
+
+foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "vtk" "VTK Widgets"} {
+    $tree AddNode "" $node $text "" 1 0
+    $tree SetNodeFontWeightToBold $node
+}
+
+pack [widgets_tree GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 widgets_panel Raise
 
@@ -148,8 +158,22 @@ foreach widget $widgets {
 
     source $widget
     
-    if {[${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]} {
-        [widgets_list GetWidget] AppendUnique $name
+    set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]
+    if {$widget_type} {
+        set parent_node ""
+        switch -- $widget_type {
+            1 {
+                set parent_node "core"
+            }
+            2 {
+                set parent_node "composite"
+            }
+            3 {
+                set parent_node "vtk"
+            }
+        }
+        [widgets_tree GetWidget] AddNode $parent_node $name $name "" 1 1
+
         set tcl_source($name) [read [open $widget]]
 
         # Try to find the C++ source too
@@ -165,9 +189,9 @@ foreach widget $widgets {
 
 # Raise the example panel
 
-set cmd {win ShowViewUserInterface [[widgets_list GetWidget] GetSelection] ; [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_list GetWidget] GetSelection]) ; [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_list GetWidget] GetSelection])}
+set cmd {if [[widgets_tree GetWidget] HasSelection] {win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection] ; [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_tree GetWidget] GetSelection]) ; [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_tree GetWidget] GetSelection])}}
 
-[widgets_list GetWidget] SetSingleClickCallback "" $cmd
+[widgets_tree GetWidget] SetSelectionChangedCommand "" $cmd
 
 # Start the application
 # If --test was provided, do not enter the event loop
@@ -187,7 +211,7 @@ foreach name $modules { catch {${name}FinalizePoint} }
 foreach object $objects { $object Delete }
 win Delete
 widgets_panel Delete
-widgets_list Delete
+widgets_tree Delete
 source_panel Delete
 source_split Delete
 tcl_source_text Delete

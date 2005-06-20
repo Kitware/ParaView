@@ -6,7 +6,9 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
 
-int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+#include "KWWidgetsTourExampleTypes.h"
+
+WidgetType vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -62,5 +64,5 @@ int vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vp->Delete();
 
-  return 1;
+  return VTKWidget;
 }

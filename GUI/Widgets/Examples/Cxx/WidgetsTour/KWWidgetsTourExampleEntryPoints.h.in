@@ -1,22 +1,13 @@
-#ifndef __KWWidgetsTourExample_h
-#define __KWWidgetsTourExample_h
+#ifndef __KWWidgetsTourExampleEntryPoints_h
+#define __KWWidgetsTourExampleEntryPoints_h
+
+#include "KWWidgetsTourExampleTypes.h"
 
 /* 
    Forward declare widget init functions
  */
 
 @WIDGETS_FORWARD_DECL@
-
-/* 
-   Create widgets map
- */
-
-typedef int (*WidgetEntryPointFunctionPointer)(vtkKWWidget *parent, vtkKWWindow *win);
-typedef struct
-{
-  const char *Name;
-  WidgetEntryPointFunctionPointer EntryPoint;
-} WidgetNode;
 
 WidgetNode Widgets[] = 
 {

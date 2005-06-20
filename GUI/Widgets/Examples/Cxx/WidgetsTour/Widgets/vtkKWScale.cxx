@@ -2,7 +2,9 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+#include "KWWidgetsTourExampleTypes.h"
+
+WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -60,5 +62,5 @@ int vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   scale3->Delete();
 
-  return 1;
+  return CoreWidget;
 }
