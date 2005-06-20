@@ -422,6 +422,10 @@
                    property="GenerateLevelArray"
                    trace_name="level_flag"
                    help="Generate a cell array storing the level of each block"/>
+ <LabeledToggle label="Generate blockId array"
+                   property="GenerateBlockIdArray"
+                   trace_name="blockid_flag"
+                   help="Generate a cell array storing a unique blockId of each block"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            keeps_timesteps="1"

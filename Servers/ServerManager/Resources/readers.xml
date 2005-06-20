@@ -795,6 +795,14 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
+ <IntVectorProperty 
+        name="GenerateBlockIdArray" 
+        command="SetGenerateBlockIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
      <IntVectorProperty 
         name="TimeStepRangeInfo"
         command="GetTimeStepRange"

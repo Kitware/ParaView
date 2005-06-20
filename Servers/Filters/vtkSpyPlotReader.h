@@ -96,6 +96,14 @@ public:
   vtkBooleanMacro(GenerateLevelArray,int);
   
   // Description:
+  // If true, the reader generate a cell array in each block that
+  // stores a unique but not necessarily contiguous id.
+  // False by default.
+  vtkSetMacro(GenerateBlockIdArray,int);
+  vtkGetMacro(GenerateBlockIdArray,int);
+  vtkBooleanMacro(GenerateBlockIdArray,int);
+  
+  // Description:
   // Get the time step range.
   vtkGetVector2Macro(TimeStepRange, int);
 
@@ -205,6 +213,7 @@ protected:
   double Bounds[6]; // bounds of the hierarchy without the bad ghostcells.
   
   int GenerateLevelArray; // user flag
+  int GenerateBlockIdArray; // user flag
   
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.

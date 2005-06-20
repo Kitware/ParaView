@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.14");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.15");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -559,6 +559,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   
   this->DistributeFiles=0; // by default, distribute blocks, not files.
   this->GenerateLevelArray=0; // by default, do not generate level array.
+  this->GenerateBlockIdArray=0; // by default, do not generate block id array.
 }
 
 //-----------------------------------------------------------------------------
@@ -1348,7 +1349,6 @@ int vtkSpyPlotReader::RequestData(
       // Add a level array, for debugging
       if(this->GenerateLevelArray)
         {
-        cout<<"cool1"<<endl;
         vtkDataArray *array=cd->GetArray("levels");
         if(array!=0)
           {
@@ -1506,7 +1506,6 @@ int vtkSpyPlotReader::RequestData(
       // Add a level array, for debugging
       if(this->GenerateLevelArray)
         {
-        cout<<"cool2"<<endl;
         vtkDataArray *array=cd->GetArray("levels");
         if(array!=0)
           {
@@ -1763,13 +1762,16 @@ int vtkSpyPlotReader::RequestData(
       if(globalIndex>0)
         {
         // move the datasets to the right indices
-        i=0;
-        int j=globalIndex;
-        while(i<numberOfDataSets)
+        // we have to start at the end because the
+        // original blocks location and final location
+        // may overlap.
+        i=numberOfDataSets-1;
+        int j=globalIndex+numberOfDataSets-1;
+        while(i>=0)
           {
           hb->SetDataSet(level,j,hb->GetDataSet(level,i));
-          ++i;
-          ++j;
+          --i;
+          --j;
           }
         // add null pointers at the beginning
         i=0;
@@ -1789,6 +1791,57 @@ int vtkSpyPlotReader::RequestData(
       }
     ++level;
     }
+  
+  // Set the unique block id cell data
+  if(this->GenerateBlockIdArray)
+    {
+    int blockId=0;
+    level=0;
+    numberOfLevels=hb->GetNumberOfLevels();
+    while(level<numberOfLevels)
+      {
+      int totalNumberOfDataSets=hb->GetNumberOfDataSets(level);
+      int i=0;
+      while(i<totalNumberOfDataSets)
+        {
+        vtkDataObject *dataObject=hb->GetDataSet(level,i);
+        if(dataObject!=0)
+          {
+          vtkDataSet *ds=vtkDataSet::SafeDownCast(dataObject);
+          assert("check: ds_exists" && ds!=0);
+          vtkCellData *cd=ds->GetCellData();
+          // Add the block id cell data array
+          
+          vtkDataArray *array=cd->GetArray("blockId");
+          if(array!=0)
+          {
+          cd->RemoveArray("blockId"); // if this is not the first step,
+          // make sure we have a clean array
+          }
+          
+          array = vtkIntArray::New();
+          cd->AddArray(array);
+          array->Delete();
+        
+          array->SetName("blockId");
+          array->SetNumberOfComponents(1);
+          int c=ds->GetNumberOfCells();
+          array->SetNumberOfTuples(c);
+          int *ptr=static_cast<int *>(array->GetVoidPointer(0));
+          int k=0;
+          while(k<c)
+            {
+            ptr[k]=blockId;
+            ++k;
+            }
+          }
+        ++i;
+        ++blockId;
+        }
+      ++level;
+      }
+    }
+  
 #if 0
   //  Display the block list for each level
   
