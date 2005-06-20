@@ -79,10 +79,10 @@ public:
   // On a Pentium M 1.8 GHz, a Debug build could fill about 5000 nodes/s.
   virtual void AddNode(const char *parent,
                        const char *node,
-                       const char *text,
-                       const char *data,
-                       int is_open,
-                       int is_selectable);
+                       const char *text = NULL,
+                       const char *data = NULL,
+                       int is_open = 0,
+                       int is_selectable = 1);
 
   // Description:
   // Arrange the tree to see a given node
@@ -92,11 +92,17 @@ public:
   // Open/close a node.
   virtual void OpenNode(const char *node);
   virtual void CloseNode(const char *node);
+  virtual int IsNodeOpen(const char *node);
 
   // Description:
   // Open/close the first node of the tree.
   virtual void OpenFirstNode();
   virtual void CloseFirstNode();
+
+  // Description:
+  // Open/close a tree, i.e. a node and all its children.
+  virtual void OpenTree(const char *node);
+  virtual void CloseTree(const char *node);
 
   // Description:
   // Query if given node exists in the tree

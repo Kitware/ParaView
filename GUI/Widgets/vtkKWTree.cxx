@@ -45,7 +45,7 @@ int vtkKWTreeCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.4");
+vtkCxxRevisionMacro(vtkKWTree, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
@@ -130,11 +130,15 @@ void vtkKWTree::AddNode(const char *parent,
 
   if (text && *text)
     {
-    cmd.append(" -text {").append(text).append("}");
+    const char *val = this->ConvertInternalStringToTclString(
+      text, vtkKWWidget::ConvertStringEscapeInterpretable);
+    cmd.append(" -text \"").append(val).append("\"");
     }
   if (data && *data)
     {
-    cmd.append(" -data {").append(data).append("}");
+    const char *val = this->ConvertInternalStringToTclString(
+      data, vtkKWWidget::ConvertStringEscapeInterpretable);
+    cmd.append(" -data \"").append(val).append("\"");
     }
   cmd.append(" -open ").append(is_open ? "1" : "0");
   cmd.append(" -selectable ").append(is_selectable ? "1" : "0");
@@ -171,6 +175,17 @@ void vtkKWTree::CloseNode(const char *node)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTree::IsNodeOpen(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    return atoi(
+      this->Script("%s itemcget %s -open", this->GetWidgetName(), node));
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::OpenFirstNode()
 {
   if (this->IsCreated())
@@ -187,6 +202,24 @@ void vtkKWTree::CloseFirstNode()
     {
     this->Script("catch {%s closetree [lindex [%s nodes root] 0]}", 
                  this->GetWidgetName(), this->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::OpenTree(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    this->Script("%s opentree %s 1", this->GetWidgetName(), node);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::CloseTree(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    this->Script("%s closetree %s 1", this->GetWidgetName(), node);
     }
 }
 
