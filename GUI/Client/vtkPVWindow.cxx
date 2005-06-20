@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.736");
+vtkCxxRevisionMacro(vtkPVWindow, "1.737");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1343,7 +1343,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   // Interface for the animation tool.
 
   this->AnimationManager->SetParent(this);
-  this->AnimationManager->SetHorizantalParent(
+  this->AnimationManager->SetHorizontalParent(
     this->GetSecondaryNotebook()->GetFrame(
       this->GetSecondaryNotebook()->AddPage("Animation")));
   this->AnimationManager->SetVerticalParent(this->GetMainPanelFrame());

@@ -99,7 +99,7 @@ public:
   // Description:
   // Set the parent frames for the vertical and horizontal animation guis.
   void SetVerticalParent(vtkKWWidget* parent);
-  void SetHorizantalParent(vtkKWWidget* parent);
+  void SetHorizontalParent(vtkKWWidget* parent);
 
   // Get the Vertical and Horizontal animation interface objects.
   vtkGetObjectMacro(VAnimationInterface, vtkPVVerticalAnimationInterface);
@@ -239,7 +239,7 @@ protected:
 
   int RecordAll;
   vtkKWWidget* VerticalParent;
-  vtkKWWidget* HorizantalParent;
+  vtkKWWidget* HorizontalParent;
 
   vtkSMProxyIterator* ProxyIterator;
 

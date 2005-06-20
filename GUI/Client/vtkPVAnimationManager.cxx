@@ -63,8 +63,8 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.54");
-vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.55");
+vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
 class vtkPVAnimationManagerObserver : public vtkCommand
@@ -109,7 +109,7 @@ public:
 //-----------------------------------------------------------------------------
 vtkPVAnimationManager::vtkPVAnimationManager()
 {
-  this->HorizantalParent = NULL;
+  this->HorizontalParent = NULL;
   this->VerticalParent = NULL;
   this->VAnimationInterface = vtkPVVerticalAnimationInterface::New();
   this->VAnimationInterface->GetTraceHelper()->SetReferenceHelper(
@@ -151,7 +151,7 @@ vtkPVAnimationManager::vtkPVAnimationManager()
 vtkPVAnimationManager::~vtkPVAnimationManager()
 {
   this->SetVerticalParent(0);
-  this->SetHorizantalParent(0);
+  this->SetHorizontalParent(0);
   this->AnimationScene->Delete();
   this->ActiveTrackSelector->Delete();
   this->VAnimationInterface->Delete();
@@ -164,9 +164,9 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::Create(vtkKWApplication* app)
 {
-  if (!this->VerticalParent || !this->HorizantalParent)
+  if (!this->VerticalParent || !this->HorizontalParent)
     {
-    vtkErrorMacro("VerticalParent and HorizantalParent must be set before calling create.");
+    vtkErrorMacro("VerticalParent and HorizontalParent must be set before calling create.");
     return;
     }
 
@@ -190,7 +190,7 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
     this->AdvancedView = pvApp->GetIntRegistryValue(2, "RunTime", "AdvancedAnimationView");
     }
 
-  this->HAnimationInterface->SetParent(this->HorizantalParent);
+  this->HAnimationInterface->SetParent(this->HorizontalParent);
   this->HAnimationInterface->Create(app);
   this->HAnimationInterface->SetReliefToFlat();
 
