@@ -62,6 +62,10 @@ public:
   virtual void ClearSelection();
 
   // Description:
+  // Return the selection as a list of space separated selected nodes
+  virtual const char* GetSelection();
+
+  // Description:
   // Add a new node identified by 'node' at the end of the children list of 
   // 'parent'. If parent is NULL or 'root', insert at the root of the tree.
   // Provides its text (i.e. the label displayed at the node 
@@ -106,9 +110,19 @@ public:
   virtual const char* GetNodeParent(const char *node);
 
   // Description:
-  // Get the node user data and if it is selectable or not
+  // Set/Get the parameters
   virtual const char* GetNodeUserData(const char *node);
+  virtual void SetNodeUserData(const char *node, const char *data);
+  virtual const char* GetNodeText(const char *node);
+  virtual void SetNodeText(const char *node, const char *text);
   virtual int GetNodeSelectableFlag(const char *node);
+  virtual void SetNodeSelectableFlag(const char *node, int flag);
+  virtual const char* GetNodeFont(const char *node);
+  virtual void SetNodeFont(const char *node, const char *font);
+  virtual void SetNodeFontWeightToBold(const char *node);
+  virtual void SetNodeFontWeightToNormal(const char *node);
+  virtual void SetNodeFontSlantToItalic(const char *node);
+  virtual void SetNodeFontSlantToRoman(const char *node);
 
   // Description:
   // Set/Get the width/height.
@@ -160,6 +174,19 @@ public:
   // the event occurs is appended to the command.
   virtual void SetBindText(
     const char *event, vtkKWObject *obj, const char *method);
+
+  // Description:
+  // Convenience method to set the callback for single click and double
+  // click on a node. This, in turn, just calls SetBindText.
+  virtual void SetDoubleClickOnNodeCommand(
+    vtkKWObject *obj, const char *method);
+  virtual void SetSingleClickOnNodeCommand(
+    vtkKWObject *obj, const char *method);
+ 
+  // Description:
+  // Set the callback to invoke when the selection changes.
+  virtual void SetSelectionChangedCommand(
+    vtkKWObject *obj, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

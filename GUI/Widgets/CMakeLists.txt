@@ -262,6 +262,7 @@ FOREACH (WidgetType
     vtkKWListBox
     vtkKWMultiColumnList
     vtkKWText 
+    vtkKWTree 
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (

@@ -45,7 +45,7 @@ int vtkKWTreeCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.2");
+vtkCxxRevisionMacro(vtkKWTree, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
@@ -91,6 +91,16 @@ void vtkKWTree::ClearSelection()
 }
 
 //----------------------------------------------------------------------------
+const char* vtkKWTree::GetSelection()
+{
+  if (this->IsCreated())
+    {
+    return this->Script("%s selection get", this->GetWidgetName());
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTree::AddNode(const char *parent,
                         const char *node,
                         const char *text,
@@ -115,14 +125,8 @@ void vtkKWTree::AddNode(const char *parent,
     {
     cmd.append(" -data {").append(data).append("}");
     }
-  if (is_open)
-    {
-    cmd.append(" -open 1");
-    }
-  if (is_selectable)
-    {
-    cmd.append(" -selectable 1");
-    }
+  cmd.append(" -open ").append(is_open ? "1" : "0");
+  cmd.append(" -selectable ").append(is_selectable ? "1" : "0");
 
   vtkKWTkUtilities::EvaluateSimpleString(
     this->GetApplication(), cmd.c_str());
@@ -220,9 +224,120 @@ const char* vtkKWTree::GetNodeUserData(const char *node)
 {
   if (this->IsCreated() && node)
     {
-    return this->Script("%s itemcget %s -data", this->GetWidgetName(), node);
+    return this->ConvertTclStringToInternalString(
+      this->Script("%s itemcget %s -data", this->GetWidgetName(), node));
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeUserData(const char *node, const char *data)
+{
+  if (this->IsCreated() && node && data)
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      data, vtkKWWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s itemconfigure %s -data \"%s\"", 
+                 this->GetWidgetName(), node, val);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTree::GetNodeText(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    return this->ConvertTclStringToInternalString(
+      this->Script("%s itemcget %s -text", this->GetWidgetName(), node));
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeText(const char *node, const char *text)
+{
+  if (this->IsCreated() && node && text)
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      text, vtkKWWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s itemconfigure %s -text \"%s\"", 
+                 this->GetWidgetName(), node, val);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTree::GetNodeFont(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    return this->ConvertTclStringToInternalString(
+      this->Script("%s itemcget %s -font", this->GetWidgetName(), node));
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeFont(const char *node, const char *font)
+{
+  if (this->IsCreated() && node && font)
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      font, vtkKWWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s itemconfigure %s -font \"%s\"", 
+                 this->GetWidgetName(), node, val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeFontWeightToBold(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    char new_font[1024];
+    vtksys_stl::string font(this->GetNodeFont(node));
+    vtkKWTkUtilities::ChangeFontWeightToBold(
+      this->GetApplication()->GetMainInterp(), font.c_str(), new_font);
+    this->SetNodeFont(node, new_font);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeFontWeightToNormal(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    char new_font[1024];
+    vtksys_stl::string font(this->GetNodeFont(node));
+    vtkKWTkUtilities::ChangeFontWeightToNormal(
+      this->GetApplication()->GetMainInterp(), font.c_str(), new_font);
+    this->SetNodeFont(node, new_font);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeFontSlantToItalic(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    char new_font[1024];
+    vtksys_stl::string font(this->GetNodeFont(node));
+    vtkKWTkUtilities::ChangeFontSlantToItalic(
+      this->GetApplication()->GetMainInterp(), font.c_str(), new_font);
+    this->SetNodeFont(node, new_font);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeFontSlantToRoman(const char *node)
+{
+  if (this->IsCreated() && node)
+    {
+    char new_font[1024];
+    vtksys_stl::string font(this->GetNodeFont(node));
+    vtkKWTkUtilities::ChangeFontSlantToRoman(
+      this->GetApplication()->GetMainInterp(), font.c_str(), new_font);
+    this->SetNodeFont(node, new_font);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -234,6 +349,16 @@ int vtkKWTree::GetNodeSelectableFlag(const char *node)
                              this->GetWidgetName(), node));
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeSelectableFlag(const char *node, int flag)
+{
+  if (this->IsCreated() && node)
+    {
+    this->Script("%s itemconfigure %s -selectable %d", 
+                 this->GetWidgetName(), node, flag);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -366,6 +491,33 @@ void vtkKWTree::SetBindText(const char *event,
   this->SetObjectMethodCommand(&command, obj, method);
   this->Script("%s bindText %s {%s}", this->GetWidgetName(), event, command);
   delete [] command;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetDoubleClickOnNodeCommand(vtkKWObject *obj, 
+                                            const char *method)
+{
+  this->SetBindText("<Double-ButtonPress-1>", obj, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetSingleClickOnNodeCommand(vtkKWObject *obj, 
+                                            const char *method)
+{
+  this->SetBindText("<ButtonPress-1>", obj, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetSelectionChangedCommand(vtkKWObject *obj, 
+                                           const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, obj, method);
+    this->SetBind("<<TreeSelect>>", command);
+    delete [] command;
+    }
 }
 
 //----------------------------------------------------------------------------
