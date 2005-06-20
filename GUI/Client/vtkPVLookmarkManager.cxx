@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.33");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.34");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -270,8 +270,8 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   char* rbv = 
     this->MenuImport->CreateRadioButtonVariable(this, "Import");
   this->Script( "set %s 0", rbv );
-  this->MenuImport->AddRadioButton(0, "Append", rbv, this, "ImportCallback", 0);
-  this->MenuImport->AddRadioButton(1, "Replace", rbv, this, "ImportCallback", 1);
+  this->MenuImport->AddRadioButton(0, "Replace", rbv, this, "ImportCallback", 0);
+  this->MenuImport->AddRadioButton(1, "Append", rbv, this, "ImportCallback", 1);
   delete [] rbv;
 
   root_menu->AddCascade("File", this->MenuFile, 0);
@@ -687,14 +687,8 @@ void vtkPVLookmarkManager::ImportCallback()
   this->Checkpoint();
 
   // If "Replace" is selected we remove all preexisting lmks and containers first
-  if(this->MenuImport->GetRadioButtonValue(this,"Import") )
-    {
-    this->Import(filename,0);
-    }
-  else if(this->MenuImport->GetRadioButtonValue(this,"Append")) 
-    {
-    this->Import(filename,1);
-    }
+  this->Import(filename,this->MenuImport->GetCheckedRadioButtonItem(this,"Import"));
+
 }
 
 //----------------------------------------------------------------------------
@@ -719,7 +713,7 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
 //  this->GetTraceHelper()->AddEntry("$kw(%s) Import \"%s\" %d",
 //                      this->GetTclName(),filename,appendFlag);
 
-  if(appendFlag==0 && this->PVLookmarks->GetNumberOfItems()>0 || this->LmkFolderWidgets->GetNumberOfItems()>0)
+  if(appendFlag==0 && (this->PVLookmarks->GetNumberOfItems()>0 || this->LmkFolderWidgets->GetNumberOfItems()>0) )
     {
     this->RemoveCheckedChildren(this->LmkScrollFrame->GetFrame(),1);
     }
