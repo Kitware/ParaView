@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.34");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.35");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1256,6 +1256,18 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
     lmk->SetImageData(lookmarkImage);
     delete [] lookmarkImage;
     }
+
+  if(elem->GetAttribute("PixelSize"))
+    {
+    int lookmarkPixelSize = 0;
+    elem->GetScalarAttribute("PixelSize",lookmarkPixelSize);
+    lmk->SetPixelSize(lookmarkPixelSize);
+    }
+  else
+    {
+    // if there is not PixelSize attribute, then it is an old lookmark file and the pixel size was 4 (the default is now 3)
+    lmk->SetPixelSize(4);
+    }
  
   double centerOfRotation[3];
   elem->GetScalarAttribute("XCenterOfRotation",centerOfRotation[0]);
@@ -2094,6 +2106,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       elem->SetAttribute("Comments", lookmarkWidget->GetComments());
       elem->SetAttribute("StateScript", lookmarkWidget->GetStateScript());
       elem->SetAttribute("ImageData", lookmarkWidget->GetImageData());
+      elem->SetIntAttribute("PixelSize", lookmarkWidget->GetPixelSize());
       elem->SetAttribute("Dataset", lookmarkWidget->GetDataset());
       
       float *temp2;
