@@ -24,7 +24,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkPVCameraAnimationCue);
-vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.1");
+vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.2");
 //------------------------------------------------------------------------------
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
@@ -137,7 +137,7 @@ void vtkPVCameraAnimationCue::RecordState(double ntime, double offset)
     if (old_numOfKeyFrames == 0)
       {
       //Pilot keyframe also needs to be initilaized.
-      vtkPVCameraKeyFrame* kf = vtkPVCameraKeyFrame::SafeDownCast(
+      vtkPVCameraKeyFrame* kf_pilot = vtkPVCameraKeyFrame::SafeDownCast(
         this->GetKeyFrame(0));
       for (int i=0; names[i]; i++)
         {
@@ -149,7 +149,7 @@ void vtkPVCameraAnimationCue::RecordState(double ntime, double offset)
         vtkSMDoubleVectorProperty* internalDvp =
           vtkSMDoubleVectorProperty::SafeDownCast(
             this->PropertyStatusManager->GetInternalProperty(cameraVp));
-        kf->SetProperty(kfnames[i], internalDvp);
+        kf_pilot->SetProperty(kfnames[i], internalDvp);
         }
       }
     }

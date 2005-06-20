@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.1");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -260,8 +260,6 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueUsingProperty(
       {
       contourEntry->Initialize(); // since we have set the SMProperty pointer
       // for this widget properly, it will update itself!
-      vtkPVContourEntry* contourEntry = 
-        vtkPVContourEntry::SafeDownCast(this->ValueWidget);
       int numContours = contourEntry->GetNumberOfValues();
       this->SetNumberOfKeyValues(numContours);
       for (int i=0; i < numContours; i++)
