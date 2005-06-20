@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.4");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.5");
 
 int vtkPVCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -195,7 +195,15 @@ void vtkPVCornerAnnotationEditor::SetCornerTextInternal(const char* text, int co
       (!this->GetCornerText(corner) ||
        strcmp(this->GetCornerText(corner), text)))
     {
+#if 0
     this->CornerAnnotation->SetText(corner, text);
+#else
+    // Note: this is a special hack to allow Tcl commands to be
+    // entered in the editor (Exodus reader for example) and
+    // evaluated directly.
+    this->CornerAnnotation->SetText(
+      corner, this->Script("%s \"%s\"", "set pvCATemp", text));
+#endif
     }
 }
 
