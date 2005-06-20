@@ -219,6 +219,7 @@ int my_main(int argc, char *argv[])
       const char *parent_node = NULL;
       switch (widget_type)
         {
+        default:
         case CoreWidget:
           parent_node = "core";
           break;
