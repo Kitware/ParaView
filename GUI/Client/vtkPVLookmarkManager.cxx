@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.32");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.33");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   // Import the lookmark file stored in the user's home directory if there is one
   ostrstream str;
   #ifndef _WIN32
-  if ( !getenv("HOME") )
+  if ( getenv("HOME") )
     {
     return;
     }
@@ -402,6 +402,7 @@ void vtkPVLookmarkManager::DisplayQuickStartGuide()
     this->QuickStartGuideDialog->Create(this->GetPVApplication());
     this->QuickStartGuideDialog->SetReliefToSolid();
     this->QuickStartGuideDialog->SetBorderWidth(1);
+    this->QuickStartGuideDialog->SetModal(0);
     }
 
   this->ConfigureQuickStartGuide();
@@ -488,6 +489,7 @@ void vtkPVLookmarkManager::DisplayUsersTutorial()
     this->UsersTutorialDialog->Create(this->GetPVApplication());
     this->UsersTutorialDialog->SetReliefToSolid();
     this->UsersTutorialDialog->SetBorderWidth(1);
+    this->UsersTutorialDialog->SetModal(0);
     }
 
   this->ConfigureUsersTutorial();
@@ -513,7 +515,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
     this->UsersTutorialTxt->Create(app);
     this->UsersTutorialTxt->ShowVerticalScrollbarOn();
 
-    vtkKWText *text = this->QuickStartGuideTxt->GetWidget();
+    vtkKWText *text = this->UsersTutorialTxt->GetWidget();
     text->ResizeToGridOn();
     text->SetWidth(60);
     text->SetHeight(20);
