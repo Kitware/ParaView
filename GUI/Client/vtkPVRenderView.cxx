@@ -110,8 +110,6 @@ static unsigned char image_properties[] =
   "eNrdkcENgDAMAxk9gzBMRmCjACqR3NSO4Islv5pz3dTdNxe+FMzjzOJ2x8axU48czSfbZ9"
   "jjtR+yKgP5lGJrBvZPfpoVWWx/OI9dVOa8J1uYqvo+uuuX6njsT//kx/d/ceVPtN4Pmg==";
 
-
-
 //===========================================================================
 //***************************************************************************
 class vtkPVRenderViewObserver : public vtkCommand
@@ -142,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.387");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.388");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -666,7 +664,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
   // paraview tehre is only one view, and it's always active, so use the
   // active color.
   this->PropertiesButton->Create(app);
-  this->PropertiesButton->SetForegroundColor(0, 0, 0.5);
+  this->PropertiesButton->SetBackgroundColor(0, 0, 0.5);
   this->PropertiesButton->SetBorderWidth(0);
   this->PropertiesButton->SetPadX(0);
   this->PropertiesButton->SetPadY(0);
