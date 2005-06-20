@@ -87,12 +87,9 @@ public:
   virtual int AppendUnique(const char* name);
   
   // Description:
-  // Set callback for double click on a list item.
-  virtual void SetDoubleClickCallback(vtkKWObject* obj, const char* methodAndArgs);
-  
-  // Description:
-  // Set callback for single click on a list item.
-  virtual void SetSingleClickCallback(vtkKWObject* obj, const char* methodAndArgs);
+  // Set callback for single and double click on a list item.
+  virtual void SetDoubleClickCommand(vtkKWObject *obj, const char *method);
+  virtual void SetSingleClickCommand(vtkKWObject *obj, const char *method);
   
   // Description:
   // Get number of items in the list.

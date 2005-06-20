@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.39");
+vtkCxxRevisionMacro(vtkKWListBox, "1.40");
 
 //----------------------------------------------------------------------------
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -199,7 +199,7 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 
  
 //----------------------------------------------------------------------------
-void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj, 
+void vtkKWListBox::SetDoubleClickCommand(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
   this->Script("bind %s <Double-1> {%s %s}", 
@@ -209,7 +209,7 @@ void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj, 
+void vtkKWListBox::SetSingleClickCommand(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
   this->Script("bind %s <ButtonRelease-1> {%s %s}", 

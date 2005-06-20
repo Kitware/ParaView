@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.5");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.6");
 
 int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -110,8 +110,8 @@ void vtkPVComparativeVisManagerGUI::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -pady 5 -expand t -fill both", 
                this->ComparativeVisList->GetWidgetName());
 
-  this->ComparativeVisList->SetDoubleClickCallback(this, "ShowVisualization");
-  this->ComparativeVisList->SetSingleClickCallback(this, "ItemSelected");
+  this->ComparativeVisList->SetDoubleClickCommand(this, "ShowVisualization");
+  this->ComparativeVisList->SetSingleClickCommand(this, "ItemSelected");
 
   this->CommandFrame->SetParent(this->MainFrame);
   this->CommandFrame->Create(app);

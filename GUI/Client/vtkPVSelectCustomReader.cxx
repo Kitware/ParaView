@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.8");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -99,7 +99,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
     }
   it->Delete();
   listbox->SetSelectionIndex(0);
-  listbox->SetDoubleClickCallback(this, "OK");
+  listbox->SetDoubleClickCommand(this, "OK");
 
   // Set the width to that of the longest string
   listbox->SetWidth(0);      

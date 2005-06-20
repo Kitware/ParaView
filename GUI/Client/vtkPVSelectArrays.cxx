@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.9");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.10");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -129,7 +129,7 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
   this->ArraySelectionList->Create(app);
   this->ArraySelectionList->SetSelectionModeToExtended();
   this->ArraySelectionList->SetHeight(0);
-  this->ArraySelectionList->SetSingleClickCallback(this,"ModifiedCallback");
+  this->ArraySelectionList->SetSingleClickCommand(this,"ModifiedCallback");
   // I assume we need focus for control and alt modifiers.
   this->Script("bind %s <Enter> {focus %s}",
                this->ArraySelectionList->GetWidgetName(),

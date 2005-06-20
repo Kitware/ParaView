@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.26");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.27");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -146,7 +146,7 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   d->ScalarFieldList->SetParent( d->CriteriaFrame->GetFrame() );
   d->ScalarFieldList->Create(app);
   d->ScalarFieldList->SetHeight( 5 );
-  d->ScalarFieldList->SetSingleClickCallback( this, "PointDataSelectedCallback" );
+  d->ScalarFieldList->SetSingleClickCommand( this, "PointDataSelectedCallback" );
   d->LastSelectionIndex = -1;
   this->Script( "%s configure -font {Helvetica -12 bold}", d->ScalarFieldList->GetWidgetName() );
 
