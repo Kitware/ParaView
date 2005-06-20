@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.81");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.82");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1981,7 +1981,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 
     if (page->Pinned)
       {
-      this->TabPopupMenu->SetState("Show", vtkKWMenu::Disabled);
+      this->TabPopupMenu->SetState("Show", vtkKWMenu::StateDisabled);
       }
     }
 

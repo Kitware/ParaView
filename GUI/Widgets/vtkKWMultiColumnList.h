@@ -62,13 +62,13 @@ public:
   //BTX
   enum 
   {
-    COLUMN_ALIGNMENT_LEFT,
-    COLUMN_ALIGNMENT_RIGHT,
-    COLUMN_ALIGNMENT_CENTER
+    ColumnAlignmentLeft,
+    ColumnAlignmentRight,
+    ColumnAlignmentCenter
   };
   //ETX
   virtual void AddColumn(
-    const char *title, int width = 0, int align = COLUMN_ALIGNMENT_LEFT);
+    const char *title, int width = 0, int align = ColumnAlignmentLeft);
 
   // Description:
   // Set the width and maxwidth of a column.

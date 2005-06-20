@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.24");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.25");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -435,7 +435,7 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
     this->WindowLevelModeCheckButton->SetCommand(
       this, "WindowLevelModeCallback");
     this->WindowLevelModeCheckButton->SetImageOption(
-      vtkKWIcon::ICON_WINDOW_LEVEL);
+      vtkKWIcon::IconWindowLevel);
     }
 }
 

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.76");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.77");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -394,15 +394,15 @@ void vtkKWMessageDialog::SetIcon()
 {
   if ( this->Options & vtkKWMessageDialog::ErrorIcon )
     {
-    this->Icon->SetImageOption(vtkKWIcon::ICON_ERROR);
+    this->Icon->SetImageOption(vtkKWIcon::IconError);
     }
   else if ( this->Options & vtkKWMessageDialog::QuestionIcon )
     {
-    this->Icon->SetImageOption(vtkKWIcon::ICON_QUESTION);
+    this->Icon->SetImageOption(vtkKWIcon::IconQuestion);
     }
   else if ( this->Options & vtkKWMessageDialog::WarningIcon )
     {
-    this->Icon->SetImageOption(vtkKWIcon::ICON_WARNING);
+    this->Icon->SetImageOption(vtkKWIcon::IconWarning);
     }
   else
     {

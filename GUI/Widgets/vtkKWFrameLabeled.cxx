@@ -26,12 +26,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.11");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.12");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
-int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST;
+int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LabelCaseUppercaseFirst;
 int vtkKWFrameLabeled::BoldLabel = 1;
 int vtkKWFrameLabeled::AllowShowHide = 1;
 
@@ -96,7 +96,7 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
     }
 
   if (vtkKWFrameLabeled::LabelCase == 
-      vtkKWFrameLabeled::LABEL_CASE_USER_SPECIFIED)
+      vtkKWFrameLabeled::LabelCaseUserSpecified)
     {
     this->GetLabel()->SetText(text);
     }
@@ -105,10 +105,10 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
     vtksys_stl::string res;
     switch (vtkKWFrameLabeled::LabelCase)
       {
-      case vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST:
+      case vtkKWFrameLabeled::LabelCaseUppercaseFirst:
         res = vtksys::SystemTools::CapitalizedWords(text);
         break;
-      case vtkKWFrameLabeled::LABEL_CASE_LOWERCASE_FIRST:
+      case vtkKWFrameLabeled::LabelCaseLowercaseFirst:
         res = vtksys::SystemTools::UnCapitalizedWords(text);
         break;
       }
@@ -218,7 +218,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
   // Force label icon to be created now, so that we can set its image option.
 
   this->Label->ShowLabelOn();
-  this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
+  this->GetLabelIcon()->SetImageOption(vtkKWIcon::IconLock);
   this->Script("%s config -bd 0 -pady 0 -padx 0", 
                this->GetLabelIcon()->GetWidgetName());
 
@@ -236,7 +236,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
     vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
     }
 
-  this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
+  this->IconData->SetImage(vtkKWIcon::IconShrink);
 
   this->Icon->SetParent(this);
   this->Icon->Create(app);
@@ -280,14 +280,14 @@ void vtkKWFrameLabeled::PerformShowHideFrame()
     {
     this->Script("pack forget %s", this->Frame->GetWidgetName());
     this->Displayed = 0;
-    this->IconData->SetImage(vtkKWIcon::ICON_EXPAND);
+    this->IconData->SetImage(vtkKWIcon::IconExpand);
     }
   else
     {
     this->Script("pack %s -fill both -expand yes",
                  this->Frame->GetWidgetName());
     this->Displayed = 1;
-    this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
+    this->IconData->SetImage(vtkKWIcon::IconShrink);
    }
   this->Icon->SetImageOption(this->IconData);
 }

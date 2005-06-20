@@ -67,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.5");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -453,7 +453,7 @@ vtkKWIcon *vtkPVLookmark::GetIconOfRenderWindow(vtkRenderWindow *renderWindow)
     wext[3] - wext[2] + 1,
     this->PixelSize,
     0,
-    vtkKWIcon::IMAGE_OPTION_FLIP_V);
+    vtkKWIcon::ImageOptionFlipVertical);
 
   w2i->Delete();
   resample->Delete();

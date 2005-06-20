@@ -147,7 +147,7 @@ public:
   //BTX
   enum 
   { 
-    UPDATE_PHOTO_OPTION_FLIP_V = 1
+    UpdatePhotoOptionFlipVertical = 1
   };
   //ETX
   static int UpdatePhoto(Tcl_Interp *interp,

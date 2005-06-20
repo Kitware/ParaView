@@ -96,9 +96,9 @@ public:
   //BTX
   enum
   {
-    CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB   = 1,
-    CONVERT_IMAGE_TO_HEADER_OPTION_BASE64 = 2,
-    CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE = 4
+    ConvertImageToHeaderOptionZlib   = 1,
+    ConvertImageToHeaderOptionBase64 = 2,
+    ConvertImageToHeaderOptionUpdate = 4
   };
   //ETX
   static int ConvertImageToHeader(

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.54");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.55");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -632,7 +632,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     pp = sblock.pixelPtr;
     }
   
-  if (update_options & vtkKWTkUtilities::UPDATE_PHOTO_OPTION_FLIP_V)
+  if (update_options & vtkKWTkUtilities::UpdatePhotoOptionFlipVertical)
     {
     sblock.pitch = -sblock.pitch;
     sblock.pixelPtr += sblock_size + sblock.pitch;

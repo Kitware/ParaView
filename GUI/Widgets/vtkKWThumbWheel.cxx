@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.32");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.33");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -68,9 +68,9 @@ vtkKWThumbWheel::vtkKWThumbWheel()
   this->MaximumValue               = 0.0;
   this->ClampMaximumValue          = 0;
 
-  this->InteractionModes[0]        = vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION;
-  this->InteractionModes[1]        = vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION;
-  this->InteractionModes[2]        = vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR;
+  this->InteractionModes[0]        = vtkKWThumbWheel::InteractionModeLinearMotion;
+  this->InteractionModes[1]        = vtkKWThumbWheel::InteractionModeNonLinearMotion;
+  this->InteractionModes[2]        = vtkKWThumbWheel::InteractionModeToggleCenterIndicator;
 
   this->ThumbWheelPositionIndicatorColor[0] = 0.91;
   this->ThumbWheelPositionIndicatorColor[1] = 0.41;
@@ -506,13 +506,13 @@ void vtkKWThumbWheel::SetInteractionMode(int mode, int arg)
     }
 
   this->InteractionModes[mode] = arg;
-  if (this->InteractionModes[mode] < vtkKWThumbWheel::INTERACTION_MODE_NONE)
+  if (this->InteractionModes[mode] < vtkKWThumbWheel::InteractionModeNone)
     {
-    this->InteractionModes[mode] = vtkKWThumbWheel::INTERACTION_MODE_NONE;
+    this->InteractionModes[mode] = vtkKWThumbWheel::InteractionModeNone;
     }
-  else if (this->InteractionModes[mode] > vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR)
+  else if (this->InteractionModes[mode] > vtkKWThumbWheel::InteractionModeToggleCenterIndicator)
     {
-    this->InteractionModes[mode] = vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR;
+    this->InteractionModes[mode] = vtkKWThumbWheel::InteractionModeToggleCenterIndicator;
     }
   this->Modified();
 
@@ -524,7 +524,7 @@ int vtkKWThumbWheel::GetInteractionMode(int mode)
 {
   if (mode < 0 || mode > 2)
     {
-    return vtkKWThumbWheel::INTERACTION_MODE_NONE;
+    return vtkKWThumbWheel::InteractionModeNone;
     }
   return InteractionModes[mode];
 }
@@ -539,16 +539,16 @@ char *vtkKWThumbWheel::GetInteractionModeAsString(int mode)
 
   switch (this->InteractionModes[mode])
     {
-    case vtkKWThumbWheel::INTERACTION_MODE_NONE:
+    case vtkKWThumbWheel::InteractionModeNone:
       return (char *)"None";
       break;
-    case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
+    case vtkKWThumbWheel::InteractionModeLinearMotion:
       return (char *)"Linear";
       break;
-    case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
+    case vtkKWThumbWheel::InteractionModeNonLinearMotion:
       return (char *)"NonLinear";
       break;
-    case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
+    case vtkKWThumbWheel::InteractionModeToggleCenterIndicator:
       return (char *)"ToggleCenterIndicator";
       break;
     default:
@@ -657,19 +657,19 @@ void vtkKWThumbWheel::Bind()
       int b = i + 1;
       switch (this->InteractionModes[i])
         {
-        case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
+        case vtkKWThumbWheel::InteractionModeLinearMotion:
           this->Script("bind %s <Button-%d> {%s StartLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {%s PerformLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           break;
-        case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
+        case vtkKWThumbWheel::InteractionModeNonLinearMotion:
           this->Script("bind %s <Button-%d> {%s StartNonLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {}", 
                        this->ThumbWheel->GetWidgetName(), b);
           break;
-        case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
+        case vtkKWThumbWheel::InteractionModeToggleCenterIndicator:
           this->Script("bind %s <Button-%d> {%s ToggleDisplayThumbWheelCenterIndicator}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {}", 
@@ -1124,7 +1124,7 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
     int i;
     for (i = 0 ; i < 3; i++)
       {
-      if (this->InteractionModes[i] == vtkKWThumbWheel::INTERACTION_MODE_NONE)
+      if (this->InteractionModes[i] == vtkKWThumbWheel::InteractionModeNone)
         {
         continue;
         }
@@ -1145,22 +1145,22 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
 
       switch (this->InteractionModes[i])
         {
-        case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
+        case vtkKWThumbWheel::InteractionModeLinearMotion:
           modes << "linear";
           break;
-        case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
+        case vtkKWThumbWheel::InteractionModeNonLinearMotion:
           modes << "non-linear";
           break;
-        case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
+        case vtkKWThumbWheel::InteractionModeToggleCenterIndicator:
           modes << "toggle center indicator";
           break;
         default:
           modes << "unknown";
         }
     
-      if ((i == 0 && (this->InteractionModes[1] != vtkKWThumbWheel::INTERACTION_MODE_NONE ||
-                      this->InteractionModes[2] != vtkKWThumbWheel::INTERACTION_MODE_NONE)) ||
-          (i == 1 && this->InteractionModes[2] != vtkKWThumbWheel::INTERACTION_MODE_NONE))
+      if ((i == 0 && (this->InteractionModes[1] != vtkKWThumbWheel::InteractionModeNone ||
+                      this->InteractionModes[2] != vtkKWThumbWheel::InteractionModeNone)) ||
+          (i == 1 && this->InteractionModes[2] != vtkKWThumbWheel::InteractionModeNone))
         {
         modes << ", ";
         }

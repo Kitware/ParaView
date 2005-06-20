@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.22");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -490,7 +490,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   // Enabled/Disabled some resolutions
 
   int normal_state = 
-    this->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+    this->GetEnabled() ? vtkKWMenu::StateNormal : vtkKWMenu::StateDisabled;
   size_t size = this->Internals->Pool.size();
 
   char label[64];
@@ -503,7 +503,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
       label, 
       (size_t)(res[idx][0] * res[idx][1]) <= 
       (size + (res[idx][0] != 1 && res[idx][1] != 1 ? 1 : 0))
-      ? normal_state : vtkKWMenu::Disabled);
+      ? normal_state : vtkKWMenu::StateDisabled);
     }
 
   // Select the right one

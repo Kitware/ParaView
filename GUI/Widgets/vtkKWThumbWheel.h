@@ -81,26 +81,26 @@ public:
   //BTX
   enum
   {
-    INTERACTION_MODE_NONE = 0,
-    INTERACTION_MODE_LINEAR_MOTION,
-    INTERACTION_MODE_NONLINEAR_MOTION,
-    INTERACTION_MODE_TOGGLE_CENTER_INDICATOR
+    InteractionModeNone = 0,
+    InteractionModeLinearMotion,
+    InteractionModeNonLinearMotion,
+    InteractionModeToggleCenterIndicator
   };
   //ETX
   virtual void SetInteractionMode(int mode, int v);
   virtual int GetInteractionMode(int mode);
   virtual void SetInteractionModeToNone(int mode) 
     { this->SetInteractionMode(
-      mode, vtkKWThumbWheel::INTERACTION_MODE_NONE); };
+      mode, vtkKWThumbWheel::InteractionModeNone); };
   virtual void SetInteractionModeToLinear(int mode) 
     { this->SetInteractionMode(
-      mode, vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION); };
+      mode, vtkKWThumbWheel::InteractionModeLinearMotion); };
   virtual void SetInteractionModeToNonLinear(int mode) 
     { this->SetInteractionMode(
-      mode, vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION); };
+      mode, vtkKWThumbWheel::InteractionModeNonLinearMotion); };
   virtual void SetInteractionModeToToggleCenterIndicator(int mode) 
     { this->SetInteractionMode(
-      mode, vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR); };
+      mode, vtkKWThumbWheel::InteractionModeToggleCenterIndicator); };
   virtual char *GetInteractionModeAsString(int mode);
 
   // Description:

@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.46");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.47");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -151,8 +151,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->SecondaryHistogramColor[2]  = 0.0;
 
   this->ComputeHistogramColorFromValue = 0;
-  this->HistogramStyle     = vtkKWHistogram::ImageDescriptor::STYLE_BARS;
-  this->SecondaryHistogramStyle     = vtkKWHistogram::ImageDescriptor::STYLE_DOTS;
+  this->HistogramStyle     = vtkKWHistogram::ImageDescriptor::StyleBars;
+  this->SecondaryHistogramStyle = vtkKWHistogram::ImageDescriptor::StyleDots;
 
   this->ParameterCursorColor[0]     = 0.2;
   this->ParameterCursorColor[1]     = 0.2;
@@ -1362,7 +1362,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     vtkKWIcon *icon = vtkKWIcon::New();
     vtksys_stl::string img_name;
 
-    icon->SetImage(vtkKWIcon::ICON_GRID_LINEAR);
+    icon->SetImage(vtkKWIcon::IconGridLinear);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img0";
     vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
@@ -1375,7 +1375,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     this->HistogramLogModeOptionMenu->AddImageEntryWithCommand(
       img_name.c_str(), this, "HistogramLogModeCallback 0");
 
-    icon->SetImage(vtkKWIcon::ICON_GRID_LOG);
+    icon->SetImage(vtkKWIcon::IconGridLog);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img1";
     vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
@@ -5196,7 +5196,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
           buffer_length,
           canv,
           NULL,
-          vtkKWTkUtilities::UPDATE_PHOTO_OPTION_FLIP_V);
+          vtkKWTkUtilities::UpdatePhotoOptionFlipVertical);
         }
       if (blend)
         {

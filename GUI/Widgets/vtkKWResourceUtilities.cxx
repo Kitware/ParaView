@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.8");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.9");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -355,11 +355,11 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
   // Options
 
   int opt_update = 
-    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE;
+    options & vtkKWResourceUtilities::ConvertImageToHeaderOptionUpdate;
   int opt_zlib = 
-    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB;
+    options & vtkKWResourceUtilities::ConvertImageToHeaderOptionZlib;
   int opt_base64 = 
-    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_BASE64;
+    options & vtkKWResourceUtilities::ConvertImageToHeaderOptionBase64;
 
   // Update only, bail out if the header is more recent than all the images
 

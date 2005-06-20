@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.92");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.93");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -114,7 +114,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   // Current state (render mode, in expose, printing, etc)
 
-  this->RenderMode         = vtkKWRenderWidget::STILL_RENDER;
+  this->RenderMode         = vtkKWRenderWidget::StillRender;
   this->PreviousRenderMode = this->RenderMode;
   this->RenderState        = 1;
   this->CollapsingRenders  = 0;
@@ -703,7 +703,7 @@ void vtkKWRenderWidget::Render()
     }
   static_in_render = 1;
 
-  if (this->RenderMode != vtkKWRenderWidget::DISABLED_RENDER)
+  if (this->RenderMode != vtkKWRenderWidget::DisabledRender)
     {
     this->GetRenderer()->ResetCameraClippingRange();
     this->RenderWindow->Render();
@@ -717,13 +717,13 @@ const char* vtkKWRenderWidget::GetRenderModeAsString()
 {
   switch (this->RenderMode)
     {
-    case vtkKWRenderWidget::INTERACTIVE_RENDER:
+    case vtkKWRenderWidget::InteractiveRender:
       return "Interactive";
-    case vtkKWRenderWidget::STILL_RENDER:
+    case vtkKWRenderWidget::StillRender:
       return "Still";
-    case vtkKWRenderWidget::SINGLE_RENDER:
+    case vtkKWRenderWidget::SingleRender:
       return "Single";
-    case vtkKWRenderWidget::DISABLED_RENDER:
+    case vtkKWRenderWidget::DisabledRender:
       return "Disabled";
     default:
       return "Unknown (error)";

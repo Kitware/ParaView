@@ -83,8 +83,8 @@ public:
 
   //BTX
   enum {
-    READONLY,
-    READWRITE
+    ReadOnly,
+    ReadWrite
   };
 
   enum

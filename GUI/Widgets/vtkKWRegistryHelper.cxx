@@ -24,7 +24,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegistryHelper, "1.2");
+vtkCxxRevisionMacro(vtkKWRegistryHelper, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWRegistryHelper *vtkKWRegistryHelper::New()
@@ -94,7 +94,7 @@ int vtkKWRegistryHelper::Open(const char *toplevel,
     return 0;
     }
 
-  if ( readonly == vtkKWRegistryHelper::READONLY )
+  if ( readonly == vtkKWRegistryHelper::ReadOnly )
     {
     res = this->OpenInternal(toplevel, subkey, readonly);
     }
@@ -145,7 +145,7 @@ int vtkKWRegistryHelper::ReadValue(const char *subkey,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegistryHelper::READONLY) )
+                     vtkKWRegistryHelper::ReadOnly) )
       {
       return 0;
       }
@@ -172,7 +172,7 @@ int vtkKWRegistryHelper::DeleteKey(const char *subkey,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegistryHelper::READWRITE) )
+                     vtkKWRegistryHelper::ReadWrite) )
       {
       return 0;
       }
@@ -200,7 +200,7 @@ int vtkKWRegistryHelper::DeleteValue(const char *subkey, const char *key)
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegistryHelper::READWRITE) )
+                     vtkKWRegistryHelper::ReadWrite) )
       {
       return 0;
       }
@@ -229,7 +229,7 @@ int vtkKWRegistryHelper::SetValue(const char *subkey, const char *key,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegistryHelper::READWRITE) )
+                     vtkKWRegistryHelper::ReadWrite) )
       {
       return 0;
       }

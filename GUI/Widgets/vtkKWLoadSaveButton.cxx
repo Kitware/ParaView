@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.10");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.11");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -80,7 +80,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
   // Cosmetic add-on
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
-  this->SetImageOption(vtkKWIcon::ICON_FOLDER);
+  this->SetImageOption(vtkKWIcon::IconFolder);
   this->Script("%s configure -compound left -padx 3 -pady 2", 
                this->GetWidgetName());
 #endif

@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.10");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.11");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -98,7 +98,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: Play button to start the animation.
     this->PlayButton->SetParent(this->GetFrame());
     this->PlayButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_PLAY);
+    icon->SetImage(vtkKWIcon::IconTransportPlay);
     this->PlayButton->SetImageOption(icon);
     this->PlayButton->SetCommand(this, "PlayCallback");
     this->PlayButton->SetBalloonHelpString("Play the animation.");
@@ -106,7 +106,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: Stop button to stop the animation.
     this->StopButton->SetParent(this->GetFrame());
     this->StopButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_STOP);
+    icon->SetImage(vtkKWIcon::IconTransportStop);
     this->StopButton->SetImageOption(icon);
     this->StopButton->SetCommand(this, "StopCallback");
     this->StopButton->SetBalloonHelpString("Stop the animation.");
@@ -114,7 +114,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: "go to beginning" button.
     this->GoToBeginningButton->SetParent(this->GetFrame());
     this->GoToBeginningButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_BEGINNING);
+    icon->SetImage(vtkKWIcon::IconTransportBeginning);
     this->GoToBeginningButton->SetImageOption(icon);
     this->GoToBeginningButton->SetCommand(this, "GoToBeginningCallback");
     this->GoToBeginningButton->SetBalloonHelpString("Go to the start of the animation.");
@@ -122,7 +122,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: "go to end" button.
     this->GoToEndButton->SetParent(this->GetFrame());
     this->GoToEndButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_END);
+    icon->SetImage(vtkKWIcon::IconTransportEnd);
     this->GoToEndButton->SetImageOption(icon);
     this->GoToEndButton->SetBalloonHelpString("Go to the end of the animation.");
     this->GoToEndButton->SetCommand(this, "GoToEndCallback");
@@ -130,7 +130,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: "go to previous frame" button.
     this->GoToPreviousButton->SetParent(this->GetFrame());
     this->GoToPreviousButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_REWIND_TO_KEY);
+    icon->SetImage(vtkKWIcon::IconTransportRewindToKey);
     this->GoToPreviousButton->SetImageOption(icon);
     this->GoToPreviousButton->SetBalloonHelpString("Go to the previous frame.");
     this->GoToPreviousButton->SetCommand(this, "GoToPreviousCallback");
@@ -138,7 +138,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     // Animation Control: "go to next frame" button.
     this->GoToNextButton->SetParent(this->GetFrame());
     this->GoToNextButton->Create(app);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_FAST_FORWARD_TO_KEY);
+    icon->SetImage(vtkKWIcon::IconTransportFastForwardToKey);
     this->GoToNextButton->SetImageOption(icon);
     this->GoToNextButton->SetBalloonHelpString("Go to the next frame.");
     this->GoToNextButton->SetCommand(this, "GoToNextCallback");
@@ -148,7 +148,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     this->LoopCheckButton->Create(app);
     this->LoopCheckButton->SetState(0);
     this->LoopCheckButton->SetIndicator(0);
-    icon->SetImage(vtkKWIcon::ICON_TRANSPORT_LOOP);
+    icon->SetImage(vtkKWIcon::IconTransportLoop);
     this->LoopCheckButton->SetImageOption(icon);
     this->LoopCheckButton->SetBalloonHelpString("Specify if the animation is to be played in a loop.");
     this->LoopCheckButton->SetCommand(this, "LoopCheckCallback");

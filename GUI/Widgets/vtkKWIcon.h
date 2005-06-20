@@ -40,47 +40,47 @@ public:
   // want to save space, we only include that file to vtkKWIcons.cxx.
   // These constants specify different icons.
   enum { 
-    ICON_NOICON = 0,
-    ICON_CONNECTION,
-    ICON_ERROR,
-    ICON_EXPAND,
-    ICON_FOLDER,
-    ICON_FOLDER_OPEN,
-    ICON_GRID_LINEAR,
-    ICON_GRID_LOG,
-    ICON_HELPBUBBLE,
-    ICON_INFO_MINI,
-    ICON_LOCK,
-    ICON_MAG_GLASS,
-    ICON_MINUS,
-    ICON_MOVE,
-    ICON_MOVE_H,
-    ICON_MOVE_V,
-    ICON_PLUS,
-    ICON_QUESTION,
-    ICON_RELOAD,
-    ICON_SHRINK,
-    ICON_SMALLERROR,
-    ICON_SMALLERRORRED,
-    ICON_STOPWATCH,
-    ICON_TRANSPORT_BEGINNING,
-    ICON_TRANSPORT_END,
-    ICON_TRANSPORT_FAST_FORWARD,
-    ICON_TRANSPORT_FAST_FORWARD_TO_KEY,
-    ICON_TRANSPORT_LOOP,
-    ICON_TRANSPORT_PAUSE,
-    ICON_TRANSPORT_PLAY,
-    ICON_TRANSPORT_PLAY_TO_KEY,
-    ICON_TRANSPORT_REWIND,
-    ICON_TRANSPORT_REWIND_TO_KEY,
-    ICON_TRANSPORT_STOP,
-    ICON_TRASHCAN,
-    ICON_TREE_CLOSE,
-    ICON_TREE_OPEN,
-    ICON_WARNING,
-    ICON_WARNING_MINI,
-    ICON_WINDOW_LEVEL,
-    LAST_ICON
+    IconNoIcon = 0,
+    IconConnection,
+    IconError,
+    IconExpand,
+    IconFolder,
+    IconFolderOpen,
+    IconGridLinear,
+    IconGridLog,
+    IconHelpBubble,
+    IconInfoMini,
+    IconLock,
+    IconMagGlass,
+    IconMinus,
+    IconMove,
+    IconMoveH,
+    IconMoveV,
+    IconPlus,
+    IconQuestion,
+    IconReload,
+    IconShrink,
+    IconSmallError,
+    IconSmallErrorRed,
+    IconStopwatch,
+    IconTransportBeginning,
+    IconTransportEnd,
+    IconTransportFastForward,
+    IconTransportFastForwardToKey,
+    IconTransportLoop,
+    IconTransportPause,
+    IconTransportPlay,
+    IconTransportPlayToKey,
+    IconTransportRewind,
+    IconTransportRewindToKey,
+    IconTransportStop,
+    IconTrashcan,
+    IconTreeClose,
+    IconTreeOpen,
+    IconWarning,
+    IconWarningMini,
+    IconWindowLevel,
+    LastIcon
   };
   //ETX
 
@@ -96,11 +96,11 @@ public:
   // Set image data from pixel data, eventually zlib and base64.
   // If 'buffer_length' is 0, compute it automatically by multiplying
   // 'pixel_size', 'width' and 'height' together.
-  // If IMAGE_OPTION_FLIP_V is set in 'option', flip the image vertically
+  // If ImageOptionFlipVertical is set in 'option', flip the image vertically
   //BTX
   enum 
   { 
-    IMAGE_OPTION_FLIP_V = 1
+    ImageOptionFlipVertical = 1
   };
   //ETX
   void SetImage(const unsigned char* data, 

@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.4");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.5");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
@@ -445,9 +445,9 @@ void vtkKWMostRecentFilesManager::UpdateMenuStateInParent()
         {
         int nb_items = this->Menu->GetNumberOfItems();
         int menu_enabled = 
-          parent->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+          parent->GetEnabled() ? vtkKWMenu::StateNormal : vtkKWMenu::StateDisabled;
         parent->SetState(
-          index,  nb_items ? menu_enabled : vtkKWMenu::Disabled);
+          index,  nb_items ? menu_enabled : vtkKWMenu::StateDisabled);
         }
       }
     }

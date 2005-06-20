@@ -81,6 +81,12 @@ public:
   //ETX
   virtual void SetColorRampPosition(int);
   vtkGetMacro(ColorRampPosition, int);
+  virtual void SetColorRampPositionToDefault()
+    { this->SetColorRampPosition(
+      vtkKWColorTransferFunctionEditor::ColorRampPositionDefault); };
+  virtual void SetColorRampPositionToCanvas()
+    { this->SetColorRampPosition(
+      vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas); };
 
   // Description:
   // Set/get the color ramp outline style.
@@ -94,6 +100,15 @@ public:
   //ETX
   virtual void SetColorRampOutlineStyle(int);
   vtkGetMacro(ColorRampOutlineStyle, int);
+  virtual void SetColorRampOutlineStyleToNone()
+    { this->SetColorRampOutlineStyle(
+      vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleNone); };
+  virtual void SetColorRampOutlineStyleToSolid()
+    { this->SetColorRampOutlineStyle(
+      vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleSolid); };
+  virtual void SetColorRampOutlineStyleToSunken()
+    { this->SetColorRampOutlineStyle(
+      vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleSunken); };
 
   // Description:
   // Show/Hide the color space option menu.

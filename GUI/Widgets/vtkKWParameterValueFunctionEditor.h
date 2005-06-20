@@ -167,6 +167,12 @@ public:
   //ETX
   virtual void SetParameterRangePosition(int);
   vtkGetMacro(ParameterRangePosition, int);
+  virtual void SetParameterRangePositionToTop()
+    { this->SetParameterRangePosition(
+      vtkKWParameterValueFunctionEditor::ParameterRangePositionTop); };
+  virtual void SetParameterRangePositionToBottom()
+    { this->SetParameterRangePosition(
+      vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom); };
 
   // Description:
   // Show the value range UI (the slider).
@@ -221,6 +227,18 @@ public:
   //ETX
   virtual void SetPointPositionInValueRange(int);
   vtkGetMacro(PointPositionInValueRange, int);
+  virtual void SetPointPositionInValueRangeToValue()
+    { this->SetPointPositionInValueRange(
+      vtkKWParameterValueFunctionEditor::PointPositionValue); };
+  virtual void SetPointPositionInValueRangeToTop()
+    { this->SetPointPositionInValueRange(
+      vtkKWParameterValueFunctionEditor::PointPositionTop); };
+  virtual void SetPointPositionInValueRangeToBottom()
+    { this->SetPointPositionInValueRange(
+      vtkKWParameterValueFunctionEditor::PointPositionBottom); };
+  virtual void SetPointPositionInValueRangeToCenter()
+    { this->SetPointPositionInValueRange(
+      vtkKWParameterValueFunctionEditor::PointPositionCenter); };
 
   // Description:
   // Show the range label UI.
@@ -244,6 +262,12 @@ public:
   //ETX
   virtual void SetRangeLabelPosition(int);
   vtkGetMacro(RangeLabelPosition, int);
+  virtual void SetRangeLabelPositionToDefault()
+    { this->SetRangeLabelPosition(
+      vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault); };
+  virtual void SetRangeLabelPositionToTop()
+    { this->SetRangeLabelPosition(
+      vtkKWParameterValueFunctionEditor::RangeLabelPositionTop); };
 
   // Description:
   // Show the parameter entry UI.
@@ -267,6 +291,12 @@ public:
   //ETX
   virtual void SetParameterEntryPosition(int);
   vtkGetMacro(ParameterEntryPosition, int);
+  virtual void SetParameterEntryPositionToDefault()
+    { this->SetParameterEntryPosition(
+      vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault); };
+  virtual void SetParameterEntryPositionToRight()
+    { this->SetParameterEntryPosition(
+      vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight); };
 
   // Description:
   // Set/Get the parameter entry printf format. If not NULL, it is
@@ -332,6 +362,12 @@ public:
   //ETX
   virtual void SetFunctionLineStyle(int);
   vtkGetMacro(FunctionLineStyle, int);
+  virtual void SetFunctionLineStyleToSolid()
+    { this->SetFunctionLineStyle(
+      vtkKWParameterValueFunctionEditor::LineStyleSolid); };
+  virtual void SetFunctionLineStyleToDash()
+    { this->SetFunctionLineStyle(
+      vtkKWParameterValueFunctionEditor::LineStyleDash); };
 
   // Description:
   // Show/Hide the canvas outline

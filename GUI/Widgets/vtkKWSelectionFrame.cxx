@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.38");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -188,13 +188,13 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   this->SelectionList->SetParent(this->TitleBar);
   this->SelectionList->Create(app);
   this->SelectionList->IndicatorOff();
-  this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
+  this->SelectionList->SetImageOption(vtkKWIcon::IconExpand);
 
   // The close button
 
   this->CloseButton->SetParent(this->TitleBar);
   this->CloseButton->Create(app);
-  this->CloseButton->SetImageOption(vtkKWIcon::ICON_SHRINK);
+  this->CloseButton->SetImageOption(vtkKWIcon::IconShrink);
   this->CloseButton->SetCommand(this, "CloseCallback");
   this->CloseButton->SetBalloonHelpString("Close window");
 

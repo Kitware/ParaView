@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.71");
+vtkCxxRevisionMacro(vtkKWMenu, "1.72");
 
 
 
@@ -788,21 +788,21 @@ int vtkKWMenu::GetState(int index)
                                    this->GetWidgetName(), index);
   if (!state || !state[0])
     {
-    return vtkKWMenu::Unknown;
+    return vtkKWMenu::StateUnknown;
     }
   if ( strcmp(state, "normal") == 0 )
     {
-    return vtkKWMenu::Normal;
+    return vtkKWMenu::StateNormal;
     }
   else if ( strcmp(state, "active") == 0 )
     {
-    return vtkKWMenu::Active;
+    return vtkKWMenu::StateActive;
     }
   else if ( strcmp(state, "disabled") == 0 )
     {
-    return vtkKWMenu::Disabled;
+    return vtkKWMenu::StateDisabled;
     }
-  return vtkKWMenu::Unknown;
+  return vtkKWMenu::StateUnknown;
 }
 
 //----------------------------------------------------------------------------
@@ -810,7 +810,7 @@ int vtkKWMenu::GetState(const char* item)
 {
   if ( !this->HasItem(item) )
     {
-    return vtkKWMenu::Unknown;
+    return vtkKWMenu::StateUnknown;
     }
   int index = this->GetIndex(item);
   return this->GetState(index);
@@ -822,7 +822,7 @@ void vtkKWMenu::SetState(int index, int state)
   if (this->IsCreated())
     {
     char stateStr[][9] = { "normal", "active", "disabled" };
-    if (state < vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
+    if (state < vtkKWMenu::StateNormal || state > vtkKWMenu::StateDisabled)
       {
       state = 0;
       }
@@ -855,7 +855,7 @@ void vtkKWMenu::SetState(int state)
   const char *wname = this->GetWidgetName();
 
   char stateStr[][9] = { "normal", "active", "disabled" };
-  if (state < vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
+  if (state < vtkKWMenu::StateNormal || state > vtkKWMenu::StateDisabled)
     {
     state = 0;
     }
@@ -1029,7 +1029,7 @@ void vtkKWMenu::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetState(this->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled);
+  this->SetState(this->GetEnabled() ? vtkKWMenu::StateNormal : vtkKWMenu::StateDisabled);
 }
 
 //----------------------------------------------------------------------------

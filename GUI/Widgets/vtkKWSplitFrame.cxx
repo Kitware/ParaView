@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.31");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.32");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -46,7 +46,7 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Size = 
     this->Frame1Size + this->Frame2Size + this->GetTotalSeparatorSize();
 
-  this->Orientation = vtkKWSplitFrame::Horizontal;
+  this->Orientation = vtkKWSplitFrame::OrientationHorizontal;
   this->ExpandFrame = vtkKWSplitFrame::ExpandFrame2;
 }
 
@@ -107,7 +107,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 
   // Setup the cursor to indication an action associated with the separator. 
 #ifdef _WIN32
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {  
     this->Script("%s configure -cursor size_we",
                  this->Separator->GetWidgetName());
@@ -118,7 +118,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
                  this->Separator->GetWidgetName());
     }
 #else
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {  
     this->Script("%s configure -cursor sb_h_double_arrow",
                  this->Separator->GetWidgetName());
@@ -174,7 +174,7 @@ void vtkKWSplitFrame::ReConfigure()
     {
     this->Size = 
       this->Frame1Size + this->Frame2Size + this->GetTotalSeparatorSize();
-    if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
       {
       this->Script("%s configure -width %d", 
                    this->GetWidgetName(), this->Size);
@@ -193,7 +193,7 @@ void vtkKWSplitFrame::ConfigureCallback()
   int tmp;
   int size;
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
     }
@@ -276,7 +276,7 @@ void vtkKWSplitFrame::DragCallback()
 {
   int size, s, smin, tmp;
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
     }
@@ -289,7 +289,7 @@ void vtkKWSplitFrame::DragCallback()
 
   // Get the position of the widget in screen
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     smin = atoi(this->Script( "winfo rootx %s",this->GetWidgetName()));
     }
@@ -300,7 +300,7 @@ void vtkKWSplitFrame::DragCallback()
 
   // Get the position of the mouse in screen
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     s = atoi(this->Script( "winfo pointerx %s", this->GetWidgetName()));
     }
@@ -318,7 +318,7 @@ void vtkKWSplitFrame::DragCallback()
   int halfSepSize1 = this->GetTotalSeparatorSize() / 2;
   int halfSepSize2 = this->GetTotalSeparatorSize() - halfSepSize1;
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     tmp = this->Frame1MinimumSize + halfSepSize1;
     if (s < tmp)
@@ -525,7 +525,7 @@ void vtkKWSplitFrame::Update()
 
   if (this->Frame1Visibility)
     {
-    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+    if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
       this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
                    this->Frame1->GetWidgetName(), frame1_size);
@@ -544,7 +544,7 @@ void vtkKWSplitFrame::Update()
 
   if (this->Frame1Visibility && this->Frame2Visibility)
     {
-    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+    if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
       this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
                    this->Separator->GetWidgetName(), 
@@ -566,7 +566,7 @@ void vtkKWSplitFrame::Update()
 
   if (this->Frame2Visibility)
     {
-    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+    if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
       this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
                    this->Frame2->GetWidgetName(), 
@@ -609,7 +609,7 @@ void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SeparatorSize: " << this->GetSeparatorSize() << endl;
   os << indent << "SeparatorMargin: " << this->GetSeparatorMargin() << endl;
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+  if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     os << indent << "Orientation: Horizontal\n";
     }
@@ -617,7 +617,7 @@ void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Orientation: Vertical\n";
     }
-  if (this->ExpandFrame == vtkKWSplitFrame::Horizontal)
+  if (this->ExpandFrame == vtkKWSplitFrame::OrientationHorizontal)
     {
     os << indent << "ExpandFrame: Horizontal\n";
     }

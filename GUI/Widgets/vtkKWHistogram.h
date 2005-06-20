@@ -180,8 +180,8 @@ public:
 
     enum
     {
-      STYLE_BARS = 0,
-      STYLE_DOTS
+      StyleBars = 0,
+      StyleDots
     };
     int          Style;
 

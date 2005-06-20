@@ -62,25 +62,25 @@ public:
   //BTX
   enum
   {
-    INTERACTIVE_RENDER = 0,
-    STILL_RENDER       = 1,
-    DISABLED_RENDER    = 2,
-    SINGLE_RENDER      = 3
+    InteractiveRender = 0,
+    StillRender       = 1,
+    DisabledRender    = 2,
+    SingleRender      = 3
   };
   //ETX
 
   vtkSetClampMacro(RenderMode, int, 
-                   vtkKWRenderWidget::INTERACTIVE_RENDER, 
-                   vtkKWRenderWidget::SINGLE_RENDER);
+                   vtkKWRenderWidget::InteractiveRender, 
+                   vtkKWRenderWidget::SingleRender);
   vtkGetMacro(RenderMode, int);
   virtual void SetRenderModeToInteractive() 
-    { this->SetRenderMode(vtkKWRenderWidget::INTERACTIVE_RENDER); };
+    { this->SetRenderMode(vtkKWRenderWidget::InteractiveRender); };
   virtual void SetRenderModeToStill() 
-    { this->SetRenderMode(vtkKWRenderWidget::STILL_RENDER); };
+    { this->SetRenderMode(vtkKWRenderWidget::StillRender); };
   virtual void SetRenderModeToSingle() 
-    { this->SetRenderMode(vtkKWRenderWidget::SINGLE_RENDER); };
+    { this->SetRenderMode(vtkKWRenderWidget::SingleRender); };
   virtual void SetRenderModeToDisabled() 
-    { this->SetRenderMode(vtkKWRenderWidget::DISABLED_RENDER); };
+    { this->SetRenderMode(vtkKWRenderWidget::DisabledRender); };
   virtual const char *GetRenderModeAsString();
 
   // Description:

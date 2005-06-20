@@ -204,6 +204,9 @@ public:
 
   // Description:
   // Set/Get state of the menu entry with a given index or name.
+  //BTX
+  enum { StateNormal = 0, StateActive, StateDisabled, StateUnknown };
+  //ETX
   void SetState(int index, int state);
   void SetState(const char* item, int state);
   int  GetState(int index);
@@ -216,10 +219,6 @@ public:
   // Description:
   // Configure the item at given index.
   void ConfigureItem(int index, const char*);
-
-  //BTX
-  enum { Normal = 0, Active, Disabled, Unknown };
-  //ETX
 
   // Description:
   // Set or get enabled state.

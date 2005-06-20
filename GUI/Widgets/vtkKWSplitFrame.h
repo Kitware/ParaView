@@ -52,16 +52,16 @@ public:
   //BTX
   enum 
   {
-    Horizontal = 0,
-    Vertical
+    OrientationHorizontal = 0,
+    OrientationVertical
   };
   //ETX
   vtkSetMacro(Orientation, int);
   vtkGetMacro(Orientation, int);
   virtual void SetOrientationToHorizontal()
-    { this->SetOrientation(vtkKWSplitFrame::Horizontal); };
+    { this->SetOrientation(vtkKWSplitFrame::OrientationHorizontal); };
   virtual void SetOrientationToVertical()
-    { this->SetOrientation(vtkKWSplitFrame::Vertical); };
+    { this->SetOrientation(vtkKWSplitFrame::OrientationVertical); };
 
   // Description:
   // Set/Get which frame is automatically expanded when the whole widget

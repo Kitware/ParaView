@@ -80,26 +80,26 @@ public:
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
   // This will change the label when SetLabelText() is called.
-  // Defaults to LABEL_CASE_UPPERCASE_FIRST.
+  // Defaults to LabelCaseUppercaseFirst.
   //BTX
   enum
   {
-    LABEL_CASE_USER_SPECIFIED = 0,
-    LABEL_CASE_UPPERCASE_FIRST,
-    LABEL_CASE_LOWERCASE_FIRST
+    LabelCaseUserSpecified = 0,
+    LabelCaseUppercaseFirst,
+    LabelCaseLowercaseFirst
   };
   //ETX
   static void SetLabelCase(int v);
   static int GetLabelCase();
   static void SetLabelCaseToUserSpecified() 
     { vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LABEL_CASE_USER_SPECIFIED);};
+      vtkKWFrameLabeled::LabelCaseUserSpecified);};
   static void SetLabelCaseToUppercaseFirst() 
     {vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST);};
+      vtkKWFrameLabeled::LabelCaseUppercaseFirst);};
   static void SetLabelCaseToLowercaseFirst() 
     {vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LABEL_CASE_LOWERCASE_FIRST);};
+      vtkKWFrameLabeled::LabelCaseLowercaseFirst);};
 
   // Description:
   // Globally enable or disable bold label.

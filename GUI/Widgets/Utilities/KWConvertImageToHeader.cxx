@@ -77,11 +77,11 @@ int main(int argc, char **argv)
   else
     {
     option_update *= 
-      vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE;
+      vtkKWResourceUtilities::ConvertImageToHeaderOptionUpdate;
     option_zlib *= 
-      vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB;
+      vtkKWResourceUtilities::ConvertImageToHeaderOptionZlib;
     option_base64 *=
-      vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_BASE64;
+      vtkKWResourceUtilities::ConvertImageToHeaderOptionBase64;
    
     cout << "- " << rem_argv[1] << endl;
 

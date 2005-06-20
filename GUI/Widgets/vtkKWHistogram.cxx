@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.3");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -545,7 +545,7 @@ void vtkKWHistogram::AccumulateHistogram(vtkDataArray *scalars, int comp)
 //----------------------------------------------------------------------------
 vtkKWHistogram::ImageDescriptor::ImageDescriptor()
 {
-  this->Style                   = vtkKWHistogram::ImageDescriptor::STYLE_BARS;
+  this->Style                   = vtkKWHistogram::ImageDescriptor::StyleBars;
   this->Width                   = 0;
   this->Height                  = 0;
   this->DrawBackground          = 1;
@@ -982,7 +982,7 @@ vtkImageData* vtkKWHistogram::GetImage(
     // This is used only in DOTS mode
 
     if (desc->DrawBackground &&
-        desc->Style == vtkKWHistogram::ImageDescriptor::STYLE_DOTS &&
+        desc->Style == vtkKWHistogram::ImageDescriptor::StyleDots &&
         ylimit > 1)
       {
       unsigned char *oor_or_bg_color = out_of_range ? oorcolor : bgcolor;
@@ -1032,7 +1032,7 @@ vtkImageData* vtkKWHistogram::GetImage(
       {
       switch (desc->Style)
         {
-        case vtkKWHistogram::ImageDescriptor::STYLE_BARS:
+        case vtkKWHistogram::ImageDescriptor::StyleBars:
           for (y = 0; y < ylimit; y++)
             {
             column_ptr[0] = color[0];
@@ -1041,7 +1041,7 @@ vtkImageData* vtkKWHistogram::GetImage(
             column_ptr += row_length;
             }
           break;
-        case vtkKWHistogram::ImageDescriptor::STYLE_DOTS:
+        case vtkKWHistogram::ImageDescriptor::StyleDots:
           if (ylimit > 0)
             {
             column_ptr[0] = color[0];
@@ -1056,7 +1056,7 @@ vtkImageData* vtkKWHistogram::GetImage(
       {
       switch (desc->Style)
         {
-        case vtkKWHistogram::ImageDescriptor::STYLE_BARS:
+        case vtkKWHistogram::ImageDescriptor::StyleBars:
           for (y = 0; y < ylimit; y++)
             {
             column_ptr[0] = color[0];
@@ -1066,7 +1066,7 @@ vtkImageData* vtkKWHistogram::GetImage(
             column_ptr += row_length;
             }
           break;
-        case vtkKWHistogram::ImageDescriptor::STYLE_DOTS:
+        case vtkKWHistogram::ImageDescriptor::StyleDots:
           if (ylimit > 0)
             {
             column_ptr += (ylimit - 1) * row_length;

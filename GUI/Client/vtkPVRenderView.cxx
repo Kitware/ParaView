@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.386");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.387");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -897,7 +897,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
       // between source and 3D views.
       int state = viewmenu->GetState(this->MenuLabelSwitchBackAndForthToViewProperties);
       viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
-                         vtkKWMenu::Normal);
+                         vtkKWMenu::StateNormal);
       viewmenu->Invoke(
         viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
       viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,

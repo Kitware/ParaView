@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.44");
+vtkCxxRevisionMacro(vtkKWRange, "1.45");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -66,7 +66,7 @@ vtkKWRange::vtkKWRange()
   this->AdjustResolution      = 0;
   this->Thickness             = 19;
   this->InternalThickness     = 0.5;
-  this->Orientation           = vtkKWRange::ORIENTATION_HORIZONTAL;
+  this->Orientation           = vtkKWRange::OrientationHorizontal;
   this->Inverted              = 0;
   this->SliderSize            = 3;
   this->ShowEntries           = 0;
@@ -262,7 +262,7 @@ void vtkKWRange::Pack()
   // Repack everything
 
   ostrstream tk_cmd;
-  int is_horiz = (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL);
+  int is_horiz = (this->Orientation == vtkKWRange::OrientationHorizontal);
 
   int row, col, row_span, col_span, c_padx = 0, c_pady = 0;
   const char *anchor, *sticky;
@@ -520,12 +520,12 @@ void vtkKWRange::Bind()
     tk_cmd << canv << " bind " <<  VTK_KW_RANGE_SLIDER1_TAG 
            << " <B1-Motion> {" << this->GetTclName() 
            << " SliderMotionCallback " 
-           << vtkKWRange::SLIDER_INDEX_1 << " %%x %%y}" << endl;
+           << vtkKWRange::SliderIndex1 << " %%x %%y}" << endl;
 
     tk_cmd << canv << " bind " <<  VTK_KW_RANGE_SLIDER2_TAG 
            << " <B1-Motion> {" << this->GetTclName() 
            << " SliderMotionCallback " 
-           << vtkKWRange::SLIDER_INDEX_2 << " %%x %%y}" << endl;
+           << vtkKWRange::SliderIndex2 << " %%x %%y}" << endl;
     }
 
   tk_cmd << ends;
@@ -621,11 +621,11 @@ void vtkKWRange::SetRange(double r0, double r1)
 
     if (old_sliders_pos[0] != sliders_pos[0])
       {
-      this->RedrawSlider(sliders_pos[0], vtkKWRange::SLIDER_INDEX_1);
+      this->RedrawSlider(sliders_pos[0], vtkKWRange::SliderIndex1);
       }
     if (old_sliders_pos[1] != sliders_pos[1])
       {
-      this->RedrawSlider(sliders_pos[1], vtkKWRange::SLIDER_INDEX_2);
+      this->RedrawSlider(sliders_pos[1], vtkKWRange::SliderIndex2);
       }
 
     this->UpdateEntriesValue(this->Range);
@@ -897,8 +897,8 @@ void vtkKWRange::ConstrainRanges()
 void vtkKWRange::SetOrientation(int arg)
 {
   if (this->Orientation == arg ||
-      arg < vtkKWRange::ORIENTATION_HORIZONTAL ||
-      arg > vtkKWRange::ORIENTATION_VERTICAL)
+      arg < vtkKWRange::OrientationHorizontal ||
+      arg > vtkKWRange::OrientationVertical)
     {
     return;
     }
@@ -1117,11 +1117,11 @@ void vtkKWRange::GetWholeRangeColor(int type, double &r, double &g, double &b)
 
   switch (type)
     {
-    case vtkKWRange::DARK_SHADOW_COLOR:
-    case vtkKWRange::LIGHT_SHADOW_COLOR:
-    case vtkKWRange::HIGHLIGHT_COLOR:
+    case vtkKWRange::DarkShadowColor:
+    case vtkKWRange::LightShadowColor:
+    case vtkKWRange::HighlightColor:
 
-      this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+      this->GetWholeRangeColor(vtkKWRange::BackgroundColor, r, g, b);
 
       if (r == g && g == b)
         {
@@ -1133,11 +1133,11 @@ void vtkKWRange::GetWholeRangeColor(int type, double &r, double &g, double &b)
         vtkMath::RGBToHSV(r, g, b, &fh, &fs, &fv);
         }
 
-      if (type == vtkKWRange::DARK_SHADOW_COLOR)
+      if (type == vtkKWRange::DarkShadowColor)
         {
         fv *= 0.3;
         }
-      else if (type == vtkKWRange::LIGHT_SHADOW_COLOR)
+      else if (type == vtkKWRange::LightShadowColor)
         {
         fv *= 0.6;
         }
@@ -1150,7 +1150,7 @@ void vtkKWRange::GetWholeRangeColor(int type, double &r, double &g, double &b)
 
       break;
 
-    case vtkKWRange::BACKGROUND_COLOR:
+    case vtkKWRange::BackgroundColor:
     default:
 
       this->Canvas->GetBackgroundColor(&r, &g, &b);
@@ -1172,11 +1172,11 @@ void vtkKWRange::GetRangeColor(int type, double &r, double &g, double &b)
 
   switch (type)
     {
-    case vtkKWRange::DARK_SHADOW_COLOR:
-    case vtkKWRange::LIGHT_SHADOW_COLOR:
-    case vtkKWRange::HIGHLIGHT_COLOR:
+    case vtkKWRange::DarkShadowColor:
+    case vtkKWRange::LightShadowColor:
+    case vtkKWRange::HighlightColor:
 
-      this->GetRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+      this->GetRangeColor(vtkKWRange::BackgroundColor, r, g, b);
 
       if (r == g && g == b)
         {
@@ -1188,11 +1188,11 @@ void vtkKWRange::GetRangeColor(int type, double &r, double &g, double &b)
         vtkMath::RGBToHSV(r, g, b, &fh, &fs, &fv);
         }
 
-      if (type == vtkKWRange::DARK_SHADOW_COLOR)
+      if (type == vtkKWRange::DarkShadowColor)
         {
         fv *= 0.3;
         }
-      else if (type == vtkKWRange::LIGHT_SHADOW_COLOR)
+      else if (type == vtkKWRange::LightShadowColor)
         {
         fv *= 0.6;
         }
@@ -1205,7 +1205,7 @@ void vtkKWRange::GetRangeColor(int type, double &r, double &g, double &b)
 
       break;
 
-    case vtkKWRange::BACKGROUND_COLOR:
+    case vtkKWRange::BackgroundColor:
     default:
 
       rgb = (this->InInteraction ? 
@@ -1213,7 +1213,7 @@ void vtkKWRange::GetRangeColor(int type, double &r, double &g, double &b)
 
       if (rgb[0] < 0 || rgb[1] < 0 || rgb[2] < 0)
         {
-        this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+        this->GetWholeRangeColor(vtkKWRange::BackgroundColor, r, g, b);
         }
       else
         {
@@ -1367,7 +1367,7 @@ void vtkKWRange::RedrawCanvas()
 
   int width, height;
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     width = atoi(this->Script("winfo width %s", 
                               this->CanvasFrame->GetWidgetName()));
@@ -1436,7 +1436,7 @@ void vtkKWRange::RedrawWholeRange()
 
   // Draw depending on the orientation
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     x_min = 0;
     x_max = atoi(this->Script("%s cget -width", canv)) - 1;
@@ -1518,7 +1518,7 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
   const char *canv = this->Canvas->GetWidgetName();
   int i, pos_min = 0, pos_max, pos_range;
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     pos_max = atoi(this->Script("%s cget -width", canv)) - 1;
     }
@@ -1622,7 +1622,7 @@ void vtkKWRange::RedrawRange()
   int min = (this->Thickness - in_thick) / 2;
   int max = min + in_thick - 1;
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     /* 
       pos[0]         pos[1]
@@ -1712,8 +1712,8 @@ void vtkKWRange::RedrawSliders()
 
   // Draw the sliders
 
-  this->RedrawSlider(pos[0], vtkKWRange::SLIDER_INDEX_1);
-  this->RedrawSlider(pos[1], vtkKWRange::SLIDER_INDEX_2);
+  this->RedrawSlider(pos[0], vtkKWRange::SliderIndex1);
+  this->RedrawSlider(pos[1], vtkKWRange::SliderIndex2);
 }
 
 //----------------------------------------------------------------------------
@@ -1725,7 +1725,7 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
     }
 
   const char *tag = "";
-  if (slider_idx == SLIDER_INDEX_1)
+  if (slider_idx == SliderIndex1)
     {
     tag = VTK_KW_RANGE_SLIDER1_TAG;
     }
@@ -1773,13 +1773,13 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
   y_min = 0;
   y_max = this->Thickness - 1;
 #else
-  y_min = (slider_idx == SLIDER_INDEX_1 ? 
+  y_min = (slider_idx == SliderIndex1 ? 
            0 : (this->Thickness - in_thick) / 2);
-  y_max = (slider_idx == SLIDER_INDEX_1 ? 
+  y_max = (slider_idx == SliderIndex1 ? 
            (this->Thickness + in_thick) / 2 - 1 : this->Thickness - 1);
 #endif
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_VERTICAL)
+  if (this->Orientation == vtkKWRange::OrientationVertical)
     {
     min_temp = x_min;
     max_temp = x_max;
@@ -1890,25 +1890,25 @@ void vtkKWRange::UpdateRangeColors()
 
   // Set the color of the Range
 
-  this->GetRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+  this->GetRangeColor(vtkKWRange::BackgroundColor, r, g, b);
   sprintf(bgcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetRangeColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
+  this->GetRangeColor(vtkKWRange::DarkShadowColor, r, g, b);
   sprintf(dscolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetRangeColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
+  this->GetRangeColor(vtkKWRange::HighlightColor, r, g, b);
   sprintf(hlcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetRangeColor(vtkKWRange::LIGHT_SHADOW_COLOR, r, g, b);
+  this->GetRangeColor(vtkKWRange::LightShadowColor, r, g, b);
   sprintf(lscolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
@@ -1940,25 +1940,25 @@ void vtkKWRange::UpdateColors()
 
   // Set the color of the Whole Range
 
-  this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+  this->GetWholeRangeColor(vtkKWRange::BackgroundColor, r, g, b);
   sprintf(bgcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetWholeRangeColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
+  this->GetWholeRangeColor(vtkKWRange::DarkShadowColor, r, g, b);
   sprintf(dscolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetWholeRangeColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
+  this->GetWholeRangeColor(vtkKWRange::HighlightColor, r, g, b);
   sprintf(hlcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetWholeRangeColor(vtkKWRange::LIGHT_SHADOW_COLOR, r, g, b);
+  this->GetWholeRangeColor(vtkKWRange::LightShadowColor, r, g, b);
   sprintf(lscolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
@@ -1975,19 +1975,19 @@ void vtkKWRange::UpdateColors()
 
   // Set the color of all Sliders
 
-  this->GetSliderColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
+  this->GetSliderColor(vtkKWRange::BackgroundColor, r, g, b);
   sprintf(bgcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetSliderColor(vtkKWRange::DARK_SHADOW_COLOR, r, g, b);
+  this->GetSliderColor(vtkKWRange::DarkShadowColor, r, g, b);
   sprintf(dscolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
           (int)(b * 255.0));
 
-  this->GetSliderColor(vtkKWRange::HIGHLIGHT_COLOR, r, g, b);
+  this->GetSliderColor(vtkKWRange::HighlightColor, r, g, b);
   sprintf(hlcolor, "#%02x%02x%02x", 
           (int)(r * 255.0), 
           (int)(g * 255.0),
@@ -2075,7 +2075,7 @@ void vtkKWRange::StartInteractionCallback(int x, int y)
 
   // Save the current range and mouse position
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     this->StartInteractionPos = x;
     }
@@ -2119,7 +2119,7 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   int min, max, pos;
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     pos = x;
     min = 0;
@@ -2147,7 +2147,7 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   double new_range[2];
 
-  if (slider_idx == vtkKWRange::SLIDER_INDEX_1)
+  if (slider_idx == vtkKWRange::SliderIndex1)
     {
     new_range[0] = new_value;
     new_range[1] = this->RangeAdjusted[1];
@@ -2180,7 +2180,7 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
 
   int pos, min, max;
 
-  if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
+  if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     pos = x;
     min = 0;

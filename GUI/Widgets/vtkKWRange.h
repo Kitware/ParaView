@@ -94,16 +94,16 @@ public:
   //BTX
   enum 
   {
-    ORIENTATION_HORIZONTAL = 0,
-    ORIENTATION_VERTICAL   = 1
+    OrientationHorizontal = 0,
+    OrientationVertical   = 1
   };
   //ETX
   virtual void SetOrientation(int);
   vtkGetMacro(Orientation, int);
   virtual void SetOrientationToHorizontal()
-    { this->SetOrientation(vtkKWRange::ORIENTATION_HORIZONTAL); };
+    { this->SetOrientation(vtkKWRange::OrientationHorizontal); };
   virtual void SetOrientationToVertical() 
-    { this->SetOrientation(vtkKWRange::ORIENTATION_VERTICAL); };
+    { this->SetOrientation(vtkKWRange::OrientationVertical); };
 
   // Description:
   // Set/Get the order of the sliders (inverted means that the first slider
@@ -243,8 +243,8 @@ public:
   //BTX
   enum
   {
-    SLIDER_INDEX_1 = 1,
-    SLIDER_INDEX_2 = 2
+    SliderIndex1 = 1,
+    SliderIndex2 = 2
   };
   //ETX
   virtual void ConfigureCallback();
@@ -343,10 +343,10 @@ protected:
   //BTX
   enum
   {
-    DARK_SHADOW_COLOR,
-    LIGHT_SHADOW_COLOR,
-    BACKGROUND_COLOR,
-    HIGHLIGHT_COLOR
+    DarkShadowColor,
+    LightShadowColor,
+    BackgroundColor,
+    HighlightColor
   };
   //ETX
   virtual void GetWholeRangeColor(int type, double &r, double &g, double &b);

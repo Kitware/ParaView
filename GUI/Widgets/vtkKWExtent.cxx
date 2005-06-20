@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.36");
+vtkCxxRevisionMacro(vtkKWExtent, "1.37");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -122,7 +122,7 @@ void vtkKWExtent::Pack()
   this->XRange->UnpackSiblings();
 
   int is_horiz = 
-    (this->XRange->GetOrientation() == vtkKWRange::ORIENTATION_HORIZONTAL);
+    (this->XRange->GetOrientation() == vtkKWRange::OrientationHorizontal);
 
   // Repack everything
 

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.6");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -86,13 +86,13 @@ void vtkKWMultiColumnList::AddColumn(const char *title,
     const char *alignment_opt;
     switch (align)
       {
-      case vtkKWMultiColumnList::COLUMN_ALIGNMENT_LEFT:
+      case vtkKWMultiColumnList::ColumnAlignmentLeft:
         alignment_opt = "left";
         break;
-      case vtkKWMultiColumnList::COLUMN_ALIGNMENT_RIGHT:
+      case vtkKWMultiColumnList::ColumnAlignmentRight:
         alignment_opt = "right";
         break;
-      case vtkKWMultiColumnList::COLUMN_ALIGNMENT_CENTER:
+      case vtkKWMultiColumnList::ColumnAlignmentCenter:
         alignment_opt = "center";
         break;
       default:

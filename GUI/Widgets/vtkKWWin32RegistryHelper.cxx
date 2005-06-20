@@ -15,7 +15,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.1");
+vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.2");
 vtkStandardNewMacro( vtkKWWin32RegistryHelper );
 
 #define BUFFER_SIZE 8192
@@ -42,7 +42,7 @@ int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
   ostrstream str;
   DWORD dwDummy;
   str << "Software\\Kitware\\" << toplevel << "\\" << subkey << ends;
-  if ( readonly == vtkKWRegistryHelper::READONLY )
+  if ( readonly == vtkKWRegistryHelper::ReadOnly )
     {
     res = ( RegOpenKeyEx(scope, str.str(), 
                          0, KEY_READ, &this->HKey) == ERROR_SUCCESS );
