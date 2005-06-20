@@ -28,12 +28,14 @@
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkKWTree.h"
+#include "vtkKWTreeWithScrollbars.h"
 
-#include <vtkstd/string>
+#include <vtksys/stl/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.57");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.58");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -48,11 +50,8 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
   this->TimeLabel = vtkKWLabel::New();
   this->TimeLabel->SetParent(this->LabeledFrame->GetFrame());
 
-  this->TreeFrame = vtkKWWidget::New();
-  this->TreeFrame->SetParent(this->LabeledFrame->GetFrame());
-
-  this->Tree = vtkKWWidget::New();
-  this->Tree->SetParent(this->TreeFrame);
+  this->Tree = vtkKWTreeWithScrollbars::New();
+  this->Tree->SetParent(this->LabeledFrame->GetFrame());
 
   this->TimeValue = 0.0;
 
@@ -68,7 +67,6 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
 {
   this->LabeledFrame->Delete();
   this->Tree->Delete();
-  this->TreeFrame->Delete();
   this->TimeLabel->Delete();
   this->SetFrameLabel(0);
   this->TimeSets->Delete();
@@ -137,26 +135,18 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *app)
   this->TimeLabel->SetText(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
-  this->TreeFrame->CreateSpecificTkWidget(
-    this->GetApplication(), "ScrolledWindow");
-  this->TreeFrame->SetReliefToSunken();
-  this->TreeFrame->SetBorderWidth(2);
+  this->Tree->Create(this->GetApplication());
+  this->Tree->SetReliefToSunken();
+  this->Tree->SetBorderWidth(2);
 
-  this->Tree->CreateSpecificTkWidget(this->GetApplication(), "Tree");
-  this->Tree->SetBackgroundColor(1.0, 1.0, 1.0);
-  this->Tree->SetBorderWidth(0);
-  this->Tree->SetReliefToFlat();
-  this->Tree->SetPadX(2);
-  this->Tree->SetConfigurationOptionAsInt("-width", 15);
-  this->Tree->SetConfigurationOptionAsInt("-redraw", 1);
-  this->Tree->SetConfigurationOption("-selectbackground", "red");
-
-  this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
-               this->Tree->GetWidgetName(), this->GetTclName());
-  this->Script("%s setwidget %s", this->TreeFrame->GetWidgetName(),
-               this->Tree->GetWidgetName());
-
-  this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
+  vtkKWTree *tree = this->Tree->GetWidget();
+  tree->SetBackgroundColor(1.0, 1.0, 1.0);
+  tree->SetWidth(15);
+  tree->SetRedrawOnIdle(1);
+  tree->SetSelectionBackgroundColor(1.0, 0.0, 0.0);
+  tree->SetSingleClickOnNodeCommand(this, "SetTimeValueCallback");
+  
+  this->Script("pack %s -expand t -fill x", this->Tree->GetWidgetName());
 
   this->Script("pack %s -side top -expand t -fill x", 
                this->LabeledFrame->GetWidgetName());
@@ -189,19 +179,19 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
 
   if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
     {
-    this->Script("if [%s itemcget %s -open] "
-                 "{%s closetree %s} else {%s opentree %s}", 
-                 this->Tree->GetWidgetName(), item,
-                 this->Tree->GetWidgetName(), item,
-                 this->Tree->GetWidgetName(), item);
+    if (this->Tree->GetWidget()->IsNodeOpen(item))
+      {
+      this->Tree->GetWidget()->CloseTree(item);
+      }
+    else
+      {
+      this->Tree->GetWidget()->OpenTree(item);
+      }
     return;
     }
 
-  this->Script("%s selection set %s", this->Tree->GetWidgetName(),
-               item);
-  this->Script("%s itemcget %s -data", this->Tree->GetWidgetName(),
-               item);
-  const char* result = this->GetApplication()->GetMainInterp()->result;
+  this->Tree->GetWidget()->SetSelectionToNode(item);
+  const char* result = this->Tree->GetWidget()->GetNodeUserData(item);
   if (result[0] == '\0')
     {
     return;
@@ -222,8 +212,7 @@ void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
     {
     return;
     }
-  this->Script("%s insert end root %s -text {%s}", this->Tree->GetWidgetName(),
-               name, text);
+  this->Tree->GetWidget()->AddNode(NULL, name, text);
 }
 
 //-----------------------------------------------------------------------------
@@ -234,8 +223,7 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
     {
     return;
     }
-  this->Script("%s insert end %s %s -text {%s} -data %s", 
-               this->Tree->GetWidgetName(), parent, name, text, data);
+  this->Tree->GetWidget()->AddNode(parent, name, text, data);
 }
 
 
@@ -261,10 +249,9 @@ void vtkPVSelectTimeSet::Accept()
   
   if (modFlag)
     {
-    this->Script("%s selection get", this->Tree->GetWidgetName());
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeValueCallback {%s}", 
-                        this->GetTclName(), 
-                        this->GetApplication()->GetMainInterp()->result);
+    vtksys_stl::string sel(this->Tree->GetWidget()->GetSelection());
+    this->GetTraceHelper()->AddEntry(
+      "$kw(%s) SetTimeValueCallback {%s}", this->GetTclName(), sel.c_str());
     }
 
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -292,9 +279,10 @@ void vtkPVSelectTimeSet::Trace(ofstream *file)
     return;
     }
 
-  this->Script("%s selection get", this->Tree->GetWidgetName());
+  vtksys_stl::string sel(this->Tree->GetWidget()->GetSelection());
+
   *file << "$kw(" << this->GetTclName() << ") SetTimeValueCallback {"
-        << this->GetApplication()->GetMainInterp()->result << "}" << endl;
+        << sel.c_str() << "}" << endl;
 }
 
 
@@ -318,8 +306,7 @@ void vtkPVSelectTimeSet::CommonReset()
     return;
     }
 
-  this->Script("%s delete [%s nodes root]", this->Tree->GetWidgetName(),
-               this->Tree->GetWidgetName());
+  this->Tree->GetWidget()->DeleteAllNodes();
   
   this->SetTimeSetsFromReader();
 
@@ -346,14 +333,14 @@ void vtkPVSelectTimeSet::CommonReset()
 
   if (this->TimeSets->GetNumberOfItems() == 0)
     {
-    this->Script("pack forget %s", this->TreeFrame->GetWidgetName());
+    this->Script("pack forget %s", this->Tree->GetWidgetName());
     this->TimeLabel->SetText("No timesets available.");
     return;
     }
   else
     {
     this->SetTimeValue(actualTimeValue);
-    this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
+    this->Script("pack %s -expand t -fill x", this->Tree->GetWidgetName());
     }
 
   this->TimeSets->InitTraversal();
@@ -372,21 +359,19 @@ void vtkPVSelectTimeSet::CommonReset()
       sprintf(timeValueName, "time%d_%-12.5e", timeSetId, timeValue);
       sprintf(timeValueText, "%-12.5e", timeValue);
       ostrstream str;
-      str << "{" << timeSetId-1 << " " << tuple << "}" << ends;
+      str << timeSetId-1 << " " << tuple << ends;
       sprintf(indices, "%s", str.str());
       str.rdbuf()->freeze(0);
       this->AddChildNode(timeSetName, timeValueName, timeValueText, indices);
       if (actualTimeValue == timeValue && !matchFound)
         {
         matchFound=1;
-        this->Script("%s selection set %s", this->Tree->GetWidgetName(),
-                     timeValueName);
+        this->Tree->GetWidget()->SetSelectionToNode(timeValueName);
         }
       }
     if (timeSetId == 1)
       {
-      this->Script("%s opentree %s", this->Tree->GetWidgetName(), 
-                   timeSetName);
+      this->Tree->GetWidget()->OpenTree(timeSetName);
       }
     }
   

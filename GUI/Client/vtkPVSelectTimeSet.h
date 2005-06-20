@@ -27,6 +27,7 @@ class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWFrameLabeled;
 class vtkDataArrayCollection;
+class vtkKWTreeWithScrollbars;
 
 class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVWidget
 {
@@ -109,8 +110,7 @@ protected:
   vtkSetStringMacro(FrameLabel);
   vtkGetStringMacro(FrameLabel);
 
-  vtkKWWidget* Tree;
-  vtkKWWidget* TreeFrame;
+  vtkKWTreeWithScrollbars* Tree;
   vtkKWLabel* TimeLabel;
   vtkKWFrameLabeled* LabeledFrame;
 
