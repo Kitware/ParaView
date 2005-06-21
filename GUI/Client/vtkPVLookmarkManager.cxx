@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.35");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.36");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   // Import the lookmark file stored in the user's home directory if there is one
   ostrstream str;
   #ifndef _WIN32
-  if ( getenv("HOME") )
+  if ( !getenv("HOME") )
     {
     return;
     }
