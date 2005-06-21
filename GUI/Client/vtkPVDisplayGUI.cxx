@@ -17,6 +17,7 @@
 #include "vtkPVColorMap.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkSMDisplayProxy.h"
@@ -78,19 +79,79 @@
 #include "vtkStdString.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkRenderWindow.h"
 
-#define VTK_PV_OUTLINE_LABEL "Outline"
-#define VTK_PV_SURFACE_LABEL "Surface"
-#define VTK_PV_WIREFRAME_LABEL "Wireframe of Surface"
-#define VTK_PV_POINTS_LABEL "Points of Surface"
-#define VTK_PV_VOLUME_LABEL "Volume Render"
+#define VTK_PV_OUTLINE_LABEL              "Outline"
+#define VTK_PV_SURFACE_LABEL              "Surface"
+#define VTK_PV_WIREFRAME_LABEL            "Wireframe of Surface"
+#define VTK_PV_POINTS_LABEL               "Points of Surface"
+#define VTK_PV_VOLUME_LABEL               "Volume Render"
+#define VTK_PV_VOLUME_PT_METHOD_LABEL     "Projection"
+#define VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL "ZSweep"
+#define VTK_PV_VOLUME_BUNYK_METHOD_LABEL  "Bunyk Ray Cast"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.34");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.35");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
+
+
+
+//----------------------------------------------------------------------------
+
+class vtkPVDisplayGUIVRObserver : public vtkCommand
+{
+public:
+  static vtkPVDisplayGUIVRObserver *New()
+    { return new vtkPVDisplayGUIVRObserver; }
+
+  void SetDisplayGUI( vtkPVDisplayGUI *gui )
+    { this->DisplayGUI = gui; }
+
+  virtual void Execute( vtkObject *w, unsigned long event, void *data )
+    { 
+      if ( !this->DisplayGUI || !this->DisplayGUI->VolumeRenderMode )
+        {
+        return;
+        }
+      if ( this->DisplayGUI->GetPVRenderView()->GetRenderWindow()->GetDesiredUpdateRate() >= 1 )
+        {
+        this->DisplayGUI->DrawVolumePTInternal();
+        }
+      else
+        {
+        if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+                     VTK_PV_VOLUME_PT_METHOD_LABEL ) )
+          {
+          this->DisplayGUI->DrawVolumePTInternal();
+          }
+        else if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+                          VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL ) )
+          {
+          this->DisplayGUI->DrawVolumeZSweepInternal();
+          }
+        else if ( !strcmp( this->DisplayGUI->VolumeRenderMethodMenu->GetValue(),
+                          VTK_PV_VOLUME_BUNYK_METHOD_LABEL ) )
+          {
+          this->DisplayGUI->DrawVolumeBunykInternal();
+          }
+        }
+    }
+  
+  
+protected:
+  
+  vtkPVDisplayGUIVRObserver()
+    {
+      this->DisplayGUI = NULL;
+    }
+  
+  vtkPVDisplayGUI *DisplayGUI;
+};
+
+
 
 //----------------------------------------------------------------------------
 vtkPVDisplayGUI::vtkPVDisplayGUI()
@@ -124,6 +185,9 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->VolumeScalarsMenuLabel = vtkKWLabel::New();
   this->VolumeScalarSelectionWidget = vtkPVColorSelectionWidget::New();
+  
+  this->VolumeRenderMethodMenuLabel = vtkKWLabel::New();
+  this->VolumeRenderMethodMenu = vtkKWOptionMenu::New();
   
   this->EditVolumeAppearanceButton = vtkKWPushButton::New();
 
@@ -173,12 +237,16 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->VolumeAppearanceEditor = NULL;
 
   this->ShouldReinitialize = 0;
-
+  
+  this->VRObserver = vtkPVDisplayGUIVRObserver::New();
+  this->VRObserver->SetDisplayGUI( this );
 }
 
 //----------------------------------------------------------------------------
 vtkPVDisplayGUI::~vtkPVDisplayGUI()
 {  
+  this->VRObserver->SetDisplayGUI( NULL );
+
   if ( this->VolumeAppearanceEditor )
     {
     this->VolumeAppearanceEditor->UnRegister(this);
@@ -214,6 +282,11 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->VolumeScalarSelectionWidget->Delete();
   this->VolumeScalarSelectionWidget = 0;
 
+  this->VolumeRenderMethodMenuLabel->Delete();
+  this->VolumeRenderMethodMenuLabel = NULL;
+  this->VolumeRenderMethodMenu->Delete();
+  this->VolumeRenderMethodMenu = NULL;
+  
   this->EditVolumeAppearanceButton->Delete();
   this->EditVolumeAppearanceButton = NULL;
   
@@ -279,6 +352,8 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
+  
+  this->VRObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -568,6 +643,23 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   this->VolumeScalarSelectionWidget->SetBalloonHelpString(
     "Select scalars to view with volume rendering.");
 
+  this->VolumeRenderMethodMenuLabel->SetParent(
+    this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeRenderMethodMenuLabel->Create(this->GetApplication());
+  this->VolumeRenderMethodMenuLabel->SetText("Still Render Method:");
+  this->VolumeRenderMethodMenuLabel->SetBalloonHelpString(
+    "Select the render method to be used when not interacting "
+    "(during interaction projection is always used). "
+    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate.");
+
+  this->VolumeRenderMethodMenu->SetParent(
+    this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeRenderMethodMenu->Create(this->GetApplication());
+  this->VolumeRenderMethodMenu->SetBalloonHelpString(
+    "Select the render method to be used when not interacting "
+    "(during interaction projection is always used). "
+    "Projection is fast, ZSweep and Bunyk are much slower, but more accurate.");
+  
   this->EditVolumeAppearanceButton->
     SetParent(this->VolumeAppearanceFrame->GetFrame());
   this->EditVolumeAppearanceButton->Create(this->GetApplication());
@@ -586,7 +678,15 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
                this->VolumeScalarSelectionWidget->GetWidgetName(),
                col_1_padx, button_pady);
 
-  this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
+  this->Script("grid %s %s -row 1 -sticky wns",
+               this->VolumeRenderMethodMenuLabel->GetWidgetName(),
+               this->VolumeRenderMethodMenu->GetWidgetName());
+
+  this->Script("grid %s -row 1 -column 1 -sticky news -padx %d -pady %d",
+               this->VolumeRenderMethodMenu->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid %s -row 2 -column 1 -sticky news -padx %d -pady %d",
                this->EditVolumeAppearanceButton->GetWidgetName(),
                col_1_padx, button_pady);
 
@@ -1354,6 +1454,37 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   this->VolumeScalarSelectionWidget->SetColorSelectionCommand(
     "VolumeRenderByArray");
   this->VolumeScalarSelectionWidget->Update();
+  
+  this->VolumeRenderMethodMenu->DeleteAllEntries();
+  this->VolumeRenderMethodMenu->AddEntryWithCommand(
+    VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
+  
+  if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsZSweepMapper() )
+    {
+    this->VolumeRenderMethodMenu->AddEntryWithCommand(
+      VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
+    }
+  if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsBunykMapper() )
+    {
+    this->VolumeRenderMethodMenu->AddEntryWithCommand(
+      VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
+    }
+  
+  switch (this->PVSource->GetDisplayProxy()->GetVolumeMapperType())
+    {
+    case vtkSMDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
+      this->VolumeRenderMethodMenu->SetValue
+        (VTK_PV_VOLUME_PT_METHOD_LABEL);
+      break;
+    case vtkSMDisplayProxy::ZSWEEP_VOLUME_MAPPER:
+      this->VolumeRenderMethodMenu->SetValue
+        (VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL);
+      break;
+    case vtkSMDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
+      this->VolumeRenderMethodMenu->SetValue
+        (VTK_PV_VOLUME_BUNYK_METHOD_LABEL);
+      break;
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetActorColor(double r, double g, double b)
@@ -1560,13 +1691,6 @@ void vtkPVDisplayGUI::DrawPoints()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawVolume()
 {
-  if (this->PVSource->GetDataInformation()->GetNumberOfCells() > 500000)
-    {
-    vtkWarningMacro("Sorry.  Unstructured grids with more than 500,000 "
-                    "cells cannot currently be rendered with ParaView.  "
-                    "Consider thresholding cells you are not interested in.");
-    return;
-    }
   if (this->GetPVSource()->GetInitialized())
     {
     this->GetTraceHelper()->AddEntry("$kw(%s) DrawVolume", this->GetTclName());
@@ -1575,10 +1699,59 @@ void vtkPVDisplayGUI::DrawVolume()
   this->VolumeRenderModeOn();
   this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::VOLUME);
 
+  this->GetPVRenderView()->GetRenderWindow()->AddObserver( vtkCommand::StartEvent,
+                                                           this->VRObserver );
+  
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumePT()
+{
+  this->DrawVolumePTInternal();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumePTInternal()
+{
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToPT();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeZSweep()
+{
+  this->DrawVolumeZSweepInternal();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeZSweepInternal()
+{
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToZSweep();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeBunyk()
+{
+  this->DrawVolumeBunykInternal();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DrawVolumeBunykInternal()
+{
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToBunyk();
 }
 
 //----------------------------------------------------------------------------

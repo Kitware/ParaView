@@ -863,6 +863,48 @@
       </ProxyProperty>
     </SourceProxy>
 
+    <SourceProxy name="ProjectedTetrahedraMapper" 
+      class="vtkProjectedTetrahedraMapper">
+      <InputProperty
+        name="Input"
+        command="SetInput">
+        <!-- 
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        -->
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+    </SourceProxy>
+
     <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
       class="vtkUnstructuredGridVolumeRayCastMapper">
       <InputProperty
@@ -908,6 +950,48 @@
           <Group name="ugrid_raycast_functions"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+    </SourceProxy>
+
+    <SourceProxy name="UnstructuredGridVolumeZSweepMapper" 
+      class="vtkUnstructuredGridVolumeZSweepMapper">
+      <InputProperty
+        name="Input"
+        command="SetInput">
+        <!-- 
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        -->
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
     </SourceProxy>
   </ProxyGroup>
 
@@ -2163,7 +2247,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="VolumeMapper" 
+        <Proxy name="VolumeBunykMapper" 
           proxygroup="mappers" 
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
@@ -2174,7 +2258,34 @@
           <Property name="SelectScalarArray" />
           <Property name="ScalarMode" />
         </ExposedProperties>
-        
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeZSweepMapper" 
+          proxygroup="mappers" 
+          proxyname="UnstructuredGridVolumeZSweepMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="SelectScalarArray" />
+          <Property name="ScalarMode" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumePTMapper" 
+          proxygroup="mappers" 
+          proxyname="ProjectedTetrahedraMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="SelectScalarArray" />
+          <Property name="ScalarMode" />
+        </ExposedProperties>        
       </SubProxy>
 
       <SubProxy>

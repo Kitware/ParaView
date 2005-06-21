@@ -80,6 +80,17 @@ public:
   const char* GetScalarArrayCM();
   
   // Description:
+  // Convenience methods for switching between volume
+  // mappers.
+  virtual void SetVolumeMapperToBunyk() {}
+  virtual void SetVolumeMapperToPT() {}
+  virtual void SetVolumeMapperToZSweep() {}
+  
+  // Description:
+  // Convenience method for determining the volume mapper
+  virtual int GetVolumeMapperType() {return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;}
+  
+  // Description:
   // Convenience method to get/set Opacity.
   void SetOpacityCM(double op);
   double GetOpacityCM();
@@ -170,6 +181,16 @@ public:
   // removed as we will generate batch script from ServerManager
   // state. However, until then.
   virtual void SaveInBatchScript(ofstream* file);
+  
+//BTX
+  enum 
+  {
+    PROJECTED_TETRA_VOLUME_MAPPER =0,
+    ZSWEEP_VOLUME_MAPPER,
+    BUNYK_RAY_CAST_VOLUME_MAPPER,
+    UNKNOWN_VOLUME_MAPPER
+  };
+//ETX
   
 protected:
   vtkSMDisplayProxy();

@@ -46,6 +46,7 @@ class vtkPVRenderView;
 class vtkPVDataSetAttributesInformation;
 class vtkPVVolumeAppearanceEditor;
 class vtkPVColorSelectionWidget;
+class vtkPVDisplayGUIVRObserver;
 
 // Try to eliminate this !!!!
 class vtkPVColorMap;
@@ -159,6 +160,12 @@ public:
   void DrawPoints();
   void DrawVolume();
   void DrawOutline();
+  
+  // Description:
+  // Methods called when item chosen from VolumeRenderMethodMenu
+  void DrawVolumePT();
+  void DrawVolumeBunyk();
+  void DrawVolumeZSweep();
   
   // Description:
   // Methods called when item chosen from InterpolationMenu
@@ -325,6 +332,9 @@ protected:
   vtkKWLabel *VolumeScalarsMenuLabel;
   vtkPVColorSelectionWidget* VolumeScalarSelectionWidget;
 
+  vtkKWLabel      *VolumeRenderMethodMenuLabel;
+  vtkKWOptionMenu *VolumeRenderMethodMenu;
+  
   vtkKWPushButton *EditVolumeAppearanceButton;
 
   vtkKWLabel *RepresentationMenuLabel;
@@ -379,6 +389,16 @@ protected:
   void UpdateActorControl();  
   void UpdateActorControlResolutions();
 
+  // Internal versions without a render
+  void DrawVolumePTInternal();
+  void DrawVolumeBunykInternal();
+  void DrawVolumeZSweepInternal();
+
+//BTX
+  friend class vtkPVDisplayGUIVRObserver;
+  vtkPVDisplayGUIVRObserver *VRObserver;
+//ETX
+  
 private:
   vtkPVDisplayGUI(const vtkPVDisplayGUI&); // Not implemented
   void operator=(const vtkPVDisplayGUI&); // Not implemented

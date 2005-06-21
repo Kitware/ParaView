@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -49,14 +49,18 @@ vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
   this->CanCreateProxy = 0;
 
   this->VolumeFilterProxy = 0;
-  this->VolumeMapperProxy = 0;
+  this->VolumePTMapperProxy = 0;
+  this->VolumeBunykMapperProxy = 0;
+  this->VolumeZSweepMapperProxy = 0;
   this->VolumeActorProxy = 0;
   this->VolumePropertyProxy = 0;
   this->OpacityFunctionProxy = 0;
   this->ColorTransferFunctionProxy = 0;
 
-  this->HasVolumePipeline = 0; // By Default, don't bother about the Volume Pipeline.
-  this->VolumeRenderMode = 0;
+  this->HasVolumePipeline    = 0; // By Default, don't bother about the Volume Pipeline.
+  this->SupportsBunykMapper  = 0;
+  this->SupportsZSweepMapper = 0;
+  this->VolumeRenderMode     = 0;
 
   this->Visibility = 1;
   this->Representation = -1;
@@ -72,7 +76,9 @@ vtkSMSimpleDisplayProxy::~vtkSMSimpleDisplayProxy()
   this->ActorProxy = 0;
 
   this->VolumeFilterProxy = 0;
-  this->VolumeMapperProxy = 0;
+  this->VolumePTMapperProxy = 0;
+  this->VolumeBunykMapperProxy = 0;
+  this->VolumeZSweepMapperProxy = 0;
   this->VolumeActorProxy = 0;
   this->VolumePropertyProxy = 0;
   this->OpacityFunctionProxy = 0;
@@ -110,14 +116,20 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
   if (this->HasVolumePipeline)
     {
     this->VolumeFilterProxy = this->GetSubProxy("VolumeFilter");
-    this->VolumeMapperProxy = this->GetSubProxy("VolumeMapper");
+    this->VolumePTMapperProxy = this->GetSubProxy("VolumePTMapper");
+    this->VolumeBunykMapperProxy = this->GetSubProxy("VolumeBunykMapper");
+    this->VolumeZSweepMapperProxy = this->GetSubProxy("VolumeZSweepMapper");
     this->VolumeActorProxy = this->GetSubProxy("VolumeActor");
     this->VolumePropertyProxy = this->GetSubProxy("VolumeProperty");
     this->OpacityFunctionProxy = this->GetSubProxy("OpacityFunction");
     this->ColorTransferFunctionProxy = this->GetSubProxy("ColorTransferFunction");
 
     this->VolumeFilterProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-    this->VolumeMapperProxy->SetServers(
+    this->VolumePTMapperProxy->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    this->VolumeBunykMapperProxy->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    this->VolumeZSweepMapperProxy->SetServers(
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     this->VolumeActorProxy->SetServers(
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -132,7 +144,9 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
     {
     // Remove all volume related subproxies (so that they are not created).
     this->RemoveSubProxy("VolumeFilter");
-    this->RemoveSubProxy("VolumeMapper");
+    this->RemoveSubProxy("VolumePTMapper");
+    this->RemoveSubProxy("VolumeBunykMapper");
+    this->RemoveSubProxy("VolumeZSweepMapper");
     this->RemoveSubProxy("VolumeActor");
     this->RemoveSubProxy("VolumeProperty");
     this->RemoveSubProxy("OpacityFunction");
@@ -191,7 +205,21 @@ void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
   vtkSMDataTypeDomain* domain = vtkSMDataTypeDomain::SafeDownCast(
     p->GetProperty("Input")->GetDomain("input_type"));
   this->HasVolumePipeline =  (domain->IsInDomain(input))? 1 : 0;
+  this->SupportsBunykMapper = 0;
+  this->SupportsZSweepMapper = 0;
   
+  if ( this->HasVolumePipeline )
+    {
+    if (input->GetDataInformation()->GetNumberOfCells() < 1000000)
+      {
+      this->SupportsZSweepMapper = 1;
+      }
+    if (input->GetDataInformation()->GetNumberOfCells() < 500000)
+      {
+      this->SupportsBunykMapper = 1;
+      }
+    }
+    
   this->CreateVTKObjects(num);
 
   vtkSMInputProperty* ip;
@@ -459,10 +487,32 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
   vtkSMProxyProperty* pp;
 
   ip = vtkSMInputProperty::SafeDownCast(
-    this->VolumeMapperProxy->GetProperty("Input"));
+    this->VolumePTMapperProxy->GetProperty("Input"));
   if (!ip)
     {
-    vtkErrorMacro("Failed to find property Input on VolumeMapperProxy.");
+    vtkErrorMacro("Failed to find property Input on VolumePTMapperProxy.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeFilterProxy);
+
+
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->VolumeBunykMapperProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on VolumeBunykMapperProxy.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeFilterProxy);
+
+
+  ip = vtkSMInputProperty::SafeDownCast(
+    this->VolumeZSweepMapperProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on VolumeZSweepMapperProxy.");
     return;
     }
   ip->RemoveAllProxies();
@@ -476,7 +526,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
     return;
     }
   pp->RemoveAllProxies();
-  pp->AddProxy(this->VolumeMapperProxy);
+  pp->AddProxy(this->VolumePTMapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Property"));
@@ -520,7 +570,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumeDefaults()
   // VolumeFilterProxy  defaults.
   // No defaults to set.
 
-  // VolumeMapperProxy defaults.
+  // VolumePTMapperProxy defaults.
   // No defaults to set.
 
   // VolumeActorProxy defaults.
@@ -654,7 +704,7 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
   
   // 1) Determine the scalar mode. (Point data or cell data?).
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->VolumeMapperProxy->GetProperty("ScalarMode"));
+    this->VolumePTMapperProxy->GetProperty("ScalarMode"));
   mode = ivp->GetElement(0);
   if (mode != vtkSMDisplayProxy::POINT_FIELD_DATA && 
     mode != vtkSMDisplayProxy::CELL_FIELD_DATA)
@@ -666,7 +716,7 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
 
   // 2) Determine the array used for volume rendering.
   svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->VolumeMapperProxy->GetProperty("SelectScalarArray"));
+    this->VolumePTMapperProxy->GetProperty("SelectScalarArray"));
   arrayname = svp->GetElement(0);
  
   // 3) Get the Input Proxy.
@@ -762,6 +812,92 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions(
 
   this->OpacityFunctionProxy->UpdateVTKObjects();
   this->ColorTransferFunctionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::SetVolumeMapperToBunyk()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActorProxy->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->VolumeBunykMapperProxy);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::SetVolumeMapperToPT()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActorProxy->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->VolumePTMapperProxy);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::SetVolumeMapperToZSweep()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActorProxy->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->VolumeZSweepMapperProxy);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMSimpleDisplayProxy::GetVolumeMapperType()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActorProxy->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
+    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    }
+  
+  vtkSMProxy *p = pp->GetProxy(0);
+  
+  if ( !p )
+    {
+    vtkErrorMacro("Failed to find proxy in Mapper proxy property!");
+    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    }
+  
+  if ( !strcmp(p->GetVTKClassName(), "vtkProjectedTetrahedraMapper" ) )
+    {
+    return vtkSMDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER;
+    }
+
+  if ( !strcmp(p->GetVTKClassName(), "vtkUnstructuredGridVolumeZSweepMapper" ) )
+    {
+    return vtkSMDisplayProxy::ZSWEEP_VOLUME_MAPPER;
+    }
+  
+  if ( !strcmp(p->GetVTKClassName(), "vtkUnstructuredGridVolumeRayCastMapper" ) )
+    {
+    return vtkSMDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER;
+    }
+  
+  return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
 }
 
 //-----------------------------------------------------------------------------

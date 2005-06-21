@@ -75,7 +75,9 @@ public:
   // Description:
   // Flag indicating if the display supports a volume rendering 
   // representation.
-  vtkGetMacro(HasVolumePipeline, int);
+  vtkGetMacro(HasVolumePipeline,    int);
+  vtkGetMacro(SupportsBunykMapper,  int);
+  vtkGetMacro(SupportsZSweepMapper, int);
   
   // Description:
   // Flag indicating if the display is currently rendered
@@ -88,7 +90,19 @@ public:
   // Method to initlaize the Volume Transfer functions 
   // (ie. Opacity Function & Color Transfer fuction).
   void ResetTransferFunctions();
-
+  
+  // Description:
+  // Convenience methods for switching between volume
+  // mappers.
+  void SetVolumeMapperToBunyk();
+  void SetVolumeMapperToPT();
+  void SetVolumeMapperToZSweep();
+  
+  // Description:
+  // Convenience method for determining which
+  // volume mapper is in use
+  virtual int GetVolumeMapperType();
+  
   // Description:
   // This method will set the subproxy GeometryFilterProxy
   // as the input (using property "Input") on the argument
@@ -142,13 +156,18 @@ protected:
   vtkSMProxy *ActorProxy; 
 
   vtkSMProxy* VolumeFilterProxy;
-  vtkSMProxy* VolumeMapperProxy;
+  vtkSMProxy* VolumePTMapperProxy;
+  vtkSMProxy* VolumeBunykMapperProxy;
+  vtkSMProxy* VolumeZSweepMapperProxy;
   vtkSMProxy* VolumeActorProxy;
   vtkSMProxy* VolumePropertyProxy;
   vtkSMProxy* OpacityFunctionProxy;
   vtkSMProxy* ColorTransferFunctionProxy;
 
   int HasVolumePipeline; 
+  int SupportsZSweepMapper;
+  int SupportsBunykMapper;
+  
   // Flag to avoid setting up the volume pipeline
   // if the input is not vtkUnstructuredGrid. I go as far as
   // removing all the volume subproxies as well (and not creating them at all!)
