@@ -17,7 +17,6 @@ SET(Filters_SRCS
   vtkCTHSource.cxx
   vtkCVGeometryCache.cxx
   vtkCaveRenderManager.cxx
-  vtkCellCenterDepthSort.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
@@ -69,9 +68,7 @@ SET(Filters_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
   vtkPickFilter.cxx
-  vtkProjectedTetrahedraMapper.cxx
   vtkSelectInputs.cxx
-  vtkSortDataArray.cxx
   vtkSpyPlotReader.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
@@ -81,7 +78,6 @@ SET(Filters_SRCS
   vtkTiledDisplaySchedule.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVRMLSource.cxx
-  vtkVisibilitySort.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
@@ -96,7 +92,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkCTHDataToPolyDataFilter.cxx
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
-  vtkVisibilitySort.cxx
   vtkImageCompressor.cxx
   ABSTRACT)
 

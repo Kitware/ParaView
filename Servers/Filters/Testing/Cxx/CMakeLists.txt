@@ -8,7 +8,6 @@ SET(ServersFilters_SRCS
   ServersFiltersPrintSelf
   TestCTH
   TestMPI
-  TestSort
   )
 
 IF (VTK_DATA_ROOT)
@@ -41,11 +40,6 @@ ENDFOREACH(name)
 IF (VTK_USE_DISPLAY)
   SET(ServersFiltersImage_SRCS
     )
-  IF (VTK_DATA_ROOT)
-    SET(ServersFiltersImage_SRCS ${ServersFiltersImage_SRCS}
-      TestProjectedTetrahedra
-      )
-  ENDIF (VTK_DATA_ROOT)
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)
     ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
