@@ -18,6 +18,7 @@
 #include "vtkAnimationScene.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
+#include "vtkErrorCode.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
@@ -31,13 +32,18 @@
 #include "vtkKWScale.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWToolbarSet.h"
+#include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
+#include "vtkPVCornerAnnotationEditor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVVCRControl.h"
 #include "vtkPVWindow.h"
 #include "vtkProcessModule.h"
@@ -46,16 +52,11 @@
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMSimpleDisplayProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSimpleDisplayProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkPVSourceCollection.h"
-#include "vtkPVSource.h"
-#include "vtkErrorCode.h"
-#include "vtkKWToolbarSet.h"
-#include "vtkPVTraceHelper.h"
 
 // Some header file is defining CurrentTime so undef it
 #undef CurrentTime
@@ -71,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.39");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.40");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -501,6 +502,10 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
         (etime==stime)?  0 : (cueInfo->CurrentTime - stime) / (etime - stime);
       this->AnimationManager->SetTimeMarker(ntime);
       this->TimeScale->SetValue(cueInfo->CurrentTime);
+      if (this->RenderView)
+        {
+        this->RenderView->GetCornerAnnotation()->UpdateCornerText();
+        }
       }
     break;
     }
