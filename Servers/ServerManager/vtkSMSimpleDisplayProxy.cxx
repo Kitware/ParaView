@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -817,6 +817,11 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions(
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::SetVolumeMapperToBunyk()
 {
+  if ( !this->HasVolumePipeline )
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Mapper"));
@@ -833,6 +838,11 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToBunyk()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::SetVolumeMapperToPT()
 {
+  if ( !this->HasVolumePipeline )
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Mapper"));
@@ -849,6 +859,11 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToPT()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::SetVolumeMapperToZSweep()
 {
+  if ( !this->HasVolumePipeline )
+    {
+    return;
+    }
+  
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Mapper"));
@@ -865,6 +880,11 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToZSweep()
 //-----------------------------------------------------------------------------
 int vtkSMSimpleDisplayProxy::GetVolumeMapperType()
 {
+  if ( !this->HasVolumePipeline )
+    {
+    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    }
+  
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Mapper"));

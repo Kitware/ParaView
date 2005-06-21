@@ -92,7 +92,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.35");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.36");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -110,7 +110,9 @@ public:
   void SetDisplayGUI( vtkPVDisplayGUI *gui )
     { this->DisplayGUI = gui; }
 
-  virtual void Execute( vtkObject *w, unsigned long event, void *data )
+  virtual void Execute( vtkObject *vtkNotUsed(w), 
+                        unsigned long vtkNotUsed(event), 
+                        void *vtkNotUsed(data) )
     { 
       if ( !this->DisplayGUI || !this->DisplayGUI->VolumeRenderMode )
         {
