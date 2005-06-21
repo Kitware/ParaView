@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.55");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.56");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -182,17 +182,21 @@ const char* vtkKWTkUtilities::EvaluateSimpleStringInternal(
   vtkObject *obj,
   const char *str)
 {
- if (Tcl_GlobalEval(interp, str) != TCL_OK && obj)
+  static vtksys_stl::string err;
+  
+  if (Tcl_GlobalEval(interp, str) != TCL_OK && obj)
     {
+    err = Tcl_GetStringResult(interp); // need to save now
     vtkErrorWithObjectMacro(
       obj, "\n    Script: \n" << str
       << "\n    Returned Error on line "
       << interp->errorLine << ": \n"  
-      << Tcl_GetStringResult(interp) << endl);
+      << err.c_str() << endl);
+    return err.c_str();
     }
   
   // Convert the Tcl result to its string representation.
-
+  
   return Tcl_GetStringResult(interp);
 }
 
