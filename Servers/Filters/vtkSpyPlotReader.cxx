@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.16");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.17");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -838,6 +838,9 @@ int vtkSpyPlotReader::RequestData(
   // return the specific process number
   int processNumber = info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int numProcessors =info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+  
+  // Update the timestep.
+  this->UpdateMetaData();
   
   int block;
   int field;
