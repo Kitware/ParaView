@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.131");
+vtkCxxRevisionMacro(vtkKWWidget, "1.132");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -191,11 +191,13 @@ int vtkKWWidget::CreateSpecificTkWidget(vtkKWApplication *app,
     this->GetDragAndDropTargetSet()->SetApplication(app);
     }
 
-  this->WidgetIsCreated = 1;
-
   const char *ret = NULL;
 
-  if (type)
+  if (!type)
+    {
+    this->WidgetIsCreated = 1;
+    }
+  else
     {
     if (args)
       {
@@ -211,6 +213,8 @@ int vtkKWWidget::CreateSpecificTkWidget(vtkKWApplication *app,
                     << " of type " << type << ": " << ret);
       return 0;
       }
+
+    this->WidgetIsCreated = 1;
 
     /* Update enable state
        At this point, the widget is considered created, although for all 
