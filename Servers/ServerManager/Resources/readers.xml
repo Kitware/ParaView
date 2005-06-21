@@ -779,6 +779,12 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
  <IntVectorProperty 
         name="DistributeFiles" 
         command="SetDistributeFiles" 

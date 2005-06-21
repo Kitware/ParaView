@@ -160,11 +160,14 @@ protected:
   // - number of time steps
   // - number of fields
   // - name of fields
-  int UpdateMetaData();
+  int UpdateMetaData(vtkInformation* request, 
+                     vtkInformationVector* outputVector);
 
   // Description:
   // This does the updating of the meta data of the case file
-  int UpdateCaseFile(const char *fname);
+  int UpdateCaseFile(const char *fname,
+                     vtkInformation* request, 
+                     vtkInformationVector* outputVector);
 
   void AddGhostLevelArray(int numLevels);
 

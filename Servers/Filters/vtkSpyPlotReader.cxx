@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.17");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.18");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -628,13 +628,13 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     this->SetCurrentFileName(this->FileName);
     this->Map->Clean();
     this->Map->Files[this->FileName]=spcth_initialize();
-    return this->UpdateMetaData();
+    return this->UpdateMetaData(request, outputVector);
     }
   else
     {
     if(strcmp(buffer,"spycase")==0)
       {
-      return this->UpdateCaseFile(this->FileName);
+      return this->UpdateCaseFile(this->FileName, request, outputVector);
       }
     else
       {
@@ -645,7 +645,9 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateCaseFile(const char *fname)
+int vtkSpyPlotReader::UpdateCaseFile(const char *fname,
+                                     vtkInformation* request, 
+                                     vtkInformationVector* outputVector)
 {
   // Check to see if this is the same filename as before
   // if so then I already have the meta info, so just return
@@ -694,11 +696,12 @@ int vtkSpyPlotReader::UpdateCaseFile(const char *fname)
 
   // Okay now open just the first file to get meta data
   vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << this->Map->Files.begin()->first.c_str());
-  return this->UpdateMetaData();
+  return this->UpdateMetaData(request, outputVector);
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateMetaData()
+int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
+                                     vtkInformationVector* outputVector)
 {
   vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator it;
   it=this->Map->Files.begin();
@@ -725,6 +728,23 @@ int vtkSpyPlotReader::UpdateMetaData()
   num_time_steps=spcth_getNumTimeSteps(spcth);
   this->TimeStepRange[1]=num_time_steps-1;
   
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+    {
+    double* timeStepValues = new double[num_time_steps];
+    for(i=0; i<num_time_steps; i++)
+      {
+      timeStepValues[i] = spcth_getTimeStepValue(spcth,i);
+      cout << "Time value for step " << i << " is " 
+           << timeStepValues[i]
+           << endl;
+      }
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+                 timeStepValues, 
+                 num_time_steps);
+    delete[] timeStepValues;
+    }
+
   this->CurrentTimeStep=this->TimeStep;
   if(this->CurrentTimeStep<0||this->CurrentTimeStep>=num_time_steps)
     {
@@ -799,7 +819,7 @@ enum
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::RequestData(
-  vtkInformation *vtkNotUsed(request),
+  vtkInformation *request,
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
@@ -840,7 +860,7 @@ int vtkSpyPlotReader::RequestData(
   int numProcessors =info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
   
   // Update the timestep.
-  this->UpdateMetaData();
+  this->UpdateMetaData(request, outputVector);
   
   int block;
   int field;
