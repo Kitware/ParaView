@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.113");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.114");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -953,6 +953,18 @@ void vtkPVFileEntry::UpdateTimeStep()
     return;
     }
 
+  // If the reader module has another time widget, do not show
+  // the time slider.
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
+  if (rm)
+    {
+    vtkPVWidget* tsw = rm->GetTimeStepWidget();
+    if (tsw && tsw != this)
+      {
+      return;
+      }
+    }
+
   this->IgnoreFileListEvents = 1;
   vtksys_stl::string file = vtksys::SystemTools::GetFilenameName(fileName);
   this->FileListSelect->AddFinalElement(file.c_str(), 1);
@@ -982,6 +994,7 @@ void vtkPVFileEntry::UpdateTimeStep()
       this->TimestepFrame->GetWidgetName());
     }
   this->IgnoreFileListEvents = 0;
+
 }
 
 //----------------------------------------------------------------------------

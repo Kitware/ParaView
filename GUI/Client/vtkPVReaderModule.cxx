@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.64");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.65");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -435,8 +435,8 @@ vtkPVWidget* vtkPVReaderModule::GetTimeStepWidget()
     return this->FileEntry;
     }
 
-  // 2) if not, search thru all the widgets and find one with KeepsTimeStep iVar set 
-  // and use it to get the timesteps.
+  // 2) if not, search thru all the widgets and find one with KeepsTimeStep
+  // iVar set and use it to get the timesteps.
   if (this->Widgets)
     {
     vtkPVWidget* toReturn = NULL;
