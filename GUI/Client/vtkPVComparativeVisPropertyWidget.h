@@ -23,7 +23,7 @@
 #ifndef __vtkPVComparativeVisPropertyWidget_h
 #define __vtkPVComparativeVisPropertyWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCompositeWidget.h"
 
 class vtkKWEntryLabeled;
 class vtkPVActiveTrackSelector;
@@ -33,11 +33,11 @@ class vtkPVSimpleAnimationCue;
 class vtkPVTrackEditor;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkPVComparativeVisPropertyWidget : public vtkKWWidget
+class VTK_EXPORT vtkPVComparativeVisPropertyWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkPVComparativeVisPropertyWidget* New();
-  vtkTypeRevisionMacro(vtkPVComparativeVisPropertyWidget,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVComparativeVisPropertyWidget,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
