@@ -77,6 +77,11 @@ private:
   vtkstd::vector<vtkstd::string> MPIPreFlags;
   vtkstd::vector<vtkstd::string> MPIPostFlags;
   
+  // For tiled display testing, we need to explicitly specify the preflags to
+  // use, so we need an option of ignoring any MPIPreFlags that may have
+  // been set.
+  int IgnoreMPIPreFlags;
+
   // MPIClientFlags / MPIServerFlags allows you to specify flags specific for 
   // the client or the server
   vtkstd::vector<vtkstd::string> MPIClientPreFlags;

@@ -177,7 +177,9 @@ FOREACH (tfile ${PROJECT_TESTS})
       ADD_TEST(${tfile}-ParaView-TILED-MPI 
         ${PARAVIEW_CS_EXECUTABLE}     
         --test-server
+        --ignore-mpi-preflags
         ${TIMEOUT}
+        --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
         --server-preflags ${VTK_MPI_SERVER_TD_PREFLAGS}
         --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
         --disable-registry 
@@ -194,7 +196,9 @@ FOREACH (tfile ${PROJECT_TESTS})
       ADD_TEST(${tfile}-ParaView-TILED-MPI 
         ${PARAVIEW_CS_EXECUTABLE}     
         --test-server
+        --ignore-mpi-preflags
         ${TIMEOUT}
+        --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
         --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
         --disable-registry 
         ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs

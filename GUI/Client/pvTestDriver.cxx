@@ -41,6 +41,7 @@ pvTestDriver::pvTestDriver()
   this->TestBatch = 0;
   this->TestServer = 0;
   this->ReverseConnection = 0;
+  this->IgnoreMPIPreFlags = 0;
 }
 
 pvTestDriver::~pvTestDriver()
@@ -234,6 +235,12 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ArgStart = i+2;
       fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
+    if (strncmp(argv[i], "--ignore-mpi-preflags", 21) == 0)
+      {
+      this->ArgStart = i+1;
+      this->IgnoreMPIPreFlags = 1;
+      fprintf(stderr, "Ignoring MPI PreFlags\n");
+      }
     }
 
   // check for the Other.pvs test
@@ -265,9 +272,12 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     commandLine.push_back(this->MPIRun.c_str());
     commandLine.push_back(this->MPINumProcessFlag.c_str());
     commandLine.push_back(numProc);
-    for(unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
+    if ( ! this->IgnoreMPIPreFlags )
       {
-      commandLine.push_back(this->MPIPreFlags[i].c_str());
+      for(unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
+        {
+        commandLine.push_back(this->MPIPreFlags[i].c_str());
+        }
       }
     // If there is specific flags for the client to pass to mpirun, add them
     if( strcmp( paraviewFlags, "--client" ) == 0)
