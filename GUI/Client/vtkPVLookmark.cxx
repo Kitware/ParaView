@@ -41,7 +41,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSMProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVArraySelection.h"
 #include "vtkCamera.h"
 #include "vtkPVScale.h"
@@ -64,10 +63,14 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkKWText.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.6");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -573,21 +576,27 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
 #ifdef PARAVIEW_USE_EXODUS
   vtkPVBasicDSPFilterWidget *dspWidget;
 #endif
+
   vtkPVSource *src;
   vtkPVWidget *pvWidget;
-  float tvalue=0;
+  char *ptr;
+  char *ptr1;
   char *ptr2;
   char *field;
-  double fval,xval,yval,zval; 
+  double fval; 
   int i=0;
   char *name = new char[50];
-  char *data = new char[50];
+  char data[50];
   char *tok;
   int val;
   char *readername=NULL; 
-  char *ptr1;
-  char *ptr;
   char cmd[200];
+  int ival;
+  char sval[100];
+  char str[100];
+
+  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVDisplayGUI *pvData = reader->GetPVOutput();
 
   this->Script("[winfo toplevel %s] config -cursor watch", 
                 this->GetWidgetName());
@@ -624,10 +633,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           if((scale = vtkPVScale::SafeDownCast(pvWidget)) && useDatasetFlag==1)
             {
             ptr = strtok(NULL,"\r\n");
-            tok = strstr(ptr,"SetValue");
-            tok+=9;
-            tvalue = atof(tok);
-            scale->SetValue(tvalue);
+            sscanf(ptr,"%*s %*s %lf",&fval);
+            scale->SetValue(fval);
             ptr = strtok(NULL,"\r\n");
             }
           else if((arraySelection = vtkPVArraySelection::SafeDownCast(pvWidget)))
@@ -647,9 +654,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           else if((labeledToggle = vtkPVLabeledToggle::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
-            val = this->GetIntegerScalarWidgetValue(ptr);
-            labeledToggle->SetState(val);
-//            labeledToggle->Accept();
+            sscanf(ptr,"%*s %*s %d",&ival);
+            labeledToggle->SetState(ival);
             labeledToggle->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
@@ -684,7 +690,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
-            vectorEntry->SetValue(this->GetVectorEntryValue(ptr));
+            sscanf(ptr,"%*s %*s %s",&sval);
+            vectorEntry->SetValue(sval);
             vectorEntry->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
@@ -696,8 +703,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
-            val = this->GetIntegerScalarWidgetValue(ptr);
-            selectionList->SetCurrentValue(val);
+            sscanf(ptr,"%*s %*s %d",&ival);
+            selectionList->SetCurrentValue(ival);
             selectionList->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
@@ -710,9 +717,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
-            minMaxWidget->SetMaxValue(this->GetIntegerScalarWidgetValue(ptr));
+            sscanf(ptr,"%*s %*s %d",&ival);
+            minMaxWidget->SetMaxValue(ival);
             ptr = strtok(NULL,"\r\n");
-            minMaxWidget->SetMinValue(this->GetIntegerScalarWidgetValue(ptr));
+            minMaxWidget->SetMinValue(ival);
+            minMaxWidget->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
 #ifdef PARAVIEW_USE_EXODUS
@@ -747,139 +756,89 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
       //update Display page
       reader->AcceptCallback();
 
-      // next line will either contain "ColorByProperty" "ColorByPointField" or "ColorByCellField"
-      vtkPVDisplayGUI *pvData = reader->GetPVOutput(); 
       ptr = strtok(NULL,"\r\n");
-
-      if(strstr(ptr,"ColorByCellField"))
+      // ignore comments
+      while(ptr[0]=='#')
         {
-        field = this->GetFieldNameAndValue(ptr,&val);
-        //pvData->ColorByCellField(field,val);
-        pvData->ColorByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
-        }
-      else if(strstr(ptr,"ColorByPointField"))
-        {
-        field = this->GetFieldNameAndValue(ptr,&val);
-        //pvData->ColorByPointField(field,val);
-        pvData->ColorByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
-        
-        }
-      else if(strstr(ptr,"ColorByProperty"))
-        {
-        pvData->ColorByProperty();
-        }
-
-      ptr = strtok(NULL,"\r\n");
-
-      if(strstr(ptr,"DrawVolume"))
-        {
-        pvData->DrawVolume();
-        ptr = strtok(NULL,"\r\n");
-        if(strstr(ptr,"VolumeRenderPointField"))
-          {
-          field = this->GetFieldNameAndValue(ptr,&val);
-          //pvData->VolumeRenderPointField(field,val);
-          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
-          }
-        else if(strstr(ptr,"VolumeRenderCellField"))
-          {
-          field = this->GetFieldNameAndValue(ptr,&val);
-          //pvData->VolumeRenderCellField(field,val);
-          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
-          }
         ptr = strtok(NULL,"\r\n");
         }
+
       // this line sets the partdisplay variable
-      ptr+=4;
-      ptr2 = ptr;
-      while(*ptr2!=' ')
-        ptr2++;
-      *ptr2='\0';
-      strcpy(data,ptr);
+      sscanf(ptr,"%*s %s %*s %*s",&data);
+
+      ptr = strtok(NULL,"\r\n");
 
       vtkSMDisplayProxy *display = reader->GetDisplayProxy();
       ptr = strtok(NULL,"\r\n");
+
       while(strstr(ptr,data)) 
         {
-        if(strstr(ptr,"SetColor"))
+        if(strstr(ptr,"UpdateVTKObjects"))
           {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetColorCM(xval,yval,zval);
+          display->UpdateVTKObjects();
+          ptr = strtok(NULL,"\r\n");
+          continue;
           }
-        else if(strstr(ptr,"SetRepresentation"))
+
+        sscanf(ptr,"%*s %*s %s %*s %*s %*s",&str);
+        ptr1 = strstr(str,"]");
+        *ptr1 = '\0';
+
+        // Borrowed the following code to loop through properties from vtkPVSource::SaveState()
+
+        vtkSMPropertyIterator* iter = reader->GetDisplayProxy()->NewPropertyIterator();
+
+        // Even in state we have to use ServerManager API for displays.
+        for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
           {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetRepresentationCM(val); 
+          vtkSMProperty* p = iter->GetProperty();
+          if(strcmp(str,p->GetXMLName()))
+            { 
+            continue;
+            }
+
+          vtkSMIntVectorProperty* ivp = 
+            vtkSMIntVectorProperty::SafeDownCast(p);
+          vtkSMDoubleVectorProperty* dvp = 
+            vtkSMDoubleVectorProperty::SafeDownCast(p);
+          vtkSMStringVectorProperty* svp =
+            vtkSMStringVectorProperty::SafeDownCast(p);
+          if (ivp)
+            {
+            sscanf(ptr,"%*s %*s %*s %*s %d %d",&val,&ival);
+            ivp->SetElement(val,ival);
+            }
+          else if (dvp)
+            {
+            sscanf(ptr,"%*s %*s %*s %*s %d %lf",&val,&fval);
+            dvp->SetElement(val,fval);
+            }
+          else if (svp)
+            {
+            sscanf(ptr,"%*s %*s %*s %*s %d %s",&val,&sval);
+            ptr1 = sval;
+            if(strstr(ptr1,"{"))
+              {
+              ptr1++;
+              ptr2 = strstr(sval,"}");
+              *ptr2 = '\0';
+              }
+            if(ptr1)
+              {
+              svp->SetElement(val,ptr1);
+              }
+            }
+
+          break;
           }
-        else if(strstr(ptr,"SetUseImmediateMode"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetImmediateModeRenderingCM(val); 
-          }
-        else if(strstr(ptr,"SetScalarVisibility"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetScalarVisibilityCM(val); 
-          }
-        else if(strstr(ptr,"SetDirectColorFlag"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          // when DirectColorFlag = 0,
-          // color mode is Default (=1).
-          // when DirectColorFlag = 1
-          // color mode is MapScalars (=0).
-          display->SetColorModeCM(!val); 
-          }
-        else if(strstr(ptr,"SetInterpolateColorsFlag"))
-          {
-          // This is "InterpolateColors" while property
-          // "InterpolateColorsBeforeMapping". 
-          // These are opposite concepts.
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetInterpolateScalarsBeforeMappingCM(val); 
-          }
-        else if(strstr(ptr,"SetInterpolation"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetInterpolationCM(val); 
-          }
-        else if(strstr(ptr,"SetPointSize"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetPointSizeCM(val); 
-          }
-        else if(strstr(ptr,"SetLineWidth"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetLineWidthCM(val); 
-          }
-        else if(strstr(ptr,"SetOpacity"))
-          {
-          fval = this->GetDoubleScalarWidgetValue(ptr);
-          display->SetOpacityCM(fval); 
-          }
-        else if(strstr(ptr,"SetTranslate"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetPositionCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetScale"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetScaleCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetOrigin"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetOriginCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetOrientation"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetOrientationCM(xval,yval,zval); 
-          }   
+
+        iter->Delete();
+
         ptr = strtok(NULL,"\r\n");
+
         }
+      win->SetCurrentPVSource(reader);
+
       break;
       }
     else
@@ -888,17 +847,19 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
       }
     }
 
-  if(strstr(ptr,readername) && strstr(ptr,"SetCubeAxesVisibility"))
+  if(strstr(ptr,"ColorByArray"))
     {
-    val = this->GetIntegerScalarWidgetValue(ptr);
-    reader->SetCubeAxesVisibility(val);
-    ptr = strtok(NULL,"\r\n");
+    field = this->GetFieldNameAndValue(ptr,&val);
+    pvData->ColorByArray(field, val);
     }
-  if(strstr(ptr,readername) && strstr(ptr,"SetPointLabelVisibility"))
+  else if(strstr(ptr,"VolumeRenderByArray"))
     {
-    val = this->GetIntegerScalarWidgetValue(ptr);
-    reader->SetPointLabelVisibility(val);
-    ptr = strtok(NULL,"\r\n");
+    field = this->GetFieldNameAndValue(ptr,&val);
+    pvData->VolumeRenderByArray(field, val);
+    }
+  else if(strstr(ptr,"ColorByProperty"))
+    {
+    pvData->ColorByProperty();
     }
 
   reader->GetPVOutput()->Update();
@@ -939,14 +900,14 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
 
       //add all pvsources created by this lmk to its collection
       this->AddPVSource(src);
-//      src->SetPVLookmark(this);
+      //src->SetPVLookmark(this);
       delete [] srcLabel;
       }
 
     if(strstr(ptr,"SetVisibility") && strstr(ptr,readername))
       {
-      val = this->GetIntegerScalarWidgetValue(ptr);
-      reader->SetVisibility(val);
+      sscanf(ptr,"%*s %*s %d",&ival);
+      reader->SetVisibility(ival);
       }
 
     if(strstr(ptr,readername) || (useDatasetFlag==0 && strstr(ptr,"SetCameraState")))
@@ -985,9 +946,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
 
   this->GetPVRenderView()->EndBlockingRender();
 
-
   delete [] name;
-  delete [] data;
   delete [] readername;
 }
 
@@ -1076,27 +1035,19 @@ int vtkPVLookmark::GetArrayStatus(char *name, char *line)
 //----------------------------------------------------------------------------
 int vtkPVLookmark::GetIntegerScalarWidgetValue(char *ptr)
 {
-  char *ptr2 = ptr;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  return atoi(ptr2);
+  int ret;
+  sscanf(ptr,"%*s %*s %*s %*s %*s %d",&ret);
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
 double vtkPVLookmark::GetDoubleScalarWidgetValue(char *ptr)
 {
-  char *ptr2 = ptr;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  return atof(ptr2);
+  double retd;
+  sscanf(ptr,"%*s %*s %*s %*s %*s %lf",&retd);
+
+  return retd;
 }
 
 //----------------------------------------------------------------------------
@@ -1195,6 +1146,7 @@ void vtkPVLookmark::AddPVSource(vtkPVSource *pvs)
 {
   this->Sources->AddItem(pvs);
 }
+
 
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVLookmark::GetPVRenderView()
