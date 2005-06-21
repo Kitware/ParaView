@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.445");
+vtkCxxRevisionMacro(vtkPVSource, "1.446");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1096,7 +1096,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // it to the annotation. In time, all readers that support time
     // (and know about the actual time values) should provide this
     // information.
-    if (this->Proxy->GetProperty("TimestepValues"))
+    vtkSMProperty* tsvProp = this->Proxy->GetProperty("TimestepValues");
+    if (tsvProp)
       {
       vtkPVCornerAnnotationEditor* annot =
         this->GetPVRenderView()->GetCornerAnnotation();
@@ -1118,7 +1119,12 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         << ends;
       annot->SetCornerText(cornerText.str(), 1);
       delete[] cornerText.str();
-      annot->SetVisibility(1);
+      vtkSMVectorProperty* vecProp = vtkSMVectorProperty::SafeDownCast(
+        tsvProp);
+      if (!vecProp || (vecProp && vecProp->GetNumberOfElements() > 1))
+        {
+        annot->SetVisibility(1);
+        }
       }
 
     // One may be tempted to move this to the start of this if condition,
