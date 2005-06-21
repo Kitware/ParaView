@@ -25,6 +25,10 @@
 #include "vtkPVTracedWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
 
+#include "vtkPVConfig.h" // Needed for PARAVIEW_USE_LOOKMARKS
+#ifdef PARAVIEW_USE_LOOKMARKS
+class vtkPVLookmark;
+#endif
 class vtkCollection;
 class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
@@ -47,6 +51,7 @@ class vtkSMCubeAxesDisplayProxy;
 class vtkSMPointLabelDisplayProxy;
 class vtkPVColorMap;
 class vtkPVDisplayGUI;
+
 
 class VTK_EXPORT vtkPVSource : public vtkPVTracedWidget
 {
@@ -487,6 +492,16 @@ public:
 
   // Description:
   void MarkSourcesForUpdate();
+
+  // Description
+  // If this source was created from a lookmark (state script), need to delete it from the lookmark's
+  // source collection when manually deleted by user (otherwise we end up with some funky residual images
+  // in render window as well as crashes when modifying an input of this source).
+#ifdef PARAVIEW_USE_LOOKMARKS
+  void SetLookmark(vtkPVLookmark *lookmark);
+  vtkGetObjectMacro(Lookmark,vtkPVLookmark);
+#endif
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -626,6 +641,10 @@ protected:
 //BTX
   friend class vtkPVWindow;
 //ETX 
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  vtkPVLookmark *Lookmark;
+#endif
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented

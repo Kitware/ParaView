@@ -106,6 +106,8 @@ public:
   // need to find a better way.
   void EnableScrollBar();
 
+  void RemovePVSource(vtkPVSource *src);
+
 protected:
 
   vtkPVLookmark();

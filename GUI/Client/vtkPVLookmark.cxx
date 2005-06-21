@@ -70,7 +70,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.7");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -900,7 +900,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
 
       //add all pvsources created by this lmk to its collection
       this->AddPVSource(src);
-      //src->SetPVLookmark(this);
+      src->SetLookmark(this);
       delete [] srcLabel;
       }
 
@@ -1145,6 +1145,12 @@ int vtkPVLookmark::DeletePVSources()
 void vtkPVLookmark::AddPVSource(vtkPVSource *pvs)
 {
   this->Sources->AddItem(pvs);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::RemovePVSource(vtkPVSource *pvs)
+{
+  this->Sources->RemoveItem(pvs);
 }
 
 

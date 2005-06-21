@@ -56,13 +56,19 @@
 #include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkPVTraceHelper.h"
+#ifdef PARAVIEW_USE_LOOKMARKS
+#include "vtkPVLookmark.h"
+#endif
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.446");
+vtkCxxRevisionMacro(vtkPVSource, "1.447");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
+#ifdef PARAVIEW_USE_LOOKMARKS
+vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
+#endif
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -138,6 +144,10 @@ vtkPVSource::vtkPVSource()
   this->PVColorMap = 0;  
 
   this->ResetInSelect = 1;
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  this->Lookmark = 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -203,6 +213,10 @@ vtkPVSource::~vtkPVSource()
   this->SetModuleName(0);
   this->SetPVColorMap(0);
   this->SetSourceList(0);
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  this->SetLookmark(0);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1765,6 +1779,15 @@ void vtkPVSource::DeleteCallback()
     }
   this->SetNotebook(0);
   
+  // Delete reference to this pvsource in lookmark if necessary
+#ifdef PARAVIEW_USE_LOOKMARKS
+  if (this->Lookmark)
+    {
+    this->Lookmark->RemovePVSource(this);
+    }
+  this->SetLookmark(0);
+#endif
+
   if ( initialized )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2843,6 +2866,18 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
   os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  os << indent << "Lookmark: ";
+  if( this->Lookmark )
+    {
+    this->Lookmark->PrintSelf( os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+#endif //PARAVIEW_USE_LOOKMARKS
 }
 
 //----------------------------------------------------------------------------
