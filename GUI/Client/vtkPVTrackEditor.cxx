@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.8");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.9");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -332,14 +332,16 @@ void vtkPVTrackEditor::ShowKeyFrame(int id)
 
   //Get rid of old times.
   pvKeyFrame->ClearTimeBounds();
+  double min_bound = 0.0;
   if (id > 0)
     {
     vtkPVKeyFrame* prev = this->SimpleAnimationCue->GetKeyFrame(id-1);
     if (prev)
       {
-      pvKeyFrame->SetTimeMinimumBound(prev->GetKeyTime());
+      min_bound = prev->GetKeyTime();
       }
     }
+  pvKeyFrame->SetTimeMinimumBound(min_bound);
 
   if (id < this->SimpleAnimationCue->GetNumberOfKeyFrames()-1)
     {
@@ -354,9 +356,9 @@ void vtkPVTrackEditor::ShowKeyFrame(int id)
     {
     this->InterpolationValid = 0;// last key frame does not use Interpolation.
     }
+  pvKeyFrame->SetTimeChangeable((id==0)? 0 : 1);
   pvKeyFrame->PrepareForDisplay();
   this->UpdateTypeImage(pvKeyFrame);
-  
 }
 
 //-----------------------------------------------------------------------------
@@ -460,8 +462,8 @@ void vtkPVTrackEditor::Update()
     this->IndexScale->SetRange(1, this->SimpleAnimationCue->GetNumberOfKeyFrames());
     this->ShowKeyFrame(id);
     this->IndexScale->SetValue(id+1);
-    this->UpdateEnableState();
     this->Script("grid %s - -row 1 -sticky ew", this->PropertiesFrame->GetWidgetName());
+    this->UpdateEnableState();
     }
 
   if (this->SimpleAnimationCue == NULL)
@@ -569,7 +571,11 @@ void vtkPVTrackEditor::UpdateEnableState()
   this->PropagateEnableState(this->TypeImage);
   this->PropagateEnableState(this->IndexScale);
   this->PropagateEnableState(this->KeyFramePropertiesFrame);
-  this->PropagateEnableState(this->ActiveKeyFrame);
+  if (this->ActiveKeyFrame)
+    {
+    this->PropagateEnableState(this->ActiveKeyFrame);
+    this->ActiveKeyFrame->UpdateEnableState();
+    }
   this->PropagateEnableState(this->AddKeyFrameButton);
   
   if (this->SimpleAnimationCue && 

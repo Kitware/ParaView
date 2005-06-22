@@ -120,6 +120,12 @@ public:
   // Copies the values from argument.
   // If the two differ in type, only corresponding properies are copied over;
   virtual void Copy(vtkPVKeyFrame* fromKF);
+
+  // Description:
+  // Get/Set if the time for this key frame is changeable. 
+  // If not the widget is disabled. Default is true.
+  vtkSetMacro(TimeChangeable, int);
+  vtkGetMacro(TimeChangeable, int);
 protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
@@ -152,6 +158,9 @@ protected:
 
   double TimeBounds[2];
   double Duration;
+
+  int TimeChangeable; // flag indicating of the time can be changed.
+    //if not the entry for time is disabled. Default is true.
   vtkPVAnimationScene* AnimationScene;
 
 private:

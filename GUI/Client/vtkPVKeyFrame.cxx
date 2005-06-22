@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.20");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.21");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -89,6 +89,7 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->Name = NULL;
   this->AnimationScene = 0;
   this->Duration = 1.0;
+  this->TimeChangeable = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,7 +181,6 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->TimeThumbWheel->SetParent(this);
   this->TimeThumbWheel->PopupModeOn();
   this->TimeThumbWheel->SetValue(0.0);
-  this->TimeThumbWheel->SetMinimumValue(0.0);
   this->TimeThumbWheel->SetResolution(0.01);
   this->TimeThumbWheel->Create(app);
   this->TimeThumbWheel->DisplayEntryOn();
@@ -297,18 +297,24 @@ void vtkPVKeyFrame::ClearTimeBounds()
 {
   this->TimeBounds[0] = -0.1;
   this->TimeBounds[1] = 1.1;
+  this->TimeThumbWheel->ClampMinimumValueOff();
+  this->TimeThumbWheel->ClampMaximumValueOff();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetTimeMinimumBound(double min)
 {
   this->TimeBounds[0] = min;
+  this->TimeThumbWheel->SetMinimumValue(min);
+  this->TimeThumbWheel->ClampMinimumValueOn();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 {
   this->TimeBounds[1] = max;
+  this->TimeThumbWheel->SetMaximumValue(max);
+  this->TimeThumbWheel->ClampMaximumValueOn();
 }
 
 //-----------------------------------------------------------------------------
@@ -354,7 +360,14 @@ void vtkPVKeyFrame::Copy(vtkPVKeyFrame* fromKF)
 void vtkPVKeyFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-  this->PropagateEnableState(this->TimeThumbWheel);
+  if (this->TimeChangeable)
+    {
+    this->PropagateEnableState(this->TimeThumbWheel);
+    }
+  else
+    {
+    this->TimeThumbWheel->SetEnabled(0);
+    }
 }
 
 //-----------------------------------------------------------------------------

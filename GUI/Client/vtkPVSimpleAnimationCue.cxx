@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.12");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.13");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -1097,12 +1097,6 @@ void vtkPVSimpleAnimationCue::StartRecording()
     this->PropertyStatusManager->InitializeStatus();
     }
   this->InRecording = 1;
-  /*
-  if (!this->Virtual)
-    {
-    this->TimeLine->DisableAddAndRemoveOn();
-    }
-    */
   this->PreviousStepKeyFrameAdded = 0;
 }
 
@@ -1114,12 +1108,6 @@ void vtkPVSimpleAnimationCue::StopRecording()
     return;
     }
   this->InRecording = 0;
-  /*
-  if (!this->Virtual)
-    {
-    this->TimeLine->SetDisableAddAndRemove(0);
-    }
-    */
 }
 
 //-----------------------------------------------------------------------------
