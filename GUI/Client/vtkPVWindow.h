@@ -779,6 +779,8 @@ protected:
   int SaveVisibleSourcesOnlyFlag;
 
 #ifdef PARAVIEW_USE_LOOKMARKS
+  vtkKWToolbar *LookmarkToolbar;
+  vtkKWPushButton *LookmarkButton;
   vtkPVLookmarkManager *PVLookmarkManager;
 #endif
 
