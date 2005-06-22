@@ -21,12 +21,13 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkPVOptions.h"
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
   this->CollectProxy = 0;
   this->LODCollectProxy = 0;
+  this->VolumeCollectProxy = 0;
 
   // When created, collection is off.
   // I set these to -1 to ensure the decision is propagated.
@@ -39,6 +40,7 @@ vtkSMCompositeDisplayProxy::~vtkSMCompositeDisplayProxy()
 {
   this->CollectProxy = 0;
   this->LODCollectProxy = 0;
+  this->VolumeCollectProxy = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,6 +67,23 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
   this->CollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->LODCollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   
+  if (this->HasVolumePipeline)
+    {
+    this->VolumeCollectProxy = this->GetSubProxy("VolumeCollect");
+
+    if (!this->VolumeCollectProxy)
+      {
+      vtkErrorMacro("Failed to find SubProxy VolumeCollect.");
+      return;
+      }
+
+    this->VolumeCollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->RemoveSubProxy("VolumeCollect");
+    }
+
   this->Superclass::CreateVTKObjects(numObjects);
 
   if (!this->ObjectsCreated)
@@ -209,6 +228,105 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
 
   this->LODCollectProxy->UpdateVTKObjects();
   this->CollectProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
+{
+  if (!this->HasVolumePipeline)
+    {
+    return;
+    }
+
+  this->Superclass::SetupVolumePipeline();
+
+  vtkSMInputProperty *ip;
+  vtkClientServerStream stream;
+
+  for (unsigned int i = 0; i < this->VolumeCollectProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID(i) << "GetUnstructuredGridOutput"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+                                  vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    }
+
+  ip = vtkSMInputProperty::SafeDownCast(
+                                this->VolumeCollectProxy->GetProperty("Input"));
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeFilterProxy);
+
+  this->VolumeCollectProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
+{
+  if (!this->HasVolumePipeline)
+    {
+    return;
+    }
+  this->Superclass::SetupVolumeDefaults();
+
+  this->SetupCollectionFilter(this->VolumeCollectProxy);
+
+  for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+    {
+    vtkClientServerStream cmd;
+    vtkClientServerStream stream;
+    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
+                                          vtkProcessModule::GetProcessModule());
+
+    cmd << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID() << "LogStartEvent"
+        << "Execute VolumeCollect"
+        << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID(i) << "AddObserver" << "StartEvent"
+      << cmd << vtkClientServerStream::End;
+    cmd.Reset();
+    cmd << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID() << "LogEndEvent"
+        << "Execute VolumeCollect"
+        << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID(i) << "AddObserver" << "EndEvent"
+      << cmd << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetSocketController"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID(i) << "SetSocketController"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
+    // Special condition to signal the client.
+    // Because both processes of the Socket controller think they are 0!!!!
+    if (pm->GetClientMode())
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << this->VolumeCollectProxy->GetID(i) << "SetController" << 0
+        << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

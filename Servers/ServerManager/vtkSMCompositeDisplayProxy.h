@@ -52,12 +52,16 @@ protected:
   virtual void SetupPipeline();
   virtual void SetupDefaults();
 
+  virtual void SetupVolumePipeline();
+  virtual void SetupVolumeDefaults();
+
 
   virtual void CreateVTKObjects(int numObjects);
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
 
   vtkSMProxy* CollectProxy;
   vtkSMProxy* LODCollectProxy;
+  vtkSMProxy* VolumeCollectProxy;
 
   int CollectionDecision;
   int LODCollectionDecision;

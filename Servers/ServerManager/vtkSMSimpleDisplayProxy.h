@@ -156,6 +156,7 @@ protected:
   vtkSMProxy *ActorProxy; 
 
   vtkSMProxy* VolumeFilterProxy;
+  vtkSMProxy* VolumeUpdateSuppressorProxy;
   vtkSMProxy* VolumePTMapperProxy;
   vtkSMProxy* VolumeBunykMapperProxy;
   vtkSMProxy* VolumeZSweepMapperProxy;
@@ -184,6 +185,7 @@ protected:
   int Representation;
   
   int GeometryIsValid;
+  int VolumeGeometryIsValid;
   int CanCreateProxy;
 
   void InvalidateGeometryInternal();

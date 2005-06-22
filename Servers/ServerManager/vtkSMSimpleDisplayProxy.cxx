@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -46,9 +46,11 @@ vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
   this->PropertyProxy = 0;
   this->ActorProxy = 0;
   this->GeometryIsValid = 0;
+  this->VolumeGeometryIsValid = 0;
   this->CanCreateProxy = 0;
 
   this->VolumeFilterProxy = 0;
+  this->VolumeUpdateSuppressorProxy = 0;
   this->VolumePTMapperProxy = 0;
   this->VolumeBunykMapperProxy = 0;
   this->VolumeZSweepMapperProxy = 0;
@@ -76,6 +78,7 @@ vtkSMSimpleDisplayProxy::~vtkSMSimpleDisplayProxy()
   this->ActorProxy = 0;
 
   this->VolumeFilterProxy = 0;
+  this->VolumeUpdateSuppressorProxy = 0;
   this->VolumePTMapperProxy = 0;
   this->VolumeBunykMapperProxy = 0;
   this->VolumeZSweepMapperProxy = 0;
@@ -116,15 +119,20 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
   if (this->HasVolumePipeline)
     {
     this->VolumeFilterProxy = this->GetSubProxy("VolumeFilter");
+    this->VolumeUpdateSuppressorProxy
+      = this->GetSubProxy("VolumeUpdateSuppressor");
     this->VolumePTMapperProxy = this->GetSubProxy("VolumePTMapper");
     this->VolumeBunykMapperProxy = this->GetSubProxy("VolumeBunykMapper");
     this->VolumeZSweepMapperProxy = this->GetSubProxy("VolumeZSweepMapper");
     this->VolumeActorProxy = this->GetSubProxy("VolumeActor");
     this->VolumePropertyProxy = this->GetSubProxy("VolumeProperty");
     this->OpacityFunctionProxy = this->GetSubProxy("OpacityFunction");
-    this->ColorTransferFunctionProxy = this->GetSubProxy("ColorTransferFunction");
+    this->ColorTransferFunctionProxy
+      = this->GetSubProxy("ColorTransferFunction");
 
-    this->VolumeFilterProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    this->VolumeFilterProxy->SetServers(vtkProcessModule::DATA_SERVER);
+    this->VolumeUpdateSuppressorProxy->SetServers(
+                                          vtkProcessModule::CLIENT_AND_SERVERS);
     this->VolumePTMapperProxy->SetServers(
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     this->VolumeBunykMapperProxy->SetServers(
@@ -144,6 +152,7 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
     {
     // Remove all volume related subproxies (so that they are not created).
     this->RemoveSubProxy("VolumeFilter");
+    this->RemoveSubProxy("VolumeUpdateSuppressor");
     this->RemoveSubProxy("VolumePTMapper");
     this->RemoveSubProxy("VolumeBunykMapper");
     this->RemoveSubProxy("VolumeZSweepMapper");
@@ -485,6 +494,28 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
 
   vtkSMInputProperty* ip;
   vtkSMProxyProperty* pp;
+  vtkSMStringVectorProperty* svp;
+  
+  ip = vtkSMInputProperty::SafeDownCast(
+                       this->VolumeUpdateSuppressorProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on VolumeUpdateSuppressor.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->VolumeFilterProxy);
+
+  svp  = vtkSMStringVectorProperty::SafeDownCast(
+                  this->VolumeUpdateSuppressorProxy->GetProperty("OutputType"));
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property OutputType on "
+                  "VolumeUpdateSuppressorProxy.");
+    return;
+    }
+  svp->SetElement(0,"vtkUnstructuredGrid");
+  this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->VolumePTMapperProxy->GetProperty("Input"));
@@ -494,7 +525,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
     return;
     }
   ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeFilterProxy);
+  ip->AddProxy(this->VolumeUpdateSuppressorProxy);
 
 
   ip = vtkSMInputProperty::SafeDownCast(
@@ -505,7 +536,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
     return;
     }
   ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeFilterProxy);
+  ip->AddProxy(this->VolumeUpdateSuppressorProxy);
 
 
   ip = vtkSMInputProperty::SafeDownCast(
@@ -516,7 +547,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
     return;
     }
   ip->RemoveAllProxies();
-  ip->AddProxy(this->VolumeFilterProxy);
+  ip->AddProxy(this->VolumeUpdateSuppressorProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->VolumeActorProxy->GetProperty("Mapper"));
@@ -582,6 +613,41 @@ void vtkSMSimpleDisplayProxy::SetupVolumeDefaults()
     return;
     }
   ivp->SetElement(0, 0);
+
+  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
+                                          vtkProcessModule::GetProcessModule());
+  if (!pm)
+    {
+    vtkErrorMacro("ProcessModule should be set before setting up the display "
+                  "pipeline.");
+    return;
+    }
+  vtkClientServerStream stream;
+  unsigned int i;
+  // Init UpdateSuppressor properties.
+  // Seems like we can't use properties for this 
+  // to work properly.
+  for (i = 0; i < this->VolumeUpdateSuppressorProxy->GetNumberOfIDs(); i++)
+    {
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID(i)
+      << "SetUpdateNumberOfPieces"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(this->VolumeUpdateSuppressorProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -990,6 +1056,7 @@ void vtkSMSimpleDisplayProxy::InvalidateGeometry()
 void vtkSMSimpleDisplayProxy::InvalidateGeometryInternal()
 {
   this->GeometryIsValid = 0;
+  this->VolumeGeometryIsValid = 0;
   this->GeometryInformationIsValid = 0;
   if (this->UpdateSuppressorProxy)
     {
@@ -1001,14 +1068,28 @@ void vtkSMSimpleDisplayProxy::InvalidateGeometryInternal()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::Update()
 {
-  if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
+  if (this->VolumeRenderMode)
     {
-    return;
+    if (this->VolumeGeometryIsValid || !this->VolumeUpdateSuppressorProxy)
+      {
+      return;
+      }
+    vtkSMProperty *p
+      = this->VolumeUpdateSuppressorProxy->GetProperty("ForceUpdate");
+    p->Modified();
+    this->VolumeGeometryIsValid = 1;
     }
-  vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
-  p->Modified();
-  this->GeometryIsValid = 1;
-  this->GeometryInformationIsValid = 0;
+  else
+    {
+    if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
+      {
+      return;
+      }
+    vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
+    p->Modified();
+    this->GeometryIsValid = 1;
+    this->GeometryInformationIsValid = 0;
+    }
   this->UpdateVTKObjects();
 }
 
@@ -1101,6 +1182,8 @@ void vtkSMSimpleDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertyProxy: " << this->PropertyProxy << endl;
   os << indent << "ActorProxy: " << this->ActorProxy << endl;
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
+  os << indent << "VolumeGeometryIsValid: "
+     << this->VolumeGeometryIsValid << endl;
   os << indent << "HasVolumePipeline: " << this->HasVolumePipeline << endl;
   os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
   os << indent << "SupportsBunykMapper: " << this->SupportsBunykMapper << endl;

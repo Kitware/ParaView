@@ -2247,6 +2247,16 @@
       </SubProxy>
 
       <SubProxy>
+        <Proxy name="VolumeUpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="UpdateSuppressor">
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="OutputType" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="VolumeBunykMapper" 
           proxygroup="mappers" 
           proxyname="UnstructuredGridVolumeRayCastMapper">
@@ -2396,6 +2406,15 @@
       <SubProxy>
         <Proxy name="LODCollect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeCollect"
+               proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+        <ShareProperties subproxy="Collect">
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
     </CompositeDisplayProxy>
 
