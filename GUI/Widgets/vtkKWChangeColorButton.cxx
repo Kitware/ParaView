@@ -17,10 +17,11 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.56");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.57");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -38,7 +39,7 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
 
   this->LabelOutsideButton = 0;
 
-  this->DialogText = 0;
+  this->DialogText = NULL;
 
   this->ColorButton = vtkKWLabel::New();
   this->ButtonFrame = vtkKWFrame::New();
@@ -56,7 +57,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
     delete [] this->Command;
     }
 
-  this->SetDialogText(0);
+  this->SetDialogText(NULL);
 
   if (this->ColorButton)
     {
@@ -74,7 +75,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::SetColor(double r, double g, double b)
 {
-  if ( this->Color[0] == r && this->Color[1] == g && this->Color[2] == b )
+  if (this->Color[0] == r && this->Color[1] == g && this->Color[2] == b)
     {
     return;
     }
@@ -260,26 +261,16 @@ void vtkKWChangeColorButton::UpdateColorButton()
 
   if (this->GetEnabled())
     {
-    if ( this->Color[0] < 0 ) { this->Color[0] = 0; }
-    if ( this->Color[1] < 0 ) { this->Color[1] = 0; }
-    if ( this->Color[2] < 0 ) { this->Color[2] = 0; }
-    char color[256];
-    sprintf(color, "#%02x%02x%02x", 
-            (int)(this->Color[0] * 255.5), 
-            (int)(this->Color[1] * 255.5), 
-            (int)(this->Color[2] * 255.5));
-    this->Script("%s configure -bg %s", 
-                 this->ColorButton->GetWidgetName(), color);
+    this->ColorButton->SetBackgroundColor(this->Color);
     }
   else
     {
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 3)
-    this->Script("%s configure -bg #808080", 
-                 this->ColorButton->GetWidgetName());
+    this->ColorButton->SetBackgroundColor(0.5, 0.5, 0.5);
 #else
-    this->Script("%s configure -bg [%s cget -disabledforeground] ", 
-                 this->ColorButton->GetWidgetName(), 
-                 this->ColorButton->GetWidgetName());
+    this->ColorButton->SetBackgroundColor(
+      vtkKWTkUtilities::GetOptionColor(
+        this->ColorButton, "-disabledforeground"));
 #endif   
     }
 }
@@ -362,8 +353,7 @@ void vtkKWChangeColorButton::UnBind()
 void vtkKWChangeColorButton::ButtonPressCallback()
 {  
   this->ButtonDown = 1;
-  this->Script("%s configure -relief sunken", 
-               this->ButtonFrame->GetWidgetName());  
+  this->ButtonFrame->SetReliefToSunken();
 }
 
 //----------------------------------------------------------------------------
@@ -375,10 +365,7 @@ void vtkKWChangeColorButton::ButtonReleaseCallback()
     }
   
   this->ButtonDown = 0;
-  
-  this->Script("%s configure -relief raised", 
-               this->ButtonFrame->GetWidgetName());  
-
+  this->ButtonFrame->SetReliefToRaised();
   this->QueryUserForColor();
 }
 
@@ -432,7 +419,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
      (int)(this->Color[1] * 255.5), 
      (int)(this->Color[2] * 255.5),
      (this->DialogText?this->DialogText:"Choose Color"),
-     this->GetWidgetName() );
+     this->GetWidgetName());
 
   this->GetApplication()->UnRegisterDialogUp(this);
 
@@ -455,7 +442,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
 
     this->UpdateColorButton();
 
-    if ( this->Command )
+    if (this->Command)
       {
       this->Script("eval %s %lf %lf %lf", 
                    this->Command, 
@@ -465,10 +452,9 @@ void vtkKWChangeColorButton::QueryUserForColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetCommand( vtkKWObject* CalledObject, 
-                                         const char *CommandString )
+void vtkKWChangeColorButton::SetCommand(vtkKWObject* obj, const char *method)
 {
-  this->SetObjectMethodCommand(&this->Command, CalledObject, CommandString);
+  this->SetObjectMethodCommand(&this->Command, obj, method);
 }
 
 //----------------------------------------------------------------------------

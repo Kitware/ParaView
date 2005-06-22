@@ -41,9 +41,9 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set/Get the current color
-  void SetColor(double c[3]) {this->SetColor(c[0], c[1], c[2]);};
-  void SetColor(double r, double g, double b);
+  // Set/Get the current color (RGB space)
+  virtual void SetColor(double c[3]) {this->SetColor(c[0], c[1], c[2]);};
+  virtual void SetColor(double r, double g, double b);
   virtual double *GetColor() {return this->Color;};
 
   // Description:
@@ -52,11 +52,9 @@ public:
   vtkGetStringMacro(DialogText);
 
   // Description:
-  // Set the command that is called when the color is changed - the object is
-  // the KWObject that will have the method called on it.  The second argument
-  // is the name of the method to be called and any arguments in string form.
+  // Set the command that is called when the color is changed.
   // Note that the current color is passed too, as 3 RGB (double) parameters.
-  virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetCommand(vtkKWObject *obj, const char *method);
 
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -70,13 +68,9 @@ public:
   vtkBooleanMacro(LabelOutsideButton, int);
 
   // Description:
-  // Query user for color
-  void QueryUserForColor();
-
-  // Description:
   // Callbacks (handle button press and release events, etc.)
-  void ButtonPressCallback();
-  void ButtonReleaseCallback();
+  virtual void ButtonPressCallback();
+  virtual void ButtonReleaseCallback();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -99,16 +93,24 @@ protected:
   double      Color[3];
   int         LabelOutsideButton;
 
-  void Bind();
-  void UnBind();
-  void UpdateColorButton();
+  // Description:
+  // Add/Remove interaction bindings
+  virtual void Bind();
+  virtual void UnBind();
 
+  // Description:
+  // Update the color of the button given the current color, or use
+  // a 'disabled' color if the object is disabled.
+  virtual void UpdateColorButton();
+
+  // Description:
+  // Query user for color
+  virtual void QueryUserForColor();
+
+  // Description:
   // Pack or repack the widget
-
   virtual void Pack();
 
-  int ButtonDown;
-  
   // Description:
   // Create the label (override the superclass)
   virtual void CreateLabel(vtkKWApplication *app);
@@ -118,6 +120,9 @@ protected:
   virtual void CreateButtonFrame(vtkKWApplication *app);
 
 private:
+
+  int ButtonDown;
+  
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
   void operator=(const vtkKWChangeColorButton&); // Not implemented
 };
