@@ -22,8 +22,10 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
+#include "vtkMultiThreader.h"
+#include "vtkMutexLock.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.18");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.19");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -31,6 +33,10 @@ vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplicatio
 vtkPVProcessModuleGUIHelper::vtkPVProcessModuleGUIHelper()
 {
   this->PVApplication = 0;
+  this->StartupInterp = 0;
+  this->StartupThreadManager = 0;
+  this->StartupPID = 0;
+  this->StartupDone = 1;
 }
 
 vtkPVProcessModuleGUIHelper::~vtkPVProcessModuleGUIHelper()
@@ -138,7 +144,6 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* )
   vtkErrorMacro("Could not find server. Client must exit.");
   return 0;
 }
-
   
 void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
 {  
@@ -194,3 +199,150 @@ void vtkPVProcessModuleGUIHelper::ExitApplication()
   this->PVApplication->Exit();
 }
 
+void vtkPVProcessModuleGUIHelper::OpenReverseConnectionDialog()
+{ 
+  char name[] = "Reverse Connection";
+  char *n = name;
+  char** args = &n;
+  ostrstream str, str2, str3;
+  int allw, allh, winw, winh;
+
+  this->StartupInterp = vtkKWApplication::InitializeStartupTcl(1, args);
+  
+#ifdef _WIN32
+  str << "option add *font {{MS Sans Serif} 8}" << endl;
+#else
+  str << "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1" << endl;
+  str << "option add *highlightThickness 0" << endl;
+  str << "option add *highlightBackground #ccc" << endl;
+  str << "option add *activeBackground #eee" << endl;
+  str << "option add *activeForeground #000" << endl;
+  str << "option add *background #ccc" << endl;
+  str << "option add *foreground #000" << endl;
+  str << "option add *Entry.background #ffffff" << endl;
+  str << "option add *Text.background #ffffff" << endl;
+  str << "option add *Button.padX 6" << endl;
+  str << "option add *Button.padY 3" << endl;
+#endif
+  str << "toplevel .waiting" << endl;
+  str << "message .waiting.message -text {Waiting for server...}" << endl;
+  str << "pack .waiting.message" << endl;
+  str << "proc shutdown {} {" << endl;
+  //this is ugly, should register a callback and then close down nicely instead
+  //but while this is up, nothing should be happening anyway
+  str << "  exit 0" << endl;
+  str << "}" << endl;
+  str << "button .waiting.quitbutton -text {Quit} -command {shutdown}" << endl;
+  str << "pack .waiting.quitbutton" << endl;
+  str << "update" << endl;
+  str << ends;
+  if (Tcl_GlobalEval(this->StartupInterp, str.str()) != TCL_OK)
+    {
+      vtkErrorMacro("Open ReverseConnection dialog failure.");
+    }
+
+  str2 << "concat [winfo screenwidth .] [winfo screenheight .] [winfo width .waiting] [winfo height .waiting]" << endl;
+  str2 << ends;
+
+  if (Tcl_GlobalEval(this->StartupInterp, str2.str()) != TCL_OK)
+    {
+      vtkWarningMacro("Dialog Window will not be centered.");
+    }
+  else
+    {
+      const char* results = Tcl_GetStringResult(this->StartupInterp);
+      if (sscanf(results, "%d %d %d %d\n", &allw, &allh, &winw, &winh) != 4)
+        {
+          vtkWarningMacro("Dialog Window will not be centered.");
+        }
+      else 
+        {
+          str3 << "wm geometry .waiting " << winw << "x" << winh << "+" << (allw-winw)/2 << "+" <<  (allh-winh)/2 << endl;      
+          str3 << ends;
+
+          if (Tcl_GlobalEval(this->StartupInterp, str3.str()) != TCL_OK)
+            {
+              vtkWarningMacro("Dialog Window will not be centered.");
+            }
+
+        }
+    }
+  
+  this->StartupDone = 0;
+  this->StartupLock = vtkSimpleMutexLock::New();
+
+  this->StartupThreadManager = vtkMultiThreader::New();
+  this->StartupPID = this->StartupThreadManager->SpawnThread(
+      (vtkThreadFunctionType)(vtkPVProcessModuleGUIHelper::RunReverseConnectionDialogThread), this);
+}
+
+
+void vtkPVProcessModuleGUIHelper::CloseReverseConnectionDialog()
+{ 
+  ostrstream str;
+  ostrstream str2;
+
+  if (this->StartupInterp == 0) return;
+
+  this->StartupDone = 1;
+
+  str << "wm withdraw .waiting" << endl;
+  str << ends;
+  if (Tcl_GlobalEval(this->StartupInterp, str.str()) != TCL_OK)
+    {
+      vtkErrorMacro("CloseReverseConnectionDialog withdraw failure.");
+      this->StartupDone = 0;
+      return;
+    }
+
+  //barrier
+  bool done = false;
+  while (!done) 
+    {
+      this->StartupLock->Lock();
+      if (this->StartupDone == 0) done = true;
+      this->StartupLock->Unlock();
+    }
+
+  //catch any spurious leftover events
+  str2 << "update" << endl;
+  str2 << ends;
+  if (Tcl_GlobalEval(this->StartupInterp, str2.str()) != TCL_OK)
+    {
+      vtkErrorMacro("CloseReverseConnectionDialog update failure.");
+    }
+
+  //free used resources
+  Tcl_Finalize();
+  this->StartupThreadManager->TerminateThread(this->StartupPID);
+  this->StartupPID = 0;
+  this->StartupThreadManager->Delete();
+  this->StartupThreadManager = 0;
+  this->StartupLock->Delete();
+  this->StartupLock = 0;
+  Tcl_DeleteInterp(this->StartupInterp);
+  this->StartupInterp = 0;
+  this->StartupDone = 1;
+}
+
+void* vtkPVProcessModuleGUIHelper::RunReverseConnectionDialogThread(void* vargs)
+{
+  vtkMultiThreader::ThreadInfo *ti = static_cast<vtkMultiThreader::ThreadInfo*>(vargs);
+  vtkPVProcessModuleGUIHelper* self = static_cast<vtkPVProcessModuleGUIHelper*>(ti->UserData);
+  if ( !self )
+    {
+    cout << "Have no pointer to self" << endl;
+    return 0;
+    }
+
+  while (!(self->StartupDone)) {
+    Tcl_DoOneEvent(0);
+  }
+
+  self->StartupLock->Lock();
+  self->StartupDone = 0;
+  self->StartupLock->Unlock();
+
+  return 0;
+}
