@@ -2,7 +2,6 @@ package require vtkrendering
 
 proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
-    global objects
     set app [$parent GetApplication]
 
     # This is a faily big widget, so create a scrolled frame

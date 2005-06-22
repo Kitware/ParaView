@@ -1,6 +1,5 @@
 proc vtkKWScaleEntryPoint {parent win} {
 
-    global objects
     set app [$parent GetApplication]
 
     # Create a scale

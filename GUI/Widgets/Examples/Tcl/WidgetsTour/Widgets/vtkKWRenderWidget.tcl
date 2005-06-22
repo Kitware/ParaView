@@ -3,7 +3,6 @@ package require vtkrendering
 
 proc vtkKWRenderWidgetEntryPoint {parent win} {
 
-    global objects
     set app [$parent GetApplication]
 
     # Create a render widget
