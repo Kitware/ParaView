@@ -317,7 +317,7 @@ TARGET_LINK_LIBRARIES (KWWidgets vtksys)
 
 IF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
   IF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
-    INCLUDE(${VTK_TCL_TK_MACROS})
+    INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
     VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
       ${VTK_TCL_SUPPORT_LIBRARY_PATH}
       ${VTK_TK_SUPPORT_LIBRARY_PATH}
@@ -384,6 +384,9 @@ SET (KWWIDGETS_SHARED_LIBS ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
   ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetsConfigure.h.in 
   ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
+CONFIGURE_FILE(
+  ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetsConfigurePaths.h.in 
+  ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigurePaths.h)
 
 # The Resources/KWWidgets.rc.in can be configured for examples/samples
 # or use apps. Here are some defaults values. Typically, you should then use:
