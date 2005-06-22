@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.56");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.57");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -285,6 +285,15 @@ void vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget,
                                    widget->GetWidgetName(),
                                    option,
                                    r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget, 
+                                         const char *option)
+{
+  static double rgb[3];
+  vtkKWTkUtilities::GetOptionColor(widget, option, rgb, rgb + 1, rgb + 2);
+  return rgb;
 }
 
 //----------------------------------------------------------------------------

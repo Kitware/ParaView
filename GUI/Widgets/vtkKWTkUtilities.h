@@ -93,6 +93,8 @@ public:
   static void GetOptionColor(vtkKWWidget *widget,
                              const char *option, 
                              double *r, double *g, double *b);
+  static double* GetOptionColor(vtkKWWidget *widget,
+                                const char *option);
   
   // Description:
   // Set the RGB components of the color 'option'
