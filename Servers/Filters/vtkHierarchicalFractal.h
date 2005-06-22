@@ -27,6 +27,7 @@
 
 class vtkIntArray;
 class vtkUniformGrid;
+class vtkRectilinearGrid;
 
 class VTK_EXPORT vtkHierarchicalFractal : public vtkHierarchicalDataSetAlgorithm
 {
@@ -60,6 +61,14 @@ public:
   vtkSetMacro(GhostLevels, int);
   vtkGetMacro(GhostLevels, int);
   vtkBooleanMacro(GhostLevels, int);
+  
+  
+  // Description:
+  // Generate either rectilinear grids either uniform grids.
+  // Default is false.
+  vtkSetMacro(GenerateRectilinearGrids, int);
+  vtkGetMacro(GenerateRectilinearGrids, int);
+  vtkBooleanMacro(GenerateRectilinearGrids, int);
 
   // Description:
   // Make a 2D data set to test.
@@ -106,7 +115,8 @@ protected:
                double bds[6], int level, int target); 
 
   void SetBlockInfo(vtkUniformGrid *grid, int level, int* ext);
-
+  void SetRBlockInfo(vtkRectilinearGrid *grid, int level, int* ext);
+  
   void AddVectorArray(vtkHierarchicalDataSet *output);
   void AddTestArray(vtkHierarchicalDataSet *output);
   void AddFractalArray(vtkHierarchicalDataSet *output);
@@ -120,6 +130,14 @@ protected:
   void CellExtentToBounds(int level,
                           int ext[6],
                           double bds[6]);
+  
+  void ExecuteRectilinearMandelbrot(vtkRectilinearGrid *grid,
+                                    double *ptr);
+  double EvaluateSet(double p[4]);
+  void GetContinuousIncrements(int extent[6],
+                               vtkIdType &incX,
+                               vtkIdType &incY,
+                               vtkIdType &incZ);
   
   // Dimensions:
   // Specify blocks relative to this top level block.
@@ -143,6 +161,7 @@ protected:
   double TopLevelSpacing[3];
   double TopLevelOrigin[3];
   
+  int GenerateRectilinearGrids;
   
 private:
   vtkHierarchicalFractal(const vtkHierarchicalFractal&);  // Not implemented.

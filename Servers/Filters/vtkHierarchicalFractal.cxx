@@ -24,16 +24,18 @@
 #include "vtkObjectFactory.h"
 
 #include "vtkUniformGrid.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkImageMandelbrotSource.h"
+#include "vtkMath.h"
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.2");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.3");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -57,6 +59,8 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
   this->TopLevelOrigin[0] = 0.0;
   this->TopLevelOrigin[1] = 0.0;
   this->TopLevelOrigin[2] = 0.0;
+  
+  this->GenerateRectilinearGrids=0;
 }
 
 //----------------------------------------------------------------------------
@@ -119,6 +123,126 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
   grid->SetDimensions(dim);
   grid->SetSpacing(spacing);
   grid->SetOrigin(origin);
+}
+
+//----------------------------------------------------------------------------
+// This handles any alterations necessary for ghost levels.
+void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
+                                           int level, 
+                                           int *ext)
+{
+  if (this->GhostLevels)
+    {
+    ext[0] -= 1;
+    ext[2] -= 1;
+    ext[4] -= 1;
+    ext[1] += 1;
+    ext[3] += 1;
+    ext[5] += 1;
+    }
+  if (this->TwoDimensional)
+    {
+    ext[4] = ext[5] = 0;
+    }
+
+  double bds[6];
+  double origin[3];
+  double spacing[3];
+  
+  this->CellExtentToBounds(level, ext, bds);
+  origin[0] = bds[0];
+  origin[1] = bds[2];
+  origin[2] = bds[4];
+  spacing[0] = (bds[1]-bds[0])/(double)(ext[1]-ext[0]+1);
+  spacing[1] = (bds[3]-bds[2])/(double)(ext[3]-ext[2]+1);
+  spacing[2] = (bds[5]-bds[4])/(double)(ext[5]-ext[4]+1);
+
+  // Handle Lower dimensions.  Assume that cell dimension of 1 is a collapsed
+  // dimension.  Point dim equal 1 also.
+  int dim[3];
+  
+  dim[0] = dim[1] = dim[2] = 1;
+  if (ext[1] > ext[0])
+    {
+    dim[0] = ext[1]-ext[0]+2;
+    }
+  if (ext[3] > ext[2])
+    {
+    dim[1] = ext[3]-ext[2]+2;
+    }
+  if (ext[5] > ext[4])
+    {
+    dim[2] = ext[5]-ext[4]+2;
+    }
+  
+  grid->SetDimensions(dim);
+  
+  vtkDoubleArray *coords[3];
+  
+  vtkMath::RandomSeed(1234);
+  int coord=0;
+  while(coord<3)
+    {
+    coords[coord]=vtkDoubleArray::New();
+    //grid->SetOrigin(origin);
+    
+    // first point
+    coords[coord]->InsertNextValue(origin[coord]);
+    
+    double uniformCoordinate;
+    
+    int i=1;
+    int c;
+    if(this->GhostLevels)
+      {
+      c=dim[coord]-2;
+      }
+    else
+      {
+      c=dim[coord]-1;
+      }
+    uniformCoordinate=origin[coord];
+    
+    if(this->GhostLevels)
+      {
+      uniformCoordinate+=spacing[coord];
+      coords[coord]->InsertNextValue(uniformCoordinate);
+      ++i;
+      }
+    
+    while(i<c)
+      {
+      uniformCoordinate+=spacing[coord];
+      // get a random number about 1/10 of the uniform spacing.
+      double epsilon=(vtkMath::Random()-0.5)*spacing[coord]*0.2;
+      coords[coord]->InsertNextValue(uniformCoordinate+epsilon);
+      ++i;
+      }
+    
+    if(this->GhostLevels)
+      {
+      uniformCoordinate+=spacing[coord];
+      coords[coord]->InsertNextValue(uniformCoordinate);
+      ++i;
+      }
+    
+    // last point 
+    uniformCoordinate+=spacing[coord];
+    coords[coord]->InsertNextValue(uniformCoordinate);
+    
+    ++coord;
+    }
+  
+//  grid->SetSpacing(spacing);
+  grid->SetXCoordinates(coords[0]);
+  grid->SetYCoordinates(coords[1]);
+  grid->SetZCoordinates(coords[2]);
+  coord=0;
+  while(coord<3)
+    {
+    coords[coord]->Delete();
+    ++coord;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -296,13 +420,16 @@ int vtkHierarchicalFractal::RequestData(
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
                  ext[5]);
-
-  this->AddVectorArray(output);
-  this->AddTestArray(output);
+  
+  if(!this->GenerateRectilinearGrids)
+    {
+    this->AddVectorArray(output);
+    this->AddTestArray(output);
+    this->AddBlockIdArray(output);
+    this->AddDepthArray(output);
+    }
   this->AddFractalArray(output);
-  this->AddBlockIdArray(output);
-  this->AddDepthArray(output);
-
+ 
   if (this->GhostLevels > 0)
     {
     this->AddGhostLevelArray(output);
@@ -509,12 +636,23 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)
         {
-        vtkUniformGrid *grid=vtkUniformGrid::New();
-        int count=output->GetNumberOfDataSets(level);
-        output->SetDataSet(level,count,grid);
-        grid->Delete();
+        if(this->GenerateRectilinearGrids)
+          {
+          vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
+          int count=output->GetNumberOfDataSets(level);
+          output->SetDataSet(level,count,grid);
+          grid->Delete();
+          this->SetRBlockInfo(grid, level, ext);
+          }
+        else
+          {
+          vtkUniformGrid *grid=vtkUniformGrid::New();
+           int count=output->GetNumberOfDataSets(level);
+           output->SetDataSet(level,count,grid);
+           grid->Delete();
+          this->SetBlockInfo(grid, level, ext);
+          }
         this->Levels->InsertValue(blockId, level);
-        this->SetBlockInfo(grid, level, ext);
         ++blockId;
         }
       ++this->BlockCount;
@@ -543,12 +681,23 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)
         {
-        vtkUniformGrid *grid=vtkUniformGrid::New();
-        int count=output->GetNumberOfDataSets(level);
-        output->SetDataSet(level,count,grid);
-        grid->Delete();
+        if(this->GenerateRectilinearGrids)
+          {
+          vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
+          int count=output->GetNumberOfDataSets(level);
+          output->SetDataSet(level,count,grid);
+          grid->Delete();
+          this->SetRBlockInfo(grid, level, ext);
+          }
+        else
+          {
+          vtkUniformGrid *grid=vtkUniformGrid::New();
+           int count=output->GetNumberOfDataSets(level);
+           output->SetDataSet(level,count,grid);
+           grid->Delete();
+          this->SetBlockInfo(grid, level, ext);
+          }
         this->Levels->InsertValue(blockId, level);
-        this->SetBlockInfo(grid, level, ext);
         ++blockId;
         }
       ++this->BlockCount;
@@ -697,57 +846,77 @@ void vtkHierarchicalFractal::AddFractalArray(vtkHierarchicalDataSet *output)
     int block=0;
     while(block<blocks)
       {
-      vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-      assert("check: grid_exists" && grid!=0);
-      
-      
-      vtkDoubleArray* array = vtkDoubleArray::New();
-      int numCells=grid->GetNumberOfCells();
-      array->Allocate(numCells);
-      array->SetNumberOfTuples(numCells);
-      double *arrayPtr = static_cast<double*>(array->GetPointer(0));
-      double  spacing[3];
-      double origin[3];
-      grid->GetSpacing(spacing);
-      grid->GetOrigin(origin);
-      grid->GetDimensions(dims);
-      // we get the dimensions according to the points
-      // we need the dimensions according to the cells
-      
-      if(dims[0]>1)
+      if(!this->GenerateRectilinearGrids)
         {
-        --dims[0];
-        }
-       if(dims[1]>1)
-        {
-        --dims[1];
-        }
-       if(dims[2]>1)
-        {
-        --dims[2];
-        }
+        vtkUniformGrid *grid;
+        grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+        assert("check: grid_exists" && grid!=0);
       
-      // Shift point to center of voxel.
-      fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
-      fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
-                                 origin[1]+(spacing[1]*0.5), 
-                                 origin[2]+(spacing[2]*0.5), 0.0);
-      fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
-      fractalSource->Update();
-      vtkDataArray *fractal;
-      fractal=fractalSource->GetOutput()->GetPointData()->GetScalars();
-      float *fractalPtr = static_cast<float *>(fractal->GetVoidPointer(0));
       
-      for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
-        {
-        // Change fractal into volume fraction (iso surface at 0.5).
-        *arrayPtr++ = *fractalPtr++ / (2.0 * this->FractalValue);
+        vtkDoubleArray* array = vtkDoubleArray::New();
+        int numCells=grid->GetNumberOfCells();
+        array->Allocate(numCells);
+        array->SetNumberOfTuples(numCells);
+        double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+        double  spacing[3];
+        double origin[3];
+        grid->GetSpacing(spacing);
+        grid->GetOrigin(origin);
+        grid->GetDimensions(dims);
+        // we get the dimensions according to the points
+        // we need the dimensions according to the cells
+        
+        if(dims[0]>1)
+          {
+          --dims[0];
+          }
+        if(dims[1]>1)
+          {
+          --dims[1];
+          }
+        if(dims[2]>1)
+          {
+          --dims[2];
+          }
+        
+        // Shift point to center of voxel.
+        fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
+        fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
+                                   origin[1]+(spacing[1]*0.5), 
+                                   origin[2]+(spacing[2]*0.5), 0.0);
+        fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
+        fractalSource->Update();
+        vtkDataArray *fractal;
+        fractal=fractalSource->GetOutput()->GetPointData()->GetScalars();
+        float *fractalPtr = static_cast<float *>(fractal->GetVoidPointer(0));
+        
+        for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
+          {
+          // Change fractal into volume fraction (iso surface at 0.5).
+          *arrayPtr++ = *fractalPtr++ / (2.0 * this->FractalValue);
+          }
+        
+        array->SetName("Fractal Volume Fraction");
+        grid->GetCellData()->AddArray(array);
+        array->Delete();
         }
-      
-      array->SetName("Fractal Volume Fraction");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
+      else // rectilinear grid
+        {
+        vtkRectilinearGrid *grid;
+        grid=vtkRectilinearGrid::SafeDownCast(output->GetDataSet(level,block));
+        assert("check: grid_exists" && grid!=0);
+        
+        vtkDoubleArray* array = vtkDoubleArray::New();
+        int numCells=grid->GetNumberOfCells();
+        array->Allocate(numCells);
+        array->SetNumberOfTuples(numCells);
+        double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+        
+        this->ExecuteRectilinearMandelbrot(grid,arrayPtr);
+        array->SetName("Fractal Volume Fraction");
+        grid->GetCellData()->AddArray(array);
+        array->Delete();
+        }
       ++block;
       }
     ++level;
@@ -840,13 +1009,26 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkHierarchicalDataSet *output)
     int block=0;
     while(block<blocks)
       {
-      vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-      assert("check: grid_exists" && grid!=0);
+      int dims[3];
+      vtkDataSet *grid;
+      if(this->GenerateRectilinearGrids)
+        {
+        vtkRectilinearGrid *rgrid;
+        rgrid=vtkRectilinearGrid::SafeDownCast(output->GetDataSet(level,block));
+        assert("check: rgrid_exists" && rgrid!=0);
+        rgrid->GetDimensions(dims);
+        grid=rgrid;
+        }
+      else
+        {
+        vtkUniformGrid *ugrid;
+        ugrid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+        assert("check: ugrid_exists" && ugrid!=0);
+        ugrid->GetDimensions(dims);
+        grid=ugrid;
+        }
       
       vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
-      int dims[3];
-      grid->GetDimensions(dims);
       // we just get the dimensions according to points
       // we need the dimensions according to cells
       if(dims[0]>1)
@@ -940,6 +1122,176 @@ void vtkHierarchicalFractal::CellExtentToBounds(int level,
 }
 
 //----------------------------------------------------------------------------
+void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
+  vtkRectilinearGrid *grid,
+  double *ptr)
+{
+  int a0=0;
+  int a1=1;
+  int a2=2;
+  
+  int dims[3];
+  
+  grid->GetDimensions(dims);
+  // we get the dimensions according to the points
+  // we need the dimensions according to the cells
+  
+  if(dims[0]>1)
+    {
+    --dims[0];
+    }
+  if(dims[1]>1)
+    {
+    --dims[1];
+    }
+  if(dims[2]>1)
+    {
+    --dims[2];
+    }
+  
+  int ext[6];
+  double p[4];
+  
+  // Shift point to center of voxel.
+//  fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
+  ext[0]=0;
+  ext[1]=dims[0]-1;
+  ext[2]=0;
+  ext[3]=dims[1]-1;
+  ext[4]=0;
+  ext[5]=dims[2]-1;
+  
+  int min0, max0;
+  int idx0, idx1, idx2;
+  vtkIdType inc0, inc1, inc2;
+  
+//  fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
+//                             origin[1]+(spacing[1]*0.5), 
+//                             origin[2]+(spacing[2]*0.5), 0.0);
+  
+  double origin[4];
+  vtkDataArray *coords[3];
+  coords[0]=grid->GetXCoordinates();
+  coords[1]=grid->GetYCoordinates();
+  coords[2]=grid->GetZCoordinates();
+  
+  origin[0]=coords[0]->GetTuple1(0)+0.5*(coords[0]->GetTuple1(1)-coords[0]->GetTuple1(0));
+  origin[1]=coords[0]->GetTuple1(0)+0.5*(coords[1]->GetTuple1(1)-coords[1]->GetTuple1(0));
+  origin[2]=coords[0]->GetTuple1(0)+0.5*(coords[2]->GetTuple1(1)-coords[2]->GetTuple1(0));
+  origin[3]=0;
+  
+  // Copy origin into pixel
+  for (idx0 = 0; idx0 < 4; ++idx0)
+    {
+    p[idx0] = origin[idx0];
+    }
+  
+  min0 = ext[0];
+  max0 = ext[1];
+  
+  this->GetContinuousIncrements(ext, inc0, inc1, inc2);
+  
+  
+//  fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
+  
+  for (idx2 = ext[4]; idx2 <= ext[5]; ++idx2)
+    {
+//    p[a2] = (double)(origin[a2]) + (double)(idx2)*(sample[a2]);
+    p[a2] = coords[a2]->GetTuple1(idx2)+0.5*(coords[a2]->GetTuple1(idx2+1)-coords[a2]->GetTuple1(idx2));
+    for (idx1 = ext[2]; idx1 <= ext[3]; ++idx1)
+      {
+//      p[a1] = (double)(origin[a1]) + (double)(idx1)*(sample[a1]);
+      p[a1] = coords[a1]->GetTuple1(idx1)+0.5*(coords[a1]->GetTuple1(idx1+1)-coords[a1]->GetTuple1(idx1));
+      for (idx0 = min0; idx0 <= max0; ++idx0)
+        {
+        //      p[a0] = (double)(origin[a0]) + (double)(idx0)*(sample[a0]);
+        p[a0] = coords[a0]->GetTuple1(idx0)+0.5*(coords[a0]->GetTuple1(idx0+1)-coords[a0]->GetTuple1(idx0));
+        
+        // Change fractal into volume fraction (iso surface at 0.5).
+        *ptr = this->EvaluateSet(p)/ (2.0 * this->FractalValue);
+        
+        ++ptr;
+        // inc0 is 0
+        }
+      ptr += inc1;
+      }
+    ptr += inc2;
+    }
+}
+
+//----------------------------------------------------------------------------
+double vtkHierarchicalFractal::EvaluateSet(double p[4])
+{
+  unsigned short count = 0;
+  double v0, v1;
+  double cReal, cImag, zReal, zImag;
+  double zReal2, zImag2;
+
+  const int maximumNumberOfIterations=100;
+  
+  cReal = p[0];
+  cImag = p[1];
+  zReal = p[2];
+  zImag = p[3];
+
+  zReal2 = zReal * zReal;
+  zImag2 = zImag * zImag;
+  v0 = 0.0;
+  v1 = (zReal2 + zImag2);
+  while ( v1 < 4.0 && count < maximumNumberOfIterations)
+    {
+    zImag = 2.0 * zReal * zImag + cImag;
+    zReal = zReal2 - zImag2 + cReal;
+    zReal2 = zReal * zReal;
+    zImag2 = zImag * zImag;
+    ++count;
+    v0 = v1;
+    v1 = (zReal2 + zImag2);
+    }
+
+  if (count == maximumNumberOfIterations)
+    {
+    return (double)count;
+    }
+
+  return (double)count + (4.0 - v0)/(v1 - v0);
+}
+
+//----------------------------------------------------------------------------
+void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
+                                                     vtkIdType &incX,
+                                                     vtkIdType &incY,
+                                                     vtkIdType &incZ)
+{
+  int e0, e1, e2, e3;
+  
+  incX = 0;
+
+  e0 = extent[0];
+  e1 = extent[1];
+  e2 = extent[2];
+  e3 = extent[3];
+
+  // Make sure the increments are up to date
+  
+  int idx;
+  
+// vtkIdType inc = this->GetPointData()->GetScalars()->GetNumberOfComponents();
+  vtkIdType inc =1;
+  
+  int increments[3];
+  
+  for (idx = 0; idx < 3; ++idx)
+    {
+    increments[idx] = inc;
+    inc *= (extent[idx*2+1] - extent[idx*2] + 1);
+    }
+  
+  incY = increments[1] - (e1 - e0 + 1)*increments[0];
+  incZ = increments[2] - (e3 - e2 + 1)*increments[1];
+}
+
+//----------------------------------------------------------------------------
 void vtkHierarchicalFractal::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -950,5 +1302,15 @@ void vtkHierarchicalFractal::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MaximumLevel: " << this->MaximumLevel << endl;
   os << indent << "GhostLevels: " << this->GhostLevels << endl;
   os << indent << "Asymetric: " << this->Asymetric << endl;
+  os << indent << "GenerateRectilinearGrids: ";
+  if(this->GenerateRectilinearGrids)
+    {
+    os << "True";
+    }
+  else
+    {
+    os << "False";
+    }
+  os<< endl;
 }
 

@@ -307,6 +307,14 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty
+         name="RectilinearGrids"
+         command="SetGenerateRectilinearGrids"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
    <!-- End HierarchicalFractal -->
    </SourceProxy>
 

@@ -91,6 +91,9 @@ The output of the 2D Glyph source is polygonal data.
   <LabeledToggle label="Asymetric" trace_name="Asymetric" 
                  property="Asymetric"
                  help="Some blocks have X dimension larger by 2." />
+ <LabeledToggle label="RectilinearGrids" trace_name="RectilinearGrids" 
+                 property="RectilinearGrids"
+                 help="Set whether to generate rectilinear grids or uniform grids" />
 </Module>
 <!-- #endif -->
 
