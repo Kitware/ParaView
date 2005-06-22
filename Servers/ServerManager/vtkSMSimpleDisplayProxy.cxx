@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -1103,4 +1103,6 @@ void vtkSMSimpleDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
   os << indent << "HasVolumePipeline: " << this->HasVolumePipeline << endl;
   os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
+  os << indent << "SupportsBunykMapper: " << this->SupportsBunykMapper << endl;
+  os << indent << "SupportsZSweepMapper: " << this->SupportsZSweepMapper << endl;
 }
