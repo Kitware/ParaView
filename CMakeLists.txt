@@ -413,6 +413,13 @@ SUBDIRS(Utilities/VTKClientServer)
 # Configure Tcl wrapping
 IF (PARAVIEW_BUILD_GUI)
   SUBDIRS(Utilities/VTKTclWrapping)
+  IF(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKTclWrapping_INSTALL_LIBRARIES 0)
+  ELSE(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKTclWrapping_INSTALL_LIBRARIES 1)
+  ENDIF(PV_INSTALL_NO_LIBRARIES)
+  SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
