@@ -35,17 +35,17 @@ public:
 
   // Description:
   // Set/Get the state of the check button 0 = off 1 = on
-  void SetState(int );
+  virtual void SetState(int );
   virtual int GetState();
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)
-  void SetIndicator(int ind);
+  virtual void SetIndicator(int ind);
 
   // Description:
   // Set the text.
-  void SetText(const char* txt);
-  const char* GetText();
+  virtual void SetText(const char* txt);
+  virtual const char* GetText();
 
   // Description:
   // Set the variable name.

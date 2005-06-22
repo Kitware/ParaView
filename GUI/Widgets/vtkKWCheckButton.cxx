@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.34");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -64,10 +64,9 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
 
   this->Modified();
   
-  if (this->IsCreated() && this->VariableName)
+  if (this->VariableName)
     {
-    this->Script("%s configure -variable {%s}", 
-                 this->GetWidgetName(), this->VariableName);
+    this->SetConfigurationOption("-variable", this->VariableName);
     }
 } 
 
@@ -78,11 +77,7 @@ void vtkKWCheckButton::SetIndicator(int ind)
     {
     this->IndicatorOn = ind;
     this->Modified();
-    if (this->IsCreated())
-      {
-      this->Script("%s configure -indicatoron %d", 
-                   this->GetWidgetName(), (ind ? 1 : 0));
-      }
+    this->SetConfigurationOptionAsInt("-indicatoron", (ind ? 1 : 0));
     }
   this->SetMyText(0);
 }
