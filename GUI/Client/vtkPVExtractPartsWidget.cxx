@@ -33,16 +33,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.32");
-
-int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 {
-  this->CommandFunction = vtkPVExtractPartsWidgetCommand;
-  
   this->ButtonFrame = vtkKWFrame::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();

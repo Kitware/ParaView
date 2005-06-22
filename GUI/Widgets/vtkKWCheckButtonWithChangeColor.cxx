@@ -20,16 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.9");
-
-int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
-                                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithChangeColor::vtkKWCheckButtonWithChangeColor()
 {
-  this->CommandFunction = vtkKWCheckButtonWithChangeColorCommand;
-
   this->CheckButton       = vtkKWCheckButton::New();
   this->ChangeColorButton = vtkKWChangeColorButton::New();
 

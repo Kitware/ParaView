@@ -35,11 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.58");
-
-//-----------------------------------------------------------------------------
-int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.59");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()

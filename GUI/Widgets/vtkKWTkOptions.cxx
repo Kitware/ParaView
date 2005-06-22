@@ -19,10 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkOptions );
-vtkCxxRevisionMacro(vtkKWTkOptions, "1.1");
-
-int vtkKWTkOptionsCommand(ClientData cd, Tcl_Interp *interp,
-                          int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWTkOptions, "1.2");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(int encoding)

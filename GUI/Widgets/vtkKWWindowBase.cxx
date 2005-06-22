@@ -48,13 +48,10 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.18");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.19");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
-
-int vtkKWWindowBaseCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkKWWindowBase::vtkKWWindowBase()
@@ -91,8 +88,6 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->TrayImageError        = vtkKWLabel::New();
 
   this->TclInteractor         = NULL;
-
-  this->CommandFunction       = vtkKWWindowBaseCommand;
 
   this->SupportHelp           = 0;
   this->SupportPrint          = 0;

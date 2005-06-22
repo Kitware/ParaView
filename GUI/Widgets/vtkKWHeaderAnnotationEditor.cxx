@@ -30,16 +30,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.3");
-
-int vtkKWHeaderAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
 {
-  this->CommandFunction = vtkKWHeaderAnnotationEditorCommand;
-
   this->AnnotationChangedEvent  = vtkKWEvent::ViewAnnotationChangedEvent;
   this->PopupTextProperty       = 0;
   this->RenderWidget            = NULL;

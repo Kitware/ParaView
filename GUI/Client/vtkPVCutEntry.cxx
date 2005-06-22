@@ -24,19 +24,13 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.7");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
 //-----------------------------------------------------------------------------
-int vtkPVCutEntryCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
-
-
-//-----------------------------------------------------------------------------
 vtkPVCutEntry::vtkPVCutEntry()
 {
-  this->CommandFunction = vtkPVCutEntryCommand;
   this->InputMenu = NULL;
   this->DomainName = "bounds";
 }

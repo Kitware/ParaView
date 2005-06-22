@@ -66,14 +66,11 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.234");
+vtkCxxRevisionMacro(vtkKWApplication, "1.235");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
-
-int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 class vtkKWApplicationInternals
@@ -93,7 +90,6 @@ vtkKWApplication::vtkKWApplication()
   //  crashing during destructor when some members have
   //  not been properly NULL initialized...
   //
-  this->CommandFunction = NULL;
   this->Internals = NULL;
   this->MajorVersion = 1;
   this->MinorVersion = 0;
@@ -134,8 +130,6 @@ vtkKWApplication::vtkKWApplication()
       "initialized properly...");
     return;
     }
-
-  this->CommandFunction = vtkKWApplicationCommand;
 
   // Instantiate the PIMPL Encapsulation for STL containers
 

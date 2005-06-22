@@ -33,16 +33,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.4");
-
-int vtkPVComparativeVisPropertyWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
 {
-  this->CommandFunction = vtkPVComparativeVisPropertyWidgetCommand;
-
   this->TrackSelector = vtkPVActiveTrackSelector::New();
   this->NumberOfFramesEntry = vtkKWEntryLabeled::New();
 

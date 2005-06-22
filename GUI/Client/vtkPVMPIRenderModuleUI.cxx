@@ -20,16 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.4");
-
-int vtkPVMPIRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVMPIRenderModuleUI::vtkPVMPIRenderModuleUI()
 {
-  this->CommandFunction = vtkPVMPIRenderModuleUICommand;
 }
 
 

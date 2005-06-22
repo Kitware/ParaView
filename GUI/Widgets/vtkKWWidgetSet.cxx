@@ -21,10 +21,7 @@
 #include <vtksys/stl/list>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.9");
-
-int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
-                          int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -46,7 +43,6 @@ public:
 //----------------------------------------------------------------------------
 vtkKWWidgetSet::vtkKWWidgetSet()
 {
-  this->CommandFunction = vtkKWWidgetSetCommand;
   this->PackHorizontally = 0;
   this->MaximumNumberOfWidgetsInPackingDirection = 0;
   this->WidgetsPadX = 0;

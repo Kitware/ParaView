@@ -34,16 +34,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.12");
-
-int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
 {
-  this->CommandFunction = vtkKWLookmarkFolderCommand;
-
   this->MainFrame = vtkKWFrame::New();
   this->LabelFrame= vtkKWFrameLabeled::New();
   this->SeparatorFrame = vtkKWFrame::New();

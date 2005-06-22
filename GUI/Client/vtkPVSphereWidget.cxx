@@ -46,13 +46,9 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
-
-int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
-
 
 //*****************************************************************************
 //----------------------------------------------------------------------------

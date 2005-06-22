@@ -32,8 +32,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
-  vtkPVCaveRenderModuleUI();
-  ~vtkPVCaveRenderModuleUI();
+  vtkPVCaveRenderModuleUI() {};
+  ~vtkPVCaveRenderModuleUI() {};
  
   vtkPVCaveRenderModuleUI(const vtkPVCaveRenderModuleUI&); // Not implemented
   void operator=(const vtkPVCaveRenderModuleUI&); // Not implemented

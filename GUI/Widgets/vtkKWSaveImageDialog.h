@@ -37,7 +37,7 @@ public:
   virtual int Invoke();
 
 protected:
-  vtkKWSaveImageDialog();
+  vtkKWSaveImageDialog() {};
   ~vtkKWSaveImageDialog() {};
 
 private:

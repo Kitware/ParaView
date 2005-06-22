@@ -21,15 +21,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.30");
-
-int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
-                              int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
 { 
-  this->CommandFunction = vtkKWProgressGaugeCommand;
   this->Width = 100;
   this->Height = 5;
   this->Value = 0.0;

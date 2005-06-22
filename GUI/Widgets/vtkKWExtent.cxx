@@ -20,16 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.37");
-
-//----------------------------------------------------------------------------
-int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWExtent, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
 {
-  this->CommandFunction = vtkKWExtentCommand;
   this->Command = NULL;
 
   this->XRange = vtkKWRange::New();

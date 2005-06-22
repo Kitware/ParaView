@@ -34,18 +34,13 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.29");
-
-int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVValueList, "1.30");
 
 const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 
 //-----------------------------------------------------------------------------
 vtkPVValueList::vtkPVValueList()
 {
-  this->CommandFunction = vtkPVValueListCommand;
-
   this->ContourValuesFrame = vtkKWFrameLabeled::New();
   this->ContourValuesFrame2 = vtkKWFrame::New();
   this->ContourValuesList = vtkKWListBox::New();

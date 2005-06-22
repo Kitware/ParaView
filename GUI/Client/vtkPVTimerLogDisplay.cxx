@@ -33,16 +33,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.31");
-
-int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
 {
-  this->CommandFunction = vtkPVTimerLogDisplayCommand;
-  
   this->ButtonFrame = vtkKWFrame::New();
   this->DismissButton = vtkKWPushButton::New();
   

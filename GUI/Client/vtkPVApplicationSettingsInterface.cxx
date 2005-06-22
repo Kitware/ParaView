@@ -27,10 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.24");
-
-int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
-                                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()

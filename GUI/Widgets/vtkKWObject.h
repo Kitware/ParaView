@@ -58,12 +58,6 @@ protected:
   ~vtkKWObject();
 
   // Description:
-  // Instance variable that holds the command function for this class.
-  //BTX
-  int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
-  //ETX
-
-  // Description:
   // Convenience static method that can be used to create a callback function
   // on an object. The first argument is the command (string) to set, the 
   // second is the KWObject that the method will be called on. The third is

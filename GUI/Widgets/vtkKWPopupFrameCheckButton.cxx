@@ -21,16 +21,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.6");
-
-int vtkKWPopupFrameCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
-                                      int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrameCheckButton::vtkKWPopupFrameCheckButton()
 {
-  this->CommandFunction = vtkKWPopupFrameCheckButtonCommand;
-
   this->LinkPopupButtonStateToCheckButton = 0;
 
   // GUI

@@ -20,16 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(@WidgetType@Set);
-vtkCxxRevisionMacro(@WidgetType@Set, "1.4");
-
-int @WidgetType@SetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
-
-//----------------------------------------------------------------------------
-@WidgetType@Set::@WidgetType@Set()
-{
-  this->CommandFunction = @WidgetType@SetCommand;
-}
+vtkCxxRevisionMacro(@WidgetType@Set, "1.5");
 
 //----------------------------------------------------------------------------
 @WidgetType@* @WidgetType@Set::GetWidget(int id)

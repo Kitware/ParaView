@@ -24,10 +24,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.22");
-
-int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.23");
 
 #define minus_width 9
 #define minus_height 9
@@ -205,7 +202,6 @@ static unsigned char plus_bits[] = {
 //----------------------------------------------------------------------------
 vtkKWBWidgets::vtkKWBWidgets()
 {
-  this->CommandFunction = vtkKWBWidgetsCommand;
 }
 
 //----------------------------------------------------------------------------

@@ -112,13 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.364");
-
-int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
-
-
-
+vtkCxxRevisionMacro(vtkPVApplication, "1.365");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -416,7 +410,6 @@ vtkPVApplication::vtkPVApplication()
   this->Display3DWidgets = 0;
 
   this->ProcessModule = NULL;
-  this->CommandFunction = vtkPVApplicationCommand;
 
   this->NumberOfPipes = 1;
 

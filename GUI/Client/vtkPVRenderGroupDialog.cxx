@@ -29,16 +29,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.9");
-
-int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVRenderGroupDialog::vtkPVRenderGroupDialog()
 {
-  this->CommandFunction = vtkPVRenderGroupDialogCommand;
-  
   this->ButtonFrame = vtkKWFrame::New();
   this->AcceptButton = vtkKWPushButton::New();
   

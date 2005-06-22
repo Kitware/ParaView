@@ -60,18 +60,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.28");
-
-int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 {
-  this->CommandFunction = vtkPVLODRenderModuleUICommand;
-  
-
   this->RenderInterruptsEnabledCheck = vtkKWCheckButton::New();
 
   this->LODFrame = vtkKWFrameLabeled::New();

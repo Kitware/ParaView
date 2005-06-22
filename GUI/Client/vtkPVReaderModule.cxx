@@ -36,15 +36,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.65");
-
-int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.66");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
 {
-  this->CommandFunction = vtkPVReaderModuleCommand;
   this->FileEntry = 0;
   this->AcceptAfterRead = 1;
   this->Extensions = vtkVector<const char*>::New();

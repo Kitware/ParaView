@@ -18,16 +18,11 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.3");
-
-int vtkKWPushButtonWithMenuCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
 {
-  this->CommandFunction = vtkKWPushButtonWithMenuCommand;
-  
   this->Menu = vtkKWMenu::New();
 }
 

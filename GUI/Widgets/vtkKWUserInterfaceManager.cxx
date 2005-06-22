@@ -22,10 +22,7 @@
 #include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.19");
-
-int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
-                                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerInternals

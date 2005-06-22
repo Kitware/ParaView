@@ -23,10 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.36");
-
-int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.37");
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
@@ -37,8 +34,6 @@ template class VTK_EXPORT vtkAbstractList<vtkPVWidget*>;
 //----------------------------------------------------------------------------
 vtkPVContainerWidget::vtkPVContainerWidget()
 {
-  this->CommandFunction = vtkPVContainerWidgetCommand;
-
   this->Widgets = vtkPVWidgetCollection::New();
 
   this->PackDirection = 0;

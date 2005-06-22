@@ -20,16 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.18");
-
-int vtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
-
-//----------------------------------------------------------------------------
-vtkKWRadioButtonSet::vtkKWRadioButtonSet()
-{
-  this->CommandFunction = vtkKWRadioButtonSetCommand;
-}
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWRadioButton* vtkKWRadioButtonSet::GetWidget(int id)

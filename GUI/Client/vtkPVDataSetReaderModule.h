@@ -40,8 +40,8 @@ public:
   virtual int Initialize(const char* fname, vtkPVReaderModule*& prm);
 
 protected:
-  vtkPVDataSetReaderModule();
-  ~vtkPVDataSetReaderModule();
+  vtkPVDataSetReaderModule() {};
+  ~vtkPVDataSetReaderModule() {};
 
 private:
   vtkPVDataSetReaderModule(const vtkPVDataSetReaderModule&); // Not implemented

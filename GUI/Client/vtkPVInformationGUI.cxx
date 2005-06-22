@@ -24,16 +24,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.7");
-
-int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
 {
-  this->CommandFunction = vtkPVInformationGUICommand;
-
   this->StatsFrame = vtkKWFrameLabeled::New();
   this->TypeLabel = vtkKWLabel::New();
   this->NumDataSetsLabel = vtkKWLabel::New();

@@ -43,10 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.33");
-
-int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
-                                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.34");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -86,7 +83,6 @@ public:
 //----------------------------------------------------------------------------
 vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
 {
-  this->CommandFunction              = vtkPVVolumeAppearanceEditorCommand;
   this->PVRenderView                 = NULL;
 
   // Don't actually create any of the widgets 

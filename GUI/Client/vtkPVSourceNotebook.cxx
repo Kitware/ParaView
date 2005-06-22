@@ -35,11 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.21");
-
-//----------------------------------------------------------------------------
-int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
-                         int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()

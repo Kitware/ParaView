@@ -35,17 +35,13 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.47");
-
-int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
 //-----------------------------------------------------------------------------
 vtkPVPointSourceWidget::vtkPVPointSourceWidget()
 {
-  this->CommandFunction = vtkPVPointSourceWidgetCommand;
   this->SourceProxy = 0;
   this->SourceProxyName = 0;
   

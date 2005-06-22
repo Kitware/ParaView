@@ -20,15 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@Labeled);
-vtkCxxRevisionMacro(@WidgetType@Labeled, "1.5");
-
-int @WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
-                                    int argc, char *argv[]);
+vtkCxxRevisionMacro(@WidgetType@Labeled, "1.6");
 
 //----------------------------------------------------------------------------
 @WidgetType@Labeled::@WidgetType@Labeled()
 {
-  this->CommandFunction = @WidgetType@LabeledCommand;
   this->ExpandWidget    = 1;
   this->Widget          = @WidgetType@::New();
 }

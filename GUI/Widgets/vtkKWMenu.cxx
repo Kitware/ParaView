@@ -21,18 +21,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.72");
-
-
-
-//----------------------------------------------------------------------------
-int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWMenu, "1.73");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
 {
-  this->CommandFunction = vtkKWMenuCommand;
   this->TearOff = 0;
 }
 

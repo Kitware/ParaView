@@ -27,16 +27,11 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.7");
-
-int vtkPVPluginsDialogCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVPluginsDialog::vtkPVPluginsDialog()
 {
-  this->CommandFunction = vtkPVPluginsDialogCommand;
-
   // Build constants widgets
   this->PluginsFrame = vtkKWFrameLabeled::New();
   this->NameButton = vtkKWPushButton::New();

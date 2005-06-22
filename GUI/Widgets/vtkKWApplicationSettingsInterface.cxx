@@ -37,10 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.41");
-
-int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
-                                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()

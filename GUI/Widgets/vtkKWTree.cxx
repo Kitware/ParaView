@@ -40,18 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtksys/stl/string>
 
-int vtkKWTreeCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.5");
-
-//----------------------------------------------------------------------------
-vtkKWTree::vtkKWTree()
-{
-  this->CommandFunction = vtkKWTreeCommand;
-}
+vtkCxxRevisionMacro(vtkKWTree, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)

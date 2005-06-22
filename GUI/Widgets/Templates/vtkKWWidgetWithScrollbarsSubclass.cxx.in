@@ -21,15 +21,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithScrollbars);
-vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.1");
-
-int @WidgetType@WithScrollbarsCommand(ClientData cd, Tcl_Interp *interp,
-                                      int argc, char *argv[]);
+vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.2");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithScrollbars::@WidgetType@WithScrollbars()
 {
-  this->CommandFunction = @WidgetType@WithScrollbarsCommand;
   this->Widget = @WidgetType@::New();
 }
 

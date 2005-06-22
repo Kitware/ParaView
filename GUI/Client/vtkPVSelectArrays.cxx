@@ -40,17 +40,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.10");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.11");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
-
-int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVSelectArrays::vtkPVSelectArrays()
 {
-  this->CommandFunction = vtkPVSelectArraysCommand;
-  
   this->Field = vtkDataSet::CELL_DATA_FIELD;
   this->Deactivate = 0;
   this->FilterArrays = 0;

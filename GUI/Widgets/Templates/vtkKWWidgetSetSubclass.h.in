@@ -51,7 +51,7 @@ public:
   virtual @WidgetType@* GetWidget(int id);
 
 protected:
-  @WidgetType@Set();
+  @WidgetType@Set() {};
   ~@WidgetType@Set() {};
 
   // Helper methods

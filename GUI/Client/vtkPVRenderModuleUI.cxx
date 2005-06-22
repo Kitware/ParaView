@@ -20,18 +20,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.13");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.14");
 vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
 //----------------------------------------------------------------------------
-
-int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
 
 //----------------------------------------------------------------------------
 vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 {
-  this->CommandFunction = vtkPVRenderModuleUICommand;
   this->RenderModuleProxy = 0;
   this->OutlineThreshold = 5000000.0;
 }

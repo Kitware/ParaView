@@ -209,7 +209,7 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWTree();
+  vtkKWTree() {};
   ~vtkKWTree() {};
 
 private:

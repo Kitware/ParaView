@@ -29,17 +29,13 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.33");
-
-int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 vtkPVLineSourceWidget::vtkPVLineSourceWidget()
 {
-  this->CommandFunction = vtkPVLineSourceWidgetCommand;
   this->SourceProxy = 0;
   this->InputMenu = NULL;
 }

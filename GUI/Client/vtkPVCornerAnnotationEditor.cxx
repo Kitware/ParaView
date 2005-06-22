@@ -31,10 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.5");
-
-int vtkPVCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()

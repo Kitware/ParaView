@@ -21,11 +21,8 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.5");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.6");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
-
-int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
-                                         int argc, char *argv[]);
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
 #define VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN "File%dCmd"

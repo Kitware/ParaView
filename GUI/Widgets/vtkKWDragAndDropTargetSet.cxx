@@ -24,10 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.4");
-
-int vtkKWDragAndDropTargetSetCommand(ClientData cd, Tcl_Interp *interp,
-                                   int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals

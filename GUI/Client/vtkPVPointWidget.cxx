@@ -35,10 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.54");
-
-int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()

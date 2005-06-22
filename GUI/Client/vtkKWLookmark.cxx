@@ -35,16 +35,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.12");
-
-int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+vtkCxxRevisionMacro( vtkKWLookmark, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
 {
-  this->CommandFunction = vtkKWLookmarkCommand;
-
   this->LmkIcon= vtkKWLabel::New();
   this->Checkbox= vtkKWCheckButton::New();
   this->LmkLeftFrame= vtkKWFrame::New();

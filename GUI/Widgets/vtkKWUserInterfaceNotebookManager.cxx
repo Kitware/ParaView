@@ -28,10 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.40");
-
-int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
-                                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceNotebookManagerInternals

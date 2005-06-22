@@ -23,15 +23,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.26");
-
-int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVAdvancedReaderModule::vtkPVAdvancedReaderModule()
 {
-  this->CommandFunction = vtkPVAdvancedReaderModuleCommand;
   this->AcceptAfterRead = 0;
 }
 

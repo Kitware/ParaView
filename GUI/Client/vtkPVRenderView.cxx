@@ -140,12 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.388");
-
-int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
-
+vtkCxxRevisionMacro(vtkPVRenderView, "1.389");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -164,7 +159,6 @@ vtkPVRenderView::vtkPVRenderView()
     this->TopLevelRenderWindow = NULL;
     }    
 
-  this->CommandFunction = vtkPVRenderViewCommand;
   this->SplitFrame = vtkKWSplitFrame::New();
 
   this->BlockRender = 0;

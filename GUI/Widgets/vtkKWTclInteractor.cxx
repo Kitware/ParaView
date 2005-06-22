@@ -26,16 +26,11 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.36");
-
-int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
 {
-  this->CommandFunction = vtkKWTclInteractorCommand;
-  
   this->ButtonFrame = vtkKWFrame::New();
   this->DismissButton = vtkKWPushButton::New();
 

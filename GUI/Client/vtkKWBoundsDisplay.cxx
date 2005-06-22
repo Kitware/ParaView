@@ -22,16 +22,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.17");
-
-int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWBoundsDisplay::vtkKWBoundsDisplay()
 {
-  this->CommandFunction = vtkKWBoundsDisplayCommand;
-
   this->XRangeLabel = vtkKWLabel::New();
   this->YRangeLabel = vtkKWLabel::New();
   this->ZRangeLabel = vtkKWLabel::New();

@@ -34,10 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.5");
-
-int vtkPVExtractDataSetsWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.6");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {
@@ -48,8 +45,6 @@ struct vtkPVExtractDataSetsWidgetInternals
 //----------------------------------------------------------------------------
 vtkPVExtractDataSetsWidget::vtkPVExtractDataSetsWidget()
 {
-  this->CommandFunction = vtkPVExtractDataSetsWidgetCommand;
-  
   this->ButtonFrame = vtkKWFrame::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();

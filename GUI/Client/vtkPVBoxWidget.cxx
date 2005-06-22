@@ -43,17 +43,13 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
-
-int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVBoxWidget::vtkPVBoxWidget()
 {
-  this->CommandFunction = vtkPVBoxWidgetCommand;
   this->InputMenu = 0;
   this->ControlFrame = vtkKWFrame::New();
   this->TranslateLabel = vtkKWLabel::New();

@@ -27,17 +27,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.58");
-
-int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
 {
-  this->CommandFunction = vtkPVSelectionListCommand;
-
   this->CurrentValue = 0;
   this->CurrentName = NULL;
   

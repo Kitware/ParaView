@@ -19,15 +19,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.50");
-
-int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWDialog, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
 {
-  this->CommandFunction = vtkKWDialogCommand;
   this->Done = 1;
   this->Beep = 0;
   this->BeepType = 0;

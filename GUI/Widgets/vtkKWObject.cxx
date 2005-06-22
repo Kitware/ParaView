@@ -23,10 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.52");
-
-int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWObject, "1.53");
 
 vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
 
@@ -35,7 +32,6 @@ vtkKWObject::vtkKWObject()
 {
   this->TclName         = NULL;
   this->Application     = NULL;  
-  this->CommandFunction = vtkKWObjectCommand;
 }
 
 //----------------------------------------------------------------------------

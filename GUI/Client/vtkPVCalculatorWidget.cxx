@@ -46,10 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.43");
-
-int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -64,8 +61,6 @@ vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMRemoveAllVariablesProperty,
 //----------------------------------------------------------------------------
 vtkPVCalculatorWidget::vtkPVCalculatorWidget()
 {
-  this->CommandFunction = vtkPVCalculatorWidgetCommand;
-  
   this->AttributeModeFrame = vtkKWFrame::New();
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();

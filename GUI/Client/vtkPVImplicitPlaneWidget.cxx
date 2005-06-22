@@ -47,12 +47,9 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.60");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
-
-int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()

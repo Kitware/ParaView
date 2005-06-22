@@ -20,16 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.8");
-
-int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModuleUI::vtkPVMultiDisplayRenderModuleUI()
 {
-  this->CommandFunction = vtkPVMultiDisplayRenderModuleUICommand;
   this->CompositeOptionEnabled = 0;
 }
 

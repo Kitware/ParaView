@@ -26,19 +26,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.28");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
-int vtkPVScalarRangeLabelCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
-//----------------------------------------------------------------------------
 vtkPVScalarRangeLabel::vtkPVScalarRangeLabel()
 {
-  this->CommandFunction = vtkPVScalarRangeLabelCommand;
-
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = NULL;
 

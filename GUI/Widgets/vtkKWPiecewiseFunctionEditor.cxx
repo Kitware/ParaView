@@ -26,11 +26,8 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.25");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.26");
 
-
-int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 {

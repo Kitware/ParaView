@@ -38,10 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.37");
-
-int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.38");
 
 class vtkXDMFReaderModuleInternal
 {

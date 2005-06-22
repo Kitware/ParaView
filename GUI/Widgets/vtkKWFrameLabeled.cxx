@@ -26,10 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.12");
-
-int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.13");
 
 int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LabelCaseUppercaseFirst;
 int vtkKWFrameLabeled::BoldLabel = 1;
@@ -38,8 +35,6 @@ int vtkKWFrameLabeled::AllowShowHide = 1;
 //----------------------------------------------------------------------------
 vtkKWFrameLabeled::vtkKWFrameLabeled()
 {
-  this->CommandFunction = vtkKWFrameLabeledCommand;
-
   this->Border     = vtkKWFrame::New();
   this->Groove     = vtkKWFrame::New();
   this->Border2    = vtkKWFrame::New();

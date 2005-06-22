@@ -30,19 +30,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.27");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
 //----------------------------------------------------------------------------
-int vtkPVBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
-//----------------------------------------------------------------------------
 vtkPVBoundsDisplay::vtkPVBoundsDisplay()
 {
-  this->CommandFunction = vtkPVBoundsDisplayCommand;
-
   this->Widget = vtkKWBoundsDisplay::New();
   this->ShowHideFrame = 0;
   this->FrameLabel = 0;

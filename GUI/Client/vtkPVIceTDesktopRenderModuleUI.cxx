@@ -24,16 +24,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.3");
-
-int vtkPVIceTDesktopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
 {
-  this->CommandFunction = vtkPVIceTDesktopRenderModuleUICommand;
 }
 
 

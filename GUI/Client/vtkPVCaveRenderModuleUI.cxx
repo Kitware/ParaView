@@ -20,23 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCaveRenderModuleUI, "1.2");
-
-int vtkPVCaveRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
-
-//----------------------------------------------------------------------------
-vtkPVCaveRenderModuleUI::vtkPVCaveRenderModuleUI()
-{
-  this->CommandFunction = vtkPVCaveRenderModuleUICommand;
-}
-
-//----------------------------------------------------------------------------
-vtkPVCaveRenderModuleUI::~vtkPVCaveRenderModuleUI()
-{
-}
-
+vtkCxxRevisionMacro(vtkPVCaveRenderModuleUI, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkPVCaveRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)

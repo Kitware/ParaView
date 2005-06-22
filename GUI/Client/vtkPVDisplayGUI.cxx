@@ -92,12 +92,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.36");
-
-int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
-
-
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.37");
 
 //----------------------------------------------------------------------------
 
@@ -158,8 +153,6 @@ protected:
 //----------------------------------------------------------------------------
 vtkPVDisplayGUI::vtkPVDisplayGUI()
 {
-  this->CommandFunction = vtkPVDisplayGUICommand;
-
   this->PVSource = 0;
   
   this->EditColorMapButtonVisible = 1;

@@ -23,10 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.10");
-
-int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()

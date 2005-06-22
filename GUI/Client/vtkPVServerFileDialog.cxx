@@ -43,13 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.44");
-
-int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
-int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
-                         int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.45");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -107,8 +101,6 @@ static unsigned char image_PVDocument[] =
 //----------------------------------------------------------------------------
 vtkPVServerFileDialog::vtkPVServerFileDialog()
 {
-  this->CommandFunction = vtkPVServerFileDialogCommand;
-  
   this->TopFrame = vtkKWFrame::New();
   this->MiddleFrame = vtkKWFrame::New();
   this->FileList = vtkKWCanvas::New();

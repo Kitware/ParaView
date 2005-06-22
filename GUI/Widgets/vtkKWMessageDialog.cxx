@@ -26,11 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.77");
-
-//----------------------------------------------------------------------------
-int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.78");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -38,7 +34,6 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->MessageDialogFrame = vtkKWFrame::New();
   this->TopFrame           = vtkKWFrame::New();
   this->BottomFrame        = vtkKWFrame::New();
-  this->CommandFunction    = vtkKWMessageDialogCommand;
   this->Label              = vtkKWLabel::New();
   this->CheckButton        = vtkKWCheckButton::New();
   this->ButtonFrame        = vtkKWFrame::New();

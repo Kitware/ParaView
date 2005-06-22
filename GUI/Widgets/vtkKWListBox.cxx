@@ -18,18 +18,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.40");
-
-//----------------------------------------------------------------------------
-int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWListBox, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
 {   
   this->CurrentSelection = 0;
   this->Item = 0; 
-  this->CommandFunction = vtkKWListBoxCommand;
 }
 
 //----------------------------------------------------------------------------

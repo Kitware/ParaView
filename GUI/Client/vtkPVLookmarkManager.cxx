@@ -111,14 +111,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.36");
-int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
 {
-  this->CommandFunction = vtkPVLookmarkManagerCommand;
-
   this->PVLookmarks = vtkVector<vtkPVLookmark*>::New();
   this->LmkFolderWidgets = vtkVector<vtkKWLookmarkFolder*>::New();
 

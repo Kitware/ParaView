@@ -89,11 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.18");
-
-//----------------------------------------------------------------------------
-int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWView, "1.19");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -133,7 +129,6 @@ vtkKWView::vtkKWView()
   this->InExpose = 0;
   this->ParentWindow = NULL;
   this->PropertiesParent = NULL;
-  this->CommandFunction = vtkKWViewCommand;
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
 

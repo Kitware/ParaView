@@ -44,19 +44,11 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.71");
-
-//----------------------------------------------------------------------------
-int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
-int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
-                               int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.72");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
 {
-  this->CommandFunction = vtkPVArraySelectionCommand;
-  
   this->LabelText = 0;
   
   this->LabeledFrame = vtkKWFrameLabeled::New();

@@ -36,16 +36,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.19");
-
-int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
-                                    int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
 {
-  this->CommandFunction = vtkKWScalarBarAnnotationCommand;
-
   this->AnnotationChangedEvent      = vtkKWEvent::ViewAnnotationChangedEvent;
   this->ScalarComponentChangedEvent = vtkKWEvent::ScalarComponentChangedEvent;
 

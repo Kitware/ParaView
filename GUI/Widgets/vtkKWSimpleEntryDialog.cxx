@@ -22,16 +22,11 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.8");
-
-int vtkKWSimpleEntryDialogCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
 {
-  this->CommandFunction = vtkKWSimpleEntryDialogCommand;
-
   this->Entry = vtkKWEntryLabeled::New();
 }
 

@@ -32,12 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.33");
-
-// ---------------------------------------------------------------------------
-int vtkKWThumbWheelCommand(ClientData cd, 
-                           Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.34");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -95,7 +90,6 @@ vtkKWThumbWheel::vtkKWThumbWheel()
   this->TopLevel        = NULL;
   this->PopupPushButton = NULL;
 
-  this->CommandFunction = vtkKWThumbWheelCommand;
   this->State           = vtkKWThumbWheel::Idle;
 
   this->ThumbWheelShift = 0.0;

@@ -29,10 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.11");
-
-int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVErrorLogDisplay::vtkPVErrorLogDisplay()

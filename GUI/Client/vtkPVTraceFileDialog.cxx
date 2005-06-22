@@ -21,10 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.12");
-
-int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVTraceFileDialog::vtkPVTraceFileDialog()

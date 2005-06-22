@@ -30,16 +30,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.18");
-
-int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
 {
-  this->CommandFunction = vtkPVSaveBatchScriptDialogCommand;
-  
   this->FilePath = NULL;
   this->FileRoot = NULL;
 

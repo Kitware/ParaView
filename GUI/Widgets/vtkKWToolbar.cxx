@@ -52,10 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.54");
-
-int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWToolbar, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -71,8 +68,6 @@ public:
 //----------------------------------------------------------------------------
 vtkKWToolbar::vtkKWToolbar()
 {
-  this->CommandFunction = vtkKWToolbarCommand;
-
   this->Frame   = vtkKWFrame::New();
   this->Handle  = vtkKWFrame::New();
 

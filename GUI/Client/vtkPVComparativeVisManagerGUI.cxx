@@ -27,16 +27,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.6");
-
-int vtkPVComparativeVisManagerGUICommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisManagerGUI::vtkPVComparativeVisManagerGUI()
 {
-  this->CommandFunction = vtkPVComparativeVisManagerGUICommand;
-
   this->Manager = vtkPVComparativeVisManager::New();
 
   this->MainFrame = vtkKWFrame::New();

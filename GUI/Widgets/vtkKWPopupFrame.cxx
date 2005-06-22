@@ -20,16 +20,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.9");
-
-int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrame::vtkKWPopupFrame()
 {
-  this->CommandFunction = vtkKWPopupFrameCommand;
-
   // GUI
 
   this->PopupMode               = 0;

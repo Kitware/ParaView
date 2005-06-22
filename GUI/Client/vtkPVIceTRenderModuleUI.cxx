@@ -27,16 +27,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.7");
-
-int vtkPVIceTRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
 {
-  this->CommandFunction = vtkPVIceTRenderModuleUICommand;
   this->CompositeOptionEnabled = 1;
 
   this->CollectLabel = vtkKWLabel::New();

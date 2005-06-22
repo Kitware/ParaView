@@ -27,21 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.20");
-
-int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
-
-//----------------------------------------------------------------------------
-vtkPVDataSetReaderModule::vtkPVDataSetReaderModule()
-{
-  this->CommandFunction = vtkPVDataSetReaderModuleCommand;
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataSetReaderModule::~vtkPVDataSetReaderModule()
-{
-}
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.21");
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetReaderModule::CreateProperties()

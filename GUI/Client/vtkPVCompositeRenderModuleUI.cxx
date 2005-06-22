@@ -31,16 +31,11 @@
 #include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.25");
-
-int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
 {
-  this->CommandFunction = vtkPVCompositeRenderModuleUICommand;
-  
   this->ParallelRenderParametersFrame = vtkKWFrameLabeled::New();
 
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();

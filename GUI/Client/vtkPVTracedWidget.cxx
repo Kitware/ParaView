@@ -21,10 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTracedWidget );
-vtkCxxRevisionMacro(vtkPVTracedWidget, "1.3");
-
-int vtkPVTracedWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVTracedWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVTracedWidget::vtkPVTracedWidget()

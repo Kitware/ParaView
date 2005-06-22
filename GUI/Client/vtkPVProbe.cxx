@@ -49,20 +49,13 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.145");
-
-int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVProbe, "1.146");
 
 #define PV_TAG_PROBE_OUTPUT 759362
-
-
 
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
 {
-  this->CommandFunction = vtkPVProbeCommand;
-
   this->SelectedPointFrame = vtkKWFrame::New();
   this->SelectedPointLabel = vtkKWLabel::New();
   this->PointDataLabel = vtkKWLabel::New();

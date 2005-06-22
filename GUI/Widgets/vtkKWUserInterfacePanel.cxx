@@ -19,10 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.11");
-
-int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
-                                   int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()

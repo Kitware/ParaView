@@ -19,15 +19,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.7");
-
-int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
-                              int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetLabeled::vtkKWWidgetLabeled()
 {
-  this->CommandFunction = vtkKWWidgetLabeledCommand;
   this->ShowLabel       = 1;
   this->Label           = NULL;
   this->LabelPosition   = vtkKWWidgetLabeled::LabelPositionDefault;

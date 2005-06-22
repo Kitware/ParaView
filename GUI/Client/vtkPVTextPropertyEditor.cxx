@@ -18,10 +18,7 @@
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTextPropertyEditor);
-vtkCxxRevisionMacro(vtkPVTextPropertyEditor, "1.1");
-
-int vtkPVTextPropertyEditorCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVTextPropertyEditor, "1.2");
 
 // ----------------------------------------------------------------------------
 vtkPVTextPropertyEditor::vtkPVTextPropertyEditor()

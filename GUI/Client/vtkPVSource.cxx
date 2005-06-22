@@ -63,22 +63,18 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.447");
+vtkCxxRevisionMacro(vtkPVSource, "1.448");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 #ifdef PARAVIEW_USE_LOOKMARKS
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
 #endif
 
-int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
-                           int argc, char *argv[]);
-
 vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
 
 //----------------------------------------------------------------------------
 vtkPVSource::vtkPVSource()
 {
-  this->CommandFunction = vtkPVSourceCommand;
   this->DataInformationValid = 0;
 
   this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();

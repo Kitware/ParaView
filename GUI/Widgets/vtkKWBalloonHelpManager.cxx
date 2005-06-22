@@ -22,16 +22,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.4");
-
-int vtkKWBalloonHelpManagerCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
 {
-  this->CommandFunction = vtkKWBalloonHelpManagerCommand;
-
   this->CurrentWidget = NULL;
   this->AfterTimerId = NULL;
 

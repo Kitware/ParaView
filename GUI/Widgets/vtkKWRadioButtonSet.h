@@ -51,7 +51,7 @@ public:
   virtual vtkKWRadioButton* GetWidget(int id);
 
 protected:
-  vtkKWRadioButtonSet();
+  vtkKWRadioButtonSet() {};
   ~vtkKWRadioButtonSet() {};
 
   // Helper methods

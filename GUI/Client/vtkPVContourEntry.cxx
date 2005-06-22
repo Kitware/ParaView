@@ -29,20 +29,13 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.57");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
 //-----------------------------------------------------------------------------
-int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
-
-
-//-----------------------------------------------------------------------------
 vtkPVContourEntry::vtkPVContourEntry()
 {
-  this->CommandFunction = vtkPVContourEntryCommand;
-
   this->ArrayMenu = NULL;
   
   this->DomainName = "scalar_range";

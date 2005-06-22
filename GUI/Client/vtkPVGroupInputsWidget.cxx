@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.35");
 
 class vtkPVSourceVectorInternals
 {
@@ -43,14 +43,10 @@ public:
   VectorType InputsVector;
 };
 
-int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
-
 //----------------------------------------------------------------------------
 vtkPVGroupInputsWidget::vtkPVGroupInputsWidget()
 {
   this->Internal = new vtkPVSourceVectorInternals;
-  this->CommandFunction = vtkPVGroupInputsWidgetCommand;
   
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();

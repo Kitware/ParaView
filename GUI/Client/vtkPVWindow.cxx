@@ -135,10 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.737");
-
-int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVWindow, "1.738");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -167,7 +164,6 @@ vtkPVWindow::vtkPVWindow()
     this->SetTitle( "Kitware ParaView" );
     }
 
-  this->CommandFunction = vtkPVWindowCommand;
   this->ModifiedEnableState = 0;
 
   this->TraceHelper = vtkPVTraceHelper::New();

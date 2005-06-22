@@ -21,16 +21,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.57");
-
-int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
-                                  int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.58");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
 {
-  this->CommandFunction = vtkKWChangeColorButtonCommand;
-
   this->Command = NULL;
 
   this->Color[0] = 1.0;

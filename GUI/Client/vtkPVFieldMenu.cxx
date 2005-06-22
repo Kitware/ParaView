@@ -36,20 +36,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.28");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.29");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
 
-
-int vtkPVFieldMenuCommand(ClientData cd, Tcl_Interp *interp,
-                          int argc, char *argv[]);
-
 //----------------------------------------------------------------------------
 vtkPVFieldMenu::vtkPVFieldMenu()
 {
-  this->CommandFunction = vtkPVFieldMenuCommand;
-  
   this->InputMenu = NULL;
   this->Label = vtkKWLabel::New();
   this->FieldMenu = vtkKWOptionMenu::New();

@@ -59,12 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.82");
-
-//----------------------------------------------------------------------------
-int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
-                         int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkKWNotebook, "1.83");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -146,8 +141,6 @@ void vtkKWNotebook::Page::SetEnabled(int s)
 //----------------------------------------------------------------------------
 vtkKWNotebook::vtkKWNotebook()
 {
-  this->CommandFunction = vtkKWNotebookCommand;
-
   this->MinimumWidth             = 10;
   this->MinimumHeight            = 10;
   this->AlwaysShowTabs           = 0;

@@ -38,16 +38,11 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.70");
-
-int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.71");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
 {
-  this->CommandFunction = vtkPVSelectWidgetCommand;
-
   this->LabeledFrame = vtkKWFrameLabeled::New();
   this->Menu = vtkKWOptionMenu::New();
 

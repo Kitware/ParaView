@@ -19,10 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRawReaderModule);
-vtkCxxRevisionMacro(vtkPVRawReaderModule, "1.5");
-
-int vtkPVRawReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVRawReaderModule, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVRawReaderModule::vtkPVRawReaderModule()

@@ -34,15 +34,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.32");
-
-int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVPLOT3DReaderModule::vtkPVPLOT3DReaderModule()
 {
-  this->CommandFunction = vtkPVPLOT3DReaderModuleCommand;
   this->PackFileEntry = 0;
   this->AlreadyAccepted = 0;
 }
