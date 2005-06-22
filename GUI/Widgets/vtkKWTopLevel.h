@@ -77,8 +77,8 @@ public:
   // Set/Get the position this toplevel should be centered at when Display()
   // is called. The default is to not set/change the position at all.
   // If set to MasterWindowCenter, it will be centered inside its master 
-  // window ; if  the MastWindow ivar is not set, it will be centered on
-  // screen, as in if the ivar was set to ScreenCenter. If set to 
+  // window ; if  the MasterWindow ivar is not set, it will be centered on
+  // screen, as if the ivar was set to ScreenCenter. If set to 
   // Pointer, it will centered at the current mouse position.
   //BTX
   enum
