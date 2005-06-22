@@ -1,6 +1,5 @@
 proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
-    global objects
     set app [$parent GetApplication]
 
     # Create a color selector
@@ -10,6 +9,7 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
     ccb Create $app
     ccb SetSelectionChangingCommand $parent "SetBackgroundColor"
     ccb InvokeCommandsWithRGBOn
+    ccb SetBalloonHelpString "This HSV Color Selector changes the background color of its parent"
 
     vtkMath math
     eval ccb SetSelectedColor [eval math RGBToHSV [$parent GetBackgroundColor]]

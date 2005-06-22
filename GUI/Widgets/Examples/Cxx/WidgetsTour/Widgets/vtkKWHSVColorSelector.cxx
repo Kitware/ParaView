@@ -16,6 +16,7 @@ WidgetType vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   ccb->Create(app);
   ccb->SetSelectionChangingCommand(parent, "SetBackgroundColor");
   ccb->InvokeCommandsWithRGBOn();
+  ccb->SetBalloonHelpString("This HSV Color Selector changes the background color of its parent");
 
   double r, g, b, h, s, v;
   parent->GetBackgroundColor(&r, &g, &b);
