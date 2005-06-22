@@ -15,8 +15,11 @@
 #define __vtkKWWidgetsConfigurePaths_h
 
 #cmakedefine KWWIDGETS_HAS_HTML_HELP
+
 #define KW_INSTALL_LIB_DIR "${KW_INSTALL_LIB_DIR}"
+#define KW_INSTALL_BIN_DIR "${KW_INSTALL_BIN_DIR}"
+#define KW_INSTALL_SHARE_DIR "${KW_INSTALL_SHARE_DIR}"
+
 #define KWWIDGETS_SOURCE_DIR "${KWWidgets_SOURCE_DIR}"
-#define KWWIDGETS_PROJECT_NAME "${PROJECT_NAME}"
 
 #endif

@@ -87,8 +87,8 @@ int my_main(int argc, char *argv[])
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
-            "%s/../share/%s/Examples/Data/teapot.vtp",
-            app->GetInstallationDirectory(), KWWIDGETS_PROJECT_NAME);
+            "%s/..%s/Examples/Data/teapot.vtp",
+            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
     }
   reader->SetFileName(data_path);
 

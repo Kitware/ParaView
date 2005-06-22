@@ -65,8 +65,8 @@ int my_main(int argc, char *argv[])
   if (!vtksys::SystemTools::FileExists(res_path))
     {
     sprintf(res_path, 
-            "%s/../share/%s/Examples/Resources/KWWidgetsSplashScreen.png",
-            app->GetInstallationDirectory(), KWWIDGETS_PROJECT_NAME);
+            "%s/..%s/Examples/Resources/KWWidgetsSplashScreen.png",
+            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
     }
   app->GetSplashScreen()->ReadImage(res_path);
 
@@ -246,9 +246,9 @@ int my_main(int argc, char *argv[])
         {
         sprintf(
           buffer, 
-          "%s/../share/%s/Examples/Cxx/%s/%s/%s.cxx",
-          app->GetInstallationDirectory(), 
-          KWWIDGETS_PROJECT_NAME,ExampleDirName,WidgetsDirName,node_ptr->Name);
+          "%s/..%s/Examples/Cxx/%s/%s/%s.cxx",
+          app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR,
+          ExampleDirName, WidgetsDirName, node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
         {
@@ -270,9 +270,8 @@ int my_main(int argc, char *argv[])
       if (!vtksys::SystemTools::FileExists(buffer))
         {
         sprintf(buffer, 
-                "%s/../share/%s/Examples/Tcl/%s/%s/%s.tcl",
-                app->GetInstallationDirectory(), 
-                KWWIDGETS_PROJECT_NAME, 
+                "%s/..%s/Examples/Tcl/%s/%s/%s.tcl",
+                app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR,
                 ExampleDirName, WidgetsDirName, node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
