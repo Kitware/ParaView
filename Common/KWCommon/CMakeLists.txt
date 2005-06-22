@@ -15,7 +15,7 @@ SET (KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
 # Let parent project set KW_INSTALL_LIB_DIR to control library install
 # location.
 IF(NOT KW_INSTALL_LIB_DIR)
-  SET(KW_INSTALL_LIB_DIR /lib)
+  SET(KW_INSTALL_LIB_DIR "/lib/${PROJECT_NAME}")
 ENDIF(NOT KW_INSTALL_LIB_DIR)
 IF(NOT KW_INSTALL_BIN_DIR)
   SET(KW_INSTALL_BIN_DIR /bin)
