@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.11");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.12");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -160,6 +160,7 @@ vtkPVSimpleAnimationCue::~vtkPVSimpleAnimationCue()
     }
 
   this->SetKeyFrameManipulatorProxyName(0);
+  this->SetKeyFrameManipulatorProxyXMLName(0);
   if (this->KeyFrameManipulatorProxy)
     {
     this->KeyFrameManipulatorProxy->Delete();
