@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.31");
+vtkCxxRevisionMacro(vtkPVOptions, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -299,18 +299,24 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   if (this->ClientMode || this->ServerMode || this->RenderServerMode )
     {
     os << indent << "ConnectID is: " << this->ConnectID << endl;
-    os << indent << "DataServerPort: " << this->DataServerPort << endl;
-    os << indent << "ServerPort: " << this->ServerPort << endl;
-    os << indent << "Render Node Port: " << this->RenderNodePort << endl;
-    os << indent << "Render Server Port: " << this->RenderServerPort << endl;
     os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;
-    os << indent << "Connect Render Server to Data Server: "
-       << (this->ConnectRenderToData?"on":"off") << endl;
-    os << indent << "Connect Data Server to Render Server: "
-       << (this->ConnectDataToRender?"on":"off") << endl;
-    os << indent << "ServerHostName: " << (this->ServerHostName?this->ServerHostName:"(none)") << endl;
-    os << indent << "DataServerHostName: " << (this->DataServerHostName?this->DataServerHostName:"(none)") << endl;
-    os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    if (this->RenderServerMode)
+      {
+      os << indent << "DataServerPort: " << this->DataServerPort << endl;
+      os << indent << "Render Node Port: " << this->RenderNodePort << endl;
+      os << indent << "Render Server Port: " << this->RenderServerPort << endl;
+      os << indent << "Connect Render Server to Data Server: "
+         << (this->ConnectRenderToData?"on":"off") << endl;
+      os << indent << "Connect Data Server to Render Server: "
+         << (this->ConnectDataToRender?"on":"off") << endl;
+      os << indent << "DataServerHostName: " << (this->DataServerHostName?this->DataServerHostName:"(none)") << endl;
+      os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+      }
+    else
+      {
+      os << indent << "ServerPort: " << this->ServerPort << endl;
+      os << indent << "ServerHostName: " << (this->ServerHostName?this->ServerHostName:"(none)") << endl;
+      }
     os << indent << "ClientHostName: " << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
     }
 
