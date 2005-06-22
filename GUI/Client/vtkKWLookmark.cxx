@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.11");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.12");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -223,7 +223,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
                padx + (int)ceil((double)(this->Width  - rw) / 2.0) + bd, 
                pady + (int)ceil((double)(this->Height - rh) / 2.0) + bd);
 
-  this->LmkIcon->SetBalloonHelpString("Left click to generate lookmark");
+  this->LmkIcon->SetBalloonHelpString("Left click to visit lookmark");
 
 
   this->LmkDatasetFrame->SetParent(this->LmkRightFrame);
