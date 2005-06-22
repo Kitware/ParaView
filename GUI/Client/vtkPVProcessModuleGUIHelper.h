@@ -22,12 +22,8 @@
 
 #include "vtkProcessModuleGUIHelper.h"
 
-#include "vtkTcl.h" // Needed for Tcl_Interp
-
 class vtkPVApplication;
 class vtkProcessModule;
-class vtkMultiThreader;
-class vtkSimpleMutexLock;
 
 class VTK_EXPORT vtkPVProcessModuleGUIHelper : public vtkProcessModuleGUIHelper
 {
@@ -42,11 +38,6 @@ public:
   // Description:
   // Open a connection dialog GUI.
   virtual int OpenConnectionDialog(int* start);
-
-  // Description:
-  // Open/Close the waiting dialog for the reverse client connection
-  virtual void OpenReverseConnectionDialog();
-  virtual void CloseReverseConnectionDialog();
   
   // Description:
   // Handle progress links.
@@ -70,18 +61,10 @@ protected:
   virtual ~vtkPVProcessModuleGUIHelper();
 
   int ActualRun(int argc, char **argv);
-  static void* RunReverseConnectionDialogThread(void*);
+
 
 private:
   int BatchFlag;
-
-  //all these are used by the reverse connection dialog
-  Tcl_Interp *StartupInterp;
-  vtkMultiThreader *StartupThreadManager;
-  int StartupPID;
-  int StartupDone;
-  vtkSimpleMutexLock *StartupLock;
-
   vtkPVApplication* PVApplication;
   vtkPVProcessModuleGUIHelper(const vtkPVProcessModuleGUIHelper&); // Not implemented
   void operator=(const vtkPVProcessModuleGUIHelper&); // Not implemented

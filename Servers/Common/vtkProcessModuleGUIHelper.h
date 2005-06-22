@@ -36,11 +36,6 @@ public:
   // Description:
   // Open a connection dialog GUI.
   virtual int OpenConnectionDialog(int* start) = 0;
-
-  // Description:
-  // Open a connection dialog GUI.
-  virtual void OpenReverseConnectionDialog() = 0;
-  virtual void CloseReverseConnectionDialog() = 0;
   
   // Description:
   // Handle progress links.

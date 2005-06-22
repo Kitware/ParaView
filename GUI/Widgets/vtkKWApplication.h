@@ -345,7 +345,6 @@ public:
   //BTX
   static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
   static Tcl_Interp *InitializeTcl(Tcl_Interp *interp, ostream *err = 0);
-  static Tcl_Interp *InitializeStartupTcl(int argc, char *argv[], ostream *err = 0);
   //ETX
 
   // Description:
