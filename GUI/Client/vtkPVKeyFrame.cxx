@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.21");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.22");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -395,5 +395,15 @@ void vtkPVKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationCueProxy: " << this->AnimationCueProxy << endl;
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "Duration: " << this->Duration << endl;
+  os << indent;
+  if(this->TimeChangeable)
+    {
+    os << "True";
+    }
+  else
+    {
+    os << "False";
+    }
+  os << endl;
 }
 
