@@ -9,7 +9,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
-#include "vtkKWWidgetsConfigure.h"
+#include "vtkKWWidgetsConfigurePaths.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>

@@ -13,6 +13,8 @@
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
 
+#include "vtkKWWidgetsConfigurePaths.h"
+
 #include "KWWidgetsTourExampleEntryPoints.h"
 #include "KWWidgetsTourExamplePath.h"
 

@@ -38,6 +38,7 @@
 #include <vtksys/stl/algorithm>
 
 #include "Resources/KWWidgets.rc.h"
+#include "vtkKWWidgetsConfigurePaths.h"
 
 static Tcl_Interp *Et_Interp = 0;
 
@@ -66,7 +67,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.236");
+vtkCxxRevisionMacro(vtkKWApplication, "1.237");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);

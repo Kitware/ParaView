@@ -8,6 +8,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
+#include "vtkKWWidgetsConfigurePaths.h"
+
 #include "KWWidgetsTourExampleTypes.h"
 
 #include <vtksys/SystemTools.hxx>
