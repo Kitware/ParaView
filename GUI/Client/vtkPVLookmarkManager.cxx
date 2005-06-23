@@ -47,6 +47,7 @@
 #ifdef PARAVIEW_USE_EXODUS
 #include "vtkPVBasicDSPFilterWidget.h"
 #endif
+#include "vtkPVGUIClientOptions.h"
 
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLookmark.h"
@@ -111,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.38");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1647,6 +1648,11 @@ void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
   ofstream *outfile;
   vtkXMLLookmarkElement *root;
   vtkXMLDataParser *parser;
+
+  if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
+    {
+    return;
+    }
   
   // write out an empty lookmark file so that the parser will not complain
   outfile = new ofstream(filename,ios::trunc);
