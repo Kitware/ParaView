@@ -25,7 +25,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
     
     pack [ccb2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-    # Create another ccb, popup mode
+    # Create another color button, without a label
 
     vtkKWChangeColorButton ccb3
     ccb3 SetParent $parent
@@ -36,7 +36,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
 
     pack [ccb3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-    return 1
+    return 2
 }
 
 proc vtkKWChangeColorButtonFinalizePoint {} {
