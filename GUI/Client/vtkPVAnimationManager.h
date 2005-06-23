@@ -233,6 +233,7 @@ public:
   // Returns the active track selector widget
   vtkGetObjectMacro(ActiveTrackSelector, vtkPVActiveTrackSelector);
 
+  
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();

@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.9");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.10");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -101,6 +101,8 @@ vtkPVTrackEditor::vtkPVTrackEditor()
   this->Observer = vtkPVTrackEditorObserver::New();
   this->Observer->SetTarget(this);
   this->ActiveKeyFrame = 0;
+  this->FixedTimeKeyframeFlag = 
+    vtkPVTrackEditor::FIRST_KEYFRAME_TIME_NOTCHANGABLE;
 }
 
 //-----------------------------------------------------------------------------
@@ -343,12 +345,13 @@ void vtkPVTrackEditor::ShowKeyFrame(int id)
     }
   pvKeyFrame->SetTimeMinimumBound(min_bound);
 
+  double max_time = 1.0;
   if (id < this->SimpleAnimationCue->GetNumberOfKeyFrames()-1)
     {
     vtkPVKeyFrame* next = this->SimpleAnimationCue->GetKeyFrame(id+1);
     if (next)
       {
-      pvKeyFrame->SetTimeMaximumBound(next->GetKeyTime());
+      max_time = next->GetKeyTime();
       }
     this->InterpolationValid = 1;
     }
@@ -356,7 +359,22 @@ void vtkPVTrackEditor::ShowKeyFrame(int id)
     {
     this->InterpolationValid = 0;// last key frame does not use Interpolation.
     }
-  pvKeyFrame->SetTimeChangeable((id==0)? 0 : 1);
+  pvKeyFrame->SetTimeMaximumBound(max_time);
+  pvKeyFrame->SetBlankTimeEntry(0);
+ 
+  int time_changeable = 1;
+  if (this->FixedTimeKeyframeFlag & vtkPVTrackEditor::FIRST_KEYFRAME_TIME_NOTCHANGABLE
+    && id == 0)
+    {
+    time_changeable = 0;
+    }
+  if (this->FixedTimeKeyframeFlag & vtkPVTrackEditor::LAST_KEYFRAME_TIME_NOTCHANGABLE
+    && id == this->SimpleAnimationCue->GetNumberOfKeyFrames()-1)
+    {
+    time_changeable = 0;
+    pvKeyFrame->SetBlankTimeEntry(1);
+    }
+  pvKeyFrame->SetTimeChangeable(time_changeable);
   pvKeyFrame->PrepareForDisplay();
   this->UpdateTypeImage(pvKeyFrame);
 }
@@ -601,4 +619,6 @@ void vtkPVTrackEditor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PropertiesFrame: " << this->PropertiesFrame << endl;
   os << indent << "TitleLabel: " << this->TitleLabel << endl;
+  os << indent << "FixedTimeKeyframeFlag: 0x" << hex  
+    << this->FixedTimeKeyframeFlag << endl;
 }

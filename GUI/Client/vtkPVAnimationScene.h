@@ -170,6 +170,13 @@ public:
   void SetCaching(int enable);
   int GetCaching();
 
+  // Description:
+  // Whenever the properties of the scence changed, this class
+  // can call a callback. This method is used to set the callback.
+  // When target=NULL, the callback is removed.
+  void SetPropertiesChangedCallback(vtkKWWidget* target, 
+    const char* methodAndArgs);
+
   void PrepareForDelete();
 protected:
   vtkPVAnimationScene();
@@ -209,6 +216,11 @@ protected:
   int InvokingError;
 
   unsigned long ErrorEventTag;
+
+  char* PropertiesChangedCallbackCommand;
+  vtkSetStringMacro(PropertiesChangedCallbackCommand);
+  void InvokePropertiesChangedCallback();
+
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.

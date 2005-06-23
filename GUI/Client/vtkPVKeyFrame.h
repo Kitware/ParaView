@@ -126,6 +126,16 @@ public:
   // If not the widget is disabled. Default is true.
   vtkSetMacro(TimeChangeable, int);
   vtkGetMacro(TimeChangeable, int);
+
+  // Description:
+  // Get/Set if the time entry should show any text.
+  // Not set by default. Note that BlankTimeEntry has any effect
+  // only when TimeChangeable is set to 0. ie. when time is changeable, 
+  // BlankTimeEntry is ignored and the time value will be shown in the 
+  // time-entry box.
+  vtkSetMacro(BlankTimeEntry, int);
+  vtkGetMacro(BlankTimeEntry, int);
+
 protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
@@ -159,6 +169,7 @@ protected:
   double TimeBounds[2];
   double Duration;
 
+  int BlankTimeEntry;
   int TimeChangeable; // flag indicating of the time can be changed.
     //if not the entry for time is disabled. Default is true.
   vtkPVAnimationScene* AnimationScene;

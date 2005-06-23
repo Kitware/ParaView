@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.22");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.23");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -90,6 +90,7 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->AnimationScene = 0;
   this->Duration = 1.0;
   this->TimeChangeable = 1;
+  this->BlankTimeEntry = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,7 +181,6 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   
   this->TimeThumbWheel->SetParent(this);
   this->TimeThumbWheel->PopupModeOn();
-  this->TimeThumbWheel->SetValue(0.0);
   this->TimeThumbWheel->SetResolution(0.01);
   this->TimeThumbWheel->Create(app);
   this->TimeThumbWheel->DisplayEntryOn();
@@ -215,8 +215,15 @@ void vtkPVKeyFrame::PrepareForDisplay()
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::UpdateValuesFromProxy()
 {
-  this->TimeThumbWheel->SetValue(
-    this->GetRelativeTime(this->KeyFrameProxy->GetKeyTime()));
+  if (this->BlankTimeEntry && !this->TimeChangeable)
+    {
+    this->TimeThumbWheel->GetEntry()->SetValue("");
+    }
+  else
+    {
+    this->TimeThumbWheel->SetValue(
+      this->GetRelativeTime(this->KeyFrameProxy->GetKeyTime()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -305,7 +312,7 @@ void vtkPVKeyFrame::ClearTimeBounds()
 void vtkPVKeyFrame::SetTimeMinimumBound(double min)
 {
   this->TimeBounds[0] = min;
-  this->TimeThumbWheel->SetMinimumValue(min);
+  this->TimeThumbWheel->SetMinimumValue(this->GetRelativeTime(min));
   this->TimeThumbWheel->ClampMinimumValueOn();
 }
 
@@ -313,7 +320,7 @@ void vtkPVKeyFrame::SetTimeMinimumBound(double min)
 void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 {
   this->TimeBounds[1] = max;
-  this->TimeThumbWheel->SetMaximumValue(max);
+  this->TimeThumbWheel->SetMaximumValue(this->GetRelativeTime(max));
   this->TimeThumbWheel->ClampMaximumValueOn();
 }
 
@@ -405,5 +412,6 @@ void vtkPVKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
     os << "False";
     }
   os << endl;
+  os << indent << this->BlankTimeEntry << endl;
 }
 

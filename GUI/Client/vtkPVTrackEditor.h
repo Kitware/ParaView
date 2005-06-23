@@ -78,6 +78,23 @@ public:
 
   virtual void UpdateEnableState();
 
+  //BTX
+  // Flags used to specify which of the keyframes have fixed times.
+  // By default FIRST_KEYFRAME_TIME_NOTCHANGABLE is true.
+  // These flags can be OR-ed together to combine more than one flag.
+  enum
+    {
+    ALL_TIMES_CHANGABLE = 0x00,
+    FIRST_KEYFRAME_TIME_NOTCHANGABLE = 0x01,
+    LAST_KEYFRAME_TIME_NOTCHANGABLE  = 0x02,
+    };
+  //ETX
+
+  // Description:
+  // Get/Set which, if any, keyframe has fixed time.
+  // By default the first keyframe has fixed time.
+  vtkSetMacro(FixedTimeKeyframeFlag, int);
+  vtkGetMacro(FixedTimeKeyframeFlag, int);
 protected:
   vtkPVTrackEditor();
   ~vtkPVTrackEditor();
@@ -89,7 +106,8 @@ protected:
   vtkKWLabel* TitleLabelLabel;
   vtkKWLabel* TitleLabel; // label to show the cue text representation.
   vtkKWFrame* PropertiesFrame;
-  vtkKWFrame* TypeFrame; //frame containing the selection for differnt types of waveforms.
+  vtkKWFrame* TypeFrame; // frame containing the selection for differnt 
+                         // types of waveforms.
   vtkKWPushButton* TypeImage;
   vtkKWMenuButton* TypeMenuButton;
   vtkKWPushButton* AddKeyFrameButton;
@@ -97,11 +115,16 @@ protected:
   vtkKWLabel* TypeLabel;
   vtkKWScale* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
- 
-  int InterpolationValid; 
+
+
   // flag indicating if the Interpolation should be enabled for the
   // current key frame. It is disabled for the last key frame.
+  int InterpolationValid; 
+  
 
+  // flag used to determine which of the keyframes have fixed times.
+  int FixedTimeKeyframeFlag;
+  
   void BuildTypeMenu();
   void UpdateTypeImage(vtkPVKeyFrame*);
   void SetActiveKeyFrame(vtkPVKeyFrame* kf);

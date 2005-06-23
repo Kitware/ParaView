@@ -219,7 +219,7 @@ public:
   // is modified. In Virtual mode, since there is no KeyFrameManipulatorProxy,
   // this class itself triggers this event when it modifies the end time points.
   enum {
-    KeysModifiedEvent = 2001,
+    KeysModifiedEvent = 3001,
     SelectionChangedEvent
   };
 //ETX

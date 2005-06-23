@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.15");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -339,7 +339,10 @@ void vtkPVAnimationCueTree::ExecuteEvent(vtkObject* wdg, unsigned long event, vo
       // children has the focus by invoking the FocusInEvent event.
       vtkPVAnimationCue* child = vtkPVAnimationCue::SafeDownCast(wdg);
       this->RemoveChildrenFocus(child);
-      this->RemoveSelfFocus();  
+      if (this->Focus)
+        {
+        this->RemoveSelfFocus();  
+        }
       this->InvokeEvent(vtkKWEvent::FocusInEvent);
       break;
       }

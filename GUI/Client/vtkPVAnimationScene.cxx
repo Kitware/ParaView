@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.40");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.41");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -171,6 +171,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->InPlay  = 0;
 
   this->InvokingError = 0;
+  this->PropertiesChangedCallbackCommand = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -200,6 +201,7 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
   this->PlayModeLabel->Delete();
   this->SetRenderView(NULL);
   this->SetAnimationManager(NULL);
+  this->SetPropertiesChangedCallbackCommand(0);
 
 }
 
@@ -569,6 +571,7 @@ void vtkPVAnimationScene::SetDuration(double duration)
   this->TimeScale->SetRange(0, duration);
   this->TimeScale->SetValue(duration*ntime);
   this->InvalidateAllGeometries();
+  this->InvokePropertiesChangedCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -706,6 +709,7 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", 
     this->GetTclName(), mode);
+  this->InvokePropertiesChangedCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -796,9 +800,41 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", fps);
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->InvalidateAllGeometries();
+  this->InvokePropertiesChangedCallback();
 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", 
     this->GetTclName(), fps);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetPropertiesChangedCallback(vtkKWWidget* target,
+  const char* methodAndArgs)
+{
+  if (!target)
+    {
+    this->SetPropertiesChangedCallbackCommand(0);
+    }
+  else
+    {
+    ostrstream str;
+    str << target->GetTclName() << " " ;
+    if (methodAndArgs)
+      {
+      str << methodAndArgs;
+      }
+    str << ends;
+    this->SetPropertiesChangedCallbackCommand(str.str());
+    str.rdbuf()->freeze(0);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::InvokePropertiesChangedCallback()
+{
+  if (this->PropertiesChangedCallbackCommand)
+    {
+    this->Script(this->PropertiesChangedCallbackCommand);
+    }
 }
 
 //-----------------------------------------------------------------------------

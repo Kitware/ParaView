@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.55");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.56");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -129,6 +129,7 @@ vtkPVAnimationManager::vtkPVAnimationManager()
     this->GetTraceHelper());
   this->AnimationScene->GetTraceHelper()->SetReferenceCommand(
     "GetAnimationScene");
+  
 
   this->ActiveTrackSelector = vtkPVActiveTrackSelector::New();
   this->ActiveTrackSelector->GetTraceHelper()->SetReferenceHelper(
@@ -206,6 +207,12 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
   this->AnimationScene->SetRenderView(pvWin->GetMainView());
   this->AnimationScene->Create(app);
   this->AnimationScene->SetReliefToFlat();
+  // This is set so that when the duration (or anything else)
+  // from the scene changes, the VAnimation interface is updated
+  // and so is the keyframe it is showing, if any. Thus, the keyframe
+  // will show the correct time when the duration is changed.
+  this->AnimationScene->SetPropertiesChangedCallback(
+    this->VAnimationInterface, "Update");
 
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->AnimationScene->GetWidgetName());

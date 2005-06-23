@@ -25,6 +25,7 @@
 #include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
 
 class vtkCameraInterpolator;
+class vtkQuaternionInterpolator;
 
 class VTK_EXPORT vtkSMCameraManipulatorProxy : 
   public vtkSMKeyFrameAnimationCueManipulatorProxy
@@ -48,6 +49,7 @@ protected:
     vtkSMAnimationCueProxy* cueproxy);
 
   vtkCameraInterpolator* CameraInterpolator;
+  vtkQuaternionInterpolator* QuaternionInterpolator;
 private:
   vtkSMCameraManipulatorProxy(const vtkSMCameraManipulatorProxy&); // Not implemented.
   void operator=(const vtkSMCameraManipulatorProxy&); // Not implemented.
