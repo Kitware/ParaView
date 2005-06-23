@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.37");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -633,8 +633,8 @@ void vtkPVLookmarkManager::UndoCallback()
 
   if ( !infile.fail())
     {
-    this->Checkpoint();
     this->Import(str.str(),0);
+    this->Checkpoint();
     }
   this->MenuEdit->SetState("Undo",2);
 
