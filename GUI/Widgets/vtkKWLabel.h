@@ -88,7 +88,7 @@ public:
   
   // Description:
   // Adjust the -wraplength argument so that it matches the width of
-  // the widget automatically (through the <Configure> event).
+  // the widget automatically (through the Configure event).
   virtual void SetAdjustWrapLengthToWidth(int);
   vtkGetMacro(AdjustWrapLengthToWidth, int);
   vtkBooleanMacro(AdjustWrapLengthToWidth, int);
