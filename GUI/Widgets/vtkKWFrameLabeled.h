@@ -45,7 +45,7 @@ public:
   
   // Description:
   // Ask the frame to readjust its tops margin according to the content of
-  // the LabelFrame. This method if bound to a <Configure> event, so
+  // the LabelFrame. This method if bound to a Configure event, so
   // the widget should adjust itself automatically most of the time.
   void AdjustMargin();
  
