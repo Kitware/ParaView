@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.13");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -382,7 +382,7 @@ void vtkKWLookmark::Pack()
   this->Script("pack %s -anchor w", this->LmkDatasetCheckbox->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
   this->Script("pack %s -anchor w", this->LmkCommentsText->GetWidgetName());
-  this->Script("%s configure -bg white -height 3 -width 50 -wrap none", this->LmkCommentsText->GetWidgetName());
+  this->Script("%s configure -bg white -height 3 -width 50 -wrap word", this->LmkCommentsText->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->LmkCommentsFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -side left", this->LmkLeftFrame->GetWidgetName());
   this->Script("pack %s -anchor w -side left -expand true -fill x -padx 3", this->LmkRightFrame->GetWidgetName());
