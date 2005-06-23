@@ -138,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.739");
+vtkCxxRevisionMacro(vtkPVWindow, "1.740");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -527,6 +527,20 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar->Delete();
     this->InteractorToolbar = NULL;
     }
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  if(this->LookmarkToolbar)
+    {
+    this->LookmarkToolbar->Delete();
+    this->LookmarkToolbar = NULL;
+    }
+  
+  if(this->LookmarkButton)
+    {
+    this->LookmarkButton->Delete();
+    this->LookmarkButton = NULL;
+    }
+#endif
     
   if (this->CameraStyle3D)
     {
