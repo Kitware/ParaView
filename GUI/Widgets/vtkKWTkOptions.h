@@ -19,13 +19,14 @@
 #ifndef __vtkKWTkOptions_h
 #define __vtkKWTkOptions_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class KWWIDGETS_EXPORT vtkKWTkOptions : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWTkOptions : public vtkObject
 {
 public:
   static vtkKWTkOptions* New();
-  vtkTypeRevisionMacro(vtkKWTkOptions,vtkKWObject);
+  vtkTypeRevisionMacro(vtkKWTkOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

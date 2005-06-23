@@ -20,7 +20,7 @@
 
 class KWWIDGETS_EXPORT vtkKWEvent
 {
-  public:
+public:
 
   static const char* GetStringFromEventId(unsigned long event);
   static unsigned long GetEventIdFromString(const char* event);

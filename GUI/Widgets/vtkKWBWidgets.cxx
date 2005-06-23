@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWBWidgets.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 
@@ -24,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.23");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.24");
 
 #define minus_width 9
 #define minus_height 9

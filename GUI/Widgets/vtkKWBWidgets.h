@@ -20,13 +20,15 @@
 #ifndef __vtkKWBWidgets_h
 #define __vtkKWBWidgets_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
+#include "vtkKWWidgets.h" // Needed for export symbols directives
+#include "vtkTcl.h" // Needed for Tcl interpreter
 
-class KWWIDGETS_EXPORT vtkKWBWidgets : public vtkKWObject
+class KWWIDGETS_EXPORT vtkKWBWidgets : public vtkObject
 {
 public:
   static vtkKWBWidgets* New();
-  vtkTypeRevisionMacro(vtkKWBWidgets,vtkKWObject);
+  vtkTypeRevisionMacro(vtkKWBWidgets,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -45,11 +47,3 @@ private:
 };
 
 #endif
-
-
-
-
-
-
-
-

@@ -166,6 +166,7 @@ SET(KWWidgets_SRCS
 # Abstract/pure virtual classes
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkKWBWidgets.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx

@@ -196,6 +196,10 @@ public:
   vtkSetMacro(LockDragAndDropEntries, int);
   vtkGetMacro(LockDragAndDropEntries, int);
 
+protected:
+  vtkKWUserInterfaceNotebookManager();
+  ~vtkKWUserInterfaceNotebookManager();
+
   //BTX
   // A Widget location. 
   // Store both the page the widget is packed in, and the widget it is 
@@ -223,12 +227,7 @@ public:
     WidgetLocation FromLocation;
     WidgetLocation ToLocation;
   };
-
   //ETX
-
-protected:
-  vtkKWUserInterfaceNotebookManager();
-  ~vtkKWUserInterfaceNotebookManager();
 
   // Description:
   // Remove the widgets of all pages belonging to a panel. It is called

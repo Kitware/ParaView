@@ -38,7 +38,7 @@ class vtkKWFrame;
 
 class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
 {
- public:
+public:
   static vtkPVPluginsDialog* New();
   vtkTypeRevisionMacro(vtkPVPluginsDialog,vtkKWDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -53,7 +53,7 @@ class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
   // canceled, nonzero otherwise.
   virtual int Invoke();
   
- protected:
+protected:
   // Description:
   // Default constructor.
   vtkPVPluginsDialog();
@@ -74,7 +74,7 @@ class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
   vtkKWPushButton *HelpButton;
   vtkKWPushButton *CloseButton;
   
- private:
+private:
   vtkPVPluginsDialog(const vtkPVPluginsDialog&); // Not implemented
   void operator=(const vtkPVPluginsDialog&); // Not implemented
 };
