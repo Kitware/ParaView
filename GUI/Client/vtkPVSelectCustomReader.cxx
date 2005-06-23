@@ -17,6 +17,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
+#include "vtkKWListBoxWithScrollbars.h"
 #include "vtkKWPushButton.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.9");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -63,7 +64,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   label->Create(app);
   str1.rdbuf()->freeze(0);
 
-  vtkKWListBox* listbox = vtkKWListBox::New();
+  vtkKWListBoxWithScrollbars* listbox = vtkKWListBoxWithScrollbars::New();
   listbox->SetParent(frame);
   listbox->Create(app);
   int num = 5;
@@ -75,7 +76,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
     {
     num = 1;
     }
-  listbox->SetHeight(num);      
+  listbox->GetWidget()->SetHeight(num);      
       
   vtkPVReaderModule* result = 0;
 
@@ -92,25 +93,26 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
       {
       ostrstream str;
       str << rm->GetLabel() << " Reader" << ends;
-      listbox->AppendUnique(str.str());
+      listbox->GetWidget()->AppendUnique(str.str());
       str.rdbuf()->freeze(0);
       }
     it->GoToNextItem();
     }
   it->Delete();
-  listbox->SetSelectionIndex(0);
-  listbox->SetDoubleClickCommand(this, "OK");
+  listbox->GetWidget()->SetSelectionIndex(0);
+  listbox->GetWidget()->SetDoubleClickCommand(this, "OK");
 
   // Set the width to that of the longest string
-  listbox->SetWidth(0);      
+  listbox->GetWidget()->SetWidth(0);      
 
   // invoke
   int res = this->Invoke();
   if ( res == 1 )
     {
     vtkPVReaderModule* reader = 0;
-    if ( win->GetReaderList()->GetItem(listbox->GetSelectionIndex(),
-                                   reader) == VTK_OK && reader )
+    if ( win->GetReaderList()->GetItem(
+           listbox->GetWidget()->GetSelectionIndex(),
+           reader) == VTK_OK && reader )
       {
       result = reader;
       }
