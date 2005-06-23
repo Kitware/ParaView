@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Doxygen documentation batch
-# modified by S. Barre (Time-stamp: <2005-06-17 15:12:58 barre>
+# modified by S. Barre (Time-stamp: <2005-06-23 16:18:39 barre>
 # -------------------------------------------------------------------------
 
 # Path to several tools (_PROG to avoid the typical GZIP env var pb)
@@ -160,6 +160,7 @@ export VTK_TAGFILE_DEST_DIR="$DOXTEMP"
 if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
+        --conds \
         --relativeto "$SOURCE_DIR/$REL_PATH_TO_TOP" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP"
 

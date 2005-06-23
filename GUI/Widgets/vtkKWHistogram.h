@@ -165,6 +165,7 @@ public:
   // transparent and the resulting image is created in RGBA space instead
   // of RGB.
   //BTX
+  // @cond nested_class
   class KWWIDGETS_EXPORT ImageDescriptor
   {
   public:
@@ -223,6 +224,7 @@ public:
     double       DefaultMaximumOccurence;
     double       LastMaximumOccurence;
   };
+  // @endcond
   virtual int IsImageUpToDate(const ImageDescriptor *desc = 0);
   virtual vtkImageData* GetImage(ImageDescriptor *desc);
   //ETX

@@ -53,26 +53,32 @@ public:
 
 
   //BTX
+  // @cond nested_class
   struct MouseEvent
   {
     int Button;
     int Modifier;
     char *Action;
   };
+  // @endcond
   
+  // @cond nested_class
   struct KeyEvent
   {
     char Key;
     int Modifier;
     char *Action;
   };
+  // @endcond
   
+  // @cond nested_class
   struct KeySymEvent
   {
     char *KeySym;
     int Modifier;
     char *Action;
   };
+  // @endcond
   //ETX
 
   // ---------------------------------------------------------
