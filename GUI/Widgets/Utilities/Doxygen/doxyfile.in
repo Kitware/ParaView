@@ -1,7 +1,10 @@
 # -------------------------------------------------------------------------
 # doxyfile for KWWidgets
-# modified by S. Barre (Time-stamp: <2005-06-17 15:14:31 barre>
+# modified by S. Barre (Time-stamp: <2005-06-23 15:45:57 barre>
 # -------------------------------------------------------------------------
+
+BRIEF_MEMBER_DESC = NO
+DETAILS_AT_TOP = YES
 
 PROJECT_NAME         = KWWidgets
 
@@ -46,8 +49,11 @@ TAGFILES             = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.t
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO
 EXTRACT_STATIC       = YES
+EXTRACT_LOCAL_CLASSES = NO
+
 HIDE_UNDOC_MEMBERS   = NO
 HIDE_UNDOC_CLASSES   = YES
+
 ALWAYS_DETAILED_SEC  = NO
 SOURCE_BROWSER       = YES
 INLINE_SOURCES       = NO
