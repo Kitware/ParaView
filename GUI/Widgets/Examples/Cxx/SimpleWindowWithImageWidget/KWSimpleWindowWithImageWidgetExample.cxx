@@ -117,18 +117,21 @@ int my_main(int argc, char *argv[])
   slice_scale->SetRange(viewer->GetWholeZMin(), viewer->GetWholeZMax());
   slice_scale->SetValue(viewer->GetZSlice());
 
-  char command[1024];
-
 #ifdef VTK_WRAP_TCL
+
+  // This code makes sense only if we can get the Tcl object corresponding
+  // to the viewer. I.e., VTK_WRAP_TCL must be ON
+
+  char command[1024];
   vtksys_stl::string viewer_tclname(
     vtkKWTkUtilities::GetTclNameFromPointer(app, viewer));
   sprintf(command, "%s SetZSlice [%s GetValue] ; %s Render", 
           viewer_tclname.c_str(), slice_scale->GetTclName(), rw->GetTclName());
   slice_scale->SetCommand(NULL, command);
-#endif
 
   app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2", 
               slice_scale->GetWidgetName());
+#endif
 
   // Start the application
   // If --test was provided, do not enter the event loop
