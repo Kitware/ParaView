@@ -40,6 +40,8 @@
 #include "Resources/KWWidgets.rc.h"
 #include "vtkKWWidgetsConfigurePaths.h"
 
+#include "vtkToolkits.h"
+
 static Tcl_Interp *Et_Interp = 0;
 
 #ifdef _WIN32
@@ -67,11 +69,39 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.239");
+vtkCxxRevisionMacro(vtkKWApplication, "1.240");
+
+extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
+
+// Initialize VTK Tcl. If we have not wrapped VTK for Tcl, then
+// we can only rely on Common and the two renderwidgets
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
-extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
+extern "C" int Vtktkimageviewerwidget_Init(Tcl_Interp *interp);
+
+#ifdef VTK_WRAP_TCL
+extern "C" int Vtkfilteringtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkiotcl_Init(Tcl_Interp *interp);
+
+#ifdef VTK_USE_RENDERING
+extern "C" int Vtkrenderingtcl_Init(Tcl_Interp *interp);
+#endif
+
+#ifdef VTK_USE_VOLUMERENDERING
+extern "C" int Vtkvolumerenderingtcl_Init(Tcl_Interp *interp);
+#endif
+
+#ifdef VTK_USE_HYBRID
+extern "C" int Vtkhybridtcl_Init(Tcl_Interp *interp);
+#endif
+
+#ifdef VTK_USE_PARALLEL
+extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
+#endif
+#endif
 
 //----------------------------------------------------------------------------
 class vtkKWApplicationInternals
@@ -584,22 +614,122 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
   if (Vtkcommontcl_Init(interp) != TCL_OK) 
     {
     if (err)
-        {
-        *err << "Vtkcommontcl_Init error: " 
-             << Tcl_GetStringResult(interp) << endl;
-        }
+      {
+      *err << "Vtkcommontcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
     return NULL;
     }
 
   if (Vtktkrenderwidget_Init(interp) != TCL_OK) 
     {
     if (err)
-        {
-        *err << "Vtktkrenderwidget_Init error: " 
-             << Tcl_GetStringResult(interp) << endl;
-        }
+      {
+      *err << "Vtktkrenderwidget_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
     return NULL;
     }
+
+  if (Vtktkimageviewerwidget_Init(interp) != TCL_OK) 
+    {
+    if (err)
+      {
+      *err << "Vtktkimageviewerwidget_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+#ifdef VTK_WRAP_TCL
+  if (Vtkfilteringtcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkfilteringtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+  if (Vtkimagingtcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkimagingtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+  if (Vtkgraphicstcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkgraphicstcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+  if (Vtkiotcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkiotcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+#ifdef VTK_USE_RENDERING
+  if (Vtkrenderingtcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkrenderingtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+#endif
+
+#ifdef VTK_USE_VOLUMERENDERING
+  if (Vtkvolumerenderingtcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkvolumerenderingtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+#endif
+
+#ifdef VTK_USE_HYBRID
+  if (Vtkhybridtcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkhybridtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+#endif
+
+#ifdef VTK_USE_PARALLEL
+  if (Vtkparalleltcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkparalleltcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+#endif
+#endif
 
   // Initialize Widgets and BWidgets
 
