@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.8");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -243,7 +243,7 @@ void vtkKWMultiColumnList::SetEditStartCommand(vtkObject* object,
   if (this->IsCreated())
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, obj, method);
+    this->SetObjectMethodCommand(&command, object, method);
     this->Script("%s configure -editstartcommand {%s}", 
                  this->GetWidgetName(), command);
     delete [] command;
@@ -257,7 +257,7 @@ void vtkKWMultiColumnList::SetEditEndCommand(vtkObject* object,
   if (this->IsCreated())
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, obj, method);
+    this->SetObjectMethodCommand(&command, object, method);
     this->Script("%s configure -editendcommand {%s}", 
                  this->GetWidgetName(), command);
     delete [] command;
@@ -271,7 +271,7 @@ void vtkKWMultiColumnList::SetLabelCommand(vtkObject* object,
   if (this->IsCreated())
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, obj, method);
+    this->SetObjectMethodCommand(&command, object, method);
     this->Script("%s configure -labelcommand {%s}", 
                  this->GetWidgetName(), command);
     delete [] command;
@@ -285,7 +285,7 @@ void vtkKWMultiColumnList::SetSortCommand(vtkObject* object,
   if (this->IsCreated())
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, obj, method);
+    this->SetObjectMethodCommand(&command, object, method);
     this->Script("%s configure -sortcommand {%s}", 
                  this->GetWidgetName(), command);
     delete [] command;
@@ -554,7 +554,7 @@ int vtkKWMultiColumnList::GetIndexOfFirstSelectedRow()
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetSelectionChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->SelectionChangedCommand, object, method);

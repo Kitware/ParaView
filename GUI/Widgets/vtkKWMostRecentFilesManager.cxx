@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.7");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.8");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
@@ -51,10 +51,10 @@ public:
 
     vtkObject *GetTargetObject() 
       { return this->TargetObject; }
-    void SetTargetObject(vtkKWObject *object) 
+    void SetTargetObject(vtkObject *object) 
       { this->TargetObject = object; }
 
-    int IsEqual(const char *filename, vtkKWObject *, const char *) 
+    int IsEqual(const char *filename, vtkObject *, const char *) 
       { return (filename && !strcmp(filename, this->FileName.c_str())); }
   
   private:

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.6");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -401,12 +401,6 @@ int vtkKWDragAndDropTargetSet::SetTargetStartCommand(vtkKWWidget *target,
     return 0;
     }
 
-  if (!object->GetApplication())
-    {
-    vtkErrorMacro("Error! Object's application not set!");
-    return 0;
-    }
-
   vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
   if (!found)
     {
@@ -436,12 +430,6 @@ int vtkKWDragAndDropTargetSet::SetTargetPerformCommand(vtkKWWidget *target,
     return 0;
     }
 
-  if (!object->GetApplication())
-    {
-    vtkErrorMacro("Error! Object's application not set!");
-    return 0;
-    }
-
   vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
   if (!found)
     {
@@ -468,12 +456,6 @@ int vtkKWDragAndDropTargetSet::SetTargetEndCommand(vtkKWWidget *target,
 {
   if (!target || !object || !method || !method[0])
     {
-    return 0;
-    }
-
-  if (!object->GetApplication())
-    {
-    vtkErrorMacro("Error! Object's application not set!");
     return 0;
     }
 

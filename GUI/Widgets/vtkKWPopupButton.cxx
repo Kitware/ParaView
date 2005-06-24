@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.23");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -243,10 +243,10 @@ void vtkKWPopupButton::WithdrawPopupCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupButton::SetWithdrawCommand(vtkObject* obj, const char* command)
+void vtkKWPopupButton::SetWithdrawCommand(vtkObject* obj, const char* method)
 {
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, command);
+  this->SetObjectMethodCommand(&command, obj, method);
   this->SetWithdrawCommand(command);
   delete [] command;
 }

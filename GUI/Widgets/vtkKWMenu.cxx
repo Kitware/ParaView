@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.74");
+vtkCxxRevisionMacro(vtkKWMenu, "1.75");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -690,7 +690,7 @@ int vtkKWMenu::GetIndex(const char* menuname)
 int vtkKWMenu::GetIndexOfCommand(
   vtkObject* Object, const char* MethodAndArgString)
 {
-  if (Object && Object->GetApplication() && MethodAndArgString)
+  if (Object && MethodAndArgString)
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, Object, MethodAndArgString);
@@ -885,7 +885,7 @@ void vtkKWMenu::SetEntryCommand(int index, vtkObject* object,
                            const char* MethodAndArgString)
 {
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, Object, MethodAndArgString);
+  this->SetObjectMethodCommand(&command, object, MethodAndArgString);
   this->SetEntryCommand(index, command);
   delete [] command;
 }
