@@ -196,15 +196,11 @@ public:
   vtkSetMacro(LockDragAndDropEntries, int);
   vtkGetMacro(LockDragAndDropEntries, int);
 
-protected:
-  vtkKWUserInterfaceNotebookManager();
-  ~vtkKWUserInterfaceNotebookManager();
-
   //BTX
   // A Widget location. 
   // Store both the page the widget is packed in, and the widget it is 
   // packed after (if any).
-
+  // @cond nested_class
   class WidgetLocation
   {
   public:
@@ -214,10 +210,11 @@ protected:
     int PageId;
     vtkKWWidget *AfterWidget;
   };
+  // @endcond
 
   // A D&D entry. 
   // Store the widget source and target location.
-
+  // @cond nested_class
   class DragAndDropEntry
   {
   public:
@@ -227,7 +224,12 @@ protected:
     WidgetLocation FromLocation;
     WidgetLocation ToLocation;
   };
+  // @endcond
   //ETX
+
+protected:
+  vtkKWUserInterfaceNotebookManager();
+  ~vtkKWUserInterfaceNotebookManager();
 
   // Description:
   // Remove the widgets of all pages belonging to a panel. It is called
