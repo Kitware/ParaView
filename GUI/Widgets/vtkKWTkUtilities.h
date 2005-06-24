@@ -43,6 +43,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Return the Tcl name of a VTK object
+  static const char* GetTclNameFromPointer(
+    Tcl_Interp *interp, vtkObject *obj);
+  static const char* GetTclNameFromPointer(
+    vtkKWApplication *app, vtkObject *obj);
+    
+  // Description:
   // Evaluate a Tcl string. The string is passed to printf() first (as format
   // specifier) along with the remaining arguments.
   // The second prototype can be used by similar variable arguments method: it

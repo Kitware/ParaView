@@ -18,6 +18,7 @@
 #include "vtkKWResourceUtilities.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkTclUtil.h"
 
 #include "vtkWindows.h"
 #include "X11/Xutil.h"
@@ -41,7 +42,34 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.57");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.58");
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetTclNameFromPointer(
+  Tcl_Interp *interp,
+  vtkObject *obj)
+{
+  if (!interp || !obj)
+    {
+    return NULL;
+    }
+
+  vtkTclGetObjectFromPointer(interp, (void *)obj, obj->GetClassName());
+  return interp->result;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetTclNameFromPointer(
+  vtkKWApplication *app,  
+  vtkObject *obj)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+  return vtkKWTkUtilities::GetTclNameFromPointer(
+    app->GetMainInterp(), obj);
+}
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
