@@ -120,8 +120,9 @@ int my_main(int argc, char *argv[])
     vtkKWTkUtilities::GetTclNameFromPointer(app, viewer));
 
   char command[1024];
-  sprintf(command, "%s SetZSlice [%s GetValue]", 
-          viewer_tclname.c_str(), slice_scale->GetTclName());
+  sprintf(command, "%s SetZSlice [%s GetValue] ; %s Render", 
+          viewer_tclname.c_str(), slice_scale->GetTclName(), rw->GetTclName());
+  cout << command << endl;
   slice_scale->SetCommand(NULL, command);
 
   app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2", 
