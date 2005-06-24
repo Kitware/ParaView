@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.42");
+vtkCxxRevisionMacro(vtkKWListBox, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -199,7 +199,8 @@ void vtkKWListBox::SetDoubleClickCommand(vtkObject* obj,
 {
   char *command = NULL;
   this->SetObjectMethodCommand(&command, obj, method);
-  this->Script("bind %s <Double-1> {%s}", command);
+  this->Script("bind %s <Double-1> {%s}", 
+               this->GetWidgetName(), command);
   delete [] command;
 }
 
@@ -209,7 +210,8 @@ void vtkKWListBox::SetSingleClickCommand(vtkObject* obj,
 {
   char *command = NULL;
   this->SetObjectMethodCommand(&command, obj, method);
-  this->Script("bind %s <ButtonRelease-1> {%s}", command);
+  this->Script("bind %s <ButtonRelease-1> {%s}", 
+               this->GetWidgetName(), command);
   delete [] command;
 }
 
