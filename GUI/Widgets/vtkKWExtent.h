@@ -72,15 +72,13 @@ public:
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetCommand(vtkObject *obj, const char *method);
 
   // Description:
   // A convenience method to set the start and end method of all the
   // internal ranges.  
-  virtual void SetStartCommand(
-    vtkKWObject* Object, const char *MethodAndArgString);
-  virtual void SetEndCommand(
-    vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetStartCommand(vtkObject *obj, const char *method);
+  virtual void SetEndCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Convenience method to set whether the command should be called or not.

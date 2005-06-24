@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.58");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.59");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -447,7 +447,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetCommand(vtkKWObject* obj, const char *method)
+void vtkKWChangeColorButton::SetCommand(vtkObject* obj, const char *method)
 {
   this->SetObjectMethodCommand(&this->Command, obj, method);
 }

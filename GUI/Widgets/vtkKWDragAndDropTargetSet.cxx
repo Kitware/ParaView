@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.5");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -244,7 +244,7 @@ void vtkKWDragAndDropTargetSet::SetSourceAnchor(vtkKWWidget *arg)
 
 //----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetStartCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->StartCommand, object, method);
@@ -252,7 +252,7 @@ void vtkKWDragAndDropTargetSet::SetStartCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetPerformCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->PerformCommand, object, method);
@@ -260,7 +260,7 @@ void vtkKWDragAndDropTargetSet::SetPerformCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetEndCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->EndCommand, object, method);
@@ -393,42 +393,7 @@ int vtkKWDragAndDropTargetSet::GetNumberOfTargets()
 
 //----------------------------------------------------------------------------
 int vtkKWDragAndDropTargetSet::SetTargetStartCommand(vtkKWWidget *target, 
-                                                   vtkKWObject *object, 
-                                                   const char *method)
-{
-  if (!target || !object || !method || !method[0])
-    {
-    return 0;
-    }
-
-  if (!object->GetApplication())
-    {
-    vtkErrorMacro("Error! Object's application not set!");
-    return 0;
-    }
-
-  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
-  if (!found)
-    {
-    this->AddTarget(target);
-    }
-  found = this->GetTarget(target);
-  if (!found)
-    {
-    return 0;
-    }
-
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  found->SetStartCommand(command.str());
-  command.rdbuf()->freeze(0);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWDragAndDropTargetSet::SetTargetPerformCommand(vtkKWWidget *target, 
-                                                     vtkKWObject *object, 
+                                                     vtkObject *object, 
                                                      const char *method)
 {
   if (!target || !object || !method || !method[0])
@@ -453,18 +418,18 @@ int vtkKWDragAndDropTargetSet::SetTargetPerformCommand(vtkKWWidget *target,
     return 0;
     }
 
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  found->SetPerformCommand(command.str());
-  command.rdbuf()->freeze(0);
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  found->SetStartCommand(command);
+  delete [] command;
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropTargetSet::SetTargetEndCommand(vtkKWWidget *target, 
-                                           vtkKWObject *object, 
-                                           const char *method)
+int vtkKWDragAndDropTargetSet::SetTargetPerformCommand(vtkKWWidget *target, 
+                                                       vtkObject *object, 
+                                                       const char *method)
 {
   if (!target || !object || !method || !method[0])
     {
@@ -488,10 +453,45 @@ int vtkKWDragAndDropTargetSet::SetTargetEndCommand(vtkKWWidget *target,
     return 0;
     }
 
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  found->SetEndCommand(command.str());
-  command.rdbuf()->freeze(0);
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  found->SetPerformCommand(command);
+  delete [] command;
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDragAndDropTargetSet::SetTargetEndCommand(vtkKWWidget *target, 
+                                                   vtkObject *object, 
+                                                   const char *method)
+{
+  if (!target || !object || !method || !method[0])
+    {
+    return 0;
+    }
+
+  if (!object->GetApplication())
+    {
+    vtkErrorMacro("Error! Object's application not set!");
+    return 0;
+    }
+
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
+  if (!found)
+    {
+    this->AddTarget(target);
+    }
+  found = this->GetTarget(target);
+  if (!found)
+    {
+    return 0;
+    }
+
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  found->SetEndCommand(command);
+  delete [] command;
 
   return 1;
 }

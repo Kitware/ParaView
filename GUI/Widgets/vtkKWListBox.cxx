@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.41");
+vtkCxxRevisionMacro(vtkKWListBox, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -194,23 +194,23 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 
  
 //----------------------------------------------------------------------------
-void vtkKWListBox::SetDoubleClickCommand(vtkKWObject* obj, 
-                                          const char* methodAndArgs)
+void vtkKWListBox::SetDoubleClickCommand(vtkObject* obj, 
+                                          const char *method)
 {
-  this->Script("bind %s <Double-1> {%s %s}", 
-               this->GetWidgetName(),
-               (obj ? obj->GetTclName() : ""), 
-               (methodAndArgs ? methodAndArgs : ""));
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, obj, method);
+  this->Script("bind %s <Double-1> {%s}", command);
+  delete [] command;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::SetSingleClickCommand(vtkKWObject* obj, 
-                                          const char* methodAndArgs)
+void vtkKWListBox::SetSingleClickCommand(vtkObject* obj, 
+                                          const char* method)
 {
-  this->Script("bind %s <ButtonRelease-1> {%s %s}", 
-               this->GetWidgetName(),
-               (obj ? obj->GetTclName() : ""), 
-               (methodAndArgs ? methodAndArgs : ""));
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, obj, method);
+  this->Script("bind %s <ButtonRelease-1> {%s}", command);
+  delete [] command;
 }
 
 

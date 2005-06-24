@@ -91,9 +91,9 @@ public:
   // Description:
   // Set the command that will be called when the property is changed/changing.
   virtual void SetPropertyChangedCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetPropertyChangingCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
   virtual void InvokePropertyChangedCommand();
   virtual void InvokePropertyChangingCommand();
 

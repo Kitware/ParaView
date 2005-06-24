@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.13");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1492,7 +1492,7 @@ void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangingCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetVolumePropertyChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->VolumePropertyChangedCommand, object, method);
@@ -1500,7 +1500,7 @@ void vtkKWVolumePropertyWidget::SetVolumePropertyChangedCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetVolumePropertyChangingCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->VolumePropertyChangingCommand, object, method);

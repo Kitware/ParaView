@@ -83,9 +83,9 @@ public:
   // unless InvokeCommandsWithRGB is true, in that case the current HSV 
   // value is converted to RGB first.
   virtual void SetSelectionChangedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetSelectionChangingCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeSelectionChangingCommand();
 

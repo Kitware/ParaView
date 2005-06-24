@@ -126,13 +126,13 @@ public:
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand      (vtkKWObject* Object, 
+  virtual void SetCommand      (vtkObject* Object, 
                                 const char *MethodAndArgString);
-  virtual void SetStartCommand (vtkKWObject* Object, 
+  virtual void SetStartCommand (vtkObject* Object, 
                                 const char *MethodAndArgString);
-  virtual void SetEndCommand   (vtkKWObject* Object, 
+  virtual void SetEndCommand   (vtkObject* Object, 
                                 const char *MethodAndArgString);
-  virtual void SetEntryCommand (vtkKWObject* Object, 
+  virtual void SetEntryCommand (vtkObject* Object, 
                                 const char *MethodAndArgString);
 
   // Description:

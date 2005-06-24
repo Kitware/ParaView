@@ -85,11 +85,11 @@ public:
   // vtkKWWidget*, vtkKWWidget*). Additionally, EndCommand is passed a 5th 
   // parameter, the target (vtkKWWidget *).
   virtual int SetTargetStartCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
+    vtkKWWidget *target, vtkObject *object, const char *method);
   virtual int SetTargetPerformCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
+    vtkKWWidget *target, vtkObject *object, const char *method);
   virtual int SetTargetEndCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
+    vtkKWWidget *target, vtkObject *object, const char *method);
 
   // Description:
   // Drag and Drop callbacks
@@ -108,9 +108,9 @@ public:
   // StartCommand and PerformCommand are called *before* any target's
   // corresponding command. EndCommand is called *after* any target's
   // EndCommand.
-  virtual void SetStartCommand(vtkKWObject *object, const char *method);
-  virtual void SetPerformCommand(vtkKWObject *object, const char *method);
-  virtual void SetEndCommand(vtkKWObject *object, const char *method);
+  virtual void SetStartCommand(vtkObject *object, const char *method);
+  virtual void SetPerformCommand(vtkObject *object, const char *method);
+  virtual void SetEndCommand(vtkObject *object, const char *method);
 
 protected:
   vtkKWDragAndDropTargetSet();

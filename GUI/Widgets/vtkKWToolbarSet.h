@@ -117,14 +117,14 @@ public:
   // Set/Get the command/callback that will be called when the visibility
   // of a toolbar is changed.
   virtual void SetToolbarVisibilityChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void InvokeToolbarVisibilityChangedCommand();
 
   // Description:
   // Set/Get the command/callback that will be called when the number of
   // toolbar has changed (added or removed).
   virtual void SetNumberOfToolbarsChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void InvokeNumberOfToolbarsChangedCommand();
 
   // Description:

@@ -216,10 +216,10 @@ public:
 
   // Description:
   // Set commands.
-  virtual void SetCommand(vtkKWObject* object, const char *method);
-  virtual void SetStartCommand(vtkKWObject* object, const char *method);
-  virtual void SetEndCommand(vtkKWObject* object, const char *method);
-  virtual void SetEntriesCommand(vtkKWObject* object, const char *method);
+  virtual void SetCommand(vtkObject* object, const char *method);
+  virtual void SetStartCommand(vtkObject* object, const char *method);
+  virtual void SetEndCommand(vtkObject* object, const char *method);
+  virtual void SetEntriesCommand(vtkObject* object, const char *method);
   virtual void InvokeCommand();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();

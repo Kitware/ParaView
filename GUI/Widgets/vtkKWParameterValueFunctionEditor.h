@@ -735,7 +735,7 @@ public:
   vtkBooleanMacro(ShowHistogramLogModeOptionMenu, int);
   vtkGetMacro(ShowHistogramLogModeOptionMenu, int);
   virtual void SetHistogramLogModeChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void InvokeHistogramLogModeChangedCommand();
 
   // Description:
@@ -766,27 +766,27 @@ public:
   // the parameter cursor is moving or was moved (at the end of the
   // interaction).
   virtual void SetPointAddedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void SetPointMovingCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetPointMovedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetPointRemovedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetSelectionChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void SetFunctionChangedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetFunctionChangingCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetVisibleRangeChangedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetVisibleRangeChangingCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetParameterCursorMovingCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void SetParameterCursorMovedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
 
   // Description:
   // Events. Even though it is highly recommended to use the commands

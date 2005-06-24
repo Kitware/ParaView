@@ -60,7 +60,7 @@ public:
   // visibility can be set.
   virtual void SetSelectionList(int num, const char **list);
   virtual void SetSelectionListCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
   vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
   virtual void SetShowSelectionList(int);
   vtkGetMacro(ShowSelectionList, int);
@@ -77,7 +77,7 @@ public:
   vtkGetMacro(ShowClose, int);
   vtkBooleanMacro(ShowClose, int);
   virtual void SetCloseCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
   vtkGetObjectMacro(CloseButton, vtkKWPushButton);
 
   // Description:
@@ -89,7 +89,7 @@ public:
   vtkGetMacro(ShowChangeTitle, int);
   vtkBooleanMacro(ShowChangeTitle, int);
   virtual void SetChangeTitleCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Set the select command, called when the frame is selected by the user
@@ -98,8 +98,8 @@ public:
   // (note that it will also invoke the select command, since the first
   // click acts as a select event).
   // This command will be passed a pointer to this object.
-  virtual void SetSelectCommand(vtkKWObject *object, const char *method);
-  virtual void SetDoubleClickCommand(vtkKWObject *object, const char *method);
+  virtual void SetSelectCommand(vtkObject *object, const char *method);
+  virtual void SetDoubleClickCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 

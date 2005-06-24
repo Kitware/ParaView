@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.24");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.25");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -857,7 +857,7 @@ void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetToolbarVisibilityChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->ToolbarVisibilityChangedCommand, object, method);
@@ -875,7 +875,7 @@ void vtkKWToolbarSet::InvokeNumberOfToolbarsChangedCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetNumberOfToolbarsChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->NumberOfToolbarsChangedCommand, object, method);

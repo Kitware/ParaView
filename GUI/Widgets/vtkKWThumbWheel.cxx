@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.34");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.35");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1075,14 +1075,14 @@ void vtkKWThumbWheel::InvokeEntryCommand()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetCommand(vtkKWObject* Object, 
+void vtkKWThumbWheel::SetCommand(vtkObject* Object, 
                                  const char *CommandString)
 {
   this->SetObjectMethodCommand(&this->Command, Object, CommandString);
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetStartCommand(vtkKWObject* Object, 
+void vtkKWThumbWheel::SetStartCommand(vtkObject* Object, 
                                       const char * MethodAndArgString)
 {
   this->SetObjectMethodCommand(
@@ -1090,7 +1090,7 @@ void vtkKWThumbWheel::SetStartCommand(vtkKWObject* Object,
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetEndCommand(vtkKWObject* Object, 
+void vtkKWThumbWheel::SetEndCommand(vtkObject* Object, 
                                     const char * MethodAndArgString)
 {
   this->SetObjectMethodCommand(
@@ -1098,7 +1098,7 @@ void vtkKWThumbWheel::SetEndCommand(vtkKWObject* Object,
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetEntryCommand(vtkKWObject* Object, 
+void vtkKWThumbWheel::SetEntryCommand(vtkObject* Object, 
                                       const char * MethodAndArgString)
 {
   this->SetObjectMethodCommand(

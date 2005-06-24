@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.133");
+vtkCxxRevisionMacro(vtkKWWidget, "1.134");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -402,10 +402,15 @@ void vtkKWWidget::Focus()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString)
+void vtkKWWidget::SetBind(vtkObject* CalledObject, const char *Event, const char *CommandString)
 {
-  this->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
-               Event, CalledObject->GetTclName(), CommandString);
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, CalledObject, CommandString);
+
+  this->Script("bind %s %s {%s}", this->GetWidgetName(), Event, command);
+
+  delete [] command;
+
 }
 
 //----------------------------------------------------------------------------
@@ -439,7 +444,7 @@ void vtkKWWidget::SetBindAll(const char *event, const char *command)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
+void vtkKWWidget::SetCommand(vtkObject* CalledObject, const char * CommandString)
 {
   if (!this->IsCreated())
     {

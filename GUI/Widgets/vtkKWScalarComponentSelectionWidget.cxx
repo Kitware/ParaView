@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.11");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.12");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -257,7 +257,7 @@ void vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWScalarComponentSelectionWidget::SetSelectedComponentChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->SelectedComponentChangedCommand, object, method);

@@ -161,7 +161,7 @@ public:
   // Description:
   // Specifies a command to be invoked when the selection has changed
   virtual void SetSelectionChangedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
 
   // Description:
   // Active a row.
@@ -218,7 +218,7 @@ public:
   // the embedded window to be created, and the resulting script is evaluated
   // in the global scope.
   virtual void SetCellWindowCommand(int row_index, int col_index, 
-                                    vtkKWObject* object, const char *method);
+                                    vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be invoked when the interactive editing of a cell's
@@ -227,7 +227,7 @@ public:
   // indices, as well as the text displayed in the cell, the resulting script
   // is evaluated in the global scope, and the return value becomes the 
   // initial contents of the temporary embedded widget used for the editing.
-  virtual void SetEditStartCommand(vtkKWObject* object, const char *method);
+  virtual void SetEditStartCommand(vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be invoked on normal termination of the 
@@ -239,7 +239,7 @@ public:
   // the global scope, and the return value becomes the cell's new contents 
   // after destroying the temporary embedded widget. The main purpose of this
   // script is to perform a final validation of the edit window's contents.
-  virtual void SetEditEndCommand(vtkKWObject* object, const char *method);
+  virtual void SetEditEndCommand(vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be invoked when mouse button 1 is pressed over one
@@ -248,7 +248,7 @@ public:
   // concatenated with the name of the tablelist widget and the column index
   // of the respective label, and the resulting script is evaluated in the
   // global scope. 
-  virtual void SetLabelCommand(vtkKWObject* object, const char *method);
+  virtual void SetLabelCommand(vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be used for the comparison of the items when
@@ -259,7 +259,7 @@ public:
   // is evaluated. The script should return an integer less than, equal to, or
   // greater than zero if the first item is to be considered less than, equal
   // to, or greater than the second, respectively.
-  virtual void SetSortCommand(vtkKWObject* object, const char *method);
+  virtual void SetSortCommand(vtkObject* object, const char *method);
 
   // Description:
   // Callbacks

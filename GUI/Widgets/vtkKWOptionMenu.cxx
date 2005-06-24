@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.37");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -147,7 +147,7 @@ void vtkKWOptionMenu::AddEntry(const char *name)
 
 //----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntryWithCommand(const char *name, 
-                                          vtkKWObject *obj, 
+                                          vtkObject *obj, 
                                           const char *method,
                                           const char *options)
 {
@@ -164,7 +164,7 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name,
 
 //----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddImageEntryWithCommand(const char *image_name, 
-                                               vtkKWObject *obj, 
+                                               vtkObject *obj, 
                                                const char *method,
                                                const char *options)
 {

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.60");
+vtkCxxRevisionMacro(vtkKWEntry, "1.61");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -271,19 +271,24 @@ void vtkKWEntry::SetWidth(int width)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::BindCommand(vtkKWObject *object, 
-                             const char *command)
+void vtkKWEntry::BindCommand(vtkObject *object, 
+                             const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("bind %s <Return> {%s %s}",
-                 this->GetWidgetName(), object->GetTclName(), command);
-    this->Script("bind %s <FocusOut> {%s %s}",
-                 this->GetWidgetName(), object->GetTclName(), command);
-    this->Script("bind %s <Return> {%s %s}",
-                 this->Entry->GetWidgetName(), object->GetTclName(), command);
-    this->Script("bind %s <FocusOut> {%s %s}",
-                 this->Entry->GetWidgetName(), object->GetTclName(), command);
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+
+    this->Script("bind %s <Return> {%s}",
+                 this->GetWidgetName(), command);
+    this->Script("bind %s <FocusOut> {%s}",
+                 this->GetWidgetName(), command);
+    this->Script("bind %s <Return> {%s}",
+                 this->Entry->GetWidgetName(), command);
+    this->Script("bind %s <FocusOut> {%s}",
+                 this->Entry->GetWidgetName(), command);
+
+    delete [] command;
     }
 }
 

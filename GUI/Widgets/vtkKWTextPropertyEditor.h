@@ -112,13 +112,13 @@ public:
   // Set/Get the command executed each time a change is made to the
   // text property.
   virtual void SetChangedCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the command executed each time a change is made to the
   // color of the text property (the ChangedCommand is run too).
   virtual void SetColorChangedCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Show copy button. This button can be used to synchronize different

@@ -80,13 +80,13 @@ public:
                                    const char *image_name, 
                                    const char *select_image_name, 
                                    const char *variable_name,
-                                   vtkKWObject *object, 
+                                   vtkObject *object, 
                                    const char *method, 
                                    const char *help = 0);
   vtkKWWidget* AddCheckButtonImage(const char *image_name, 
                                    const char *select_image_name, 
                                    const char *variable_name,
-                                   vtkKWObject *object, 
+                                   vtkObject *object, 
                                    const char *method, 
                                    const char *help = 0);
   

@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.45");
+vtkCxxRevisionMacro(vtkKWRange, "1.46");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1269,25 +1269,25 @@ void vtkKWRange::InvokeEntriesCommand()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetCommand(vtkKWObject *object, const char *method)
+void vtkKWRange::SetCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->Command, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetStartCommand(vtkKWObject *object, const char *method)
+void vtkKWRange::SetStartCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->StartCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetEndCommand(vtkKWObject *object, const char *method)
+void vtkKWRange::SetEndCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->EndCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetEntriesCommand(vtkKWObject *object, const char *method)
+void vtkKWRange::SetEntriesCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->EntriesCommand, object, method);
 }

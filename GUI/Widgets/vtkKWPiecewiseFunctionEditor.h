@@ -85,7 +85,7 @@ public:
   // Description:
   // Set commands.
   virtual void SetWindowLevelModeChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void InvokeWindowLevelModeChangedCommand();
   virtual void InvokeFunctionChangedCommand();
   virtual void InvokeFunctionChangingCommand();

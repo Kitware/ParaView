@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.26");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -873,7 +873,7 @@ void vtkKWPiecewiseFunctionEditor::InvokeWindowLevelModeChangedCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::SetWindowLevelModeChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->WindowLevelModeChangedCommand, object, method);

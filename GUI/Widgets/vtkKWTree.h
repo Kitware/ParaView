@@ -172,32 +172,32 @@ public:
   // Description:
   // Set the method to be called when the user opens a node. The path of the
   // opened node is appended to the command.
-  virtual void SetOpenCommand(vtkKWObject *obj, const char *method);
+  virtual void SetOpenCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Set the method to be called when the user closes a node. The path of the
   // closed node is appended to the command.
-  virtual void SetCloseCommand(vtkKWObject *obj, const char *method);
+  virtual void SetCloseCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Associates a object/method to execute whenever the event sequence given 
   // by 'event' occurs on the label of a node. The node idenfier on which
   // the event occurs is appended to the command.
   virtual void SetBindText(
-    const char *event, vtkKWObject *obj, const char *method);
+    const char *event, vtkObject *obj, const char *method);
 
   // Description:
   // Convenience method to set the callback for single click and double
   // click on a node. This, in turn, just calls SetBindText.
   virtual void SetDoubleClickOnNodeCommand(
-    vtkKWObject *obj, const char *method);
+    vtkObject *obj, const char *method);
   virtual void SetSingleClickOnNodeCommand(
-    vtkKWObject *obj, const char *method);
+    vtkObject *obj, const char *method);
  
   // Description:
   // Set the callback to invoke when the selection changes.
   virtual void SetSelectionChangedCommand(
-    vtkKWObject *obj, const char *method);
+    vtkObject *obj, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

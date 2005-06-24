@@ -46,10 +46,10 @@ public:
   // Add/Insert entries to an option menu, with or without a command.
   virtual void AddEntry(const char *name);
   virtual void AddEntryWithCommand(
-    const char *name, vtkKWObject *obj, const char *method, 
+    const char *name, vtkObject *obj, const char *method, 
     const char *options=0);
   virtual void AddImageEntryWithCommand(
-    const char *image_name, vtkKWObject *obj, const char *method, 
+    const char *image_name, vtkObject *obj, const char *method, 
     const char *options = 0);
   virtual void AddSeparator();
 

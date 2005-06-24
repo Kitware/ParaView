@@ -46,7 +46,7 @@ public:
   // object and/or default target command are used.
   virtual void AddFile(
     const char *filename, 
-    vtkKWObject *target_object = NULL, 
+    vtkObject *target_object = NULL, 
     const char *target_command = NULL);
   
   // Description:
@@ -57,8 +57,8 @@ public:
   // invoked on the associated target object. If one and/or the other was not
   // specified when the most recent file was added, the default target
   // object and default target command are used.
-  vtkGetObjectMacro(DefaultTargetObject, vtkKWObject);
-  virtual void SetDefaultTargetObject(vtkKWObject*);
+  vtkGetObjectMacro(DefaultTargetObject, vtkObject);
+  virtual void SetDefaultTargetObject(vtkObject*);
   vtkGetStringMacro(DefaultTargetCommand);
   virtual void SetDefaultTargetCommand(const char *);
 
@@ -119,7 +119,7 @@ protected:
   ~vtkKWMostRecentFilesManager();
 
   char        *DefaultTargetCommand;
-  vtkKWObject *DefaultTargetObject;
+  vtkObject   *DefaultTargetObject;
   char        *RegistryKey;
   int         MaximumNumberOfFilesInRegistry;
   int         MaximumNumberOfFilesInMenu;
@@ -138,7 +138,7 @@ protected:
   // or save to the registry).
   virtual void AddFileInternal(
     const char *filename, 
-    vtkKWObject *target_object = NULL, 
+    vtkObject *target_object = NULL, 
     const char *target_command = NULL);
 
   // Description::

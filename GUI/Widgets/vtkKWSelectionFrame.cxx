@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.39");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -616,35 +616,35 @@ void vtkKWSelectionFrame::UpdateSelectionList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetSelectionListCommand(vtkKWObject *object,
+void vtkKWSelectionFrame::SetSelectionListCommand(vtkObject *object,
                                                   const char *method)
 {
   this->SetObjectMethodCommand(&this->SelectionListCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetCloseCommand(vtkKWObject *object,
+void vtkKWSelectionFrame::SetCloseCommand(vtkObject *object,
                                           const char *method)
 {
   this->SetObjectMethodCommand(&this->CloseCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
-                                                    const char *method)
+void vtkKWSelectionFrame::SetSelectCommand(vtkObject *object,
+                                           const char *method)
 {
   this->SetObjectMethodCommand(&this->SelectCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetDoubleClickCommand(vtkKWObject *object,
+void vtkKWSelectionFrame::SetDoubleClickCommand(vtkObject *object,
                                                 const char *method)
 {
   this->SetObjectMethodCommand(&this->DoubleClickCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetChangeTitleCommand(vtkKWObject *object,
+void vtkKWSelectionFrame::SetChangeTitleCommand(vtkObject *object,
                                                 const char *method)
 {
   this->SetObjectMethodCommand(&this->ChangeTitleCommand, object, method);

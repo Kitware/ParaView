@@ -176,7 +176,7 @@ public:
   // If the "Recent files" sub-menu has been inserted at that point (see
   // the InsertRecentFilesMenu method), it will be updated as well.
   virtual void AddRecentFile(
-    const char *filename, vtkKWObject *target, const char *command);
+    const char *filename, vtkObject *target, const char *command);
   
   // Description:
   // Set/Get a hint about print support. Disabled by default.
@@ -262,7 +262,7 @@ protected:
   // and fill it with the most recent files stored in the registry.
   // The 'target' parameter is the object against which the command
   // associated to a most recent file will be executed (usually the instance).
-  virtual void InsertRecentFilesMenu(int pos, vtkKWObject *target);
+  virtual void InsertRecentFilesMenu(int pos, vtkObject *target);
 
   // Description:
   // Display the close dialog.

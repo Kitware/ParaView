@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.19");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.20");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -747,7 +747,7 @@ vtkKWMenu *vtkKWWindowBase::GetToolbarsVisibilityMenu()
 
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::InsertRecentFilesMenu(
-  int pos, vtkKWObject *target)
+  int pos, vtkObject *target)
 {
   if (!this->IsCreated() || !this->MostRecentFilesManager)
     {
@@ -785,7 +785,7 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
 
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::AddRecentFile(const char *name, 
-                                    vtkKWObject *target,
+                                    vtkObject *target,
                                     const char *command)
 {  
   if (this->MostRecentFilesManager)

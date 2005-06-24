@@ -54,7 +54,7 @@ public:
   // Description:
   // Set the command that is called when the color is changed.
   // Note that the current color is passed too, as 3 RGB (double) parameters.
-  virtual void SetCommand(vtkKWObject *obj, const char *method);
+  virtual void SetCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Set the string that enables balloon help for this widget.

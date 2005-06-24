@@ -63,7 +63,7 @@ public:
 
   // Description:
   // Set and get the command that is called when the popup is withdrawed.
-  virtual void SetWithdrawCommand(vtkKWObject* obj, const char* command);
+  virtual void SetWithdrawCommand(vtkObject* obj, const char* command);
   vtkSetStringMacro(WithdrawCommand);
   vtkGetStringMacro(WithdrawCommand);
 

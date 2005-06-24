@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.7");
+vtkCxxRevisionMacro(vtkKWTree, "1.8");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -485,7 +485,7 @@ void vtkKWTree::SetSelectionForegroundColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetOpenCommand(vtkKWObject *obj, const char *method)
+void vtkKWTree::SetOpenCommand(vtkObject *obj, const char *method)
 {
   if (!this->IsCreated())
     {
@@ -499,7 +499,7 @@ void vtkKWTree::SetOpenCommand(vtkKWObject *obj, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetCloseCommand(vtkKWObject *obj, const char *method)
+void vtkKWTree::SetCloseCommand(vtkObject *obj, const char *method)
 {
   if (!this->IsCreated())
     {
@@ -514,7 +514,7 @@ void vtkKWTree::SetCloseCommand(vtkKWObject *obj, const char *method)
 
 //----------------------------------------------------------------------------
 void vtkKWTree::SetBindText(const char *event, 
-                            vtkKWObject *obj, 
+                            vtkObject *obj, 
                             const char *method)
 {
   if (!this->IsCreated() || !event)
@@ -529,21 +529,21 @@ void vtkKWTree::SetBindText(const char *event,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetDoubleClickOnNodeCommand(vtkKWObject *obj, 
+void vtkKWTree::SetDoubleClickOnNodeCommand(vtkObject *obj, 
                                             const char *method)
 {
   this->SetBindText("<Double-ButtonPress-1>", obj, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetSingleClickOnNodeCommand(vtkKWObject *obj, 
+void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *obj, 
                                             const char *method)
 {
   this->SetBindText("<ButtonPress-1>", obj, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetSelectionChangedCommand(vtkKWObject *obj, 
+void vtkKWTree::SetSelectionChangedCommand(vtkObject *obj, 
                                            const char *method)
 {
   if (this->IsCreated())

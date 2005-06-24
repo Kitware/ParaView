@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.55");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.56");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -323,7 +323,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
                                                const char *image_name, 
                                                const char *select_image_name, 
                                                const char *variable_name, 
-                                               vtkKWObject *object, 
+                                               vtkObject *object, 
                                                const char *method,
                                                const char *help)
 {
@@ -373,7 +373,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
 vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name, 
                                                const char *select_image_name, 
                                                const char *variable_name, 
-                                               vtkKWObject *object, 
+                                               vtkObject *object, 
                                                const char *method,
                                                const char *help)
 {

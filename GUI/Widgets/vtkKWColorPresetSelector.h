@@ -130,7 +130,7 @@ public:
   // Description:
   // Set/Get the command executed when a preset a selected.
   virtual void SetPresetSelectedCommand(
-    vtkKWObject *object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Callbacks

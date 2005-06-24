@@ -37,7 +37,7 @@ public:
   
   // Description: 
   // Append a standard menu item and command to the current menu.
-  void AddCommand(const char* label, vtkKWObject* Object,
+  void AddCommand(const char* label, vtkObject* Object,
                   const char* MethodAndArgString , const char* help = 0);
   
   // Description: 

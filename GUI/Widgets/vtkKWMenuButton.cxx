@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.24");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -73,7 +73,7 @@ const char* vtkKWMenuButton::GetButtonText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
+void vtkKWMenuButton::AddCommand(const char* label, vtkObject* Object,
                                  const char* MethodAndArgString,
                                  const char* help)
 {

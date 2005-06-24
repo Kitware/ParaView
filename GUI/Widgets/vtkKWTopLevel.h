@@ -186,7 +186,7 @@ public:
   // The second is the name of the method to be called and any arguments
   // in string form.
   virtual void SetDeleteWindowProtocolCommand(
-    vtkKWObject *obj, const char *command);
+    vtkObject *obj, const char *command);
 
   // Description:
   // Convenience method to set the name inside the icon associated to this

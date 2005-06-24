@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.10");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.11");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -497,7 +497,7 @@ void vtkKWHSVColorSelector::InvokeSelectionChangingCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWHSVColorSelector::SetSelectionChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->SelectionChangedCommand, object, method);
@@ -505,7 +505,7 @@ void vtkKWHSVColorSelector::SetSelectionChangedCommand(
 
 //----------------------------------------------------------------------------
 void vtkKWHSVColorSelector::SetSelectionChangingCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->SelectionChangingCommand, object, method);

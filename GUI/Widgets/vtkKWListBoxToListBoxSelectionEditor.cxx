@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -432,12 +432,13 @@ void vtkKWListBoxToListBoxSelectionEditor::EllipsisCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(vtkKWObject* obj, const char* command)
+void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(
+  vtkObject* obj, const char* method)
 {
-  ostrstream str;
-  str << obj->GetTclName() << " " << command << ends;
-  this->SetEllipsisCommand(str.str());
-  str.rdbuf()->freeze(0);
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, obj, method);
+  this->SetEllipsisCommand(command);
+  delete [] command;
 }
 
 //-----------------------------------------------------------------------------

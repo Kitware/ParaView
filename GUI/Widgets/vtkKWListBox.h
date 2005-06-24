@@ -88,8 +88,8 @@ public:
   
   // Description:
   // Set callback for single and double click on a list item.
-  virtual void SetDoubleClickCommand(vtkKWObject *obj, const char *method);
-  virtual void SetSingleClickCommand(vtkKWObject *obj, const char *method);
+  virtual void SetDoubleClickCommand(vtkObject *obj, const char *method);
+  virtual void SetSingleClickCommand(vtkObject *obj, const char *method);
   
   // Description:
   // Get number of items in the list.

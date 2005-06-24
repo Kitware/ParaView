@@ -61,7 +61,7 @@ public:
   // Description:
   // Override vtkKWWidget's SetCommand so that the button command callback
   // will invoke the load/save dialog, then invoke a user-defined command.
-  virtual void SetCommand(vtkKWObject *object, const char *method);
+  virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Callbacks.

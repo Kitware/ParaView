@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.6");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.7");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
@@ -49,7 +49,7 @@ public:
     void SetTargetCommand(const char *command) 
       { this->TargetCommand = command; }
 
-    vtkKWObject *GetTargetObject() 
+    vtkObject *GetTargetObject() 
       { return this->TargetObject; }
     void SetTargetObject(vtkKWObject *object) 
       { this->TargetObject = object; }
@@ -60,7 +60,7 @@ public:
   private:
     
     vtksys_stl::string FileName;
-    vtkKWObject *TargetObject;
+    vtkObject *TargetObject;
     vtksys_stl::string TargetCommand;
   };
 
@@ -116,7 +116,7 @@ vtkKWMostRecentFilesManager::~vtkKWMostRecentFilesManager()
 //----------------------------------------------------------------------------
 void vtkKWMostRecentFilesManager::AddFileInternal(
   const char *filename, 
-  vtkKWObject *target_object, 
+  vtkObject *target_object, 
   const char *target_command)
 {
   if (!filename || !*filename)
@@ -152,7 +152,7 @@ void vtkKWMostRecentFilesManager::AddFileInternal(
 //----------------------------------------------------------------------------
 void vtkKWMostRecentFilesManager::AddFile(
   const char *filename, 
-  vtkKWObject *target_object, 
+  vtkObject *target_object, 
   const char *target_command)
 {
   if (!this->GetApplication())
@@ -175,7 +175,7 @@ void vtkKWMostRecentFilesManager::AddFile(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesManager::SetDefaultTargetObject(vtkKWObject *_arg)
+void vtkKWMostRecentFilesManager::SetDefaultTargetObject(vtkObject *_arg)
 {
   if (this->DefaultTargetObject == _arg) 
     { 
@@ -393,7 +393,7 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
     if (*it)
       {
       const char *filename = (*it)->GetFileName();
-      vtkKWObject *target_object = (*it)->GetTargetObject();
+      vtkObject *target_object = (*it)->GetTargetObject();
       if (!target_object)
         {
         target_object= this->DefaultTargetObject;

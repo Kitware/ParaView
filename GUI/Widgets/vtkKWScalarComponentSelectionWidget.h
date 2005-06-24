@@ -63,7 +63,7 @@ public:
   // Set the command called when the selected component is changed.
   // Note that the selected component is passed as a parameter.
   virtual void SetSelectedComponentChangedCommand(
-    vtkKWObject* object, const char *method);
+    vtkObject* object, const char *method);
   virtual void InvokeSelectedComponentChangedCommand();
 
   // Description:

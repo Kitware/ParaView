@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.10");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.11");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -875,7 +875,7 @@ int vtkKWColorPresetSelector::CreateColorTransferFunctionPreview(
 
 //----------------------------------------------------------------------------
 void vtkKWColorPresetSelector::SetPresetSelectedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->PresetSelectedCommand, object, method);
 }

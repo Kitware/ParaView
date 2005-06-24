@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -862,14 +862,14 @@ void vtkKWMaterialPropertyWidget::InvokePropertyChangingCommand()
 
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::SetPropertyChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->PropertyChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::SetPropertyChangingCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->PropertyChangingCommand, object, method);
 }

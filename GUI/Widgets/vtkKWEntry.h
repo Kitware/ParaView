@@ -67,7 +67,7 @@ public:
   // Description:
   // Bind the command called when the Return key is pressed or the widget
   // gets out of focus.
-  virtual void BindCommand(vtkKWObject *object, const char *command);
+  virtual void BindCommand(vtkObject *object, const char *command);
 
   // Description:
   // Add and delete values to put in the list.

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.12");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -97,7 +97,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::SetCommand(vtkKWObject *object, 
+void vtkKWLoadSaveButton::SetCommand(vtkObject *object, 
                                      const char *method)
 {
   if (!this->IsCreated())

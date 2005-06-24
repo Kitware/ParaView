@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.7");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -237,50 +237,58 @@ int vtkKWMultiColumnList::GetHeight()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetEditStartCommand(vtkKWObject* object, 
+void vtkKWMultiColumnList::SetEditStartCommand(vtkObject* object, 
                                                const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("%s configure -editstartcommand {%s %s}", 
-                 this->GetWidgetName(),
-                 object->GetTclName(), method);
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, obj, method);
+    this->Script("%s configure -editstartcommand {%s}", 
+                 this->GetWidgetName(), command);
+    delete [] command;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetEditEndCommand(vtkKWObject* object, 
+void vtkKWMultiColumnList::SetEditEndCommand(vtkObject* object, 
                                              const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("%s configure -editendcommand {%s %s}", 
-                 this->GetWidgetName(),
-                 object->GetTclName(), method);
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, obj, method);
+    this->Script("%s configure -editendcommand {%s}", 
+                 this->GetWidgetName(), command);
+    delete [] command;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetLabelCommand(vtkKWObject* object, 
-                                             const char *method)
+void vtkKWMultiColumnList::SetLabelCommand(vtkObject* object, 
+                                           const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("%s configure -labelcommand {%s %s}", 
-                 this->GetWidgetName(),
-                 object->GetTclName(), method);
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, obj, method);
+    this->Script("%s configure -labelcommand {%s}", 
+                 this->GetWidgetName(), command);
+    delete [] command;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetSortCommand(vtkKWObject* object, 
-                                             const char *method)
+void vtkKWMultiColumnList::SetSortCommand(vtkObject* object, 
+                                          const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("%s configure -sortcommand {%s %s}", 
-                 this->GetWidgetName(),
-                 object->GetTclName(), method);
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, obj, method);
+    this->Script("%s configure -sortcommand {%s}", 
+                 this->GetWidgetName(), command);
+    delete [] command;
     }
 }
 
@@ -370,15 +378,17 @@ void vtkKWMultiColumnList::ConfigureCellOptions(int row_index,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellWindowCommand(int row_index, 
                                                 int col_index, 
-                                                vtkKWObject* object, 
+                                                vtkObject* object, 
                                                 const char *method)
 {
   if (this->IsCreated())
     {
-    this->Script("%s cellconfigure %d,%d -window {%s %s}", 
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->Script("%s cellconfigure %d,%d -window {%s}", 
                  this->GetWidgetName(), 
-                 row_index, col_index,
-                 object->GetTclName(), method);
+                 row_index, col_index, command);
+    delete [] command;
     }
 }
 

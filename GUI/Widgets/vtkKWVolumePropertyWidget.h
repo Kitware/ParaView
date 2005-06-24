@@ -134,9 +134,9 @@ public:
   // Description:
   // Set commands.
   virtual void SetVolumePropertyChangedCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void SetVolumePropertyChangingCommand(
-    vtkKWObject* object,const char *method);
+    vtkObject* object,const char *method);
   virtual void InvokeVolumePropertyChangedCommand();
   virtual void InvokeVolumePropertyChangingCommand();
 

@@ -86,13 +86,13 @@ public:
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkKWObject* Object, const char* MethodAndArgString);
+  virtual void SetCommand(vtkObject* Object, const char* MethodAndArgString);
 
   // Description:
   // A method to set binding on the object.
   // This method sets binding:
   // bind this->GetWidgetName() event { object->GetTclName() command }
-  void SetBind(vtkKWObject* object, const char *event, const char *command);
+  void SetBind(vtkObject* object, const char *event, const char *command);
 
   // Description:
   // A method to set binding on the object.

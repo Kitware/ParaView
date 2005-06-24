@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.38");
+vtkCxxRevisionMacro(vtkKWExtent, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -288,48 +288,48 @@ void vtkKWExtent::ExtentChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
+void vtkKWExtent::SetCommand(vtkObject *obj, const char *method)
 { 
-  this->SetObjectMethodCommand(&this->Command, CalledObject, CommandString);
+  this->SetObjectMethodCommand(&this->Command, obj, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetStartCommand(vtkKWObject* Object, 
-                                  const char *MethodAndArgString)
+void vtkKWExtent::SetStartCommand(vtkObject* obj, 
+                                  const char *method)
 { 
   if (this->XRange)
     {
-    this->XRange->SetStartCommand(Object, MethodAndArgString);
+    this->XRange->SetStartCommand(obj, method);
     }
 
   if (this->YRange)
     {
-    this->YRange->SetStartCommand(Object, MethodAndArgString);
+    this->YRange->SetStartCommand(obj, method);
     }
 
   if (this->ZRange)
     {
-    this->ZRange->SetStartCommand(Object, MethodAndArgString);
+    this->ZRange->SetStartCommand(obj, method);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetEndCommand(vtkKWObject* Object, 
-                                const char *MethodAndArgString)
+void vtkKWExtent::SetEndCommand(vtkObject* obj, 
+                                const char *method)
 { 
   if (this->XRange)
     {
-    this->XRange->SetEndCommand(Object, MethodAndArgString);
+    this->XRange->SetEndCommand(obj, method);
     }
 
   if (this->YRange)
     {
-    this->YRange->SetEndCommand(Object, MethodAndArgString);
+    this->YRange->SetEndCommand(obj, method);
     }
 
   if (this->ZRange)
     {
-    this->ZRange->SetEndCommand(Object, MethodAndArgString);
+    this->ZRange->SetEndCommand(obj, method);
     }
 }
 

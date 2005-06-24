@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.5");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.6");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -1098,14 +1098,14 @@ void vtkKWTextPropertyEditor::UpdateEnableState()
 
 //----------------------------------------------------------------------------
 void vtkKWTextPropertyEditor::SetChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->ChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTextPropertyEditor::SetColorChangedCommand(
-  vtkKWObject *object, const char *method)
+  vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->ColorChangedCommand, object, method);
 }
