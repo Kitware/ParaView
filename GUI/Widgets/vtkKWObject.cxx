@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.53");
+vtkCxxRevisionMacro(vtkKWObject, "1.54");
 
 vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
 
@@ -64,11 +64,8 @@ const char *vtkKWObject::GetTclName()
     return NULL;
     }
 
-  vtkTclGetObjectFromPointer(
-    this->GetApplication()->GetMainInterp(), (void *)this, "vtkKWObject");
-
   this->TclName = vtksys::SystemTools::DuplicateString(
-    this->GetApplication()->GetMainInterp()->result);
+    vtkKWTkUtilities::GetTclNameFromPointer(this->GetApplication(), this));
 
   return this->TclName;
 }
@@ -97,7 +94,7 @@ const char* vtkKWObject::Script(const char* format, ...)
 //----------------------------------------------------------------------------
 void vtkKWObject::SetObjectMethodCommand(
   char **command, 
-  vtkKWObject *object, 
+  vtkObject *object, 
   const char *method)
 {
   if (*command)
@@ -106,7 +103,28 @@ void vtkKWObject::SetObjectMethodCommand(
     *command = NULL;
     }
 
-  const char *object_name = object ? object->GetTclName() : NULL;
+  const char *object_name = NULL;
+  if (object)
+    {
+    vtkKWObject *kw_object = vtkKWObject::SafeDownCast(object);
+    if (kw_object)
+      {
+      object_name = object->GetTclName();
+      }
+    else
+      {
+      if (!this->GetApplication())
+        {
+        vtkErrorMacro(
+          "Attempt to create a Tcl instance before the application was set!");
+        }
+      else
+        {
+        object_name = vtkKWTkUtilities::GetTclNameFromPointer(
+          this->GetApplication(), object);
+        }
+      }
+    }
 
   size_t object_len = object_name ? strlen(object_name) + 1 : 0;
   size_t method_len = method ? strlen(method) : 0;

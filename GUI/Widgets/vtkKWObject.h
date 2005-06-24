@@ -58,14 +58,14 @@ protected:
   ~vtkKWObject();
 
   // Description:
-  // Convenience static method that can be used to create a callback function
+  // Convenience method that can be used to create a callback function
   // on an object. The first argument is the command (string) to set, the 
   // second is the KWObject that the method will be called on. The third is
   // the name of the method itself and any arguments in string form. 
   // Note that the command is allocated automatically using the 'new' 
   // operator. If it is not NULL, it is deallocated first using 'delete []'.
-  static void SetObjectMethodCommand(
-    char **command, vtkKWObject *object, const char *method);
+  void SetObjectMethodCommand(
+    char **command, vtkObject *object, const char *method);
 
 private:
 
