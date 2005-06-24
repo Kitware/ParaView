@@ -105,10 +105,8 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkParallelCS_Initialize(pm->GetInterpreter());
   vtkPVCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-
-#ifdef PARAVIEW_LINK_XDMF
   vtkXdmfCS_Initialize(pm->GetInterpreter());
-#endif
+
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
   vtkPVDevelopmentCS_Initialize(pm->GetInterpreter());
 #endif

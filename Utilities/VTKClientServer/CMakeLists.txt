@@ -89,9 +89,7 @@ SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid P
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
 IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-  IF(PARAVIEW_LINK_XDMF)
-    SUBDIRS(Xdmf)
-  ENDIF(PARAVIEW_LINK_XDMF)
+  SUBDIRS(Xdmf)
 ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
