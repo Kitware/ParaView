@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.6");
+vtkCxxRevisionMacro(vtkKWTree, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -52,7 +52,7 @@ void vtkKWTree::Create(vtkKWApplication *app)
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "Tree"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "KWTree"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
