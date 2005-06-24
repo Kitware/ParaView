@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -193,6 +193,9 @@ void vtkPVPropertyKeyFrame::SetValueToMinimum()
   vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
   vtkPVSelectionList *pvSelect = 
     vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+  vtkPVContourEntry* pvContour = vtkPVContourEntry::SafeDownCast(
+    this->ValueWidget);
+  
   if (pvWheel && pvWheel->GetClampMinimumValue())
     {
     this->SetKeyValue(pvWheel->GetMinimumValue());
@@ -200,6 +203,20 @@ void vtkPVPropertyKeyFrame::SetValueToMinimum()
   else if (pvSelect && pvSelect->GetNumberOfItems() > 0)
     {
     this->SetKeyValue(0);
+    }
+  else if (pvContour)
+    {
+    vtkSMDoubleRangeDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(
+      this->AnimationCueProxy->GetAnimatedDomain());
+    if (domain)
+      {
+      int exists;
+      double min = domain->GetMinimum(0, exists);
+      if (exists)
+        {
+        this->SetKeyValue(0, min);
+        }
+      }
     }
   this->UpdateValuesFromProxy();
 }
@@ -211,6 +228,9 @@ void vtkPVPropertyKeyFrame::SetValueToMaximum()
   vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
   vtkPVSelectionList *pvSelect = 
     vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+  vtkPVContourEntry* pvContour = vtkPVContourEntry::SafeDownCast(
+    this->ValueWidget);
+
   if (pvWheel && pvWheel->GetClampMaximumValue())
     {
     this->SetKeyValue(pvWheel->GetMaximumValue());
@@ -219,6 +239,20 @@ void vtkPVPropertyKeyFrame::SetValueToMaximum()
     {
     this->SetKeyValue(pvSelect->GetNumberOfItems()-1);
     } 
+  else if (pvContour)
+    {
+    vtkSMDoubleRangeDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(
+      this->AnimationCueProxy->GetAnimatedDomain());
+    if (domain)
+      {
+      int exists;
+      double max = domain->GetMaximum(0, exists);
+      if (exists)
+        {
+        this->SetKeyValue(0, max);
+        }
+      }
+    }
   this->UpdateValuesFromProxy();
 }
 
@@ -551,6 +585,19 @@ void vtkPVPropertyKeyFrame::UpdateValuesFromProxy()
     {
     vtkKWThumbWheel::SafeDownCast(this->ValueWidget)->SetValue(
       keyvalue);
+    }
+  else if (vtkPVContourEntry::SafeDownCast(this->ValueWidget))
+    {
+    vtkPVContourEntry* pvContour = vtkPVContourEntry::SafeDownCast(
+      this->ValueWidget);
+    pvContour->SetModifiedCommand(0, 0);
+    pvContour->RemoveAllValues();
+    int numVals = this->GetNumberOfKeyValues();
+    for (int i=0; i < numVals; i++)
+      {
+      pvContour->AddValue(this->GetKeyValue(i));
+      }
+    pvContour->SetModifiedCommand(this->GetTclName(),"ValueChangedCallback");
     }
 
   this->Superclass::UpdateValuesFromProxy();
