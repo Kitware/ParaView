@@ -323,7 +323,6 @@
     <Source class="vtkBYUReader"/>
   </Module>
 #endif
-#ifdef PARAVIEW_LINK_XDMF
   <Module name="XdmfReader"
           root_name="XdmfReader"
           output="vtkDataSet"
@@ -345,7 +344,6 @@
     <XDMFParameters trace_name="xdmf_parameters"
                     property="ParameterIndex" label="Parameters" />
   </Module>
-#endif
   <Module name="P3DReader"
           class="vtkPVPLOT3DReaderModule"
           root_name="Plot3D"
