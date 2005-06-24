@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.48");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.49");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -2059,6 +2059,20 @@ void vtkKWParameterValueFunctionEditor::SetWholeParameterRange(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetWholeParameterRangeToFunctionRange()
+{
+  double start, end;
+  if (this->GetFunctionSize() >= 2)
+    {
+    if (this->GetFunctionPointParameter(0, &start) &&
+        this->GetFunctionPointParameter(this->GetFunctionSize() - 1, &end))
+      {
+      this->SetWholeParameterRange(start, end);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 double* vtkKWParameterValueFunctionEditor::GetVisibleParameterRange()
 {
   return this->ParameterRange->GetRange();
@@ -2072,6 +2086,20 @@ void vtkKWParameterValueFunctionEditor::SetVisibleParameterRange(
 
   // VisibleParameterRangeChangingCallback is invoked automatically 
   // by the line above
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetVisibleParameterRangeToFunctionRange()
+{
+  double start, end;
+  if (this->GetFunctionSize() >= 2)
+    {
+    if (this->GetFunctionPointParameter(0, &start) &&
+        this->GetFunctionPointParameter(this->GetFunctionSize() - 1, &end))
+      {
+      this->SetVisibleParameterRange(start, end);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

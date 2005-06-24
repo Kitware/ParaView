@@ -57,7 +57,12 @@ public:
     { this->GetWholeParameterRange(range[0], range[1]); };
   virtual void SetWholeParameterRange(double range[2]) 
     { this->SetWholeParameterRange(range[0], range[1]); };
-  
+
+  // Description:
+  // Convenience method to set the whole parameter range to the
+  // function parameter range
+  virtual void SetWholeParameterRangeToFunctionRange();
+
   // Description:
   // Set/Get the visible parameter range in the editor.
   // This is the portion of the whole parameter range that is currently
@@ -71,6 +76,11 @@ public:
     { this->GetVisibleParameterRange(range[0], range[1]); };
   virtual void SetVisibleParameterRange(double range[2]) 
     { this->SetVisibleParameterRange(range[0], range[1]); };
+
+  // Description:
+  // Convenience method to set the visible parameter range to the
+  // function parameter range
+  virtual void SetVisibleParameterRangeToFunctionRange();
 
   // Description:
   // Set/Get the visible parameter range in the editor as relative positions
