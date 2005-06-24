@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.41");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceNotebookManagerInternals
@@ -960,10 +960,13 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
     &dd_entry->FromLocation;
 
   const char *page_title = NULL;
-  if (this->Notebook)
+  if (this->Notebook && this->Notebook->HasPage(from_loc->PageId))
     {
     page_title = this->Notebook->GetPageTitle(from_loc->PageId);
-    from_page_title << page_title;
+    if (page_title)
+      {
+      from_page_title << page_title;
+      }
     }
   vtkKWUserInterfacePanel *from_panel = 
     this->GetPanelFromPageId(from_loc->PageId);
@@ -992,10 +995,13 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
   if (from_loc->PageId != to_loc->PageId)
     {
     page_title = NULL;
-    if (this->Notebook)
+    if (this->Notebook && this->Notebook->HasPage(to_loc->PageId))
       {
       page_title = this->Notebook->GetPageTitle(to_loc->PageId);
-      to_page_title << page_title;
+      if (page_title)
+        {
+        to_page_title << page_title;
+        }
       }
     vtkKWUserInterfacePanel *to_panel = 
       this->GetPanelFromPageId(to_loc->PageId);
