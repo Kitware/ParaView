@@ -2665,6 +2665,7 @@
        multiple_input="1">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
+            <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
