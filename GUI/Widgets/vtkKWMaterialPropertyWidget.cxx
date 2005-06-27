@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -323,7 +323,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Ambient
 
-  int entry_width = 4;
+  int entry_width = 5;
   int label_width = 12;
   int row = 0;
 
