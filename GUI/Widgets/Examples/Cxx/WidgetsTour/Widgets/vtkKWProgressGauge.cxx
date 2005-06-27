@@ -62,6 +62,8 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
     pushbutton->SetCommand(progress1, buffer);
     }
 
+  // Add a special button that will iterate from 0 to 100% in Tcl
+
   vtkKWPushButton *pushbutton = pushbutton_set->AddWidget(1000);
   pushbutton->SetText("0% to 100%");
 
