@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.59");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.60");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -403,40 +403,15 @@ void vtkKWChangeColorButton::SetBalloonHelpString(const char *string)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::QueryUserForColor()
 {  
-  int r, g, b;
-  char tmp[3];
-
-  this->GetApplication()->RegisterDialogUp(this);
-
-  const char *result = this->Script(
-     "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {%s} -parent %s",
-     (int)(this->Color[0] * 255.5), 
-     (int)(this->Color[1] * 255.5), 
-     (int)(this->Color[2] * 255.5),
-     (this->DialogText?this->DialogText:"Choose Color"),
-     this->GetWidgetName());
-
-  this->GetApplication()->UnRegisterDialogUp(this);
-
-  if (strlen(result) > 6)
+  if (vtkKWTkUtilities::QueryUserForColor(
+        this->GetApplication(),
+        this->GetWidgetName(),
+        this->DialogText,
+        this->Color[0], this->Color[1], this->Color[2],
+        &this->Color[0], &this->Color[1], &this->Color[2]))
     {
-    tmp[2] = '\0';
-    tmp[0] = result[1];
-    tmp[1] = result[2];
-    sscanf(tmp, "%x", &r);
-    tmp[0] = result[3];
-    tmp[1] = result[4];
-    sscanf(tmp, "%x", &g);
-    tmp[0] = result[5];
-    tmp[1] = result[6];
-    sscanf(tmp, "%x", &b);
-    
-    this->Color[0] = (double)r / 255.0;
-    this->Color[1] = (double)g / 255.0;
-    this->Color[2] = (double)b / 255.0;
-
     this->UpdateColorButton();
-
+    
     if (this->Command)
       {
       this->Script("eval %s %lf %lf %lf", 

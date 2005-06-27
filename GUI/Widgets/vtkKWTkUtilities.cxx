@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.58");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.59");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -363,6 +363,96 @@ void vtkKWTkUtilities::SetOptionColor(vtkKWWidget *widget,
                                    widget->GetWidgetName(),
                                    option,
                                    r, g, b);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::QueryUserForColor(
+  vtkKWApplication *app,  
+  const char *dialog_parent,
+  const char *dialog_title,
+  double in_r, double in_g, double in_b,
+  double *out_r, double *out_g, double *out_b)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+
+  app->RegisterDialogUp(NULL);
+
+  int res = vtkKWTkUtilities::QueryUserForColor(
+    app->GetMainInterp(), 
+    dialog_parent,
+    dialog_title,
+    in_r, in_g, in_b,
+    out_r, out_g, out_b);
+
+  app->UnRegisterDialogUp(NULL);
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::QueryUserForColor(
+  Tcl_Interp *interp,
+  const char *dialog_parent,
+  const char *dialog_title,
+  double in_r, double in_g, double in_b,
+  double *out_r, double *out_g, double *out_b)
+{
+  vtksys_stl::string cmd("tk_chooseColor");
+  if (dialog_parent)
+    {
+    cmd += " -parent {";
+    cmd += dialog_parent;
+    cmd += "}";
+    }
+  if (dialog_title)
+    {
+    cmd += " -title {";
+    cmd += dialog_title;
+    cmd += "}";
+    }
+  
+  char color_hex[8];
+  sprintf(color_hex, "#%02x%02x%02x", 
+          (int)(in_r * 255.5), (int)(in_g * 255.5), (int)(in_b * 255.5));
+  cmd += " -initialcolor {";
+  cmd += color_hex;
+  cmd += "}";
+
+  if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query color: " << interp->result);
+    return 0;
+    }
+
+  if (strlen(interp->result) > 6)
+    {
+    char tmp[3];
+    int r, g, b;
+    tmp[2] = '\0';
+    tmp[0] = interp->result[1];
+    tmp[1] = interp->result[2];
+    if (sscanf(tmp, "%x", &r) == 1)
+      {
+      tmp[0] = interp->result[3];
+      tmp[1] = interp->result[4];
+      if (sscanf(tmp, "%x", &g) == 1)
+        {
+        tmp[0] = interp->result[5];
+        tmp[1] = interp->result[6];
+        if (sscanf(tmp, "%x", &b) == 1)
+          {
+          *out_r = (double)r / 255.0;
+          *out_g = (double)g / 255.0;
+          *out_b = (double)b / 255.0;
+          return 1;
+          }
+        }
+      }
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

@@ -116,6 +116,22 @@ public:
                              double r, double g, double b);
   
   // Description:
+  // Query user for color using a Tk color dialog
+  // Convenience methods are provided to specify a vtkKWApplication
+  // instead of the Tcl interpreter. 
+  // Return 1 on success, 0 otherwise.
+  static int QueryUserForColor(Tcl_Interp *interp,
+                               const char *dialog_parent,
+                               const char *dialog_title,
+                               double in_r, double in_g, double in_b,
+                               double *out_r, double *out_g, double *out_b);
+  static int QueryUserForColor(vtkKWApplication *app,
+                               const char *dialog_parent,
+                               const char *dialog_title,
+                               double in_r, double in_g, double in_b,
+                               double *out_r, double *out_g, double *out_b);
+
+  // Description:
   // Get the geometry of a widget given by 'widget' (say, .foo.bar).
   // The geometry is the width, height and position of the widget. 
   // Any of them can be a NULL pointer, they will be safely ignored.
