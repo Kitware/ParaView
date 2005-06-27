@@ -69,8 +69,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
-  // Create another extent, popup mode
-  // It also sets extent2 to the same value
+  // Create another extent, hide the last component
 
   vtkKWExtent *extent3 = vtkKWExtent::New();
   extent3->SetParent(parent);
@@ -93,6 +92,8 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     extent3->GetWidgetName());
 
   extent3->Delete();
+
+  // TODO: vertical extent
 
   return new vtkKWExtentItem;
 }

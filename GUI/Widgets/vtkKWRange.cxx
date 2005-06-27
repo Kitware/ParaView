@@ -24,12 +24,14 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.47");
+vtkCxxRevisionMacro(vtkKWRange, "1.48");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
 #define VTK_KW_RANGE_MIN_INTERNAL_THICKNESS 5
-#define VTK_KW_RANGE_MIN_LENGTH             (2*VTK_KW_RANGE_MIN_THICKNESS)
+
+//#define VTK_KW_RANGE_MIN_LENGTH             (2*VTK_KW_RANGE_MIN_THICKNESS)
+#define VTK_KW_RANGE_MIN_LENGTH             50
 
 #define VTK_KW_RANGE_NB_ENTRIES             2
 
@@ -70,7 +72,7 @@ vtkKWRange::vtkKWRange()
   this->Orientation           = vtkKWRange::OrientationHorizontal;
   this->Inverted              = 0;
   this->SliderSize            = 3;
-  this->ShowEntries           = 0;
+  this->ShowEntries           = 1;
   this->Entry1Position        = vtkKWRange::EntryPositionDefault;
   this->Entry2Position        = vtkKWRange::EntryPositionDefault;
   this->EntriesWidth          = 10;
