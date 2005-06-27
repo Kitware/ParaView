@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.11");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.12");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -89,18 +89,7 @@ vtkKWColorPresetSelector::~vtkKWColorPresetSelector()
 
   // Delete all presets
 
-  vtkKWColorPresetSelectorInternals::PresetContainerIterator it = 
-    this->Internals->Presets.begin();
-  vtkKWColorPresetSelectorInternals::PresetContainerIterator end = 
-    this->Internals->Presets.end();
-  for (; it != end; ++it)
-    {
-    if (it->ColorTransferFunction)
-      {
-      it->ColorTransferFunction->Delete();
-      it->ColorTransferFunction = NULL;
-      }
-    }
+  this->RemoveAllPresets();
 
   // Delete our container
 
@@ -196,7 +185,7 @@ int vtkKWColorPresetSelector::AllocatePreset(const char *name)
 //----------------------------------------------------------------------------
 int vtkKWColorPresetSelector::RemovePreset(const char *name)
 {
-  if (name)
+  if (name && this->Internals)
     {
     vtkKWColorPresetSelectorInternals::PresetContainerIterator it = 
       this->Internals->Presets.begin();
@@ -219,6 +208,30 @@ int vtkKWColorPresetSelector::RemovePreset(const char *name)
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorPresetSelector::RemoveAllPresets()
+{
+  if (this->Internals)
+    {
+    vtkKWColorPresetSelectorInternals::PresetContainerIterator it = 
+      this->Internals->Presets.begin();
+    vtkKWColorPresetSelectorInternals::PresetContainerIterator end = 
+      this->Internals->Presets.end();
+    for (; it != end; ++it)
+      {
+      if (it->ColorTransferFunction)
+        {
+        it->ColorTransferFunction->Delete();
+        it->ColorTransferFunction = NULL;
+        }
+      }
+    this->Internals->Presets.clear();
+    this->PopulatePresetMenu();
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

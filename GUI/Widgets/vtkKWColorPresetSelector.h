@@ -68,13 +68,15 @@ public:
     const char *name, vtkColorTransferFunction *func, double range[2]);
 
   // Description:
-  // Remove color preset.
+  // Remove one (or all) color preset(s).
   // Return 1 on success, 0 otherwise
   virtual int RemovePreset(const char *name);
+  virtual int RemoveAllPresets();
 
   // Description:
   // Add a color preset. 
-  // Convenience methods to add a preset given a solid color, in RGB or HSV format.
+  // Convenience methods to add a preset given a solid color, in RGB or
+  // HSV format.
   virtual int AddSolidRGBPreset(const char *name, double rgb[3]);
   virtual int AddSolidRGBPreset(const char *name,double r,double g, double b);
   virtual int AddSolidHSVPreset(const char *name, double hsv[3]);
