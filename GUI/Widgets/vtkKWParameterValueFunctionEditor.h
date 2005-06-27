@@ -83,6 +83,11 @@ public:
   virtual void SetVisibleParameterRangeToFunctionRange();
 
   // Description:
+  // Convenience method to set the visible parameter range to the
+  // whole parameter range
+  virtual void SetVisibleParameterRangeToWholeParameterRange();
+
+  // Description:
   // Set/Get the visible parameter range in the editor as relative positions
   // in the whole parameter range.
   virtual void SetRelativeVisibleParameterRange(double r0, double r1);
@@ -498,11 +503,39 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
+  // Set/Get if the points of the function are locked in the parameter
+  // space (they can not be removed or can only be moved in the value space).
+  vtkSetMacro(LockPointsParameter, int);
+  vtkBooleanMacro(LockPointsParameter, int);
+  vtkGetMacro(LockPointsParameter, int);
+
+  // Description:
   // Set/Get if the end-points of the function are locked in the parameter
   // space (they can not be removed or can only be moved in the value space).
+  // Superseded by LockPointsParameter
   vtkSetMacro(LockEndPointsParameter, int);
   vtkBooleanMacro(LockEndPointsParameter, int);
   vtkGetMacro(LockEndPointsParameter, int);
+
+  // Description:
+  // Set/Get if the points of the function are locked in the value
+  // space (they can not be removed or can only be moved in the parameter 
+  // space).
+  vtkSetMacro(LockPointsValue, int);
+  vtkBooleanMacro(LockPointsValue, int);
+  vtkGetMacro(LockPointsValue, int);
+
+  // Description:
+  // Set/Get if points can be added and removed.
+  vtkSetMacro(DisableAddAndRemove, int);
+  vtkBooleanMacro(DisableAddAndRemove, int);
+  vtkGetMacro(DisableAddAndRemove, int);
+
+  // Description:
+  // Convenience method to set both LockPointsParameter, LockPointsValue
+  // and DisableAddAndRemove to On or Off
+  virtual void SetReadOnly(int);
+  vtkBooleanMacro(ReadOnly, int);
 
   // Description:
   // Set/Get if moving the end-points of the function will automatically
@@ -513,12 +546,6 @@ public:
   vtkSetMacro(RescaleBetweenEndPoints, int);
   vtkBooleanMacro(RescaleBetweenEndPoints, int);
   vtkGetMacro(RescaleBetweenEndPoints, int);
-
-  // Description:
-  // Set/Get if points can be added and removed.
-  vtkSetMacro(DisableAddAndRemove, int);
-  vtkBooleanMacro(DisableAddAndRemove, int);
-  vtkGetMacro(DisableAddAndRemove, int);
 
   // Description:
   // Set/Get the point radius (in pixels).
@@ -550,6 +577,27 @@ public:
   //ETX
   virtual void SetPointStyle(int);
   vtkGetMacro(PointStyle, int);
+  virtual void SetPointStyleToDisc()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleDisc); };
+  virtual void SetPointStyleToCursorDown()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleCursorDown); };
+  virtual void SetPointStyleToCursorUp()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleCursorUp); };
+  virtual void SetPointStyleToCursorLeft()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleCursorLeft); };
+  virtual void SetPointStyleToCursorRight()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleCursorRight); };
+  virtual void SetPointStyleToRectangle()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleRectangle); };
+  virtual void SetPointStyleToDefault()
+    { this->SetPointStyle(
+      vtkKWParameterValueFunctionEditor::PointStyleDefault); };
   virtual void SetFirstPointStyle(int);
   vtkGetMacro(FirstPointStyle, int);
   virtual void SetLastPointStyle(int);
@@ -891,6 +939,7 @@ public:
   virtual void ParameterCursorMoveCallback(int x);
   virtual void ParameterEntryCallback();
   virtual void HistogramLogModeCallback(int mode);
+  virtual void DoubleClickOnPointCallback(int x, int y);
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -945,6 +994,8 @@ protected:
   virtual int  MoveFunctionPointToParameter(int id,double parameter,int i=0);
   virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
   virtual int  EqualFunctionPointValues(const double *values1, const double *values2);
+  virtual int  FindFunctionPointAtCanvasCoordinates(
+    int x, int y, int &id, int &c_x, int &c_y);
 
   virtual void UpdatePointEntries(int id);
 
@@ -969,7 +1020,9 @@ protected:
   int   CanvasHeight;
   int   CanvasWidth;
   int   ExpandCanvasWidth;
+  int   LockPointsParameter;
   int   LockEndPointsParameter;
+  int   LockPointsValue;
   int   RescaleBetweenEndPoints;
   int   DisableAddAndRemove;
   int   DisableRedraw;

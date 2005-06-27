@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.50");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.51");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -82,7 +82,9 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->CanvasHeight                = 55;
   this->CanvasWidth                 = 55;
   this->ExpandCanvasWidth           = 1;
+  this->LockPointsParameter         = 0;
   this->LockEndPointsParameter      = 0;
+  this->LockPointsValue             = 0;
   this->RescaleBetweenEndPoints     = 0;
   this->DisableAddAndRemove         = 0;
   this->DisableRedraw               = 0;
@@ -523,16 +525,26 @@ int vtkKWParameterValueFunctionEditor::FunctionPointCanBeRemoved(int id)
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::FunctionPointParameterIsLocked(int id)
 {
-  return (this->HasFunction() &&
-          this->LockEndPointsParameter &&
-          (id == 0 || 
-           (this->GetFunctionSize() && id == this->GetFunctionSize() - 1)));
+  return 
+    (this->HasFunction() &&
+     (this->LockPointsParameter ||
+      (this->LockEndPointsParameter &&
+       (id == 0 || 
+        (this->GetFunctionSize() && id == this->GetFunctionSize() - 1)))));
 }
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::FunctionPointValueIsLocked(int)
 {
-  return 0;
+ return (this->HasFunction() && this->LockPointsValue);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetReadOnly(int arg)
+{
+  this->SetLockPointsParameter(arg);
+  this->SetLockPointsValue(arg);
+  this->SetDisableAddAndRemove(arg);
 }
 
 //----------------------------------------------------------------------------
@@ -1271,6 +1283,14 @@ void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
     return;
     }
 
+  // If we are displaying the label in the top left frame, make sure it has
+  // been created. 
+
+  if (this->IsTopLeftFrameUsed() && this->IsCreated())
+    {
+    this->CreateTopLeftFrame(this->GetApplication());
+    }
+
   this->Superclass::CreateLabel(app);
   vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
 }
@@ -1542,7 +1562,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
             a b  c              d   e  f
          +------------------------------
-        0|       L              RL              ShowLabel: On
+        0|       L            RL                ShowLabel: On
         1|       TLC            TRF             LabelPosition: Top
         2|    VT [--------------]   VR          RangeLabelPosition: Top
         3|       PT 
@@ -1570,6 +1590,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   int col_a = 0, col_b = 1, col_c = 2, col_d = 3, col_e = 4, col_f = 5;
   
   // Label (L) if on top, i.e. its on own row not in the top left frame (TLF)
+  // Note that we span column col_c and col_d because (L) can get quite large
+  // whereas TLC is usually small, so we would end up with a too large col_c
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
@@ -1577,13 +1599,15 @@ void vtkKWParameterValueFunctionEditor::Pack()
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
-           << " -stick wns -padx 0 -pady 0 -in "
+           << " -stick wns -padx 0 -pady 0  -columnspan 2 -in "
            << this->GetWidgetName()
            << " -column " << col_c << " -row " << row << endl;
     row_inc = 1;
     }
   
   // RangeLabel (RL) on top, i.e. on its own row not in the top left frame(TLF)
+  // Note that we span column col_c and col_d because (L) can get quite large
+  // whereas TLC is usually small, so we would end up with a too large col_c
   
   if (this->ShowRangeLabel && 
       (this->RangeLabelPosition == 
@@ -1591,9 +1615,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
       this->RangeLabel && this->RangeLabel->IsCreated())
     {
     tk_cmd << "grid " << this->RangeLabel->GetWidgetName() 
-           << " -stick ens -padx 0 -pady 0  -in "
+           << " -stick ens -padx 0 -pady 0 -columnspan 2 -in "
            << this->GetWidgetName() 
-           << " -column " << col_d << " -row " << row << endl;
+           << " -column " << col_c << " -row " << row << endl;
     row_inc = 1;
     }
 
@@ -1851,6 +1875,17 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
+    // Double click on point
+
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
+           << " <Double-1> {" << this->GetTclName() 
+           << " DoubleClickOnPointCallback %%x %%y}" << endl;
+
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
+           << " <Double-1> {" << this->GetTclName() 
+           << " DoubleClickOnPointCallback %%x %%y}" << endl;
+
+
     // Parameter Cursor
 
     if (this->ParameterCursorInteractionStyle & 
@@ -2103,6 +2138,12 @@ void vtkKWParameterValueFunctionEditor::SetVisibleParameterRangeToFunctionRange(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetVisibleParameterRangeToWholeParameterRange()
+{
+  this->SetVisibleParameterRange(this->GetWholeParameterRange());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::GetRelativeVisibleParameterRange(
   double &r0, double &r1)
 {
@@ -2335,10 +2376,7 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
   // If we are displaying the label in the top left frame, make sure it has
   // been created. 
 
-  if (this->ShowLabel && 
-      (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionDefault) &&
-      this->IsCreated())
+  if (this->IsTopLeftFrameUsed() && this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());
     }
@@ -2414,6 +2452,8 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
     {
     this->CreateTopLeftFrame(this->GetApplication());
     }
+
+  this->UpdateRangeLabel();
 
   this->Modified();
 
@@ -2906,6 +2946,7 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterTicks(int arg)
     }
 
   this->RedrawRangeTicks();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -2926,6 +2967,7 @@ void vtkKWParameterValueFunctionEditor::SetShowValueTicks(int arg)
     }
 
   this->RedrawRangeTicks();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -5685,7 +5727,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
   if (!this->IsCreated() || 
       !this->RangeLabel || 
       !this->RangeLabel->IsAlive() ||
-      (!this->ShowParameterRange && !this->ShowValueRange))
+      !this->ShowRangeLabel)
     {
     return;
     }
@@ -6271,11 +6313,12 @@ void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
+int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
+  int x, int y, int &id, int &c_x, int &c_y)
 {
   if (!this->IsCreated() || !this->HasFunction())
     {
-    return;
+    return 0;
     }
 
   const char *canv = this->Canvas->GetWidgetName();
@@ -6302,14 +6345,14 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
 
   // Get the real canvas coordinates
 
-  int c_x = atoi(this->Script("%s canvasx %d", canv, x));
-  int c_y = atoi(this->Script("%s canvasy %d", canv, y));
+  c_x = atoi(this->Script("%s canvasx %d", canv, x));
+  c_y = atoi(this->Script("%s canvasy %d", canv, y));
 
   // Find the closest element
   // Get its first tag, which should be either a point or a text (in
   // the form of tid or pid, ex: t0, or p0)
 
-  int id = -1;
+  id = -1;
 
   const char *closest = this->Script("%s find closest %d %d", 
                                      this->Canvas->GetWidgetName(), c_x, c_y);
@@ -6323,9 +6366,35 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
       }
     }
 
+  return (id < 0 || id >= this->GetFunctionSize()) ? 0 : 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::DoubleClickOnPointCallback(
+  int x, int y)
+{
+  int id, c_x, c_y;
+
+  // No point found
+
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
+    {
+    return;
+    }
+
+  // Select the point
+
+  this->SelectPoint(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
+{
+  int id, c_x, c_y;
+
   // No point found, then let's add that point
 
-  if (id < 0 || id >= this->GetFunctionSize())
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
     {
     if (!this->AddPointAtCanvasCoordinates(c_x, c_y, id))
       {
@@ -6652,6 +6721,10 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->DisableCommands ? "On" : "Off") << endl;
   os << indent << "LockEndPointsParameter: "
      << (this->LockEndPointsParameter ? "On" : "Off") << endl;
+  os << indent << "LockPointsParameter: "
+     << (this->LockPointsParameter ? "On" : "Off") << endl;
+  os << indent << "LockPointsValue: "
+     << (this->LockPointsValue ? "On" : "Off") << endl;
   os << indent << "RescaleBetweenEndPoints: "
      << (this->RescaleBetweenEndPoints ? "On" : "Off") << endl;
   os << indent << "PointMarginToCanvas: " << this->PointMarginToCanvas << endl;
