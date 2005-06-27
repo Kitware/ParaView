@@ -10,11 +10,7 @@
 #include "vtkXMLImageDataReader.h"
 #include "vtkCornerAnnotation.h"
 
-#include "vtkKWWidgetsConfigurePaths.h"
-
 #include "KWWidgetsTourExampleTypes.h"
-
-#include <vtksys/SystemTools.hxx>
 
 class vtkKWCornerAnnotationEditorItem : public KWWidgetsTourItem
 {
