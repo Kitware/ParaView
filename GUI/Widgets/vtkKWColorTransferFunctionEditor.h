@@ -142,6 +142,7 @@ public:
   // Callbacks
   virtual void ColorSpaceCallback();
   virtual void ValueEntriesCallback();
+  virtual void DoubleClickOnPointCallback(int x, int y);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -175,7 +176,8 @@ protected:
   virtual int GetFunctionPointValues(int id, double *values);
   virtual int SetFunctionPointValues(int id, const double *values);
   virtual int InterpolateFunctionPointValues(double parameter, double *values);
-  virtual int AddFunctionPoint(double parameter, const double *values, int *id);
+  virtual int AddFunctionPoint(
+    double parameter, const double *values, int *id);
   virtual int SetFunctionPoint(int id, double parameter, const double *values);
   virtual int RemoveFunctionPoint(int id);
 

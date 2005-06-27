@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.33");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.34");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -66,6 +66,8 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
     {
     this->ValueEntries[i] = vtkKWEntryLabeled::New();
     }
+
+  this->ShowValueRangeOff();
 }
 
 //----------------------------------------------------------------------------
@@ -397,8 +399,11 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
     {
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->GetWidget()->SetValue("");
-      this->ValueEntries[i]->SetEnabled(0);
+      if (this->ValueEntries[i])
+        {
+        this->ValueEntries[i]->GetWidget()->SetValue("");
+        this->ValueEntries[i]->SetEnabled(0);
+        }
       }
     return;
     }
@@ -862,6 +867,44 @@ void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::DoubleClickOnPointCallback(
+  int x, int y)
+{
+  int id, c_x, c_y;
+
+  // No point found
+
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
+    {
+    return;
+    }
+
+  // Select the point and change its color
+
+  this->SelectPoint(id);
+  
+  double rgb[3];
+  if (!this->FunctionPointValueIsLocked(id) &&
+      this->GetPointColorAsRGB(id, rgb) &&
+      vtkKWTkUtilities::QueryUserForColor(
+        this->GetApplication(),
+        this->GetWidgetName(),
+        NULL,
+        rgb[0], rgb[1], rgb[2],
+        &rgb[0], &rgb[1], &rgb[2]))
+    {
+    unsigned long mtime = this->GetFunctionMTime();
+
+    this->SetPointColorAsRGB(id, rgb);
+
+    if (this->GetFunctionMTime() > mtime)
+      {
+      this->InvokeFunctionChangedCommand();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWColorTransferFunctionEditor::SetShowColorSpaceOptionMenu(int arg)
 {
   if (this->ShowColorSpaceOptionMenu == arg)
@@ -1170,7 +1213,7 @@ int vtkKWColorTransferFunctionEditor::IsColorRampUpToDate()
 void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
 {
   if (!this->ColorRamp->IsCreated() || 
-      !this->HasFunction() ||
+      !this->GetFunctionSize() ||
       this->DisableRedraw)
     {
     return;
