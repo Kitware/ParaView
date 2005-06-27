@@ -5,9 +5,18 @@
 
 #include "KWWidgetsTourExampleTypes.h"
 
-WidgetType vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+class vtkKWThumbWheelItem : public KWWidgetsTourItem
+{
+public:
+  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+};
+
+KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
+  vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+
+  // -----------------------------------------------------------------------
 
   // Create a thumbwheel
 
@@ -25,6 +34,8 @@ WidgetType vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     thumbwheel1->GetWidgetName());
 
   thumbwheel1->Delete();
+
+  // -----------------------------------------------------------------------
 
   // Create another thumbwheel, but put the label and entry on top
 
@@ -50,6 +61,8 @@ WidgetType vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   thumbwheel2->Delete();
 
+  // -----------------------------------------------------------------------
+
   // Create another thumbwheel, popup mode
 
   vtkKWThumbWheel *thumbwheel3 = vtkKWThumbWheel::New();
@@ -68,5 +81,5 @@ WidgetType vtkKWThumbWheelEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   thumbwheel3->Delete();
 
-  return CompositeWidget;
+  return new vtkKWThumbWheelItem;
 }

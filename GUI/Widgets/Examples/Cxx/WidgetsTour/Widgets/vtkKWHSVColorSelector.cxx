@@ -5,7 +5,14 @@
 
 #include "KWWidgetsTourExampleTypes.h"
 
-WidgetType vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+class vtkKWHSVColorSelectorItem : public KWWidgetsTourItem
+{
+public:
+  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+};
+
+KWWidgetsTourItem* vtkKWHSVColorSelectorEntryPoint(
+  vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -16,17 +23,14 @@ WidgetType vtkKWHSVColorSelectorEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   ccb->Create(app);
   ccb->SetSelectionChangingCommand(parent, "SetBackgroundColor");
   ccb->InvokeCommandsWithRGBOn();
-  ccb->SetBalloonHelpString("This HSV Color Selector changes the background color of its parent");
-
-  double r, g, b, h, s, v;
-  parent->GetBackgroundColor(&r, &g, &b);
-  vtkMath::RGBToHSV(r, g, b, &h, &s, &v);
-  ccb->SetSelectedColor(h, s, v);
+  ccb->SetBalloonHelpString(
+    "This HSV Color Selector changes the background color of its parent");
+  ccb->SetSelectedColor(vtkMath::RGBToHSV(parent->GetBackgroundColor()));
 
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               ccb->GetWidgetName());
 
   ccb->Delete();
 
-  return CompositeWidget;
+  return new vtkKWHSVColorSelectorItem;
 }

@@ -8,9 +8,18 @@
 
 #include "KWWidgetsTourExampleTypes.h"
 
-WidgetType vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+class vtkKWVolumePropertyWidgetItem : public KWWidgetsTourItem
+{
+public:
+  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+};
+
+KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
+  vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+
+  // -----------------------------------------------------------------------
 
   // This is a faily big widget, so create a scrolled frame
 
@@ -22,6 +31,8 @@ WidgetType vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow 
               framews->GetWidgetName());
     
   framews->Delete();
+
+  // -----------------------------------------------------------------------
 
   // Create a volume property widget
 
@@ -64,5 +75,5 @@ WidgetType vtkKWVolumePropertyWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow 
 
   vp->Delete();
 
-  return VTKWidget;
+  return new vtkKWVolumePropertyWidgetItem;
 }

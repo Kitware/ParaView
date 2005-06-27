@@ -10,7 +10,7 @@ FOREACH(file ${WIDGETS_SRCS})
   SET(WIDGET_ENTRY_POINT "${WIDGET_NAME}EntryPoint")
   SET(WIDGETS_FORWARD_DECL
     "${WIDGETS_FORWARD_DECL}
-         extern WidgetType ${WIDGET_ENTRY_POINT}(vtkKWWidget *parent, vtkKWWindow *win);")
+         extern KWWidgetsTourItem* ${WIDGET_ENTRY_POINT}(vtkKWWidget *parent, vtkKWWindow *win);")
   SET(WIDGETS_NODES
     "${WIDGETS_NODES}
          {\"${WIDGET_NAME}\", ${WIDGET_ENTRY_POINT}},")

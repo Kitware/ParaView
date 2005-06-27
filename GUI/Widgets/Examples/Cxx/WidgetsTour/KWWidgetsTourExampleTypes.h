@@ -5,21 +5,38 @@
    Create widgets map
  */
 
+class vtkKWApplication;
 
-enum WidgetType 
+class KWWidgetsTourItem
 {
-  InvalidWidget = 0,
-  CoreWidget,
-  CompositeWidget,
-  VTKWidget
+public:
+
+  // Get the type
+
+  enum WidgetType 
+  {
+    TypeCore,
+    TypeComposite,
+    TypeVTK
+  };
+  virtual int GetType() = 0;
+
+  KWWidgetsTourItem() {};
+  virtual ~KWWidgetsTourItem() {};
+
+  // Get path to example data
+
+  static const char *GetPathToExampleData(
+    vtkKWApplication *app, const char *name);
 };
 
-typedef WidgetType (*WidgetEntryPointFunctionPointer)(vtkKWWidget *parent, vtkKWWindow *win);
+
+typedef KWWidgetsTourItem* (*KWWidgetsTourItemEntryPoint)(vtkKWWidget *parent, vtkKWWindow *win);
 
 typedef struct
 {
   const char *Name;
-  WidgetEntryPointFunctionPointer EntryPoint;
-} WidgetNode;
+  KWWidgetsTourItemEntryPoint EntryPoint;
+} KWWidgetsTourNode;
 
 #endif

@@ -14,9 +14,18 @@
 
 #include <vtksys/SystemTools.hxx>
 
-WidgetType vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+class vtkKWRenderWidgetItem : public KWWidgetsTourItem
+{
+public:
+  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+};
+
+KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint(
+  vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+
+  // -----------------------------------------------------------------------
 
   // Create a render widget
 
@@ -26,6 +35,8 @@ WidgetType vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   app->Script("pack %s -side top -fill both -expand y -padx 0 -pady 0", 
               rw->GetWidgetName());
+
+  // -----------------------------------------------------------------------
 
   // Switch to trackball style, it's nicer
 
@@ -39,16 +50,8 @@ WidgetType vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   // Create a 3D object reader
 
   vtkXMLPolyDataReader *reader = vtkXMLPolyDataReader::New();
-
-  char data_path[2048];
-  sprintf(data_path, "%s/Examples/Data/teapot.vtp", KWWIDGETS_SOURCE_DIR);
-  if (!vtksys::SystemTools::FileExists(data_path))
-    {
-    sprintf(data_path, 
-            "%s/..%s/Examples/Data/teapot.vtp",
-            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
-    }
-  reader->SetFileName(data_path);
+  reader->SetFileName(
+    KWWidgetsTourItem::GetPathToExampleData(app, "teapot.vtp"));
 
   // Create the mapper and actor
 
@@ -68,5 +71,5 @@ WidgetType vtkKWRenderWidgetEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   mapper->Delete();
   rw->Delete();
 
-  return VTKWidget;
+  return new vtkKWRenderWidgetItem;
 }

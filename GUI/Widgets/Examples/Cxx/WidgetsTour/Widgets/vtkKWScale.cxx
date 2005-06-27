@@ -4,9 +4,17 @@
 
 #include "KWWidgetsTourExampleTypes.h"
 
-WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+class vtkKWScaleItem : public KWWidgetsTourItem
+{
+public:
+  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+};
+
+KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+
+  // -----------------------------------------------------------------------
 
   // Create a scale
 
@@ -25,6 +33,8 @@ WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     scale1->GetWidgetName());
 
   scale1->Delete();
+
+  // -----------------------------------------------------------------------
 
   // Create another scale, but put the label and entry on top
 
@@ -45,7 +55,10 @@ WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   scale2->Delete();
 
+  // -----------------------------------------------------------------------
+
   // Create another scale, popup mode
+  // It also sets scale2 to the same value
 
   vtkKWScale *scale3 = vtkKWScale::New();
   scale3->SetParent(parent);
@@ -55,6 +68,12 @@ WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale3->SetResolution(1.0);
   scale3->DisplayEntry();
   scale3->DisplayLabel("A popup scale:");
+  scale3->SetBalloonHelpString(
+    "It's a pop-up, and it sets the previous scale value too");
+
+  char buffer[100];
+  sprintf(buffer, "SetValue [%s GetValue]", scale3->GetTclName());
+  scale3->SetCommand(scale2, buffer);
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
@@ -62,5 +81,5 @@ WidgetType vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   scale3->Delete();
 
-  return CoreWidget;
+  return new vtkKWScaleItem;
 }

@@ -20,6 +20,10 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/stl/vector>
+
+typedef vtksys_stl::vector<KWWidgetsTourItem*> KWWidgetsTourItemsContainer;
+typedef vtksys_stl::vector<KWWidgetsTourItem*>::iterator KWWidgetsTourItemsContainerIterator;
 
 int my_main(int argc, char *argv[])
 {
@@ -72,7 +76,7 @@ int my_main(int argc, char *argv[])
 
   // Set a help link. Can be a remote link (URL), or a local file
 
-  app->SetHelpDialogStartingPage("http://www.kitware.com");
+  app->SetHelpDialogStartingPage("http://public.kitware.com/KWWidgets");
 
   // Add a window to the application
   // Set 'SupportHelp' to automatically add a menu entry for the help link
@@ -99,7 +103,7 @@ int my_main(int argc, char *argv[])
   vtkKWTreeWithScrollbars *widgets_tree = vtkKWTreeWithScrollbars::New();
   widgets_tree->SetParent(page_widget);
   widgets_tree->ShowVerticalScrollbarOn();
-  widgets_tree->ShowHorizontalScrollbarOff();
+  widgets_tree->ShowHorizontalScrollbarOn();
   widgets_tree->Create(app);
 
   vtkKWTree *tree = widgets_tree->GetWidget();
@@ -199,7 +203,9 @@ int my_main(int argc, char *argv[])
 
   char buffer[2048];
 
-  WidgetNode *node_ptr = Widgets;
+  KWWidgetsTourItemsContainer KWWidgetsTourItems;
+
+  KWWidgetsTourNode *node_ptr = KWWidgetsTourNodes;
   while (node_ptr->Name && node_ptr->EntryPoint)
     {
     vtkKWUserInterfacePanel *panel = vtkKWUserInterfacePanel::New();
@@ -214,21 +220,22 @@ int my_main(int argc, char *argv[])
       app->GetSplashScreen()->SetProgressMessage(node_ptr->Name);
       }
 
-    WidgetType widget_type = 
+    KWWidgetsTourItem *item = 
       (*node_ptr->EntryPoint)(panel->GetPageWidget(panel->GetName()), win);
-    if (widget_type != InvalidWidget)
+    if (item)
       {
+      KWWidgetsTourItems.push_back(item);
       const char *parent_node = NULL;
-      switch (widget_type)
+      switch (item->GetType())
         {
         default:
-        case CoreWidget:
+        case KWWidgetsTourItem::TypeCore:
           parent_node = "core";
           break;
-        case CompositeWidget:
+        case KWWidgetsTourItem::TypeComposite:
           parent_node = "composite";
           break;
-        case VTKWidget:
+        case KWWidgetsTourItem::TypeVTK:
           parent_node = "vtk";
           break;
         }
@@ -319,6 +326,13 @@ int my_main(int argc, char *argv[])
 
   // Deallocate and exit
 
+  KWWidgetsTourItemsContainerIterator it = KWWidgetsTourItems.begin();
+  KWWidgetsTourItemsContainerIterator end = KWWidgetsTourItems.end();
+  for (; it != end ; it++)
+    {
+    delete (*it);
+    }
+
   win->Delete();
   widgets_panel->Delete();
   widgets_tree->Delete();
@@ -350,3 +364,18 @@ int main(int argc, char *argv[])
   return my_main(argc, argv);
 }
 #endif
+
+const char* KWWidgetsTourItem::GetPathToExampleData(
+  vtkKWApplication *app, const char *name)
+{
+  static char data_path[2048];
+  sprintf(
+    data_path, "%s/Examples/Data/%s", KWWIDGETS_SOURCE_DIR, name);
+  if (!vtksys::SystemTools::FileExists(data_path))
+    {
+    sprintf(data_path, 
+            "%s/..%s/Examples/Data/%s",
+            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR, name);
+    }
+  return data_path;
+}

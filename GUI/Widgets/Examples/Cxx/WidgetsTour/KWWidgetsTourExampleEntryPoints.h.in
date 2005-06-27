@@ -9,7 +9,7 @@
 
 @WIDGETS_FORWARD_DECL@
 
-WidgetNode Widgets[] = 
+KWWidgetsTourNode KWWidgetsTourNodes[] = 
 {
   @WIDGETS_NODES@
   {NULL , NULL}
