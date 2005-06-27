@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -356,13 +356,6 @@ void vtkKWCornerAnnotationEditor::Update()
 {
   this->Superclass::Update();
 
-  // If no widget or view, let's disable everything
-
-  if (!this->RenderWidget)
-    {
-    this->SetEnabled(0);
-    }
-
   if (!this->IsCreated())
     {
     return;
@@ -592,18 +585,38 @@ void vtkKWCornerAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->CornerFrame);
+  int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+
+  if (this->CornerFrame)
+    {
+    this->CornerFrame->SetEnabled(enabled);
+    }
 
   int i;
   for (i = 0; i < 4; i++)
     {
-    this->PropagateEnableState(this->CornerText[i]);
+    if (this->CornerText[i])
+      {
+      this->CornerText[i]->SetEnabled(enabled);
+      }
     }
 
-  this->PropagateEnableState(this->PropertiesFrame);
-  this->PropagateEnableState(this->MaximumLineHeightScale);
-  this->PropagateEnableState(this->TextPropertyWidget);
-  this->PropagateEnableState(this->TextPropertyPopupButton);
+  if (this->PropertiesFrame)
+    {
+    this->PropertiesFrame->SetEnabled(enabled);
+    }
+  if (this->MaximumLineHeightScale)
+    {
+    this->MaximumLineHeightScale->SetEnabled(enabled);
+    }
+  if (this->TextPropertyWidget)
+    {
+    this->TextPropertyWidget->SetEnabled(enabled);
+    }
+  if (this->TextPropertyPopupButton)
+    {
+    this->TextPropertyPopupButton->SetEnabled(enabled);
+    }
 }
 
 //----------------------------------------------------------------------------
