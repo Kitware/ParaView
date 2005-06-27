@@ -58,13 +58,13 @@ public:
   // Show/Hide part of the extent selectively (x, y, z).
   virtual void SetShowExtent(int index, int arg);
   vtkBooleanMacro(ShowXExtent, int);
-  virtual int GetShowXExtent(int arg) { return this->ShowExtent[0]; };
+  virtual int GetShowXExtent() { return this->ShowExtent[0]; };
   virtual void SetShowXExtent(int arg) { this->SetShowExtent(0, arg); };
   vtkBooleanMacro(ShowYExtent, int);
-  virtual int GetShowYExtent(int arg) { return this->ShowExtent[1]; };
+  virtual int GetShowYExtent() { return this->ShowExtent[1]; };
   virtual void SetShowYExtent(int arg) { this->SetShowExtent(1, arg); };
   vtkBooleanMacro(ShowZExtent, int);
-  virtual int GetShowZExtent(int arg) { return this->ShowExtent[2]; };
+  virtual int GetShowZExtent() { return this->ShowExtent[2]; };
   virtual void SetShowZExtent(int arg) { this->SetShowExtent(2, arg); };
 
   // Description:
