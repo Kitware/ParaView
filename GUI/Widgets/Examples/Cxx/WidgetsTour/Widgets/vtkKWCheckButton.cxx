@@ -80,6 +80,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   cbs->Create(app);
   cbs->SetBorderWidth(2);
   cbs->SetReliefToGroove();
+  cbs->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
   for (int i = 0; i < 4; i++)
     {
@@ -87,7 +88,8 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
     cb->SetBalloonHelpString(
       "This checkbutton is part of a unique set (a vtkKWCheckButtonSet), "
       "which provides an easy way to create a bunch of related widgets "
-      "without allocating them one by one.");
+      "without allocating them one by one. The widgets can be layout as a "
+      "NxM grid.");
     }
 
   // Let's be creative. The first two share the same variable name

@@ -5,6 +5,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 #include "vtkKWIcon.h"
+#include "vtkMath.h"
 
 #include <vtksys/stl/string>
 #include "KWWidgetsTourExampleTypes.h"
@@ -111,19 +112,28 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set->Create(app);
   label_set->SetBorderWidth(2);
   label_set->SetReliefToGroove();
+  label_set->SetMaximumNumberOfWidgetsInPackingDirection(3);
+  label_set->ExpandWidgetsOn();
+  label_set->SetWidgetsPadX(1);
+  label_set->SetWidgetsPadY(1);
+  label_set->SetPadX(1);
+  label_set->SetPadY(1);
 
-  for (int i = 0; i < 3; i++)
+  char buffer[50];
+  for (int i = 0; i < 9; i++)
     {
+    sprintf(buffer, "Label %d", i);
     vtkKWLabel *label = label_set->AddWidget(i);
+    label->SetText(buffer);
+    label->SetBackgroundColor(vtkMath::HSVToRGB((double)i / 8.0, 0.3, 0.75));
     label->SetBalloonHelpString(
       "This label is part of a unique set (a vtkKWLabelSet), "
       "which provides an easy way to create a bunch of related widgets "
-      "without allocating them one by one.");
+      "without allocating them one by one. The widgets can be layout as a "
+      "NxM grid.");
     }
 
-  label_set->GetWidget(0)->SetText("Label 0");
-  label_set->GetWidget(1)->SetText("Label 1");
-  label_set->GetWidget(2)->SetText("Label 3");
+  label_set->GetWidget(0)->SetText("Firs Label");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
@@ -142,8 +152,9 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set2->Create(app);
   label_set2->SetBorderWidth(2);
   label_set2->SetReliefToGroove();
-  label_set2->SetWidgetsPadX(2);
+  label_set2->SetWidgetsPadX(1);
   label_set2->SetWidgetsPadY(1);
+  label_set2->SetPadX(1);
   label_set2->SetPadY(1);
 
   for (int i = 0; i < 3; i++)

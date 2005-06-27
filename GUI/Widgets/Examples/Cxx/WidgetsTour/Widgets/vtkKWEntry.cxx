@@ -81,8 +81,11 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   entry_set->Create(app);
   entry_set->SetBorderWidth(2);
   entry_set->SetReliefToGroove();
-  entry_set->SetWidgetsPadX(2);
-  entry_set->SetWidgetsPadY(2);
+  entry_set->SetWidgetsPadX(1);
+  entry_set->SetWidgetsPadY(1);
+  entry_set->SetPadX(1);
+  entry_set->SetPadY(1);
+  entry_set->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
   for (int i = 0; i < 4; i++)
     {
@@ -90,7 +93,8 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
     entry->SetBalloonHelpString(
       "This entry is part of a unique set (a vtkKWEntrySet), "
       "which provides an easy way to create a bunch of related widgets "
-      "without allocating them one by one.");
+      "without allocating them one by one. The widgets can be layout as a "
+      "NxM grid.");
     }
 
   // Let's be creative. The first one also set the value of the last one

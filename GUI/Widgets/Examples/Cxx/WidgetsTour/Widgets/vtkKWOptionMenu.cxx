@@ -15,7 +15,7 @@ KWWidgetsTourItem* vtkKWOptionMenuEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
-  int i;
+  size_t i;
   const char* days[] = 
     {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
 
