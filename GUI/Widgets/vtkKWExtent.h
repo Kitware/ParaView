@@ -43,6 +43,10 @@ public:
   // minx maxx miny maxy minz maxz
   virtual void SetExtentRange(double*);
   virtual void SetExtentRange(double, double, double, double, double, double);
+  virtual double* GetExtentRange();
+  virtual void GetExtentRange(
+    double&, double&, double&, double&, double&, double&);
+  virtual void GetExtentRange(double*);
   
   // Description:
   // Set/Get the Extent.
@@ -52,15 +56,16 @@ public:
 
   // Description:
   // Show/Hide part of the extent selectively (x, y, z).
-  vtkGetMacro(ShowXExtent, int);
+  virtual void SetShowExtent(int index, int arg);
   vtkBooleanMacro(ShowXExtent, int);
-  virtual void SetShowXExtent(int);
-  vtkGetMacro(ShowYExtent, int);
+  virtual int GetShowXExtent(int arg) { return this->ShowExtent[0]; };
+  virtual void SetShowXExtent(int arg) { this->SetShowExtent(0, arg); };
   vtkBooleanMacro(ShowYExtent, int);
-  virtual void SetShowYExtent(int);
-  vtkGetMacro(ShowZExtent, int);
+  virtual int GetShowYExtent(int arg) { return this->ShowExtent[1]; };
+  virtual void SetShowYExtent(int arg) { this->SetShowExtent(1, arg); };
   vtkBooleanMacro(ShowZExtent, int);
-  virtual void SetShowZExtent(int);
+  virtual int GetShowZExtent(int arg) { return this->ShowExtent[2]; };
+  virtual void SetShowZExtent(int arg) { this->SetShowExtent(2, arg); };
 
   // Description:
   // Handle the callback, this is called internally when one of the 
@@ -93,6 +98,10 @@ public:
   virtual void SetLabelPosition(int);
   virtual void SetEntry1Position(int);
   virtual void SetEntry2Position(int);
+  virtual void SetThickness(int);
+  virtual void SetInternalThickness(double);
+  virtual void SetRequestedLength(int);
+  virtual void SetSliderSize(int);
   virtual void SetSliderCanPush(int);
   vtkBooleanMacro(SliderCanPush, int);
 
@@ -107,9 +116,10 @@ public:
 
   // Description:
   // Access the internal vtkKWRange's.
-  vtkKWRange *GetXRange() { return this->XRange; };
-  vtkKWRange *GetYRange() { return this->YRange; };
-  vtkKWRange *GetZRange() { return this->ZRange; };
+  vtkKWRange* GetXRange() { return this->Range[0]; };
+  vtkKWRange* GetYRange() { return this->Range[1]; };
+  vtkKWRange* GetZRange() { return this->Range[2]; };
+  vtkKWRange* GetRange(int index);
 
 protected:
   vtkKWExtent();
@@ -118,13 +128,9 @@ protected:
   char *Command;
   double Extent[6];
 
-  vtkKWRange  *XRange;
-  vtkKWRange  *YRange;
-  vtkKWRange  *ZRange;
+  vtkKWRange  *Range[3];
 
-  int ShowXExtent;
-  int ShowYExtent;
-  int ShowZExtent;
+  int ShowExtent[3];
 
   // Pack or repack the widget
 
