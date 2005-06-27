@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -229,12 +229,7 @@ void vtkKWHeaderAnnotationEditor::Update()
   this->Superclass::Update();
 
   vtkTextActor *anno = NULL;
-
-  if (!this->RenderWidget)
-    {
-    this->SetEnabled(0);
-    }
-  else
+  if (this->RenderWidget)
     {
     anno = this->RenderWidget->GetHeaderAnnotation();
     }
@@ -358,10 +353,24 @@ void vtkKWHeaderAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->TextFrame);
-  this->PropagateEnableState(this->TextEntry);
-  this->PropagateEnableState(this->TextPropertyWidget);
-  this->PropagateEnableState(this->TextPropertyPopupButton);
+  int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+
+  if (this->TextFrame)
+    {
+    this->TextFrame->SetEnabled(enabled);
+    }
+  if (this->TextEntry)
+    {
+    this->TextEntry->SetEnabled(enabled);
+    }
+  if (this->TextPropertyWidget)
+    {
+    this->TextPropertyWidget->SetEnabled(enabled);
+    }
+  if (this->TextPropertyPopupButton)
+    {
+    this->TextPropertyPopupButton->SetEnabled(enabled);
+    }
 }
 
 //----------------------------------------------------------------------------
