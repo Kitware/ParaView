@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.10");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.11");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -316,7 +316,7 @@ void vtkKWWidgetSet::SetWidgetsPadX(int arg)
 //----------------------------------------------------------------------------
 void vtkKWWidgetSet::SetWidgetsPadY(int arg)
 {
-  if (arg == this->WidgetsPadX)
+  if (arg == this->WidgetsPadY)
     {
     return;
     }
