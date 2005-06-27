@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -74,14 +74,25 @@ vtkKWVolumeMaterialPropertyWidget::~vtkKWVolumeMaterialPropertyWidget()
 
 //----------------------------------------------------------------------------
 void vtkKWVolumeMaterialPropertyWidget::SetVolumeProperty(
-  vtkVolumeProperty *prop)
+  vtkVolumeProperty *arg)
 {
-  if (this->VolumeProperty == prop)
+  if (this->VolumeProperty == arg)
     {
     return;
     }
 
-  this->VolumeProperty = prop;
+  if (this->VolumeProperty)
+    {
+    this->VolumeProperty->UnRegister(this);
+    }
+    
+  this->VolumeProperty = arg;
+
+  if (this->VolumeProperty)
+    {
+    this->VolumeProperty->Register(this);
+    }
+
   this->Modified();
 
   this->Update();
