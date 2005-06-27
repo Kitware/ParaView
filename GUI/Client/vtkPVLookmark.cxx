@@ -70,7 +70,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.8");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -690,7 +690,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
-            sscanf(ptr,"%*s %*s %s",&sval);
+            sscanf(ptr,"%*s %*s %s",sval);
             vectorEntry->SetValue(sval);
             vectorEntry->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
@@ -764,7 +764,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
         }
 
       // this line sets the partdisplay variable
-      sscanf(ptr,"%*s %s %*s %*s",&data);
+      sscanf(ptr,"%*s %s %*s %*s",data);
 
       ptr = strtok(NULL,"\r\n");
 
@@ -780,7 +780,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
           continue;
           }
 
-        sscanf(ptr,"%*s %*s %s %*s %*s %*s",&str);
+        sscanf(ptr,"%*s %*s %s %*s %*s %*s",str);
         ptr1 = strstr(str,"]");
         *ptr1 = '\0';
 
@@ -815,7 +815,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
             }
           else if (svp)
             {
-            sscanf(ptr,"%*s %*s %*s %*s %d %s",&val,&sval);
+            sscanf(ptr,"%*s %*s %*s %*s %d %s",&val,sval);
             ptr1 = sval;
             if(strstr(ptr1,"{"))
               {
