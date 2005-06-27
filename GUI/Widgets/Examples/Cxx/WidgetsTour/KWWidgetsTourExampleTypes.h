@@ -6,6 +6,7 @@
  */
 
 class vtkKWApplication;
+class vtkKWWindow;
 
 class KWWidgetsTourItem
 {
