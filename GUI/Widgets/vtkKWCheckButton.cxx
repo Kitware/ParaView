@@ -17,12 +17,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.35");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
 {
-  this->IndicatorOn = 1;
+  this->Indicator = 1;
   this->MyText = 0;
   this->VariableName = NULL;
 }
@@ -73,11 +73,12 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::SetIndicator(int ind)
 {
-  if (ind != this->IndicatorOn)
+  if (ind != this->Indicator)
     {
-    this->IndicatorOn = ind;
+    this->Indicator = ind;
     this->Modified();
-    this->SetConfigurationOptionAsInt("-indicatoron", (ind ? 1 : 0));
+    this->SetConfigurationOptionAsInt(
+      "-indicatoron", (this->Indicator ? 1 : 0));
     }
   this->SetMyText(0);
 }
@@ -135,6 +136,12 @@ void vtkKWCheckButton::SetState(int s)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCheckButton::ToggleState()
+{
+  this->SetState(this->GetState() ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCheckButton::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
@@ -158,7 +165,7 @@ void vtkKWCheckButton::Configure()
   const char *wname = this->GetWidgetName();
 
   this->Script("%s configure -indicatoron %d",
-               wname, (this->IndicatorOn ? 1 : 0));
+               wname, (this->Indicator ? 1 : 0));
 
   this->SetTextOption(this->MyText);
 

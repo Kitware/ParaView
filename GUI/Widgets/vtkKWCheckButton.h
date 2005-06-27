@@ -34,13 +34,17 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set/Get the state of the check button 0 = off 1 = on
+  // Set/Get/Toggle the state of the check button 0 = off 1 = on
   virtual void SetState(int );
   virtual int GetState();
+  vtkBooleanMacro(State, int);
+  virtual void ToggleState();
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)
   virtual void SetIndicator(int ind);
+  vtkGetMacro(Indicator, int);
+  vtkBooleanMacro(Indicator, int);
 
   // Description:
   // Set the text.
@@ -88,7 +92,7 @@ protected:
   vtkKWCheckButton();
   ~vtkKWCheckButton();
 
-  int IndicatorOn;
+  int Indicator;
   char *MyText;
   char *VariableName;
 
