@@ -33,9 +33,11 @@
 #include "vtkImageMandelbrotSource.h"
 #include "vtkMath.h"
 
+#include "vtkExtractCTHPart.h" // for the BOUNDS key
+
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.3");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.4");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -213,8 +215,8 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
     while(i<c)
       {
       uniformCoordinate+=spacing[coord];
-      // get a random number about 1/10 of the uniform spacing.
-      double epsilon=(vtkMath::Random()-0.5)*spacing[coord]*0.2;
+      // get a random number about 1/5 of the uniform spacing.
+      double epsilon=(vtkMath::Random()-0.5)*spacing[coord]*0.4;
       coords[coord]->InsertNextValue(uniformCoordinate+epsilon);
       ++i;
       }
@@ -420,6 +422,25 @@ int vtkHierarchicalFractal::RequestData(
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
                  ext[5]);
+  
+  
+  double bounds[6];
+
+  bounds[0]=ox;
+  bounds[1]=ox+xSize;
+  bounds[2]=oy;
+  bounds[3]=oy+ySize;
+  bounds[4]=oz;
+  if(this->TwoDimensional)
+    {
+    bounds[5]=oz;
+    }
+  else
+    {
+    bounds[5]=oz+zSize;
+    }
+  
+  info->Set(vtkExtractCTHPart::BOUNDS(),bounds,6);
   
   if(!this->GenerateRectilinearGrids)
     {
@@ -1091,7 +1112,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkHierarchicalDataSet *output)
         }
       }
       array->SetName("vtkGhostLevels");
-//      array->SetName("Test");
+//      array->SetName("vtkNotGhostLevels");
       grid->GetCellData()->AddArray(array);
       array->Delete();
       ++block;
