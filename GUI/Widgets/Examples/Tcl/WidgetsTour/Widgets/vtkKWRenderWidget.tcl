@@ -5,6 +5,8 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
     set app [$parent GetApplication]
 
+    # -----------------------------------------------------------------------
+
     # Create a render widget
 
     vtkKWRenderWidget rw
@@ -12,6 +14,8 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
     rw Create $app
 
     pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+
+    # -----------------------------------------------------------------------
 
     # Switch to trackball style, it's nicer
 

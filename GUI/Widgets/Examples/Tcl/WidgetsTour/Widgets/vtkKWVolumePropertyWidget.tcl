@@ -4,6 +4,8 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
     set app [$parent GetApplication]
 
+    # -----------------------------------------------------------------------
+
     # This is a faily big widget, so create a scrolled frame
 
     vtkKWFrameWithScrollbar framews
@@ -12,6 +14,8 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
     pack [framews GetWidgetName] -side top -expand y -fill both
     
+    # -----------------------------------------------------------------------
+
     # Create a volume property widget
 
     vtkKWVolumePropertyWidget vpw

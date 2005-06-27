@@ -2,12 +2,12 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWRenderWidget.h"
+#include "vtkKWScale.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWWindowBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
-#include "vtkKWScale.h"
-#include "vtkKWTkUtilities.h"
 
 #include "vtkKWWidgetsConfigurePaths.h"
 #include "vtkToolkits.h"
@@ -52,7 +52,7 @@ int my_main(int argc, char *argv[])
 
   // Set a help link. Can be a remote link (URL), or a local file
 
-  app->SetHelpDialogStartingPage("http://www.kitware.com");
+  app->SetHelpDialogStartingPage("http://public.kitware.com/KWWidgets");
 
   // Add a window
   // Set 'SupportHelp' to automatically add a menu entry for the help link

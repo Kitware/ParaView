@@ -2,6 +2,8 @@ proc vtkKWScaleEntryPoint {parent win} {
 
     set app [$parent GetApplication]
 
+    # -----------------------------------------------------------------------
+
     # Create a scale
     
     vtkKWScale scale1
@@ -15,6 +17,8 @@ proc vtkKWScaleEntryPoint {parent win} {
     scale1 DisplayLabel "A scale:"
     
     pack [scale1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+
+    # -----------------------------------------------------------------------
 
     # Create another scale, but put the label and entry on top
 
@@ -30,6 +34,8 @@ proc vtkKWScaleEntryPoint {parent win} {
     scale2 SetBalloonHelpString "This time, the label and entry are on top"
 
     pack [scale2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+    # -----------------------------------------------------------------------
 
     # Create another scale, popup mode
 

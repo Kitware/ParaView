@@ -2,6 +2,8 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
 
     set app [$parent GetApplication]
 
+    # -----------------------------------------------------------------------
+
     # Create a color button. The label is inside the button
     
     vtkKWChangeColorButton ccb1
@@ -12,6 +14,8 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
     ccb1 SetBalloonHelpString "A color button. Note that the label is inside the button. Its position can be changed."
     
     pack [ccb1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+
+    # -----------------------------------------------------------------------
 
     # Create another color button. The label is now outside the button
 
@@ -24,6 +28,8 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
     ccb2 SetBalloonHelpString "A color button. Note that the label is now outside the button and its default position has been changed to the right."
     
     pack [ccb2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+    # -----------------------------------------------------------------------
 
     # Create another color button, without a label
 
