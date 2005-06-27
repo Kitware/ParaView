@@ -21,13 +21,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.31");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
 { 
   this->Width = 100;
-  this->Height = 5;
+  this->Height = 15;
   this->Value = 0.0;
   this->BarColor[0] = 0.0;
   this->BarColor[1] = 0.0;
