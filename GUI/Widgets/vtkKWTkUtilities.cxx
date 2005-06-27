@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.59");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.60");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -375,7 +375,7 @@ int vtkKWTkUtilities::QueryUserForColor(
 {
   if (!app)
     {
-    return NULL;
+    return 0;
     }
 
   app->RegisterDialogUp(NULL);
