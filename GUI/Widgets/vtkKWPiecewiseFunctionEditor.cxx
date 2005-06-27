@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.27");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -349,7 +349,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 {
   this->Superclass::UpdatePointEntries(id);
 
-  if (!this->IsCreated())
+  if (!this->IsCreated() || !this->ValueEntry)
     {
     return;
     }
