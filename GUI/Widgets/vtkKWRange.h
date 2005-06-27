@@ -127,6 +127,14 @@ public:
   vtkGetMacro(InternalThickness, double);
   
   // Description:
+  // Set/Get the long dimension of the widget. For horizontal widget
+  // this is the widget width, for vertical this is the height.
+  // Set it to zero (default) to ignore it and let the widget
+  // resize.
+  virtual void SetRequestedLength(int);
+  vtkGetMacro(RequestedLength, int);
+  
+  // Description:
   // Set/Get the slider size.
   virtual void SetSliderSize(int);
   vtkGetMacro(SliderSize, int);
@@ -290,6 +298,7 @@ protected:
   int   Inverted;
   int   Thickness;
   double InternalThickness;
+  int   RequestedLength;
   int   Orientation;
   int   DisableCommands;
   int   SliderSize;

@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.46");
+vtkCxxRevisionMacro(vtkKWRange, "1.47");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -66,6 +66,7 @@ vtkKWRange::vtkKWRange()
   this->AdjustResolution      = 0;
   this->Thickness             = 19;
   this->InternalThickness     = 0.5;
+  this->RequestedLength       = 0;
   this->Orientation           = vtkKWRange::OrientationHorizontal;
   this->Inverted              = 0;
   this->SliderSize            = 3;
@@ -1046,6 +1047,21 @@ void vtkKWRange::SetInternalThickness(double arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRange::SetRequestedLength(int arg)
+{
+  if (this->RequestedLength == arg || arg < VTK_KW_RANGE_MIN_LENGTH)
+    {
+    return;
+    }
+
+  this->RequestedLength = arg;
+
+  this->Modified();
+
+  this->RedrawCanvas();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRange::SetSliderSize(int arg)
 {
   if (this->SliderSize == arg || 
@@ -1371,6 +1387,10 @@ void vtkKWRange::RedrawCanvas()
     {
     width = atoi(this->Script("winfo width %s", 
                               this->CanvasFrame->GetWidgetName()));
+    if (this->RequestedLength)
+      {
+      width = this->RequestedLength;
+      }
     if (width < VTK_KW_RANGE_MIN_LENGTH)
       {
       width = VTK_KW_RANGE_MIN_LENGTH;
@@ -1382,6 +1402,10 @@ void vtkKWRange::RedrawCanvas()
     width = this->Thickness;
     height = atoi(this->Script("winfo height %s", 
                                this->CanvasFrame->GetWidgetName()));
+    if (this->RequestedLength)
+      {
+      height = this->RequestedLength;
+      }
     if (height < VTK_KW_RANGE_MIN_LENGTH)
       {
       height = VTK_KW_RANGE_MIN_LENGTH;
@@ -2246,6 +2270,7 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resolution: " << this->Resolution << endl;
   os << indent << "Thickness: " << this->Thickness << endl;
   os << indent << "InternalThickness: " << this->InternalThickness << endl;
+  os << indent << "RequestedLength: " << this->RequestedLength << endl;
   os << indent << "Orientation: "<< this->Orientation << endl;
   os << indent << "Inverted: "
      << (this->Inverted ? "On" : "Off") << endl;
