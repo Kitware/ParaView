@@ -1,4 +1,5 @@
 #include "vtkKWScale.h"
+#include "vtkKWScaleSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
@@ -80,6 +81,38 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     scale3->GetWidgetName());
 
   scale3->Delete();
+
+  // -----------------------------------------------------------------------
+
+  // Create a set of scale
+  // An easy way to create a bunch of related widgets without allocating
+  // them one by one
+
+  vtkKWScaleSet *scale_set = vtkKWScaleSet::New();
+  scale_set->SetParent(parent);
+  scale_set->Create(app);
+  scale_set->SetBorderWidth(2);
+  scale_set->SetReliefToGroove();
+  scale_set->SetMaximumNumberOfWidgetsInPackingDirection(2);
+
+  for (int i = 0; i < 4; i++)
+    {
+    sprintf(buffer, "Scale %d", i);
+    vtkKWScale *scale = scale_set->AddWidget(i);
+    scale->DisplayLabel(buffer);
+    scale->SetBalloonHelpString(
+      "This scale is part of a unique set (a vtkKWScaleSet), "
+      "which provides an easy way to create a bunch of related widgets "
+      "without allocating them one by one. The widgets can be layout as a "
+      "NxM grid.");
+    }
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    scale_set->GetWidgetName());
+
+  scale_set->Delete();
+
 
   return new vtkKWScaleItem;
 }
