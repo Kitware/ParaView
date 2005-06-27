@@ -60,6 +60,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks
+  virtual void UpdateVariableCallback(const char*, const char*, const char*);
+
 protected:
   vtkKWCheckButtonWithChangeColor();
   ~vtkKWCheckButtonWithChangeColor();
@@ -72,6 +76,8 @@ protected:
   // Pack or repack the widget
 
   virtual void Pack();
+
+  virtual void UpdateVariableBindings();
 
 private:
   vtkKWCheckButtonWithChangeColor(const vtkKWCheckButtonWithChangeColor&); // Not implemented

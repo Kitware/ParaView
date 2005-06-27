@@ -18,9 +18,11 @@
 #include "vtkKWCheckButton.h"
 #include "vtkObjectFactory.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.10");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithChangeColor::vtkKWCheckButtonWithChangeColor()
@@ -79,6 +81,7 @@ void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app)
 
   // Update
 
+  this->UpdateVariableBindings();
   this->Update();
 }
 
@@ -101,7 +104,7 @@ void vtkKWCheckButtonWithChangeColor::Pack()
   tk_cmd << "pack " << this->CheckButton->GetWidgetName() 
          << " -side left -anchor w" << endl
          << "pack " << this->ChangeColorButton->GetWidgetName() 
-         << " -side left -anchor w -fill x -expand t -padx 2" << endl;
+         << " -side left -anchor w -fill x -expand t -padx 2 -pady 2" << endl;
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -137,6 +140,41 @@ void vtkKWCheckButtonWithChangeColor::SetDisableChangeColorButtonWhenNotChecked(
   this->DisableChangeColorButtonWhenNotChecked = _arg;
   this->Modified();
 
+  this->UpdateVariableBindings();
+  this->Update();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWCheckButtonWithChangeColor::UpdateVariableBindings()
+{
+  if (!this->IsCreated() || 
+      !this->CheckButton || !this->CheckButton->GetVariableName())
+    {
+    return;
+    }
+
+  // If the variable of the checkbutton is changed, i.e. its state has
+  // changed, then call our Update() so that we are given a chance
+  // to disable the state of the color change button.
+  // Nope, we can't use the checkbutton's Command, it might be used
+  // already (most likely).
+
+  vtksys_stl::string cmd(this->GetTclName());
+  cmd += " UpdateVariableCallback";
+  this->Script("trace remove variable %s {write} {%s}",
+               this->CheckButton->GetVariableName(), cmd.c_str());
+
+  if (this->DisableChangeColorButtonWhenNotChecked)
+    {
+    this->Script("trace add variable %s {write} {%s}",
+                 this->CheckButton->GetVariableName(), cmd.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButtonWithChangeColor::UpdateVariableCallback(
+  const char*, const char*, const char*)
+{
   this->Update();
 }
 
