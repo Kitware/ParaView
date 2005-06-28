@@ -71,6 +71,7 @@ public:
   // in loss of accuracy.
   // Possible values are: INT, DOUBLE, STRING.
   void SetElementType(unsigned int idx, int type);
+  int GetElementType(unsigned int idx);
 
   // Description:
   // Returns the value of 1 unchecked element. These are used by
@@ -104,8 +105,6 @@ protected:
   ~vtkSMStringVectorProperty();
 
   vtkSMStringVectorPropertyInternals* Internals;
-
-  int GetElementType(unsigned int idx);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is

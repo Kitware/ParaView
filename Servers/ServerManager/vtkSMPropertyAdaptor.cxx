@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.13");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.14");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -456,7 +456,16 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue()
   if (this->StringListDomain && this->StringVectorProperty 
     && this->StringVectorProperty->GetNumberOfElements() > 0)
     {
-    name = this->StringVectorProperty->GetElement(0);
+    unsigned int nos = this->StringVectorProperty->GetNumberOfElements();
+    for (unsigned int i=0; i < nos; i++)
+      {
+      if (this->StringVectorProperty->GetElementType(i) == 
+        vtkSMStringVectorProperty::STRING)
+        {
+        name = this->StringVectorProperty->GetElement(i);
+        break;
+        }
+      }
     }
 
   if (this->ProxyGroupDomain && this->ProxyProperty
@@ -518,7 +527,15 @@ int vtkSMPropertyAdaptor::SetEnumerationValue(const char* sidx)
 
   if (this->StringListDomain && this->StringVectorProperty)
     {
-    return this->StringVectorProperty->SetElement(0, enumName);
+    unsigned int nos = this->StringVectorProperty->GetNumberOfElements();
+    for (unsigned int i=0; i < nos ; i++)
+      {
+      if (this->StringVectorProperty->GetElementType(i) == 
+        vtkSMStringVectorProperty::STRING)
+        {
+        return this->StringVectorProperty->SetElement(i, enumName);
+        }
+      }
     }
 
   if (this->ProxyGroupDomain && this->ProxyProperty)
