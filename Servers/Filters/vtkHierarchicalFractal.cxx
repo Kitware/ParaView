@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.5");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.6");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -747,10 +747,10 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-           int count=output->GetNumberOfDataSets(level);
-           output->SetDataSet(level,count,grid);
-           grid->Delete();
-           this->SetBlockInfo(grid, level, ext,onFace);
+          int count=output->GetNumberOfDataSets(level);
+          output->SetDataSet(level,count,grid);
+          grid->Delete();
+          this->SetBlockInfo(grid, level, ext,onFace);
           }
         this->Levels->InsertValue(blockId, level);
         ++blockId;
