@@ -69,7 +69,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.240");
+vtkCxxRevisionMacro(vtkKWApplication, "1.241");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1926,9 +1926,9 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MajorVersion: " << this->MajorVersion << endl;
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "ReleaseName: " 
-     << (this->ReleaseName ? this->ReleaseName : NULL) << endl;
+     << (this->ReleaseName ? this->ReleaseName : "(None)") << endl;
   os << indent << "VersionName: " 
-     << (this->VersionName ? this->VersionName : NULL) << endl;
+     << (this->VersionName ? this->VersionName : "(None)") << endl;
   os << indent << "PrettyName: " 
      << this->GetPrettyName() << endl;
   os << indent << "EmailFeedbackAddress: "
