@@ -20,6 +20,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
+  int i;
 
   // -----------------------------------------------------------------------
 
@@ -120,7 +121,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set->SetPadY(1);
 
   char buffer[50];
-  for (int i = 0; i < 9; i++)
+  for (i = 0; i < 9; i++)
     {
     sprintf(buffer, "Label %d", i);
     vtkKWLabel *label = label_set->AddWidget(i);
@@ -157,7 +158,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set2->SetPadX(1);
   label_set2->SetPadY(1);
 
-  for (int i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++)
     {
     vtkKWLabelLabeled *label = label_set2->AddWidget(i);
     label->SetLabelWidth(15);
