@@ -21,7 +21,7 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
 {
   vtkKWApplication *app = parent->GetApplication();
 
-  // Create the color transfer function that will be modified by the 1st editor
+  // Create the color transfer function that is modified by the 1st editor
 
   vtkColorTransferFunction *cpsel_tfunc1 = vtkColorTransferFunction::New();
   cpsel_tfunc1->SetColorSpaceToHSV();
@@ -64,18 +64,19 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   // This other transfer function editor is based on a real image data
   // Let's load it first
 
-  vtkXMLImageDataReader *reader = vtkXMLImageDataReader::New();
-  reader->SetFileName(
+  vtkXMLImageDataReader *cpsel_reader = vtkXMLImageDataReader::New();
+  cpsel_reader->SetFileName(
     KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // The build an histogram of the data, it will be used inside the editor
   // as if we were trying to tune a tfunc based on the real values
 
-  reader->Update();
-  vtkKWHistogram *hist = vtkKWHistogram::New();
-  hist->BuildHistogram(reader->GetOutput()->GetPointData()->GetScalars(), 0);
+  cpsel_reader->Update();
+  vtkKWHistogram *cpsel_hist = vtkKWHistogram::New();
+  cpsel_hist->BuildHistogram(
+    cpsel_reader->GetOutput()->GetPointData()->GetScalars(), 0);
 
-  double *range = hist->GetRange();
+  double *range = cpsel_hist->GetRange();
 
   // Create the color transfer function that will be modified by the 2nd editor
   // This one shows a different look & feel
@@ -124,7 +125,7 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc2_editor->ShowPointIndexOff();
   cpsel_tfunc2_editor->ShowSelectedPointIndexOff();
 
-  cpsel_tfunc2_editor->SetHistogram(hist);
+  cpsel_tfunc2_editor->SetHistogram(cpsel_hist);
 
   cpsel_tfunc2_editor->ShowParameterTicksOn();
   cpsel_tfunc2_editor->ComputeValueTicksFromHistogramOn();
@@ -138,8 +139,8 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
 
   cpsel_tfunc2->Delete();
 
-  hist->Delete();
-  reader->Delete();
+  cpsel_hist->Delete();
+  cpsel_reader->Delete();
 
   return new vtkKWColorTransferFunctionEditorItem;
 }
