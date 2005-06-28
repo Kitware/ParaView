@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.4");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.5");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -76,16 +76,42 @@ vtkHierarchicalFractal::~vtkHierarchicalFractal()
 // This handles any alterations necessary for ghost levels.
 void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
                                           int level, 
-                                          int *ext)
+                                          int *ext,
+                                          int onFace[6])
 {
+  // onFace[0]:xmin
+  // onFace[1]:xmax
+  // onFace[2]:ymin
+  // onFace[3]:ymax
+  // onFace[4]:zmin
+  // onFace[5]:zmax
+  
   if (this->GhostLevels)
     {
-    ext[0] -= 1;
-    ext[2] -= 1;
-    ext[4] -= 1;
-    ext[1] += 1;
-    ext[3] += 1;
-    ext[5] += 1;
+    if(!onFace[0])
+      {
+      ext[0] -= 1;
+      }
+    if(!onFace[2])
+      {
+      ext[2] -= 1;
+      }
+    if(!onFace[4])
+      {
+      ext[4] -= 1;
+      }
+    if(!onFace[1])
+      {
+      ext[1] += 1;
+      }
+    if(!onFace[3])
+      {
+      ext[3] += 1;
+      }
+    if(!onFace[5])
+      {
+      ext[5] += 1;
+      }
     }
   if (this->TwoDimensional)
     {
@@ -125,22 +151,46 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
   grid->SetDimensions(dim);
   grid->SetSpacing(spacing);
   grid->SetOrigin(origin);
+  
+  if(this->GhostLevels>0)
+    {
+    this->AddGhostLevelArray(grid,dim,onFace);
+    }
 }
 
 //----------------------------------------------------------------------------
 // This handles any alterations necessary for ghost levels.
 void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
                                            int level, 
-                                           int *ext)
+                                           int *ext,
+                                           int onFace[6])
 {
   if (this->GhostLevels)
     {
-    ext[0] -= 1;
-    ext[2] -= 1;
-    ext[4] -= 1;
-    ext[1] += 1;
-    ext[3] += 1;
-    ext[5] += 1;
+    if(!onFace[0])
+      {
+      ext[0] -= 1;
+      }
+    if(!onFace[2])
+      {
+      ext[2] -= 1;
+      }
+    if(!onFace[4])
+      {
+      ext[4] -= 1;
+      }
+    if(!onFace[1])
+      {
+      ext[1] += 1;
+      }
+    if(!onFace[3])
+      {
+      ext[3] += 1;
+      }
+    if(!onFace[5])
+      {
+      ext[5] += 1;
+      }
     }
   if (this->TwoDimensional)
     {
@@ -195,7 +245,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
     
     int i=1;
     int c;
-    if(this->GhostLevels)
+    if(this->GhostLevels && !onFace[coord*2+1])
       {
       c=dim[coord]-2;
       }
@@ -205,7 +255,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
       }
     uniformCoordinate=origin[coord];
     
-    if(this->GhostLevels)
+    if(this->GhostLevels && !onFace[coord*2])
       {
       uniformCoordinate+=spacing[coord];
       coords[coord]->InsertNextValue(uniformCoordinate);
@@ -221,7 +271,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
       ++i;
       }
     
-    if(this->GhostLevels)
+    if(this->GhostLevels && !onFace[coord*2+1])
       {
       uniformCoordinate+=spacing[coord];
       coords[coord]->InsertNextValue(uniformCoordinate);
@@ -244,6 +294,11 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
     {
     coords[coord]->Delete();
     ++coord;
+    }
+  
+  if(this->GhostLevels>0)
+    {
+    this->AddGhostLevelArray(grid,dim,onFace);
     }
 }
 
@@ -410,9 +465,16 @@ int vtkHierarchicalFractal::RequestData(
   // Do not create the blocks.
   this->StartBlock = 0;
   this->EndBlock = -1;
-  this->BlockCount = 0;;
+  this->BlockCount = 0;
+  int onFace[6];
+  onFace[0]=1;
+  onFace[1]=1;
+  onFace[2]=1;
+  onFace[3]=1;
+  onFace[4]=1;
+  onFace[5]=1;
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
-                 ext[5]);
+                 ext[5],onFace);
 
   // Generate our share of the blocks.
   this->StartBlock = (int)((float)(piece*this->BlockCount)/(float)(numPieces));
@@ -421,7 +483,7 @@ int vtkHierarchicalFractal::RequestData(
 
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
-                 ext[5]);
+                 ext[5],onFace);
   
   
   double bounds[6];
@@ -450,11 +512,7 @@ int vtkHierarchicalFractal::RequestData(
     this->AddDepthArray(output);
     }
   this->AddFractalArray(output);
- 
-  if (this->GhostLevels > 0)
-    {
-    this->AddGhostLevelArray(output);
-    }
+  
   return 1;
 }
   
@@ -606,7 +664,8 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
                                       int y0,
                                       int y3,
                                       int z0,
-                                      int z3)
+                                      int z3,
+                                      int onFace[6])
 {
   double bds[6];
   int x1, x2, y1, y2, z1, z2;
@@ -641,16 +700,36 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
     x1 += 2;
     }
     
+  int subOnFace[6];
+  
   if (this->TwoDimensional)
     {
     if (this->TwoDTest(bds, level, this->MaximumLevel))
       {
       ++level;
       // Traverse the 4 new blocks.
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z0);
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z0);
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z0);
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z0);
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=onFace[2];
+      subOnFace[3]=0;
+      subOnFace[4]=1;
+      subOnFace[5]=1;
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z0,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnFace[2]=onFace[2];
+//      subOnFace[3]=0;
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z0,subOnFace);
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=0;
+      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z0,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnFace[2]=0;
+//      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z0,subOnFace);
       }
     else
       {
@@ -663,7 +742,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
           int count=output->GetNumberOfDataSets(level);
           output->SetDataSet(level,count,grid);
           grid->Delete();
-          this->SetRBlockInfo(grid, level, ext);
+          this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
@@ -671,7 +750,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
            int count=output->GetNumberOfDataSets(level);
            output->SetDataSet(level,count,grid);
            grid->Delete();
-          this->SetBlockInfo(grid, level, ext);
+           this->SetBlockInfo(grid, level, ext,onFace);
           }
         this->Levels->InsertValue(blockId, level);
         ++blockId;
@@ -688,14 +767,52 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       { // break block into eight.
       ++level;
       // Traverse the 8 new blocks.
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z1);
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z1);
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z1);
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z1);
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z2,z3);
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z2,z3);
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z2,z3);
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z2,z3);
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=onFace[2];
+      subOnFace[3]=0;
+      subOnFace[4]=onFace[4];
+      subOnFace[5]=0;
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z1,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnFace[2]=onFace[2];
+//      subOnFace[3]=0;
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z1,subOnFace);
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=0;
+      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z1,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnface[2]=0;
+//      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z1,subOnFace);
+      
+      
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=onFace[2];
+      subOnFace[3]=0;
+      subOnFace[4]=0;
+      subOnFace[5]=onFace[5];
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z2,z3,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnFace[2]=onFace[2];
+//      subOnFace[3]=0;
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z2,z3,subOnFace);
+      subOnFace[0]=onFace[0];
+      subOnFace[1]=0;
+      subOnFace[2]=0;
+      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z2,z3,subOnFace);
+      subOnFace[0]=0;
+      subOnFace[1]=onFace[1];
+//      subOnFace[2]=0;
+//      subOnFace[3]=onFace[3];
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z2,z3,subOnFace);
       }
     else
       {
@@ -708,15 +825,15 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
           int count=output->GetNumberOfDataSets(level);
           output->SetDataSet(level,count,grid);
           grid->Delete();
-          this->SetRBlockInfo(grid, level, ext);
+          this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-           int count=output->GetNumberOfDataSets(level);
-           output->SetDataSet(level,count,grid);
-           grid->Delete();
-          this->SetBlockInfo(grid, level, ext);
+          int count=output->GetNumberOfDataSets(level);
+          output->SetDataSet(level,count,grid);
+          grid->Delete();
+          this->SetBlockInfo(grid, level, ext,onFace);
           }
         this->Levels->InsertValue(blockId, level);
         ++blockId;
@@ -1019,106 +1136,126 @@ void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalDataSet *output)
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddGhostLevelArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet *grid,
+                                                int dim[3],
+                                                int onFace[6])
 {
-  int levels=output->GetNumberOfLevels();
-  int level=0;
-  while(level<levels)
+  vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
+  // we just get the dimensions according to points
+  // we need the dimensions according to cells
+  
+  int dims[3];
+  dims[0]=dim[0];
+  dims[1]=dim[1];
+  dims[2]=dim[2];
+  
+  if(dims[0]>1)
     {
-    int blocks=output->GetNumberOfDataSets(level);
-    int block=0;
-    while(block<blocks)
+    --dims[0];
+    }
+  if(dims[1]>1)
+    {
+    --dims[1];
+      }
+  if(dims[2]>1)
+    {
+    --dims[2];
+    }
+  
+  int numCells=grid->GetNumberOfCells();
+  array->SetNumberOfTuples(numCells);
+  
+  int i, j, k;
+  int iLevel, jLevel, kLevel, tmp;
+  unsigned char* ptr;
+  
+  ptr = (unsigned char*)(array->GetVoidPointer(0));
+  
+  
+  for (k = 0; k < dims[2]; ++k)
+    {
+    // ghost level at the beginning
+    if(onFace[4])
       {
-      int dims[3];
-      vtkDataSet *grid;
-      if(this->GenerateRectilinearGrids)
+      kLevel=this->GhostLevels-1 - k; // or =-k
+      }
+    else
+      {
+      kLevel = this->GhostLevels - k;
+      }
+    // ghost level at the end.
+    if(onFace[5])
+      {
+      tmp = k - dims[2] + 1 + this->GhostLevels-1;
+      }
+    else
+      {
+      tmp = k - dims[2] + 1 + this->GhostLevels;
+      }
+    if (tmp > kLevel) { kLevel = tmp;}
+    if (this->TwoDimensional)
+      {
+      kLevel = 0;
+        }
+    for (j = 0; j < dims[1]; ++j)
+      {
+      jLevel = kLevel;
+      if(onFace[2])
         {
-        vtkRectilinearGrid *rgrid;
-        rgrid=vtkRectilinearGrid::SafeDownCast(output->GetDataSet(level,block));
-        assert("check: rgrid_exists" && rgrid!=0);
-        rgrid->GetDimensions(dims);
-        grid=rgrid;
+        tmp = this->GhostLevels-1 - j;
         }
       else
         {
-        vtkUniformGrid *ugrid;
-        ugrid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-        assert("check: ugrid_exists" && ugrid!=0);
-        ugrid->GetDimensions(dims);
-        grid=ugrid;
-        }
-      
-      vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
-      // we just get the dimensions according to points
-      // we need the dimensions according to cells
-      if(dims[0]>1)
-        {
-        --dims[0];
-        }
-      if(dims[1]>1)
-        {
-        --dims[1];
-        }
-      if(dims[2]>1)
-        {
-        --dims[2];
-        }
-      
-      int numCells=grid->GetNumberOfCells();
-      array->SetNumberOfTuples(numCells);
-      
-      int i, j, k;
-      int iLevel, jLevel, kLevel, tmp;
-      unsigned char* ptr;
-      
-      ptr = (unsigned char*)(array->GetVoidPointer(0));
-      
-      
-      for (k = 0; k < dims[2]; ++k)
-      {
-      kLevel = this->GhostLevels - k;
-      tmp = k - dims[2] + 1 + this->GhostLevels;
-      if (tmp > kLevel) { kLevel = tmp;}
-      if (this->TwoDimensional)
-        {
-        kLevel = 0;
-        }
-      for (j = 0; j < dims[1]; ++j)
-        {
-        jLevel = kLevel;
         tmp = this->GhostLevels - j;
-        if (tmp > jLevel) { jLevel = tmp;}
-        tmp = j - dims[1] + 1 + this->GhostLevels;
-        if (tmp > jLevel) { jLevel = tmp;}
-        for (i = 0; i < dims[0]; ++i)
+        }
+      if (tmp > jLevel) { jLevel = tmp;}
+      if(onFace[3])
           {
-          iLevel = jLevel;
-          tmp = this->GhostLevels - i;
-          if (tmp > iLevel) { iLevel = tmp;}
-          tmp = i - dims[0] + 1 + this->GhostLevels;
-          if (tmp > iLevel) { iLevel = tmp;}
-
-          if (iLevel <= 0)
-            {
-            *ptr = 0;
-            }
-          else
-            {
-            *ptr = iLevel;
-            }
-          ++ptr;
+          tmp = j - dims[1] + 1 + this->GhostLevels-1;
           }
+      else
+        {
+        tmp = j - dims[1] + 1 + this->GhostLevels;
+        }
+      if (tmp > jLevel) { jLevel = tmp;}
+      for (i = 0; i < dims[0]; ++i)
+        {
+        iLevel = jLevel;
+        if(onFace[0])
+          {
+          tmp = this->GhostLevels-1 - i;
+          }
+        else
+          {
+          tmp = this->GhostLevels - i;
+          }
+        if (tmp > iLevel) { iLevel = tmp;}
+        if(onFace[1])
+          {
+          tmp = i - dims[0] + 1 + this->GhostLevels-1;
+          }
+        else
+          {
+          tmp = i - dims[0] + 1 + this->GhostLevels;
+          }
+        if (tmp > iLevel) { iLevel = tmp;}
+        
+        if (iLevel <= 0)
+          {
+          *ptr = 0;
+          }
+        else
+          {
+          *ptr = iLevel;
+          }
+        ++ptr;
         }
       }
-      array->SetName("vtkGhostLevels");
-//      array->SetName("vtkNotGhostLevels");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
-      ++block;
-      }
-    ++level;
     }
+  array->SetName("vtkGhostLevels");
+//      array->SetName("vtkNotGhostLevels");
+  grid->GetCellData()->AddArray(array);
+  array->Delete();
 }
 
 //----------------------------------------------------------------------------
