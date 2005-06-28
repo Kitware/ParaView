@@ -436,59 +436,6 @@
    <!-- End Mandelbrot -->
    </SourceProxy>
 
-   <SourceProxy name="MazeSource" class="vtkMazeSource">
-      <IntVectorProperty
-         name="XSize"
-         command="SetXSize"
-         number_of_elements="1"
-         animateable="1"
-         default_values="20" >
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="YSize"
-         command="SetYSize"
-         number_of_elements="1"
-         animateable="1"
-         default_values="20" >
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="RunFactor"
-         command="SetRunFactor"
-         number_of_elements="1"
-         default_values="20" >
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="MagnetFactor"
-         command="SetMagnetFactor"
-         number_of_elements="1"
-         default_values="4" >
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="RandomSeed"
-         command="SetRandomSeed"
-         number_of_elements="1"
-         default_values="111" >
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ShowSolution" 
-        command="SetShowSolution" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-   <!-- End Maze -->
-   </SourceProxy>
-
    <SourceProxy name="PlaneSource" class="vtkPlaneSource">
       <DoubleVectorProperty
          name="Origin"
