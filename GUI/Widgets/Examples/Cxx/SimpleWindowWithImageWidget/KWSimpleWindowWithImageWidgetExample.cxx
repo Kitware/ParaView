@@ -8,6 +8,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
+#include "vtkCornerAnnotation.h"
 
 #include "vtkKWWidgetsConfigurePaths.h"
 #include "vtkToolkits.h"
@@ -67,6 +68,7 @@ int my_main(int argc, char *argv[])
   vtkKWRenderWidget *rw = vtkKWRenderWidget::New();
   rw->SetParent(win->GetViewFrame());
   rw->Create(app);
+  rw->CornerAnnotationVisibilityOn();
 
   app->Script("pack %s -expand y -fill both -anchor c -expand y", 
               rw->GetWidgetName());
@@ -106,14 +108,23 @@ int my_main(int argc, char *argv[])
 
   rw->ResetCamera();
 
+  // The corner annotation has the ability to parse "tags" and fill
+  // them with information gathered from other objects.
+  // For example, let's display the slice and window/level in one corner
+  // by connecting the corner annotation to our image actor and
+  // image mapper
+
+  vtkCornerAnnotation *ca = rw->GetCornerAnnotation();
+  ca->SetImageActor(viewer->GetImageActor());
+  ca->SetWindowLevel(viewer->GetWindowLevel());
+  ca->SetText(2, "<slice>");
+  ca->SetText(3, "<window>\n<level>");
+
   // Create a scale to control the slice
 
   vtkKWScale *slice_scale = vtkKWScale::New();
   slice_scale->SetParent(win->GetViewFrame());
   slice_scale->Create(app);
-  slice_scale->DisplayEntry();
-  slice_scale->DisplayEntryAndLabelOnTopOff();
-  slice_scale->DisplayLabel("Slice:");
   slice_scale->SetRange(viewer->GetWholeZMin(), viewer->GetWholeZMax());
   slice_scale->SetValue(viewer->GetZSlice());
 

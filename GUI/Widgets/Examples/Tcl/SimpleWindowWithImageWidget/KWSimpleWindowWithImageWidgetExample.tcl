@@ -1,8 +1,6 @@
 # Initialize Tcl
 
 package require kwwidgets
-package require vtkio
-package require vtkrendering
 
 # Process some command-line arguments
 
@@ -35,11 +33,12 @@ win Create app
 
 # Add a render widget, attach it to the view frame, and pack
   
-# Create a render widget
+# Create a render widget, show the corner annotation
 
 vtkKWRenderWidget rw
 rw SetParent [win GetViewFrame]
 rw Create app
+rw CornerAnnotationVisibilityOn
 
 pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 
@@ -68,14 +67,23 @@ viewer SetColorLevel [expr 0.5 * ([lindex $range 1] + [lindex $range 0])]
 
 rw ResetCamera
 
+# The corner annotation has the ability to parse "tags" and fill
+# them with information gathered from other objects.
+# For example, let's display the slice and window/level in one corner
+# by connecting the corner annotation to our image actor and
+# image mapper
+
+set ca [rw GetCornerAnnotation]
+$ca SetImageActor [viewer GetImageActor]
+$ca SetWindowLevel [viewer GetWindowLevel]
+$ca SetText 2 "<slice>"
+$ca SetText 3 "<window>\n<level>"
+
 # Create a scale to control the slice
 
 vtkKWScale slice_scale
 slice_scale SetParent [win GetViewFrame]
 slice_scale Create app
-slice_scale DisplayEntry
-slice_scale DisplayEntryAndLabelOnTopOff
-slice_scale DisplayLabel "Slice:"
 slice_scale SetRange [viewer GetWholeZMin] [viewer GetWholeZMax]
 slice_scale SetValue [viewer GetZSlice]
 slice_scale SetCommand "" {viewer SetZSlice [slice_scale GetValue] ; rw Render}
