@@ -39,6 +39,8 @@ public:
   virtual int GetState();
   vtkBooleanMacro(State, int);
   virtual void ToggleState();
+  virtual void Select() { this->SetState(1); };
+  virtual void DeSelect() { this->SetState(0); };
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)
