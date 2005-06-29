@@ -96,10 +96,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 
-#include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
-#ifdef PARAVIEW_USE_LOOKMARKS
-#  include "vtkPVLookmarkManager.h"
-#endif
+#include "vtkPVLookmarkManager.h"
 
 #include "Resources/vtkPVLogoSmall.h"
 
@@ -130,15 +127,13 @@
 #define VTK_PV_TOOLBARS_INTERACTION_LABEL "Interaction"
 #define VTK_PV_TOOLBARS_TOOLS_LABEL       "Tools"
 #define VTK_PV_TOOLBARS_CAMERA_LABEL      "Camera"
-#ifdef PARAVIEW_USE_LOOKMARKS
 #define VTK_PV_TOOLBARS_LOOKMARK_LABEL "Lookmark"
-#endif
 
 #define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.741");
+vtkCxxRevisionMacro(vtkPVWindow, "1.742");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -199,11 +194,9 @@ vtkPVWindow::vtkPVWindow()
   this->Toolbar->SetName(VTK_PV_TOOLBARS_TOOLS_LABEL);
 
   // This toolbar contains buttons for creating lookmarks
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->LookmarkToolbar = vtkKWToolbar::New();
   this->LookmarkToolbar->SetName(VTK_PV_TOOLBARS_LOOKMARK_LABEL);
   this->LookmarkButton = vtkKWPushButton::New();
-#endif
 
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
@@ -320,9 +313,8 @@ vtkPVWindow::vtkPVWindow()
   this->ServerFileListingID.ID = 0;
 
   this->SaveVisibleSourcesOnlyFlag = 0;
-  #ifdef PARAVIEW_USE_LOOKMARKS
+
   this->PVLookmarkManager = NULL;
-  #endif
 
   if (this->MainSplitFrame)
     {
@@ -528,7 +520,6 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar = NULL;
     }
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   if(this->LookmarkToolbar)
     {
     this->LookmarkToolbar->Delete();
@@ -540,7 +531,6 @@ void vtkPVWindow::PrepareForDelete()
     this->LookmarkButton->Delete();
     this->LookmarkButton = NULL;
     }
-#endif
     
   if (this->CameraStyle3D)
     {
@@ -704,14 +694,12 @@ void vtkPVWindow::PrepareForDelete()
     this->ErrorLogDisplay = NULL;
     }
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   if (this->PVLookmarkManager )
     {
     this->PVLookmarkManager->SetMasterWindow(NULL);
     this->PVLookmarkManager->Delete();
     this->PVLookmarkManager = NULL;
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -877,12 +865,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     0, 
     "Show comparative visualization manager");
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   // Display Lookmark Manager
   this->GetWindowMenu()->InsertCommand(
     4, "Lookmark Manager", this, 
     "DisplayLookmarkManager", "Create and Manage Your Lookmarks");
-#endif
 
   // Edit menu
 
@@ -1149,7 +1135,6 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->Toolbar->ResizableOn();
   this->GetMainToolbarSet()->AddToolbar(this->Toolbar);
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->LookmarkToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
   this->LookmarkToolbar->Create(app);
   this->GetMainToolbarSet()->AddToolbar(this->LookmarkToolbar,0);
@@ -1160,7 +1145,6 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->LookmarkButton->SetImageOption("PVLookmarkButton");
   this->LookmarkButton->SetBalloonHelpString("Create a lookmark of the current view.");
   this->LookmarkToolbar->AddWidget(this->LookmarkButton);
-#endif
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);
   this->ToolbarMenuButton->Create(app);
@@ -1560,7 +1544,6 @@ void vtkPVWindow::Create(vtkKWApplication *app)
     this->TimerLogDisplay->Create(this->GetPVApplication());
     }
   
-#ifdef PARAVIEW_USE_LOOKMARKS
   if ( ! this->PVLookmarkManager )
     {
     this->PVLookmarkManager = vtkPVLookmarkManager::New();
@@ -1570,7 +1553,6 @@ void vtkPVWindow::Create(vtkKWApplication *app)
     this->PVLookmarkManager->Create(this->GetApplication());
     }
   this->LookmarkButton->SetCommand(this->PVLookmarkManager, "CreateLookmarkCallback");
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -3892,9 +3874,7 @@ void vtkPVWindow::SetSecondaryPanelVisibility(int arg)
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisplayLookmarkManager()
 {
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->PVLookmarkManager->Display();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -5094,7 +5074,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InComparativeVis: " << this->InComparativeVis << endl;
 
   // Lookmarks part:
-#ifdef PARAVIEW_USE_LOOKMARKS
   os << indent << "PVLookmarkManager: ";
   if( this->PVLookmarkManager )
     {
@@ -5104,7 +5083,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-#endif //PARAVIEW_USE_LOOKMARKS
 }
 
 

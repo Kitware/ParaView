@@ -64,6 +64,7 @@ SET(PROJECT_TESTS
   ScalarsSphereClip
   SPCTH
   TestDemo
+  TestLookmarks
   TestPackage
   Threshold
   ThresholdAttrMode
@@ -93,12 +94,6 @@ IF(PARAVIEW_USE_EXODUS)
     )
 ENDIF(PARAVIEW_USE_EXODUS)
 
-IF(PARAVIEW_USE_LOOKMARKS)
-  SET(PROJECT_TESTS
-    ${PROJECT_TESTS}
-    TestLookmarks
-    )
-ENDIF(PARAVIEW_USE_LOOKMARKS)
 
 # some tests require MPI because the classes do not get built otherwise
 IF(VTK_USE_MPI)

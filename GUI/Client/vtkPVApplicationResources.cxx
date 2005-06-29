@@ -81,9 +81,7 @@
 #include "Resources/vtkPVRecord.h"
 #include "Resources/vtkPVRecordState.h"
 #include "Resources/vtkPVMovie.h"
-#ifdef PARAVIEW_USE_LOOKMARKS
 #include "Resources/vtkPVLookmarkButton.h"
-#endif
 
 // Splash screen
 
@@ -463,14 +461,12 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVMovie_pixel_size,
     image_PVMovie_buffer_length);
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->CreatePhoto("PVLookmarkButton",
     image_PVLookmarkButton,
     image_PVLookmarkButton_width,
     image_PVLookmarkButton_height,
     image_PVLookmarkButton_pixel_size,
     image_PVLookmarkButton_buffer_length);
-#endif
 }
 
 //----------------------------------------------------------------------------

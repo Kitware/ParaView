@@ -421,11 +421,6 @@ IF (PARAVIEW_BUILD_GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
-# Configure LOOKMARKS
-OPTION(PARAVIEW_USE_LOOKMARKS "Build ParaView with visual bookmarking capability" ON)
-
-
-#########################################################################
 # Import external projects, such as EXODUS and SAF
 
 SET(PARAVIEW_ADDITIONAL_LIBRARIES)
