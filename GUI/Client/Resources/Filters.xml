@@ -93,7 +93,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
   <Module name="CTHAMRCellToPointData"
           root_name="CTHAMRCellToPointData"
-          menu_name="CTH AMR CellToPointData"
+          menu_name="CTH AMR Cell to Point Data"
           module_type="Filter"
           replace_input="0"
           long_help="Convert an array from cell to point data."
@@ -1253,7 +1253,7 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
-          menu_name="Normals generation"
+          menu_name="Normals Generation"
           root_name="PDNormals"
           module_type="Filter"
           long_help="This filter will produce surface normals used for smooth shading.  Spltting is used to avoid smoothing across feature edges."
@@ -2627,6 +2627,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
   </Module>
 
  <Module name="GenericClip"
+    menu_name="Generic Clip"
     root_name="GenericClip"
     module_type="Filter"
     button_help="Clip with an implicit plane, sphere or with scalars.Clipping does not reduce the dimensionality of the data set."
@@ -2708,6 +2709,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
 
 
   <Module name="GenericContour"
+          menu_name="Generic Contour"
           root_name="GenericContour"
           module_type="Filter"
           replace_input="0"
@@ -2764,6 +2766,7 @@ The Contour filter operates on any type of data set, but the input is required t
   </Module>
 
   <Module name="GenericCut"
+          menu_name="Generic Cut"
           root_name="GenericCut"
           replace_input="0"
           module_type="Filter"
@@ -2815,7 +2818,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
     </Documentation>
   </Module>
 
- <Module name="GenericGeometryFilter" menu_name="GenericGeometryFilter" root_name="PolyData"
+ <Module name="GenericGeometryFilter" menu_name="Generic Geometry Filter" root_name="PolyData"
          module_type="Filter"
          long_help="Extract geometry from a higher-order dataset"
          short_help="Extract geometry from a higher-order dataset">
