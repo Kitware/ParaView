@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.39");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -137,6 +137,9 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->UsersTutorialDialog = 0;
   this->UsersTutorialTxt = 0;
 
+  this->TraceHelper = vtkPVTraceHelper::New();
+  this->TraceHelper->SetObject(this);
+
   this->SetTitle("Lookmark Manager");
 }
 
@@ -144,6 +147,9 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
 vtkPVLookmarkManager::~vtkPVLookmarkManager()
 {
   this->Checkpoint();
+
+  this->TraceHelper->Delete();
+  this->TraceHelper = 0;
 
   this->CreateLmkButton->Delete();
   this->CreateLmkButton= NULL;
@@ -373,8 +379,8 @@ void vtkPVLookmarkManager::Withdraw()
 {
   this->Superclass::Withdraw();
 
-//  this->GetTraceHelper()->AddEntry("$kw(%s) Withdraw",
-//                      this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) Withdraw",
+                      this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -382,8 +388,8 @@ void vtkPVLookmarkManager::Display()
 {
   this->Superclass::Display();
 
-//  this->GetTraceHelper()->AddEntry("$kw(%s) Display",
-//                      this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) Display",
+                      this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -585,7 +591,7 @@ void vtkPVLookmarkManager::Checkpoint()
     return;
     }
   str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
-  this->SaveLookmarksInternal(str.str());
+  this->SaveAll(str.str());
 
   #else
 
@@ -594,10 +600,13 @@ void vtkPVLookmarkManager::Checkpoint()
     return;
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
-  this->SaveLookmarksInternal(str.str());
+  this->SaveAll(str.str());
 
   #endif
    
+  this->GetTraceHelper()->AddEntry("$kw(%s) Checkpoint",
+                      this->GetTclName());
+
   this->MenuEdit->SetState("Undo",0);
 
 }
@@ -708,8 +717,8 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
     return;
     }
 
-//  this->GetTraceHelper()->AddEntry("$kw(%s) Import \"%s\" %d",
-//                      this->GetTclName(),filename,appendFlag);
+  this->GetTraceHelper()->AddEntry("$kw(%s) Import \"%s\" %d",
+                      this->GetTclName(),filename,appendFlag);
 
   if(appendFlag==0 && (this->PVLookmarks->GetNumberOfItems()>0 || this->LmkFolderWidgets->GetNumberOfItems()>0) )
     {
@@ -1031,6 +1040,11 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     newLmkWidget->SetParent(dstPrnt);
     newLmkWidget->Create(this->GetPVApplication());
     newLmkWidget->SetName(lmkWidget->GetName());
+    newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+    ostrstream s;
+    s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
+    newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
     newLmkWidget->SetDataset(lmkWidget->GetDataset());
     newLmkWidget->SetLocation(newLoc);
     newLmkWidget->SetComments(lmkWidget->GetComments());
@@ -1157,6 +1171,11 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
     // create lookmark widget
     lookmarkWidget = this->GetPVLookmark(lmkElement);
+    lookmarkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+    ostrstream s;
+    s << "GetPVLookmark \"" << lookmarkWidget->GetName() << "\"" << ends;
+    lookmarkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
     lookmarkWidget->SetParent(parent);
     lookmarkWidget->Create(this->GetPVApplication());
     lookmarkWidget->UpdateWidgetValues();
@@ -1209,6 +1228,24 @@ char* vtkPVLookmarkManager::PromptForLookmarkFile(int saveFlag)
 
   return dialog->GetFileName();
   
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(char *name)
+{
+  vtkPVLookmark *lookmarkWidget;
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
+  for(int i=numLmkWidgets-1;i>=0;i--)
+    {
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
+    if(!strcmp(lookmarkWidget->GetName(),name))
+      {
+      return lookmarkWidget;
+      }
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1365,17 +1402,10 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::CreateLookmarkCallback()
 {
-  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
-  vtkPVLookmark *newLookmark;
-  vtkPVReaderModule *mod;
-  vtkPVSource *reader;
-  vtkPVSource *temp;
-  vtkPVSource *src;
-  int indexOfNewLmkWidget;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
   // if the pipeline is empty, don't add
-  if(this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources")->GetNumberOfItems()==0)
+  if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "No Data Loaded", 
@@ -1386,8 +1416,24 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
     return;
     }
 
-//  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark",
-//                      this->GetTclName());
+  this->CreateLookmark(this->GetUnusedLookmarkName());
+  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::CreateLookmark(char *name)
+{
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
+  vtkPVLookmark *newLookmark;
+  vtkPVReaderModule *mod;
+  vtkPVSource *reader;
+  vtkPVSource *temp;
+  vtkPVSource *src;
+  int indexOfNewLmkWidget;
+  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\"",
+                      this->GetTclName(),name);
 
   // what if the main window is not maximized in screen? 
 
@@ -1418,7 +1464,12 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
   // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
   newLookmark->SetParent(this->LmkScrollFrame->GetFrame());
   newLookmark->Create(this->GetPVApplication());
-  newLookmark->SetName(this->GetUnusedLookmarkName());
+  newLookmark->SetName(name);
+  newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  ostrstream s;
+  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
+  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
+  s.rdbuf()->freeze(0);
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
   newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
   newLookmark->StoreStateScript();
@@ -1459,6 +1510,9 @@ void vtkPVLookmarkManager::SaveAllCallback()
     return;
     }
 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveAll \"%s\"",
+                      this->GetTclName(),filename);
+
 #ifndef _WIN32
   if ( !getenv("HOME") )
     {
@@ -1481,7 +1535,7 @@ void vtkPVLookmarkManager::SaveAllCallback()
       vtkKWMessageDialog::ErrorIcon);
     return;
     }
-  this->SaveLookmarksInternal(filename);
+  this->SaveAll(filename);
 
   this->SetButtonFrameState(1);
 }
@@ -1642,7 +1696,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SaveLookmarksInternal(char *filename)
+void vtkPVLookmarkManager::SaveAll(char *filename)
 {
   ifstream *infile;
   ofstream *outfile;
@@ -1880,80 +1934,6 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
   root->PrintXML(*outfile,vtkIndent(1));
   outfile->close();
   parser->Delete();
-
-  delete infile;
-  delete outfile;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SaveLookmarksInternal(ostream *os)
-{
-  ifstream *infile;
-  ofstream *outfile;
-  vtkXMLLookmarkElement *root;
-  vtkXMLDataParser *parser;
-
-  // write out an empty lookmark file so that the parser will not complain
-  outfile = new ofstream("./tempLmkFile",ios::trunc);
-  if ( !outfile )
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-    }
-  if ( outfile->fail())
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-    }
-
-  *outfile << "<LmkFile></LmkFile>";
-  outfile->close();
-
-  infile = new ifstream("./tempLmkFile");
-  if ( !infile )
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-    }
-  if ( infile->fail())
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-    }
-
-  parser = vtkXMLDataParser::New();
-  parser->SetStream(infile);
-  parser->Parse();
-  root = (vtkXMLLookmarkElement *)parser->GetRootElement();
-
-  this->CreateNestedXMLElements(this->LmkScrollFrame->GetFrame(),root);
-
-  infile->close();
-  root->PrintXML(*os,vtkIndent(1));
-  parser->Delete();
-
-  remove("./tempLmkFile");
 
   delete infile;
   delete outfile;
@@ -2716,6 +2696,11 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       newLmkWidget->SetParent(packingFrame);
       newLmkWidget->Create(this->GetPVApplication());
       newLmkWidget->SetName(oldLmkWidget->GetName());
+      newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+      ostrstream s;
+      s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
+      newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
       newLmkWidget->SetDataset(oldLmkWidget->GetDataset());
       newLmkWidget->SetLocation(oldLmkWidget->GetLocation());
       newLmkWidget->SetComments(oldLmkWidget->GetComments());
@@ -2839,5 +2824,8 @@ void vtkPVLookmarkManager::UpdateEnableState()
 void vtkPVLookmarkManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "TraceHelper: " << this->TraceHelper << endl;
+
 }
 

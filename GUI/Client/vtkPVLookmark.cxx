@@ -70,7 +70,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.9");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -79,11 +79,16 @@ vtkPVLookmark::vtkPVLookmark()
   this->StateScript= NULL;
   this->CenterOfRotation = new float[3];
   this->Sources = vtkPVSourceCollection::New();
+  this->TraceHelper = vtkPVTraceHelper::New();
+  this->TraceHelper->SetObject(this);
+
 }
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::~vtkPVLookmark()
 {
+  this->TraceHelper->Delete();
+  this->TraceHelper = 0;
 
   if(this->CenterOfRotation)
     {
@@ -185,6 +190,9 @@ void vtkPVLookmark::View()
 
   char *temp_script = new char[strlen(this->StateScript)+1];
   strcpy(temp_script,this->GetStateScript());
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) View",
+                      this->GetTclName());
 
   this->ParseAndExecuteStateScript(reader,temp_script,1);
 
@@ -300,6 +308,9 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
     camera->SetPosition(cam->GetPosition());
     camera->SetViewUp(cam->GetViewUp());
 
+    this->GetTraceHelper()->AddEntry("$kw(%s) ViewLookmarkWithCurrentDataset",
+                        this->GetTclName());
+
     this->ParseAndExecuteStateScript(src,temp_script,0);
 //    this->CreateLookmarkCallback();
 
@@ -382,6 +393,9 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 
 void vtkPVLookmark::Update()
 {
+  this->GetTraceHelper()->AddEntry("$kw(%s) Update",
+                      this->GetTclName());
+
   //create and store a new session state file
   this->StoreStateScript();
   this->CreateIconFromMainView();
@@ -1189,4 +1203,6 @@ void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterOfRotation: " << this->GetCenterOfRotation() << endl;
   os << indent << "Dataset: " << this->GetDataset() << endl;
   os << indent << "Location: " << this->GetLocation() << endl;
+  os << indent << "TraceHelper: " << this->TraceHelper << endl;
+
 }

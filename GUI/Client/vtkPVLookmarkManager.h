@@ -52,6 +52,7 @@ class vtkKWMenu;
 class vtkKWMessageDialog;
 class vtkKWWindow;
 class vtkKWTextWithScrollbars;
+class vtkPVTraceHelper;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -67,6 +68,13 @@ public:
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
+
+  // Description
+  vtkPVLookmark* GetPVLookmark(char *name);
 
   // Description:
   // Display the toplevel.
@@ -91,10 +99,12 @@ public:
   // and their inputs. The window is moved behind the render window to save the image, but is
   // then moved back in front.
   void CreateLookmarkCallback();
+  void CreateLookmark(char *name);
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
   void SaveAllCallback();
+  void SaveAll(char *path);
 
   // Description: 
   // This is called when File --> Export Folder is selected
@@ -223,10 +233,7 @@ protected:
   void SetButtonFrameState(int state);
 
   // Description: 
-  // takes a filename, writes out an empty lookmark file, parses to get at the root element, 
-  // recursively calls CreateNestedXMLElement and prints the root and all its elements to the file
-  void SaveLookmarksInternal(char *path);
-  void SaveLookmarksInternal(ostream *os);
+  // prints the root and all its elements to the file
   void CreateNestedXMLElements(vtkKWWidget *wid, vtkXMLDataElement *parentElement);
 
   // Description: 
@@ -276,6 +283,8 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWTextWithScrollbars *QuickStartGuideTxt;
   vtkKWMessageDialog *UsersTutorialDialog;
   vtkKWTextWithScrollbars *UsersTutorialTxt;
+
+  vtkPVTraceHelper* TraceHelper;
 };
 
 #endif

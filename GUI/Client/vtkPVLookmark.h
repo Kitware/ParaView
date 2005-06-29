@@ -42,6 +42,7 @@ class vtkRenderWindow;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVLookmarkManager;
+class vtkPVTraceHelper;
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
@@ -50,6 +51,10 @@ public:
   static vtkPVLookmark* New();
   vtkTypeRevisionMacro(vtkPVLookmark,vtkKWLookmark);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
   // Description: 
   // It is called when the user clicks on a lookmark's thumbnail
@@ -173,6 +178,8 @@ protected:
   float* CenterOfRotation;
   vtkPVSourceCollection* Sources;
   int Location;
+
+  vtkPVTraceHelper* TraceHelper;
 
 private:
   vtkPVLookmark(const vtkPVLookmark&); // Not implemented

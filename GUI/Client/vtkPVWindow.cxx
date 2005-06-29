@@ -138,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.740");
+vtkCxxRevisionMacro(vtkPVWindow, "1.741");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1564,6 +1564,8 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   if ( ! this->PVLookmarkManager )
     {
     this->PVLookmarkManager = vtkPVLookmarkManager::New();
+    this->PVLookmarkManager->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+    this->PVLookmarkManager->GetTraceHelper()->SetReferenceCommand("GetPVLookmarkManager");
     this->PVLookmarkManager->SetMasterWindow(this);
     this->PVLookmarkManager->Create(this->GetApplication());
     }
