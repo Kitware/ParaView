@@ -18,16 +18,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.1");
-
-//----------------------------------------------------------------------------
-int vtkKWSpinBoxCommand(ClientData cd, Tcl_Interp *interp,
-                        int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
 {
-  this->CommandFunction = vtkKWSpinBoxCommand;
 }
 
 //----------------------------------------------------------------------------
@@ -38,62 +33,96 @@ vtkKWSpinBox::~vtkKWSpinBox()
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::Create(vtkKWApplication *app)
 {
-  // Call the superclass to set the appropriate flags then create manually
-
   if (!this->Superclass::CreateSpecificTkWidget(app, "spinbox"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  // Update enable state
-
   this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::SetRange(int from, int to, int increment, int autoenable)
+void vtkKWSpinBox::SetRange(double from, double to)
 {
-  this->Script("%s configure -from %d -to %d -increment %d",
-    this->GetWidgetName(), from, to, increment);
+  char format[1024];
+  char script[1024];
+  sprintf(format, "%s", this->GetConfigurationOption("-format"));
+  sprintf(script, "%%s configure -from %s -to %s", format, format);
+  this->Script(script, this->GetWidgetName(), from, to);
+}
 
-  // When using the integer overload of SetRange, automatically:
-  this->RestrictValuesToIntegers();
-  this->SetValue(from);
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetIncrement(double increment)
+{
+  char format[1024];
+  char script[1024];
+  sprintf(format, "%s", this->GetConfigurationOption("-format"));
+  sprintf(script, "%%s configure -increment %s", format);
+  this->Script(script, this->GetWidgetName(), increment);
+}
 
-  // Update Enabled based on range:
-  if (autoenable)
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetValue(double value)
+{
+  char format[1024];
+  char script[1024];
+  sprintf(format, "%s", this->GetConfigurationOption("-format"));
+  sprintf(script, "%%s set %s", format);
+  this->Script(script, this->GetWidgetName(), value);
+}
+
+//----------------------------------------------------------------------------
+double vtkKWSpinBox::GetValue()
+{
+  char buffer[1024];
+  sprintf(buffer, "%s", this->Script("%s get", this->GetWidgetName()));
+  return atof(buffer);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetValueFormat(const char *arg)
+{
+  this->SetConfigurationOption("-format", arg);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetWrap(int arg)
+{
+  this->SetConfigurationOptionAsInt("-wrap", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::GetWrap()
+{
+  return this->GetConfigurationOptionAsInt("-wrap");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetRestrictValuesToIntegers(int restrict)
+{
+  if (restrict)
     {
-    this->SetEnabled(to>from ? 1 : 0);
-    this->UpdateEnableState();
+    this->Script("%s configure -validate key -validatecommand {string is integer %%P}",
+      this->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -validate none",
+      this->GetWidgetName());
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::SetValue(int value)
+void vtkKWSpinBox::SetWidth(int arg)
 {
-  this->Script("%s set %d", this->GetWidgetName(), value);
+  this->SetConfigurationOptionAsInt("-width", arg);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSpinBox::GetValue()
+int vtkKWSpinBox::GetWidth()
 {
-  char buffer[1024];
-  sprintf(buffer, "%s", this->Script("%s get", this->GetWidgetName()));
-  return atoi(buffer);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSpinBox::RestrictValuesToIntegers()
-{
-  this->Script("%s configure -validate key -validatecommand {string is integer %%P}",
-    this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSpinBox::SetWidth(int w)
-{
-  this->Script("%s configure -width %d", this->GetWidgetName(), w);
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------

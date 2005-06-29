@@ -36,23 +36,38 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set the integer range and increment value. If autoenable is non-zero,
-  // enable the widget if 'to' is larger than 'from,' otherwise disable.
-  // If autoenable is zero, do not change the enabled state.
-  virtual void SetRange(int from, int to, int increment = 1, int autoenable = 1);
+  // Set the range.
+  virtual void SetRange(double from, double to);
+
+  // Description:
+  // Set the increment value.
+  virtual void SetIncrement(double increment);
 
   // Description:
   // Set/Get the current value.
-  virtual void SetValue(int value);
-  virtual int GetValue();
+  virtual void SetValue(double value);
+  virtual double GetValue();
+
+  // Description:
+  // Set/Get the string used to format the value.
+  virtual void SetValueFormat(const char *format);
+
+  // Description:
+  // Set/Get the wrap. If on, values at edges of range wrap around to the
+  // other side of the range when clicking on the up/down arrows.
+  virtual void SetWrap(int wrap);
+  virtual int GetWrap();
+  vtkBooleanMacro(Wrap, int);
 
   // Description:
   // Prevent the user from typing in non-integer values.
-  virtual void RestrictValuesToIntegers();
+  virtual void SetRestrictValuesToIntegers(int restrict);
+  vtkBooleanMacro(RestrictValuesToIntegers, int);
 
-  // Description: 
-  // Set the width of the spinbox in number of characters.
+  // Description:
+  // Set/Get the width of the spinbox in number of characters.
   virtual void SetWidth(int);
+  virtual int GetWidth();
 
   // Description:
   // Specifies whether or not a selection in the widget should also be the X
