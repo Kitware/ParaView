@@ -44,20 +44,20 @@ The output of the 2D Glyph source is polygonal data.
   <VectorEntry label="Dimension" trace_name="Dimension"
                property="Dimensions" type="int"
                help="XYZ cell dimensions of a block"/>
-  <VectorEntry label="FractalValue" trace_name="FractalValue"
+  <VectorEntry label="Fractal Value" trace_name="FractalValue"
                property="FractalValue" type="float"
                help="Map this value to 0.5 for use as a volume fraction."/>
 <!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
+  <VectorEntry label="Maximum Level" trace_name="MaximumLevel"
                property="MaximumLevel" type="int"
                help="Determines how deep to refine the grid."/>
-  <LabeledToggle label="GhostLevels" trace_name="GhostLevels" 
+  <LabeledToggle label="Ghost Levels" trace_name="GhostLevels" 
                  property="GhostLevels"
                  help="Set whether to generate overlapping ghost levels." />
-  <LabeledToggle label="TwoDimensional" trace_name="TwoDimensional" 
+  <LabeledToggle label="Two Dimensional" trace_name="TwoDimensional" 
                  property="TwoDimensional"
                  help="Generate a 2D AMR fractal." />
-  <LabeledToggle label="Asymetric" trace_name="Asymetric" 
+  <LabeledToggle label="Asymmetric" trace_name="Asymetric" 
                  property="Asymetric"
                  help="Some blocks have X dimension larger by 2." />
 </Module>
