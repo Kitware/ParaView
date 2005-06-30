@@ -49,7 +49,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.146");
+vtkCxxRevisionMacro(vtkPVProbe, "1.147");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -320,14 +320,15 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       this->PlotDisplayProxy->GetProperty("ArrayNames"));
     if (svp)
-      {
+      {      
+      int e=0;
       for(int i=0; i<numArrays; i++)
         {
         vtkPVArrayInformation* arrayInfo = 
           this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(i);
         if( arrayInfo->GetNumberOfComponents() == 1 )
           {
-          svp->SetElement(i, arrayInfo->GetName());
+          svp->SetElement(e++, arrayInfo->GetName());
           }
         }
       // Trick to force a domain of the sub-proxy to depend to the parent proxy one
