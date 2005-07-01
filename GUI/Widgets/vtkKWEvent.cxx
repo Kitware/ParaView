@@ -212,6 +212,7 @@ static const char *vtkKWEventStrings[] =
   "InitializeTraceEvent",
   "ManipulatorModifiedEvent",
   "WarningMessageEvent",
+  "SourceDeletedEvent",
   //
   "FinalBogusNotUsedEvent",
   0

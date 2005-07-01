@@ -223,6 +223,7 @@ public:
     InitializeTraceEvent,
     ManipulatorModifiedEvent,
     WarningMessageEvent,
+    SourceDeletedEvent,
     //
     FinalBogusNotUsedEvent
   };
