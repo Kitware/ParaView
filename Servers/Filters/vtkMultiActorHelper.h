@@ -52,6 +52,10 @@ public:
   // Add an actor to be transformed.
   void AddActor(vtkActor* actor);
 
+  // Description:
+  // Removes all actors from the list.
+  void RemoveAllActors();
+
 protected:
   vtkMultiActorHelper();
   ~vtkMultiActorHelper();

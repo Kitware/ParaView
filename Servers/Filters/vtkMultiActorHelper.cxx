@@ -21,7 +21,7 @@
 #include "vtkProp3D.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkMultiActorHelper, "1.3");
+vtkCxxRevisionMacro(vtkMultiActorHelper, "1.4");
 vtkStandardNewMacro(vtkMultiActorHelper);
 
 //----------------------------------------------------------------------------
@@ -40,6 +40,12 @@ vtkMultiActorHelper::~vtkMultiActorHelper()
 void vtkMultiActorHelper::AddActor(vtkActor* actor)
 {
   this->Actors->AddItem(actor);
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiActorHelper::RemoveAllActors()
+{
+  this->Actors->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
