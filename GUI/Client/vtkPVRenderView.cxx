@@ -140,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.389");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.390");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -2724,6 +2724,16 @@ void vtkPVRenderView::Enable3DWidget(vtkInteractorObserver *o)
       }
     }      
   savedRens->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetOrientationAxesVisibility()
+{
+  if (!this->OrientationAxesCheck)
+    {
+    return 0;
+    }
+  return this->OrientationAxesCheck->GetState();
 }
 
 //----------------------------------------------------------------------------

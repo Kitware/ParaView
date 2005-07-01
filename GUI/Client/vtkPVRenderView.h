@@ -282,6 +282,7 @@ public:
   // Description:
   // Callbacks for the orientation axes.
   void SetOrientationAxesVisibility(int val);
+  int  GetOrientationAxesVisibility();
   void OrientationAxesCheckCallback();
   void SetOrientationAxesInteractivity(int val);
   void OrientationAxesInteractiveCallback();
