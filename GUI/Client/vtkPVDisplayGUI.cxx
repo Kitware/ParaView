@@ -92,7 +92,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.37");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.38");
 
 //----------------------------------------------------------------------------
 
@@ -1195,7 +1195,7 @@ void vtkPVDisplayGUI::UpdateInternal()
     vtkErrorMacro("Unknown representation.");
     }
   this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
-  this->PointSizeThumbWheel->SetValue(pDisp->GetLineWidthCM());
+  this->LineWidthThumbWheel->SetValue(pDisp->GetLineWidthCM());
   this->OpacityScale->SetValue(pDisp->GetOpacityCM());
 
   // Update actor control resolutions
