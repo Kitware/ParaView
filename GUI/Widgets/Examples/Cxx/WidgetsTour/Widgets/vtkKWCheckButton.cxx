@@ -32,8 +32,6 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cb1->GetWidgetName());
 
-  cb1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another checkbutton, but use an icon this time
@@ -48,8 +46,6 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     cb2->GetWidgetName());
-
-  cb2->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -66,8 +62,6 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     cb3->GetWidgetName());
-
-  cb3->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -111,11 +105,14 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     cbs->GetWidgetName());
 
-  cbs->Delete();
-
   // -----------------------------------------------------------------------
 
   // TODO: use vtkKWCheckButtonSetLabeled
+
+  cb1->Delete();
+  cb2->Delete();
+  cb3->Delete();
+  cbs->Delete();
 
   return new vtkKWCheckButtonItem;
 }

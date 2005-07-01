@@ -54,13 +54,9 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc1_editor->SetWholeParameterRangeToFunctionRange();
   pfed_tfunc1_editor->SetVisibleParameterRangeToWholeParameterRange();
 
-  pfed_tfunc1_editor->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     pfed_tfunc1_editor->GetWidgetName());
-
-  pfed_tfunc1->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -127,14 +123,14 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc2_editor->ComputeValueTicksFromHistogramOn();
   pfed_tfunc2_editor->SetParameterTicksFormat("%-#6.0f");
 
-  pfed_tfunc2_editor->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 20", 
     pfed_tfunc2_editor->GetWidgetName());
 
+  pfed_tfunc1_editor->Delete();
+  pfed_tfunc1->Delete();
+  pfed_tfunc2_editor->Delete();
   pfed_tfunc2->Delete();
-
   hist->Delete();
   reader->Delete();
 

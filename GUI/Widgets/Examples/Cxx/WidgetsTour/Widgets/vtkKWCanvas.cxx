@@ -29,8 +29,6 @@ KWWidgetsTourItem* vtkKWCanvasEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     canvas1->GetWidgetName());
 
-  canvas1->Delete();
-
   // There is no C++ API at the moment to access Tk's Canvas functions,
   // so let's just use Tk in the example:
 
@@ -57,6 +55,8 @@ KWWidgetsTourItem* vtkKWCanvasEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "%s create rectangle 150 80 320 180 -outline #666666 -width 3", wname);
 
   // TODO: add a canvas with scrollbars
+
+  canvas1->Delete();
 
   return new vtkKWCanvasItem;
 }
