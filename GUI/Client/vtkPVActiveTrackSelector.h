@@ -28,6 +28,7 @@ class vtkPVActiveTrackSelectorInternals;
 class vtkPVAnimationCueTree;
 class vtkPVAnimationCue;
 class vtkSMProxy;
+class vtkPVSource;
 
 class VTK_EXPORT vtkPVActiveTrackSelector : public vtkPVTracedWidget
 {
@@ -44,6 +45,7 @@ public:
   // Add the AnimationCue for a PVSource.
   void AddSource(vtkPVAnimationCueTree*);
   void RemoveSource(vtkPVAnimationCueTree*);
+  void RemoveSource(vtkPVSource*);
 
   // Description:
   // These are the callbacks for menus.
@@ -54,7 +56,8 @@ public:
   // When ever a cue gets focus, this method should be called
   // so that the cue gets selected in the Track Selector as well.
   // Call with argument NULL when a cue is unselected.
-  void SelectCue(vtkPVAnimationCue*);
+  // Returns 0 if passed cue does not exist, 1 otherwise.
+  int SelectCue(vtkPVAnimationCue*);
 
   // Description:
   // Accessors to menu buttons

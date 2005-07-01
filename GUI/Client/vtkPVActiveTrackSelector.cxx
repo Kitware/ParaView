@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.7");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.8");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -125,12 +125,12 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVActiveTrackSelector::SelectCue(vtkPVAnimationCue* cue)
+int vtkPVActiveTrackSelector::SelectCue(vtkPVAnimationCue* cue)
 {
   if (!cue)
     {
     this->CleanupSource();
-    return;
+    return 1;
     }
   
   const char* key = (cue->GetPVSource())? cue->GetPVSource()->GetName():
@@ -146,9 +146,10 @@ void vtkPVActiveTrackSelector::SelectCue(vtkPVAnimationCue* cue)
     if (iter->GetPointer() == cue)
       {
       this->SelectPropertyCallbackInternal(index);
-      break;
+      return 1;
       }
     }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -167,6 +168,21 @@ void vtkPVActiveTrackSelector::AddSource(vtkPVAnimationCueTree* cue)
   command << "SelectSourceCallback " << key  << ends;
   this->SourceMenuButton->AddCommand(cue->GetLabelText(), this, command.str(), 0);
   command.rdbuf()->freeze(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVActiveTrackSelector::RemoveSource(vtkPVSource* source)
+{
+  vtkPVActiveTrackSelectorInternals::MapOfStringToCueTrees::iterator iter =
+    this->Internals->SourceCueTrees.begin();
+  for (; iter != this->Internals->SourceCueTrees.end(); iter++)
+    {
+    if (source == iter->second->GetPVSource())
+      {
+      this->RemoveSource(iter->second);
+      break;
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
