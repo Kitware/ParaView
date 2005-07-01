@@ -85,7 +85,7 @@ ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 SUBDIRS(Wrapping)
 
 # Build vtkClientServer wrappers for VTK kits.
-SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering)
+SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering Widgets)
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
 IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
