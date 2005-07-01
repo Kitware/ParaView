@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.19");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.20");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -175,7 +175,8 @@ void vtkSMProxyProperty::AppendCommandToStream(
     vtkSMProxy* proxy = this->GetProxy(idx);
     // Keep track of all proxies that point to this as a
     // consumer so that we can remove this from the consumer
-    // list later if necessarythis->AddPreviousProxy(proxy);
+    // list later if necessary
+    this->AddPreviousProxy(proxy);
     if (proxy)
       {
       proxy->AddConsumer(this, cons);
@@ -270,7 +271,10 @@ void vtkSMProxyProperty::RemoveConsumers(vtkSMProxy* proxy)
     this->PPInternals->PreviousProxies.begin();
   for(; it != this->PPInternals->PreviousProxies.end(); it++)
     {
-    it->GetPointer()->RemoveConsumer(this, proxy);
+    if (it->GetPointer())
+      {
+      it->GetPointer()->RemoveConsumer(this, proxy);
+      }
     }
 }
 
