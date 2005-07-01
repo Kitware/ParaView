@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEntryLabeled.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
@@ -29,6 +30,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVComparativeVis.h"
 #include "vtkPVComparativeVisPropertyWidget.h"
+#include "vtkPVSource.h"
 #include "vtkPVTrackEditor.h"
 #include "vtkPVWindow.h"
 
@@ -37,11 +39,11 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.7");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
-const int vtkPVComparativeVisDialog::DialogHeight = 400;
+const int vtkPVComparativeVisDialog::DialogHeight = 600;
 
 // Private implementation
 struct vtkPVComparativeVisDialogInternals
@@ -62,16 +64,37 @@ struct vtkPVComparativeVisDialogInternals
   RadioButtonsType RadioButtons;
 };
 
-class vtkCueSelectionCommand : public vtkCommand
+class vtkPVCVCueSelectionCommand : public vtkCommand
 {
 public:
   void Execute(vtkObject *caller, unsigned long, void*)
   {
-    this->Dialog->CueSelected(
-      vtkPVComparativeVisPropertyWidget::SafeDownCast(caller));
+    if (this->Dialog)
+      {
+      this->Dialog->CueSelected(
+        vtkPVComparativeVisPropertyWidget::SafeDownCast(caller));
+      }
   }
 
+  vtkPVCVCueSelectionCommand() : Dialog(0) {}
+
   vtkPVComparativeVisDialog* Dialog;
+};
+
+class vtkPVCVSourceDeletedCommand : public vtkCommand
+{
+public:
+  void Execute(vtkObject*, unsigned long, void* callData)
+  {
+    if (this->Widget)
+      {
+      this->Widget->RemovePVSource((vtkPVSource*)callData);
+      }
+  }
+
+  vtkPVCVSourceDeletedCommand(): Widget(0) {}
+
+  vtkPVComparativeVisPropertyWidget* Widget;
 };
 
 //-----------------------------------------------------------------------------
@@ -81,6 +104,9 @@ vtkPVComparativeVisDialog::vtkPVComparativeVisDialog()
 
   this->MainFrame = vtkKWFrame::New();
   this->TrackEditor = vtkPVTrackEditor::New();
+  this->TrackEditor->SetFixedTimeKeyframeFlag(
+    vtkPVTrackEditor::FIRST_KEYFRAME_TIME_NOTCHANGABLE |
+    vtkPVTrackEditor::LAST_KEYFRAME_TIME_NOTCHANGABLE);
   this->NameEntry = vtkKWEntryLabeled::New();
   this->VisualizationListFrame = vtkKWFrameLabeled::New();
   this->CloseButton = vtkKWPushButton::New();
@@ -91,11 +117,11 @@ vtkPVComparativeVisDialog::~vtkPVComparativeVisDialog()
 {
   delete this->Internal;
 
-  this->MainFrame->Delete();
   this->TrackEditor->Delete();
   this->NameEntry->Delete();
   this->VisualizationListFrame->Delete();
   this->CloseButton->Delete();
+  this->MainFrame->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +164,8 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   vtkKWRadioButton* r1 = vtkKWRadioButton::New();
   this->Internal->RadioButtons.push_back(r1);
   r1->SetParent(f1);
-  r1->SetVariableName("vtkPVComparativeVisDialogVar");
   r1->Create(this->GetApplication());
+  r1->SetVariableName("vtkPVComparativeVisDialogVar");
   unsigned int value = this->Internal->RadioButtons.size() - 1;
   r1->SetValue(value);
   ostrstream comm;
@@ -151,10 +177,19 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   vtkPVComparativeVisPropertyWidget* w1 = 
     vtkPVComparativeVisPropertyWidget::New();
   this->Internal->Widgets.push_back(w1);
-  vtkCueSelectionCommand* command = new vtkCueSelectionCommand;
+
+  vtkPVCVCueSelectionCommand* command = new vtkPVCVCueSelectionCommand;
   command->Dialog = this;
   w1->AddObserver(vtkCommand::WidgetModifiedEvent, command);
   command->Delete();
+
+  vtkPVCVSourceDeletedCommand* dcommand = new vtkPVCVSourceDeletedCommand;
+  dcommand->Widget = w1;
+  vtkPVWindow* window = vtkPVApplication::SafeDownCast(
+    this->GetApplication())->GetMainWindow();
+  window->AddObserver(vtkKWEvent::SourceDeletedEvent, dcommand);
+  dcommand->Delete();
+
   w1->SetParent(f1);
   w1->Create(this->GetApplication());
   this->Script("pack %s -side left", w1->GetWidgetName());
@@ -184,7 +219,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
   // Create two property widgets by default
   this->NewPropertyWidget();
   this->NewPropertyWidget();
-
+  
   vtkPVComparativeVisPropertyWidget* wid = this->Internal->Widgets[0];
   wid->ShowCueEditor(this->TrackEditor);
 

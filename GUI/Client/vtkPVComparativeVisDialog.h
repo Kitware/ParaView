@@ -74,7 +74,7 @@ protected:
   void NewPropertyWidget();
 
 //BTX
-  friend class vtkCueSelectionCommand;
+  friend class vtkPVCVCueSelectionCommand;
 //ETX
 
   // To edit the keyframes
