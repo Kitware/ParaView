@@ -35,12 +35,11 @@ SET( ServerManagerCommon_SRCS
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
+  vtkSMComparativeVis.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayProxy.cxx
-#  vtkSMDisplayWindowProxy.cxx
-#  vtkSMDisplayerProxy.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
@@ -134,22 +133,15 @@ SET_SOURCE_FILES_PROPERTIES(
 
 
 INCLUDE_DIRECTORIES(
-  ${VTK_BINARY_DIR}
+  ${VTK_INCLUDE_DIR}
   ${TCL_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${KWCommon_INCLUDE_PATH}
+  
 )
-
-SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
-FOREACH(kit ${kits})
-  INCLUDE_DIRECTORIES(
-    ${VTK_SOURCE_DIR}/${kit}
-    ${VTK_BINARY_DIR}/${kit}
-    )
-ENDFOREACH(kit)
 
 SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 

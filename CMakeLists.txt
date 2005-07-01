@@ -290,7 +290,7 @@ SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
-SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
+SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering Widgets)
 FOREACH(kit ${kits})
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
     ${ParaView_SOURCE_DIR}/VTK/${kit}

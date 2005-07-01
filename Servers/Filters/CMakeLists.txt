@@ -206,6 +206,7 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkHybridCS
   vtkParallelCS
   vtkVolumeRenderingCS
+  vtkWidgetsCS
   KWCommon
   vtksys
   ${PARAVIEW_ADDITIONAL_LIBRARIES}
