@@ -44,6 +44,7 @@ public:
 
   // Description:
   // Get/Set the key time: the time for this key frame.
+  // Time is normalized, i.e. 1 == end of cue.
   void SetKeyTime(double time);
   double GetKeyTime();
 
