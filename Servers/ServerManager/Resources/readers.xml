@@ -917,6 +917,7 @@
      <StringVectorProperty
         name="QFileName"
         command="SetQFileName"
+        animateable="1"
         number_of_elements="1">
        <StringListDomain name="files"/>
      </StringVectorProperty>
