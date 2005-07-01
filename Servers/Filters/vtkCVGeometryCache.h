@@ -42,6 +42,10 @@ public:
   // Shallow copies the input of the mapper into the internal cache.
   void AddGeometry(vtkMapper* mapper);
 
+  // Description:
+  // Removes all cached geometry.
+  void RemoveAllGeometry();
+
 protected:
   vtkCVGeometryCache();
   ~vtkCVGeometryCache();
