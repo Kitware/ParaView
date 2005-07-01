@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.56");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.57");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -93,6 +93,22 @@ protected:
     this->Target = NULL;
     }
   vtkPVAnimationManager* Target;
+};
+
+class vtkPVAMSourceDeletedCommand : public vtkCommand
+{
+public:
+  void Execute(vtkObject*, unsigned long, void*)
+  {
+    if (this->AnimationManager)
+      {
+      this->AnimationManager->Update();
+      }
+  }
+
+  vtkPVAMSourceDeletedCommand() : AnimationManager(0) {}
+
+  vtkPVAnimationManager* AnimationManager;
 };
 
 //*****************************************************************************
@@ -146,6 +162,8 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->RecordingIncrement = 0.1;
 
   this->AdvancedView = 0;
+
+  this->ObserverTag = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +203,11 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
+
+  vtkPVAMSourceDeletedCommand* comm = new vtkPVAMSourceDeletedCommand;
+  comm->AnimationManager = this;
+  this->ObserverTag = pvWin->AddObserver(vtkKWEvent::SourceDeletedEvent, comm);
+  comm->Delete();
 
   if (pvApp->HasRegistryValue(2,"RunTime","AdvancedAnimationView"))
     {
@@ -952,6 +975,15 @@ void vtkPVAnimationManager::UpdateEnableState()
 void vtkPVAnimationManager::PrepareForDelete()
 {
   this->AnimationScene->PrepareForDelete();
+
+  if (this->ObserverTag > 0)
+    {
+    vtkPVApplication* pvApp = 
+      vtkPVApplication::SafeDownCast(this->GetApplication());
+    vtkPVWindow* pvWin = pvApp->GetMainWindow();
+    pvWin->RemoveObserver(this->ObserverTag);
+    this->ObserverTag = 0;
+    }
 
   // We need to delete the cue for the camera here since it keeps a
   // reference to the vtkSMRenderModuleProxy which must be deleted before

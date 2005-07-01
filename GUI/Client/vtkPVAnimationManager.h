@@ -299,6 +299,8 @@ protected:
   int InRecording;
   double RecordingIncrement;
 
+  unsigned long ObserverTag;
+
 private:
   vtkPVAnimationManager(const vtkPVAnimationManager&); // Not implemented.
   void operator=(const vtkPVAnimationManager&); // Not implemented.

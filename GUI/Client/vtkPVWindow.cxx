@@ -19,6 +19,7 @@
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
@@ -133,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.743");
+vtkCxxRevisionMacro(vtkPVWindow, "1.744");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3586,7 +3587,7 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
       col->RemoveItem(pvs);
       this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
-      this->UpdateAnimationInterface();
+      this->InvokeEvent(vtkKWEvent::SourceDeletedEvent, (void*)pvs);
       }
     }
 }
@@ -3931,6 +3932,7 @@ void vtkPVWindow::CreateComparativeVisManagerGUI()
     this->ComparativeVisManagerGUI->SetTitle("Comparative Visualizations");
     this->ComparativeVisManagerGUI->SetMasterWindow(this);
     this->ComparativeVisManagerGUI->Create(this->GetPVApplication());
+    this->ComparativeVisManagerGUI->SetDisplayPositionToMasterWindowCenter();
     }  
 }
 
