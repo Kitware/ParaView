@@ -1277,11 +1277,19 @@
 
   <ProxyGroup name="ComparativeVisHelpers">
     <SourceProxy name="GeometryCache" class="vtkCVGeometryCache">
-      <ProxyProperty name="AddGeometry" command="AddGeometry" repeat_command="1">
+      <ProxyProperty 
+          name="AddGeometry" 
+          command="AddGeometry" 
+          clean_command="RemoveAllGeometry"
+          repeat_command="1">
       </ProxyProperty>
     </SourceProxy>
     <Proxy name="MultiActorHelper" class="vtkMultiActorHelper">
-      <ProxyProperty name="Actors" command="AddActor" repeat_command="1"/>
+      <ProxyProperty 
+          name="Actors" 
+          command="AddActor" 
+          clean_command="RemoveAllActors"
+          repeat_command="1"/>
       <DoubleVectorProperty
          name="UniformScale"
          command="UniformScale"
