@@ -141,6 +141,12 @@ public:
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
+  // Description:
+  // Set this to 1 to abort before generating next frame. Automatically
+  // resetted to 0 once aborted.
+  vtkSetMacro(ShouldAbort, int);
+  vtkGetMacro(ShouldAbort, int);
+
 protected:
   vtkPVComparativeVis();
   ~vtkPVComparativeVis();
@@ -181,13 +187,24 @@ protected:
 
   int IsGenerated;
 
+  void UpdateProgress(double progress);
+
 //BTX
   friend class vtkCVAnimationSceneObserver;
 //ETX
 
 private:
+  void ComputeNumberOfFrames();
+
+  unsigned int NumberOfFrames;
+  unsigned int CurrentFrame;
+
   // Private implementation
   vtkPVComparativeVisInternals* Internal;
+
+  int ShouldAbort;
+
+  static const double BorderWidth;
 
   vtkPVComparativeVis(const vtkPVComparativeVis&); // Not implemented.
   void operator=(const vtkPVComparativeVis&); // Not implemented.

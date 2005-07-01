@@ -41,7 +41,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.5");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.6");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
@@ -103,6 +103,8 @@ protected:
     }
 };
 
+const double vtkPVComparativeVis::BorderWidth = 0.02;
+
 //-----------------------------------------------------------------------------
 vtkPVComparativeVis::vtkPVComparativeVis()
 {
@@ -116,6 +118,11 @@ vtkPVComparativeVis::vtkPVComparativeVis()
 
   this->InFirstShow = 1;
   this->IsGenerated = 0;
+
+  this->NumberOfFrames = 1;
+  this->CurrentFrame = 0;
+
+  this->ShouldAbort = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,15 +135,32 @@ vtkPVComparativeVis::~vtkPVComparativeVis()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVComparativeVis::ComputeNumberOfFrames()
+{
+  this->NumberOfFrames = 1;
+  unsigned int numProps = this->Internal->NumberOfPropertyValues.size();
+  for (unsigned int i=0; i<numProps; i++)
+    {
+    this->NumberOfFrames *= this->Internal->NumberOfPropertyValues[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVComparativeVis::Generate()
 {
   this->Initialize();
 
   vtkTimerLog::MarkStartEvent("Play One (all)");
+  this->CurrentFrame = 0;
+  this->ComputeNumberOfFrames();
   this->PlayOne(0);
   vtkTimerLog::MarkEndEvent("Play One (all)");
   this->InFirstShow = 1;
-  this->IsGenerated = 1;
+  if (!this->ShouldAbort)
+    {
+    this->IsGenerated = 1;
+    }
+  this->ShouldAbort = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +170,9 @@ void vtkPVComparativeVis::Initialize()
   this->Internal->Displays.clear();
   this->Internal->Bounds.clear();
   this->IsGenerated = 0;
+
+  this->NumberOfFrames = 0;
+  this->CurrentFrame = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -282,7 +309,7 @@ void vtkPVComparativeVis::ExecuteEvent(
   switch(event)
     {
     case vtkCommand::AnimationCueTickEvent:
-      if (this->Application)
+      if (this->Application && !this->ShouldAbort)
         {
         // If not the last property, call the next one. For example,
         // if there are two parameters and each have 2 values, the
@@ -302,10 +329,19 @@ void vtkPVComparativeVis::ExecuteEvent(
           this->Application->GetMainView()->ForceRender();
           vtkTimerLog::MarkEndEvent("Force Render");
           this->StoreGeometry();
+          this->UpdateProgress(static_cast<double>(this->CurrentFrame)/
+                               this->NumberOfFrames);
+          this->CurrentFrame++;
           }
         }
       break;
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVComparativeVis::UpdateProgress(double progress)
+{
+  this->InvokeEvent(vtkCommand::ProgressEvent,(void *)&progress);
 }
 
 //-----------------------------------------------------------------------------
@@ -578,7 +614,8 @@ int vtkPVComparativeVis::Show()
         vtkSMDoubleVectorProperty* porigin =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeR->GetProperty("Origin"));
-        porigin->SetElements3(xPos+bb[1], 0, 0);
+        porigin->SetElements3(
+          xPos+bb[1]-cellSpacing[0]*this->BorderWidth, 0, 0);
         vtkSMDoubleVectorProperty* pnormal =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeR->GetProperty("Normal"));
@@ -594,7 +631,8 @@ int vtkPVComparativeVis::Show()
         porigin =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeL->GetProperty("Origin"));
-        porigin->SetElements3(xPos+bb[0], 0, 0);
+        porigin->SetElements3(
+          xPos+bb[0]+cellSpacing[0]*this->BorderWidth, 0, 0);
         pnormal =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeL->GetProperty("Normal"));
@@ -610,7 +648,8 @@ int vtkPVComparativeVis::Show()
         porigin =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeD->GetProperty("Origin"));
-        porigin->SetElements3(0, yPos+bb[2], 0);
+        porigin->SetElements3(
+          0, yPos+bb[2]+cellSpacing[1]*this->BorderWidth, 0);
         pnormal =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeD->GetProperty("Normal"));
@@ -626,7 +665,8 @@ int vtkPVComparativeVis::Show()
         porigin =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeU->GetProperty("Origin"));
-        porigin->SetElements3(0, yPos+bb[3], 0);
+        porigin->SetElements3(
+          0, yPos+bb[3]-cellSpacing[1]*this->BorderWidth, 0);
         pnormal =
           vtkSMDoubleVectorProperty::SafeDownCast(
             planeU->GetProperty("Normal"));
@@ -637,6 +677,8 @@ int vtkPVComparativeVis::Show()
       }
     }
   
+  this->MultiActorHelper->UpdateVTKObjects();
+
   if (this->InFirstShow)
     {
     this->InFirstShow = 0;
@@ -732,4 +774,5 @@ void vtkPVComparativeVis::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "IsGenerated: " << this->IsGenerated << endl;
   os << indent << "Name: " << (this->Name?this->Name:"(null)") << endl;
   os << indent << "MultiActorHelper: " << this->MultiActorHelper << endl;
+  os << indent << "ShouldAbort: " << this->ShouldAbort << endl;
 }

@@ -26,14 +26,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVComparativeVis.h"
+#include "vtkPVKeyFrame.h"
 #include "vtkPVSimpleAnimationCue.h"
+#include "vtkPVSource.h"
 #include "vtkPVTrackEditor.h"
 #include "vtkPVWindow.h"
 #include "vtkSMAnimationCueProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
@@ -99,11 +101,20 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
                this->NumberOfFramesEntry->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisPropertyWidget::RemovePVSource(vtkPVSource* source)
+{
+  if (this->TrackSelector)
+    {
+    this->TrackSelector->RemoveSource(source);
+    }
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
   vtkPVComparativeVis* cv)
 {
-  if (this->LastCueEditor)
+  if (this->LastCueEditor && this->LastCue)
     {
     int numFrames = 1;
     int value = this->NumberOfFramesEntry->GetWidget()->GetValueAsInt();
@@ -111,7 +122,17 @@ void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
       {
       numFrames = value;
       }
-    this->LastCueEditor->SetDuration(numFrames);
+    this->LastCueEditor->SetDuration(numFrames-1);
+    int numKeyFrames = this->LastCueEditor->GetNumberOfKeyFrames();
+    vtkPVKeyFrame* keyFrame = this->LastCueEditor->GetKeyFrame(
+      numKeyFrames-1);
+    if (keyFrame)
+      {
+      // The last key frame is always at the end.
+      // We have to set the normalized time.
+      keyFrame->SetKeyTime(1.0);
+      }
+    
     cv->AddProperty(
       this->LastCue, this->LastCueEditor, numFrames);  
     }
@@ -121,11 +142,27 @@ void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
 void vtkPVComparativeVisPropertyWidget::CopyFromVisualization(
   vtkPVAnimationCue* acue, vtkPVSimpleAnimationCue* cue, unsigned int numValues)
 {
-  this->TrackSelector->SelectCue(acue);
-  this->LastCue = acue;
+  if (this->TrackSelector->SelectCue(acue))
+    {
+    this->LastCue = acue;
+    }
+  else
+    {
+    this->LastCue = 0;
+    }
+  this->NumberOfFramesEntry->GetWidget()->SetValue(static_cast<int>(numValues));
+
+  if (cue == this->LastCueEditor)
+    {
+    return;
+    }
+  if (this->LastCueEditor)
+    {
+    this->LastCueEditor->Delete();
+    this->LastCueEditor = 0;
+    }
   this->LastCueEditor = cue;
   cue->Register(this);
-  this->NumberOfFramesEntry->GetWidget()->SetValue(static_cast<int>(numValues));
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +184,7 @@ void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
         }
       this->LastCue = selectedCue;
       this->LastCueEditor = vtkPVSimpleAnimationCue::New();
-      this->LastCueEditor->SetDuration(5);
+      this->LastCueEditor->SetDuration(4);
       this->LastCueEditor->SetKeyFrameParent(trackE->GetPropertiesFrame());
       this->LastCueEditor->Create(this->GetApplication());
 

@@ -30,6 +30,7 @@ class vtkPVActiveTrackSelector;
 class vtkPVAnimationCue;
 class vtkPVComparativeVis;
 class vtkPVSimpleAnimationCue;
+class vtkPVSource;
 class vtkPVTrackEditor;
 class vtkSMProxy;
 
@@ -68,6 +69,12 @@ protected:
   vtkPVSimpleAnimationCue* LastCueEditor;
   vtkPVAnimationCue* LastCue;
   vtkKWEntryLabeled* NumberOfFramesEntry;
+
+  void RemovePVSource(vtkPVSource* source);
+
+//BTX
+  friend class vtkPVCVSourceDeletedCommand;
+//ETX
 
 private:
   vtkPVComparativeVisPropertyWidget(const vtkPVComparativeVisPropertyWidget&); // Not implemented

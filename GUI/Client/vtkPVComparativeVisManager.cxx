@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.13");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.14");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -52,6 +52,7 @@ struct vtkPVComparativeVisManagerInternals
     {
       this->CurrentPVSource = 0;
       this->MainPanelVisibility = 1;
+      this->OrientationAxesVisibility = 1;
       this->InteractorStyle = 0;
     }
 
@@ -59,6 +60,7 @@ struct vtkPVComparativeVisManagerInternals
   // to Show(). This state is later restored after Hide().
   vtkstd::list<vtkSMSimpleDisplayProxy*> VisibleDisplayProxies;
   int MainPanelVisibility;
+  int OrientationAxesVisibility;
   int InteractorStyle;
   vtkstd::list<vtkKWToolbar*> VisibleToolbars;
   vtkPVSource* CurrentPVSource;
@@ -209,6 +211,8 @@ int vtkPVComparativeVisManager::Show()
     this->IStyle->SetApplication(this->Application);
     
     vtkPVWindow* window = this->Application->GetMainWindow();
+    vtkPVRenderView* mainView = this->Application->GetMainView();
+
     // Make sure the main window updates it's enable state based
     // on InComparativeVis.
     window->SetInComparativeVis(1);
@@ -225,6 +229,9 @@ int vtkPVComparativeVisManager::Show()
     window->SetCurrentPVSource(0);
     this->Internal->MainPanelVisibility = window->GetMainPanelVisibility();
     window->SetMainPanelVisibility(0);
+    this->Internal->OrientationAxesVisibility =
+      mainView->GetOrientationAxesVisibility();
+    mainView->SetOrientationAxesVisibility(0);
     
     vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
     int numToolbars = toolbars->GetNumberOfToolbars();
@@ -275,7 +282,6 @@ int vtkPVComparativeVisManager::Show()
     iter->Delete();
     
     // Store camera settings
-    vtkPVRenderView* mainView = this->Application->GetMainView();
     vtkCamera* camera = 
       this->Application->GetMainView()->GetRenderer()->GetActiveCamera();
     camera->GetPosition(this->Internal->CameraPosition);
@@ -322,6 +328,7 @@ void vtkPVComparativeVisManager::Hide()
     }
   // Restore state prior to Show()
   vtkPVWindow* window = this->Application->GetMainWindow();
+  vtkPVRenderView* mainView = this->Application->GetMainView();
   vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
   vtkstd::list<vtkKWToolbar*>::iterator iter = 
       this->Internal->VisibleToolbars.begin();
@@ -333,6 +340,8 @@ void vtkPVComparativeVisManager::Hide()
   window->UpdateToolbarState();
 
   window->SetMainPanelVisibility(this->Internal->MainPanelVisibility);
+  mainView->SetOrientationAxesVisibility(
+    this->Internal->OrientationAxesVisibility);
 
   window->SetInteractorStyle(this->Internal->InteractorStyle);
 
@@ -358,7 +367,6 @@ void vtkPVComparativeVisManager::Hide()
 
   window->SetCurrentPVSource(this->Internal->CurrentPVSource);
 
-  vtkPVRenderView* mainView = this->Application->GetMainView();
   mainView->SetCameraState(
     this->Internal->CameraPosition[0], 
     this->Internal->CameraPosition[1], 

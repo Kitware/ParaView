@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkPVComparativeVisManagerGUI.h"
 
+#include "vtkCommand.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWListBox.h"
@@ -23,11 +24,37 @@
 #include "vtkPVComparativeVis.h"
 #include "vtkPVComparativeVisDialog.h"
 #include "vtkPVComparativeVisManager.h"
+#include "vtkPVComparativeVisProgressDialog.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.7");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.8");
+
+class vtkCVProgressObserver : public vtkCommand
+{
+public:
+  static vtkCVProgressObserver* New()
+    {
+    return new vtkCVProgressObserver;
+    }
+  virtual void Execute(vtkObject*, unsigned long, void* prog)
+    {
+      double progress = *((double*)prog);
+      if (this->Manager)
+        {
+        this->Manager->UpdateProgress(progress);
+        }
+    }
+
+  vtkPVComparativeVisManagerGUI* Manager;
+
+protected:
+  vtkCVProgressObserver()
+    {
+      this->Manager = 0;
+    }
+};
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisManagerGUI::vtkPVComparativeVisManagerGUI()
@@ -48,9 +75,15 @@ vtkPVComparativeVisManagerGUI::vtkPVComparativeVisManagerGUI()
   this->CloseButton = vtkKWPushButton::New();
 
   this->EditDialog = vtkPVComparativeVisDialog::New();
+  this->ProgressDialog = vtkPVComparativeVisProgressDialog::New();
 
   this->InShow = 0;
   this->VisSelected = 0;
+
+  this->VisBeingGenerated = 0;
+
+  this->ProgressObserver = vtkCVProgressObserver::New();
+  this->ProgressObserver->Manager = this;
 }
 
 //----------------------------------------------------------------------------
@@ -71,8 +104,11 @@ vtkPVComparativeVisManagerGUI::~vtkPVComparativeVisManagerGUI()
   this->CloseButton->Delete();
 
   this->EditDialog->Delete();
+  this->ProgressDialog->Delete();
 
   this->Manager->Delete();
+
+  this->ProgressObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -169,7 +205,26 @@ void vtkPVComparativeVisManagerGUI::Create(vtkKWApplication *app)
   this->EditDialog->SetMasterWindow(pvApp->GetMainWindow());
   this->EditDialog->SetTitle("Edit visualization");
 
+  this->ProgressDialog->Create(app);
+  this->ProgressDialog->SetMasterWindow(pvApp->GetMainWindow());
+  this->ProgressDialog->SetTitle("Comparative vis progress");
+
   this->SetResizable(0, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisManagerGUI::UpdateProgress(double progress)
+{
+  if (progress <= 0.01)
+    {
+    return;
+    }
+
+  this->ProgressDialog->SetProgress(progress);
+  if (this->ProgressDialog->GetAbortFlag())
+    {
+    this->VisBeingGenerated->SetShouldAbort(1);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -194,7 +249,7 @@ void vtkPVComparativeVisManagerGUI::AddVisualization()
     {
     vtkPVComparativeVis* vis = vtkPVComparativeVis::New();
     this->EditDialog->CopyToVisualization(vis);
-    
+ 
     this->Manager->AddVisualization(vis);
     if (vis->GetName() && vis->GetName()[0] != '\0')
       {
@@ -261,14 +316,29 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
           app->GetMainWindow()->GetAnimationManager();
         int prevStat = aMan->GetCacheGeometry();
         aMan->SetCacheGeometry(0);
+        vis->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);
+        this->VisBeingGenerated = vis;
+        this->ProgressDialog->Display();
+        this->ProgressDialog->SetProgress(0.01);
         this->Manager->GenerateVisualization(vis);
+        this->ProgressDialog->Withdraw();
+        this->VisBeingGenerated = 0;
+        vis->RemoveObserver(this->ProgressObserver);
         aMan->SetCacheGeometry(prevStat);
         }
-      this->Manager->SetSelectedVisualizationName(cur);
-      if (this->Manager->Show())
+      if (!this->ProgressDialog->GetAbortFlag())
         {
-        this->InShow = 1;
+        this->Manager->SetSelectedVisualizationName(cur);
+        if (this->Manager->Show())
+          {
+          this->InShow = 1;
+          }
         }
+      else
+        {
+        vis->Initialize();
+        }
+      this->ProgressDialog->SetAbortFlag(0);
       this->Update();
       }
     }  

@@ -22,12 +22,15 @@
 
 #include "vtkKWTopLevel.h"
 
+class vtkCVProgressObserver;
 class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWListBox;
 class vtkKWPushButton;
+class vtkPVComparativeVis;
 class vtkPVComparativeVisDialog;
 class vtkPVComparativeVisManager;
+class vtkPVComparativeVisProgressDialog;
 
 class VTK_EXPORT vtkPVComparativeVisManagerGUI : public vtkKWTopLevel
 {
@@ -103,13 +106,26 @@ protected:
   // Popup dialog to edit a visualization
   vtkPVComparativeVisDialog* EditDialog;
 
+  // Popup dialog to show progress during generate
+  vtkPVComparativeVisProgressDialog* ProgressDialog;
+
   // Underlying data
   vtkPVComparativeVisManager* Manager;
 
   int InShow;
   int VisSelected;
 
+  void UpdateProgress(double prog);
+
+  vtkPVComparativeVis* VisBeingGenerated;
+
+//BTX
+  friend class vtkCVProgressObserver;
+//ETX
+
 private:
+  vtkCVProgressObserver* ProgressObserver;
+
   vtkPVComparativeVisManagerGUI(const vtkPVComparativeVisManagerGUI&); // Not implemented
   void operator=(const vtkPVComparativeVisManagerGUI&); // Not Implemented
 };
