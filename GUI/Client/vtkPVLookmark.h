@@ -43,6 +43,7 @@ class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVLookmarkManager;
 class vtkPVTraceHelper;
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
@@ -64,6 +65,8 @@ public:
   // The reader is initialized using the attributes in the lookmark's state script. The rest of the
   // script is then executed.
   void View();
+  // called when lookmark's thumbnail is pressed and "Lock to dataset" is OFF
+  void ViewLookmarkWithCurrentDataset();
 
   // Description:
   // Updates the lookmark's icon and state while maintaining any existing name, comments, etc.
@@ -113,6 +116,9 @@ public:
 
   void RemovePVSource(vtkPVSource *src);
 
+  vtkGetObjectMacro(ToolbarButton,vtkKWPushButton);
+  void AddLookmarkToolbarButton(vtkKWIcon *icon);
+
 protected:
 
   vtkPVLookmark();
@@ -131,9 +137,6 @@ protected:
   // Each time before a lookmark is recreated this method is called which *attempts* to delete the vtkPVSources stored in this lookmakr's collection. 
   // Of course if one of these filters have been set as input to another one it cannot and will not be deleted. This helps in cleaning up the Source window.
   int DeletePVSources();
-
-  // called when lookmark's thumbnail is pressed and "Lock to dataset" is OFF
-  void ViewLookmarkWithCurrentDataset();
 
   // Description:
   // An added or updated lookmark widgets uses the return value of this to setup its thumbnail
@@ -180,6 +183,8 @@ protected:
   int Location;
 
   vtkPVTraceHelper* TraceHelper;
+
+  vtkKWPushButton *ToolbarButton;
 
 private:
   vtkPVLookmark(const vtkPVLookmark&); // Not implemented

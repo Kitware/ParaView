@@ -53,6 +53,7 @@ class vtkKWMessageDialog;
 class vtkKWWindow;
 class vtkKWTextWithScrollbars;
 class vtkPVTraceHelper;
+class vtkPVXMLElement;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -100,6 +101,8 @@ public:
   // then moved back in front.
   void CreateLookmarkCallback();
   void CreateLookmark(char *name);
+
+  void CreateMacroCallback();
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
@@ -156,6 +159,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  vtkKWLookmarkFolder *GetMacrosFolder();
+  void AddMacroExampleCallback(int index);
+  void ImportMacroExamplesCallback();
 
 protected:
 
@@ -220,6 +227,7 @@ protected:
   // Description:
   // Takes a vtkKWLookmarkElement and uses its attributes to initialize and return a new vtkPVLookmark
   vtkPVLookmark* GetPVLookmark(vtkXMLDataElement *elem);
+  vtkPVLookmark* GetPVLookmark(vtkPVXMLElement *elem);
 
   // Description:
   // Necessary to encode/decode newlines in the comments text and image data before/after being written/read to/from a lookmark file since they get lost in the call to WriteObject()
@@ -262,6 +270,7 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
 
 //BTX
   vtkVector<vtkPVLookmark*> *PVLookmarks;
+  vtkVector<vtkPVLookmark*> *MacroExamples;
   vtkVector<vtkKWLookmarkFolder*> *LmkFolderWidgets;
 //ETX
   
@@ -276,6 +285,7 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuImport;
   vtkKWMenu *MenuHelp;
+  vtkKWMenu *MenuExamples;
 
   vtkKWPushButton *CreateLmkButton;
 

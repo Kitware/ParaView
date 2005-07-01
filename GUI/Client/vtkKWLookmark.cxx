@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.14");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -59,6 +59,8 @@ vtkKWLookmark::vtkKWLookmark()
   this->Dataset = NULL;
   this->Width = this->Height = 48; 
   this->PixelSize = 3;
+  this->MacroFlag = 0;
+
 }
 
 //----------------------------------------------------------------------------
@@ -298,13 +300,6 @@ void vtkKWLookmark::DragAndDropPerformCommand(int x, int y, vtkKWWidget *vtkNotU
 
 
 //----------------------------------------------------------------------------
-int vtkKWLookmark::IsLockedToDataset()
-{
-  return this->LmkDatasetCheckbox->GetWidget()->GetState();
-}
-
-
-//----------------------------------------------------------------------------
 void vtkKWLookmark::RemoveDragAndDropTargetCues()
 {
   this->Script("%s configure -bd 0 -relief flat", this->SeparatorFrame->GetWidgetName());
@@ -330,6 +325,11 @@ void vtkKWLookmark::EditLookmarkCallback()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::ChangeLookmarkName()
 {
+  if(!strcmp(this->LmkNameField->GetValue(),"Macros"))
+    {
+    return;
+    }
+
   char *lmkName = new char[100];
 
   strcpy(lmkName,this->LmkNameField->GetValue());
@@ -378,9 +378,11 @@ void vtkKWLookmark::Pack()
   // Repack everything
   this->Script("pack %s -anchor nw -side left", this->Checkbox->GetWidgetName());
   this->Script("pack %s -anchor nw -side left -padx 1 -pady 1", this->LmkIcon->GetWidgetName());
-  this->Script("pack %s -anchor w", this->LmkDatasetLabel->GetWidgetName());
-  this->Script("pack %s -anchor w", this->LmkDatasetCheckbox->GetWidgetName());
-  this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
+  if(!this->MacroFlag)
+    {
+    this->Script("pack %s -anchor w", this->LmkDatasetLabel->GetWidgetName());
+    this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
+    }
   this->Script("pack %s -anchor w", this->LmkCommentsText->GetWidgetName());
   this->Script("%s configure -bg white -height 3 -width 50 -wrap word", this->LmkCommentsText->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->LmkCommentsFrame->GetWidgetName());

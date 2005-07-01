@@ -81,10 +81,6 @@ public:
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
 
   // Description:
-  // If TRUE, use the default dataset when loading lookmark, else use the currently selected one in source list
-  int IsLockedToDataset();
-  
-  // Description:
   // When EditLookmarkCallback is called, an editable text widget appears in place of the label and contains the old name.
   // The user edits this as appropriate and pressing 'Return' then calls ChangeLookmarkName
   void EditLookmarkCallback();
@@ -111,6 +107,9 @@ public:
   void UpdateWidgetValues();
 
   virtual void UpdateEnableState();
+
+  vtkSetMacro(MacroFlag,int);
+  vtkGetMacro(MacroFlag,int);
 
 protected:
 
@@ -139,6 +138,7 @@ protected:
   int PixelSize;
 
   int SelectionFlag;
+  int MacroFlag;
 
 private:
   vtkKWLookmark(const vtkKWLookmark&); // Not implemented

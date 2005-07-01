@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.742");
+vtkCxxRevisionMacro(vtkPVWindow, "1.743");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1135,16 +1135,24 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->Toolbar->ResizableOn();
   this->GetMainToolbarSet()->AddToolbar(this->Toolbar);
 
+  // Set up Lookmark toolbar and interfaces
   this->LookmarkToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
   this->LookmarkToolbar->Create(app);
   this->GetMainToolbarSet()->AddToolbar(this->LookmarkToolbar,0);
-
-  // Set up the button to create a lookmark.
+  if(!this->PVLookmarkManager)
+    {
+    this->PVLookmarkManager = vtkPVLookmarkManager::New();
+    this->PVLookmarkManager->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+    this->PVLookmarkManager->GetTraceHelper()->SetReferenceCommand("GetPVLookmarkManager");
+    this->PVLookmarkManager->SetMasterWindow(this);
+    this->PVLookmarkManager->Create(this->GetApplication());
+    }
   this->LookmarkButton->SetParent(this->LookmarkToolbar->GetFrame());
   this->LookmarkButton->Create(app);
   this->LookmarkButton->SetImageOption("PVLookmarkButton");
   this->LookmarkButton->SetBalloonHelpString("Create a lookmark of the current view.");
-  this->LookmarkToolbar->AddWidget(this->LookmarkButton);
+  this->LookmarkButton->SetCommand(this->PVLookmarkManager, "CreateLookmarkCallback");
+  this->LookmarkToolbar->InsertWidget(0,this->LookmarkButton);
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);
   this->ToolbarMenuButton->Create(app);
@@ -1543,16 +1551,6 @@ void vtkPVWindow::Create(vtkKWApplication *app)
     this->TimerLogDisplay->SetMasterWindow(this);
     this->TimerLogDisplay->Create(this->GetPVApplication());
     }
-  
-  if ( ! this->PVLookmarkManager )
-    {
-    this->PVLookmarkManager = vtkPVLookmarkManager::New();
-    this->PVLookmarkManager->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-    this->PVLookmarkManager->GetTraceHelper()->SetReferenceCommand("GetPVLookmarkManager");
-    this->PVLookmarkManager->SetMasterWindow(this);
-    this->PVLookmarkManager->Create(this->GetApplication());
-    }
-  this->LookmarkButton->SetCommand(this->PVLookmarkManager, "CreateLookmarkCallback");
 }
 
 //----------------------------------------------------------------------------

@@ -181,6 +181,7 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
+  vtkGetObjectMacro(LookmarkToolbar, vtkKWToolbar);
  
   // Description:
   // Access from script for regression test.

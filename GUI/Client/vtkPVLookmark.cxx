@@ -67,10 +67,14 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWToolbar.h"
+#include "vtkKWFrame.h"
+#include "vtkImageReader2.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.10");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -81,7 +85,7 @@ vtkPVLookmark::vtkPVLookmark()
   this->Sources = vtkPVSourceCollection::New();
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetObject(this);
-
+  this->ToolbarButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -110,6 +114,11 @@ vtkPVLookmark::~vtkPVLookmark()
     this->Sources->Delete();
     this->Sources = 0;
     }
+  if(this->ToolbarButton)
+    {
+    this->ToolbarButton->Delete();
+    this->ToolbarButton = 0;
+    }
 }
 
 
@@ -128,13 +137,6 @@ void vtkPVLookmark::View()
 
   // this prevents other filters' visibility from disturbing the lookmark view
   this->TurnFiltersOff();
-
-  if(this->IsLockedToDataset()==0)
-    {
-    this->ViewLookmarkWithCurrentDataset();
-    this->SetLookmarkIconCommand();
-    return;
-    }
 
   //  If the lookmark is clicked and this checkbox is checked
   //    and the dataset is currently loaded - same behavior as now
@@ -230,11 +232,18 @@ void vtkPVLookmark::CreateIconFromMainView()
   this->SetImageData(this->GetEncodedImageData(lmkIcon));
   this->SetLookmarkIconCommand();
 
+  if(this->MacroFlag)
+    {
+    this->AddLookmarkToolbarButton(lmkIcon);
+    }
+
   lmkIcon->Delete();
 }
 
 void vtkPVLookmark::CreateIconFromImageData()
 {
+  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
   if(!this->ImageData)
     {
     return;
@@ -248,9 +257,31 @@ void vtkPVLookmark::CreateIconFromImageData()
   this->SetLookmarkImage(icon);
   this->SetLookmarkIconCommand();
 
+  if(this->MacroFlag)
+    {
+    this->AddLookmarkToolbarButton(icon);
+    }
+
   delete [] decodedImageData;
   decoder->Delete();
   icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
+{
+  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  if(!this->ToolbarButton)
+    {
+    this->ToolbarButton = vtkKWPushButton::New();
+    this->ToolbarButton->SetParent(win->GetLookmarkToolbar()->GetFrame());
+    this->ToolbarButton->Create(this->GetPVApplication());
+    this->ToolbarButton->SetImageOption(icon);
+    this->ToolbarButton->SetBalloonHelpString(this->GetName());
+    this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
+    win->GetLookmarkToolbar()->AddWidget(this->ToolbarButton);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -287,6 +318,16 @@ void vtkPVLookmark::StoreStateScript()
 void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  // if the pipeline is empty, don't add
+  if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->GetPVApplication(), win, "No Data Loaded", 
+      "You must first open your data to execute a lookmark macro", 
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
 
   // execute state script stored with this lookmark except
   // don't use reader assigned to lookmark, use the current one
@@ -398,9 +439,17 @@ void vtkPVLookmark::Update()
 
   //create and store a new session state file
   this->StoreStateScript();
+  if(this->MacroFlag)
+    {
+    this->GetPVApplication()->GetMainWindow()->GetLookmarkToolbar()->RemoveWidget(this->ToolbarButton);
+    this->ToolbarButton->Delete();
+    this->ToolbarButton = 0;
+    }
   this->CreateIconFromMainView();
+
 //  this->SetCenterOfRotation(this->PVApplication->GetMainWindow()->GetCenterOfRotationStyle()->GetCenter());
 }
+
 
 
 //----------------------------------------------------------------------------
@@ -498,8 +547,16 @@ char *vtkPVLookmark::GetEncodedImageData(vtkKWIcon *icon)
 //----------------------------------------------------------------------------
 void vtkPVLookmark::SetLookmarkIconCommand()
 {
-  this->LmkIcon->SetBind(this, "<Button-1>", "View");
-  this->LmkIcon->SetBind(this, "<Double-1>", "View");
+  if(this->MacroFlag)
+    {
+    this->LmkIcon->SetBind(this, "<Button-1>", "ViewLookmarkWithCurrentDataset");
+    this->LmkIcon->SetBind(this, "<Double-1>", "ViewLookmarkWithCurrentDataset");
+    }
+  else
+    {
+    this->LmkIcon->SetBind(this, "<Button-1>", "View");
+    this->LmkIcon->SetBind(this, "<Double-1>", "View");
+    }
 }
 
 //----------------------------------------------------------------------------

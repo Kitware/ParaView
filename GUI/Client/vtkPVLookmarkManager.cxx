@@ -19,6 +19,9 @@
 
 #include "vtkPVLookmarkManager.h"
 
+//#include "vtkToolkits.h" // Needed for vtkPVGeneratedModules
+//#include "vtkPVConfig.h" // Needed for vtkPVGeneratedModules
+//#include "vtkPVGeneratedModules.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
@@ -69,6 +72,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWDragAndDropTargetSet.h"
+#include "vtkKWToolbar.h"
 
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataParser.h"
@@ -99,6 +103,8 @@
 #include "vtkPVProcessModule.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVXMLParser.h"
+#include "vtkPVXMLElement.h"
 
 #include "vtkSMDisplayProxy.h"
 
@@ -112,13 +118,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.40");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
 {
   this->PVLookmarks = vtkVector<vtkPVLookmark*>::New();
   this->LmkFolderWidgets = vtkVector<vtkKWLookmarkFolder*>::New();
+  this->MacroExamples = vtkVector<vtkPVLookmark*>::New();
 
   this->LmkPanelFrame = vtkKWFrame::New();
   this->LmkScrollFrame = vtkKWFrameWithScrollbar::New();
@@ -131,6 +138,7 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->MenuEdit = vtkKWMenu::New();
   this->MenuImport = vtkKWMenu::New();
   this->MenuHelp = vtkKWMenu::New();
+  this->MenuExamples = vtkKWMenu::New();
 
   this->QuickStartGuideDialog = 0;
   this->QuickStartGuideTxt = 0;
@@ -164,6 +172,7 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
   this->MenuImport->Delete();
   this->MenuFile->Delete();
   this->MenuHelp->Delete();
+  this->MenuExamples->Delete();
 
   if (this->QuickStartGuideTxt)
     {
@@ -187,6 +196,23 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
     {
     this->UsersTutorialDialog->Delete();
     this->UsersTutorialDialog = NULL;
+    }
+
+  if(this->MacroExamples)
+    {
+    vtkVectorIterator<vtkPVLookmark *> *it = this->MacroExamples->NewIterator();
+    while (!it->IsDoneWithTraversal())
+      {
+      vtkPVLookmark *lmk = 0;
+      if (it->GetData(lmk) == VTK_OK && lmk)
+        {
+        lmk->Delete();
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    this->MacroExamples->Delete();
+    this->MacroExamples = 0;
     }
 
   if(this->PVLookmarks)
@@ -292,6 +318,19 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   root_menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
   this->MenuEdit->AddSeparator();
+
+  this->MenuExamples->SetParent(this->MenuEdit);
+  this->MenuExamples->SetTearOff(0);
+  this->MenuExamples->Create(app);
+  this->MenuEdit->AddCascade("Add Existing Macro", this->MenuExamples,0);
+  this->MenuEdit->AddCommand("Create Macro", this,"CreateMacroCallback");
+  this->MenuEdit->AddSeparator();
+//  char* cbv = 
+//    this->MenuExamples->CreateCheckButtonVariable(this, "MacroExamples");
+//  this->Script( "set %s 0", cbv );
+  this->ImportMacroExamplesCallback();
+//  delete [] cbv;
+
   this->MenuEdit->AddCommand("Create Lookmark", this, "CreateLookmarkCallback");
   this->MenuEdit->AddCommand("Update Lookmark", this, "UpdateLookmarkCallback");
   this->MenuEdit->AddCommand("Rename Lookmark", this, "RenameLookmarkCallback");
@@ -372,6 +411,145 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
     {
     this->Import(str.str(),0);
     }
+
+  vtkKWLookmarkFolder *folder = this->GetMacrosFolder();
+  if(!folder)
+    {
+    vtkKWLookmarkFolder *macroFolder = vtkKWLookmarkFolder::New();
+    macroFolder->SetParent(this->LmkScrollFrame->GetFrame());
+    macroFolder->SetMacroFlag(1);
+    macroFolder->Create(this->GetPVApplication());
+    this->Script("pack %s -fill both -expand yes -padx 8",macroFolder->GetWidgetName());
+    this->Script("%s configure -height 8",macroFolder->GetLabelFrame()->GetFrame()->GetWidgetName());
+    macroFolder->SetFolderName("Macros");
+    macroFolder->SetLocation(this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame()));
+    this->LmkFolderWidgets->InsertItem(this->LmkFolderWidgets->GetNumberOfItems(),macroFolder);
+    this->DragAndDropWidget(macroFolder,this->TopDragAndDropTarget);
+    this->PackChildrenBasedOnLocation(macroFolder->GetParent());
+    this->ResetDragAndDropTargetSetAndCallbacks();
+
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
+{
+  vtkPVLookmark *lookmarkWidget;
+  this->MacroExamples->GetItem(index,lookmarkWidget);
+  vtkPVLookmark *newLookmark = vtkPVLookmark::New();
+  newLookmark->SetName(lookmarkWidget->GetName());
+  newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  ostrstream s;
+  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
+  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
+  s.rdbuf()->freeze(0);
+  newLookmark->SetStateScript(lookmarkWidget->GetStateScript());
+  newLookmark->SetName(lookmarkWidget->GetName());
+  newLookmark->SetComments(lookmarkWidget->GetComments());
+  newLookmark->SetDataset(lookmarkWidget->GetDataset());
+  newLookmark->SetImageData(lookmarkWidget->GetImageData());
+  newLookmark->SetPixelSize(lookmarkWidget->GetPixelSize());
+  newLookmark->SetMacroFlag(1);
+
+  newLookmark->SetApplication(this->GetApplication());
+  newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
+  newLookmark->Create(this->GetPVApplication());
+  newLookmark->UpdateWidgetValues();
+  this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
+  newLookmark->CreateIconFromImageData();
+  newLookmark->SetLocation(this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()));
+//  this->MacroExamples->RemoveItem(index);
+  this->PVLookmarks->InsertItem(this->PVLookmarks->GetNumberOfItems(),newLookmark);
+  this->ResetDragAndDropTargetSetAndCallbacks();
+}
+/*
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::SetLookmarkMacros(char *string)
+{
+  this->LookmarkMacros = new char[strlen(string)];
+  strcpy(this->LookmarkMacros,string);
+}
+*/
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::ImportMacroExamplesCallback()
+{
+  vtkXMLDataParser *parser;
+  vtkXMLDataElement *root;
+  vtkPVLookmark *lookmarkWidget;
+  int j, numLmks;
+
+//  char* init_string;
+//  init_string = vtkPVDefaultModulesLookmarkMacrosGetInterfaces();
+
+  ostrstream str;
+
+  #ifdef _WIN32
+  if ( !getenv("HOMEPATH") )
+    {
+    return;
+    }
+  str << "C:" << getenv("HOMEPATH") << "\\#LookmarkMacros#" << ends;
+  #else
+  if ( !getenv("HOME") )
+    {
+    return;
+    }
+  str << getenv("HOME") << "/.LookmarkMacros" << ends;
+  #endif
+
+  ifstream infile(str.str());
+  if ( infile.fail())
+    {
+    return;
+    }
+
+  //parse the .lmk xml file and get the root node for traversing
+  parser = vtkXMLDataParser::New();
+  parser->SetStream(&infile);
+  //parser->Parse(this->LookmarkMacros);
+  parser->Parse();
+  root = parser->GetRootElement();
+
+  vtkXMLDataElement *lmkElement;
+  for(j=0; j<root->GetNumberOfNestedElements(); j++)
+    {
+    lmkElement = root->GetNestedElement(j);
+
+    // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
+    // create lookmark widget
+    lookmarkWidget = this->GetPVLookmark(lmkElement);
+    lookmarkWidget->SetMacroFlag(1);
+    numLmks = this->PVLookmarks->GetNumberOfItems();
+    this->MacroExamples->InsertItem(j,lookmarkWidget);
+    ostrstream checkCommand;
+    checkCommand << "AddMacroExampleCallback " << j << ends;
+//    this->MenuExamples->AddCascade(lookmarkWidget->GetName(), buttonVar, this, checkCommand.str());
+    this->MenuExamples->AddCommand(lookmarkWidget->GetName(), this, checkCommand.str());
+
+    checkCommand.rdbuf()->freeze(0);
+    }
+
+  parser->Delete();
+//  delete [] init_string;
+
+}
+
+
+//----------------------------------------------------------------------------
+vtkKWLookmarkFolder* vtkPVLookmarkManager::GetMacrosFolder()
+{
+  vtkKWLookmarkFolder *lmkFolderWidget;
+  vtkIdType numLmkFolders = this->LmkFolderWidgets->GetNumberOfItems();
+  for(int i=numLmkFolders-1;i>=0;i--)
+    {
+    this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
+    if(!strcmp(lmkFolderWidget->GetFolderName(),"Macros"))
+      {
+      return lmkFolderWidget;
+      }
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -557,7 +735,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "Export the contents of a folder - Press \"File\" >> \"Export Folder\". You will be asked to select a new or pre-existing lookmark file. All information needed to recreate the lookmarks and/or folders nested within the selected folder is written to this file." << endl << endl;
   str << "Import a lookmark file - Press \"File\" >> \"Import\" >> and either \"Append\" or \"Replace\" in its cascaded menu. The first will append the contents of the imported lookmark file to the existing contents of the Lookmark Manager. The latter will first remove the contents of the Lookmark Manager and then import the new lookmark file." << endl << endl;
   str << "Automatic saving and loading of the contents of the Lookmark Manager - Any time you modify the Lookmark Manager in some way (create or update a lookmark, move, rename, or remove items, import or export lookmarks), after the modification takes place a lookmark file by the name of \"ParaViewlmk\" is written to the user's home directory containing the state of the Lookmark Manager at that point in time. This file is automatically imported into ParaView at the start of the session. It can be used to recover your lookmarks in the event of a ParaView crash." << endl << endl;
-  str << "Using a lookmark on a different dataset - When you create a new lookmark, the current dataset is recorded as that lookmark's default dataset. This means that when you revisit this lookmark (by clicking on its thumbnail) with the \"Lock to Dataset\" option ON, it is this dataset that will be used with the lookmark. However, if the \"Lock to Dataset\" option is turned OFF, the dataset currently being viewed in the render window will be used." << endl << endl;
+  str << "Use a lookmark on a different dataset - A permanent folder titled \"Macros\" is located at the top of the Lookmark Manager. A lookmark can be placed in here, or created manually using the \"Edit\" >> \"Create Macro\" option. When invoked, this lookmark will be used on the currently selected dataset instead of the one from which it was originally created. What this means is that you can automate the operations you perform on a dataset and apply those to other datasets with similar properties." << endl << endl;
   str << "Create a folder - Press \"Edit\" >> \"Create Folder\". This appends to the end of the Lookmark Manager an empty folder named \"New Folder\". You can now drag lookmarks into this folder (see How to move lookmarks and/or folders)." << endl << endl;
   str << "Move lookmarks and/or folders - A lookmark or folder can be moved in between any other lookmark or folder in the Lookmark Manager. Simply move your mouse over the name of the item you wish to relocate and hold the left mouse button down. Then drag the widget to the desired location (a box will appear under your mouse if the location is a valid drop point) then release the left mouse button. Releasing over the label of a folder will drop the item in the first nested entry of that folder." << endl << endl;
   str << "Remove lookmarks and/or folders - Select any combination of lookmarks and/or folders and then press \"Edit\" >> \"Remove Item(s)\" button. You will be asked to verify that you wish to delete these. This prompt may be turned off. " << endl << endl;
@@ -850,13 +1028,17 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
   for(i=numberOfLookmarkFolders-1;i>=0;i--)
     {
     this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
+    if(lmkFolderWidget->GetMacroFlag())
+      {
+      continue;
+      }
     lmkFolderWidget->GetDragAndDropTargetSet()->SetEnable(1);
     // must check to see if the widgets are descendants of this container widget if so dont add as target
     // for each lmk container, add its internal frame as target to this
     for(j=numberOfLookmarkFolders-1;j>=0;j--)
       {
       this->LmkFolderWidgets->GetItem(j,targetLmkFolder);
-      if(targetLmkFolder!=lmkFolderWidget && !this->IsWidgetInsideFolder(lmkFolderWidget,targetLmkFolder))
+      if(targetLmkFolder!=lmkFolderWidget && !this->IsWidgetInsideFolder(targetLmkFolder,lmkFolderWidget))
         {
         if(!lmkFolderWidget->GetDragAndDropTargetSet()->HasTarget(targetLmkFolder->GetSeparatorFrame()))
           {
@@ -884,7 +1066,7 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
     for(j=numberOfLookmarkWidgets-1;j>=0;j--)
       {
       this->PVLookmarks->GetItem(j,targetLmkWidget);
-      if(!this->IsWidgetInsideFolder(lmkFolderWidget,targetLmkWidget))
+      if(!this->IsWidgetInsideFolder(targetLmkWidget,lmkFolderWidget))
         {
         if(!lmkFolderWidget->GetDragAndDropTargetSet()->HasTarget(targetLmkWidget->GetSeparatorFrame()))
           {
@@ -907,7 +1089,7 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
 }
 
 //---------------------------------------------------------------------------
-int vtkPVLookmarkManager::IsWidgetInsideFolder(vtkKWWidget *parent, vtkKWWidget *lmkItem)
+int vtkPVLookmarkManager::IsWidgetInsideFolder(vtkKWWidget *lmkItem,vtkKWWidget *parent)
 {
   int ret = 0;
 
@@ -920,7 +1102,7 @@ int vtkPVLookmarkManager::IsWidgetInsideFolder(vtkKWWidget *parent, vtkKWWidget 
     int nb_children = parent->GetNumberOfChildren();
     for (int i = 0; i < nb_children; i++)
       {
-      if (this->IsWidgetInsideFolder(parent->GetNthChild(i), lmkItem))
+      if (this->IsWidgetInsideFolder(lmkItem,parent->GetNthChild(i)))
         {
         ret = 1;
         break;
@@ -1037,6 +1219,11 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
       }
 
     vtkPVLookmark *newLmkWidget = vtkPVLookmark::New();
+    newLmkWidget->SetMacroFlag(this->IsWidgetInsideFolder(dstPrnt,this->GetMacrosFolder()));
+    if(lmkWidget->GetMacroFlag())
+      {
+      this->GetPVApplication()->GetMainWindow()->GetLookmarkToolbar()->RemoveWidget(lmkWidget->GetToolbarButton());
+      }
     newLmkWidget->SetParent(dstPrnt);
     newLmkWidget->Create(this->GetPVApplication());
     newLmkWidget->SetName(lmkWidget->GetName());
@@ -1049,6 +1236,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     newLmkWidget->SetLocation(newLoc);
     newLmkWidget->SetComments(lmkWidget->GetComments());
     newLmkWidget->SetImageData(lmkWidget->GetImageData());
+    newLmkWidget->SetPixelSize(lmkWidget->GetPixelSize());
     newLmkWidget->CreateIconFromImageData();
 /*
     this->SetImageWidth(lmkIcon->GetWidth());
@@ -1096,6 +1284,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
       }
 
     vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
+    newLmkFolder->SetMacroFlag(lmkFolder->GetMacroFlag());
     newLmkFolder->SetParent(dstPrnt);
     newLmkFolder->Create(this->GetPVApplication());
     newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetText());
@@ -1138,6 +1327,10 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     {
     lmkFolderWidget = vtkKWLookmarkFolder::New();
     lmkFolderWidget->SetParent(parent);
+    if(!strcmp(lmkElement->GetAttribute("Name"),"Macros"))
+      {
+      lmkFolderWidget->SetMacroFlag(1);
+      }
  //   lmkFolderWidget->SetParent(this->LmkScrollFrame->GetFrame());
     lmkFolderWidget->Create(this->GetPVApplication());
     this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
@@ -1176,6 +1369,11 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     s << "GetPVLookmark \"" << lookmarkWidget->GetName() << "\"" << ends;
     lookmarkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
     s.rdbuf()->freeze(0);
+    vtkKWLookmarkFolder *folder = this->GetMacrosFolder();
+    if(folder)
+      {
+      lookmarkWidget->SetMacroFlag(this->IsWidgetInsideFolder(parent,this->GetMacrosFolder()));
+      }
     lookmarkWidget->SetParent(parent);
     lookmarkWidget->Create(this->GetPVApplication());
     lookmarkWidget->UpdateWidgetValues();
@@ -1315,6 +1513,72 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
 
 
 //----------------------------------------------------------------------------
+vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkPVXMLElement *elem)
+{
+  vtkPVLookmark *lmk = vtkPVLookmark::New();
+
+  char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1]; 
+  strcpy(lookmarkName,elem->GetAttribute("Name"));
+  lmk->SetName(lookmarkName);
+  delete [] lookmarkName;
+
+  if(elem->GetAttribute("Comments"))
+    {
+    char *lookmarkComments = new char[strlen(elem->GetAttribute("Comments"))+1];
+    strcpy(lookmarkComments,elem->GetAttribute("Comments"));
+    this->DecodeNewlines(lookmarkComments);
+    lmk->SetComments(lookmarkComments);
+    delete [] lookmarkComments;
+    }
+  
+  if(elem->GetAttribute("StateScript"))
+    {
+    char *lookmarkScript = new char[strlen(elem->GetAttribute("StateScript"))+1];
+    strcpy(lookmarkScript,elem->GetAttribute("StateScript"));
+    this->DecodeNewlines(lookmarkScript);
+    lmk->SetStateScript(lookmarkScript);
+    delete [] lookmarkScript;
+    }
+
+  if(elem->GetAttribute("Dataset"))
+    {
+    char *lookmarkDataset = new char[strlen(elem->GetAttribute("Dataset"))+1];
+    strcpy(lookmarkDataset,elem->GetAttribute("Dataset"));
+    lmk->SetDataset(lookmarkDataset);
+    delete [] lookmarkDataset;
+    }
+ 
+  if(elem->GetAttribute("ImageData"))
+    {
+    char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+    strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetImageData(lookmarkImage);
+    delete [] lookmarkImage;
+    }
+
+  if(elem->GetAttribute("PixelSize"))
+    {
+    int lookmarkPixelSize = 0;
+    elem->GetScalarAttribute("PixelSize",&lookmarkPixelSize);
+    lmk->SetPixelSize(lookmarkPixelSize);
+    }
+  else
+    {
+    // if there is not PixelSize attribute, then it is an old lookmark file and the pixel size was 4 (the default is now 3)
+    lmk->SetPixelSize(4);
+    }
+ 
+  double centerOfRotation[3];
+  elem->GetScalarAttribute("XCenterOfRotation",&centerOfRotation[0]);
+  elem->GetScalarAttribute("YCenterOfRotation",&centerOfRotation[1]);
+  elem->GetScalarAttribute("ZCenterOfRotation",&centerOfRotation[2]);
+  lmk->SetCenterOfRotation(centerOfRotation[0],centerOfRotation[1],centerOfRotation[2]);
+
+  return lmk;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVLookmarkManager::EncodeNewlines(char *string)
 {
   int i;
@@ -1418,6 +1682,92 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
 
   this->CreateLookmark(this->GetUnusedLookmarkName());
   
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::CreateMacroCallback()
+{
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
+  vtkPVLookmark *newLookmark;
+  vtkPVReaderModule *mod;
+  vtkPVSource *reader;
+  vtkPVSource *temp;
+  vtkPVSource *src;
+  int indexOfNewLmkWidget;
+  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  // if the pipeline is empty, don't add
+  if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->GetPVApplication(), win, "No Data Loaded", 
+      "To create a lookmark macro you must first open your data and view some feature of interest. Then select \"Create Macro\" in the \"Edit\" menu.", 
+      vtkKWMessageDialog::ErrorIcon);
+    this->Focus();
+
+    return;
+    }
+//  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\"",
+//                      this->GetTclName(),name);
+
+  // what if the main window is not maximized in screen? 
+
+  //find the reader to use by getting the reader of the current pvsource
+  src = win->GetCurrentPVSource();
+  while((temp = src->GetPVInput(0)))
+    src = temp;
+  reader = src;
+  if(reader->IsA("vtkPVReaderModule"))
+    {
+    mod = vtkPVReaderModule::SafeDownCast(reader);
+    }
+  else
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->GetPVApplication(), win, "Error Creating Lookmark", 
+      "Lookmarking ParaView source is not yet supported", 
+      vtkKWMessageDialog::ErrorIcon);
+    this->Focus();
+
+    return;
+    }
+
+  this->Checkpoint();
+
+  // create and initialize pvlookmark:
+  newLookmark = vtkPVLookmark::New();
+  // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
+  newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
+  newLookmark->SetMacroFlag(1);
+  newLookmark->Create(this->GetPVApplication());
+  newLookmark->SetName(this->GetUnusedLookmarkName());
+  newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  ostrstream s;
+  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
+  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
+  s.rdbuf()->freeze(0);
+  newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
+  newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+  newLookmark->StoreStateScript();
+  newLookmark->UpdateWidgetValues();
+  this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
+
+  // since the direct children of the LmkListingFrame will always be either lmk widgets or containers
+  // counting them will give us the appropriate location to assign the new lmk:
+  indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame());
+  newLookmark->SetLocation(indexOfNewLmkWidget);
+  newLookmark->CreateIconFromMainView();
+
+  this->PVLookmarks->InsertItem(numLmkWidgets,newLookmark);
+
+  this->ResetDragAndDropTargetSetAndCallbacks();
+
+  this->Script("update");
+
+//   Try to get the scroll bar to initialize properly (show correct portion).
+  this->Script("%s yview moveto 1",
+               this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1623,12 +1973,12 @@ void vtkPVLookmarkManager::ExportFolderCallback()
         {
         rootFolder = lmkFolderWidget;
         }
-      else if(this->IsWidgetInsideFolder(lmkFolderWidget,rootFolder))
+      else if(this->IsWidgetInsideFolder(rootFolder,lmkFolderWidget))
         {
         errorFlag = 0;
         rootFolder = lmkFolderWidget;
         }
-      else if(!this->IsWidgetInsideFolder(rootFolder,lmkFolderWidget) && rootFolder->GetParent()==lmkFolderWidget->GetParent())
+      else if(!this->IsWidgetInsideFolder(lmkFolderWidget,rootFolder) && rootFolder->GetParent()==lmkFolderWidget->GetParent())
         {
         errorFlag = 1;
         }
@@ -1661,7 +2011,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
       this->PVLookmarks->GetItem(i,lookmarkWidget);
       if(lookmarkWidget->GetSelectionState()==1)
         {
-        if(!this->IsWidgetInsideFolder(rootFolder,lookmarkWidget))
+        if(!this->IsWidgetInsideFolder(lookmarkWidget,rootFolder))
           {
           vtkKWMessageDialog::PopupMessage(
             this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Multiple Lookmarks and Folders Selected", 
@@ -2215,12 +2565,12 @@ void vtkPVLookmarkManager::RenameFolderCallback()
         {
         rootFolder = lmkFolderWidget;
         }
-      else if(this->IsWidgetInsideFolder(lmkFolderWidget,rootFolder))
+      else if(this->IsWidgetInsideFolder(rootFolder,lmkFolderWidget))
         {
         errorFlag = 0;
         rootFolder = lmkFolderWidget;
         }
-      else if(!this->IsWidgetInsideFolder(rootFolder,lmkFolderWidget) && rootFolder->GetParent()==lmkFolderWidget->GetParent())
+      else if(!this->IsWidgetInsideFolder(lmkFolderWidget,rootFolder) && rootFolder->GetParent()==lmkFolderWidget->GetParent())
         {
         errorFlag = 1;
         }
@@ -2251,7 +2601,7 @@ void vtkPVLookmarkManager::RenameFolderCallback()
       this->PVLookmarks->GetItem(i,lookmarkWidget);
       if(lookmarkWidget->GetSelectionState()==1)
         {
-        if(!this->IsWidgetInsideFolder(rootFolder,lookmarkWidget))
+        if(!this->IsWidgetInsideFolder(lookmarkWidget,rootFolder))
           {
           vtkKWMessageDialog::PopupMessage(
             this->GetPVApplication(), this->GetPVApplication()->GetMainWindow(), "Multiple Lookmarks and Folders Selected", 
@@ -2693,6 +3043,11 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
     if(this->PVLookmarks->IsItemPresent(oldLmkWidget))
       {
       vtkPVLookmark *newLmkWidget = vtkPVLookmark::New();
+      newLmkWidget->SetMacroFlag(this->IsWidgetInsideFolder(packingFrame,this->GetMacrosFolder()));
+      if(oldLmkWidget->GetMacroFlag())
+        {
+        this->GetPVApplication()->GetMainWindow()->GetLookmarkToolbar()->RemoveWidget(oldLmkWidget->GetToolbarButton());
+        }
       newLmkWidget->SetParent(packingFrame);
       newLmkWidget->Create(this->GetPVApplication());
       newLmkWidget->SetName(oldLmkWidget->GetName());
@@ -2705,6 +3060,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       newLmkWidget->SetLocation(oldLmkWidget->GetLocation());
       newLmkWidget->SetComments(oldLmkWidget->GetComments());
       newLmkWidget->SetImageData(oldLmkWidget->GetImageData());
+      newLmkWidget->SetPixelSize(oldLmkWidget->GetPixelSize());
       newLmkWidget->CreateIconFromImageData();
       newLmkWidget->SetStateScript(oldLmkWidget->GetStateScript());
       newLmkWidget->UpdateWidgetValues();
@@ -2795,6 +3151,10 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
         this->DecrementHigherSiblingLmkItemLocationIndices(
           oldLmkWidget->GetParent(),oldLmkWidget->GetLocation());
         this->PVLookmarks->FindItem(oldLmkWidget,loc);
+        if(oldLmkWidget->GetMacroFlag())
+          {
+          this->GetPVApplication()->GetMainWindow()->GetLookmarkToolbar()->RemoveWidget(oldLmkWidget->GetToolbarButton());
+          }
         this->PVLookmarks->RemoveItem(loc);
         this->Script("destroy %s", oldLmkWidget->GetWidgetName());
         oldLmkWidget->Delete();

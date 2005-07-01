@@ -62,6 +62,7 @@ public:
   // Description:
   // Set/Get methods that hide underlying widgets
   void SetFolderName(const char *val);
+  char *GetFolderName();
 
   // Direct Access to underlying widgets:
   vtkGetObjectMacro(LabelFrame,vtkKWFrameLabeled);
@@ -84,6 +85,10 @@ public:
   void DragAndDropPerformCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor);
   void RemoveDragAndDropTargetCues();
 
+  vtkSetMacro(MacroFlag,int);
+  vtkGetMacro(MacroFlag,int);
+
+
 protected:
 
   vtkKWLookmarkFolder();
@@ -97,6 +102,7 @@ protected:
 
   vtkKWText *NameField;
   int SelectionFlag;
+  int MacroFlag;
 
   // This lmk container's location amongst its sibling lmk items
   int Location;
