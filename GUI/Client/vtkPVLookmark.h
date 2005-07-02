@@ -44,6 +44,7 @@ class vtkPVRenderView;
 class vtkPVLookmarkManager;
 class vtkPVTraceHelper;
 class vtkKWPushButton;
+class vtkPVLookmarkObserver;
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
@@ -129,6 +130,13 @@ protected:
   vtkPVRenderView* GetPVRenderView(); 
   vtkPVLookmarkManager* GetPVLookmarkManager(); 
 
+  virtual void ExecuteEvent(vtkObject* , unsigned long event, void* calldata);
+//BTX
+  vtkPVLookmarkObserver* Observer;
+  friend class vtkPVLookmarkObserver;
+//ETX
+
+
   // Description:
   // When a lookmark is recreated/viewed and the stored state script is parsed, each filter that is created gets stored in this object's vtkPVSourceCOllection
   void AddPVSource(vtkPVSource *src);
@@ -181,6 +189,7 @@ protected:
   float* CenterOfRotation;
   vtkPVSourceCollection* Sources;
   int Location;
+  unsigned long ErrorEventTag;
 
   vtkPVTraceHelper* TraceHelper;
 

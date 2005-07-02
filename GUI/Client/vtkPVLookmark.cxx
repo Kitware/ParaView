@@ -71,10 +71,41 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWFrame.h"
 #include "vtkImageReader2.h"
+#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.11");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.12");
+
+
+//*****************************************************************************
+class vtkPVLookmarkObserver : public vtkCommand
+{
+public:
+  static vtkPVLookmarkObserver* New()
+    {
+    return new vtkPVLookmarkObserver;
+    }
+  void SetLookmark(vtkPVLookmark* lmk)
+    {
+    this->Lookmark = lmk;
+    }
+  virtual void Execute(vtkObject* obj, unsigned long event, void* calldata)
+    {
+    if (this->Lookmark)
+      {
+      this->Lookmark->ExecuteEvent(obj, event, calldata);
+      }
+    }
+protected:
+  vtkPVLookmarkObserver()
+    {
+    this->Lookmark = 0;
+    }
+  vtkPVLookmark* Lookmark;
+};
+
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -86,6 +117,9 @@ vtkPVLookmark::vtkPVLookmark()
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetObject(this);
   this->ToolbarButton = 0;
+  this->Observer = vtkPVLookmarkObserver::New();
+  this->Observer->SetLookmark(this);
+  this->ErrorEventTag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -93,6 +127,8 @@ vtkPVLookmark::~vtkPVLookmark()
 {
   this->TraceHelper->Delete();
   this->TraceHelper = 0;
+
+  this->Observer->Delete();
 
   if(this->CenterOfRotation)
     {
@@ -118,6 +154,17 @@ vtkPVLookmark::~vtkPVLookmark()
     {
     this->ToolbarButton->Delete();
     this->ToolbarButton = 0;
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVLookmark::ExecuteEvent(vtkObject* , unsigned long event,
+  void* calldata)
+{
+  if ( event == vtkKWEvent::ErrorMessageEvent || event == vtkKWEvent::WarningMessageEvent )
+    {
+    this->GetPVApplication()->GetMainWindow()->ShowErrorLog();
     }
 }
 
@@ -352,8 +399,20 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
     this->GetTraceHelper()->AddEntry("$kw(%s) ViewLookmarkWithCurrentDataset",
                         this->GetTclName());
 
+    if(!this->ErrorEventTag)
+      {
+      this->ErrorEventTag = this->GetPVApplication()->GetMainWindow()->AddObserver(
+        vtkKWEvent::ErrorMessageEvent, this->Observer);
+      }
+
     this->ParseAndExecuteStateScript(src,temp_script,0);
 //    this->CreateLookmarkCallback();
+
+    if (this->ErrorEventTag)
+      {
+      this->GetPVApplication()->GetMainWindow()->RemoveObserver(this->ErrorEventTag);
+      this->ErrorEventTag = 0;
+      }
 
     // copy the parameters of the current camera for this class
     // into the active camera on the client and server
