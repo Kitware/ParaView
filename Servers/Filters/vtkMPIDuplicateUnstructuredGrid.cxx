@@ -22,6 +22,7 @@
 #include "vtkCharArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
@@ -30,7 +31,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicateUnstructuredGrid, "1.2");
+vtkCxxRevisionMacro(vtkMPIDuplicateUnstructuredGrid, "1.3");
 vtkStandardNewMacro(vtkMPIDuplicateUnstructuredGrid);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicateUnstructuredGrid,Controller, vtkMultiProcessController);
@@ -243,16 +244,22 @@ void vtkMPIDuplicateUnstructuredGrid::ServerExecute(vtkUnstructuredGridReader* ,
     if (myId == 0 && this->SocketController)
       {
       // Send the string to the client.
-      this->SocketController->Send(&numProcs, 1, 1, 948344);
-      this->SocketController->Send(recvLengths, numProcs*2, 1, 948345);
-      this->SocketController->Send(allbuffers, sum, 1, 948346);
+      this->SocketController->Send(&numProcs, 1, 
+                                   1, vtkProcessModule::DuplicatePDNProcs);
+      this->SocketController->Send(recvLengths, numProcs*2, 
+                                   1, vtkProcessModule::DuplicatePDNRecLen);
+      this->SocketController->Send(allbuffers, sum, 
+                                   1, vtkProcessModule::DuplicatePDNAllBuffers);
       }
     if (this->RenderServerSocketController)
       {
       // Send the string to the render server.
-      this->RenderServerSocketController->Send(&numProcs, 1, 1, 948344);
-      this->RenderServerSocketController->Send(recvLengths, numProcs*2, 1, 948345);
-      this->RenderServerSocketController->Send(allbuffers, sum, 1, 948346);
+      this->RenderServerSocketController->Send(
+        &numProcs, 1, 1, vtkProcessModule::DuplicatePDNProcs);
+      this->RenderServerSocketController->Send(
+        recvLengths, numProcs*2, 1, vtkProcessModule::DuplicatePDNRecLen);
+      this->RenderServerSocketController->Send(
+        allbuffers, sum, 1, vtkProcessModule::DuplicatePDNAllBuffers);
       }
     this->ReconstructOutput(reader, numProcs, allbuffers, 
                             recvLengths, recvOffsets);
@@ -356,12 +363,14 @@ void vtkMPIDuplicateUnstructuredGrid::ClientExecute(vtkUnstructuredGridReader* r
   char* buffers;
 
   // Receive the numer of processes.
-  this->SocketController->Receive(&numProcs, 1, 1, 948344);
+  this->SocketController->Receive(&numProcs, 1, 
+                                  1, vtkProcessModule::DuplicatePDNProcs);
 
   // Receive information about the lengths/offsets of each marshaled data set.
   recvLengths = new int[numProcs*2];
   recvOffsets = recvLengths + numProcs;
-  this->SocketController->Receive(recvLengths, numProcs*2, 1, 948345);
+  this->SocketController->Receive(recvLengths, numProcs*2, 
+                                  1, vtkProcessModule::DuplicatePDNRecLen);
 
   // Receive the actual buffers.
   totalLength = 0;
@@ -370,7 +379,8 @@ void vtkMPIDuplicateUnstructuredGrid::ClientExecute(vtkUnstructuredGridReader* r
     totalLength += recvLengths[idx];
     }
   buffers = new char[totalLength];
-  this->SocketController->Receive(buffers, totalLength, 1, 948346);
+  this->SocketController->Receive(buffers, totalLength, 
+                                  1, vtkProcessModule::DuplicatePDNAllBuffers);
 
   this->ReconstructOutput(reader, numProcs, buffers, 
                           recvLengths, recvOffsets);
@@ -399,12 +409,14 @@ void vtkMPIDuplicateUnstructuredGrid::RenderServerExecute(vtkUnstructuredGridRea
     }
 
   // Receive the numer of processes.
-  this->RenderServerSocketController->Receive(&numProcs, 1, 1, 948344);
+  this->RenderServerSocketController->Receive(
+    &numProcs, 1, 1, vtkProcessModule::DuplicatePDNProcs);
 
   // Receive information about the lengths/offsets of each marshaled data set.
   recvLengths = new int[numProcs*2];
   recvOffsets = recvLengths + numProcs;
-  this->RenderServerSocketController->Receive(recvLengths, numProcs*2, 1, 948345);
+  this->RenderServerSocketController->Receive(
+    recvLengths, numProcs*2, 1, vtkProcessModule::DuplicatePDNRecLen);
 
   // Receive the actual buffers.
   totalLength = 0;
@@ -413,7 +425,8 @@ void vtkMPIDuplicateUnstructuredGrid::RenderServerExecute(vtkUnstructuredGridRea
     totalLength += recvLengths[idx];
     }
   buffers = new char[totalLength];
-  this->RenderServerSocketController->Receive(buffers, totalLength, 1, 948346);
+  this->RenderServerSocketController->Receive(
+    buffers, totalLength, 1, vtkProcessModule::DuplicatePDNAllBuffers);
 
   this->ReconstructOutput(reader, numProcs, buffers, 
                           recvLengths, recvOffsets);

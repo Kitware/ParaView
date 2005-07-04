@@ -23,6 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
@@ -30,7 +31,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.13");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.14");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -231,9 +232,12 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
     if (myId == 0 && this->SocketController)
       {
       // Send the string to the client.
-      this->SocketController->Send(&numProcs, 1, 1, 948344);
-      this->SocketController->Send(recvLengths, numProcs*2, 1, 948345);
-      this->SocketController->Send(allbuffers, sum, 1, 948346);
+      this->SocketController->Send(&numProcs, 1, 
+                                   1, vtkProcessModule::DuplicatePDNProcs);
+      this->SocketController->Send(recvLengths, numProcs*2, 
+                                   1, vtkProcessModule::DuplicatePDNRecLen);
+      this->SocketController->Send(allbuffers, sum, 
+                                   1, vtkProcessModule::DuplicatePDNAllBuffers);
       }
     this->ReconstructOutput(reader, numProcs, allbuffers, 
                             recvLengths, recvOffsets);
@@ -253,12 +257,15 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
   // Server must be a single process!
   if (this->SocketController)
     {
-    this->SocketController->Send(&numProcs, 1, 1, 948344);
+    this->SocketController->Send(&numProcs, 1, 
+                                 1, vtkProcessModule::DuplicatePDNProcs);
     int tmp[2];
     tmp[0] = size;
     tmp[1] = 0;
-    this->SocketController->Send(tmp, 2, 1, 948345);
-    this->SocketController->Send(buf, size, 1, 948346);
+    this->SocketController->Send(tmp, 2, 
+                                 1, vtkProcessModule::DuplicatePDNRecLen);
+    this->SocketController->Send(buf, size, 
+                                 1, vtkProcessModule::DuplicatePDNAllBuffers);
     }
   // Degenerate reconstruct output.
   if (input)
@@ -326,12 +333,14 @@ void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
   char* buffers;
 
   // Receive the numer of processes.
-  this->SocketController->Receive(&numProcs, 1, 1, 948344);
+  this->SocketController->Receive(&numProcs, 1, 
+                                  1, vtkProcessModule::DuplicatePDNProcs);
 
   // Receive information about the lengths/offsets of each marshaled data set.
   recvLengths = new int[numProcs*2];
   recvOffsets = recvLengths + numProcs;
-  this->SocketController->Receive(recvLengths, numProcs*2, 1, 948345);
+  this->SocketController->Receive(recvLengths, numProcs*2, 
+                                  1, vtkProcessModule::DuplicatePDNRecLen);
 
   // Receive the actual buffers.
   totalLength = 0;
@@ -340,7 +349,8 @@ void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
     totalLength += recvLengths[idx];
     }
   buffers = new char[totalLength];
-  this->SocketController->Receive(buffers, totalLength, 1, 948346);
+  this->SocketController->Receive(buffers, totalLength, 
+                                  1, vtkProcessModule::DuplicatePDNAllBuffers);
 
   this->ReconstructOutput(reader, numProcs, buffers, 
                           recvLengths, recvOffsets);

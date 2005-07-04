@@ -32,6 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -50,7 +51,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.59");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.60");
 
 
 //=========================================================================
@@ -191,7 +192,8 @@ void vtkPVTreeComposite::InitializeRMIs()
 void vtkPVTreeComposite::CheckForDataRMI()
 {
   int dataFlag = this->CheckForData();
-  this->Controller->Send(&dataFlag, 1, 0, 877630);
+  this->Controller->Send(&dataFlag, 1, 
+                         0, vtkProcessModule::TreeCompositeDataFlag);
 }
 
 
@@ -265,7 +267,8 @@ int vtkPVTreeComposite::ShouldIComposite()
   this->CheckForData();
   for (idx = 1; idx < numProcs; ++idx)
     {
-    this->Controller->Receive(&tmp, 1, idx, 877630);
+    this->Controller->Receive(&tmp, 1, 
+                              idx, vtkProcessModule::TreeCompositeDataFlag);
     if (tmp)
       {
       dataFlag = 1;
@@ -857,11 +860,6 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 }
 
 
-
-
-#define VTK_STATUS_TAG           548934
-
-
 // Root ------> Satellite
 // Exaclty one of these two methods will be sent (by the root) to each
 // satelite process.  They terminate the non blocking receive.  The second
@@ -973,7 +971,8 @@ void vtkPVTreeComposite::RootAbortCheck()
       {
       //cout << "0 send to 1, message: " << message << endl;
       message = VTK_ABORT_RENDER;
-      this->MPIController->Send(&message, 1, idx, VTK_STATUS_TAG);
+      this->MPIController->Send(&message, 1, 
+                                idx, vtkProcessModule::TreeCompositeStatus);
       }
     
     // abort our own render.
@@ -1024,12 +1023,14 @@ void vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
   // Send a message to the process that informs it that we are waiting for
   // it to finish rendering, and expect to be pinged every so often.
   message = VTK_ROOT_WAITING;
-  this->MPIController->Send(&message, 1, satelliteId, VTK_STATUS_TAG);
+  this->MPIController->Send(&message, 1, 
+                            satelliteId, vtkProcessModule::TreeCompositeStatus);
   
   // Wait for the process to finish.
   while (1)
     {
-    this->MPIController->Receive(&message, 1, satelliteId, VTK_STATUS_TAG);
+    this->MPIController->Receive(
+      &message, 1, satelliteId, vtkProcessModule::TreeCompositeStatus);
 
     // Even if we abort, We still expect the "FINISHED" message because the
     // satellite might sned the "FINISHED" message before it receives the
@@ -1075,7 +1076,8 @@ void vtkPVTreeComposite::RootSendFinalCompositeDecision()
       {
       // In order to get rid of the abort asych receive still pending.
       message = VTK_COMPOSITE;
-      this->MPIController->Send(&message, 1, idx, VTK_STATUS_TAG);
+      this->MPIController->Send(
+        &message, 1, idx, vtkProcessModule::TreeCompositeStatus);
       }
     }
 }
@@ -1103,8 +1105,10 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
     vtkMPICommunicator::Request sendRequest;
     message = VTK_CHECK_ABORT;
     //cout << "1 noBlockSend to 0, message: " << status << endl;
-    this->MPIController->NoBlockSend(&message, 1, 0, VTK_STATUS_TAG, 
-                                     sendRequest);
+    this->MPIController->NoBlockSend(
+      &message, 1, 
+      0, vtkProcessModule::TreeCompositeStatus, 
+      sendRequest);
     }
   
   // If this is the first call for this render, 
@@ -1112,7 +1116,7 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
   if ( ! this->ReceivePending)
     {
     this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-                                        VTK_STATUS_TAG, 
+                                        vtkProcessModule::TreeCompositeStatus, 
                                         this->ReceiveRequest);
     this->ReceivePending = 1;
     }
@@ -1139,7 +1143,7 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
       this->RootWaiting = 1;
       // Rearm the receive to get a possible abort.
       this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-                                          VTK_STATUS_TAG, 
+                                          vtkProcessModule::TreeCompositeStatus, 
                                           this->ReceiveRequest);
       this->ReceivePending = 1;
       }
@@ -1181,9 +1185,9 @@ void vtkPVTreeComposite::SatelliteFinalAbortCheck()
         { 
         this->RootWaiting = 1;
         // Rearm the receive to put in a consistent state.
-        this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-                                            VTK_STATUS_TAG, 
-                                            this->ReceiveRequest);
+        this->MPIController->NoBlockReceive(
+          &this->ReceiveMessage, 1, 0, vtkProcessModule::TreeCompositeStatus, 
+          this->ReceiveRequest);
         this->ReceivePending = 1;
         }
       else 
@@ -1199,7 +1203,8 @@ void vtkPVTreeComposite::SatelliteFinalAbortCheck()
   if ( this->RootWaiting)
     {
     message = VTK_FINISHED;
-    this->MPIController->Send(&message, 1, 0, VTK_STATUS_TAG);
+    this->MPIController->Send(&message, 1, 
+                              0, vtkProcessModule::TreeCompositeStatus);
     // Reset the RootWaiting flag for the next render.
     this->RootWaiting = 0;
     }

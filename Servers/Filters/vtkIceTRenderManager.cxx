@@ -31,6 +31,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkCamera.h"
 #include "vtkPerspectiveTransform.h"
+#include "vtkProcessModule.h"
 
 #include <GL/ice-t.h>
 #include <GL/ice-t_mpi.h>
@@ -57,7 +58,7 @@ public:
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.24");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.25");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -667,17 +668,17 @@ void vtkIceTRenderManager::SendWindowInformation()
     if (id == this->RootProcessId) continue;
 
     this->Controller->Send((int *)&info, ICET_INFO_SIZE, id,
-                           vtkIceTRenderManager::ICET_INFO_TAG);
+                           vtkProcessModule::IceTInfo);
     if (this->TilesDirty)
       {
       this->Controller->Send(&this->TileDimensions[0], 1, id,
-                             vtkIceTRenderManager::NUM_TILES_X_TAG);
+                             vtkProcessModule::IceTNumTilesX);
       this->Controller->Send(&this->TileDimensions[1], 1, id,
-                             vtkIceTRenderManager::NUM_TILES_Y_TAG);
+                             vtkProcessModule::IceTNumTilesY);
       for (int x = 0; x < this->TileDimensions[0]; x++)
         {
         this->Controller->Send(this->TileRanks[x], this->TileDimensions[1], id,
-                               vtkIceTRenderManager::TILE_RANKS_TAG);
+                               vtkProcessModule::IceTTileRanks);
         }
       }
     }
@@ -693,19 +694,19 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 
   struct IceTInformation info;
   this->Controller->Receive((int *)&info, ICET_INFO_SIZE, this->RootProcessId,
-                            vtkIceTRenderManager::ICET_INFO_TAG);
+                            vtkProcessModule::IceTInfo);
   if (info.TilesDirty)
     {
     int NewNumTilesX, NewNumTilesY;
     this->Controller->Receive(&NewNumTilesX, 1, 0,
-                              vtkIceTRenderManager::NUM_TILES_X_TAG);
+                              vtkProcessModule::IceTNumTilesX);
     this->Controller->Receive(&NewNumTilesY, 1, 0,
-                              vtkIceTRenderManager::NUM_TILES_Y_TAG);
+                              vtkProcessModule::IceTNumTilesY);
     this->SetTileDimensions(NewNumTilesX, NewNumTilesY);
     for (int x = 0; x < this->TileDimensions[0]; x++)
       {
       this->Controller->Receive(this->TileRanks[x], this->TileDimensions[1], 0,
-                                vtkIceTRenderManager::TILE_RANKS_TAG);
+                                vtkProcessModule::IceTTileRanks);
       }
     }
 

@@ -33,6 +33,7 @@
 #include "vtkPVCompositeBuffer.h"
 #include "vtkPVCompositeUtilities.h"
 #include "vtkTiledDisplaySchedule.h"
+#include "vtkProcessModule.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -42,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.4");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.5");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -219,8 +220,8 @@ void vtkMultiDisplayManagerRootStartRender(void *localArg,
   vtkMultiProcessController *controller = self->GetSocketController();
   vtkPVMultiDisplayInfo info;  
 
-  controller->Receive((double*)(&info), 24, 1, 
-                     vtkMultiDisplayManager::INFO_TAG);
+  controller->Receive((double*)(&info), 24, 
+                      1, vtkProcessModule::MultiDisplayInfo);
   self->RootStartRender(info);
 }
 
@@ -372,10 +373,10 @@ void vtkMultiDisplayManager::ClientStartRender()
   // Trigger the satellite processes to start their render routine.  
   if (this->SocketController)
     { // client... Send to root
-    this->SocketController->TriggerRMI(1, NULL, 0, 
-                     vtkMultiDisplayManager::ROOT_RENDER_RMI_TAG);
-    this->SocketController->Send((double*)(&info), 24, 1, 
-                     vtkMultiDisplayManager::INFO_TAG);
+    this->SocketController->TriggerRMI(
+      1, NULL, 0, vtkProcessModule::MultiDisplayRootRender);
+    this->SocketController->Send(
+      (double*)(&info), 24, 1, vtkProcessModule::MultiDisplayInfo);
     }
   else
     {
@@ -402,10 +403,10 @@ void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
   // Every process (except "client") gets to participate.  
   for (id = 1; id < numProcs; ++id)
     {
-    this->Controller->TriggerRMI(id, NULL, 0, 
-                     vtkMultiDisplayManager::SATELLITE_RENDER_RMI_TAG);
-    this->Controller->Send((double*)(&info), 24, id,
-                     vtkMultiDisplayManager::INFO_TAG);
+    this->Controller->TriggerRMI(
+      id, NULL, 0, vtkProcessModule::MultiDisplaySatelliteRender);
+    this->Controller->Send(
+      (double*)(&info), 24, id,vtkProcessModule::MultiDisplayInfo);
     }
   if ( this->SocketController)
     { // Root is not client, it participates also.
@@ -418,8 +419,8 @@ void vtkMultiDisplayManager::SatelliteStartRender()
 {
   vtkPVMultiDisplayInfo info;
 
-  this->Controller->Receive((double*)(&info), 24, 0, 
-                                  vtkMultiDisplayManager::INFO_TAG);
+  this->Controller->Receive((double*)(&info), 24, 
+                            0, vtkProcessModule::MultiDisplayInfo);
   this->InternalSatelliteStartRender(info);
 }
 
@@ -499,7 +500,8 @@ void vtkMultiDisplayManager::InternalSatelliteStartRender(vtkPVMultiDisplayInfo 
     // Socket barrier is not implemented.
     // Just send a message to synchronize.
     int dummyMessage = 10;
-    this->SocketController->Send(&dummyMessage,1, 1, 12323);
+    this->SocketController->Send(
+      &dummyMessage,1, 1, vtkProcessModule::MultiDisplayDummy);
     }
 
   // Force swap buffers here.
@@ -908,13 +910,15 @@ void vtkMultiDisplayManager::InitializeRMIs()
   // Adding RMIs to processes that do not need them is harmless ...
   if (this->SocketController)
     {
-    this->SocketController->AddRMI(vtkMultiDisplayManagerRootStartRender, (void*)this, 
-                                   vtkMultiDisplayManager::ROOT_RENDER_RMI_TAG); 
+    this->SocketController->AddRMI(
+      vtkMultiDisplayManagerRootStartRender, (void*)this, 
+      vtkProcessModule::MultiDisplayRootRender); 
     }
   if (this->Controller)
     {
-    this->Controller->AddRMI(vtkMultiDisplayManagerSatelliteStartRender, (void*)this, 
-                             vtkMultiDisplayManager::SATELLITE_RENDER_RMI_TAG); 
+    this->Controller->AddRMI(
+      vtkMultiDisplayManagerSatelliteStartRender, (void*)this, 
+      vtkProcessModule::MultiDisplaySatelliteRender); 
     }
 }
 
@@ -974,7 +978,8 @@ void vtkMultiDisplayManager::ClientEndRender()
       // Since socket barrier is not implemented,
       // just receive a message to synchronize.
       int dummyMessage;
-      this->SocketController->Receive(&dummyMessage,1, 1, 12323);
+      this->SocketController->Receive(
+        &dummyMessage, 1, 1, vtkProcessModule::MultiDisplayDummy);
       }
     }
 

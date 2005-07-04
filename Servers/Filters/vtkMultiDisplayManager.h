@@ -85,14 +85,6 @@ public:
   void SetMaximumMemoryUsage(unsigned long mem);
   unsigned long GetTotalMemoryUsage();
 
-//BTX
-  enum Tags {
-    ROOT_RENDER_RMI_TAG      = 12721,
-    SATELLITE_RENDER_RMI_TAG = 12722,
-    INFO_TAG                 = 22135
-  };
-//ETX
-
   //============================================================
   // New compositing methods.
 

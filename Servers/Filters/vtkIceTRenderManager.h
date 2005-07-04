@@ -173,15 +173,6 @@ public:
   // return until it is called in all methods of the communicator.
   virtual void SetDataReplicationGroupColor(int color);
 
-//BTX
-  enum {
-    ICET_INFO_TAG=234551,
-    NUM_TILES_X_TAG=234552,
-    NUM_TILES_Y_TAG=234553,
-    TILE_RANKS_TAG=234554
-  };
-//ETX
-
 protected:
   vtkIceTRenderManager();
   virtual ~vtkIceTRenderManager();

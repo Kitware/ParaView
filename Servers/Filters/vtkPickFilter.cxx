@@ -27,12 +27,13 @@
 #include "vtkToolkits.h"
 #include "vtkAppendFilter.h"
 #include "vtkExtractCells.h"
+#include "vtkProcessModule.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.14");
+vtkCxxRevisionMacro(vtkPickFilter, "1.15");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -332,7 +333,8 @@ int vtkPickFilter::CompareProcesses(double bestDist2)
     int idx;
     for (idx = 1; idx < numProcs; ++idx)
       {
-      this->Controller->Receive(&dist2, 1 ,idx, 234099);
+      this->Controller->Receive(&dist2, 1,
+                                idx, vtkProcessModule::PickBestDist2);
       if (dist2 < bestDist2)
         {
         bestDist2 = dist2;
@@ -342,13 +344,16 @@ int vtkPickFilter::CompareProcesses(double bestDist2)
     // Send the result back to all the processes.
     for (idx = 1; idx < numProcs; ++idx)
       {
-      this->Controller->Send(&bestProc, 1, idx, 234100);
+      this->Controller->Send(&bestProc, 1, 
+                             idx, vtkProcessModule::PickBestProc);
       }
     }
   else
     { // Other processes.
-    this->Controller->Send(&bestDist2, 1, 0, 234099);
-    this->Controller->Receive(&bestProc, 1, 0, 234100);
+    this->Controller->Send(&bestDist2, 1, 
+                           0, vtkProcessModule::PickBestDist2);
+    this->Controller->Receive(&bestProc, 1, 
+                              0, vtkProcessModule::PickBestProc);
     }
   if (myId != bestProc)
     { // Return without creating an output.

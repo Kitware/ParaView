@@ -251,6 +251,29 @@ public:
 
   virtual void CreateLogFile();
 
+//BTX
+  enum CommunicationIds
+  {
+    MultiDisplayDummy=948346,
+    MultiDisplayRootRender,
+    MultiDisplaySatelliteRender,
+    MultiDisplayInfo,
+    PickBestProc,
+    PickBestDist2,
+    IceTInfo,
+    IceTNumTilesX,
+    IceTNumTilesY,
+    IceTTileRanks,
+    GlyphNPointsGather,
+    GlyphNPointsScatter,
+    TreeCompositeDataFlag,
+    TreeCompositeStatus,
+    DuplicatePDNProcs,
+    DuplicatePDNRecLen,
+    DuplicatePDNAllBuffers
+  };
+//ETX
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
