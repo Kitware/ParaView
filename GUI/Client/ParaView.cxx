@@ -137,9 +137,6 @@ extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkKWParaViewCS_Initialize(vtkClientServerInterpreter*);
 
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
-extern "C" void vtkPVDevelopmentCS_Initialize(vtkClientServerInterpreter *);
-#endif
 
 //----------------------------------------------------------------------------
 void ParaViewInitializeInterpreter(vtkProcessModule* pm)
@@ -160,8 +157,4 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkKWParaViewCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
-
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
-  vtkPVDevelopmentCS_Initialize(pm->GetInterpreter());
-#endif
 }
