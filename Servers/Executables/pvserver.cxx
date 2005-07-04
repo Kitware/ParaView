@@ -80,6 +80,7 @@ extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
@@ -102,6 +103,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkRenderingCS_Initialize(pm->GetInterpreter());
   vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
   vtkHybridCS_Initialize(pm->GetInterpreter());
+  vtkWidgetsCS_Initialize(pm->GetInterpreter());
   vtkParallelCS_Initialize(pm->GetInterpreter());
   vtkPVCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
