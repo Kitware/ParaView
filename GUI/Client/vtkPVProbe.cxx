@@ -41,7 +41,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVArraySelection.h"
-#include "vtkSMDomain.h"
+#include "vtkSMStringListDomain.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMXYPlotActorProxy.h"
 #include <vtkstd/string>
@@ -49,7 +49,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.147");
+vtkCxxRevisionMacro(vtkPVProbe, "1.148");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -321,6 +321,8 @@ void vtkPVProbe::AcceptCallbackInternal()
       this->PlotDisplayProxy->GetProperty("ArrayNames"));
     if (svp)
       {      
+      vtkSMStringListDomain *arrayList = vtkSMStringListDomain::SafeDownCast(svp->GetDomain( "array_list" ));
+
       int e=0;
       for(int i=0; i<numArrays; i++)
         {
@@ -329,14 +331,15 @@ void vtkPVProbe::AcceptCallbackInternal()
         if( arrayInfo->GetNumberOfComponents() == 1 )
           {
           svp->SetElement(e++, arrayInfo->GetName());
+          arrayList->AddString(arrayInfo->GetName());
           }
         }
+
       // Trick to force a domain of the sub-proxy to depend to the parent proxy one
       // This need to be done after the accept
-      vtkSMDomain *arrayList = svp->GetDomain( "array_list" );
-      vtkSMProperty* inputProp = this->GetProxy()->GetProperty("Input");
-      arrayList->AddRequiredProperty(inputProp, "SubInput");
-      svp->UpdateDependentDomains(); // Now forcing to update the domain
+      //vtkSMProperty* inputProp = this->GetProxy()->GetProperty("Input");
+      //arrayList->AddRequiredProperty(inputProp, "SubInput");
+      //svp->UpdateDependentDomains(); // Now forcing to update the domain
 
       this->ArraySelection->SetSMProperty(svp);
       this->ArraySelection->Create(pvApp);

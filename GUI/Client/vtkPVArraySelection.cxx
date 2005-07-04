@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.72");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.73");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -226,8 +226,7 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
       for(unsigned int i=0; i < numStrings; ++i)
         {
         const char* name = dom2->GetString(i);
-        int found = 0;
-        if (!found)
+        if (!name)
           {
           continue;
           }
