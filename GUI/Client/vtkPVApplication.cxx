@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.365");
+vtkCxxRevisionMacro(vtkPVApplication, "1.366");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -362,10 +362,6 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     {
     return interp;
     }
-
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
-  Vtkpvdevelopmenttcl_Init(interp);
-#endif
 
   Vtkkwparaview_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
