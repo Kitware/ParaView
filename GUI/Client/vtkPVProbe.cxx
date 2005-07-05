@@ -44,12 +44,16 @@
 #include "vtkSMStringListDomain.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMXYPlotActorProxy.h"
+
+#include "vtkKWLoadSaveButton.h"
+#include "vtkKWLoadSaveDialog.h"
+
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.148");
+vtkCxxRevisionMacro(vtkPVProbe, "1.149");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -76,6 +80,8 @@ vtkPVProbe::vtkPVProbe()
   this->PlotDisplayProxyName = 0;
   this->CanShowPlot = 0;
   this->ArraySelection = vtkPVArraySelection::New();
+
+  this->SaveButton = vtkKWLoadSaveButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -114,6 +120,9 @@ vtkPVProbe::~vtkPVProbe()
 
   this->ArraySelection->Delete();
   this->ArraySelection = NULL;
+
+  this->SaveButton->Delete();
+  this->SaveButton =  NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -192,6 +201,19 @@ void vtkPVProbe::CreateProperties()
   this->ArraySelection->SetPVSource(this);
   this->ArraySelection->SetLabelText("Point Scalars");
   this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
+
+
+  // Add a save button to save XYPloatActor as CSV file
+  this->SaveButton->SetParent(this->ParameterFrame->GetFrame());
+  this->SaveButton->Create(pvApp); //, "foo");
+  this->SaveButton->SetCommand(this, "SaveDialogCallback");
+  this->SaveButton->SetText("Save as CSV");
+  vtkKWLoadSaveDialog *dlg = this->SaveButton->GetLoadSaveDialog();
+  dlg->SetDefaultExtension(".csv");
+  dlg->SetFileTypes("{{CSV Document} {.csv}}");
+  dlg->SaveDialogOn();
+  this->Script("pack %s",
+               this->SaveButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -305,11 +327,16 @@ void vtkPVProbe::AcceptCallbackInternal()
       }
     this->PointDataLabel->SetText( label.c_str() );
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
+
+    this->SaveButton->SetEnabled(0);
+
     }
   else
     {
     this->PointDataLabel->SetText("");
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
+
+    this->SaveButton->SetEnabled(1);
     }
 
   // Fill up the ArrayNames of the XYPlotActorProxy (subproxy of XYPlotDisplayProxy) from the
@@ -397,3 +424,20 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProbe::SaveDialogCallback()
+{
+  int numPts = this->GetDataInformation()->GetNumberOfPoints();
+  
+  // We need to be in the case of a line
+  if (numPts > 1)
+    {
+    vtkXYPlotActor *xy = this->PlotDisplayProxy->GetXYPlotWidget()->GetXYPlotActor();
+    
+    ofstream f;
+    const char *filename = this->SaveButton->GetFileName();
+    f.open( filename );
+    xy->PrintAsCSV(f);
+    f.close();
+    }
+}
