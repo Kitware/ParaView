@@ -53,10 +53,6 @@
 
 #include "vtkClientServerID.h" // Needed for InteractorID
 
-#include "vtkPVConfig.h" // Needed for PARAVIEW_USE_LOOKMARKS
-#ifdef PARAVIEW_USE_LOOKMARKS
-class vtkPVLookmarkManager;
-#endif
 class vtkCollection;
 class vtkPVGenericRenderWindowInteractor;
 class vtkKWCheckButton;
@@ -78,6 +74,7 @@ class vtkPVComparativeVisManagerGUI;
 class vtkPVErrorLogDisplay;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
+class vtkPVLookmarkManager;
 class vtkPVReaderModule;
 class vtkPVRenderView;
 class vtkPVSource;
@@ -184,6 +181,7 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
+  vtkGetObjectMacro(LookmarkToolbar, vtkKWToolbar);
  
   // Description:
   // Access from script for regression test.
@@ -533,15 +531,11 @@ public:
   // Display the Lookmark Manager.
   void DisplayLookmarkManager();
 
+  vtkGetObjectMacro(PVLookmarkManager, vtkPVLookmarkManager);
+
   // Description: 
   // When on and SaveState() is called, only sources that "contribute to the view" are saved to the session script.
   vtkSetMacro(SaveVisibleSourcesOnlyFlag,int);
-
-//BTX
-#ifdef PARAVIEW_USE_LOOKMARKS
-  vtkGetObjectMacro(PVLookmarkManager, vtkPVLookmarkManager);
-#endif
-//ETX
 
   // Description:
   // Method to change toolbar state in tcl scripts.
@@ -778,11 +772,9 @@ protected:
 
   int SaveVisibleSourcesOnlyFlag;
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   vtkKWToolbar *LookmarkToolbar;
   vtkKWPushButton *LookmarkButton;
   vtkPVLookmarkManager *PVLookmarkManager;
-#endif
 
   // Description:
   // Show a main user interface. The  main UserInterfaceManager (UIM) will be

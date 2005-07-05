@@ -56,19 +56,15 @@
 #include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkPVTraceHelper.h"
-#ifdef PARAVIEW_USE_LOOKMARKS
 #include "vtkPVLookmark.h"
-#endif
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.448");
+vtkCxxRevisionMacro(vtkPVSource, "1.448.2.1");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
-#ifdef PARAVIEW_USE_LOOKMARKS
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
-#endif
 
 vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
 
@@ -141,9 +137,7 @@ vtkPVSource::vtkPVSource()
 
   this->ResetInSelect = 1;
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->Lookmark = 0;
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -210,9 +204,7 @@ vtkPVSource::~vtkPVSource()
   this->SetPVColorMap(0);
   this->SetSourceList(0);
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   this->SetLookmark(0);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1776,13 +1768,11 @@ void vtkPVSource::DeleteCallback()
   this->SetNotebook(0);
   
   // Delete reference to this pvsource in lookmark if necessary
-#ifdef PARAVIEW_USE_LOOKMARKS
   if (this->Lookmark)
     {
     this->Lookmark->RemovePVSource(this);
     }
   this->SetLookmark(0);
-#endif
 
   if ( initialized )
     {
@@ -2863,7 +2853,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
   os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;
 
-#ifdef PARAVIEW_USE_LOOKMARKS
   os << indent << "Lookmark: ";
   if( this->Lookmark )
     {
@@ -2873,7 +2862,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-#endif //PARAVIEW_USE_LOOKMARKS
 }
 
 //----------------------------------------------------------------------------

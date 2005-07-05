@@ -51,18 +51,14 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVWorldPointPicker.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVGUIClientOptions.cxx
+  vtkXMLLookmarkElement.cxx 
   ${ExtraParaViewClientNonWrapped_SRCS}
   )
 
-IF (PARAVIEW_USE_LOOKMARKS)
-  SET( ParaViewClientNotWrapped_SRCS
-    ${ParaViewClientNotWrapped_SRCS}
-    vtkXMLLookmarkElement.cxx 
-    )
-ENDIF (PARAVIEW_USE_LOOKMARKS)
-
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
+  vtkKWLookmark.cxx
+  vtkKWLookmarkFolder.cxx
   vtkKWView.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
@@ -138,6 +134,8 @@ SET( ParaViewClient_SRCS
   vtkPVLabeledToggle.cxx
   vtkPVLineSourceWidget.cxx
   vtkPVLineWidget.cxx
+  vtkPVLookmark.cxx
+  vtkPVLookmarkManager.cxx
   vtkPVMPIRenderModuleUI.cxx
   vtkPVMinMax.cxx
   vtkPVMultiDisplayRenderModuleUI.cxx
@@ -200,16 +198,6 @@ SET( ParaViewClient_SRCS
   #  vtkPVRenderGroupDialog.cxx
   ${ExtraParaViewClient_SRCS}
   )
-
-IF (PARAVIEW_USE_LOOKMARKS)
-  SET( ParaViewClient_SRCS
-    ${ParaViewClient_SRCS}
-    vtkKWLookmark.cxx
-    vtkKWLookmarkFolder.cxx
-    vtkPVLookmark.cxx
-    vtkPVLookmarkManager.cxx
-    )
-ENDIF (PARAVIEW_USE_LOOKMARKS)
 
 
 INCLUDE_DIRECTORIES(
