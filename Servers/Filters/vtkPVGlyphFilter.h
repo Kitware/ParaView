@@ -52,17 +52,48 @@ public:
   void SetRandomMode(int mode);
   int GetRandomMode();
 
+  // Description:
+  // In processing composite datasets, will check if a point
+  // is visible as long as the dataset being process if a
+  // vtkUniformGrid.
+  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
+
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, 
+                          vtkInformationVector **, 
+                          vtkInformationVector *);
+  virtual int RequestCompositeData(vtkInformation* request,
+                                   vtkInformationVector** inputVector,
+                                   vtkInformationVector* outputVector);
+
+  virtual int FillInputPortInformation(int, vtkInformation*);
+
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
   
+  vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
+
+  int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
+                     vtkDataSet* input,
+                     vtkInformation* request,
+                     vtkInformationVector** inputVector,
+                     vtkInformationVector* outputVector);
+
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int NumberOfProcesses;
   int UseMaskPoints;
+  int InputIsUniformGrid;
   
+  vtkIdType BlockMaxNumPts;
+  vtkIdType BlockOnRatio;
+  vtkIdType BlockPointCounter;
+  vtkIdType BlockNextPoint;
+  vtkIdType BlockNumPts;
+
   virtual void ReportReferences(vtkGarbageCollector*);
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
