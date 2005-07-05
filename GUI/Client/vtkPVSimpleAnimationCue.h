@@ -188,16 +188,23 @@ public:
   virtual void RecordState(double ntime, double offset);
 
   // Description:
-  // Adds a new key frame is the property animated by this cue has changed
-  // since last call to InitializeStatus(). ntime is the time at which this
-  // key frame will be added.  If onlyFocus is 1, the new key frame is
-  // added only if this cue has the focus.
-//  virtual void KeyFramePropertyChanges(double ntime, double offset, int onlyFocus);
-
-  // Description:
   // Get the animation cue proxy associated with this cue. If this cue is
   // Virtual, this method returns NULL.
   vtkGetObjectMacro(CueProxy, vtkSMAnimationCueProxy);
+
+  // Description:
+  // Set the animation cue proxy controlled by this cue. If
+  // this GUI already had a Cue proxy associated with it which it had 
+  // registered with the vtkSMProxyManager, this call unregisters the 
+  // old proxy and registers the new one. If the old proxy had keyframes
+  // in it which had GUI associated with it, then, the keyframe GUI is
+  // also destroyed. If the new cue proxy doesn't have a manipulator associated
+  // with it, a new vtkSMKeyFrameAnimationCueManipulatorProxy will be created
+  // and set as the manipulator for the cueProxy.
+  // If this cue is Virtual, this method has no effect.
+  // Can be called before Create is called in which case this class
+  // does not create the proxies.
+  void SetCueProxy(vtkSMAnimationCueProxy* cueProxy);
 
   // Description:
   // Sets up the keyframe state (key value/ value bounds etc). using the current state of 
@@ -278,6 +285,7 @@ public:
   // Description:
   // Returns the type of the key frame.
   int GetKeyFrameType(vtkPVKeyFrame* kf);
+  int GetKeyFrameType(vtkSMProxy* kf);
 
 protected:
   vtkPVSimpleAnimationCue();
@@ -287,6 +295,20 @@ protected:
   // Description:
   // Creates the proxies for the Cue.
   virtual void CreateProxy();
+
+  // Description:
+  // Internal method to clean up keyframes GUI.
+  void CleanupKeyFramesGUI();
+
+  // Description:
+  // Using the proxies for keyframes, creates the corresponding GUI.
+  void InitializeGUIFromProxy();
+
+
+  // Description:
+  // Initantiates a new vtkPVKeyFrame subclass for the given type and
+  // sets it's parent etc. Does not call Create on the object though.
+  vtkPVKeyFrame* CreateNewKeyFrameAndInit(int type);
 
   // Description:
   // Set if the Cue is virtual i.e. it has no proxies associated with it,
@@ -314,6 +336,13 @@ protected:
   vtkSetStringMacro(CueProxyName);
 
   vtkSMKeyFrameAnimationCueManipulatorProxy* KeyFrameManipulatorProxy;
+  void SetKeyFrameManipulatorProxy(vtkSMKeyFrameAnimationCueManipulatorProxy*);
+
+  // Description:
+  // Obtains the Manip. proxy from the CueProxy. If CueProxy doesn't have a manip.
+  // a new one is created using the KeyFrameManipulatorProxyXMLName.
+  void SetupManipulatorProxy();
+  
   char* KeyFrameManipulatorProxyName;
   vtkSetStringMacro(KeyFrameManipulatorProxyName);
   char* KeyFrameManipulatorProxyXMLName;

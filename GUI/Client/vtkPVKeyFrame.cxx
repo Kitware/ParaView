@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.23");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.24");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -91,6 +91,13 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->Duration = 1.0;
   this->TimeChangeable = 1;
   this->BlankTimeEntry = 0;
+
+  static int proxyNum = 0;
+  ostrstream str;
+  str << "vtkPVKeyFrame_" << this->KeyFrameProxyXMLName << proxyNum << ends;
+  this->SetKeyFrameProxyName(str.str());
+  str.rdbuf()->freeze(0);
+  proxyNum++;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,18 +105,8 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
 {
   this->Observer->SetTarget(NULL);
   this->Observer->Delete();
-  if (this->KeyFrameProxyName)
-    {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy(
-      "animation_keyframes", this->KeyFrameProxyName);
-    this->SetKeyFrameProxyName(0);
-    }
-
-  if (this->KeyFrameProxy)
-    {
-    this->KeyFrameProxy->Delete();
-    this->KeyFrameProxy = NULL;
-    }
+  this->SetKeyFrameProxy(0);
+  this->SetKeyFrameProxyName(0);
 
   this->SetAnimationCueProxy(NULL);
   this->SetKeyFrameProxyXMLName(0);
@@ -146,30 +143,50 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app)
   // Call the superclass to create the whole widget
 
   this->Superclass::Create(app);
+  this->ChildCreate(app);
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  static int proxyNum = 0;
-
-  this->KeyFrameProxy = vtkSMKeyFrameProxy::SafeDownCast(
-    pxm->NewProxy("animation_keyframes", this->KeyFrameProxyXMLName));
-
+  if (!this->KeyFrameProxy)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMKeyFrameProxy* kf  = vtkSMKeyFrameProxy::SafeDownCast(
+      pxm->NewProxy("animation_keyframes", this->KeyFrameProxyXMLName));
+    this->SetKeyFrameProxy(kf);
+    kf->Delete();
+    }
+  
   if (!this->KeyFrameProxy)
     {
     vtkErrorMacro("Failed to create proxy " << this->KeyFrameProxyXMLName);
     return;
     }
-  ostrstream str;
-  str << "vtkPVKeyFrame_" << this->KeyFrameProxyXMLName << proxyNum << ends;
-  this->SetKeyFrameProxyName(str.str());
-  str.rdbuf()->freeze(0);
-  proxyNum++;
-
-  pxm->RegisterProxy("animation_keyframes", this->KeyFrameProxyName,
-    this->KeyFrameProxy);
   
-  this->KeyFrameProxy->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
   this->KeyFrameProxy->UpdateVTKObjects(); // creates the proxy.
-  this->ChildCreate(app);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVKeyFrame::SetKeyFrameProxy(vtkSMKeyFrameProxy* kf)
+{
+  if (this->KeyFrameProxy == kf)
+    {
+    return;
+    }
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  
+  if (this->KeyFrameProxy)
+    {
+    this->KeyFrameProxy->RemoveObserver(this->Observer);
+    pxm->UnRegisterProxy("animation_keyframes", this->KeyFrameProxyName);
+    }
+  
+  vtkSetObjectBodyMacro(KeyFrameProxy, vtkSMKeyFrameProxy, kf);
+
+  if (this->KeyFrameProxy)
+    {
+    pxm->RegisterProxy("animation_keyframes", 
+      this->KeyFrameProxyName, this->KeyFrameProxy);
+    this->KeyFrameProxy->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+    this->UpdateValuesFromProxy();
+    }
 }
 
 //-----------------------------------------------------------------------------

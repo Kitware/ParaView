@@ -30,18 +30,27 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVWindow.h"
 #include "vtkSMAnimationCueProxy.h"
+#include "vtkSMBooleanKeyFrameProxy.h"
+#include "vtkSMCameraKeyFrameProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMExponentialKeyFrameProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
 #include "vtkSMKeyFrameProxy.h"
 #include "vtkSMPropertyStatusManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRampKeyFrameProxy.h"
+#include "vtkSMSinusoidKeyFrameProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
+#include <vtksys/ios/sstream>
+
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.13");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.14");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
+vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
+  vtkSMKeyFrameAnimationCueManipulatorProxy);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
 {
@@ -211,37 +220,36 @@ void vtkPVSimpleAnimationCue::CreateProxy()
     {
     return;
     }
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+
+  // Setup the names used to register the proxies with.
   static int proxyNum = 0;
-  this->CueProxy = vtkSMAnimationCueProxy::SafeDownCast(
+  vtksys_ios::ostringstream str;
+  str << "AnimationCue" << proxyNum;
+  this->SetCueProxyName(str.str().c_str());
+
+  vtksys_ios::ostringstream str1;
+  str1 << "KeyFrameAnimationCueManipulator" << proxyNum;
+  this->SetKeyFrameManipulatorProxyName(str1.str().c_str());
+  proxyNum++;
+  
+  if ( this->CueProxy )
+    {
+    // proxy has been set externally, so we don't need to create any. 
+    return;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMAnimationCueProxy* cueProxy = vtkSMAnimationCueProxy::SafeDownCast(
     pxm->NewProxy("animation","AnimationCue"));
+  this->SetCueProxy(cueProxy);
+  cueProxy->Delete();
+
   if (!this->CueProxy)
     {
     vtkErrorMacro("Failed to create proxy " << "AnimationCue");
     return;
     }
-  ostrstream str;
-  str << "AnimationCue" << proxyNum << ends;
-  this->SetCueProxyName(str.str());
-
-  this->KeyFrameManipulatorProxy = vtkSMKeyFrameAnimationCueManipulatorProxy::
-    SafeDownCast(pxm->NewProxy("animation_manipulators",
-        this->KeyFrameManipulatorProxyXMLName));
-  if (!this->KeyFrameManipulatorProxy)
-    {
-    vtkErrorMacro("Failed to create proxy " << 
-      this->KeyFrameManipulatorProxyXMLName);
-    return;
-    }
-  ostrstream str1;
-  str1 << "KeyFrameAnimationCueManipulator" << proxyNum << ends;
-  this->SetKeyFrameManipulatorProxyName(str1.str());
-
-  proxyNum++;
-  str.rdbuf()->freeze(0);
-  str1.rdbuf()->freeze(0);
-
-
+  
   this->KeyFrameManipulatorProxy->UpdateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -256,8 +264,132 @@ void vtkPVSimpleAnimationCue::CreateProxy()
   DoubleVectPropertySetElement(this->CueProxy, "StartTime", 0.0);
   DoubleVectPropertySetElement(this->CueProxy, "EndTime", 1.0);
   this->CueProxy->UpdateVTKObjects(); //calls CreateVTKObjects(1) internally.
+}
 
+//-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::SetupManipulatorProxy()
+{
+  // verify if the CueProxy has the manipulator set. If not, this creates 
+  // a new one.
+  if (!this->CueProxy)
+    {
+    vtkErrorMacro("CueProxy must be set.");
+    return;
+    }
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->CueProxy->GetProperty("Manipulator"));
+  
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Manipulator.");
+    return;
+    }
+  
+  if (pp->GetNumberOfProxies() == 0)
+    {
+    // create a new proxy.
+    vtkSMKeyFrameAnimationCueManipulatorProxy* manipProxy;
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    manipProxy = vtkSMKeyFrameAnimationCueManipulatorProxy::
+      SafeDownCast(pxm->NewProxy("animation_manipulators",
+          this->KeyFrameManipulatorProxyXMLName));
+    this->SetKeyFrameManipulatorProxy(manipProxy);
+    manipProxy->Delete();
+    }
+  else
+    {
+    vtkSMKeyFrameAnimationCueManipulatorProxy* manipProxy;
+    manipProxy = vtkSMKeyFrameAnimationCueManipulatorProxy::SafeDownCast(
+      pp->GetProxy(0));
+    this->SetKeyFrameManipulatorProxy(manipProxy);
+    }
+  if (this->KeyFrameManipulatorProxy)
+    {
+    this->KeyFrameManipulatorProxy->RemoveObserver(this->Observer);
+    }
   this->Observe(this->KeyFrameManipulatorProxy, vtkCommand::ModifiedEvent);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::SetCueProxy(vtkSMAnimationCueProxy* cueProxy)
+{
+  if (this->CueProxy == cueProxy)
+    {
+    return;
+    }
+ 
+  int proxies_were_registered = this->ProxiesRegistered;
+  
+  this->UnregisterProxies();
+
+  //destroy keyframe GUI.
+  this->CleanupKeyFramesGUI(); 
+  
+  vtkSetObjectBodyMacro(CueProxy, vtkSMAnimationCueProxy, cueProxy);
+
+  if (this->CueProxy)
+    {
+    // verify that the cue proxy has a manipulator, if not create a new one.
+    // create keyframe GUI for the keyframes.
+    this->SetupManipulatorProxy();
+    if (proxies_were_registered)
+      {
+      this->RegisterProxies();
+      }
+    this->InitializeGUIFromProxy();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::InitializeGUIFromProxy()
+{
+  if (!this->KeyFrameManipulatorProxy)
+    {
+    return;
+    }
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property KeyFrames.");
+    return;
+    }
+  
+  int numKeyFrames = pp->GetNumberOfProxies();
+  for (int i = 0; i < numKeyFrames ; i++)
+    {
+    vtkSMKeyFrameProxy* kfProxy = vtkSMKeyFrameProxy::SafeDownCast(
+      pp->GetProxy(i));
+    int type = this->GetKeyFrameType(kfProxy);
+    if (type == vtkPVSimpleAnimationCue::LAST_NOT_USED)
+      {
+      vtkErrorMacro("Unknown keyframe type: " << kfProxy->GetClassName());
+      continue;
+      }
+    vtkPVKeyFrame* kf = this->CreateNewKeyFrameAndInit(type);
+    if (!kf)
+      {
+      continue;
+      }
+    kf->SetKeyFrameProxy(kfProxy); 
+    kf->Create(this->GetApplication());
+    this->PVKeyFrames->AddItem(kf);
+    kf->Delete();
+    }
+
+  if (numKeyFrames >= 2)
+    {
+    this->RegisterProxies();
+    }
+
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::CleanupKeyFramesGUI()
+{
+  // Note this only cleanups the GUI, the keyframe proxies will not get 
+  // cleaned up.
+  this->PVKeyFrames->RemoveAllItems();
 }
 
 //-----------------------------------------------------------------------------
@@ -646,30 +778,11 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
     // pvAM->SetCurrentTime(time);
     }
   
-  ostrstream str ;
-  str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
-  
-  vtkPVKeyFrame* keyframe = this->NewKeyFrame(type);
+  vtkPVKeyFrame* keyframe = this->CreateNewKeyFrameAndInit(type);
   if (!keyframe)
     {
-    vtkErrorMacro("Failed to create KeyFrame of type " << type);
     return -1;
     }
-  keyframe->SetParent(this->KeyFrameParent);
-  keyframe->SetName(str.str());
-  str.rdbuf()->freeze(0);
-  
-  keyframe->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-  
-  //ostrstream sCommand;
-  //sCommand << "GetKeyFrame \"" << keyframe->GetName() << "\"" << ends;
-  //keyframe->GetTraceHelper()->SetReferenceCommand(sCommand.str());
-  //sCommand.rdbuf()->freeze(0);
-  keyframe->GetTraceHelper()->SetReferenceCommand("GetSelectedKeyFrame");
-
-  keyframe->SetAnimationCueProxy(this->GetCueProxy()); 
-  // provide a pointer to cue, so that the interace
-  // can be in accordance with the animated proeprty.
   keyframe->Create(this->GetApplication());
   keyframe->SetDuration(this->Duration);
   keyframe->SetKeyTime(time);
@@ -679,6 +792,32 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   this->InitializeKeyFrameUsingCurrentState(keyframe);
   return id;
 }
+
+//-----------------------------------------------------------------------------
+vtkPVKeyFrame* vtkPVSimpleAnimationCue::CreateNewKeyFrameAndInit(int type)
+{
+  ostrstream str ;
+  str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
+
+  vtkPVKeyFrame* keyframe = this->NewKeyFrame(type);
+  if (!keyframe)
+    {
+    vtkErrorMacro("Failed to create KeyFrame of type " << type);
+    return NULL;
+    }
+  keyframe->SetParent(this->KeyFrameParent);
+  keyframe->SetName(str.str());
+  str.rdbuf()->freeze(0);
+
+  keyframe->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  keyframe->GetTraceHelper()->SetReferenceCommand("GetSelectedKeyFrame");
+
+  keyframe->SetAnimationCueProxy(this->GetCueProxy()); 
+  // provide a pointer to cue, so that the interace
+  // can be in accordance with the animated proeprty.
+  return keyframe;
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVSimpleAnimationCue::InitializeKeyFrameUsingCurrentState(
   vtkPVKeyFrame* keyframe)
@@ -1260,6 +1399,32 @@ int vtkPVSimpleAnimationCue::GetKeyFrameType(vtkPVKeyFrame* kf)
     return vtkPVSimpleAnimationCue::SINUSOID;
     }
   else if (vtkPVCameraKeyFrame::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::CAMERA;
+    }
+  return vtkPVSimpleAnimationCue::LAST_NOT_USED;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVSimpleAnimationCue::GetKeyFrameType(vtkSMProxy* kf)
+{
+  if (vtkSMRampKeyFrameProxy::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::RAMP;
+    }
+  else if (vtkSMBooleanKeyFrameProxy::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::STEP;
+    }
+  else if (vtkSMExponentialKeyFrameProxy::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::EXPONENTIAL;
+    }
+  else if (vtkSMSinusoidKeyFrameProxy::SafeDownCast(kf))
+    {
+    return vtkPVSimpleAnimationCue::SINUSOID;
+    }
+  else if (vtkSMCameraKeyFrameProxy::SafeDownCast(kf))
     {
     return vtkPVSimpleAnimationCue::CAMERA;
     }

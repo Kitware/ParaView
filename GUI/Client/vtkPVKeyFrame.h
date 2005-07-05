@@ -40,7 +40,20 @@ public:
   // Create the widget.
   virtual void Create(vtkKWApplication* app);
 
+  // Description:
+  // Get the keyframe proxy.
   vtkGetObjectMacro(KeyFrameProxy, vtkSMKeyFrameProxy);
+
+  // Description:
+  // Set the keyframe proxy to be used by this GUI.
+  // If set before calling Create(), this class will not
+  // create any instance of KeyFrameProxy, instead use the one provided.
+  // When set after create, the old one is dereferenced and
+  // the GUI is updated to the values of the provided proxy.
+  // Note that the type of the KeyFrameProxy and that of the 
+  // GUI must match.
+  void SetKeyFrameProxy(vtkSMKeyFrameProxy* kfProxy);
+  
 
   // Description:
   // Get/Set the key time: the time for this key frame.
