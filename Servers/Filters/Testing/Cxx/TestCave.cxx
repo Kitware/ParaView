@@ -218,8 +218,6 @@ void MyMain( vtkMultiProcessController *controller, void *arg )
 
 int main( int argc, char* argv[] )
 {
-  vtkDebugLeaks::PromptUserOff();
-
   vtkMultiProcessController* contr = vtkMultiProcessController::New();
   contr->Initialize(&argc, &argv);
   contr->CreateOutputWindow();
@@ -227,11 +225,6 @@ int main( int argc, char* argv[] )
   vtkParallelFactory* pf = vtkParallelFactory::New();
   vtkObjectFactory::RegisterFactory(pf);
   pf->Delete();
-
-  // This is repeated for the sake of MPI. This one might not
-  // get called by the parent process, the first one might not
-  // get called by all others.
-  vtkDebugLeaks::PromptUserOff();
 
   // When using MPI, the number of processes is determined
   // by the external program which launches this application.
