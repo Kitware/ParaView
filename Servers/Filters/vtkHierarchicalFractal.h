@@ -28,6 +28,7 @@
 class vtkIntArray;
 class vtkUniformGrid;
 class vtkRectilinearGrid;
+class vtkDataSet;
 
 class VTK_EXPORT vtkHierarchicalFractal : public vtkHierarchicalDataSetAlgorithm
 {
@@ -105,7 +106,8 @@ protected:
                           vtkInformationVector *outputVector);
   
   void Traverse(int &blockId, int level, vtkHierarchicalDataSet* output, 
-                int x0,int x1, int y0,int y1, int z0,int z1);
+                int x0,int x1, int y0,int y1, int z0,int z1,
+                int onFace[6]);
 
   int LineTest2(float x0, float y0, float z0, 
                 float x1, float y1, float z1,
@@ -114,15 +116,19 @@ protected:
                float x1, float y1, float z1,
                double bds[6], int level, int target); 
 
-  void SetBlockInfo(vtkUniformGrid *grid, int level, int* ext);
-  void SetRBlockInfo(vtkRectilinearGrid *grid, int level, int* ext);
+  void SetBlockInfo(vtkUniformGrid *grid, int level, int* ext,int onFace[6]);
+  void SetRBlockInfo(vtkRectilinearGrid *grid, int level, int* ext,
+                     int onFace[6]);
   
   void AddVectorArray(vtkHierarchicalDataSet *output);
   void AddTestArray(vtkHierarchicalDataSet *output);
   void AddFractalArray(vtkHierarchicalDataSet *output);
   void AddBlockIdArray(vtkHierarchicalDataSet *output);
   void AddDepthArray(vtkHierarchicalDataSet *output);
-  void AddGhostLevelArray(vtkHierarchicalDataSet *output);
+  
+  void AddGhostLevelArray(vtkDataSet *grid,
+                          int dim[3],
+                          int onFace[6]);
 
   int MandelbrotTest(double x, double y);
   int TwoDTest(double bds[6], int level, int target);
