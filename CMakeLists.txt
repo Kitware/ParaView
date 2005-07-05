@@ -74,7 +74,9 @@ SET(VTK_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(VTK_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 
 SET(KW_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+SET(KW_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(KW_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+SET(KW_INSTALL_SHARE_DIR ${PV_INSTALL_DATA_DIR})
 
 # VTK and KW should install only the components paraview does.
 SET(VTK_INSTALL_NO_DOCUMENTATION 1)
@@ -378,6 +380,10 @@ SUBDIRS(Utilities/vtkmpeg2)
 
 #########################################################################
 # Configure IceT
+SET(ICET_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+SET(ICET_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+SET(ICET_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
+SET(ICET_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 MARK_AS_ADVANCED(CLEAR VTK_USE_MPI)
 IF(VTK_USE_MPI)
   OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" ON)
@@ -419,11 +425,6 @@ IF (PARAVIEW_BUILD_GUI)
   SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
   SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 ENDIF (PARAVIEW_BUILD_GUI)
-
-#########################################################################
-# Configure LOOKMARKS
-OPTION(PARAVIEW_USE_LOOKMARKS "Build ParaView with visual bookmarking capability" ON)
-
 
 #########################################################################
 # Import external projects, such as EXODUS and SAF
