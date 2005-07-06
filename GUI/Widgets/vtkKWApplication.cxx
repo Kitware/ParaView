@@ -69,7 +69,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.241");
+vtkCxxRevisionMacro(vtkKWApplication, "1.242");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -81,6 +81,7 @@ extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtktkimageviewerwidget_Init(Tcl_Interp *interp);
 
 #ifdef VTK_WRAP_TCL
+
 extern "C" int Vtkfilteringtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
@@ -88,19 +89,15 @@ extern "C" int Vtkiotcl_Init(Tcl_Interp *interp);
 
 #ifdef VTK_USE_RENDERING
 extern "C" int Vtkrenderingtcl_Init(Tcl_Interp *interp);
-#endif
-
-#ifdef VTK_USE_VOLUMERENDERING
 extern "C" int Vtkvolumerenderingtcl_Init(Tcl_Interp *interp);
-#endif
-
-#ifdef VTK_USE_HYBRID
 extern "C" int Vtkhybridtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkwidgetstcl_Init(Tcl_Interp *interp);
 #endif
 
 #ifdef VTK_USE_PARALLEL
 extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
 #endif
+
 #endif
 
 //----------------------------------------------------------------------------
@@ -692,9 +689,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
       }
     return NULL;
     }
-#endif
 
-#ifdef VTK_USE_VOLUMERENDERING
   if (Vtkvolumerenderingtcl_Init(interp) != TCL_OK)
     {
     if (err)
@@ -704,14 +699,22 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
       }
     return NULL;
     }
-#endif
 
-#ifdef VTK_USE_HYBRID
   if (Vtkhybridtcl_Init(interp) != TCL_OK)
     {
     if (err)
       {
       *err << "Vtkhybridtcl_Init error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+  if (Vtkwidgetstcl_Init(interp) != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Vtkwidgetstcl_Init error: " 
            << Tcl_GetStringResult(interp) << endl;
       }
     return NULL;
@@ -729,6 +732,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
     return NULL;
     }
 #endif
+
 #endif
 
   // Initialize Widgets and BWidgets
