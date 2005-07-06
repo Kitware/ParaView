@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.744");
+vtkCxxRevisionMacro(vtkPVWindow, "1.745");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -5083,6 +5083,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "LookmarkToolbar: " << this->GetLookmarkToolbar() << endl;
+
 }
 
 

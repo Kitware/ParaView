@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.13");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.14");
 
 
 //*****************************************************************************
@@ -1317,5 +1317,6 @@ void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Dataset: " << this->GetDataset() << endl;
   os << indent << "Location: " << this->GetLocation() << endl;
   os << indent << "TraceHelper: " << this->TraceHelper << endl;
+  os << indent << "ToolbarButton: " << this->GetToolbarButton() << endl;
 
 }

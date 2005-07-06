@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.14");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -397,6 +397,7 @@ void vtkKWLookmarkFolder::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Location: " << this->Location << endl;
   os << indent << "LabelFrame: " << this->LabelFrame << endl;
   os << indent << "SeparatorFrame: " << this->SeparatorFrame << endl;
-  os << indent << "NestedSeparatorFrame: " << 
-    this->NestedSeparatorFrame << endl;
+  os << indent << "NestedSeparatorFrame: " << this->NestedSeparatorFrame << endl;
+  os << indent << "MacroFlag: " << this->GetMacroFlag() << endl;
+
 }
