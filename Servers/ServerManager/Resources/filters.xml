@@ -3451,5 +3451,17 @@
    <!-- End ExtractDataSets -->
    </SourceProxy>
 
+   <ShrunkContoursProxy name="ShrunkContours" class="vtkContourFilter"
+        base_proxygroup="filters" base_proxyname="Contour">
+      <SubProxy>
+        <Proxy name="Shrink" proxygroup="filters" proxyname="ShrinkFilter" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ShrinkFactor" />
+        </ExposedProperties>
+      </SubProxy>
+   </ShrunkContoursProxy>
+    
   </ProxyGroup>
 </ServerManagerConfiguration>
+

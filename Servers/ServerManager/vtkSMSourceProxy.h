@@ -100,7 +100,7 @@ public:
   // Description:
   // Create n parts where n is the number of filters. Each part
   // correspond to one output of one filter.
-  void CreateParts();
+  virtual void CreateParts();
 
   // Description:
   // DataInformation is used by the source proxy to obtain information
@@ -174,6 +174,10 @@ protected:
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
+  // Internal method which creates the parts using the proxy specified.
+  void CreatePartsInternal(vtkSMProxy* op);
 
 private:
   vtkSMSourceProxyInternals* PInternals;

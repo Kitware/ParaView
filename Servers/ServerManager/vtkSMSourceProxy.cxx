@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.29");
 
 struct vtkSMSourceProxyInternals
 {
@@ -208,6 +208,12 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::CreateParts()
 {
+  this->CreatePartsInternal(this);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
+{
   if (this->PartsCreated && this->GetNumberOfParts())
     {
     return;
@@ -218,11 +224,12 @@ void vtkSMSourceProxy::CreateParts()
   // This happens when connecting a filter to a source which is not
   // initialized. In other situations, SetInput() creates the VTK
   // objects before this gets called.
-  this->CreateVTKObjects(1);
+  op->CreateVTKObjects(1);
+
 
   this->PInternals->Parts.clear();
 
-  int numIDs = this->GetNumberOfIDs();
+  int numIDs = op->GetNumberOfIDs();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -232,7 +239,7 @@ void vtkSMSourceProxy::CreateParts()
   vtkClientServerStream stream;
   for (int i=0; i<numIDs; i++)
     {
-    vtkClientServerID sourceID = this->GetID(i);
+    vtkClientServerID sourceID = op->GetID(i);
     // TODO replace this with UpdateInformation and OutputInformation
     // property.
     pm->GatherInformation(info, sourceID);
@@ -262,7 +269,7 @@ void vtkSMSourceProxy::CreateParts()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(op->GetServers(), stream);
     }
   info->Delete();
 
@@ -456,7 +463,7 @@ void vtkSMSourceProxy::UpdateDataInformation()
   if (!property)
     {
     vtkSMProperty* prop = vtkSMProperty::New();
-    this->AddProperty("DataInformation", prop);
+    this->AddPropertyToSelf("DataInformation", prop);
     property = prop;
     // Assignment above is still valid. Adding pointer increments 
     // it's ref. count
