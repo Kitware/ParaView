@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.12");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.13");
 
 
 //*****************************************************************************
@@ -159,8 +159,7 @@ vtkPVLookmark::~vtkPVLookmark()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVLookmark::ExecuteEvent(vtkObject* , unsigned long event,
-  void* calldata)
+void vtkPVLookmark::ExecuteEvent(vtkObject* vtkNotUsed(obj), unsigned long event, void* vtkNotUsed(callData))
 {
   if ( event == vtkKWEvent::ErrorMessageEvent || event == vtkKWEvent::WarningMessageEvent )
     {
@@ -289,8 +288,6 @@ void vtkPVLookmark::CreateIconFromMainView()
 
 void vtkPVLookmark::CreateIconFromImageData()
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
   if(!this->ImageData)
     {
     return;
