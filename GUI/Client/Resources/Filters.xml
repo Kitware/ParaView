@@ -1219,7 +1219,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
                input_name="Input"/>
     <SelectionList property="TriangleQualityMeasure"
                    trace_name="TriangleQualityMeasure"
-                   label="Triangle Quality Measure"
+                   label="Tri Quality Measure"
                    help="Select the quality measure used to evaluate triangle quality. The radius ratio is the size of a circle circumscribed by a triangle's 3 vertices divided by the size of a circle tangent to a triangle's 3 edges. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
       <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
@@ -1229,7 +1229,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
     </SelectionList>
     <SelectionList property="QuadQualityMeasure"
                    trace_name="QuadQualityMeasure"
-                   label="Quadrilateral Quality Measure"
+                   label="Quad Quality Measure"
                    help="Select the quality measure used to evaluate quadrilateral quality">
       <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
