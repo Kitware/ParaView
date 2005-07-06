@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.41");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -477,6 +477,11 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   vtkXMLDataElement *root;
   vtkPVLookmark *lookmarkWidget;
   int j, numLmks;
+
+  if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
+    {
+    return;
+    }
 
 //  char* init_string;
 //  init_string = vtkPVDefaultModulesLookmarkMacrosGetInterfaces();
