@@ -19,12 +19,13 @@
 #include "vtkKWLabel.h"
 
 vtkStandardNewMacro(vtkPVBooleanKeyFrame);
-vtkCxxRevisionMacro(vtkPVBooleanKeyFrame, "1.1");
+vtkCxxRevisionMacro(vtkPVBooleanKeyFrame, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVBooleanKeyFrame::vtkPVBooleanKeyFrame()
 {
   this->SetKeyFrameProxyXMLName("BooleanKeyFrame");
+  this->DetermineKeyFrameProxyName();
 }
 
 //-----------------------------------------------------------------------------

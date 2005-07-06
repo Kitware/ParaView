@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.9");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.10");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -43,6 +43,7 @@ inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy,
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
 {
   this->SetKeyFrameProxyXMLName("SinusoidKeyFrame");
+  this->DetermineKeyFrameProxyName();
   this->PhaseLabel = vtkKWLabel::New();
   this->FrequencyLabel = vtkKWLabel::New();
   this->OffsetLabel = vtkKWLabel::New();

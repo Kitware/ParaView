@@ -17,12 +17,13 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVRampKeyFrame);
-vtkCxxRevisionMacro(vtkPVRampKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVRampKeyFrame, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVRampKeyFrame::vtkPVRampKeyFrame()
 {
   this->SetKeyFrameProxyXMLName("RampKeyFrame");
+  this->DetermineKeyFrameProxyName();
 }
 
 //-----------------------------------------------------------------------------

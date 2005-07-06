@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.24");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.25");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -91,13 +91,6 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->Duration = 1.0;
   this->TimeChangeable = 1;
   this->BlankTimeEntry = 0;
-
-  static int proxyNum = 0;
-  ostrstream str;
-  str << "vtkPVKeyFrame_" << this->KeyFrameProxyXMLName << proxyNum << ends;
-  this->SetKeyFrameProxyName(str.str());
-  str.rdbuf()->freeze(0);
-  proxyNum++;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,6 +108,17 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
   this->TimeThumbWheel->Delete();
   this->SetName(NULL);
   this->SetAnimationScene(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVKeyFrame::DetermineKeyFrameProxyName()
+{
+  static int proxyNum = 0;
+  ostrstream str;
+  str << "vtkPVKeyFrame_" << this->KeyFrameProxyXMLName << proxyNum << ends;
+  this->SetKeyFrameProxyName(str.str());
+  str.rdbuf()->freeze(0);
+  proxyNum++;
 }
 
 //-----------------------------------------------------------------------------

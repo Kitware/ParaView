@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.8");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.9");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -43,6 +43,7 @@ inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy,
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
 {
   this->SetKeyFrameProxyXMLName("ExponentialKeyFrame");
+  this->DetermineKeyFrameProxyName();
   this->BaseLabel = vtkKWLabel::New();
   this->StartPowerLabel = vtkKWLabel::New();
   this->EndPowerLabel = vtkKWLabel::New();

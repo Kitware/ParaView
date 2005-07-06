@@ -162,6 +162,8 @@ protected:
   vtkSetStringMacro(KeyFrameProxyName);
   vtkSetStringMacro(KeyFrameProxyXMLName);
 
+  void DetermineKeyFrameProxyName();
+
   vtkKWLabel* TimeLabel;
   vtkKWThumbWheel* TimeThumbWheel;
 

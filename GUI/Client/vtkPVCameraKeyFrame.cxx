@@ -27,7 +27,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVCameraKeyFrame);
-vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.3");
 //------------------------------------------------------------------------------
 vtkPVCameraKeyFrame::vtkPVCameraKeyFrame()
 {
@@ -46,6 +46,7 @@ vtkPVCameraKeyFrame::vtkPVCameraKeyFrame()
   this->ViewAngleWheel = vtkKWThumbWheel::New();
 
   this->SetKeyFrameProxyXMLName("CameraKeyFrame");
+  this->DetermineKeyFrameProxyName();
 }
 
 //------------------------------------------------------------------------------
