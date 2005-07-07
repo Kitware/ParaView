@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.747");
+vtkCxxRevisionMacro(vtkPVWindow, "1.748");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -368,6 +368,13 @@ vtkPVWindow::~vtkPVWindow()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
+  // Make sure that no more renders occur due to previous EventuallyRender
+  // calls.
+  if (this->MainView)
+    {
+    this->MainView->DisableRendering();
+    }
+
   this->Superclass::PrepareForDelete();
 
   // I was getting intermittent crashes in Configure so make sure that after the Interactor is released, Configure cannot be called
