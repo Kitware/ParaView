@@ -33,8 +33,6 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     scale1->GetWidgetName());
 
-  scale1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another scale, but put the label and entry on top
@@ -53,8 +51,6 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     scale2->GetWidgetName());
-
-  scale2->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -79,8 +75,6 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     scale3->GetWidgetName());
-
-  scale3->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -111,8 +105,10 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     scale_set->GetWidgetName());
 
+  scale1->Delete();
+  scale2->Delete();
+  scale3->Delete();
   scale_set->Delete();
-
 
   return new vtkKWScaleItem;
 }

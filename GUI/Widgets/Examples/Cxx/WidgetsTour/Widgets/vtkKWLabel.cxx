@@ -35,8 +35,6 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     label1->GetWidgetName());
 
-  label1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another label, right justify it
@@ -56,8 +54,6 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label2->GetWidgetName());
-
-  label2->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -79,8 +75,6 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label3->GetWidgetName());
 
-  label3->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another label, with a label this time (!)
@@ -88,7 +82,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   vtkKWLabelLabeled *label4 = vtkKWLabelLabeled::New();
   label4->SetParent(parent);
   label4->Create(app);
-  label4->GetLabel()->SetImageOption(vtkKWIcon::IconInfoMini);
+  label4->GetLabel()->SetImageToPredefinedIcon(vtkKWIcon::IconInfoMini);
   label4->GetWidget()->SetText("Another use of a labeled label !");
   label4->SetBalloonHelpString(
     "This is a vtkKWLabelLabeled, i.e. a label associated to a "
@@ -99,8 +93,6 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label4->GetWidgetName());
-
-  label4->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -140,8 +132,6 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label_set->GetWidgetName());
 
-  label_set->Delete();
-
   // -----------------------------------------------------------------------
 
   // Even trickier: create a set of labeled label !
@@ -179,6 +169,11 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     label_set2->GetWidgetName());
 
+  label1->Delete();
+  label2->Delete();
+  label3->Delete();
+  label4->Delete();
+  label_set->Delete();
   label_set2->Delete();
 
   return new vtkKWLabelItem;

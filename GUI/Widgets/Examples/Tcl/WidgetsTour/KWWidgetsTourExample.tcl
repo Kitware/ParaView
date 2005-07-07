@@ -14,8 +14,8 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 vtkKWApplication app
 app SetName "KWWidgetsTourExample"
 if {$option_test} {
-    app SetRegistryLevel 0
-    app PromptBeforeExitOff
+  app SetRegistryLevel 0
+  app PromptBeforeExitOff
 }
 app SupportSplashScreenOn
 app ShowSplashScreenOn
@@ -63,8 +63,8 @@ $tree RedrawOnIdleOn
 $tree SelectionFillOn
 
 foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "vtk" "VTK Widgets"} {
-    $tree AddNode "" $node $text "" 1 0
-    $tree SetNodeFontWeightToBold $node
+  $tree AddNode "" $node $text "" 1 0
+  $tree SetNodeFontWeightToBold $node
 }
 
 pack [widgets_tree GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
@@ -141,55 +141,61 @@ pack [cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pad
 
 set widgets [glob -path "[file join [file dirname [info script]] Widgets]/" *.tcl]
 foreach widget $widgets {
-    set name [file rootname [file tail $widget]]
-    lappend modules $name
+  set name [file rootname [file tail $widget]]
+  lappend modules $name
 
-    set panel "panel$name"
-    vtkKWUserInterfacePanel $panel
-    $panel SetName $name
-    $panel SetUserInterfaceManager [win GetViewUserInterfaceManager]
-    $panel Create app
-    $panel AddPage [$panel GetName] "" ""
-    lappend objects $panel
+  set panel "panel$name"
+  vtkKWUserInterfacePanel $panel
+  $panel SetName $name
+  $panel SetUserInterfaceManager [win GetViewUserInterfaceManager]
+  $panel Create app
+  $panel AddPage [$panel GetName] "" ""
+  lappend objects $panel
 
-    if {[app GetShowSplashScreen]} {
-        [app GetSplashScreen] SetProgressMessage $name
+  if {[app GetShowSplashScreen]} {
+    [app GetSplashScreen] SetProgressMessage $name
+  }
+
+  source $widget
+  
+  set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]
+  if {$widget_type != ""} {
+    set parent_node ""
+    switch -- $widget_type {
+      "TypeCore" {
+        set parent_node "core"
+      }
+      "TypeComposite" {
+        set parent_node "composite"
+      }
+      "TypeVTK" {
+        set parent_node "vtk"
+      }
     }
+    [widgets_tree GetWidget] AddNode $parent_node $name $name "" 1 1
 
-    source $widget
-    
-    set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]
-    if {$widget_type} {
-        set parent_node ""
-        switch -- $widget_type {
-            1 {
-                set parent_node "core"
-            }
-            2 {
-                set parent_node "composite"
-            }
-            3 {
-                set parent_node "vtk"
-            }
-        }
-        [widgets_tree GetWidget] AddNode $parent_node $name $name "" 1 1
+    set tcl_source($name) [read [open $widget]]
 
-        set tcl_source($name) [read [open $widget]]
+    # Try to find the C++ source too
 
-        # Try to find the C++ source too
-
-        set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
-        if {[file exists $cxx_source_name]} {
-            set cxx_source($name) [read [open $cxx_source_name]]
-        } else {
-            set cxx_source($name) {}
-        }
+    set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
+    if {[file exists $cxx_source_name]} {
+      set cxx_source($name) [read [open $cxx_source_name]]
+    } else {
+      set cxx_source($name) {}
     }
+  }
 }
 
 # Raise the example panel
 
-set cmd {if [[widgets_tree GetWidget] HasSelection] {win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection] ; [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_tree GetWidget] GetSelection]) ; [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_tree GetWidget] GetSelection])}}
+set cmd {
+  if [[widgets_tree GetWidget] HasSelection] {
+    win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection]
+    [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_tree GetWidget] GetSelection]) 
+    [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_tree GetWidget] GetSelection])
+  } 
+}
 
 [widgets_tree GetWidget] SetSelectionChangedCommand "" $cmd
 
@@ -199,8 +205,8 @@ set cmd {if [[widgets_tree GetWidget] HasSelection] {win ShowViewUserInterface [
 set ret 0
 win Display
 if {!$option_test} {
-    app Start
-    set ret [app GetExitStatus]
+  app Start
+  set ret [app GetExitStatus]
 }
 win Close
 

@@ -32,8 +32,6 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     extent1->GetWidgetName());
 
-  extent1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another extent, but put the label and entry on top
@@ -65,8 +63,6 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   sprintf(buffer, "SetExtent [%s GetExtent]", extent2->GetTclName());
   extent2->SetCommand(extent1, buffer);
 
-  extent2->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another extent, hide the last component
@@ -91,6 +87,8 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     extent3->GetWidgetName());
 
+  extent1->Delete();
+  extent2->Delete();
   extent3->Delete();
 
   // TODO: vertical extent

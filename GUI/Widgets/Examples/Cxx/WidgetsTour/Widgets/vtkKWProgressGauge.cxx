@@ -35,8 +35,6 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     progress1->GetWidgetName());
 
-  progress1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create a set of pushbutton that will modify the progress gauge
@@ -77,6 +75,7 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     pushbutton_set->GetWidgetName());
 
+  progress1->Delete();
   pushbutton_set->Delete();
 
   // TODO: add callbacks

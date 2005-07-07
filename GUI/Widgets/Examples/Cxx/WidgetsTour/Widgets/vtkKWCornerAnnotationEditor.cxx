@@ -27,6 +27,11 @@ protected:
   vtkKWCornerAnnotationEditor *CornerAnnotationEditor;
 };
 
+KWWidgetsTourItem* vtkKWCornerAnnotationEditorEntryPoint(vtkKWWidget *parent, vtkKWWindow *window)
+{
+  return new vtkKWCornerAnnotationEditorItem(parent, window);
+}
+
 vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   vtkKWWidget *parent, vtkKWWindow *)
 {
@@ -109,9 +114,4 @@ vtkKWCornerAnnotationEditorItem::~vtkKWCornerAnnotationEditorItem()
   this->Interactor->Delete();
   this->RenderWidget->Delete();
   this->Viewer->Delete();
-}
-
-KWWidgetsTourItem* vtkKWCornerAnnotationEditorEntryPoint(vtkKWWidget *parent, vtkKWWindow *window)
-{
-  return new vtkKWCornerAnnotationEditorItem(parent, window);
 }

@@ -16,8 +16,8 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 vtkKWApplication app
 app SetName "KWSimpleWindowWithRenderWidgetExample"
 if {$option_test} {
-    app SetRegistryLevel 0
-    app PromptBeforeExitOff
+  app SetRegistryLevel 0
+  app PromptBeforeExitOff
 }
 app RestoreApplicationSettingsFromRegistry
 
@@ -34,7 +34,7 @@ app AddWindow win
 win Create app
 
 # Add a render widget, attach it to the view frame, and pack
-  
+
 # Create a render widget
 
 vtkKWRenderWidget rw
@@ -71,8 +71,8 @@ rw ResetCamera
 set ret 0
 win Display
 if {!$option_test} {
-    app Start
-    set ret [app GetExitStatus]
+  app Start
+  set ret [app GetExitStatus]
 }
 win Close
 

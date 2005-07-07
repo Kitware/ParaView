@@ -37,8 +37,6 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cbwcc1->GetWidgetName());
 
-  cbwcc1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another checkbutton with change color button
@@ -65,6 +63,7 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cbwcc2->GetWidgetName());
 
+  cbwcc1->Delete();
   cbwcc2->Delete();
 
   return new vtkKWCheckButtonWithChangeColorItem;

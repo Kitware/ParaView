@@ -39,8 +39,6 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     listbox1->GetWidgetName());
 
-  listbox1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another listbox, this time with scrollbars and multiple choices
@@ -68,6 +66,7 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     listbox2->GetWidgetName());
 
+  listbox1->Delete();
   listbox2->Delete();
 
   // TODO: use callbacks

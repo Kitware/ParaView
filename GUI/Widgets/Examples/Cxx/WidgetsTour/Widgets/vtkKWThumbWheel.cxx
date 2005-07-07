@@ -33,8 +33,6 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     thumbwheel1->GetWidgetName());
 
-  thumbwheel1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another thumbwheel, but put the label and entry on top
@@ -59,8 +57,6 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     thumbwheel2->GetWidgetName());
 
-  thumbwheel2->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another thumbwheel, popup mode
@@ -79,6 +75,8 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     thumbwheel3->GetWidgetName());
 
+  thumbwheel1->Delete();
+  thumbwheel2->Delete();
   thumbwheel3->Delete();
 
   return new vtkKWThumbWheelItem;

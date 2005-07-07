@@ -48,8 +48,6 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
     "A color transfer function editor to demonstrate how the color "
     "transfer function is affected by our choice of preset");
 
-  cpsel_tfunc_editor->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create a color preset selector
@@ -66,8 +64,6 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cpsel1->GetWidgetName());
-
-  cpsel1->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -86,8 +82,6 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cpsel2->GetWidgetName());
-
-  cpsel2->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -116,12 +110,14 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cpsel3->GetWidgetName());
 
-  cpsel3->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 20", 
     cpsel_tfunc_editor->GetWidgetName());
 
+  cpsel_tfunc_editor->Delete();
+  cpsel1->Delete();
+  cpsel2->Delete();
+  cpsel3->Delete();
   cpsel_func->Delete();
 
   return new vtkKWColorPresetSelectorItem;

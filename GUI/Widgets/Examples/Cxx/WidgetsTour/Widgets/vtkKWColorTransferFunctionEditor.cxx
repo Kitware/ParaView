@@ -51,13 +51,9 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc1_editor->SetWholeParameterRangeToFunctionRange();
   cpsel_tfunc1_editor->SetVisibleParameterRangeToWholeParameterRange();
 
-  cpsel_tfunc1_editor->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     cpsel_tfunc1_editor->GetWidgetName());
-
-  cpsel_tfunc1->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -131,14 +127,14 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc2_editor->ComputeValueTicksFromHistogramOn();
   cpsel_tfunc2_editor->SetParameterTicksFormat("%-#6.0f");
 
-  cpsel_tfunc2_editor->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 20", 
     cpsel_tfunc2_editor->GetWidgetName());
 
+  cpsel_tfunc1_editor->Delete();
+  cpsel_tfunc1->Delete();
+  cpsel_tfunc2_editor->Delete();
   cpsel_tfunc2->Delete();
-
   cpsel_hist->Delete();
   cpsel_reader->Delete();
 

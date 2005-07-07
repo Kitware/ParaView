@@ -38,10 +38,9 @@ proc vtkKWCanvasEntryPoint {parent win} {
 
   # TODO: add a canvas with scrollbars
 
-  return 1
+  return "TypeCore"
 }
 
 proc vtkKWCanvasFinalizePoint {} {
   canvas1 Delete
 }
-

@@ -36,8 +36,6 @@ KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     range1->GetWidgetName());
 
-  range1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another range, but put the label and entry on top
@@ -69,8 +67,6 @@ KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   sprintf(buffer, "SetRange [%s GetRange]", range2->GetTclName());
   range2->SetCommand(range1, buffer);
 
-  range2->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another range
@@ -93,6 +89,8 @@ KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     range3->GetWidgetName());
 
+  range1->Delete();
+  range2->Delete();
   range3->Delete();
 
   // TODO: vertical range

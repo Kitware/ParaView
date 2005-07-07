@@ -38,8 +38,6 @@ KWWidgetsTourItem* vtkKWOptionMenuEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     optionmenu1->GetWidgetName());
 
-  optionmenu1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another optionmenu, this time with a label
@@ -70,6 +68,7 @@ KWWidgetsTourItem* vtkKWOptionMenuEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     optionmenu2->GetWidgetName());
 
+  optionmenu1->Delete();
   optionmenu2->Delete();
 
   // TODO: use callbacks

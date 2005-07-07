@@ -36,8 +36,6 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     ccb1->GetWidgetName());
 
-  ccb1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another ccb, but put the label and entry on top
@@ -59,8 +57,6 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     ccb2->GetWidgetName());
 
-  ccb2->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another color button, without a label
@@ -77,6 +73,8 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     ccb3->GetWidgetName());
 
+  ccb1->Delete();
+  ccb2->Delete();
   ccb3->Delete();
 
   return new vtkKWChangeColorButtonItem;

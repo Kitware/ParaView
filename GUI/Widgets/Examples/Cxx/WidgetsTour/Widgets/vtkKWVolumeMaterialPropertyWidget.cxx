@@ -36,8 +36,6 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
 
   volprop1_widget->SetVolumeProperty(volprop1);
 
-  volprop1_widget->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     volprop1_widget->GetWidgetName());
@@ -59,8 +57,6 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
 
   volprop2_widget->SetVolumeProperty(volprop1);
 
-  volprop2_widget->Delete();
-
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 15", 
     volprop2_widget->GetWidgetName());
@@ -74,6 +70,8 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
   volprop1_widget->SetPropertyChangingCommand(volprop2_widget, "Update");
   volprop1_widget->SetPropertyChangedCommand(volprop2_widget, "Update");
 
+  volprop1_widget->Delete();
+  volprop2_widget->Delete();
   volprop1->Delete();
 
   return new vtkKWVolumeMaterialPropertyWidgetItem;

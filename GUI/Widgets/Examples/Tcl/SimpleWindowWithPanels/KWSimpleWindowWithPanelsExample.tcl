@@ -14,8 +14,8 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 vtkKWApplication app
 app SetName "KWSimpleWindowWithPanelsExample"
 if {$option_test} {
-    app SetRegistryLevel 0
-    app PromptBeforeExitOff
+  app SetRegistryLevel 0
+  app PromptBeforeExitOff
 }
 app RestoreApplicationSettingsFromRegistry
 
@@ -72,10 +72,10 @@ pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
 
 set texts { "Hello, World" "Bonjour, Monde" "Hallo, Welt" }
 for {set id 0} {$id < [llength $texts]} {incr id} {
-    set rb [rbs AddWidget $id]
-    $rb SetText [lindex $texts $id]
-    $rb SetCommand hello_label "SetText \"[lindex $texts $id]\""
-    $rb SetBalloonHelpString "Set label text"
+  set rb [rbs AddWidget $id]
+  $rb SetText [lindex $texts $id]
+  $rb SetCommand hello_label "SetText \"[lindex $texts $id]\""
+  $rb SetBalloonHelpString "Set label text"
 }
 
 # Select the first label text in the set, and show/raise  the panel now
@@ -169,31 +169,31 @@ bg_toolbar_label Delete
 set nb_buttons 10
 set objects {}
 for {set i 0} {$i < $nb_buttons} {incr i} {
-    set hue [expr double($i) * (1.0 / double($nb_buttons))]
+  set hue [expr double($i) * (1.0 / double($nb_buttons))]
 
-    set rgb [math HSVToRGB $hue 1.0 1.0]
-    set fg_button "fg_button$i"
-    vtkKWPushButton $fg_button
-    $fg_button SetParent [fg_toolbar GetFrame]
-    $fg_button Create app
-    $fg_button SetCommand hello_label "SetForegroundColor $rgb"
-    $fg_button SetWidth 2
-    eval $fg_button SetBackgroundColor $rgb
-    $fg_button SetBalloonHelpString "Set the label foreground color"
-    fg_toolbar AddWidget $fg_button
-    lappend objects $fg_button
+  set rgb [math HSVToRGB $hue 1.0 1.0]
+  set fg_button "fg_button$i"
+  vtkKWPushButton $fg_button
+  $fg_button SetParent [fg_toolbar GetFrame]
+  $fg_button Create app
+  $fg_button SetCommand hello_label "SetForegroundColor $rgb"
+  $fg_button SetWidth 2
+  eval $fg_button SetBackgroundColor $rgb
+  $fg_button SetBalloonHelpString "Set the label foreground color"
+  fg_toolbar AddWidget $fg_button
+  lappend objects $fg_button
 
-    set rgb [math HSVToRGB $hue 0.5 0.5]
-    set bg_button "bg_button$i"
-    vtkKWPushButton $bg_button
-    $bg_button SetParent [bg_toolbar GetFrame]
-    $bg_button Create app
-    $bg_button SetCommand hello_label "SetBackgroundColor $rgb"
-    $bg_button SetWidth 2
-    eval $bg_button SetBackgroundColor $rgb
-    $bg_button SetBalloonHelpString "Set the label background color"
-    bg_toolbar AddWidget $bg_button
-    lappend objects $bg_button
+  set rgb [math HSVToRGB $hue 0.5 0.5]
+  set bg_button "bg_button$i"
+  vtkKWPushButton $bg_button
+  $bg_button SetParent [bg_toolbar GetFrame]
+  $bg_button Create app
+  $bg_button SetCommand hello_label "SetBackgroundColor $rgb"
+  $bg_button SetWidth 2
+  eval $bg_button SetBackgroundColor $rgb
+  $bg_button SetBalloonHelpString "Set the label background color"
+  bg_toolbar AddWidget $bg_button
+  lappend objects $bg_button
 }
 
 # Start the application
@@ -202,8 +202,8 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
 set ret 0
 win Display
 if {!$option_test} {
-    app Start
-    set ret [app GetExitStatus]
+  app Start
+  set ret [app GetExitStatus]
 }
 win Close
 

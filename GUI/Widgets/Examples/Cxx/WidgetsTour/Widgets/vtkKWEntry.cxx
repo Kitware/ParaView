@@ -32,8 +32,6 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     entry1->GetWidgetName());
 
-  entry1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another entry, but larger, and read-only
@@ -50,8 +48,6 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     entry2->GetWidgetName());
 
-  entry2->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another entry, with a label this time
@@ -67,8 +63,6 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     entry3->GetWidgetName());
-
-  entry3->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -111,6 +105,9 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     entry_set->GetWidgetName());
 
+  entry1->Delete();
+  entry2->Delete();
+  entry3->Delete();
   entry_set->Delete();
 
   return new vtkKWEntryItem;

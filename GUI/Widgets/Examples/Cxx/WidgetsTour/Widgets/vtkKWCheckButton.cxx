@@ -39,7 +39,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   vtkKWCheckButton *cb2 = vtkKWCheckButton::New();
   cb2->SetParent(parent);
   cb2->Create(app);
-  cb2->SetImageOption(vtkKWIcon::IconLock);
+  cb2->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
   cb2->IndicatorOff();
   cb2->SetBalloonHelpString("This time, use one of the predefined icon");
 

@@ -44,9 +44,6 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
     "pack %s %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     radiob1->GetWidgetName(), radiob1b->GetWidgetName());
 
-  radiob1->Delete();
-  radiob1b->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create two radiobuttons. Use icons
@@ -56,14 +53,14 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   vtkKWRadioButton *radiob2 = vtkKWRadioButton::New();
   radiob2->SetParent(parent);
   radiob2->Create(app);
-  radiob2->SetImageOption(vtkKWIcon::IconPlus);
+  radiob2->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
   radiob2->IndicatorOff();
   radiob2->SetValue("foo");
 
   vtkKWRadioButton *radiob2b = vtkKWRadioButton::New();
   radiob2b->SetParent(parent);
   radiob2b->Create(app);
-  radiob2b->SetImageOption(vtkKWIcon::IconMinus);
+  radiob2b->SetImageToPredefinedIcon(vtkKWIcon::IconMinus);
   radiob2b->IndicatorOff();
   radiob2b->SetValue("bar");
 
@@ -73,9 +70,6 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   app->Script(
     "pack %s %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     radiob2->GetWidgetName(), radiob2b->GetWidgetName());
-
-  radiob2->Delete();
-  radiob2b->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -109,6 +103,10 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     radiob_set->GetWidgetName());
 
+  radiob1->Delete();
+  radiob1b->Delete();
+  radiob2->Delete();
+  radiob2b->Delete();
   radiob_set->Delete();
 
   // -----------------------------------------------------------------------

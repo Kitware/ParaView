@@ -33,8 +33,6 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
     pushbutton1->GetWidgetName());
 
-  pushbutton1->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create another push button, use an icon
@@ -42,15 +40,13 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
   vtkKWPushButton *pushbutton2 = vtkKWPushButton::New();
   pushbutton2->SetParent(parent);
   pushbutton2->Create(app);
-  pushbutton2->SetImageOption(vtkKWIcon::IconConnection);
+  pushbutton2->SetImageToPredefinedIcon(vtkKWIcon::IconConnection);
   pushbutton2->SetBalloonHelpString(
     "Another pushbutton, using one of the predefined icons");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     pushbutton2->GetWidgetName());
-
-  pushbutton2->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -68,8 +64,6 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     pushbutton3->GetWidgetName());
-
-  pushbutton3->Delete();
 
   // -----------------------------------------------------------------------
 
@@ -110,6 +104,9 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     pushbutton_set->GetWidgetName());
 
+  pushbutton1->Delete();
+  pushbutton2->Delete();
+  pushbutton3->Delete();
   pushbutton_set->Delete();
 
   // TODO: add callbacks

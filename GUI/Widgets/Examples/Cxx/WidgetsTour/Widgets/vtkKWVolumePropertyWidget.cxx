@@ -30,8 +30,6 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   app->Script("pack %s -side top -fill both -expand y", 
               framews->GetWidgetName());
     
-  framews->Delete();
-
   // -----------------------------------------------------------------------
 
   // Create a volume property widget
@@ -42,8 +40,6 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
  
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               vpw->GetWidgetName());
-
-  vpw->Delete();
 
   // Create a volume property and assign it
   // We need color tfuncs, opacity, and gradient
@@ -66,13 +62,14 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   vp->SetScalarOpacity(0, ofun);
   vp->SetGradientOpacity(0, gfun);
 
-  cfun->Delete();
-  ofun->Delete();
-  gfun->Delete();
-
   vpw->SetVolumeProperty(vp);
   vpw->SetWindowLevel(128, 128);
 
+  framews->Delete();
+  vpw->Delete();
+  cfun->Delete();
+  ofun->Delete();
+  gfun->Delete();
   vp->Delete();
 
   return new vtkKWVolumePropertyWidgetItem;
