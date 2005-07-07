@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.41");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.42");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -215,6 +215,17 @@ void vtkPVAnimationScene::PrepareForDelete()
       this->AnimationSceneProxy->GetProperty("RenderModule"));
     pp->RemoveAllProxies();
     this->AnimationSceneProxy->UpdateVTKObjects();
+    // Make sure the AnimationScene is deleted here. It holds a reference
+    // to the render module (therefore, the render window) which should
+    // be deleted before the render widget is destroyed.
+    this->AnimationSceneProxy->Delete();
+    this->AnimationSceneProxy = 0;
+    }
+  if (this->AnimationSceneProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("animation_scene",
+      this->AnimationSceneProxyName);
+    this->SetAnimationSceneProxyName(0);
     }
   this->SetRenderView(0);
   this->SetAnimationManager(0);
