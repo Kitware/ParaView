@@ -124,6 +124,7 @@ public:
   void ForceRender();
   void EventuallyRender();
   void EventuallyRenderCallBack();
+  void DisableRendering();
 
   // Description:
   // Tcl "update" has to be called for various reasons (packing).

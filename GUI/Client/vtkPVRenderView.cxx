@@ -140,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.391");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.392");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -593,8 +593,25 @@ void vtkPVRenderView::PrepareForDelete()
       this->CameraIcons[cc] = 0;
       }
     }
+
+  if (this->TimerToken)
+    {
+    Tcl_DeleteTimerHandler( this->TimerToken );
+    this->TimerToken = NULL;
+    }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DisableRendering()
+{
+  if (this->TimerToken)
+    {
+    Tcl_DeleteTimerHandler( this->TimerToken );
+    this->TimerToken = NULL;
+    }
+
+  this->StartBlockingRender();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Close()
