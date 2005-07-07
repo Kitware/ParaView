@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.745");
+vtkCxxRevisionMacro(vtkPVWindow, "1.746");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -487,13 +487,6 @@ void vtkPVWindow::PrepareForDelete()
       }
     }
 
-  if (this->AnimationManager)
-    {
-    this->AnimationManager->PrepareForDelete();
-    this->AnimationManager->Delete();
-    this->AnimationManager = NULL;
-    }
-
   // Color maps have circular references because they
   // reference renderview.
 
@@ -640,6 +633,17 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->SourceLists->Delete();
     this->SourceLists = NULL;
+    }
+
+  // This should happen after all sources are deleted otherwise
+  // the animation objects will not remove their reference to
+  // PVSource objects and might invoke callbacks on invalid PVSource
+  // pointers.
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->PrepareForDelete();
+    this->AnimationManager->Delete();
+    this->AnimationManager = NULL;
     }
 
   if (this->MainView)
