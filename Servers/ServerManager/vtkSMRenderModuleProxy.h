@@ -132,6 +132,12 @@ public:
   void SynchronizeCameraProperties();
 
   // Description:
+  // Internal method do not call directly. 
+  // Synchornizes the properties of the 2D and 3D renders before
+  // each render.
+  void SynchronizeRenderers();
+
+  // Description:
   // Generate a screenshot from the render window.
   // Mostly here for batch mode testing.
   int WriteImage(const char* filename, const char* writerName);
@@ -231,6 +237,7 @@ protected:
   int RenderInterruptsEnabled;
   int ResetCameraClippingRangeTag;
   int AbortCheckTag;
+  int StartRenderEventTag;
 
   // Description:
   // Method called before/after Still Render is called.

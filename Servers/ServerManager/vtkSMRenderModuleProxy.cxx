@@ -44,7 +44,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkErrorCode.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.10");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -53,7 +53,8 @@ vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.9");
 void vtkSMRenderModuleResetCameraClippingRange(
  vtkObject *, unsigned long vtkNotUsed(event),void *clientData, void *)
 {
-  vtkSMRenderModuleProxy* self = (vtkSMRenderModuleProxy*)clientData;
+  vtkSMRenderModuleProxy* self = 
+    reinterpret_cast<vtkSMRenderModuleProxy*>(clientData);
   if(self)
     {
     self->ResetCameraClippingRange();
@@ -63,10 +64,22 @@ void vtkSMRenderModuleResetCameraClippingRange(
 void vtkSMRenderModuleProxyAbortCheck(
   vtkObject*, unsigned long, void* arg, void*)
 {
-  vtkSMRenderModuleProxy* self = (vtkSMRenderModuleProxy*) arg;
+  vtkSMRenderModuleProxy* self = 
+    reinterpret_cast<vtkSMRenderModuleProxy*>(arg);
   if (self && self->GetRenderInterruptsEnabled())
     {
     self->InvokeEvent(vtkCommand::AbortCheckEvent, NULL);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxyStartRenderEvent(
+  vtkObject*, unsigned long, void* arg, void*)
+{
+  vtkSMRenderModuleProxy* self = reinterpret_cast<vtkSMRenderModuleProxy*>(arg);
+  if (self)
+    {
+    self->SynchronizeRenderers();
     }
 }
 
@@ -86,6 +99,7 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->DisplayXMLName = 0;
   this->ResetCameraClippingRangeTag = 0;
   this->AbortCheckTag = 0;
+  this->StartRenderEventTag = 0;
   this->RenderInterruptsEnabled = 1;
 
   this->Renderer = 0;
@@ -108,6 +122,11 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
     {
     this->GetRenderWindow()->RemoveObserver(this->AbortCheckTag);
     this->AbortCheckTag = 0;
+    }
+  if (this->StartRenderEventTag && this->Renderer)
+    {
+    this->Renderer->RemoveObserver(this->StartRenderEventTag);
+    this->StartRenderEventTag = 0;
     }
   this->Displays->Delete();
   this->RendererProps->Delete();
@@ -227,7 +246,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   // don't take intersection of servers on which they are created before
   // setting as yet.
   this->GetRenderer()->SetActiveCamera(this->ActiveCamera);
-  this->GetRenderer2D()->SetActiveCamera(this->ActiveCamera);
+  // the 2D active camera is excplicitly synchronized with this->ActiveCamera.
   
   if (pvm->GetOptions()->GetUseStereoRendering())
     {
@@ -328,6 +347,14 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->AbortCheckTag =
     this->GetRenderWindow()->AddObserver(vtkCommand::AbortCheckEvent, abc);
   abc->Delete();
+
+  vtkCallbackCommand* src = vtkCallbackCommand::New();
+  src->SetCallback(vtkSMRenderModuleProxyStartRenderEvent);
+  src->SetClientData(this);
+  this->StartRenderEventTag =
+    this->GetRenderer()->AddObserver(vtkCommand::StartEvent, src);
+  src->Delete();
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -811,6 +838,28 @@ void vtkSMRenderModuleProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
     this->Renderer2DProps->RemoveItem(proxy);
     vtkProcessModule::GetProcessModule()->SendStream(
       this->RendererProxy->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::SynchronizeRenderers()
+{
+  // Synchronize the camera properties between the 3D and 2D renders.
+  if (this->Renderer && this->Renderer2D)
+    {
+    this->Renderer2D->GetActiveCamera()->SetClippingRange(
+      this->Renderer->GetActiveCamera()->GetClippingRange());
+    this->Renderer2D->GetActiveCamera()->SetPosition(
+      this->Renderer->GetActiveCamera()->GetPosition());
+    this->Renderer2D->GetActiveCamera()->SetFocalPoint(
+      this->Renderer->GetActiveCamera()->GetFocalPoint());
+    this->Renderer2D->GetActiveCamera()->SetViewUp(
+      this->Renderer->GetActiveCamera()->GetViewUp());
+
+    this->Renderer2D->GetActiveCamera()->SetParallelProjection(
+      this->Renderer->GetActiveCamera()->GetParallelProjection());
+    this->Renderer2D->GetActiveCamera()->SetParallelScale(
+      this->Renderer->GetActiveCamera()->GetParallelScale());
     }
 }
 
