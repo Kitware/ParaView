@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.28");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -431,7 +431,7 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
       "Place the editor in window/level mode.");
     this->WindowLevelModeCheckButton->SetCommand(
       this, "WindowLevelModeCallback");
-    this->WindowLevelModeCheckButton->SetImageOption(
+    this->WindowLevelModeCheckButton->SetImageToPredefinedIcon(
       vtkKWIcon::IconWindowLevel);
     }
 }

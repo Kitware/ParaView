@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.34");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.35");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -1380,7 +1380,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
 
     // Update the image
 
-    this->ColorRamp->SetImageOption(
+    this->ColorRamp->SetImageToPixels(
       img_buffer, img_width, img_height, 3);
 
     delete [] img_buffer;

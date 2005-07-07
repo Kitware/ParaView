@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.35");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.36");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -189,11 +189,11 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
     this->PopupPushButton->SetPadX(0);
     this->PopupPushButton->SetPadY(0);
 
-    this->PopupPushButton->SetImageOption(image_arrow, 
-                                          image_arrow_width, 
-                                          image_arrow_height, 
-                                          image_arrow_pixel_size,
-                                          image_arrow_buffer_length);
+    this->PopupPushButton->SetImageToPixels(image_arrow, 
+                                            image_arrow_width, 
+                                            image_arrow_height, 
+                                            image_arrow_pixel_size,
+                                            image_arrow_buffer_length);
 
     this->ThumbWheel->SetParent(this->TopLevel);
     }
@@ -1463,10 +1463,10 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
 
   // Update the Tk photo
 
-  this->ThumbWheel->SetImageOption(img_buffer,
-                                   this->ThumbWheelWidth, 
-                                   this->ThumbWheelHeight, 
-                                   img_pixel_size);
+  this->ThumbWheel->SetImageToPixels(img_buffer,
+                                     this->ThumbWheelWidth, 
+                                     this->ThumbWheelHeight, 
+                                     img_pixel_size);
 
   delete [] img_buffer;
 }

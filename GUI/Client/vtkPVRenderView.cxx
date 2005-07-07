@@ -140,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.390");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.391");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -669,11 +669,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
     "Switch back and forth between the current view properties and the" 
     VTK_PV_VIEW_MENU_LABEL ".");
 
-  this->PropertiesButton->SetImageOption(image_properties, 
-                                         image_properties_width, 
-                                         image_properties_height, 
-                                         image_properties_pixel_size,
-                                         image_properties_buffer_length);
+  this->PropertiesButton->SetImageToPixels(image_properties, 
+                                           image_properties_width, 
+                                           image_properties_height, 
+                                           image_properties_pixel_size,
+                                           image_properties_buffer_length);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
                this->Label->GetWidgetName(),
@@ -771,10 +771,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
   this->SelectionWindowButton->Create(app);
   this->SelectionWindowButton->SetHighlightThickness(0);
   this->SelectionWindowButton->SetIndicator(0);
-  this->SelectionWindowButton->SetImageOption(
-    "PVSelectionWindowButton");
-  this->SelectionWindowButton->SetImageOption(
-    "PVSelectionWindowButton", "-selectimage");
+  this->SelectionWindowButton->SetConfigurationOption(
+    "-image", "PVSelectionWindowButton");
+  this->SelectionWindowButton->SetConfigurationOption(
+    "-selectimage", "PVSelectionWindowButton");
 
   this->SelectionWindowButton->SetBalloonHelpString(
     "Switch to selection window mode.");
@@ -786,10 +786,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
   this->NavigationWindowButton->Create(app);
   this->NavigationWindowButton->SetHighlightThickness(0);
   this->NavigationWindowButton->SetIndicator(0);
-  this->NavigationWindowButton->SetImageOption(
-    "PVNavigationWindowButton");
-  this->NavigationWindowButton->SetImageOption(
-    "PVNavigationWindowButton", "-selectimage");
+  this->NavigationWindowButton->SetConfigurationOption(
+    "-image", "PVNavigationWindowButton");
+  this->NavigationWindowButton->SetConfigurationOption(
+    "-selectimage", "PVNavigationWindowButton");
 
   this->NavigationWindowButton->SetBalloonHelpString(
     "Switch to navigation window mode.");

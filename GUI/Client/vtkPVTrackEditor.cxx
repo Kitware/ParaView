@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.10");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.11");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -193,7 +193,8 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
   this->TypeMenuButton->SetParent(this->PropertiesFrame);
   this->TypeMenuButton->Create(app);
   this->TypeMenuButton->SetReliefToFlat();
-  this->TypeMenuButton->SetImageOption("PVToolbarPullDownArrow");
+  this->TypeMenuButton->SetConfigurationOption(
+    "-image", "PVToolbarPullDownArrow");
   this->TypeMenuButton->SetBalloonHelpString(
     "Specify the type of interpolation "
     "starting at the active key frame.");
@@ -415,25 +416,25 @@ void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_RAMP_INDEX);
-    this->TypeImage->SetImageOption("PVRamp");
+    this->TypeImage->SetConfigurationOption("-image", "PVRamp");
     }
   else if (vtkPVBooleanKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_STEP_INDEX);
-    this->TypeImage->SetImageOption("PVStep");
+    this->TypeImage->SetConfigurationOption("-image", "PVStep");
     }
   else if (vtkPVExponentialKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
       VTK_PV_EXPONENTIAL_INDEX);
-    this->TypeImage->SetImageOption("PVExponential");
+    this->TypeImage->SetConfigurationOption("-image", "PVExponential");
     }
   else if (vtkPVSinusoidKeyFrame::SafeDownCast(keyframe))
     {
     this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio",
       VTK_PV_SINUSOID_INDEX);
-    this->TypeImage->SetImageOption("PVSinusoid");
+    this->TypeImage->SetConfigurationOption("-image", "PVSinusoid");
     }
   else
     {

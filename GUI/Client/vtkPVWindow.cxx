@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.746");
+vtkCxxRevisionMacro(vtkPVWindow, "1.747");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -909,7 +909,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   
   this->ResetCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->ResetCameraButton->Create(app);
-  this->ResetCameraButton->SetImageOption("PVResetViewButton");
+  this->ResetCameraButton->SetConfigurationOption("-image", "PVResetViewButton");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   this->ResetCameraButton->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(this->ResetCameraButton);
@@ -939,9 +939,9 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->RotateCameraButton->Create(app);
   this->RotateCameraButton->SetIndicator(0);
   this->RotateCameraButton->SetHighlightThickness(0);
-  this->RotateCameraButton->SetImageOption("PVRotateViewButton");
-  this->RotateCameraButton->SetImageOption(
-    "PVRotateViewButtonActive", "-selectimage");
+  this->RotateCameraButton->SetConfigurationOption("-image", "PVRotateViewButton");
+  this->RotateCameraButton->SetConfigurationOption(
+    "-selectimage", "PVRotateViewButtonActive");
   this->RotateCameraButton->SetBalloonHelpString(
     "3D Movements Interaction Mode\nThis interaction mode can be configured "
     "from View->3D View Properties->Camera");
@@ -958,9 +958,10 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->TranslateCameraButton->Create(app);
   this->TranslateCameraButton->SetIndicator(0);
   this->TranslateCameraButton->SetHighlightThickness(0);
-  this->TranslateCameraButton->SetImageOption("PVTranslateViewButton");
-  this->TranslateCameraButton->SetImageOption(
-    "PVTranslateViewButtonActive", "-selectimage");
+  this->TranslateCameraButton->SetConfigurationOption(
+    "-image", "PVTranslateViewButton");
+  this->TranslateCameraButton->SetConfigurationOption(
+    "-selectimage", "PVTranslateViewButtonActive");
 
   this->TranslateCameraButton->SetBalloonHelpString(
     "2D Movements Interaction Mode\nThis mode can be used in conjunction with "
@@ -993,7 +994,7 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   vtkKWPushButton* button = vtkKWPushButton::New();
   button->SetParent(this->Toolbar->GetFrame());
   button->Create(this->GetPVApplication());
-  button->SetImageOption(imageName);
+  button->SetConfigurationOption("-image", imageName);
   // Add the button to the toolbar configuration menu.
   vtkKWMenu* menu = this->ToolbarMenuButton->GetMenu();
   char* var = menu->CreateCheckButtonVariable(this, buttonName);
@@ -1154,14 +1155,14 @@ void vtkPVWindow::Create(vtkKWApplication *app)
     }
   this->LookmarkButton->SetParent(this->LookmarkToolbar->GetFrame());
   this->LookmarkButton->Create(app);
-  this->LookmarkButton->SetImageOption("PVLookmarkButton");
+  this->LookmarkButton->SetConfigurationOption("-image", "PVLookmarkButton");
   this->LookmarkButton->SetBalloonHelpString("Create a lookmark of the current view.");
   this->LookmarkButton->SetCommand(this->PVLookmarkManager, "CreateLookmarkCallback");
   this->LookmarkToolbar->InsertWidget(0,this->LookmarkButton);
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);
   this->ToolbarMenuButton->Create(app);
-  this->ToolbarMenuButton->SetImageOption("PVToolbarPullDownArrow");
+  this->ToolbarMenuButton->SetConfigurationOption("-image", "PVToolbarPullDownArrow");
   this->ToolbarMenuButton->SetReliefToFlat();
   this->ToolbarMenuButton->IndicatorOff();
 
@@ -1185,7 +1186,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->PickCenterButton->Create(app);
-  this->PickCenterButton->SetImageOption("PVPickCenterButton");
+  this->PickCenterButton->SetConfigurationOption("-image", "PVPickCenterButton");
   ostrstream command;
   command << "SetInteractorStyle " << INTERACTOR_STYLE_CENTER_OF_ROTATION 
           << ends;
@@ -1197,7 +1198,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   
   this->ResetCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->ResetCenterButton->Create(app);
-  this->ResetCenterButton->SetImageOption("PVResetCenterButton");
+  this->ResetCenterButton->SetConfigurationOption("-image", "PVResetCenterButton");
   this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
   this->ResetCenterButton->SetBalloonHelpString(
     "Reset the center of rotation to the center of the current data set.");
@@ -1205,7 +1206,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
 
   this->HideCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->HideCenterButton->Create(app);
-  this->HideCenterButton->SetImageOption("PVHideCenterButton");
+  this->HideCenterButton->SetConfigurationOption("-image", "PVHideCenterButton");
   this->HideCenterButton->SetCommand(this, "ToggleCenterActorCallback");
   this->HideCenterButton->SetBalloonHelpString(
     "Hide the center of rotation to the center of the current data set.");
@@ -1214,7 +1215,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->CenterEntryOpenCloseButton->SetParent(
     this->PickCenterToolbar->GetFrame());
   this->CenterEntryOpenCloseButton->Create(app);
-  this->CenterEntryOpenCloseButton->SetImageOption("PVEditCenterButtonOpen");
+  this->CenterEntryOpenCloseButton->SetConfigurationOption("-image", "PVEditCenterButtonOpen");
   this->CenterEntryOpenCloseButton->SetBalloonHelpString(
     "Edit the center of rotation xyz coordinates.");
   this->CenterEntryOpenCloseButton->SetCommand(this, "CenterEntryOpenCallback");
@@ -1569,11 +1570,12 @@ void vtkPVWindow::UpdateStatusImage()
   vtkKWLabel *status_image = this->GetStatusImage();
   if (status_image && status_image->IsCreated())
     {
-    vtksys_stl::string image_name(status_image->GetImageOption());
+    vtksys_stl::string image_name(
+      status_image->GetConfigurationOption("-image"));
     if (!image_name.size() || !*image_name.c_str())
       {
       image_name = status_image->Script("image create photo");
-      status_image->SetImageOption(image_name.c_str());
+      status_image->SetConfigurationOption("-image", image_name.c_str());
       }
 
     // Update status image

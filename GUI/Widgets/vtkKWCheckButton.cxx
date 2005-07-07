@@ -14,10 +14,11 @@
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.36");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -184,56 +185,23 @@ void vtkKWCheckButton::Configure()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::SetImageOption(int icon_index,
-                                      const char *blend_color_option,
-                                      const char *image_option)
+void vtkKWCheckButton::SetImageToPixels(
+  const unsigned char* pixels, 
+  int width, 
+  int height,
+  int pixel_size,
+  unsigned long buffer_length)
 {
-  this->Superclass::SetImageOption(
-    icon_index, blend_color_option, image_option);
-  if (!blend_color_option && !image_option)
-    {
-    this->Superclass::SetImageOption(
-      icon_index, "-selectcolor", "-selectimage");
-    }
-}
+  this->Superclass::SetImageToPixels(
+    pixels, width, height, pixel_size, buffer_length);
 
-//----------------------------------------------------------------------------
-void vtkKWCheckButton::SetImageOption(vtkKWIcon* icon,
-                                      const char *blend_color_option,
-                                      const char *image_option)
-{
-  this->Superclass::SetImageOption(icon, blend_color_option, image_option);
-  if (!blend_color_option && !image_option)
-    {
-    this->Superclass::SetImageOption(icon, "-selectcolor", "-selectimage");
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCheckButton::SetImageOption(const unsigned char* data, 
-                                      int width, 
-                                      int height,
-                                      int pixel_size,
-                                      unsigned long buffer_length,
-                                      const char *blend_color_option,
-                                      const char *image_option)
-{
-  this->Superclass::SetImageOption(
-    data, width, height, pixel_size, buffer_length, 
-    blend_color_option, image_option);
-  if (!blend_color_option && !image_option)
-    {
-    this->Superclass::SetImageOption(
-      data, width, height, pixel_size, buffer_length, 
-      "-selectcolor", "-selectimage");
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCheckButton::SetImageOption(const char *image_name,
-                                      const char *image_option)
-{
-  this->Superclass::SetImageOption(image_name, image_option);
+  vtkKWTkUtilities::SetImageOptionToPixels(
+    this,
+    pixels, 
+    width, height, pixel_size,
+    buffer_length,
+    "-selectcolor", 
+    "-selectimage");
 }
 
 // ---------------------------------------------------------------------------

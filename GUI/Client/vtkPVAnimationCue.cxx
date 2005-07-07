@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.35");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.36");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -502,7 +502,7 @@ void vtkPVAnimationCue::SetImageType(int type)
     case vtkPVAnimationCue::NONE:
       break;
     case vtkPVAnimationCue::IMAGE_OPEN:
-      this->Image->SetImageOption(
+      this->Image->SetImageToPixels(
         image_open,
         image_open_width,
         image_open_height,
@@ -510,7 +510,7 @@ void vtkPVAnimationCue::SetImageType(int type)
         image_open_buffer_length);
       break;
     case vtkPVAnimationCue::IMAGE_CLOSE:
-      this->Image->SetImageOption(
+      this->Image->SetImageToPixels(
         image_close,
         image_close_width,
         image_close_height,

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.13");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.14");
 
 int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LabelCaseUppercaseFirst;
 int vtkKWFrameLabeled::BoldLabel = 1;
@@ -213,7 +213,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
   // Force label icon to be created now, so that we can set its image option.
 
   this->Label->ShowLabelOn();
-  this->GetLabelIcon()->SetImageOption(vtkKWIcon::IconLock);
+  this->GetLabelIcon()->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
   this->Script("%s config -bd 0 -pady 0 -padx 0", 
                this->GetLabelIcon()->GetWidgetName());
 
@@ -235,7 +235,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
 
   this->Icon->SetParent(this);
   this->Icon->Create(app);
-  this->Icon->SetImageOption(this->IconData);
+  this->Icon->SetImageToIcon(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
@@ -284,7 +284,7 @@ void vtkKWFrameLabeled::PerformShowHideFrame()
     this->Displayed = 1;
     this->IconData->SetImage(vtkKWIcon::IconShrink);
    }
-  this->Icon->SetImageOption(this->IconData);
+  this->Icon->SetImageToIcon(this->IconData);
 }
 
 //----------------------------------------------------------------------------

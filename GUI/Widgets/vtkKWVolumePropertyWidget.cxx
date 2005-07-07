@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.14");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -424,7 +424,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->LockOpacityAndColorCheckButton->SetCommand(
     this, "LockOpacityAndColorCallback");
 
-  this->LockOpacityAndColorCheckButton->SetImageOption(vtkKWIcon::IconLock);
+  this->LockOpacityAndColorCheckButton->SetImageToPredefinedIcon(
+    vtkKWIcon::IconLock);
  
   tk_cmd << "pack " << this->LockOpacityAndColorCheckButton->GetWidgetName() 
          << " -side left -fill both -padx 2" << endl;

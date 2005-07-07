@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.134");
+vtkCxxRevisionMacro(vtkKWWidget, "1.135");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -934,131 +934,45 @@ int vtkKWWidget::GetPadY()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageOption(int icon_index,
-                                 const char *blend_color_option,
-                                 const char *image_option)
+void vtkKWWidget::SetImageToPredefinedIcon(int icon_index)
 {
   vtkKWIcon *icon = vtkKWIcon::New();
   icon->SetImage(icon_index);
-  this->SetImageOption(icon, blend_color_option, image_option);
+  this->SetImageToIcon(icon); // , blend_color_option, image_option);
   icon->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageOption(vtkKWIcon* icon,
-                                 const char *blend_color_option,
-                                 const char *image_option)
+void vtkKWWidget::SetImageToIcon(vtkKWIcon* icon)
 {
   if (!icon)
     {
     return;
     }
 
-  this->SetImageOption(icon->GetData(), 
-                       icon->GetWidth(), 
-                       icon->GetHeight(), 
-                       icon->GetPixelSize(),
-                       0,
-                       blend_color_option, 
-                       image_option);
+  this->SetImageToPixels(icon->GetData(), 
+                         icon->GetWidth(), 
+                         icon->GetHeight(), 
+                         icon->GetPixelSize(),
+                         0);
+  // blend_color_option, 
+  // image_option);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageOption(const unsigned char* data, 
-                                 int width, 
-                                 int height,
-                                 int pixel_size,
-                                 unsigned long buffer_length,
-                                 const char *blend_color_option,
-                                 const char *image_option)
+void vtkKWWidget::SetImageToPixels(const unsigned char* pixels, 
+                                   int width, 
+                                   int height,
+                                   int pixel_size,
+                                   unsigned long buffer_length)
 {
-  if (!this->IsCreated())
-    {
-    vtkWarningMacro("Widget is not created yet !");
-    return;
-    }
-
-  if (!image_option || !*image_option)
-    {
-    image_option = "-image";
-    }
-
-  if (!this->HasConfigurationOption(image_option))
-    {
-    return;
-    }
-
-  if (!this->HasConfigurationOption(image_option))
-    {
-    return;
-    }
-
-  ostrstream image_name;
-  image_name << this->GetWidgetName() << "." << &image_option[1] << ends;
-
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  // This work-around is put here to "fix" what looks like a bug
-  // in Tk. Without this, there seems to be some weird problems
-  // with Tk picking some alpha values for some colors.
-  this->Script("catch {destroy %s}", image_name.str());
-#endif
-  
-  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
-                                     image_name.str(),
-                                     data, 
-                                     width, height, pixel_size,
-                                     buffer_length,
-                                     this->GetWidgetName(),
-                                     blend_color_option))
-    {
-    vtkWarningMacro("Error updating Tk photo " << image_name.str());
-    image_name.rdbuf()->freeze(0);
-    return;
-    }
-
-  this->SetImageOption(image_name.str(), image_option);
-
-  image_name.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetImageOption(const char *image_name,
-                                 const char *image_option)
-{
-  if (!this->IsCreated())
-    {
-    vtkWarningMacro("Widget is not created yet !");
-    return;
-    }
-
-  if (!image_option || !*image_option)
-    {
-    image_option = "-image";
-    }
-
-  if (!this->HasConfigurationOption(image_option))
-    {
-    return;
-    }
-
-  if (!image_name)
-    {
-    image_name = "";
-    }
-
-  this->Script("%s configure %s {%s}", 
-               this->GetWidgetName(), image_option, image_name);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::GetImageOption(const char *image_option)
-{
-  if (!image_option || !*image_option)
-    {
-    image_option = "-image";
-    }
-
-  return this->GetConfigurationOption(image_option);
+  vtkKWTkUtilities::SetImageOptionToPixels(
+    this,
+    pixels, 
+    width, height, pixel_size,
+    buffer_length,
+    NULL, // blend_color_option 
+    NULL); // image_option))
 }
 
 //----------------------------------------------------------------------------

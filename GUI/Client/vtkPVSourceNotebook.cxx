@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.22");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -337,7 +337,8 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
 
   this->AcceptPullDownArrow->SetParent(this->AcceptButton);
   this->AcceptPullDownArrow->Create(this->GetApplication());
-  this->AcceptPullDownArrow->SetImageOption("PVPullDownArrow");
+  this->AcceptPullDownArrow->SetConfigurationOption(
+    "-image", "PVPullDownArrow");
   this->Script("place %s -relx 0 -rely 1 -x -5 -y 5 -anchor se", 
                 this->AcceptPullDownArrow->GetWidgetName());
 

@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.7");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -252,33 +252,33 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   cb->SetBalloonHelpString("Select bold style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageOption(image_bold, 
-                     image_bold_width, 
-                     image_bold_height, 
-                     image_bold_pixel_size,
-                     image_bold_buffer_length);
+  cb->SetImageToPixels(image_bold, 
+                       image_bold_width, 
+                       image_bold_height, 
+                       image_bold_pixel_size,
+                       image_bold_buffer_length);
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_ITALIC_ID);
   cb->SetCommand(this, "ItalicCallback");
   cb->SetBalloonHelpString("Select italic style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageOption(image_italic, 
-                     image_italic_width, 
-                     image_italic_height, 
-                     image_italic_pixel_size,
-                     image_italic_buffer_length);
+  cb->SetImageToPixels(image_italic, 
+                       image_italic_width, 
+                       image_italic_height, 
+                       image_italic_pixel_size,
+                       image_italic_buffer_length);
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_SHADOW_ID);
   cb->SetCommand(this, "ShadowCallback");
   cb->SetBalloonHelpString("Select shadow style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageOption(image_shadow, 
-                     image_shadow_width, 
-                     image_shadow_height, 
-                     image_shadow_pixel_size,
-                     image_shadow_buffer_length);
+  cb->SetImageToPixels(image_shadow, 
+                       image_shadow_width, 
+                       image_shadow_height, 
+                       image_shadow_pixel_size,
+                       image_shadow_buffer_length);
 
   // Opacity
 
@@ -311,11 +311,11 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   // Buttons : copy button
 
   pb = pbs->AddWidget(VTK_KW_TEXT_PROP_COPY_ID);
-  pb->SetImageOption(image_copy, 
-                     image_copy_width, 
-                     image_copy_height, 
-                     image_copy_pixel_size,
-                     image_copy_buffer_length);
+  pb->SetImageToPixels(image_copy, 
+                       image_copy_width, 
+                       image_copy_height, 
+                       image_copy_pixel_size,
+                       image_copy_buffer_length);
 
   // Pack
 

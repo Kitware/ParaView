@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.14");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.15");
 
 
 //*****************************************************************************
@@ -321,7 +321,7 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     this->ToolbarButton = vtkKWPushButton::New();
     this->ToolbarButton->SetParent(win->GetLookmarkToolbar()->GetFrame());
     this->ToolbarButton->Create(this->GetPVApplication());
-    this->ToolbarButton->SetImageOption(icon);
+    this->ToolbarButton->SetImageToIcon(icon);
     this->ToolbarButton->SetBalloonHelpString(this->GetName());
     this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
     win->GetLookmarkToolbar()->AddWidget(this->ToolbarButton);
@@ -627,7 +627,7 @@ void vtkPVLookmark::SetLookmarkImage(vtkKWIcon *icon)
 {
   if(this->LmkIcon)
     {
-    this->LmkIcon->SetImageOption(icon);
+    this->LmkIcon->SetImageToIcon(icon);
     }
 }
 

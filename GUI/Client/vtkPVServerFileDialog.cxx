@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.45");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.46");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -302,7 +302,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 
   this->DownDirectoryButton->SetParent(this->TopFrame);
   this->DownDirectoryButton->Create(app);
-  this->DownDirectoryButton->SetImageOption(
+  this->DownDirectoryButton->SetImageToPixels(
     image_PVUpDirectoryButton, 
     image_PVUpDirectoryButton_width,
     image_PVUpDirectoryButton_height,

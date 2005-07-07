@@ -285,7 +285,13 @@ public:
   virtual int GetPadY();
 
   // Description:
-  // Set image option using either icon, predefined icon index (see 
+  // Specifies an image to display in the widget. Typically, if the image
+  // is specified then it overrides other options that specify a bitmap or
+  // textual value to display in the widget.
+  // Use SetConfigurationOption("-image", imagename) to use a specific
+  // pre-existing Tk image, or use one of the following convenience function.
+  // SetImageToPredefinedIcon
+  // Set the image  option using either icon, predefined icon index (see 
   // vtkKWIcon.h) or pixel data (pixels and the structure of the
   // image, i.e. width, height, pixel_size ; if buffer_length = 0, it
   // is computed using width * height * pixel_size, otherwise used as 
@@ -296,20 +302,11 @@ public:
   // (ex: -fg, -selectcolor)
   // An image is created and associated to the Tk -image option, 
   // or image_option if not NULL (ex: -selectimage).
-  virtual void SetImageOption(int icon_index,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(vtkKWIcon *icon,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(const unsigned char *data, 
-                              int width, int height, int pixel_size = 4,
-                              unsigned long buffer_length = 0,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(const char *image_name,
-                              const char *image_option = 0);
-  virtual const char* GetImageOption(const char *image_option = 0);
+  virtual void SetImageToIcon(vtkKWIcon *icon);
+  virtual void SetImageToPredefinedIcon(int icon_index);
+  virtual void SetImageToPixels(const unsigned char *pixels, 
+                                int width, int height, int pixel_size = 4,
+                                unsigned long buffer_length = 0);
   
   // Description:
   // Grab the widget (locally)

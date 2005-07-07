@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.15");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -535,7 +535,7 @@ void vtkKWMaterialPropertyWidget::UpdatePreview()
                     this->SpecularPowerScale->GetValue(), 
                     this->PreviewSize);
 
-  this->PreviewLabel->GetWidget()->SetImageOption(
+  this->PreviewLabel->GetWidget()->SetImageToPixels(
     buffer, this->PreviewSize, this->PreviewSize, pixel_size);
   
   delete [] buffer;
@@ -581,7 +581,7 @@ void vtkKWMaterialPropertyWidget::UpdatePopupPreview()
                     this->SpecularPowerScale->GetValue(), 
                     this->PopupPreviewSize);
 
-  this->PopupButton->GetWidget()->SetImageOption(
+  this->PopupButton->GetWidget()->SetImageToPixels(
     buffer, this->PopupPreviewSize, this->PopupPreviewSize, pixel_size);
   
   delete [] buffer;
@@ -643,7 +643,7 @@ void vtkKWMaterialPropertyWidget::CreatePresets()
                         (*it)->SpecularPower, 
                         this->PresetSize);
 
-      pb->SetImageOption(
+      pb->SetImageToPixels(
         buffer, this->PresetSize, this->PresetSize, pixel_size);
       
       ostrstream preset_callback;

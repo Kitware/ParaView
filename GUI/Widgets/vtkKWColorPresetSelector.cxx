@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.12");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.13");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -628,7 +628,7 @@ void vtkKWColorPresetSelector::Create(vtkKWApplication *app)
     "preset to use it.");
 
   this->GetWidget()->IndicatorOff();
-  this->GetWidget()->SetImageOption(vtkKWIcon::IconFolder);
+  this->GetWidget()->SetImageToPredefinedIcon(vtkKWIcon::IconFolder);
 
   this->PopulatePresetMenu();
 }

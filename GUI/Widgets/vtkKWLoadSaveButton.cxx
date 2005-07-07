@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.13");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -75,7 +75,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
   // Cosmetic add-on
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
-  this->SetImageOption(vtkKWIcon::IconFolder);
+  this->SetImageToPredefinedIcon(vtkKWIcon::IconFolder);
   this->Script("%s configure -compound left -padx 3 -pady 2", 
                this->GetWidgetName());
 #endif

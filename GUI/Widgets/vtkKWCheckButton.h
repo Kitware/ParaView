@@ -59,24 +59,10 @@ public:
   virtual void SetVariableName(const char *);
 
   // Description:
-  // Overriden from vtkKWWidget. If blend_color_option = 0 and 
-  // image_option = 0, this function is automatically called with the same
-  // parameters but blend_color_option = -selectcolor, 
-  // image_option = -selectimage, so that the aspect is correct when the
-  // button is checked.
-  virtual void SetImageOption(int icon_index,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(vtkKWIcon *icon,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(const unsigned char *data, 
-                              int width, int height, int pixel_size = 4,
-                              unsigned long buffer_length = 0,
-                              const char *blend_color_option = 0,
-                              const char *image_option = 0);
-  virtual void SetImageOption(const char *image_name,
-                              const char *image_option = 0);
+  // Overriden from vtkKWWidget to set the selected image too.
+  virtual void SetImageToPixels(const unsigned char *pixels, 
+                                int width, int height, int pixel_size = 4,
+                                unsigned long buffer_length = 0);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

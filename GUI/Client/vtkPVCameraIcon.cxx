@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.26");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -289,7 +289,7 @@ void vtkPVCameraIcon::StoreCamera()
       img_data->GetNumberOfScalarComponents(),
       0,
       vtkKWIcon::ImageOptionFlipVertical);
-    this->SetImageOption(icon);
+    this->SetImageToIcon(icon);
     icon->Delete();    
     resample->Delete();
     w2i->Delete();
