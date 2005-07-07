@@ -79,6 +79,10 @@ public:
   // Overridden to clean up cached geometry as well. 
   virtual void MarkConsumersAsModified();
 
+  // Description:
+  // Get the client side XY plot Widget.
+  vtkGetObjectMacro(XYPlotWidget,vtkXYPlotWidget);
+
 protected:
   vtkSMXYPlotDisplayProxy();
   ~vtkSMXYPlotDisplayProxy();

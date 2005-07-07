@@ -28,6 +28,7 @@ class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkSMXYPlotDisplayProxy;
 class vtkPVArraySelection;
+class vtkKWLoadSaveButton;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -55,6 +56,8 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
   void ArraySelectionInternalCallback();
 
+  void SaveDialogCallback();
+
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
@@ -80,6 +83,8 @@ protected:
 
   int CanShowPlot; // Flag indicating if the input is such that we can show 
     // the plot display.
+
+  vtkKWLoadSaveButton *SaveButton;
 
 private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented

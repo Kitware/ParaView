@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -369,7 +369,7 @@ void vtkPVClientServerModule::Initialize()
     // Receive the connect id from client
     this->SocketController->Receive(&connectID, 1, 1, 8843);
     int match = 1;
-    if ( (this->Options->GetConnectID() != 0) && (connectID != this->Options->GetConnectID()) )
+    if ( (connectID != this->Options->GetConnectID()) )
       {
       // If the ids do not match, disable all rmis by setting
       // this->Enabled to 0.
