@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.16");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -253,6 +253,8 @@ void vtkKWLookmarkFolder::Pack()
               this->NestedSeparatorFrame->GetWidgetName()); 
   this->Script("pack %s -fill x -expand t -side left", 
               this->LabelFrame->GetWidgetName());
+  this->Script("%s configure -bd 3",
+              this->LabelFrame->GetFrame()->GetParent()->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand t", 
               this->MainFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -expand t -fill x", 
