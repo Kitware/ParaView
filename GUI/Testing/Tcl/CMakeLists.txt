@@ -382,6 +382,17 @@ ADD_TEST(OtherTests-ParaView
 #   -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
 #   -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch00001.png
 #   )
+ADD_TEST(LabelPointIds-ParaView
+  ${PARAVIEW_EXECUTABLE}
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE}
+   --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/LabelPointIds.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/LabelPointIds.png
+  )
 
 ADD_TEST(VolumeRenderVox8-ParaView 
   ${PARAVIEW_EXECUTABLE} 
