@@ -20,8 +20,8 @@
 #include "vtkPVWindow.h"
 #include "vtkPVInformationGUI.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkKWLabelLabeled.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWLabelWithLabel.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonWithMenu.h"
 #include "vtkKWLabel.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.23");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -49,10 +49,10 @@ vtkPVSourceNotebook::vtkPVSourceNotebook()
   this->InformationGUI = vtkPVInformationGUI::New();
 
   this->DescriptionFrame = vtkKWFrame::New();
-  this->NameLabel = vtkKWLabelLabeled::New();
-  this->TypeLabel = vtkKWLabelLabeled::New();
-  this->LongHelpLabel = vtkKWLabelLabeled::New();
-  this->LabelEntry = vtkKWEntryLabeled::New();
+  this->NameLabel = vtkKWLabelWithLabel::New();
+  this->TypeLabel = vtkKWLabelWithLabel::New();
+  this->LongHelpLabel = vtkKWLabelWithLabel::New();
+  this->LabelEntry = vtkKWEntryWithLabel::New();
 
   this->ButtonFrame = vtkKWFrame::New();
   this->MainParameterFrame = vtkKWFrame::New();

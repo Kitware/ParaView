@@ -62,12 +62,12 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidget.h"
-#include "vtkKWFrameLabeled.h"
 #include "vtkKWWindow.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.43");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()

@@ -1,5 +1,5 @@
 #include "vtkKWEntry.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWEntrySet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
@@ -52,12 +52,12 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
 
   // Create another entry, with a label this time
 
-  vtkKWEntryLabeled *entry3 = vtkKWEntryLabeled::New();
+  vtkKWEntryWithLabel *entry3 = vtkKWEntryWithLabel::New();
   entry3->SetParent(parent);
   entry3->Create(app);
   entry3->SetLabelText("Another entry, with a label in front:");
   entry3->SetBalloonHelpString(
-    "This is a vtkKWEntryLabeled, i.e. a entry associated to a "
+    "This is a vtkKWEntryWithLabel, i.e. a entry associated to a "
     "label that can be positioned around the entry.");
 
   app->Script(

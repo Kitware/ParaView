@@ -21,7 +21,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.51");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -101,7 +101,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 {
   this->Internals = new vtkPVInteractorStyleControlInternal;
   this->InEvent = 0;
-  this->LabeledFrame = vtkKWFrameLabeled::New();
+  this->LabeledFrame = vtkKWFrameWithLabel::New();
   this->LabeledFrame->SetParent(this);
   this->OuterFrame = 0;
 

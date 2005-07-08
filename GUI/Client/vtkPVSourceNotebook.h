@@ -28,8 +28,8 @@
 class vtkKWApplication;
 class vtkKWNotebook;
 class vtkPVSource;
-class vtkKWLabelLabeled;
-class vtkKWEntryLabeled;
+class vtkKWLabelWithLabel;
+class vtkKWEntryWithLabel;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
 class vtkPVApplication;
@@ -127,10 +127,10 @@ protected:
   vtkPVDisplayGUI* DisplayGUI;
   vtkPVInformationGUI* InformationGUI;
   vtkKWFrame *DescriptionFrame;
-  vtkKWLabelLabeled *NameLabel;
-  vtkKWLabelLabeled *TypeLabel;
-  vtkKWEntryLabeled *LabelEntry;
-  vtkKWLabelLabeled *LongHelpLabel;
+  vtkKWLabelWithLabel *NameLabel;
+  vtkKWLabelWithLabel *TypeLabel;
+  vtkKWEntryWithLabel *LabelEntry;
+  vtkKWLabelWithLabel *LongHelpLabel;
   vtkKWFrame *ButtonFrame;
   vtkKWPushButtonWithMenu *AcceptButton;
   vtkKWPushButton *ResetButton;

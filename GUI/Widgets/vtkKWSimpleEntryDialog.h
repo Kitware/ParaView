@@ -19,7 +19,7 @@
 #include "vtkKWMessageDialog.h"
 
 class vtkKWApplication;
-class vtkKWEntryLabeled;
+class vtkKWEntryWithLabel;
 
 class KWWIDGETS_EXPORT vtkKWSimpleEntryDialog : public vtkKWMessageDialog
 {
@@ -34,7 +34,7 @@ public:
 
   // Description:
   // Access to the entry
-  vtkGetObjectMacro(Entry, vtkKWEntryLabeled);
+  vtkGetObjectMacro(Entry, vtkKWEntryWithLabel);
 
   // Description:
   // Invoke the dialog and display it in a modal manner. 
@@ -46,7 +46,7 @@ protected:
   vtkKWSimpleEntryDialog();
   ~vtkKWSimpleEntryDialog();
 
-  vtkKWEntryLabeled *Entry;
+  vtkKWEntryWithLabel *Entry;
 
 private:
   vtkKWSimpleEntryDialog(const vtkKWSimpleEntryDialog&); // Not implemented

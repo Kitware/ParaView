@@ -14,26 +14,26 @@
 // .NAME vtkKWChangeColorButton - a button for selecting colors
 // .SECTION Description
 // A button that can be pressed to select a color.
-// Note: As a subclass of vtkKWWidgetLabeled, it inherits a label and methods
+// Note: As a subclass of vtkKWWidgetWithLabel, it inherits a label and methods
 // to set its position and visibility. Note that the default label position 
 // implemented in this class is on the left of the color label. Only a subset
-// of the specific positions listed in vtkKWWidgetLabeled is supported: on 
+// of the specific positions listed in vtkKWWidgetWithLabel is supported: on 
 // Left, and on Right of the color label. 
 // .SECTION See Also
-// vtkKWWidgetLabeled
+// vtkKWWidgetWithLabel
 
 #ifndef __vtkKWChangeColorButton_h
 #define __vtkKWChangeColorButton_h
 
-#include "vtkKWWidgetLabeled.h"
+#include "vtkKWWidgetWithLabel.h"
 
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWChangeColorButton : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT vtkKWChangeColorButton : public vtkKWWidgetWithLabel
 {
 public:
   static vtkKWChangeColorButton* New();
-  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWWidgetLabeled);
+  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWWidgetWithLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

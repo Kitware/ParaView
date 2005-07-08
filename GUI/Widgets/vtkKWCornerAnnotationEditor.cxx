@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWPopupButtonLabeled.h"
-#include "vtkKWTextLabeled.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWPopupButtonWithLabel.h"
+#include "vtkKWTextWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -61,7 +61,7 @@ vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
 
   for (int i = 0; i < 4; i++)
     {
-    this->CornerText[i] = vtkKWTextLabeled::New();
+    this->CornerText[i] = vtkKWTextWithLabel::New();
     }
 }
 
@@ -310,7 +310,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     {
     if (!this->TextPropertyPopupButton)
       {
-      this->TextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
+      this->TextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
     this->TextPropertyPopupButton->Create(app);

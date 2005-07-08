@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetLabeledSubclass.h.in
+  Module:    vtkKWWidgetWithLabelSubclass.h.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,30 +11,30 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME @WidgetType@Labeled - a @WidgetType@ associated to a vtkKWLabel
+// .NAME @WidgetType@WithLabel - a @WidgetType@ associated to a vtkKWLabel
 // .SECTION Description
 // This class creates a composite widget associating a @WidgetType@ to a
 // vtkKWLabel.
-// As a subclass of vtkKWWidgetLabeled, it inherits a label and methods to
+// As a subclass of vtkKWWidgetWithLabel, it inherits a label and methods to
 // set its position and visibility. Note that the default label position 
 // implemented in this class is on the left of the @WidgetType@, but 
-// specific positions listed in vtkKWWidgetLabeled are supported as well.
+// specific positions listed in vtkKWWidgetWithLabel are supported as well.
 // .SECTION See Also
-// vtkKWWidgetLabeled @WidgetType@
+// vtkKWWidgetWithLabel @WidgetType@
 
-#ifndef __@WidgetType@Labeled_h
-#define __@WidgetType@Labeled_h
+#ifndef __@WidgetType@WithLabel_h
+#define __@WidgetType@WithLabel_h
 
-#include "vtkKWWidgetLabeled.h"
+#include "vtkKWWidgetWithLabel.h"
 
 class vtkKWApplication;
 class @WidgetType@;
 
-class KWWIDGETS_EXPORT @WidgetType@Labeled : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT @WidgetType@WithLabel : public vtkKWWidgetWithLabel
 {
 public:
-  static @WidgetType@Labeled* New();
-  vtkTypeRevisionMacro(@WidgetType@Labeled, vtkKWWidgetLabeled);
+  static @WidgetType@WithLabel* New();
+  vtkTypeRevisionMacro(@WidgetType@WithLabel, vtkKWWidgetWithLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -67,8 +67,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  @WidgetType@Labeled();
-  ~@WidgetType@Labeled();
+  @WidgetType@WithLabel();
+  ~@WidgetType@WithLabel();
 
   // Description:
   // Expand the widget that is being labeled
@@ -84,8 +84,8 @@ protected:
 
 private:
 
-  @WidgetType@Labeled(const @WidgetType@Labeled&); // Not implemented
-  void operator=(const @WidgetType@Labeled&); // Not implemented
+  @WidgetType@WithLabel(const @WidgetType@WithLabel&); // Not implemented
+  void operator=(const @WidgetType@WithLabel&); // Not implemented
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetLabeledSubclass.cxx.in
+  Module:    vtkKWWidgetWithLabelSubclass.cxx.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,25 +12,25 @@
 
 =========================================================================*/
 
-#include "@WidgetType@Labeled.h"
+#include "@WidgetType@WithLabel.h"
 
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "@WidgetType@.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(@WidgetType@Labeled);
-vtkCxxRevisionMacro(@WidgetType@Labeled, "1.6");
+vtkStandardNewMacro(@WidgetType@WithLabel);
+vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.1");
 
 //----------------------------------------------------------------------------
-@WidgetType@Labeled::@WidgetType@Labeled()
+@WidgetType@WithLabel::@WidgetType@WithLabel()
 {
   this->ExpandWidget    = 1;
   this->Widget          = @WidgetType@::New();
 }
 
 //----------------------------------------------------------------------------
-@WidgetType@Labeled::~@WidgetType@Labeled()
+@WidgetType@WithLabel::~@WidgetType@WithLabel()
 {
   if (this->Widget)
     {
@@ -40,19 +40,19 @@ vtkCxxRevisionMacro(@WidgetType@Labeled, "1.6");
 }
 
 //----------------------------------------------------------------------------
-@WidgetType@* @WidgetType@Labeled::GetWidget()
+@WidgetType@* @WidgetType@WithLabel::GetWidget()
 {
   return this->Widget;
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@Labeled::Create(vtkKWApplication *app)
+void @WidgetType@WithLabel::Create(vtkKWApplication *app)
 {
   // Check if already created
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("@WidgetType@Labeled already created");
+    vtkErrorMacro("@WidgetType@WithLabel already created");
     return;
     }
 
@@ -75,7 +75,7 @@ void @WidgetType@Labeled::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@Labeled::Pack()
+void @WidgetType@WithLabel::Pack()
 {
   if (!this->IsCreated())
     {
@@ -96,17 +96,17 @@ void @WidgetType@Labeled::Pack()
   const char *side;
   switch (this->LabelPosition)
     {
-    case vtkKWWidgetLabeled::LabelPositionTop:
+    case vtkKWWidgetWithLabel::LabelPositionTop:
       side = "top";
       break;
-    case vtkKWWidgetLabeled::LabelPositionBottom:
+    case vtkKWWidgetWithLabel::LabelPositionBottom:
       side = "bottom";
       break;
-    case vtkKWWidgetLabeled::LabelPositionRight:
+    case vtkKWWidgetWithLabel::LabelPositionRight:
       side = "right";
       break;
-    case vtkKWWidgetLabeled::LabelPositionDefault:
-    case vtkKWWidgetLabeled::LabelPositionLeft:
+    case vtkKWWidgetWithLabel::LabelPositionDefault:
+    case vtkKWWidgetWithLabel::LabelPositionLeft:
     default:
       side = "left";
       break;
@@ -131,7 +131,7 @@ void @WidgetType@Labeled::Pack()
 }
 
 // ----------------------------------------------------------------------------
-void @WidgetType@Labeled::SetExpandWidget(int _arg)
+void @WidgetType@WithLabel::SetExpandWidget(int _arg)
 {
   if (this->ExpandWidget == _arg)
     {
@@ -146,7 +146,7 @@ void @WidgetType@Labeled::SetExpandWidget(int _arg)
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@Labeled::UpdateEnableState()
+void @WidgetType@WithLabel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
   
@@ -154,7 +154,7 @@ void @WidgetType@Labeled::UpdateEnableState()
 }
 
 // ---------------------------------------------------------------------------
-void @WidgetType@Labeled::SetBalloonHelpString(const char *string)
+void @WidgetType@WithLabel::SetBalloonHelpString(const char *string)
 {
   this->Superclass::SetBalloonHelpString(string);
 
@@ -165,7 +165,7 @@ void @WidgetType@Labeled::SetBalloonHelpString(const char *string)
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@Labeled::PrintSelf(ostream& os, vtkIndent indent)
+void @WidgetType@WithLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.60");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.61");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -177,7 +177,7 @@ void vtkKWChangeColorButton::Pack()
   // Repack everything
 
   int is_before = 
-    (this->LabelPosition != vtkKWWidgetLabeled::LabelPositionRight);
+    (this->LabelPosition != vtkKWWidgetWithLabel::LabelPositionRight);
 
   if (this->LabelOutsideButton)
     {

@@ -17,9 +17,8 @@
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWCheckButton.h"
@@ -27,13 +26,13 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVPluginsDialog::vtkPVPluginsDialog()
 {
   // Build constants widgets
-  this->PluginsFrame = vtkKWFrameLabeled::New();
+  this->PluginsFrame = vtkKWFrameWithLabel::New();
   this->NameButton = vtkKWPushButton::New();
   this->TypeButton = vtkKWPushButton::New();
   this->LoadedButton = vtkKWPushButton::New();

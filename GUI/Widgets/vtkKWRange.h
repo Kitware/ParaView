@@ -14,29 +14,29 @@
 // .NAME vtkKWRange - a range widget
 // .SECTION Description
 // A widget that represents a range within a bigger range.
-// Note: As a subclass of vtkKWWidgetLabeled, it inherits a label and methods
+// Note: As a subclass of vtkKWWidgetWithLabel, it inherits a label and methods
 // to set its position and visibility. Note that the default label position 
 // implemented in this class is on the top of the range if the range 
 // direction is horizontal, on the left if is is vertical. Specific positions
-// listed in vtkKWWidgetLabeled are supported as well.
+// listed in vtkKWWidgetWithLabel are supported as well.
 // .SECTION See Also
-// vtkKWWidgetLabeled
+// vtkKWWidgetWithLabel
 
 #ifndef __vtkKWRange_h
 #define __vtkKWRange_h
 
-#include "vtkKWWidgetLabeled.h"
+#include "vtkKWWidgetWithLabel.h"
 
 class vtkKWCanvas;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWPushButtonSet;
 
-class KWWIDGETS_EXPORT vtkKWRange : public vtkKWWidgetLabeled
+class KWWIDGETS_EXPORT vtkKWRange : public vtkKWWidgetWithLabel
 {
 public:
   static vtkKWRange* New();
-  vtkTypeRevisionMacro(vtkKWRange,vtkKWWidgetLabeled);
+  vtkTypeRevisionMacro(vtkKWRange,vtkKWWidgetWithLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -186,7 +186,7 @@ public:
   // Set/Get the position of the entries (Default is top if the range 
   // direction is horizontal, left if it is vertical).
   // Note that you can also set the label position using the superclass
-  // methods (vtkKWWidgetLabeled).
+  // methods (vtkKWWidgetWithLabel).
   //BTX
   enum
   {

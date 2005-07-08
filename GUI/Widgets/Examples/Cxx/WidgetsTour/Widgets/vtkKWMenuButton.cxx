@@ -1,5 +1,5 @@
 #include "vtkKWMenuButton.h"
-#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
@@ -42,7 +42,7 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   // Create another menu button, this time with a label
 
-  vtkKWMenuButtonLabeled *menubutton2 = vtkKWMenuButtonLabeled::New();
+  vtkKWMenuButtonWithLabel *menubutton2 = vtkKWMenuButtonWithLabel::New();
   menubutton2->SetParent(parent);
   menubutton2->Create(app);
   menubutton2->SetBorderWidth(2);
@@ -53,7 +53,7 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   menubutton2->GetWidget()->IndicatorOff();
   menubutton2->GetWidget()->SetWidth(20);
   menubutton2->SetBalloonHelpString(
-    "This is a vtkKWMenuButtonLabeled, i.e. a menu button associated to a "
+    "This is a vtkKWMenuButtonWithLabel, i.e. a menu button associated to a "
     "label that can be positioned around the menu button. The indicator is "
     "hidden, and the width is set explicitly");
 

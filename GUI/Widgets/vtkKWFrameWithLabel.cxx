@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWFrameLabeled.cxx
+  Module:    vtkKWFrameWithLabel.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,36 +11,36 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 
 #include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabelLabeled.h"
+#include "vtkKWLabelWithLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.14");
+vtkStandardNewMacro( vtkKWFrameWithLabel );
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.1");
 
-int vtkKWFrameLabeled::LabelCase = vtkKWFrameLabeled::LabelCaseUppercaseFirst;
-int vtkKWFrameLabeled::BoldLabel = 1;
-int vtkKWFrameLabeled::AllowShowHide = 1;
+int vtkKWFrameWithLabel::LabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
+int vtkKWFrameWithLabel::BoldLabel = 1;
+int vtkKWFrameWithLabel::AllowShowHide = 1;
 
 //----------------------------------------------------------------------------
-vtkKWFrameLabeled::vtkKWFrameLabeled()
+vtkKWFrameWithLabel::vtkKWFrameWithLabel()
 {
   this->Border     = vtkKWFrame::New();
   this->Groove     = vtkKWFrame::New();
   this->Border2    = vtkKWFrame::New();
   this->Frame      = vtkKWFrame::New();
   this->LabelFrame = vtkKWFrame::New();
-  this->Label      = vtkKWLabelLabeled::New();
+  this->Label      = vtkKWLabelWithLabel::New();
   this->Icon       = vtkKWLabel::New();
   this->IconData   = vtkKWIcon::New();
 
@@ -50,7 +50,7 @@ vtkKWFrameLabeled::vtkKWFrameLabeled()
 }
 
 //----------------------------------------------------------------------------
-vtkKWFrameLabeled::~vtkKWFrameLabeled()
+vtkKWFrameWithLabel::~vtkKWFrameWithLabel()
 {
   this->Icon->Delete();
   this->IconData->Delete();
@@ -63,7 +63,7 @@ vtkKWFrameLabeled::~vtkKWFrameLabeled()
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabel* vtkKWFrameLabeled::GetLabel()
+vtkKWLabel* vtkKWFrameWithLabel::GetLabel()
 {
   if (this->Label)
     {
@@ -73,7 +73,7 @@ vtkKWLabel* vtkKWFrameLabeled::GetLabel()
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabel* vtkKWFrameLabeled::GetLabelIcon()
+vtkKWLabel* vtkKWFrameWithLabel::GetLabelIcon()
 {
   if (this->Label)
     {
@@ -83,27 +83,27 @@ vtkKWLabel* vtkKWFrameLabeled::GetLabelIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::SetLabelText(const char *text)
+void vtkKWFrameWithLabel::SetLabelText(const char *text)
 {
   if (!text)
     {
     return;
     }
 
-  if (vtkKWFrameLabeled::LabelCase == 
-      vtkKWFrameLabeled::LabelCaseUserSpecified)
+  if (vtkKWFrameWithLabel::LabelCase == 
+      vtkKWFrameWithLabel::LabelCaseUserSpecified)
     {
     this->GetLabel()->SetText(text);
     }
   else
     {
     vtksys_stl::string res;
-    switch (vtkKWFrameLabeled::LabelCase)
+    switch (vtkKWFrameWithLabel::LabelCase)
       {
-      case vtkKWFrameLabeled::LabelCaseUppercaseFirst:
+      case vtkKWFrameWithLabel::LabelCaseUppercaseFirst:
         res = vtksys::SystemTools::CapitalizedWords(text);
         break;
-      case vtkKWFrameLabeled::LabelCaseLowercaseFirst:
+      case vtkKWFrameWithLabel::LabelCaseLowercaseFirst:
         res = vtksys::SystemTools::UnCapitalizedWords(text);
         break;
       }
@@ -112,7 +112,7 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::AdjustMargin()
+void vtkKWFrameWithLabel::AdjustMargin()
 {
   if (this->IsCreated())
     {
@@ -136,7 +136,7 @@ void vtkKWFrameLabeled::AdjustMargin()
     // Don't forget the show/hide collapse icon, it might be bigger than
     // the LabelFrame contents (really ?)
 
-    if (vtkKWFrameLabeled::AllowShowHide && this->ShowHideFrame &&
+    if (vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame &&
         height < this->IconData->GetHeight())
       {
       height = this->IconData->GetHeight();
@@ -155,7 +155,7 @@ void vtkKWFrameLabeled::AdjustMargin()
     this->Script("%s configure -height %d", 
                  this->Border2->GetWidgetName(), border2_h);
 
-    if ( vtkKWFrameLabeled::AllowShowHide && this->ShowHideFrame )
+    if ( vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame )
       {
       this->Script("place %s -relx 1 -x %d -rely 0 -y %d -anchor center",
                    this->Icon->GetWidgetName(),
@@ -167,7 +167,7 @@ void vtkKWFrameLabeled::AdjustMargin()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::Create(vtkKWApplication *app)
+void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -226,7 +226,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
   this->GetLabelIcon()->SetBalloonHelpString(balloon_str.str());
   balloon_str.rdbuf()->freeze(0);
 
-  if (vtkKWFrameLabeled::BoldLabel)
+  if (vtkKWFrameWithLabel::BoldLabel)
     {
     vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
     }
@@ -251,7 +251,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
 
   this->Script("raise %s", this->Label->GetWidgetName());
 
-  if ( vtkKWFrameLabeled::AllowShowHide && this->ShowHideFrame )
+  if ( vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame )
     {
     this->Script("bind %s <ButtonRelease-1> { %s PerformShowHideFrame }",
                  this->Icon->GetWidgetName(),
@@ -269,7 +269,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::PerformShowHideFrame()
+void vtkKWFrameWithLabel::PerformShowHideFrame()
 {
   if ( this->Displayed )
     {
@@ -288,39 +288,39 @@ void vtkKWFrameLabeled::PerformShowHideFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::AllowShowHideOn() 
+void vtkKWFrameWithLabel::AllowShowHideOn() 
 { 
-  vtkKWFrameLabeled::AllowShowHide = 1; 
+  vtkKWFrameWithLabel::AllowShowHide = 1; 
 }
-void vtkKWFrameLabeled::AllowShowHideOff() 
+void vtkKWFrameWithLabel::AllowShowHideOff() 
 { 
-  vtkKWFrameLabeled::AllowShowHide = 0; 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWFrameLabeled::BoldLabelOn() 
-{ 
-  vtkKWFrameLabeled::BoldLabel = 1; 
-}
-void vtkKWFrameLabeled::BoldLabelOff() 
-{ 
-  vtkKWFrameLabeled::BoldLabel = 0; 
+  vtkKWFrameWithLabel::AllowShowHide = 0; 
 }
 
 //----------------------------------------------------------------------------
-
-void vtkKWFrameLabeled::SetLabelCase(int v) 
+void vtkKWFrameWithLabel::BoldLabelOn() 
 { 
-  vtkKWFrameLabeled::LabelCase = v;
+  vtkKWFrameWithLabel::BoldLabel = 1; 
 }
-
-int vtkKWFrameLabeled::GetLabelCase() 
+void vtkKWFrameWithLabel::BoldLabelOff() 
 { 
-  return vtkKWFrameLabeled::LabelCase;
+  vtkKWFrameWithLabel::BoldLabel = 0; 
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::SetShowIconInLimitedEditionMode(int arg)
+
+void vtkKWFrameWithLabel::SetLabelCase(int v) 
+{ 
+  vtkKWFrameWithLabel::LabelCase = v;
+}
+
+int vtkKWFrameWithLabel::GetLabelCase() 
+{ 
+  return vtkKWFrameWithLabel::LabelCase;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetShowIconInLimitedEditionMode(int arg)
 {
   if (this->ShowIconInLimitedEditionMode == arg)
     {
@@ -334,7 +334,7 @@ void vtkKWFrameLabeled::SetShowIconInLimitedEditionMode(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::UpdateEnableState()
+void vtkKWFrameWithLabel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -363,7 +363,7 @@ void vtkKWFrameLabeled::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropTargetSet* vtkKWFrameLabeled::GetDragAndDropTargetSet()
+vtkKWDragAndDropTargetSet* vtkKWFrameWithLabel::GetDragAndDropTargetSet()
 {
   int exist = this->HasDragAndDropTargetSet();
   vtkKWDragAndDropTargetSet *targets = this->Superclass::GetDragAndDropTargetSet();
@@ -375,7 +375,7 @@ vtkKWDragAndDropTargetSet* vtkKWFrameLabeled::GetDragAndDropTargetSet()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWFrameWithLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ShowHideFrame: " 

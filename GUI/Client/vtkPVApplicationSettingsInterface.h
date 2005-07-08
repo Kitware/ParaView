@@ -33,7 +33,6 @@
 #define VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY "CreateLogFiles"
 
 class vtkKWCheckButton;
-class vtkKWFrameLabeled;
 
 class VTK_EXPORT vtkPVApplicationSettingsInterface : public vtkKWApplicationSettingsInterface
 {

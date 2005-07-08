@@ -1,6 +1,6 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -141,7 +141,7 @@ int my_main(int argc, char *argv[])
   // Add a HSV color selector to set the view frame color
   // Put it inside a labeled frame for kicks
 
-  vtkKWFrameLabeled *ccb_frame = vtkKWFrameLabeled::New();
+  vtkKWFrameWithLabel *ccb_frame = vtkKWFrameWithLabel::New();
   ccb_frame->SetParent(page_widget);
   ccb_frame->Create(app);
   ccb_frame->SetLabelText("View Background Color");

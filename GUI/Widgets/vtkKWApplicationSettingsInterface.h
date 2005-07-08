@@ -25,10 +25,10 @@
 
 class vtkKWCheckButton;
 class vtkKWFrame;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWPushButton;
 class vtkKWWindow;
-class vtkKWMenuButtonLabeled;
+class vtkKWMenuButtonWithLabel;
 
 class KWWIDGETS_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
 {
@@ -80,7 +80,7 @@ protected:
 
   // Interface settings
 
-  vtkKWFrameLabeled *InterfaceSettingsFrame;
+  vtkKWFrameWithLabel *InterfaceSettingsFrame;
 
   vtkKWCheckButton  *ConfirmExitCheckButton;
   vtkKWCheckButton  *SaveUserInterfaceGeometryCheckButton;
@@ -89,19 +89,19 @@ protected:
 
   // Interface customization
 
-  vtkKWFrameLabeled *InterfaceCustomizationFrame;
+  vtkKWFrameWithLabel *InterfaceCustomizationFrame;
   vtkKWPushButton   *ResetDragAndDropButton;
 
   // Toolbar settings
 
-  vtkKWFrameLabeled *ToolbarSettingsFrame;
+  vtkKWFrameWithLabel *ToolbarSettingsFrame;
   vtkKWCheckButton  *FlatFrameCheckButton;
   vtkKWCheckButton  *FlatButtonsCheckButton;
 
   // Print settings
 
-  vtkKWFrameLabeled      *PrintSettingsFrame;
-  vtkKWMenuButtonLabeled *DPIOptionMenu;
+  vtkKWFrameWithLabel      *PrintSettingsFrame;
+  vtkKWMenuButtonWithLabel *DPIOptionMenu;
 
 private:
   vtkKWApplicationSettingsInterface(const vtkKWApplicationSettingsInterface&); // Not implemented

@@ -14,14 +14,14 @@
 #include "vtkKWScalarComponentSelectionWidget.h"
 
 #include "vtkKWEvent.h"
-#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.14");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ vtkKWScalarComponentSelectionWidget::vtkKWScalarComponentSelectionWidget()
 
   // GUI
 
-  this->SelectedComponentOptionMenu     = vtkKWMenuButtonLabeled::New();
+  this->SelectedComponentOptionMenu     = vtkKWMenuButtonWithLabel::New();
 }
 
 //----------------------------------------------------------------------------

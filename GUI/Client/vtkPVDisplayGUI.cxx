@@ -93,7 +93,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.39");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.40");
 
 //----------------------------------------------------------------------------
 
@@ -163,10 +163,10 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->InterpolateColorsCheckVisible = 1;
 
   this->MainFrame = vtkKWFrameWithScrollbar::New();
-  this->ColorFrame = vtkKWFrameLabeled::New();
-  this->VolumeAppearanceFrame = vtkKWFrameLabeled::New();
-  this->DisplayStyleFrame = vtkKWFrameLabeled::New();
-  this->ViewFrame = vtkKWFrameLabeled::New();
+  this->ColorFrame = vtkKWFrameWithLabel::New();
+  this->VolumeAppearanceFrame = vtkKWFrameWithLabel::New();
+  this->DisplayStyleFrame = vtkKWFrameWithLabel::New();
+  this->ViewFrame = vtkKWFrameWithLabel::New();
   
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorSelectionMenu = vtkPVColorSelectionWidget::New();
@@ -205,7 +205,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->ResetCameraButton = vtkKWPushButton::New();
 
-  this->ActorControlFrame = vtkKWFrameLabeled::New();
+  this->ActorControlFrame = vtkKWFrameWithLabel::New();
   this->TranslateLabel = vtkKWLabel::New();
   this->ScaleLabel = vtkKWLabel::New();
   this->OrientationLabel = vtkKWLabel::New();

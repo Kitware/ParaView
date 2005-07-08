@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.71");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.72");
 
 //===========================================================================
 //***************************************************************************
@@ -70,7 +70,7 @@ vtkPV3DWidget::vtkPV3DWidget()
 {
   this->Observer     = vtkPV3DWidgetObserver::New();
   this->Observer->PV3DWidget = this;
-  this->LabeledFrame = vtkKWFrameLabeled::New();
+  this->LabeledFrame = vtkKWFrameWithLabel::New();
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 1;

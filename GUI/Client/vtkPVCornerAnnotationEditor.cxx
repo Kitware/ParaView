@@ -17,7 +17,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
-#include "vtkKWTextLabeled.h"
+#include "vtkKWTextWithLabel.h"
 #include "vtkPVTextPropertyEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.6");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()

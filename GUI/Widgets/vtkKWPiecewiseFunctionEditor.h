@@ -107,7 +107,7 @@ public:
   // Access the entry
   // If you need to customize this object, make sure you first set 
   // ShowValueEntry to On and call Create().
-  vtkGetObjectMacro(ValueEntry, vtkKWEntryLabeled);
+  vtkGetObjectMacro(ValueEntry, vtkKWEntryWithLabel);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -177,7 +177,7 @@ protected:
 
   // GUI
 
-  vtkKWEntryLabeled *ValueEntry;
+  vtkKWEntryWithLabel *ValueEntry;
   vtkKWCheckButton  *WindowLevelModeCheckButton;
 
   // Description:

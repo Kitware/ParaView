@@ -34,7 +34,7 @@ class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
 class vtkKWLabel;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWScale;
@@ -274,7 +274,7 @@ public:
   // Description:
   // Access to these objects from a script
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
-  vtkGetObjectMacro(ActorControlFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(ActorControlFrame, vtkKWFrameWithLabel);
   vtkGetObjectMacro(MainFrame, vtkKWFrameWithScrollbar);
 
 protected:
@@ -316,10 +316,10 @@ protected:
 
   vtkKWFrameWithScrollbar *MainFrame;
 
-  vtkKWFrameLabeled *ColorFrame;
-  vtkKWFrameLabeled *VolumeAppearanceFrame;
-  vtkKWFrameLabeled *DisplayStyleFrame;
-  vtkKWFrameLabeled *ViewFrame;
+  vtkKWFrameWithLabel *ColorFrame;
+  vtkKWFrameWithLabel *VolumeAppearanceFrame;
+  vtkKWFrameWithLabel *DisplayStyleFrame;
+  vtkKWFrameWithLabel *ViewFrame;
   
   vtkKWLabel *ColorMenuLabel;
   vtkPVColorSelectionWidget* ColorSelectionMenu;
@@ -354,7 +354,7 @@ protected:
   vtkKWCheckButton *InterpolateColorsCheck;
   
   // For translating actor
-  vtkKWFrameLabeled* ActorControlFrame;
+  vtkKWFrameWithLabel* ActorControlFrame;
   vtkKWLabel*        TranslateLabel;
   vtkKWThumbWheel*   TranslateThumbWheel[3];
   vtkKWLabel*        ScaleLabel;

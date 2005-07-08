@@ -19,14 +19,14 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWRange.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.29");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -43,7 +43,7 @@ vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 
   this->WindowLevelModeChangedCommand    = NULL;
 
-  this->ValueEntry                       = vtkKWEntryLabeled::New();
+  this->ValueEntry                       = vtkKWEntryWithLabel::New();
 
   this->WindowLevelModeCheckButton       = vtkKWCheckButton::New();
 }

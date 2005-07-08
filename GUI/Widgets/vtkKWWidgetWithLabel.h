@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetLabeled.h
+  Module:    vtkKWWidgetWithLabel.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,24 +11,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWWidgetLabeled - an abstract class widget with a label
+// .NAME vtkKWWidgetWithLabel - an abstract class widget with a label
 // .SECTION Description
 // This class implements an abstract superclass for composite widgets
 // associating a label to a widget.
 
-#ifndef __vtkKWWidgetLabeled_h
-#define __vtkKWWidgetLabeled_h
+#ifndef __vtkKWWidgetWithLabel_h
+#define __vtkKWWidgetWithLabel_h
 
 #include "vtkKWCompositeWidget.h"
 
 class vtkKWApplication;
 class vtkKWLabel;
 
-class KWWIDGETS_EXPORT vtkKWWidgetLabeled : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWWidgetWithLabel : public vtkKWCompositeWidget
 {
 public:
-  static vtkKWWidgetLabeled* New();
-  vtkTypeRevisionMacro(vtkKWWidgetLabeled, vtkKWCompositeWidget);
+  static vtkKWWidgetWithLabel* New();
+  vtkTypeRevisionMacro(vtkKWWidgetWithLabel, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -87,15 +87,15 @@ public:
   virtual void SetLabelPosition(int);
   vtkGetMacro(LabelPosition, int);
   virtual void SetLabelPositionToDefault()
-    { this->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionDefault); };
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionDefault); };
   virtual void SetLabelPositionToTop()
-    { this->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionTop); };
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionTop); };
   virtual void SetLabelPositionToBottom()
-    { this->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionBottom); };
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionBottom); };
   virtual void SetLabelPositionToLeft()
-    { this->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionLeft); };
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionLeft); };
   virtual void SetLabelPositionToRight()
-    { this->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionRight); };
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionRight); };
   
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -112,8 +112,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWWidgetLabeled();
-  ~vtkKWWidgetLabeled();
+  vtkKWWidgetWithLabel();
+  ~vtkKWWidgetWithLabel();
 
   // Description:
   // Show/Hide the label
@@ -139,8 +139,8 @@ private:
   // label if it does not exist. This allow the object to remain lightweight. 
   vtkKWLabel *Label;
 
-  vtkKWWidgetLabeled(const vtkKWWidgetLabeled&); // Not implemented
-  void operator=(const vtkKWWidgetLabeled&); // Not implemented
+  vtkKWWidgetWithLabel(const vtkKWWidgetWithLabel&); // Not implemented
+  void operator=(const vtkKWWidgetWithLabel&); // Not implemented
 };
 
 #endif

@@ -39,7 +39,6 @@ class vtkKWScale;
 class vtkKWTopLevel;
 class vtkPVSourceNotebook;
 class vtkKWSplitFrame;
-class vtkLabeledFrame;
 class vtkMultiProcessController;
 class vtkPVApplication;
 class vtkPVAxesWidget;
@@ -143,7 +142,7 @@ public:
 
   // Description:
   // Get the frame for the navigation window
-  vtkGetObjectMacro(NavigationFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(NavigationFrame, vtkKWFrameWithLabel);
 
   // Description:
   // Show either navigation window with a fragment of pipeline or a
@@ -319,10 +318,10 @@ public:
  
   // Description:
   // Access to these widgets from a script.
-  vtkGetObjectMacro(StandardViewsFrame, vtkKWFrameLabeled);
-  vtkGetObjectMacro(CameraIconsFrame, vtkKWFrameLabeled);
-  vtkGetObjectMacro(CameraControlFrame, vtkKWFrameLabeled);
-  vtkGetObjectMacro(OrientationAxesFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(StandardViewsFrame, vtkKWFrameWithLabel);
+  vtkGetObjectMacro(CameraIconsFrame, vtkKWFrameWithLabel);
+  vtkGetObjectMacro(CameraControlFrame, vtkKWFrameWithLabel);
+  vtkGetObjectMacro(OrientationAxesFrame, vtkKWFrameWithLabel);
   //BTX
   vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   //ETX
@@ -363,7 +362,7 @@ protected:
 
   void CalculateBBox(char* name, int bbox[4]);
  
-  vtkKWFrameLabeled *StandardViewsFrame;
+  vtkKWFrameWithLabel *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 
   vtkKWPushButton   *YMaxViewButton; 
@@ -371,18 +370,18 @@ protected:
   vtkKWPushButton   *ZMaxViewButton; 
   vtkKWPushButton   *ZMinViewButton; 
 
-  vtkKWFrameLabeled *RenderParametersFrame;
+  vtkKWFrameWithLabel *RenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ParallelProjectionCheck;
   vtkKWCheckButton *ImmediateModeCheck;
 
   vtkPVRenderModuleUI* RenderModuleUI;
 
-  vtkKWFrameLabeled *InterfaceSettingsFrame;
+  vtkKWFrameWithLabel *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
   // Lighting stuff:
-  vtkKWFrameLabeled *LightParameterFrame;
+  vtkKWFrameWithLabel *LightParameterFrame;
   vtkKWCheckButton  *UseLightButton;
   vtkKWLabel        *KeyLightLabel;
   vtkKWLabel        *FillLightLabel;
@@ -395,7 +394,7 @@ protected:
   vtkKWCheckButton  *MaintainLuminanceButton;
   // Main proxy to access the vtkLightKit
 
-  vtkKWFrameLabeled *OrientationAxesFrame;
+  vtkKWFrameWithLabel *OrientationAxesFrame;
   vtkKWCheckButton *OrientationAxesCheck;
   vtkKWCheckButton *OrientationAxesInteractiveCheck;
   vtkKWChangeColorButton *OrientationAxesOutlineColor;
@@ -404,7 +403,7 @@ protected:
 
   vtkKWSplitFrame *SplitFrame;
 
-  vtkKWFrameLabeled* NavigationFrame;
+  vtkKWFrameWithLabel* NavigationFrame;
   vtkPVSourcesNavigationWindow* NavigationWindow;
   vtkPVSourcesNavigationWindow* SelectionWindow;
   vtkKWRadioButton *NavigationWindowButton;
@@ -422,11 +421,11 @@ protected:
   vtkPVInteractorStyleControl *ManipulatorControl3D;
 
   // Camera icons
-  vtkKWFrameLabeled* CameraIconsFrame;
+  vtkKWFrameWithLabel* CameraIconsFrame;
   vtkPVCameraIcon* CameraIcons[6];
   
   // Camera controls (elevation, azimuth, roll)
-  vtkKWFrameLabeled *CameraControlFrame;
+  vtkKWFrameWithLabel *CameraControlFrame;
   vtkPVCameraControl *CameraControl;
 
   vtkKWPushButton *PropertiesButton;

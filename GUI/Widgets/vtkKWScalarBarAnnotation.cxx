@@ -19,9 +19,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWEntryWithLabel.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.20");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -56,12 +56,12 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
     vtkKWScalarComponentSelectionWidget::New();
 
   this->TitleFrame                      = vtkKWFrame::New();
-  this->TitleEntry                      = vtkKWEntryLabeled::New();
+  this->TitleEntry                      = vtkKWEntryWithLabel::New();
   this->TitleTextPropertyWidget         = vtkKWTextPropertyEditor::New();
   this->TitleTextPropertyPopupButton    = NULL;
 
   this->LabelFrame                      = vtkKWFrame::New();
-  this->LabelFormatEntry                = vtkKWEntryLabeled::New();
+  this->LabelFormatEntry                = vtkKWEntryWithLabel::New();
   this->LabelTextPropertyWidget         = vtkKWTextPropertyEditor::New();
   this->LabelTextPropertyPopupButton    = NULL;
 
@@ -260,7 +260,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
     {
     if (!this->TitleTextPropertyPopupButton)
       {
-      this->TitleTextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
+      this->TitleTextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->TitleTextPropertyPopupButton->SetParent(this->TitleFrame);
     this->TitleTextPropertyPopupButton->Create(app);
@@ -326,7 +326,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
     {
     if (!this->LabelTextPropertyPopupButton)
       {
-      this->LabelTextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
+      this->LabelTextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->LabelTextPropertyPopupButton->SetParent(this->LabelFrame);
     this->LabelTextPropertyPopupButton->Create(app);

@@ -25,7 +25,7 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWEntryLabeled;
+class vtkKWEntryWithLabel;
 class vtkPVActiveTrackSelector;
 class vtkPVAnimationCue;
 class vtkPVComparativeVis;
@@ -68,7 +68,7 @@ protected:
   vtkPVActiveTrackSelector* TrackSelector;
   vtkPVSimpleAnimationCue* LastCueEditor;
   vtkPVAnimationCue* LastCue;
-  vtkKWEntryLabeled* NumberOfFramesEntry;
+  vtkKWEntryWithLabel* NumberOfFramesEntry;
 
   void RemovePVSource(vtkPVSource* source);
 

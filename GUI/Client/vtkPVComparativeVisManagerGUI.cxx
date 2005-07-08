@@ -15,7 +15,7 @@
 
 #include "vtkCommand.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.8");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.9");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -63,7 +63,7 @@ vtkPVComparativeVisManagerGUI::vtkPVComparativeVisManagerGUI()
 
   this->MainFrame = vtkKWFrame::New();
 
-  this->ListFrame = vtkKWFrameLabeled::New();
+  this->ListFrame = vtkKWFrameWithLabel::New();
   this->ComparativeVisList = vtkKWListBox::New();
 
   this->CommandFrame = vtkKWFrame::New();

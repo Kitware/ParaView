@@ -32,7 +32,6 @@
 #include "vtkKWListBoxToListBoxSelectionEditor.h"
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
-#include "vtkKWFrameLabeled.h"
 #include "vtkKWEvent.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
@@ -72,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.114");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.115");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()

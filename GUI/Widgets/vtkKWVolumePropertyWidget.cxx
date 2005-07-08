@@ -18,22 +18,22 @@
 #include "vtkImageData.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWColorTransferFunctionEditor.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWHistogramSet.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
-#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
-#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWScaleSet.h"
-#include "vtkKWScaleSetLabeled.h"
+#include "vtkKWScaleSetWithLabel.h"
 #include "vtkKWVolumeMaterialPropertyWidget.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.15");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.16");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -74,9 +74,9 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   // GUI
 
-  this->EditorFrame                     = vtkKWFrameLabeled::New();
+  this->EditorFrame                     = vtkKWFrameWithLabel::New();
 
-  this->InterpolationTypeOptionMenu     = vtkKWMenuButtonLabeled::New();
+  this->InterpolationTypeOptionMenu     = vtkKWMenuButtonWithLabel::New();
 
   this->EnableShadingCheckButton        = vtkKWCheckButton::New();
 
@@ -88,7 +88,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->EnableGradientOpacityOptionMenu = vtkKWMenuButton::New();
 
-  this->ComponentWeightScaleSet         = vtkKWScaleSetLabeled::New();
+  this->ComponentWeightScaleSet         = vtkKWScaleSetWithLabel::New();
 
   this->ComponentSelectionWidget = 
     vtkKWScalarComponentSelectionWidget::New();
@@ -261,7 +261,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWMenuButtonLabeled *omenu = 
+  vtkKWMenuButtonWithLabel *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
   omenu->GetWidget()->SetWidth(menu_width);
@@ -271,7 +271,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
 
   if (!this->InterpolationTypeOptionMenu)
     {
-    this->InterpolationTypeOptionMenu = vtkKWMenuButtonLabeled::New();
+    this->InterpolationTypeOptionMenu = vtkKWMenuButtonWithLabel::New();
     }
 
   this->InterpolationTypeOptionMenu->SetParent(frame);

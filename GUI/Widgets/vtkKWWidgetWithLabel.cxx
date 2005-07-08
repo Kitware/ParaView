@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetLabeled.cxx
+  Module:    vtkKWWidgetWithLabel.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,25 +12,25 @@
 
 =========================================================================*/
 
-#include "vtkKWWidgetLabeled.h"
+#include "vtkKWWidgetWithLabel.h"
 
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.8");
+vtkStandardNewMacro(vtkKWWidgetWithLabel);
+vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.1");
 
 //----------------------------------------------------------------------------
-vtkKWWidgetLabeled::vtkKWWidgetLabeled()
+vtkKWWidgetWithLabel::vtkKWWidgetWithLabel()
 {
   this->ShowLabel       = 1;
   this->Label           = NULL;
-  this->LabelPosition   = vtkKWWidgetLabeled::LabelPositionDefault;
+  this->LabelPosition   = vtkKWWidgetWithLabel::LabelPositionDefault;
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidgetLabeled::~vtkKWWidgetLabeled()
+vtkKWWidgetWithLabel::~vtkKWWidgetWithLabel()
 {
   if (this->Label)
     {
@@ -40,7 +40,7 @@ vtkKWWidgetLabeled::~vtkKWWidgetLabeled()
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabel* vtkKWWidgetLabeled::GetLabel()
+vtkKWLabel* vtkKWWidgetWithLabel::GetLabel()
 {
   // Lazy evaluation. Create the label only when it is needed
 
@@ -54,13 +54,13 @@ vtkKWLabel* vtkKWWidgetLabeled::GetLabel()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidgetLabeled::HasLabel()
+int vtkKWWidgetWithLabel::HasLabel()
 {
   return this->Label ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::Create(vtkKWApplication *app)
+void vtkKWWidgetWithLabel::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -90,7 +90,7 @@ void vtkKWWidgetLabeled::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app)
+void vtkKWWidgetWithLabel::CreateLabel(vtkKWApplication *app)
 {
   // Create the label. If the parent has been set before (i.e. by the subclass)
   // do not set it.
@@ -120,21 +120,21 @@ void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetLabelText(const char *text)
+void vtkKWWidgetWithLabel::SetLabelText(const char *text)
 {
   this->GetLabel()->SetText(text);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetLabelPosition(int arg)
+void vtkKWWidgetWithLabel::SetLabelPosition(int arg)
 {
-  if (arg < vtkKWWidgetLabeled::LabelPositionDefault)
+  if (arg < vtkKWWidgetWithLabel::LabelPositionDefault)
     {
-    arg = vtkKWWidgetLabeled::LabelPositionDefault;
+    arg = vtkKWWidgetWithLabel::LabelPositionDefault;
     }
-  else if (arg > vtkKWWidgetLabeled::LabelPositionRight)
+  else if (arg > vtkKWWidgetWithLabel::LabelPositionRight)
     {
-    arg = vtkKWWidgetLabeled::LabelPositionRight;
+    arg = vtkKWWidgetWithLabel::LabelPositionRight;
     }
 
   if (this->LabelPosition == arg)
@@ -150,19 +150,19 @@ void vtkKWWidgetLabeled::SetLabelPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetLabelWidth(int width)
+void vtkKWWidgetWithLabel::SetLabelWidth(int width)
 {
   this->GetLabel()->SetWidth(width);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidgetLabeled::GetLabelWidth()
+int vtkKWWidgetWithLabel::GetLabelWidth()
 {
   return this->GetLabel()->GetWidth();
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetShowLabel(int _arg)
+void vtkKWWidgetWithLabel::SetShowLabel(int _arg)
 {
   if (this->ShowLabel == _arg)
     {
@@ -183,7 +183,7 @@ void vtkKWWidgetLabeled::SetShowLabel(int _arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::UpdateEnableState()
+void vtkKWWidgetWithLabel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
   
@@ -196,7 +196,7 @@ void vtkKWWidgetLabeled::UpdateEnableState()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetBalloonHelpString(const char *string)
+void vtkKWWidgetWithLabel::SetBalloonHelpString(const char *string)
 {
   this->Superclass::SetBalloonHelpString(string);
 
@@ -212,7 +212,7 @@ void vtkKWWidgetLabeled::SetBalloonHelpString(const char *string)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWWidgetWithLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

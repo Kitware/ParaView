@@ -100,7 +100,7 @@ set page_widget [frame_panel GetPageWidget "View Colors"]
 # Add a HSV color selector to set the view frame color
 # Put it inside a labeled frame for kicks
 
-vtkKWFrameLabeled ccb_frame
+vtkKWFrameWithLabel ccb_frame
 ccb_frame SetParent $page_widget
 ccb_frame Create app
 ccb_frame SetLabelText "View Background Color"

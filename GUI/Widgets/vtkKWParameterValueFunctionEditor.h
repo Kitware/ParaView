@@ -16,7 +16,7 @@
 // A widget that allows the user to edit a parameter/value function.
 // Keybindings: Delete or x, Home, End, PageUp or p, PageDown or n, 
 // .SECTION See Also
-// vtkKWWidgetLabeled
+// vtkKWWidgetWithLabel
 
 #ifndef __vtkKWParameterValueFunctionEditor_h
 #define __vtkKWParameterValueFunctionEditor_h
@@ -32,7 +32,7 @@ class vtkKWCanvas;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
-class vtkKWEntryLabeled;
+class vtkKWEntryWithLabel;
 class vtkKWRange;
 class vtkKWMenuButton;
 
@@ -154,11 +154,11 @@ public:
   // Description:
   // If supported, set the label position in regards to the rest of
   // the composite widget (override the super).
-  // As a subclass of vtkKWWidgetLabeled, this class inherits a label and
+  // As a subclass of vtkKWWidgetWithLabel, this class inherits a label and
   // methods to set its position and visibility. Note that the default label 
   // position implemented in this class is on the same line as all other UI
   // elements like entries, or range parameters. Only a subset of the specific
-  // positions listed in vtkKWWidgetLabeled is supported: on Top
+  // positions listed in vtkKWWidgetWithLabel is supported: on Top
   // (the label is placed on its own line), or the Left of the whole editor, 
   // on the same line as the canvas. 
   virtual void SetLabelPosition(int);
@@ -324,7 +324,7 @@ public:
   // Access the entry
   // If you need to customize this object, make sure you first set 
   // ShowParameterEntry to On and call Create().
-  vtkGetObjectMacro(ParameterEntry, vtkKWEntryLabeled);
+  vtkGetObjectMacro(ParameterEntry, vtkKWEntryWithLabel);
 
   // Description:
   // Show the user frame UI.
@@ -1113,7 +1113,7 @@ protected:
   vtkKWFrame        *UserFrame;
   vtkKWFrame        *TopRightFrame;
   vtkKWLabel        *RangeLabel;
-  vtkKWEntryLabeled *ParameterEntry;
+  vtkKWEntryWithLabel *ParameterEntry;
   vtkKWCanvas       *ValueTicksCanvas;
   vtkKWCanvas       *ParameterTicksCanvas;
 

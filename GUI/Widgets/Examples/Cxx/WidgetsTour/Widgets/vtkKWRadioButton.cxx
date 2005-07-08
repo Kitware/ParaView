@@ -111,7 +111,7 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
 
   // -----------------------------------------------------------------------
 
-  // TODO: use vtkKWRadioButtonSetLabeled and callbacks
+  // TODO: use vtkKWRadioButtonSetWithLabel and callbacks
 
   return new vtkKWRadioButtonItem;
 }

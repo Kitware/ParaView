@@ -25,7 +25,7 @@
 #include "vtkKWFrameWithScrollbar.h"
 
 class vtkPVSource;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWBoundsDisplay;
 
@@ -60,7 +60,7 @@ protected:
   vtkPVInformationGUI();
   ~vtkPVInformationGUI();
   
-  vtkKWFrameLabeled *StatsFrame;
+  vtkKWFrameWithLabel *StatsFrame;
 
   vtkKWLabel *TypeLabel;
   vtkKWLabel *NumDataSetsLabel;

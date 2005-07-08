@@ -42,7 +42,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   extent2->SetBorderWidth(2);
   extent2->SetReliefToGroove();
   extent2->SetExtentRange(extent1->GetExtentRange());
-  extent2->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionLeft);
+  extent2->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionLeft);
   extent2->SetEntry1Position(vtkKWRange::EntryPositionLeft);
   extent2->SetEntry2Position(vtkKWRange::EntryPositionRight);
   extent2->SetSliderSize(4);
@@ -72,7 +72,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   extent3->Create(app);
   extent3->SetBorderWidth(2);
   extent3->SetReliefToGroove();
-  extent3->SetLabelPosition(vtkKWWidgetLabeled::LabelPositionRight);
+  extent3->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionRight);
   extent3->SetEntry1Position(vtkKWRange::EntryPositionLeft);
   extent3->SetEntry2Position(vtkKWRange::EntryPositionLeft);
   extent3->ShowZExtentOff();

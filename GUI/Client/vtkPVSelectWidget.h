@@ -30,7 +30,7 @@ class vtkKWMenuButton;
 class vtkKWLabel;
 class vtkPVSource;
 class vtkPVWidgetCollection;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkStringList;
 
 //BTX
@@ -153,7 +153,7 @@ protected:
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);
 
-  vtkKWFrameLabeled *LabeledFrame;
+  vtkKWFrameWithLabel *LabeledFrame;
   vtkKWMenuButton *Menu;
 
   vtkSetStringMacro(EntryLabel);

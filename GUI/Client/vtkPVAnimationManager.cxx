@@ -19,7 +19,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.57");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.58");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1107,19 +1107,19 @@ void vtkPVAnimationManager::SaveAnimation()
     int origWidth = view->GetRenderWindowSize()[0];
     int origHeight = view->GetRenderWindowSize()[1];
 
-    vtkKWEntryLabeled *widthEntry = vtkKWEntryLabeled::New();
+    vtkKWEntryWithLabel *widthEntry = vtkKWEntryWithLabel::New();
     widthEntry->GetLabel()->SetText("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication());
     widthEntry->GetWidget()->SetValue(origWidth);
 
-    vtkKWEntryLabeled *heightEntry = vtkKWEntryLabeled::New();
+    vtkKWEntryWithLabel *heightEntry = vtkKWEntryWithLabel::New();
     heightEntry->GetLabel()->SetText("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication());
     heightEntry->GetWidget()->SetValue(origHeight);
 
-    vtkKWEntryLabeled *framerateEntry = vtkKWEntryLabeled::New();
+    vtkKWEntryWithLabel *framerateEntry = vtkKWEntryWithLabel::New();
     framerateEntry->GetLabel()->SetText("Frame Rate:");
     framerateEntry->SetParent(frame);
     framerateEntry->Create(this->GetApplication());

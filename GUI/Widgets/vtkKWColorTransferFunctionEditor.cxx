@@ -19,7 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWRange.h"
 #include "vtkKWCanvas.h"
@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.36");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.37");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -64,7 +64,7 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
   int i;
   for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
-    this->ValueEntries[i] = vtkKWEntryLabeled::New();
+    this->ValueEntries[i] = vtkKWEntryWithLabel::New();
     }
 
   this->ShowValueRangeOff();

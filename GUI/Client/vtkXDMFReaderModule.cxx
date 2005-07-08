@@ -16,7 +16,7 @@
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.39");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.40");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -138,7 +138,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->Create(pvApp);
     dlg->SetText("Select Domain and Grids");
 
-    this->DomainGridFrame = vtkKWFrameLabeled::New();
+    this->DomainGridFrame = vtkKWFrameWithLabel::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
     this->DomainGridFrame->Create(pvApp);
     this->DomainGridFrame->SetLabelText("Domain and Grids Selection");

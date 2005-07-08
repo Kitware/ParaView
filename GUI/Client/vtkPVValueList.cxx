@@ -19,7 +19,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
@@ -34,14 +34,14 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.30");
+vtkCxxRevisionMacro(vtkPVValueList, "1.31");
 
 const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 
 //-----------------------------------------------------------------------------
 vtkPVValueList::vtkPVValueList()
 {
-  this->ContourValuesFrame = vtkKWFrameLabeled::New();
+  this->ContourValuesFrame = vtkKWFrameWithLabel::New();
   this->ContourValuesFrame2 = vtkKWFrame::New();
   this->ContourValuesList = vtkKWListBox::New();
 
@@ -49,13 +49,13 @@ vtkPVValueList::vtkPVValueList()
   this->DeleteValueButton = vtkKWPushButton::New();
   this->DeleteAllButton = vtkKWPushButton::New();
 
-  this->NewValueFrame = vtkKWFrameLabeled::New();
+  this->NewValueFrame = vtkKWFrameWithLabel::New();
   this->NewValueLabel = vtkKWLabel::New();
   this->NewValueEntry = vtkKWScale::New();
   this->NewValueEntry->ClampValueOff();
   this->AddValueButton = vtkKWPushButton::New();
 
-  this->GenerateFrame = vtkKWFrameLabeled::New();
+  this->GenerateFrame = vtkKWFrameWithLabel::New();
   this->GenerateNumberFrame = vtkKWFrame::New();
   this->GenerateRangeFrame = vtkKWFrame::New();
 

@@ -91,7 +91,7 @@ SET(KWWidgets_SRCS
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
   vtkKWFrameWithScrollbar.cxx
-  vtkKWFrameLabeled.cxx 
+  vtkKWFrameWithLabel.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotationEditor.cxx 
@@ -154,7 +154,7 @@ SET(KWWidgets_SRCS
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
-  vtkKWWidgetLabeled.cxx 
+  vtkKWWidgetWithLabel.cxx 
   vtkKWWidgetSet.cxx 
   vtkKWWidgetWithScrollbars.cxx 
   vtkKWWindow.cxx 
@@ -207,7 +207,7 @@ FOREACH (WidgetType
     vtkKWCheckButton 
     vtkKWEntry
     vtkKWLabel
-    vtkKWLabelLabeled
+    vtkKWLabelWithLabel
     vtkKWPushButton
     vtkKWScale
     )
@@ -223,7 +223,7 @@ FOREACH (WidgetType
 ENDFOREACH (WidgetType)
 
 # The "labeled widgets" are automatically generated from some core widgets
-# (i.e., vtkKWCheckButton => vtkKWCheckButtonLabeled)
+# (i.e., vtkKWCheckButton => vtkKWCheckButtonWithLabel)
 # If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
@@ -243,13 +243,13 @@ FOREACH (WidgetType
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (
-    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.h.in 
-    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.h IMMEDIATE)
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithLabelSubclass.h.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithLabel.h IMMEDIATE)
   CONFIGURE_FILE (
-    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.cxx.in 
-    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.cxx IMMEDIATE)
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithLabelSubclass.cxx.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithLabel.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
-    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}Labeled.cxx)
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithLabel.cxx)
 ENDFOREACH (WidgetType)
 
 # The "widgets with scrollbars" are automatically generated from some core

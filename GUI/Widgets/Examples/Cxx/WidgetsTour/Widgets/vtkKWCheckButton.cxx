@@ -1,5 +1,5 @@
 #include "vtkKWCheckButton.h"
-#include "vtkKWCheckButtonLabeled.h"
+#include "vtkKWCheckButtonWithLabel.h"
 #include "vtkKWCheckButtonSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
@@ -51,12 +51,12 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   // Create another checkbutton, with a label this time
 
-  vtkKWCheckButtonLabeled *cb3 = vtkKWCheckButtonLabeled::New();
+  vtkKWCheckButtonWithLabel *cb3 = vtkKWCheckButtonWithLabel::New();
   cb3->SetParent(parent);
   cb3->Create(app);
   cb3->SetLabelText("Another checkbutton, with a label in front");
   cb3->SetBalloonHelpString(
-    "This is a vtkKWCheckButtonLabeled, i.e. a checkbutton associated to a "
+    "This is a vtkKWCheckButtonWithLabel, i.e. a checkbutton associated to a "
     "label that can be positioned around the checkbutton.");
 
   app->Script(
@@ -107,7 +107,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   // -----------------------------------------------------------------------
 
-  // TODO: use vtkKWCheckButtonSetLabeled
+  // TODO: use vtkKWCheckButtonSetWithLabel
 
   cb1->Delete();
   cb2->Delete();

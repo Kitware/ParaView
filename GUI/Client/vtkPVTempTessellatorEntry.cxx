@@ -11,7 +11,7 @@
 
 #include "vtkObjectFactory.h"
 
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWListBox.h"
 #include "vtkKWCheckButton.h"
@@ -36,13 +36,13 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.28");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
 {
 public:
-  vtkKWFrameLabeled* CriteriaFrame;
+  vtkKWFrameWithLabel* CriteriaFrame;
   vtkKWFrame* EditSubframe;
 
   vtkKWLabel* CriteriaInstructions;
@@ -64,7 +64,7 @@ vtkPVTempTessellatorEntry::vtkPVTempTessellatorEntry()
   this->Data = new vtkTessellatorEntryData;
   vtkTessellatorEntryData* d = this->Data;
 
-  d->CriteriaFrame = vtkKWFrameLabeled::New();
+  d->CriteriaFrame = vtkKWFrameWithLabel::New();
   d->EditSubframe = vtkKWFrame::New();
 
   d->CriteriaInstructions = vtkKWLabel::New();

@@ -33,7 +33,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
@@ -140,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.392");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.393");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -167,7 +167,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->SetMenuEntryName(VTK_PV_VIEW_MENU_LABEL);
   this->SetMenuEntryHelp("Show global view parameters (background color, annoations2 etc.)");
 
-  this->StandardViewsFrame = vtkKWFrameLabeled::New();
+  this->StandardViewsFrame = vtkKWFrameWithLabel::New();
   this->XMaxViewButton = vtkKWPushButton::New();
   this->XMinViewButton = vtkKWPushButton::New();
   this->YMaxViewButton = vtkKWPushButton::New();
@@ -175,7 +175,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ZMaxViewButton = vtkKWPushButton::New();
   this->ZMinViewButton = vtkKWPushButton::New();
   
-  this->RenderParametersFrame = vtkKWFrameLabeled::New();
+  this->RenderParametersFrame = vtkKWFrameWithLabel::New();
 
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ParallelProjectionCheck = vtkKWCheckButton::New();
@@ -188,10 +188,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl3D->SetRegistryName("3D");
 
-  this->CameraControlFrame = vtkKWFrameLabeled::New();
+  this->CameraControlFrame = vtkKWFrameWithLabel::New();
   this->CameraControl = vtkPVCameraControl::New();
   
-  this->NavigationFrame = vtkKWFrameLabeled::New();
+  this->NavigationFrame = vtkKWFrameWithLabel::New();
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
 
@@ -201,11 +201,11 @@ vtkPVRenderView::vtkPVRenderView()
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 0;
 
-  this->InterfaceSettingsFrame = vtkKWFrameLabeled::New();
+  this->InterfaceSettingsFrame = vtkKWFrameWithLabel::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
   // Light
-  this->LightParameterFrame = vtkKWFrameLabeled::New();
+  this->LightParameterFrame = vtkKWFrameWithLabel::New();
   this->UseLightButton      = vtkKWCheckButton::New();
   this->KeyLightLabel       = vtkKWLabel::New();
   this->FillLightLabel      = vtkKWLabel::New();
@@ -221,7 +221,7 @@ vtkPVRenderView::vtkPVRenderView()
     }
   this->MaintainLuminanceButton = vtkKWCheckButton::New(); 
 
-  this->OrientationAxesFrame = vtkKWFrameLabeled::New();
+  this->OrientationAxesFrame = vtkKWFrameWithLabel::New();
   this->OrientationAxesCheck = vtkKWCheckButton::New();
   this->OrientationAxesInteractiveCheck = vtkKWCheckButton::New();
   this->OrientationAxesOutlineColor = vtkKWChangeColorButton::New();
@@ -232,7 +232,7 @@ vtkPVRenderView::vtkPVRenderView()
     {
     this->CameraIcons[cc] = vtkPVCameraIcon::New();
     }
-  this->CameraIconsFrame = vtkKWFrameLabeled::New();
+  this->CameraIconsFrame = vtkKWFrameWithLabel::New();
 
   this->PropertiesButton = vtkKWPushButton::New();
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;

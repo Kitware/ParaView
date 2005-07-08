@@ -16,10 +16,10 @@
 
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.8");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -107,8 +107,8 @@ vtkPVComparativeVisDialog::vtkPVComparativeVisDialog()
   this->TrackEditor->SetFixedTimeKeyframeFlag(
     vtkPVTrackEditor::FIRST_KEYFRAME_TIME_NOTCHANGABLE |
     vtkPVTrackEditor::LAST_KEYFRAME_TIME_NOTCHANGABLE);
-  this->NameEntry = vtkKWEntryLabeled::New();
-  this->VisualizationListFrame = vtkKWFrameLabeled::New();
+  this->NameEntry = vtkKWEntryWithLabel::New();
+  this->VisualizationListFrame = vtkKWFrameWithLabel::New();
   this->CloseButton = vtkKWPushButton::New();
 }
 

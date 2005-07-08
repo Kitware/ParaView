@@ -23,7 +23,7 @@
 #include "vtkPVTracedWidget.h"
 
 class vtkKWFrame;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWMenuButton;
@@ -102,7 +102,7 @@ protected:
   vtkPVSimpleAnimationCue* SimpleAnimationCue;
   vtkPVKeyFrame* ActiveKeyFrame;
   
-  vtkKWFrameLabeled* KeyFramePropertiesFrame;
+  vtkKWFrameWithLabel* KeyFramePropertiesFrame;
   vtkKWLabel* TitleLabelLabel;
   vtkKWLabel* TitleLabel; // label to show the cue text representation.
   vtkKWFrame* PropertiesFrame;

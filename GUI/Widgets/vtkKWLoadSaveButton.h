@@ -17,7 +17,7 @@
 // will popup a vtkKWLoadSaveDialog and display the chosen filename as
 // the button label.
 // .SECTION See Also
-// vtkKWLoadSaveButtonLabeled
+// vtkKWLoadSaveButtonWithLabel
 
 #ifndef __vtkKWLoadSaveButton_h
 #define __vtkKWLoadSaveButton_h

@@ -18,10 +18,10 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWLabelLabeled.h"
-#include "vtkKWPopupButtonLabeled.h"
-#include "vtkKWPushButtonSetLabeled.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWLabelWithLabel.h"
+#include "vtkKWPopupButtonWithLabel.h"
+#include "vtkKWPushButtonSetWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.15");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -76,7 +76,7 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   this->PopupButton = NULL;
 
-  this->MaterialPropertiesFrame = vtkKWFrameLabeled::New();
+  this->MaterialPropertiesFrame = vtkKWFrameWithLabel::New();
 
   this->LightingFrame = vtkKWFrame::New();
 
@@ -90,9 +90,9 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   this->PresetsFrame = vtkKWFrame::New();
 
-  this->PreviewLabel = vtkKWLabelLabeled::New();
+  this->PreviewLabel = vtkKWLabelWithLabel::New();
 
-  this->PresetPushButtonSet = vtkKWPushButtonSetLabeled::New();
+  this->PresetPushButtonSet = vtkKWPushButtonSetWithLabel::New();
 }
 
 //----------------------------------------------------------------------------
@@ -276,7 +276,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
     {
     if (!this->PopupButton)
       {
-      this->PopupButton = vtkKWPopupButtonLabeled::New();
+      this->PopupButton = vtkKWPopupButtonWithLabel::New();
       }
     
     this->PopupButton->SetParent(this);

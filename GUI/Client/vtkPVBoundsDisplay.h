@@ -14,8 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVBoundsDisplay - an entry with a label
 // .SECTION Description
-// The LabeledEntry creates an entry with a label in front of it; both are
-// contained in a frame
+// None
 
 
 #ifndef __vtkPVBoundsDisplay_h

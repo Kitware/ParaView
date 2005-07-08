@@ -25,11 +25,10 @@
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWFrame;
 class vtkKWScale;
 class vtkKWCheckButton;
-class vtkLabeledFrame;
 class vtkMultiProcessController;
 class vtkPVApplication;
 class vtkPVCameraIcon;
@@ -124,7 +123,7 @@ protected:
  
   int UseReductionFactor;
   
-  vtkKWFrameLabeled *LODFrame;
+  vtkKWFrameWithLabel *LODFrame;
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
 
   vtkKWFrame*       LODScalesFrame;

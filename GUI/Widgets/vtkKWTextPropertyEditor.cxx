@@ -19,9 +19,9 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
 #include "vtkKWLabel.h"
-#include "vtkKWCheckButtonSetLabeled.h"
-#include "vtkKWMenuButtonLabeled.h"
-#include "vtkKWPushButtonSetLabeled.h"
+#include "vtkKWCheckButtonSetWithLabel.h"
+#include "vtkKWMenuButtonWithLabel.h"
+#include "vtkKWPushButtonSetWithLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.9");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -118,10 +118,10 @@ vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
   this->ChangeColorButton = vtkKWChangeColorButton::New();
 
   this->ShowFontFamily = 1;
-  this->FontFamilyOptionMenu = vtkKWMenuButtonLabeled::New();
+  this->FontFamilyOptionMenu = vtkKWMenuButtonWithLabel::New();
 
   this->ShowStyles = 1;
-  this->StylesCheckButtonSet = vtkKWCheckButtonSetLabeled::New();
+  this->StylesCheckButtonSet = vtkKWCheckButtonSetWithLabel::New();
 
   this->ShowOpacity = 1;
   this->OpacityScale = vtkKWScale::New();
@@ -130,7 +130,7 @@ vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
   this->ColorChangedCommand = NULL;
 
   this->ShowCopy = 0;
-  this->PushButtonSet = vtkKWPushButtonSetLabeled::New();
+  this->PushButtonSet = vtkKWPushButtonSetWithLabel::New();
 }
 
 // ----------------------------------------------------------------------------

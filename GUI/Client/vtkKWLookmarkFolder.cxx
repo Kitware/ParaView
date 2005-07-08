@@ -25,7 +25,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWText.h"
@@ -34,13 +34,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.15");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
 {
   this->MainFrame = vtkKWFrame::New();
-  this->LabelFrame= vtkKWFrameLabeled::New();
+  this->LabelFrame= vtkKWFrameWithLabel::New();
   this->SeparatorFrame = vtkKWFrame::New();
   this->NestedSeparatorFrame = vtkKWFrame::New();
   this->NameField = vtkKWText::New();
@@ -316,7 +316,7 @@ void vtkKWLookmarkFolder::ToggleNestedCheckBoxes(vtkKWWidget *parent, int onoff)
         }
       //else cleanup
       }
-    else if(!widget->IsA("vtkKWCheckButtonLabeled"))
+    else if(!widget->IsA("vtkKWCheckButtonWithLabel"))
       {
         this->ToggleNestedCheckBoxes(widget, onoff);
       }

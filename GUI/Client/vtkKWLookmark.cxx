@@ -22,10 +22,10 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWCheckButtonLabeled.h"
+#include "vtkKWCheckButtonWithLabel.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWRadioButton.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.16");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -45,10 +45,10 @@ vtkKWLookmark::vtkKWLookmark()
   this->LmkLeftFrame= vtkKWFrame::New();
   this->LmkRightFrame= vtkKWFrame::New();
   this->LmkFrame = vtkKWFrame::New();
-  this->LmkMainFrame = vtkKWFrameLabeled::New();
-  this->LmkCommentsFrame= vtkKWFrameLabeled::New();
+  this->LmkMainFrame = vtkKWFrameWithLabel::New();
+  this->LmkCommentsFrame= vtkKWFrameWithLabel::New();
   this->LmkDatasetLabel= vtkKWLabel::New();
-  this->LmkDatasetCheckbox = vtkKWCheckButtonLabeled::New();
+  this->LmkDatasetCheckbox = vtkKWCheckButtonWithLabel::New();
   this->LmkDatasetFrame = vtkKWFrame::New();
   this->LmkCommentsText= vtkKWText::New();
   this->LmkNameField = vtkKWText::New();

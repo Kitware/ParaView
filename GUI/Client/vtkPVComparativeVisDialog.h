@@ -24,9 +24,9 @@
 
 #include "vtkKWDialog.h"
 
-class vtkKWEntryLabeled;
+class vtkKWEntryWithLabel;
 class vtkKWFrame;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWPushButton;
 class vtkPVComparativeVis;
 class vtkPVComparativeVisPropertyWidget;
@@ -80,9 +80,9 @@ protected:
   // To edit the keyframes
   vtkPVTrackEditor* TrackEditor;
   // The name of the visualization
-  vtkKWEntryLabeled* NameEntry;
+  vtkKWEntryWithLabel* NameEntry;
   // The property list
-  vtkKWFrameLabeled* VisualizationListFrame;
+  vtkKWFrameWithLabel* VisualizationListFrame;
 
   vtkKWFrame* MainFrame;
   vtkKWPushButton* CloseButton;

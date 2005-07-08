@@ -18,7 +18,7 @@
 #include "vtkFloatArray.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -35,12 +35,12 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.59");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.60");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 {
-  this->LabeledFrame = vtkKWFrameLabeled::New();
+  this->LabeledFrame = vtkKWFrameWithLabel::New();
   this->LabeledFrame->SetParent(this);
   
   this->TimeLabel = vtkKWLabel::New();

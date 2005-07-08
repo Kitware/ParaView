@@ -37,7 +37,7 @@
 class vtkKWMenuButton;
 class vtkKWListBoxWithScrollbars;
 class vtkXDMFReaderModuleInternal;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 
 class VTK_EXPORT vtkXDMFReaderModule : public vtkPVAdvancedReaderModule
 {
@@ -77,7 +77,7 @@ protected:
   vtkXDMFReaderModule();
   ~vtkXDMFReaderModule();
 
-  vtkKWFrameLabeled *DomainGridFrame;
+  vtkKWFrameWithLabel *DomainGridFrame;
   vtkKWMenuButton *DomainMenu;
   vtkKWListBoxWithScrollbars* GridSelection;
 

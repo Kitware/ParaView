@@ -18,10 +18,10 @@
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.43");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -198,7 +198,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->InterfaceSettingsFrame)
     {
-    this->InterfaceSettingsFrame = vtkKWFrameLabeled::New();
+    this->InterfaceSettingsFrame = vtkKWFrameWithLabel::New();
     }
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
@@ -299,7 +299,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->InterfaceCustomizationFrame)
     {
-    this->InterfaceCustomizationFrame = vtkKWFrameLabeled::New();
+    this->InterfaceCustomizationFrame = vtkKWFrameWithLabel::New();
     }
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
@@ -343,7 +343,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->ToolbarSettingsFrame)
     {
-    this->ToolbarSettingsFrame = vtkKWFrameLabeled::New();
+    this->ToolbarSettingsFrame = vtkKWFrameWithLabel::New();
     }
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
@@ -398,7 +398,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->PrintSettingsFrame)
     {
-    this->PrintSettingsFrame = vtkKWFrameLabeled::New();
+    this->PrintSettingsFrame = vtkKWFrameWithLabel::New();
     }
 
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
@@ -416,7 +416,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->DPIOptionMenu)
     {
-    this->DPIOptionMenu = vtkKWMenuButtonLabeled::New();
+    this->DPIOptionMenu = vtkKWMenuButtonWithLabel::New();
     }
 
   this->DPIOptionMenu->SetParent(frame);

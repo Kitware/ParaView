@@ -25,7 +25,7 @@
 
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProperty;
@@ -96,7 +96,7 @@ protected:
   vtkPVOrientScaleWidget();
   ~vtkPVOrientScaleWidget();
 
-  vtkKWFrameLabeled *LabeledFrame;
+  vtkKWFrameWithLabel *LabeledFrame;
   vtkKWFrame *ScalarsFrame;
   vtkKWLabel *ScalarsLabel;
   vtkKWMenuButton *ScalarsMenu;

@@ -19,8 +19,8 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWCheckButtonLabeled.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWCheckButtonWithLabel.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.23");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.24");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app)
@@ -222,12 +222,12 @@ void vtkPVConnectDialog::MPICheckBoxCallback()
 vtkPVConnectDialog::vtkPVConnectDialog()
 {
   this->Username = vtkKWEntry::New();
-  this->Hostname = vtkKWEntryLabeled::New();
+  this->Hostname = vtkKWEntryWithLabel::New();
   this->Hostname->GetWidget()->PullDownOn();
-  this->Port = vtkKWEntryLabeled::New();
+  this->Port = vtkKWEntryWithLabel::New();
   this->Label = vtkKWLabel::New();
   this->MPINumberOfServers = vtkKWScale::New();
-  this->MPIMode = vtkKWCheckButtonLabeled::New();
+  this->MPIMode = vtkKWCheckButtonWithLabel::New();
 
   this->HostnameString = 0;
   this->PortInt = 0;

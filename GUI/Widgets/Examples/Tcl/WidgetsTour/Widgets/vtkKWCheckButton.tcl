@@ -30,12 +30,12 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   # Create another checkbutton with a label this time
 
-  vtkKWCheckButtonLabeled cb3
+  vtkKWCheckButtonWithLabel cb3
   cb3 SetParent $parent
   cb3 Create $app
   cb3 SetLabelText "Another checkbutton with a label in front"
   cb3 SetBalloonHelpString \
-    "This is a vtkKWCheckButtonLabeled i.e. a checkbutton associated to a\
+    "This is a vtkKWCheckButtonWithLabel i.e. a checkbutton associated to a\
     label that can be positioned around the checkbutton."
 
   pack [cb3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
@@ -82,7 +82,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
-  # TODO: use vtkKWCheckButtonSetLabeled
+  # TODO: use vtkKWCheckButtonSetWithLabel
 
   return "TypeComposite"
 }

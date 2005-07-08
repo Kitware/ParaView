@@ -23,7 +23,7 @@
 
 class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkPVAnimationCue;
 class vtkPVVerticalAnimationInterfaceObserver;
@@ -108,12 +108,12 @@ protected:
   vtkPVTrackEditor* TrackEditor;
 
   vtkKWFrameWithScrollbar* TopFrame;
-  vtkKWFrameLabeled* ScenePropertiesFrame;
-  vtkKWFrameLabeled* SelectorFrame;
+  vtkKWFrameWithLabel* ScenePropertiesFrame;
+  vtkKWFrameWithLabel* SelectorFrame;
 
   vtkKWCheckButton* RecordAllButton;
 
-  vtkKWFrameLabeled* SaveFrame;
+  vtkKWFrameWithLabel* SaveFrame;
   vtkKWCheckButton* CacheGeometryCheck;
   vtkKWCheckButton* AdvancedAnimationCheck;
   

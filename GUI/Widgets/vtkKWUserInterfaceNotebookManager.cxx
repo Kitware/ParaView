@@ -16,7 +16,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWTkUtilities.h"
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.42");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceNotebookManagerInternals
@@ -605,22 +605,22 @@ void vtkKWUserInterfaceNotebookManager::SetEnableDragAndDrop(int arg)
 int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
   vtkKWWidget *widget, vtkKWWidget **anchor)
 {
-  // Check if the widget is a labeled frame (vtkKWFrameLabeled). 
+  // Check if the widget is a labeled frame (vtkKWFrameWithLabel). 
   // In that case, the widget can be drag&dropped, and its anchor is 
   // the widget's anchor itself.
   // If we did not find such a frame, check if it is a widget with a single
-  // labeled frame child (i.e. a vtkKWWidget that uses a vtkKWFrameLabeled 
-  // but did not want to inherit from vtkKWFrameLabeled)
+  // labeled frame child (i.e. a vtkKWWidget that uses a vtkKWFrameWithLabel 
+  // but did not want to inherit from vtkKWFrameWithLabel)
   // In that case, the widget can be drag&dropped, and its anchor is 
   // the internal labeled frame's anchor.
 
   if (widget)
     {
-    vtkKWFrameLabeled *frame = 
-      vtkKWFrameLabeled::SafeDownCast(widget);
+    vtkKWFrameWithLabel *frame = 
+      vtkKWFrameWithLabel::SafeDownCast(widget);
     if (!frame && widget->GetNumberOfChildren() == 1)
       {
-      frame = vtkKWFrameLabeled::SafeDownCast(widget->GetNthChild(0));
+      frame = vtkKWFrameWithLabel::SafeDownCast(widget->GetNthChild(0));
       }
     if (frame)
       {
@@ -644,11 +644,11 @@ char* vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLabel(
 
   if (widget)
     {
-    vtkKWFrameLabeled *frame = 
-      vtkKWFrameLabeled::SafeDownCast(widget);
+    vtkKWFrameWithLabel *frame = 
+      vtkKWFrameWithLabel::SafeDownCast(widget);
     if (!frame && widget->GetNumberOfChildren() == 1)
       {
-      frame = vtkKWFrameLabeled::SafeDownCast(widget->GetNthChild(0));
+      frame = vtkKWFrameWithLabel::SafeDownCast(widget->GetNthChild(0));
       }
     if (frame)
       {

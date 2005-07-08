@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.48");
+vtkCxxRevisionMacro(vtkKWRange, "1.49");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -303,17 +303,17 @@ void vtkKWRange::Pack()
       {
       switch (this->LabelPosition)
         {
-        case vtkKWWidgetLabeled::LabelPositionLeft:
+        case vtkKWWidgetWithLabel::LabelPositionLeft:
           col = 0; row = 1; sticky = "nsw"; anchor = "w";
           break;
-        case vtkKWWidgetLabeled::LabelPositionRight:
+        case vtkKWWidgetWithLabel::LabelPositionRight:
           col = 6; row = 1; sticky = "nsw"; anchor = "w";
           break;
-        case vtkKWWidgetLabeled::LabelPositionBottom:
+        case vtkKWWidgetWithLabel::LabelPositionBottom:
           col = 4; row = 2; sticky = "ew"; anchor = "c";
           break;
-        case vtkKWWidgetLabeled::LabelPositionDefault:
-        case vtkKWWidgetLabeled::LabelPositionTop:
+        case vtkKWWidgetWithLabel::LabelPositionDefault:
+        case vtkKWWidgetWithLabel::LabelPositionTop:
         default:
           col = 4; row = 0; sticky = "ew"; anchor = "c";
           break;
@@ -321,18 +321,18 @@ void vtkKWRange::Pack()
       } else {
       switch (this->LabelPosition)
         {
-        case vtkKWWidgetLabeled::LabelPositionDefault:
-        case vtkKWWidgetLabeled::LabelPositionLeft:
+        case vtkKWWidgetWithLabel::LabelPositionDefault:
+        case vtkKWWidgetWithLabel::LabelPositionLeft:
         default:
           col = 0; row = 4; sticky = "nsw"; anchor = "w";
           break;
-        case vtkKWWidgetLabeled::LabelPositionRight:
+        case vtkKWWidgetWithLabel::LabelPositionRight:
           col = 2; row = 4; sticky = "nsw"; anchor = "w";
           break;
-        case vtkKWWidgetLabeled::LabelPositionBottom:
+        case vtkKWWidgetWithLabel::LabelPositionBottom:
           col = 1; row = 6; sticky = "ew"; anchor = "w";
           break;
-        case vtkKWWidgetLabeled::LabelPositionTop:
+        case vtkKWWidgetWithLabel::LabelPositionTop:
           col = 1; row = 0; sticky = "ew"; anchor = "w";
           break;
         }

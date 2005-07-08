@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWFrameLabeled.h
+  Module:    vtkKWFrameWithLabel.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,14 +11,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWFrameLabeled - a frame with a grooved border and a label
+// .NAME vtkKWFrameWithLabel - a frame with a grooved border and a label
 // .SECTION Description
-// The LabeledFrame creates a frame with a grooved border, and a label
+// The vtkKWFrameWithLabel creates a frame with a grooved border, and a label
 // embedded in the upper left corner of the grooved border.
 
 
-#ifndef __vtkKWFrameLabeled_h
-#define __vtkKWFrameLabeled_h
+#ifndef __vtkKWFrameWithLabel_h
+#define __vtkKWFrameWithLabel_h
 
 #include "vtkKWCompositeWidget.h"
 
@@ -26,13 +26,13 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
-class vtkKWLabelLabeled;
+class vtkKWLabelWithLabel;
 
-class KWWIDGETS_EXPORT vtkKWFrameLabeled : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWFrameWithLabel : public vtkKWCompositeWidget
 {
 public:
-  static vtkKWFrameLabeled* New();
-  vtkTypeRevisionMacro(vtkKWFrameLabeled,vtkKWCompositeWidget);
+  static vtkKWFrameWithLabel* New();
+  vtkTypeRevisionMacro(vtkKWFrameWithLabel,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -92,14 +92,14 @@ public:
   static void SetLabelCase(int v);
   static int GetLabelCase();
   static void SetLabelCaseToUserSpecified() 
-    { vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LabelCaseUserSpecified);};
+    { vtkKWFrameWithLabel::SetLabelCase(
+      vtkKWFrameWithLabel::LabelCaseUserSpecified);};
   static void SetLabelCaseToUppercaseFirst() 
-    {vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LabelCaseUppercaseFirst);};
+    {vtkKWFrameWithLabel::SetLabelCase(
+      vtkKWFrameWithLabel::LabelCaseUppercaseFirst);};
   static void SetLabelCaseToLowercaseFirst() 
-    {vtkKWFrameLabeled::SetLabelCase(
-      vtkKWFrameLabeled::LabelCaseLowercaseFirst);};
+    {vtkKWFrameWithLabel::SetLabelCase(
+      vtkKWFrameWithLabel::LabelCaseLowercaseFirst);};
 
   // Description:
   // Globally enable or disable bold label.
@@ -131,12 +131,12 @@ public:
 
 protected:
 
-  vtkKWFrameLabeled();
-  ~vtkKWFrameLabeled();
+  vtkKWFrameWithLabel();
+  ~vtkKWFrameWithLabel();
 
   vtkKWFrame        *Frame;
   vtkKWFrame        *LabelFrame;
-  vtkKWLabelLabeled *Label;
+  vtkKWLabelWithLabel *Label;
 
   vtkKWFrame       *Border;
   vtkKWFrame       *Border2;
@@ -155,8 +155,8 @@ protected:
   virtual vtkKWLabel *GetLabelIcon();
 
 private:
-  vtkKWFrameLabeled(const vtkKWFrameLabeled&); // Not implemented
-  void operator=(const vtkKWFrameLabeled&); // Not implemented
+  vtkKWFrameWithLabel(const vtkKWFrameWithLabel&); // Not implemented
+  void operator=(const vtkKWFrameWithLabel&); // Not implemented
 };
 
 #endif

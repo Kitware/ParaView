@@ -28,7 +28,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.19");
+vtkCxxRevisionMacro(vtkKWView, "1.20");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -152,7 +152,7 @@ vtkKWView::vtkKWView()
 
   this->GeneralPropertiesFrame = vtkKWFrameWithScrollbar::New();
 
-  this->ColorsFrame = vtkKWFrameLabeled::New();
+  this->ColorsFrame = vtkKWFrameWithLabel::New();
   this->RendererBackgroundColor = vtkKWChangeColorButton::New();
 
   this->Printing = 0;

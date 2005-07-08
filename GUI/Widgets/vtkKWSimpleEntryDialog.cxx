@@ -16,18 +16,18 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.9");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
 {
-  this->Entry = vtkKWEntryLabeled::New();
+  this->Entry = vtkKWEntryWithLabel::New();
 }
 
 //----------------------------------------------------------------------------

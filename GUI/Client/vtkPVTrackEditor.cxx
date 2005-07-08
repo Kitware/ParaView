@@ -17,7 +17,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWMenuButton.h"
@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.11");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.12");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -78,7 +78,7 @@ protected:
 //-----------------------------------------------------------------------------
 vtkPVTrackEditor::vtkPVTrackEditor()
 {
-  this->KeyFramePropertiesFrame = vtkKWFrameLabeled::New();
+  this->KeyFramePropertiesFrame = vtkKWFrameWithLabel::New();
   this->PropertiesFrame = vtkKWFrame::New();
   this->SelectKeyFrameLabel = vtkKWLabel::New();
   

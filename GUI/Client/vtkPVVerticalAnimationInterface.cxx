@@ -18,7 +18,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkCommand.h"
@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.22");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.23");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -61,12 +61,12 @@ vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.22");
 vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 {
   this->TopFrame = vtkKWFrameWithScrollbar::New();
-  this->ScenePropertiesFrame = vtkKWFrameLabeled::New();
+  this->ScenePropertiesFrame = vtkKWFrameWithLabel::New();
 
   this->RecordAllButton = vtkKWCheckButton::New();
-  this->SelectorFrame = vtkKWFrameLabeled::New();
+  this->SelectorFrame = vtkKWFrameWithLabel::New();
 
-  this->SaveFrame = vtkKWFrameLabeled::New();
+  this->SaveFrame = vtkKWFrameWithLabel::New();
   this->CacheGeometryCheck = vtkKWCheckButton::New();
   this->AdvancedAnimationCheck = vtkKWCheckButton::New();
  

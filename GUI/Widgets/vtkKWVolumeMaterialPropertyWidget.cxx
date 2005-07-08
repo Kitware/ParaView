@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWCheckButtonLabeled.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWCheckButtonWithLabel.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -51,7 +51,7 @@ vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
   this->ComponentSelectionWidget = 
     vtkKWScalarComponentSelectionWidget::New();
 
-  this->EnableShadingCheckButton = vtkKWCheckButtonLabeled::New();
+  this->EnableShadingCheckButton = vtkKWCheckButtonWithLabel::New();
 }
 
 //----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void vtkKWVolumeMaterialPropertyWidget::Create(vtkKWApplication *app)
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWMenuButtonLabeled *omenu = 
+  vtkKWMenuButtonWithLabel *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
   

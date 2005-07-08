@@ -60,7 +60,7 @@
 #ifdef PARAVIEW_USE_EXODUS
 #include "vtkPVBasicDSPFilterWidget.h"
 #endif
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkKWText.h"
 #include "vtkSMPropertyIterator.h"
@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.15");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.16");
 
 
 //*****************************************************************************

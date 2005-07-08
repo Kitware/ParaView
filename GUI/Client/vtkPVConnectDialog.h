@@ -30,11 +30,11 @@
 
 #include "vtkKWMessageDialog.h"
 
-class vtkKWCheckButtonLabeled;
+class vtkKWCheckButtonWithLabel;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWScale;
-class vtkKWEntryLabeled;
+class vtkKWEntryWithLabel;
 class vtkKWApplication;
 class vtkStringList;
 
@@ -71,10 +71,10 @@ protected:
   ~vtkPVConnectDialog();
 
   vtkKWEntry* Username;
-  vtkKWEntryLabeled* Hostname;
-  vtkKWEntryLabeled* Port;
+  vtkKWEntryWithLabel* Hostname;
+  vtkKWEntryWithLabel* Port;
   vtkKWLabel* Label;
-  vtkKWCheckButtonLabeled* MPIMode;
+  vtkKWCheckButtonWithLabel* MPIMode;
   vtkKWScale* MPINumberOfServers;
 
   vtkSetStringMacro(HostnameString);

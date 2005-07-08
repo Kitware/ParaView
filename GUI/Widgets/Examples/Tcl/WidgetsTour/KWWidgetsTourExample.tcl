@@ -92,7 +92,7 @@ source_split Create app
 pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 # Add text widget to display the Tcl example source
 
-vtkKWTextWithScrollbarsLabeled tcl_source_text
+vtkKWTextWithScrollbarsWithLabel tcl_source_text
 tcl_source_text SetParent [source_split GetFrame1]
 tcl_source_text Create app
 tcl_source_text SetLabelPositionToTop
@@ -113,7 +113,7 @@ pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pad
 
 # Add text widget to display the C++ example source
 
-vtkKWTextWithScrollbarsLabeled cxx_source_text
+vtkKWTextWithScrollbarsWithLabel cxx_source_text
 cxx_source_text SetParent [source_split GetFrame2]
 cxx_source_text Create app
 cxx_source_text SetLabelPositionToTop

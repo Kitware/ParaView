@@ -1,5 +1,5 @@
 #include "vtkKWPushButton.h"
-#include "vtkKWPushButtonLabeled.h"
+#include "vtkKWPushButtonWithLabel.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
@@ -52,13 +52,13 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
 
   // Create another push button, with a label this time
 
-  vtkKWPushButtonLabeled *pushbutton3 = vtkKWPushButtonLabeled::New();
+  vtkKWPushButtonWithLabel *pushbutton3 = vtkKWPushButtonWithLabel::New();
   pushbutton3->SetParent(parent);
   pushbutton3->Create(app);
   pushbutton3->SetLabelText("Press this...");
   pushbutton3->GetWidget()->SetText("button");
   pushbutton3->SetBalloonHelpString(
-    "This is a vtkKWPushButtonLabeled, i.e. a pushbutton associated to a "
+    "This is a vtkKWPushButtonWithLabel, i.e. a pushbutton associated to a "
     "label that can be positioned around the pushbutton.");
 
   app->Script(

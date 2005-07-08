@@ -26,9 +26,9 @@ class vtkActor2D;
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWLabel;
-class vtkKWCheckButtonSetLabeled;
-class vtkKWMenuButtonLabeled;
-class vtkKWPushButtonSetLabeled;
+class vtkKWCheckButtonSetWithLabel;
+class vtkKWMenuButtonWithLabel;
+class vtkKWPushButtonSetWithLabel;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkTextProperty;
@@ -194,10 +194,10 @@ protected:
   vtkKWChangeColorButton *ChangeColorButton;
 
   int ShowFontFamily;
-  vtkKWMenuButtonLabeled *FontFamilyOptionMenu;
+  vtkKWMenuButtonWithLabel *FontFamilyOptionMenu;
 
   int ShowStyles;
-  vtkKWCheckButtonSetLabeled *StylesCheckButtonSet;
+  vtkKWCheckButtonSetWithLabel *StylesCheckButtonSet;
   
   int ShowOpacity;
   vtkKWScale *OpacityScale;
@@ -206,7 +206,7 @@ protected:
   char *ColorChangedCommand;
 
   int ShowCopy;
-  vtkKWPushButtonSetLabeled *PushButtonSet;
+  vtkKWPushButtonSetWithLabel *PushButtonSet;
 
 private:
   vtkKWTextPropertyEditor(const vtkKWTextPropertyEditor&); // Not implemented

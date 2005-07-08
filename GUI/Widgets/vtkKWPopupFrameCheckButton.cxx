@@ -15,13 +15,13 @@
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.7");
+vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrameCheckButton::vtkKWPopupFrameCheckButton()

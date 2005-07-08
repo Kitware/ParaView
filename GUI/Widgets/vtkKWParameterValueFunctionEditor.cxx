@@ -21,7 +21,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWRange.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.52");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.53");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -196,7 +196,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->UserFrame                   = vtkKWFrame::New();
   this->TopRightFrame               = vtkKWFrame::New();
   this->RangeLabel                  = vtkKWLabel::New();
-  this->ParameterEntry              = vtkKWEntryLabeled::New();
+  this->ParameterEntry              = vtkKWEntryWithLabel::New();
   this->ValueTicksCanvas            = vtkKWCanvas::New();
   this->ParameterTicksCanvas        = vtkKWCanvas::New();
 
@@ -1428,7 +1428,7 @@ int vtkKWParameterValueFunctionEditor::IsTopLeftFrameUsed()
 {
   return ((this->ShowLabel && 
            (this->LabelPosition == 
-            vtkKWWidgetLabeled::LabelPositionDefault)) ||
+            vtkKWWidgetWithLabel::LabelPositionDefault)) ||
           (this->ShowRangeLabel && 
            (this->RangeLabelPosition == 
             vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault)) ||
@@ -1595,7 +1595,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWWidgetLabeled::LabelPositionTop) &&
+       vtkKWWidgetWithLabel::LabelPositionTop) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
@@ -1659,7 +1659,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWWidgetLabeled::LabelPositionDefault) &&
+       vtkKWWidgetWithLabel::LabelPositionDefault) &&
       this->HasLabel() && this->GetLabel()->IsCreated() &&
       this->TopLeftFrame && this->TopLeftFrame->IsCreated())
     {
@@ -1736,7 +1736,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWWidgetLabeled::LabelPositionLeft) &&
+       vtkKWWidgetWithLabel::LabelPositionLeft) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
@@ -2347,7 +2347,7 @@ void vtkKWParameterValueFunctionEditor::SetShowLabel(int arg)
 
   if (arg && 
       (this->LabelPosition == 
-       vtkKWWidgetLabeled::LabelPositionDefault) &&
+       vtkKWWidgetWithLabel::LabelPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());

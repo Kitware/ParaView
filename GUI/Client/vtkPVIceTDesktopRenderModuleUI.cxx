@@ -16,15 +16,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkTimerLog.h"
-#include "vtkKWFrameLabeled.h"
-
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.4");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()

@@ -31,15 +31,14 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWCheckButtonLabeled;
+class vtkKWCheckButtonWithLabel;
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWCheckButton;
 class vtkPVCameraIcon;
 class vtkKWText;
-class vtkKWCheckButtonLabeled;
 class vtkKWRadioButtonSet;
 
 
@@ -119,10 +118,10 @@ protected:
   vtkKWFrame *LmkLeftFrame;
   vtkKWFrame *LmkRightFrame;
   vtkKWFrame *LmkFrame;
-  vtkKWFrameLabeled *LmkMainFrame;
-  vtkKWFrameLabeled *LmkCommentsFrame;
+  vtkKWFrameWithLabel *LmkMainFrame;
+  vtkKWFrameWithLabel *LmkCommentsFrame;
   vtkKWLabel *LmkDatasetLabel;
-  vtkKWCheckButtonLabeled *LmkDatasetCheckbox;
+  vtkKWCheckButtonWithLabel *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
   vtkKWLabel *LmkIcon;
   vtkKWText *LmkCommentsText;

@@ -8,7 +8,7 @@
 #include "vtkKWSplitFrame.h"
 #include "vtkKWText.h"
 #include "vtkKWTextWithScrollbars.h"
-#include "vtkKWTextWithScrollbarsLabeled.h"
+#include "vtkKWTextWithScrollbarsWithLabel.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
@@ -150,8 +150,8 @@ int my_main(int argc, char *argv[])
 
   // Add text widget to display the Tcl example source
 
-  vtkKWTextWithScrollbarsLabeled *tcl_source_text = 
-    vtkKWTextWithScrollbarsLabeled::New();
+  vtkKWTextWithScrollbarsWithLabel *tcl_source_text = 
+    vtkKWTextWithScrollbarsWithLabel::New();
   tcl_source_text->SetParent(source_split->GetFrame1());
   tcl_source_text->Create(app);
   tcl_source_text->SetLabelPositionToTop();
@@ -173,8 +173,8 @@ int my_main(int argc, char *argv[])
 
   // Add text widget to display the C++ example source
 
-  vtkKWTextWithScrollbarsLabeled *cxx_source_text = 
-    vtkKWTextWithScrollbarsLabeled::New();
+  vtkKWTextWithScrollbarsWithLabel *cxx_source_text = 
+    vtkKWTextWithScrollbarsWithLabel::New();
   cxx_source_text->SetParent(source_split->GetFrame2());
   cxx_source_text->Create(app);
   cxx_source_text->SetLabelPositionToTop();

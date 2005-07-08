@@ -14,23 +14,22 @@
 =========================================================================*/
 // .NAME vtkKWBoundsDisplay - an entry with a label
 // .SECTION Description
-// The LabeledEntry creates an entry with a label in front of it; both are
-// contained in a frame
+// None
 
 
 #ifndef __vtkKWBoundsDisplay_h
 #define __vtkKWBoundsDisplay_h
 
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 
 class vtkKWApplication;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWFrameLabeled
+class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWFrameWithLabel
 {
 public:
   static vtkKWBoundsDisplay* New();
-  vtkTypeRevisionMacro(vtkKWBoundsDisplay, vtkKWFrameLabeled);
+  vtkTypeRevisionMacro(vtkKWBoundsDisplay, vtkKWFrameWithLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -1,7 +1,7 @@
 #include "vtkKWLabel.h"
-#include "vtkKWLabelLabeled.h"
+#include "vtkKWLabelWithLabel.h"
 #include "vtkKWLabelSet.h"
-#include "vtkKWLabelLabeledSet.h"
+#include "vtkKWLabelWithLabelSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 #include "vtkKWIcon.h"
@@ -59,14 +59,14 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
 
   // Create another label, with a label this time (!)
 
-  vtkKWLabelLabeled *label3 = vtkKWLabelLabeled::New();
+  vtkKWLabelWithLabel *label3 = vtkKWLabelWithLabel::New();
   label3->SetParent(parent);
   label3->Create(app);
   label3->GetLabel()->SetText("Name:");
   label3->GetLabel()->SetBackgroundColor(0.7, 0.7, 0.7);
   label3->GetWidget()->SetText("Sebastien Barre");
   label3->SetBalloonHelpString(
-    "This is a vtkKWLabelLabeled, i.e. a label associated to a "
+    "This is a vtkKWLabelWithLabel, i.e. a label associated to a "
     "label that can be positioned around the label. This can be used for "
     "example to label a value without having to construct a single "
     "label out of two separate elements, one of them likely not to change.");
@@ -79,13 +79,13 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
 
   // Create another label, with a label this time (!)
 
-  vtkKWLabelLabeled *label4 = vtkKWLabelLabeled::New();
+  vtkKWLabelWithLabel *label4 = vtkKWLabelWithLabel::New();
   label4->SetParent(parent);
   label4->Create(app);
   label4->GetLabel()->SetImageToPredefinedIcon(vtkKWIcon::IconInfoMini);
   label4->GetWidget()->SetText("Another use of a labeled label !");
   label4->SetBalloonHelpString(
-    "This is a vtkKWLabelLabeled, i.e. a label associated to a "
+    "This is a vtkKWLabelWithLabel, i.e. a label associated to a "
     "label that can be positioned around the label. This can be used for "
     "example to prefix a label with a small icon to emphasize its meaning. "
     "Predefined icons include warning, info, error, etc.");
@@ -138,7 +138,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   // An easy way to create a bunch of related widgets without allocating
   // them one by one
 
-  vtkKWLabelLabeledSet *label_set2 = vtkKWLabelLabeledSet::New();
+  vtkKWLabelWithLabelSet *label_set2 = vtkKWLabelWithLabelSet::New();
   label_set2->SetParent(parent);
   label_set2->Create(app);
   label_set2->SetBorderWidth(2);
@@ -150,12 +150,12 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
 
   for (i = 0; i < 3; i++)
     {
-    vtkKWLabelLabeled *label = label_set2->AddWidget(i);
+    vtkKWLabelWithLabel *label = label_set2->AddWidget(i);
     label->SetLabelWidth(15);
     label->GetLabel()->SetBackgroundColor(0.7, 0.7, 0.7);
     label->SetBalloonHelpString(
       "This labeled label (!) is part of a unique set "
-      "(a vtkKWLabeledLabelSet).");
+      "(a vtkKWWithLabelLabelSet).");
     }
 
   label_set2->GetWidget(0)->SetLabelText("First Name:");

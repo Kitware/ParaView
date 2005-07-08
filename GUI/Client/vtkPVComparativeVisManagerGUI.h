@@ -24,7 +24,7 @@
 
 class vtkCVProgressObserver;
 class vtkKWFrame;
-class vtkKWFrameLabeled;
+class vtkKWFrameWithLabel;
 class vtkKWListBox;
 class vtkKWPushButton;
 class vtkPVComparativeVis;
@@ -91,7 +91,7 @@ protected:
   vtkKWFrame* MainFrame;
 
   // List of visualizations
-  vtkKWFrameLabeled* ListFrame;
+  vtkKWFrameWithLabel* ListFrame;
   vtkKWListBox* ComparativeVisList;
 
   // Buttons

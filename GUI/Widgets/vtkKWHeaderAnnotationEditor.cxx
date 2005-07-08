@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryLabeled.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWEntryWithLabel.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWTextPropertyEditor.h"
@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.5");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -42,7 +42,7 @@ vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
   // GUI
 
   this->TextFrame               = vtkKWFrame::New();
-  this->TextEntry               = vtkKWEntryLabeled::New();
+  this->TextEntry               = vtkKWEntryWithLabel::New();
   this->TextPropertyWidget      = vtkKWTextPropertyEditor::New();
   this->TextPropertyPopupButton = NULL;
 }
@@ -182,7 +182,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
     {
     if (!this->TextPropertyPopupButton)
       {
-      this->TextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
+      this->TextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
     this->TextPropertyPopupButton->Create(app);

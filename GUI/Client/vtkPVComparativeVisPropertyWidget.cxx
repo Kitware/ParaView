@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkEventForwarderCommand.h"
 #include "vtkKWEntry.h"
-#include "vtkKWEntryLabeled.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
@@ -35,13 +35,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
 {
   this->TrackSelector = vtkPVActiveTrackSelector::New();
-  this->NumberOfFramesEntry = vtkKWEntryLabeled::New();
+  this->NumberOfFramesEntry = vtkKWEntryWithLabel::New();
 
   // Forward the WidgetModifiedEvent the track editor signals.
   vtkEventForwarderCommand* ef = vtkEventForwarderCommand::New();

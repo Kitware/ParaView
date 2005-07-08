@@ -20,7 +20,7 @@
 #include "vtkCommand.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWFrameLabeled.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.38");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -208,7 +208,7 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
-  this->Frame = vtkKWFrameLabeled::New();
+  this->Frame = vtkKWFrameWithLabel::New();
   this->Frame->SetParent(this);
   this->Frame->Create(app);
   this->Frame->SetLabelText(this->FrameLabel);

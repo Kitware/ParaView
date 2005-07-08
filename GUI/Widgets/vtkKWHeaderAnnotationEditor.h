@@ -20,8 +20,8 @@
 
 #include "vtkKWPopupFrameCheckButton.h"
 
-class vtkKWEntryLabeled;
-class vtkKWPopupButtonLabeled;
+class vtkKWEntryWithLabel;
+class vtkKWPopupButtonWithLabel;
 class vtkKWRenderWidget;
 class vtkKWTextPropertyEditor;
 class vtkTextActor;
@@ -100,9 +100,9 @@ protected:
   int                     PopupTextProperty;
 
   vtkKWFrame              *TextFrame;
-  vtkKWEntryLabeled       *TextEntry;
+  vtkKWEntryWithLabel       *TextEntry;
   vtkKWTextPropertyEditor *TextPropertyWidget;
-  vtkKWPopupButtonLabeled *TextPropertyPopupButton;
+  vtkKWPopupButtonWithLabel *TextPropertyPopupButton;
 
   virtual void Render();
   virtual void SetHeaderText(const char *txt);
