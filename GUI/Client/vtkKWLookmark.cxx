@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.17");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -72,11 +72,7 @@ vtkKWLookmark::~vtkKWLookmark()
     this->LmkIcon->Delete();
     this->LmkIcon = 0;
     }
-  if(this->Checkbox)
-    {
-    this->Checkbox->Delete();
-    this->Checkbox = 0;
-    }
+
   if(this->LmkDatasetLabel)
     {
     this->LmkDatasetLabel->Delete();
@@ -118,6 +114,12 @@ vtkKWLookmark::~vtkKWLookmark()
     {
     this->LmkRightFrame->Delete();
     this->LmkRightFrame= NULL;
+    }
+
+  if(this->Checkbox)
+    {
+    this->Checkbox->Delete();
+    this->Checkbox = 0;
     }
 
   if(this->LmkMainFrame)
@@ -173,16 +175,16 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkFrame->SetParent(this);
   this->LmkFrame->Create(app);
 
-  this->Checkbox->SetParent(this->LmkFrame);
-  this->Checkbox->SetIndicator(1);
-  this->Checkbox->Create(app);
-  this->Checkbox->SetState(0);
-
   this->LmkMainFrame->SetParent(this->LmkFrame);
   this->LmkMainFrame->ShowHideFrameOn();
   this->LmkMainFrame->Create(app);
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
+
+  this->Checkbox->SetParent(this->LmkMainFrame->GetLabelFrame());
+  this->Checkbox->SetIndicator(1);
+  this->Checkbox->Create(app);
+  this->Checkbox->SetState(0);
 
   this->GetDragAndDropTargetSet()->SetSourceAnchor(
     this->LmkMainFrame->GetLabel());
@@ -376,7 +378,6 @@ void vtkKWLookmark::Pack()
   this->SeparatorFrame->Unpack();
 
   // Repack everything
-  this->Script("pack %s -anchor nw -side left", this->Checkbox->GetWidgetName());
   this->Script("pack %s -anchor nw -side left -padx 1 -pady 1", this->LmkIcon->GetWidgetName());
   if(!this->MacroFlag)
     {
@@ -388,6 +389,7 @@ void vtkKWLookmark::Pack()
   this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->LmkCommentsFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -side left", this->LmkLeftFrame->GetWidgetName());
   this->Script("pack %s -anchor w -side left -expand true -fill x -padx 3", this->LmkRightFrame->GetWidgetName());
+  this->Script("pack %s -before %s -anchor nw -side left", this->Checkbox->GetWidgetName(),this->LmkMainFrame->GetLabel()->GetWidgetName());
   this->Script("pack %s -fill x -expand true -side left", this->LmkMainFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -fill x -expand true", this->LmkFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -expand t -fill both", this->SeparatorFrame->GetWidgetName());

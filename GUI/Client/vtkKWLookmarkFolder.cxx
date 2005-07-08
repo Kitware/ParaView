@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.17");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -112,17 +112,17 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->MainFrame->SetParent(this);
   this->MainFrame->Create(app);
 
-  this->Checkbox->SetParent(this->MainFrame);
-  this->Checkbox->SetIndicator(1);
-  this->Checkbox->Create(app);
-  this->Checkbox->SetState(0);
-  this->Checkbox->SetCommand(this, "SelectCallback");
-
   this->LabelFrame->SetParent(this->MainFrame);
   this->LabelFrame->ShowHideFrameOn();
   this->LabelFrame->Create(app);
   this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
+
+  this->Checkbox->SetParent(this->LabelFrame->GetLabelFrame());
+  this->Checkbox->SetIndicator(1);
+  this->Checkbox->Create(app);
+  this->Checkbox->SetState(0);
+  this->Checkbox->SetCommand(this, "SelectCallback");
 
   if(!this->MacroFlag)
     {
@@ -243,14 +243,14 @@ void vtkKWLookmarkFolder::Pack()
   this->MainFrame->Unpack();
   this->SeparatorFrame->Unpack();
 
-  if(this->MacroFlag==0)
-    {
-    this->Script("pack %s -anchor nw -side left", this->Checkbox->GetWidgetName());
-    }
   this->Script("pack %s -anchor nw -expand t -fill x -side top", 
               this->NestedSeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",
               this->NestedSeparatorFrame->GetWidgetName()); 
+  if(this->MacroFlag==0)//
+    {
+    this->Script("pack %s -before %s -anchor nw -side left", this->Checkbox->GetWidgetName(),this->LabelFrame->GetLabel()->GetWidgetName());
+    }
   this->Script("pack %s -fill x -expand t -side left", 
               this->LabelFrame->GetWidgetName());
   this->Script("%s configure -bd 3",
