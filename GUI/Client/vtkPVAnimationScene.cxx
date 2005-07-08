@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.42");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.43");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -508,7 +508,10 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
   case vtkCommand::EndAnimationCueEvent:
   case vtkCommand::AnimationCueTickEvent:
       {
-      
+      if (!this->AnimationSceneProxy)
+        {
+        return;
+        }
       double etime = this->AnimationSceneProxy->GetEndTime();
       double stime = this->AnimationSceneProxy->GetStartTime();
       double ntime = 
@@ -535,6 +538,10 @@ void vtkPVAnimationScene::DurationChangedCallback()
 //-----------------------------------------------------------------------------
 double vtkPVAnimationScene::GetDuration()
 {
+  if (!this->AnimationSceneProxy)
+    {
+    return 0;
+    }
   return this->AnimationSceneProxy->GetEndTime();
 }
 
@@ -635,7 +642,10 @@ void vtkPVAnimationScene::Play()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::Stop()
 {
-  this->AnimationSceneProxy->Stop();
+  if (this->AnimationSceneProxy)
+    {
+    this->AnimationSceneProxy->Stop();
+    }
   if (this->Window && this->Window->GetCurrentPVSource() )
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
@@ -652,12 +662,20 @@ void vtkPVAnimationScene::GoToBeginning()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToEnd()
 {
+  if (!this->AnimationSceneProxy)
+    {
+    return;
+    }
   this->SetCurrentTimeWithTrace(this->AnimationSceneProxy->GetEndTime());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToNext()
 {
+  if (!this->AnimationSceneProxy)
+    {
+    return;
+    }
   double time = this->TimeScale->GetValue();
   double duration = this->AnimationSceneProxy->GetEndTime();
   double newtime = time + 1.0/this->AnimationSceneProxy->GetFrameRate();
@@ -671,6 +689,10 @@ void vtkPVAnimationScene::GoToNext()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToPrevious()
 {
+  if (!this->AnimationSceneProxy)
+    {
+    return;
+    }
   double time = this->TimeScale->GetValue();
   double newtime = time - 1.0/this->AnimationSceneProxy->GetFrameRate();
   newtime = (newtime < 0) ? 0 : newtime;
@@ -864,7 +886,10 @@ int vtkPVAnimationScene::GetCaching()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::InvalidateAllGeometries()
 {
-  this->AnimationSceneProxy->CleanCache();
+  if (this->AnimationSceneProxy)
+    {
+    this->AnimationSceneProxy->CleanCache();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -982,6 +1007,10 @@ void vtkPVAnimationScene::AddAnimationCue(vtkPVAnimationCue *pvCue)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::RemoveAnimationCue(vtkPVAnimationCue* pvCue)
 {
+  if (!this->AnimationSceneProxy)
+    {
+    return;
+    }
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->AnimationSceneProxy->GetProperty("Cues"));
   pp->RemoveProxy(pvCue->GetCueProxy());
