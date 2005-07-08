@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.26");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -140,10 +140,11 @@ void vtkKWMenuButton::AddRadioButton(const char *label,
                                      const char *method,
                                      const char *help)
 {
-  vtksys_stl::string var(this->GetWidgetName());
-  var += "Value";
-  this->Menu->AddRadioButton(
-    0, label, var.c_str(), obj, method, help);
+  vtksys_stl::string options("-variable ");
+  options += this->GetWidgetName();
+  options += "Value";
+  this->Menu->AddGeneric(
+    "radiobutton", label, obj, method, options.c_str(), help);
 }
 
 //----------------------------------------------------------------------------
@@ -152,10 +153,16 @@ void vtkKWMenuButton::AddRadioButtonImage(const char *image_name,
                                           const char *method,
                                           const char *help)
 {
-  vtksys_stl::string var(this->GetWidgetName());
-  var += "Value";
-  this->Menu->AddRadioButtonImage(
-    0, image_name, var.c_str(), obj, method, help);
+  vtksys_stl::string options("-variable ");
+  options += this->GetWidgetName();
+  options += "Value";
+  options += " -image ";
+  options += image_name;
+  options += " -selectimage ";
+  options += image_name;
+
+  this->Menu->AddGeneric(
+    "radiobutton", image_name, obj, method, options.c_str(), help);
 }
 
 //----------------------------------------------------------------------------
