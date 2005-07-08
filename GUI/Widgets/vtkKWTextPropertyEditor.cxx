@@ -20,9 +20,9 @@
 #include "vtkKWCheckButtonSet.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButtonSetLabeled.h"
-#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWMenuButtonLabeled.h"
 #include "vtkKWPushButtonSetLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWScale.h"
@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.8");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -118,7 +118,7 @@ vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
   this->ChangeColorButton = vtkKWChangeColorButton::New();
 
   this->ShowFontFamily = 1;
-  this->FontFamilyOptionMenu = vtkKWOptionMenuLabeled::New();
+  this->FontFamilyOptionMenu = vtkKWMenuButtonLabeled::New();
 
   this->ShowStyles = 1;
   this->StylesCheckButtonSet = vtkKWCheckButtonSetLabeled::New();
@@ -226,13 +226,13 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   this->FontFamilyOptionMenu->ExpandWidgetOff();
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
-  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
     VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
 
-  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
     VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
 
-  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
     VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
 
   // Styles (bold, italic, shadow)

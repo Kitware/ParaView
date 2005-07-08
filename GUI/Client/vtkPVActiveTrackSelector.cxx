@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.8");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.9");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -89,7 +89,7 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
   this->SourceMenuButton->SetParent(this);
   this->SourceMenuButton->Create(app);
   this->SourceMenuButton->SetBalloonHelpString("Select a Source to animate.");
-  this->SourceMenuButton->SetButtonText("Unselected"); 
+  this->SourceMenuButton->SetValue("Unselected"); 
   
   this->PropertyLabel->SetParent(this);
   this->PropertyLabel->SetText("Property:");
@@ -99,7 +99,7 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
   this->PropertyMenuButton->Create(app);
   this->PropertyMenuButton->SetBalloonHelpString(
     "Select a Property to animate for the choosen Source.");
-  this->PropertyMenuButton->SetButtonText("Unselected"); 
+  this->PropertyMenuButton->SetValue("Unselected"); 
 
   if (!this->PackHorizontally)
     {
@@ -166,7 +166,8 @@ void vtkPVActiveTrackSelector::AddSource(vtkPVAnimationCueTree* cue)
   
   ostrstream command;
   command << "SelectSourceCallback " << key  << ends;
-  this->SourceMenuButton->AddCommand(cue->GetLabelText(), this, command.str(), 0);
+  this->SourceMenuButton->GetMenu()->AddCommand(
+    cue->GetLabelText(), this, command.str());
   command.rdbuf()->freeze(0);
 }
 
@@ -228,7 +229,7 @@ void vtkPVActiveTrackSelector::CleanupSource()
 {
   this->CleanupPropertiesMenu();
   this->CurrentSourceCueTree = 0;
-  this->SourceMenuButton->SetButtonText("Unselected"); 
+  this->SourceMenuButton->SetValue("Unselected"); 
 }
 
 //-----------------------------------------------------------------------------
@@ -263,7 +264,7 @@ void vtkPVActiveTrackSelector::SelectSourceCallbackInternal(
   
   vtkPVAnimationCueTree* cueTree = iter->second.GetPointer();
   this->CurrentSourceCueTree = cueTree;
-  this->SourceMenuButton->SetButtonText(cueTree->GetLabelText());
+  this->SourceMenuButton->SetValue(cueTree->GetLabelText());
   this->BuildPropertiesMenu(0, cueTree);
 }
 
@@ -272,7 +273,7 @@ void vtkPVActiveTrackSelector::CleanupPropertiesMenu()
 {
   this->PropertyMenuButton->GetMenu()->DeleteAllMenuItems();
   this->Internals->PropertyCues.clear();
-  this->PropertyMenuButton->SetButtonText("Unselected");
+  this->PropertyMenuButton->SetValue("Unselected");
 }
 
 //-----------------------------------------------------------------------------
@@ -310,7 +311,8 @@ void vtkPVActiveTrackSelector::BuildPropertiesMenu(const char* pretext,
 
       ostrstream command;
       command << "SelectPropertyCallback " << index << ends;
-      this->PropertyMenuButton->AddCommand(label.str(), this, command.str(), 0);
+      this->PropertyMenuButton->GetMenu()->AddCommand(
+        label.str(), this, command.str());
       command.rdbuf()->freeze(0);
       }
     label.rdbuf()->freeze(0);
@@ -338,7 +340,7 @@ void vtkPVActiveTrackSelector::SelectPropertyCallback(int cue_index)
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::SelectPropertyCallbackInternal(int cue_index)
 {
-  this->PropertyMenuButton->SetButtonText(
+  this->PropertyMenuButton->SetValue(
     this->PropertyMenuButton->GetMenu()->GetItemLabel(cue_index));
 
   vtkPVAnimationCue* cue= 

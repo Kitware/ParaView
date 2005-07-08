@@ -22,7 +22,8 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVCameraManipulator.h"
@@ -42,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.50");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -115,7 +116,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
     }
   for ( cc = 0; cc < 9; cc ++ )
     {
-    this->Menus[cc] = vtkKWOptionMenu::New();
+    this->Menus[cc] = vtkKWMenuButton::New();
     }
 
   this->ManipulatorCollection = 0;
@@ -194,14 +195,14 @@ void vtkPVInteractorStyleControl::UpdateMenus()
     int cc;
     for ( cc = 0; cc < 9; cc ++ )
       {
-      this->Menus[cc]->DeleteAllEntries();
+      this->Menus[cc]->GetMenu()->DeleteAllMenuItems();
       char command[100];
       for ( it = this->Internals->Manipulators.begin();
         it != this->Internals->Manipulators.end();
         ++it )
         {
         sprintf(command, "SetCurrentManipulator %d {%s}", cc, it->first.c_str());
-        this->Menus[cc]->AddEntryWithCommand(it->first.c_str(), this, command);
+        this->Menus[cc]->AddRadioButton(it->first.c_str(), this, command);
         }
       if ( this->GetManipulator(cc) == 0 && this->DefaultManipulator )
         {

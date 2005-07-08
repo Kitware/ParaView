@@ -20,7 +20,7 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
@@ -36,10 +36,11 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkKWFrame.h"
+#include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.78");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.79");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -50,7 +51,7 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ArrayName = NULL;
 
   this->Label = vtkKWLabel::New();
-  this->ArrayMenu = vtkKWOptionMenu::New();
+  this->ArrayMenu = vtkKWMenuButton::New();
 
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
@@ -383,7 +384,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   char methodAndArgs[1024];
 
   // Regenerate the menu, and look for the specified array.
-  this->ArrayMenu->DeleteAllEntries();
+
+  this->ArrayMenu->GetMenu()->DeleteAllMenuItems();
 
   vtkSMProperty* property = this->GetSMProperty();
   if (property)
@@ -409,7 +411,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
         }
       aname << ends;
       sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", arrayName);
-      this->ArrayMenu->AddEntryWithCommand(aname.str(), this, methodAndArgs);
+      this->ArrayMenu->AddRadioButton(aname.str(), this, methodAndArgs);
       delete[] aname.str();
       }
 

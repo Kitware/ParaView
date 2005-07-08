@@ -27,7 +27,7 @@
 #include "vtkPVObjectWidget.h"
 
 class vtkStringList;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWLabel;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkPVObjectWidget
@@ -140,7 +140,7 @@ protected:
   ~vtkPVSelectionList();
 
   vtkKWLabel *Label;
-  vtkKWOptionMenu *Menu;
+  vtkKWMenuButton *Menu;
   char *Command;
 
   int LabelVisibility;

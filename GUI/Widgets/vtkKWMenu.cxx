@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.75");
+vtkCxxRevisionMacro(vtkKWMenu, "1.76");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -582,6 +582,7 @@ void vtkKWMenu::AddRadioButtonImage(int value,
 {
   ostrstream str;
   str << "-image " << imgname 
+      << " -selectimage " << imgname 
       << " -value " << value 
       << " -variable " << buttonVar
       << ends;

@@ -39,9 +39,10 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWThumbWheel.h"
@@ -92,7 +93,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.38");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.39");
 
 //----------------------------------------------------------------------------
 
@@ -182,15 +183,15 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->VolumeScalarSelectionWidget = vtkPVColorSelectionWidget::New();
   
   this->VolumeRenderMethodMenuLabel = vtkKWLabel::New();
-  this->VolumeRenderMethodMenu = vtkKWOptionMenu::New();
+  this->VolumeRenderMethodMenu = vtkKWMenuButton::New();
   
   this->EditVolumeAppearanceButton = vtkKWPushButton::New();
 
   this->RepresentationMenuLabel = vtkKWLabel::New();
-  this->RepresentationMenu = vtkKWOptionMenu::New();
+  this->RepresentationMenu = vtkKWMenuButton::New();
   
   this->InterpolationMenuLabel = vtkKWLabel::New();
-  this->InterpolationMenu = vtkKWOptionMenu::New();
+  this->InterpolationMenu = vtkKWMenuButton::New();
   
   this->PointSizeLabel = vtkKWLabel::New();
   this->PointSizeThumbWheel = vtkKWThumbWheel::New();
@@ -699,13 +700,13 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->GetApplication());
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_OUTLINE_LABEL, this,
+  this->RepresentationMenu->AddRadioButton(VTK_PV_OUTLINE_LABEL, this,
                                                 "DrawOutline");
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_SURFACE_LABEL, this,
+  this->RepresentationMenu->AddRadioButton(VTK_PV_SURFACE_LABEL, this,
                                                 "DrawSurface");
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_WIREFRAME_LABEL, this,
+  this->RepresentationMenu->AddRadioButton(VTK_PV_WIREFRAME_LABEL, this,
                                                 "DrawWireframe");
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
+  this->RepresentationMenu->AddRadioButton(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
 
   this->RepresentationMenu->SetBalloonHelpString(
@@ -717,9 +718,9 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
 
   this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenu->Create(this->GetApplication());
-  this->InterpolationMenu->AddEntryWithCommand("Flat", this,
+  this->InterpolationMenu->AddRadioButton("Flat", this,
                                                "SetInterpolationToFlat");
-  this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
+  this->InterpolationMenu->AddRadioButton("Gouraud", this,
                                                "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
   this->InterpolationMenu->SetBalloonHelpString(
@@ -1327,8 +1328,8 @@ void vtkPVDisplayGUI::UpdateColorMenu()
     }
       
   // Populate menus
-  this->ColorSelectionMenu->DeleteAllEntries();
-  this->ColorSelectionMenu->AddEntryWithCommand("Property", 
+  this->ColorSelectionMenu->GetMenu()->DeleteAllMenuItems();
+  this->ColorSelectionMenu->AddRadioButton("Property", 
     this, "ColorByProperty");
   this->ColorSelectionMenu->SetPVSource(this->PVSource);
 
@@ -1419,9 +1420,9 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
 
   // Determine if this is unstructured grid data and add the 
   // volume rendering option
-  if ( this->RepresentationMenu->HasEntry( VTK_PV_VOLUME_LABEL ) )
+  if ( this->RepresentationMenu->GetMenu()->HasItem( VTK_PV_VOLUME_LABEL ) )
     {
-      this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
+    this->RepresentationMenu->GetMenu()->DeleteMenuItem( VTK_PV_VOLUME_LABEL );
     }
   
   if (!vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetHasVolumePipeline())
@@ -1429,7 +1430,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     this->VolumeRenderMode = 0;
     return;
     }
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+  this->RepresentationMenu->AddRadioButton(VTK_PV_VOLUME_LABEL, this,
     "DrawVolume");
 
   // Update the transfer functions    
@@ -1450,18 +1451,18 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     "VolumeRenderByArray");
   this->VolumeScalarSelectionWidget->Update();
   
-  this->VolumeRenderMethodMenu->DeleteAllEntries();
-  this->VolumeRenderMethodMenu->AddEntryWithCommand(
+  this->VolumeRenderMethodMenu->GetMenu()->DeleteAllMenuItems();
+  this->VolumeRenderMethodMenu->AddRadioButton(
     VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
   
   if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsZSweepMapper() )
     {
-    this->VolumeRenderMethodMenu->AddEntryWithCommand(
+    this->VolumeRenderMethodMenu->AddRadioButton(
       VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
     }
   if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsBunykMapper() )
     {
-    this->VolumeRenderMethodMenu->AddEntryWithCommand(
+    this->VolumeRenderMethodMenu->AddRadioButton(
       VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
     }
   

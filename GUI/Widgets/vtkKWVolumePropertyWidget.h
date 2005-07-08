@@ -29,9 +29,9 @@ class vtkKWColorTransferFunctionEditor;
 class vtkKWHSVColorSelector;
 class vtkKWHistogramSet;
 class vtkKWFrameLabeled;
-class vtkKWOptionMenuLabeled;
+class vtkKWMenuButtonLabeled;
 class vtkKWScaleSetLabeled;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWPiecewiseFunctionEditor;
 class vtkKWScalarComponentSelectionWidget;
 class vtkKWScale;
@@ -210,7 +210,7 @@ protected:
   vtkKWFrameLabeled                   *EditorFrame;
   vtkKWHSVColorSelector               *HSVColorSelector;
   vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
-  vtkKWOptionMenuLabeled              *InterpolationTypeOptionMenu;
+  vtkKWMenuButtonLabeled              *InterpolationTypeOptionMenu;
   vtkKWVolumeMaterialPropertyWidget   *MaterialPropertyWidget;
   vtkKWCheckButton                    *EnableShadingCheckButton;
   vtkKWCheckButton                    *InteractiveApplyCheckButton;
@@ -219,7 +219,7 @@ protected:
   vtkKWColorTransferFunctionEditor    *ScalarColorFunctionEditor;
   vtkKWCheckButton                    *LockOpacityAndColorCheckButton;
   vtkKWPiecewiseFunctionEditor        *GradientOpacityFunctionEditor;
-  vtkKWOptionMenu                     *EnableGradientOpacityOptionMenu;
+  vtkKWMenuButton                     *EnableGradientOpacityOptionMenu;
   vtkKWScaleSetLabeled                *ComponentWeightScaleSet;
 
   int                                 LockOpacityAndColor[VTK_MAX_VRCOMP];

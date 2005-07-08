@@ -29,7 +29,7 @@ class vtkKWLabel;
 class vtkKWTextWithScrollbars;
 class vtkKWFrame;
 class vtkKWWindow;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWCheckButton;
 class vtkPVTimerInformation;
 
@@ -107,9 +107,9 @@ protected:
   vtkKWPushButton*  ClearButton;
   vtkKWPushButton*  RefreshButton;
   vtkKWLabel*       ThresholdLabel;
-  vtkKWOptionMenu*  ThresholdMenu;
+  vtkKWMenuButton*  ThresholdMenu;
   vtkKWLabel*       BufferLengthLabel;
-  vtkKWOptionMenu*  BufferLengthMenu;
+  vtkKWMenuButton*  BufferLengthMenu;
   vtkKWLabel*       EnableLabel;
   vtkKWCheckButton* EnableCheck;
 

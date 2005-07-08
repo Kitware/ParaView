@@ -34,7 +34,7 @@ class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWEntryLabeled;
 class vtkKWRange;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 
 //BTX
 class ostrstream;
@@ -1134,7 +1134,7 @@ protected:
   int           ShowHistogramLogModeOptionMenu;
   char          *HistogramLogModeChangedCommand;
 
-  vtkKWOptionMenu  *HistogramLogModeOptionMenu;
+  vtkKWMenuButton  *HistogramLogModeOptionMenu;
   virtual void CreateHistogramLogModeOptionMenu(vtkKWApplication *app);
   virtual void UpdateHistogramLogModeOptionMenu();
 

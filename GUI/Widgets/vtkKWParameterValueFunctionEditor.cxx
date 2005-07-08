@@ -27,12 +27,12 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageBlend.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.51");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.52");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -143,7 +143,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->HistogramColor[2]           = 0.63;
 
   this->ShowHistogramLogModeOptionMenu  = 0;
-  this->HistogramLogModeOptionMenu      = vtkKWOptionMenu::New();
+  this->HistogramLogModeOptionMenu      = vtkKWMenuButton::New();
   this->HistogramLogModeChangedCommand  = NULL;
 
   this->SecondaryHistogramColor[0]  = 0.0;
@@ -1390,7 +1390,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
                                   icon->GetHeight(),
                                   icon->GetPixelSize());
  
-    this->HistogramLogModeOptionMenu->AddImageEntryWithCommand(
+    this->HistogramLogModeOptionMenu->AddRadioButtonImage(
       img_name.c_str(), this, "HistogramLogModeCallback 0");
 
     icon->SetImage(vtkKWIcon::IconGridLog);
@@ -1403,7 +1403,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
                                   icon->GetHeight(),
                                   icon->GetPixelSize());
  
-    this->HistogramLogModeOptionMenu->AddImageEntryWithCommand(
+    this->HistogramLogModeOptionMenu->AddRadioButtonImage(
       img_name.c_str(), this, "HistogramLogModeCallback 1");
 
     icon->Delete();
@@ -5871,7 +5871,7 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramLogModeOptionMenu()
     ostrstream img_name;
     img_name << this->HistogramLogModeOptionMenu->GetWidgetName() 
              << ".img" << log_mode << ends;
-    this->HistogramLogModeOptionMenu->SetCurrentImageEntry(img_name.str());
+    this->HistogramLogModeOptionMenu->SetValue(img_name.str());
     img_name.rdbuf()->freeze(0);
     if (!hist)
       {

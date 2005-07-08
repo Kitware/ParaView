@@ -16,23 +16,23 @@
 // This class displays a color preset selector as an option menu.
 // Different type of presets can be enabled/disabled.
 // .SECTION See Also
-// vtkKWOptionMenu
+// vtkKWMenuButton
 
 #ifndef __vtkKWColorPresetSelector_h
 #define __vtkKWColorPresetSelector_h
 
-#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWMenuButtonLabeled.h"
 
 class vtkColorTransferFunction;
 class vtkKWColorPresetSelectorInternals;
 
 //----------------------------------------------------------------------------
 
-class KWWIDGETS_EXPORT vtkKWColorPresetSelector : public vtkKWOptionMenuLabeled
+class KWWIDGETS_EXPORT vtkKWColorPresetSelector : public vtkKWMenuButtonLabeled
 {
 public:
   static vtkKWColorPresetSelector* New();
-  vtkTypeRevisionMacro(vtkKWColorPresetSelector,vtkKWOptionMenuLabeled);
+  vtkTypeRevisionMacro(vtkKWColorPresetSelector,vtkKWMenuButtonLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

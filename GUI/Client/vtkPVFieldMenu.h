@@ -27,10 +27,10 @@
 
 #include "vtkPVWidget.h"
 
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWWidget;
 class vtkKWLabel;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVDataSetAttributesInformation;
@@ -113,7 +113,7 @@ protected:
                         vtkPVXMLPackageParser* parser);
 
   vtkKWLabel* Label;
-  vtkKWOptionMenu* FieldMenu;
+  vtkKWMenuButton* FieldMenu;
   vtkPVInputMenu* InputMenu;
 
   void UpdateProperty();

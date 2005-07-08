@@ -27,7 +27,7 @@ class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWText;
 class vtkKWWindow;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWCheckButton;
 
 //BTX

@@ -20,7 +20,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrame.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
 #include "vtkKWTextWithScrollbars.h"
@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.32");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -48,9 +48,9 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->ClearButton = vtkKWPushButton::New();
   this->RefreshButton = vtkKWPushButton::New();
   this->ThresholdLabel = vtkKWLabel::New();
-  this->ThresholdMenu = vtkKWOptionMenu::New();
+  this->ThresholdMenu = vtkKWMenuButton::New();
   this->BufferLengthLabel = vtkKWLabel::New();
-  this->BufferLengthMenu = vtkKWOptionMenu::New();
+  this->BufferLengthMenu = vtkKWMenuButton::New();
   this->EnableLabel = vtkKWLabel::New();
   this->EnableCheck = vtkKWCheckButton::New();
 
@@ -173,11 +173,11 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->ThresholdLabel->SetBalloonHelpString("This option filters out short duration events.");
   this->ThresholdMenu->SetParent(this->ControlFrame);
   this->ThresholdMenu->Create(app);
-  this->ThresholdMenu->AddEntryWithCommand("0.0", this, "SetThreshold 0.001");
-  this->ThresholdMenu->AddEntryWithCommand("0.001", this, "SetThreshold 0.001");
-  this->ThresholdMenu->AddEntryWithCommand("0.01", this, "SetThreshold 0.01");
-  this->ThresholdMenu->AddEntryWithCommand("0.1", this, "SetThreshold 0.1");
-  this->ThresholdMenu->SetCurrentEntry("0.01");
+  this->ThresholdMenu->AddRadioButton("0.0", this, "SetThreshold 0.001");
+  this->ThresholdMenu->AddRadioButton("0.001", this, "SetThreshold 0.001");
+  this->ThresholdMenu->AddRadioButton("0.01", this, "SetThreshold 0.01");
+  this->ThresholdMenu->AddRadioButton("0.1", this, "SetThreshold 0.1");
+  this->ThresholdMenu->SetValue("0.01");
   this->SetThreshold(0.01);
 
   this->ThresholdMenu->SetBalloonHelpString("This option filters out short duration events.");
@@ -191,11 +191,11 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->BufferLengthLabel->SetBalloonHelpString("Set how many entries the log can have.");
   this->BufferLengthMenu->SetParent(this->ControlFrame);
   this->BufferLengthMenu->Create(app);
-  this->BufferLengthMenu->AddEntryWithCommand("100", this, "SetBufferLength 100");
-  this->BufferLengthMenu->AddEntryWithCommand("500", this, "SetBufferLength 500");
-  this->BufferLengthMenu->AddEntryWithCommand("1000", this, "SetBufferLength 1000");
-  this->BufferLengthMenu->AddEntryWithCommand("5000", this, "SetBufferLength 5000");
-  this->BufferLengthMenu->SetCurrentEntry("500");
+  this->BufferLengthMenu->AddRadioButton("100", this, "SetBufferLength 100");
+  this->BufferLengthMenu->AddRadioButton("500", this, "SetBufferLength 500");
+  this->BufferLengthMenu->AddRadioButton("1000", this, "SetBufferLength 1000");
+  this->BufferLengthMenu->AddRadioButton("5000", this, "SetBufferLength 5000");
+  this->BufferLengthMenu->SetValue("500");
   this->SetBufferLength(500);
   this->BufferLengthMenu->SetBalloonHelpString("Set how many entries the log can have.");
   this->Script("pack %s %s -side left",

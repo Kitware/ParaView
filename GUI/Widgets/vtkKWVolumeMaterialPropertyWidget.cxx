@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButtonLabeled.h"
 #include "vtkKWFrameLabeled.h"
-#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWMenuButtonLabeled.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -126,7 +126,7 @@ void vtkKWVolumeMaterialPropertyWidget::Create(vtkKWApplication *app)
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWOptionMenuLabeled *omenu = 
+  vtkKWMenuButtonLabeled *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
   

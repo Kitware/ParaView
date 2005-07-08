@@ -19,7 +19,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWMenu.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.13");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.14");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 

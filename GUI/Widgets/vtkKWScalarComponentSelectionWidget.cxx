@@ -14,13 +14,14 @@
 #include "vtkKWScalarComponentSelectionWidget.h"
 
 #include "vtkKWEvent.h"
-#include "vtkKWOptionMenuLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.13");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ vtkKWScalarComponentSelectionWidget::vtkKWScalarComponentSelectionWidget()
 
   // GUI
 
-  this->SelectedComponentOptionMenu     = vtkKWOptionMenuLabeled::New();
+  this->SelectedComponentOptionMenu     = vtkKWMenuButtonLabeled::New();
 }
 
 //----------------------------------------------------------------------------
@@ -134,12 +135,12 @@ void vtkKWScalarComponentSelectionWidget::Update()
 
   if (this->SelectedComponentOptionMenu)
     {
-    vtkKWOptionMenu *menu = this->SelectedComponentOptionMenu->GetWidget();
+    vtkKWMenuButton *menu = this->SelectedComponentOptionMenu->GetWidget();
 
     if (this->SelectedComponentOptionMenu->IsCreated() &&
-        menu->GetNumberOfEntries() != this->NumberOfComponents)
+        menu->GetMenu()->GetNumberOfItems() != this->NumberOfComponents)
       {
-      menu->DeleteAllEntries();
+      menu->GetMenu()->DeleteAllMenuItems();
       for (i = 0; i < this->NumberOfComponents; ++i)
         {
         ostrstream cmd_name, cmd_method;
@@ -147,14 +148,14 @@ void vtkKWScalarComponentSelectionWidget::Update()
         cmd_name << i + 1 << ends;
         cmd_method << "SelectedComponentCallback " << i << ends;
 
-        menu->AddEntryWithCommand(cmd_name.str(), this, cmd_method.str());
+        menu->AddRadioButton(cmd_name.str(), this, cmd_method.str());
 
         cmd_name.rdbuf()->freeze(0);
         cmd_method.rdbuf()->freeze(0);
         }
       }
     
-    if (menu->GetNumberOfEntries() && this->IndependentComponents)
+    if (menu->GetMenu()->GetNumberOfItems() && this->IndependentComponents)
       {
       ostrstream v;
       v << this->SelectedComponent + 1 << ends;

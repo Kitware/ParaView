@@ -31,7 +31,7 @@ class vtkKWLabel;
 class vtkKWFrameLabeled;
 class vtkKWFrame;
 class vtkKWMenuButton;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkSMProperty;
@@ -110,7 +110,7 @@ protected:
 
   vtkKWFrame* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
-  vtkKWOptionMenu* AttributeModeMenu;
+  vtkKWMenuButton* AttributeModeMenu;
   
   vtkKWFrameLabeled* CalculatorFrame;
   vtkKWEntry* FunctionLabel;

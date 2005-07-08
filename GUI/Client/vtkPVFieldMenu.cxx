@@ -17,7 +17,8 @@
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.29");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.30");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -46,7 +47,7 @@ vtkPVFieldMenu::vtkPVFieldMenu()
 {
   this->InputMenu = NULL;
   this->Label = vtkKWLabel::New();
-  this->FieldMenu = vtkKWOptionMenu::New();
+  this->FieldMenu = vtkKWMenuButton::New();
   this->Value = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   
 }
@@ -258,7 +259,7 @@ void vtkPVFieldMenu::Update()
 
   this->UpdateProperty();
 
-  this->FieldMenu->DeleteAllEntries();
+  this->FieldMenu->GetMenu()->DeleteAllMenuItems();
   if (prop)
     {
     vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
@@ -271,7 +272,7 @@ void vtkPVFieldMenu::Update()
         {
         ostrstream com;
         com << "SetValue " << edom->GetEntryValue(i) << ends;
-        this->FieldMenu->AddEntryWithCommand(
+        this->FieldMenu->AddRadioButton(
           edom->GetEntryText(i), this, com.str());
         delete[] com.str();
         if (this->Value == edom->GetEntryValue(i))
@@ -281,7 +282,7 @@ void vtkPVFieldMenu::Update()
         }
       if (valid)
         {
-        this->FieldMenu->SetCurrentEntry(valid);
+        this->FieldMenu->SetValue(valid);
         }
       }
     else

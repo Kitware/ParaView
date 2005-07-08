@@ -22,7 +22,7 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -63,7 +63,7 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
 {
   this->AttributeModeFrame = vtkKWFrame::New();
   this->AttributeModeLabel = vtkKWLabel::New();
-  this->AttributeModeMenu = vtkKWOptionMenu::New();
+  this->AttributeModeMenu = vtkKWMenuButton::New();
   
   this->CalculatorFrame = vtkKWFrameLabeled::New();
   this->FunctionLabel = vtkKWEntry::New();
@@ -280,11 +280,11 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
     "Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp);
-  this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
+  this->AttributeModeMenu->AddRadioButton("Point Data", this,
                                                "ChangeAttributeMode point");
-  this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
+  this->AttributeModeMenu->AddRadioButton("Cell Data", this,
                                                "ChangeAttributeMode cell");
-  this->AttributeModeMenu->SetCurrentEntry("Point Data");
+  this->AttributeModeMenu->SetValue("Point Data");
   this->AttributeModeMenu->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
   this->Script("pack %s %s -side left",
@@ -527,11 +527,11 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
   
   this->ScalarsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->ScalarsMenu->Create(pvApp);
-  this->ScalarsMenu->SetButtonText("scalars");
+  this->ScalarsMenu->SetValue("scalars");
   this->ScalarsMenu->SetBalloonHelpString("Select a scalar array to operate on");
   this->VectorsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->VectorsMenu->Create(pvApp);
-  this->VectorsMenu->SetButtonText("vectors");
+  this->VectorsMenu->SetValue("vectors");
   this->VectorsMenu->SetBalloonHelpString("Select a vector array to operate on");
   this->Script("grid %s -row 6 -column 3 -columnspan 4 -sticky news",
                this->ScalarsMenu->GetWidgetName());

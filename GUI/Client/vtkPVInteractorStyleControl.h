@@ -31,7 +31,7 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWFrameLabeled;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkPVCameraManipulator;
 class vtkPVInteractorStyleControlCmd;
 class vtkPVWidget;
@@ -145,7 +145,7 @@ protected:
   vtkKWFrameLabeled *LabeledFrame;
   vtkKWFrame        *OuterFrame;
   vtkKWLabel *Labels[6];
-  vtkKWOptionMenu *Menus[9];
+  vtkKWMenuButton *Menus[9];
   vtkKWFrame *ArgumentsFrame;
 
   vtkPVInteractorStyleControlCmd *Observer;

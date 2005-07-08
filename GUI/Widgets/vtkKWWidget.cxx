@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.135");
+vtkCxxRevisionMacro(vtkKWWidget, "1.136");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -444,20 +444,6 @@ void vtkKWWidget::SetBindAll(const char *event, const char *command)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetCommand(vtkObject* CalledObject, const char * CommandString)
-{
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, CalledObject, CommandString);
-  this->Script("%s configure -command {%s}", this->GetWidgetName(), command);
-  delete [] command;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
   if (this->BalloonHelpString == NULL && str == NULL)
@@ -603,6 +589,43 @@ void vtkKWWidget::SetForegroundColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWidget::SetConfigurationOption(
+  const char *option, const char *value)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option || !value)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  const char *res = 
+    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    vtksys_stl::string err_msg(res);
+    vtksys_stl::string tcl_name(this->GetTclName());
+    vtksys_stl::string widget_name(this->GetWidgetName());
+    vtksys_stl::string type(this->GetType());
+    vtkErrorMacro(
+      "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
+      << widget_name.c_str() << ") with option: [" << option 
+      << "] and value [" << value << "] => " << err_msg.c_str());
+    return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWidget::HasConfigurationOption(const char* option)
 {
   if (!this->IsCreated())
@@ -629,6 +652,15 @@ const char* vtkKWWidget::GetConfigurationOption(const char* option)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWidget::SetConfigurationOptionAsInt(
+  const char *option, int value)
+{
+  char buffer[20];
+  sprintf(buffer, "%d", value);
+  return this->SetConfigurationOption(option, buffer);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
 {
   if (!this->HasConfigurationOption(option))
@@ -637,6 +669,26 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
     }
 
   return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::SetConfigurationOptionAsDouble(
+  const char *option, double value)
+{
+  char buffer[20];
+  sprintf(buffer, "%lf", value);
+  return this->SetConfigurationOption(option, buffer);
+}
+
+//----------------------------------------------------------------------------
+double vtkKWWidget::GetConfigurationOptionAsDouble(const char* option)
+{
+  if (!this->HasConfigurationOption(option))
+    {
+    return 0.0;
+    }
+
+  return atof(this->Script("%s cget %s", this->GetWidgetName(), option));
 }
 
 //----------------------------------------------------------------------------
@@ -858,20 +910,6 @@ vtkKWDragAndDropTargetSet* vtkKWWidget::GetDragAndDropTargetSet()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetAnchor(int anchor)
-{
-  this->SetConfigurationOption(
-    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetAnchor()
-{
-  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
-    this->GetConfigurationOption("-anchor"));
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::SetHighlightThickness(int width)
 {
   this->SetConfigurationOptionAsInt("-highlightthickness", width);
@@ -934,48 +972,6 @@ int vtkKWWidget::GetPadY()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageToPredefinedIcon(int icon_index)
-{
-  vtkKWIcon *icon = vtkKWIcon::New();
-  icon->SetImage(icon_index);
-  this->SetImageToIcon(icon); // , blend_color_option, image_option);
-  icon->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetImageToIcon(vtkKWIcon* icon)
-{
-  if (!icon)
-    {
-    return;
-    }
-
-  this->SetImageToPixels(icon->GetData(), 
-                         icon->GetWidth(), 
-                         icon->GetHeight(), 
-                         icon->GetPixelSize(),
-                         0);
-  // blend_color_option, 
-  // image_option);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetImageToPixels(const unsigned char* pixels, 
-                                   int width, 
-                                   int height,
-                                   int pixel_size,
-                                   unsigned long buffer_length)
-{
-  vtkKWTkUtilities::SetImageOptionToPixels(
-    this,
-    pixels, 
-    width, height, pixel_size,
-    buffer_length,
-    NULL, // blend_color_option 
-    NULL); // image_option))
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::Grab()
 {
   if (!this->IsCreated())
@@ -1007,52 +1003,6 @@ int vtkKWWidget::IsGrabbed()
 
   const char *res = this->Script("grab status %s", this->GetWidgetName());
   return (!strcmp(res, "none") ? 0 : 1);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::SetConfigurationOption(
-  const char *option, const char *value)
-{
-  if (!this->IsCreated())
-    {
-    vtkWarningMacro("Widget is not created yet !");
-    return 0;
-    }
-
-  if (!option || !value)
-    {
-    vtkWarningMacro("Wrong option or value !");
-    return 0;
-    }
-
-  const char *res = 
-    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
-
-  // 'configure' is not supposed to return anything, so let's assume
-  // any output is an error
-
-  if (res && *res)
-    {
-    vtksys_stl::string err_msg(res);
-    vtksys_stl::string tcl_name(this->GetTclName());
-    vtksys_stl::string widget_name(this->GetWidgetName());
-    vtksys_stl::string type(this->GetType());
-    vtkErrorMacro(
-      "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
-      << widget_name.c_str() << ") with option: [" << option 
-      << "] and value [" << value << "] => " << err_msg.c_str());
-    return 0;
-    }
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::SetConfigurationOptionAsInt(
-  const char *option, int value)
-{
-  char buffer[20];
-  sprintf(buffer, "%d", value);
-  return this->SetConfigurationOption(option, buffer);
 }
 
 //----------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWPushButton.h"
@@ -72,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.43");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.44");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -381,9 +382,11 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
   this->PlayModeMenuButton->Create(app);
   this->PlayModeMenuButton->SetBalloonHelpString("Change the mode in which the "
     "animation is played.");
-  this->PlayModeMenuButton->AddCommand(VTK_PV_PLAYMODE_SEQUENCE_TITLE, this,
+  this->PlayModeMenuButton->GetMenu()->AddCommand(
+    VTK_PV_PLAYMODE_SEQUENCE_TITLE, this,
     "SetPlayMode 0", "Plays the animation as a sequence of images.");
-  this->PlayModeMenuButton->AddCommand(VTK_PV_PLAYMODE_REALTIME_TITLE, this,
+  this->PlayModeMenuButton->GetMenu()->AddCommand(
+    VTK_PV_PLAYMODE_REALTIME_TITLE, this,
     "SetPlayMode 1", "Plays the animation in real time mode.");
   this->SetPlayModeToSequence();
   
@@ -720,13 +723,13 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
   switch (mode)
     {
   case vtkAnimationScene::PLAYMODE_SEQUENCE:
-    this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
+    this->PlayModeMenuButton->SetValue(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
     this->AnimationManager->EnableCacheCheck();
     // Change the time scale increment to 1.
     this->TimeScale->SetResolution(1);
     break;
   case vtkAnimationScene::PLAYMODE_REALTIME:
-    this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_REALTIME_TITLE);
+    this->PlayModeMenuButton->SetValue(VTK_PV_PLAYMODE_REALTIME_TITLE);
     this->AnimationManager->DisableCacheCheck();
       // disable cahce check when in real time mode.
       // Note that when we switch the mode to realtime,

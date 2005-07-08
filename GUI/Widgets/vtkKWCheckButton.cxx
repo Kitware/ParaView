@@ -15,10 +15,11 @@
 #include "vtkKWCheckButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWIcon.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.37");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -185,6 +186,52 @@ void vtkKWCheckButton::Configure()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCheckButton::SetCommand(vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetConfigurationOption("-command", command);
+    delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetAnchor(int anchor)
+{
+  this->SetConfigurationOption(
+    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetAnchor()
+{
+  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+    this->GetConfigurationOption("-anchor"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageToPredefinedIcon(int icon_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  this->SetImageToIcon(icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageToIcon(vtkKWIcon* icon)
+{
+  if (icon)
+    {
+    this->SetImageToPixels(
+      icon->GetData(), 
+      icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCheckButton::SetImageToPixels(
   const unsigned char* pixels, 
   int width, 
@@ -192,16 +239,12 @@ void vtkKWCheckButton::SetImageToPixels(
   int pixel_size,
   unsigned long buffer_length)
 {
-  this->Superclass::SetImageToPixels(
-    pixels, width, height, pixel_size, buffer_length);
+  vtkKWTkUtilities::SetImageOptionToPixels(
+    this, pixels, width, height, pixel_size, buffer_length);
 
   vtkKWTkUtilities::SetImageOptionToPixels(
-    this,
-    pixels, 
-    width, height, pixel_size,
-    buffer_length,
-    "-selectcolor", 
-    "-selectimage");
+    this, pixels, width, height, pixel_size, buffer_length,
+    "-selectcolor", "-selectimage");
 }
 
 // ---------------------------------------------------------------------------

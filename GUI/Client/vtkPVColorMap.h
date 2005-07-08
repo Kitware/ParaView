@@ -36,7 +36,7 @@ class vtkKWLabel;
 class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWMenuButton;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkPVTextPropertyEditor;
@@ -319,8 +319,8 @@ protected:
   vtkKWChangeColorButton* EndColorButton;
 
   vtkKWFrameLabeled* VectorFrame;
-  vtkKWOptionMenu*   VectorModeMenu;
-  vtkKWOptionMenu*   VectorComponentMenu;
+  vtkKWMenuButton*   VectorModeMenu;
+  vtkKWMenuButton*   VectorComponentMenu;
   vtkKWEntry*        ScalarBarVectorTitleEntry;
 
   vtkKWFrameLabeled* ScalarBarFrame;

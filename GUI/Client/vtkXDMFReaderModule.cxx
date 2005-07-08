@@ -18,7 +18,8 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -38,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.38");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.39");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -142,7 +143,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainGridFrame->Create(pvApp);
     this->DomainGridFrame->SetLabelText("Domain and Grids Selection");
 
-    this->DomainMenu = vtkKWOptionMenu::New();
+    this->DomainMenu = vtkKWMenuButton::New();
     this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
     this->DomainMenu->Create(pvApp);
     this->UpdateDomains();
@@ -166,7 +167,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
       this->GridSelection->GetWidgetName());
 
-    if ( this->DomainMenu->GetNumberOfEntries() > 0 )
+    if ( this->DomainMenu->GetMenu()->GetNumberOfItems() > 0 )
       {
       this->Script("pack %s -expand yes -fill x -side top -pady 2", 
         this->DomainGridFrame->GetWidgetName());
@@ -360,7 +361,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     }
 
   // Fill the domain menu with the name of each domain.
-  this->DomainMenu->DeleteAllEntries();
+  this->DomainMenu->GetMenu()->DeleteAllMenuItems();
   for(int i = 0; i < numDomains; ++i)
     {
     stream << vtkClientServerStream::Invoke
@@ -370,7 +371,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     const char* dname;
     if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &dname))
       {
-      this->DomainMenu->AddEntryWithCommand(dname, this, "UpdateGrids");
+      this->DomainMenu->AddRadioButton(dname, this, "UpdateGrids");
 
       // Set the menu selection to the first entry.
       if(i == 0)

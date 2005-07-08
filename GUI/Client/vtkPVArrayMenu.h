@@ -33,7 +33,7 @@ class vtkCollection;
 class vtkDataArray;
 class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWLabel;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
@@ -133,7 +133,7 @@ protected:
 
   // Subwidgets.
   vtkKWLabel *Label;
-  vtkKWOptionMenu *ArrayMenu;
+  vtkKWMenuButton *ArrayMenu;
 
   // Resets the values based on the array.
   void UpdateArrayMenu();

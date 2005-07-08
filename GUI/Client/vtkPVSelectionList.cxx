@@ -16,7 +16,8 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
@@ -27,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.59");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -36,7 +37,7 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->CurrentName = NULL;
   
   this->Label = vtkKWLabel::New();
-  this->Menu = vtkKWOptionMenu::New();
+  this->Menu = vtkKWMenuButton::New();
 
   this->Names = vtkStringList::New();
 
@@ -124,7 +125,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     if (name)
       {
       sprintf(tmp, "SelectCallback {%s} %d", name, i);
-      this->Menu->AddEntryWithCommand(name, this, tmp);
+      this->Menu->AddRadioButton(name, this, tmp);
       }
     }
   name = this->Names->GetString(this->CurrentValue);
@@ -268,7 +269,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   if (this->GetApplication())
     {
     sprintf(tmp, "SelectCallback {%s} %d", name, value);
-    this->Menu->AddEntryWithCommand(name, this, tmp);
+    this->Menu->AddRadioButton(name, this, tmp);
     
     if (value == this->CurrentValue)
       {
@@ -290,7 +291,7 @@ void vtkPVSelectionList::RemoveAllItems()
   this->Names->RemoveAllItems();
   if (this->Menu->IsCreated())
     {
-    this->Menu->DeleteAllEntries();
+    this->Menu->GetMenu()->DeleteAllMenuItems();
     }
   this->Modified();
 }

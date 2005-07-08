@@ -35,7 +35,7 @@ class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
 class vtkKWLabel;
 class vtkKWFrameLabeled;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWThumbWheel;
@@ -175,11 +175,11 @@ public:
 
   // Description:
   // Get the representation menu.
-  vtkGetObjectMacro(RepresentationMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(RepresentationMenu, vtkKWMenuButton);
 
   // Description:
   // Get the interpolation menu.
-  vtkGetObjectMacro(InterpolationMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(InterpolationMenu, vtkKWMenuButton);
     
   // Description:
   // Called when the user presses the "Edit Color Map" button.
@@ -333,14 +333,14 @@ protected:
   vtkPVColorSelectionWidget* VolumeScalarSelectionWidget;
 
   vtkKWLabel      *VolumeRenderMethodMenuLabel;
-  vtkKWOptionMenu *VolumeRenderMethodMenu;
+  vtkKWMenuButton *VolumeRenderMethodMenu;
   
   vtkKWPushButton *EditVolumeAppearanceButton;
 
   vtkKWLabel *RepresentationMenuLabel;
-  vtkKWOptionMenu *RepresentationMenu;
+  vtkKWMenuButton *RepresentationMenu;
   vtkKWLabel *InterpolationMenuLabel;
-  vtkKWOptionMenu *InterpolationMenu;
+  vtkKWMenuButton *InterpolationMenu;
 
   vtkKWLabel      *PointSizeLabel;
   vtkKWThumbWheel *PointSizeThumbWheel;

@@ -111,7 +111,6 @@ SET(KWWidgets_SRCS
   vtkKWMultiColumnList.cxx
   vtkKWNotebook.cxx 
   vtkKWObject.cxx 
-  vtkKWOptionMenu.cxx 
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWPiecewiseFunctionEditor.cxx
@@ -233,7 +232,7 @@ FOREACH (WidgetType
     vtkKWEntry
     vtkKWLabel
     vtkKWLoadSaveButton
-    vtkKWOptionMenu
+    vtkKWMenuButton
     vtkKWPopupButton
     vtkKWPushButton
     vtkKWPushButtonSet

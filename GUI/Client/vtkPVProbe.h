@@ -24,7 +24,7 @@
 class vtkKWCheckButton;
 class vtkKWLabel;
 class vtkKWFrame;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWWidget;
 class vtkSMXYPlotDisplayProxy;
 class vtkPVArraySelection;
@@ -72,7 +72,7 @@ protected:
   virtual void AcceptCallbackInternal();  
 
   vtkKWLabel *DimensionalityLabel;
-  vtkKWOptionMenu *DimensionalityMenu;
+  vtkKWMenuButton *DimensionalityMenu;
   vtkKWFrame *ProbeFrame;
 
   vtkKWFrame *SelectedPointFrame;

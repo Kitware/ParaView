@@ -25,7 +25,7 @@
 
 class vtkDataSet;
 class vtkKWLabel;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkPVData;
 class vtkPVInputProperty;
 class vtkPVSourceCollection;
@@ -152,7 +152,7 @@ protected:
   vtkPVSourceCollection *Sources;
   
   vtkKWLabel *Label;
-  vtkKWOptionMenu *Menu;
+  vtkKWMenuButton *Menu;
 
   // Description:
   // Reset the menu by taking all entries out.

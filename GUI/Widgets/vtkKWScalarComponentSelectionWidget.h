@@ -20,7 +20,7 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWOptionMenuLabeled;
+class vtkKWMenuButtonLabeled;
 
 class KWWIDGETS_EXPORT vtkKWScalarComponentSelectionWidget : public vtkKWCompositeWidget
 {
@@ -72,7 +72,7 @@ public:
 
   // Description:
   // Access to objects
-  vtkGetObjectMacro(SelectedComponentOptionMenu, vtkKWOptionMenuLabeled);
+  vtkGetObjectMacro(SelectedComponentOptionMenu, vtkKWMenuButtonLabeled);
  
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -98,7 +98,7 @@ protected:
 
   // GUI
 
-  vtkKWOptionMenuLabeled *SelectedComponentOptionMenu;
+  vtkKWMenuButtonLabeled *SelectedComponentOptionMenu;
 
   // Pack
   virtual void Pack();

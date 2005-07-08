@@ -82,13 +82,6 @@ public:
   virtual vtkKWWidget* GetChildWidgetWithName(const char *);
 
   // Description:
-  // A method to set callback functions on objects.  The first argument is
-  // the KWObject that will have the method called on it.  The second is the
-  // name of the method to be called and any arguments in string form.
-  // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkObject* Object, const char* MethodAndArgString);
-
-  // Description:
   // A method to set binding on the object.
   // This method sets binding:
   // bind this->GetWidgetName() event { object->GetTclName() command }
@@ -161,10 +154,12 @@ public:
   // curly braces {} as a convenience.
   // SetConfigurationOption returns 1 on success, 0 otherwise.
   virtual int SetConfigurationOption(const char* option, const char *value);
-  virtual int SetConfigurationOptionAsInt(const char* option, int value);
   virtual int HasConfigurationOption(const char* option);
   virtual const char* GetConfigurationOption(const char* option);
   virtual int GetConfigurationOptionAsInt(const char* option);
+  virtual int SetConfigurationOptionAsInt(const char* option, int value);
+  virtual double GetConfigurationOptionAsDouble(const char* option);
+  virtual int SetConfigurationOptionAsDouble(const char* option, double value);
 
   // Description:
   // Set/Get the textual value of a Tk option (defaut is -text option) given a
@@ -208,32 +203,6 @@ public:
   // HasDragAndDropTargetSet(), not GetDragAndDropTargetSet().
   virtual int HasDragAndDropTargetSet();
   virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
-
-  // Description:
-  // Set/Get the anchoring.
-  // Specifies how the information in a widget (e.g. text or a bitmap) is to
-  // be displayed in the widget.
-  // Valid constants can be found in vtkKWTkOptions::AnchorType.
-  virtual void SetAnchor(int);
-  virtual int GetAnchor();
-  virtual void SetAnchorToNorth() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorth); };
-  virtual void SetAnchorToNorthEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); };
-  virtual void SetAnchorToEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorEast); };
-  virtual void SetAnchorToSouthEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); };
-  virtual void SetAnchorToSouth() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouth); };
-  virtual void SetAnchorToSouthWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); };
-  virtual void SetAnchorToWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorWest); };
-  virtual void SetAnchorToNorthWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); };
-  virtual void SetAnchorToCenter() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorCenter); };
 
   // Description:
   // Set/get the highlight thickness, a non-negative value indicating the
@@ -284,30 +253,6 @@ public:
   virtual void SetPadY(int);
   virtual int GetPadY();
 
-  // Description:
-  // Specifies an image to display in the widget. Typically, if the image
-  // is specified then it overrides other options that specify a bitmap or
-  // textual value to display in the widget.
-  // Use SetConfigurationOption("-image", imagename) to use a specific
-  // pre-existing Tk image, or use one of the following convenience function.
-  // SetImageToPredefinedIcon
-  // Set the image  option using either icon, predefined icon index (see 
-  // vtkKWIcon.h) or pixel data (pixels and the structure of the
-  // image, i.e. width, height, pixel_size ; if buffer_length = 0, it
-  // is computed using width * height * pixel_size, otherwise used as 
-  // a hint whereas the data is in Base64 / Zlib format).
-  // If RGBA (pixel_size > 3), blend pixels with background color of
-  // the widget (otherwise 0.5, 0.5, 0.5 gray). If blend_color_option is not
-  // NULL,  use this option as blend color instead of background (-bg) 
-  // (ex: -fg, -selectcolor)
-  // An image is created and associated to the Tk -image option, 
-  // or image_option if not NULL (ex: -selectimage).
-  virtual void SetImageToIcon(vtkKWIcon *icon);
-  virtual void SetImageToPredefinedIcon(int icon_index);
-  virtual void SetImageToPixels(const unsigned char *pixels, 
-                                int width, int height, int pixel_size = 4,
-                                unsigned long buffer_length = 0);
-  
   // Description:
   // Grab the widget (locally)
   virtual void Grab();

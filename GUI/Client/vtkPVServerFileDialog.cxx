@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.46");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.47");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -372,7 +372,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->ExtensionsMenuButton->SetParent(this->ExtensionsDisplayFrame);
   this->ExtensionsMenuButton->GetMenu()->SetTearOff(0);
   this->ExtensionsMenuButton->Create(app);
-  this->ExtensionsMenuButton->SetButtonText("");
+  this->ExtensionsMenuButton->SetValue("");
   this->Script("pack %s -side left -expand 0", 
                this->ExtensionsMenuButton->GetWidgetName());
 

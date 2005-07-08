@@ -26,7 +26,7 @@
 
 class vtkColorTransferFunction;
 class vtkKWEntryLabeled;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 
 class KWWIDGETS_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
 {
@@ -201,7 +201,7 @@ protected:
 
   // GUI
 
-  vtkKWOptionMenu   *ColorSpaceOptionMenu;
+  vtkKWMenuButton   *ColorSpaceOptionMenu;
   vtkKWEntryLabeled *ValueEntries[3];
   vtkKWLabel        *ColorRamp;
 

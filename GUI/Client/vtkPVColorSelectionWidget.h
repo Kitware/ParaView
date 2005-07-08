@@ -23,16 +23,16 @@
 #ifndef __vtkPVColorSelectionWidget_h
 #define __vtkPVColorSelectionWidget_h
 
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 class vtkPVSource;
 class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
 
-class VTK_EXPORT vtkPVColorSelectionWidget : public vtkKWOptionMenu
+class VTK_EXPORT vtkPVColorSelectionWidget : public vtkKWMenuButton
 {
 public:
   static vtkPVColorSelectionWidget* New();
-  vtkTypeRevisionMacro(vtkPVColorSelectionWidget, vtkKWOptionMenu);
+  vtkTypeRevisionMacro(vtkPVColorSelectionWidget, vtkKWMenuButton);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

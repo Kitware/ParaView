@@ -27,7 +27,7 @@ class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWLabel;
 class vtkKWCheckButtonSetLabeled;
-class vtkKWOptionMenuLabeled;
+class vtkKWMenuButtonLabeled;
 class vtkKWPushButtonSetLabeled;
 class vtkKWPushButton;
 class vtkKWScale;
@@ -194,7 +194,7 @@ protected:
   vtkKWChangeColorButton *ChangeColorButton;
 
   int ShowFontFamily;
-  vtkKWOptionMenuLabeled *FontFamilyOptionMenu;
+  vtkKWMenuButtonLabeled *FontFamilyOptionMenu;
 
   int ShowStyles;
   vtkKWCheckButtonSetLabeled *StylesCheckButtonSet;

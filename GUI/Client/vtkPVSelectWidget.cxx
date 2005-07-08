@@ -17,7 +17,7 @@
 #include "vtkArrayMap.txx"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPV3DWidget.h"
 #include "vtkPVApplication.h"
@@ -38,13 +38,13 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.71");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.72");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
 {
   this->LabeledFrame = vtkKWFrameLabeled::New();
-  this->Menu = vtkKWOptionMenu::New();
+  this->Menu = vtkKWMenuButton::New();
 
   this->Labels = vtkStringList::New();
   this->Values = vtkStringList::New();
@@ -125,7 +125,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   for(i=0; i<len; i++)
     {
     label = this->Labels->GetString(i);
-    this->Menu->AddEntryWithCommand(label, this, "MenuCallback");
+    this->Menu->AddRadioButton(label, this, "MenuCallback");
     }
   if (len > 0 && this->CurrentIndex < 0)
     {
@@ -517,7 +517,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
 
   if (this->GetApplication())
     {
-    this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
+    this->Menu->AddRadioButton(labelVal, this, "MenuCallback");
     if (this->CurrentIndex < 0)
       {
       this->Menu->SetValue(labelVal);

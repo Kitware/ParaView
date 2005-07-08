@@ -16,7 +16,7 @@
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
 #include "vtkKWTextWithScrollbars.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.12");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVErrorLogDisplay::vtkPVErrorLogDisplay()

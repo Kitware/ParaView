@@ -20,7 +20,7 @@
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntryLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWRange.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWTkUtilities.h"
@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.35");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.36");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -58,7 +58,7 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
   this->ColorRampPosition              = vtkKWColorTransferFunctionEditor::ColorRampPositionDefault;
   this->ColorRampOutlineStyle          = vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleSolid;
 
-  this->ColorSpaceOptionMenu           = vtkKWOptionMenu::New();
+  this->ColorSpaceOptionMenu           = vtkKWMenuButton::New();
   this->ColorRamp                      = vtkKWLabel::New();
 
   int i;
@@ -573,13 +573,13 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
       "Change the interpolation color space to RGB or HSV.");
 
     const char callback[] = "ColorSpaceCallback";
-    this->ColorSpaceOptionMenu->AddEntryWithCommand(
+    this->ColorSpaceOptionMenu->AddRadioButton(
       VTK_KW_CTFE_RGB_LABEL, this, callback);
     
-    this->ColorSpaceOptionMenu->AddEntryWithCommand(
+    this->ColorSpaceOptionMenu->AddRadioButton(
       VTK_KW_CTFE_HSV_LABEL, this, callback);
 
-    this->ColorSpaceOptionMenu->AddEntryWithCommand(
+    this->ColorSpaceOptionMenu->AddRadioButton(
       VTK_KW_CTFE_HSV_NO_WRAP_LABEL, this, callback);
 
     this->UpdateColorSpaceOptionMenu();

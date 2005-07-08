@@ -8,7 +8,6 @@
 * vtkKWListBox
 * vtkKWMenu
 * vtkKWMenuButton
-* vtkKWOptionMenu
 * vtkKWPushButton
 * vtkKWRadioButton
 * vtkKWScale
@@ -58,7 +57,7 @@ complete list of labeled widgets. At the moment:
     vtkKWEntry          => vtkKWEntryLabeled
     vtkKWLabel          => vtkKWLabelLabeled
     vtkKWLoadSaveButton => vtkKWLoadSaveButtonLabeled
-    vtkKWOptionMenu     => vtkKWOptionMenuLabeled
+    vtkKWMenuButton     => vtkKWMenuButtonLabeled
     vtkKWPopupButton    => vtkKWPopupButtonLabeled
     vtkKWPushButton     => vtkKWPushButtonLabeled
     vtkKWPushButtonSet  => vtkKWPushButtonSetLabeled

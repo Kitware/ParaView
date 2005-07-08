@@ -21,8 +21,8 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWOptionMenuLabeled.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButtonLabeled.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.42");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -416,7 +416,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->DPIOptionMenu)
     {
-    this->DPIOptionMenu = vtkKWOptionMenuLabeled::New();
+    this->DPIOptionMenu = vtkKWMenuButtonLabeled::New();
     }
 
   this->DPIOptionMenu->SetParent(frame);
@@ -430,7 +430,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     char label[128], command[128];
     sprintf(command, "DPICallback %lf", dpis[i]);
     sprintf(label, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, dpis[i]);
-    this->DPIOptionMenu->GetWidget()->AddEntryWithCommand(
+    this->DPIOptionMenu->GetWidget()->AddRadioButton(
       label, this, command);
     }
 
@@ -528,7 +528,7 @@ void vtkKWApplicationSettingsInterface::Update()
     char buffer[128];
     sprintf(buffer, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, 
             this->GetApplication()->GetPrintTargetDPI());
-    this->DPIOptionMenu->GetWidget()->SetCurrentEntry(buffer);
+    this->DPIOptionMenu->GetWidget()->SetValue(buffer);
     }
 }
 

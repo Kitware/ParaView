@@ -52,7 +52,7 @@
 #endif
 #include "vtkPVGUIClientOptions.h"
 
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWLookmarkFolder.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.42");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()

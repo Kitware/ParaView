@@ -28,7 +28,7 @@ class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkKWWindow;
-class vtkKWOptionMenuLabeled;
+class vtkKWMenuButtonLabeled;
 
 class KWWIDGETS_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
 {
@@ -101,7 +101,7 @@ protected:
   // Print settings
 
   vtkKWFrameLabeled      *PrintSettingsFrame;
-  vtkKWOptionMenuLabeled *DPIOptionMenu;
+  vtkKWMenuButtonLabeled *DPIOptionMenu;
 
 private:
   vtkKWApplicationSettingsInterface(const vtkKWApplicationSettingsInterface&); // Not implemented

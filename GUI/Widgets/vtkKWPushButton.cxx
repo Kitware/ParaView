@@ -14,10 +14,12 @@
 #include "vtkKWApplication.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWIcon.h"
+#include "vtkKWTkUtilities.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.21");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -75,6 +77,63 @@ void vtkKWPushButton::SetWidth(int width)
 int vtkKWPushButton::GetWidth()
 {
   return this->GetConfigurationOptionAsInt("-width");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetAnchor(int anchor)
+{
+  this->SetConfigurationOption(
+    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetAnchor()
+{
+  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+    this->GetConfigurationOption("-anchor"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetImageToPredefinedIcon(int icon_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  this->SetImageToIcon(icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetImageToIcon(vtkKWIcon* icon)
+{
+  if (icon)
+    {
+    this->SetImageToPixels(
+      icon->GetData(), 
+      icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetImageToPixels(const unsigned char* pixels, 
+                                       int width, 
+                                       int height,
+                                       int pixel_size,
+                                       unsigned long buffer_length)
+{
+  vtkKWTkUtilities::SetImageOptionToPixels(
+    this, pixels, width, height, pixel_size, buffer_length);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetCommand(vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetConfigurationOption("-command", command);
+    delete [] command;
+    }
 }
 
 //----------------------------------------------------------------------------

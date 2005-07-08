@@ -122,18 +122,15 @@ public:
   virtual void InvokeEntryCommand();
 
   // Description:
-  // A method to set callback functions on objects.  The first argument is
-  // the KWObject that will have the method called on it.  The second is the
-  // name of the method to be called and any arguments in string form.
-  // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand      (vtkObject* Object, 
-                                const char *MethodAndArgString);
-  virtual void SetStartCommand (vtkObject* Object, 
-                                const char *MethodAndArgString);
-  virtual void SetEndCommand   (vtkObject* Object, 
-                                const char *MethodAndArgString);
-  virtual void SetEntryCommand (vtkObject* Object, 
-                                const char *MethodAndArgString);
+  // Specifies commands to associate with the widget. 
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is evaluated as a simple command.
+  virtual void SetCommand(vtkObject *object, const char *method);
+  virtual void SetStartCommand(vtkObject *object, const char *method);
+  virtual void SetEndCommand(vtkObject *object, const char *method);
+  virtual void SetEntryCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/get whether the above commands should be called or not.

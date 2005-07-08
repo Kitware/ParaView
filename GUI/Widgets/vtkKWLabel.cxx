@@ -14,10 +14,12 @@
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkKWIcon.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.40");
+vtkCxxRevisionMacro(vtkKWLabel, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -210,6 +212,51 @@ void vtkKWLabel::SetWrapLength(const char *wraplength)
 const char* vtkKWLabel::GetWrapLength()
 {
   return this->GetConfigurationOption("-wraplength");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetAnchor(int anchor)
+{
+  this->SetConfigurationOption(
+    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetAnchor()
+{
+  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+    this->GetConfigurationOption("-anchor"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetImageToPredefinedIcon(int icon_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  this->SetImageToIcon(icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetImageToIcon(vtkKWIcon* icon)
+{
+  if (icon)
+    {
+    this->SetImageToPixels(
+      icon->GetData(), 
+      icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetImageToPixels(const unsigned char* pixels, 
+                                   int width, 
+                                   int height,
+                                   int pixel_size,
+                                   unsigned long buffer_length)
+{
+  vtkKWTkUtilities::SetImageOptionToPixels(
+    this, pixels, width, height, pixel_size, buffer_length);
 }
 
 //---------------------------------------------------------------------------

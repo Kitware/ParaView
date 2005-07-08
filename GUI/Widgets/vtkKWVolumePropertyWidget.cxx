@@ -26,8 +26,8 @@
 #include "vtkKWHistogramSet.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWMenuButtonLabeled.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWPopupButtonLabeled.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.15");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->EditorFrame                     = vtkKWFrameLabeled::New();
 
-  this->InterpolationTypeOptionMenu     = vtkKWOptionMenuLabeled::New();
+  this->InterpolationTypeOptionMenu     = vtkKWMenuButtonLabeled::New();
 
   this->EnableShadingCheckButton        = vtkKWCheckButton::New();
 
@@ -86,7 +86,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->ScalarOpacityUnitDistanceScale  = vtkKWScale::New();
 
-  this->EnableGradientOpacityOptionMenu = vtkKWOptionMenu::New();
+  this->EnableGradientOpacityOptionMenu = vtkKWMenuButton::New();
 
   this->ComponentWeightScaleSet         = vtkKWScaleSetLabeled::New();
 
@@ -261,7 +261,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWOptionMenuLabeled *omenu = 
+  vtkKWMenuButtonLabeled *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
   omenu->GetWidget()->SetWidth(menu_width);
@@ -271,7 +271,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
 
   if (!this->InterpolationTypeOptionMenu)
     {
-    this->InterpolationTypeOptionMenu = vtkKWOptionMenuLabeled::New();
+    this->InterpolationTypeOptionMenu = vtkKWMenuButtonLabeled::New();
     }
 
   this->InterpolationTypeOptionMenu->SetParent(frame);
@@ -283,15 +283,15 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->InterpolationTypeOptionMenu->SetBalloonHelpString(
     "Set the interpolation type used for sampling the volume.");
 
-  vtkKWOptionMenu *menu = this->InterpolationTypeOptionMenu->GetWidget();
+  vtkKWMenuButton *menu = this->InterpolationTypeOptionMenu->GetWidget();
 
   char callback[128];
 
   sprintf(callback, "InterpolationTypeCallback %d", VTK_LINEAR_INTERPOLATION);
-  menu->AddEntryWithCommand(VTK_KW_VPW_INTERPOLATION_LINEAR, this, callback);
+  menu->AddRadioButton(VTK_KW_VPW_INTERPOLATION_LINEAR, this, callback);
 
   sprintf(callback, "InterpolationTypeCallback %d", VTK_NEAREST_INTERPOLATION);
-  menu->AddEntryWithCommand(VTK_KW_VPW_INTERPOLATION_NEAREST, this, callback);
+  menu->AddRadioButton(VTK_KW_VPW_INTERPOLATION_NEAREST, this, callback);
 
   // --------------------------------------------------------------
   // Enable shading
@@ -472,9 +472,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->EnableGradientOpacityOptionMenu->SetBalloonHelpString(
     "Enable modulation of the opacity by the magnitude of the gradient "
     "according to the specified function.");
-  this->EnableGradientOpacityOptionMenu->AddEntryWithCommand(
+  this->EnableGradientOpacityOptionMenu->AddRadioButton(
     "On", this, "EnableGradientOpacityCallback 1");
-  this->EnableGradientOpacityOptionMenu->AddEntryWithCommand(
+  this->EnableGradientOpacityOptionMenu->AddRadioButton(
     "Off", this, "EnableGradientOpacityCallback 0");
 
   tk_cmd << "pack " << this->EnableGradientOpacityOptionMenu->GetWidgetName() 
@@ -741,24 +741,24 @@ void vtkKWVolumePropertyWidget::Update()
 
   if (InterpolationTypeOptionMenu)
     {
-    vtkKWOptionMenu *m = this->InterpolationTypeOptionMenu->GetWidget();
+    vtkKWMenuButton *m = this->InterpolationTypeOptionMenu->GetWidget();
     if (has_prop)
       {
       switch (this->VolumeProperty->GetInterpolationType())
         {
         case VTK_NEAREST_INTERPOLATION:
-          m->SetCurrentEntry(VTK_KW_VPW_INTERPOLATION_NEAREST);
+          m->SetValue(VTK_KW_VPW_INTERPOLATION_NEAREST);
           break;
         case VTK_LINEAR_INTERPOLATION:
-          m->SetCurrentEntry(VTK_KW_VPW_INTERPOLATION_LINEAR);
+          m->SetValue(VTK_KW_VPW_INTERPOLATION_LINEAR);
           break;
         default:
-          m->SetCurrentEntry("Unknown");
+          m->SetValue("Unknown");
         }
       }
     else
       {
-      m->SetCurrentEntry("");
+      m->SetValue("");
       }
     }
     
@@ -1022,7 +1022,7 @@ void vtkKWVolumePropertyWidget::Update()
 
   if (this->EnableGradientOpacityOptionMenu && has_prop)
     {
-    this->EnableGradientOpacityOptionMenu->SetCurrentEntry(
+    this->EnableGradientOpacityOptionMenu->SetValue(
       this->VolumeProperty->GetDisableGradientOpacity(
         this->SelectedComponent) ? "Off" : "On");
     }

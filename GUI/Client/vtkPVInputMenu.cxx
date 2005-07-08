@@ -20,7 +20,8 @@
 #include "vtkPVApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWOptionMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVInputProperty.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.74");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.75");
 
 
 //----------------------------------------------------------------------------
@@ -47,7 +48,7 @@ vtkPVInputMenu::vtkPVInputMenu()
   this->CurrentValue = NULL;
 
   this->Label = vtkKWLabel::New();
-  this->Menu = vtkKWOptionMenu::New();
+  this->Menu = vtkKWMenuButton::New();
 
   this->InitializeWithCurrent = 1;
 }
@@ -184,7 +185,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   sprintf(methodAndArgs, "MenuEntryCallback %s", pvs->GetTclName());
 
   char* label = this->GetPVApplication()->GetTextRepresentation(pvs);
-  this->Menu->AddEntryWithCommand(label, this, methodAndArgs);
+  this->Menu->AddRadioButton(label, this, methodAndArgs);
   delete[] label;
   
   return 1;
@@ -559,7 +560,7 @@ vtkPVSourceCollection *vtkPVInputMenu::GetSources()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::DeleteAllEntries() 
 { 
-  this->Menu->DeleteAllEntries();
+  this->Menu->GetMenu()->DeleteAllMenuItems();
 }
 
 //----------------------------------------------------------------------------

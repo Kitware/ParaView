@@ -26,7 +26,7 @@
 #include "vtkPVObjectWidget.h"
 
 class vtkStringList;
-class vtkKWOptionMenu;
+class vtkKWMenuButton;
 class vtkKWLabel;
 class vtkPVSource;
 class vtkPVWidgetCollection;
@@ -154,7 +154,7 @@ protected:
   void SetCurrentIndex(int idx);
 
   vtkKWFrameLabeled *LabeledFrame;
-  vtkKWOptionMenu *Menu;
+  vtkKWMenuButton *Menu;
 
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);

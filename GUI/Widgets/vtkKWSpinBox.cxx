@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.2");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
@@ -45,39 +45,29 @@ void vtkKWSpinBox::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::SetRange(double from, double to)
 {
-  char format[1024];
-  char script[1024];
-  sprintf(format, "%s", this->GetConfigurationOption("-format"));
-  sprintf(script, "%%s configure -from %s -to %s", format, format);
-  this->Script(script, this->GetWidgetName(), from, to);
+  this->SetConfigurationOptionAsDouble("-from", from);
+  this->SetConfigurationOptionAsDouble("-to", to);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::SetIncrement(double increment)
 {
-  char format[1024];
-  char script[1024];
-  sprintf(format, "%s", this->GetConfigurationOption("-format"));
-  sprintf(script, "%%s configure -increment %s", format);
-  this->Script(script, this->GetWidgetName(), increment);
+  this->SetConfigurationOptionAsDouble("-increment", increment);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::SetValue(double value)
 {
-  char format[1024];
-  char script[1024];
-  sprintf(format, "%s", this->GetConfigurationOption("-format"));
-  sprintf(script, "%%s set %s", format);
-  this->Script(script, this->GetWidgetName(), value);
+  if (this->IsCreated())
+    {
+    this->Script("%s set %lf", this->GetWidgetName(), value);
+    }
 }
 
 //----------------------------------------------------------------------------
 double vtkKWSpinBox::GetValue()
 {
-  char buffer[1024];
-  sprintf(buffer, "%s", this->Script("%s get", this->GetWidgetName()));
-  return atof(buffer);
+  return atof(this->Script("%s get", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
@@ -135,6 +125,18 @@ void vtkKWSpinBox::SetExportSelection(int arg)
 int vtkKWSpinBox::GetExportSelection()
 {
   return this->GetConfigurationOptionAsInt("-exportselection");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetCommand(vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetConfigurationOption("-command", command);
+    delete [] command;
+    }
 }
 
 //----------------------------------------------------------------------------
