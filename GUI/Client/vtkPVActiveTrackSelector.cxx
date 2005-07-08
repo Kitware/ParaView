@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.9");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.10");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -340,8 +340,19 @@ void vtkPVActiveTrackSelector::SelectPropertyCallback(int cue_index)
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::SelectPropertyCallbackInternal(int cue_index)
 {
-  this->PropertyMenuButton->SetValue(
-    this->PropertyMenuButton->GetMenu()->GetItemLabel(cue_index));
+  const char* selected_label = 
+    this->PropertyMenuButton->GetMenu()->GetItemLabel(cue_index);
+  if (selected_label)
+    {
+    char* temp = new char[strlen(selected_label) + 1];
+    strcpy(temp, selected_label);
+    this->PropertyMenuButton->SetValue(temp);
+    delete [] temp;
+    }
+  else
+    {
+    this->PropertyMenuButton->SetValue("Unselected");
+    }
 
   vtkPVAnimationCue* cue= 
     this->Internals->PropertyCues[cue_index].GetPointer();
