@@ -21,55 +21,55 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
-  // Create a optionmenu
+  // Create a menu button
   // Add some entries
 
-  vtkKWMenuButton *optionmenu1 = vtkKWMenuButton::New();
-  optionmenu1->SetParent(parent);
-  optionmenu1->Create(app);
-  optionmenu1->SetBalloonHelpString("A simple option menu");
+  vtkKWMenuButton *menubutton1 = vtkKWMenuButton::New();
+  menubutton1->SetParent(parent);
+  menubutton1->Create(app);
+  menubutton1->SetBalloonHelpString("A simple menu button");
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
     {
-    optionmenu1->AddRadioButton(days[i]);
+    menubutton1->AddRadioButton(days[i]);
     }
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
-    optionmenu1->GetWidgetName());
+    menubutton1->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
-  // Create another optionmenu, this time with a label
+  // Create another menu button, this time with a label
 
-  vtkKWMenuButtonLabeled *optionmenu2 = vtkKWMenuButtonLabeled::New();
-  optionmenu2->SetParent(parent);
-  optionmenu2->Create(app);
-  optionmenu2->SetBorderWidth(2);
-  optionmenu2->SetReliefToGroove();
-  optionmenu2->SetLabelText("Days:");
-  optionmenu2->SetPadX(2);
-  optionmenu2->SetPadY(2);
-  optionmenu2->GetWidget()->IndicatorOff();
-  optionmenu2->GetWidget()->SetWidth(20);
-  optionmenu2->SetBalloonHelpString(
-    "This is a vtkKWMenuButtonLabeled, i.e. an option menu associated to a "
-    "label that can be positioned around the option menu. The indicator is "
+  vtkKWMenuButtonLabeled *menubutton2 = vtkKWMenuButtonLabeled::New();
+  menubutton2->SetParent(parent);
+  menubutton2->Create(app);
+  menubutton2->SetBorderWidth(2);
+  menubutton2->SetReliefToGroove();
+  menubutton2->SetLabelText("Days:");
+  menubutton2->SetPadX(2);
+  menubutton2->SetPadY(2);
+  menubutton2->GetWidget()->IndicatorOff();
+  menubutton2->GetWidget()->SetWidth(20);
+  menubutton2->SetBalloonHelpString(
+    "This is a vtkKWMenuButtonLabeled, i.e. a menu button associated to a "
+    "label that can be positioned around the menu button. The indicator is "
     "hidden, and the width is set explicitly");
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
     {
-    optionmenu2->GetWidget()->AddRadioButton(days[i]);
+    menubutton2->GetWidget()->AddRadioButton(days[i]);
     }
 
-  optionmenu2->GetWidget()->SetValue(days[0]);
+  menubutton2->GetWidget()->SetValue(days[0]);
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
-    optionmenu2->GetWidgetName());
+    menubutton2->GetWidgetName());
 
-  optionmenu1->Delete();
-  optionmenu2->Delete();
+  menubutton1->Delete();
+  menubutton2->Delete();
 
   // TODO: use callbacks
 
