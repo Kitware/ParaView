@@ -128,7 +128,6 @@ void vtkSMPointLabelDisplayProxy::CreateVTKObjects(int numObjects)
 void vtkSMPointLabelDisplayProxy::SetupPipeline()
 {
   vtkSMInputProperty* ip;
-  vtkSMStringVectorProperty* svp;
   vtkSMProxyProperty* pp;
 
   vtkClientServerStream stream;
@@ -148,16 +147,6 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
     vtkProcessModule::GetProcessModule()->SendStream(
       this->UpdateSuppressorProxy->GetServers(), stream);
     }
-  
-  svp =  vtkSMStringVectorProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("OutputType"));
-  if (!svp)
-    {
-    vtkErrorMacro("Failed to find property OutputType on "
-      "UpdateSuppressorProxy.");
-    return;
-    }
-  svp->SetElement(0, "vtkUnstructuredGrid");
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->MapperProxy->GetProperty("Input"));
