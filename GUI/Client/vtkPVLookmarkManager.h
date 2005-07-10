@@ -135,6 +135,7 @@ public:
   // Description:
   // This uses the backup file to repopulate the lookmark manager, bringing it up to the point just before the last operation
   void UndoCallback();
+  void RedoCallback();
 
   // Description:
   // Only one lookmark/folder can be selected/checked when this is called. It will display a text widget in which to type the new name.
@@ -262,6 +263,8 @@ protected:
   // Before any action that changes the state of the lookmark manager (Add,Update,etc), this method is called to write out a lookmark file 
   // in the current directory of the current state of the lookmark manager. The file name is "LookmarkManager.lmk" by default until a lookmark file is imported or one is saved out
   void Checkpoint();
+
+  void UndoRedoInternal();
 
 private:
 

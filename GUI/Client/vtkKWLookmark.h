@@ -31,7 +31,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWCheckButtonWithLabel;
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
@@ -121,7 +120,6 @@ protected:
   vtkKWFrameWithLabel *LmkMainFrame;
   vtkKWFrameWithLabel *LmkCommentsFrame;
   vtkKWLabel *LmkDatasetLabel;
-  vtkKWCheckButtonWithLabel *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
   vtkKWLabel *LmkIcon;
   vtkKWText *LmkCommentsText;

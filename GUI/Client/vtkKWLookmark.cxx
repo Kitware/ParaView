@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.18");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -48,7 +48,6 @@ vtkKWLookmark::vtkKWLookmark()
   this->LmkMainFrame = vtkKWFrameWithLabel::New();
   this->LmkCommentsFrame= vtkKWFrameWithLabel::New();
   this->LmkDatasetLabel= vtkKWLabel::New();
-  this->LmkDatasetCheckbox = vtkKWCheckButtonWithLabel::New();
   this->LmkDatasetFrame = vtkKWFrame::New();
   this->LmkCommentsText= vtkKWText::New();
   this->LmkNameField = vtkKWText::New();
@@ -77,12 +76,6 @@ vtkKWLookmark::~vtkKWLookmark()
     {
     this->LmkDatasetLabel->Delete();
     this->LmkDatasetLabel = NULL;
-    }
-
-  if(this->LmkDatasetCheckbox)
-    {
-    this->LmkDatasetCheckbox->Delete();
-    this->LmkDatasetCheckbox = NULL;
     }
 
   if(this->LmkCommentsText)
@@ -233,12 +226,6 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkDatasetLabel->Create(app);
   this->LmkDatasetLabel->SetText("Dataset: ");
 
-  this->LmkDatasetCheckbox->SetParent(this->LmkDatasetFrame);
-  this->LmkDatasetCheckbox->Create(app);
-  this->LmkDatasetCheckbox->GetWidget()->SetIndicator(1);
-  this->LmkDatasetCheckbox->GetWidget()->SetState(1);
-  this->LmkDatasetCheckbox->GetLabel()->SetText("Lock to Dataset");
-
   this->LmkCommentsFrame->SetParent(this->LmkRightFrame);
   this->LmkCommentsFrame->ShowHideFrameOn();
   this->LmkCommentsFrame->Create(app);
@@ -264,17 +251,27 @@ void vtkKWLookmark::UpdateWidgetValues()
   this->LmkCommentsText->SetValue(this->Comments);
   this->LmkMainFrame->SetLabelText(this->Name);
 
-  char *ptr = this->Dataset;
-  ptr+=strlen(ptr)-1;
-  while(*ptr!='/' && *ptr!='\\')
-    ptr--;
-  ptr++;
-  char *datasetLabel = new char[15+strlen(ptr)];
-  strcpy(datasetLabel,"Dataset: ");
-  strcat(datasetLabel,ptr);
-  this->LmkDatasetLabel->SetText(datasetLabel);
-  delete [] datasetLabel;
-
+  if(strstr(this->Dataset,"/") && !strstr(this->Dataset,"\\"))
+    {
+    char *ptr = this->Dataset;
+    ptr+=strlen(ptr)-1;
+    while(*ptr!='/' && *ptr!='\\')
+      ptr--;
+    ptr++;
+    char *datasetLabel = new char[15+strlen(ptr)];
+    strcpy(datasetLabel,"Dataset: ");
+    strcat(datasetLabel,ptr);
+    this->LmkDatasetLabel->SetText(datasetLabel);
+    delete [] datasetLabel;
+    }
+  else
+    {
+    char *datasetLabel = new char[15+strlen(this->Dataset)];
+    strcpy(datasetLabel,"Source: ");
+    strcat(datasetLabel,this->Dataset);
+    this->LmkDatasetLabel->SetText(datasetLabel);
+    delete [] datasetLabel;
+    }
 }
 
 void vtkKWLookmark::UpdateVariableValues()

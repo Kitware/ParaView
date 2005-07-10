@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.44");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -317,6 +317,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuEdit->Create(app);
   root_menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
+  //this->MenuEdit->AddCommand("Redo", this, "RedoCallback");
   this->MenuEdit->AddSeparator();
 
   this->MenuExamples->SetParent(this->MenuEdit);
@@ -343,6 +344,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuEdit->AddCommand("Select All", this, "AllOnOffCallback 1");
   this->MenuEdit->AddCommand("Clear All", this, "AllOnOffCallback 0");
   this->MenuEdit->SetState("Undo",2);
+  this->MenuEdit->SetState("Redo",2);
 
   // Menu : Help
 
@@ -791,8 +793,22 @@ void vtkPVLookmarkManager::Checkpoint()
                       this->GetTclName());
 
   this->MenuEdit->SetState("Undo",0);
+  this->MenuEdit->SetState("Redo",2);
 
 }
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::RedoCallback()
+{
+//  this->GetTraceHelper()->AddEntry("$kw(%s) RedoCallback",
+//                      this->GetTclName());
+
+  this->UndoRedoInternal();
+
+  this->MenuEdit->SetState("Redo",2);
+  this->MenuEdit->SetState("Undo",0);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::UndoCallback()
@@ -800,7 +816,17 @@ void vtkPVLookmarkManager::UndoCallback()
 //  this->GetTraceHelper()->AddEntry("$kw(%s) UndoCallback",
 //                      this->GetTclName());
 
+  this->UndoRedoInternal();
+
+  this->MenuEdit->SetState("Undo",2);
+  this->MenuEdit->SetState("Redo",0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::UndoRedoInternal()
+{
   ostrstream str;
+  ostrstream tempstr;
 
   // Get the path to the checkpointed file
 
@@ -811,6 +837,7 @@ void vtkPVLookmarkManager::UndoCallback()
     return;
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
+  tempstr << getenv("HOME") << "/.TempParaViewlmk" << ends;
 
   #else
 
@@ -819,6 +846,7 @@ void vtkPVLookmarkManager::UndoCallback()
     return;
     }
   str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  tempstr << "C:" << getenv("HOMEPATH") << "\\#TempParaViewlmk#" << ends;
 
   #endif
 
@@ -826,10 +854,11 @@ void vtkPVLookmarkManager::UndoCallback()
 
   if ( !infile.fail())
     {
+    // save out the current contents to a temp file
+    this->SaveAll(tempstr.str());
     this->Import(str.str(),0);
     this->Checkpoint();
     }
-  this->MenuEdit->SetState("Undo",2);
 
 }
 
@@ -1552,7 +1581,7 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkPVXMLElement *elem)
     lmk->SetDataset(lookmarkDataset);
     delete [] lookmarkDataset;
     }
- 
+
   if(elem->GetAttribute("ImageData"))
     {
     char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
@@ -1722,13 +1751,13 @@ void vtkPVLookmarkManager::CreateMacroCallback()
   src = win->GetCurrentPVSource();
   while((temp = src->GetPVInput(0)))
     src = temp;
-  reader = src;
-  if(reader->IsA("vtkPVReaderModule"))
+  if(src->IsA("vtkPVReaderModule"))
     {
-    mod = vtkPVReaderModule::SafeDownCast(reader);
+    mod = vtkPVReaderModule::SafeDownCast(src);
     }
   else
     {
+/*
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "Error Creating Lookmark", 
       "Lookmarking ParaView source is not yet supported", 
@@ -1736,6 +1765,7 @@ void vtkPVLookmarkManager::CreateMacroCallback()
     this->Focus();
 
     return;
+*/
     }
 
   this->Checkpoint();
@@ -1753,7 +1783,14 @@ void vtkPVLookmarkManager::CreateMacroCallback()
   newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
   s.rdbuf()->freeze(0);
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-  newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+  if(src->IsA("vtkPVReaderModule"))
+    {
+    newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+    }
+  else
+    {
+    newLookmark->SetDataset(src->GetModuleName());
+    }
   newLookmark->StoreStateScript();
   newLookmark->UpdateWidgetValues();
   this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
@@ -1796,13 +1833,13 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
   src = win->GetCurrentPVSource();
   while((temp = src->GetPVInput(0)))
     src = temp;
-  reader = src;
-  if(reader->IsA("vtkPVReaderModule"))
+  if(src->IsA("vtkPVReaderModule"))
     {
-    mod = vtkPVReaderModule::SafeDownCast(reader);
+    mod = vtkPVReaderModule::SafeDownCast(src);
     }
   else
     {
+/*
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "Error Creating Lookmark", 
       "Lookmarking ParaView source is not yet supported", 
@@ -1810,6 +1847,7 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
     this->Focus();
 
     return;
+*/
     }
 
   this->Checkpoint();
@@ -1826,7 +1864,14 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
   newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
   s.rdbuf()->freeze(0);
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-  newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+  if(src->IsA("vtkPVReaderModule"))
+    {
+    newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+    }
+  else
+    {
+    newLookmark->SetDataset(src->GetModuleName());
+    }
   newLookmark->StoreStateScript();
   newLookmark->UpdateWidgetValues();
   this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());

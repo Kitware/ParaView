@@ -171,18 +171,6 @@ protected:
   // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
   // the filters so that we can go back and set reset them at the end
   void ParseAndExecuteStateScript(vtkPVSource *reader, char *state, int useDatasetFlag);
-  // Description: 
-  // helper functions when parsing
-  int GetArrayStatus(char *name, char *line);
-  int GetIntegerScalarWidgetValue(char *line);
-  double GetDoubleScalarWidgetValue(char *line);
-  void GetDoubleVectorWidgetValue(char *line,double *x,double *y, double *z);
-  char *GetReaderTclName(char *line);
-  char *GetFieldName(char *line);
-  char *GetFieldNameAndValue(char *line, int *val);
-  char *GetStringEntryValue(char *line);
-  char *GetStringValue(char *line);
-  char *GetVectorEntryValue(char *line);
 
   char* StateScript;
   char* ImageData;
