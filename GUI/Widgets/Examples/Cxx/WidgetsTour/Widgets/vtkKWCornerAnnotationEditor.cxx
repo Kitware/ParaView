@@ -20,11 +20,11 @@ public:
   virtual ~vtkKWCornerAnnotationEditorItem();
 
 protected:
-  vtkKWRenderWidget *RenderWidget;
-  vtkXMLImageDataReader *Reader;
-  vtkImageViewer2 *Viewer;
-  vtkRenderWindowInteractor *Interactor;
-  vtkKWCornerAnnotationEditor *CornerAnnotationEditor;
+  vtkKWRenderWidget *cae_renderwidget;
+  vtkXMLImageDataReader *cae_reader;
+  vtkImageViewer2 *cae_viewer;
+  vtkRenderWindowInteractor *cae_iren;
+  vtkKWCornerAnnotationEditor *cae_anno_editor;
 };
 
 KWWidgetsTourItem* vtkKWCornerAnnotationEditorEntryPoint(vtkKWWidget *parent, vtkKWWindow *window)
@@ -42,41 +42,41 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   // Create a render widget
   // Set the corner annotation visibility
 
-  this->RenderWidget = vtkKWRenderWidget::New();
-  this->RenderWidget->SetParent(parent);
-  this->RenderWidget->Create(app);
-  this->RenderWidget->CornerAnnotationVisibilityOn();
+  this->cae_renderwidget = vtkKWRenderWidget::New();
+  this->cae_renderwidget->SetParent(parent);
+  this->cae_renderwidget->Create(app);
+  this->cae_renderwidget->CornerAnnotationVisibilityOn();
 
   app->Script("pack %s -side right -fill both -expand y -padx 0 -pady 0", 
-              this->RenderWidget->GetWidgetName());
+              this->cae_renderwidget->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
   // Create a volume reader
 
-  this->Reader = vtkXMLImageDataReader::New();
-  this->Reader->SetFileName(
+  this->cae_reader = vtkXMLImageDataReader::New();
+  this->cae_reader->SetFileName(
     KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // Create an image viewer
   // Use the render window and renderer of the renderwidget
 
-  this->Viewer = vtkImageViewer2::New();
-  this->Viewer->SetRenderWindow(this->RenderWidget->GetRenderWindow());
-  this->Viewer->SetRenderer(this->RenderWidget->GetRenderer());
-  this->Viewer->SetInput(this->Reader->GetOutput());
+  this->cae_viewer = vtkImageViewer2::New();
+  this->cae_viewer->SetRenderWindow(this->cae_renderwidget->GetRenderWindow());
+  this->cae_viewer->SetRenderer(this->cae_renderwidget->GetRenderer());
+  this->cae_viewer->SetInput(this->cae_reader->GetOutput());
 
-  this->Interactor = vtkRenderWindowInteractor::New();
-  this->Viewer->SetupInteractor(this->Interactor);
+  this->cae_iren = vtkRenderWindowInteractor::New();
+  this->cae_viewer->SetupInteractor(this->cae_iren);
 
   // Reset the window/level and the camera
 
-  this->Reader->Update();
-  double *range = this->Reader->GetOutput()->GetScalarRange();
-  this->Viewer->SetColorWindow(range[1] - range[0]);
-  this->Viewer->SetColorLevel(0.5 * (range[1] + range[0]));
+  this->cae_reader->Update();
+  double *range = this->cae_reader->GetOutput()->GetScalarRange();
+  this->cae_viewer->SetColorWindow(range[1] - range[0]);
+  this->cae_viewer->SetColorLevel(0.5 * (range[1] + range[0]));
 
-  this->RenderWidget->ResetCamera();
+  this->cae_renderwidget->ResetCamera();
 
   // -----------------------------------------------------------------------
 
@@ -86,9 +86,9 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   // by connecting the corner annotation to our image actor and
   // image mapper
 
-  vtkCornerAnnotation *ca = this->RenderWidget->GetCornerAnnotation();
-  ca->SetImageActor(this->Viewer->GetImageActor());
-  ca->SetWindowLevel(this->Viewer->GetWindowLevel());
+  vtkCornerAnnotation *ca = this->cae_renderwidget->GetCornerAnnotation();
+  ca->SetImageActor(this->cae_viewer->GetImageActor());
+  ca->SetWindowLevel(this->cae_viewer->GetWindowLevel());
   ca->SetText(2, "<slice>");
   ca->SetText(3, "<window>\n<level>");
   ca->SetText(1, "Hello, World!");
@@ -98,20 +98,20 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   // Create a corner annotation editor
   // Connect it to the render widget
   
-  this->CornerAnnotationEditor = vtkKWCornerAnnotationEditor::New();
-  this->CornerAnnotationEditor->SetParent(parent);
-  this->CornerAnnotationEditor->Create(app);
-  this->CornerAnnotationEditor->SetRenderWidget(this->RenderWidget);
+  this->cae_anno_editor = vtkKWCornerAnnotationEditor::New();
+  this->cae_anno_editor->SetParent(parent);
+  this->cae_anno_editor->Create(app);
+  this->cae_anno_editor->SetRenderWidget(this->cae_renderwidget);
 
   app->Script("pack %s -side left -anchor nw -expand n -padx 2 -pady 2", 
-              this->CornerAnnotationEditor->GetWidgetName());
+              this->cae_anno_editor->GetWidgetName());
 }
 
 vtkKWCornerAnnotationEditorItem::~vtkKWCornerAnnotationEditorItem()
 {
-  this->CornerAnnotationEditor->Delete();
-  this->Reader->Delete();
-  this->Interactor->Delete();
-  this->RenderWidget->Delete();
-  this->Viewer->Delete();
+  this->cae_anno_editor->Delete();
+  this->cae_reader->Delete();
+  this->cae_iren->Delete();
+  this->cae_renderwidget->Delete();
+  this->cae_viewer->Delete();
 }

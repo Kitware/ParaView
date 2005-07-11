@@ -39,22 +39,22 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
 
   // Create a set of pushbutton that will modify the progress gauge
 
-  vtkKWPushButtonSet *pushbutton_set = vtkKWPushButtonSet::New();
-  pushbutton_set->SetParent(parent);
-  pushbutton_set->Create(app);
-  pushbutton_set->SetBorderWidth(2);
-  pushbutton_set->SetReliefToGroove();
-  pushbutton_set->SetWidgetsPadX(1);
-  pushbutton_set->SetWidgetsPadY(1);
-  pushbutton_set->SetPadX(1);
-  pushbutton_set->SetPadY(1);
-  pushbutton_set->ExpandWidgetsOn();
+  vtkKWPushButtonSet *progress1_pbs = vtkKWPushButtonSet::New();
+  progress1_pbs->SetParent(parent);
+  progress1_pbs->Create(app);
+  progress1_pbs->SetBorderWidth(2);
+  progress1_pbs->SetReliefToGroove();
+  progress1_pbs->SetWidgetsPadX(1);
+  progress1_pbs->SetWidgetsPadY(1);
+  progress1_pbs->SetPadX(1);
+  progress1_pbs->SetPadY(1);
+  progress1_pbs->ExpandWidgetsOn();
 
   char buffer[250];
   for (int i = 0; i <= 100; i += 25)
     {
     sprintf(buffer, "Set Progress to %d%%", i);
-    vtkKWPushButton *pushbutton = pushbutton_set->AddWidget(i);
+    vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(i);
     pushbutton->SetText(buffer);
     sprintf(buffer, "SetValue %d", i);
     pushbutton->SetCommand(progress1, buffer);
@@ -62,7 +62,7 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
 
   // Add a special button that will iterate from 0 to 100% in Tcl
 
-  vtkKWPushButton *pushbutton = pushbutton_set->AddWidget(1000);
+  vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(1000);
   pushbutton->SetText("0% to 100%");
 
   sprintf(
@@ -73,10 +73,10 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
   
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
-    pushbutton_set->GetWidgetName());
+    progress1_pbs->GetWidgetName());
 
   progress1->Delete();
-  pushbutton_set->Delete();
+  progress1_pbs->Delete();
 
   // TODO: add callbacks
 

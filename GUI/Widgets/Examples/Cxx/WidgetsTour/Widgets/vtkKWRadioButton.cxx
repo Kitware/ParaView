@@ -40,9 +40,10 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob1->SetState(1);
   radiob1b->SetVariableName(radiob1->GetVariableName());
 
-  app->Script(
-    "pack %s %s -side top -anchor nw -expand n -padx 2 -pady 2", 
-    radiob1->GetWidgetName(), radiob1b->GetWidgetName());
+  app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+              radiob1->GetWidgetName());
+  app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+              radiob1b->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
@@ -67,9 +68,10 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob2->SetState(1);
   radiob2b->SetVariableName(radiob2->GetVariableName());
 
-  app->Script(
-    "pack %s %s -side top -anchor nw -expand n -padx 2 -pady 2", 
-    radiob2->GetWidgetName(), radiob2b->GetWidgetName());
+  app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+              radiob2->GetWidgetName());
+  app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+              radiob2b->GetWidgetName());
 
   // -----------------------------------------------------------------------
 

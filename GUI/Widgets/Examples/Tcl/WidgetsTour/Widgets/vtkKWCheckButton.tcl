@@ -20,7 +20,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
   vtkKWCheckButton cb2
   cb2 SetParent $parent
   cb2 Create $app
-  cb2 SetImageToPredefinedIcon 10
+  cb2 SetImageToPredefinedIcon 62
   cb2 IndicatorOff
   cb2 SetBalloonHelpString "This time use one of the predefined icon"
 
@@ -84,7 +84,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   # TODO: use vtkKWCheckButtonSetWithLabel
 
-  return "TypeComposite"
+  return "TypeCore"
 }
 
 proc vtkKWCheckButtonFinalizePoint {} {

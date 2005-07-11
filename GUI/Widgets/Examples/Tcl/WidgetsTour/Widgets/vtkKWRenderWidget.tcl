@@ -1,50 +1,49 @@
-package require vtkio
-package require vtkrendering
-
 proc vtkKWRenderWidgetEntryPoint {parent win} {
 
-  set app [$parent GetApplication]
+  set app [$parent GetApplication] 
 
   # -----------------------------------------------------------------------
 
   # Create a render widget
 
-  vtkKWRenderWidget rw
-  rw SetParent $parent
-  rw Create $app
+  vtkKWRenderWidget rw_renderwidget
+  rw_renderwidget SetParent $parent
+  rw_renderwidget Create $app
 
-  pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+  pack [rw_renderwidget GetWidgetName] -side top -fill both -expand y -padx 0 -pady 0
 
   # -----------------------------------------------------------------------
 
-  # Switch to trackball style, it's nicer
+  # Switch to trackball style it's nicer
 
-  [[[rw GetRenderWindow] GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
+  [[[rw_renderwidget GetRenderWindow] GetInteractor] GetInteractorStyle] \
+      SetCurrentStyleToTrackballCamera
 
   # Create a 3D object reader
 
-  vtkXMLPolyDataReader reader
-  reader SetFileName [file join [file dirname [info script]] ".." ".." Data teapot.vtp]
+  vtkXMLPolyDataReader rw_reader
+  rw_reader SetFileName [file join [file dirname [info script]] ".." ".." Data "teapot.vtp"]
 
   # Create the mapper and actor
 
-  vtkPolyDataMapper mapper
-  mapper SetInputConnection [reader GetOutputPort]
+  vtkPolyDataMapper rw_mapper
+  rw_mapper SetInputConnection [rw_reader GetOutputPort] 
 
-  vtkActor actor
-  actor SetMapper mapper
+  vtkActor rw_actor
+  rw_actor SetMapper rw_mapper
 
   # Add the actor to the scene
 
-  rw AddProp actor
-  rw ResetCamera
+  rw_renderwidget AddProp rw_actor
+  rw_renderwidget ResetCamera
 
   return "TypeVTK"
 }
 
 proc vtkKWRenderWidgetFinalizePoint {} {
-  rw Delete
-  reader Delete
-  mapper Delete
-  actor Delete
+  rw_reader Delete
+  rw_actor Delete
+  rw_mapper Delete
+  rw_renderwidget Delete
 }
+

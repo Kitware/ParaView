@@ -3,9 +3,7 @@
 #include "vtkKWEntrySet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
-#include "vtkKWIcon.h"
 
-#include <vtksys/stl/string>
 #include "KWWidgetsTourExampleTypes.h"
 
 class vtkKWEntryItem : public KWWidgetsTourItem

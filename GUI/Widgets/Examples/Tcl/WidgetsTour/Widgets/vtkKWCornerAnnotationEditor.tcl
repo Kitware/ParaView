@@ -7,39 +7,39 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   # Create a render widget
   # Set the corner annotation visibility
 
-  vtkKWRenderWidget RenderWidget
-  RenderWidget SetParent $parent
-  RenderWidget Create $app
-  RenderWidget CornerAnnotationVisibilityOn
+  vtkKWRenderWidget cae_renderwidget
+  cae_renderwidget SetParent $parent
+  cae_renderwidget Create $app
+  cae_renderwidget CornerAnnotationVisibilityOn
 
-  pack [RenderWidget GetWidgetName] -side right -fill both -expand y -padx 0 -pady 0
+  pack [cae_renderwidget GetWidgetName] -side right -fill both -expand y -padx 0 -pady 0
 
   # -----------------------------------------------------------------------
 
   # Create a volume reader
 
-  vtkXMLImageDataReader Reader
-  Reader SetFileName [file join [file dirname [info script]] ".." ".." Data "head100x100x47.vti"]
+  vtkXMLImageDataReader cae_reader
+  cae_reader SetFileName [file join [file dirname [info script]] ".." ".." Data "head100x100x47.vti"]
 
   # Create an image viewer
   # Use the render window and renderer of the renderwidget
 
-  vtkImageViewer2 Viewer
-  Viewer SetRenderWindow [RenderWidget GetRenderWindow] 
-  Viewer SetRenderer [RenderWidget GetRenderer] 
-  Viewer SetInput [Reader GetOutput] 
+  vtkImageViewer2 cae_viewer
+  cae_viewer SetRenderWindow [cae_renderwidget GetRenderWindow] 
+  cae_viewer SetRenderer [cae_renderwidget GetRenderer] 
+  cae_viewer SetInput [cae_reader GetOutput] 
 
-  vtkRenderWindowInteractor Interactor
-  Viewer SetupInteractor Interactor
+  vtkRenderWindowInteractor cae_iren
+  cae_viewer SetupInteractor cae_iren
 
   # Reset the window/level and the camera
 
-  Reader Update
-  set range [[Reader GetOutput] GetScalarRange]
-  Viewer SetColorWindow [expr [lindex $range 1] - [lindex $range 0]]
-  Viewer SetColorLevel [expr 0.5 *  [lindex $range 1] + [lindex $range 0]]
+  cae_reader Update
+  set range [[cae_reader GetOutput] GetScalarRange]
+  cae_viewer SetColorWindow [expr [lindex $range 1] - [lindex $range 0]]
+  cae_viewer SetColorLevel [expr 0.5 * ([lindex $range 1] + [lindex $range 0])]
 
-  RenderWidget ResetCamera
+  cae_renderwidget ResetCamera
 
   # -----------------------------------------------------------------------
 
@@ -49,9 +49,9 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   # by connecting the corner annotation to our image actor and
   # image mapper
 
-  set ca [RenderWidget GetCornerAnnotation] 
-  $ca SetImageActor [Viewer GetImageActor] 
-  $ca SetWindowLevel [Viewer GetWindowLevel] 
+  set ca [cae_renderwidget GetCornerAnnotation] 
+  $ca SetImageActor [cae_viewer GetImageActor] 
+  $ca SetWindowLevel [cae_viewer GetWindowLevel] 
   $ca SetText 2 "<slice>"
   $ca SetText 3 "<window>\n<level>"
   $ca SetText 1 "Hello World!"
@@ -61,20 +61,20 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   # Create a corner annotation editor
   # Connect it to the render widget
   
-  vtkKWCornerAnnotationEditor CornerAnnotationEditor
-  CornerAnnotationEditor SetParent $parent
-  CornerAnnotationEditor Create $app
-  CornerAnnotationEditor SetRenderWidget RenderWidget
+  vtkKWCornerAnnotationEditor cae_anno_editor
+  cae_anno_editor SetParent $parent
+  cae_anno_editor Create $app
+  cae_anno_editor SetRenderWidget cae_renderwidget
 
-  pack [CornerAnnotationEditor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
+  pack [cae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
 
   return "TypeVTK"
 }
 
 proc vtkKWCornerAnnotationEditorFinalizePoint {} {
-  CornerAnnotationEditor Delete
-  Reader Delete
-  Interactor Delete
-  RenderWidget Delete
-  Viewer Delete
+  cae_anno_editor Delete
+  cae_reader Delete
+  cae_iren Delete
+  cae_renderwidget Delete
+  cae_viewer Delete
 }

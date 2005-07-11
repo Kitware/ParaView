@@ -63,18 +63,19 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   // This other transfer function editor is based on a real image data
   // Let's load it first
 
-  vtkXMLImageDataReader *reader = vtkXMLImageDataReader::New();
-  reader->SetFileName(
+  vtkXMLImageDataReader *pfed_reader = vtkXMLImageDataReader::New();
+  pfed_reader->SetFileName(
     KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // The build an histogram of the data, it will be used inside the editor
   // as if we were trying to tune a tfunc based on the real values
 
-  reader->Update();
-  vtkKWHistogram *hist = vtkKWHistogram::New();
-  hist->BuildHistogram(reader->GetOutput()->GetPointData()->GetScalars(), 0);
+  pfed_reader->Update();
+  vtkKWHistogram *pfed_hist = vtkKWHistogram::New();
+  pfed_hist->BuildHistogram(
+    pfed_reader->GetOutput()->GetPointData()->GetScalars(), 0);
 
-  double *range = hist->GetRange();
+  double *range = pfed_hist->GetRange();
 
   // Create the transfer function that will be modified by the 2nd editor
   // This one shows a different look & feel
@@ -117,7 +118,7 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc2_editor->ShowPointIndexOff();
   pfed_tfunc2_editor->ShowSelectedPointIndexOff();
 
-  pfed_tfunc2_editor->SetHistogram(hist);
+  pfed_tfunc2_editor->SetHistogram(pfed_hist);
 
   pfed_tfunc2_editor->ShowParameterTicksOn();
   pfed_tfunc2_editor->ComputeValueTicksFromHistogramOn();
@@ -131,8 +132,8 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc1->Delete();
   pfed_tfunc2_editor->Delete();
   pfed_tfunc2->Delete();
-  hist->Delete();
-  reader->Delete();
+  pfed_hist->Delete();
+  pfed_reader->Delete();
 
   return new vtkKWPiecewiseFunctionEditorItem;
 }

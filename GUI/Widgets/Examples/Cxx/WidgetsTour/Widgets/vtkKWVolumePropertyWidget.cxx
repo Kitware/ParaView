@@ -23,19 +23,19 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
 
   // This is a faily big widget, so create a scrolled frame
 
-  vtkKWFrameWithScrollbar *framews = vtkKWFrameWithScrollbar::New();
-  framews->SetParent(parent);
-  framews->Create(app);
+  vtkKWFrameWithScrollbar *vpw_frame = vtkKWFrameWithScrollbar::New();
+  vpw_frame->SetParent(parent);
+  vpw_frame->Create(app);
 
   app->Script("pack %s -side top -fill both -expand y", 
-              framews->GetWidgetName());
+              vpw_frame->GetWidgetName());
     
   // -----------------------------------------------------------------------
 
   // Create a volume property widget
 
   vtkKWVolumePropertyWidget *vpw = vtkKWVolumePropertyWidget::New();
-  vpw->SetParent(framews->GetFrame());
+  vpw->SetParent(vpw_frame->GetFrame());
   vpw->Create(app);
  
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
@@ -44,33 +44,33 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   // Create a volume property and assign it
   // We need color tfuncs, opacity, and gradient
 
-  vtkVolumeProperty *vp = vtkVolumeProperty::New();
-  vp->SetIndependentComponents(1);
+  vtkVolumeProperty *vpw_vp = vtkVolumeProperty::New();
+  vpw_vp->SetIndependentComponents(1);
 
-  vtkColorTransferFunction *cfun = vtkColorTransferFunction::New();
-  cfun->AddHSVSegment(0.0, 0.2, 1.0, 1.0, 255.0, 0.8, 1.0, 1.0);
-  cfun->AddHSVSegment(80, 0.8, 1.0, 1.0, 130.0, 0.1, 1.0, 1.0);
+  vtkColorTransferFunction *vpw_cfun = vtkColorTransferFunction::New();
+  vpw_cfun->AddHSVSegment(0.0, 0.2, 1.0, 1.0, 255.0, 0.8, 1.0, 1.0);
+  vpw_cfun->AddHSVSegment(80, 0.8, 1.0, 1.0, 130.0, 0.1, 1.0, 1.0);
 
-  vtkPiecewiseFunction *ofun = vtkPiecewiseFunction::New();
-  ofun->AddSegment(0.0, 0.2, 255.0, 0.8);
-  ofun->AddSegment(40, 0.9, 120.0, 0.1);
+  vtkPiecewiseFunction *vpw_ofun = vtkPiecewiseFunction::New();
+  vpw_ofun->AddSegment(0.0, 0.2, 255.0, 0.8);
+  vpw_ofun->AddSegment(40, 0.9, 120.0, 0.1);
   
-  vtkPiecewiseFunction *gfun = vtkPiecewiseFunction::New();
-  gfun->AddSegment(0.0, 0.2, 60.0, 0.4);
+  vtkPiecewiseFunction *vpw_gfun = vtkPiecewiseFunction::New();
+  vpw_gfun->AddSegment(0.0, 0.2, 60.0, 0.4);
   
-  vp->SetColor(0, cfun);
-  vp->SetScalarOpacity(0, ofun);
-  vp->SetGradientOpacity(0, gfun);
+  vpw_vp->SetColor(0, vpw_cfun);
+  vpw_vp->SetScalarOpacity(0, vpw_ofun);
+  vpw_vp->SetGradientOpacity(0, vpw_gfun);
 
-  vpw->SetVolumeProperty(vp);
+  vpw->SetVolumeProperty(vpw_vp);
   vpw->SetWindowLevel(128, 128);
 
-  framews->Delete();
+  vpw_frame->Delete();
   vpw->Delete();
-  cfun->Delete();
-  ofun->Delete();
-  gfun->Delete();
-  vp->Delete();
+  vpw_cfun->Delete();
+  vpw_ofun->Delete();
+  vpw_gfun->Delete();
+  vpw_vp->Delete();
 
   return new vtkKWVolumePropertyWidgetItem;
 }
