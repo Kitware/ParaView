@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.3");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
@@ -45,8 +45,13 @@ void vtkKWSpinBox::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::SetRange(double from, double to)
 {
-  this->SetConfigurationOptionAsDouble("-from", from);
-  this->SetConfigurationOptionAsDouble("-to", to);
+  if (this->IsCreated())
+    {
+    // both options have to be set at the same time to avoid error if
+    // -from/-to is greater/lower the -to/-from
+    this->Script("%s configure -from %lf -to %lf", 
+                 this->GetWidgetName(), from, to);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -128,7 +133,7 @@ int vtkKWSpinBox::GetExportSelection()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::SetCommand(vtkObject *object, const char *method)
+void vtkKWSpinBox::SetCommand(vtkObject *object, const char *method)
 {
   if (this->IsCreated())
     {
