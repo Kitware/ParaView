@@ -136,6 +136,7 @@ SET(KWWidgets_SRCS
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
   vtkKWSimpleEntryDialog.cxx
+  vtkKWSpinBox.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
   vtkKWTclInteractor.cxx
@@ -236,6 +237,7 @@ FOREACH (WidgetType
     vtkKWPopupButton
     vtkKWPushButton
     vtkKWPushButtonSet
+    vtkKWSpinBox
     vtkKWText
     vtkKWTextWithScrollbars
     vtkKWRadioButtonSet
