@@ -23,7 +23,8 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWRange;
+#include "vtkKWRange.h" // Needed for some constants
+
 class vtkKWApplication;
 
 class KWWIDGETS_EXPORT vtkKWExtent : public vtkKWCompositeWidget
@@ -95,9 +96,43 @@ public:
   // Convenience method to set the ranges orientations and item positions.
   // This just propagates the same method to the internal ranges.
   virtual void SetOrientation(int);
+  virtual void SetOrientationToHorizontal()
+    { this->SetOrientation(vtkKWRange::OrientationHorizontal); };
+  virtual void SetOrientationToVertical() 
+    { this->SetOrientation(vtkKWRange::OrientationVertical); };
   virtual void SetLabelPosition(int);
+  virtual void SetLabelPositionToDefault()
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionDefault); };
+  virtual void SetLabelPositionToTop()
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionTop); };
+  virtual void SetLabelPositionToBottom()
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionBottom); };
+  virtual void SetLabelPositionToLeft()
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionLeft); };
+  virtual void SetLabelPositionToRight()
+    { this->SetLabelPosition(vtkKWWidgetWithLabel::LabelPositionRight); };
   virtual void SetEntry1Position(int);
+  virtual void SetEntry1PositionToDefault()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionDefault); };
+  virtual void SetEntry1PositionToTop()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionTop); };
+  virtual void SetEntry1PositionToBottom()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionBottom); };
+  virtual void SetEntry1PositionToLeft()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionLeft); };
+  virtual void SetEntry1PositionToRight()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionRight); };
   virtual void SetEntry2Position(int);
+  virtual void SetEntry2PositionToDefault()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionDefault); };
+  virtual void SetEntry2PositionToTop()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionTop); };
+  virtual void SetEntry2PositionToBottom()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionBottom); };
+  virtual void SetEntry2PositionToLeft()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionLeft); };
+  virtual void SetEntry2PositionToRight()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionRight); };
   virtual void SetThickness(int);
   virtual void SetInternalThickness(double);
   virtual void SetRequestedLength(int);
