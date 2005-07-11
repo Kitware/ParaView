@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.18");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.19");
 
 
 //*****************************************************************************
@@ -343,7 +343,9 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
 void vtkPVLookmark::StoreStateScript()
 {
   FILE *lookmarkScript;
-  char *buf = new char[300];
+  char buf[300];
+  char filter[50];
+  char *cmd;
   char *stateScript;
   ostrstream state;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
@@ -352,20 +354,48 @@ void vtkPVLookmark::StoreStateScript()
   win->SaveState("tempLookmarkState.pvs");
   win->SetSaveVisibleSourcesOnlyFlag(0);
 
+  cmd = new char[200];
+  if(strstr(this->Dataset,"/") && !strstr(this->Dataset,"\\"))
+    {
+    char *ptr = this->Dataset;
+    ptr+=strlen(ptr)-1;
+    while(*ptr!='/' && *ptr!='\\')
+      ptr--;
+    ptr++;
+    sprintf(cmd,"Operations: %s", ptr);
+    }
+  else
+    {
+    sprintf(cmd,"Operations: %s", this->Dataset);
+    }
+
   //read the session state file in to a new vtkPVLookmark
   if((lookmarkScript = fopen("tempLookmarkState.pvs","r")) != NULL)
     {
     while(fgets(buf,300,lookmarkScript))
+      {
+      if(strstr(buf,"CreatePVSource") && !strstr(buf,this->Dataset))
+        {
+        sscanf(buf,"%*s %*s %*s %*s %[^]]",filter);
+        cmd = (char *)realloc(cmd,strlen(cmd)+strlen(filter)+5);
+        sprintf(cmd,"%s, %s ",cmd,filter);
+        }
       state << buf;
+      }
     }
   state << ends;
   fclose(lookmarkScript);
-  delete [] buf;
   stateScript = new char[strlen(state.str())+1];
   strcpy(stateScript,state.str());
   this->SetStateScript(stateScript);
   delete [] stateScript;
 
+  if(!this->GetComments())
+    {
+    this->SetComments(cmd);
+    }
+
+  delete [] cmd;
   remove("tempLookmarkState.pvs");
 }
 
@@ -512,6 +542,7 @@ void vtkPVLookmark::Update()
     this->ToolbarButton = 0;
     }
   this->CreateIconFromMainView();
+  this->UpdateWidgetValues();
 
 //  this->SetCenterOfRotation(this->PVApplication->GetMainWindow()->GetCenterOfRotationStyle()->GetCenter());
 }

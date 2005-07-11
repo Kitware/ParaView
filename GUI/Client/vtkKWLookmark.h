@@ -84,6 +84,8 @@ public:
   void EditLookmarkCallback();
   void ChangeLookmarkName();
 
+  void CommentsModifiedCallback();
+
   // Description:
   // COnvenience method for encapsulating and reusing code that packs this widget
   // the argument tells Pack() whether to display the hidden widgets or not

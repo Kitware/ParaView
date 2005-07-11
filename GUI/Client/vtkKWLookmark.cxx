@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.20");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -221,7 +221,6 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkDatasetFrame->SetParent(this->LmkRightFrame);
   this->LmkDatasetFrame->Create(app);
 
-
   this->LmkDatasetLabel->SetParent(this->LmkDatasetFrame);
   this->LmkDatasetLabel->Create(app);
   this->LmkDatasetLabel->SetText("Dataset: ");
@@ -233,6 +232,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->LmkCommentsText->SetParent(this->LmkCommentsFrame->GetFrame());
   this->LmkCommentsText->Create(app);
+  this->LmkCommentsText->AddBinding("<KeyPress>", this, "CommentsModifiedCallback");
 
   this->LmkNameField->SetParent(this->LmkMainFrame->GetLabelFrame());
   this->LmkNameField->Create(app);
@@ -245,6 +245,41 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->UpdateEnableState();
 }
 
+void vtkKWLookmark::CommentsModifiedCallback()
+{
+  int num;
+  char words[4][50];
+  char str[250];
+
+  this->SetComments(this->LmkCommentsText->GetValue());
+
+  num = sscanf(this->Comments,"%s %s %s %s",words[0],words[1],words[2],words[3]);
+  switch (num)
+    {
+    case 1:
+      sprintf(str,"Comments:  %s...",words[0]);
+      break;
+    case 2:
+      sprintf(str,"Comments:  %s %s...",words[0],words[1]);
+      break;
+    case 3:
+      sprintf(str,"Comments:  %s %s %s...",words[0],words[1],words[2]);
+      break;
+    case 4:
+      sprintf(str,"Comments:  %s %s %s %s...",words[0],words[1],words[2],words[3]);
+      break;
+    default:
+      strcpy(str,"Comments:  ");
+    }
+  
+  if(strlen(str) > 30)
+    {
+    str[30] = '\0';
+    strcat(str,"...");
+    }
+
+  this->LmkCommentsFrame->SetLabelText(str);
+}
 
 void vtkKWLookmark::UpdateWidgetValues()
 {
