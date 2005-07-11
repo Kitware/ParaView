@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.14");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.15");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -154,6 +154,7 @@ vtkPVSimpleAnimationCue::vtkPVSimpleAnimationCue()
 //-----------------------------------------------------------------------------
 vtkPVSimpleAnimationCue::~vtkPVSimpleAnimationCue()
 {
+  this->UnregisterProxies();
   this->SetKeyFrameParent(0);
   this->Observer->SetTarget(0);
   this->Observer->Delete();
