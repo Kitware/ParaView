@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.47");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.48");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -278,7 +278,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->Script("%s configure -yscrollcommand \"%s set\"", 
                this->FileList->GetWidgetName(),
                this->ScrollBar->GetWidgetName());
-  this->FileList->SetBind(this, "<Configure>", "Reconfigure");
+  this->FileList->AddBinding("<Configure>", this, "Reconfigure");
 
   this->BottomFrame->SetParent(this->GetFrame());
   this->BottomFrame->Create(app);

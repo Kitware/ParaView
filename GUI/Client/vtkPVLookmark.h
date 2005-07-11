@@ -45,6 +45,7 @@ class vtkPVLookmarkManager;
 class vtkPVTraceHelper;
 class vtkKWPushButton;
 class vtkPVLookmarkObserver;
+class vtkKWIcon;
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.19");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -216,7 +216,7 @@ void vtkKWLookmarkFolder::EditCallback()
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetWidgetName(), strlen(temp));
   if(this->NameField)
     this->NameField->SetValue(temp);
-  this->NameField->SetBind(this, "<KeyPress-Return>", "ChangeName");
+  this->NameField->AddBinding("<KeyPress-Return>", this, "ChangeName");
 
   delete [] temp;
 }
@@ -329,7 +329,6 @@ void vtkKWLookmarkFolder::ToggleNestedCheckBoxes(vtkKWWidget *parent, int onoff)
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
 {
-  vtkKWWidget *anchor;
   vtkKWLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
 
@@ -346,11 +345,12 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       {
 //      lmkWidget->SetLookmarkState(onoff);
       double fr, fg, fb, br, bg, bb;
-      anchor = lmkWidget->GetDragAndDropTargetSet()->GetSourceAnchor();
-      anchor->GetForegroundColor(&fr, &fg, &fb);
-      anchor->GetBackgroundColor(&br, &bg, &bb);
-      anchor->SetForegroundColor(br, bg, bb);
-      anchor->SetBackgroundColor(fr, fg, fb);
+      vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
+        lmkWidget->GetDragAndDropTargetSet()->GetSourceAnchor());
+      anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
+      anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
+      anchor_as_core->SetForegroundColor(br, bg, bb);
+      anchor_as_core->SetBackgroundColor(fr, fg, fb);
       }
     }
   else if( widget->IsA("vtkKWLookmarkFolder") && widget->IsPacked())
@@ -361,11 +361,12 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
 //      if(lmkFolder->GetSelectionFlag() != onoff)
 //        {
         double fr, fg, fb, br, bg, bb;
-        anchor = lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor();
-        anchor->GetForegroundColor(&fr, &fg, &fb);
-        anchor->GetBackgroundColor(&br, &bg, &bb);
-        anchor->SetForegroundColor(br, bg, bb);
-        anchor->SetBackgroundColor(fr, fg, fb);
+        vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
+          lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor());
+        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
+        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
+        anchor_as_core->SetForegroundColor(br, bg, bb);
+        anchor_as_core->SetBackgroundColor(fr, fg, fb);
 
 //        lmkFolder->SetSelectionFlag(onoff);
 //        }

@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.11");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
@@ -137,23 +137,26 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app)
     this->ButtonFrame->GetWidgetName());
 
 
-  this->SelButton1->SetBind("<FocusIn>", this->SelFrame1->GetWidgetName(), 
-                      "configure -relief groove");
-  this->SelButton1->SetBind("<FocusOut>", this->SelFrame1->GetWidgetName(), 
-                      "configure -relief flat");
-  this->SelButton1->SetBind(this, "<Return>", "SetGhostLevel 0");
+  this->SelButton1->AddBinding(
+    "<FocusIn>", this->SelFrame1, "SetReliefToGroove");
+  this->SelButton1->AddBinding(
+    "<FocusOut>", this->SelFrame1, "SetReliefToFlat");
+  this->SelButton1->AddBinding(
+    "<Return>", this, "SetGhostLevel 0");
 
-  this->SelButton2->SetBind("<FocusIn>", this->SelFrame2->GetWidgetName(), 
-                      "configure -relief groove");
-  this->SelButton2->SetBind("<FocusOut>", this->SelFrame2->GetWidgetName(), 
-                      "configure -relief flat");
-  this->SelButton2->SetBind(this, "<Return>", "SetGhostLevel 1");
+  this->SelButton2->AddBinding(
+    "<FocusIn>", this->SelFrame2, "SetReliefToGroove");
+  this->SelButton2->AddBinding(
+    "<FocusOut>", this->SelFrame2, "SetReliefToFlat");
+  this->SelButton2->AddBinding(
+    "<Return>", this, "SetGhostLevel 1");
 
-  this->SelButton3->SetBind("<FocusIn>", this->SelFrame3->GetWidgetName(), 
-                      "configure -relief groove");
-  this->SelButton3->SetBind("<FocusOut>", this->SelFrame3->GetWidgetName(), 
-                      "configure -relief flat");
-  this->SelButton3->SetBind(this, "<Return>", "SetGhostLevel 2");
+  this->SelButton3->AddBinding(
+    "<FocusIn>", this->SelFrame3, "SetReliefToGroove");
+  this->SelButton3->AddBinding(
+    "<FocusOut>", this->SelFrame1, "SetReliefToFlat");
+  this->SelButton3->AddBinding(
+    "<Return>", this, "SetGhostLevel 2");
 }
 
 int vtkPVGhostLevelDialog::Invoke()

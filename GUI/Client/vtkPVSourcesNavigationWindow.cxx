@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.27");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.28");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -173,7 +173,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
                this->Canvas->GetWidgetName(),
                this->ScrollBar->GetWidgetName());
 
-  this->Canvas->SetBind(this, "<Configure>", "Reconfigure");
+  this->Canvas->AddBinding("<Configure>", this, "Reconfigure");
 
   this->Script("grid %s -row 0 -column 0 -sticky news", 
                this->Canvas->GetWidgetName());

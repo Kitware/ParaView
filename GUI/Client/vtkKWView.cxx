@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.20");
+vtkCxxRevisionMacro(vtkKWView, "1.21");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -1158,7 +1158,7 @@ void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
 //----------------------------------------------------------------------------
 void vtkKWView::SetTitle(const char *title)
 {
-  this->Label->SetTextOption(title);
+  this->Label->SetText(title);
   //  this->Script("update idletasks");
 }
 

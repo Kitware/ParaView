@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.27");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -68,8 +68,8 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp)
 
   this->Superclass::Create(pvApp);
 
-  this->SetBind(this, "<Button-1>", "RestoreCamera");
-  this->SetBind(this, "<Button-3>", "StoreCamera");
+  this->AddBinding("<Button-1>", this, "RestoreCamera");
+  this->AddBinding("<Button-3>", this, "StoreCamera");
   this->SetBalloonHelpString(
     "Click left mouse button to retrieve the camera position, "
     "right mouse button to store a camera position.");

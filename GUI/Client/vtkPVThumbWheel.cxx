@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.18");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -85,8 +85,8 @@ void vtkPVThumbWheel::Create(vtkKWApplication *app)
   this->ThumbWheel->SetInteractionModeToNonLinear(0);
   this->ThumbWheel->SetNonLinearMaximumMultiplier(10);
   this->ThumbWheel->SetEndCommand(this, "ModifiedCallback");
-  this->ThumbWheel->GetEntry()->SetBind(this, "<KeyRelease>",
-                                        "ModifiedCallback");
+  this->ThumbWheel->GetEntry()->AddBinding(
+    "<KeyRelease>", this, "ModifiedCallback");
   
   this->Script("pack %s -side left -fill x -expand 1", this->ThumbWheel->GetWidgetName());
 }

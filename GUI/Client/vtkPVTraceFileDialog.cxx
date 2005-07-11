@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVTraceFileDialog::vtkPVTraceFileDialog()
@@ -83,11 +83,12 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
 
   if ( this->SaveButton->GetApplication() )
     {
-    this->SaveButton->SetBind("<FocusIn>", this->SaveFrame->GetWidgetName(), 
-                            "configure -relief groove");
-    this->SaveButton->SetBind("<FocusOut>", this->SaveFrame->GetWidgetName(), 
-                            "configure -relief flat");
-    this->SaveButton->SetBind(this, "<Return>", "Save");
+    this->SaveButton->AddBinding(
+      "<FocusIn>", this->SaveFrame, "SetReliefToGroove");
+    this->SaveButton->AddBinding(
+      "<FocusOut>", this->SaveFrame, "SetReliefToFlat");
+    this->SaveButton->AddBinding(
+      "<Return>", this, "Save");
     }
   this->RetraceFrame->Create(app);
   this->SaveFrame->SetBorderWidth(3);
@@ -104,11 +105,12 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
 
   if ( this->RetraceButton->GetApplication() )
     {
-    this->RetraceButton->SetBind("<FocusIn>", this->RetraceFrame->GetWidgetName(), 
-                            "configure -relief groove");
-    this->RetraceButton->SetBind("<FocusOut>", this->RetraceFrame->GetWidgetName(), 
-                            "configure -relief flat");
-    this->RetraceButton->SetBind(this, "<Return>", "Retrace");
+    this->RetraceButton->AddBinding(
+      "<FocusIn>", this->RetraceFrame, "SetReliefToGroove");
+    this->RetraceButton->AddBinding(
+      "<FocusOut>", this->RetraceFrame, "SetReliefToFlat");
+    this->RetraceButton->AddBinding(
+      "<Return>", this, "Retrace");
     }
 }
 

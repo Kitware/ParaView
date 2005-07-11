@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.45");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -625,7 +625,8 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
     text->SetWrapToWord();
     text->EditableTextOff();
     double r, g, b;
-    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     }
 
@@ -711,7 +712,8 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
     text->SetWrapToWord();
     text->EditableTextOff();
     double r, g, b;
-    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     }
 
@@ -1725,7 +1727,6 @@ void vtkPVLookmarkManager::CreateMacroCallback()
   vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
   vtkPVReaderModule *mod;
-  vtkPVSource *reader;
   vtkPVSource *temp;
   vtkPVSource *src;
   int indexOfNewLmkWidget;
@@ -1818,7 +1819,6 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
   vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
   vtkPVReaderModule *mod;
-  vtkPVSource *reader;
   vtkPVSource *temp;
   vtkPVSource *src;
   int indexOfNewLmkWidget;

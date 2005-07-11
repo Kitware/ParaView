@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.7");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()
@@ -223,7 +223,7 @@ void vtkPVCornerAnnotationEditor::CornerTextCallback(int i)
 
     vtksys_stl::string escaped(
       this->ConvertInternalStringToTclString(
-        text, vtkKWWidget::ConvertStringEscapeInterpretable));
+        text, vtkKWCoreWidget::ConvertStringEscapeInterpretable));
     
     this->GetTraceHelper()->AddEntry(
       "$kw(%s) SetCornerText \"%s\" %d", 
@@ -259,7 +259,7 @@ void vtkPVCornerAnnotationEditor::SetCornerText(const char *text, int corner)
 
     vtksys_stl::string escaped(
       this->ConvertInternalStringToTclString(
-        text, vtkKWWidget::ConvertStringEscapeInterpretable));
+        text, vtkKWCoreWidget::ConvertStringEscapeInterpretable));
     
     this->GetTraceHelper()->AddEntry(
       "$kw(%s) SetCornerText \"%s\" %d", 

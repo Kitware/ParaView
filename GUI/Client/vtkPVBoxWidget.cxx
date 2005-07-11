@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -468,8 +468,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
     this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
-    this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
-      "<Key>", "SetValueChanged");
+    this->TranslateThumbWheel[cc]->GetEntry()->AddBinding(
+      "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
     this->TranslateThumbWheel[cc]->SetEntryCommand(this, "SetTranslate");
     //Command is called when the value is changed  
@@ -488,8 +488,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->ScaleThumbWheel[cc]->ExpandEntryOn();
     this->ScaleThumbWheel[cc]->GetEntry()->SetWidth(5);
-    this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
-      "<Key>", "SetValueChanged");
+    this->ScaleThumbWheel[cc]->GetEntry()->AddBinding(
+      "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
     this->ScaleThumbWheel[cc]->SetEntryCommand(this,"SetScale");
     this->ScaleThumbWheel[cc]->SetCommand(this, "SetValueChanged");
@@ -507,8 +507,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->OrientationScale[cc]->ExpandEntryOn();
     this->OrientationScale[cc]->GetEntry()->SetWidth(5);
-    this->OrientationScale[cc]->GetEntry()->SetBind(this,
-      "<Key>", "SetValueChanged");
+    this->OrientationScale[cc]->GetEntry()->AddBinding(
+      "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
     this->OrientationScale[cc]->SetEntryCommand(this,"SetOrientation");
     this->OrientationScale[cc]->SetCommand(this, "SetValueChanged");

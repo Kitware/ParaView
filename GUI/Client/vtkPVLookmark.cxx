@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.17");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.18");
 
 
 //*****************************************************************************
@@ -615,21 +615,23 @@ void vtkPVLookmark::SetLookmarkIconCommand()
 {
   if(this->MacroFlag)
     {
-    this->LmkIcon->SetBind(this, "<Button-1>", "ViewLookmarkWithCurrentDataset");
-    this->LmkIcon->SetBind(this, "<Double-1>", "ViewLookmarkWithCurrentDataset");
+    this->LmkIcon->AddBinding(
+      "<Button-1>", this, "ViewLookmarkWithCurrentDataset");
+    this->LmkIcon->AddBinding(
+      "<Double-1>", this, "ViewLookmarkWithCurrentDataset");
     }
   else
     {
-    this->LmkIcon->SetBind(this, "<Button-1>", "View");
-    this->LmkIcon->SetBind(this, "<Double-1>", "View");
+    this->LmkIcon->AddBinding("<Button-1>", this, "View");
+    this->LmkIcon->AddBinding("<Double-1>", this, "View");
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::UnsetLookmarkIconCommand()
 {
-  this->LmkIcon->UnsetBind("<Button-1>");
-  this->LmkIcon->UnsetBind("<Double-1>");
+  this->LmkIcon->RemoveBinding("<Button-1>");
+  this->LmkIcon->RemoveBinding("<Double-1>");
 }
 
 //----------------------------------------------------------------------------

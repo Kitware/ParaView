@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.19");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -316,7 +316,7 @@ void vtkKWLookmark::EditLookmarkCallback()
   this->Script("pack %s", this->LmkNameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetWidgetName(),strlen(temp));
   this->LmkNameField->SetValue(temp);
-  this->LmkNameField->SetBind(this, "<KeyPress-Return>", "ChangeLookmarkName");
+  this->LmkNameField->AddBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
 
   delete [] temp;
 }
