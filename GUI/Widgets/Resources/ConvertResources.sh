@@ -17,6 +17,8 @@ KWConvertImageToHeader --zlib --base64 \
     vtkKWIconResources.h \
     connection.png \
     error.png \
+    error_mini.png \
+    error_red_mini.png \
     expand.png \
     folder.png \
     folder_open.png \
@@ -34,8 +36,6 @@ KWConvertImageToHeader --zlib --base64 \
     question.png \
     reload.png \
     shrink.png \
-    smallerror.png \
-    smallerrorred.png \
     stopwatch.png \
     transport_beginning.png \
     transport_end.png \

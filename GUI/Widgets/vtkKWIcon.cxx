@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.10");
+vtkCxxRevisionMacro(vtkKWIcon, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -351,20 +351,20 @@ void vtkKWIcon::SetImage(int image)
         image_shrink_buffer_length);
       break;
 
-    case vtkKWIcon::IconSmallError:
+    case vtkKWIcon::IconErrorMini:
       this->SetImage(
-        image_smallerror, 
-        image_smallerror_width, image_smallerror_height,
-        image_smallerror_pixel_size, 
-        image_smallerror_buffer_length);
+        image_error_mini, 
+        image_error_mini_width, image_error_mini_height,
+        image_error_mini_pixel_size, 
+        image_error_mini_buffer_length);
       break;
 
-    case vtkKWIcon::IconSmallErrorRed:
+    case vtkKWIcon::IconErrorRedMini:
       this->SetImage(
-        image_smallerrorred, 
-        image_smallerrorred_width, image_smallerrorred_height,
-        image_smallerrorred_pixel_size, 
-        image_smallerrorred_buffer_length);
+        image_error_red_mini, 
+        image_error_red_mini_width, image_error_red_mini_height,
+        image_error_red_mini_pixel_size, 
+        image_error_red_mini_buffer_length);
       break;
 
     case vtkKWIcon::IconStopwatch:

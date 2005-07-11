@@ -38,6 +38,32 @@ static const unsigned char image_error[] =
 
 /* 
  * Resource generated for image:
+ *    error_mini.png (zlib, base64)
+ */
+static const unsigned int  image_error_mini_width         = 16;
+static const unsigned int  image_error_mini_height        = 16;
+static const unsigned int  image_error_mini_pixel_size    = 4;
+static const unsigned long image_error_mini_buffer_length = 132;
+
+static const unsigned char image_error_mini[] = 
+  "eNr7//8/w38aYCBoQMZk6P+PjAez/rS0xTxAzAjCOPRfIMP+B0j6D5Ch/wCS/glk6F+ApL"
+  "+BzPiH6Q8gQ78DUvpRQJZraGhgJNL/MDyBwvg/MAD6kfNPwn8a5VMAWUd70g==";
+
+/* 
+ * Resource generated for image:
+ *    error_red_mini.png (zlib, base64)
+ */
+static const unsigned int  image_error_red_mini_width         = 16;
+static const unsigned int  image_error_red_mini_height        = 16;
+static const unsigned int  image_error_red_mini_pixel_size    = 4;
+static const unsigned long image_error_red_mini_buffer_length = 132;
+
+static const unsigned char image_error_red_mini[] = 
+  "eNr7//8/w39aYAaGBhRMuv7/KHgQ609LW8wDxIwgjEP/BTLsf4Ck/wAZ+g8g6Z9Ahv4FSP"
+  "obyIx/mP4AMvQ7IKUfBWS5hoYGRiL9D8MTKIz/AwOgHzn/JPynUT4FAF9ns5o=";
+
+/* 
+ * Resource generated for image:
  *    expand.png (zlib, base64)
  */
 static const unsigned int  image_expand_width         = 10;
@@ -267,32 +293,6 @@ static const unsigned long image_shrink_buffer_length = 108;
 static const unsigned char image_shrink[] = 
   "eNr7//8/w38iMRB8B+InQBwBxExQHAEV+46kDsQHMS4CcSgUX4SKPUFSF4Ek/gKKYfoikN"
   "QxAnEYkjxMPUiMkQx1xNpLrD+IChdiMABK75XF";
-
-/* 
- * Resource generated for image:
- *    smallerror.png (zlib, base64)
- */
-static const unsigned int  image_smallerror_width         = 16;
-static const unsigned int  image_smallerror_height        = 16;
-static const unsigned int  image_smallerror_pixel_size    = 4;
-static const unsigned long image_smallerror_buffer_length = 132;
-
-static const unsigned char image_smallerror[] = 
-  "eNr7//8/w38aYCBoQMZk6P+PjAez/rS0xTxAzAjCOPRfIMP+B0j6D5Ch/wCS/glk6F+ApL"
-  "+BzPiH6Q8gQ78DUvpRQJZraGhgJNL/MDyBwvg/MAD6kfNPwn8a5VMAWUd70g==";
-
-/* 
- * Resource generated for image:
- *    smallerrorred.png (zlib, base64)
- */
-static const unsigned int  image_smallerrorred_width         = 16;
-static const unsigned int  image_smallerrorred_height        = 16;
-static const unsigned int  image_smallerrorred_pixel_size    = 4;
-static const unsigned long image_smallerrorred_buffer_length = 132;
-
-static const unsigned char image_smallerrorred[] = 
-  "eNr7//8/w39aYAaGBhRMuv7/KHgQ609LW8wDxIwgjEP/BTLsf4Ck/wAZ+g8g6Z9Ahv4FSP"
-  "obyIx/mP4AMvQ7IKUfBWS5hoYGRiL9D8MTKIz/AwOgHzn/JPynUT4FAF9ns5o=";
 
 /* 
  * Resource generated for image:
