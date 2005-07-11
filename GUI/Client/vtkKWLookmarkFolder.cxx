@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.18");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -46,7 +46,7 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->NameField = vtkKWText::New();
   this->Checkbox = vtkKWCheckButton::New();
   this->MacroFlag = 0;
-
+  this->Location=0;
 }
 
 //----------------------------------------------------------------------------
