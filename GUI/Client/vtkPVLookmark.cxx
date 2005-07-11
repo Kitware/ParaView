@@ -70,7 +70,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.1");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -720,6 +720,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
             sscanf(ptr,"%*s %*s %d",&ival);
             minMaxWidget->SetMaxValue(ival);
             ptr = strtok(NULL,"\r\n");
+            sscanf(ptr,"%*s %*s %d",&ival);
             minMaxWidget->SetMinValue(ival);
             minMaxWidget->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
