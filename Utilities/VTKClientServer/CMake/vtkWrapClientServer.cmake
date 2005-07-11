@@ -9,6 +9,13 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   SET (CXX_CONTENTS2)
   SET (CXX_CONTENTS3) 
 
+  # Initialize the custom target counter.
+  IF(VTK_WRAP_CS_NEED_CUSTOM_TARGETS)
+    SET(VTK_WRAP_CS_CUSTOM_COUNT "")
+    SET(VTK_WRAP_CS_CUSTOM_NAME ${TARGET})
+    SET(VTK_WRAP_CS_CUSTOM_LIST)
+  ENDIF(VTK_WRAP_CS_NEED_CUSTOM_TARGETS)
+
   # For each class
   FOREACH(FILE ${SOURCES})
 
@@ -61,7 +68,20 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         ARGS ${TMP_INPUT} ${VTK_WRAP_HINTS} ${TMP_CONCRETE} 
         ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         )
-      
+
+      # Add this output to a custom target if needed.
+      IF(VTK_WRAP_CS_NEED_CUSTOM_TARGETS)
+        SET(VTK_WRAP_CS_CUSTOM_LIST ${VTK_WRAP_CS_CUSTOM_LIST}
+          ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx)
+        SET(VTK_WRAP_CS_CUSTOM_COUNT ${VTK_WRAP_CS_CUSTOM_COUNT}x)
+        IF(VTK_WRAP_CS_CUSTOM_COUNT MATCHES "^${VTK_WRAP_CS_CUSTOM_LIMIT}$")
+          SET(VTK_WRAP_CS_CUSTOM_NAME ${VTK_WRAP_CS_CUSTOM_NAME}Hack)
+          ADD_CUSTOM_TARGET(${VTK_WRAP_CS_CUSTOM_NAME} DEPENDS ${VTK_WRAP_CS_CUSTOM_LIST})
+          SET(KIT_CS_DEPS ${VTK_WRAP_CS_CUSTOM_NAME})
+          SET(VTK_WRAP_CS_CUSTOM_LIST)
+          SET(VTK_WRAP_CS_CUSTOM_COUNT)
+        ENDIF(VTK_WRAP_CS_CUSTOM_COUNT MATCHES "^${VTK_WRAP_CS_CUSTOM_LIMIT}$")
+      ENDIF(VTK_WRAP_CS_NEED_CUSTOM_TARGETS)
     ENDIF (NOT TMP_WRAP_EXCLUDE)
   ENDFOREACH(FILE)
   
@@ -84,3 +104,20 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     )
   
 ENDMACRO(VTK_WRAP_ClientServer)
+
+# VS 6 does not like needing to run a huge number of custom commands
+# when building a single target.  Generate some extra custom targets
+# that run the custom commands before the main target is built.  This
+# is a hack to work-around the limitation.  The test to enable it is
+# done here since it does not need to be done for every macro
+# invocation.
+IF(CMAKE_GENERATOR MATCHES "^Visual Studio 6$")
+  SET(VTK_WRAP_CS_NEED_CUSTOM_TARGETS 1)
+  SET(VTK_WRAP_CS_CUSTOM_LIMIT x)
+  # Limit the number of custom commands in each target
+  # to 2^7.
+  FOREACH(t 1 2 3 4 5 6 7)
+    SET(VTK_WRAP_CS_CUSTOM_LIMIT
+      ${VTK_WRAP_CS_CUSTOM_LIMIT}${VTK_WRAP_CS_CUSTOM_LIMIT})
+  ENDFOREACH(t)
+ENDIF(CMAKE_GENERATOR MATCHES "^Visual Studio 6$")
