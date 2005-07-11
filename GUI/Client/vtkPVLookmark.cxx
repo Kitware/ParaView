@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.19");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.20");
 
 
 //*****************************************************************************
@@ -113,6 +113,7 @@ vtkPVLookmark::vtkPVLookmark()
   this->ImageData = NULL;
   this->StateScript= NULL;
   this->CenterOfRotation = new float[3];
+  this->CenterOfRotation[0] = this->CenterOfRotation[1] = this->CenterOfRotation[2] = 0;
   this->Sources = vtkPVSourceCollection::New();
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetObject(this);
@@ -303,7 +304,7 @@ void vtkPVLookmark::CreateIconFromImageData()
     {
     return;
     }
-  int imageSize = this->Width*this->Height*this->PixelSize;
+  unsigned long imageSize = this->Width*this->Height*this->PixelSize;
   unsigned char *decodedImageData = new unsigned char[imageSize];
   vtkBase64Utilities *decoder = vtkBase64Utilities::New();
   decoder->Decode((unsigned char*)this->ImageData,imageSize,decodedImageData);
