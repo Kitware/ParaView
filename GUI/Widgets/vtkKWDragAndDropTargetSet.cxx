@@ -15,7 +15,7 @@
 #include "vtkKWDragAndDropTargetSet.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWApplication.h"
 
@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.7");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -503,14 +503,15 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
       this->Script("[winfo toplevel %s] config -cursor hand2", 
                    anchor->GetWidgetName());
 
-      if (anchor->HasConfigurationOption("-fg") &&
-          anchor->HasConfigurationOption("-bg"))
+      vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(anchor);
+      if (anchor_as_core->HasConfigurationOption("-fg") &&
+          anchor_as_core->HasConfigurationOption("-bg"))
         {
         double fr, fg, fb, br, bg, bb;
-        anchor->GetForegroundColor(&fr, &fg, &fb);
-        anchor->GetBackgroundColor(&br, &bg, &bb);
-        anchor->SetForegroundColor(br, bg, bb);
-        anchor->SetBackgroundColor(fr, fg, fb);
+        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
+        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
+        anchor_as_core->SetForegroundColor(br, bg, bb);
+        anchor_as_core->SetBackgroundColor(fr, fg, fb);
         }
       }
 
@@ -608,14 +609,15 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       this->Script("[winfo toplevel %s] config -cursor {}", 
                    anchor->GetWidgetName());
 
-      if (anchor->HasConfigurationOption("-fg") &&
-          anchor->HasConfigurationOption("-bg"))
+      vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(anchor);
+      if (anchor_as_core->HasConfigurationOption("-fg") &&
+          anchor_as_core->HasConfigurationOption("-bg"))
         {
         double fr, fg, fb, br, bg, bb;
-        anchor->GetForegroundColor(&fr, &fg, &fb);
-        anchor->GetBackgroundColor(&br, &bg, &bb);
-        anchor->SetForegroundColor(br, bg, bb);
-        anchor->SetBackgroundColor(fr, fg, fb);
+        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
+        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
+        anchor_as_core->SetForegroundColor(br, bg, bb);
+        anchor_as_core->SetBackgroundColor(fr, fg, fb);
         }
       }
 

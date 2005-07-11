@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.61");
+vtkCxxRevisionMacro(vtkKWEntry, "1.62");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -97,7 +97,7 @@ void vtkKWEntry::UpdateEnableState()
 
   if (this->Entry)
     {
-    this->Entry->SetStateOption(this->GetEnabled());
+    this->SetStateOption(this->GetEnabled());
     if (this->Entry != this)
       {
       this->PropagateEnableState(this->Entry);
@@ -144,7 +144,7 @@ void vtkKWEntry::SetValue(const char *s)
     if (s)
       {
       const char *val = this->ConvertInternalStringToTclString(
-        s, vtkKWWidget::ConvertStringEscapeInterpretable);
+        s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
       this->Script("%s insert 0 \"%s\"", 
                    this->Entry->GetWidgetName(), val ? val : "");
       }

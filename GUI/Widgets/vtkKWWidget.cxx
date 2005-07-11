@@ -15,8 +15,6 @@
 #include "vtkKWWidget.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWIcon.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindowBase.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkObjectFactory.h"
@@ -24,11 +22,10 @@
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/algorithm>
-#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.136");
+vtkCxxRevisionMacro(vtkKWWidget, "1.137");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -402,48 +399,6 @@ void vtkKWWidget::Focus()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetBind(vtkObject* CalledObject, const char *Event, const char *CommandString)
-{
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, CalledObject, CommandString);
-
-  this->Script("bind %s %s {%s}", this->GetWidgetName(), Event, command);
-
-  delete [] command;
-
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
-{
-  this->Script("bind %s %s { %s }", this->GetWidgetName(), Event, CommandString);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::UnsetBind(const char *Event)
-{
-  this->SetBind(Event, "");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
-{
-  this->Script("bind %s %s { %s %s }", this->GetWidgetName(), event, widget, command);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
-{
-  this->Script("bind all %s { %s %s }", event, widget, command);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBindAll(const char *event, const char *command)
-{
-  this->Script("bind all %s { %s }", event, command);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
   if (this->BalloonHelpString == NULL && str == NULL)
@@ -491,16 +446,6 @@ vtkKWWindowBase* vtkKWWidget::GetWindow()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::GetType()
-{
-  if (this->IsCreated())
-    {
-    return this->Script("winfo class %s", this->GetWidgetName());
-    }
-  return "None";
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::SetEnabled(int e)
 {
   if ( this->Enabled == e )
@@ -527,303 +472,6 @@ void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
     return;
     }
   widget->SetEnabled(this->GetEnabled());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetStateOption(int flag)
-{
-  if (this->IsAlive())
-    {
-    this->SetConfigurationOption("-state", (flag ? "normal" : "disabled")); 
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetStateOption()
-{
-  if (this->IsAlive())
-    {
-    return !strcmp(this->GetConfigurationOption("-state"), "normal") ? 1 : 0; 
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
-{
-  vtkKWTkUtilities::GetOptionColor(this, "-background", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-double* vtkKWWidget::GetBackgroundColor()
-{
-  static double rgb[3];
-  this->GetBackgroundColor(rgb, rgb + 1, rgb + 2);
-  return rgb;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
-{
-  vtkKWTkUtilities::SetOptionColor(this, "-background", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::GetForegroundColor(double *r, double *g, double *b)
-{
-  vtkKWTkUtilities::GetOptionColor(this, "-foreground", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-double* vtkKWWidget::GetForegroundColor()
-{
-  static double rgb[3];
-  this->GetForegroundColor(rgb, rgb + 1, rgb + 2);
-  return rgb;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetForegroundColor(double r, double g, double b)
-{
-  vtkKWTkUtilities::SetOptionColor(this, "-foreground", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::SetConfigurationOption(
-  const char *option, const char *value)
-{
-  if (!this->IsCreated())
-    {
-    vtkWarningMacro("Widget is not created yet !");
-    return 0;
-    }
-
-  if (!option || !value)
-    {
-    vtkWarningMacro("Wrong option or value !");
-    return 0;
-    }
-
-  const char *res = 
-    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
-
-  // 'configure' is not supposed to return anything, so let's assume
-  // any output is an error
-
-  if (res && *res)
-    {
-    vtksys_stl::string err_msg(res);
-    vtksys_stl::string tcl_name(this->GetTclName());
-    vtksys_stl::string widget_name(this->GetWidgetName());
-    vtksys_stl::string type(this->GetType());
-    vtkErrorMacro(
-      "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
-      << widget_name.c_str() << ") with option: [" << option 
-      << "] and value [" << value << "] => " << err_msg.c_str());
-    return 0;
-    }
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::HasConfigurationOption(const char* option)
-{
-  if (!this->IsCreated())
-    {
-    vtkWarningMacro("Widget is not created yet !");
-    return 0;
-    }
-
-  return (this->GetApplication() && 
-          !this->GetApplication()->EvaluateBooleanExpression(
-            "catch {%s cget %s}",
-            this->GetWidgetName(), option));
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::GetConfigurationOption(const char* option)
-{
-  if (!this->HasConfigurationOption(option))
-    {
-    return NULL;
-    }
-
-  return this->Script("%s cget %s", this->GetWidgetName(), option);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::SetConfigurationOptionAsInt(
-  const char *option, int value)
-{
-  char buffer[20];
-  sprintf(buffer, "%d", value);
-  return this->SetConfigurationOption(option, buffer);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
-{
-  if (!this->HasConfigurationOption(option))
-    {
-    return 0;
-    }
-
-  return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::SetConfigurationOptionAsDouble(
-  const char *option, double value)
-{
-  char buffer[20];
-  sprintf(buffer, "%lf", value);
-  return this->SetConfigurationOption(option, buffer);
-}
-
-//----------------------------------------------------------------------------
-double vtkKWWidget::GetConfigurationOptionAsDouble(const char* option)
-{
-  if (!this->HasConfigurationOption(option))
-    {
-    return 0.0;
-    }
-
-  return atof(this->Script("%s cget %s", this->GetWidgetName(), option));
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertInternalStringToTclString(
-  const char *source, int options)
-{
-  if (!source || !this->IsCreated())
-    {
-    return NULL;
-    }
-
-  static vtksys_stl::string dest;
-  const char *res = source;
-
-  // Handle the encoding
-
-  int app_encoding = this->GetApplication()->GetCharacterEncoding();
-  if (app_encoding != VTK_ENCODING_NONE &&
-      app_encoding != VTK_ENCODING_UNKNOWN)
-    {
-    // Get the Tcl encoding name
-
-    const char *tcl_encoding_name = 
-      vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(app_encoding);
-
-    // Check if we have that encoding
-    
-    Tcl_Encoding tcl_encoding = 
-      Tcl_GetEncoding(
-        this->GetApplication()->GetMainInterp(), tcl_encoding_name);
-    if (tcl_encoding != NULL)
-      {
-      Tcl_FreeEncoding(tcl_encoding);
-      
-      // Convert from that encoding
-      // We need to escape interpretable chars to perform that conversion
-
-      dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
-      res = source = this->Script(
-        "encoding convertfrom %s \"%s\"", tcl_encoding_name, dest.c_str());
-      }
-    }
-
-  // Escape
-  
-  vtksys_stl::string escape_chars;
-  if (options)
-    {
-    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
-      {
-      escape_chars += "{}";
-      }
-    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
-      {
-      escape_chars += "[]$\"";
-      }
-    dest = 
-      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
-    res = source = dest.c_str();
-    }
-
-  return res;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertTclStringToInternalString(
-  const char *source, int options)
-{
-  if (!source || !this->IsCreated())
-    {
-    return NULL;
-    }
-
-  static vtksys_stl::string dest;
-  const char *res = source;
-
-  // Handle the encoding
-
-  int app_encoding = this->GetApplication()->GetCharacterEncoding();
-  if (app_encoding != VTK_ENCODING_NONE &&
-      app_encoding != VTK_ENCODING_UNKNOWN)
-    {
-    // Convert from that encoding
-    // We need to escape interpretable chars to perform that conversion
-
-    dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
-    res = source = this->Script(
-      "encoding convertfrom identity \"%s\"", dest.c_str());
-    }
-  
-  // Escape
-  
-  vtksys_stl::string escape_chars;
-  if (options)
-    {
-    if (options & vtkKWWidget::ConvertStringEscapeCurlyBraces)
-      {
-      escape_chars += "{}";
-      }
-    if (options & vtkKWWidget::ConvertStringEscapeInterpretable)
-      {
-      escape_chars += "[]$\"";
-      }
-    dest = 
-      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
-    res = source = dest.c_str();
-    }
-
-  return res;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetTextOption(const char *str, const char *option)
-{
-  if (!option || !this->IsCreated())
-    {
-    return;
-    }
-
-  const char *val = this->ConvertInternalStringToTclString(
-    str, vtkKWWidget::ConvertStringEscapeInterpretable);
-  this->Script("%s configure %s \"%s\"", 
-               this->GetWidgetName(), option, val ? val : "");
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWWidget::GetTextOption(const char *option)
-{
-  if (!option || !this->IsCreated())
-    {
-    return "";
-    }
-
-  return this->ConvertTclStringToInternalString(
-    this->GetConfigurationOption(option));
 }
 
 //----------------------------------------------------------------------------
@@ -910,68 +558,6 @@ vtkKWDragAndDropTargetSet* vtkKWWidget::GetDragAndDropTargetSet()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetHighlightThickness(int width)
-{
-  this->SetConfigurationOptionAsInt("-highlightthickness", width);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetHighlightThickness()
-{
-  return this->GetConfigurationOptionAsInt("-highlightthickness");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetBorderWidth(int width)
-{
-  this->SetConfigurationOptionAsInt("-bd", width);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetBorderWidth()
-{
-  return this->GetConfigurationOptionAsInt("-bd");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetRelief(int relief)
-{
-  this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetRelief()
-{
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
-    this->GetConfigurationOption("-relief"));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetPadX(int arg)
-{
-  this->SetConfigurationOptionAsInt("-padx", arg);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetPadX()
-{
-  return this->GetConfigurationOptionAsInt("-padx");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetPadY(int arg)
-{
-  this->SetConfigurationOptionAsInt("-pady", arg);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::GetPadY()
-{
-  return this->GetConfigurationOptionAsInt("-pady");
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::Grab()
 {
   if (!this->IsCreated())
@@ -1003,14 +589,6 @@ int vtkKWWidget::IsGrabbed()
 
   const char *res = this->Script("grab status %s", this->GetWidgetName());
   return (!strcmp(res, "none") ? 0 : 1);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::TakeScreenDump(const char* fname,
-                                int top, int bottom, int left, int right)
-{
-  return vtkKWTkUtilities::TakeScreenDump(
-    this, fname, top, bottom, left, right);
 }
 
 //----------------------------------------------------------------------------

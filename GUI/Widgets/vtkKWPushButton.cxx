@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.22");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -44,7 +44,7 @@ void vtkKWPushButton::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetTextOption(this->ButtonText);
+  this->SetTextOption("-text", this->ButtonText);
 
   // Update enable state
 
@@ -55,7 +55,7 @@ void vtkKWPushButton::Create(vtkKWApplication *app)
 void vtkKWPushButton::SetText( const char *name )
 {
   this->SetButtonText(name);
-  this->SetTextOption(name);
+  this->SetTextOption("-text", name);
 }
 
 //----------------------------------------------------------------------------

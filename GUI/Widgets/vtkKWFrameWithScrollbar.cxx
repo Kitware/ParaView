@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.5");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -60,7 +60,7 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
   // ScrollableFrame is a BWidget's ScrollableFrame
   // attached to the ScrolledWindow
 
-  this->ScrollableFrame = vtkKWWidget::New();
+  this->ScrollableFrame = vtkKWCoreWidget::New();
   this->ScrollableFrame->SetParent(this);
   this->ScrollableFrame->CreateSpecificTkWidget(app, "ScrollableFrame");
   this->ScrollableFrame->SetConfigurationOptionAsInt("-height", 1024);
@@ -71,7 +71,7 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
 
   // The internal frame is a frame we set the widget name explicitly
 
-  this->Frame = vtkKWWidget::New();
+  this->Frame = vtkKWCoreWidget::New();
   this->Frame->SetParent(this->ScrollableFrame);
   this->Frame->SetWidgetName(
     this->Script("%s getframe", this->ScrollableFrame->GetWidgetName()));

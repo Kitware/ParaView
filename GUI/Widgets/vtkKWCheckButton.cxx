@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.38");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -89,7 +89,7 @@ void vtkKWCheckButton::SetIndicator(int ind)
 void vtkKWCheckButton::SetText(const char* txt)
 {
   this->SetMyText(txt);
-  this->SetTextOption(txt);
+  this->SetTextOption("-text", txt);
 }
 
 //----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void vtkKWCheckButton::Configure()
   this->Script("%s configure -indicatoron %d",
                wname, (this->Indicator ? 1 : 0));
 
-  this->SetTextOption(this->MyText);
+  this->SetTextOption("-text", this->MyText);
 
   // Set the variable name if not set already
   if (!this->VariableName)

@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.25");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -180,7 +180,7 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app)
   // twice each time we add a toolbar, but it's not like we have
   // thousand's of them. Again, hack, sorry. 
   
-  this->SetBind(this, "<Map>", "Pack");
+  this->AddBinding("<Map>", this, "Pack");
 
   this->Update();
 }

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -405,7 +405,8 @@ void vtkKWListBoxToListBoxSelectionEditor::DisplayEllipsis()
     return;
     }
   this->SourceList->GetWidget()->InsertEntry(0, "...");
-  this->SourceList->GetWidget()->SetBind(this, "<Double-1>", "EllipsisCallback");
+  this->SourceList->GetWidget()->AddBinding(
+    "<Double-1>", this, "EllipsisCallback");
   this->EllipsisDisplayed = 1;
 }
 
@@ -417,7 +418,7 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveEllipsis()
     return;
     }
   this->SourceList->GetWidget()->DeleteAll();
-  this->SourceList->GetWidget()->UnsetBind("<Double-1>");
+  this->SourceList->GetWidget()->RemoveBinding("<Double-1>");
   this->EllipsisDisplayed = 0;
 }
 

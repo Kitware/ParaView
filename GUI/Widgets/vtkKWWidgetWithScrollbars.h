@@ -83,8 +83,8 @@ protected:
   // methods with the internal argument as parameter.
   virtual void CreateHorizontalScrollbar(vtkKWApplication *app);
   virtual void CreateVerticalScrollbar(vtkKWApplication *app);
-  virtual void AssociateHorizontalScrollbarToWidget(vtkKWWidget *widget);
-  virtual void AssociateVerticalScrollbarToWidget(vtkKWWidget *widget);
+  virtual void AssociateHorizontalScrollbarToWidget(vtkKWCoreWidget *widget);
+  virtual void AssociateVerticalScrollbarToWidget(vtkKWCoreWidget *widget);
 
   // Description:
   // Pack or repack the widget. This should be implemented by subclasses,

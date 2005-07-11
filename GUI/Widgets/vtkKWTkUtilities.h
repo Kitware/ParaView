@@ -32,6 +32,7 @@
 #include <stdarg.h> // Needed for "va_list" argument of EstimateFormatLength.
 
 class vtkKWWidget;
+class vtkKWCoreWidget;
 class vtkKWApplication;
 struct Tcl_Interp;
 
@@ -239,7 +240,7 @@ public:
   // An image is created and associated to the Tk -image option or 
   // image_option if not NULL (ex: -selectimage).
   static void SetImageOptionToPixels(
-    vtkKWWidget *widget,
+    vtkKWCoreWidget *widget,
     const unsigned char *pixels, 
     int width, int height, 
     int pixel_size = 4,

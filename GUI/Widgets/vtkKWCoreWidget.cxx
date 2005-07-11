@@ -15,10 +15,13 @@
 
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkKWIcon.h"
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -34,6 +37,398 @@ void vtkKWCoreWidget::Create(vtkKWApplication *app)
   // Call the superclass to create the whole widget
 
   this->Superclass::Create(app);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::GetBackgroundColor(double *r, double *g, double *b)
+{
+  vtkKWTkUtilities::GetOptionColor(this, "-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCoreWidget::GetBackgroundColor()
+{
+  static double rgb[3];
+  this->GetBackgroundColor(rgb, rgb + 1, rgb + 2);
+  return rgb;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetBackgroundColor(double r, double g, double b)
+{
+  vtkKWTkUtilities::SetOptionColor(this, "-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::GetForegroundColor(double *r, double *g, double *b)
+{
+  vtkKWTkUtilities::GetOptionColor(this, "-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCoreWidget::GetForegroundColor()
+{
+  static double rgb[3];
+  this->GetForegroundColor(rgb, rgb + 1, rgb + 2);
+  return rgb;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetForegroundColor(double r, double g, double b)
+{
+  vtkKWTkUtilities::SetOptionColor(this, "-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetPadX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-padx", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetPadX()
+{
+  return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetPadY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-pady", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetPadY()
+{
+  return this->GetConfigurationOptionAsInt("-pady");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::AddBinding(const char *event, 
+                                 vtkObject *object, 
+                                 const char *method)
+{
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  this->Script("bind %s %s {%s}", this->GetWidgetName(), event, command);
+  delete [] command;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::AddBinding(const char *event, const char *command)
+{
+  this->Script("bind %s %s {%s}", this->GetWidgetName(), event, command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::RemoveBinding(const char *event)
+{
+  this->AddBinding(event, "");
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::SetConfigurationOption(
+  const char *option, const char *value)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option || !value)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  const char *res = 
+    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    vtksys_stl::string err_msg(res);
+    vtksys_stl::string tcl_name(this->GetTclName());
+    vtksys_stl::string widget_name(this->GetWidgetName());
+    vtksys_stl::string type(this->GetType());
+    vtkErrorMacro(
+      "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
+      << widget_name.c_str() << ") with option: [" << option 
+      << "] and value [" << value << "] => " << err_msg.c_str());
+    return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::HasConfigurationOption(const char* option)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  return (this->GetApplication() && 
+          !this->GetApplication()->EvaluateBooleanExpression(
+            "catch {%s cget %s}",
+            this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCoreWidget::GetConfigurationOption(const char* option)
+{
+  if (!this->HasConfigurationOption(option))
+    {
+    return NULL;
+    }
+
+  return this->Script("%s cget %s", this->GetWidgetName(), option);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::SetConfigurationOptionAsInt(
+  const char *option, int value)
+{
+  char buffer[20];
+  sprintf(buffer, "%d", value);
+  return this->SetConfigurationOption(option, buffer);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetConfigurationOptionAsInt(const char* option)
+{
+  if (!this->HasConfigurationOption(option))
+    {
+    return 0;
+    }
+
+  return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::SetConfigurationOptionAsDouble(
+  const char *option, double value)
+{
+  char buffer[20];
+  sprintf(buffer, "%lf", value);
+  return this->SetConfigurationOption(option, buffer);
+}
+
+//----------------------------------------------------------------------------
+double vtkKWCoreWidget::GetConfigurationOptionAsDouble(const char* option)
+{
+  if (!this->HasConfigurationOption(option))
+    {
+    return 0.0;
+    }
+
+  return atof(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCoreWidget::ConvertInternalStringToTclString(
+  const char *source, int options)
+{
+  if (!source || !this->IsCreated())
+    {
+    return NULL;
+    }
+
+  static vtksys_stl::string dest;
+  const char *res = source;
+
+  // Handle the encoding
+
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
+    {
+    // Get the Tcl encoding name
+
+    const char *tcl_encoding_name = 
+      vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(app_encoding);
+
+    // Check if we have that encoding
+    
+    Tcl_Encoding tcl_encoding = 
+      Tcl_GetEncoding(
+        this->GetApplication()->GetMainInterp(), tcl_encoding_name);
+    if (tcl_encoding != NULL)
+      {
+      Tcl_FreeEncoding(tcl_encoding);
+      
+      // Convert from that encoding
+      // We need to escape interpretable chars to perform that conversion
+
+      dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
+      res = source = this->Script(
+        "encoding convertfrom %s \"%s\"", tcl_encoding_name, dest.c_str());
+      }
+    }
+
+  // Escape
+  
+  vtksys_stl::string escape_chars;
+  if (options)
+    {
+    if (options & vtkKWCoreWidget::ConvertStringEscapeCurlyBraces)
+      {
+      escape_chars += "{}";
+      }
+    if (options & vtkKWCoreWidget::ConvertStringEscapeInterpretable)
+      {
+      escape_chars += "[]$\"";
+      }
+    dest = 
+      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+    res = source = dest.c_str();
+    }
+
+  return res;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCoreWidget::ConvertTclStringToInternalString(
+  const char *source, int options)
+{
+  if (!source || !this->IsCreated())
+    {
+    return NULL;
+    }
+
+  static vtksys_stl::string dest;
+  const char *res = source;
+
+  // Handle the encoding
+
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
+    {
+    // Convert from that encoding
+    // We need to escape interpretable chars to perform that conversion
+
+    dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
+    res = source = this->Script(
+      "encoding convertfrom identity \"%s\"", dest.c_str());
+    }
+  
+  // Escape
+  
+  vtksys_stl::string escape_chars;
+  if (options)
+    {
+    if (options & vtkKWCoreWidget::ConvertStringEscapeCurlyBraces)
+      {
+      escape_chars += "{}";
+      }
+    if (options & vtkKWCoreWidget::ConvertStringEscapeInterpretable)
+      {
+      escape_chars += "[]$\"";
+      }
+    dest = 
+      vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
+    res = source = dest.c_str();
+    }
+
+  return res;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetTextOption(const char *option, const char *value)
+{
+  if (!option || !this->IsCreated())
+    {
+    return;
+    }
+
+  const char *val = this->ConvertInternalStringToTclString(
+    value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+  this->Script("%s configure %s \"%s\"", 
+               this->GetWidgetName(), option, val ? val : "");
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCoreWidget::GetTextOption(const char *option)
+{
+  if (!option || !this->IsCreated())
+    {
+    return "";
+    }
+
+  return this->ConvertTclStringToInternalString(
+    this->GetConfigurationOption(option));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetStateOption(int flag)
+{
+  if (this->IsAlive())
+    {
+    this->SetConfigurationOption("-state", (flag ? "normal" : "disabled")); 
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCoreWidget::GetStateOption()
+{
+  if (this->IsAlive())
+    {
+    return !strcmp(this->GetConfigurationOption("-state"), "normal") ? 1 : 0; 
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCoreWidget::GetType()
+{
+  if (this->IsCreated())
+    {
+    return this->Script("winfo class %s", this->GetWidgetName());
+    }
+  return "None";
 }
 
 //----------------------------------------------------------------------------

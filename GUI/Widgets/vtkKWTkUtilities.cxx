@@ -13,7 +13,7 @@
 =========================================================================*/
 #include "vtkKWTkUtilities.h"
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWResourceUtilities.h"
 
@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.61");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.62");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -825,7 +825,7 @@ int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::SetImageOptionToPixels(
-  vtkKWWidget *widget,
+  vtkKWCoreWidget *widget,
   const unsigned char* pixels, 
   int width, 
   int height,

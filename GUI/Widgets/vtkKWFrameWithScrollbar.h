@@ -19,16 +19,15 @@
 #ifndef __vtkKWFrameWithScrollbar_h
 #define __vtkKWFrameWithScrollbar_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWApplication;
-class vtkKWWidget;
 
-class KWWIDGETS_EXPORT vtkKWFrameWithScrollbar : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWFrameWithScrollbar : public vtkKWCoreWidget
 {
 public:
   static vtkKWFrameWithScrollbar* New();
-  vtkTypeRevisionMacro(vtkKWFrameWithScrollbar,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWFrameWithScrollbar,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -58,8 +57,8 @@ protected:
   vtkKWFrameWithScrollbar();
   ~vtkKWFrameWithScrollbar();
 
-  vtkKWWidget *Frame;
-  vtkKWWidget *ScrollableFrame;
+  vtkKWCoreWidget *Frame;
+  vtkKWCoreWidget *ScrollableFrame;
 
 private:
   vtkKWFrameWithScrollbar(const vtkKWFrameWithScrollbar&); // Not implemented

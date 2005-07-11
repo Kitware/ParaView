@@ -198,6 +198,12 @@ public:
   vtkSetMacro(DisableScaleValueCallback, int);
   vtkBooleanMacro(DisableScaleValueCallback, int);
 
+  // Description:
+  // Show/Hide the value on top of the slide.
+  virtual void SetShowValue(int);
+  virtual int GetShowValue();
+  vtkBooleanMacro(ShowValue, int);
+
 protected:
   vtkKWScale();
   ~vtkKWScale();
@@ -219,7 +225,7 @@ protected:
   double       Resolution;
   double       Range[2];
 
-  vtkKWWidget   *Scale;
+  vtkKWCoreWidget *Scale;
   vtkKWEntry    *Entry;
   vtkKWLabel    *Label;
   vtkKWTopLevel *TopLevel;

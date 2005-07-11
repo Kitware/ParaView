@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.56");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.57");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -301,13 +301,14 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
         {
         for (int i = 0; i < 4; i++)
           {
-          if ((*it)->HasConfigurationOption(options[i]) && (*it)->IsCreated())
+          vtkKWCoreWidget *core = vtkKWCoreWidget::SafeDownCast(*it);
+          if (core->HasConfigurationOption(options[i]) && core->IsCreated())
             {
             const char *option = 
-              (*it)->Script("%s cget %s", (*it)->GetWidgetName(), options[i]);
+              core->Script("%s cget %s", core->GetWidgetName(), options[i]);
             if (!strcmp(name, option))
               {
-              return (*it);
+              return core;
               }
             }
           }
@@ -457,18 +458,19 @@ void vtkKWToolbar::UpdateWidgetsAspect()
     // has a -command will qualify, -state could have been used, or
     // a match on the widget type, etc).
 
-    if ((*it) && (*it)->HasConfigurationOption("-command"))
+    vtkKWCoreWidget *core = vtkKWCoreWidget::SafeDownCast(*it);
+    if (core && core->HasConfigurationOption("-command"))
       {
-      int use_relief = (*it)->HasConfigurationOption("-relief");
-      if ((*it)->HasConfigurationOption("-indicatoron"))
+      int use_relief = core->HasConfigurationOption("-relief");
+      if (core->HasConfigurationOption("-indicatoron"))
         {
         use_relief = atoi(
-          this->Script("%s cget -indicatoron", (*it)->GetWidgetName()));
+          this->Script("%s cget -indicatoron", core->GetWidgetName()));
         }
         
       if (use_relief)
         {
-        s << (*it)->GetWidgetName() << " config -relief " 
+        s << core->GetWidgetName() << " config -relief " 
           << (this->WidgetsFlatAspect ? "flat" : "raised") << endl;
         }
       else
@@ -478,27 +480,27 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         // the negative value will be handled as 0, but still will enable
         // us to retrieve the old value using abs() later on).
 
-        if ((*it)->HasConfigurationOption("-bd"))
+        if (core->HasConfigurationOption("-bd"))
           {
           int bd = atoi(
-            this->Script("%s cget -bd", (*it)->GetWidgetName()));
-          s << (*it)->GetWidgetName() << " config -bd "
+            this->Script("%s cget -bd", core->GetWidgetName()));
+          s << core->GetWidgetName() << " config -bd "
             << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
           }
         }
 
       // If radiobutton, remove the select color border in flat aspect
 
-      if ((*it)->HasConfigurationOption("-selectcolor"))
+      if (core->HasConfigurationOption("-selectcolor"))
         {
         if (this->WidgetsFlatAspect)
           {
-          s << (*it)->GetWidgetName() << " config -selectcolor [" 
-            << (*it)->GetWidgetName() << " cget -bg]" << endl; 
+          s << core->GetWidgetName() << " config -selectcolor [" 
+            << core->GetWidgetName() << " cget -bg]" << endl; 
           }
         else
           {
-          s << (*it)->GetWidgetName() << " config -selectcolor [" 
+          s << core->GetWidgetName() << " config -selectcolor [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -selectcolor]" << endl; 
           }
@@ -506,16 +508,16 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 
       // Do not use active background in flat mode either
 
-      if ((*it)->HasConfigurationOption("-activebackground"))
+      if (core->HasConfigurationOption("-activebackground"))
         {
         if (this->WidgetsFlatAspect)
           {
-          s << (*it)->GetWidgetName() << " config -activebackground [" 
-            << (*it)->GetWidgetName() << " cget -bg]" << endl; 
+          s << core->GetWidgetName() << " config -activebackground [" 
+            << core->GetWidgetName() << " cget -bg]" << endl; 
           }
         else
           {
-          s << (*it)->GetWidgetName() << " config -activebackground [" 
+          s << core->GetWidgetName() << " config -activebackground [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -activebackground]" << endl; 
           }

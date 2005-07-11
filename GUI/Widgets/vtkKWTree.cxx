@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.8");
+vtkCxxRevisionMacro(vtkKWTree, "1.9");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -122,13 +122,13 @@ void vtkKWTree::AddNode(const char *parent,
   if (text && *text)
     {
     const char *val = this->ConvertInternalStringToTclString(
-      text, vtkKWWidget::ConvertStringEscapeInterpretable);
+      text, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     cmd.append(" -text \"").append(val).append("\"");
     }
   if (data && *data)
     {
     const char *val = this->ConvertInternalStringToTclString(
-      data, vtkKWWidget::ConvertStringEscapeInterpretable);
+      data, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     cmd.append(" -data \"").append(val).append("\"");
     }
   cmd.append(" -open ").append(is_open ? "1" : "0");
@@ -271,7 +271,7 @@ void vtkKWTree::SetNodeUserData(const char *node, const char *data)
   if (this->IsCreated() && node && data)
     {
     const char *val = this->ConvertInternalStringToTclString(
-      data, vtkKWWidget::ConvertStringEscapeInterpretable);
+      data, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     this->Script("%s itemconfigure %s -data \"%s\"", 
                  this->GetWidgetName(), node, val);
     }
@@ -294,7 +294,7 @@ void vtkKWTree::SetNodeText(const char *node, const char *text)
   if (this->IsCreated() && node && text)
     {
     const char *val = this->ConvertInternalStringToTclString(
-      text, vtkKWWidget::ConvertStringEscapeInterpretable);
+      text, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     this->Script("%s itemconfigure %s -text \"%s\"", 
                  this->GetWidgetName(), node, val);
     }
@@ -317,7 +317,7 @@ void vtkKWTree::SetNodeFont(const char *node, const char *font)
   if (this->IsCreated() && node && font)
     {
     const char *val = this->ConvertInternalStringToTclString(
-      font, vtkKWWidget::ConvertStringEscapeInterpretable);
+      font, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     this->Script("%s itemconfigure %s -font \"%s\"", 
                  this->GetWidgetName(), node, val);
     }
@@ -546,13 +546,7 @@ void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *obj,
 void vtkKWTree::SetSelectionChangedCommand(vtkObject *obj, 
                                            const char *method)
 {
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, obj, method);
-    this->SetBind("<<TreeSelect>>", command);
-    delete [] command;
-    }
+  this->AddBinding("<<TreeSelect>>", obj, method);
 }
 
 //----------------------------------------------------------------------------

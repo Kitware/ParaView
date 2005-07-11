@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.22");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.23");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -446,7 +446,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
 
   this->TrayImageError->SetImageToPredefinedIcon(vtkKWIcon::IconErrorRedMini);
   
-  this->TrayImageError->SetBind(this, "<Button-1>", "ErrorIconCallback");
+  this->TrayImageError->AddBinding("<Button-1>", this, "ErrorIconCallback");
 
   // Udpate the enable state
 

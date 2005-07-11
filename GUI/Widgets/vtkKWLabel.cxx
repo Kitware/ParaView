@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.41");
+vtkCxxRevisionMacro(vtkKWLabel, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -78,7 +78,8 @@ void vtkKWLabel::UpdateText()
 {
   if (this->IsCreated())
     {
-    this->SetTextOption(this->Text); // NULL is handled correctly as ""
+    this->SetTextOption("-text", this->Text); 
+    // NULL is handled correctly as ""
 
     // Whatever the label, -image always takes precedence, unless it's empty
     // so change it accordingly

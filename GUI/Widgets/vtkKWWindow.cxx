@@ -42,7 +42,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.259");
+vtkCxxRevisionMacro(vtkKWWindow, "1.260");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -284,7 +284,7 @@ void vtkKWWindow::Create(vtkKWApplication *app)
   event = "<Key-";
   event += vtkKWWindow::MainPanelVisibilityKeyAccelerator;
   event += ">";
-  this->SetBind(this, event.c_str(), "MainPanelVisibilityCallback");
+  this->AddBinding(event.c_str(), this, "MainPanelVisibilityCallback");
 
   // Create the main notebook
 
@@ -329,7 +329,7 @@ void vtkKWWindow::Create(vtkKWApplication *app)
   event = "<Key-";
   event += vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator;
   event += ">";
-  this->SetBind(this, event.c_str(), "SecondaryPanelVisibilityCallback");
+  this->AddBinding(event.c_str(), this, "SecondaryPanelVisibilityCallback");
 
   // Menu : View : Application Settings
 

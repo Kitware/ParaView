@@ -158,8 +158,10 @@ int my_main(int argc, char *argv[])
   ccb->InvokeCommandsWithRGBOn();
   ccb->SetBalloonHelpString("Set the view background color");
 
+  vtkKWCoreWidget *parent = 
+    vtkKWCoreWidget::SafeDownCast(hello_label->GetParent());
   ccb->SetSelectedColor(
-    vtkMath::RGBToHSV(hello_label->GetParent()->GetBackgroundColor()));
+    vtkMath::RGBToHSV(parent->GetBackgroundColor()));
 
   app->Script("pack %s -side top -anchor w -expand y -padx 2 -pady 2", 
               ccb->GetWidgetName());

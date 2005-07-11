@@ -15,11 +15,12 @@
 #include "vtkKWWidgetWithScrollbars.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWScrollbar.h"
+#include "vtkKWCoreWidget.h"
 
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithScrollbars::vtkKWWidgetWithScrollbars()
@@ -107,15 +108,14 @@ void vtkKWWidgetWithScrollbars::CreateVerticalScrollbar(vtkKWApplication *app)
 
 //----------------------------------------------------------------------------
 void vtkKWWidgetWithScrollbars::AssociateVerticalScrollbarToWidget(
-  vtkKWWidget *widget)
+  vtkKWCoreWidget *widget)
 {
   if (this->VerticalScrollBar && this->VerticalScrollBar->IsCreated() &&
       widget && widget->IsCreated())
     {
     vtksys_stl::string command(widget->GetWidgetName());
     command += " yview";
-    this->VerticalScrollBar->SetConfigurationOption(
-      "-command", command.c_str());
+    this->VerticalScrollBar->SetCommand(NULL, command.c_str());
     command = this->VerticalScrollBar->GetWidgetName();
     command += " set";
     widget->SetConfigurationOption(
@@ -141,15 +141,14 @@ void vtkKWWidgetWithScrollbars::CreateHorizontalScrollbar(vtkKWApplication *app)
 
 //----------------------------------------------------------------------------
 void vtkKWWidgetWithScrollbars::AssociateHorizontalScrollbarToWidget(
-  vtkKWWidget *widget)
+  vtkKWCoreWidget *widget)
 {
   if (this->HorizontalScrollBar && this->HorizontalScrollBar->IsCreated() &&
       widget && widget->IsCreated())
     {
     vtksys_stl::string command(widget->GetWidgetName());
     command += " xview";
-    this->HorizontalScrollBar->SetConfigurationOption(
-      "-command", command.c_str());
+    this->HorizontalScrollBar->SetCommand(NULL, command.c_str());
     command = this->HorizontalScrollBar->GetWidgetName();
     command += " set";
     widget->SetConfigurationOption(

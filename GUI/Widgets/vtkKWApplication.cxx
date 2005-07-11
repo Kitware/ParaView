@@ -69,7 +69,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.242");
+vtkCxxRevisionMacro(vtkKWApplication, "1.243");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1149,7 +1149,8 @@ void vtkKWApplication::ConfigureAboutDialog()
     text->EditableTextOff();
 
     double r, g, b;
-    text->GetParent()->GetBackgroundColor(&r, &g, &b);
+    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
                  this->AboutRuntimeInfo->GetWidgetName());

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.31");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -73,7 +73,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand y",
                this->Canvas->GetWidgetName());
 
-  this->Canvas->SetBind(this, "<ButtonPress>", "Withdraw");
+  this->Canvas->AddBinding("<ButtonPress>", this, "Withdraw");
 
   // Insert the image
 
@@ -242,7 +242,7 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
     }
 
   const char *val = this->ConvertInternalStringToTclString(
-    txt, vtkKWWidget::ConvertStringEscapeInterpretable);
+    txt, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
   this->Script("%s itemconfigure msg -text \"%s\"",
                this->Canvas->GetWidgetName(), (val ? val : ""));
 

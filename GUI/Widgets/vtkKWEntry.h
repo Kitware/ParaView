@@ -105,7 +105,7 @@ protected:
   int ReadOnly;
   int PullDown;
 
-  vtkKWWidget* Entry;
+  vtkKWCoreWidget* Entry;
 
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented

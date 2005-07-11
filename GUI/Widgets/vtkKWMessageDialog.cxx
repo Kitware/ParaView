@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.79");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.80");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -179,7 +179,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->OKButton->SetParent(this->OKFrame);
     this->OKButton->Create(app);
     this->OKButton->SetWidth(16);
-    this->OKButton->SetTextOption(this->OKButtonText);
+    this->OKButton->SetText(this->OKButtonText);
     this->OKButton->SetCommand(this, "OK");
     this->Script("pack %s %s %s",
                  this->OKButton->GetWidgetName(),
@@ -195,7 +195,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->OtherButton->SetParent(this->OtherFrame);
     this->OtherButton->Create(app);
     this->OtherButton->SetWidth(16);
-    this->OtherButton->SetTextOption(this->OtherButtonText);
+    this->OtherButton->SetText(this->OtherButtonText);
     this->OtherButton->SetCommand(this, "Other");
     this->Script("pack %s %s %s",
                  this->OtherButton->GetWidgetName(),
@@ -211,7 +211,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->CancelButton->SetParent(this->CancelFrame);
     this->CancelButton->Create(app);
     this->CancelButton->SetWidth(16);
-    this->CancelButton->SetTextOption(this->CancelButtonText);
+    this->CancelButton->SetText(this->CancelButtonText);
     this->CancelButton->SetCommand(this, "Cancel");
     this->Script("pack %s %s %s",
                  this->CancelButton->GetWidgetName(),
@@ -224,35 +224,32 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
 
   if (this->OKButton->IsCreated())
     {
-    this->OKButton->SetBind(
-      "<FocusIn>", this->OKFrame->GetWidgetName(), 
-      "configure -relief groove");
-    this->OKButton->SetBind(
-      "<FocusOut>", this->OKFrame->GetWidgetName(), 
-      "configure -relief flat");
-    this->OKButton->SetBind(this, "<Return>", "OK");
+    this->OKButton->AddBinding(
+      "<FocusIn>", this->OKFrame, "SetReliefToGroove");
+    this->OKButton->AddBinding(
+      "<FocusOut>", this->OKFrame, "SetReliefToFlat");
+    this->OKButton->AddBinding(
+      "<Return>", this, "OK");
     }
 
   if (this->CancelButton->IsCreated())
     {
-    this->CancelButton->SetBind(
-      "<FocusIn>", this->CancelFrame->GetWidgetName(), 
-      "configure -relief groove");
-    this->CancelButton->SetBind(
-      "<FocusOut>", this->CancelFrame->GetWidgetName(),
-      "configure -relief flat");
-    this->CancelButton->SetBind(this, "<Return>", "Cancel");
+    this->CancelButton->AddBinding(
+      "<FocusIn>", this->CancelFrame, "SetReliefToGroove");
+    this->CancelButton->AddBinding(
+      "<FocusOut>", this->CancelFrame, "SetReliefToFlat");
+    this->CancelButton->AddBinding(
+      "<Return>", this, "Cancel");
     }
 
   if (this->OtherButton->IsCreated())
     {
-    this->OtherButton->SetBind(
-      "<FocusIn>", this->OtherFrame->GetWidgetName(), 
-      "configure -relief groove");
-    this->OtherButton->SetBind(
-      "<FocusOut>", this->OtherFrame->GetWidgetName(),
-      "configure -relief flat");
-    this->OtherButton->SetBind(this, "<Return>", "Other");
+    this->OtherButton->AddBinding(
+      "<FocusIn>", this->OtherFrame, "SetReliefToGroove");
+    this->OtherButton->AddBinding(
+      "<FocusOut>", this->OtherFrame, "SetReliefToFlat");
+    this->OtherButton->AddBinding(
+      "<Return>", this, "Other");
     }
 
   // Icon
@@ -340,14 +337,14 @@ int vtkKWMessageDialog::Invoke()
     }
   if (this->OKButton->IsCreated() && this->CancelButton->IsCreated())
     {
-    this->OKButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
-    this->OKButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
-    this->CancelButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
-    this->CancelButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
+    this->OKButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
+    this->OKButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
+    this->CancelButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
+    this->CancelButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
     if (this->OtherButton->IsCreated())
       {
-      this->OtherButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
-      this->OtherButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
+      this->OtherButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
+      this->OtherButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
       }
     }
   if (this->Options & vtkKWMessageDialog::InvokeAtPointer)

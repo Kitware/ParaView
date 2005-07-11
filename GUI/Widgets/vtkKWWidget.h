@@ -24,9 +24,7 @@
 #define __vtkKWWidget_h
 
 #include "vtkKWObject.h"
-#include "vtkKWTkOptions.h" // For option constants
 
-class vtkKWIcon;
 class vtkKWWindowBase;
 class vtkKWDragAndDropTargetSet;
 class vtkKWWidgetInternals;
@@ -46,7 +44,7 @@ public:
   // Description:
   // Create the widget.
   // The parent should be set before calling this method.
-  // Subclasses should implement a Create() method.
+  // Subclasses should implement a Create() method with the same signature.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
@@ -54,7 +52,7 @@ public:
   // The Create() method should be called before invoking this method.
   // Note that setting the widget name manually is *not* recommended ; use
   // it only if you know what you are doing, say, for example, if
-  // you have to map an external pure Tk widget to a vtkKWWidget object.
+  // you have to map an external Tk widget to a vtkKWWidget object.
   virtual const char *GetWidgetName();
   vtkSetStringMacro(WidgetName);
 
@@ -63,8 +61,8 @@ public:
   virtual int IsCreated();
 
   // Description:
-  // Query if the widget is "alive" (i.e. IsCreate() and has not been deleted
-  // as far as Tk is concerned)
+  // Query if the widget is "alive" (i.e. IsCreated()) and has not been 
+  // deleted as far as Tk is concerned.
   virtual int IsAlive();
   
   // Description:
@@ -72,111 +70,19 @@ public:
   virtual int IsMapped();
   
   // Description:
-  // Add/Remove/Get a child to/from this widget
-  virtual void AddChild(vtkKWWidget *w);
-  virtual void RemoveChild(vtkKWWidget *w);
-  virtual int HasChild(vtkKWWidget *w);
-  virtual void RemoveAllChildren();
-  virtual int GetNumberOfChildren();
-  virtual vtkKWWidget* GetNthChild(int rank);
-  virtual vtkKWWidget* GetChildWidgetWithName(const char *);
+  // Set focus to this widget.
+  virtual void Focus();
 
   // Description:
-  // A method to set binding on the object.
-  // This method sets binding:
-  // bind this->GetWidgetName() event { object->GetTclName() command }
-  void SetBind(vtkObject* object, const char *event, const char *command);
-
-  // Description:
-  // A method to set binding on the object.
-  // This method sets binding:
-  // bind this->GetWidgetName() event { command }  
-  void SetBind(const char *event, const char *command);
-
-  // Description:
-  // A method to set binding on the object.
-  // This method sets binding:
-  // bind this->GetWidgetName() event { widget command }  
-  void SetBind(const char *event, const char *widget, const char *command);
-
-  // Description:
-  // A method to set binding on the object.
-  // This method sets binding:
-  // bind all event { widget command }  
-  void SetBindAll(const char *event, const char *widget, const char *command);
-
-  // Description:
-  // A method to set binding on the object.
-  // This method sets binding:
-  // bind all event { command }  
-  void SetBindAll(const char *event, const char *command);
-
-  // Description:
-  // This method unsets the bind for specific event.
-  void UnsetBind(const char *event);
-
-  // Description:
-  // Set or get enabled state.
+  // Set/Get the enabled state.
   virtual void SetEnabled(int);
   vtkBooleanMacro(Enabled, int);
   vtkGetMacro(Enabled, int);
 
   // Description:
-  // Set focus to this widget.
-  virtual void Focus();
-
-  // Description:
   // Get the containing vtkKWWindowBase for this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
   vtkKWWindowBase* GetWindow();
-
-  // Description:
-  // Convenience method to Set/Get the current background and foreground colors
-  // of the widget
-  virtual void GetBackgroundColor(double *r, double *g, double *b);
-  virtual double* GetBackgroundColor();
-  virtual void SetBackgroundColor(double r, double g, double b);
-  virtual void SetBackgroundColor(double rgb[3])
-    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void GetForegroundColor(double *r, double *g, double *b);
-  virtual double* GetForegroundColor();
-  virtual void SetForegroundColor(double r, double g, double b);
-  virtual void SetForegroundColor(double rgb[3])
-    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
-  
-  // Description:
-  // Set/Get Tk configuration option (ex: "-state") 
-  // Please make sure you check the class (and subclasses) API for
-  // a C++ method acting as a front-end for the corresponding Tk option.
-  // For example, the SetBackgroundColor() method can be used to set the 
-  // corresponding -bg Tk option. 
-  // Note that SetConfigurationOption will enclose the value inside
-  // curly braces {} as a convenience.
-  // SetConfigurationOption returns 1 on success, 0 otherwise.
-  virtual int SetConfigurationOption(const char* option, const char *value);
-  virtual int HasConfigurationOption(const char* option);
-  virtual const char* GetConfigurationOption(const char* option);
-  virtual int GetConfigurationOptionAsInt(const char* option);
-  virtual int SetConfigurationOptionAsInt(const char* option, int value);
-  virtual double GetConfigurationOptionAsDouble(const char* option);
-  virtual int SetConfigurationOptionAsDouble(const char* option, double value);
-
-  // Description:
-  // Set/Get the textual value of a Tk option (defaut is -text option) given a
-  // pointer to a string.
-  // The characted encoding used in the string will be retrieved by querying
-  // the widget's application CharacterEncoding ivar. Conversion from that
-  // encoding to Tk internal encoding will be performed automatically.
-  //BTX
-  virtual void SetTextOption(const char *text, const char *option = "-text");
-  virtual const char* GetTextOption(const char *option = "-text");
-  //ETX
-
-  // Description:
-  // Convenience method to Set/Get the -state option to "normal" (if true) or
-  // "disabled" (if false).
-  virtual void SetStateOption(int flag);
-  virtual int GetStateOption();
 
   // Description:
   // Query if widget is packed
@@ -205,55 +111,6 @@ public:
   virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
   // Description:
-  // Set/get the highlight thickness, a non-negative value indicating the
-  // width of the highlight rectangle to draw around the outside of the
-  // widget when it has the input focus.
-  virtual void SetHighlightThickness(int);
-  virtual int GetHighlightThickness();
-  
-  // Description:
-  // Set/get the border width, a non-negative value
-  // indicating the width of the 3-D border to draw around the outside of
-  // the widget (if such a border is being drawn; the Relief option typically
-  // determines this).
-  virtual void SetBorderWidth(int);
-  virtual int GetBorderWidth();
-  
-  // Description:
-  // Set/Get the 3-D effect desired for the widget. 
-  // The value indicates how the interior of the widget should appear
-  // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
-  virtual void SetRelief(int);
-  virtual int GetRelief();
-  virtual void SetReliefToRaised() 
-    { this->SetRelief(vtkKWTkOptions::ReliefRaised); };
-  virtual void SetReliefToSunken() 
-    { this->SetRelief(vtkKWTkOptions::ReliefSunken); };
-  virtual void SetReliefToFlat() 
-    { this->SetRelief(vtkKWTkOptions::ReliefFlat); };
-  virtual void SetReliefToRidge() 
-    { this->SetRelief(vtkKWTkOptions::ReliefRidge); };
-  virtual void SetReliefToSolid() 
-    { this->SetRelief(vtkKWTkOptions::ReliefSolid); };
-  virtual void SetReliefToGroove() 
-    { this->SetRelief(vtkKWTkOptions::ReliefGroove); };
-
-  // Description:
-  // Set/Get the padding that will be applied around each widget (in pixels).
-  // Specifies a non-negative value indicating how much extra space to request
-  // for the widget in the X and Y-direction. When computing how large a
-  // window it needs, the widget will add this amount to the width it would
-  // normally need (as determined by the width of the things displayed
-  // in the widget); if the geometry manager can satisfy this request, the 
-  // widget will end up with extra internal space around what it displays 
-  // inside. 
-  virtual void SetPadX(int);
-  virtual int GetPadX();
-  virtual void SetPadY(int);
-  virtual int GetPadY();
-
-  // Description:
   // Grab the widget (locally)
   virtual void Grab();
   virtual void ReleaseGrab();
@@ -268,11 +125,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  // Description:
-  // Take screendump of the widget and store it into the png file.
-  int TakeScreenDump(const char *fname,
-                     int top=0, int bottom=0, int left=0, int right=0);
-
   // Description::
   // Override Unregister since widgets have loops.
   virtual void UnRegister(vtkObjectBase *o);
@@ -281,6 +133,14 @@ public:
   // Get the net reference count of this widget. That is the
   // reference count of this widget minus its children.
   virtual int  GetNetReferenceCount();
+
+  // Description:
+  // Query children from this widget
+  virtual int HasChild(vtkKWWidget *w);
+  virtual int GetNumberOfChildren();
+  virtual vtkKWWidget* GetNthChild(int rank);
+  virtual vtkKWWidget* GetChildWidgetWithName(const char *);
+  virtual void RemoveAllChildren();
 
   // Description:
   // Create a specific Tk widget of type 'type', with optional arguments 
@@ -314,40 +174,26 @@ protected:
   vtkKWWidget();
   ~vtkKWWidget();
 
+  // Description:
+  // Add/Remove a child to/from this widget
+  virtual void AddChild(vtkKWWidget *w);
+  virtual void RemoveChild(vtkKWWidget *w);
+
+  // Description:
+  // The name of the underlying Tk widget being used.
   char *WidgetName;
 
+  // Description:
+  // The parent of the widget
   vtkKWWidget *Parent;
 
   // Ballon help
-
+  // The tooltip associated to the widget
   char *BalloonHelpString;
   
   // Description:
-  // Get the Tk string type of the widget.
-  virtual const char* GetType();
-  
-  // Description:
-  // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
-  // internal format (given the widget's application CharacterEncoding), 
-  // and vice-versa.
-  // The 'source' string is the source to convert.
-  // It returns a pointer to a static buffer where the converted string
-  // can be found (so be quick about it).
-  // The 'options' can be set to perform some replacements/escaping.
-  // ConvertStringEscapeInterpretable will attempt to escape all characters
-  // that can be interpreted (when found between a pair of quotes for
-  // example): $ [ ] "
-  //BTX
-  enum
-  {
-    ConvertStringEscapeCurlyBraces   = 1,
-    ConvertStringEscapeInterpretable = 2
-  };
-  const char* ConvertTclStringToInternalString(
-    const char *source, int options = 0);
-  const char* ConvertInternalStringToTclString(
-    const char *source, int options = 0);
-  //ETX
+  // PIMPL Encapsulation for STL containers
+  vtkKWWidgetInternals *Internals;
 
   // Description:
   // Convenience function to that propagates the Enabled state of
@@ -355,12 +201,11 @@ protected:
   // It calls SetEnabled(this->GetEnabled()) on the 'widget' parameter
   virtual void PropagateEnableState(vtkKWWidget* widget);
 
-  // PIMPL Encapsulation for STL containers
-
-  vtkKWWidgetInternals *Internals;
-
 private:
   
+  // Description:
+  // The Drag & Drop targets, if any. In private: so that it can be
+  // lazy-created
   vtkKWDragAndDropTargetSet* DragAndDropTargetSet;
 
   int WidgetIsCreated;

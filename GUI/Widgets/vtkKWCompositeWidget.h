@@ -22,13 +22,13 @@
 #ifndef __vtkKWCompositeWidget_h
 #define __vtkKWCompositeWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWFrame.h"
 
-class KWWIDGETS_EXPORT vtkKWCompositeWidget : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCompositeWidget : public vtkKWFrame
 {
 public:
   static vtkKWCompositeWidget* New();
-  vtkTypeRevisionMacro(vtkKWCompositeWidget, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCompositeWidget, vtkKWFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
