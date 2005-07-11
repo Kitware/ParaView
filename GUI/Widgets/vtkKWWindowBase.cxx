@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.21");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.22");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -444,7 +444,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   this->TrayImageError->SetParent(this->TrayFrame);
   this->TrayImageError->Create(app);
 
-  this->TrayImageError->SetImageToPredefinedIcon(vtkKWIcon::IconSmallErrorRed);
+  this->TrayImageError->SetImageToPredefinedIcon(vtkKWIcon::IconErrorRedMini);
   
   this->TrayImageError->SetBind(this, "<Button-1>", "ErrorIconCallback");
 
@@ -897,12 +897,12 @@ void vtkKWWindowBase::SetErrorIcon(int s)
     if (s == vtkKWWindowBase::ErrorIconRed)
       {
       this->TrayImageError->SetImageToPredefinedIcon(
-        vtkKWIcon::IconSmallErrorRed);
+        vtkKWIcon::IconErrorRedMini);
       }
     else if (s == vtkKWWindowBase::ErrorIconBlack)
       {
       this->TrayImageError->SetImageToPredefinedIcon(
-        vtkKWIcon::IconSmallError);
+        vtkKWIcon::IconErrorMini);
       }
     }
   else
