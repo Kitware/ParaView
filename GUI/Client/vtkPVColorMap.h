@@ -73,6 +73,7 @@ public:
   // (e.g. Temperature). Currently it also indicates the arrays mapped
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
+  void SetScalarBarTitleNoTrace(const char* name);
   vtkGetStringMacro(ScalarBarTitle);
 
   // Description:

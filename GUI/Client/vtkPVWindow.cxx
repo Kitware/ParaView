@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.749");
+vtkCxxRevisionMacro(vtkPVWindow, "1.750");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -4524,7 +4524,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   cm->Create(this->GetPVApplication());
   cm->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   cm->SetArrayName(parameterName);
-  cm->SetScalarBarTitle(parameterName);
+  cm->SetScalarBarTitleNoTrace(parameterName);
   cm->ResetScalarRangeInternal();
 
   this->PVColorMaps->AddItem(cm);
