@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.20");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.21");
 
 
 //*****************************************************************************
@@ -782,7 +782,9 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
   char ThirdToken_WrappedString[] = "%*s %*s {%[^}]";
   char ThirdToken_OptionalWrappedString[] = "%*s %*s %*[{\"]%[^}\"]";
   char ThirdThruEighthToken_String[] = "%*s %*s %s %s %s %s %s %s";
+#ifdef PARAVIEW_USE_EXODUS
   char ThirdToken_String[] = "%*s %*s %s";
+#endif
   char ThirdToken_RightBracketedString[] = "%*s %*s %[^]] %*s %*s %*s";
   char FifthAndSixthToken_IntAndInt[] = "%*s %*s %*s %*s %d %d";
   char FifthAndSixthToken_IntAndFloat[] = "%*s %*s %*s %*s %d %lf";
