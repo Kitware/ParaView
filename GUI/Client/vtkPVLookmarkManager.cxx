@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.47");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -479,7 +479,8 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   vtkXMLDataParser *parser;
   vtkXMLDataElement *root;
   vtkPVLookmark *lookmarkWidget;
-  int j, numLmks;
+  int j, numLmks, retval;
+  char msg[500];
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
     {
@@ -515,7 +516,14 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   parser = vtkXMLDataParser::New();
   parser->SetStream(&infile);
   //parser->Parse(this->LookmarkMacros);
-  parser->Parse();
+  retval = parser->Parse();
+  if(retval==0)
+    {
+    sprintf(msg,"Error parsing lookmark file in %s.",str.str());
+    this->GetPVApplication()->GetMainWindow()->ErrorMessage(msg);
+    parser->Delete();
+    return;
+    } 
   root = parser->GetRootElement();
 
   vtkXMLDataElement *lmkElement;
@@ -921,6 +929,8 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
   vtkXMLDataParser *parser;
   vtkXMLDataElement *root;
   vtkPVLookmark *lookmarkWidget;
+  int retval;
+  char msg[500];
 
   ifstream infile(filename);
   if ( infile.fail())
@@ -945,7 +955,14 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
   //parse the .lmk xml file and get the root node for traversing
   parser = vtkXMLDataParser::New();
   parser->SetStream(&infile);
-  parser->Parse();
+  retval = parser->Parse();
+  if(retval==0)
+    {
+    sprintf(msg,"Error parsing lookmark file in %s.",filename);
+    this->GetPVApplication()->GetMainWindow()->ErrorMessage(msg);
+    parser->Delete();
+    return;
+    }
   root = parser->GetRootElement();
 
   this->Script("[winfo toplevel %s] config -cursor watch", 
@@ -2110,6 +2127,8 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
   ofstream *outfile;
   vtkXMLLookmarkElement *root;
   vtkXMLDataParser *parser;
+  int retval;
+  char msg[500];
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
     {
@@ -2125,7 +2144,7 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete outfile;
     return;
     }
   if ( outfile->fail())
@@ -2135,12 +2154,13 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete outfile;
     return;
     }
 
   *outfile << "<LmkFile></LmkFile>";
   outfile->close();
+  delete outfile;
 
   infile = new ifstream(filename);
   if ( !infile )
@@ -2150,7 +2170,7 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete infile;
     return;
     }
   if ( infile->fail())
@@ -2160,13 +2180,20 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete infile;
     return;
     }
 
   parser = vtkXMLDataParser::New();
   parser->SetStream(infile);
-  parser->Parse();
+  retval = parser->Parse();
+  if(retval==0)
+    {
+    sprintf(msg,"Error parsing lookmark file in %s.",filename);
+    this->GetPVApplication()->GetMainWindow()->ErrorMessage(msg);
+    parser->Delete();
+    return;
+    } 
   root = (vtkXMLLookmarkElement *)parser->GetRootElement();
 
   this->CreateNestedXMLElements(this->LmkScrollFrame->GetFrame(),root);
@@ -2180,7 +2207,8 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete infile;
+    delete outfile;
     return;
     }
   if ( outfile->fail())
@@ -2190,7 +2218,8 @@ void vtkPVLookmarkManager::SaveAll(char *filename)
       "File might have been moved, deleted, or its permissions changed.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
-
+    delete infile;
+    delete outfile;
     return;
     }
 
@@ -2209,6 +2238,8 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
   ofstream *outfile;
   vtkXMLLookmarkElement *root;
   vtkXMLDataParser *parser;
+  int retval;
+  char msg[500];
   
   // write out an empty lookmark file so that the parser will not complain
   outfile = new ofstream(filename,ios::trunc);
@@ -2260,7 +2291,16 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
 
   parser = vtkXMLDataParser::New();
   parser->SetStream(infile);
-  parser->Parse();
+  retval = parser->Parse();
+  if(retval==0)
+    {
+    sprintf(msg,"Error parsing lookmark file in %s.",filename);
+    this->GetPVApplication()->GetMainWindow()->ErrorMessage(msg);
+    parser->Delete();
+    delete infile;
+    delete outfile;
+    return;
+    } 
   root = (vtkXMLLookmarkElement *)parser->GetRootElement();
 
 //  this->CreateNestedXMLElements(folder->GetLabelFrame()->GetFrame()->GetFrame(),root);
