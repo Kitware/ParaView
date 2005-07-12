@@ -80,8 +80,8 @@ int MyMain(int argc, char *argv[])
   // run the paraview main
   int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
   helper->Delete();
-  options->Delete();
   pvmain->Delete();
+  options->Delete();
   vtkPVMain::Finalize();
   return ret;
 }

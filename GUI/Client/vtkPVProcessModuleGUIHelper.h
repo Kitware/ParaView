@@ -24,6 +24,7 @@
 
 class vtkPVApplication;
 class vtkProcessModule;
+class vtkKWMessageDialog;
 
 class VTK_EXPORT vtkPVProcessModuleGUIHelper : public vtkProcessModuleGUIHelper
 {
@@ -55,16 +56,32 @@ public:
     {
       return this->PVApplication;
     }
-  
+
+   // Description:
+  // Popup dialog. The result will contain result when the user answers.
+  //BTX
+  virtual void PopupDialog(const char* title, const char* text);
+  virtual int UpdatePopup();
+  virtual void ClosePopup();
+  //ETX
+ 
 protected:
   vtkPVProcessModuleGUIHelper();
   virtual ~vtkPVProcessModuleGUIHelper();
 
+  int InitializeApplication();
+  int FinalizeApplication();
   int ActualRun(int argc, char **argv);
 
 
 private:
   int BatchFlag;
+
+  void* TclInterp;
+
+  vtkKWMessageDialog* PopupDialogWidget;
+
+
   vtkPVApplication* PVApplication;
   vtkPVProcessModuleGUIHelper(const vtkPVProcessModuleGUIHelper&); // Not implemented
   void operator=(const vtkPVProcessModuleGUIHelper&); // Not implemented

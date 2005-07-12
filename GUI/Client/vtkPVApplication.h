@@ -56,7 +56,7 @@ public:
   // ivars appropriately.
   // Return error (1) if the arguments are not formed properly.
   // Returns 0 if all went well.
-  int ParseCommandLineArguments(int argc, char*argv[]);
+  int ParseCommandLineArguments();
   virtual void SetOptions(vtkPVGUIClientOptions* op);
 
   // Description:
@@ -206,6 +206,7 @@ public:
   // This is used (Unix only) to obtain the path of the executable.
   // This path is used to locate demos etc.
   vtkGetStringMacro(Argv0);
+  vtkSetStringMacro(Argv0);
 
   // Description:
   // The name of the trace file.
@@ -348,7 +349,6 @@ protected:
   char* TraceFileName;
   ofstream *TraceFile;
   char* Argv0;
-  vtkSetStringMacro(Argv0);
 
   //BTX
   enum

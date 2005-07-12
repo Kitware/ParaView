@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.23");
+vtkCxxRevisionMacro(vtkProcessModule, "1.24");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -111,6 +111,7 @@ vtkProcessModule::~vtkProcessModule()
   if(this->GUIHelper)
     {
     this->GUIHelper->Delete();
+    this->GUIHelper = 0;
     }
   this->ProgressHandler->Cleanup();
   this->ProgressHandler->Delete();

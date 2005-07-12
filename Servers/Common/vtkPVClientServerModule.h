@@ -193,6 +193,8 @@ protected:
   
   virtual const char* DetermineLogFilePrefix();
 
+  int WaitForConnectionOnSocket(vtkSocketCommunicator* comm, int sock);
+
   int NumberOfServerProcesses;
   vtkSocketController* SocketController;
   vtkSocketController* RenderServerSocket;

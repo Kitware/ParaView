@@ -48,6 +48,7 @@
 #include <vtkstd/string>
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkTimerLog.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -147,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.37");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.38");
 
 
 //----------------------------------------------------------------------------
@@ -709,6 +710,8 @@ void vtkPVClientServerModule::SetupWaitForConnection()
   if ( this->Options->GetClientMode() )
     {
     cout << "Waiting for server..." << endl;
+    this->GUIHelper->PopupDialog("Waiting for server",
+      "Waiting for server to connect to this client via the reverse connection. Press OK to exit.");
     }
   else
     {
@@ -719,21 +722,43 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     cout << "Waiting for client..." << endl;
     }
   // now wait for a connection on sock
-  if (!comm->WaitForConnectionOnSocket(sock))
+  int sockRes;
+  if ((sockRes = this->WaitForConnectionOnSocket(comm, sock)) <= 0)
     {
-    vtkErrorMacro("Wait timed out or could not initialize socket.");
+    if ( sockRes == 0 )
+      {
+      vtkErrorMacro("Wait timed out or could not initialize socket.");
+      }
     comm->Delete();
+    this->SocketController->Delete();
+    this->SocketController = 0;
+    if ( this->GUIHelper )
+      {
+      this->GUIHelper->ClosePopup();
+      }
     this->ReturnValue = 1;
     return;
     }
   cout << "connected to port " << port << "\n";
-  // If there is a second connection, wait for it on sock2
-  if (comm2 && !comm2->WaitForConnectionOnSocket(sock2))
+  if ( comm2 && (sockRes = this->WaitForConnectionOnSocket(comm2, sock2)) <= 0 )
     {
-    vtkErrorMacro("Wait timed out or could not initialize render server socket.");
+    if ( sockRes == 0 )
+      {
+      vtkErrorMacro("Wait timed out or could not initialize render server socket.");
+      }
     comm->Delete();
+    this->SocketController->Delete();
+    this->SocketController = 0;
+    if ( this->GUIHelper )
+      {
+      this->GUIHelper->ClosePopup();
+      }
     this->ReturnValue = 1;
     return;
+    }
+  if ( this->GUIHelper )
+    {
+    this->GUIHelper->ClosePopup();
     }
   // print out connection messages
   if(comm2)
@@ -759,6 +784,47 @@ void vtkPVClientServerModule::SetupWaitForConnection()
   comm = 0;
 }
 
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::WaitForConnectionOnSocket(vtkSocketCommunicator* comm, int sock)
+{
+  int res = 0;
+  int not_abort_connection = 1;
+  vtkTimerLog* tl = vtkTimerLog::New();
+  tl->StartTimer();
+  while ( not_abort_connection )
+    {
+    // Wait for 1/2 second
+    res = comm->WaitForConnectionOnSocket(sock, 333);
+    if ( res > 0 )
+      {
+      break;
+      }
+    if ( res == 0 )
+      {
+      break;
+      }
+    if ( this->GUIHelper )
+      {
+      not_abort_connection = this->GUIHelper->UpdatePopup();
+      }
+    tl->StopTimer();
+    if ( tl->GetElapsedTime() > 120 )
+      {
+      break;
+      }
+    }
+  tl->Delete();
+  if ( not_abort_connection == 0 )
+    {
+    return -1;
+    }
+  if (res <= 0)
+    {
+    vtkErrorMacro("Wait timed out or could not initialize socket.");
+    return 0;
+    }
+  return 1;
+}
 
 
 //----------------------------------------------------------------------------

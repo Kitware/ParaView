@@ -50,6 +50,18 @@ public:
   // Set the Process module pointer
   virtual void SetProcessModule(vtkProcessModule*);
 
+  // Description:
+  // Popup dialog. The result will contain result when the user answers.
+  //BTX
+  virtual void PopupDialog(const char* title, const char* text)
+    {
+    (void) title;
+    (void) text;
+    }
+  virtual int UpdatePopup() { return 1; }
+  virtual void ClosePopup() { }
+  //ETX
+
 protected:
   vtkProcessModuleGUIHelper();
 

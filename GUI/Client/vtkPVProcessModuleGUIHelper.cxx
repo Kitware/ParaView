@@ -23,69 +23,90 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.20");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.21");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
 
+//----------------------------------------------------------------------------
 vtkPVProcessModuleGUIHelper::vtkPVProcessModuleGUIHelper()
 {
   this->PVApplication = 0;
+  this->TclInterp = 0;
+  this->PopupDialogWidget = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVProcessModuleGUIHelper::~vtkPVProcessModuleGUIHelper()
 {
+  this->FinalizeApplication();
   this->SetPVApplication(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
-int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
+//----------------------------------------------------------------------------
+int vtkPVProcessModuleGUIHelper::InitializeApplication()
 {
-  (void)myId;
-  // Initialize Tcl/Tk.
-  Tcl_Interp *interp;
-  vtkPVOptions* options = this->ProcessModule->GetOptions();
-
-  int retVal = 0;
-  int new_argc = 0;
-  char** new_argv = 0;
-  options->GetRemainingArguments(&new_argc, &new_argv);
-
-  ostrstream err;
-  interp = vtkPVApplication::InitializeTcl(new_argc, new_argv, &err);
-  err << ends;
-  if (!interp)
+  if ( this->PVApplication && this->TclInterp )
     {
-#ifdef _WIN32
-    ::MessageBox(0, err.str(), 
-      "ParaView error: InitializeTcl failed", MB_ICONERROR|MB_OK);
-#else
-    cerr << "ParaView error: InitializeTcl failed" << endl 
-      << err.str() << endl;
-#endif
-    err.rdbuf()->freeze(0);
-#ifdef VTK_USE_MPI
-    MPI_Finalize();
-#endif
     return 1;
     }
-  err.rdbuf()->freeze(0);
 
-  // Create the application to parse the command line arguments.
-  this->PVApplication = vtkPVApplication::New();
-  this->PVApplication->SetOptions(vtkPVGUIClientOptions::SafeDownCast(options));
+  vtkPVOptions* options = this->ProcessModule->GetOptions();
 
-  if (myId == 0)
+  if ( !this->TclInterp )
     {
-    if (this->PVApplication->ParseCommandLineArguments(argc, argv))
+    Tcl_Interp *interp;
+
+    int new_argc = 0;
+    char** new_argv = 0;
+    options->GetRemainingArguments(&new_argc, &new_argv);
+
+    ostrstream err;
+    interp = vtkPVApplication::InitializeTcl(new_argc, new_argv, &err);
+    err << ends;
+    if (!interp)
       {
-      retVal = 1;
+#ifdef _WIN32
+      ::MessageBox(0, err.str(), 
+        "ParaView error: InitializeTcl failed", MB_ICONERROR|MB_OK);
+#else
+      cerr << "ParaView error: InitializeTcl failed" << endl 
+        << err.str() << endl;
+#endif
+      err.rdbuf()->freeze(0);
+#ifdef VTK_USE_MPI
+      MPI_Finalize();
+#endif
+      return 0;
+      }
+    err.rdbuf()->freeze(0);
+    this->TclInterp = interp;
+    }
+
+  if ( !this->PVApplication )
+    {
+    // Create the application to parse the command line arguments.
+    this->PVApplication = vtkPVApplication::New();
+    this->PVApplication->SetOptions(vtkPVGUIClientOptions::SafeDownCast(options));
+
+    this->PVApplication->SetProcessModule(
+      vtkPVProcessModule::SafeDownCast(this->ProcessModule));
+    // Start the application (UI). 
+#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
+    this->PVApplication->SetupTrapsForSignals(myId);   
+#endif // PV_HAVE_TRAPS_FOR_SIGNALS
+
+    if (!this->PVApplication->ParseCommandLineArguments())
+      {
       this->PVApplication->SetStartGUI(0);
       }
+
     // Get the application settings from the registry
     // It has to be called now, after ParseCommandLineArguments, which can 
     // change the registry level (also, it can not be called in the application
@@ -93,31 +114,64 @@ int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServe
     // application name to be set)
 
     this->PVApplication->RestoreApplicationSettingsFromRegistry();
+    this->PVApplication->Initialize();
     }
 
-  this->PVApplication->SetProcessModule(
-    vtkPVProcessModule::SafeDownCast(this->ProcessModule));
-  // Start the application (UI). 
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModuleGUIHelper::FinalizeApplication()
+{
+  if ( this->PVApplication )
+    {
+    this->PVApplication->PromptBeforeExitOff();
+    this->PVApplication->Exit();
+    this->PVApplication->SetProcessModule(0);
+    this->PVApplication->SetOptions(0);
+    this->PVApplication->Delete();
+    this->PVApplication = 0;
+    }
+
+  Tcl_Interp* interp = static_cast<Tcl_Interp*>(this->TclInterp);
+  if ( interp )
+    {
+    Tcl_DeleteInterp(interp);
+    Tcl_Finalize();
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
+{
+  if ( myId )
+    {
+    abort();
+    }
+
+  // Initialize Tcl/Tk.
+  if ( !this->InitializeApplication() )
+    {
+    this->FinalizeApplication();
+    return 1;
+    }
+
   // For SGI pipe option.
   this->PVApplication->SetNumberOfPipes(numServerProcs);
-
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-  this->PVApplication->SetupTrapsForSignals(myId);   
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
+  this->PVApplication->SetArgv0(argv[0]);
 
   int resStart = this->ActualRun(argc, argv);
 
   // Exiting:  CLean up.
   int resExit = this->PVApplication->GetExitStatus();
-  this->PVApplication->Delete();
-  this->PVApplication = 0;
 
-  Tcl_DeleteInterp(interp);
-  Tcl_Finalize();
+  this->FinalizeApplication();
 
-  return resStart?resStart:(resExit?resExit:retVal);
+  return resStart?resStart:resExit;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVProcessModuleGUIHelper::ActualRun(int argc, char **argv)
 {
   if (this->PVApplication->GetStartGUI())
@@ -131,6 +185,7 @@ int vtkPVProcessModuleGUIHelper::ActualRun(int argc, char **argv)
   return 0;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* )
 { 
   // This should perhaps open a dialog and ask for where
@@ -140,6 +195,7 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* )
 }
 
   
+//----------------------------------------------------------------------------
 void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
 {  
   if (! this->PVApplication || !this->PVApplication->GetMainWindow())
@@ -157,6 +213,7 @@ void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProcessModuleGUIHelper::SendCleanupPendingProgress()
 { 
   if ( !this->PVApplication || !this->PVApplication->GetMainWindow())
@@ -167,6 +224,7 @@ void vtkPVProcessModuleGUIHelper::SendCleanupPendingProgress()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVProcessModuleGUIHelper::SetLocalProgress(const char* filter, int progress)
 {
   if ( !this->PVApplication || !this->PVApplication->GetMainWindow())
@@ -185,6 +243,7 @@ void vtkPVProcessModuleGUIHelper::SetLocalProgress(const char* filter, int progr
 }
 
   
+//----------------------------------------------------------------------------
 void vtkPVProcessModuleGUIHelper::ExitApplication()
 { 
   if ( !this->PVApplication )
@@ -192,5 +251,53 @@ void vtkPVProcessModuleGUIHelper::ExitApplication()
     return;
     }
   this->PVApplication->Exit();
+}
+//----------------------------------------------------------------------------
+void vtkPVProcessModuleGUIHelper::PopupDialog(const char* title, const char* text)
+{
+  if ( this->PopupDialogWidget )
+    {
+    vtkErrorMacro("Only one popup dialog allowed");
+    return;
+    }
+  this->InitializeApplication();
+  this->PopupDialogWidget = vtkKWMessageDialog::New();
+  this->PopupDialogWidget->SetOptions(vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault);
+  this->PopupDialogWidget->Create(this->PVApplication);
+  this->PopupDialogWidget->SetText(text);
+  this->PopupDialogWidget->SetTitle(title);
+  this->PopupDialogWidget->PreInvoke();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModuleGUIHelper::UpdatePopup()
+{
+  if ( !this->PopupDialogWidget )
+    {
+    return 0;
+    }
+  if ( !this->PopupDialogWidget->IsUserDoneWithDialog() )
+    {
+    Tcl_DoOneEvent(0);
+    }
+  int res = this->PopupDialogWidget->IsUserDoneWithDialog();
+  if ( res )
+    {
+    this->ClosePopup();
+    return res -1;
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModuleGUIHelper::ClosePopup()
+{
+  if ( !this->PopupDialogWidget )
+    {
+    return;
+    }
+  this->PopupDialogWidget->PostInvoke();
+  this->PopupDialogWidget->Delete();
+  this->PopupDialogWidget = 0;
 }
 

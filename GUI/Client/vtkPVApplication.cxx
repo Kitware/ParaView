@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.367");
+vtkCxxRevisionMacro(vtkPVApplication, "1.368");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -908,14 +908,8 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVApplication::ParseCommandLineArguments(int vtkNotUsed(argc), char*argv[])
+int vtkPVApplication::ParseCommandLineArguments()
 {
-  // This should really be part of Parsing !!!!!!
-  if (argv)
-    {
-    this->SetArgv0(argv[0]);
-    }
-
   if ( this->Options->GetDisableRegistry() )
     {
     this->RegistryLevel = 0;
@@ -935,7 +929,7 @@ int vtkPVApplication::ParseCommandLineArguments(int vtkNotUsed(argc), char*argv[
     this->OutputWindow->CrashOnErrorsOn();
     }
 
-  return 0;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -997,7 +991,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   if (!this->SetupRenderModule())
     {
     vtkErrorMacro("Failed to setup Render Module. Aborting.");
-    abort();
+    vtkPVApplication::Abort();
     }
   // set the font size to be small
 #ifdef _WIN32
