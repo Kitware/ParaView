@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.80");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.81");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -303,12 +303,8 @@ int vtkKWMessageDialog::GetTextWidth()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::Invoke()
+int vtkKWMessageDialog::PreInvoke()
 {
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
   this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, this->DialogText);
 
   if ( this->DialogName )
@@ -317,11 +313,13 @@ int vtkKWMessageDialog::Invoke()
       this->GetApplication(), this->DialogName);
     if ( res == 1 )
       {
+      this->Done = 2;
       return 1;
       }
     if ( res == -1 )
       {
-      return 0;
+      this->Done = 1;
+      return 1;
       }
     }
   
@@ -353,8 +351,14 @@ int vtkKWMessageDialog::Invoke()
     }
 
   this->SetResizable(0, 0);
+  return this->Superclass::PreInvoke();
+}
 
-  int res = this->Superclass::Invoke();
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::PostInvoke()
+{
+  this->Superclass::PostInvoke();
+  int res = this->Done -1;
 
   if ( this->DialogName && this->GetRememberMessage() )
     {
@@ -377,7 +381,12 @@ int vtkKWMessageDialog::Invoke()
     this->SaveMessageDialogResponseToRegistry(
       this->GetApplication(), this->DialogName, ires);
     }
+}
 
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::Invoke()
+{
+  int res = this->Superclass::Invoke();
   return res;
 }
 

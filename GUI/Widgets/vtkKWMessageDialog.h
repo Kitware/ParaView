@@ -50,6 +50,13 @@ public:
   virtual int Invoke();
 
   // Description:
+  // Dialog can be also used by performing individual steps of Invoke. These
+  // steps are initialize: PreInvoke(), finalize: PostInvoke(), and check if
+  // user responded IsUserDoneWithDialog().
+  virtual int PreInvoke();
+  virtual void PostInvoke();
+
+  // Description:
   // Set the style of the message box
   //BTX
   enum 

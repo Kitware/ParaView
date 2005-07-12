@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.51");
+vtkCxxRevisionMacro(vtkKWDialog, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
@@ -32,7 +32,7 @@ vtkKWDialog::vtkKWDialog()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDialog::Invoke()
+int vtkKWDialog::PreInvoke()
 {
   this->Done = 0;
 
@@ -44,17 +44,42 @@ int vtkKWDialog::Invoke()
     {
     this->Script("bell");
     }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDialog::PostInvoke()
+{
+  this->Withdraw();
+
+  this->GetApplication()->UnRegisterDialogUp(this);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDialog::IsUserDoneWithDialog()
+{
+  return this->Done;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDialog::Invoke()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+  if ( !this->PreInvoke() )
+    {
+    return 0;
+    }
 
   // Wait for the end
-
-  while (!this->Done)
+  while (!this->IsUserDoneWithDialog())
     {
     Tcl_DoOneEvent(0);    
     }
 
-  this->Withdraw();
-
-  this->GetApplication()->UnRegisterDialogUp(this);
+  this->PostInvoke();
 
   return (this->Done-1);
 }
