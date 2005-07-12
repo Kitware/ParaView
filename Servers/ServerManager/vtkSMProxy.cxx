@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.40");
+vtkCxxRevisionMacro(vtkSMProxy, "1.41");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1267,13 +1267,22 @@ vtkSMPropertyIterator* vtkSMProxy::NewPropertyIterator()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::DeepCopy(vtkSMProxy* src)
+void vtkSMProxy::Copy(vtkSMProxy* src)
 {
-  this->DeepCopy(src, 0);
+  this->Copy(src, 0, 
+    vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
+void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass)
+{
+  this->Copy(src, exceptionClass,
+    vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass,
+  int proxyPropertyCopyFlag)
 {
   if (!src)
     {
@@ -1287,7 +1296,7 @@ void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
     vtkSMProxy* sub = this->GetSubProxy(it2->first.c_str());
     if (sub)
       {
-      sub->DeepCopy(it2->second, exceptionClass); 
+      sub->Copy(it2->second, exceptionClass, proxyPropertyCopyFlag); 
       }
     }
 
@@ -1304,7 +1313,17 @@ void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
         {
         if (!exceptionClass || !dest->IsA(exceptionClass))
           {
-          dest->DeepCopy(source);
+          vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(dest);
+          if (!pp || proxyPropertyCopyFlag == 
+            vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE)
+            {
+            dest->Copy(source);
+            }
+          else
+            {
+            pp->DeepCopy(source, exceptionClass, 
+              vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
+            }
           }
         }
       }

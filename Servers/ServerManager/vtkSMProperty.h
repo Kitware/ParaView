@@ -202,10 +202,9 @@ public:
   vtkSetMacro(Saveable, int);
   vtkGetMacro(Saveable, int);
 
-  // Description: 
+  // Description:
   // Copy all property values.
-  virtual void DeepCopy(vtkSMProperty* src);
-
+  virtual void Copy(vtkSMProperty* src);
 protected:
   vtkSMProperty();
   ~vtkSMProperty();

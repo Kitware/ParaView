@@ -103,6 +103,13 @@ public:
 //BTX
   vtkClientServerID GetID() { return this->SelfID; }
 //ETX
+ 
+  // Description:
+  // This copies a clone of the AnimationCue. The AnimatedProxy
+  // is shallow copied, while the Manipulator, and the keyframes
+  // are deep copied.
+  virtual void CloneCopy(vtkSMAnimationCueProxy* src);
+
 protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();

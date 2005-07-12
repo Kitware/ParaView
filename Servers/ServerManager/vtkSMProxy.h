@@ -254,18 +254,32 @@ public:
   // Description:
   // Return the servers.
   vtkTypeUInt32 GetServers();
+
+  // Description:
+  // Flags used for the proxyPropertyCopyFlag argument to the Copy method.
+  enum
+    {
+    COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE=0,
+    COPY_PROXY_PROPERTY_VALUES_BY_CLONING
+    };
 //ETX
 
   // Description:
-  // Copy the values of all properties and sub-proxies.
+  // Copies values of all the properties and sub-proxies from src.
   // NOTE: This does NOT create properties and sub-proxies. Only
   // copies values. Mismatched property and sub-proxy pairs are
   // ignored.
   // Properties of type exceptionClass are not copied. This
-  // is usually vtkSMInputProperty
-  virtual void DeepCopy(vtkSMProxy* src, const char* exceptionClass);
-  virtual void DeepCopy(vtkSMProxy* src);
-
+  // is usually vtkSMInputProperty.
+  // proxyPropertyCopyFlag specifies how the values for vtkSMProxyProperty
+  // and its subclasses are copied over: by reference or by 
+  // cloning (ie. creating new instances of the value proxies and 
+  // synchronizing their values).
+  void Copy(vtkSMProxy* src);
+  void Copy(vtkSMProxy* src, const char* exceptionClass);
+  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
+    int proxyPropertyCopyFlag);
+  
   // Description:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes
   // should add their functionality and call this.

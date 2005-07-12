@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.21");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.22");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -311,9 +311,9 @@ void vtkSMIntVectorProperty::SaveState(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::DeepCopy(vtkSMProperty* src)
+void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
 {
-  this->Superclass::DeepCopy(src);
+  this->Superclass::Copy(src);
 
   vtkSMIntVectorProperty* dsrc = vtkSMIntVectorProperty::SafeDownCast(
     src);

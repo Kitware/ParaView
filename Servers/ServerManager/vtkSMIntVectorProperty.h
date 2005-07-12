@@ -120,7 +120,7 @@ public:
 
   // Description: 
   // Copy all property values.
-  virtual void DeepCopy(vtkSMProperty* src);
+  virtual void Copy(vtkSMProperty* src);
 
 protected:
   vtkSMIntVectorProperty();

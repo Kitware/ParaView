@@ -41,7 +41,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkPVComparativeVis);
-vtkCxxRevisionMacro(vtkPVComparativeVis, "1.6");
+vtkCxxRevisionMacro(vtkPVComparativeVis, "1.7");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVis, Application, vtkPVApplication);
@@ -399,8 +399,8 @@ void vtkPVComparativeVis::StoreGeometry()
           vtkSMProxyProperty::SafeDownCast(display->GetProperty("Input"));
         input->AddProxy(proxy);
         display->UpdateVTKObjects();
-        display->DeepCopy(pDisp, "vtkSMProxyProperty");
-        display->GetProperty("LookupTable")->DeepCopy(
+        display->Copy(pDisp, "vtkSMProxyProperty");
+        display->GetProperty("LookupTable")->Copy(
           pDisp->GetProperty("LookupTable"));
         display->UpdateVTKObjects();
         this->Internal->Displays[prevSize].push_back(display);

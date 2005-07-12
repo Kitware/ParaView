@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.15");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.16");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -251,8 +251,6 @@ void vtkPVSimpleAnimationCue::CreateProxy()
     return;
     }
   
-  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
-
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->CueProxy->GetProperty("Manipulator"));
   if (pp)
@@ -285,7 +283,11 @@ void vtkPVSimpleAnimationCue::SetupManipulatorProxy()
     vtkErrorMacro("Failed to find property Manipulator.");
     return;
     }
-  
+ 
+  if (this->KeyFrameManipulatorProxy)
+    {
+    this->KeyFrameManipulatorProxy->RemoveObserver(this->Observer);
+    } 
   if (pp->GetNumberOfProxies() == 0)
     {
     // create a new proxy.
@@ -304,10 +306,8 @@ void vtkPVSimpleAnimationCue::SetupManipulatorProxy()
       pp->GetProxy(0));
     this->SetKeyFrameManipulatorProxy(manipProxy);
     }
-  if (this->KeyFrameManipulatorProxy)
-    {
-    this->KeyFrameManipulatorProxy->RemoveObserver(this->Observer);
-    }
+
+  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
   this->Observe(this->KeyFrameManipulatorProxy, vtkCommand::ModifiedEvent);
 }
 
@@ -330,6 +330,9 @@ void vtkPVSimpleAnimationCue::SetCueProxy(vtkSMAnimationCueProxy* cueProxy)
 
   if (this->CueProxy)
     {
+    // Ensure that the proxy is up-to-date.
+    this->CueProxy->UpdateVTKObjects();
+    
     // verify that the cue proxy has a manipulator, if not create a new one.
     // create keyframe GUI for the keyframes.
     this->SetupManipulatorProxy();
@@ -361,6 +364,8 @@ void vtkPVSimpleAnimationCue::InitializeGUIFromProxy()
     {
     vtkSMKeyFrameProxy* kfProxy = vtkSMKeyFrameProxy::SafeDownCast(
       pp->GetProxy(i));
+    // Ensure that the proxy is up-to-date.
+    kfProxy->UpdateVTKObjects();
     int type = this->GetKeyFrameType(kfProxy);
     if (type == vtkPVSimpleAnimationCue::LAST_NOT_USED)
       {

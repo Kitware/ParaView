@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()
@@ -28,6 +28,14 @@ vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::~vtkSMAnimationCueManipulatorProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationCueManipulatorProxy::Copy(vtkSMProxy* src, 
+  const char* exceptionClass, int proxyPropertyCopyFlag)
+{
+  this->Superclass::Copy(src, exceptionClass, proxyPropertyCopyFlag);
+  this->MarkAllPropertiesAsModified();
 }
 
 //----------------------------------------------------------------------------

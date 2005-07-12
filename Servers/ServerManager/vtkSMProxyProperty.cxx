@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.20");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.21");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -285,6 +285,21 @@ void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
+{
+  vtkstd::vector<vtkSMProxy* >::iterator it =
+    this->PPInternals->UncheckedProxies.begin();
+  for (; it != this->PPInternals->UncheckedProxies.end(); it++)
+    {
+    if (*it == proxy)
+      {
+      this->PPInternals->UncheckedProxies.erase(it);
+      break;
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
 {
   if (this->PPInternals->UncheckedProxies.size() <= idx)
@@ -488,9 +503,58 @@ void vtkSMProxyProperty::SaveState(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src)
+void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src, 
+  const char* exceptionClass, int proxyPropertyCopyFlag)
 {
-  this->Superclass::DeepCopy(src);
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(
+    src);
+
+  this->RemoveAllProxies();
+  this->RemoveAllUncheckedProxies();
+  
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    unsigned int i;
+    unsigned int numElems = dsrc->GetNumberOfProxies();
+
+    for(i=0; i<numElems; i++)
+      {
+      vtkSMProxy* psrc = dsrc->GetProxy(i);
+      vtkSMProxy* pdest = pxm->NewProxy(psrc->GetXMLGroup(), 
+        psrc->GetXMLName());
+      pdest->Copy(psrc, exceptionClass, proxyPropertyCopyFlag);
+      this->AddProxy(pdest);
+      pdest->Delete();
+      }
+    
+    numElems = dsrc->GetNumberOfUncheckedProxies();
+    for(i=0; i<numElems; i++)
+      {
+      vtkSMProxy* psrc = dsrc->GetUncheckedProxy(i);
+      vtkSMProxy* pdest = pxm->NewProxy(psrc->GetXMLGroup(), 
+        psrc->GetXMLName());
+      pdest->Copy(psrc, exceptionClass, proxyPropertyCopyFlag);
+      this->AddUncheckedProxy(pdest);
+      pdest->Delete();
+      }
+    this->ImmediateUpdate = imUpdate;
+    }
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::Copy(vtkSMProperty* src)
+{
+  this->Superclass::Copy(src);
+
+  this->RemoveAllProxies();
+  this->RemoveAllUncheckedProxies();
 
   vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(
     src);

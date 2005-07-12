@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.32");
+vtkCxxRevisionMacro(vtkSMProperty, "1.33");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -421,7 +421,7 @@ int vtkSMProperty::GetCheckDomains()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::DeepCopy(vtkSMProperty* )
+void vtkSMProperty::Copy(vtkSMProperty* )
 {
 }
 

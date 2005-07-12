@@ -46,6 +46,10 @@ public:
     };
 //ETX
 
+  // Description:
+  // Overridden to call MarkAllPropertiesAsModified().
+  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
+    int proxyPropertyCopyFlag);
 protected:
   // Description:
   // This method is called when the AnimationCue's StartAnimationCueEvent is

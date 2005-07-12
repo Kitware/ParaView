@@ -70,6 +70,11 @@ public:
 //BTX
   vtkClientServerID GetID() { return this->SelfID; }
 //ETX
+  
+  // Description:
+  // Overridden to call MarkAllPropertiesAsModified().
+  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
+    int proxyPropertyCopyFlag);
 protected:
   vtkSMKeyFrameProxy();
   ~vtkSMKeyFrameProxy();

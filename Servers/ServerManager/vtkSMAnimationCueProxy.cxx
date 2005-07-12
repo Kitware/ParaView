@@ -19,11 +19,12 @@
 #include "vtkCommand.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMAnimationCueManipulatorProxy.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.8");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -395,6 +396,39 @@ double vtkSMAnimationCueProxy::GetStartTime()
     return 0;
     }
   return this->AnimationCue->GetStartTime();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationCueProxy::CloneCopy(vtkSMAnimationCueProxy* src)
+{
+  if (!src || src == this)
+    {
+    return;
+    }
+
+  // Copy all properties except proxyproperties.
+  this->Copy(src, "vtkSMProxyProperty", 
+    vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
+  
+  vtkSMProxyProperty* source = vtkSMProxyProperty::SafeDownCast(
+    src->GetProperty("AnimatedProxy"));
+  vtkSMProxyProperty* dest = vtkSMProxyProperty::SafeDownCast(
+    this->GetProperty("AnimatedProxy"));
+  
+  if (source && dest)
+    {
+    dest->Copy(source);//we ShallowCopy AnimatedProxy.
+    }
+
+  source = vtkSMProxyProperty::SafeDownCast(src->GetProperty("Manipulator"));
+  dest = vtkSMProxyProperty::SafeDownCast(this->GetProperty("Manipulator"));
+
+  if (source && dest)
+    {
+    dest->DeepCopy(source, 0, 
+      vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
+    }
+  this->MarkAllPropertiesAsModified();
 }
 
 //----------------------------------------------------------------------------

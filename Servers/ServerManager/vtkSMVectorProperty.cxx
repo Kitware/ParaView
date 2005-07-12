@@ -16,7 +16,7 @@
 
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.6");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -83,9 +83,9 @@ int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMVectorProperty::DeepCopy(vtkSMProperty* src)
+void vtkSMVectorProperty::Copy(vtkSMProperty* src)
 {
-  this->Superclass::DeepCopy(src);
+  this->Superclass::Copy(src);
 }
 
 //---------------------------------------------------------------------------
