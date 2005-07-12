@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.48");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -448,7 +448,6 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetStateScript(lookmarkWidget->GetStateScript());
   newLookmark->SetName(lookmarkWidget->GetName());
   newLookmark->SetComments(lookmarkWidget->GetComments());
-  newLookmark->CommentsModifiedCallback();
   newLookmark->SetDataset(lookmarkWidget->GetDataset());
   newLookmark->SetImageData(lookmarkWidget->GetImageData());
   newLookmark->SetPixelSize(lookmarkWidget->GetPixelSize());
@@ -458,6 +457,7 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
   newLookmark->Create(this->GetPVApplication());
   newLookmark->UpdateWidgetValues();
+  newLookmark->CommentsModifiedCallback();
   this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
   newLookmark->CreateIconFromImageData();
   newLookmark->SetLocation(this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()));
@@ -534,8 +534,6 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
     // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
     // create lookmark widget
     lookmarkWidget = this->GetPVLookmark(lmkElement);
-    lookmarkWidget->UpdateWidgetValues();
-    lookmarkWidget->CommentsModifiedCallback();
     lookmarkWidget->SetMacroFlag(1);
     numLmks = this->PVLookmarks->GetNumberOfItems();
     this->MacroExamples->InsertItem(j,lookmarkWidget);
