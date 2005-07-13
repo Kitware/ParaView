@@ -42,6 +42,7 @@ SET(PROJECT_TESTS
   DefaultAnimation
   Delete
   DeleteSource
+  #DualSphereAnimation
   EnSight
   Extrusion
   ExtractGrid
