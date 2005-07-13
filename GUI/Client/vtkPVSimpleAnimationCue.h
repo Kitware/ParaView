@@ -109,6 +109,10 @@ public:
   int AppendNewKeyFrame();
  
   // Description:
+  // Remove All Key frames from this cue.
+  virtual void RemoveAllKeyFrames();
+
+  // Description:
   // Removes a particular key frame from the cue.
   // This method merely removes the keyframe. It does not
   // lead to changing of the selection on the timeline and raising of

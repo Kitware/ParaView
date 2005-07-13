@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.16");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.17");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -341,6 +341,15 @@ void vtkPVSimpleAnimationCue::SetCueProxy(vtkSMAnimationCueProxy* cueProxy)
       this->RegisterProxies();
       }
     this->InitializeGUIFromProxy();
+    }
+
+  if (this->GetNumberOfKeyFrames() > 0)
+    {
+    this->SelectKeyFrame(0);
+    }
+  else
+    {
+    this->SelectKeyFrame(-1);
     }
 }
 
@@ -870,6 +879,21 @@ int vtkPVSimpleAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->KeyFrameManipulatorProxy->GetProperty("LastAddedKeyFrameIndex"));
   return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSimpleAnimationCue::RemoveAllKeyFrames()
+{
+  if (this->Virtual)
+    {
+    return;
+    }
+
+  int numKeyFrames = this->GetNumberOfKeyFrames();
+  for (int i=numKeyFrames-1; i >=0; i--)
+    {
+    this->RemoveKeyFrame(i);
+    }
 }
 
 //-----------------------------------------------------------------------------
