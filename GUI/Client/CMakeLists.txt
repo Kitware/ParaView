@@ -74,7 +74,6 @@ SET( ParaViewClient_SRCS
   vtkPVCameraKeyFrame.cxx
   vtkPVExponentialKeyFrame.cxx
   vtkPVSinusoidKeyFrame.cxx
-  vtkPVComparativeVis.cxx
   vtkPVComparativeVisDialog.cxx
   vtkPVComparativeVisManager.cxx
   vtkPVComparativeVisManagerGUI.cxx
