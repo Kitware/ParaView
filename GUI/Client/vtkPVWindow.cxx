@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.750");
+vtkCxxRevisionMacro(vtkPVWindow, "1.751");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3230,6 +3230,9 @@ void vtkPVWindow::SaveState(const char* filename)
         << this->CenterXEntry->GetValueAsFloat() << " "
         << this->CenterYEntry->GetValueAsFloat() << " "
         << this->CenterZEntry->GetValueAsFloat() << endl;
+  
+  // Save state of comparative vis manager
+  this->GetComparativeVisManagerGUI()->SaveState(file);
   
   file->flush();
   if (file->fail())
