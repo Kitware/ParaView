@@ -44,19 +44,6 @@ public:
   virtual int GetTextWidth();
 
   // Description:
-  // Invoke the dialog and display it in a modal manner. 
-  // This method returns a zero if the dilaog was killed or 
-  // canceled, nonzero otherwise.
-  virtual int Invoke();
-
-  // Description:
-  // Dialog can be also used by performing individual steps of Invoke. These
-  // steps are initialize: PreInvoke(), finalize: PostInvoke(), and check if
-  // user responded IsUserDoneWithDialog().
-  virtual int PreInvoke();
-  virtual void PostInvoke();
-
-  // Description:
   // Set the style of the message box
   //BTX
   enum 
@@ -172,6 +159,15 @@ public:
     vtkKWApplication *app, const char *dialogname);
   static void SaveMessageDialogResponseToRegistry(
     vtkKWApplication *app, const char *dialogname, int response);
+
+  // Description:
+  // Dialog can be also used by performing individual steps of Invoke. These
+  // steps are initialize: PreInvoke(), finalize: PostInvoke(), and check if
+  // user responded IsUserDoneWithDialog(). Use this method only if you
+  // want to bypass the event loop used in Invoke() by creating your own
+  // and checking for IsUserDoneWithDialog().
+  virtual int PreInvoke();
+  virtual void PostInvoke();
 
 protected:
   vtkKWMessageDialog();

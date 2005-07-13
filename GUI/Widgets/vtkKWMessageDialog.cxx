@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.81");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.82");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -307,29 +307,32 @@ int vtkKWMessageDialog::PreInvoke()
 {
   this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, this->DialogText);
 
-  if ( this->DialogName )
+  // Check if the user specified a default answer for this one, stored
+  // in the registry
+
+  if (this->DialogName)
     {
     int res = this->RestoreMessageDialogResponseFromRegistry(
       this->GetApplication(), this->DialogName);
-    if ( res == 1 )
+    if (res == 1) 
       {
       this->Done = 2;
       return 1;
       }
-    if ( res == -1 )
+    if (res == -1)
       {
       this->Done = 1;
       return 1;
       }
     }
   
-  if( this->Options & vtkKWMessageDialog::NoDefault ||
-           this->Options & vtkKWMessageDialog::CancelDefault )
+  if (this->Options & vtkKWMessageDialog::NoDefault ||
+      this->Options & vtkKWMessageDialog::CancelDefault)
     {
     this->CancelButton->Focus();
     } 
-  else if ( this->Options & vtkKWMessageDialog::YesDefault ||
-            this->Options & vtkKWMessageDialog::OkDefault )
+  else if (this->Options & vtkKWMessageDialog::YesDefault ||
+           this->Options & vtkKWMessageDialog::OkDefault)
     {
     this->OKButton->Focus();
     }
@@ -351,6 +354,7 @@ int vtkKWMessageDialog::PreInvoke()
     }
 
   this->SetResizable(0, 0);
+
   return this->Superclass::PreInvoke();
 }
 
@@ -358,22 +362,26 @@ int vtkKWMessageDialog::PreInvoke()
 void vtkKWMessageDialog::PostInvoke()
 {
   this->Superclass::PostInvoke();
+
   int res = this->Done -1;
 
-  if ( this->DialogName && this->GetRememberMessage() )
+  // Check if the user specified a default answer for this one, and store it
+  // in the registry
+
+  if (this->DialogName && this->GetRememberMessage())
     {
     int ires = res;
-    if ( this->Options & vtkKWMessageDialog::RememberYes )
+    if (this->Options & vtkKWMessageDialog::RememberYes)
       {
       ires = 1;
       }
-    else if ( this->Options & vtkKWMessageDialog::RememberNo )
+    else if (this->Options & vtkKWMessageDialog::RememberNo)
       {
       ires = -1;
       }
     else
       {
-      if ( !ires )
+      if (!ires)
         {
         ires = -1;
         }
@@ -381,13 +389,6 @@ void vtkKWMessageDialog::PostInvoke()
     this->SaveMessageDialogResponseToRegistry(
       this->GetApplication(), this->DialogName, ires);
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMessageDialog::Invoke()
-{
-  int res = this->Superclass::Invoke();
-  return res;
 }
 
 //----------------------------------------------------------------------------
