@@ -42,6 +42,7 @@ public:
   enum { 
     IconNoIcon                    = 0,
     IconConnection                = 1,
+    IconEmpty16x16                = 6,
     IconError                     = 2, 
     IconErrorMini                 = 3,
     IconErrorRedMini              = 4,

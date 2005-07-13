@@ -14,6 +14,18 @@ static const unsigned char image_connection[] =
 
 /* 
  * Resource generated for image:
+ *    empty_16x16.png (zlib, base64)
+ */
+static const unsigned int  image_empty_16x16_width         = 16;
+static const unsigned int  image_empty_16x16_height        = 16;
+static const unsigned int  image_empty_16x16_pixel_size    = 4;
+static const unsigned long image_empty_16x16_buffer_length = 28;
+
+static const unsigned char image_empty_16x16[] = 
+  "eNr7//8/w/9RPIpH8YjEAFrT/R8=";
+
+/* 
+ * Resource generated for image:
  *    error.png (zlib, base64)
  */
 static const unsigned int  image_error_width         = 32;

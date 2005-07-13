@@ -16,6 +16,7 @@ KWConvertImageToHeader --zlib --base64 \
 KWConvertImageToHeader --zlib --base64 \
     vtkKWIconResources.h \
     connection.png \
+    empty_16x16.png \
     error.png \
     error_mini.png \
     error_red_mini.png \
