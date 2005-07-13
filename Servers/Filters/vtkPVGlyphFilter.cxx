@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.20");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.21");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ int vtkPVGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   this->MaskPoints->SetOnRatio(numPts / maxNumPts);
 
   vtkInformation *maskPointsInfo =
-    this->MaskPoints->GetOutputPortInformation(0);
+    this->MaskPoints->GetExecutive()->GetOutputInformation(0);
   maskPointsInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
