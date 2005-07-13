@@ -38,7 +38,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.2");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -71,10 +71,10 @@ struct vtkSMComparativeVisProxyInternals
   vtkstd::vector<unsigned int> Indices;
 
   // The names of the sources are used only by the gui.
-  vtkstd::vector<string> SourceNames;
+  vtkstd::vector<vtkstd::string> SourceNames;
 
   // The tcl names of the sources are used only for saving scripts.
-  vtkstd::vector<string> SourceTclNames;
+  vtkstd::vector<vtkstd::string> SourceTclNames;
 };
 
 //*****************************************************************************
