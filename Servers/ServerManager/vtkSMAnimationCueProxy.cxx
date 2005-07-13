@@ -24,7 +24,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.10");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -277,18 +277,25 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file)
 {
   ostrstream proxyTclName;
 
-  proxyTclName << "$";
-  if (this->AnimatedProxy->GetNumberOfIDs() > 0)
+  if (this->AnimatedProxy)
     {
-    proxyTclName << "pvTemp" << this->AnimatedProxy->GetID(0);
+    proxyTclName << "$";
+    if (this->AnimatedProxy->GetNumberOfIDs() > 0)
+      {
+      proxyTclName << "pvTemp" << this->AnimatedProxy->GetID(0);
+      }
+    else
+      {
+      proxyTclName << this->AnimatedProxy->GetName();
+      }
+    proxyTclName << ends;
+    this->SaveInBatchScript(file, proxyTclName.str(), 1);
+    delete[] proxyTclName.str();
     }
   else
     {
-    proxyTclName << this->AnimatedProxy->GetName();
+    this->SaveInBatchScript(file, 0, 1);
     }
-  proxyTclName << ends;
-  this->SaveInBatchScript(file, proxyTclName.str(), 1);
-  delete[] proxyTclName.str();
 }
 
 //----------------------------------------------------------------------------
@@ -320,7 +327,7 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file,
   // NOTE: For this to work, it is required that the the AnimatedProxy
   // has been already saved in the batch script. We can ensure that by dumping
   // the animation batch out at the end of the batch script.
-  if (this->AnimatedProxy )
+  if (proxyTclName)
     {
     *file << "[$pvTemp" << id << " GetProperty AnimatedProxy]"
       << " RemoveAllProxies" << endl;
