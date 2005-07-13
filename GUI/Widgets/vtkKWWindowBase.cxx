@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.23");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.24");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -64,11 +64,15 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->ViewMenu              = NULL;
   this->WindowMenu            = NULL;
 
+  // Separator
+
+  this->MenuBarSeparatorFrame  = vtkKWFrame::New();
+
   // Toolbars
 
-  this->MainToolbarSet               = vtkKWToolbarSet::New();
+  this->MainToolbarSet        = vtkKWToolbarSet::New();
   this->ToolbarsVisibilityMenu = NULL; 
-  this->MenuBarSeparatorFrame  = vtkKWFrame::New();
+  this->StatusToolbar         = NULL;
 
   // Main Frame
 
@@ -81,17 +85,21 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->StatusLabel           = vtkKWLabel::New();
   this->StatusImage           = NULL;
 
-  this->ProgressFrame         = vtkKWFrame::New();
   this->ProgressGauge         = vtkKWProgressGauge::New();
+  this->ProgressGaugePosition = 
+    vtkKWWindowBase::ProgressGaugePositionStatusFrame;
 
   this->TrayFrame             = vtkKWFrame::New();
   this->TrayImageError        = vtkKWLabel::New();
+  this->TrayFramePosition = 
+    vtkKWWindowBase::TrayFramePositionStatusFrame;
 
   this->TclInteractor         = NULL;
 
   this->SupportHelp           = 0;
   this->SupportPrint          = 0;
   this->PromptBeforeClose     = 0;
+  this->StatusFrameVisibility   = 1;
 
   this->MostRecentFilesManager = vtkKWMostRecentFilesManager::New();
 
@@ -139,6 +147,12 @@ vtkKWWindowBase::~vtkKWWindowBase()
     this->MenuBarSeparatorFrame = NULL;
     }
 
+  if (this->StatusToolbar)
+    {
+    this->StatusToolbar->Delete();
+    this->StatusToolbar = NULL;
+    }
+
   if (this->MainFrame)
     {
     this->MainFrame->Delete();
@@ -167,12 +181,6 @@ vtkKWWindowBase::~vtkKWWindowBase()
     {
     this->StatusLabel->Delete();
     this->StatusLabel = NULL;
-    }
-
-  if (this->ProgressFrame)
-    {
-    this->ProgressFrame->Delete();
-    this->ProgressFrame = NULL;
     }
 
   if (this->ProgressGauge)
@@ -329,12 +337,9 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   this->MenuBarSeparatorFrame->SetReliefToSunken();
 #endif
 
-  this->Script("pack %s -side top -fill x -pady 2",
-               this->MenuBarSeparatorFrame->GetWidgetName());
-
   // Toolbars
 
-  this->MainToolbarSet->SetParent(this);  
+  this->MainToolbarSet->SetParent(this);
   this->MainToolbarSet->Create(app);
   this->MainToolbarSet->ShowTopSeparatorOff();
   this->MainToolbarSet->ShowBottomSeparatorOn();
@@ -344,38 +349,16 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   this->MainToolbarSet->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
-  this->Script(
-    "pack %s -padx 0 -pady 0 -side top -fill x -expand no -after %s",
-    this->MainToolbarSet->GetWidgetName(),
-    this->MenuBarSeparatorFrame->GetWidgetName());
-
   // Main frame
 
   this->MainFrame->SetParent(this);
   this->MainFrame->Create(app);
-
-  this->Script("pack %s -side top -fill both -expand t",
-               this->MainFrame->GetWidgetName());
-
-  // Restore Window Geometry
-
-  if (app->GetSaveUserInterfaceGeometry())
-    {
-    this->RestoreWindowGeometryFromRegistry();
-    }
-  else
-    {
-    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
-    }
 
   // Status frame
 
   this->StatusFrame->SetParent(this);
   this->StatusFrame->Create(app);
   
-  this->Script("pack %s -side bottom -fill x -pady 0",
-               this->StatusFrame->GetWidgetName());
-
   // Status frame separator
 
   this->StatusFrameSeparator->SetParent(this);
@@ -388,9 +371,6 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   this->StatusFrameSeparator->SetReliefToSunken();
 #endif
 
-  this->Script("pack %s -side bottom -fill x -pady 2",
-               this->StatusFrameSeparator->GetWidgetName());
-  
   // Status frame : image
 
   this->UpdateStatusImage();
@@ -404,53 +384,257 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   this->StatusLabel->SetPadX(3);
   this->StatusLabel->SetAnchorToWest();
 
-  this->Script("pack %s -side left -padx 1 -expand yes -fill both",
-               this->StatusLabel->GetWidgetName());
+  // Progress gauge
 
-  // Status frame : progress frame
-
-  this->ProgressFrame->SetParent(this->StatusFrame);
-  this->ProgressFrame->Create(app);
-  this->ProgressFrame->SetBorderWidth(1);
-  this->ProgressFrame->SetReliefToSunken();
-
-  this->Script("pack %s -side left -padx 0 -fill y", 
-               this->ProgressFrame->GetWidgetName());
-
-  // Status frame : progress frame : gauge
-  // Set the height to 0 so that it auto-expands to the right height
-
-  this->ProgressGauge->SetParent(this->ProgressFrame);
-  this->ProgressGauge->SetWidth(200);
+  this->ProgressGauge->SetParent(this); 
+  this->ProgressGauge->SetWidth(150);
   this->ProgressGauge->ExpandHeightOn();
   this->ProgressGauge->Create(app);
+  this->ProgressGauge->SetBorderWidth(1);
+  this->ProgressGauge->SetPadX(2);
+  this->ProgressGauge->SetPadY(2);
+  this->ProgressGauge->SetReliefToSunken();
 
-  this->Script("pack %s -side right -padx 2 -pady 2 -expand y -fill y",
-               this->ProgressGauge->GetWidgetName());
+  // Tray frame
 
-  // Status frame : tray frame
-
-  this->TrayFrame->SetParent(this->StatusFrame);
+  this->TrayFrame->SetParent(this);
   this->TrayFrame->Create(app);
   this->TrayFrame->SetBorderWidth(1);
   this->TrayFrame->SetReliefToSunken();
 
-  this->Script(
-    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both",
-    this->TrayFrame->GetWidgetName());
-
-  // Status frame : tray frame : error image
+  // Tray frame : error image
 
   this->TrayImageError->SetParent(this->TrayFrame);
   this->TrayImageError->Create(app);
+  this->TrayImageError->SetBorderWidth(1);
+  this->TrayImageError->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty16x16);
 
-  this->TrayImageError->SetImageToPredefinedIcon(vtkKWIcon::IconErrorRedMini);
-  
-  this->TrayImageError->AddBinding("<Button-1>", this, "ErrorIconCallback");
+  this->Script("pack %s -fill both -ipadx 2 -ipady 0 -pady 0", 
+               this->TrayImageError->GetWidgetName());
 
-  // Udpate the enable state
+  // Pack and restore geometry
+
+  this->Pack();
+
+  // Restore Window Geometry
+
+  if (app->GetSaveUserInterfaceGeometry())
+    {
+    this->RestoreWindowGeometryFromRegistry();
+    }
+  else
+    {
+    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
+    }
+
+  // Update the enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->UnpackChildren();
+
+  // Menubar separator
+  
+  if (this->MenuBarSeparatorFrame && this->MenuBarSeparatorFrame->IsCreated())
+    {
+    this->Script("pack %s -side top -fill x -pady 2",
+                 this->MenuBarSeparatorFrame->GetWidgetName());
+    }
+
+  // Toolbars
+
+  if (this->MainToolbarSet && this->MainToolbarSet->IsCreated())
+    {
+    vtksys_stl::string after;
+    if (this->MenuBarSeparatorFrame && 
+        this->MenuBarSeparatorFrame->IsCreated())
+      {
+      after = " -after ";
+      after += this->MenuBarSeparatorFrame->GetWidgetName();
+      }
+    this->Script(
+      "pack %s -padx 0 -pady 0 -side top -fill x -expand no %s",
+      this->MainToolbarSet->GetWidgetName(), after.c_str());
+    }
+
+  // Main frame
+
+  if (this->MainFrame && this->MainFrame->IsCreated())
+    {
+    this->Script("pack %s -side top -fill both -expand t",
+                 this->MainFrame->GetWidgetName());
+    }
+
+  // Status frame and status frame separator
+
+  if (this->StatusFrame && this->StatusFrame->IsCreated())
+    {
+    if (this->StatusFrameVisibility)
+      {
+      this->Script("pack %s -side bottom -fill x -pady 0",
+                   this->StatusFrame->GetWidgetName());
+
+      if (this->StatusFrameSeparator && 
+          this->StatusFrameSeparator->IsCreated())
+        {
+        this->Script("pack %s -side bottom -fill x -pady 2",
+                     this->StatusFrameSeparator->GetWidgetName());
+        }
+      }
+
+    this->StatusFrame->UnpackChildren();
+
+    // Status image (application logo)
+
+    if (this->StatusImage && this->StatusImage->IsCreated())
+      {
+      this->StatusImage->Script(
+        "pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
+        this->StatusImage->GetWidgetName());
+      }
+
+    // Status label (display status text)
+
+    if (this->StatusLabel && this->StatusLabel)
+      {
+      this->Script("pack %s -side left -padx 1 -expand yes -fill both",
+                   this->StatusLabel->GetWidgetName());
+      }
+
+    // Progress gauge
+
+    if (this->ProgressGauge && this->ProgressGauge->IsCreated() &&
+        this->ProgressGaugePosition == 
+        vtkKWWindowBase::ProgressGaugePositionStatusFrame)
+      {
+      this->Script("pack %s -side left -padx 0 -pady 0 -fill y -in %s", 
+                   this->ProgressGauge->GetWidgetName(),
+                   this->StatusFrame->GetWidgetName());
+      }
+
+    // Tray frame (error icon, etc.)
+
+    if (this->TrayFrame && this->TrayFrame->IsCreated() &&
+        this->TrayFramePosition == 
+        vtkKWWindowBase::TrayFramePositionStatusFrame)
+      {
+      this->Script(
+      "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both -in %s",
+        this->TrayFrame->GetWidgetName(), 
+        this->StatusFrame->GetWidgetName());
+      }
+    }
+
+  // Take care of placing the progress gauge and the tray frame in
+  // a toolbar, if this is how they have been set
+
+  if (this->GetMainToolbarSet())
+    {
+    int need_progress_in = 
+      (this->ProgressGauge && 
+       this->ProgressGauge->IsCreated() && 
+       (this->ProgressGaugePosition == 
+        vtkKWWindowBase::ProgressGaugePositionToolbar));
+
+    int need_tray_in = 
+      (this->TrayFrame && 
+       this->TrayFrame->IsCreated() && 
+       (this->TrayFramePosition == 
+        vtkKWWindowBase::TrayFramePositionToolbar));
+
+    // We need a toolbar for any of them (progress or tray)
+
+    if (need_progress_in || need_tray_in)
+      {
+      if (!this->StatusToolbar)
+        {
+        this->StatusToolbar = vtkKWToolbar::New();
+        this->StatusToolbar->SetName("Status");
+        }
+      if (!this->StatusToolbar->IsCreated() && this->IsCreated())
+        {
+        this->StatusToolbar->SetParent(
+          this->GetMainToolbarSet()->GetToolbarsFrame());
+        this->StatusToolbar->Create(this->GetApplication());
+        }
+      }
+
+    if (this->StatusToolbar)
+      {
+      // Add the progress, if not here already, or remove it if it is placed
+      // somewhere else (say, in the status frame)
+
+      int has_progress_in = 
+        this->StatusToolbar->HasWidget(this->ProgressGauge);
+      if (need_progress_in)
+        {
+        if (!has_progress_in)
+          {
+          this->StatusToolbar->AddWidget(this->ProgressGauge);
+          }
+        }
+      else
+        {
+        if (has_progress_in)
+          {
+          this->StatusToolbar->RemoveWidget(this->ProgressGauge);
+          }
+        }
+
+      // Add the tray frame, if not here already, or remove it if it is placed
+      // somewhere else (say, in the status frame)
+
+      int has_tray_in = 
+        this->StatusToolbar->HasWidget(this->TrayFrame);
+      if (need_tray_in)
+        {
+        if (!has_tray_in)
+          {
+          this->StatusToolbar->AddWidget(this->TrayFrame);
+          }
+        }
+      else
+        {
+        if (has_tray_in)
+          {
+          this->StatusToolbar->RemoveWidget(this->TrayFrame);
+          }
+        }
+
+      // Now do we really need that toolbar anymore ? If it is empty, just
+      // remove it, otherwise make sure it is added to the main toolbar set
+      // but anchored to the east side, so that it does not interfere
+      // too much with the regular ones
+
+      int has_toolbar = 
+        this->GetMainToolbarSet()->HasToolbar(this->StatusToolbar);
+      if (this->StatusToolbar->GetNumberOfWidgets())
+        {
+        if (!has_toolbar)
+          {
+          this->GetMainToolbarSet()->AddToolbar(this->StatusToolbar);
+          this->GetMainToolbarSet()->SetToolbarAnchorToEast(
+            this->StatusToolbar);
+          }
+        }
+      else
+        {
+        if (has_toolbar)
+          {
+          this->GetMainToolbarSet()->RemoveToolbar(this->StatusToolbar);
+          }
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -558,6 +742,19 @@ void vtkKWWindowBase::SetStatusText(const char *text)
 const char *vtkKWWindowBase::GetStatusText()
 {
   return this->StatusLabel->GetText();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::SetStatusFrameVisibility(int flag)
+{
+  if (this->StatusFrameVisibility == flag)
+    {
+    return;
+    }
+
+  this->StatusFrameVisibility = flag;
+  this->Modified();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -890,24 +1087,29 @@ void vtkKWWindowBase::SetErrorIcon(int s)
     return;
     }
 
-  if (s > vtkKWWindowBase::ErrorIconNone) 
+  switch (s)
     {
-    this->Script("pack %s -fill both -ipadx 4 -expand yes", 
-                 this->TrayImageError->GetWidgetName());
-    if (s == vtkKWWindowBase::ErrorIconRed)
-      {
+    case vtkKWWindowBase::ErrorIconRed:
       this->TrayImageError->SetImageToPredefinedIcon(
         vtkKWIcon::IconErrorRedMini);
-      }
-    else if (s == vtkKWWindowBase::ErrorIconBlack)
-      {
+      break;
+    case vtkKWWindowBase::ErrorIconBlack:
       this->TrayImageError->SetImageToPredefinedIcon(
         vtkKWIcon::IconErrorMini);
-      }
+      break;
+    default:
+      this->TrayImageError->SetImageToPredefinedIcon(
+        vtkKWIcon::IconEmpty16x16);
+      break;
+    }
+
+  if (s == vtkKWWindowBase::ErrorIconNone)
+    {
+    this->TrayImageError->RemoveBinding("<Button-1>");
     }
   else
     {
-    this->Script("pack forget %s", this->TrayImageError->GetWidgetName());
+    this->TrayImageError->AddBinding("<Button-1>", this, "ErrorIconCallback");
     }
 }
 
@@ -965,6 +1167,48 @@ void vtkKWWindowBase::DisplayTclInteractor()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindowBase::SetProgressGaugePosition(int s)
+{
+  if (s < vtkKWWindowBase::ProgressGaugePositionStatusFrame)
+    {
+    s = vtkKWWindowBase::ProgressGaugePositionStatusFrame;
+    }
+  else if (s > vtkKWWindowBase::ProgressGaugePositionToolbar) 
+    {
+    s = vtkKWWindowBase::ProgressGaugePositionToolbar;
+    }
+  if (s == this->ProgressGaugePosition)
+    {
+    return;
+    }
+
+  this->ProgressGaugePosition = s;
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::SetTrayFramePosition(int s)
+{
+  if (s < vtkKWWindowBase::TrayFramePositionStatusFrame)
+    {
+    s = vtkKWWindowBase::TrayFramePositionStatusFrame;
+    }
+  else if (s > vtkKWWindowBase::TrayFramePositionToolbar) 
+    {
+    s = vtkKWWindowBase::TrayFramePositionToolbar;
+    }
+  if (s == this->TrayFramePosition)
+    {
+    return;
+    }
+
+  this->TrayFramePosition = s;
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 vtkKWLabel* vtkKWWindowBase::GetStatusImage()
 {
   if (!this->StatusImage)
@@ -979,15 +1223,6 @@ vtkKWLabel* vtkKWWindowBase::GetStatusImage()
     this->StatusImage->Create(this->StatusFrame->GetApplication());
     this->StatusImage->SetBorderWidth(1);
     this->StatusImage->SetReliefToSunken();
-    vtksys_stl::string before;
-    if (this->StatusLabel && this->StatusLabel->IsCreated())
-      {
-      before = " -before ";
-      before += this->StatusLabel->GetWidgetName();
-      }
-    this->StatusImage->Script(
-      "pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y %s", 
-      this->StatusImage->GetWidgetName(), before.c_str());
     }
 
   return this->StatusImage;
@@ -1119,6 +1354,7 @@ void vtkKWWindowBase::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "MainToolbarSet: " << this->GetMainToolbarSet() << endl;
+  os << indent << "StatusFrameVisibility: " << (this->StatusFrameVisibility ? "On" : "Off") << endl;
 }
 
 

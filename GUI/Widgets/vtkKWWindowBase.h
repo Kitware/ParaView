@@ -29,6 +29,7 @@ class vtkKWProgressGauge;
 class vtkKWTclInteractor;
 class vtkKWToolbarSet;
 class vtkKWMostRecentFilesManager;
+class vtkKWToolbar;
 
 class KWWIDGETS_EXPORT vtkKWWindowBase : public vtkKWTopLevel
 {
@@ -89,6 +90,9 @@ public:
 
   // Description:
   // Show or hide the error / warning icon in the tray.
+  // Note that if StatusFrameVisibility is Off, you may want to move the
+  // tray frame to a different position (say, in a toolbar), using
+  // the SetTrayFramePosition() method.
   //BTX
   enum 
   {
@@ -128,9 +132,66 @@ public:
   vtkGetObjectMacro(StatusFrame, vtkKWFrame);
 
   // Description:
+  // Set/Get the visibility of the status frame. If set to Off, the status
+  // text, as set by SetStatusText(), will not be displayed anymore. Neither
+  // will the progress gauge, the application icon, the tray frame and status
+  // icons. Both the progress gauge and tray frame position can be changed 
+  // independently though (see SetProgressGaugePosition and 
+  // SetTrayFramePosition).
+  virtual void SetStatusFrameVisibility(int flag);
+  vtkGetMacro(StatusFrameVisibility, int);
+  vtkBooleanMacro(StatusFrameVisibility, int);  
+
+  // Description:
   // Get the progress gauge widget.  The progress gauge is displayed
   // in the Status frame on the bottom right corner of the window.
   vtkGetObjectMacro(ProgressGauge, vtkKWProgressGauge);
+
+  // Description:
+  // Set the progress gauge position. The default position is in the
+  // status frame, but this object can also be displayed in a toolbar, on
+  // top of the window. This is useful when StatusFrameVisibility is set
+  // to Off.
+  //BTX
+  enum 
+  {
+    ProgressGaugePositionStatusFrame = 0,
+    ProgressGaugePositionToolbar
+  };
+  //ETX
+  virtual void SetProgressGaugePosition(int);
+  virtual void SetProgressGaugePositionToStatusFrame()
+    { this->SetProgressGaugePosition(
+      vtkKWWindowBase::ProgressGaugePositionStatusFrame); };
+  virtual void SetProgressGaugePositionToToolbar()
+    { this->SetProgressGaugePosition(
+      vtkKWWindowBase::ProgressGaugePositionToolbar); };
+
+  // Description:
+  // Get the tray frame object. A default status icon is already packed
+  // in this frame and modified by SetErrorIcon, but other icons can
+  // probably fit there.
+  vtkGetObjectMacro(TrayFrame, vtkKWFrame);
+
+  // Description:
+  // Set the tray frame position. The default position is in the
+  // status frame, but this object can also be displayed in a toolbar, on
+  // top of the window. This is useful when StatusFrameVisibility is set
+  // to Off.
+  //BTX
+  enum 
+  {
+    TrayFramePositionStatusFrame = 0,
+    TrayFramePositionToolbar
+  };
+  //ETX
+  virtual void SetTrayFramePosition(int);
+  virtual void SetTrayFramePositionToStatusFrame()
+    { this->SetTrayFramePosition(
+      vtkKWWindowBase::TrayFramePositionStatusFrame); };
+  virtual void SetTrayFramePositionToToolbar()
+    { this->SetTrayFramePosition(
+      vtkKWWindowBase::TrayFramePositionToolbar); };
 
   // Description:
   // Get the menu objects. This will allocate and create them on the fly.
@@ -284,8 +345,11 @@ protected:
   virtual void SaveWindowGeometryToRegistry();
   virtual void RestoreWindowGeometryFromRegistry();
 
-  vtkKWFrame *MenuBarSeparatorFrame;
+  // Description:
+  // Pack/repack the UI
+  virtual void Pack();
 
+  vtkKWFrame *MenuBarSeparatorFrame;
   vtkKWFrame *MainFrame;
 
   vtkKWFrame *StatusFrameSeparator;
@@ -293,19 +357,22 @@ protected:
   vtkKWLabel *StatusImage;
   vtkKWLabel *StatusLabel;
 
-  vtkKWFrame         *ProgressFrame;
   vtkKWProgressGauge *ProgressGauge;
+  int                ProgressGaugePosition;
 
   vtkKWFrame      *TrayFrame;
   vtkKWLabel      *TrayImageError;
+  int             TrayFramePosition;
 
   vtkKWToolbarSet *MainToolbarSet;
+  vtkKWToolbar    *StatusToolbar;
 
-  char  *ScriptExtension;
-  char  *ScriptType;
-  int   SupportHelp;
-  int   SupportPrint;
-  int   PromptBeforeClose;
+  char *ScriptExtension;
+  char *ScriptType;
+  int  SupportHelp;
+  int  SupportPrint;
+  int  PromptBeforeClose;
+  int  StatusFrameVisibility;
 
   // Allocated and created when queried
 
