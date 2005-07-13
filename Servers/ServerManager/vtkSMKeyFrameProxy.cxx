@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.6");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -99,24 +99,20 @@ void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
     << " [$proxyManager NewProxy " 
     << this->GetXMLGroup() <<" "
     << this->GetXMLName() << "]" << endl;
-  *file << "  $proxyManager RegisterProxy "
-    << this->GetXMLName()
-    <<" pvTemp" << id << " $pvTemp" << id << endl;
-  *file << "  $pvTemp" << id << " UnRegister {}" << endl;
 
   vtkSMKeyFrameProxyInternals::VectorOfDoubles::iterator iter = 
     this->Internals->KeyValues.begin();
   int i = 0;
   for (; iter != this->Internals->KeyValues.end(); ++iter)
     {
-    *file << "  [$pvTemp" << id << " GetProperty KeyValues]"
+    *file << "[$pvTemp" << id << " GetProperty KeyValues]"
       << " SetElement " << i << " " << (*iter) << endl;
     i++;
     }
 
-  *file << "  [$pvTemp" << id << " GetProperty KeyTime]"
+  *file << "[$pvTemp" << id << " GetProperty KeyTime]"
     << " SetElements1 " << this->KeyTime << endl;
-  *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+  *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------
