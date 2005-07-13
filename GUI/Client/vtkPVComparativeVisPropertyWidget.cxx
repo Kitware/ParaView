@@ -25,22 +25,29 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
-#include "vtkPVComparativeVis.h"
 #include "vtkPVKeyFrame.h"
 #include "vtkPVSimpleAnimationCue.h"
 #include "vtkPVSource.h"
 #include "vtkPVTrackEditor.h"
 #include "vtkPVWindow.h"
 #include "vtkSMAnimationCueProxy.h"
+#include "vtkSMComparativeVisProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.8");
+
+vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
 //----------------------------------------------------------------------------
 vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
 {
   this->TrackSelector = vtkPVActiveTrackSelector::New();
+  this->TrackSelector->SetDisplayOnlyPVSourceProperties(1);
+
   this->NumberOfFramesEntry = vtkKWEntryWithLabel::New();
 
   // Forward the WidgetModifiedEvent the track editor signals.
@@ -49,8 +56,9 @@ vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
   this->TrackSelector->AddObserver(vtkCommand::WidgetModifiedEvent, ef);
   ef->Delete();
 
-  this->LastCueEditor = 0;
+  this->CueEditor = 0;
   this->LastCue = 0;
+  this->TrackEditor = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -58,10 +66,11 @@ vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 {
   this->TrackSelector->Delete();
   this->NumberOfFramesEntry->Delete();
-  if (this->LastCueEditor)
+  if (this->CueEditor)
     {
-    this->LastCueEditor->Delete();
+    this->CueEditor->Delete();
     }
+  this->SetTrackEditor(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -76,7 +85,6 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
     }
 
   // Call the superclass to create the whole widget
-
   this->Superclass::Create(app);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
@@ -86,7 +94,7 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
   this->TrackSelector->SetParent(this);
   this->TrackSelector->SetPackHorizontally(1);
   this->TrackSelector->Create(app);
-  this->TrackSelector->ShallowCopy(pvAM->GetActiveTrackSelector());
+  this->TrackSelector->ShallowCopy(pvAM->GetActiveTrackSelector(), 1);
   this->TrackSelector->SetFocusCurrentCue(0);
   this->TrackSelector->GetSourceMenuButton()->SetWidth(15);
   this->TrackSelector->GetPropertyMenuButton()->SetWidth(20);
@@ -99,6 +107,11 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
   this->NumberOfFramesEntry->SetLabelText("Number of Frames:");;
   this->Script("pack %s -side left", 
                this->NumberOfFramesEntry->GetWidgetName());
+
+  this->CueEditor = vtkPVSimpleAnimationCue::New();
+  this->CueEditor->SetDuration(4);
+  this->CueEditor->SetKeyFrameParent(this->TrackEditor->GetPropertiesFrame());
+  this->CueEditor->Create(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------
@@ -112,9 +125,9 @@ void vtkPVComparativeVisPropertyWidget::RemovePVSource(vtkPVSource* source)
 
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
-  vtkPVComparativeVis* cv)
+  vtkSMComparativeVisProxy* cv)
 {
-  if (this->LastCueEditor && this->LastCue)
+  if (this->CueEditor && this->LastCue)
     {
     int numFrames = 1;
     int value = this->NumberOfFramesEntry->GetWidget()->GetValueAsInt();
@@ -122,9 +135,9 @@ void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
       {
       numFrames = value;
       }
-    this->LastCueEditor->SetDuration(numFrames-1);
-    int numKeyFrames = this->LastCueEditor->GetNumberOfKeyFrames();
-    vtkPVKeyFrame* keyFrame = this->LastCueEditor->GetKeyFrame(
+    this->CueEditor->SetDuration(numFrames-1);
+    int numKeyFrames = this->CueEditor->GetNumberOfKeyFrames();
+    vtkPVKeyFrame* keyFrame = this->CueEditor->GetKeyFrame(
       numKeyFrames-1);
     if (keyFrame)
       {
@@ -132,41 +145,70 @@ void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
       // We have to set the normalized time.
       keyFrame->SetKeyTime(1.0);
       }
-    
-    cv->AddProperty(
-      this->LastCue, this->LastCueEditor, numFrames);  
+ 
+    vtkSMProxyProperty::SafeDownCast(
+      cv->GetProperty("Cues"))->AddProxy(
+        this->CueEditor->GetCueProxy());
+
+    vtkSMIntVectorProperty* numProps = vtkSMIntVectorProperty::SafeDownCast(
+      cv->GetProperty("NumberOfFramesInCue"));
+    numProps->SetElement(numProps->GetNumberOfElements(), numFrames);
+
+    vtkSMStringVectorProperty* sourceNames = 
+      vtkSMStringVectorProperty::SafeDownCast(cv->GetProperty("SourceNames"));
+    vtkPVSource* source = this->LastCue->GetPVSource();
+    if (source)
+      {
+      sourceNames->SetElement(sourceNames->GetNumberOfElements(), 
+                              source->GetName());
+      }
+    else
+      {
+      sourceNames->SetElement(sourceNames->GetNumberOfElements(), 0);
+      }
+
+    vtkSMStringVectorProperty* sourceTclNames = 
+      vtkSMStringVectorProperty::SafeDownCast(cv->GetProperty("SourceTclNames"));
+    if (source)
+      {
+      sourceTclNames->SetElement(sourceTclNames->GetNumberOfElements(), 
+                                 source->GetTclName());
+      }
+    else
+      {
+      sourceTclNames->SetElement(sourceTclNames->GetNumberOfElements(), 0);
+      }
+    cv->UpdateVTKObjects();
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisPropertyWidget::CopyFromVisualization(
-  vtkPVAnimationCue* acue, vtkPVSimpleAnimationCue* cue, unsigned int numValues)
+  unsigned int propIdx, vtkSMComparativeVisProxy* proxy)
+
 {
-  if (this->TrackSelector->SelectCue(acue))
+  if (this->TrackSelector->SelectCue(proxy->GetSourceName(propIdx), 
+                                     vtkSMAnimationCueProxy::SafeDownCast(
+                                       proxy->GetCue(propIdx))))
     {
-    this->LastCue = acue;
+    this->LastCue = this->TrackSelector->GetCurrentCue();
     }
   else
     {
     this->LastCue = 0;
     }
-  this->NumberOfFramesEntry->GetWidget()->SetValue(static_cast<int>(numValues));
+  this->NumberOfFramesEntry->GetWidget()->SetValue(
+    static_cast<int>(proxy->GetNumberOfFramesInCue(propIdx)));
 
-  if (cue == this->LastCueEditor)
-    {
-    return;
-    }
-  if (this->LastCueEditor)
-    {
-    this->LastCueEditor->Delete();
-    this->LastCueEditor = 0;
-    }
-  this->LastCueEditor = cue;
-  cue->Register(this);
+  this->CueEditor->SetCueProxy(vtkSMAnimationCueProxy::SafeDownCast(
+                                 proxy->GetCue(propIdx)));
+
+  this->TrackEditor->SetAnimationCue(0);
+  this->TrackEditor->SetAnimationCue(this->CueEditor);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
+void vtkPVComparativeVisPropertyWidget::ShowCueEditor()
 {
   vtkPVAnimationCue* selectedCue = this->TrackSelector->GetCurrentCue();
   if (selectedCue)
@@ -175,37 +217,31 @@ void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
     // the one in the ParaView animation track list. Therefore, we also
     // make a copy and use that in the comparative vis. This is so because
     // we do not want to modify a cue in the ParaView animation editor.
-    if (this->LastCue != selectedCue || !this->LastCueEditor)
+    if (this->LastCue != selectedCue)
       {
-      if (this->LastCueEditor)
-        {
-        this->LastCueEditor->Delete();
-        this->LastCueEditor = 0;
-        }
       this->LastCue = selectedCue;
-      this->LastCueEditor = vtkPVSimpleAnimationCue::New();
-      this->LastCueEditor->SetDuration(4);
-      this->LastCueEditor->SetKeyFrameParent(trackE->GetPropertiesFrame());
-      this->LastCueEditor->Create(this->GetApplication());
 
-      this->LastCueEditor->SetAnimatedProxy(
+      this->CueEditor->RemoveAllKeyFrames();
+
+      this->CueEditor->SetAnimatedProxy(
         this->LastCue->GetAnimatedProxy());
-      this->LastCueEditor->SetAnimatedPropertyName(
+      this->CueEditor->SetAnimatedPropertyName(
         this->LastCue->GetAnimatedPropertyName());
-      this->LastCueEditor->SetAnimatedDomainName(
+      this->CueEditor->SetAnimatedDomainName(
         this->LastCue->GetAnimatedDomainName());
-      this->LastCueEditor->SetAnimatedElement(
+      this->CueEditor->SetAnimatedElement(
         this->LastCue->GetAnimatedElement());
 
       // Create 2 default keyframes.
-      this->LastCueEditor->AppendNewKeyFrame();      
+      this->CueEditor->AppendNewKeyFrame();      
       }
-    trackE->SetAnimationCue(this->LastCueEditor);
-    trackE->GetTitleLabel()->SetText(selectedCue->GetTextRepresentation());
+    this->TrackEditor->SetAnimationCue(this->CueEditor);
+    this->TrackEditor->GetTitleLabel()->SetText(
+      selectedCue->GetTextRepresentation());
     }
   else
     {
-    trackE->SetAnimationCue(0);
+    this->TrackEditor->SetAnimationCue(0);
     }
 }
 
@@ -213,5 +249,15 @@ void vtkPVComparativeVisPropertyWidget::ShowCueEditor(vtkPVTrackEditor* trackE)
 void vtkPVComparativeVisPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "TrackEditor: ";
+  if (this->TrackEditor)
+    {
+    this->TrackEditor->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 

@@ -27,10 +27,10 @@ class vtkKWFrame;
 class vtkKWFrameWithLabel;
 class vtkKWListBox;
 class vtkKWPushButton;
-class vtkPVComparativeVis;
 class vtkPVComparativeVisDialog;
 class vtkPVComparativeVisManager;
 class vtkPVComparativeVisProgressDialog;
+class vtkSMComparativeVisProxy;
 
 class VTK_EXPORT vtkPVComparativeVisManagerGUI : public vtkKWTopLevel
 {
@@ -73,7 +73,7 @@ public:
 
   // Description:
   // Returns the comparative manager object. This is the actual
-  // object that manager the comparative visualizations.
+  // object that manages the comparative visualizations.
   vtkGetObjectMacro(Manager, vtkPVComparativeVisManager);
 
   // Description:
@@ -83,6 +83,11 @@ public:
   // Description:
   // Called by the list box when a visualization is selected.
   void ItemSelected();
+
+  // Description:
+  // Saves the state of comparative visualizations to file as
+  // as Tcl script.
+  virtual void SaveState(ofstream *file);
 
 protected:
   vtkPVComparativeVisManagerGUI();
@@ -117,7 +122,7 @@ protected:
 
   void UpdateProgress(double prog);
 
-  vtkPVComparativeVis* VisBeingGenerated;
+  vtkSMComparativeVisProxy* VisBeingGenerated;
 
 //BTX
   friend class vtkCVProgressObserver;

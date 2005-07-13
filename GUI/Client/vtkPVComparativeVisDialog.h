@@ -28,9 +28,9 @@ class vtkKWEntryWithLabel;
 class vtkKWFrame;
 class vtkKWFrameWithLabel;
 class vtkKWPushButton;
-class vtkPVComparativeVis;
 class vtkPVComparativeVisPropertyWidget;
 class vtkPVTrackEditor;
+class vtkSMComparativeVisProxy;
 //BTX
 struct vtkPVComparativeVisDialogInternals;
 //ETX
@@ -49,11 +49,11 @@ public:
   // Description:
   // Copy the values of the dialog to the given vis. Call after and if Invoke()
   // returns true.
-  void CopyToVisualization(vtkPVComparativeVis* cv);
+  void CopyToVisualization(vtkSMComparativeVisProxy* cv); 
 
   // Description:
   // Copy the values of the given vis to the dialog. Call after Create().
-  void CopyFromVisualization(vtkPVComparativeVis* cv);
+  void CopyFromVisualization(vtkSMComparativeVisProxy* cv);
 
   // Description:
   // The default case is two (unselected) properties with 5 values.

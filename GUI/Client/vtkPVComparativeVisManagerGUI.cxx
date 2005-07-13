@@ -21,15 +21,18 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
-#include "vtkPVComparativeVis.h"
 #include "vtkPVComparativeVisDialog.h"
 #include "vtkPVComparativeVisManager.h"
 #include "vtkPVComparativeVisProgressDialog.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
+#include "vtkSMComparativeVisProxy.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.9");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.10");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -155,7 +158,8 @@ void vtkPVComparativeVisManagerGUI::Create(vtkKWApplication *app)
   this->CreateButton->SetWidth(7);
   this->CreateButton->SetCommand(this, "AddVisualization");
   this->CreateButton->SetText("Create");
-  this->Script("pack %s -side left -padx 2", this->CreateButton->GetWidgetName());
+  this->Script("pack %s -side left -padx 2", 
+               this->CreateButton->GetWidgetName());
 
   this->DeleteButton->SetParent(this->CommandFrame);
   this->DeleteButton->SetBalloonHelpString("Delete a visualization");
@@ -247,10 +251,13 @@ void vtkPVComparativeVisManagerGUI::AddVisualization()
 
   if (this->EditDialog->Invoke()) 
     {
-    vtkPVComparativeVis* vis = vtkPVComparativeVis::New();
-    this->EditDialog->CopyToVisualization(vis);
+    vtkSMProxy* vis = vtkSMObject::GetProxyManager()->NewProxy(
+      "ComparativeVisHelpers","ComparativeVis");
+    this->EditDialog->CopyToVisualization(
+      static_cast<vtkSMComparativeVisProxy*>(vis));
  
-    this->Manager->AddVisualization(vis);
+    this->Manager->AddVisualization(
+      static_cast<vtkSMComparativeVisProxy*>(vis));
     if (vis->GetName() && vis->GetName()[0] != '\0')
       {
       this->Manager->SetSelectedVisualizationName(vis->GetName());
@@ -267,7 +274,7 @@ void vtkPVComparativeVisManagerGUI::EditVisualization()
   const char* cur = this->ComparativeVisList->GetSelection();
   if (cur)
     {
-    vtkPVComparativeVis* vis = this->Manager->GetVisualization(cur);
+    vtkSMComparativeVisProxy* vis = this->Manager->GetVisualization(cur);
     if (vis)
       {
       this->EditDialog->CopyFromVisualization(vis);
@@ -290,7 +297,8 @@ void vtkPVComparativeVisManagerGUI::DeleteVisualization()
 {
   if (this->ComparativeVisList->GetSelection())
     {
-    this->Manager->RemoveVisualization(this->ComparativeVisList->GetSelection());
+    this->Manager->RemoveVisualization(
+      this->ComparativeVisList->GetSelection());
     if (!this->Manager->GetCurrentlyDisplayedVisualization())
       {
       this->InShow = 0;
@@ -305,7 +313,7 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
   const char* cur = this->ComparativeVisList->GetSelection();
   if (cur)
     {
-    vtkPVComparativeVis* vis = this->Manager->GetVisualization(cur);
+    vtkSMComparativeVisProxy* vis = this->Manager->GetVisualization(cur);
     if (vis)
       {
       if (!vis->GetIsGenerated())
@@ -336,7 +344,9 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
         }
       else
         {
-        vis->Initialize();
+        vis->RemoveAllCache();
+        vtkPVApplication::SafeDownCast(
+          this->GetApplication())->GetMainView()->ForceRender();
         }
       this->ProgressDialog->SetAbortFlag(0);
       this->Update();
@@ -362,7 +372,7 @@ void vtkPVComparativeVisManagerGUI::Update()
   unsigned int numVis = this->Manager->GetNumberOfVisualizations();
   for (unsigned int i=0; i<numVis; i++)
     {
-    vtkPVComparativeVis* vis = this->Manager->GetVisualization(i);
+    vtkSMComparativeVisProxy* vis = this->Manager->GetVisualization(i);
     const char* name = vis->GetName();
     if (name && name[0] != '\0')
       {
@@ -437,6 +447,25 @@ void vtkPVComparativeVisManagerGUI::UpdateEnableState()
       this->EditButton->SetEnabled(0);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisManagerGUI::SaveState(ofstream *file)
+{
+  *file << endl;
+  *file << "# Comparative visualizations" << endl;
+
+  vtkPVApplication* app = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
+  vtkPVWindow* mainWin = app->GetMainWindow();
+  *file << "set kw(" << this->GetTclName() << ") [$kw(" 
+        << mainWin->GetTclName() << ") GetComparativeVisManagerGUI]"
+        << endl;
+  *file << "set kw(" << this->Manager->GetTclName() << ") [$kw("
+        << this->GetTclName() << ") GetManager]" << endl;
+  this->Manager->SaveState(file);
+ 
+  *file << "$kw(" << this->GetTclName() << ") Update" << endl;
 }
 
 //----------------------------------------------------------------------------

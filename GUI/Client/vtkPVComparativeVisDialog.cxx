@@ -28,18 +28,21 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkPVApplication.h"
-#include "vtkPVComparativeVis.h"
 #include "vtkPVComparativeVisPropertyWidget.h"
 #include "vtkPVSource.h"
 #include "vtkPVTrackEditor.h"
 #include "vtkPVWindow.h"
+#include "vtkSMComparativeVisProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/vector>
 #include "vtkSmartPointer.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.9");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -58,10 +61,13 @@ struct vtkPVComparativeVisDialogInternals
       WidgetsType;
   WidgetsType Widgets;
 
-  // Radio buttongs
+  // Radio buttons
   typedef vtkstd::vector<vtkSmartPointer<vtkKWRadioButton> > 
       RadioButtonsType;
   RadioButtonsType RadioButtons;
+
+  typedef vtkstd::vector<vtkSmartPointer<vtkCommand> > ObserversType;
+  ObserversType Observers;
 };
 
 class vtkPVCVCueSelectionCommand : public vtkCommand
@@ -115,6 +121,19 @@ vtkPVComparativeVisDialog::vtkPVComparativeVisDialog()
 //-----------------------------------------------------------------------------
 vtkPVComparativeVisDialog::~vtkPVComparativeVisDialog()
 {
+  vtkPVWindow* window = vtkPVApplication::SafeDownCast(
+    this->GetApplication())->GetMainWindow();
+
+  if (window)
+    {
+    vtkPVComparativeVisDialogInternals::ObserversType::iterator iter =
+      this->Internal->Observers.begin();
+    for(; iter !=  this->Internal->Observers.end(); iter++)
+      {
+      window->RemoveObserver(*iter);
+      }
+    }
+
   delete this->Internal;
 
   this->TrackEditor->Delete();
@@ -133,7 +152,7 @@ void vtkPVComparativeVisDialog::CueSelected(unsigned int i)
     }
   if (this->Internal->Widgets[i])
     {
-    this->Internal->Widgets[i]->ShowCueEditor(this->TrackEditor);
+    this->Internal->Widgets[i]->ShowCueEditor();
     }
 }
 
@@ -141,7 +160,7 @@ void vtkPVComparativeVisDialog::CueSelected(unsigned int i)
 void vtkPVComparativeVisDialog::CueSelected(
   vtkPVComparativeVisPropertyWidget* wid)
 {
-  wid->ShowCueEditor(this->TrackEditor);
+  wid->ShowCueEditor();
   unsigned int numWids = this->Internal->Widgets.size();
   for (unsigned int i=0; i<numWids; i++)
     {
@@ -178,6 +197,8 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
     vtkPVComparativeVisPropertyWidget::New();
   this->Internal->Widgets.push_back(w1);
 
+  w1->SetTrackEditor(this->TrackEditor);
+
   vtkPVCVCueSelectionCommand* command = new vtkPVCVCueSelectionCommand;
   command->Dialog = this;
   w1->AddObserver(vtkCommand::WidgetModifiedEvent, command);
@@ -188,6 +209,7 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   vtkPVWindow* window = vtkPVApplication::SafeDownCast(
     this->GetApplication())->GetMainWindow();
   window->AddObserver(vtkKWEvent::SourceDeletedEvent, dcommand);
+  this->Internal->Observers.push_back(dcommand);
   dcommand->Delete();
 
   w1->SetParent(f1);
@@ -221,7 +243,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
   this->NewPropertyWidget();
   
   vtkPVComparativeVisPropertyWidget* wid = this->Internal->Widgets[0];
-  wid->ShowCueEditor(this->TrackEditor);
+  wid->ShowCueEditor();
 
   // Choose the first widget by default
   this->CueSelected(static_cast<unsigned int>(0));
@@ -276,14 +298,26 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisDialog::CopyToVisualization(vtkPVComparativeVis* cv)
+void vtkPVComparativeVisDialog::CopyToVisualization(
+  vtkSMComparativeVisProxy* cv)
 {
   if(!cv)
     {
     return;
     }
 
-  cv->RemoveAllProperties();
+  cv->RemoveAllCache();
+  cv->RemoveAllCues();
+  vtkSMProxyProperty::SafeDownCast(
+    cv->GetProperty("Cues"))->RemoveAllProxies();
+  vtkSMIntVectorProperty::SafeDownCast(
+    cv->GetProperty("NumberOfFramesInCue"))->SetNumberOfElements(0);
+  vtkSMStringVectorProperty::SafeDownCast(
+    cv->GetProperty("SourceNames"))->SetNumberOfElements(0);
+  vtkSMStringVectorProperty::SafeDownCast(
+    cv->GetProperty("SourceTclNames"))->SetNumberOfElements(0);
+  cv->UpdateVTKObjects();
+
   vtkPVComparativeVisDialogInternals::WidgetsType::iterator iter =
     this->Internal->Widgets.begin();
   for (; iter != this->Internal->Widgets.end(); iter++)
@@ -295,7 +329,8 @@ void vtkPVComparativeVisDialog::CopyToVisualization(vtkPVComparativeVis* cv)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisDialog::CopyFromVisualization(vtkPVComparativeVis* cv)
+void vtkPVComparativeVisDialog::CopyFromVisualization(
+  vtkSMComparativeVisProxy* cv)
 {
   if (!cv)
     {
@@ -307,14 +342,12 @@ void vtkPVComparativeVisDialog::CopyFromVisualization(vtkPVComparativeVis* cv)
   this->Internal->RadioButtons.clear();
   this->Internal->PropertyFrames.clear();
 
-  unsigned int numCues = cv->GetNumberOfProperties();
+  unsigned int numCues = cv->GetNumberOfCues();
   for (unsigned int i=0; i<numCues; i++)
     {
     this->NewPropertyWidget();
     vtkPVComparativeVisPropertyWidget* wid = this->Internal->Widgets[i];
-    wid->CopyFromVisualization(cv->GetAnimationCue(i), 
-                               cv->GetCue(i), 
-                               cv->GetNumberOfPropertyValues(i));
+    wid->CopyFromVisualization(i ,cv);
     }
 
   // We want at least 2 property widgets

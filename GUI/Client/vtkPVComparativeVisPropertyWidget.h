@@ -18,7 +18,7 @@
 // for choosing the property and an entry to enter the number of
 // parameter values.
 // .SECTION See Also
-// vtkPVComparativeVis
+// vtkSMComparativeVisProxy
 
 #ifndef __vtkPVComparativeVisPropertyWidget_h
 #define __vtkPVComparativeVisPropertyWidget_h
@@ -28,11 +28,11 @@
 class vtkKWEntryWithLabel;
 class vtkPVActiveTrackSelector;
 class vtkPVAnimationCue;
-class vtkPVComparativeVis;
 class vtkPVSimpleAnimationCue;
 class vtkPVSource;
 class vtkPVTrackEditor;
 class vtkSMProxy;
+class vtkSMComparativeVisProxy;
 
 class VTK_EXPORT vtkPVComparativeVisPropertyWidget : public vtkKWCompositeWidget
 {
@@ -47,28 +47,32 @@ public:
 
   // Description:
   // Copy the values of the widget to the given vis.
-  void CopyToVisualization(vtkPVComparativeVis* cv);
+  void CopyToVisualization(vtkSMComparativeVisProxy* cv);
 
   // Description:
   // Copy the values of the given vis to the widget.
-  void CopyFromVisualization(vtkPVAnimationCue* acue, 
-                             vtkPVSimpleAnimationCue* cue,
-                             unsigned int numValues);
+  void CopyFromVisualization(
+    unsigned int propIdx, vtkSMComparativeVisProxy* proxy);
 
   // Description:
   // Show the cue editor for the currently selected property in
-  // the given frame. This will create a new vtkPVSimpleAnimationCue
-  // if necessary.
-  void ShowCueEditor(vtkPVTrackEditor* ed);
+  // the given frame.
+  void ShowCueEditor();
+
+  // Description:
+  // Set/Get the track editor. Should be set before Create().
+  void SetTrackEditor(vtkPVTrackEditor* ed);
+  vtkGetObjectMacro(TrackEditor, vtkPVTrackEditor);
 
 protected:
   vtkPVComparativeVisPropertyWidget();
   ~vtkPVComparativeVisPropertyWidget();
 
   vtkPVActiveTrackSelector* TrackSelector;
-  vtkPVSimpleAnimationCue* LastCueEditor;
+  vtkPVSimpleAnimationCue* CueEditor;
   vtkPVAnimationCue* LastCue;
   vtkKWEntryWithLabel* NumberOfFramesEntry;
+  vtkPVTrackEditor* TrackEditor;
 
   void RemovePVSource(vtkPVSource* source);
 

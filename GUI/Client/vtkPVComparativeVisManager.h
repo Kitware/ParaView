@@ -18,32 +18,27 @@
 // comparative visualizations. It can store, generate, show and hide
 // visualizations. 
 // .SECTION See Also
-// vtkPVComparativeVis
+// vtkSMComparativeVisProxy
 
 #ifndef __vtkPVComparativeVisManager_h
 #define __vtkPVComparativeVisManager_h
 
-#include "vtkObject.h"
+#include "vtkKWObject.h"
 
 class vtkInteractorStyleTrackballMultiActor;
 class vtkPVAnimationCue;
 class vtkPVApplication;
-class vtkPVComparativeVis;
+class vtkSMComparativeVisProxy;
 //BTX
 struct vtkPVComparativeVisManagerInternals;
 //ETX
 
-class VTK_EXPORT vtkPVComparativeVisManager : public vtkObject
+class VTK_EXPORT vtkPVComparativeVisManager : public vtkKWObject
 {
 public:
   static vtkPVComparativeVisManager* New();
-  vtkTypeRevisionMacro(vtkPVComparativeVisManager, vtkObject);
+  vtkTypeRevisionMacro(vtkPVComparativeVisManager, vtkKWObject);
   void PrintSelf(ostream& os ,vtkIndent indent);
-
-  // Description:
-  // Application should be set before first call to 
-  // GenerateVisualization().
-  void SetApplication(vtkPVApplication*);
 
   // Description:
   // Show the current visualization (SelectedVisualizationName).
@@ -63,16 +58,16 @@ public:
 
   // Description:
   // Retrieve a visualization bu index or name.
-  vtkPVComparativeVis* GetVisualization(unsigned int idx);
-  vtkPVComparativeVis* GetVisualization(const char* name); 
+  vtkSMComparativeVisProxy* GetVisualization(unsigned int idx);
+  vtkSMComparativeVisProxy* GetVisualization(const char* name); 
 
   // Description:
   // Add a visualization.
-  void AddVisualization(vtkPVComparativeVis* vis); 
+  void AddVisualization(vtkSMComparativeVisProxy* vis); 
 
   // Description:
   // Generate a visualization.
-  void GenerateVisualization(vtkPVComparativeVis* vis); 
+  void GenerateVisualization(vtkSMComparativeVisProxy* vis); 
 
   // Description:
   // Remove a visualization.
@@ -87,19 +82,24 @@ public:
   // Description:
   // Returns the currently shown visualization. Returns NULL
   // if no managed visualization is shown.
-  vtkGetObjectMacro(CurrentlyDisplayedVisualization, vtkPVComparativeVis);
+  vtkGetObjectMacro(CurrentlyDisplayedVisualization, vtkSMComparativeVisProxy);
 
+  // Description:
+  // Saves the state of comparative visualizations to file as
+  // as Tcl script.
+  virtual void SaveState(ofstream *file);
+  
 protected:
   vtkPVComparativeVisManager();
   ~vtkPVComparativeVisManager();
-
-  vtkPVApplication* Application;
 
   vtkInteractorStyleTrackballMultiActor* IStyle;
 
   char* SelectedVisualizationName;
 
-  vtkPVComparativeVis* CurrentlyDisplayedVisualization;
+  vtkSMComparativeVisProxy* CurrentlyDisplayedVisualization;
+
+  vtkPVApplication* GetPVApplication();
 
 private:
   // PIMPL

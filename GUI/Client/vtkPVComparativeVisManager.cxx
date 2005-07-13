@@ -21,13 +21,14 @@
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVComparativeVis.h"
+#include "vtkSMComparativeVisProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMAnimationCueProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -40,10 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.14");
-
-vtkCxxSetObjectMacro(
-  vtkPVComparativeVisManager, Application, vtkPVApplication);
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.15");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -70,14 +68,13 @@ struct vtkPVComparativeVisManagerInternals
   double CameraViewUp[3];
   
   typedef 
-  vtkstd::vector<vtkSmartPointer<vtkPVComparativeVis> > VisualizationsType;
+  vtkstd::vector<vtkSmartPointer<vtkSMComparativeVisProxy> > VisualizationsType;
   VisualizationsType Visualizations;
 };
 
 //-----------------------------------------------------------------------------
 vtkPVComparativeVisManager::vtkPVComparativeVisManager()
 {
-  this->Application = 0;
   this->Internal = new vtkPVComparativeVisManagerInternals;
   this->IStyle = 0;
   this->SelectedVisualizationName = 0;
@@ -90,7 +87,6 @@ vtkPVComparativeVisManager::vtkPVComparativeVisManager()
 //-----------------------------------------------------------------------------
 vtkPVComparativeVisManager::~vtkPVComparativeVisManager()
 {
-  this->SetApplication(0);
   delete this->Internal;
   if (this->IStyle)
     {
@@ -106,21 +102,21 @@ unsigned int vtkPVComparativeVisManager::GetNumberOfVisualizations()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVComparativeVis* vtkPVComparativeVisManager::GetVisualization(
+vtkSMComparativeVisProxy* vtkPVComparativeVisManager::GetVisualization(
   unsigned int idx)
 {
   return this->Internal->Visualizations[idx].GetPointer();
 }
 
 //-----------------------------------------------------------------------------
-vtkPVComparativeVis* vtkPVComparativeVisManager::GetVisualization(
+vtkSMComparativeVisProxy* vtkPVComparativeVisManager::GetVisualization(
   const char* name)
 {
   vtkPVComparativeVisManagerInternals::VisualizationsType::iterator iter = 
     this->Internal->Visualizations.begin();
   for(; iter != this->Internal->Visualizations.end(); iter++)
     {
-    vtkPVComparativeVis* vis = iter->GetPointer();
+    vtkSMComparativeVisProxy* vis = iter->GetPointer();
     if (vis && vis->GetName() && name && strcmp(name, vis->GetName()) == 0)
       {
       return iter->GetPointer();
@@ -130,7 +126,7 @@ vtkPVComparativeVis* vtkPVComparativeVisManager::GetVisualization(
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisManager::GenerateVisualization(vtkPVComparativeVis* vis)
+void vtkPVComparativeVisManager::GenerateVisualization(vtkSMComparativeVisProxy* vis)
 {
   if (!vis)
     {
@@ -142,16 +138,20 @@ void vtkPVComparativeVisManager::GenerateVisualization(vtkPVComparativeVis* vis)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisManager::AddVisualization(vtkPVComparativeVis* vis)
+void vtkPVComparativeVisManager::AddVisualization(vtkSMComparativeVisProxy* vis)
 {
   if (!vis->GetName())
     {
     vtkErrorMacro("Cannot add visualization without a name!");
     return;
     }
-  if (this->Application)
+  if (this->GetApplication())
     {
-    vis->SetApplication(this->Application);
+    vtkSMRenderModuleProxy* ren =
+      this->GetPVApplication()->GetRenderModuleProxy();
+    vtkSMProxyProperty::SafeDownCast(
+      vis->GetProperty("RenderModule"))->AddProxy(ren);
+    vis->UpdateVTKObjects();
     }
   this->Internal->Visualizations.push_back(vis);
 
@@ -164,13 +164,13 @@ void vtkPVComparativeVisManager::AddVisualization(vtkPVComparativeVis* vis)
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
 {
-  vtkPVComparativeVis* curVis = 
+  vtkSMComparativeVisProxy* curVis = 
     this->GetVisualization(this->SelectedVisualizationName);
   vtkPVComparativeVisManagerInternals::VisualizationsType::iterator iter = 
     this->Internal->Visualizations.begin();
   for(; iter != this->Internal->Visualizations.end(); iter++)
     {
-    vtkPVComparativeVis* vis = iter->GetPointer();
+    vtkSMComparativeVisProxy* vis = iter->GetPointer();
     if (vis && vis->GetName() && name && strcmp(name, vis->GetName()) == 0)
       {
       if (iter->GetPointer() == curVis)
@@ -186,13 +186,13 @@ void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
 //-----------------------------------------------------------------------------
 int vtkPVComparativeVisManager::Show()
 {
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     vtkErrorMacro("Application is not set. Cannot show");
     return 0;
     }
 
-  vtkPVComparativeVis* currentVis = this->GetVisualization(
+  vtkSMComparativeVisProxy* currentVis = this->GetVisualization(
     this->SelectedVisualizationName);
   if (!currentVis)
     {
@@ -208,10 +208,10 @@ int vtkPVComparativeVisManager::Show()
 
   if (!this->CurrentlyDisplayedVisualization)
     {
-    this->IStyle->SetApplication(this->Application);
+    this->IStyle->SetApplication(this->GetPVApplication());
     
-    vtkPVWindow* window = this->Application->GetMainWindow();
-    vtkPVRenderView* mainView = this->Application->GetMainView();
+    vtkPVWindow* window = this->GetPVApplication()->GetMainWindow();
+    vtkPVRenderView* mainView = this->GetPVApplication()->GetMainView();
 
     // Make sure the main window updates it's enable state based
     // on InComparativeVis.
@@ -264,7 +264,7 @@ int vtkPVComparativeVisManager::Show()
     
     // Hide all visible displays (to be restored after Hide())
     vtkSMRenderModuleProxy* ren =
-      this->Application->GetRenderModuleProxy();
+      this->GetPVApplication()->GetRenderModuleProxy();
     vtkCollection* displays = ren->GetDisplays();
     vtkCollectionIterator* iter = displays->NewIterator();
     for(iter->GoToFirstItem(); 
@@ -283,7 +283,7 @@ int vtkPVComparativeVisManager::Show()
     
     // Store camera settings
     vtkCamera* camera = 
-      this->Application->GetMainView()->GetRenderer()->GetActiveCamera();
+      this->GetPVApplication()->GetMainView()->GetRenderer()->GetActiveCamera();
     camera->GetPosition(this->Internal->CameraPosition);
     camera->GetFocalPoint(this->Internal->CameraFocalPoint);
     camera->GetViewUp(this->Internal->CameraViewUp);
@@ -299,7 +299,7 @@ int vtkPVComparativeVisManager::Show()
     mainView->ForceRender();
 
     // Make sure the render window size is updated (we hid the left panel)
-    this->Application->Script("update idletasks");
+    this->GetApplication()->Script("update idletasks");
     }
   else
     {
@@ -327,8 +327,8 @@ void vtkPVComparativeVisManager::Hide()
     return;
     }
   // Restore state prior to Show()
-  vtkPVWindow* window = this->Application->GetMainWindow();
-  vtkPVRenderView* mainView = this->Application->GetMainView();
+  vtkPVWindow* window = this->GetPVApplication()->GetMainWindow();
+  vtkPVRenderView* mainView = this->GetPVApplication()->GetMainView();
   vtkKWToolbarSet* toolbars = window->GetMainToolbarSet();
   vtkstd::list<vtkKWToolbar*>::iterator iter = 
       this->Internal->VisibleToolbars.begin();
@@ -353,7 +353,7 @@ void vtkPVComparativeVisManager::Hide()
     }
 
   vtkSMRenderModuleProxy* ren =
-    this->Application->GetRenderModuleProxy();
+    this->GetPVApplication()->GetRenderModuleProxy();
 
   if (ren)
     {
@@ -379,13 +379,13 @@ void vtkPVComparativeVisManager::Hide()
     this->Internal->CameraViewUp[2]
     );
 
-  vtkPVComparativeVis* currentVis = this->GetVisualization(
+  vtkSMComparativeVisProxy* currentVis = this->GetVisualization(
     this->SelectedVisualizationName);
   if (currentVis)
     {
     currentVis->Hide();
     }
-  this->Application->GetMainView()->ForceRender();
+  this->GetPVApplication()->GetMainView()->ForceRender();
 
   if (ren)
     {
@@ -395,6 +395,70 @@ void vtkPVComparativeVisManager::Hide()
   this->CurrentlyDisplayedVisualization = 0;
   window->SetInComparativeVis(0);
   window->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVComparativeVisManager::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeVisManager::SaveState(ofstream *file)
+{
+  *file << endl;
+  *file << "vtkSMObject foo" << endl;
+  *file << "set proxyManager [foo GetProxyManager]" << endl;
+  *file << "foo Delete" << endl;
+  *file << endl;
+
+  vtkPVComparativeVisManagerInternals::VisualizationsType::iterator iter = 
+    this->Internal->Visualizations.begin();
+  for(int idx=0; iter != this->Internal->Visualizations.end(); iter++,idx++)
+    {
+    *file << "set comparativeVis(" << idx << ") "
+          << "[$proxyManager NewProxy ComparativeVisHelpers " 
+          << "ComparativeVis]" << endl;
+    *file << "$comparativeVis(" << idx << ") SetName {" 
+          << iter->GetPointer()->GetName() << "}" << endl;
+    unsigned int numCues = iter->GetPointer()->GetNumberOfCues();
+    for (unsigned int i=0; i<numCues; i++)
+      {
+      *file << "$comparativeVis(" << idx << ") SetNumberOfFramesInCue " 
+            << i << " " << iter->GetPointer()->GetNumberOfFramesInCue(i) 
+            << endl;
+      *file << "$comparativeVis(" << idx << ") SetSourceName " 
+            << i << " [$kw(" << iter->GetPointer()->GetSourceTclName(i)
+            << ") GetName]" << endl;
+      *file << "$comparativeVis(" << idx << ") SetSourceTclName " 
+            << i << " $kw(" << iter->GetPointer()->GetSourceTclName(i)
+            << ")" << endl;
+      vtkSMProxy* cue = iter->GetPointer()->GetCue(i);
+      if (cue)
+        {
+        vtkSMAnimationCueProxy* animCue =
+          vtkSMAnimationCueProxy::SafeDownCast(cue);
+        if (animCue)
+          {
+          *file << endl;
+          ostrstream proxyName;
+          proxyName << "[$kw(" << iter->GetPointer()->GetSourceTclName(i)
+                    << ") GetProxy]" << ends;
+          animCue->SaveInBatchScript(file, proxyName.str(), 0);
+          delete[] proxyName.str();
+          *file << "$comparativeVis(" << idx << ") AddCue $pvTemp" 
+                << animCue->GetID() 
+                << endl;
+          *file << "$pvTemp" << animCue->GetID() << " UnRegister {}" 
+                << endl << endl;
+          }
+        }
+      }
+    *file << "$kw(" << this->GetTclName() << ") AddVisualization "
+          << "$comparativeVis(" << idx << ")" << endl;
+    *file << "$comparativeVis(" << idx << ") UnRegister {}" << endl;
+    *file << endl;
+    }
 }
 
 //-----------------------------------------------------------------------------
