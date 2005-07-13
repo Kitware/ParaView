@@ -120,6 +120,12 @@ public:
   virtual void SetSeparatorMargin(int size);
   vtkGetMacro(SeparatorMargin, int);
 
+  // Description:
+  // Set/Get the visibility of the separator.  
+  virtual void SetSeparatorVisibility(int flag);
+  vtkGetMacro(SeparatorVisibility, int);
+  vtkBooleanMacro(SeparatorVisibility, int);  
+
   // Callbacks used internally to adjust the size,
   virtual void DragCallback();
   virtual void ConfigureCallback();
@@ -146,8 +152,10 @@ protected:
   int Size;
   int Frame1Size;
   int Frame2Size;
+
   int SeparatorSize;
   int SeparatorMargin;
+  int SeparatorVisibility;
 
   int Frame1Visibility;
   int Frame2Visibility;
@@ -160,9 +168,11 @@ protected:
 
   // Reset the actual windows to match our size IVars.
 
-  virtual void Update();
+  virtual void Pack();
   virtual void AddBindings();
   virtual void RemoveBindings();
+  virtual void AddSeparatorBindings();
+  virtual void RemoveSeparatorBindings();
   virtual void ReConfigure();
 
 private:

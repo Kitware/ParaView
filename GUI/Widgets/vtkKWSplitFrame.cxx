@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.33");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -37,6 +37,7 @@ vtkKWSplitFrame::vtkKWSplitFrame()
 
   this->SeparatorSize = 4;
   this->SeparatorMargin = 2;
+  this->SeparatorVisibility = 1;
 
   this->Size = 
     this->Frame1Size + this->Frame2Size + this->GetTotalSeparatorSize();
@@ -96,7 +97,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
   this->Frame2->SetParent(this);
   this->Frame2->Create(app);
   
-  this->Update();
+  this->Pack();
 
   this->AddBindings();
 
@@ -131,13 +132,29 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplitFrame::AddBindings()
+void vtkKWSplitFrame::AddSeparatorBindings()
 {
   if (this->Separator && this->Separator->IsCreated())
     {
     this->Script("bind %s <B1-Motion> {%s DragCallback}",
                  this->Separator->GetWidgetName(), this->GetTclName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::RemoveSeparatorBindings()
+{
+  if (this->Separator && this->Separator->IsCreated())
+    {
+    this->Script("bind %s <B1-Motion> {}",
+                 this->Separator->GetWidgetName(), this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::AddBindings()
+{
+  this->AddSeparatorBindings();
 
   if (this->IsCreated())
     {
@@ -149,11 +166,7 @@ void vtkKWSplitFrame::AddBindings()
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::RemoveBindings()
 {
-  if (this->Separator && this->Separator->IsCreated())
-    {
-    this->Script("bind %s <B1-Motion> {}",
-                 this->Separator->GetWidgetName(), this->GetTclName());
-    }
+  this->RemoveSeparatorBindings();
 
   if (this->IsCreated())
     {
@@ -215,7 +228,7 @@ void vtkKWSplitFrame::ConfigureCallback()
     this->Frame1Size = this->Frame1MinimumSize;
     this->Frame2Size = this->Frame2MinimumSize;
     this->ReConfigure();
-    this->Update();
+    this->Pack();
     return;
     }
 
@@ -263,7 +276,7 @@ void vtkKWSplitFrame::ConfigureCallback()
 
   this->Size = size;
 
-  this->Update();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -344,7 +357,7 @@ void vtkKWSplitFrame::DragCallback()
     this->Frame1Size = size - s - halfSepSize1;
     }
 
-  this->Update();
+  this->Pack();
 }
 
 
@@ -383,7 +396,7 @@ void vtkKWSplitFrame::SetFrame1Size(int size)
     this->ReConfigure();
     }
 
-  this->Update();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -421,7 +434,7 @@ void vtkKWSplitFrame::SetFrame2Size(int size)
     this->ReConfigure();
     }
 
-  this->Update();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -449,6 +462,28 @@ void vtkKWSplitFrame::SetSeparatorMargin(int size)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetSeparatorVisibility(int flag)
+{
+  if (this->SeparatorVisibility == flag)
+    {
+    return;
+    }
+
+  this->SeparatorVisibility = flag;
+  this->Modified();
+  this->Pack();
+
+  if (this->SeparatorVisibility)
+    {
+    this->AddSeparatorBindings();
+    }
+  else
+    {
+    this->RemoveSeparatorBindings();
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkKWSplitFrame::GetTotalSeparatorSize()
 {
   return this->SeparatorMargin * 2 + this->SeparatorSize;
@@ -464,7 +499,7 @@ void vtkKWSplitFrame::SetFrame1Visibility(int flag)
 
   this->Frame1Visibility = flag;
   this->Modified();
-  this->Update();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -477,11 +512,11 @@ void vtkKWSplitFrame::SetFrame2Visibility(int flag)
 
   this->Frame2Visibility = flag;
   this->Modified();
-  this->Update();
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplitFrame::Update()
+void vtkKWSplitFrame::Pack()
 {
   if (!this->IsCreated())
     {
@@ -493,11 +528,23 @@ void vtkKWSplitFrame::Update()
 
   if (this->Frame1Visibility && this->Frame2Visibility)
     {
-    separator_size = this->SeparatorSize;
-    separator_margin = this->SeparatorMargin;
-    total_separator_size = this->GetTotalSeparatorSize();
-    frame1_size = this->Frame1Size;
-    frame2_size = this->Frame2Size;
+    if (this->SeparatorVisibility)
+      {
+      separator_size = this->SeparatorSize;
+      separator_margin = this->SeparatorMargin;
+      total_separator_size = this->GetTotalSeparatorSize();
+      frame1_size = this->Frame1Size;
+      frame2_size = this->Frame2Size;
+      }
+    else
+      {
+      separator_size = 0;
+      separator_margin = 0;
+      total_separator_size = this->SeparatorMargin;
+      int remaining = this->GetTotalSeparatorSize() - total_separator_size;
+      frame1_size = this->Frame1Size + (remaining / 2);
+      frame2_size = this->Frame2Size + (remaining - remaining / 2);
+      }
     }
   else
     {
@@ -537,7 +584,9 @@ void vtkKWSplitFrame::Update()
     this->Script("place forget %s", this->Frame1->GetWidgetName());
     }
 
-  if (this->Frame1Visibility && this->Frame2Visibility)
+  if (this->Frame1Visibility && 
+      this->Frame2Visibility && 
+      this->SeparatorVisibility)
     {
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
@@ -603,6 +652,7 @@ void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Frame2Visibility: " << (this->Frame2Visibility ? "On" : "Off") << endl;
   os << indent << "SeparatorSize: " << this->GetSeparatorSize() << endl;
   os << indent << "SeparatorMargin: " << this->GetSeparatorMargin() << endl;
+  os << indent << "SeparatorVisibility: " << (this->SeparatorVisibility ? "On" : "Off") << endl;
 
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
