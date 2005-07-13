@@ -1276,6 +1276,65 @@
   </ProxyGroup>
 
   <ProxyGroup name="ComparativeVisHelpers">
+
+    <ComparativeVisProxy name="ComparativeVis">
+      <ProxyProperty
+        name="RenderModule"
+        command="SetRenderModule"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="rendermodules" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="Cues"
+        command="AddCue"
+        update_self="1"
+        clean_command="RemoveAllCues">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property 
+        name="Generate" 
+        command="Generate" 
+        immediate_update="1"
+        update_self="1">
+      </Property>
+
+      <IntVectorProperty
+        name="NumberOfFramesInCue"
+        command="SetNumberOfFramesInCue"
+        number_of_elements_per_command="1"
+        number_of_elements="0"
+        repeat_command="1"
+        use_index="1"
+        update_self="1">
+        <IntRangeDomain name="range"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="SourceNames"
+        command="SetSourceName"
+        number_of_elements="0"
+        repeat_command="1"
+        use_index="1"
+        update_self="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="SourceTclNames"
+        command="SetSourceTclName"
+        number_of_elements="0"
+        repeat_command="1"
+        use_index="1"
+        update_self="1">
+      </StringVectorProperty>
+      <!-- End of ComparativeVis -->
+    </ComparativeVisProxy>
+
     <SourceProxy name="GeometryCache" class="vtkCVGeometryCache">
       <ProxyProperty 
           name="AddGeometry" 
@@ -1284,6 +1343,7 @@
           repeat_command="1">
       </ProxyProperty>
     </SourceProxy>
+
     <Proxy name="MultiActorHelper" class="vtkMultiActorHelper">
       <ProxyProperty 
           name="Actors" 
@@ -1314,6 +1374,7 @@
          default_values="0 0 0 0">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
+      <!-- End of MultiActorHelper -->
     </Proxy>
   </ProxyGroup>
 
