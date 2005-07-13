@@ -62,6 +62,11 @@ public:
   virtual void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
 
   // Description:
+  // Query widgets
+  virtual int HasWidget(vtkKWWidget* widget);
+  virtual int GetNumberOfWidgets();
+
+  // Description:
   // Remove a widget (or all) from the toolbar
   virtual void RemoveWidget(vtkKWWidget* widget);
   virtual void RemoveAllWidgets();

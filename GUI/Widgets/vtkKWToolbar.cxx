@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.57");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.58");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -234,6 +234,31 @@ void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
   this->PropagateEnableState(widget);
 
   this->UpdateWidgets();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWToolbar::HasWidget(vtkKWWidget *widget)
+{
+  if (!widget || !this->Internals)
+    {
+    return 0;
+    }
+
+  vtkKWToolbarInternals::WidgetsContainerIterator location_pos = 
+    vtksys_stl::find(this->Internals->Widgets.begin(),
+                     this->Internals->Widgets.end(),
+                     widget);
+  return (location_pos == this->Internals->Widgets.end() ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWToolbar::GetNumberOfWidgets()
+{
+  if (this->Internals)
+    {
+    return this->Internals->Widgets.size();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -576,6 +601,7 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
         {
         s << "grid " << (*it)->GetWidgetName() << " -row " 
           << row << " -column " << num << " -sticky news "
+          << " -in " << this->GetFrame()->GetWidgetName()
           << " -padx " 
           << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
                             this->WidgetsFlatAdditionalPadX : 0))
@@ -632,6 +658,7 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     }
 
   s << " -sticky news -row 0 "
+    << " -in " << this->GetFrame()->GetWidgetName()
     << " -padx " 
     << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadX : 0))
