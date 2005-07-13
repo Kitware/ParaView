@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.10");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -349,9 +349,10 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file
     {
     vtkSMKeyFrameProxy* proxy = *it; 
     proxy->SaveInBatchScript(file);
-    *file << "  [$pvTemp" << id << " GetProperty KeyFrames]"
+    *file << "[$pvTemp" << id << " GetProperty KeyFrames]"
       <<" AddProxy $pvTemp" << proxy->GetID() << endl;
-    *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+    *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
+    *file << "$pvTemp" << proxy->GetID() << " UnRegister {}" << endl;
     }
 }
 
