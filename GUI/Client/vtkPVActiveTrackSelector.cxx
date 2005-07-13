@@ -26,6 +26,7 @@
 #include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMAnimationCueProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
@@ -42,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.10");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.11");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -55,6 +56,7 @@ vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
   this->CurrentCue = 0;
   this->PackHorizontally = 0;
   this->FocusCurrentCue = 1;
+  this->DisplayOnlyPVSourceProperties = 0;
 }
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
@@ -122,6 +124,39 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
                  this->PropertyLabel->GetWidgetName(),
                  this->PropertyMenuButton->GetWidgetName());
     }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVActiveTrackSelector::SelectCue(const char* sourceName, 
+                                        vtkSMAnimationCueProxy* cue)
+{
+  if (!cue)
+    {
+    this->CleanupSource();
+    return 1;
+    }
+  
+  this->SelectSourceCallbackInternal(sourceName);
+
+  vtkPVActiveTrackSelectorInternals::VectorOfCues::iterator iter =
+    this->Internals->PropertyCues.begin();
+  int index = 0;
+  for (; iter != this->Internals->PropertyCues.end(); ++iter, ++index)
+    {
+    if (iter->GetPointer())
+      {
+      vtkSMAnimationCueProxy* proxy = iter->GetPointer()->GetCueProxy();
+      if (proxy && proxy->GetAnimatedProxy() == cue->GetAnimatedProxy() &&
+          strcmp(proxy->GetAnimatedPropertyName(), cue->GetAnimatedPropertyName()) == 0 &&
+          proxy->GetAnimatedElement() == cue->GetAnimatedElement())
+        {
+        this->SelectPropertyCallbackInternal(index);
+        return 1;
+        }
+      }
+    }
+  return 0;
+
 }
 
 //-----------------------------------------------------------------------------
@@ -214,13 +249,17 @@ void vtkPVActiveTrackSelector::RemoveSource(vtkPVAnimationCueTree* cue)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVActiveTrackSelector::ShallowCopy(vtkPVActiveTrackSelector* source)
+void vtkPVActiveTrackSelector::ShallowCopy(
+  vtkPVActiveTrackSelector* source, int onlyCopySources)
 {
   vtkPVActiveTrackSelectorInternals::MapOfStringToCueTrees::iterator iter =
     source->Internals->SourceCueTrees.begin();
   for (; iter != source->Internals->SourceCueTrees.end(); iter++)
     {
-    this->AddSource(iter->second);
+    if (!onlyCopySources || iter->second->GetPVSource())
+      {
+      this->AddSource(iter->second);
+      }
     }
 }
 
@@ -306,14 +345,26 @@ void vtkPVActiveTrackSelector::BuildPropertiesMenu(const char* pretext,
       }
     else if (child_cue)
       {
-      int index = this->Internals->PropertyCues.size();
-      this->Internals->PropertyCues.push_back(child_cue);
-
-      ostrstream command;
-      command << "SelectPropertyCallback " << index << ends;
-      this->PropertyMenuButton->GetMenu()->AddCommand(
-        label.str(), this, command.str());
-      command.rdbuf()->freeze(0);
+      int addProperty = 1;
+      if (this->DisplayOnlyPVSourceProperties)
+        {
+        if (child_cue->GetPVSource() &&
+            child_cue->GetPVSource()->GetProxy()!=child_cue->GetAnimatedProxy())
+          {
+          addProperty = 0;
+          }
+        }
+      if (addProperty)
+        {
+        int index = this->Internals->PropertyCues.size();
+        this->Internals->PropertyCues.push_back(child_cue);
+        
+        ostrstream command;
+        command << "SelectPropertyCallback " << index << ends;
+        this->PropertyMenuButton->GetMenu()->AddCommand(
+          label.str(), this, command.str());
+        command.rdbuf()->freeze(0);
+        }
       }
     label.rdbuf()->freeze(0);
     }
@@ -394,4 +445,6 @@ void vtkPVActiveTrackSelector::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "PackHorizontally: " << this->PackHorizontally << endl;
   os << indent << "FocusCurrentCue: " << this->FocusCurrentCue << endl;
+  os << indent << "DisplayOnlyPVSourceProperties: " 
+     << this->DisplayOnlyPVSourceProperties << endl;
 }

@@ -27,6 +27,7 @@ class vtkKWMenuButton;
 class vtkPVActiveTrackSelectorInternals;
 class vtkPVAnimationCueTree;
 class vtkPVAnimationCue;
+class vtkSMAnimationCueProxy;
 class vtkSMProxy;
 class vtkPVSource;
 
@@ -58,6 +59,7 @@ public:
   // Call with argument NULL when a cue is unselected.
   // Returns 0 if passed cue does not exist, 1 otherwise.
   int SelectCue(vtkPVAnimationCue*);
+  int SelectCue(const char* sourceName, vtkSMAnimationCueProxy* cue);
 
   // Description:
   // Accessors to menu buttons
@@ -82,8 +84,18 @@ public:
   vtkGetMacro(PackHorizontally, int);
 
   // Description:
-  // (Shallow) copy all the source cues from the source widget
-  void ShallowCopy(vtkPVActiveTrackSelector* source);
+  // (Shallow) copy all the source cues from the source widget.
+  // If onlyCopySources is true, only cues that have an associated
+  // PVSource are copied.
+  void ShallowCopy(vtkPVActiveTrackSelector* source,
+                   int onlyCopySources=0);
+
+  // Description:
+  // If true, only properties belonging to the proxy of the 
+  // point PVSource are shown in the properties dialog. False
+  // by default.
+  vtkSetMacro(DisplayOnlyPVSourceProperties, int);
+  vtkGetMacro(DisplayOnlyPVSourceProperties, int);
 
 protected:
   vtkPVActiveTrackSelector();
@@ -107,6 +119,8 @@ protected:
 
   int PackHorizontally;
   int FocusCurrentCue;
+
+  int DisplayOnlyPVSourceProperties;
 
 private:
   vtkPVActiveTrackSelector(const vtkPVActiveTrackSelector&); // Not implemented.
