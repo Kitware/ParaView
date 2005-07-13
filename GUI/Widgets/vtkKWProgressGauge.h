@@ -35,6 +35,12 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
+  // Set/Get the percentage displayed. This number is clamped to be betwen
+  // 0.0 and 100.0
+  virtual void SetValue(double value);
+  vtkGetMacro(Value, double);
+  
+  // Description:
   // Set/Get the width and height of the widget
   // The height parameter is ignored is ExpandHeight is set.
   virtual void SetWidth(int width);
@@ -45,16 +51,18 @@ public:
   // Description:
   // Set/Get if the height of the gauge should be automatically adjusted
   // to fill the available vertical space. The widget should be packed
-  // accordingly to expand automatically.
+  // accordingly to expand automatically. Check MinimumHeight too.
   vtkBooleanMacro(ExpandHeight, int);
   virtual void SetExpandHeight(int);
   vtkGetMacro(ExpandHeight, int);
-  
+
   // Description:
-  // Set/Get the percentage displayed. This number is clamped to be betwen
-  // 0.0 and 100.0
-  virtual void SetValue(double value);
-  vtkGetMacro(Value, double);
+  // Set/Get the minimum height of the widget
+  // This value is ignored if ExpandHeight is set to Off. If set to On,
+  // it will make sure that the height computed from the available vertical
+  // space is not smaller than this minimum height. 
+  virtual void SetMinimumHeight(int height);
+  vtkGetMacro(MinimumHeight, int);
   
   // Description:
   // Set the color of the progress bar, the default is blue.
@@ -75,6 +83,7 @@ protected:
 
   int Width;
   int Height;
+  int MinimumHeight;
   double BarColor[3];
   double Value;
   int ExpandHeight;

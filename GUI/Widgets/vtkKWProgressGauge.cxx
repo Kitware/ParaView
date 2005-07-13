@@ -21,13 +21,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.32");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
 { 
   this->Width = 100;
-  this->Height = 15;
+  this->Height = 14;
+  this->MinimumHeight = this->Height;
   this->Value = 0.0;
   this->BarColor[0] = 0.0;
   this->BarColor[1] = 0.0;
@@ -69,9 +70,6 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app)
   this->Canvas->SetWidth(0);
   this->Canvas->SetHeight(0);
 
-  this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->Canvas->GetWidgetName(), this->GetTclName());
-
   // Create the progress bar and text
 
   this->Script("%s create rectangle 0 0 0 0 -outline \"\" -tags bar", 
@@ -80,12 +78,17 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app)
   this->Script("%s create text 0 0 -anchor c -text \"\" -tags value",
                this->Canvas->GetWidgetName());
 
+  this->Script("bind %s <Configure> {%s ConfigureCallback}",
+               this->Canvas->GetWidgetName(), this->GetTclName());
+
   this->Script("pack %s -fill both -expand yes", 
                this->Canvas->GetWidgetName());
 
   // Update enable state
 
   this->UpdateEnableState();
+
+  this->Redraw();
 }
 
 //----------------------------------------------------------------------------
@@ -133,6 +136,20 @@ void vtkKWProgressGauge::SetWidth(int width)
     }
 
   this->Width = width;
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetMinimumHeight(int height)
+{
+  if (this->MinimumHeight == height)
+    {
+    return;
+    }
+
+  this->MinimumHeight = height;
   this->Modified();
 
   this->Redraw();
@@ -202,6 +219,11 @@ void vtkKWProgressGauge::Redraw()
   if (this->ExpandHeight)
     {
     height = atoi(this->Script("winfo height %s", wname));
+    if (height < this->MinimumHeight)
+      {
+      height = this->MinimumHeight;
+      tk_cmd << wname << " config -height " << height << endl;
+      }
     }
   else
     {
@@ -274,6 +296,7 @@ void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BarColor: (" << this->BarColor[0] << ", " 
     << this->BarColor[1] << ", " << this->BarColor[2] << ")\n";
   os << indent << "Height: " << this->GetHeight() << endl;
+  os << indent << "MinimumHeight: " << this->GetMinimumHeight() << endl;
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "ExpandHeight: "
      << (this->ExpandHeight ? "On" : "Off") << endl;
