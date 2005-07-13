@@ -145,6 +145,7 @@ protected:
   // the input geometry
   friend class vtkPVComparativeVisManager;
   friend class vtkPVComparativeVis;
+  friend class vtkSMComparativeVisProxy;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
 //ETX
