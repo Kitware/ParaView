@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.26");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.27");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -369,7 +369,7 @@ void vtkKWToolbarSet::PackToolbars()
   tk_cmd << "pack " << this->ToolbarsFrame->GetWidgetName() 
          << " -side top -fill both -expand y -padx 0 -pady 0" << endl;
 
-  vtkKWToolbar *previous = NULL;
+  vtkKWToolbar *previous_w = NULL, *previous_e = NULL;
 
   vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
     this->Internals->Toolbars.begin();
@@ -381,9 +381,13 @@ void vtkKWToolbarSet::PackToolbars()
       {
       if ((*it)->Visibility)
         {
+        int anchor_w = ((*it)->Anchor == vtkKWToolbarSet::ToolbarAnchorWest);
+        const char *side = anchor_w ? " -side left" : " -side right";
+
         // Pack a separator
+
         (*it)->Toolbar->Bind();
-        if (previous)
+        if ((anchor_w && previous_w) || (!anchor_w && previous_e))
           {
           if (!(*it)->SeparatorFrame->IsCreated())
             {
@@ -396,16 +400,26 @@ void vtkKWToolbarSet::PackToolbars()
                          VTK_KW_TOOLBAR_RELIEF_SEP);
             }
           tk_cmd << "pack " << (*it)->SeparatorFrame->GetWidgetName() 
-                 << " -side left -padx 1 -pady 0 -fill y -expand n" << endl;
+                 << " -padx 1 -pady 0 -fill y -expand n " << side << endl;
           }
-        previous = (*it)->Toolbar;
 
         // Pack toolbar
 
         tk_cmd << "pack " << (*it)->Toolbar->GetWidgetName() 
-               << " -side left -padx 1 -pady 0 -fill both -expand "
+               << " -padx 1 -pady 0 -anchor w " << side
+               << " -in " << this->ToolbarsFrame->GetWidgetName()
+               << " -fill both -expand "
                << ((*it)->Toolbar->GetResizable() ? "y" : "n")
-               << " -in " << this->ToolbarsFrame->GetWidgetName() << endl;
+               << endl;
+        
+        if (anchor_w)
+          {
+          previous_w = (*it)->Toolbar;
+          }
+        else
+          {
+          previous_e = (*it)->Toolbar;
+          }
         }
       else
         {
@@ -459,6 +473,7 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
   toolbar_slot->SeparatorFrame = vtkKWFrame::New();
   this->PropagateEnableState(toolbar_slot->SeparatorFrame);
 
+  toolbar_slot->Anchor = vtkKWToolbarSet::ToolbarAnchorWest;
   toolbar_slot->Visibility = default_visibility;
   if (this->SynchronizeToolbarsVisibilityWithRegistry)
     {
@@ -613,6 +628,33 @@ int vtkKWToolbarSet::GetNumberOfVisibleToolbars()
     }
 
   return count;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::SetToolbarAnchor(
+  vtkKWToolbar *toolbar, int anchor)
+{
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+
+  if (toolbar_slot && toolbar_slot->Anchor != anchor)
+    {
+    toolbar_slot->Anchor = anchor;
+    if (toolbar_slot->Visibility)
+      {
+      this->Pack();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWToolbarSet::GetToolbarAnchor(vtkKWToolbar* toolbar)
+{
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+  if (toolbar_slot)
+    {
+    return toolbar_slot->Anchor;
+    }
+  return vtkKWToolbarSet::ToolbarAnchorWest;
 }
 
 //----------------------------------------------------------------------------

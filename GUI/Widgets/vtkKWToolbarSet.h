@@ -84,6 +84,32 @@ public:
   virtual int GetNumberOfVisibleToolbars();
 
   // Description:
+  // Set a toolbar's anchor. By default, toolbars are packed from left
+  // to right in the order they were added to the toolbar set, i.e. each
+  // toolbar is "anchored" to the west side of the set. One can change
+  // this anchor on a per-toolbar basis. This means that all toolbars anchored
+  // to the west side will be grouped together on that side, and all toolbars
+  // anchored to the east side will be grouped on the opposite side. Note
+  // though that anchoring acts like a "mirror": packing starts from the
+  // anchor side, progressing towards the middle of the toolbar set (i.e.,
+  // toolbars anchored west are packed left to right, toolbars anchored east
+  // are packed right to left, following the order they were inserted in
+  // the set).
+  //BTX
+  enum 
+  {
+    ToolbarAnchorWest = 0,
+    ToolbarAnchorEast
+  };
+  //ETX
+  virtual void SetToolbarAnchor(vtkKWToolbar *toolbar, int anchor);
+  virtual int GetToolbarAnchor(vtkKWToolbar *toolbar);
+  virtual void SetToolbarAnchorToWest(vtkKWToolbar *toolbar)
+    { this->SetToolbarAnchor(toolbar, vtkKWToolbarSet::ToolbarAnchorWest); };
+  virtual void SetToolbarAnchorToEast(vtkKWToolbar *toolbar)
+    { this->SetToolbarAnchor(toolbar, vtkKWToolbarSet::ToolbarAnchorEast); };
+
+  // Description:
   // Save/Restore the visibility flag of one/all toolbars to/from the registry
   // Note that the name of each toolbar to save/restore should have been set
   // for this method to work (see vtkKWToolbar).
@@ -181,6 +207,7 @@ protected:
   {
   public:
     int Visibility;
+    int Anchor;
     vtkKWFrame   *SeparatorFrame;
     vtkKWToolbar *Toolbar;
   };
