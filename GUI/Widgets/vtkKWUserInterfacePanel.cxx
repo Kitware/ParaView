@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.12");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
@@ -74,7 +74,10 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
-    vtkErrorMacro("The panel is already created");
+    // Comment this one. Some user interface manager creates their panels
+    // early on, or on the fly, so it is not too uncommon that this method
+    // is called twice, without a need to be bothered about it.
+    // vtkErrorMacro("The panel is already created");
     return;
     }
 

@@ -26,7 +26,7 @@
 // manager on top of other pages.
 // This class is not a widget, it can not be mapped, the manager is the
 // place where a concrete widget is set and used as the root of all panels (see
-// vtkKWUserInterfaceNotebookManager for example). What you need to do
+// vtkKWUserInterfaceManagerNotebook for example). What you need to do
 // is to set the UserInterfaceManager's Ivar to a manager, and the rest should
 // be taken care of (i.e. the panel is automatically added to the manager, 
 // and if the panel is not created the first time one if its pages is shown or 
@@ -36,7 +36,7 @@
 // etc, just use this panel's API and calls will be propagated to the 
 // right manager with the proper arguments).
 // .SECTION See Also
-// vtkKWUserInterfaceManager vtkKWUserInterfaceNotebookManager
+// vtkKWUserInterfaceManager vtkKWUserInterfaceManagerNotebook
 
 #ifndef __vtkKWUserInterfacePanel_h
 #define __vtkKWUserInterfacePanel_h
