@@ -42,7 +42,7 @@ SET(PROJECT_TESTS
   DefaultAnimation
   Delete
   DeleteSource
-  #DualSphereAnimation
+  DualSphereAnimation
   EnSight
   Extrusion
   ExtractGrid
@@ -283,6 +283,7 @@ SET (PROJECT_TESTS_NO_BATCH
   #Animation
   DefaultAnimation
   DeleteSource
+  DualSphereAnimation
   MouseInteraction
   OrientationWidget
   RecordAnimation
