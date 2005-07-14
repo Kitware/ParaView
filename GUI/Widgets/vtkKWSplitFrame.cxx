@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.34");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -176,6 +176,18 @@ void vtkKWSplitFrame::RemoveBindings()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWSplitFrame::GetInternalMarginHorizontal()
+{
+  return this->GetBorderWidth() + this->GetPadX();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSplitFrame::GetInternalMarginVertical()
+{
+  return this->GetBorderWidth() + this->GetPadY();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSplitFrame::ReConfigure()
 {
   if (this->IsCreated())
@@ -184,13 +196,17 @@ void vtkKWSplitFrame::ReConfigure()
       this->Frame1Size + this->Frame2Size + this->GetTotalSeparatorSize();
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
       {
-      this->Script("%s configure -width %d", 
-                   this->GetWidgetName(), this->Size);
+      int margin = this->GetInternalMarginHorizontal();
+      this->Script(
+        "%s configure -width %d", 
+        this->GetWidgetName(), this->Size + margin * 2);
       }
     else
       {
-      this->Script("%s configure -height %d", 
-                   this->GetWidgetName(), this->Size);
+      int margin = this->GetInternalMarginVertical();
+      this->Script(
+        "%s configure -height %d", 
+        this->GetWidgetName(), this->Size + margin * 2);
       }
     }
 }
@@ -204,16 +220,18 @@ void vtkKWSplitFrame::ConfigureCallback()
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
+    size -= this->GetInternalMarginHorizontal() * 2;
     }
   else
     {
     size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
+    size -= this->GetInternalMarginVertical() * 2;
     }
 
   // If size == 1 then the widget has not been packed, it will be later
   // and the Configure event will bring us back here with the correct size
 
-  if (size == 1)
+  if (size <= 1)
     {
     return;
     }
@@ -287,10 +305,12 @@ void vtkKWSplitFrame::DragCallback()
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
     size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
+    size -= this->GetInternalMarginHorizontal() * 2;
     }
   else
     {
     size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
+    size -= this->GetInternalMarginVertical() * 2;
     }
 
   this->Size = size;
@@ -565,18 +585,26 @@ void vtkKWSplitFrame::Pack()
       }
     }
 
+  int margin_h = 0; // this->GetInternalMarginHorizontal();
+  int margin_v = 0; // this->GetInternalMarginVertical();
+
   if (this->Frame1Visibility)
     {
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
-      this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
-                   this->Frame1->GetWidgetName(), frame1_size);
+      this->Script("place %s -x %d -y %d -width %d -relheight 1.0 -height -%d",
+                   this->Frame1->GetWidgetName(), 
+                   margin_h, 
+                   margin_v, 
+                   frame1_size, margin_v * 2);
       }
     else
       {
-      this->Script("place %s -relx 0 -y %d -height %d -relwidth 1.0",
+      this->Script("place %s -x %d -y %d -height %d -relwidth 1.0 -width -%d",
                    this->Frame1->GetWidgetName(), 
-                   frame2_size + total_separator_size, frame1_size);
+                   margin_h,
+                   margin_v + frame2_size + total_separator_size, 
+                   frame1_size, margin_h * 2);
       }
     }
   else
@@ -590,17 +618,19 @@ void vtkKWSplitFrame::Pack()
     {
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
-      this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+      this->Script("place %s -x %d -y %d -width %d -relheight 1.0 -height -%d",
                    this->Separator->GetWidgetName(), 
-                   frame1_size + separator_margin,
-                   separator_size);
+                   margin_h + frame1_size + separator_margin,
+                   margin_v,
+                   separator_size, margin_v * 2);
       }
     else
       {
-      this->Script("place %s -relx 0 -y %d -relwidth 1.0 -height %d",
+      this->Script("place %s -x %d -y %d -height %d -relwidth 1.0 -width -%d",
                    this->Separator->GetWidgetName(), 
-                   frame2_size + separator_margin,
-                   separator_size);
+                   margin_h,
+                   margin_v + frame2_size + separator_margin,
+                   separator_size, margin_h * 2);
       }
     }
   else
@@ -612,14 +642,19 @@ void vtkKWSplitFrame::Pack()
     {
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)  
       {
-      this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+      this->Script("place %s -x %d -y %d -width %d -relheight 1.0 -height -%d",
                    this->Frame2->GetWidgetName(), 
-                   frame1_size + total_separator_size, frame2_size);
+                   margin_h + frame1_size + total_separator_size, 
+                   margin_v,
+                   frame2_size, margin_v * 2);
       }
     else
       {
-      this->Script("place %s -relx 0 -rely 0 -relwidth 1.0 -height %d",
-                   this->Frame2->GetWidgetName(), frame2_size);
+      this->Script("place %s -x %d -y %d -height %d -relwidth 1.0 -width -%d",
+                   this->Frame2->GetWidgetName(), 
+                   margin_h,
+                   margin_v,
+                   frame2_size, margin_h * 2);
       }
     }
   else

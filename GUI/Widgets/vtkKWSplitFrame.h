@@ -174,6 +174,8 @@ protected:
   virtual void AddSeparatorBindings();
   virtual void RemoveSeparatorBindings();
   virtual void ReConfigure();
+  virtual int GetInternalMarginHorizontal();
+  virtual int GetInternalMarginVertical();
 
 private:
   vtkKWSplitFrame(const vtkKWSplitFrame&); // Not implemented
