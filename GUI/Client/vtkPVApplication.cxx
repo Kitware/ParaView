@@ -35,7 +35,6 @@
 #include "vtkFloatArray.h"
 #include "vtkGarbageCollector.h"
 #include "vtkIntArray.h"
-#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrameWithLabel.h"
@@ -112,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.368");
+vtkCxxRevisionMacro(vtkPVApplication, "1.369");
 
 //----------------------------------------------------------------------------
 //****************************************************************************

@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.751");
+vtkCxxRevisionMacro(vtkPVWindow, "1.752");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2148,7 +2148,7 @@ vtkPVWindow::GetApplicationSettingsInterface()
       vtkPVApplicationSettingsInterface::New();
     this->ApplicationSettingsInterface->SetWindow(this);
     this->ApplicationSettingsInterface->SetUserInterfaceManager(
-      this->GetMainUserInterfaceManager());
+      this->GetApplicationSettingsUserInterfaceManager());
     }
   return this->ApplicationSettingsInterface;
 }

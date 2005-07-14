@@ -12,7 +12,7 @@
 
 =========================================================================*/
 
-#include "vtkKWUserInterfaceNotebookManager.h"
+#include "vtkKWUserInterfaceManagerNotebook.h"
 
 #include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
@@ -27,23 +27,23 @@
 #include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.1");
+vtkStandardNewMacro(vtkKWUserInterfaceManagerNotebook);
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerNotebook, "1.2");
 
 //----------------------------------------------------------------------------
-class vtkKWUserInterfaceNotebookManagerInternals
+class vtkKWUserInterfaceManagerNotebookInternals
 {
 public:
 
-  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*> DragAndDropEntriesContainer;
-  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::iterator DragAndDropEntriesContainerIterator;
-  typedef vtksys_stl::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::reverse_iterator DragAndDropEntriesContainerReverseIterator;
+  typedef vtksys_stl::list<vtkKWUserInterfaceManagerNotebook::DragAndDropEntry*> DragAndDropEntriesContainer;
+  typedef vtksys_stl::list<vtkKWUserInterfaceManagerNotebook::DragAndDropEntry*>::iterator DragAndDropEntriesContainerIterator;
+  typedef vtksys_stl::list<vtkKWUserInterfaceManagerNotebook::DragAndDropEntry*>::reverse_iterator DragAndDropEntriesContainerReverseIterator;
 
   DragAndDropEntriesContainer DragAndDropEntries;
 };
 
 //----------------------------------------------------------------------------
-vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
+vtkKWUserInterfaceManagerNotebook::vtkKWUserInterfaceManagerNotebook()
 {
   // The parent class (vtkKWUserInterfaceManager) initializes IdCounter so that
   // panel IDs starts at 0. In this class, a panel ID will map to a notebook 
@@ -57,11 +57,11 @@ vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
   this->EnableDragAndDrop = 0;
   this->LockDragAndDropEntries = 0;
 
-  this->Internals = new vtkKWUserInterfaceNotebookManagerInternals;
+  this->Internals = new vtkKWUserInterfaceManagerNotebookInternals;
 }
 
 //----------------------------------------------------------------------------
-vtkKWUserInterfaceNotebookManager::~vtkKWUserInterfaceNotebookManager()
+vtkKWUserInterfaceManagerNotebook::~vtkKWUserInterfaceManagerNotebook()
 {
   this->SetNotebook(NULL);
 
@@ -75,7 +75,7 @@ vtkKWUserInterfaceNotebookManager::~vtkKWUserInterfaceNotebookManager()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::SetNotebook(vtkKWNotebook *_arg)
+void vtkKWUserInterfaceManagerNotebook::SetNotebook(vtkKWNotebook *_arg)
 { 
   vtkDebugMacro(<< this->GetClassName() << " (" << this 
                 << "): setting Notebook to " << _arg);
@@ -108,7 +108,7 @@ void vtkKWUserInterfaceNotebookManager::SetNotebook(vtkKWNotebook *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::Create(vtkKWApplication *app)
+void vtkKWUserInterfaceManagerNotebook::Create(vtkKWApplication *app)
 {
   if (this->IsCreated())
     {
@@ -131,7 +131,7 @@ void vtkKWUserInterfaceNotebookManager::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::AddPage(
+int vtkKWUserInterfaceManagerNotebook::AddPage(
   vtkKWUserInterfacePanel *panel, 
   const char *title, 
   const char *balloon, 
@@ -169,7 +169,7 @@ int vtkKWUserInterfaceNotebookManager::AddPage(
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(int id)
+vtkKWWidget* vtkKWUserInterfaceManagerNotebook::GetPageWidget(int id)
 {
   if (!this->IsCreated())
     {
@@ -184,7 +184,7 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(int id)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(
+vtkKWWidget* vtkKWUserInterfaceManagerNotebook::GetPageWidget(
   vtkKWUserInterfacePanel *panel, 
   const char *title)
 {
@@ -223,7 +223,7 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPagesParentWidget(
+vtkKWWidget* vtkKWUserInterfaceManagerNotebook::GetPagesParentWidget(
   vtkKWUserInterfacePanel *vtkNotUsed(panel))
 {
   // Here we probably need this->Notebook->Body but it's not a public member
@@ -232,7 +232,7 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPagesParentWidget(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::RaisePage(int id)
+void vtkKWUserInterfaceManagerNotebook::RaisePage(int id)
 {
   if (!this->IsCreated())
     {
@@ -259,7 +259,7 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::RaisePage(
+void vtkKWUserInterfaceManagerNotebook::RaisePage(
   vtkKWUserInterfacePanel *panel, 
   const char *title)
 {
@@ -302,7 +302,7 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::RaisePanel(
+int vtkKWUserInterfaceManagerNotebook::RaisePanel(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -375,7 +375,7 @@ int vtkKWUserInterfaceNotebookManager::RaisePanel(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::ShowPanel(
+int vtkKWUserInterfaceManagerNotebook::ShowPanel(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -444,7 +444,7 @@ int vtkKWUserInterfaceNotebookManager::ShowPanel(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::HidePanel(
+int vtkKWUserInterfaceManagerNotebook::HidePanel(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -483,7 +483,7 @@ int vtkKWUserInterfaceNotebookManager::HidePanel(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::IsPanelVisible(
+int vtkKWUserInterfaceManagerNotebook::IsPanelVisible(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -520,7 +520,7 @@ int vtkKWUserInterfaceNotebookManager::IsPanelVisible(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
+int vtkKWUserInterfaceManagerNotebook::RemovePageWidgets(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -559,7 +559,7 @@ int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::UpdatePanel(
+void vtkKWUserInterfaceManagerNotebook::UpdatePanel(
   vtkKWUserInterfacePanel *panel)
 {
   this->UpdatePanelDragAndDrop(panel);
@@ -567,7 +567,7 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel* 
-vtkKWUserInterfaceNotebookManager::GetPanelFromPageId(int page_id)
+vtkKWUserInterfaceManagerNotebook::GetPanelFromPageId(int page_id)
 {
   if (!this->Notebook || !this->Notebook->HasPage(page_id))
     {
@@ -578,7 +578,7 @@ vtkKWUserInterfaceNotebookManager::GetPanelFromPageId(int page_id)
 }
 
 //---------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::SetEnableDragAndDrop(int arg)
+void vtkKWUserInterfaceManagerNotebook::SetEnableDragAndDrop(int arg)
 {
   if (this->EnableDragAndDrop == arg)
     {
@@ -602,7 +602,7 @@ void vtkKWUserInterfaceNotebookManager::SetEnableDragAndDrop(int arg)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
+int vtkKWUserInterfaceManagerNotebook::CanWidgetBeDragAndDropped(
   vtkKWWidget *widget, vtkKWWidget **anchor)
 {
   // Check if the widget is a labeled frame (vtkKWFrameWithLabel). 
@@ -636,7 +636,7 @@ int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLabel(
+char* vtkKWUserInterfaceManagerNotebook::GetDragAndDropWidgetLabel(
   vtkKWWidget *widget)
 {
   // See CanWidgetBeDragAndDropped() above to understand how we pick
@@ -660,7 +660,7 @@ char* vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLabel(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
+void vtkKWUserInterfaceManagerNotebook::UpdatePanelDragAndDrop(
   vtkKWUserInterfacePanel *panel)
 {
   if (!panel)
@@ -723,20 +723,20 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
 }
 
 //---------------------------------------------------------------------------
-vtkKWUserInterfaceNotebookManager::WidgetLocation::WidgetLocation()
+vtkKWUserInterfaceManagerNotebook::WidgetLocation::WidgetLocation()
 {
   this->Empty();
 }
 
 //---------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::WidgetLocation::Empty()
+void vtkKWUserInterfaceManagerNotebook::WidgetLocation::Empty()
 {
   this->PageId = -1;
   this->AfterWidget = NULL;
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
+int vtkKWUserInterfaceManagerNotebook::GetDragAndDropWidgetLocation(
   vtkKWWidget *widget, WidgetLocation *loc)
 {
   if (!loc || !this->Notebook || !widget || !widget->IsPacked())
@@ -805,7 +805,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
 
 //----------------------------------------------------------------------------
 vtkKWWidget* 
-vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
+vtkKWUserInterfaceManagerNotebook::GetDragAndDropWidgetFromLabelAndLocation(
   const char *widget_label, const WidgetLocation *loc_hint)
 {
   if (!widget_label || !loc_hint)
@@ -859,20 +859,20 @@ vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
 }
 
 //---------------------------------------------------------------------------
-vtkKWUserInterfaceNotebookManager::DragAndDropEntry::DragAndDropEntry()
+vtkKWUserInterfaceManagerNotebook::DragAndDropEntry::DragAndDropEntry()
 {
   this->Widget = NULL;
 }
 
 //---------------------------------------------------------------------------
-vtkKWUserInterfaceNotebookManager::DragAndDropEntry* 
-vtkKWUserInterfaceNotebookManager::GetLastDragAndDropEntry(vtkKWWidget *widget)
+vtkKWUserInterfaceManagerNotebook::DragAndDropEntry* 
+vtkKWUserInterfaceManagerNotebook::GetLastDragAndDropEntry(vtkKWWidget *widget)
 {
   if (this->Internals && widget)
     {
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerReverseIterator 
+    vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerReverseIterator 
       rit = this->Internals->DragAndDropEntries.rbegin();
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerReverseIterator 
+    vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerReverseIterator 
       rend = this->Internals->DragAndDropEntries.rend();
     for (; rit != rend; ++rit)
       {
@@ -887,19 +887,19 @@ vtkKWUserInterfaceNotebookManager::GetLastDragAndDropEntry(vtkKWWidget *widget)
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::GetNumberOfDragAndDropEntries()
+int vtkKWUserInterfaceManagerNotebook::GetNumberOfDragAndDropEntries()
 {
   return this->Internals ? this->Internals->DragAndDropEntries.size() : 0;
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::DeleteAllDragAndDropEntries()
+int vtkKWUserInterfaceManagerNotebook::DeleteAllDragAndDropEntries()
 {
   if (this->Internals)
     {
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+    vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator it = 
       this->Internals->DragAndDropEntries.begin();
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+    vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator end = 
       this->Internals->DragAndDropEntries.end();
     for (; it != end; ++it)
       {
@@ -916,7 +916,7 @@ int vtkKWUserInterfaceNotebookManager::DeleteAllDragAndDropEntries()
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
+int vtkKWUserInterfaceManagerNotebook::GetDragAndDropEntry(
   int idx, 
   ostream &widget_label, 
   ostream &from_panel_name, 
@@ -931,9 +931,9 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
     return 0;
     }
 
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator it = 
     this->Internals->DragAndDropEntries.begin();
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator end = 
     this->Internals->DragAndDropEntries.end();
   for (; it != end && idx; ++it, --idx)
     {
@@ -946,7 +946,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
 
   // Widget
 
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = *it;
+  vtkKWUserInterfaceManagerNotebook::DragAndDropEntry *dd_entry = *it;
   if (dd_entry->Widget)
     {
     widget_label << this->GetDragAndDropWidgetLabel(dd_entry->Widget);
@@ -956,7 +956,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
   // If both the page title and panel name are the same, do not
   // output the panel name
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation *from_loc = 
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation *from_loc = 
     &dd_entry->FromLocation;
 
   const char *page_title = NULL;
@@ -989,7 +989,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
   // If both the page title and panel name are the same, do not
   // output the page title
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation *to_loc = 
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation *to_loc = 
     &dd_entry->ToLocation;
 
   if (from_loc->PageId != to_loc->PageId)
@@ -1024,7 +1024,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
+int vtkKWUserInterfaceManagerNotebook::DragAndDropWidget(
   const char *widget_label, 
   const char *from_panel_name, 
   const char *from_page_title, 
@@ -1041,7 +1041,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
   // From
   // If there is no panel name, use page title
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc;
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation from_loc;
 
   if (!from_panel_name)
     {
@@ -1077,7 +1077,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
   // If there if no "To page title", use "From page title"
   // If there is no panel name, use page title
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation to_loc;
 
   if (!to_page_title)
     {
@@ -1116,7 +1116,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
+int vtkKWUserInterfaceManagerNotebook::DragAndDropWidget(
   vtkKWWidget *widget, 
   const WidgetLocation *from_loc,
   const WidgetLocation *to_loc)
@@ -1161,7 +1161,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::IsDragAndDropWidgetAtOriginalLocation(
+int vtkKWUserInterfaceManagerNotebook::IsDragAndDropWidgetAtOriginalLocation(
   vtkKWWidget *widget)
 {
   if (!widget)
@@ -1169,9 +1169,9 @@ int vtkKWUserInterfaceNotebookManager::IsDragAndDropWidgetAtOriginalLocation(
     return 0;
     }
 
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator it = 
     this->Internals->DragAndDropEntries.begin();
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator end = 
     this->Internals->DragAndDropEntries.end();
   for (; it != end; ++it)
     {
@@ -1193,7 +1193,7 @@ int vtkKWUserInterfaceNotebookManager::IsDragAndDropWidgetAtOriginalLocation(
 }
 
 //---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
+int vtkKWUserInterfaceManagerNotebook::AddDragAndDropEntry(
   vtkKWWidget *widget, 
   const WidgetLocation *from_loc, 
   const WidgetLocation *to_loc)
@@ -1203,9 +1203,9 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
     return 0;
     }
 
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry, *prev_entry;
+  vtkKWUserInterfaceManagerNotebook::DragAndDropEntry *dd_entry, *prev_entry;
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc_fixed = *from_loc;
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation from_loc_fixed = *from_loc;
 
   // Do we have an entry for that widget already ?
   // In that case, remove it, and use the previous "from" location as the
@@ -1214,7 +1214,7 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   prev_entry = this->GetLastDragAndDropEntry(widget);
   if (prev_entry)
     {
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator pos = 
+    vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator pos = 
       vtksys_stl::find(this->Internals->DragAndDropEntries.begin(),
                    this->Internals->DragAndDropEntries.end(),
                    prev_entry);
@@ -1230,7 +1230,7 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
 
   // Append and set an entry
 
-  dd_entry = new vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
+  dd_entry = new vtkKWUserInterfaceManagerNotebook::DragAndDropEntry;
   this->Internals->DragAndDropEntries.push_back(dd_entry);
 
   dd_entry->Widget = widget;
@@ -1247,8 +1247,8 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   // if A is not valid anymore (it has been repack elsewhere), update the
   // old entry W so that its destination location matches its current location
 
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = this->Internals->DragAndDropEntries.begin();
-  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = this->Internals->DragAndDropEntries.end();
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator it = this->Internals->DragAndDropEntries.begin();
+  vtkKWUserInterfaceManagerNotebookInternals::DragAndDropEntriesContainerIterator end = this->Internals->DragAndDropEntries.end();
   for (; it != end; ++it)
     {
     if (*it && (*it)->ToLocation.AfterWidget == widget)
@@ -1309,7 +1309,7 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
+void vtkKWUserInterfaceManagerNotebook::DragAndDropEndCallback(
   int x, int y, 
   vtkKWWidget *widget, vtkKWWidget *vtkNotUsed(anchor), vtkKWWidget *target)
 {
@@ -1322,7 +1322,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
 
   // Get the current location of the widget
 
-  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc;
+  vtkKWUserInterfaceManagerNotebook::WidgetLocation from_loc;
   if (!this->GetDragAndDropWidgetLocation(widget, &from_loc))
     {
     return;
@@ -1336,7 +1336,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     {
     if (page_id != this->Notebook->GetRaisedPageId())
       {
-      vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
+      vtkKWUserInterfaceManagerNotebook::WidgetLocation to_loc;
       to_loc.PageId = page_id;
       this->DragAndDropWidget(widget, &from_loc, &to_loc);
       }
@@ -1367,7 +1367,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
         sibbling->IsMapped() && 
         vtkKWTkUtilities::ContainsCoordinates(sibbling, x, y))
       {
-      vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
+      vtkKWUserInterfaceManagerNotebook::WidgetLocation to_loc;
       to_loc.PageId = from_loc.PageId;
       to_loc.AfterWidget = sibbling;
       this->DragAndDropWidget(widget, &from_loc, &to_loc);
@@ -1377,7 +1377,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::PrintSelf(
+void vtkKWUserInterfaceManagerNotebook::PrintSelf(
   ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

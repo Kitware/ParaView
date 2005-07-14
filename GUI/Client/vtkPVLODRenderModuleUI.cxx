@@ -19,7 +19,6 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
-#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
@@ -33,7 +32,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraIcon.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDisplayGUI.h"
@@ -60,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.30");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()

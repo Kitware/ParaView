@@ -18,7 +18,7 @@
 // user interface defined in vtkKWApplicationSettingsInterface.
 // See vtkKWUserInterfacePanel for a more detailed description.
 // .SECTION See Also
-// vtkKWApplicationSettingsInterface vtkKWUserInterfacePanel vtkKWUserInterfaceManager vtkKWUserInterfaceNotebookManager
+// vtkKWApplicationSettingsInterface vtkKWUserInterfacePanel vtkKWUserInterfaceManager
 
 #ifndef __vtkPVApplicationSettingsInterface_h
 #define __vtkPVApplicationSettingsInterface_h

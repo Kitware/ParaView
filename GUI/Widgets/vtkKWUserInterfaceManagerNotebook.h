@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWUserInterfaceNotebookManager - a user interface manager.
+// .NAME vtkKWUserInterfaceManagerNotebook - a user interface manager.
 // .SECTION Description
 // This class is used to abstract the way a set of interface "panels" 
 // (vtkKWUserInterfacePanel) can be grouped inside a widget. As such, it is a 
@@ -30,8 +30,8 @@
 // .SECTION See Also
 // vtkKWUserInterfaceManager vtkKWUserInterfacePanel
 
-#ifndef __vtkKWUserInterfaceNotebookManager_h
-#define __vtkKWUserInterfaceNotebookManager_h
+#ifndef __vtkKWUserInterfaceManagerNotebook_h
+#define __vtkKWUserInterfaceManagerNotebook_h
 
 #include "vtkKWUserInterfaceManager.h"
 
@@ -40,13 +40,13 @@ class vtkKWIcon;
 class vtkKWNotebook;
 class vtkKWUserInterfacePanel;
 class vtkKWWidget;
-class vtkKWUserInterfaceNotebookManagerInternals;
+class vtkKWUserInterfaceManagerNotebookInternals;
 
-class KWWIDGETS_EXPORT vtkKWUserInterfaceNotebookManager : public vtkKWUserInterfaceManager
+class KWWIDGETS_EXPORT vtkKWUserInterfaceManagerNotebook : public vtkKWUserInterfaceManager
 {
 public:
-  static vtkKWUserInterfaceNotebookManager* New();
-  vtkTypeRevisionMacro(vtkKWUserInterfaceNotebookManager,vtkKWUserInterfaceManager);
+  static vtkKWUserInterfaceManagerNotebook* New();
+  vtkTypeRevisionMacro(vtkKWUserInterfaceManagerNotebook,vtkKWUserInterfaceManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -228,8 +228,8 @@ public:
   //ETX
 
 protected:
-  vtkKWUserInterfaceNotebookManager();
-  ~vtkKWUserInterfaceNotebookManager();
+  vtkKWUserInterfaceManagerNotebook();
+  ~vtkKWUserInterfaceManagerNotebook();
 
   // Description:
   // Remove the widgets of all pages belonging to a panel. It is called
@@ -266,8 +266,8 @@ protected:
 
   // PIMPL Encapsulation for STL containers
 
-  vtkKWUserInterfaceNotebookManagerInternals *Internals;
-  friend class vtkKWUserInterfaceNotebookManagerInternals;
+  vtkKWUserInterfaceManagerNotebookInternals *Internals;
+  friend class vtkKWUserInterfaceManagerNotebookInternals;
 
   // Description:
   // Get the location of a widget.
@@ -311,8 +311,8 @@ protected:
 
 private:
 
-  vtkKWUserInterfaceNotebookManager(const vtkKWUserInterfaceNotebookManager&); // Not implemented
-  void operator=(const vtkKWUserInterfaceNotebookManager&); // Not Implemented
+  vtkKWUserInterfaceManagerNotebook(const vtkKWUserInterfaceManagerNotebook&); // Not implemented
+  void operator=(const vtkKWUserInterfaceManagerNotebook&); // Not Implemented
 };
 
 #endif

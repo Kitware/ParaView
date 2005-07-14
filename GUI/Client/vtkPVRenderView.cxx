@@ -26,7 +26,6 @@
 #include "vtkImageData.h"
 #include "vtkInteractorObserver.h"
 #include "vtkJPEGWriter.h"
-#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkPVCornerAnnotationEditor.h"
@@ -46,7 +45,6 @@
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPVApplication.h"
-#include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraControl.h"
 #include "vtkPVCameraIcon.h"
@@ -140,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.393");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.394");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
