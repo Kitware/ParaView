@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.2");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -125,7 +125,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   this->SplitFrame->SetFrame1Size(220);
   this->SplitFrame->SetFrame1MinimumSize(this->SplitFrame->GetFrame1Size());
   
-  this->Script("pack %s -side top -expand y -fill both -padx 1 -pady 1", 
+  this->Script("pack %s -side top -expand y -fill both -padx 1 -pady 2", 
                this->SplitFrame->GetWidgetName());
   
   // Create the tree
@@ -136,10 +136,15 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
 
   vtkKWTree *tree = this->Tree->GetWidget();
   tree->SetPadX(0);
+  tree->SetReliefToFlat();
+  tree->SetBorderWidth(0);
+  tree->SetHighlightThickness(0);
   tree->SetBackgroundColor(1.0, 1.0, 1.0);
+  tree->SetSelectionForegroundColor(1.0, 1.0, 1.0);
+  tree->SetSelectionBackgroundColor(0.0, 0.0, 0.7);
   tree->RedrawOnIdleOn();
   tree->SelectionFillOn();
-  tree->SetWidth(15);
+  tree->SetWidth(350 / 8);
   tree->SetSelectionChangedCommand(this, "SelectionChangedCallback");
 
   this->Script("pack %s -side top -expand y -fill both", 
@@ -153,7 +158,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   this->CloseButton->SetWidth(30);
   this->CloseButton->SetCommand(this->TopLevel, "Withdraw");
   
-  this->Script("pack %s -side top -anchor c -fill x -padx 1 -pady 1", 
+  this->Script("pack %s -side top -anchor c -fill x -padx 1 -pady 2", 
                this->CloseButton->GetWidgetName());
   
   // Create the notebook
