@@ -69,7 +69,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.243");
+vtkCxxRevisionMacro(vtkKWApplication, "1.244");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -367,7 +367,7 @@ int vtkKWApplication::Exit()
 
   // If a dialog is still up, complain and bail
 
-  if (this->GetDialogUp())
+  if (this->IsDialogUp())
     {
     this->Script("bell");
     return 0;
@@ -1844,6 +1844,18 @@ void vtkKWApplication::RegisterDialogUp(vtkKWWidget *)
 void vtkKWApplication::UnRegisterDialogUp(vtkKWWidget *)
 {
   this->DialogUp--;
+
+  if (this->DialogUp < 0)
+    {
+    vtkErrorMacro(
+      "It seems that UnRegisterDialogUp() was called without a matching call to RegisterDialogUp(), since the number of dialogs supposed to be up is now negative... This is most likely not good.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::IsDialogUp()
+{
+  return (this->DialogUp > 0 ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1944,7 +1956,6 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->HelpDialogStartingPage ? this->HelpDialogStartingPage :
          "(none)")
      << endl;
-  os << indent << "DialogUp: " << this->GetDialogUp() << endl;
   os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
   os << indent << "RegistryLevel: " << this->GetRegistryLevel() << endl;
   os << indent << "ExitAfterLoadScript: " << (this->ExitAfterLoadScript ? "on":"off") << endl;

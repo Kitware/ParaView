@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.24");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -225,7 +225,7 @@ void vtkKWPopupButton::DisplayPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWPopupButton::WithdrawPopupCallback()
 {
-  if ( this->GetApplication()->GetDialogUp() )
+  if ( this->GetApplication()->IsDialogUp() )
     {
     this->Script("bell");
     return;

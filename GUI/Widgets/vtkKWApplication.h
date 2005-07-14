@@ -349,7 +349,7 @@ public:
 
   // Description:
   // Call RegisterDialogUp to notify the application that a modal dialog is up,
-  // and UnRegisterDialogUp when it is not anymore. GetDialogUp will return
+  // and UnRegisterDialogUp when it is not anymore. IsDialogUp will return
   // if any dialog is up. 
   // The parameter to pass is a pointer to the dialog/toplevel/widget that is
   // being registered/unregistered. If there is no such widget (say, if you
@@ -364,7 +364,7 @@ public:
   // or vtkKWDialog should take care of calling this function for you.
   virtual void RegisterDialogUp(vtkKWWidget *ptr);
   virtual void UnRegisterDialogUp(vtkKWWidget *ptr);
-  vtkGetMacro(DialogUp, int);
+  virtual int IsDialogUp();
   
   // Description:
   // Open a link (media).On Win32, use ShellExecute to trigger the default
