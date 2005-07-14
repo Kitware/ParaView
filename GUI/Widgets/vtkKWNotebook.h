@@ -61,7 +61,7 @@ public:
 
   // Description:
   // Accessors
-  char* GetPageTitle(int id);
+  const char* GetPageTitle(int id);
 
   // Description:
   // Return the number of pages in the notebook.
@@ -384,7 +384,7 @@ protected:
   int  CanBeHidden(Page*);
   int  GetPageTag(Page*);
   int  GetPagePinned(Page*);
-  char* GetPageTitle(Page*);
+  const char* GetPageTitle(Page*);
   void BindPage(Page*);
   void UnBindPage(Page*);
 

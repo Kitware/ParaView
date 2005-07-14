@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.84");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.85");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -1201,18 +1201,18 @@ int vtkKWNotebook::GetPageTag(vtkKWNotebook::Page *page)
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWNotebook::GetPageTitle(int id)
+const char* vtkKWNotebook::GetPageTitle(int id)
 {
   return this->GetPageTitle(this->GetPage(id));
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWNotebook::GetPageTitle(vtkKWNotebook::Page *page)
+const char* vtkKWNotebook::GetPageTitle(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
     {
     vtkErrorMacro("Can not query page title.");
-    return 0;
+    return NULL;
     }
 
   return page->Title;
