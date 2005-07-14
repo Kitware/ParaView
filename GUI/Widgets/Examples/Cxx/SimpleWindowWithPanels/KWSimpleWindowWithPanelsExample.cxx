@@ -102,11 +102,11 @@ int my_main(int argc, char *argv[])
   // different value (arbitrarily set to the ID of the button by default)
 
   vtkKWRadioButtonSet *rbs = vtkKWRadioButtonSet::New();
-  rbs->SetParent(page_widget);
+  rbs->SetParent(label_panel->GetPagesParentWidget());
   rbs->Create(app);
 
-  app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
-              rbs->GetWidgetName());
+  app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2 -in %s", 
+              rbs->GetWidgetName(), page_widget->GetWidgetName());
 
   const char* texts[] = { "Hello, World", "Bonjour, Monde", "Hallo, Welt"};
   vtkKWRadioButton *rb = NULL;
@@ -142,13 +142,13 @@ int my_main(int argc, char *argv[])
   // Put it inside a labeled frame for kicks
 
   vtkKWFrameWithLabel *ccb_frame = vtkKWFrameWithLabel::New();
-  ccb_frame->SetParent(page_widget);
+  ccb_frame->SetParent(frame_panel->GetPagesParentWidget());
   ccb_frame->Create(app);
   ccb_frame->SetLabelText("View Background Color");
 
   app->Script(
-    "pack %s -side top -anchor nw -expand y -fill x -padx 2 -pady 2", 
-    ccb_frame->GetWidgetName());
+    "pack %s -side top -anchor nw -expand y -fill x -padx 2 -pady 2 -in %s", 
+    ccb_frame->GetWidgetName(), page_widget->GetWidgetName());
 
   vtkKWHSVColorSelector *ccb = vtkKWHSVColorSelector::New();
   ccb->SetParent(ccb_frame->GetFrame());

@@ -65,10 +65,10 @@ set page_widget [label_panel GetPageWidget "Language"]
 # different value (arbitrarily set to the ID of the button by default)
 
 vtkKWRadioButtonSet rbs
-rbs SetParent $page_widget
+rbs SetParent [label_panel GetPagesParentWidget]
 rbs Create app
 
-pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
+pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2 -in [page_widget GetWidgetName]
 
 set texts { "Hello, World" "Bonjour, Monde" "Hallo, Welt" }
 for {set id 0} {$id < [llength $texts]} {incr id} {
@@ -101,11 +101,11 @@ set page_widget [frame_panel GetPageWidget "View Colors"]
 # Put it inside a labeled frame for kicks
 
 vtkKWFrameWithLabel ccb_frame
-ccb_frame SetParent $page_widget
+ccb_frame SetParent  [frame_panel GetPagesParentWidget]
 ccb_frame Create app
 ccb_frame SetLabelText "View Background Color"
 
-pack [ccb_frame GetWidgetName] -side top -anchor nw -expand y -fill x -padx 2 -pady 2
+pack [ccb_frame GetWidgetName] -side top -anchor nw -expand y -fill x -padx 2 -pady 2 -in [page_widget GetWidgetName]
 
 vtkKWHSVColorSelector ccb
 ccb SetParent [ccb_frame GetFrame]
