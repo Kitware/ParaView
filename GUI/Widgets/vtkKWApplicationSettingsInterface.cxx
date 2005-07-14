@@ -26,18 +26,20 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
-#include "vtkKWUserInterfaceNotebookManager.h"
+#include "vtkKWUserInterfaceManagerNotebook.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
+
+const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Settings";
 
 #define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
 #define VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT "%.1lf"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.44");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -404,7 +406,8 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->PrintSettingsFrame->ShowHideFrameOn();
   this->PrintSettingsFrame->Create(app);
-  this->PrintSettingsFrame->SetLabelText("Print Settings");
+  this->PrintSettingsFrame->SetLabelText(
+    vtkKWApplicationSettingsInterface::PrintSettingsLabel);
     
   tk_cmd << "pack " << this->PrintSettingsFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 "  
@@ -498,8 +501,8 @@ void vtkKWApplicationSettingsInterface::Update()
 
   // Interface customization : Drag & Drop : Enable
 
-  vtkKWUserInterfaceNotebookManager *uim_nb = 
-    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+  vtkKWUserInterfaceManagerNotebook *uim_nb = 
+    vtkKWUserInterfaceManagerNotebook::SafeDownCast(
       this->Window->GetMainUserInterfaceManager());
   if (!uim_nb)
     {
@@ -607,8 +610,8 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
         "start this application.",
         vtkKWMessageDialog::WarningIcon);
 
-  vtkKWUserInterfaceNotebookManager *uim_nb = 
-    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+  vtkKWUserInterfaceManagerNotebook *uim_nb = 
+    vtkKWUserInterfaceManagerNotebook::SafeDownCast(
       this->Window->GetMainUserInterfaceManager());
   if (uim_nb)
     {

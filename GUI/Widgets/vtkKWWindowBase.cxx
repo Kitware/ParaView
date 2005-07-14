@@ -31,7 +31,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-const char *vtkKWWindowBase::PrintOptionsMenuLabel = "Print options...";
+const char *vtkKWWindowBase::PrintOptionsMenuLabel = "Print Settings...";
 const char *vtkKWWindowBase::FileMenuLabel = "File";
 const char *vtkKWWindowBase::FileCloseMenuLabel = "Close";
 const char *vtkKWWindowBase::FileExitMenuLabel = "Exit";
@@ -48,7 +48,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.24");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.25");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -289,7 +289,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   if (this->SupportPrint)
     {
     menu->AddCommand(
-      vtkKWWindowBase::PrintOptionsMenuLabel, this, "PrintOptionsCallback", 4);
+      vtkKWWindowBase::PrintOptionsMenuLabel, this, "PrintSettingsCallback",4);
     menu->AddSeparator();
     }
 
@@ -669,7 +669,7 @@ int vtkKWWindowBase::Close()
   // up is something that was created by this instance, and not by another
   // window instance (in the later case, it would be safe to close)
 
-  if (this->GetApplication()->GetDialogUp())
+  if (this->GetApplication()->IsDialogUp())
     {
     this->Script("bell");
     return 0;

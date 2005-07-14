@@ -16,7 +16,7 @@
 // A concrete implementation of a user interface panel.
 // See vtkKWUserInterfacePanel for a more detailed description.
 // .SECTION See Also
-// vtkKWUserInterfacePanel vtkKWUserInterfaceManager vtkKWUserInterfaceNotebookManager
+// vtkKWUserInterfacePanel vtkKWUserInterfaceManager 
 
 #ifndef __vtkKWApplicationSettingsInterface_h
 #define __vtkKWApplicationSettingsInterface_h
@@ -71,6 +71,12 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Some constants
+  //BTX
+  static const char *PrintSettingsLabel;
+  //ETX
 
 protected:
   vtkKWApplicationSettingsInterface();

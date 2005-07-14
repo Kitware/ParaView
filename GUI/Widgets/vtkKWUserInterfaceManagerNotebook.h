@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWUserInterfaceNotebookManager.h
+  Module:    vtkKWUserInterfaceManagerNotebook.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

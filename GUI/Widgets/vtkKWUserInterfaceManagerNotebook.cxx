@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWUserInterfaceNotebookManager.cxx
+  Module:    vtkKWUserInterfaceManagerNotebook.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.43");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.1");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceNotebookManagerInternals

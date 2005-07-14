@@ -14,17 +14,19 @@
 #include "vtkKWWindow.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWUserInterfaceNotebookManager.h"
-#include "vtkKWApplicationSettingsInterface.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkKWToolbarSet.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
+#include "vtkKWUserInterfaceManagerDialog.h"
+#include "vtkKWUserInterfaceManagerNotebook.h"
+#include "vtkObjectFactory.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -42,7 +44,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.260");
+vtkCxxRevisionMacro(vtkKWWindow, "1.261");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -64,9 +66,13 @@ vtkKWWindow::vtkKWWindow()
   this->MainNotebook->EnablePageTabContextMenuOn();
   this->MainNotebook->AlwaysShowTabsOn();
 
-  this->MainUserInterfaceManager = vtkKWUserInterfaceNotebookManager::New();
+#if 0
+  this->MainUserInterfaceManager = vtkKWUserInterfaceManagerDialog::New();
+#else
+  this->MainUserInterfaceManager = vtkKWUserInterfaceManagerNotebook::New();
   this->MainUserInterfaceManager->SetNotebook(this->MainNotebook);
   this->MainUserInterfaceManager->EnableDragAndDropOn();
+#endif
 
   // Secondary panel
 
@@ -76,7 +82,7 @@ vtkKWWindow::vtkKWWindow()
   this->SecondaryNotebook->AlwaysShowTabsOn();
 
   this->SecondaryUserInterfaceManager = 
-    vtkKWUserInterfaceNotebookManager::New();
+    vtkKWUserInterfaceManagerNotebook::New();
   this->SecondaryUserInterfaceManager->SetNotebook(this->SecondaryNotebook);
   this->SecondaryUserInterfaceManager->EnableDragAndDropOn();
 
@@ -88,7 +94,7 @@ vtkKWWindow::vtkKWWindow()
   this->ViewNotebook->AlwaysShowTabsOff();
 
   this->ViewUserInterfaceManager = 
-    vtkKWUserInterfaceNotebookManager::New();
+    vtkKWUserInterfaceManagerNotebook::New();
   this->ViewUserInterfaceManager->SetNotebook(this->ViewNotebook);
   this->ViewUserInterfaceManager->EnableDragAndDropOn();
 
@@ -96,9 +102,10 @@ vtkKWWindow::vtkKWWindow()
 
   this->SecondaryToolbarSet = vtkKWToolbarSet::New();
   
-  // Interfaces
+  // Application Settings
 
   this->ApplicationSettingsInterface = NULL;
+  this->ApplicationSettingsUserInterfaceManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -160,6 +167,12 @@ vtkKWWindow::~vtkKWWindow()
     this->SecondaryToolbarSet = NULL;
     }
 
+  if (this->ApplicationSettingsUserInterfaceManager)
+    {
+    this->ApplicationSettingsUserInterfaceManager->Delete();
+    this->ApplicationSettingsUserInterfaceManager = NULL;
+    }
+
   if (this->ApplicationSettingsInterface)
     {
     this->ApplicationSettingsInterface->Delete();
@@ -183,6 +196,11 @@ void vtkKWWindow::PrepareForDelete()
   if (this->ViewUserInterfaceManager)
     {
     this->ViewUserInterfaceManager->RemoveAllPanels();
+    }
+
+  if (this->ApplicationSettingsUserInterfaceManager)
+    {
+    this->ApplicationSettingsUserInterfaceManager->RemoveAllPanels();
     }
 
   if (this->SecondaryToolbarSet)
@@ -336,7 +354,7 @@ void vtkKWWindow::Create(vtkKWApplication *app)
   menu = this->GetViewMenu();
   idx = this->GetViewMenuInsertPosition();
   menu->InsertSeparator(idx++);
-  cmd = "ShowMainUserInterface {";
+  cmd = "ShowApplicationSettingsUserInterface {";
   cmd += this->GetApplicationSettingsInterface()->GetName();
   cmd += "}";
   menu->InsertCommand(
@@ -381,7 +399,8 @@ vtkKWApplicationSettingsInterface*
 vtkKWWindow::GetApplicationSettingsInterface()
 {
   // If not created, create the application settings interface, connect it
-  // to the current window, and manage it with the current interface manager.
+  // to the current window, and manage it with the app settings
+  // interface manager.
 
   // Subclasses that will add more settings will likely to create a subclass
   // of vtkKWApplicationSettingsInterface and override this function so that
@@ -393,9 +412,65 @@ vtkKWWindow::GetApplicationSettingsInterface()
       vtkKWApplicationSettingsInterface::New();
     this->ApplicationSettingsInterface->SetWindow(this);
     this->ApplicationSettingsInterface->SetUserInterfaceManager(
-      this->GetMainUserInterfaceManager());
+      this->GetApplicationSettingsUserInterfaceManager());
     }
   return this->ApplicationSettingsInterface;
+}
+
+//----------------------------------------------------------------------------
+vtkKWUserInterfaceManager* 
+vtkKWWindow::GetApplicationSettingsUserInterfaceManager()
+{
+  if (!this->ApplicationSettingsUserInterfaceManager)
+    {
+    this->ApplicationSettingsUserInterfaceManager = 
+      vtkKWUserInterfaceManagerDialog::New();
+    this->ApplicationSettingsUserInterfaceManager->SetDialogTitle(
+      "Application Settings");
+    this->ApplicationSettingsUserInterfaceManager->PageNodeVisibilityOff();
+    }
+
+  if  (this->IsCreated() && 
+       !this->ApplicationSettingsUserInterfaceManager->IsCreated())
+    {
+    this->ApplicationSettingsUserInterfaceManager->Create(
+      this->GetApplication());
+    }
+  
+  return this->ApplicationSettingsUserInterfaceManager;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowApplicationSettingsUserInterface(const char *name)
+{
+  if (this->GetApplicationSettingsUserInterfaceManager())
+    {
+    this->ShowApplicationSettingsUserInterface(
+      this->GetApplicationSettingsUserInterfaceManager()->GetPanel(name));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowApplicationSettingsUserInterface(
+  vtkKWUserInterfacePanel *panel)
+{
+  if (!panel)
+    {
+    return;
+    }
+
+  vtkKWUserInterfaceManager *uim = 
+    this->GetApplicationSettingsUserInterfaceManager();
+  if (!uim || !uim->HasPanel(panel))
+    {
+    vtkErrorMacro(
+      "Sorry, the user interface panel you are trying to display ("
+      << panel->GetName() << ") is not managed by the Application Settings "
+      "User Interface Manager");
+    return;
+    }
+  
+  panel->Raise();
 }
 
 //----------------------------------------------------------------------------
@@ -425,6 +500,10 @@ void vtkKWWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
   vtkKWUserInterfaceManager *uim = this->GetMainUserInterfaceManager();
   if (!uim || !uim->HasPanel(panel))
     {
+    vtkErrorMacro(
+      "Sorry, the user interface panel you are trying to display ("
+      << panel->GetName() << ") is not managed by the Main "
+      "User Interface Manager");
     return;
     }
 
@@ -528,6 +607,10 @@ void vtkKWWindow::ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel)
   vtkKWUserInterfaceManager *uim = this->GetSecondaryUserInterfaceManager();
   if (!uim || !uim->HasPanel(panel))
     {
+    vtkErrorMacro(
+      "Sorry, the user interface panel you are trying to display ("
+      << panel->GetName() << ") is not managed by the Secondary "
+      "User Interface Manager");
     return;
     }
 
@@ -651,6 +734,10 @@ void vtkKWWindow::ShowViewUserInterface(vtkKWUserInterfacePanel *panel)
   vtkKWUserInterfaceManager *uim = this->GetViewUserInterfaceManager();
   if (!uim || !uim->HasPanel(panel))
     {
+    vtkErrorMacro(
+      "Sorry, the user interface panel you are trying to display ("
+      << panel->GetName() << ") is not managed by the View "
+      "User Interface Manager");
     return;
     }
 
@@ -679,9 +766,29 @@ void vtkKWWindow::ShowViewUserInterface(vtkKWUserInterfacePanel *panel)
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWWindow::PrintOptionsCallback()
+void vtkKWWindow::PrintSettingsCallback()
 {
-  this->ShowMainUserInterface(this->GetApplicationSettingsInterface());
+  vtkKWApplicationSettingsInterface *app_settings = 
+    this->GetApplicationSettingsInterface();
+
+  vtkKWUserInterfaceManagerDialog *app_settings_uim =
+    vtkKWUserInterfaceManagerDialog::SafeDownCast(
+      this->GetApplicationSettingsUserInterfaceManager());
+
+  // If the UIM is a dialog one, try to reach the Print Settings section
+  // directly, otherwise just use the regular UIM API to show the panel
+  
+  if (app_settings && app_settings_uim)
+    {
+    app_settings_uim->RaiseSection(
+      app_settings, 
+      NULL, 
+      vtkKWApplicationSettingsInterface:: PrintSettingsLabel);
+    }
+  else
+    {
+    this->ShowApplicationSettingsUserInterface(app_settings);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -859,6 +966,16 @@ void vtkKWWindow::UpdateEnableState()
     // which will call an UpdateEnableState() too,
     // this->GetViewUserInterfaceManager()->UpdateEnableState();
     // this->GetViewUserInterfaceManager()->Update();
+    }
+
+  if (this->GetApplicationSettingsUserInterfaceManager())
+    {
+    this->GetApplicationSettingsUserInterfaceManager()->SetEnabled(
+      this->GetEnabled());
+    // As a side effect, SetEnabled() call an Update() on the panel, 
+    // which will call an UpdateEnableState() too,
+    // this->GetApplicationSettingsUserInterfaceManager()->UpdateEnableState();
+    // this->GetApplicationSettingsUserInterfaceManager()->Update();
     }
 
   // Update the window element

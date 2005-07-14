@@ -30,7 +30,7 @@
 // or manually request a page from the manager, it should be done through the 
 // panel's API).
 // .SECTION See Also
-// vtkKWUserInterfaceNotebookManager vtkKWUserInterfacePanel
+// vtkKWUserInterfaceManagerNotebook vtkKWUserInterfacePanel
 
 #ifndef __vtkKWUserInterfaceManager_h
 #define __vtkKWUserInterfaceManager_h
@@ -163,7 +163,7 @@ public:
   // manager-specific changes on the panel). Note that it does not call the
   // panel's Update() method, on the opposite the panel's Update() will call
   // this method if the panel has a UIM set.
-  virtual void UpdatePanel(vtkKWUserInterfacePanel *panel) = 0;
+  virtual void UpdatePanel(vtkKWUserInterfacePanel *panel) {};
 
 protected:
   vtkKWUserInterfaceManager();
@@ -206,6 +206,11 @@ protected:
   int GetPanelId(vtkKWUserInterfacePanel *panel);
 
   //ETX
+
+  // Description:
+  // This method is (and should be) called each time the number of panels
+  // changes (for example, after AddPanel() / RemovePanel())
+  virtual void NumberOfPanelsChanged() {};
 
 private:
 

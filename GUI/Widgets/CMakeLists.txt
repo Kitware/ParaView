@@ -150,7 +150,8 @@ SET(KWWidgets_SRCS
   vtkKWTopLevel.cxx 
   vtkKWTree.cxx 
   vtkKWUserInterfaceManager.cxx
-  vtkKWUserInterfaceNotebookManager.cxx
+  vtkKWUserInterfaceManagerDialog.cxx
+  vtkKWUserInterfaceManagerNotebook.cxx
   vtkKWUserInterfacePanel.cxx
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyWidget.cxx

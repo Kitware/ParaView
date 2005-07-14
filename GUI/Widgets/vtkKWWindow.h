@@ -43,7 +43,8 @@
 // GetName() method of a vtkKWUserInterfacePanel (UIP). 
 // The ShowMainUserInterface() method will query the main UIM to check if it
 // is indeed managing a panel (UIP) with that name, and show/raise that UIP
-// accordingly.
+// accordingly. If you do not know which user interface manager is used
+// by the panel, just call Show() or Raise() on the panel itself !
 //
 // Note that by following such framework, a subclass will be free of using
 // a totally different type of UIM, while the UIP implementation and 
@@ -79,6 +80,14 @@
 // As a convenience, a GetViewPanelFrame() method returns the parent
 // of the notebook, i.e. the space into which the notebook was packed, so
 // that other elements can be packed below or before the notebook itself.
+//
+// A fourth user interface manager is used to display and group all
+// panels related to application settings (i.e. "Preferences"). It is not
+// part of the layout as it will popup as a dialog instead. Note that
+// the panels do not have to bother about that, the manager will parse
+// each panel and create the dialog accordingly. If you have more application
+// settings parameters, just create your own panels and set their UIM to
+// the ApplicationSettingsUserInterfaceManager.
 //
 // This describes the default layout so far, where the secondary panel is
 // located below the view frame. The PanelLayout ivar can be set 
@@ -142,7 +151,8 @@ class vtkKWNotebook;
 class vtkKWSplitFrame;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
-class vtkKWUserInterfaceNotebookManager;
+class vtkKWUserInterfaceManagerNotebook;
+class vtkKWUserInterfaceManagerDialog;
 class vtkKWApplicationSettingsInterface;
 class vtkKWUserInterfacePanel;
 
@@ -243,7 +253,10 @@ public:
   virtual void Render();
 
   // Description:
-  // Get the Application Settings Interface. 
+  // Get the Application Settings Interface as well as the Application
+  // Settings User Interface Manager.
+  virtual vtkKWUserInterfaceManager* GetApplicationSettingsUserInterfaceManager();
+  virtual void ShowApplicationSettingsUserInterface(const char *name);
   virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
   // Description:
@@ -272,7 +285,7 @@ public:
   // Callbacks.
   virtual void MainPanelVisibilityCallback();
   virtual void SecondaryPanelVisibilityCallback();
-  virtual void PrintOptionsCallback();
+  virtual void PrintSettingsCallback();
   virtual void ToolbarVisibilityChangedCallback();
   virtual void NumberOfToolbarsChangedCallback();
 
@@ -314,9 +327,12 @@ protected:
   // managing the UIP, and show/raise that UIP accordingly.
   // The ShowSecondaryUserInterface will do the same on the secondary UIM.
   // The ShowViewUserInterface will do the same on the view UIM.
+  // The ShowApplicationSettingsUserInterface will do the same on the app 
+  // settings UIM.
   virtual void ShowMainUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowSecondaryUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowViewUserInterface(vtkKWUserInterfacePanel *panel);
+  virtual void ShowApplicationSettingsUserInterface(vtkKWUserInterfacePanel *panel);
 
   int PanelLayout;
 
@@ -334,9 +350,10 @@ protected:
 
 private:
 
-  vtkKWUserInterfaceNotebookManager *MainUserInterfaceManager;
-  vtkKWUserInterfaceNotebookManager *SecondaryUserInterfaceManager;
-  vtkKWUserInterfaceNotebookManager *ViewUserInterfaceManager;
+  vtkKWUserInterfaceManagerNotebook *MainUserInterfaceManager;
+  vtkKWUserInterfaceManagerNotebook *SecondaryUserInterfaceManager;
+  vtkKWUserInterfaceManagerNotebook *ViewUserInterfaceManager;
+  vtkKWUserInterfaceManagerDialog *ApplicationSettingsUserInterfaceManager;
 
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented

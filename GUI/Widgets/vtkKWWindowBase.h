@@ -291,7 +291,7 @@ public:
   // Process the click on the error icon.
   // Override it in subclasses to popup more elaborate log/error dialog.
   virtual void ErrorIconCallback();
-  virtual void PrintOptionsCallback() {};
+  virtual void PrintSettingsCallback() {};
   virtual void ToolbarVisibilityChangedCallback();
   virtual void NumberOfToolbarsChangedCallback();
 

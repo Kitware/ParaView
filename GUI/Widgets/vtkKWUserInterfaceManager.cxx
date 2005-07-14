@@ -22,7 +22,7 @@
 #include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.20");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerInternals
@@ -321,6 +321,8 @@ int vtkKWUserInterfaceManager::AddPanel(vtkKWUserInterfacePanel *panel)
 
   panel_slot->Panel->Register(this);
 
+  this->NumberOfPanelsChanged();
+
   return panel_slot->Id;
 }
 
@@ -375,6 +377,8 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
   // Delete the panel slot
 
   delete panel_slot;
+
+  this->NumberOfPanelsChanged();
 
   return 1;
 }
