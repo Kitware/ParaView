@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.1");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -533,7 +533,8 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
     
     vtkKWUserInterfacePanel *panel;
     int page_id;
-    if (!this->GetWidgetLocation(widget->GetWidgetName(), &panel, &page_id))
+    if (!widget->IsPacked() || 
+        !this->GetWidgetLocation(widget->GetWidgetName(), &panel, &page_id))
       {
       continue;
       }
@@ -672,7 +673,8 @@ void vtkKWUserInterfaceManagerDialog::RaiseSection(
     // Find where it is packed right now in the notebook, and retrieve the
     // corresponding notebook page id, as well as the panel it belongs to
     
-    if (!this->GetWidgetLocation(widget->GetWidgetName(), &panel, &page_id))
+    if (!widget->IsPacked() || 
+        !this->GetWidgetLocation(widget->GetWidgetName(), &panel, &page_id))
       {
       continue;
       }
