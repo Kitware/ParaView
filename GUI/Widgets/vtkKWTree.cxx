@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.9");
+vtkCxxRevisionMacro(vtkKWTree, "1.10");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -70,7 +70,7 @@ void vtkKWTree::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetSelectionToNode(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s selection set %s", this->GetWidgetName(), node);
     }
@@ -141,7 +141,7 @@ void vtkKWTree::AddNode(const char *parent,
 //----------------------------------------------------------------------------
 void vtkKWTree::SeeNode(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s see %s", this->GetWidgetName(), node);
     }
@@ -150,7 +150,7 @@ void vtkKWTree::SeeNode(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::OpenNode(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s opentree %s 0", this->GetWidgetName(), node);
     }
@@ -159,7 +159,7 @@ void vtkKWTree::OpenNode(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::CloseNode(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s closetree %s 0", this->GetWidgetName(), node);
     }
@@ -168,7 +168,7 @@ void vtkKWTree::CloseNode(const char *node)
 //----------------------------------------------------------------------------
 int vtkKWTree::IsNodeOpen(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return atoi(
       this->Script("%s itemcget %s -open", this->GetWidgetName(), node));
@@ -199,7 +199,7 @@ void vtkKWTree::CloseFirstNode()
 //----------------------------------------------------------------------------
 void vtkKWTree::OpenTree(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s opentree %s 1", this->GetWidgetName(), node);
     }
@@ -208,7 +208,7 @@ void vtkKWTree::OpenTree(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::CloseTree(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s closetree %s 1", this->GetWidgetName(), node);
     }
@@ -217,7 +217,7 @@ void vtkKWTree::CloseTree(const char *node)
 //----------------------------------------------------------------------------
 int vtkKWTree::HasNode(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return atoi(this->Script("%s exists %s", this->GetWidgetName(), node));
     }
@@ -237,7 +237,7 @@ void vtkKWTree::DeleteAllNodes()
 //----------------------------------------------------------------------------
 const char* vtkKWTree::GetNodeChildren(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return this->Script("%s nodes %s", this->GetWidgetName(), node);
     }
@@ -247,7 +247,7 @@ const char* vtkKWTree::GetNodeChildren(const char *node)
 //----------------------------------------------------------------------------
 const char* vtkKWTree::GetNodeParent(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return this->Script("%s parent %s", this->GetWidgetName(), node);
     }
@@ -257,7 +257,7 @@ const char* vtkKWTree::GetNodeParent(const char *node)
 //----------------------------------------------------------------------------
 const char* vtkKWTree::GetNodeUserData(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return this->ConvertTclStringToInternalString(
       this->Script("%s itemcget %s -data", this->GetWidgetName(), node));
@@ -268,7 +268,7 @@ const char* vtkKWTree::GetNodeUserData(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeUserData(const char *node, const char *data)
 {
-  if (this->IsCreated() && node && data)
+  if (this->IsCreated() && node && *node && data)
     {
     const char *val = this->ConvertInternalStringToTclString(
       data, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
@@ -280,7 +280,7 @@ void vtkKWTree::SetNodeUserData(const char *node, const char *data)
 //----------------------------------------------------------------------------
 const char* vtkKWTree::GetNodeText(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return this->ConvertTclStringToInternalString(
       this->Script("%s itemcget %s -text", this->GetWidgetName(), node));
@@ -291,7 +291,7 @@ const char* vtkKWTree::GetNodeText(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeText(const char *node, const char *text)
 {
-  if (this->IsCreated() && node && text)
+  if (this->IsCreated() && node && *node && text)
     {
     const char *val = this->ConvertInternalStringToTclString(
       text, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
@@ -303,7 +303,7 @@ void vtkKWTree::SetNodeText(const char *node, const char *text)
 //----------------------------------------------------------------------------
 const char* vtkKWTree::GetNodeFont(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return this->ConvertTclStringToInternalString(
       this->Script("%s itemcget %s -font", this->GetWidgetName(), node));
@@ -314,7 +314,7 @@ const char* vtkKWTree::GetNodeFont(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeFont(const char *node, const char *font)
 {
-  if (this->IsCreated() && node && font)
+  if (this->IsCreated() && node && *node && font)
     {
     const char *val = this->ConvertInternalStringToTclString(
       font, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
@@ -326,7 +326,7 @@ void vtkKWTree::SetNodeFont(const char *node, const char *font)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeFontWeightToBold(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     char new_font[1024];
     vtksys_stl::string font(this->GetNodeFont(node));
@@ -339,7 +339,7 @@ void vtkKWTree::SetNodeFontWeightToBold(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeFontWeightToNormal(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     char new_font[1024];
     vtksys_stl::string font(this->GetNodeFont(node));
@@ -352,7 +352,7 @@ void vtkKWTree::SetNodeFontWeightToNormal(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeFontSlantToItalic(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     char new_font[1024];
     vtksys_stl::string font(this->GetNodeFont(node));
@@ -365,7 +365,7 @@ void vtkKWTree::SetNodeFontSlantToItalic(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeFontSlantToRoman(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     char new_font[1024];
     vtksys_stl::string font(this->GetNodeFont(node));
@@ -378,7 +378,7 @@ void vtkKWTree::SetNodeFontSlantToRoman(const char *node)
 //----------------------------------------------------------------------------
 int vtkKWTree::GetNodeSelectableFlag(const char *node)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     return atoi(this->Script("%s itemcget %s -selectable", 
                              this->GetWidgetName(), node));
@@ -389,7 +389,7 @@ int vtkKWTree::GetNodeSelectableFlag(const char *node)
 //----------------------------------------------------------------------------
 void vtkKWTree::SetNodeSelectableFlag(const char *node, int flag)
 {
-  if (this->IsCreated() && node)
+  if (this->IsCreated() && node && *node)
     {
     this->Script("%s itemconfigure %s -selectable %d", 
                  this->GetWidgetName(), node, flag);
