@@ -369,21 +369,35 @@ IF(MAKE_SYSTEM OR UNIX)
 ENDIF(MAKE_SYSTEM OR UNIX)
 SET(CMD ${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/kwProcessXML${EXE_EXT})
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
-  DEPENDS 
+SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
+  )
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
+  DEPENDS ${resourceFiles}
   kwProcessXML
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources
   vtkPVDefaultModules Interface GetInterfaces
-  Filters Manipulators Readers Sources Writers)
+  ${resourceFiles})
 
+SET(PARAVIEW_INCLUDE_MODULES_TO_PVINITIALIZE "")
+FOREACH(rf ${resourceFiles})
+  STRING(REGEX REPLACE "^.*/(.*).xml$" "\\1" moduleName "${rf}")
+  SET(oneModule "  init_string = vtkPVDefaultModules${moduleName}GetInterfaces();\n")
+  SET(oneModule "${oneModule}  win->ReadSourceInterfacesFromString(init_string);\n")
+  SET(oneModule "${oneModule}  delete[] init_string;\n")
+  SET(PARAVIEW_INCLUDE_MODULES_TO_PVINITIALIZE
+    "${PARAVIEW_INCLUDE_MODULES_TO_PVINITIALIZE}\n${oneModule}")
+ENDFOREACH(rf)
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkParaViewIncludeModulesToPVInitialize.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToPVInitialize.h"
+  @ONLY IMMEDIATE)
 SET_SOURCE_FILES_PROPERTIES(vtkPVInitialize.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h)
 
