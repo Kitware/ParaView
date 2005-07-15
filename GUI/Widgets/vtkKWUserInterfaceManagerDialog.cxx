@@ -28,12 +28,13 @@
 #include "vtkKWTree.h"
 #include "vtkKWTreeWithScrollbars.h"
 
+#include <vtksys/stl/string>
 #include <vtksys/stl/list>
 #include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.3");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -791,9 +792,9 @@ int vtkKWUserInterfaceManagerDialog::ShowSelectedNodeSection()
     }
   else
     {
-    this->Internals->SelectedNode.clear();
-    this->Internals->SelectedSection.clear();
-    this->Internals->SelectedSectionOldPackingPosition.clear();
+    this->Internals->SelectedNode = "";
+    this->Internals->SelectedSection = "";
+    this->Internals->SelectedSectionOldPackingPosition = "";
     }
 
   return res;
