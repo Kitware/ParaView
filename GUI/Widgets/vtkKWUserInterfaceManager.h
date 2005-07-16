@@ -163,7 +163,7 @@ public:
   // manager-specific changes on the panel). Note that it does not call the
   // panel's Update() method, on the opposite the panel's Update() will call
   // this method if the panel has a UIM set.
-  virtual void UpdatePanel(vtkKWUserInterfacePanel *panel) {};
+  virtual void UpdatePanel(vtkKWUserInterfacePanel *) {};
 
 protected:
   vtkKWUserInterfaceManager();

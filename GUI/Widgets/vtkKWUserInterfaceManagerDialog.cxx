@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.4");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -296,14 +296,14 @@ int vtkKWUserInterfaceManagerDialog::ShowPanel(
 
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceManagerDialog::HidePanel(
-  vtkKWUserInterfacePanel *panel)
+  vtkKWUserInterfacePanel *)
 {
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceManagerDialog::IsPanelVisible(
-  vtkKWUserInterfacePanel *panel)
+  vtkKWUserInterfacePanel *)
 {
   return 1;
 }
