@@ -68,7 +68,7 @@ vtkKWRadioButtonSet rbs
 rbs SetParent [label_panel GetPagesParentWidget]
 rbs Create app
 
-pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2 -in [page_widget GetWidgetName]
+pack [rbs GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2 -in [$page_widget GetWidgetName]
 
 set texts { "Hello, World" "Bonjour, Monde" "Hallo, Welt" }
 for {set id 0} {$id < [llength $texts]} {incr id} {
@@ -105,7 +105,7 @@ ccb_frame SetParent  [frame_panel GetPagesParentWidget]
 ccb_frame Create app
 ccb_frame SetLabelText "View Background Color"
 
-pack [ccb_frame GetWidgetName] -side top -anchor nw -expand y -fill x -padx 2 -pady 2 -in [page_widget GetWidgetName]
+pack [ccb_frame GetWidgetName] -side top -anchor nw -expand y -fill x -padx 2 -pady 2 -in [$page_widget GetWidgetName]
 
 vtkKWHSVColorSelector ccb
 ccb SetParent [ccb_frame GetFrame]
