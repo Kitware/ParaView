@@ -1,3 +1,3 @@
-vtkKWWidget     GetBackgroundColor               307 3
-vtkKWWidget     GetForegroundColor               307 3
+vtkKWCoreWidget GetBackgroundColor               307 3
+vtkKWCoreWidget GetForegroundColor               307 3
 vtkKWExtent     GetExtentRange                   307 6
