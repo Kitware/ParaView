@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWFrame);
-vtkCxxRevisionMacro(vtkKWFrame, "1.27");
+vtkCxxRevisionMacro(vtkKWFrame, "1.28");
 
 //----------------------------------------------------------------------------
 void vtkKWFrame::Create(vtkKWApplication *app)
@@ -34,19 +34,25 @@ void vtkKWFrame::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWFrame::SetWidth(int width)
 {
-  if (this->IsCreated() && this->HasConfigurationOption("-width"))
-    {
-    this->Script("%s config -width %d", this->GetWidgetName(), width);
-    }
+  this->SetConfigurationOptionAsInt("-width", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrame::GetWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWFrame::SetHeight(int height)
 {
-  if (this->IsCreated() && this->HasConfigurationOption("-height"))
-    {
-    this->Script("%s config -height %d", this->GetWidgetName(), height);
-    }
+  this->SetConfigurationOptionAsInt("-height", height);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrame::GetHeight()
+{
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------

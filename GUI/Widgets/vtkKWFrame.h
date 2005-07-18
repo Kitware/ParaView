@@ -36,7 +36,9 @@ public:
   // Convenience method to set the width/height of a frame.
   // Supported only starting Tcl/Tk 8.3
   virtual void SetWidth(int);
+  virtual int GetWidth();
   virtual void SetHeight(int);
+  virtual int GetHeight();
   
 protected:
   vtkKWFrame() {};
