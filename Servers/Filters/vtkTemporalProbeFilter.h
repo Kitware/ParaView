@@ -23,7 +23,7 @@
 
 #include "vtkDataSetAlgorithm.h"
 
-class VTK_PARALLEL_EXPORT vtkTemporalProbeFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkTemporalProbeFilter : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeRevisionMacro(vtkTemporalProbeFilter,vtkDataSetAlgorithm);
