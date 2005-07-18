@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -610,6 +610,31 @@ void vtkSMXYPlotDisplayProxy::MarkConsumersAsModified()
 {
   this->Superclass::MarkConsumersAsModified();
   this->InvalidateGeometry();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::SetXAxisLabel(bool IsTemporal)
+{
+  vtkPVProcessModule* pm =
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkClientServerStream stream;
+  
+  vtkSMStringVectorProperty* svp;
+  svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->XYPlotActorProxy->GetProperty("XTitle"));
+  if (svp)
+    {
+    if (IsTemporal) 
+      svp->SetElement(0, "Time");
+    else 
+      svp->SetElement(0, "Line Divisions");
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property XTitle.");
+    }
+   
+  this->XYPlotActorProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

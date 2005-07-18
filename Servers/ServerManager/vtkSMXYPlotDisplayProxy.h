@@ -83,6 +83,10 @@ public:
   // Get the client side XY plot Widget.
   vtkGetObjectMacro(XYPlotWidget,vtkXYPlotWidget);
 
+  // Description:
+  // Sets the label of the plot to reflect either time or space sampling.
+  void SetXAxisLabel(bool IsTemporal);
+
 protected:
   vtkSMXYPlotDisplayProxy();
   ~vtkSMXYPlotDisplayProxy();

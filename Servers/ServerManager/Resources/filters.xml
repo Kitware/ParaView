@@ -2657,6 +2657,36 @@
    <!-- End Probe -->
    </SourceProxy>
 
+   <SourceProxy name="TemporalProbe" class="vtkTemporalProbeFilter">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+    </InputProperty>
+ 
+    <Property
+       name="AnimateInit"
+       command="AnimateInit">
+    </Property>
+
+    <DoubleVectorProperty
+       name="AnimateTick"
+       command="AnimateTick"
+       number_of_elements="1"
+       default_values="0.0" >
+          <DoubleRangeDomain name="range" min="0" max="1" />
+    </DoubleVectorProperty>
+
+   <!-- End TemporalProbe -->
+   </SourceProxy>
+
+
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
     <InputProperty
        name="Input"

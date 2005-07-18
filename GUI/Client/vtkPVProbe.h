@@ -29,6 +29,8 @@ class vtkKWWidget;
 class vtkSMXYPlotDisplayProxy;
 class vtkPVArraySelection;
 class vtkKWLoadSaveButton;
+class vtkSMProxy;
+class vtkTemporalProbeFilterObserver;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -54,8 +56,11 @@ public:
   // a user interface.
   // Overridden to save the plot display in batch.
   virtual void SaveInBatchScript(ofstream *file);
+
   void ArraySelectionInternalCallback();
 
+  // Description:
+  // Callback for the Save as comma separated values button.
   void SaveDialogCallback();
 
 protected:
@@ -81,10 +86,13 @@ protected:
   
   vtkKWCheckButton *ShowXYPlotToggle;
 
-  int CanShowPlot; // Flag indicating if the input is such that we can show 
-    // the plot display.
-
   vtkKWLoadSaveButton *SaveButton;
+
+  vtkSMProxy* TemporalProbeProxy;
+  char* TemporalProbeProxyName; 
+  vtkSetStringMacro(TemporalProbeProxyName);
+  vtkTemporalProbeFilterObserver *Observer;
+  virtual void SaveTemporalProbeInBatchScript(ofstream *file);
 
 private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented
