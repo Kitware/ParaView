@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.151");
+vtkCxxRevisionMacro(vtkPVProbe, "1.152");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -74,7 +74,7 @@ public:
     {
     this->TemporalProbeProxy = proxy;
     }
-  virtual void Execute(vtkObject* obj, unsigned long event, void* calldata)
+  virtual void Execute(vtkObject * vtkNotUsed(obj), unsigned long event, void* calldata)
     {
     if (this->TemporalProbeProxy)
       {
