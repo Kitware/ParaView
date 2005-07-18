@@ -22,9 +22,10 @@
 
 class vtkKWApplication;
 class vtkKWFrame;
+class vtkKWMenu;
+class vtkKWSeparator;
 class vtkKWToolbar;
 class vtkKWToolbarSetInternals;
-class vtkKWMenu;
 
 class KWWIDGETS_EXPORT vtkKWToolbarSet : public vtkKWCompositeWidget
 {
@@ -188,9 +189,9 @@ protected:
   vtkKWToolbarSet();
   ~vtkKWToolbarSet();
 
-  vtkKWFrame *TopSeparatorFrame;
-  vtkKWFrame *ToolbarsFrame;
-  vtkKWFrame *BottomSeparatorFrame;
+  vtkKWSeparator *TopSeparator;
+  vtkKWFrame     *ToolbarsFrame;
+  vtkKWSeparator *BottomSeparator;
 
   int ShowBottomSeparator;
   int ShowTopSeparator;
@@ -208,8 +209,8 @@ protected:
   public:
     int Visibility;
     int Anchor;
-    vtkKWFrame   *SeparatorFrame;
-    vtkKWToolbar *Toolbar;
+    vtkKWSeparator *Separator;
+    vtkKWToolbar   *Toolbar;
   };
 
   // PIMPL Encapsulation for STL containers

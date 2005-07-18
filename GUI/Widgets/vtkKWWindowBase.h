@@ -25,11 +25,12 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenu;
-class vtkKWProgressGauge;
-class vtkKWTclInteractor;
-class vtkKWToolbarSet;
 class vtkKWMostRecentFilesManager;
+class vtkKWProgressGauge;
+class vtkKWSeparator;
+class vtkKWTclInteractor;
 class vtkKWToolbar;
+class vtkKWToolbarSet;
 
 class KWWIDGETS_EXPORT vtkKWWindowBase : public vtkKWTopLevel
 {
@@ -349,10 +350,10 @@ protected:
   // Pack/repack the UI
   virtual void Pack();
 
-  vtkKWFrame *MenuBarSeparatorFrame;
+  vtkKWSeparator *MenuBarSeparator;
   vtkKWFrame *MainFrame;
 
-  vtkKWFrame *StatusFrameSeparator;
+  vtkKWSeparator *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;
   vtkKWLabel *StatusImage;
   vtkKWLabel *StatusLabel;

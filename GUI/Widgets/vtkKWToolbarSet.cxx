@@ -17,15 +17,10 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWSeparator.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWTkUtilities.h"
-
-#if defined(_WIN32)
-#define VTK_KW_TOOLBAR_RELIEF_SEP "groove"
-#else
-#define VTK_KW_TOOLBAR_RELIEF_SEP "sunken"
-#endif
 
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
@@ -34,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.27");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -60,9 +55,9 @@ vtkKWToolbarSet::vtkKWToolbarSet()
   this->ToolbarVisibilityChangedCommand  = NULL;
   this->NumberOfToolbarsChangedCommand  = NULL;
 
-  this->ToolbarsFrame        = vtkKWFrame::New();
-  this->BottomSeparatorFrame = vtkKWFrame::New();
-  this->TopSeparatorFrame = vtkKWFrame::New();
+  this->ToolbarsFrame   = vtkKWFrame::New();
+  this->BottomSeparator = vtkKWSeparator::New();
+  this->TopSeparator    = vtkKWSeparator::New();
 
   this->Internals = new vtkKWToolbarSetInternals;
 }
@@ -76,16 +71,16 @@ vtkKWToolbarSet::~vtkKWToolbarSet()
     this->ToolbarsFrame = NULL;
     }
 
-  if (this->BottomSeparatorFrame)
+  if (this->BottomSeparator)
     {
-    this->BottomSeparatorFrame->Delete();
-    this->BottomSeparatorFrame = NULL;
+    this->BottomSeparator->Delete();
+    this->BottomSeparator = NULL;
     }
 
-  if (this->TopSeparatorFrame)
+  if (this->TopSeparator)
     {
-    this->TopSeparatorFrame->Delete();
-    this->TopSeparatorFrame = NULL;
+    this->TopSeparator->Delete();
+    this->TopSeparator = NULL;
     }
 
   if (this->ToolbarVisibilityChangedCommand)
@@ -153,25 +148,15 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app)
 
   // Bottom separator
 
-  this->BottomSeparatorFrame->SetParent(this);  
-  this->BottomSeparatorFrame->Create(app);
-  this->BottomSeparatorFrame->SetHeight(2);
-  this->BottomSeparatorFrame->SetBorderWidth(1);
-
-  this->Script("%s config -relief %s", 
-               this->BottomSeparatorFrame->GetWidgetName(), 
-               VTK_KW_TOOLBAR_RELIEF_SEP);
+  this->BottomSeparator->SetParent(this);  
+  this->BottomSeparator->Create(app);
+  this->BottomSeparator->SetOrientationToHorizontal();
 
   // Top separator
 
-  this->TopSeparatorFrame->SetParent(this);  
-  this->TopSeparatorFrame->Create(app);
-  this->TopSeparatorFrame->SetHeight(2);
-  this->TopSeparatorFrame->SetBorderWidth(1);
-
-  this->Script("%s config -relief %s", 
-               this->TopSeparatorFrame->GetWidgetName(), 
-               VTK_KW_TOOLBAR_RELIEF_SEP);
+  this->TopSeparator->SetParent(this);  
+  this->TopSeparator->Create(app);
+  this->TopSeparator->SetOrientationToHorizontal();
 
   // This is needed for the hack in Pack() to work, otherwise
   // the widget is not hidden properly if the user packs it manually
@@ -318,12 +303,12 @@ void vtkKWToolbarSet::PackBottomSeparator()
     {
     this->Script(
       "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
-      this->BottomSeparatorFrame->GetWidgetName(),
+      this->BottomSeparator->GetWidgetName(),
       this->ToolbarsFrame->GetWidgetName());
     }
   else
     {
-    this->BottomSeparatorFrame->Unpack();
+    this->BottomSeparator->Unpack();
     }
 }
 
@@ -339,12 +324,12 @@ void vtkKWToolbarSet::PackTopSeparator()
     {
     this->Script(
       "pack %s -side top -fill x -expand y -padx 0 -pady 2 -before %s",
-      this->TopSeparatorFrame->GetWidgetName(),
+      this->TopSeparator->GetWidgetName(),
       this->ToolbarsFrame->GetWidgetName());
     }
   else
     {
-    this->TopSeparatorFrame->Unpack();
+    this->TopSeparator->Unpack();
     }
 }
 
@@ -389,17 +374,13 @@ void vtkKWToolbarSet::PackToolbars()
         (*it)->Toolbar->Bind();
         if ((anchor_w && previous_w) || (!anchor_w && previous_e))
           {
-          if (!(*it)->SeparatorFrame->IsCreated())
+          if (!(*it)->Separator->IsCreated())
             {
-            (*it)->SeparatorFrame->SetParent(this->ToolbarsFrame);
-            (*it)->SeparatorFrame->Create(this->GetApplication());
-            (*it)->SeparatorFrame->SetWidth(2);
-            (*it)->SeparatorFrame->SetBorderWidth(1);
-            this->Script("%s config -relief %s", 
-                         (*it)->SeparatorFrame->GetWidgetName(), 
-                         VTK_KW_TOOLBAR_RELIEF_SEP);
+            (*it)->Separator->SetParent(this->ToolbarsFrame);
+            (*it)->Separator->Create(this->GetApplication());
+            (*it)->Separator->SetOrientationToVertical();
             }
-          tk_cmd << "pack " << (*it)->SeparatorFrame->GetWidgetName() 
+          tk_cmd << "pack " << (*it)->Separator->GetWidgetName() 
                  << " -padx 1 -pady 0 -fill y -expand n " << side << endl;
           }
 
@@ -425,10 +406,10 @@ void vtkKWToolbarSet::PackToolbars()
         {
         // Unpack separator and toolbar
         (*it)->Toolbar->UnBind();
-        if ((*it)->SeparatorFrame->IsCreated())
+        if ((*it)->Separator->IsCreated())
           {
           tk_cmd << "pack forget " 
-                 << (*it)->SeparatorFrame->GetWidgetName() << endl;
+                 << (*it)->Separator->GetWidgetName() << endl;
           }
         tk_cmd << "pack forget " 
                << (*it)->Toolbar->GetWidgetName() << endl;
@@ -470,8 +451,8 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
   toolbar_slot->Toolbar = toolbar;
   this->PropagateEnableState(toolbar_slot->Toolbar);
 
-  toolbar_slot->SeparatorFrame = vtkKWFrame::New();
-  this->PropagateEnableState(toolbar_slot->SeparatorFrame);
+  toolbar_slot->Separator = vtkKWSeparator::New();
+  this->PropagateEnableState(toolbar_slot->Separator);
 
   toolbar_slot->Anchor = vtkKWToolbarSet::ToolbarAnchorWest;
   toolbar_slot->Visibility = default_visibility;
@@ -534,9 +515,9 @@ int vtkKWToolbarSet::RemoveToolbar(vtkKWToolbar *toolbar)
 
   // Delete the toolbar slot
 
-  if (toolbar_slot->SeparatorFrame)
+  if (toolbar_slot->Separator)
     {
-    toolbar_slot->SeparatorFrame->Delete();
+    toolbar_slot->Separator->Delete();
     }
   
   toolbar_slot->Toolbar->UnRegister(this);
@@ -939,7 +920,7 @@ void vtkKWToolbarSet::UpdateEnableState()
       if (*it)
         {
         this->PropagateEnableState((*it)->Toolbar);
-        this->PropagateEnableState((*it)->SeparatorFrame);
+        this->PropagateEnableState((*it)->Separator);
         }
       }
     }

@@ -23,6 +23,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMostRecentFilesManager.h"
 #include "vtkKWProgressGauge.h"
+#include "vtkKWSeparator.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
@@ -48,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.25");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.26");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -66,7 +67,7 @@ vtkKWWindowBase::vtkKWWindowBase()
 
   // Separator
 
-  this->MenuBarSeparatorFrame  = vtkKWFrame::New();
+  this->MenuBarSeparator  = vtkKWSeparator::New();
 
   // Toolbars
 
@@ -80,7 +81,7 @@ vtkKWWindowBase::vtkKWWindowBase()
 
   // Status frame
 
-  this->StatusFrameSeparator  = vtkKWFrame::New();
+  this->StatusFrameSeparator  = vtkKWSeparator::New();
   this->StatusFrame           = vtkKWFrame::New();
   this->StatusLabel           = vtkKWLabel::New();
   this->StatusImage           = NULL;
@@ -141,10 +142,10 @@ vtkKWWindowBase::~vtkKWWindowBase()
     this->MainToolbarSet = NULL;
     }
 
-  if (this->MenuBarSeparatorFrame)
+  if (this->MenuBarSeparator)
     {
-    this->MenuBarSeparatorFrame->Delete();
-    this->MenuBarSeparatorFrame = NULL;
+    this->MenuBarSeparator->Delete();
+    this->MenuBarSeparator = NULL;
     }
 
   if (this->StatusToolbar)
@@ -240,7 +241,7 @@ void vtkKWWindowBase::PrepareForDelete()
 {
   // Have reference to this object:
   // this->Menu
-  // this->MenuBarSeparatorFrame
+  // this->MenuBarSeparator
   // this->MainToolbarSet
   // this->MainFrame
   // this->StatusFrameSeparator
@@ -327,15 +328,9 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
 
   // Menubar separator
 
-  this->MenuBarSeparatorFrame->SetParent(this);  
-  this->MenuBarSeparatorFrame->Create(app);
-  this->MenuBarSeparatorFrame->SetHeight(2);
-  this->MenuBarSeparatorFrame->SetBorderWidth(2);
-#if defined(_WIN32)
-  this->MenuBarSeparatorFrame->SetReliefToGroove();
-#else
-  this->MenuBarSeparatorFrame->SetReliefToSunken();
-#endif
+  this->MenuBarSeparator->SetParent(this);  
+  this->MenuBarSeparator->Create(app);
+  this->MenuBarSeparator->SetOrientationToHorizontal();
 
   // Toolbars
 
@@ -363,13 +358,7 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
 
   this->StatusFrameSeparator->SetParent(this);
   this->StatusFrameSeparator->Create(app);
-  this->StatusFrameSeparator->SetHeight(2);
-  this->StatusFrameSeparator->SetBorderWidth(2);
-#if defined(_WIN32)
-  this->StatusFrameSeparator->SetReliefToGroove();
-#else
-  this->StatusFrameSeparator->SetReliefToSunken();
-#endif
+  this->StatusFrameSeparator->SetOrientationToHorizontal();
 
   // Status frame : image
 
@@ -444,10 +433,10 @@ void vtkKWWindowBase::Pack()
 
   // Menubar separator
   
-  if (this->MenuBarSeparatorFrame && this->MenuBarSeparatorFrame->IsCreated())
+  if (this->MenuBarSeparator && this->MenuBarSeparator->IsCreated())
     {
     this->Script("pack %s -side top -fill x -pady 2",
-                 this->MenuBarSeparatorFrame->GetWidgetName());
+                 this->MenuBarSeparator->GetWidgetName());
     }
 
   // Toolbars
@@ -455,11 +444,11 @@ void vtkKWWindowBase::Pack()
   if (this->MainToolbarSet && this->MainToolbarSet->IsCreated())
     {
     vtksys_stl::string after;
-    if (this->MenuBarSeparatorFrame && 
-        this->MenuBarSeparatorFrame->IsCreated())
+    if (this->MenuBarSeparator && 
+        this->MenuBarSeparator->IsCreated())
       {
       after = " -after ";
-      after += this->MenuBarSeparatorFrame->GetWidgetName();
+      after += this->MenuBarSeparator->GetWidgetName();
       }
     this->Script(
       "pack %s -padx 0 -pady 0 -side top -fill x -expand no %s",
@@ -1283,7 +1272,7 @@ void vtkKWWindowBase::UpdateEnableState()
 
   this->PropagateEnableState(this->MainFrame);
   this->PropagateEnableState(this->StatusFrame);
-  this->PropagateEnableState(this->MenuBarSeparatorFrame);
+  this->PropagateEnableState(this->MenuBarSeparator);
 
   // Given the state, can we close or not ?
 
