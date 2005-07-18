@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.21");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.22");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -138,6 +138,7 @@ int vtkPVProcessModuleGUIHelper::FinalizeApplication()
     {
     Tcl_DeleteInterp(interp);
     Tcl_Finalize();
+    this->TclInterp = NULL;
     }
   return 1;
 }
