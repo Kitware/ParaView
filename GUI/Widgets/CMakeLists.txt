@@ -72,12 +72,13 @@ SET (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 SET(KWWidgets_SRCS
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
-  vtkKWBWidgets.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   vtkKWBalloonHelpManager.cxx
   vtkKWCanvas.cxx 
   vtkKWChangeColorButton.cxx 
   vtkKWCheckButton.cxx 
-  vtkKWCheckButtonWithChangeColor.cxx
+  vtkKWCheckButtonWithChangeColorButton.cxx
+  vtkKWCheckButtonWithPopupFrame.cxx 
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCompositeWidget.cxx
@@ -116,7 +117,6 @@ SET(KWWidgets_SRCS
   vtkKWPiecewiseFunctionEditor.cxx
   vtkKWPopupButton.cxx 
   vtkKWPopupFrame.cxx 
-  vtkKWPopupFrameCheckButton.cxx 
   vtkKWProgressGauge.cxx 
   vtkKWPushButton.cxx 
   vtkKWPushButtonWithMenu.cxx 
@@ -167,7 +167,7 @@ SET(KWWidgets_SRCS
 # Abstract/pure virtual classes
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkKWBWidgets.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
@@ -183,6 +183,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
   WRAP_EXCLUDE
   )
@@ -191,10 +192,10 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF (WIN32)
   SET(KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.c
     vtkKWWin32RegistryHelper.cxx)
   SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.c
     WRAP_EXCLUDE)
 ELSE (WIN32)
   SET(KWWidgets_SRCS ${KWWidgets_SRCS} 

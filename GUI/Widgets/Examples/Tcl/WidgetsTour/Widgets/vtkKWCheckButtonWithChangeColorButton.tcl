@@ -1,4 +1,4 @@
-proc vtkKWCheckButtonWithChangeColorEntryPoint {parent win} {
+proc vtkKWCheckButtonWithChangeColorButtonEntryPoint {parent win} {
 
   set app [$parent GetApplication] 
 
@@ -6,7 +6,7 @@ proc vtkKWCheckButtonWithChangeColorEntryPoint {parent win} {
 
   # Create a checkbutton with change color button
 
-  vtkKWCheckButtonWithChangeColor cbwcc1
+  vtkKWCheckButtonWithChangeColorButton cbwcc1
   cbwcc1 SetParent $parent
   cbwcc1 Create $app
   [cbwcc1 GetCheckButton] SetText "a checkbutton with color change button"
@@ -23,7 +23,7 @@ proc vtkKWCheckButtonWithChangeColorEntryPoint {parent win} {
 
   # Create another checkbutton with change color button
 
-  vtkKWCheckButtonWithChangeColor cbwcc2
+  vtkKWCheckButtonWithChangeColorButton cbwcc2
   cbwcc2 SetParent $parent
   cbwcc2 Create $app
   cbwcc2 SetBorderWidth 2
@@ -45,7 +45,7 @@ proc vtkKWCheckButtonWithChangeColorEntryPoint {parent win} {
   return "TypeComposite"
 }
 
-proc vtkKWCheckButtonWithChangeColorFinalizePoint {} {
+proc vtkKWCheckButtonWithChangeColorButtonFinalizePoint {} {
   cbwcc1 Delete
   cbwcc2 Delete
 }

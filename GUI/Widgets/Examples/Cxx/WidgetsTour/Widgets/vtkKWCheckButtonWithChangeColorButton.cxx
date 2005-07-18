@@ -1,4 +1,4 @@
-#include "vtkKWCheckButtonWithChangeColor.h"
+#include "vtkKWCheckButtonWithChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWApplication.h"
@@ -6,13 +6,13 @@
 
 #include "KWWidgetsTourExampleTypes.h"
 
-class vtkKWCheckButtonWithChangeColorItem : public KWWidgetsTourItem
+class vtkKWCheckButtonWithChangeColorButtonItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
 };
 
-KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
+KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorButtonEntryPoint(
   vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
@@ -21,8 +21,8 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
 
   // Create a checkbutton with change color button
 
-  vtkKWCheckButtonWithChangeColor *cbwcc1 = 
-    vtkKWCheckButtonWithChangeColor::New();
+  vtkKWCheckButtonWithChangeColorButton *cbwcc1 = 
+    vtkKWCheckButtonWithChangeColorButton::New();
   cbwcc1->SetParent(parent);
   cbwcc1->Create(app);
   cbwcc1->GetCheckButton()->SetText("a checkbutton with color change button");
@@ -41,8 +41,8 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
 
   // Create another checkbutton with change color button
 
-  vtkKWCheckButtonWithChangeColor *cbwcc2 = 
-    vtkKWCheckButtonWithChangeColor::New();
+  vtkKWCheckButtonWithChangeColorButton *cbwcc2 = 
+    vtkKWCheckButtonWithChangeColorButton::New();
   cbwcc2->SetParent(parent);
   cbwcc2->Create(app);
   cbwcc2->SetBorderWidth(2);
@@ -66,5 +66,5 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorEntryPoint(
   cbwcc1->Delete();
   cbwcc2->Delete();
 
-  return new vtkKWCheckButtonWithChangeColorItem;
+  return new vtkKWCheckButtonWithChangeColorButtonItem;
 }

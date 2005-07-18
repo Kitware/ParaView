@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWPopupFrameCheckButton.cxx
+  Module:    vtkKWCheckButtonWithPopupFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWPopupFrameCheckButton.h"
+#include "vtkKWCheckButtonWithPopupFrame.h"
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
@@ -20,13 +20,13 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.8");
+vtkStandardNewMacro( vtkKWCheckButtonWithPopupFrame );
+vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.1");
 
 //----------------------------------------------------------------------------
-vtkKWPopupFrameCheckButton::vtkKWPopupFrameCheckButton()
+vtkKWCheckButtonWithPopupFrame::vtkKWCheckButtonWithPopupFrame()
 {
-  this->LinkPopupButtonStateToCheckButton = 0;
+  this->DisablePopupButtonWhenNotChecked = 0;
 
   // GUI
 
@@ -34,7 +34,7 @@ vtkKWPopupFrameCheckButton::vtkKWPopupFrameCheckButton()
 }
 
 //----------------------------------------------------------------------------
-vtkKWPopupFrameCheckButton::~vtkKWPopupFrameCheckButton()
+vtkKWCheckButtonWithPopupFrame::~vtkKWCheckButtonWithPopupFrame()
 {
   // GUI
 
@@ -46,7 +46,7 @@ vtkKWPopupFrameCheckButton::~vtkKWPopupFrameCheckButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app)
+void vtkKWCheckButtonWithPopupFrame::Create(vtkKWApplication *app)
 {
   // Create the superclass widgets
 
@@ -94,7 +94,7 @@ void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::Update()
+void vtkKWCheckButtonWithPopupFrame::Update()
 {
   this->UpdateEnableState();
 
@@ -112,7 +112,7 @@ void vtkKWPopupFrameCheckButton::Update()
 
   // Disable the popup button if not checked
 
-  if (this->LinkPopupButtonStateToCheckButton && 
+  if (this->DisablePopupButtonWhenNotChecked && 
       this->PopupButton && 
       this->CheckButton && 
       this->CheckButton->IsCreated())
@@ -123,28 +123,28 @@ void vtkKWPopupFrameCheckButton::Update()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::SetLinkPopupButtonStateToCheckButton(
+void vtkKWCheckButtonWithPopupFrame::SetDisablePopupButtonWhenNotChecked(
   int _arg)
 {
-  if (this->LinkPopupButtonStateToCheckButton == _arg)
+  if (this->DisablePopupButtonWhenNotChecked == _arg)
     {
     return;
     }
 
-  this->LinkPopupButtonStateToCheckButton = _arg;
+  this->DisablePopupButtonWhenNotChecked = _arg;
   this->Modified();
 
   this->Update();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::CheckButtonCallback() 
+void vtkKWCheckButtonWithPopupFrame::CheckButtonCallback() 
 {
   this->Update();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::UpdateEnableState()
+void vtkKWCheckButtonWithPopupFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -155,12 +155,12 @@ void vtkKWPopupFrameCheckButton::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrameCheckButton::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWCheckButtonWithPopupFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "CheckButton: " 
      << this->CheckButton << endl;
-  os << indent << "LinkPopupButtonStateToCheckButton: " 
-     << (this->LinkPopupButtonStateToCheckButton ? "On" : "Off") << endl;
+  os << indent << "DisablePopupButtonWhenNotChecked: " 
+     << (this->DisablePopupButtonWhenNotChecked ? "On" : "Off") << endl;
 }

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCheckButtonWithChangeColor.h
+  Module:    vtkKWCheckButtonWithChangeColorButton.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,23 +11,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWCheckButtonWithChangeColor - a check button and color change button
+// .NAME vtkKWCheckButtonWithChangeColorButton - a check button and color change button
 // .SECTION Description
 // This packs a checkbutton and a color change button inside a frame
 
-#ifndef __vtkKWCheckButtonWithChangeColor_h
-#define __vtkKWCheckButtonWithChangeColor_h
+#ifndef __vtkKWCheckButtonWithChangeColorButton_h
+#define __vtkKWCheckButtonWithChangeColorButton_h
 
 #include "vtkKWCompositeWidget.h"
 
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 
-class KWWIDGETS_EXPORT vtkKWCheckButtonWithChangeColor : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWCheckButtonWithChangeColorButton : public vtkKWCompositeWidget
 {
 public:
-  static vtkKWCheckButtonWithChangeColor* New();
-  vtkTypeRevisionMacro(vtkKWCheckButtonWithChangeColor, vtkKWCompositeWidget);
+  static vtkKWCheckButtonWithChangeColorButton* New();
+  vtkTypeRevisionMacro(vtkKWCheckButtonWithChangeColorButton, vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -65,8 +65,8 @@ public:
   virtual void UpdateVariableCallback(const char*, const char*, const char*);
 
 protected:
-  vtkKWCheckButtonWithChangeColor();
-  ~vtkKWCheckButtonWithChangeColor();
+  vtkKWCheckButtonWithChangeColorButton();
+  ~vtkKWCheckButtonWithChangeColorButton();
 
   vtkKWCheckButton       *CheckButton;
   vtkKWChangeColorButton *ChangeColorButton;
@@ -80,8 +80,8 @@ protected:
   virtual void UpdateVariableBindings();
 
 private:
-  vtkKWCheckButtonWithChangeColor(const vtkKWCheckButtonWithChangeColor&); // Not implemented
-  void operator=(const vtkKWCheckButtonWithChangeColor&); // Not implemented
+  vtkKWCheckButtonWithChangeColorButton(const vtkKWCheckButtonWithChangeColorButton&); // Not implemented
+  void operator=(const vtkKWCheckButtonWithChangeColorButton&); // Not implemented
 };
 
 #endif

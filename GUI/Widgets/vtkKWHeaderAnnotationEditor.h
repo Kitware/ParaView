@@ -18,7 +18,7 @@
 #ifndef __vtkKWHeaderAnnotationEditor_h
 #define __vtkKWHeaderAnnotationEditor_h
 
-#include "vtkKWPopupFrameCheckButton.h"
+#include "vtkKWCheckButtonWithPopupFrame.h"
 
 class vtkKWEntryWithLabel;
 class vtkKWPopupButtonWithLabel;
@@ -27,11 +27,11 @@ class vtkKWTextPropertyEditor;
 class vtkTextActor;
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWHeaderAnnotationEditor : public vtkKWPopupFrameCheckButton
+class KWWIDGETS_EXPORT vtkKWHeaderAnnotationEditor : public vtkKWCheckButtonWithPopupFrame
 {
 public:
   static vtkKWHeaderAnnotationEditor* New();
-  vtkTypeRevisionMacro(vtkKWHeaderAnnotationEditor,vtkKWPopupFrameCheckButton);
+  vtkTypeRevisionMacro(vtkKWHeaderAnnotationEditor,vtkKWCheckButtonWithPopupFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

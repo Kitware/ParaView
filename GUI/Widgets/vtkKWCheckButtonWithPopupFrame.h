@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWPopupFrameCheckButton.h
+  Module:    vtkKWCheckButtonWithPopupFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWPopupFrameCheckButton - a popup frame + checkbutton
+// .NAME vtkKWCheckButtonWithPopupFrame - a popup frame + checkbutton
 // .SECTION Description
 // A class that provides a checkbutton and a (popup) frame. In popup mode
 // the checkbutton is visible on the left of the popup button that will
 // display the frame. In normal mode, the checkbutton is the first item
 // packed in the frame.
 
-#ifndef __vtkKWPopupFrameCheckButton_h
-#define __vtkKWPopupFrameCheckButton_h
+#ifndef __vtkKWCheckButtonWithPopupFrame_h
+#define __vtkKWCheckButtonWithPopupFrame_h
 
 #include "vtkKWPopupFrame.h"
 
 class vtkKWCheckButton;
 
-class KWWIDGETS_EXPORT vtkKWPopupFrameCheckButton : public vtkKWPopupFrame
+class KWWIDGETS_EXPORT vtkKWCheckButtonWithPopupFrame : public vtkKWPopupFrame
 {
 public:
-  static vtkKWPopupFrameCheckButton* New();
-  vtkTypeRevisionMacro(vtkKWPopupFrameCheckButton,vtkKWPopupFrame);
+  static vtkKWCheckButtonWithPopupFrame* New();
+  vtkTypeRevisionMacro(vtkKWCheckButtonWithPopupFrame,vtkKWPopupFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -39,9 +39,9 @@ public:
   // Description:
   // Automatically disable the popup button when the checkbutton is not 
   // checked.
-  virtual void SetLinkPopupButtonStateToCheckButton(int);
-  vtkBooleanMacro(LinkPopupButtonStateToCheckButton, int);
-  vtkGetMacro(LinkPopupButtonStateToCheckButton, int);
+  virtual void SetDisablePopupButtonWhenNotChecked(int);
+  vtkBooleanMacro(DisablePopupButtonWhenNotChecked, int);
+  vtkGetMacro(DisablePopupButtonWhenNotChecked, int);
 
   // Description:
   // Callbacks
@@ -65,12 +65,12 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWPopupFrameCheckButton();
-  ~vtkKWPopupFrameCheckButton();
+  vtkKWCheckButtonWithPopupFrame();
+  ~vtkKWCheckButtonWithPopupFrame();
 
   // GUI
 
-  int                     LinkPopupButtonStateToCheckButton;
+  int                     DisablePopupButtonWhenNotChecked;
 
   vtkKWCheckButton        *CheckButton;
 
@@ -81,8 +81,8 @@ protected:
   virtual int GetCheckButtonState() { return 0; };
 
 private:
-  vtkKWPopupFrameCheckButton(const vtkKWPopupFrameCheckButton&); // Not implemented
-  void operator=(const vtkKWPopupFrameCheckButton&); // Not Implemented
+  vtkKWCheckButtonWithPopupFrame(const vtkKWCheckButtonWithPopupFrame&); // Not implemented
+  void operator=(const vtkKWCheckButtonWithPopupFrame&); // Not Implemented
 };
 
 #endif

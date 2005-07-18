@@ -18,12 +18,12 @@
 
 #include "vtkTk.h"
 
-#include "Utilities/vtkKWBWidgetsTclLibrary.h"
-#include "Utilities/vtkKWComboboxTclLibrary.h"
+#include "Utilities/BWidgets/vtkKWBWidgetsTclLibrary.h"
+#include "Utilities/BWidgets/vtkKWComboboxTclLibrary.h"
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.24");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.1");
 
 #define minus_width 9
 #define minus_height 9

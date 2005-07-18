@@ -18,7 +18,7 @@
 #ifndef __vtkKWScalarBarAnnotation_h
 #define __vtkKWScalarBarAnnotation_h
 
-#include "vtkKWPopupFrameCheckButton.h"
+#include "vtkKWCheckButtonWithPopupFrame.h"
 
 class vtkKWFrame;
 class vtkKWEntryWithLabel;
@@ -30,11 +30,11 @@ class vtkKWThumbWheel;
 class vtkScalarBarWidget;
 class vtkVolumeProperty;
 
-class KWWIDGETS_EXPORT vtkKWScalarBarAnnotation : public vtkKWPopupFrameCheckButton
+class KWWIDGETS_EXPORT vtkKWScalarBarAnnotation : public vtkKWCheckButtonWithPopupFrame
 {
 public:
   static vtkKWScalarBarAnnotation* New();
-  vtkTypeRevisionMacro(vtkKWScalarBarAnnotation,vtkKWPopupFrameCheckButton);
+  vtkTypeRevisionMacro(vtkKWScalarBarAnnotation,vtkKWCheckButtonWithPopupFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

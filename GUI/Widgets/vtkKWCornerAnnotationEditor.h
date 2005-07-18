@@ -20,7 +20,7 @@
 #ifndef __vtkKWCornerAnnotationEditor_h
 #define __vtkKWCornerAnnotationEditor_h
 
-#include "vtkKWPopupFrameCheckButton.h"
+#include "vtkKWCheckButtonWithPopupFrame.h"
 
 class vtkCornerAnnotation;
 class vtkKWFrame;
@@ -32,11 +32,11 @@ class vtkKWRenderWidget;
 class vtkKWScale;
 class vtkKWTextPropertyEditor;
 
-class KWWIDGETS_EXPORT vtkKWCornerAnnotationEditor : public vtkKWPopupFrameCheckButton
+class KWWIDGETS_EXPORT vtkKWCornerAnnotationEditor : public vtkKWCheckButtonWithPopupFrame
 {
 public:
   static vtkKWCornerAnnotationEditor* New();
-  vtkTypeRevisionMacro(vtkKWCornerAnnotationEditor,vtkKWPopupFrameCheckButton);
+  vtkTypeRevisionMacro(vtkKWCornerAnnotationEditor,vtkKWCheckButtonWithPopupFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

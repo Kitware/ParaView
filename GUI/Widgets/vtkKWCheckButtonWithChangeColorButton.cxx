@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCheckButtonWithChangeColor.cxx
+  Module:    vtkKWCheckButtonWithChangeColorButton.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
 
 =========================================================================*/
 
-#include "vtkKWCheckButtonWithChangeColor.h"
+#include "vtkKWCheckButtonWithChangeColorButton.h"
 
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
@@ -21,11 +21,11 @@
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.11");
+vtkStandardNewMacro(vtkKWCheckButtonWithChangeColorButton);
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColorButton, "1.1");
 
 //----------------------------------------------------------------------------
-vtkKWCheckButtonWithChangeColor::vtkKWCheckButtonWithChangeColor()
+vtkKWCheckButtonWithChangeColorButton::vtkKWCheckButtonWithChangeColorButton()
 {
   this->CheckButton       = vtkKWCheckButton::New();
   this->ChangeColorButton = vtkKWChangeColorButton::New();
@@ -34,7 +34,7 @@ vtkKWCheckButtonWithChangeColor::vtkKWCheckButtonWithChangeColor()
 }
 
 //----------------------------------------------------------------------------
-vtkKWCheckButtonWithChangeColor::~vtkKWCheckButtonWithChangeColor()
+vtkKWCheckButtonWithChangeColorButton::~vtkKWCheckButtonWithChangeColorButton()
 {
   if (this->CheckButton)
     {
@@ -50,7 +50,7 @@ vtkKWCheckButtonWithChangeColor::~vtkKWCheckButtonWithChangeColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app)
+void vtkKWCheckButtonWithChangeColorButton::Create(vtkKWApplication *app)
 {
   // Check if already created
 
@@ -86,7 +86,7 @@ void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::Pack()
+void vtkKWCheckButtonWithChangeColorButton::Pack()
 {
   if (!this->IsCreated())
     {
@@ -112,7 +112,7 @@ void vtkKWCheckButtonWithChangeColor::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::Update()
+void vtkKWCheckButtonWithChangeColorButton::Update()
 {
   // Update enable state
 
@@ -130,7 +130,7 @@ void vtkKWCheckButtonWithChangeColor::Update()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::SetDisableChangeColorButtonWhenNotChecked(
+void vtkKWCheckButtonWithChangeColorButton::SetDisableChangeColorButtonWhenNotChecked(
   int _arg)
 {
   if (this->DisableChangeColorButtonWhenNotChecked == _arg)
@@ -145,7 +145,7 @@ void vtkKWCheckButtonWithChangeColor::SetDisableChangeColorButtonWhenNotChecked(
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::UpdateVariableBindings()
+void vtkKWCheckButtonWithChangeColorButton::UpdateVariableBindings()
 {
   if (!this->IsCreated() || 
       !this->CheckButton || !this->CheckButton->GetVariableName())
@@ -172,14 +172,14 @@ void vtkKWCheckButtonWithChangeColor::UpdateVariableBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::UpdateVariableCallback(
+void vtkKWCheckButtonWithChangeColorButton::UpdateVariableCallback(
   const char*, const char*, const char*)
 {
   this->Update();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::UpdateEnableState()
+void vtkKWCheckButtonWithChangeColorButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -188,7 +188,7 @@ void vtkKWCheckButtonWithChangeColor::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColor::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWCheckButtonWithChangeColorButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

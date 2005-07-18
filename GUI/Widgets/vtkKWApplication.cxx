@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 
-#include "vtkKWBWidgets.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
@@ -50,8 +49,10 @@ static Tcl_Interp *Et_Interp = 0;
 #include <process.h>
 #include <mapi.h>
 #include <htmlhelp.h>
-#include "Utilities/vtkKWSetApplicationIconTclCommand.h"
+#include "Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.h"
 #endif
+
+#include "Utilities/BWidgets/vtkKWBWidgets.h"
 
 // I need those two Tcl functions. They usually are declared in tclIntDecls.h,
 // but Unix build do not have access to VTK's tkInternals include path.
@@ -69,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.244");
+vtkCxxRevisionMacro(vtkKWApplication, "1.245");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
