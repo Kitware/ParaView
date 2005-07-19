@@ -89,6 +89,10 @@ public:
   // as Tcl script.
   virtual void SaveState(ofstream *file);
 
+  // Description:
+  // Returns the list box of comparative visualizations.
+  vtkGetObjectMacro(ComparativeVisList, vtkKWListBox);
+
 protected:
   vtkPVComparativeVisManagerGUI();
   ~vtkPVComparativeVisManagerGUI();
