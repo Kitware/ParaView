@@ -48,7 +48,7 @@
 #define image_bold_width         12
 #define image_bold_height        16
 #define image_bold_pixel_size    4
-#define image_bold_buffer_length 152
+#define image_bold_length 152
 
 static unsigned char image_bold[] = 
   "eNr7//8/w38aYiBQAuI0IH4HxP+huByIZ0LFzkD56GA3knoYMEYzg5B6ZPF3NFCP7J40PO"
@@ -62,7 +62,7 @@ static unsigned char image_bold[] =
 #define image_italic_width         12
 #define image_italic_height        16
 #define image_italic_pixel_size    4
-#define image_italic_buffer_length 140
+#define image_italic_length 140
 
 static unsigned char image_italic[] = 
   "eNr7//8/w38aYyzABYjvAjFIsgOIlQioB4HdUD1gQIT6d0A8k0j1LlC3hBKpvgOqXpBI9W"
@@ -75,7 +75,7 @@ static unsigned char image_italic[] =
 #define image_shadow_width         12
 #define image_shadow_height        16
 #define image_shadow_pixel_size    4
-#define image_shadow_buffer_length 384
+#define image_shadow_length 384
 
 static unsigned char image_shadow[] = 
   "eNq10s8rRFEYxvFhRmZIzSATXSnNlR/JwsiMsiALyo+sxFqUmhVFdjaSBWv/go2VlY38Bf"
@@ -92,7 +92,7 @@ static unsigned char image_shadow[] =
 #define image_copy_width         15
 #define image_copy_height        16
 #define image_copy_pixel_size    4
-#define image_copy_buffer_length 124
+#define image_copy_length 124
 
 static unsigned char image_copy[] = 
   "eNqlkwkKACAIBHu6P9+CLjNlpYSlCKZJJAAFj2kFL1nWVpaPWLVSVrnGXtwwb+fFPdO89e"
@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.10");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -256,7 +256,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
                        image_bold_width, 
                        image_bold_height, 
                        image_bold_pixel_size,
-                       image_bold_buffer_length);
+                       image_bold_length);
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_ITALIC_ID);
   cb->SetCommand(this, "ItalicCallback");
@@ -267,7 +267,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
                        image_italic_width, 
                        image_italic_height, 
                        image_italic_pixel_size,
-                       image_italic_buffer_length);
+                       image_italic_length);
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_SHADOW_ID);
   cb->SetCommand(this, "ShadowCallback");
@@ -278,7 +278,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
                        image_shadow_width, 
                        image_shadow_height, 
                        image_shadow_pixel_size,
-                       image_shadow_buffer_length);
+                       image_shadow_length);
 
   // Opacity
 
@@ -315,7 +315,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
                        image_copy_width, 
                        image_copy_height, 
                        image_copy_pixel_size,
-                       image_copy_buffer_length);
+                       image_copy_length);
 
   // Pack
 

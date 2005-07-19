@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVTranslateViewButton.png (zlib, base64)
  */
-static const unsigned int  image_PVTranslateViewButton_width         = 32;
-static const unsigned int  image_PVTranslateViewButton_height        = 32;
-static const unsigned int  image_PVTranslateViewButton_pixel_size    = 3;
-static const unsigned long image_PVTranslateViewButton_buffer_length = 996;
+static const unsigned int  image_PVTranslateViewButton_width          = 32;
+static const unsigned int  image_PVTranslateViewButton_height         = 32;
+static const unsigned int  image_PVTranslateViewButton_pixel_size     = 3;
+static const unsigned long image_PVTranslateViewButton_length         = 996;
+static const unsigned long image_PVTranslateViewButton_decoded_length = 3072;
 
 static const unsigned char image_PVTranslateViewButton[] = 
   "eNq9ll1rE0EUhn9Grko/EkrbpKHN7lqCEBqaZIlJk00jkVKtUC8jKGgT0N55IX7ciRU0Yq"
@@ -25,13 +26,14 @@ static const unsigned char image_PVTranslateViewButton[] =
   "Wdj/8F79C15n3pY=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVTranslateViewButtonActive.png (zlib, base64)
  */
-static const unsigned int  image_PVTranslateViewButtonActive_width         = 32;
-static const unsigned int  image_PVTranslateViewButtonActive_height        = 32;
-static const unsigned int  image_PVTranslateViewButtonActive_pixel_size    = 3;
-static const unsigned long image_PVTranslateViewButtonActive_buffer_length = 980;
+static const unsigned int  image_PVTranslateViewButtonActive_width          = 32;
+static const unsigned int  image_PVTranslateViewButtonActive_height         = 32;
+static const unsigned int  image_PVTranslateViewButtonActive_pixel_size     = 3;
+static const unsigned long image_PVTranslateViewButtonActive_length         = 980;
+static const unsigned long image_PVTranslateViewButtonActive_decoded_length = 3072;
 
 static const unsigned char image_PVTranslateViewButtonActive[] = 
   "eNq9ls9KI0EQxvs0l+nLzCXP4CEQCOpB2Ev+ES/xEJQQTUBvq+CCmwiamwdBvIkKGlHXTZ"

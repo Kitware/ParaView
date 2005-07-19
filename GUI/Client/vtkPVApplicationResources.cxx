@@ -95,378 +95,378 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVLockedButton_width, 
                     image_PVLockedButton_height,
                     image_PVLockedButton_pixel_size,
-                    image_PVLockedButton_buffer_length);
+                    image_PVLockedButton_length);
 
   this->CreatePhoto("PVUnlockedButton",
                     image_PVUnlockedButton , 
                     image_PVUnlockedButton_width, 
                     image_PVUnlockedButton_height,
                     image_PVUnlockedButton_pixel_size,
-                    image_PVUnlockedButton_buffer_length);
+                    image_PVUnlockedButton_length);
 
   this->CreatePhoto("PVPullDownArrow",
                     image_PVPullDownArrow , 
                     image_PVPullDownArrow_width, 
                     image_PVPullDownArrow_height,
                     image_PVPullDownArrow_pixel_size,
-                    image_PVPullDownArrow_buffer_length);
+                    image_PVPullDownArrow_length);
 
   this->CreatePhoto("PVToolbarPullDownArrow",
                     image_PVToolbarPullDownArrow , 
                     image_PVToolbarPullDownArrow_width, 
                     image_PVToolbarPullDownArrow_height,
                     image_PVToolbarPullDownArrow_pixel_size,
-                    image_PVToolbarPullDownArrow_buffer_length);
+                    image_PVToolbarPullDownArrow_length);
 
   this->CreatePhoto("PVResetViewButton", 
                     image_PVResetViewButton, 
                     image_PVResetViewButton_width, 
                     image_PVResetViewButton_height,
                     image_PVResetViewButton_pixel_size,
-                    image_PVResetViewButton_buffer_length);
+                    image_PVResetViewButton_length);
 
   this->CreatePhoto("PVTranslateViewButton", 
                     image_PVTranslateViewButton, 
                     image_PVTranslateViewButton_width, 
                     image_PVTranslateViewButton_height,
                     image_PVTranslateViewButton_pixel_size,
-                    image_PVTranslateViewButton_buffer_length);
+                    image_PVTranslateViewButton_length);
 
   this->CreatePhoto("PVTranslateViewButtonActive", 
                     image_PVTranslateViewButtonActive, 
                     image_PVTranslateViewButtonActive_width, 
                     image_PVTranslateViewButtonActive_height,
                     image_PVTranslateViewButtonActive_pixel_size,
-                    image_PVTranslateViewButtonActive_buffer_length);
+                    image_PVTranslateViewButtonActive_length);
 
   this->CreatePhoto("PVFlyButton", 
                     image_PVFlyButton, 
                     image_PVFlyButton_width, 
                     image_PVFlyButton_height,
                     image_PVFlyButton_pixel_size,
-                    image_PVFlyButton_buffer_length);
+                    image_PVFlyButton_length);
 
   this->CreatePhoto("PVFlyButtonActive", 
                     image_PVFlyButtonActive, 
                     image_PVFlyButtonActive_width, 
                     image_PVFlyButtonActive_height,
                     image_PVFlyButtonActive_pixel_size,
-                    image_PVFlyButtonActive_buffer_length);
+                    image_PVFlyButtonActive_length);
 
   this->CreatePhoto("PVRotateViewButton", 
                     image_PVRotateViewButton, 
                     image_PVRotateViewButton_width, 
                     image_PVRotateViewButton_height,
                     image_PVRotateViewButton_pixel_size,
-                    image_PVRotateViewButton_buffer_length);
+                    image_PVRotateViewButton_length);
 
   this->CreatePhoto("PVRotateViewButtonActive", 
                     image_PVRotateViewButtonActive, 
                     image_PVRotateViewButtonActive_width, 
                     image_PVRotateViewButtonActive_height,
                     image_PVRotateViewButtonActive_pixel_size,
-                    image_PVRotateViewButtonActive_buffer_length);
+                    image_PVRotateViewButtonActive_length);
 
   this->CreatePhoto("PVPickCenterButton", 
                     image_PVPickCenterButton, 
                     image_PVPickCenterButton_width, 
                     image_PVPickCenterButton_height,
                     image_PVPickCenterButton_pixel_size,
-                    image_PVPickCenterButton_buffer_length);
+                    image_PVPickCenterButton_length);
   
   this->CreatePhoto("PVResetCenterButton", 
                     image_PVResetCenterButton, 
                     image_PVResetCenterButton_width, 
                     image_PVResetCenterButton_height,
                     image_PVResetCenterButton_pixel_size,
-                    image_PVResetCenterButton_buffer_length);
+                    image_PVResetCenterButton_length);
   
   this->CreatePhoto("PVShowCenterButton", 
                     image_PVShowCenterButton, 
                     image_PVShowCenterButton_width, 
                     image_PVShowCenterButton_height,
                     image_PVShowCenterButton_pixel_size,
-                    image_PVShowCenterButton_buffer_length);
+                    image_PVShowCenterButton_length);
   
   this->CreatePhoto("PVHideCenterButton", 
                     image_PVHideCenterButton, 
                     image_PVHideCenterButton_width, 
                     image_PVHideCenterButton_height,
                     image_PVHideCenterButton_pixel_size,
-                    image_PVHideCenterButton_buffer_length);
+                    image_PVHideCenterButton_length);
   
   this->CreatePhoto("PVEditCenterButtonOpen", 
                     image_PVEditCenterButtonOpen, 
                     image_PVEditCenterButtonOpen_width, 
                     image_PVEditCenterButtonOpen_height,
                     image_PVEditCenterButtonOpen_pixel_size,
-                    image_PVEditCenterButtonOpen_buffer_length);
+                    image_PVEditCenterButtonOpen_length);
   
   this->CreatePhoto("PVEditCenterButtonClose", 
                     image_PVEditCenterButtonClose, 
                     image_PVEditCenterButtonClose_width, 
                     image_PVEditCenterButtonClose_height,
                     image_PVEditCenterButtonClose_pixel_size,
-                    image_PVEditCenterButtonClose_buffer_length);
+                    image_PVEditCenterButtonClose_length);
   
   this->CreatePhoto("PVCalculatorButton", 
                     image_PVCalculatorButton, 
                     image_PVCalculatorButton_width, 
                     image_PVCalculatorButton_height,
                     image_PVCalculatorButton_pixel_size,
-                    image_PVCalculatorButton_buffer_length);
+                    image_PVCalculatorButton_length);
 
   this->CreatePhoto("PVThresholdButton", 
                     image_PVThresholdButton, 
                     image_PVThresholdButton_width, 
                     image_PVThresholdButton_height,
                     image_PVThresholdButton_pixel_size,
-                    image_PVThresholdButton_buffer_length);
+                    image_PVThresholdButton_length);
 
   this->CreatePhoto("PVContourButton", 
                     image_PVContourButton, 
                     image_PVContourButton_width, 
                     image_PVContourButton_height,
                     image_PVContourButton_pixel_size,
-                    image_PVContourButton_buffer_length);
+                    image_PVContourButton_length);
 
   this->CreatePhoto("PVProbeButton", 
                     image_PVProbeButton, 
                     image_PVProbeButton_width, 
                     image_PVProbeButton_height,
                     image_PVProbeButton_pixel_size,
-                    image_PVProbeButton_buffer_length);
+                    image_PVProbeButton_length);
 
   this->CreatePhoto("PVGlyphButton", 
                     image_PVGlyphButton, 
                     image_PVGlyphButton_width, 
                     image_PVGlyphButton_height,
                     image_PVGlyphButton_pixel_size,
-                    image_PVGlyphButton_buffer_length);
+                    image_PVGlyphButton_length);
 
   this->CreatePhoto("PV3DCursorButton", 
                     image_PV3DCursorButton, 
                     image_PV3DCursorButton_width, 
                     image_PV3DCursorButton_height,
                     image_PV3DCursorButton_pixel_size,
-                    image_PV3DCursorButton_buffer_length);
+                    image_PV3DCursorButton_length);
 
   this->CreatePhoto("PV3DCursorButtonActive", 
                     image_PV3DCursorButtonActive, 
                     image_PV3DCursorButtonActive_width, 
                     image_PV3DCursorButtonActive_height,
                     image_PV3DCursorButtonActive_pixel_size,
-                    image_PV3DCursorButtonActive_buffer_length);
+                    image_PV3DCursorButtonActive_length);
 
   this->CreatePhoto("PVCutButton", 
                     image_PVCutButton, 
                     image_PVCutButton_width, 
                     image_PVCutButton_height,
                     image_PVCutButton_pixel_size,
-                    image_PVCutButton_buffer_length);
+                    image_PVCutButton_length);
 
   this->CreatePhoto("PVClipButton", 
                     image_PVClipButton, 
                     image_PVClipButton_width, 
                     image_PVClipButton_height,
                     image_PVClipButton_pixel_size,
-                    image_PVClipButton_buffer_length);
+                    image_PVClipButton_length);
 
   this->CreatePhoto("PVExtractGridButton", 
                     image_PVExtractGridButton, 
                     image_PVExtractGridButton_width, 
                     image_PVExtractGridButton_height,
                     image_PVExtractGridButton_pixel_size,
-                    image_PVExtractGridButton_buffer_length);
+                    image_PVExtractGridButton_length);
 
   this->CreatePhoto("PVVectorDisplacementButton", 
                     image_PVVectorDisplacementButton, 
                     image_PVVectorDisplacementButton_width, 
                     image_PVVectorDisplacementButton_height,
                     image_PVVectorDisplacementButton_pixel_size,
-                    image_PVVectorDisplacementButton_buffer_length);
+                    image_PVVectorDisplacementButton_length);
 
   this->CreatePhoto("PVStreamTracerButton", 
                     image_PVStreamTracerButton, 
                     image_PVStreamTracerButton_width, 
                     image_PVStreamTracerButton_height,
                     image_PVStreamTracerButton_pixel_size,
-                    image_PVStreamTracerButton_buffer_length);
+                    image_PVStreamTracerButton_length);
 
   this->CreatePhoto("PVRulerButton", 
                     image_PVRulerButton, 
                     image_PVRulerButton_width, 
                     image_PVRulerButton_height,
                     image_PVRulerButton_pixel_size,
-                    image_PVRulerButton_buffer_length);
+                    image_PVRulerButton_length);
 
   this->CreatePhoto("PVNavigationWindowButton", 
                     image_PVNavigationWindowButton, 
                     image_PVNavigationWindowButton_width, 
                     image_PVNavigationWindowButton_height,
                     image_PVNavigationWindowButton_pixel_size,
-                    image_PVNavigationWindowButton_buffer_length);
+                    image_PVNavigationWindowButton_length);
 
   this->CreatePhoto("PVSelectionWindowButton", 
                     image_PVSelectionWindowButton, 
                     image_PVSelectionWindowButton_width, 
                     image_PVSelectionWindowButton_height,
                     image_PVSelectionWindowButton_pixel_size,
-                    image_PVSelectionWindowButton_buffer_length);
+                    image_PVSelectionWindowButton_length);
 
   this->CreatePhoto("PVPickButton", 
                     image_PVPickButton, 
                     image_PVPickButton_width, 
                     image_PVPickButton_height,
                     image_PVPickButton_pixel_size,
-                    image_PVPickButton_buffer_length);
+                    image_PVPickButton_length);
 
   this->CreatePhoto("PVIntegrateFlowButton", 
                     image_PVIntegrateFlowButton, 
                     image_PVIntegrateFlowButton_width, 
                     image_PVIntegrateFlowButton_height,
                     image_PVIntegrateFlowButton_pixel_size,
-                    image_PVIntegrateFlowButton_buffer_length);
+                    image_PVIntegrateFlowButton_length);
 
   this->CreatePhoto("PVSurfaceVectorsButton", 
                     image_PVSurfaceVectorsButton, 
                     image_PVSurfaceVectorsButton_width, 
                     image_PVSurfaceVectorsButton_height,
                     image_PVSurfaceVectorsButton_pixel_size,
-                    image_PVSurfaceVectorsButton_buffer_length);
+                    image_PVSurfaceVectorsButton_length);
 
   this->CreatePhoto("PVMandelbrotButton", 
                     image_PVMandelbrotButton, 
                     image_PVMandelbrotButton_width, 
                     image_PVMandelbrotButton_height,
                     image_PVMandelbrotButton_pixel_size,
-                    image_PVMandelbrotButton_buffer_length);
+                    image_PVMandelbrotButton_length);
 
   this->CreatePhoto("PVWaveletButton", 
                     image_PVWaveletButton, 
                     image_PVWaveletButton_width, 
                     image_PVWaveletButton_height,
                     image_PVWaveletButton_pixel_size,
-                    image_PVWaveletButton_buffer_length);
+                    image_PVWaveletButton_length);
 
   this->CreatePhoto("PVSphereSourceButton", 
                     image_PVSphereSourceButton, 
                     image_PVSphereSourceButton_width, 
                     image_PVSphereSourceButton_height,
                     image_PVSphereSourceButton_pixel_size,
-                    image_PVSphereSourceButton_buffer_length);
+                    image_PVSphereSourceButton_length);
 
   this->CreatePhoto("PVSuperquadricButton", 
                     image_PVSuperquadricButton, 
                     image_PVSuperquadricButton_width, 
                     image_PVSuperquadricButton_height,
                     image_PVSuperquadricButton_pixel_size,
-                    image_PVSuperquadricButton_buffer_length);
+                    image_PVSuperquadricButton_length);
 
   this->CreatePhoto("PVGroupButton", 
                     image_PVGroupButton, 
                     image_PVGroupButton_width, 
                     image_PVGroupButton_height,
                     image_PVGroupButton_pixel_size,
-                    image_PVGroupButton_buffer_length);
+                    image_PVGroupButton_length);
 
   this->CreatePhoto("PVUngroupButton", 
                     image_PVUngroupButton, 
                     image_PVUngroupButton_width, 
                     image_PVUngroupButton_height,
                     image_PVUngroupButton_pixel_size,
-                    image_PVUngroupButton_buffer_length);
+                    image_PVUngroupButton_length);
 
   this->CreatePhoto("PVAMRPartButton", 
                     image_PVAMRPartButton, 
                     image_PVAMRPartButton_width, 
                     image_PVAMRPartButton_height,
                     image_PVAMRPartButton_pixel_size,
-                    image_PVAMRPartButton_buffer_length);
+                    image_PVAMRPartButton_length);
 
   this->CreatePhoto("PVAMROutlineButton", 
                     image_PVAMROutlineButton, 
                     image_PVAMROutlineButton_width, 
                     image_PVAMROutlineButton_height,
                     image_PVAMROutlineButton_pixel_size,
-                    image_PVAMROutlineButton_buffer_length);
+                    image_PVAMROutlineButton_length);
 
   this->CreatePhoto("PVAMRSurfaceButton", 
                     image_PVAMRSurfaceButton, 
                     image_PVAMRSurfaceButton_width, 
                     image_PVAMRSurfaceButton_height,
                     image_PVAMRSurfaceButton_pixel_size,
-                    image_PVAMRSurfaceButton_buffer_length);
+                    image_PVAMRSurfaceButton_length);
 
   this->CreatePhoto("PVRamp",
     image_PVRamp,
     image_PVRamp_width,
     image_PVRamp_height,
     image_PVRamp_pixel_size,
-    image_PVRamp_buffer_length);
+    image_PVRamp_length);
 
   this->CreatePhoto("PVStep",
     image_PVStep,
     image_PVStep_width,
     image_PVStep_height,
     image_PVStep_pixel_size,
-    image_PVStep_buffer_length);
+    image_PVStep_length);
 
   this->CreatePhoto("PVExponential",
     image_PVExponential,
     image_PVExponential_width,
     image_PVExponential_height,
     image_PVExponential_pixel_size,
-    image_PVExponential_buffer_length);
+    image_PVExponential_length);
   
   this->CreatePhoto("PVSinusoid",
     image_PVSinusoid,
     image_PVSinusoid_width,
     image_PVSinusoid_height,
     image_PVSinusoid_pixel_size,
-    image_PVSinusoid_buffer_length);
+    image_PVSinusoid_length);
   
   this->CreatePhoto("PVKeyFrameChanges",
     image_PVKeyFrameChanges,
     image_PVKeyFrameChanges_width,
     image_PVKeyFrameChanges_height,
     image_PVKeyFrameChanges_pixel_size,
-    image_PVKeyFrameChanges_buffer_length);
+    image_PVKeyFrameChanges_length);
 
   this->CreatePhoto("PVInitState",
     image_PVInitState,
     image_PVInitState_width,
     image_PVInitState_height,
     image_PVInitState_pixel_size,
-    image_PVInitState_buffer_length);
+    image_PVInitState_length);
 
   this->CreatePhoto("PVRecord",
     image_PVRecord,
     image_PVRecord_width,
     image_PVRecord_height,
     image_PVRecord_pixel_size,
-    image_PVRecord_buffer_length);
+    image_PVRecord_length);
 
   this->CreatePhoto("PVRecordState",
     image_PVRecordState,
     image_PVRecordState_width,
     image_PVRecordState_height,
     image_PVRecordState_pixel_size,
-    image_PVRecordState_buffer_length);
+    image_PVRecordState_length);
 
   this->CreatePhoto("PVMovie",
     image_PVMovie,
     image_PVMovie_width,
     image_PVMovie_height,
     image_PVMovie_pixel_size,
-    image_PVMovie_buffer_length);
+    image_PVMovie_length);
 
   this->CreatePhoto("PVLookmarkButton",
     image_PVLookmarkButton,
     image_PVLookmarkButton_width,
     image_PVLookmarkButton_height,
     image_PVLookmarkButton_pixel_size,
-    image_PVLookmarkButton_buffer_length);
+    image_PVLookmarkButton_length);
 }
 
 //----------------------------------------------------------------------------
@@ -474,7 +474,7 @@ void vtkPVApplication::CreateSplashScreen()
 {
   // copy the image from the header file into memory
   unsigned char *buffer = 
-    new unsigned char [image_PVSplashScreen_buffer_length];
+    new unsigned char [image_PVSplashScreen_length];
 
   unsigned int i;
   unsigned char *curPos = buffer;
@@ -490,7 +490,7 @@ void vtkPVApplication::CreateSplashScreen()
                     image_PVSplashScreen_width, 
                     image_PVSplashScreen_height,
                     image_PVSplashScreen_pixel_size,
-                    image_PVSplashScreen_buffer_length);
+                    image_PVSplashScreen_length);
   delete [] buffer;
 
   if (!this->GetSplashScreen()->IsCreated())

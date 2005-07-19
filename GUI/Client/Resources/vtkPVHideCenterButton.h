@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVHideCenterButton.png (zlib, base64)
  */
-static const unsigned int  image_PVHideCenterButton_width         = 32;
-static const unsigned int  image_PVHideCenterButton_height        = 32;
-static const unsigned int  image_PVHideCenterButton_pixel_size    = 3;
-static const unsigned long image_PVHideCenterButton_buffer_length = 956;
+static const unsigned int  image_PVHideCenterButton_width          = 32;
+static const unsigned int  image_PVHideCenterButton_height         = 32;
+static const unsigned int  image_PVHideCenterButton_pixel_size     = 3;
+static const unsigned long image_PVHideCenterButton_length         = 956;
+static const unsigned long image_PVHideCenterButton_decoded_length = 3072;
 
 static const unsigned char image_PVHideCenterButton[] = 
   "eNq1Vl1PGkEU/Rk8NGlSKlVD/AgrhcU0prHiit1+7C4ISAEbX3yRjS1bWH0xwSgaNX5E/A"

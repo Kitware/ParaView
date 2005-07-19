@@ -24,7 +24,6 @@
 #include "X11/Xutil.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/Base64.h>
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -34,15 +33,10 @@
 #endif
 
 #include "vtkTk.h"
-#if ((VTK_MAJOR_VERSION <= 4) && (VTK_MINOR_VERSION <= 4))
-#include "zlib.h" // needed for TIFF
-#else
-#include "vtk_zlib.h" // needed for TIFF
-#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.62");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.63");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -55,7 +49,7 @@ const char* vtkKWTkUtilities::GetTclNameFromPointer(
     }
 
   vtkTclGetObjectFromPointer(interp, (void *)obj, obj->GetClassName());
-  return interp->result;
+  return Tcl_GetStringResult(interp);
 }
 
 //----------------------------------------------------------------------------
@@ -243,14 +237,15 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
   command << "winfo rgb " << widget << " " << color << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "Unable to get RGB color: " << interp->result);
+    vtkGenericWarningMacro(
+      << "Unable to get RGB color: " << Tcl_GetStringResult(interp));
     command.rdbuf()->freeze(0);     
     return;
     }
   command.rdbuf()->freeze(0);     
 
   int rr, gg, bb;
-  if (sscanf(interp->result, "%d %d %d", &rr, &gg, &bb) == 3)
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d %d", &rr, &gg, &bb) == 3)
     {
     *r = static_cast<double>(rr) / 65535.0;
     *g = static_cast<double>(gg) / 65535.0;
@@ -290,13 +285,15 @@ void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
     vtkGenericWarningMacro(
-      << "Unable to get " << option << " option: " << interp->result);
+      << "Unable to get " << option << " option: " 
+      << Tcl_GetStringResult(interp));
     command.rdbuf()->freeze(0);     
     return;
     }
   command.rdbuf()->freeze(0);     
 
-  vtkKWTkUtilities::GetRGBColor(interp, widget, interp->result, r, g, b);
+  vtkKWTkUtilities::GetRGBColor(
+    interp, widget, Tcl_GetStringResult(interp), r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -344,7 +341,8 @@ void vtkKWTkUtilities::SetOptionColor(Tcl_Interp *interp,
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
     vtkGenericWarningMacro(
-      << "Unable to set " << option << " option: " << interp->result);
+      << "Unable to set " << option << " option: " 
+      << Tcl_GetStringResult(interp));
     }
   command.rdbuf()->freeze(0);     
 }
@@ -422,25 +420,28 @@ int vtkKWTkUtilities::QueryUserForColor(
 
   if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "Unable to query color: " << interp->result);
+    vtkGenericWarningMacro(
+      << "Unable to query color: " << Tcl_GetStringResult(interp));
     return 0;
     }
 
-  if (strlen(interp->result) > 6)
+  const char *result = Tcl_GetStringResult(interp);
+
+  if (strlen(result) > 6)
     {
     char tmp[3];
     int r, g, b;
     tmp[2] = '\0';
-    tmp[0] = interp->result[1];
-    tmp[1] = interp->result[2];
+    tmp[0] = result[1];
+    tmp[1] = result[2];
     if (sscanf(tmp, "%x", &r) == 1)
       {
-      tmp[0] = interp->result[3];
-      tmp[1] = interp->result[4];
+      tmp[0] = result[3];
+      tmp[1] = result[4];
       if (sscanf(tmp, "%x", &g) == 1)
         {
-        tmp[0] = interp->result[5];
-        tmp[1] = interp->result[6];
+        tmp[0] = result[5];
+        tmp[1] = result[6];
         if (sscanf(tmp, "%x", &b) == 1)
           {
           *out_r = (double)r / 255.0;
@@ -477,7 +478,8 @@ int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
     }
   
   int ww, wh, wx, wy;
-  if (sscanf(interp->result, "%dx%d+%d+%d", &ww, &wh, &wx, &wy) != 4)
+  if (sscanf(
+        Tcl_GetStringResult(interp), "%dx%d+%d+%d", &ww, &wh, &wx, &wy) != 4)
     {
     return 0;
     }
@@ -542,7 +544,8 @@ int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
     }
   
   int ww, wh, wx, wy;
-  if (sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy) != 4)
+  if (sscanf(
+        Tcl_GetStringResult(interp), "%d %d %d %d", &ww, &wh, &wx, &wy) != 4)
     {
     return 0;
     }
@@ -621,7 +624,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(
-        << "Unable to create photo " << photo_name << ": " << interp->result);
+        << "Unable to create photo " << photo_name << ": " 
+        << Tcl_GetStringResult(interp));
       return 0;
       }
 
@@ -640,60 +644,20 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 #endif
 
   unsigned long nb_of_raw_bytes = width * height * pixel_size;
-  const unsigned char *data_ptr = pixels;
 
-  // If the buffer_lenth has been provided, and if it's different than the
-  // expected size of the raw image buffer, than it might have been compressed
-  // using zlib and/or encoded in base64. In that case, decode and/or
-  // uncompress the buffer.
-
-  int base64 = 0;
-  unsigned char *base64_buffer = 0;
-
-  int zlib = 0;
-  unsigned char *zlib_buffer = 0;
-
+  // Is the data encoded (zlib and/or base64) ?
+  
+  unsigned char *decoded_data = NULL;
   if (buffer_length && buffer_length != nb_of_raw_bytes)
     {
-    // Is it a base64 stream (i.e. not zlib for the moment) ?
-
-    if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
+    if (!vtkKWResourceUtilities::DecodeBuffer(
+          pixels, buffer_length, &decoded_data, nb_of_raw_bytes))
       {
-      base64_buffer = new unsigned char [buffer_length];
-      buffer_length = vtksysBase64_Decode(data_ptr, 0, 
-                                         base64_buffer, buffer_length);
-      if (buffer_length == 0)
-        {
-        vtkGenericWarningMacro(<< "Error decoding base64 stream");
-        delete [] base64_buffer;
-        return 0;
-        }
-      base64 = 1;
-      data_ptr = base64_buffer;
+      vtkGenericWarningMacro(
+        << "Error while decoding pixels for photo:" << photo_name);
+      return 0;
       }
-    
-    // Is it zlib ?
-
-    if (buffer_length != nb_of_raw_bytes &&
-        data_ptr[0] == 0x78 && data_ptr[1] == 0xDA)
-      {
-      unsigned long zlib_buffer_length = nb_of_raw_bytes;
-      zlib_buffer = new unsigned char [zlib_buffer_length];
-      if (uncompress(zlib_buffer, &zlib_buffer_length, 
-                     data_ptr, buffer_length) != Z_OK ||
-          zlib_buffer_length != nb_of_raw_bytes)
-        {
-        vtkGenericWarningMacro(<< "Error decoding zlib stream");
-        delete [] zlib_buffer;
-        if (base64)
-          {
-          delete [] base64_buffer;
-          }
-        return 0;
-        }
-      zlib = 1;
-      data_ptr = zlib_buffer;
-      }
+    pixels = decoded_data;
     }
 
   // Set block struct
@@ -716,7 +680,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 
   if (pixel_size <= 3)
     {
-    sblock.pixelPtr = const_cast<unsigned char *>(data_ptr);
+    sblock.pixelPtr = const_cast<unsigned char *>(pixels);
     }
   else 
     {
@@ -750,13 +714,13 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       {
       for (xx=0; xx < width; xx++)
         {
-        double alpha = static_cast<float>(*(data_ptr + 3)) / 255.0;
+        double alpha = static_cast<float>(*(pixels + 3)) / 255.0;
         
-        *(pp)     = static_cast<int>(r * (1 - alpha) + *(data_ptr)    * alpha);
-        *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(data_ptr+ 1) * alpha);
-        *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(data_ptr+ 2) * alpha);
+        *(pp)     = static_cast<int>(r * (1 - alpha) + *(pixels)    * alpha);
+        *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(pixels+ 1) * alpha);
+        *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(pixels+ 2) * alpha);
         
-        data_ptr += pixel_size;
+        pixels += pixel_size;
         pp += 3;
         }
       }
@@ -783,14 +747,9 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     delete [] pp;
     }
 
-  if (base64)
+  if (decoded_data)
     {
-    delete [] base64_buffer;
-    }
-
-  if (zlib)
-    {
-    delete [] zlib_buffer;
+    delete [] decoded_data;
     }
 
   return 1;
@@ -1032,20 +991,21 @@ int vtkKWTkUtilities::GetPhotoHeight(vtkKWWidget *widget)
   if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
     {
     vtkGenericWarningMacro(
-      << "Unable to get -image option: " << interp->result);
+      << "Unable to get -image option: " << Tcl_GetStringResult(interp));
     return 0;
     }
 
   // No -image ?
 
-  if (!interp->result || !*interp->result)
+  const char *result = Tcl_GetStringResult(interp);
+  if (!result || !*result)
     {
     return 0;
     }
 
   // Get size
 
-  vtksys_stl::string image_name(interp->result);
+  vtksys_stl::string image_name(result);
   return vtkKWTkUtilities::GetPhotoHeight(interp, image_name.c_str());
 }
 
@@ -1111,7 +1071,7 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
-                             << interp->result << ")");
+                             << Tcl_GetStringResult(interp) << ")");
       return 0;
       }
     strcpy(new_font, Tcl_GetStringResult(interp));
@@ -1137,7 +1097,7 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! (2) ("
-                             << interp->result << ")");
+                             << Tcl_GetStringResult(interp) << ")");
       return 0;
       }
     strcpy(new_font, Tcl_GetStringResult(interp));
@@ -1201,7 +1161,7 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
   if (res != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to replace font ! ("
-                           << interp->result << ")");
+                           << Tcl_GetStringResult(interp) << ")");
     return 0;
     }
   
@@ -1277,7 +1237,7 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
-                             << interp->result << ")");
+                             << Tcl_GetStringResult(interp) << ")");
       return 0;
       }
     strcpy(new_font, Tcl_GetStringResult(interp));
@@ -1303,7 +1263,7 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! (2) ("
-                             << interp->result << ")");
+                             << Tcl_GetStringResult(interp) << ")");
       return 0;
       }
     strcpy(new_font, Tcl_GetStringResult(interp));
@@ -1367,7 +1327,7 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
   if (res != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to replace font ! ("
-                           << interp->result << ")");
+                           << Tcl_GetStringResult(interp) << ")");
     return 0;
     }
   
@@ -1429,7 +1389,8 @@ int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
     vtkGenericWarningMacro(<< "Unable to query grid size!");
     return 0;
     }
-  if (sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows) != 2)
+  if (sscanf(
+        Tcl_GetStringResult(interp), "%d %d", nb_of_cols, nb_of_rows) != 2)
     {
     return 0;
     }
@@ -1472,7 +1433,9 @@ int vtkKWTkUtilities::GetWidgetPositionInGrid(Tcl_Interp *interp,
   const char *pos;
   int ok = 1;
 
-  pos = strstr(interp->result, "-column ");
+  const char *result = Tcl_GetStringResult(interp);
+
+  pos = strstr(result, "-column ");
   if (pos)
     {
     if (sscanf(pos, "-column %d", col) != 1)
@@ -1481,7 +1444,7 @@ int vtkKWTkUtilities::GetWidgetPositionInGrid(Tcl_Interp *interp,
       }
     }
 
-  pos = strstr(interp->result, "-row ");
+  pos = strstr(result, "-row ");
   if (pos)
     {
     if (sscanf(pos, "-row %d", row) != 1)
@@ -1521,7 +1484,8 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
   packinfo << "pack info " << widget << ends;
   int res = Tcl_GlobalEval(interp, packinfo.str());
   packinfo.rdbuf()->freeze(0);
-  if (res != TCL_OK || !interp->result || !interp->result[0])
+  const char *result = Tcl_GetStringResult(interp);
+  if (res != TCL_OK || !result || !result[0])
     {
     vtkGenericWarningMacro(<< "Unable to get pack info!");
     return 0;
@@ -1534,7 +1498,7 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
   char *ptr;
   if (ipadx)
     {
-    ptr = strstr(interp->result, "-ipadx ");
+    ptr = strstr(result, "-ipadx ");
     if (ptr)
       {
       if (sscanf(ptr + 7, "%d", ipadx) != 1)
@@ -1546,7 +1510,7 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
 
   if (ipady)
     {
-    ptr = strstr(interp->result, "-ipady ");
+    ptr = strstr(result, "-ipady ");
     if (ptr)
       {
       if (sscanf(ptr + 7, "%d", ipady) != 1)
@@ -1558,7 +1522,7 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
 
   if (padx)
     {
-    ptr = strstr(interp->result, "-padx ");
+    ptr = strstr(result, "-padx ");
     if (ptr)
       {
       if (sscanf(ptr + 6, "%d", padx) != 1)
@@ -1570,7 +1534,7 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
 
   if (pady)
     {
-    ptr = strstr(interp->result, "-pady ");
+    ptr = strstr(result, "-pady ");
     if (ptr)
       {
       if (sscanf(ptr + 6, "%d", pady) != 1)
@@ -1592,7 +1556,8 @@ int vtkKWTkUtilities::GetMasterInPack(Tcl_Interp *interp,
   packinfo << "pack info " << widget << ends;
   int res = Tcl_GlobalEval(interp, packinfo.str());
   packinfo.rdbuf()->freeze(0);
-  if (res != TCL_OK || !interp->result || !interp->result[0])
+  const char *result = Tcl_GetStringResult(interp);
+  if (res != TCL_OK || !result || !result[0])
     {
     vtkGenericWarningMacro(<< "Unable to get pack info!");
     return 0;
@@ -1600,7 +1565,7 @@ int vtkKWTkUtilities::GetMasterInPack(Tcl_Interp *interp,
   
   // Parse for -in
 
-  const char *pack_in = strstr(interp->result, "-in ");
+  const char *pack_in = strstr(result, "-in ");
   if (!pack_in)
     {
     return 0;
@@ -1658,16 +1623,17 @@ int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(Tcl_Interp *interp,
   
   // No slaves
   
-  if (!interp->result || !interp->result[0])
+  const char *result = Tcl_GetStringResult(interp);
+  if (!result || !result[0])
     {
     return 1;
     }
   
   // Browse each slave for reqwidth, reqheight
 
-  int buffer_length = strlen(interp->result);
+  int buffer_length = strlen(result);
   char *buffer = new char [buffer_length + 1];
-  strcpy(buffer, interp->result);
+  strcpy(buffer, result);
 
   char *buffer_end = buffer + buffer_length;
   char *ptr = buffer, *word_end;
@@ -1700,7 +1666,7 @@ int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(Tcl_Interp *interp,
     else
       {
       int w, h;
-      sscanf(interp->result, "%d %d", &w, &h);
+      sscanf(Tcl_GetStringResult(interp), "%d %d", &w, &h);
 
       // If w == h == 1 then again it might not have been packed, so call
       // recursively
@@ -1771,7 +1737,8 @@ int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(Tcl_Interp *interp,
   
   // No slaves
   
-  if (!interp->result || !interp->result[0])
+  const char *result = Tcl_GetStringResult(interp);
+  if (!result || !result[0])
     {
     vtkGenericWarningMacro(<< "Unable to find slaves!");
     return 0;
@@ -1779,9 +1746,9 @@ int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(Tcl_Interp *interp,
   
   // Browse each slave until the right one if found
 
-  int buffer_length = strlen(interp->result);
+  int buffer_length = strlen(result);
   char *buffer = new char [buffer_length + 1];
-  strcpy(buffer, interp->result);
+  strcpy(buffer, result);
 
   char *buffer_end = buffer + buffer_length;
   char *ptr = buffer, *word_end;
@@ -1824,7 +1791,7 @@ int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(Tcl_Interp *interp,
       }
     else
       {
-      int w = atoi(interp->result);
+      int w = atoi(Tcl_GetStringResult(interp));
       
       // If w == 1 then again it might not have been packed, so get bbox
 
@@ -1915,7 +1882,8 @@ int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
 
       // No slave, let's process the next row
 
-      if (!interp->result || !interp->result[0])
+      const char *result = Tcl_GetStringResult(interp);
+      if (!result || !result[0])
         {
         continue;
         }
@@ -1923,7 +1891,7 @@ int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
       // Get the slave reqwidth
 
       ostrstream reqwidth;
-      reqwidth << "winfo reqwidth " << interp->result << ends;
+      reqwidth << "winfo reqwidth " << result << ends;
       res = Tcl_GlobalEval(interp, reqwidth.str());
       reqwidth.rdbuf()->freeze(0);
       if (res != TCL_OK)
@@ -1932,7 +1900,7 @@ int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
         continue;
         }
       int width = 0;
-      if (sscanf(interp->result, "%d", &width) == 1 && 
+      if (sscanf(Tcl_GetStringResult(interp), "%d", &width) == 1 && 
           width > (*col_widths)[col])
         {
         (*col_widths)[col] = width;
@@ -2044,13 +2012,14 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
     getwidth << widgets[widget] << " cget -width" << ends;
     int res = Tcl_GlobalEval(interp, getwidth.str());
     getwidth.rdbuf()->freeze(0);
-    if (res != TCL_OK || !interp->result || !interp->result[0])
+    const char *result = Tcl_GetStringResult(interp);
+    if (res != TCL_OK || !result || !result[0])
       {
       vtkGenericWarningMacro(<< "Unable to get label -width! " 
-                             <<interp->result);
+                             <<result);
       continue;
       }
-    width = atoi(interp->result);
+    width = atoi(result);
 
     // Get the -text length
 
@@ -2061,10 +2030,11 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to get label -text! " 
-                             << interp->result);
+                             << Tcl_GetStringResult(interp));
       continue;
       }
-    length = interp->result ? strlen(interp->result) : 0;
+    result = Tcl_GetStringResult(interp);
+    length = result ? strlen(result) : 0;
 
     // Store the max
 
@@ -2096,7 +2066,7 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
   if (res != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to synchronize labels width! " 
-                           << interp->result);
+                           << Tcl_GetStringResult(interp));
     }
 
   return 1;
@@ -2130,13 +2100,14 @@ int vtkKWTkUtilities::GetSlavesInPack(
   nb_slaves_str << "llength [pack slaves " << widget << "]" << ends;
   res = Tcl_GlobalEval(interp, nb_slaves_str.str());
   nb_slaves_str.rdbuf()->freeze(0);
-  if (res != TCL_OK || !interp->result || !interp->result[0])
+  const char *result = Tcl_GetStringResult(interp);
+  if (res != TCL_OK || !result || !result[0])
     {
     vtkGenericWarningMacro(<< "Unable to get number of packed slaves!");
     return 0;
     }
 
-  int nb_slaves = atoi(interp->result);
+  int nb_slaves = atoi(result);
   if (!nb_slaves)
     {
     return 0;
@@ -2148,7 +2119,8 @@ int vtkKWTkUtilities::GetSlavesInPack(
   slaves_str << "pack slaves " << widget << ends;
   res = Tcl_GlobalEval(interp, slaves_str.str());
   slaves_str.rdbuf()->freeze(0);
-  if (res != TCL_OK || !interp->result || !interp->result[0])
+  result = Tcl_GetStringResult(interp);
+  if (res != TCL_OK || !result || !result[0])
     {
     vtkGenericWarningMacro(<< "Unable to get packed slaves!");
     return 0;
@@ -2160,9 +2132,9 @@ int vtkKWTkUtilities::GetSlavesInPack(
   
   // Browse each slave and store it
 
-  int buffer_length = strlen(interp->result);
+  int buffer_length = strlen(result);
   char *buffer = new char [buffer_length + 1];
-  strcpy(buffer, interp->result);
+  strcpy(buffer, result);
 
   char *buffer_end = buffer + buffer_length;
   char *ptr = buffer, *word_end;
@@ -2385,7 +2357,8 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
   
   int xx, yy, ww, hh;
   xx = yy = ww = hh = 0;
-  if (sscanf(interp->result, "%d %d %d %d", &xx, &yy, &ww, &hh) != 4)
+  if (sscanf(
+        Tcl_GetStringResult(interp), "%d %d %d %d", &xx, &yy, &ww, &hh) != 4)
     {
     return 0;
     }

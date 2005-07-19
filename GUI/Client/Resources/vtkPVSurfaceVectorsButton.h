@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVSurfaceVectorsButton.png (zlib, base64)
  */
-static const unsigned int  image_PVSurfaceVectorsButton_width         = 32;
-static const unsigned int  image_PVSurfaceVectorsButton_height        = 32;
-static const unsigned int  image_PVSurfaceVectorsButton_pixel_size    = 3;
-static const unsigned long image_PVSurfaceVectorsButton_buffer_length = 1128;
+static const unsigned int  image_PVSurfaceVectorsButton_width          = 32;
+static const unsigned int  image_PVSurfaceVectorsButton_height         = 32;
+static const unsigned int  image_PVSurfaceVectorsButton_pixel_size     = 3;
+static const unsigned long image_PVSurfaceVectorsButton_length         = 1128;
+static const unsigned long image_PVSurfaceVectorsButton_decoded_length = 3072;
 
 static const unsigned char image_PVSurfaceVectorsButton[] = 
   "eNql1UtLW0EUB/D5Lv0ECt124Sbgpgp1kSCWkoKVGMFFogg1UfT6iDeEy01cKCKoiCtRJE"

@@ -163,3 +163,45 @@ KWConvertImageToHeader --zlib --base64 \
     vtkPVLockButton.h \
     PVUnlockedButton.png \
     PVLockedButton.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVRamp.h \
+    PVRamp.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVStep.h \
+    PVStep.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVExponential.h \
+    PVExponential.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVSinusoid.h \
+    PVSinusoid.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVKeyFrameChanges.h \
+    PVKeyFrameChanges.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVInitState.h \
+    PVInitState.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVRecord.h \
+    PVRecord.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVRecordState.h \
+    PVRecordState.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVMovie.h \
+    PVMovie.png
+
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVLookmarkButton.h \
+    PVLookmarkButton.png
+
+

@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVClipButton.png (zlib, base64)
  */
-static const unsigned int  image_PVClipButton_width         = 32;
-static const unsigned int  image_PVClipButton_height        = 32;
-static const unsigned int  image_PVClipButton_pixel_size    = 3;
-static const unsigned long image_PVClipButton_buffer_length = 604;
+static const unsigned int  image_PVClipButton_width          = 32;
+static const unsigned int  image_PVClipButton_height         = 32;
+static const unsigned int  image_PVClipButton_pixel_size     = 3;
+static const unsigned long image_PVClipButton_length         = 604;
+static const unsigned long image_PVClipButton_decoded_length = 3072;
 
 static const unsigned char image_PVClipButton[] = 
   "eNrFlj9LA0EQxa+66ppU1ws2cpBGEIKNEUM67awE7VNYiNjli1gd+F0sLe4D+eILwzA7+y"

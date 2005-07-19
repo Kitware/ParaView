@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.752");
+vtkCxxRevisionMacro(vtkPVWindow, "1.753");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1594,7 +1594,7 @@ void vtkPVWindow::UpdateStatusImage()
           image_PVLogoSmall_width, 
           image_PVLogoSmall_height,
           image_PVLogoSmall_pixel_size,
-          image_PVLogoSmall_buffer_length))
+          image_PVLogoSmall_length))
       {
       vtkWarningMacro("Error updating status image!" << image_name.c_str());
       }

@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVStreamTracerButton.png (zlib, base64)
  */
-static const unsigned int  image_PVStreamTracerButton_width         = 32;
-static const unsigned int  image_PVStreamTracerButton_height        = 32;
-static const unsigned int  image_PVStreamTracerButton_pixel_size    = 3;
-static const unsigned long image_PVStreamTracerButton_buffer_length = 1168;
+static const unsigned int  image_PVStreamTracerButton_width          = 32;
+static const unsigned int  image_PVStreamTracerButton_height         = 32;
+static const unsigned int  image_PVStreamTracerButton_pixel_size     = 3;
+static const unsigned long image_PVStreamTracerButton_length         = 1168;
+static const unsigned long image_PVStreamTracerButton_decoded_length = 3072;
 
 static const unsigned char image_PVStreamTracerButton[] = 
   "eNq1ls9TUlEUx4+u27SyVf9B0zTTezXW2CXxR9MPTU2yqRSV4IIpIIKSwEPkKQHyI9PRtI"

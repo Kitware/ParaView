@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVProbeButton.png (zlib, base64)
  */
-static const unsigned int  image_PVProbeButton_width         = 32;
-static const unsigned int  image_PVProbeButton_height        = 32;
-static const unsigned int  image_PVProbeButton_pixel_size    = 3;
-static const unsigned long image_PVProbeButton_buffer_length = 432;
+static const unsigned int  image_PVProbeButton_width          = 32;
+static const unsigned int  image_PVProbeButton_height         = 32;
+static const unsigned int  image_PVProbeButton_pixel_size     = 3;
+static const unsigned long image_PVProbeButton_length         = 432;
+static const unsigned long image_PVProbeButton_decoded_length = 3072;
 
 static const unsigned char image_PVProbeButton[] = 
   "eNq7cuHEFWyorKQAiK7gkKUcjZo/mM1fumgO7cwHGu7m6kwj86liOC7zqWU4VvOpaDim+d"

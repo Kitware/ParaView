@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVFlyButton.png (zlib, base64)
  */
-static const unsigned int  image_PVFlyButton_width         = 32;
-static const unsigned int  image_PVFlyButton_height        = 32;
-static const unsigned int  image_PVFlyButton_pixel_size    = 3;
-static const unsigned long image_PVFlyButton_buffer_length = 580;
+static const unsigned int  image_PVFlyButton_width          = 32;
+static const unsigned int  image_PVFlyButton_height         = 32;
+static const unsigned int  image_PVFlyButton_pixel_size     = 3;
+static const unsigned long image_PVFlyButton_length         = 580;
+static const unsigned long image_PVFlyButton_decoded_length = 3072;
 
 static const unsigned char image_PVFlyButton[] = 
   "eNq1ljFLw1AUhX9Gtg4dusibDCVTEaIVB4uCgwGLkyIuFbQOce6/cBLc6v9wdMjsb/GjF8"
@@ -19,13 +20,14 @@ static const unsigned char image_PVFlyButton[] =
   "fk9lwizYJhr8D28MTOY=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVFlyButtonActive.png (zlib, base64)
  */
-static const unsigned int  image_PVFlyButtonActive_width         = 32;
-static const unsigned int  image_PVFlyButtonActive_height        = 32;
-static const unsigned int  image_PVFlyButtonActive_pixel_size    = 3;
-static const unsigned long image_PVFlyButtonActive_buffer_length = 592;
+static const unsigned int  image_PVFlyButtonActive_width          = 32;
+static const unsigned int  image_PVFlyButtonActive_height         = 32;
+static const unsigned int  image_PVFlyButtonActive_pixel_size     = 3;
+static const unsigned long image_PVFlyButtonActive_length         = 592;
+static const unsigned long image_PVFlyButtonActive_decoded_length = 3072;
 
 static const unsigned char image_PVFlyButtonActive[] = 
   "eNq1lr1qw0AQhFWpkRqr8UO4VO1gSOKgRpWrBBcJ2Bg3CeQXqfZbpAqks98jZQrVfpZ8sC"

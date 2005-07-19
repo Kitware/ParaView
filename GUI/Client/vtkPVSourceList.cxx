@@ -29,7 +29,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.41");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -40,7 +40,7 @@ vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 #define image_eye_open_width         18
 #define image_eye_open_height        11
 #define image_eye_open_pixel_size    4
-#define image_eye_open_buffer_length 236
+#define image_eye_open_length 236
 
 static unsigned char image_eye_open[] = 
   "eNqVkgENxCAMRbGAhVnAAhawgAUszAIWZgELs1ALWNhxySNpFnrkfvKzdmv/Pi3ObREGIz"
@@ -55,7 +55,7 @@ static unsigned char image_eye_open[] =
 #define image_eye_gray_width         18
 #define image_eye_gray_height        11
 #define image_eye_gray_pixel_size    4
-#define image_eye_gray_buffer_length 244
+#define image_eye_gray_length 244
 
 static unsigned char image_eye_gray[] = 
   "eNqFklERxCAMRGsBC7WABSxgAQtYOAtYOAt88lsLsYCFHjfzmMl0SPnYadJutkuW1trR3u"
@@ -70,7 +70,7 @@ static unsigned char image_eye_gray[] =
 #define image_eye_novis_width         7
 #define image_eye_novis_height        7
 #define image_eye_novis_pixel_size    4
-#define image_eye_novis_buffer_length 80
+#define image_eye_novis_length 80
 
 static unsigned char image_eye_novis[] = 
   "eNr7//8/AxAkAPEOIP4KpRP+I8TnA7E7EHNB6flI6t1B6mAYKg8zhwtNjgvJfFz6cNr3H4"
@@ -84,7 +84,7 @@ static unsigned char image_eye_novis[] =
 #define image_eye_empty_width         18
 #define image_eye_empty_height        11
 #define image_eye_empty_pixel_size    4
-#define image_eye_empty_buffer_length 28
+#define image_eye_empty_length 28
 
 static unsigned char image_eye_empty[] = 
   "eNr7//8/w/9RPIpHMQoGAMmpT80=";
@@ -174,7 +174,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_open_width, 
                                      image_eye_open_height, 
                                      image_eye_open_pixel_size,
-                                     image_eye_open_buffer_length,
+                                     image_eye_open_length,
                                      this->Canvas->GetWidgetName()))
     {
     vtkWarningMacro(<< "Error creating photo (eye open)");
@@ -189,7 +189,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_gray_width, 
                                      image_eye_gray_height, 
                                      image_eye_gray_pixel_size,
-                                     image_eye_gray_buffer_length,
+                                     image_eye_gray_length,
                                      this->Canvas->GetWidgetName()))
     {
     vtkWarningMacro(<< "Error creating photo (eye gray)");
@@ -204,7 +204,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_novis_width, 
                                      image_eye_novis_height, 
                                      image_eye_novis_pixel_size,
-                                     image_eye_novis_buffer_length,
+                                     image_eye_novis_length,
                                      this->Canvas->GetWidgetName()))
     {
     vtkWarningMacro(<< "Error creating photo (eye novis)");

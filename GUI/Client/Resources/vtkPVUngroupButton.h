@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVUngroupButton.png (zlib, base64)
  */
-static const unsigned int  image_PVUngroupButton_width         = 32;
-static const unsigned int  image_PVUngroupButton_height        = 32;
-static const unsigned int  image_PVUngroupButton_pixel_size    = 3;
-static const unsigned long image_PVUngroupButton_buffer_length = 1392;
+static const unsigned int  image_PVUngroupButton_width          = 32;
+static const unsigned int  image_PVUngroupButton_height         = 32;
+static const unsigned int  image_PVUngroupButton_pixel_size     = 3;
+static const unsigned long image_PVUngroupButton_length         = 1392;
+static const unsigned long image_PVUngroupButton_decoded_length = 3072;
 
 static const unsigned char image_PVUngroupButton[] = 
   "eNrVVmtTUlEU5S8YXDA0XyhIljmVFNjTaiYVRFHTVAQsNTW5NqJiPlBRLLG0RPHJlGlWaO"

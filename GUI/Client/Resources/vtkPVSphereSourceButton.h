@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVSphereSourceButton.png (zlib, base64)
  */
-static const unsigned int  image_PVSphereSourceButton_width         = 32;
-static const unsigned int  image_PVSphereSourceButton_height        = 32;
-static const unsigned int  image_PVSphereSourceButton_pixel_size    = 3;
-static const unsigned long image_PVSphereSourceButton_buffer_length = 928;
+static const unsigned int  image_PVSphereSourceButton_width          = 32;
+static const unsigned int  image_PVSphereSourceButton_height         = 32;
+static const unsigned int  image_PVSphereSourceButton_pixel_size     = 3;
+static const unsigned long image_PVSphereSourceButton_length         = 928;
+static const unsigned long image_PVSphereSourceButton_decoded_length = 3072;
 
 static const unsigned char image_PVSphereSourceButton[] = 
   "eNrl1mlL1VEQBvBvYCUm7rtFiFqoReQtkqIkXIhybfGWlWlpipqYpWViGSolZaAYtIAoWU"

@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVResetViewButton.png (zlib, base64)
  */
-static const unsigned int  image_PVResetViewButton_width         = 32;
-static const unsigned int  image_PVResetViewButton_height        = 32;
-static const unsigned int  image_PVResetViewButton_pixel_size    = 3;
-static const unsigned long image_PVResetViewButton_buffer_length = 1028;
+static const unsigned int  image_PVResetViewButton_width          = 32;
+static const unsigned int  image_PVResetViewButton_height         = 32;
+static const unsigned int  image_PVResetViewButton_pixel_size     = 3;
+static const unsigned long image_PVResetViewButton_length         = 1028;
+static const unsigned long image_PVResetViewButton_decoded_length = 3072;
 
 static const unsigned char image_PVResetViewButton[] = 
   "eNq7cuHEFUKIgYHB1MRo/pxpV4hQTCrKzkwFmu/sLKejLUd1WxbMnW5ibAhkSEgwrF9b0d"

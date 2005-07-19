@@ -102,7 +102,7 @@
 #define image_properties_width         16
 #define image_properties_height        14
 #define image_properties_pixel_size    4
-#define image_properties_buffer_length 140
+#define image_properties_length 140
 
 static unsigned char image_properties[] = 
   "eNrdkcENgDAMAxk9gzBMRmCjACqR3NSO4Islv5pz3dTdNxe+FMzjzOJ2x8axU48czSfbZ9"
@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.394");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.395");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -688,7 +688,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
                                            image_properties_width, 
                                            image_properties_height, 
                                            image_properties_pixel_size,
-                                           image_properties_buffer_length);
+                                           image_properties_length);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
                this->Label->GetWidgetName(),

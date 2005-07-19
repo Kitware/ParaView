@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.25");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -551,7 +551,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x1_width, 
     image_KWWindowLayout1x1_height,
     image_KWWindowLayout1x1_pixel_size,
-    image_KWWindowLayout1x1_buffer_length);
+    image_KWWindowLayout1x1_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -562,7 +562,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x1c_width, 
     image_KWWindowLayout1x1c_height,
     image_KWWindowLayout1x1c_pixel_size,
-    image_KWWindowLayout1x1c_buffer_length);
+    image_KWWindowLayout1x1c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -573,7 +573,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x2_width, 
     image_KWWindowLayout1x2_height,
     image_KWWindowLayout1x2_pixel_size,
-    image_KWWindowLayout1x2_buffer_length);
+    image_KWWindowLayout1x2_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -584,7 +584,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x2c_width, 
     image_KWWindowLayout1x2c_height,
     image_KWWindowLayout1x2c_pixel_size,
-    image_KWWindowLayout1x2c_buffer_length);
+    image_KWWindowLayout1x2c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -595,7 +595,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x1_width, 
     image_KWWindowLayout2x1_height,
     image_KWWindowLayout2x1_pixel_size,
-    image_KWWindowLayout2x1_buffer_length);
+    image_KWWindowLayout2x1_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -606,7 +606,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x1c_width, 
     image_KWWindowLayout2x1c_height,
     image_KWWindowLayout2x1c_pixel_size,
-    image_KWWindowLayout2x1c_buffer_length);
+    image_KWWindowLayout2x1c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -617,7 +617,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x2_width, 
     image_KWWindowLayout2x2_height,
     image_KWWindowLayout2x2_pixel_size,
-    image_KWWindowLayout2x2_buffer_length);
+    image_KWWindowLayout2x2_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -628,7 +628,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x2c_width, 
     image_KWWindowLayout2x2c_height,
     image_KWWindowLayout2x2c_pixel_size,
-    image_KWWindowLayout2x2c_buffer_length);
+    image_KWWindowLayout2x2c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -639,7 +639,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x3_width, 
     image_KWWindowLayout2x3_height,
     image_KWWindowLayout2x3_pixel_size,
-    image_KWWindowLayout2x3_buffer_length);
+    image_KWWindowLayout2x3_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -650,7 +650,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x3c_width, 
     image_KWWindowLayout2x3c_height,
     image_KWWindowLayout2x3c_pixel_size,
-    image_KWWindowLayout2x3c_buffer_length);
+    image_KWWindowLayout2x3c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -661,7 +661,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout3x2_width, 
     image_KWWindowLayout3x2_height,
     image_KWWindowLayout3x2_pixel_size,
-    image_KWWindowLayout3x2_buffer_length);
+    image_KWWindowLayout3x2_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -672,7 +672,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout3x2c_width, 
     image_KWWindowLayout3x2c_height,
     image_KWWindowLayout3x2c_pixel_size,
-    image_KWWindowLayout3x2c_buffer_length);
+    image_KWWindowLayout3x2c_length);
 
   // Allowed resolutions
 

@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVLookmarkButton.png (zlib, base64)
  */
-static const unsigned int  image_PVLookmarkButton_width         = 35;
-static const unsigned int  image_PVLookmarkButton_height        = 31;
-static const unsigned int  image_PVLookmarkButton_pixel_size    = 3;
-static const unsigned long image_PVLookmarkButton_buffer_length = 2252;
+static const unsigned int  image_PVLookmarkButton_width          = 35;
+static const unsigned int  image_PVLookmarkButton_height         = 31;
+static const unsigned int  image_PVLookmarkButton_pixel_size     = 3;
+static const unsigned long image_PVLookmarkButton_length         = 2252;
+static const unsigned long image_PVLookmarkButton_decoded_length = 3255;
 
 static const unsigned char image_PVLookmarkButton[] = 
   "eNqdlllMlGcYhecCbS+0KcYGYw3GrUGS0kpLSY1om0JVrMENEBFlURAKCrLbABIKKAjIwI"

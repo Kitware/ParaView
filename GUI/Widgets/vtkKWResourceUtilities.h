@@ -74,28 +74,43 @@ public:
                            unsigned char *pixels);
 
   // Description:
-  // Convert 'nb_images' images (stored in an array of filenames given by 
-  // 'image_filenames') into a C/C++ header given by 'header_filename'.
-  // Note that only images supported by ReadImage are read.
-  // The structure and contents of each image are decoded and 
+  // Convert 'nb_files' files (stored in an array of filenames given by 
+  // 'filenames') into a C/C++ header given by 'header_filename'.
+  // The structure (if any) and contents of each file are decoded and 
   // written into a form that can be used programatically. 
+  // An attempt is made to read the file as an image first (using ReadImage).
+  // If it succeeds, the width, height and pixel_size are stored in the
+  // header file as well as the buffer length and contents, prefixed with
+  // 'image_' and the name of the file *without* its extension.
   // For example, the file foobar.png is converted into:
-  //   static const unsigned int image_foobar_width  = 19
-  //   static const unsigned int image_foobar_height     = 19
-  //   static const unsigned int image_foobar_pixel_size = 3
-  //   static const unsigned long image_foobar_buffer_length = 40
+  //   static const unsigned int  image_foobar_width          = 19;
+  //   static const unsigned int  image_foobar_height         = 19;
+  //   static const unsigned int  image_foobar_pixel_size     = 3;
+  //   static const unsigned long image_foobar_length         = 40;
+  //   static const unsigned long image_foobar_decoded_length = 1083;
   //   static const unsigned char image_foobar[] = 
+  //     "eNpjYCAfPH1wg1Q0qnFU46jGwaaRPAAAa7/zXA==";
+  // If the file can not be read as an image, it is treated as a simple
+  // stream of bytes and still converted accordingly. Only the buffer length
+  // and contents are output, prefixed with 'file_' and the name of the
+  // file *with* its extension ('.' are replaced by '_').
+  // For example, the file foobar.tcl is converted into:
+  //   static const unsigned long file_foobar_tcl_length         = 40
+  //   static const unsigned long file_foobar_tcl_decoded_length = 2048
+  //   static const unsigned char file_foobar_tcl[] = 
   //     "eNpjYCAfPH1wg1Q0qnFU46jGwaaRPAAAa7/zXA==";
   // Several options can be combined into the 'options' parameter.
   //   CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB: 
-  //    => Compress the pixels using zlib
+  //    => Compress the data using zlib
   //   CONVERT_IMAGE_TO_HEADER_OPTION_BASE64: 
-  //    => Encode the pixels in base64
+  //    => Encode the data in base64
   //   CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE: 
-  //    => Update the header file only if one of the image is newer
-  // If the file can not be read as an image, it is treated as a stream
-  // of bytes and still converted accordingly (the width/height/pixel_size
-  // fields will not be found in the header file).
+  //    => Update the header file only if one of the file(s) is/are newer
+  // Note that if the contents of the file is encoded using zlib and/or base64
+  // the _length field still represents the size of the *encoded* 
+  // buffer. The expected size of the decoded buffer can be found using
+  // the _decoded_length field (which should match
+  // width * height * pixel_size for images)
   //BTX
   enum
   {
@@ -106,9 +121,21 @@ public:
   //ETX
   static int ConvertImageToHeader(
     const char *header_filename,
-    const char **image_filenames,
-    int nb_images,
+    const char **filenames,
+    int nb_files,
     int options);
+
+  // Description:
+  // Decode a buffer that was encoded using zlib and/or base64.
+  // output_buffer is automatically allocated using the 'new' operator
+  // and should be deallocated using 'delete []'.
+  // Note that it does allocate an extra-byte (i.e. output_expected_length + 1)
+  // for convenience purposes, so that the resulting buffer can be
+  // NULL terminated manually.
+  // Return 1 on success, 0 otherwise (also sets *output to NULL on error).
+  static int DecodeBuffer(
+    const unsigned char *input, unsigned long input_length, 
+    unsigned char **output, unsigned long output_expected_length);
 
 protected:
   vtkKWResourceUtilities() {};

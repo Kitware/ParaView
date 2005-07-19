@@ -58,7 +58,7 @@
 #define image_close_width         9
 #define image_close_height        9
 #define image_close_pixel_size    4
-#define image_close_buffer_length 48
+#define image_close_length 48
 
 static unsigned char image_close[] = 
   "eNpjYGD4z0AEBgIGXBibGmx8UtTgcgMt7CLkL0IYANH+oGA=";
@@ -71,13 +71,13 @@ static unsigned char image_close[] =
 #define image_open_width         9
 #define image_open_height        9
 #define image_open_pixel_size    4
-#define image_open_buffer_length 40
+#define image_open_length 40
 
 static unsigned char image_open[] = 
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.36");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.37");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -507,7 +507,7 @@ void vtkPVAnimationCue::SetImageType(int type)
         image_open_width,
         image_open_height,
         image_open_pixel_size,
-        image_open_buffer_length);
+        image_open_length);
       break;
     case vtkPVAnimationCue::IMAGE_CLOSE:
       this->Image->SetImageToPixels(
@@ -515,7 +515,7 @@ void vtkPVAnimationCue::SetImageType(int type)
         image_close_width,
         image_close_height,
         image_close_pixel_size,
-        image_close_buffer_length);
+        image_close_length);
       break;
     default:
       vtkErrorMacro("Invalid image type " << type);

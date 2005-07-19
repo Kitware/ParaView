@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.36");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.37");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -42,7 +42,7 @@ vtkCxxRevisionMacro(vtkKWThumbWheel, "1.36");
 #define image_arrow_width         4
 #define image_arrow_height        7
 #define image_arrow_pixel_size    4
-#define image_arrow_buffer_length 40
+#define image_arrow_length 40
 
 static unsigned char image_arrow[] = 
   "eNpjYGD4z4AK/jOgiv1HE/uPB+PSDwcAlQUP8Q==";
@@ -193,7 +193,7 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
                                             image_arrow_width, 
                                             image_arrow_height, 
                                             image_arrow_pixel_size,
-                                            image_arrow_buffer_length);
+                                            image_arrow_length);
 
     this->ThumbWheel->SetParent(this->TopLevel);
     }

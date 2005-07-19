@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVWaveletButton.png (zlib, base64)
  */
-static const unsigned int  image_PVWaveletButton_width         = 32;
-static const unsigned int  image_PVWaveletButton_height        = 32;
-static const unsigned int  image_PVWaveletButton_pixel_size    = 3;
-static const unsigned long image_PVWaveletButton_buffer_length = 2360;
+static const unsigned int  image_PVWaveletButton_width          = 32;
+static const unsigned int  image_PVWaveletButton_height         = 32;
+static const unsigned int  image_PVWaveletButton_pixel_size     = 3;
+static const unsigned long image_PVWaveletButton_length         = 2360;
+static const unsigned long image_PVWaveletButton_decoded_length = 3072;
 
 static const unsigned char image_PVWaveletButton[] = 
   "eNrdVvtTE1ka/Q9mhaTJ6+bpTfNYyDTMWlsyo/PYkVkVRwGBGZU3IQlpBYGAgjiD0EnoTn"

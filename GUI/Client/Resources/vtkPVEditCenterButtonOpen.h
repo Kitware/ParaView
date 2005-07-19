@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVEditCenterButtonOpen.png (zlib, base64)
  */
-static const unsigned int  image_PVEditCenterButtonOpen_width         = 32;
-static const unsigned int  image_PVEditCenterButtonOpen_height        = 32;
-static const unsigned int  image_PVEditCenterButtonOpen_pixel_size    = 3;
-static const unsigned long image_PVEditCenterButtonOpen_buffer_length = 1092;
+static const unsigned int  image_PVEditCenterButtonOpen_width          = 32;
+static const unsigned int  image_PVEditCenterButtonOpen_height         = 32;
+static const unsigned int  image_PVEditCenterButtonOpen_pixel_size     = 3;
+static const unsigned long image_PVEditCenterButtonOpen_length         = 1092;
+static const unsigned long image_PVEditCenterButtonOpen_decoded_length = 3072;
 
 static const unsigned char image_PVEditCenterButtonOpen[] = 
   "eNq1lt1OGlEQxzdp+gxcNGlSW6vGqo1IAW1jGxC36LYpy1ZAKjRNSKipEFq+VnqhrVFs1P"

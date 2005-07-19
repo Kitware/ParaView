@@ -14,20 +14,13 @@
 #include "vtkKWIcon.h"
 
 #include "vtkObjectFactory.h"
-
-#if ((VTK_MAJOR_VERSION <= 4) && (VTK_MINOR_VERSION <= 4))
-#include "zlib.h"
-#else
-#include "vtk_zlib.h"
-#endif
+#include "vtkKWResourceUtilities.h"
 
 #include "Resources/vtkKWIconResources.h"
 
-#include <vtksys/Base64.h>
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.12");
+vtkCxxRevisionMacro(vtkKWIcon, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -69,75 +62,29 @@ void vtkKWIcon::SetImage(const unsigned char *data,
     {
     buffer_length = nb_of_raw_bytes;
     }
-  const unsigned char *data_ptr = data;
 
-  // If the buffer_lenth has been provided, and if it's different than the
-  // expected size of the raw image buffer, than it might have been compressed
-  // using zlib and/or encoded in base64. In that case, decode and/or
-  // uncompress the buffer.
+  // Is the data encoded (zlib and/or base64) ?
 
-  int base64 = 0;
-  unsigned char *base64_buffer = 0;
-
-  int zlib = 0;
-  unsigned char *zlib_buffer = 0;
-
+  unsigned char *decoded_data = NULL;
   if (buffer_length && buffer_length != nb_of_raw_bytes)
     {
-    // Is it a base64 stream (i.e. not zlib for the moment) ?
-
-    if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
+    if (!vtkKWResourceUtilities::DecodeBuffer(
+          data, buffer_length, &decoded_data, nb_of_raw_bytes))
       {
-      base64_buffer = new unsigned char [buffer_length];
-      buffer_length = vtksysBase64_Decode(data_ptr, 0, 
-                                         base64_buffer, buffer_length);
-      if (buffer_length == 0)
-        {
-        vtkGenericWarningMacro(<< "Error decoding base64 stream");
-        delete [] base64_buffer;
-        return;
-        }
-      base64 = 1;
-      data_ptr = base64_buffer;
+      vtkErrorMacro("Error while decoding icon pixels");
+      return;
       }
-    
-    // Is it zlib ?
-
-    if (buffer_length != nb_of_raw_bytes &&
-        data_ptr[0] == 0x78 && data_ptr[1] == 0xDA)
-      {
-      unsigned long zlib_buffer_length = nb_of_raw_bytes;
-      zlib_buffer = new unsigned char [zlib_buffer_length];
-      if (uncompress(zlib_buffer, &zlib_buffer_length, 
-                     data_ptr, buffer_length) != Z_OK ||
-          zlib_buffer_length != nb_of_raw_bytes)
-        {
-        vtkGenericWarningMacro(<< "Error decoding zlib stream");
-        delete [] zlib_buffer;
-        if (base64)
-          {
-          delete [] base64_buffer;
-          }
-        return;
-        }
-      zlib = 1;
-      data_ptr = zlib_buffer;
-      }
+    data = decoded_data;
     }
 
-  if (data_ptr)
+  if (data)
     {
-    this->SetData(data_ptr, width, height, pixel_size, options);
+    this->SetData(data, width, height, pixel_size, options);
     }
 
-  if (base64)
+  if (decoded_data)
     {
-    delete [] base64_buffer;
-    }
-
-  if (zlib)
-    {
-    delete [] zlib_buffer;
+    delete [] decoded_data;
     }
 }
 
@@ -204,7 +151,7 @@ void vtkKWIcon::SetImage(int image)
         image_connection, 
         image_connection_width, image_connection_height,
         image_connection_pixel_size, 
-        image_connection_buffer_length);
+        image_connection_length);
       break;
 
     case vtkKWIcon::IconEmpty16x16:
@@ -212,7 +159,7 @@ void vtkKWIcon::SetImage(int image)
         image_empty_16x16, 
         image_empty_16x16_width, image_empty_16x16_height,
         image_empty_16x16_pixel_size, 
-        image_empty_16x16_buffer_length);
+        image_empty_16x16_length);
       break;
 
     case vtkKWIcon::IconError:
@@ -220,7 +167,7 @@ void vtkKWIcon::SetImage(int image)
         image_error, 
         image_error_width, image_error_height,
         image_error_pixel_size, 
-        image_error_buffer_length);
+        image_error_length);
       break;
 
     case vtkKWIcon::IconExpand:
@@ -228,7 +175,7 @@ void vtkKWIcon::SetImage(int image)
         image_expand, 
         image_expand_width, image_expand_height,
         image_expand_pixel_size, 
-        image_expand_buffer_length);
+        image_expand_length);
       break;
 
     case vtkKWIcon::IconFolder:
@@ -236,7 +183,7 @@ void vtkKWIcon::SetImage(int image)
         image_folder, 
         image_folder_width, image_folder_height,
         image_folder_pixel_size, 
-        image_folder_buffer_length);
+        image_folder_length);
       break;
 
     case vtkKWIcon::IconFolderOpen:
@@ -244,7 +191,7 @@ void vtkKWIcon::SetImage(int image)
         image_folder_open, 
         image_folder_open_width, image_folder_open_height,
         image_folder_open_pixel_size, 
-        image_folder_open_buffer_length);
+        image_folder_open_length);
       break;
 
     case vtkKWIcon::IconGridLinear:
@@ -252,7 +199,7 @@ void vtkKWIcon::SetImage(int image)
         image_grid_linear, 
         image_grid_linear_width, image_grid_linear_height,
         image_grid_linear_pixel_size, 
-        image_grid_linear_buffer_length);
+        image_grid_linear_length);
       break;      
 
     case vtkKWIcon::IconGridLog:
@@ -260,7 +207,7 @@ void vtkKWIcon::SetImage(int image)
         image_grid_log, 
         image_grid_log_width, image_grid_log_height,
         image_grid_log_pixel_size, 
-        image_grid_log_buffer_length);
+        image_grid_log_length);
       break;      
 
     case vtkKWIcon::IconHelpBubble:
@@ -268,7 +215,7 @@ void vtkKWIcon::SetImage(int image)
         image_helpbubble, 
         image_helpbubble_width, image_helpbubble_height,
         image_helpbubble_pixel_size, 
-        image_helpbubble_buffer_length);
+        image_helpbubble_length);
       break;      
 
     case vtkKWIcon::IconInfoMini:
@@ -276,7 +223,7 @@ void vtkKWIcon::SetImage(int image)
         image_info_mini, 
         image_info_mini_width, image_info_mini_height,
         image_info_mini_pixel_size, 
-        image_info_mini_buffer_length);
+        image_info_mini_length);
       break;
 
     case vtkKWIcon::IconLock:
@@ -284,7 +231,7 @@ void vtkKWIcon::SetImage(int image)
         image_lock, 
         image_lock_width, image_lock_height,
         image_lock_pixel_size, 
-        image_lock_buffer_length);
+        image_lock_length);
       break;
 
     case vtkKWIcon::IconMagGlass:
@@ -292,7 +239,7 @@ void vtkKWIcon::SetImage(int image)
         image_mag_glass,
         image_mag_glass_width, image_mag_glass_height,
         image_mag_glass_pixel_size,
-        image_mag_glass_buffer_length);
+        image_mag_glass_length);
       break;
 
     case vtkKWIcon::IconMinus:
@@ -300,7 +247,7 @@ void vtkKWIcon::SetImage(int image)
         image_minus, 
         image_minus_width, image_minus_height,
         image_minus_pixel_size, 
-        image_minus_buffer_length);
+        image_minus_length);
       break;      
 
     case vtkKWIcon::IconMove:
@@ -308,7 +255,7 @@ void vtkKWIcon::SetImage(int image)
         image_move, 
         image_move_width, image_move_height,
         image_move_pixel_size, 
-        image_move_buffer_length);
+        image_move_length);
       break;      
 
     case vtkKWIcon::IconMoveH:
@@ -316,7 +263,7 @@ void vtkKWIcon::SetImage(int image)
         image_move_h, 
         image_move_h_width, image_move_h_height,
         image_move_h_pixel_size, 
-        image_move_h_buffer_length);
+        image_move_h_length);
       break;      
 
     case vtkKWIcon::IconMoveV:
@@ -324,7 +271,7 @@ void vtkKWIcon::SetImage(int image)
         image_move_v, 
         image_move_v_width, image_move_v_height,
         image_move_v_pixel_size, 
-        image_move_v_buffer_length);
+        image_move_v_length);
       break;      
 
     case vtkKWIcon::IconPlus:
@@ -332,7 +279,7 @@ void vtkKWIcon::SetImage(int image)
         image_plus, 
         image_plus_width, image_plus_height,
         image_plus_pixel_size, 
-        image_plus_buffer_length);
+        image_plus_length);
       break;      
 
     case vtkKWIcon::IconQuestion:
@@ -340,7 +287,7 @@ void vtkKWIcon::SetImage(int image)
         image_question, 
         image_question_width, image_question_height,
         image_question_pixel_size, 
-        image_question_buffer_length);
+        image_question_length);
       break;
 
     case vtkKWIcon::IconReload:
@@ -348,7 +295,7 @@ void vtkKWIcon::SetImage(int image)
         image_reload, 
         image_reload_width, image_reload_height,
         image_reload_pixel_size, 
-        image_reload_buffer_length);
+        image_reload_length);
       break;
 
     case vtkKWIcon::IconShrink:
@@ -356,7 +303,7 @@ void vtkKWIcon::SetImage(int image)
         image_shrink, 
         image_shrink_width, image_shrink_height,
         image_shrink_pixel_size, 
-        image_shrink_buffer_length);
+        image_shrink_length);
       break;
 
     case vtkKWIcon::IconErrorMini:
@@ -364,7 +311,7 @@ void vtkKWIcon::SetImage(int image)
         image_error_mini, 
         image_error_mini_width, image_error_mini_height,
         image_error_mini_pixel_size, 
-        image_error_mini_buffer_length);
+        image_error_mini_length);
       break;
 
     case vtkKWIcon::IconErrorRedMini:
@@ -372,7 +319,7 @@ void vtkKWIcon::SetImage(int image)
         image_error_red_mini, 
         image_error_red_mini_width, image_error_red_mini_height,
         image_error_red_mini_pixel_size, 
-        image_error_red_mini_buffer_length);
+        image_error_red_mini_length);
       break;
 
     case vtkKWIcon::IconStopwatch:
@@ -380,7 +327,7 @@ void vtkKWIcon::SetImage(int image)
         image_stopwatch, 
         image_stopwatch_width, image_stopwatch_height,
         image_stopwatch_pixel_size, 
-        image_stopwatch_buffer_length);
+        image_stopwatch_length);
       break;
       
     case vtkKWIcon::IconTransportBeginning:
@@ -388,7 +335,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_beginning, 
         image_transport_beginning_width, image_transport_beginning_height,
         image_transport_beginning_pixel_size, 
-        image_transport_beginning_buffer_length);
+        image_transport_beginning_length);
       break;
       
     case vtkKWIcon::IconTransportEnd:
@@ -396,7 +343,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_end, 
         image_transport_end_width, image_transport_end_height,
         image_transport_end_pixel_size, 
-        image_transport_end_buffer_length);
+        image_transport_end_length);
       break;
       
     case vtkKWIcon::IconTransportFastForward:
@@ -405,7 +352,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_fast_forward_width, 
         image_transport_fast_forward_height,
         image_transport_fast_forward_pixel_size, 
-        image_transport_fast_forward_buffer_length);
+        image_transport_fast_forward_length);
       break;
       
     case vtkKWIcon::IconTransportFastForwardToKey:
@@ -414,7 +361,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_fast_forward_to_key_width, 
         image_transport_fast_forward_to_key_height,
         image_transport_fast_forward_to_key_pixel_size, 
-        image_transport_fast_forward_to_key_buffer_length);
+        image_transport_fast_forward_to_key_length);
       break;
       
     case vtkKWIcon::IconTransportLoop:
@@ -423,7 +370,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_loop_width, 
         image_transport_loop_height,
         image_transport_loop_pixel_size, 
-        image_transport_loop_buffer_length);
+        image_transport_loop_length);
       break;
       
     case vtkKWIcon::IconTransportPause:
@@ -432,7 +379,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_pause_width, 
         image_transport_pause_height,
         image_transport_pause_pixel_size, 
-        image_transport_pause_buffer_length);
+        image_transport_pause_length);
       break;
       
     case vtkKWIcon::IconTransportPlay:
@@ -441,7 +388,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_play_width, 
         image_transport_play_height,
         image_transport_play_pixel_size, 
-        image_transport_play_buffer_length);
+        image_transport_play_length);
       break;
       
     case vtkKWIcon::IconTransportPlayToKey:
@@ -450,7 +397,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_play_to_key_width, 
         image_transport_play_to_key_height,
         image_transport_play_to_key_pixel_size, 
-        image_transport_play_to_key_buffer_length);
+        image_transport_play_to_key_length);
       break;
       
     case vtkKWIcon::IconTransportRewind:
@@ -459,7 +406,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_rewind_width, 
         image_transport_rewind_height,
         image_transport_rewind_pixel_size, 
-        image_transport_rewind_buffer_length);
+        image_transport_rewind_length);
       break;
       
     case vtkKWIcon::IconTransportRewindToKey:
@@ -468,7 +415,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_rewind_to_key_width, 
         image_transport_rewind_to_key_height,
         image_transport_rewind_to_key_pixel_size, 
-        image_transport_rewind_to_key_buffer_length);
+        image_transport_rewind_to_key_length);
       break;
       
     case vtkKWIcon::IconTransportStop:
@@ -477,7 +424,7 @@ void vtkKWIcon::SetImage(int image)
         image_transport_stop_width, 
         image_transport_stop_height,
         image_transport_stop_pixel_size, 
-        image_transport_stop_buffer_length);
+        image_transport_stop_length);
       break;
       
     case vtkKWIcon::IconTrashcan:
@@ -485,7 +432,7 @@ void vtkKWIcon::SetImage(int image)
         image_trashcan, 
         image_trashcan_width, image_trashcan_height,
         image_trashcan_pixel_size, 
-        image_trashcan_buffer_length);
+        image_trashcan_length);
       break;
       
     case vtkKWIcon::IconTreeClose:
@@ -493,7 +440,7 @@ void vtkKWIcon::SetImage(int image)
         image_tree_close, 
         image_tree_close_width, image_tree_close_height,
         image_tree_close_pixel_size, 
-        image_tree_close_buffer_length);
+        image_tree_close_length);
       break;
       
     case vtkKWIcon::IconTreeOpen:
@@ -501,7 +448,7 @@ void vtkKWIcon::SetImage(int image)
         image_tree_open, 
         image_tree_open_width, image_tree_open_height,
         image_tree_open_pixel_size, 
-        image_tree_open_buffer_length);
+        image_tree_open_length);
       break;
       
     case vtkKWIcon::IconWarning:
@@ -509,7 +456,7 @@ void vtkKWIcon::SetImage(int image)
         image_warning, 
         image_warning_width, image_warning_height,
         image_warning_pixel_size, 
-        image_warning_buffer_length);
+        image_warning_length);
       break;
 
     case vtkKWIcon::IconWarningMini:
@@ -517,7 +464,7 @@ void vtkKWIcon::SetImage(int image)
         image_warning_mini, 
         image_warning_mini_width, image_warning_mini_height,
         image_warning_mini_pixel_size, 
-        image_warning_mini_buffer_length);
+        image_warning_mini_length);
       break;
 
     case vtkKWIcon::IconWindowLevel:
@@ -525,7 +472,7 @@ void vtkKWIcon::SetImage(int image)
         image_window_level, 
         image_window_level_width, image_window_level_height,
         image_window_level_pixel_size, 
-        image_window_level_buffer_length);
+        image_window_level_length);
       break;
     }
 }

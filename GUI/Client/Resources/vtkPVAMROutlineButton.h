@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVAMROutlineButton.png (zlib, base64)
  */
-static const unsigned int  image_PVAMROutlineButton_width         = 32;
-static const unsigned int  image_PVAMROutlineButton_height        = 32;
-static const unsigned int  image_PVAMROutlineButton_pixel_size    = 3;
-static const unsigned long image_PVAMROutlineButton_buffer_length = 288;
+static const unsigned int  image_PVAMROutlineButton_width          = 32;
+static const unsigned int  image_PVAMROutlineButton_height         = 32;
+static const unsigned int  image_PVAMROutlineButton_pixel_size     = 3;
+static const unsigned long image_PVAMROutlineButton_length         = 288;
+static const unsigned long image_PVAMROutlineButton_decoded_length = 3072;
 
 static const unsigned char image_PVAMROutlineButton[] = 
   "eNqzSMq1GBYotr4js3MiVRDQKEzDP339+p9KAGgUmhVAS4HiyAwgAjKAXCDj7PVbszdsQ2"

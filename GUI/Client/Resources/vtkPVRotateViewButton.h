@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVRotateViewButton.png (zlib, base64)
  */
-static const unsigned int  image_PVRotateViewButton_width         = 32;
-static const unsigned int  image_PVRotateViewButton_height        = 32;
-static const unsigned int  image_PVRotateViewButton_pixel_size    = 3;
-static const unsigned long image_PVRotateViewButton_buffer_length = 1004;
+static const unsigned int  image_PVRotateViewButton_width          = 32;
+static const unsigned int  image_PVRotateViewButton_height         = 32;
+static const unsigned int  image_PVRotateViewButton_pixel_size     = 3;
+static const unsigned long image_PVRotateViewButton_length         = 1004;
+static const unsigned long image_PVRotateViewButton_decoded_length = 3072;
 
 static const unsigned char image_PVRotateViewButton[] = 
   "eNq1lm1v0lAUxz8G75YOki0bK0gpW2c26C4PpTy08GKGCWoiyaJLFnXDDZyowS1hSuZzfC"
@@ -25,13 +26,14 @@ static const unsigned char image_PVRotateViewButton[] =
   "ndUrKDiIxczWf38BWc1rdw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVRotateViewButtonActive.png (zlib, base64)
  */
-static const unsigned int  image_PVRotateViewButtonActive_width         = 32;
-static const unsigned int  image_PVRotateViewButtonActive_height        = 32;
-static const unsigned int  image_PVRotateViewButtonActive_pixel_size    = 3;
-static const unsigned long image_PVRotateViewButtonActive_buffer_length = 976;
+static const unsigned int  image_PVRotateViewButtonActive_width          = 32;
+static const unsigned int  image_PVRotateViewButtonActive_height         = 32;
+static const unsigned int  image_PVRotateViewButtonActive_pixel_size     = 3;
+static const unsigned long image_PVRotateViewButtonActive_length         = 976;
+static const unsigned long image_PVRotateViewButtonActive_decoded_length = 3072;
 
 static const unsigned char image_PVRotateViewButtonActive[] = 
   "eNq1ls9L40AUx99pLplLeul/UdSgFXvcbmoFFT2pqBEF0Uq7wrYNWlBQVPBU8SdaUeu2B/"

@@ -1,11 +1,12 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    PVAMRPartButton.png (zlib, base64)
  */
-static const unsigned int  image_PVAMRPartButton_width         = 32;
-static const unsigned int  image_PVAMRPartButton_height        = 32;
-static const unsigned int  image_PVAMRPartButton_pixel_size    = 3;
-static const unsigned long image_PVAMRPartButton_buffer_length = 1804;
+static const unsigned int  image_PVAMRPartButton_width          = 32;
+static const unsigned int  image_PVAMRPartButton_height         = 32;
+static const unsigned int  image_PVAMRPartButton_pixel_size     = 3;
+static const unsigned long image_PVAMRPartButton_length         = 1804;
+static const unsigned long image_PVAMRPartButton_decoded_length = 3072;
 
 static const unsigned char image_PVAMRPartButton[] = 
   "eNrllmtQlGUUx/+TGY5Truk4qaPhJZVQJCfUNZU1RRkHcSG8Ky43gXVZVth9H9d9WFBJtA"

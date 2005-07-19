@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.10");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.11");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -340,15 +340,15 @@ int vtkKWResourceUtilities::WritePNGImage(
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ConvertImageToHeader(
   const char *header_filename,
-  const char **image_filenames,
-  int nb_images,
+  const char **filenames,
+  int nb_files,
   int options)
 {
   // Check parameters
 
-  if (!image_filenames || nb_images <= 0 || !header_filename)
+  if (!filenames || nb_files <= 0 || !header_filename)
     {
-    vtkGenericWarningMacro("Unable to convert image, invalid parameters!");
+    vtkGenericWarningMacro("Unable to convert file, invalid parameters!");
     return 0;
     }
 
@@ -361,17 +361,17 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
   int opt_base64 = 
     options & vtkKWResourceUtilities::ConvertImageToHeaderOptionBase64;
 
-  // Update only, bail out if the header is more recent than all the images
+  // Update only, bail out if the header is more recent than all the files
 
   if (opt_update && vtksys::SystemTools::FileExists(header_filename))
     {
     long int header_mod_time = 
       vtksys::SystemTools::ModifiedTime(header_filename);
     int up_to_date = 1;
-    for (int img_idx = 0; img_idx < nb_images; img_idx++)
+    for (int img_idx = 0; img_idx < nb_files; img_idx++)
       {
-      if (image_filenames[img_idx] && 
-          (vtksys::SystemTools::ModifiedTime(image_filenames[img_idx]) >
+      if (filenames[img_idx] && 
+          (vtksys::SystemTools::ModifiedTime(filenames[img_idx]) >
            header_mod_time))
         {
         up_to_date = 0;
@@ -393,61 +393,63 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     return 0;
     }
 
-  // Loop over the images
+  // Loop over the files
 
   int all_ok = 1;
 
-  for (int img_idx = 0; img_idx < nb_images; img_idx++)
+  for (int img_idx = 0; img_idx < nb_files; img_idx++)
     {
-    const char *image_filename = image_filenames[img_idx];
+    const char *filename = filenames[img_idx];
 
     // Is the filename valid ?
 
-    if (!image_filename)
+    if (!filename)
       {
       continue;
       }
 
-    // Image exists ?
+    // File exists ?
 
-    if (!vtksys::SystemTools::FileExists(image_filename))
+    if (!vtksys::SystemTools::FileExists(filename))
       {
-      vtkGenericWarningMacro("Unable to find image " << image_filename);
+      vtkGenericWarningMacro("Unable to find file " << filename);
       all_ok = 0;
       continue;
       }
 
-    // Read image
+    // Read file
     // If failed, read it as a buffer
 
     int width = 0;
     int height = 0;
     int pixel_size = 0;
-    unsigned long nb_of_bytes = 0;
-    unsigned char *image_buffer = NULL;
+    unsigned long buffer_length = 0;
+    unsigned char *buffer = NULL;
 
     if (vtkKWResourceUtilities::ReadImage(
-          image_filename, &width, &height, &pixel_size, &image_buffer))
+          filename, &width, &height, &pixel_size, &buffer))
       {
-      nb_of_bytes = width * height * pixel_size;
+      buffer_length = width * height * pixel_size;
       }
     else
       {
-      nb_of_bytes = vtksys::SystemTools::FileLength(image_filename);
-      image_buffer = new unsigned char [nb_of_bytes];
-      FILE *filep = fopen(image_filename, "rb");
+      buffer_length = vtksys::SystemTools::FileLength(filename);
+      buffer = new unsigned char [buffer_length];
+      FILE *filep = fopen(filename, "rb");
       if (!filep ||
-          fread(image_buffer, 1, nb_of_bytes, filep) != nb_of_bytes ||
+          fread(buffer, 1, buffer_length, filep) != buffer_length ||
           fclose(filep))
         {
-        vtkGenericWarningMacro("Unable to read file " << image_filename);
-        delete [] image_buffer;
+        vtkGenericWarningMacro("Unable to read file " << filename);
+        delete [] buffer;
         all_ok = 0;
         continue;
         }
       }
 
-    unsigned char *data_ptr = image_buffer;
+    unsigned long buffer_decoded_length = buffer_length;
+
+    unsigned char *data_ptr = buffer;
 
     // Zlib the buffer
 
@@ -455,20 +457,20 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     if (opt_zlib)
       {
       unsigned long zlib_buffer_size = 
-        (unsigned long)((float)nb_of_bytes * 1.2 + 12);
+        (unsigned long)((float)buffer_length * 1.2 + 12);
       zlib_buffer = new unsigned char [zlib_buffer_size];
       if (compress2(zlib_buffer, &zlib_buffer_size, 
-                    data_ptr, nb_of_bytes, 
+                    data_ptr, buffer_length, 
                     Z_BEST_COMPRESSION) != Z_OK)
         {
-        vtkGenericWarningMacro("Unable to compress image buffer!");
+        vtkGenericWarningMacro("Unable to compress buffer!");
         delete [] zlib_buffer;
-        delete [] image_buffer;
+        delete [] buffer;
         all_ok = 0;
         continue;
         }
       data_ptr = zlib_buffer;
-      nb_of_bytes = zlib_buffer_size;
+      buffer_length = zlib_buffer_size;
       }
   
     // Base64 the buffer
@@ -476,31 +478,44 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     unsigned char *base64_buffer = NULL;
     if (opt_base64)
       {
-      base64_buffer = new unsigned char [nb_of_bytes * 2];
-      nb_of_bytes = 
-        vtksysBase64_Encode(data_ptr, nb_of_bytes, base64_buffer, 0);
-      if (nb_of_bytes == 0)
+      base64_buffer = new unsigned char [buffer_length * 2];
+      buffer_length = 
+        vtksysBase64_Encode(data_ptr, buffer_length, base64_buffer, 0);
+      if (buffer_length == 0)
         {
-        vtkGenericWarningMacro("Unable to base64 image buffer!");
+        vtkGenericWarningMacro("Unable to base64 buffer!");
         delete [] zlib_buffer;
         delete [] base64_buffer;
-        delete [] image_buffer;
+        delete [] buffer;
         all_ok = 0;
         continue;
         }
       data_ptr = base64_buffer;
       }
     
-    // Output the image in the header
+    // Output the file in the header
 
-    vtksys_stl::string image_basename = 
-      vtksys::SystemTools::GetFilenameName(image_filename);
-    vtksys_stl::string image_name = 
-      vtksys::SystemTools::GetFilenameWithoutExtension(image_basename);
-  
+    vtksys_stl::string filename_base = 
+      vtksys::SystemTools::GetFilenameName(filename);
+    vtksys_stl::string prefix;
+    
+    if (width && height && pixel_size)
+      {
+      prefix = "image_";
+      prefix += 
+        vtksys::SystemTools::GetFilenameWithoutExtension(filename_base);
+      }
+    else
+      {
+      prefix = "file_";
+      vtksys_stl::string filename_base_clean(filename_base);
+      vtksys::SystemTools::ReplaceString(filename_base_clean, ".", "_");
+      prefix += filename_base_clean;
+      }
+    
     out << "/* " << endl
         << " * Resource generated for file:" << endl
-        << " *    " << image_basename.c_str();
+        << " *    " << filename_base.c_str();
 
     if (opt_base64 || opt_zlib)
       {
@@ -520,27 +535,39 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     
     if (width)
       {
-      out << "static const unsigned int  image_" << image_name.c_str() 
-          << "_width         = " << width <<  ";" << endl;
+      out << "static const unsigned int  " << prefix.c_str() 
+          << "_width          = " << width <<  ";" << endl;
       }
 
     if (height)
       {
-      out << "static const unsigned int  image_" << image_name.c_str() 
-          << "_height        = " << height << ";" << endl;
+      out << "static const unsigned int  " << prefix.c_str() 
+          << "_height         = " << height << ";" << endl;
       }
 
     if (pixel_size)
       {
-      out << "static const unsigned int  image_" << image_name.c_str() 
-          << "_pixel_size    = " << pixel_size << ";" << endl;
+      out << "static const unsigned int  " << prefix.c_str() 
+          << "_pixel_size     = " << pixel_size << ";" << endl;
       }
 
-    out << "static const unsigned long image_" << image_name.c_str() 
-        << "_buffer_length = " << nb_of_bytes << ";" << endl << endl;
+    if (buffer_length)
+      {
+      out << "static const unsigned long " << prefix.c_str() 
+          << "_length         = " << buffer_length << ";" << endl;
+      }
 
-    out << "static " << pixel_byte_type << " image_" << image_name.c_str();
-    if (nb_of_bytes >= max_bytes)
+    if (opt_zlib || opt_base64)
+      {
+      out << "static const unsigned long " << prefix.c_str() 
+          << "_decoded_length = " 
+          << buffer_decoded_length << ";" << endl;
+      }
+    
+    out << endl;
+
+    out << "static " << pixel_byte_type << " " << prefix.c_str();
+    if (buffer_length >= max_bytes)
       {
       out << "_section_" << ++section_idx;
       }
@@ -550,7 +577,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     // Loop over pixels
 
     unsigned char *ptr = data_ptr;
-    unsigned char *end = data_ptr + nb_of_bytes;
+    unsigned char *end = data_ptr + buffer_length;
 
     int cc = 0;
     while (ptr < (end - 1))
@@ -567,7 +594,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
           }
         ++section_idx;
         out << endl
-            << "static " << pixel_byte_type << " image_" << image_name.c_str()
+            << "static " << pixel_byte_type << " " << prefix.c_str()
             << "_section_" << section_idx << "[] = " << endl
             << (opt_base64 ? "  \"" : "{\n  ");
         }
@@ -606,17 +633,17 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     if (section_idx)
       {
       out << endl 
-          << "static " << pixel_byte_type << " *image_" << image_name.c_str()
+          << "static " << pixel_byte_type << " *" << prefix.c_str()
           << "_sections[" << section_idx << "] = {" << endl;
       for (int i = 1; i <= section_idx; i++)
         {
-        out << "  image_" << image_name.c_str() << "_section_" << i 
+        out << "  " << prefix.c_str() << "_section_" << i 
             << (i < section_idx ? "," : "") << endl;
         }
       out << "};" << endl
           << endl
-          << "static const unsigned int image_" << image_name.c_str() 
-          << "_nb_sections   = " << section_idx << ";" << endl;
+          << "static const unsigned int " << prefix.c_str() 
+          << "_nb_sections = " << section_idx << ";" << endl;
       }
 
     out << endl;
@@ -625,7 +652,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     delete [] base64_buffer;
     delete [] zlib_buffer;
-    delete [] image_buffer;
+    delete [] buffer;
 
     } // Next file
 
@@ -634,6 +661,70 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
   out.close();
 
   return all_ok;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWResourceUtilities::DecodeBuffer(
+  const unsigned char *input, unsigned long input_length, 
+  unsigned char **output, unsigned long output_expected_length)
+{
+  *output = NULL;
+  if (!input || input_length <= 0 || !output || output_expected_length < 0)
+    {
+    return 0;
+    }
+
+  unsigned char *base64_buffer = NULL;
+  unsigned char *zlib_buffer = NULL;
+
+  // Is it a base64 stream (i.e. not zlib for the moment) ?
+
+  if (input[0] != 0x78 || input[1] != 0xDA)
+    {
+    base64_buffer = new unsigned char [output_expected_length + 1];
+    input_length = vtksysBase64_Decode(input, 0, base64_buffer, input_length);
+    if (input_length == 0)
+      {
+      vtkGenericWarningMacro(<< "Error decoding base64 stream");
+      delete [] base64_buffer;
+      return 0;
+      }
+    input = base64_buffer;
+    }
+    
+  // Is it zlib ?
+
+  if (input_length != output_expected_length &&
+      input[0] == 0x78 && input[1] == 0xDA)
+    {
+    zlib_buffer = new unsigned char [output_expected_length + 1];
+    unsigned long zlib_buffer_length;
+    int error = 
+      (uncompress(zlib_buffer, &zlib_buffer_length, 
+                  input, input_length) != Z_OK ||
+       zlib_buffer_length != output_expected_length);
+    if (base64_buffer)
+      {
+      delete [] base64_buffer;
+      base64_buffer = NULL;
+      }
+    if (error)
+      {
+      vtkGenericWarningMacro(<< "Error decoding zlib stream");
+      delete [] zlib_buffer;
+      return 0;
+      }
+    *output = zlib_buffer;
+    return 1;
+    }
+
+  if (base64_buffer)
+    {
+    *output = base64_buffer;
+    return 1;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

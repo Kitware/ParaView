@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.48");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.49");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -53,7 +53,7 @@ vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.48");
 #define image_PVUpDirectoryButton_width         16
 #define image_PVUpDirectoryButton_height        16
 #define image_PVUpDirectoryButton_pixel_size    3
-#define image_PVUpDirectoryButton_buffer_length 108
+#define image_PVUpDirectoryButton_length 108
 
 static unsigned char image_PVUpDirectoryButton[] = 
   "eNq7cuHEFbIQAyogqPj/f5AaOIlHCwPRAK4e2WQ8JEQlmmPwaIerR1YMt5qg+ZiuJWg+RJ"
@@ -67,7 +67,7 @@ static unsigned char image_PVUpDirectoryButton[] =
 #define image_PVFolder_width         17
 #define image_PVFolder_height        17
 #define image_PVFolder_pixel_size    3
-#define image_PVFolder_buffer_length 448
+#define image_PVFolder_length 448
 
 static unsigned char image_PVFolder[] = 
   "eNr7/59+4MxMk9MzjE9OMzw+Rf/+/fvfvn0jqB6Ze6hf68SJE3h0wdTPREL/93ap7mpX2t"
@@ -85,7 +85,7 @@ static unsigned char image_PVFolder[] =
 #define image_PVDocument_width         17
 #define image_PVDocument_height        17
 #define image_PVDocument_pixel_size    3
-#define image_PVDocument_buffer_length 176
+#define image_PVDocument_length 176
 
 static unsigned char image_PVDocument[] = 
   "eNqd0sENgCAMBdAeu4+zdB9O7sBMcHYFxqgFYiS1FOJPA8b0pWBk/pPTTYzRJKVcsxJCRF"
@@ -307,7 +307,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     image_PVUpDirectoryButton_width,
     image_PVUpDirectoryButton_height,
     image_PVUpDirectoryButton_pixel_size,
-    image_PVUpDirectoryButton_buffer_length);
+    image_PVUpDirectoryButton_length);
 
   this->DownDirectoryButton->SetBalloonHelpString("Up One Level");
   this->Script("bind %s <ButtonRelease-1> { %s DownDirectoryCallback}",
@@ -397,7 +397,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                                      image_PVFolder_width, 
                                      image_PVFolder_height, 
                                      image_PVFolder_pixel_size,
-                                     image_PVFolder_buffer_length,
+                                     image_PVFolder_length,
                                      this->FileList->GetWidgetName()))
     {
     vtkWarningMacro(<< "Error creating photo (eye open)");
@@ -412,7 +412,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                                      image_PVDocument_width, 
                                      image_PVDocument_height, 
                                      image_PVDocument_pixel_size,
-                                     image_PVDocument_buffer_length,
+                                     image_PVDocument_length,
                                      this->FileList->GetWidgetName()))
     {
     vtkWarningMacro(<< "Error creating photo (eye gray)");

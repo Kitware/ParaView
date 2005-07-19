@@ -2,10 +2,11 @@
  * Resource generated for file:
  *    connection.png (zlib, base64)
  */
-static const unsigned int  image_connection_width         = 16;
-static const unsigned int  image_connection_height        = 16;
-static const unsigned int  image_connection_pixel_size    = 4;
-static const unsigned long image_connection_buffer_length = 160;
+static const unsigned int  image_connection_width          = 16;
+static const unsigned int  image_connection_height         = 16;
+static const unsigned int  image_connection_pixel_size     = 4;
+static const unsigned long image_connection_length         = 160;
+static const unsigned long image_connection_decoded_length = 1024;
 
 static const unsigned char image_connection[] = 
   "eNq9kgEOgDAIA3mgj+Jp/Axlc0nDcAxjjLlE2brUtapKzKwRqgfldH17uWnfRL/qPahf/Z"
@@ -16,10 +17,11 @@ static const unsigned char image_connection[] =
  * Resource generated for file:
  *    empty_16x16.png (zlib, base64)
  */
-static const unsigned int  image_empty_16x16_width         = 16;
-static const unsigned int  image_empty_16x16_height        = 16;
-static const unsigned int  image_empty_16x16_pixel_size    = 4;
-static const unsigned long image_empty_16x16_buffer_length = 28;
+static const unsigned int  image_empty_16x16_width          = 16;
+static const unsigned int  image_empty_16x16_height         = 16;
+static const unsigned int  image_empty_16x16_pixel_size     = 4;
+static const unsigned long image_empty_16x16_length         = 28;
+static const unsigned long image_empty_16x16_decoded_length = 1024;
 
 static const unsigned char image_empty_16x16[] = 
   "eNr7//8/w/9RPIpH8YjEAFrT/R8=";
@@ -28,10 +30,11 @@ static const unsigned char image_empty_16x16[] =
  * Resource generated for file:
  *    error.png (zlib, base64)
  */
-static const unsigned int  image_error_width         = 32;
-static const unsigned int  image_error_height        = 32;
-static const unsigned int  image_error_pixel_size    = 4;
-static const unsigned long image_error_buffer_length = 900;
+static const unsigned int  image_error_width          = 32;
+static const unsigned int  image_error_height         = 32;
+static const unsigned int  image_error_pixel_size     = 4;
+static const unsigned long image_error_length         = 900;
+static const unsigned long image_error_decoded_length = 4096;
 
 static const unsigned char image_error[] = 
   "eNr7//8/w38icFTpWlUgTgDiKUB8AIgfAvEPKH4IFZsCVaP6n0hzibDXAYgnAfEDIP5PJH"
@@ -52,10 +55,11 @@ static const unsigned char image_error[] =
  * Resource generated for file:
  *    error_mini.png (zlib, base64)
  */
-static const unsigned int  image_error_mini_width         = 16;
-static const unsigned int  image_error_mini_height        = 16;
-static const unsigned int  image_error_mini_pixel_size    = 4;
-static const unsigned long image_error_mini_buffer_length = 132;
+static const unsigned int  image_error_mini_width          = 16;
+static const unsigned int  image_error_mini_height         = 16;
+static const unsigned int  image_error_mini_pixel_size     = 4;
+static const unsigned long image_error_mini_length         = 132;
+static const unsigned long image_error_mini_decoded_length = 1024;
 
 static const unsigned char image_error_mini[] = 
   "eNr7//8/w38aYCBoQMZk6P+PjAez/rS0xTxAzAjCOPRfIMP+B0j6D5Ch/wCS/glk6F+ApL"
@@ -65,10 +69,11 @@ static const unsigned char image_error_mini[] =
  * Resource generated for file:
  *    error_red_mini.png (zlib, base64)
  */
-static const unsigned int  image_error_red_mini_width         = 16;
-static const unsigned int  image_error_red_mini_height        = 16;
-static const unsigned int  image_error_red_mini_pixel_size    = 4;
-static const unsigned long image_error_red_mini_buffer_length = 132;
+static const unsigned int  image_error_red_mini_width          = 16;
+static const unsigned int  image_error_red_mini_height         = 16;
+static const unsigned int  image_error_red_mini_pixel_size     = 4;
+static const unsigned long image_error_red_mini_length         = 132;
+static const unsigned long image_error_red_mini_decoded_length = 1024;
 
 static const unsigned char image_error_red_mini[] = 
   "eNr7//8/w39aYAaGBhRMuv7/KHgQ609LW8wDxIwgjEP/BTLsf4Ck/wAZ+g8g6Z9Ahv4FSP"
@@ -78,10 +83,11 @@ static const unsigned char image_error_red_mini[] =
  * Resource generated for file:
  *    expand.png (zlib, base64)
  */
-static const unsigned int  image_expand_width         = 10;
-static const unsigned int  image_expand_height        = 10;
-static const unsigned int  image_expand_pixel_size    = 4;
-static const unsigned long image_expand_buffer_length = 80;
+static const unsigned int  image_expand_width          = 10;
+static const unsigned int  image_expand_height         = 10;
+static const unsigned int  image_expand_pixel_size     = 4;
+static const unsigned long image_expand_length         = 80;
+static const unsigned long image_expand_decoded_length = 400;
 
 static const unsigned char image_expand[] = 
   "eNr7//8/w/8BwkCQDcTbgfg4GgaJZaOpnQ3Er4H4NxSD2LNxmDsfiN9D8XwCbpgOwv8HMB"
@@ -91,10 +97,11 @@ static const unsigned char image_expand[] =
  * Resource generated for file:
  *    folder.png (zlib, base64)
  */
-static const unsigned int  image_folder_width         = 15;
-static const unsigned int  image_folder_height        = 13;
-static const unsigned int  image_folder_pixel_size    = 4;
-static const unsigned long image_folder_buffer_length = 104;
+static const unsigned int  image_folder_width          = 15;
+static const unsigned int  image_folder_height         = 13;
+static const unsigned int  image_folder_pixel_size     = 4;
+static const unsigned long image_folder_length         = 104;
+static const unsigned long image_folder_decoded_length = 780;
 
 static const unsigned char image_folder[] = 
   "eNrtj9sJACAMAzN6R+tm0YhiEXx+KxxB9BolCWbMjCOsZyt0z93LNubOn3nRn72p5tWSA4"
@@ -104,10 +111,11 @@ static const unsigned char image_folder[] =
  * Resource generated for file:
  *    folder_open.png (zlib, base64)
  */
-static const unsigned int  image_folder_open_width         = 16;
-static const unsigned int  image_folder_open_height        = 13;
-static const unsigned int  image_folder_open_pixel_size    = 4;
-static const unsigned long image_folder_open_buffer_length = 140;
+static const unsigned int  image_folder_open_width          = 16;
+static const unsigned int  image_folder_open_height         = 13;
+static const unsigned int  image_folder_open_pixel_size     = 4;
+static const unsigned long image_folder_open_length         = 140;
+static const unsigned long image_folder_open_decoded_length = 832;
 
 static const unsigned char image_folder_open[] = 
   "eNqdkAEOwCAIA3k6T+NnXVwkYx0qjKQhQa9UAQimVBUshPOd5t1PVTycNbN79O5Aliv6Pr"
@@ -117,10 +125,11 @@ static const unsigned char image_folder_open[] =
  * Resource generated for file:
  *    grid_linear.png (zlib, base64)
  */
-static const unsigned int  image_grid_linear_width         = 16;
-static const unsigned int  image_grid_linear_height        = 16;
-static const unsigned int  image_grid_linear_pixel_size    = 4;
-static const unsigned long image_grid_linear_buffer_length = 44;
+static const unsigned int  image_grid_linear_width          = 16;
+static const unsigned int  image_grid_linear_height         = 16;
+static const unsigned int  image_grid_linear_pixel_size     = 4;
+static const unsigned long image_grid_linear_length         = 44;
+static const unsigned long image_grid_linear_decoded_length = 1024;
 
 static const unsigned char image_grid_linear[] = 
   "eNpjYGD4z0AhBgIQwUAOmxr6R90/6v5R95OHATizxkg=";
@@ -129,10 +138,11 @@ static const unsigned char image_grid_linear[] =
  * Resource generated for file:
  *    grid_log.png (zlib, base64)
  */
-static const unsigned int  image_grid_log_width         = 16;
-static const unsigned int  image_grid_log_height        = 16;
-static const unsigned int  image_grid_log_pixel_size    = 4;
-static const unsigned long image_grid_log_buffer_length = 52;
+static const unsigned int  image_grid_log_width          = 16;
+static const unsigned int  image_grid_log_height         = 16;
+static const unsigned int  image_grid_log_pixel_size     = 4;
+static const unsigned long image_grid_log_length         = 52;
+static const unsigned long image_grid_log_decoded_length = 1024;
 
 static const unsigned char image_grid_log[] = 
   "eNpjYGD4z0AhBgIGdIwujsyHsRmoYDc17B/p7h/1/8gNfwDY0fAe";
@@ -141,10 +151,11 @@ static const unsigned char image_grid_log[] =
  * Resource generated for file:
  *    helpbubble.png (zlib, base64)
  */
-static const unsigned int  image_helpbubble_width         = 16;
-static const unsigned int  image_helpbubble_height        = 16;
-static const unsigned int  image_helpbubble_pixel_size    = 4;
-static const unsigned long image_helpbubble_buffer_length = 180;
+static const unsigned int  image_helpbubble_width          = 16;
+static const unsigned int  image_helpbubble_height         = 16;
+static const unsigned int  image_helpbubble_pixel_size     = 4;
+static const unsigned long image_helpbubble_length         = 180;
+static const unsigned long image_helpbubble_decoded_length = 1024;
 
 static const unsigned char image_helpbubble[] = 
   "eNqVk10OwCAIgz06R/NmzAbJkDktJn1Q+drgj6q23nsbQ1mhHtLBQlhbx3nuHl+e80G9iO"
@@ -155,10 +166,11 @@ static const unsigned char image_helpbubble[] =
  * Resource generated for file:
  *    info_mini.png (zlib, base64)
  */
-static const unsigned int  image_info_mini_width         = 16;
-static const unsigned int  image_info_mini_height        = 16;
-static const unsigned int  image_info_mini_pixel_size    = 4;
-static const unsigned long image_info_mini_buffer_length = 264;
+static const unsigned int  image_info_mini_width          = 16;
+static const unsigned int  image_info_mini_height         = 16;
+static const unsigned int  image_info_mini_pixel_size     = 4;
+static const unsigned long image_info_mini_length         = 264;
+static const unsigned long image_info_mini_decoded_length = 1024;
 
 static const unsigned char image_info_mini[] = 
   "eNr7//8/w38qY0F+/v8MDAxwDOITo8/IwBis3iYq6r951kI4BvFB4iB5fHql9Az+u7ef/m"
@@ -170,10 +182,11 @@ static const unsigned char image_info_mini[] =
  * Resource generated for file:
  *    lock.png (zlib, base64)
  */
-static const unsigned int  image_lock_width         = 14;
-static const unsigned int  image_lock_height        = 14;
-static const unsigned int  image_lock_pixel_size    = 4;
-static const unsigned long image_lock_buffer_length = 140;
+static const unsigned int  image_lock_width          = 14;
+static const unsigned int  image_lock_height         = 14;
+static const unsigned int  image_lock_pixel_size     = 4;
+static const unsigned long image_lock_length         = 140;
+static const unsigned long image_lock_decoded_length = 784;
 
 static const unsigned char image_lock[] = 
   "eNrVkjEOgDAIRZm9dK/GWbyFE8rwmyeJlsTJJm8o8EpLGhHm7pMxRpjZJPfMJ3E5AU91XD"
@@ -183,10 +196,11 @@ static const unsigned char image_lock[] =
  * Resource generated for file:
  *    mag_glass.png (zlib, base64)
  */
-static const unsigned int  image_mag_glass_width         = 16;
-static const unsigned int  image_mag_glass_height        = 16;
-static const unsigned int  image_mag_glass_pixel_size    = 4;
-static const unsigned long image_mag_glass_buffer_length = 152;
+static const unsigned int  image_mag_glass_width          = 16;
+static const unsigned int  image_mag_glass_height         = 16;
+static const unsigned int  image_mag_glass_pixel_size     = 4;
+static const unsigned long image_mag_glass_length         = 152;
+static const unsigned long image_mag_glass_decoded_length = 1024;
 
 static const unsigned char image_mag_glass[] = 
   "eNrFk9EJADEIQ2//DdwmA7hT7zwIhFJU/KkQKNXXWGkBPEj0xVKhqKfM7K9396URe5FDw5"
@@ -197,10 +211,11 @@ static const unsigned char image_mag_glass[] =
  * Resource generated for file:
  *    minus.png (zlib, base64)
  */
-static const unsigned int  image_minus_width         = 12;
-static const unsigned int  image_minus_height        = 12;
-static const unsigned int  image_minus_pixel_size    = 4;
-static const unsigned long image_minus_buffer_length = 152;
+static const unsigned int  image_minus_width          = 12;
+static const unsigned int  image_minus_height         = 12;
+static const unsigned int  image_minus_pixel_size     = 4;
+static const unsigned long image_minus_length         = 152;
+static const unsigned long image_minus_decoded_length = 576;
 
 static const unsigned char image_minus[] = 
   "eNr7//8/w38gBgJZIC4A4u1A/AqKt0PFZP9D1UHVWgLxBiDuB2IPIBaFYg+oGEjOEslcEN"
@@ -211,10 +226,11 @@ static const unsigned char image_minus[] =
  * Resource generated for file:
  *    move.png (zlib, base64)
  */
-static const unsigned int  image_move_width         = 9;
-static const unsigned int  image_move_height        = 9;
-static const unsigned int  image_move_pixel_size    = 4;
-static const unsigned long image_move_buffer_length = 56;
+static const unsigned int  image_move_width          = 9;
+static const unsigned int  image_move_height         = 9;
+static const unsigned int  image_move_pixel_size     = 4;
+static const unsigned long image_move_length         = 56;
+static const unsigned long image_move_decoded_length = 324;
 
 static const unsigned char image_move[] = 
   "eNr7//8/w38kDAT//6OJocvDMCF1hMSxsZHNx4WJMec/Hf0FAD65wEA=";
@@ -223,10 +239,11 @@ static const unsigned char image_move[] =
  * Resource generated for file:
  *    move_h.png (zlib, base64)
  */
-static const unsigned int  image_move_h_width         = 9;
-static const unsigned int  image_move_h_height        = 9;
-static const unsigned int  image_move_h_pixel_size    = 4;
-static const unsigned long image_move_h_buffer_length = 40;
+static const unsigned int  image_move_h_width          = 9;
+static const unsigned int  image_move_h_height         = 9;
+static const unsigned int  image_move_h_pixel_size     = 4;
+static const unsigned long image_move_h_length         = 40;
+static const unsigned long image_move_h_decoded_length = 324;
 
 static const unsigned char image_move_h[] = 
   "eNr7//8/w386YiD4j08cRBPCxJhDTwwAkDrYKA==";
@@ -235,10 +252,11 @@ static const unsigned char image_move_h[] =
  * Resource generated for file:
  *    move_v.png (zlib, base64)
  */
-static const unsigned int  image_move_v_width         = 9;
-static const unsigned int  image_move_v_height        = 9;
-static const unsigned int  image_move_v_pixel_size    = 4;
-static const unsigned long image_move_v_buffer_length = 48;
+static const unsigned int  image_move_v_width          = 9;
+static const unsigned int  image_move_v_height         = 9;
+static const unsigned int  image_move_v_pixel_size     = 4;
+static const unsigned long image_move_v_length         = 48;
+static const unsigned long image_move_v_decoded_length = 324;
 
 static const unsigned char image_move_v[] = 
   "eNr7//8/w38kDAT//6OJocvDMCF1+OQHmxpK/AUAkDrYKA==";
@@ -247,10 +265,11 @@ static const unsigned char image_move_v[] =
  * Resource generated for file:
  *    plus.png (zlib, base64)
  */
-static const unsigned int  image_plus_width         = 12;
-static const unsigned int  image_plus_height        = 12;
-static const unsigned int  image_plus_pixel_size    = 4;
-static const unsigned long image_plus_buffer_length = 152;
+static const unsigned int  image_plus_width          = 12;
+static const unsigned int  image_plus_height         = 12;
+static const unsigned int  image_plus_pixel_size     = 4;
+static const unsigned long image_plus_length         = 152;
+static const unsigned long image_plus_decoded_length = 576;
 
 static const unsigned char image_plus[] = 
   "eNqVktEJwDAIRLtEPjNINvAvq3QTV+lfduoS1wtcQPyqgRdQj0NNAFwgPJ3cZJFXLOU6pJ"
@@ -261,10 +280,11 @@ static const unsigned char image_plus[] =
  * Resource generated for file:
  *    question.png (zlib, base64)
  */
-static const unsigned int  image_question_width         = 32;
-static const unsigned int  image_question_height        = 32;
-static const unsigned int  image_question_pixel_size    = 4;
-static const unsigned long image_question_buffer_length = 828;
+static const unsigned int  image_question_width          = 32;
+static const unsigned int  image_question_height         = 32;
+static const unsigned int  image_question_pixel_size     = 4;
+static const unsigned long image_question_length         = 828;
+static const unsigned long image_question_decoded_length = 4096;
 
 static const unsigned char image_question[] = 
   "eNrNl88rrFEYx+8fYHNTFDYmU1eJpLCZGndu3YVLNhKrScnGyOZ2b4p0y2uhK03vjZAfY2"
@@ -284,10 +304,11 @@ static const unsigned char image_question[] =
  * Resource generated for file:
  *    reload.png (zlib, base64)
  */
-static const unsigned int  image_reload_width         = 14;
-static const unsigned int  image_reload_height        = 14;
-static const unsigned int  image_reload_pixel_size    = 4;
-static const unsigned long image_reload_buffer_length = 72;
+static const unsigned int  image_reload_width          = 14;
+static const unsigned int  image_reload_height         = 14;
+static const unsigned int  image_reload_pixel_size     = 4;
+static const unsigned long image_reload_length         = 72;
+static const unsigned long image_reload_decoded_length = 784;
 
 static const unsigned char image_reload[] = 
   "eNr7//8/w38aYCD4j4zJ0YdPnlT78InjkifW7ejqhoo+YvQSE97kxiEuTKu0RQwGAB5r2j"
@@ -297,10 +318,11 @@ static const unsigned char image_reload[] =
  * Resource generated for file:
  *    shrink.png (zlib, base64)
  */
-static const unsigned int  image_shrink_width         = 10;
-static const unsigned int  image_shrink_height        = 10;
-static const unsigned int  image_shrink_pixel_size    = 4;
-static const unsigned long image_shrink_buffer_length = 108;
+static const unsigned int  image_shrink_width          = 10;
+static const unsigned int  image_shrink_height         = 10;
+static const unsigned int  image_shrink_pixel_size     = 4;
+static const unsigned long image_shrink_length         = 108;
+static const unsigned long image_shrink_decoded_length = 400;
 
 static const unsigned char image_shrink[] = 
   "eNr7//8/w38iMRB8B+InQBwBxExQHAEV+46kDsQHMS4CcSgUX4SKPUFSF4Ek/gKKYfoikN"
@@ -310,10 +332,11 @@ static const unsigned char image_shrink[] =
  * Resource generated for file:
  *    stopwatch.png (zlib, base64)
  */
-static const unsigned int  image_stopwatch_width         = 16;
-static const unsigned int  image_stopwatch_height        = 16;
-static const unsigned int  image_stopwatch_pixel_size    = 4;
-static const unsigned long image_stopwatch_buffer_length = 220;
+static const unsigned int  image_stopwatch_width          = 16;
+static const unsigned int  image_stopwatch_height         = 16;
+static const unsigned int  image_stopwatch_pixel_size     = 4;
+static const unsigned long image_stopwatch_length         = 220;
+static const unsigned long image_stopwatch_decoded_length = 1024;
 
 static const unsigned char image_stopwatch[] = 
   "eNqlk90NgCAMhFnIhHEYwmmcgFe36GbVEk/PCip6SaPRfsfxJyJBXK1SXzFGlUpvjYOMgZ"
@@ -325,10 +348,11 @@ static const unsigned char image_stopwatch[] =
  * Resource generated for file:
  *    transport_beginning.png (zlib, base64)
  */
-static const unsigned int  image_transport_beginning_width         = 16;
-static const unsigned int  image_transport_beginning_height        = 16;
-static const unsigned int  image_transport_beginning_pixel_size    = 4;
-static const unsigned long image_transport_beginning_buffer_length = 188;
+static const unsigned int  image_transport_beginning_width          = 16;
+static const unsigned int  image_transport_beginning_height         = 16;
+static const unsigned int  image_transport_beginning_pixel_size     = 4;
+static const unsigned long image_transport_beginning_length         = 188;
+static const unsigned long image_transport_beginning_decoded_length = 1024;
 
 static const unsigned char image_transport_beginning[] = 
   "eNrN00ENgDAMBdBZmAUsYAELWJiFWcBCPaFlFkq30KQpLesNlpTDz94nwEDEhB8PrX7Z0n"
@@ -339,10 +363,11 @@ static const unsigned char image_transport_beginning[] =
  * Resource generated for file:
  *    transport_end.png (zlib, base64)
  */
-static const unsigned int  image_transport_end_width         = 16;
-static const unsigned int  image_transport_end_height        = 16;
-static const unsigned int  image_transport_end_pixel_size    = 4;
-static const unsigned long image_transport_end_buffer_length = 184;
+static const unsigned int  image_transport_end_width          = 16;
+static const unsigned int  image_transport_end_height         = 16;
+static const unsigned int  image_transport_end_pixel_size     = 4;
+static const unsigned long image_transport_end_length         = 184;
+static const unsigned long image_transport_end_decoded_length = 1024;
 
 static const unsigned char image_transport_end[] = 
   "eNrNk1sNgDAMRWcBC1jAAhawMAuzgIV6QgsWykbSpCn3bvxBk/vT7Jy9VTXpx6lVapb0rL"
@@ -353,10 +378,11 @@ static const unsigned char image_transport_end[] =
  * Resource generated for file:
  *    transport_fast_forward.png (zlib, base64)
  */
-static const unsigned int  image_transport_fast_forward_width         = 16;
-static const unsigned int  image_transport_fast_forward_height        = 16;
-static const unsigned int  image_transport_fast_forward_pixel_size    = 4;
-static const unsigned long image_transport_fast_forward_buffer_length = 168;
+static const unsigned int  image_transport_fast_forward_width          = 16;
+static const unsigned int  image_transport_fast_forward_height         = 16;
+static const unsigned int  image_transport_fast_forward_pixel_size     = 4;
+static const unsigned long image_transport_fast_forward_length         = 168;
+static const unsigned long image_transport_fast_forward_decoded_length = 1024;
 
 static const unsigned char image_transport_fast_forward[] = 
   "eNrNk9ENwCAIBV2hs7gTs3SFzsIKztIVXkmjhhIofkrCz0vuoogACjZoqav4dUofNnR4BA"
@@ -367,10 +393,11 @@ static const unsigned char image_transport_fast_forward[] =
  * Resource generated for file:
  *    transport_fast_forward_to_key.png (zlib, base64)
  */
-static const unsigned int  image_transport_fast_forward_to_key_width         = 16;
-static const unsigned int  image_transport_fast_forward_to_key_height        = 16;
-static const unsigned int  image_transport_fast_forward_to_key_pixel_size    = 4;
-static const unsigned long image_transport_fast_forward_to_key_buffer_length = 204;
+static const unsigned int  image_transport_fast_forward_to_key_width          = 16;
+static const unsigned int  image_transport_fast_forward_to_key_height         = 16;
+static const unsigned int  image_transport_fast_forward_to_key_pixel_size     = 4;
+static const unsigned long image_transport_fast_forward_to_key_length         = 204;
+static const unsigned long image_transport_fast_forward_to_key_decoded_length = 1024;
 
 static const unsigned char image_transport_fast_forward_to_key[] = 
   "eNrFk9ENgCAMRF3BFVyBFZiFFVjBFZylKzCLK9RqijmbIho/JLmEXvIuhQIzD/yzZC2Dv2"
@@ -381,10 +408,11 @@ static const unsigned char image_transport_fast_forward_to_key[] =
  * Resource generated for file:
  *    transport_loop.png (zlib, base64)
  */
-static const unsigned int  image_transport_loop_width         = 16;
-static const unsigned int  image_transport_loop_height        = 16;
-static const unsigned int  image_transport_loop_pixel_size    = 4;
-static const unsigned long image_transport_loop_buffer_length = 212;
+static const unsigned int  image_transport_loop_width          = 16;
+static const unsigned int  image_transport_loop_height         = 16;
+static const unsigned int  image_transport_loop_pixel_size     = 4;
+static const unsigned long image_transport_loop_length         = 212;
+static const unsigned long image_transport_loop_decoded_length = 1024;
 
 static const unsigned char image_transport_loop[] = 
   "eNrNk1ENwCAMRLGAhVnAAhZmYRZqYRawMAtYwMIszEJHk9tCSMuWfe2S+6H3CLTAzI5/4K"
@@ -396,10 +424,11 @@ static const unsigned char image_transport_loop[] =
  * Resource generated for file:
  *    transport_pause.png (zlib, base64)
  */
-static const unsigned int  image_transport_pause_width         = 16;
-static const unsigned int  image_transport_pause_height        = 16;
-static const unsigned int  image_transport_pause_pixel_size    = 4;
-static const unsigned long image_transport_pause_buffer_length = 80;
+static const unsigned int  image_transport_pause_width          = 16;
+static const unsigned int  image_transport_pause_height         = 16;
+static const unsigned int  image_transport_pause_pixel_size     = 4;
+static const unsigned long image_transport_pause_length         = 80;
+static const unsigned long image_transport_pause_decoded_length = 1024;
 
 static const unsigned char image_transport_pause[] = 
   "eNr7//8/w/9BhIFAEIhdoBgGjKF8JSL0g9T9h2IY2A3ll4/qH9VPY/1KIHVQDANpUL7L/0"
@@ -409,10 +438,11 @@ static const unsigned char image_transport_pause[] =
  * Resource generated for file:
  *    transport_play.png (zlib, base64)
  */
-static const unsigned int  image_transport_play_width         = 16;
-static const unsigned int  image_transport_play_height        = 16;
-static const unsigned int  image_transport_play_pixel_size    = 4;
-static const unsigned long image_transport_play_buffer_length = 108;
+static const unsigned int  image_transport_play_width          = 16;
+static const unsigned int  image_transport_play_height         = 16;
+static const unsigned int  image_transport_play_pixel_size     = 4;
+static const unsigned long image_transport_play_length         = 108;
+static const unsigned long image_transport_play_decoded_length = 1024;
 
 static const unsigned char image_transport_play[] = 
   "eNr7//8/w/9BhoFACYgFGbAAIvW7APEZbGaQoP8/NjNI1I9hBhn6UcwgUz/cDAr0g3AoBf"
@@ -422,10 +452,11 @@ static const unsigned char image_transport_play[] =
  * Resource generated for file:
  *    transport_play_to_key.png (zlib, base64)
  */
-static const unsigned int  image_transport_play_to_key_width         = 16;
-static const unsigned int  image_transport_play_to_key_height        = 16;
-static const unsigned int  image_transport_play_to_key_pixel_size    = 4;
-static const unsigned long image_transport_play_to_key_buffer_length = 152;
+static const unsigned int  image_transport_play_to_key_width          = 16;
+static const unsigned int  image_transport_play_to_key_height         = 16;
+static const unsigned int  image_transport_play_to_key_pixel_size     = 4;
+static const unsigned long image_transport_play_to_key_length         = 152;
+static const unsigned long image_transport_play_to_key_decoded_length = 1024;
 
 static const unsigned char image_transport_play_to_key[] = 
   "eNr7//8/w/9BhIFACYgFGbAAIvW7APEZbGaQoP8/NjNI1I9hBhn6UcwgUz/cDAr0g3AoBf"
@@ -436,10 +467,11 @@ static const unsigned char image_transport_play_to_key[] =
  * Resource generated for file:
  *    transport_rewind.png (zlib, base64)
  */
-static const unsigned int  image_transport_rewind_width         = 16;
-static const unsigned int  image_transport_rewind_height        = 16;
-static const unsigned int  image_transport_rewind_pixel_size    = 4;
-static const unsigned long image_transport_rewind_buffer_length = 172;
+static const unsigned int  image_transport_rewind_width          = 16;
+static const unsigned int  image_transport_rewind_height         = 16;
+static const unsigned int  image_transport_rewind_pixel_size     = 4;
+static const unsigned long image_transport_rewind_length         = 172;
+static const unsigned long image_transport_rewind_decoded_length = 1024;
 
 static const unsigned char image_transport_rewind[] = 
   "eNrN09ENgCAMBFBWcBZ36iys0FlcwVlcoVZjTa1X4BOS+7nwGgMoIkUmCFiLpha8uOMvu2"
@@ -450,10 +482,11 @@ static const unsigned char image_transport_rewind[] =
  * Resource generated for file:
  *    transport_rewind_to_key.png (zlib, base64)
  */
-static const unsigned int  image_transport_rewind_to_key_width         = 16;
-static const unsigned int  image_transport_rewind_to_key_height        = 16;
-static const unsigned int  image_transport_rewind_to_key_pixel_size    = 4;
-static const unsigned long image_transport_rewind_to_key_buffer_length = 196;
+static const unsigned int  image_transport_rewind_to_key_width          = 16;
+static const unsigned int  image_transport_rewind_to_key_height         = 16;
+static const unsigned int  image_transport_rewind_to_key_pixel_size     = 4;
+static const unsigned long image_transport_rewind_to_key_length         = 196;
+static const unsigned long image_transport_rewind_to_key_decoded_length = 1024;
 
 static const unsigned char image_transport_rewind_to_key[] = 
   "eNrN010NgDAMBGAsYAELs4CWWcACFqoFC2jBQilkI0e5Ak+EJpeQhq9r+FHVRn8SUq1lbH"
@@ -464,10 +497,11 @@ static const unsigned char image_transport_rewind_to_key[] =
  * Resource generated for file:
  *    transport_stop.png (zlib, base64)
  */
-static const unsigned int  image_transport_stop_width         = 16;
-static const unsigned int  image_transport_stop_height        = 16;
-static const unsigned int  image_transport_stop_pixel_size    = 4;
-static const unsigned long image_transport_stop_buffer_length = 64;
+static const unsigned int  image_transport_stop_width          = 16;
+static const unsigned int  image_transport_stop_height         = 16;
+static const unsigned int  image_transport_stop_pixel_size     = 4;
+static const unsigned long image_transport_stop_length         = 64;
+static const unsigned long image_transport_stop_decoded_length = 1024;
 
 static const unsigned char image_transport_stop[] = 
   "eNr7//8/w/9hgoFACYhdCGAlPPrLgfg/AVw+qn/Y6k8D4t0EcNr/YZRnAMXDIoM=";
@@ -476,10 +510,11 @@ static const unsigned char image_transport_stop[] =
  * Resource generated for file:
  *    trashcan.png (zlib, base64)
  */
-static const unsigned int  image_trashcan_width         = 9;
-static const unsigned int  image_trashcan_height        = 10;
-static const unsigned int  image_trashcan_pixel_size    = 4;
-static const unsigned long image_trashcan_buffer_length = 52;
+static const unsigned int  image_trashcan_width          = 9;
+static const unsigned int  image_trashcan_height         = 10;
+static const unsigned int  image_trashcan_pixel_size     = 4;
+static const unsigned long image_trashcan_length         = 52;
+static const unsigned long image_trashcan_decoded_length = 360;
 
 static const unsigned char image_trashcan[] = 
   "eNr7//8/w38oBoL/MPwfhzg+jA+QYAYDzCwcNMNgVYPPTwBvR79B";
@@ -488,10 +523,11 @@ static const unsigned char image_trashcan[] =
  * Resource generated for file:
  *    tree_close.png (zlib, base64)
  */
-static const unsigned int  image_tree_close_width         = 16;
-static const unsigned int  image_tree_close_height        = 16;
-static const unsigned int  image_tree_close_pixel_size    = 4;
-static const unsigned long image_tree_close_buffer_length = 84;
+static const unsigned int  image_tree_close_width          = 16;
+static const unsigned int  image_tree_close_height         = 16;
+static const unsigned int  image_tree_close_pixel_size     = 4;
+static const unsigned long image_tree_close_length         = 84;
+static const unsigned long image_tree_close_decoded_length = 1024;
 
 static const unsigned char image_tree_close[] = 
   "eNr7//8/g7u7+39cGAgYCGGoOgxAjn4GBgay9YP0wjBMP8wMXDQ17afE/5SEPxa3MNATj6"
@@ -501,10 +537,11 @@ static const unsigned char image_tree_close[] =
  * Resource generated for file:
  *    tree_open.png (zlib, base64)
  */
-static const unsigned int  image_tree_open_width         = 16;
-static const unsigned int  image_tree_open_height        = 16;
-static const unsigned int  image_tree_open_pixel_size    = 4;
-static const unsigned long image_tree_open_buffer_length = 80;
+static const unsigned int  image_tree_open_width          = 16;
+static const unsigned int  image_tree_open_height         = 16;
+static const unsigned int  image_tree_open_pixel_size     = 4;
+static const unsigned long image_tree_open_length         = 80;
+static const unsigned long image_tree_open_decoded_length = 1024;
 
 static const unsigned char image_tree_open[] = 
   "eNr7//8/g7u7+39cGAgYCGGoOgxAb/0MDAxwDNMPMwMXTW/34xKjJPwJmU+KPKV41P6hZT"
@@ -514,10 +551,11 @@ static const unsigned char image_tree_open[] =
  * Resource generated for file:
  *    warning.png (zlib, base64)
  */
-static const unsigned int  image_warning_width         = 32;
-static const unsigned int  image_warning_height        = 32;
-static const unsigned int  image_warning_pixel_size    = 4;
-static const unsigned long image_warning_buffer_length = 628;
+static const unsigned int  image_warning_width          = 32;
+static const unsigned int  image_warning_height         = 32;
+static const unsigned int  image_warning_pixel_size     = 4;
+static const unsigned long image_warning_length         = 628;
+static const unsigned long image_warning_decoded_length = 4096;
 
 static const unsigned char image_warning[] = 
   "eNrNl79Lw0AUgP0Durh3sMGCg5uDLkIhglNLFxGdiiBOioviUpGCcZGioYI42sHJpVQQhB"
@@ -534,10 +572,11 @@ static const unsigned char image_warning[] =
  * Resource generated for file:
  *    warning_mini.png (zlib, base64)
  */
-static const unsigned int  image_warning_mini_width         = 16;
-static const unsigned int  image_warning_mini_height        = 16;
-static const unsigned int  image_warning_mini_pixel_size    = 4;
-static const unsigned long image_warning_mini_buffer_length = 264;
+static const unsigned int  image_warning_mini_width          = 16;
+static const unsigned int  image_warning_mini_height         = 16;
+static const unsigned int  image_warning_mini_pixel_size     = 4;
+static const unsigned long image_warning_mini_length         = 264;
+static const unsigned long image_warning_mini_decoded_length = 1024;
 
 static const unsigned char image_warning_mini[] = 
   "eNrFkrENhDAMRV3R0FBdiTIB9a3CVCzDEgzAGvRUPj0s31lWQBRIV1iWf/6P/Z2oqujD0b"
@@ -549,10 +588,11 @@ static const unsigned char image_warning_mini[] =
  * Resource generated for file:
  *    window_level.png (zlib, base64)
  */
-static const unsigned int  image_window_level_width         = 14;
-static const unsigned int  image_window_level_height        = 14;
-static const unsigned int  image_window_level_pixel_size    = 4;
-static const unsigned long image_window_level_buffer_length = 164;
+static const unsigned int  image_window_level_width          = 14;
+static const unsigned int  image_window_level_height         = 14;
+static const unsigned int  image_window_level_pixel_size     = 4;
+static const unsigned long image_window_level_length         = 164;
+static const unsigned long image_window_level_decoded_length = 784;
 
 static const unsigned char image_window_level[] = 
   "eNr7//8/w38kjAyWLpoDEvgPpVH4//HoA6n5DxGEYxifgD4LMu2rBeI2JMtxYjSwD4gdSd"
