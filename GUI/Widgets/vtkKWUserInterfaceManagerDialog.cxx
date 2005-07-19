@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.5");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -482,8 +482,13 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
     return;
     }
 
-  int i;
   vtkKWTree *tree = this->Tree->GetWidget();
+  if (!tree || !tree->IsCreated())
+    {
+    return;
+    }
+
+  int i;
 
   // Preserve the old selection
 
@@ -618,9 +623,13 @@ void vtkKWUserInterfaceManagerDialog::RaiseSection(
     return;
     }
 
-  int i;
   vtkKWTree *tree = this->Tree->GetWidget();
+  if (!tree || !tree->IsCreated())
+    {
+    return;
+    }
 
+  int i;
   vtkKWUserInterfacePanel *panel;
   int page_id;
 
@@ -741,6 +750,10 @@ int vtkKWUserInterfaceManagerDialog::ShowSelectedNodeSection()
     }
 
   vtkKWTree *tree = this->Tree->GetWidget();
+  if (!tree || !tree->IsCreated())
+    {
+    return 0;
+    }
 
   // First unpack the previously selected section
 
