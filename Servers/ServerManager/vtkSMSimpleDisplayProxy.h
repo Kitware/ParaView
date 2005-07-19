@@ -148,6 +148,7 @@ protected:
   friend class vtkSMComparativeVisProxy;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
+  vtkGetObjectMacro(GeometryFilterProxy, vtkSMProxy);
 //ETX
 
   vtkSMProxy *GeometryFilterProxy;
