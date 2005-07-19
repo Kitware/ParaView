@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.63");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.64");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -1495,7 +1495,7 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
 
   int ok = 1;
 
-  char *ptr;
+  const char *ptr;
   if (ipadx)
     {
     ptr = strstr(result, "-ipadx ");
