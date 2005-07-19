@@ -38,7 +38,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.4");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -746,10 +746,6 @@ int vtkSMComparativeVisProxy::Show()
   
   this->MultiActorHelper->UpdateVTKObjects();
 
-  if (this->InFirstShow)
-    {
-    this->InFirstShow = 0;
-    }
 
   // Place and focus the camera
   vtkSMDoubleVectorProperty* position = 
@@ -788,6 +784,14 @@ int vtkSMComparativeVisProxy::Show()
   parallelScale->SetElements1((totalBounds[3]-totalBounds[2])/2);
 //  parallelScale->SetElements1(1);
   this->RenderModule->UpdateVTKObjects();
+
+  if (this->InFirstShow)
+    {
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      this->MultiActorHelper->GetProperty("UniformScale"))->SetElements1(0.8);
+    this->MultiActorHelper->UpdateVTKObjects();
+    this->InFirstShow = 0;
+    }
 
   this->RenderModule->StillRender();
 
