@@ -44,7 +44,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkErrorCode.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.11");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1069,7 +1069,14 @@ int vtkSMRenderModuleProxy::GetServerRenderWindowSize(int size[2])
     }
   vtkTypeUInt32 servers =
     this->RenderWindowProxy->GetServers();
-  this->RenderWindowProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+  if (this->IsRenderLocal())
+    {
+    this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT);
+    }
+  else
+    {
+    this->RenderWindowProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+    }
   this->RenderWindowProxy->UpdatePropertyInformation(winSize);
   this->RenderWindowProxy->SetServers(servers);
   size[0] = winSize->GetElement(0);

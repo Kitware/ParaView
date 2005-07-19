@@ -156,6 +156,10 @@ public:
   // Overridden to SynchronizeCameraProperties before saving the properties.
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
+  // Description:
+  // Indicates if we should locally render.
+  virtual int IsRenderLocal() { return 1; }
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();

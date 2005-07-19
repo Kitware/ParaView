@@ -63,6 +63,11 @@ public:
   // Get the value of the z buffer at a position. 
   // This is necessary for picking the center of rotation.
   virtual double GetZBufferValue(int x, int y);
+
+  // Description:
+  // Indicates if we should locally render.
+  virtual int IsRenderLocal();
+
 protected:
   vtkSMCompositeRenderModuleProxy();
   ~vtkSMCompositeRenderModuleProxy();
