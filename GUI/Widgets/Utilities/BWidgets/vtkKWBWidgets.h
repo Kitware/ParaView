@@ -36,10 +36,13 @@ public:
   static void Initialize(Tcl_Interp*);
 
 protected:
-  vtkKWBWidgets();
-  ~vtkKWBWidgets();
+  vtkKWBWidgets() {};
+  ~vtkKWBWidgets() {};
 
-  static void Execute(Tcl_Interp*, const char* str, const char*);
+  static void Execute(Tcl_Interp* interp, 
+                      const unsigned char *buffer, 
+                      unsigned long length,
+                      unsigned long decoded_length);
 
 private:
   vtkKWBWidgets(const vtkKWBWidgets&);   // Not implemented.

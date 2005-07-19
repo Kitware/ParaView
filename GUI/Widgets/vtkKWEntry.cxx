@@ -17,8 +17,8 @@
 #include "vtkKWApplication.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.63");
+vtkStandardNewMacro( vtkKWEntry);
+vtkCxxRevisionMacro(vtkKWEntry, "1.64");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -34,7 +34,7 @@ vtkKWEntry::vtkKWEntry()
 vtkKWEntry::~vtkKWEntry()
 {
   this->SetValueString(NULL);
-  if ( this->Entry && this->Entry != this )
+  if ( this->Entry && this->Entry != this)
     {
     this->Entry->Delete();
     }
@@ -208,7 +208,7 @@ void vtkKWEntry::Create(vtkKWApplication *app)
   // Call the superclass to set the appropriate flags then create manually
 
   if (!this->Superclass::CreateSpecificTkWidget(
-        app, this->PullDown ? "combobox" : "entry"))
+        app, this->PullDown ? "ComboBox" : "entry"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -240,7 +240,7 @@ void vtkKWEntry::SetReadOnly(int ro)
     {
     return;
     }
-  if ( ro && this->GetWidgetName() )
+  if ( ro && this->GetWidgetName())
     {
     this->Script("%s configure -state disabled", this->Entry->GetWidgetName());
     }
@@ -292,95 +292,86 @@ void vtkKWEntry::BindCommand(vtkObject *object,
 //----------------------------------------------------------------------------
 void vtkKWEntry::AddValue(const char* value)
 {
-  if ( !this->PullDown )
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown || 
+      this->GetValueIndex(value) >= 0)
     {
     return;
     }
-  if ( this->GetValueIndex(value) >= 0 )
-    {
-    return;
-    }
-  // Add to the combo
-  this->Script("%s list insert end {%s}", 
-    this->Entry->GetWidgetName(), value);
-  this->Modified();
+
+  this->Script("%s configure -values [concat [%s cget -values] {%s}]", 
+    this->Entry->GetWidgetName(), this->Entry->GetWidgetName(), value);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetNumberOfValues()
 {
-  if ( !this->Entry )
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
     {
     return 0;
     }
-  if ( !this->PullDown )
-    {
-    return 1;
-    }
-  // Get the number of values in combo
-  return atoi(this->Script("%s list size",
-      this->Entry->GetWidgetName()));
+
+  return atoi(this->Script("llength [%s cget -values]",
+                           this->Entry->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteAllValues()
 {
-  if ( !this->PullDown )
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
     {
     return;
     }
-  // Delete all values from combo
-  this->Script("%s list delete 0 %d",
-    this->Entry->GetWidgetName(), this->GetNumberOfValues()-1);
-  this->Modified();
+
+  this->Script("%s configure -values {}", this->Entry->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteValue(int idx)
 {
-  if ( !this->PullDown )
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
     {
     return;
     }
-  if ( idx >= (int)this->GetNumberOfValues() )
+  if (idx < 0 || idx >= this->GetNumberOfValues())
     {
-    vtkErrorMacro("This entry has only: " 
-      << this->GetNumberOfValues()
-      << " elements. Index " << idx << " is too high");
+    vtkErrorMacro(
+      "This combobox has only " << this->GetNumberOfValues()
+      << " elements. Index " << idx << " is out of range");
     return;
     }
-  // Delete from combo
-  this->Script("%s list delete %d",
-    this->Entry->GetWidgetName(), idx);
-  this->Modified();
+
+  this->Script("%s configure -values [lreplace [%s cget -values] %d %d]", 
+    this->Entry->GetWidgetName(), this->Entry->GetWidgetName(), idx, idx);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWEntry::GetValueFromIndex(int idx)
 {
-  if ( !this->PullDown )
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
     {
-    return 0;
+    return NULL;
     }
-  if ( idx >= this->GetNumberOfValues() )
+  if (idx < 0 || idx >= this->GetNumberOfValues())
     {
-    return 0;
+    vtkErrorMacro(
+      "This combobox has only " << this->GetNumberOfValues()
+      << " elements. Index " << idx << " is out of range");
+    return NULL;
     }
-  // Get value from index
-  return this->Script("%s list get %d", 
-    this->Entry->GetWidgetName(), idx);
+
+  return this->Script("lindex [%s cget -values] %d",
+                      this->Entry->GetWidgetName(), idx);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueIndex(const char* value)
 {
-  if ( !this->PullDown || !value)
+  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown || !value)
     {
-    return 0;
+    return -1;
     }
-  const char* res = this->Script("lsearch [ %s list get 0 end ] {%s}",
-      this->Entry->GetWidgetName(), value);
-  return atoi(res);
+  return atoi(this->Script("lsearch [%s cget -values] {%s}",
+                           this->Entry->GetWidgetName(), value));
 }
 
 //----------------------------------------------------------------------------

@@ -15,198 +15,15 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWResourceUtilities.h"
 
 #include "vtkTk.h"
 
 #include "Utilities/BWidgets/vtkKWBWidgetsTclLibrary.h"
-#include "Utilities/BWidgets/vtkKWComboboxTclLibrary.h"
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.1");
-
-#define minus_width 9
-#define minus_height 9
-static unsigned char minus_bits[] = {
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0
-};
-
-#define plus_width 9
-#define plus_height 9
-static unsigned char plus_bits[] = {
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  255,255,255,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0,
-  0,0,0
-};
-
-
-//----------------------------------------------------------------------------
-vtkKWBWidgets::vtkKWBWidgets()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkKWBWidgets::~vtkKWBWidgets()
-{
-}
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
@@ -217,47 +34,125 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
+  // Create the images required for tree.tcl
+
   if (!vtkKWTkUtilities::UpdatePhoto(
-        interp, "bwminus", minus_bits, minus_width, minus_height, 3) ||
+        interp, 
+        "bwminus", 
+        image_bwminus, 
+        image_bwminus_width, image_bwminus_height, 
+        image_bwminus_pixel_size, image_bwminus_length) ||
       !vtkKWTkUtilities::UpdatePhoto(
-        interp, "bwplus", plus_bits, plus_width, plus_height, 3))
+        interp, "bwplus", 
+        image_bwplus, 
+        image_bwplus_width, image_bwplus_height, 
+        image_bwplus_pixel_size, image_bwplus_length))
     {
     vtkGenericWarningMacro("Can not initialize bwidgets resources.");
     return;
     }
 
-  vtkKWBWidgets::Execute(interp, bwidgets1, "BWidgets1");
-  vtkKWBWidgets::Execute(interp, bwidgets2, "BWidgets2");
-  vtkKWBWidgets::Execute(interp, bwidgets3, "BWidgets3");
-  vtkKWBWidgets::Execute(interp, bwidgets4, "BWidgets4");
-  vtkKWBWidgets::Execute(interp, bwidgets5, "BWidgets5");
-  vtkKWBWidgets::Execute(interp, bwidgets6, "BWidgets6");
-  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget1, "ComboBox1");
-  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget2, "ComboBox2");
-  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget3, "ComboBox2");
+  // Evaluate the library
+  
+  vtkKWBWidgets::Execute(interp, 
+                         file_utils_tcl, 
+                         file_utils_tcl_length,
+                         file_utils_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_widget_tcl, 
+                         file_widget_tcl_length,
+                         file_widget_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_dragsite_tcl, 
+                         file_dragsite_tcl_length,
+                         file_dragsite_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_dropsite_tcl, 
+                         file_dropsite_tcl_length,
+                         file_dropsite_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_dynhelp_tcl, 
+                         file_dynhelp_tcl_length,
+                         file_dynhelp_tcl_decoded_length);
+
+  // Combobox
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_arrow_tcl, 
+                         file_arrow_tcl_length,
+                         file_arrow_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_entry_tcl, 
+                         file_entry_tcl_length,
+                         file_entry_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_listbox_tcl, 
+                         file_listbox_tcl_length,
+                         file_listbox_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_combobox_tcl, 
+                         file_combobox_tcl_length,
+                         file_combobox_tcl_decoded_length);
+
+  // ScrolledWindow/Frame
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_scrollframe_tcl, 
+                         file_scrollframe_tcl_length,
+                         file_scrollframe_tcl_decoded_length);
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_scrollw_tcl, 
+                         file_scrollw_tcl_length,
+                         file_scrollw_tcl_decoded_length);
+
+  // Tree
+
+  vtkKWBWidgets::Execute(interp, 
+                         file_tree_tcl, 
+                         file_tree_tcl_length,
+                         file_tree_tcl_decoded_length);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* module)
+void vtkKWBWidgets::Execute(Tcl_Interp* interp, 
+                            const unsigned char *buffer, 
+                            unsigned long length,
+                            unsigned long decoded_length)
 {
-  const unsigned int maxlen = 32000;
-  if ( strlen(str) > maxlen )
+  // Is the data encoded (zlib and/or base64) ?
+
+  unsigned char *decoded_buffer = NULL;
+  if (length && length != decoded_length)
     {
-    cout << "The size of tcl string for module " << module << " is " << strlen(str) 
-      << " (higher than " << maxlen << "), so compilers that cannot "
-      "handle such a large strings might not compile this." << endl;
-    cout << "The line is: [";
-    cout.write(str+maxlen, 100);
-    cout << "]" << endl;
+    if (!vtkKWResourceUtilities::DecodeBuffer(
+          buffer, length, &decoded_buffer, decoded_length))
+      {
+      vtkGenericWarningMacro(<<"Error while decoding library");
+      return;
+      }
+    buffer = decoded_buffer;
+    length = decoded_length;
     }
-  char* script = new char[strlen(str)+1];
-  strcpy(script, str);
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
+
+  if (buffer && 
+      Tcl_EvalEx(interp, (const char*)buffer, length, TCL_EVAL_GLOBAL)!=TCL_OK)
     {
-    vtkGenericWarningMacro(<< module << " failed to initialize. Error:" 
-                           << interp->result);
+    vtkGenericWarningMacro(
+      << " Failed to initialize. Error:" << Tcl_GetStringResult(interp));
     }
-  delete[] script;
+
+  if (decoded_buffer)
+    {
+    delete [] decoded_buffer;
+    }
 }
 
 //----------------------------------------------------------------------------
