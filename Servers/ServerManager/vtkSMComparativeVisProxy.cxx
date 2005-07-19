@@ -38,7 +38,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.3");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -444,7 +444,8 @@ void vtkSMComparativeVisProxy::StoreGeometry()
         proxM->NewProxy("ComparativeVisHelpers", "GeometryCache");
       vtkSMProxyProperty* prop = 
         vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("AddGeometry"));
-      prop->AddProxy(pDisp->GetMapperProxy());
+      prop->AddProxy(pDisp->GetGeometryFilterProxy());
+      //prop->AddProxy(pDisp->GetMapperProxy());
       proxy->UpdateVTKObjects();
       this->Internal->Caches[prevSize].push_back(proxy);
       proxy->Delete();
@@ -730,6 +731,15 @@ int vtkSMComparativeVisProxy::Show()
         pnormal->SetElements3(0, -1, 0);
         planeU->UpdateVTKObjects();
         planeU->Delete();
+        }
+      else
+        {
+        // It is not enough to reset the positions. All
+        // transforms have to be reset
+        //vtkSMDoubleVectorProperty* position = 
+        //vtkSMDoubleVectorProperty::SafeDownCast(
+        //display->GetProperty("Position"));
+        //position->SetElements3(xPos, yPos, 0);
         }
       }
     }
