@@ -73,6 +73,7 @@ SET(PROJECT_TESTS
   VectorTextSpace
   Write
   Tessellate
+  TestComparativeVis
   TestPolyDataIO
   TestUnstructuredGridIO
   TestRectilinearGridIO
@@ -290,6 +291,7 @@ SET (PROJECT_TESTS_NO_BATCH
   TestDemo
   TestPackage
   Write
+  TestComparativeVis
 #  TestAnimationSaveLoad
 #  XdmfRead
 )
