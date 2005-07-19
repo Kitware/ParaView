@@ -1,5 +1,5 @@
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    connection.png (zlib, base64)
  */
 static const unsigned int  image_connection_width         = 16;
@@ -13,7 +13,7 @@ static const unsigned char image_connection[] =
   "5U5/ovyx/1l/VpyvmjtU";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    empty_16x16.png (zlib, base64)
  */
 static const unsigned int  image_empty_16x16_width         = 16;
@@ -25,7 +25,7 @@ static const unsigned char image_empty_16x16[] =
   "eNr7//8/w/9RPIpH8YjEAFrT/R8=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    error.png (zlib, base64)
  */
 static const unsigned int  image_error_width         = 32;
@@ -49,7 +49,7 @@ static const unsigned char image_error[] =
   "4Wt/gupvkBlY/IG3rgKpR4ur04Ta4QPZ/h4M/Y/B0P8aDP1PevW/AR1plE8=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    error_mini.png (zlib, base64)
  */
 static const unsigned int  image_error_mini_width         = 16;
@@ -62,7 +62,7 @@ static const unsigned char image_error_mini[] =
   "+BzPiH6Q8gQ78DUvpRQJZraGhgJNL/MDyBwvg/MAD6kfNPwn8a5VMAWUd70g==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    error_red_mini.png (zlib, base64)
  */
 static const unsigned int  image_error_red_mini_width         = 16;
@@ -75,7 +75,7 @@ static const unsigned char image_error_red_mini[] =
   "obyIx/mP4AMvQ7IKUfBWS5hoYGRiL9D8MTKIz/AwOgHzn/JPynUT4FAF9ns5o=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    expand.png (zlib, base64)
  */
 static const unsigned int  image_expand_width         = 10;
@@ -88,7 +88,7 @@ static const unsigned char image_expand[] =
   "yQMQCeof29";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    folder.png (zlib, base64)
  */
 static const unsigned int  image_folder_width         = 15;
@@ -101,7 +101,7 @@ static const unsigned char image_folder[] =
   "DdxbI/5uieeu0fv/e+9wW5GqR8IQFckCHj";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    folder_open.png (zlib, base64)
  */
 static const unsigned int  image_folder_open_width         = 16;
@@ -114,7 +114,7 @@ static const unsigned char image_folder_open[] =
   "tl6ZHlEhGc9+fd+VW2nYZH5KvlDO/vZI+Z/7w/7mW++nfMdz2cZb4j5od81tEF64k9/Q==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    grid_linear.png (zlib, base64)
  */
 static const unsigned int  image_grid_linear_width         = 16;
@@ -126,7 +126,7 @@ static const unsigned char image_grid_linear[] =
   "eNpjYGD4z0AhBgIQwUAOmxr6R90/6v5R95OHATizxkg=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    grid_log.png (zlib, base64)
  */
 static const unsigned int  image_grid_log_width         = 16;
@@ -138,7 +138,7 @@ static const unsigned char image_grid_log[] =
   "eNpjYGD4z0AhBgIGdIwujsyHsRmoYDc17B/p7h/1/8gNfwDY0fAe";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    helpbubble.png (zlib, base64)
  */
 static const unsigned int  image_helpbubble_width         = 16;
@@ -152,7 +152,7 @@ static const unsigned char image_helpbubble[] =
   "Hzln4/v1/4D1ncxjZXf8SfnvVXn3yPwDgkCsMw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    info_mini.png (zlib, base64)
  */
 static const unsigned int  image_info_mini_width         = 16;
@@ -167,7 +167,7 @@ static const unsigned char image_info_mini[] =
   "/k8AfZhQ3A3IAt/NHjH+RmULzDMIhPKP4pTX/40j8uNw8GDADD16Au";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    lock.png (zlib, base64)
  */
 static const unsigned int  image_lock_width         = 14;
@@ -180,7 +180,7 @@ static const unsigned char image_lock[] =
   "rnycu8HPaTy770VKOegvGOx7vX+FeP71lRvWPflmDeN4/zqLx5f+jXhR7/WYd0TrUDvkA=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    mag_glass.png (zlib, base64)
  */
 static const unsigned int  image_mag_glass_width         = 16;
@@ -194,7 +194,7 @@ static const unsigned char image_mag_glass[] =
   "Vs+Ysi/t7mza";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    minus.png (zlib, base64)
  */
 static const unsigned int  image_minus_width         = 12;
@@ -208,7 +208,7 @@ static const unsigned char image_minus[] =
   "mB4APezfsQ==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    move.png (zlib, base64)
  */
 static const unsigned int  image_move_width         = 9;
@@ -220,7 +220,7 @@ static const unsigned char image_move[] =
   "eNr7//8/w38kDAT//6OJocvDMCF1hMSxsZHNx4WJMec/Hf0FAD65wEA=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    move_h.png (zlib, base64)
  */
 static const unsigned int  image_move_h_width         = 9;
@@ -232,7 +232,7 @@ static const unsigned char image_move_h[] =
   "eNr7//8/w386YiD4j08cRBPCxJhDTwwAkDrYKA==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    move_v.png (zlib, base64)
  */
 static const unsigned int  image_move_v_width         = 9;
@@ -244,7 +244,7 @@ static const unsigned char image_move_v[] =
   "eNr7//8/w38kDAT//6OJocvDMCF1+OQHmxpK/AUAkDrYKA==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    plus.png (zlib, base64)
  */
 static const unsigned int  image_plus_width         = 12;
@@ -258,7 +258,7 @@ static const unsigned char image_plus[] =
   "+B8+Lv7PwQ==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    question.png (zlib, base64)
  */
 static const unsigned int  image_question_width         = 32;
@@ -281,7 +281,7 @@ static const unsigned char image_question[] =
   "pxnf4zR/6pqg/X7b/Ra6LeuOXBV/bfhfD+KIT3VyG8P9/r/f0MsXi9Bw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    reload.png (zlib, base64)
  */
 static const unsigned int  image_reload_width         = 14;
@@ -294,7 +294,7 @@ static const unsigned char image_reload[] =
   "Q=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    shrink.png (zlib, base64)
  */
 static const unsigned int  image_shrink_width         = 10;
@@ -307,7 +307,7 @@ static const unsigned char image_shrink[] =
   "QxAnEYkjxMPUiMkQx1xNpLrD+IChdiMABK75XF";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    stopwatch.png (zlib, base64)
  */
 static const unsigned int  image_stopwatch_width         = 16;
@@ -322,7 +322,7 @@ static const unsigned char image_stopwatch[] =
   "8tCF7Dnw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_beginning.png (zlib, base64)
  */
 static const unsigned int  image_transport_beginning_width         = 16;
@@ -336,7 +336,7 @@ static const unsigned char image_transport_beginning[] =
   "h3z/EPC6Q39/CHjZYZ0/UL7SLMa+7OTjPOAP/r0LX11aGw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_end.png (zlib, base64)
  */
 static const unsigned int  image_transport_end_width         = 16;
@@ -350,7 +350,7 @@ static const unsigned char image_transport_end[] =
   "v7G98xNy/55lvJB3FlnEo7fbagas9Yv+4O9dh3laGw==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_fast_forward.png (zlib, base64)
  */
 static const unsigned int  image_transport_fast_forward_width         = 16;
@@ -364,7 +364,7 @@ static const unsigned char image_transport_fast_forward[] =
   "lLy/xw6eFvavBvvr5tjk3z2gxJNI";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_fast_forward_to_key.png (zlib, base64)
  */
 static const unsigned int  image_transport_fast_forward_to_key_width         = 16;
@@ -378,7 +378,7 @@ static const unsigned char image_transport_fast_forward_to_key[] =
   "I2v5nZ1EERSAtyzySets+iHlPbbyCeoMDO5D4/1aP+sMo86YXv4Tt/8v2gD0ZHI2";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_loop.png (zlib, base64)
  */
 static const unsigned int  image_transport_loop_width         = 16;
@@ -393,7 +393,7 @@ static const unsigned char image_transport_loop[] =
   "VE";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_pause.png (zlib, base64)
  */
 static const unsigned int  image_transport_pause_width         = 16;
@@ -406,7 +406,7 @@ static const unsigned char image_transport_pause[] =
   "GW3wCFUQ4g";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_play.png (zlib, base64)
  */
 static const unsigned int  image_transport_play_width         = 16;
@@ -419,7 +419,7 @@ static const unsigned char image_transport_play[] =
   "rTKHB/GgXhl0ZB/KVRkH7SyE2/9MQARXskxQ==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_play_to_key.png (zlib, base64)
  */
 static const unsigned int  image_transport_play_to_key_width         = 16;
@@ -433,7 +433,7 @@ static const unsigned char image_transport_play_to_key[] =
   "7icVAwABaPew";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_rewind.png (zlib, base64)
  */
 static const unsigned int  image_transport_rewind_width         = 16;
@@ -447,7 +447,7 @@ static const unsigned char image_transport_rewind[] =
   "74yB90fJ+7lnDHjbC3uZ5L87AbKWk0g=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_rewind_to_key.png (zlib, base64)
  */
 static const unsigned int  image_transport_rewind_to_key_width         = 16;
@@ -461,7 +461,7 @@ static const unsigned char image_transport_rewind_to_key[] =
   "wOd3mlH8EJyXg/d3zAA/4TXcm4PvZ58BZi67S3AeqxTt/+U/twKGyXI2";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    transport_stop.png (zlib, base64)
  */
 static const unsigned int  image_transport_stop_width         = 16;
@@ -473,7 +473,7 @@ static const unsigned char image_transport_stop[] =
   "eNr7//8/w/9hgoFACYhdCGAlPPrLgfg/AVw+qn/Y6k8D4t0EcNr/YZRnAMXDIoM=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    trashcan.png (zlib, base64)
  */
 static const unsigned int  image_trashcan_width         = 9;
@@ -485,7 +485,7 @@ static const unsigned char image_trashcan[] =
   "eNr7//8/w38oBoL/MPwfhzg+jA+QYAYDzCwcNMNgVYPPTwBvR79B";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    tree_close.png (zlib, base64)
  */
 static const unsigned int  image_tree_close_width         = 16;
@@ -498,7 +498,7 @@ static const unsigned char image_tree_close[] =
   "afoZt+AD+9zuo=";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    tree_open.png (zlib, base64)
  */
 static const unsigned int  image_tree_open_width         = 16;
@@ -511,7 +511,7 @@ static const unsigned char image_tree_open[] =
   "8Asfff0A==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    warning.png (zlib, base64)
  */
 static const unsigned int  image_warning_width         = 32;
@@ -531,7 +531,7 @@ static const unsigned char image_warning[] =
   "MTTZ/isDfzeqH8f0nyn9/aQ+nNJ/C58f2f6bev4g+NHnj2k4f03D+fOvzt+/1KxzrQ==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    warning_mini.png (zlib, base64)
  */
 static const unsigned int  image_warning_mini_width         = 16;
@@ -546,7 +546,7 @@ static const unsigned char image_warning_mini[] =
   "FecfYz/3n/cc7sq7b/2vu7hzjP1fvX/h/6u//vif//j/gAd0GI4Q==";
 
 /* 
- * Resource generated for image:
+ * Resource generated for file:
  *    window_level.png (zlib, base64)
  */
 static const unsigned int  image_window_level_width         = 14;
