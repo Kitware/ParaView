@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithLabel);
-vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.1");
+vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.2");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithLabel::@WidgetType@WithLabel()
@@ -64,6 +64,11 @@ void @WidgetType@WithLabel::Create(vtkKWApplication *app)
 
   this->Widget->SetParent(this);
   this->Widget->Create(app);
+  if (!this->Widget->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " failed creating @WidgetType@");
+    return;
+    }
 
   // Pack
 

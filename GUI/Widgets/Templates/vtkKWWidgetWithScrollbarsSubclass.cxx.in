@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithScrollbars);
-vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.2");
+vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.3");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithScrollbars::@WidgetType@WithScrollbars()
@@ -64,6 +64,11 @@ void @WidgetType@WithScrollbars::Create(vtkKWApplication *app)
 
   this->Widget->SetParent(this);
   this->Widget->Create(app);
+  if (!this->Widget->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " failed creating @WidgetType@");
+    return;
+    }
 
   // Now that we have been created, make sure we are associated to
   // the scrollbars created by the super, *if any*
