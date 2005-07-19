@@ -76,7 +76,7 @@ public:
   // Description:
   // Convert 'nb_images' images (stored in an array of filenames given by 
   // 'image_filenames') into a C/C++ header given by 'header_filename'.
-  // Note that only PNG images are supported at the moment.
+  // Note that only images supported by ReadImage are read.
   // The structure and contents of each image are decoded and 
   // written into a form that can be used programatically. 
   // For example, the file foobar.png is converted into:
@@ -93,6 +93,9 @@ public:
   //    => Encode the pixels in base64
   //   CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE: 
   //    => Update the header file only if one of the image is newer
+  // If the file can not be read as an image, it is treated as a stream
+  // of bytes and still converted accordingly (the width/height/pixel_size
+  // fields will not be found in the header file).
   //BTX
   enum
   {

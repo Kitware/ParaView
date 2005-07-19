@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.9");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.10");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -417,21 +417,35 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
       continue;
       }
 
-    // Read as PNG
+    // Read image
+    // If failed, read it as a buffer
 
-    int width, height, pixel_size;
+    int width = 0;
+    int height = 0;
+    int pixel_size = 0;
+    unsigned long nb_of_bytes = 0;
     unsigned char *image_buffer = NULL;
 
-    if (!vtkKWResourceUtilities::ReadPNGImage(
+    if (vtkKWResourceUtilities::ReadImage(
           image_filename, &width, &height, &pixel_size, &image_buffer))
       {
-      vtkGenericWarningMacro("Unable to read PNG image " << image_filename);
-      all_ok = 0;
-      continue;
+      nb_of_bytes = width * height * pixel_size;
       }
-
-    unsigned long nb_of_pixels = width * height;
-    unsigned long nb_of_bytes = nb_of_pixels * pixel_size;
+    else
+      {
+      nb_of_bytes = vtksys::SystemTools::FileLength(image_filename);
+      image_buffer = new unsigned char [nb_of_bytes];
+      FILE *filep = fopen(image_filename, "rb");
+      if (!filep ||
+          fread(image_buffer, 1, nb_of_bytes, filep) != nb_of_bytes ||
+          fclose(filep))
+        {
+        vtkGenericWarningMacro("Unable to read file " << image_filename);
+        delete [] image_buffer;
+        all_ok = 0;
+        continue;
+        }
+      }
 
     unsigned char *data_ptr = image_buffer;
 
@@ -485,7 +499,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
       vtksys::SystemTools::GetFilenameWithoutExtension(image_basename);
   
     out << "/* " << endl
-        << " * Resource generated for image:" << endl
+        << " * Resource generated for file:" << endl
         << " *    " << image_basename.c_str();
 
     if (opt_base64 || opt_zlib)
@@ -503,21 +517,29 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     unsigned long max_bytes = 65530;
 
     const char *pixel_byte_type = "const unsigned char";
+    
+    if (width)
+      {
+      out << "static const unsigned int  image_" << image_name.c_str() 
+          << "_width         = " << width <<  ";" << endl;
+      }
 
-    out 
-      << "static const unsigned int  image_" << image_name.c_str() 
-      << "_width         = " << width <<  ";" << endl
-      << "static const unsigned int  image_" << image_name.c_str() 
-      << "_height        = " 
-      << height << ";" << endl
-      << "static const unsigned int  image_" << image_name.c_str() 
-      << "_pixel_size    = " 
-      << pixel_size << ";" << endl
-      << "static const unsigned long image_" << image_name.c_str() 
-      << "_buffer_length = " 
-      << nb_of_bytes << ";" << endl
-      << endl
-      << "static " << pixel_byte_type << " image_" << image_name.c_str();
+    if (height)
+      {
+      out << "static const unsigned int  image_" << image_name.c_str() 
+          << "_height        = " << height << ";" << endl;
+      }
+
+    if (pixel_size)
+      {
+      out << "static const unsigned int  image_" << image_name.c_str() 
+          << "_pixel_size    = " << pixel_size << ";" << endl;
+      }
+
+    out << "static const unsigned long image_" << image_name.c_str() 
+        << "_buffer_length = " << nb_of_bytes << ";" << endl << endl;
+
+    out << "static " << pixel_byte_type << " image_" << image_name.c_str();
     if (nb_of_bytes >= max_bytes)
       {
       out << "_section_" << ++section_idx;
