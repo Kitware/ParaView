@@ -24,7 +24,7 @@
 
 #include "vtkPolyDataAlgorithm.h"
 
-class vtkMapper;
+class vtkPVGeometryFilter;
 
 //BTX
 struct vtkCVGeometryCacheInternal;
@@ -40,7 +40,7 @@ public:
 
   // Description:
   // Shallow copies the input of the mapper into the internal cache.
-  void AddGeometry(vtkMapper* mapper);
+  void AddGeometry(vtkPVGeometryFilter* filter);
 
   // Description:
   // Removes all cached geometry.
