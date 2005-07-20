@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -405,7 +405,7 @@ const char* vtkKWCoreWidget::GetTextOption(const char *option)
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::SetState(int state)
 {
-  if (this->IsCreated())
+  if (this->IsAlive())
     {
     this->SetConfigurationOption(
       "-state", vtkKWTkOptions::GetStateAsTkOptionValue(state));
@@ -415,7 +415,7 @@ void vtkKWCoreWidget::SetState(int state)
 //----------------------------------------------------------------------------
 int vtkKWCoreWidget::GetState()
 {
-  if (this->IsCreated())
+  if (this->IsAlive())
     {
     return vtkKWTkOptions::GetStateFromTkOptionValue(
       this->GetConfigurationOption("-state"));
