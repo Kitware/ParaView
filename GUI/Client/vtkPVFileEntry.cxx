@@ -16,7 +16,7 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
-#include "vtkKWComboBox.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.116");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.117");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -80,7 +80,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Observer = vtkPVFileEntryObserver::New();
   this->Observer->FileEntry = this;
   this->LabelWidget = vtkKWLabel::New();
-  this->Entry = vtkKWComboBox::New();
+  this->Entry = vtkKWEntry::New();
   this->BrowseButton = vtkKWPushButton::New();
   this->Extension = NULL;
   this->InSetValue = 0;
@@ -204,6 +204,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
   
   // Now the entry
   this->Entry->Create(app);
+  this->Entry->SetWidth(8);
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
   this->Entry->SetCommand(this, "EntryChangedCallback");
@@ -488,7 +489,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     char secondformat[100];
     sprintf(firstformat, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
-    this->Entry->DeleteAllValues();
     pm->GetDirectoryListing(path.c_str(), 0, files, 0);
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
@@ -516,7 +516,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       sprintf(rfname, firstformat, path.c_str(), file.c_str(), cc, ext.c_str());
       if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
-        this->Entry->AddValue(rfname);
         if ( max < cc )
           {
           max = cc;
@@ -547,7 +546,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       sprintf(rfname, secondformat, path.c_str(), file.c_str(), cc, ext.c_str());
       if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
-        this->Entry->AddValue(rfname);
         if ( smax < cc )
           {
           smax = cc;
