@@ -81,6 +81,7 @@ SET(KWWidgets_SRCS
   vtkKWCheckButtonWithPopupFrame.cxx 
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
+  vtkKWComboBox.cxx
   vtkKWCompositeWidget.cxx
   vtkKWCoreWidget.cxx
   vtkKWCornerAnnotationEditor.cxx 
@@ -209,6 +210,7 @@ ENDIF (WIN32)
 
 FOREACH (WidgetType 
     vtkKWCheckButton 
+    vtkKWComboBox
     vtkKWEntry
     vtkKWLabel
     vtkKWLabelWithLabel
@@ -233,6 +235,7 @@ ENDFOREACH (WidgetType)
 FOREACH (WidgetType 
     vtkKWCheckButton 
     vtkKWCheckButtonSet
+    vtkKWComboBox
     vtkKWEntry
     vtkKWLabel
     vtkKWLoadSaveButton
