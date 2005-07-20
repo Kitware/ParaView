@@ -33,7 +33,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.6");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.7");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
@@ -49,19 +49,20 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->SetYAxisLabelText("Y");
   this->SetZAxisLabelText("Z");
   
+  //colors chosen to match the output of vtkAxes.cxx's LUT.
   this->XAxisShaft = vtkActor::New();
   this->XAxisShaft->GetProperty()->SetColor(1, 0, 0);
   this->YAxisShaft = vtkActor::New();
-  this->YAxisShaft->GetProperty()->SetColor(0, 1, 0);
+  this->YAxisShaft->GetProperty()->SetColor(1, 1, 0);
   this->ZAxisShaft = vtkActor::New();
-  this->ZAxisShaft->GetProperty()->SetColor(0, 0, 1);
+  this->ZAxisShaft->GetProperty()->SetColor(0, 1, 0);
 
   this->XAxisTip = vtkActor::New();
   this->XAxisTip->GetProperty()->SetColor(1, 0, 0);
   this->YAxisTip = vtkActor::New();
-  this->YAxisTip->GetProperty()->SetColor(0, 1, 0);
+  this->YAxisTip->GetProperty()->SetColor(1, 1, 0);
   this->ZAxisTip = vtkActor::New();
-  this->ZAxisTip->GetProperty()->SetColor(0, 0, 1);
+  this->ZAxisTip->GetProperty()->SetColor(0, 1, 0);
 
   this->CylinderSource = vtkCylinderSource::New();
   this->CylinderSource->SetHeight(1.0);
