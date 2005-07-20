@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.12");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.13");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -698,19 +698,38 @@ int vtkKWResourceUtilities::DecodeBuffer(
       input[0] == 0x78 && input[1] == 0xDA)
     {
     zlib_buffer = new unsigned char [output_expected_length + 1];
-    unsigned long zlib_buffer_length;
-    int error = 
-      (uncompress(zlib_buffer, &zlib_buffer_length, 
-                  input, input_length) != Z_OK ||
-       zlib_buffer_length != output_expected_length);
+    unsigned long zlib_buffer_length = output_expected_length; // IMPORTANT
+    int z_status = uncompress(zlib_buffer, &zlib_buffer_length, 
+                              input, input_length);
+    switch (z_status)
+      {
+      case Z_MEM_ERROR:
+        vtkGenericWarningMacro(
+          << "Error decoding zlib stream: not enough memory");
+        break;
+      case Z_BUF_ERROR:
+        vtkGenericWarningMacro(
+          << "Error decoding zlib stream: not enough room in output buffer");
+        break;
+      case Z_DATA_ERROR:
+        vtkGenericWarningMacro(
+          << "Error decoding zlib stream: input data was corrupted");
+        break;
+      }
+    if (z_status == Z_OK && zlib_buffer_length != output_expected_length)
+      {
+      vtkGenericWarningMacro(
+        << "Error decoding zlib stream: uncompressed buffer size (" 
+        << zlib_buffer_length << ") different than expected length ("
+        << output_expected_length << ")");
+      }
     if (base64_buffer)
       {
       delete [] base64_buffer;
       base64_buffer = NULL;
       }
-    if (error)
+    if (z_status != Z_OK || zlib_buffer_length != output_expected_length)
       {
-      vtkGenericWarningMacro(<< "Error decoding zlib stream");
       delete [] zlib_buffer;
       return 0;
       }
