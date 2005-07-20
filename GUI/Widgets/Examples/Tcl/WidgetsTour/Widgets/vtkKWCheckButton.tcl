@@ -71,7 +71,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   # The last two buttons trigger each other's states
 
-  [cbs GetWidget 2] SetState 1
+  [cbs GetWidget 2] SetSelectedState 1
   [cbs GetWidget 2] SetText "Checkbutton 2 also toggles 3"
   [cbs GetWidget 2] SetCommand [cbs GetWidget 3] "ToggleState"
 

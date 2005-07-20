@@ -73,7 +73,7 @@ proc vtkKWEntryEntryPoint {parent win} {
   [entry_set GetWidget 0] SetValue "Enter a value here..."
   [entry_set GetWidget 3] SetValue "...and it will show there."
 
-  [entry_set GetWidget 0] BindCommand [entry_set GetWidget 3] {SetValue [[entry_set GetWidget 0] GetValue]}
+  [entry_set GetWidget 0] SetCommand [entry_set GetWidget 3] {SetValue [[entry_set GetWidget 0] GetValue]}
 
   pack [entry_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 

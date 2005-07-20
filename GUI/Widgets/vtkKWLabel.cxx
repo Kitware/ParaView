@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.42");
+vtkCxxRevisionMacro(vtkKWLabel, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -267,7 +267,7 @@ void vtkKWLabel::UpdateEnableState()
 
   if (this->LineType != vtkKWLabel::MultiLine)
     {
-    this->SetStateOption(this->GetEnabled());
+    this->SetState(this->GetEnabled());
     }
 }
 

@@ -122,6 +122,21 @@ public:
   static const char* GetOrientationAsTkOptionValue(int);
   static int GetOrientationFromTkOptionValue(const char *);
 
+  // Description:
+  // State option (make sure disabled/normal map to 0/1). 
+  //BTX
+  enum StateType
+  {
+    StateDisabled = 0,
+    StateNormal = 1,
+    StateActive = 2,
+    StateReadOnly = 3,
+    StateUnknown
+  };
+  //ETX
+  static const char* GetStateAsTkOptionValue(int);
+  static int GetStateFromTkOptionValue(const char *);
+
 protected:
   vtkKWTkOptions() {};
   ~vtkKWTkOptions() {};

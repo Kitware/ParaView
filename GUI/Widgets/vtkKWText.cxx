@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.39");
+vtkCxxRevisionMacro(vtkKWText, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -58,7 +58,7 @@ public:
 vtkKWText::vtkKWText()
 {
   this->ValueString          = NULL;
-  this->EditableText         = 1;
+  this->ReadOnly         = 0;
   this->QuickFormatting      = 0;
 
   this->Internals = new vtkKWTextInternals;
@@ -109,12 +109,12 @@ void vtkKWText::SetValue(const char *s, const char *tag)
 
   // Delete everything
 
-  int state = this->GetStateOption();
-  this->SetStateOption(1);
+  int state = this->GetState();
+  this->SetStateToNormal();
 
   this->Script("%s delete 1.0 end", this->GetWidgetName());
 
-  this->SetStateOption(state);
+  this->SetState(state);
 
   // Append to the end
 
@@ -135,12 +135,12 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
     return;
     }
 
-  int state = this->GetStateOption();
-  this->SetStateOption(1);
+  int state = this->GetState();
+  this->SetStateToNormal();
 
   this->AppendValueInternalTagging(s, tag);
   
-  this->SetStateOption(state);
+  this->SetState(state);
 }
 
 //----------------------------------------------------------------------------
@@ -327,14 +327,14 @@ void vtkKWText::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::SetEditableText(int arg)
+void vtkKWText::SetReadOnly(int arg)
 {
-  if (this->EditableText == arg)
+  if (this->ReadOnly == arg)
     {
     return;
     }
 
-  this->EditableText = arg;
+  this->ReadOnly = arg;
   this->UpdateEnableState();
   this->Modified();
 }
@@ -411,8 +411,7 @@ void vtkKWText::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetStateOption(
-    this->EditableText ? this->GetEnabled() : 0);
+  this->SetState(this->ReadOnly ? this->GetEnabled() : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -434,8 +433,8 @@ void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "EditableText: " 
-     << (this->EditableText ? "On" : "Off") << endl;
+  os << indent << "ReadOnly: " 
+     << (this->ReadOnly ? "On" : "Off") << endl;
   os << indent << "QuickFormatting: " 
      << (this->QuickFormatting ? "On" : "Off") << endl;
 }

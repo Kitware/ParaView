@@ -97,7 +97,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   char buffer[100];
   sprintf(buffer, "SetValue [%s GetValue]", 
           entry_set->GetWidget(0)->GetTclName());
-  entry_set->GetWidget(0)->BindCommand(entry_set->GetWidget(3), buffer);
+  entry_set->GetWidget(0)->SetCommand(entry_set->GetWidget(3), buffer);
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

@@ -18,151 +18,95 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.64");
+vtkCxxRevisionMacro(vtkKWEntry, "1.65");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
 {
-  this->ValueString = NULL;
-  this->Width       = -1;
+  this->Width       = 0;
   this->ReadOnly    = 0;
-  this->PullDown    = 0;
-  this->Entry       = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkKWEntry::~vtkKWEntry()
+void vtkKWEntry::Create(vtkKWApplication *app)
 {
-  this->SetValueString(NULL);
-  if ( this->Entry && this->Entry != this)
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->Superclass::CreateSpecificTkWidget(app, "entry"))
     {
-    this->Entry->Delete();
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
     }
+
+  this->SetConfigurationOptionAsInt("-width", this->Width);
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWEntry::GetValue()
+const char* vtkKWEntry::GetValue()
 {
   if (!this->IsCreated())
     {
     return NULL;
     }
 
-  const char *val = this->Script("%s get", this->Entry->GetWidgetName());
-  this->SetValueString(this->ConvertTclStringToInternalString(val));
-  return this->GetValueString();
+  const char *val = this->Script("%s get", this->GetWidgetName());
+  return this->ConvertTclStringToInternalString(val);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
-  
-  char *val = this->GetValue();
+  const char *val = this->GetValue();
   if (!val || !*val)
     {
     return 0;
     }
-
   return atoi(val);
 }
 
 //----------------------------------------------------------------------------
 double vtkKWEntry::GetValueAsFloat()
 {
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
-
-  char *val = this->GetValue();
+  const char *val = this->GetValue();
   if (!val || !*val)
     {
     return 0;
     }
-
   return atof(val);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::UpdateEnableState()
-{
-  this->Superclass::UpdateEnableState();
-
-  if (this->Entry)
-    {
-    this->SetStateOption(this->GetEnabled());
-    if (this->Entry != this)
-      {
-      this->PropagateEnableState(this->Entry);
-      }
-    }
-
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  if (this->Entry && this->Entry->IsCreated())
-    {
-    if (this->Enabled)
-      {
-      this->Script("%s configure -foreground black -background white", 
-                   this->Entry->GetWidgetName());
-      }
-    else
-      {
-      this->Script("%s configure -foreground gray70 -background gray90", 
-                   this->Entry->GetWidgetName());
-      }
-    }
-#endif
-}
-
-
-//----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(const char *s)
 {
-  int ro = 0;
-  if (this->ReadOnly)
+  if (!this->IsAlive())
     {
-    this->ReadOnlyOff();
-    ro = 1;
+    return;
     }
 
-  int was_disabled = !this->GetEnabled();
-  if (was_disabled)
+  int old_state = this->GetState();
+  this->SetStateToNormal();
+
+  this->Script("%s delete 0 end", this->GetWidgetName());
+  if (s)
     {
-    this->SetEnabled(1);
+    const char *val = this->ConvertInternalStringToTclString(
+      s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s insert 0 \"%s\"", 
+                 this->GetWidgetName(), val ? val : "");
     }
 
-  if (this->Entry && this->Entry->IsAlive())
-    {
-    this->Script("%s delete 0 end", this->Entry->GetWidgetName());
-    if (s)
-      {
-      const char *val = this->ConvertInternalStringToTclString(
-        s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
-      this->Script("%s insert 0 \"%s\"", 
-                   this->Entry->GetWidgetName(), val ? val : "");
-      }
-    }
-
-  if (was_disabled)
-    {
-    this->SetEnabled(0);
-    }
-
-  if (ro)
-    {
-    this->ReadOnlyOn();
-    }
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(int i)
 {
-  char *val = this->GetValue();
-  if (val && *val && i == this->GetValueAsInt())
+  const char *val = this->GetValue();
+  if (val && *val && i == atoi(val))
     {
     return;
     }
@@ -175,8 +119,8 @@ void vtkKWEntry::SetValue(int i)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(double f)
 {
-  char *val = this->GetValue();
-  if (val && *val && f == this->GetValueAsFloat())
+  const char *val = this->GetValue();
+  if (val && *val && f == atof(val))
     {
     return;
     }
@@ -189,65 +133,32 @@ void vtkKWEntry::SetValue(double f)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(double f, int size)
 {
-  char *val = this->GetValue();
-  if (val && *val && f == this->GetValueAsFloat())
+  const char *val = this->GetValue();
+  if (val && *val && f == atof(val))
     {
     return;
     }
 
-  char tmp[1024];
   char format[1024];
-  sprintf(format,"%%.%dg",size);
-  sprintf(tmp,format, f);
+  sprintf(format, "%%.%dg", size);
+
+  char tmp[1024];
+  sprintf(tmp, format, f);
+
   this->SetValue(tmp);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::Create(vtkKWApplication *app)
+void vtkKWEntry::SetReadOnly(int arg)
 {
-  // Call the superclass to set the appropriate flags then create manually
-
-  if (!this->Superclass::CreateSpecificTkWidget(
-        app, this->PullDown ? "ComboBox" : "entry"))
+  if (this->ReadOnly == arg)
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->Entry = this;
-
-  const char* entry_wname = this->Entry->GetWidgetName();
-  this->Script("%s configure -textvariable %sValue", entry_wname, entry_wname);
-  if (this->Width > 0)
-    {
-    this->Script("%s configure -width %d", entry_wname, this->Width);
-    }
-  if (this->ReadOnly)
-    {
-    this->Script("%s configure -state disabled", entry_wname);
-    }
-
-  // Update enable state
-
+  this->ReadOnly = arg;
+  this->Modified();
   this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWEntry::SetReadOnly(int ro)
-{
-  this->ReadOnly = ro;
-  if (!this->IsCreated())
-    {
-    return;
-    }
-  if ( ro && this->GetWidgetName())
-    {
-    this->Script("%s configure -state disabled", this->Entry->GetWidgetName());
-    }
-  else
-    {
-    this->Script("%s configure -state normal", this->Entry->GetWidgetName());
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -258,129 +169,56 @@ void vtkKWEntry::SetWidth(int width)
     return;
     }
 
-  this->Modified();
   this->Width = width;
+  this->Modified();
 
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -width %d", this->GetWidgetName(), width);
-    }
+  this->SetConfigurationOptionAsInt("-width", this->Width);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::BindCommand(vtkObject *object, 
+void vtkKWEntry::SetCommand(vtkObject *object, 
                              const char *method)
 {
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-
-    this->Script("bind %s <Return> {%s}",
-                 this->GetWidgetName(), command);
-    this->Script("bind %s <FocusOut> {%s}",
-                 this->GetWidgetName(), command);
-    this->Script("bind %s <Return> {%s}",
-                 this->Entry->GetWidgetName(), command);
-    this->Script("bind %s <FocusOut> {%s}",
-                 this->Entry->GetWidgetName(), command);
-
-    delete [] command;
-    }
+  this->AddBinding("<Return>", object, method);
+  this->AddBinding("<FocusOut>", object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::AddValue(const char* value)
+void vtkKWEntry::UpdateEnableState()
 {
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown || 
-      this->GetValueIndex(value) >= 0)
+  this->Superclass::UpdateEnableState();
+
+  int disabled = this->ReadOnly || !this->GetEnabled();
+
+  if (this->GetEnabled() && this->ReadOnly)
     {
-    return;
+    this->SetStateToReadOnly();
+    }
+  else
+    {
+    this->SetState(this->GetEnabled());
     }
 
-  this->Script("%s configure -values [concat [%s cget -values] {%s}]", 
-    this->Entry->GetWidgetName(), this->Entry->GetWidgetName(), value);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWEntry::GetNumberOfValues()
-{
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
+  if (disabled)
     {
-    return 0;
+    this->SetForegroundColor(0.0, 0.0, 0.0);
+    this->SetbackgroundColor(1.0, 1.0, 1.0);
     }
-
-  return atoi(this->Script("llength [%s cget -values]",
-                           this->Entry->GetWidgetName()));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWEntry::DeleteAllValues()
-{
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
+  else
     {
-    return;
+    this->SetForegroundColor(0.7, 0.7, 0.7);
+    this->SetbackgroundColor(0.9, 0.9, 0.9);
     }
-
-  this->Script("%s configure -values {}", this->Entry->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWEntry::DeleteValue(int idx)
-{
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
-    {
-    return;
-    }
-  if (idx < 0 || idx >= this->GetNumberOfValues())
-    {
-    vtkErrorMacro(
-      "This combobox has only " << this->GetNumberOfValues()
-      << " elements. Index " << idx << " is out of range");
-    return;
-    }
-
-  this->Script("%s configure -values [lreplace [%s cget -values] %d %d]", 
-    this->Entry->GetWidgetName(), this->Entry->GetWidgetName(), idx, idx);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWEntry::GetValueFromIndex(int idx)
-{
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown)
-    {
-    return NULL;
-    }
-  if (idx < 0 || idx >= this->GetNumberOfValues())
-    {
-    vtkErrorMacro(
-      "This combobox has only " << this->GetNumberOfValues()
-      << " elements. Index " << idx << " is out of range");
-    return NULL;
-    }
-
-  return this->Script("lindex [%s cget -values] %d",
-                      this->Entry->GetWidgetName(), idx);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWEntry::GetValueIndex(const char* value)
-{
-  if (!this->Entry || !this->Entry->IsCreated() || !this->PullDown || !value)
-    {
-    return -1;
-    }
-  return atoi(this->Script("lsearch [%s cget -values] {%s}",
-                           this->Entry->GetWidgetName(), value));
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "Width: " << this->GetWidth() << endl;
-  os << indent << "Readonly: " << (this->ReadOnly?"on":"off") << endl;
-  os << indent << "PullDown: " << (this->PullDown?"on":"off") << endl;
-  os << indent << "Entry: " << this->Entry << endl;
+  os << indent << "Readonly: " << (this->ReadOnly ? "On" : "Off") << endl;
 }
 

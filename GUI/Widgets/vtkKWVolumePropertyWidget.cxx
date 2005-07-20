@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.17");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -775,7 +775,7 @@ void vtkKWVolumePropertyWidget::Update()
       this->LockOpacityAndColorCheckButton->SetEnabled(0);
       }
 
-    this->LockOpacityAndColorCheckButton->SetState(
+    this->LockOpacityAndColorCheckButton->SetSelectedState(
       this->LockOpacityAndColor[this->SelectedComponent]);
     }
 
@@ -785,7 +785,7 @@ void vtkKWVolumePropertyWidget::Update()
     {
     if (has_prop)
       {
-      this->EnableShadingCheckButton->SetState(
+      this->EnableShadingCheckButton->SetSelectedState(
         this->VolumeProperty->GetShade(0));
       }
     if (!this->EnableShadingForAllComponents)
@@ -1540,7 +1540,7 @@ void vtkKWVolumePropertyWidget::EnableShadingCallback()
   // Set the first component
 
   this->VolumeProperty->SetShade(
-    0, this->EnableShadingCheckButton->GetState() ? 1 : 0);
+    0, this->EnableShadingCheckButton->GetSelectedState() ? 1 : 0);
 
   // Update the others
 
@@ -1570,7 +1570,7 @@ void vtkKWVolumePropertyWidget::LockOpacityAndColorCallback()
     }
 
   this->LockOpacityAndColor[this->SelectedComponent] = 
-    this->LockOpacityAndColorCheckButton->GetState();
+    this->LockOpacityAndColorCheckButton->GetSelectedState();
 
   this->Update();
 }
@@ -1596,7 +1596,7 @@ void vtkKWVolumePropertyWidget::MaterialPropertyChangedCallback()
 void vtkKWVolumePropertyWidget::MaterialPropertyChangingCallback()
 {
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1630,7 +1630,7 @@ void vtkKWVolumePropertyWidget::ScalarOpacityFunctionChangingCallback()
     }
 
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1660,7 +1660,7 @@ void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangingCallback()
     }
 
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     float d = this->ScalarOpacityUnitDistanceScale->GetValue();
     this->VolumeProperty->SetScalarOpacityUnitDistance(
@@ -1694,7 +1694,7 @@ void vtkKWVolumePropertyWidget::RGBTransferFunctionChangingCallback()
   this->UpdateHSVColorSelectorFromScalarColorFunctionEditor();
 
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1790,7 +1790,7 @@ void vtkKWVolumePropertyWidget::GradientOpacityFunctionChangedCallback()
 void vtkKWVolumePropertyWidget::GradientOpacityFunctionChangingCallback()
 {
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1833,7 +1833,7 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback(
   if (this->ScalarColorFunctionEditor->GetColorTransferFunction()->GetMTime() >
       mtime &&
       this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1887,7 +1887,7 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(int index)
   this->InvokeEvent(vtkKWEvent::ScalarComponentWeightChangingEvent, fargs);
 
   if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetState())
+      this->InteractiveApplyCheckButton->GetSelectedState())
     {
     this->InvokeVolumePropertyChangingCommand();
     }

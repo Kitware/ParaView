@@ -14,7 +14,7 @@
 // .NAME vtkKWCheckButton - check button widget
 // .SECTION Description
 // A simple widget that represents a check button. It can be modified 
-// and queried using the GetState and SetState methods.
+// and queried using the GetSelectedState and SetSelectedState methods.
 
 #ifndef __vtkKWCheckButton_h
 #define __vtkKWCheckButton_h
@@ -36,12 +36,12 @@ public:
 
   // Description:
   // Set/Get/Toggle the state of the check button 0 = off 1 = on
-  virtual void SetState(int );
-  virtual int GetState();
-  vtkBooleanMacro(State, int);
-  virtual void ToggleState();
-  virtual void Select() { this->SetState(1); };
-  virtual void DeSelect() { this->SetState(0); };
+  virtual void SetSelectedState(int );
+  virtual int GetSelectedState();
+  vtkBooleanMacro(SelectedState, int);
+  virtual void ToggleSelectedState();
+  virtual void Select() { this->SetSelectedState(1); };
+  virtual void DeSelect() { this->SetSelectedState(0); };
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)

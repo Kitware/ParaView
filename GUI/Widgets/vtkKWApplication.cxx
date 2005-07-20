@@ -52,8 +52,6 @@ static Tcl_Interp *Et_Interp = 0;
 #include "Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.h"
 #endif
 
-#include "Utilities/BWidgets/vtkKWBWidgets.h"
-
 // I need those two Tcl functions. They usually are declared in tclIntDecls.h,
 // but Unix build do not have access to VTK's tkInternals include path.
 // Since the signature has not changed for years (at least since 8.2),
@@ -70,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.245");
+vtkCxxRevisionMacro(vtkKWApplication, "1.246");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -736,11 +734,9 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
 
 #endif
 
-  // Initialize Widgets and BWidgets
+  // Initialize Widgets
 
   Kwwidgets_Init(interp);
-
-  vtkKWBWidgets::Initialize(interp);
 
   return interp;
 }
@@ -1147,7 +1143,7 @@ void vtkKWApplication::ConfigureAboutDialog()
     text->SetWidth(60);
     text->SetHeight(8);
     text->SetWrapToWord();
-    text->EditableTextOff();
+    text->ReadOnlyOn();
 
     double r, g, b;
     vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());

@@ -204,17 +204,19 @@ public:
 
   // Description:
   // Set/Get state of the menu entry with a given index or name.
-  //BTX
-  enum { StateNormal = 0, StateActive, StateDisabled, StateUnknown };
-  //ETX
-  void SetState(int index, int state);
-  void SetState(const char* item, int state);
-  int  GetState(int index);
-  int  GetState(const char* item);
+  // Valid constants can be found in vtkKWTkOptions::StateType.
+  virtual void SetState(int index, int state);
+  virtual void SetState(const char* item, int state);
+  virtual int  GetState(int index);
+  virtual int  GetState(const char* item);
 
   // Description:
   // Convenience method to set the state of all entries.
-  void SetState(int state);
+  // Valid constants can be found in vtkKWTkOptions::StateType.
+  // This should not be used directly, this is done by 
+  // SetEnabled()/UpdateEnableState(). 
+  // Overriden to pass to all menu entries
+  virtual void SetState(int state);
 
   // Description:
   // Configure the item at given index.

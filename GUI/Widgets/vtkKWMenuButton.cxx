@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.27");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -283,7 +283,7 @@ void vtkKWMenuButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetStateOption(this->GetEnabled());
+  this->SetState(this->GetEnabled());
   this->PropagateEnableState(this->Menu);
 }
 

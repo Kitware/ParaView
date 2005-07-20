@@ -39,7 +39,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.45");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -466,7 +466,7 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->ConfirmExitCheckButton)
     {
-    this->ConfirmExitCheckButton->SetState(
+    this->ConfirmExitCheckButton->SetSelectedState(
       vtkKWMessageDialog::RestoreMessageDialogResponseFromRegistry(
         this->GetApplication(), vtkKWApplication::ExitDialogName) ? 0 : 1);
     }
@@ -475,7 +475,7 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->SaveUserInterfaceGeometryCheckButton)
     {
-    this->SaveUserInterfaceGeometryCheckButton->SetState(
+    this->SaveUserInterfaceGeometryCheckButton->SetSelectedState(
       this->GetApplication()->GetSaveUserInterfaceGeometry());
     }
   
@@ -483,7 +483,7 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->ShowSplashScreenCheckButton)
     {
-    this->ShowSplashScreenCheckButton->SetState(
+    this->ShowSplashScreenCheckButton->SetSelectedState(
       this->GetApplication()->GetShowSplashScreen());
     }
 
@@ -495,7 +495,7 @@ void vtkKWApplicationSettingsInterface::Update()
       this->GetApplication()->GetBalloonHelpManager();
     if (mgr)
       {
-      this->ShowBalloonHelpCheckButton->SetState(mgr->GetShow());
+      this->ShowBalloonHelpCheckButton->SetSelectedState(mgr->GetShow());
       }
     }
 
@@ -513,14 +513,14 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatFrameCheckButton)
     {
-    this->FlatFrameCheckButton->SetState(vtkKWToolbar::GetGlobalFlatAspect());
+    this->FlatFrameCheckButton->SetSelectedState(vtkKWToolbar::GetGlobalFlatAspect());
     }
 
   // Toolbar settings : flat buttons
 
   if (FlatButtonsCheckButton)
     {
-    this->FlatButtonsCheckButton->SetState(
+    this->FlatButtonsCheckButton->SetSelectedState(
       vtkKWToolbar::GetGlobalWidgetsFlatAspect());
     }
 
@@ -547,7 +547,7 @@ void vtkKWApplicationSettingsInterface::ConfirmExitCallback()
   vtkKWMessageDialog::SaveMessageDialogResponseToRegistry(
     this->GetApplication(),
     vtkKWApplication::ExitDialogName, 
-    this->ConfirmExitCheckButton->GetState() ? 0 : 1);
+    this->ConfirmExitCheckButton->GetSelectedState() ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
@@ -559,7 +559,7 @@ void vtkKWApplicationSettingsInterface::SaveUserInterfaceGeometryCallback()
     return;
     }
   
-  int state = this->SaveUserInterfaceGeometryCheckButton->GetState() ? 1 : 0;
+  int state = this->SaveUserInterfaceGeometryCheckButton->GetSelectedState() ? 1 : 0;
   this->GetApplication()->SetSaveUserInterfaceGeometry(state);
 }
 
@@ -572,7 +572,7 @@ void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
     return;
     }
 
-  int state = this->ShowSplashScreenCheckButton->GetState() ? 1 : 0;
+  int state = this->ShowSplashScreenCheckButton->GetSelectedState() ? 1 : 0;
   this->GetApplication()->SetShowSplashScreen(state);
 }
 
@@ -585,7 +585,7 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
     return;
     }
 
-  int state = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
+  int state = this->ShowBalloonHelpCheckButton->GetSelectedState() ? 1 : 0;
   vtkKWBalloonHelpManager *mgr = 
     this->GetApplication()->GetBalloonHelpManager();
   if (mgr)
@@ -629,7 +629,7 @@ void vtkKWApplicationSettingsInterface::FlatFrameCallback()
     }
 
   vtkKWToolbar::SetGlobalFlatAspect(
-    this->FlatFrameCheckButton->GetState() ? 1 : 0);
+    this->FlatFrameCheckButton->GetSelectedState() ? 1 : 0);
 
   if (this->Window)
     {
@@ -647,7 +647,7 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
     }
 
   vtkKWToolbar::SetGlobalWidgetsFlatAspect(
-    this->FlatButtonsCheckButton->GetState() ? 1 : 0);
+    this->FlatButtonsCheckButton->GetSelectedState() ? 1 : 0);
 
   if (this->Window)
     {

@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.10");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.11");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -770,7 +770,7 @@ void vtkKWTextPropertyEditor::UpdateBoldCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->SetState(this->TextProperty->GetBold());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->SetSelectedState(this->TextProperty->GetBold());
     }
 }
 
@@ -780,7 +780,7 @@ void vtkKWTextPropertyEditor::BoldCallback()
   if (this->IsCreated())
     {
     this->SetBold(this->StylesCheckButtonSet->GetWidget()
-                  ->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->GetState());
+                  ->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->GetSelectedState());
     }
 }
 
@@ -811,7 +811,7 @@ void vtkKWTextPropertyEditor::UpdateItalicCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->SetState(this->TextProperty->GetItalic());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->SetSelectedState(this->TextProperty->GetItalic());
     }
 }
 
@@ -821,7 +821,7 @@ void vtkKWTextPropertyEditor::ItalicCallback()
   if (this->IsCreated())
     {
     this->SetItalic(this->StylesCheckButtonSet->GetWidget()
-                    ->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->GetState());
+                    ->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->GetSelectedState());
     }
 }
 
@@ -852,7 +852,7 @@ void vtkKWTextPropertyEditor::UpdateShadowCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->SetState(this->TextProperty->GetShadow());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->SetSelectedState(this->TextProperty->GetShadow());
     }
 }
 
@@ -862,7 +862,7 @@ void vtkKWTextPropertyEditor::ShadowCallback()
   if (this->IsCreated())
     {
     this->SetShadow(this->StylesCheckButtonSet->GetWidget()
-                    ->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->GetState());
+                    ->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->GetSelectedState());
     }
 }
 

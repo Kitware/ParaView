@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButtonWithPopupFrame );
-vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.1");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithPopupFrame::vtkKWCheckButtonWithPopupFrame()
@@ -107,7 +107,7 @@ void vtkKWCheckButtonWithPopupFrame::Update()
 
   if (this->CheckButton)
     {
-    this->CheckButton->SetState(this->GetCheckButtonState());
+    this->CheckButton->SetSelectedState(this->GetCheckButtonState());
     }
 
   // Disable the popup button if not checked
@@ -118,7 +118,7 @@ void vtkKWCheckButtonWithPopupFrame::Update()
       this->CheckButton->IsCreated())
     {
     this->PopupButton->SetEnabled(
-      this->CheckButton->GetState() ? this->GetEnabled() : 0);
+      this->CheckButton->GetSelectedState() ? this->GetEnabled() : 0);
     }
 }
 

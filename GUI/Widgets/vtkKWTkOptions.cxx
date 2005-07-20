@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkOptions );
-vtkCxxRevisionMacro(vtkKWTkOptions, "1.2");
+vtkCxxRevisionMacro(vtkKWTkOptions, "1.3");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(int encoding)
@@ -330,6 +330,50 @@ int vtkKWTkOptions::GetOrientationFromTkOptionValue(const char *orientation)
     return vtkKWTkOptions::OrientationVertical;
     }
   return vtkKWTkOptions::OrientationUnknown;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkOptions::GetStateAsTkOptionValue(int state)
+{
+  switch (state)
+    {
+    case vtkKWTkOptions::StateDisabled:
+      return "disabled";
+    case vtkKWTkOptions::StateNormal:
+      return "normal";
+    case vtkKWTkOptions::StateActive:
+      return "active";
+    case vtkKWTkOptions::StateReadOnly:
+      return "readonly";
+    default:
+      return "";
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkOptions::GetStateFromTkOptionValue(const char *state)
+{
+  if (!state)
+    {
+    return vtkKWTkOptions::StateUnknown;
+    }
+  if (!strcmp(state, "disabled"))
+    {
+    return vtkKWTkOptions::StateDisabled;
+    }
+  if (!strcmp(state, "normal"))
+    {
+    return vtkKWTkOptions::StateNormal;
+    }
+  if (!strcmp(state, "active"))
+    {
+    return vtkKWTkOptions::StateActive;
+    }
+  if (!strcmp(state, "readonly"))
+    {
+    return vtkKWTkOptions::StateReadOnly;
+    }
+  return vtkKWTkOptions::StateUnknown;
 }
 
 //----------------------------------------------------------------------------

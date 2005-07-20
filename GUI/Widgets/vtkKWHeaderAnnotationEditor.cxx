@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -165,7 +165,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
   this->TextEntry->Create(app);
   this->TextEntry->GetLabel()->SetText("Header:");
   this->TextEntry->GetWidget()->SetWidth(20);
-  this->TextEntry->GetWidget()->BindCommand(this, "HeaderTextCallback");
+  this->TextEntry->GetWidget()->SetCommand(this, "HeaderTextCallback");
 
   this->TextEntry->SetBalloonHelpString(
     "Set the header annotation. The text will automatically scale "
@@ -304,7 +304,7 @@ void vtkKWHeaderAnnotationEditor::CheckButtonCallback()
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
-    this->SetVisibility(this->CheckButton->GetState() ? 1 : 0);
+    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
     }
 }
 

@@ -123,7 +123,7 @@ int my_main(int argc, char *argv[])
   // that we have added our UI
 
   hello_label->SetText(texts[0]);
-  rbs->GetWidget(0)->StateOn(); // or rb->SetVariableValue(0);
+  rbs->GetWidget(0)->SelectedStateOn(); // or rb->SetVariableValue(0);
 
   label_panel->Raise();
 

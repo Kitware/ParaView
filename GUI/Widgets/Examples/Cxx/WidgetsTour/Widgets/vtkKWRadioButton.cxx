@@ -37,7 +37,7 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob1b->SetText("Another radiobutton");
   radiob1b->SetValue(456);
 
-  radiob1->SetState(1);
+  radiob1->SetSelectedState(1);
   radiob1b->SetVariableName(radiob1->GetVariableName());
 
   app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
@@ -65,7 +65,7 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob2b->IndicatorOff();
   radiob2b->SetValue("bar");
 
-  radiob2->SetState(1);
+  radiob2->SetSelectedState(1);
   radiob2b->SetVariableName(radiob2->GetVariableName());
 
   app->Script("pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
@@ -99,7 +99,7 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
       "among all radiobuttons, as well as a unique value.");
     }
   
-  radiob_set->GetWidget(0)->SetState(1);
+  radiob_set->GetWidget(0)->SetSelectedState(1);
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

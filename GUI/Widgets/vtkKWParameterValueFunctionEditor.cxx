@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.53");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.54");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1355,7 +1355,7 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
 
     this->UpdateParameterEntry(this->SelectedPoint);
 
-    this->ParameterEntry->GetWidget()->BindCommand(
+    this->ParameterEntry->GetWidget()->SetCommand(
       this, "ParameterEntryCallback");
     }
 }

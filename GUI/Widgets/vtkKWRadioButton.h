@@ -35,8 +35,8 @@ public:
 
   // Description:
   // Set/Get the state of the Radio button 0 = off 1 = on
-  vtkBooleanMacro(State,int);
-  virtual int GetState();
+  vtkBooleanMacro(SelectedState,int);
+  virtual int GetSelectedState();
 
   // Description:
   // Specify the value to store in the button's associated variable 

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.21");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -243,7 +243,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
   this->TitleEntry->Create(app);
   this->TitleEntry->GetLabel()->SetText("Title:");
   this->TitleEntry->GetWidget()->SetWidth(20);
-  this->TitleEntry->GetWidget()->BindCommand(this, "ScalarBarTitleCallback");
+  this->TitleEntry->GetWidget()->SetCommand(this, "ScalarBarTitleCallback");
 
   this->TitleEntry->SetBalloonHelpString(
     "Set the scalar bar title. The text will automatically scale "
@@ -313,7 +313,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
   this->LabelFormatEntry->Create(app);
   this->LabelFormatEntry->GetLabel()->SetText("Label format:");
   this->LabelFormatEntry->GetWidget()->SetWidth(20);
-  this->LabelFormatEntry->GetWidget()->BindCommand(
+  this->LabelFormatEntry->GetWidget()->SetCommand(
     this, "ScalarBarLabelFormatCallback");
 
   this->LabelFormatEntry->SetBalloonHelpString(
@@ -657,7 +657,7 @@ void vtkKWScalarBarAnnotation::CheckButtonCallback()
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
-    this->SetVisibility(this->CheckButton->GetState() ? 1 : 0);
+    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
     }
 }
 

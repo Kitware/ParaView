@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.85");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.86");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -1974,7 +1974,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 
     if (page->Pinned)
       {
-      this->TabPopupMenu->SetState("Show", vtkKWMenu::StateDisabled);
+      this->TabPopupMenu->SetState("Show", vtkKWTkOptions::StateDisabled);
       }
     }
 

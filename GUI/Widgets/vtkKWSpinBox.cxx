@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.4");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
@@ -149,7 +149,7 @@ void vtkKWSpinBox::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetStateOption(this->GetEnabled());
+  this->SetState(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------

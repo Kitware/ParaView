@@ -43,46 +43,36 @@ public:
   // controlled using the the second parameter of SetValue). Trailing zeros
   // are truncated, and the decimal point appears only if one or more digits
   // follow it.
-  void SetValue(const char *);
-  void SetValue(int a);
-  void SetValue(double f, int size);
-  void SetValue(double f);
-  char *GetValue();
-  int GetValueAsInt();
-  double GetValueAsFloat();
+  virtual void SetValue(const char *);
+  virtual void SetValue(int a);
+  virtual void SetValue(double f, int size);
+  virtual void SetValue(double f);
+  virtual const char* GetValue();
+  virtual int GetValueAsInt();
+  virtual double GetValueAsFloat();
   
   // Description:
   // The width is the number of charaters wide the entry box can fit.
   // To keep from changing behavior of the entry,  the default
-  // value is -1 wich means the width is not explicitely set.
-  void SetWidth(int width);
+  // value is 0 wich means the width is not explicitely set, the width will
+  // be just large enough to hold the value.
+  virtual void SetWidth(int width);
   vtkGetMacro(Width, int);
 
   // Description:
   // Set or get readonly flag. This flags makes entry read only.
-  void SetReadOnly(int);
+  virtual void SetReadOnly(int);
   vtkBooleanMacro(ReadOnly, int);
   vtkGetMacro(ReadOnly, int);
 
   // Description:
-  // Bind the command called when the Return key is pressed or the widget
-  // gets out of focus.
-  virtual void BindCommand(vtkObject *object, const char *command);
-
-  // Description:
-  // Add and delete values to put in the list.
-  void AddValue(const char* value);
-  void DeleteValue(int idx);
-  int GetValueIndex(const char* value);
-  const char* GetValueFromIndex(int idx);
-  int GetNumberOfValues();
-  void DeleteAllValues();
-
-  // Description:
-  // Make this entry a pulldown combobox.
-  vtkSetClampMacro(PullDown, int, 0, 1);
-  vtkBooleanMacro(PullDown, int);
-  vtkGetMacro(PullDown, int);
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the return key is pressed, or the focus is lost.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is evaluated as a simple command.
+  virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -95,17 +85,10 @@ public:
 
 protected:
   vtkKWEntry();
-  ~vtkKWEntry();
+  ~vtkKWEntry() {};
   
-  vtkSetStringMacro(ValueString);
-  vtkGetStringMacro(ValueString);
-  
-  char *ValueString;
   int Width;
   int ReadOnly;
-  int PullDown;
-
-  vtkKWCoreWidget* Entry;
 
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented

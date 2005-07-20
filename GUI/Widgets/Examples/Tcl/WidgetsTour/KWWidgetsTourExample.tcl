@@ -102,7 +102,7 @@ set text_widget [tcl_source_text GetWidget]
 $text_widget ShowVerticalScrollbarOn
 
 set text [$text_widget GetWidget]
-$text EditableTextOff
+$text ReadOnlyOn
 $text SetWrapToNone
 $text SetHeight 3000
 $text AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
@@ -123,7 +123,7 @@ set text_widget [cxx_source_text GetWidget]
 $text_widget ShowVerticalScrollbarOn
 
 set text [$text_widget GetWidget]
-$text EditableTextOff
+$text ReadOnlyOn
 $text SetWrapToNone
 $text SetHeight 3000
 $text AddTagMatcher "#\[a-z\]+" "_fg_red_tag_"

@@ -49,10 +49,10 @@ public:
   virtual void AppendValue(const char *, const char *tag);
 
   // Description:
-  // Set/Get if this text is editable by the user. Default is On.
-  virtual void SetEditableText(int val);
-  vtkGetMacro(EditableText, int);
-  vtkBooleanMacro(EditableText, int);
+  // Set/Get if this text is read-only. Default is Off.
+  virtual void SetReadOnly(int val);
+  vtkGetMacro(ReadOnly, int);
+  vtkBooleanMacro(ReadOnly, int);
 
   // Description:
   // Set/Get if quick formatting is enabled.
@@ -130,7 +130,7 @@ protected:
   vtkGetStringMacro(ValueString);
   vtkSetStringMacro(ValueString);
 
-  int EditableText;
+  int ReadOnly;
   int QuickFormatting;
 
   //BTX

@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.30");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -450,7 +450,7 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
 
     this->UpdatePointEntries(this->SelectedPoint);
 
-    this->ValueEntry->GetWidget()->BindCommand(
+    this->ValueEntry->GetWidget()->SetCommand(
       this, "ValueEntryCallback");
     }
 }
@@ -523,7 +523,7 @@ void vtkKWPiecewiseFunctionEditor::Update()
 
   if (this->WindowLevelModeCheckButton)
     {
-    this->WindowLevelModeCheckButton->SetState(this->WindowLevelMode);
+    this->WindowLevelModeCheckButton->SetSelectedState(this->WindowLevelMode);
     }
 }
 
@@ -887,7 +887,7 @@ void vtkKWPiecewiseFunctionEditor::WindowLevelModeCallback()
     return;
     }
 
-  this->SetWindowLevelMode(this->WindowLevelModeCheckButton->GetState());
+  this->SetWindowLevelMode(this->WindowLevelModeCheckButton->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------

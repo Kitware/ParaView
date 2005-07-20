@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.39");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -99,7 +99,7 @@ const char* vtkKWCheckButton::GetText()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCheckButton::GetState()
+int vtkKWCheckButton::GetSelectedState()
 {
   if (this->IsCreated())
     {
@@ -111,7 +111,7 @@ int vtkKWCheckButton::GetState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::SetState(int s)
+void vtkKWCheckButton::SetSelectedState(int s)
 {
   if (this->IsCreated())
     {
@@ -138,9 +138,9 @@ void vtkKWCheckButton::SetState(int s)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::ToggleState()
+void vtkKWCheckButton::ToggleSelectedState()
 {
-  this->SetState(this->GetState() ? 0 : 1);
+  this->SetSelectedState(this->GetSelectedState() ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
@@ -252,7 +252,7 @@ void vtkKWCheckButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetStateOption(this->GetEnabled());
+  this->SetState(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------

@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.37");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -119,7 +119,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   text->SetWidth(100);
   text->SetHeight(20);
   text->SetWrapToWord();
-  text->EditableTextOff();
+  text->ReadOnlyOn();
 
   this->Script("pack %s -side bottom -expand 1 -fill both",
                this->DisplayText->GetWidgetName());

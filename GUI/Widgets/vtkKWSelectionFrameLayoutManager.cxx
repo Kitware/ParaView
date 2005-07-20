@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.26");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.27");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -490,7 +490,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   // Enabled/Disabled some resolutions
 
   int normal_state = 
-    this->GetEnabled() ? vtkKWMenu::StateNormal : vtkKWMenu::StateDisabled;
+    this->GetEnabled() ? vtkKWTkOptions::StateNormal : vtkKWTkOptions::StateDisabled;
   size_t size = this->Internals->Pool.size();
 
   char label[64];
@@ -503,7 +503,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
       label, 
       (size_t)(res[idx][0] * res[idx][1]) <= 
       (size + (res[idx][0] != 1 && res[idx][1] != 1 ? 1 : 0))
-      ? normal_state : vtkKWMenu::StateDisabled);
+      ? normal_state : vtkKWTkOptions::StateDisabled);
     }
 
   // Select the right one
@@ -1249,7 +1249,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   int ok = dlg->Invoke();
   if (ok)
     {
-    char *new_title = dlg->GetEntry()->GetWidget()->GetValue();
+    const char *new_title = dlg->GetEntry()->GetWidget()->GetValue();
     ok = this->CanWidgetTitleBeChanged(widget, new_title);
     if (!ok)
       {

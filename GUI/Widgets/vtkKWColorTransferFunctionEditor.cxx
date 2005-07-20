@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.37");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.38");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -616,7 +616,7 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
       this->ValueEntries[i]->SetParent(this->TopRightFrame);
       this->ValueEntries[i]->Create(app);
       this->ValueEntries[i]->GetWidget()->SetWidth(4);
-      this->ValueEntries[i]->GetWidget()->BindCommand(
+      this->ValueEntries[i]->GetWidget()->SetCommand(
         this, "ValueEntriesCallback");
       }
 

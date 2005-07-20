@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.19");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.20");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app)
@@ -75,7 +75,7 @@ void vtkKWRadioButton::SetVariableValue(const char *v)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRadioButton::GetState()
+int vtkKWRadioButton::GetSelectedState()
 {
   if (this->IsCreated())
     {

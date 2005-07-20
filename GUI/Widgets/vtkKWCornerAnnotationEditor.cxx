@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -392,7 +392,7 @@ void vtkKWCornerAnnotationEditor::Update()
 
   if (this->CheckButton && this->CornerAnnotation)
     {
-    this->CheckButton->SetState(this->CornerAnnotation->GetVisibility());
+    this->CheckButton->SetSelectedState(this->CornerAnnotation->GetVisibility());
     }
 }
 
@@ -458,7 +458,7 @@ void vtkKWCornerAnnotationEditor::CheckButtonCallback()
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
-    this->SetVisibility(this->CheckButton->GetState() ? 1 : 0);
+    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
     }
 }
 

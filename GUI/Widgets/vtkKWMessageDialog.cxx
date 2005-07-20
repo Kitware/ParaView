@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.82");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.83");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -492,7 +492,7 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *wi
 //----------------------------------------------------------------------------
 int vtkKWMessageDialog::GetRememberMessage()
 {
-  int res = this->CheckButton->GetState();
+  int res = this->CheckButton->GetSelectedState();
   return res;
 }
 

@@ -20,7 +20,7 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
   radiob1b SetText "Another radiobutton"
   radiob1b SetValue 456
 
-  radiob1 SetState 1
+  radiob1 SetSelectedState 1
   radiob1b SetVariableName [radiob1 GetVariableName] 
 
   pack [radiob1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -46,7 +46,7 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
   radiob2b IndicatorOff
   radiob2b SetValue "bar"
 
-  radiob2 SetState 1
+  radiob2 SetSelectedState 1
   radiob2b SetVariableName [radiob2 GetVariableName] 
 
   pack [radiob2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -76,7 +76,7 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
       among all radiobuttons as well as a unique value."
     }
   
-  [radiob_set GetWidget 0] SetState 1
+  [radiob_set GetWidget 0] SetSelectedState 1
 
   pack [radiob_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 

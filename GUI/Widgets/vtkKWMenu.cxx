@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.76");
+vtkCxxRevisionMacro(vtkKWMenu, "1.77");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -783,36 +783,19 @@ void vtkKWMenu::InsertSeparator(int position)
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetState(int index)
 {
-  const char* state = this->Script("%s entrycget %d -state", 
-                                   this->GetWidgetName(), index);
-  if (!state || !state[0])
-    {
-    return vtkKWMenu::StateUnknown;
-    }
-  if ( strcmp(state, "normal") == 0 )
-    {
-    return vtkKWMenu::StateNormal;
-    }
-  else if ( strcmp(state, "active") == 0 )
-    {
-    return vtkKWMenu::StateActive;
-    }
-  else if ( strcmp(state, "disabled") == 0 )
-    {
-    return vtkKWMenu::StateDisabled;
-    }
-  return vtkKWMenu::StateUnknown;
+  const char *state = 
+    this->Script("%s entrycget %d -state", this->GetWidgetName(), index);
+  return vtkKWTkOptions::GetStateFromTkOptionValue(state);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetState(const char* item)
 {
-  if ( !this->HasItem(item) )
+  if (!this->HasItem(item))
     {
-    return vtkKWMenu::StateUnknown;
+    return vtkKWTkOptions::StateUnknown;
     }
-  int index = this->GetIndex(item);
-  return this->GetState(index);
+  return this->GetState(this->GetIndex(item));
 }
 
 //----------------------------------------------------------------------------
@@ -820,25 +803,21 @@ void vtkKWMenu::SetState(int index, int state)
 {
   if (this->IsCreated())
     {
-    char stateStr[][9] = { "normal", "active", "disabled" };
-    if (state < vtkKWMenu::StateNormal || state > vtkKWMenu::StateDisabled)
-      {
-      state = 0;
-      }
     this->Script("catch {%s entryconfigure %d -state %s}", 
-                 this->GetWidgetName(), index, stateStr[state] );
+                 this->GetWidgetName(), 
+                 index, 
+                 vtkKWTkOptions::GetStateAsTkOptionValue(state));
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(const char* item, int state)
 {
-  if ( !this->HasItem(item) )
+  if (!this->HasItem(item))
     {
     return;
     }
-  int index = this->GetIndex(item);
-  this->SetState(index, state);
+  this->SetState(index, this->GetIndex(item));
 }
 
 //----------------------------------------------------------------------------
@@ -853,16 +832,12 @@ void vtkKWMenu::SetState(int state)
   ostrstream tk_cmd;
   const char *wname = this->GetWidgetName();
 
-  char stateStr[][9] = { "normal", "active", "disabled" };
-  if (state < vtkKWMenu::StateNormal || state > vtkKWMenu::StateDisabled)
-    {
-    state = 0;
-    }
+  const char *statestr = vtkKWTkOptions::GetStateAsTkOptionValue(state);
 
   for (int i = 0; i < nb_items; i++)
     {
     tk_cmd << "catch {" << wname << " entryconfigure " << i 
-           << " -state " << stateStr[state] << "}" << endl;
+           << " -state " << statestr << "}" << endl;
     }
 
   tk_cmd << ends;
@@ -1021,7 +996,7 @@ void vtkKWMenu::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetState(this->GetEnabled() ? vtkKWMenu::StateNormal : vtkKWMenu::StateDisabled);
+  this->SetState(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------
