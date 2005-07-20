@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.40");
+vtkCxxRevisionMacro(vtkKWText, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -57,9 +57,9 @@ public:
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
 {
-  this->ValueString          = NULL;
-  this->ReadOnly         = 0;
-  this->QuickFormatting      = 0;
+  this->InternalValueString = NULL;
+  this->ReadOnly            = 0;
+  this->QuickFormatting     = 0;
 
   this->Internals = new vtkKWTextInternals;
 }
@@ -67,7 +67,7 @@ vtkKWText::vtkKWText()
 //----------------------------------------------------------------------------
 vtkKWText::~vtkKWText()
 {
-  this->SetValueString(NULL);
+  this->SetInternalValueString(NULL);
 
   // Delete all presets
 
@@ -88,9 +88,8 @@ char *vtkKWText::GetValue()
 
   const char *val = this->Script("%s get 1.0 {end -1 chars}", 
                                  this->GetWidgetName());
-  this->SetValueString(
-    this->ConvertTclStringToInternalString(val));
-  return this->GetValueString();
+  this->SetInternalValueString(this->ConvertTclStringToInternalString(val));
+  return this->GetInternalValueString();
 }
 
 //----------------------------------------------------------------------------

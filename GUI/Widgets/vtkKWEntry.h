@@ -43,6 +43,9 @@ public:
   // controlled using the the second parameter of SetValue). Trailing zeros
   // are truncated, and the decimal point appears only if one or more digits
   // follow it.
+  // IMPORTANT: whenever possible, use any of the GetValueAs...() methods
+  // to retrieve the value if it is meant to be a number. This is faster
+  // than calling GetValue() and converting the resulting string to a number.
   virtual void SetValue(const char *);
   virtual const char* GetValue();
   virtual void SetValueAsInt(int a);
@@ -84,18 +87,19 @@ public:
 
 protected:
   vtkKWEntry();
-  ~vtkKWEntry() {};
+  ~vtkKWEntry();
   
   int Width;
   int ReadOnly;
 
 private:
+
+  char *InternalValueString;
+  vtkGetStringMacro(InternalValueString);
+  vtkSetStringMacro(InternalValueString);
+
   vtkKWEntry(const vtkKWEntry&); // Not implemented
   void operator=(const vtkKWEntry&); // Not Implemented
 };
 
-
 #endif
-
-
-

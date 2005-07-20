@@ -126,10 +126,6 @@ protected:
   vtkKWText();
   ~vtkKWText();
 
-  char *ValueString;
-  vtkGetStringMacro(ValueString);
-  vtkSetStringMacro(ValueString);
-
   int ReadOnly;
   int QuickFormatting;
 
@@ -142,6 +138,11 @@ protected:
   virtual void AppendValueInternal(const char *, const char *tag);
 
 private:
+
+  char *InternalValueString;
+  vtkGetStringMacro(InternalValueString);
+  vtkSetStringMacro(InternalValueString);
+
   vtkKWText(const vtkKWText&); // Not implemented
   void operator=(const vtkKWText&); // Not implemented
 };

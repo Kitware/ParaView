@@ -18,13 +18,20 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.68");
+vtkCxxRevisionMacro(vtkKWEntry, "1.69");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
 {
   this->Width       = 0;
   this->ReadOnly    = 0;
+  this->InternalValueString = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWEntry::~vtkKWEntry()
+{
+  this->SetInternalValueString(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -57,13 +64,22 @@ const char* vtkKWEntry::GetValue()
     }
 
   const char *val = this->Script("%s get", this->GetWidgetName());
-  return this->ConvertTclStringToInternalString(val);
+  this->SetInternalValueString(this->ConvertTclStringToInternalString(val));
+  return this->GetInternalValueString();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
-  const char *val = this->GetValue();
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // Do not call this->GetValue() here to speed up things (GetValue() copies
+  // the buffer to a string each time, for safety reasons)
+
+  const char *val = this->Script("%s get", this->GetWidgetName());
   if (!val || !*val)
     {
     return 0;
@@ -74,7 +90,15 @@ int vtkKWEntry::GetValueAsInt()
 //----------------------------------------------------------------------------
 double vtkKWEntry::GetValueAsDouble()
 {
-  const char *val = this->GetValue();
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // Do not call this->GetValue() here to speed up things (GetValue() copies
+  // the buffer to a string each time, for safety reasons)
+
+  const char *val = this->Script("%s get", this->GetWidgetName());
   if (!val || !*val)
     {
     return 0;
@@ -108,7 +132,15 @@ void vtkKWEntry::SetValue(const char *s)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValueAsInt(int i)
 {
-  const char *val = this->GetValue();
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Do not call this->GetValue() here to speed up things (GetValue() copies
+  // the buffer to a string each time, for safety reasons)
+
+  const char *val = this->Script("%s get", this->GetWidgetName());
   if (val && *val && i == atoi(val))
     {
     return;
@@ -122,7 +154,15 @@ void vtkKWEntry::SetValueAsInt(int i)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValueAsDouble(double f)
 {
-  const char *val = this->GetValue();
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Do not call this->GetValue() here to speed up things (GetValue() copies
+  // the buffer to a string each time, for safety reasons)
+
+  const char *val = this->Script("%s get", this->GetWidgetName());
   if (val && *val && f == atof(val))
     {
     return;
@@ -136,7 +176,15 @@ void vtkKWEntry::SetValueAsDouble(double f)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValueAsFormattedDouble(double f, int size)
 {
-  const char *val = this->GetValue();
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Do not call this->GetValue() here to speed up things (GetValue() copies
+  // the buffer to a string each time, for safety reasons)
+
+  const char *val = this->Script("%s get", this->GetWidgetName());
   if (val && *val && f == atof(val))
     {
     return;
