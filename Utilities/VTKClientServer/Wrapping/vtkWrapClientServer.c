@@ -56,6 +56,7 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
     case 0xA:     fprintf(fp,"vtkIdType "); break;
     case 0xB:     fprintf(fp,"long long "); break;
     case 0xC:     fprintf(fp,"__int64 "); break;
+    case 0xD:     fprintf(fp,"signed char "); break;
     case 0x9:     fprintf(fp,"%s ",Id); break;
     case 0x8: return;
     }
@@ -91,7 +92,7 @@ void use_hints(FILE *fp)
     case 0x301: case 0x307:
     case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C:
     case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A: case 0x31B:
-    case 0x31C:
+    case 0x31C: case 0x30D:
       fprintf(fp,
               "      resultStream.Reset();\n"
               "      resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
@@ -106,7 +107,7 @@ void return_result(FILE *fp)
     case 0x2:
       break;
     case 0x1: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7: case 0xA:
-    case 0xB: case 0xC: case 0x13: case 0x14: case 0x15: case 0x16:
+    case 0xB: case 0xC: case 0xD: case 0x13: case 0x14: case 0x15: case 0x16:
     case 0x1A: case 0x1B: case 0x1C:
     case 0x303:
       fprintf(fp,
@@ -135,7 +136,7 @@ void return_result(FILE *fp)
     /* handle functions returning vectors */
     /* this is done by looking them up in a hint file */
     case 0x301: case 0x307:
-    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C:
+    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C: case 0x30D:
     case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A: case 0x31B:
     case 0x31C:
       use_hints(fp);
@@ -192,6 +193,7 @@ void get_args(FILE *fp, int i)
     case 0xA:
     case 0xB:
     case 0xC:
+    case 0xD:
     case 0x3:
     case 0x13:
     case 0x14:
@@ -216,7 +218,7 @@ void get_args(FILE *fp, int i)
         switch (currentFunction->ArgTypes[i] % 0x100)
           {
           case 0x1: case 0x7:
-          case 0x4: case 0x5: case 0x6: case 0xA: case 0xB: case 0xC:
+          case 0x4: case 0x5: case 0x6: case 0xA: case 0xB: case 0xC: case 0xD:
           case 0x13: case 0x14: case 0x15: case 0x16:
           case 0x1A: case 0x1B: case 0x1C:
             fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)",
@@ -298,7 +300,7 @@ void outputFunction(FILE *fp, FileInfo *data)
     {
     case 0x301: case 0x307:
     case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B:
-    case 0x30C:
+    case 0x30C: case 0x30D:
     case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A:
     case 0x31B: case 0x31C:
       args_ok = currentFunction->HaveHint;
