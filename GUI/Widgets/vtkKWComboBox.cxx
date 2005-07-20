@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.1");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -43,6 +43,22 @@ void vtkKWComboBox::Create(vtkKWApplication *app)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::SetValue(const char *s)
+{
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
+  int old_state = this->GetState();
+  this->SetStateToNormal();
+
+  this->SetTextOption("-text", s);
+
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
@@ -127,6 +143,19 @@ int vtkKWComboBox::GetValueIndex(const char* value)
     }
   return atoi(this->Script("lsearch [%s cget -values] {%s}",
                            this->GetWidgetName(), value));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::UpdateEnableState()
+{
+  this->vtkKWCoreWidget::UpdateEnableState();
+
+  this->SetState(this->GetEnabled());
+
+  if (this->IsCreated())
+    {
+    this->SetConfigurationOptionAsInt("-editable", this->ReadOnly ? 0 : 1);
+    }
 }
 
 //----------------------------------------------------------------------------

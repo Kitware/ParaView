@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.31");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -372,7 +372,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 
   double *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
 
-  this->ValueEntry->GetWidget()->SetValue(point[1], 3);
+  this->ValueEntry->GetWidget()->SetValueAsFormattedDouble(point[1], 3);
 }
 
 //----------------------------------------------------------------------------
@@ -850,7 +850,7 @@ void vtkKWPiecewiseFunctionEditor::ValueEntryCallback()
 
   // Get the value from the entry
 
-  double value = this->ValueEntry->GetWidget()->GetValueAsFloat();
+  double value = this->ValueEntry->GetWidget()->GetValueAsDouble();
 
   // Move the point, check if something has really been moved
 

@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.38");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.39");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -429,7 +429,8 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
 
   for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
-    this->ValueEntries[i]->GetWidget()->SetValue(values[i], 2);
+    this->ValueEntries[i]->GetWidget()->SetValueAsFormattedDouble(
+      values[i], 2);
     }
 }
 
@@ -848,7 +849,7 @@ void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
       {
       return;
       }
-    values[i] = this->ValueEntries[i]->GetWidget()->GetValueAsFloat();
+    values[i] = this->ValueEntries[i]->GetWidget()->GetValueAsDouble();
     }
 
   // Move the point, check if something has really been moved

@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.37");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.38");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -250,7 +250,7 @@ void vtkKWThumbWheel::RefreshValue()
 {
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->SetValue(this->Value);
+    this->Entry->SetValueAsDouble(this->Value);
     }
 }
 
@@ -395,7 +395,7 @@ void vtkKWThumbWheel::CreateEntry()
   this->Entry->Create(this->GetApplication());
   this->Entry->SetWidth(7);
   this->PropagateEnableState(this->Entry);
-  this->Entry->SetValue(this->GetValue());
+  this->Entry->SetValueAsDouble(this->GetValue());
 }
 
 // ---------------------------------------------------------------------------
@@ -831,7 +831,7 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::EntryCallback()
 {
-  double value = this->Entry->GetValueAsFloat();
+  double value = this->Entry->GetValueAsDouble();
   double old_value = this->GetValue();
   this->SetValue(value);
 

@@ -44,12 +44,12 @@ public:
   // are truncated, and the decimal point appears only if one or more digits
   // follow it.
   virtual void SetValue(const char *);
-  virtual void SetValue(int a);
-  virtual void SetValue(double f, int size);
-  virtual void SetValue(double f);
   virtual const char* GetValue();
+  virtual void SetValueAsInt(int a);
   virtual int GetValueAsInt();
-  virtual double GetValueAsFloat();
+  virtual void SetValueAsFormattedDouble(double f, int size);
+  virtual void SetValueAsDouble(double f);
+  virtual double GetValueAsDouble();
   
   // Description:
   // The width is the number of charaters wide the entry box can fit.

@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.49");
+vtkCxxRevisionMacro(vtkKWRange, "1.50");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -737,7 +737,7 @@ void vtkKWRange::UpdateEntriesValue(double range[2])
     {
     if (this->Entries[i] && this->Entries[i]->IsCreated())
       {
-      this->Entries[i]->SetValue(range[i]);
+      this->Entries[i]->SetValueAsDouble(range[i]);
       }
     }
 }
@@ -2041,7 +2041,7 @@ void vtkKWRange::EntriesUpdateCallback(int i)
     return;
     }
 
-  double value = this->Entries[i]->GetValueAsFloat();
+  double value = this->Entries[i]->GetValueAsDouble();
   double old_value = this->Range[i];
 
   if (i == 0)

@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.67");
+vtkCxxRevisionMacro(vtkKWEntry, "1.68");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -72,7 +72,7 @@ int vtkKWEntry::GetValueAsInt()
 }
 
 //----------------------------------------------------------------------------
-double vtkKWEntry::GetValueAsFloat()
+double vtkKWEntry::GetValueAsDouble()
 {
   const char *val = this->GetValue();
   if (!val || !*val)
@@ -106,7 +106,7 @@ void vtkKWEntry::SetValue(const char *s)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(int i)
+void vtkKWEntry::SetValueAsInt(int i)
 {
   const char *val = this->GetValue();
   if (val && *val && i == atoi(val))
@@ -120,7 +120,7 @@ void vtkKWEntry::SetValue(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(double f)
+void vtkKWEntry::SetValueAsDouble(double f)
 {
   const char *val = this->GetValue();
   if (val && *val && f == atof(val))
@@ -134,7 +134,7 @@ void vtkKWEntry::SetValue(double f)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(double f, int size)
+void vtkKWEntry::SetValueAsFormattedDouble(double f, int size)
 {
   const char *val = this->GetValue();
   if (val && *val && f == atof(val))
