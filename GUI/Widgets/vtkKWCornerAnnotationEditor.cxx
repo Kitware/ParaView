@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -585,7 +585,8 @@ void vtkKWCornerAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+  //int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+  int enabled = this->GetEnabled();
 
   if (this->CornerFrame)
     {

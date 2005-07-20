@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -353,7 +353,8 @@ void vtkKWHeaderAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+  //int enabled = this->RenderWidget ? this->GetEnabled() : 0;
+  int enabled = this->GetEnabled();
 
   if (this->TextFrame)
     {
