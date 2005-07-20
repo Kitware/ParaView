@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.71");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.72");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -353,15 +353,15 @@ void vtkPVLineWidget::Trace(ofstream *file)
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetPoint1 "
-        << this->Point1[0]->GetValue() << " "
-        << this->Point1[1]->GetValue() << " "
-        << this->Point1[2]->GetValue() << endl;
+        << this->Point1[0]->GetValueAsDouble() << " "
+        << this->Point1[1]->GetValueAsDouble() << " "
+        << this->Point1[2]->GetValueAsDouble() << endl;
   *file << "$kw(" << this->GetTclName() << ") SetPoint2 "
-        << this->Point2[0]->GetValue() << " "
-        << this->Point2[1]->GetValue() << " "
-        << this->Point2[2]->GetValue() << endl;
+        << this->Point2[0]->GetValueAsDouble() << " "
+        << this->Point2[1]->GetValueAsDouble() << " "
+        << this->Point2[2]->GetValueAsDouble() << endl;
   *file << "$kw(" << this->GetTclName() << ") SetResolution "
-        << this->ResolutionEntry->GetValue() << endl;
+        << this->ResolutionEntry->GetValueAsDouble() << endl;
 }
 
 //----------------------------------------------------------------------------
