@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.6");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -113,7 +113,10 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
 
   // Create the dialog
 
-  this->TopLevel->SetMasterWindow(app->GetNthWindow(0));
+  if (!this->TopLevel->GetMasterWindow())
+    {
+    this->TopLevel->SetMasterWindow(app->GetNthWindow(0));
+    }
   this->TopLevel->Create(app);
   this->TopLevel->ModalOff();
   this->TopLevel->SetSize(600, 300);
@@ -357,25 +360,6 @@ vtkKWUserInterfaceManagerDialog::GetPanelFromPageId(int page_id)
     }
 
   return this->GetPanel(this->Notebook->GetPageTag(page_id));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWUserInterfaceManagerDialog::SetDialogTitle(const char *title)
-{
-  if (this->TopLevel)
-    {
-    this->TopLevel->SetTitle(title);
-    }
-}
-
-//----------------------------------------------------------------------------
-const char * vtkKWUserInterfaceManagerDialog::GetDialogTitle()
-{
-  if (this->TopLevel)
-    {
-    return this->TopLevel->GetTitle();
-    }
-  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -818,4 +802,6 @@ void vtkKWUserInterfaceManagerDialog::PrintSelf(
   ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "TopLevel: " << this->TopLevel << endl;
 }

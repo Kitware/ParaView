@@ -81,9 +81,9 @@ public:
   vtkBooleanMacro(PageNodeVisibility, int);
 
   // Description:
-  // Set/Get the dialog title. 
-  virtual void SetDialogTitle(const char *);
-  virtual const char* GetDialogTitle();
+  // Access to the dialog/toplevel
+  // Can be used to change its title, and master window
+  vtkGetObjectMacro(TopLevel, vtkKWTopLevel);
 
   // Description:
   // Raise a specific section, given a panel, a page id (or page title) 
