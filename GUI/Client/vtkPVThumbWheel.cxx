@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.19");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -187,7 +187,7 @@ void vtkPVThumbWheel::SaveInBatchScript(ofstream *file)
 void vtkPVThumbWheel::Accept()
 {
   float scalar = this->ThumbWheel->GetValue();
-  float entryValue = this->ThumbWheel->GetEntry()->GetValueAsFloat();
+  float entryValue = this->ThumbWheel->GetEntry()->GetValueAsDouble();
   if (entryValue != scalar)
     {
     scalar = entryValue;

@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.58");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.59");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1111,19 +1111,19 @@ void vtkPVAnimationManager::SaveAnimation()
     widthEntry->GetLabel()->SetText("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication());
-    widthEntry->GetWidget()->SetValue(origWidth);
+    widthEntry->GetWidget()->SetValueAsInt(origWidth);
 
     vtkKWEntryWithLabel *heightEntry = vtkKWEntryWithLabel::New();
     heightEntry->GetLabel()->SetText("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication());
-    heightEntry->GetWidget()->SetValue(origHeight);
+    heightEntry->GetWidget()->SetValueAsInt(origHeight);
 
     vtkKWEntryWithLabel *framerateEntry = vtkKWEntryWithLabel::New();
     framerateEntry->GetLabel()->SetText("Frame Rate:");
     framerateEntry->SetParent(frame);
     framerateEntry->Create(this->GetApplication());
-    framerateEntry->GetWidget()->SetValue(15);
+    framerateEntry->GetWidget()->SetValueAsInt(15);
 
     this->Script("pack %s %s -side left -fill both -expand t",
       widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
@@ -1140,7 +1140,7 @@ void vtkPVAnimationManager::SaveAnimation()
     int height = origHeight;
     height = heightEntry->GetWidget()->GetValueAsInt();
     double framerate = (isMPEG)?
-      framerateEntry->GetWidget()->GetValueAsFloat() : 1.0;
+      framerateEntry->GetWidget()->GetValueAsDouble() : 1.0;
     if (!framerate) 
       {
       framerate = 1.0;

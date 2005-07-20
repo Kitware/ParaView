@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.755");
+vtkCxxRevisionMacro(vtkPVWindow, "1.756");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1264,7 +1264,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
   //this->CenterXEntry->SetValue(this->CameraStyle3D->GetCenter()[0], 3);
-  this->CenterXEntry->SetValue(0.0);
+  this->CenterXEntry->SetValueAsDouble(0.0);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
   this->CenterYLabel->Create(app);
@@ -1276,7 +1276,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
   //this->CenterYEntry->SetValue(this->CameraStyle3D->GetCenter()[1], 3);
-  this->CenterYEntry->SetValue(0.0);
+  this->CenterYEntry->SetValueAsDouble(0.0);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
   this->CenterZLabel->Create(app);
@@ -1288,7 +1288,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
   //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
-  this->CenterZEntry->SetValue(0.0);
+  this->CenterZEntry->SetValueAsDouble(0.0);
 
   this->Script("pack %s %s %s %s %s %s -side left",
                this->CenterXLabel->GetWidgetName(),
@@ -1649,9 +1649,9 @@ void vtkPVWindow::CenterEntryCloseCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::CenterEntryCallback()
 {
-  float x = this->CenterXEntry->GetValueAsFloat();
-  float y = this->CenterYEntry->GetValueAsFloat();
-  float z = this->CenterZEntry->GetValueAsFloat();
+  float x = this->CenterXEntry->GetValueAsDouble();
+  float y = this->CenterYEntry->GetValueAsDouble();
+  float z = this->CenterZEntry->GetValueAsDouble();
   this->SetCenterOfRotation(x, y, z);
 }
 
@@ -1661,9 +1661,9 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetCenterOfRotation %f %f %f",
                       this->GetTclName(), x, y, z);
   
-  this->CenterXEntry->SetValue(x);
-  this->CenterYEntry->SetValue(y);
-  this->CenterZEntry->SetValue(z);
+  this->CenterXEntry->SetValueAsDouble(x);
+  this->CenterYEntry->SetValueAsDouble(y);
+  this->CenterZEntry->SetValueAsDouble(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   this->CameraStyle2D->SetCenterOfRotation(x, y, z);
   
@@ -1758,9 +1758,9 @@ void vtkPVWindow::ResetCenterCallback()
   center[2] = (bounds[4]+bounds[5])/2.0;
 
   this->SetCenterOfRotation(center[0], center[1], center[2]);
-  this->CenterXEntry->SetValue(center[0]);
-  this->CenterYEntry->SetValue(center[1]);
-  this->CenterZEntry->SetValue(center[2]);
+  this->CenterXEntry->SetValueAsDouble(center[0]);
+  this->CenterYEntry->SetValueAsDouble(center[1]);
+  this->CenterZEntry->SetValueAsDouble(center[2]);
   this->ResizeCenterActor();
   this->MainView->EventuallyRender();
 }
@@ -3227,9 +3227,9 @@ void vtkPVWindow::SaveState(const char* filename)
 
   // Save the center of rotation
   *file << "$kw(" << this->GetTclName() << ") SetCenterOfRotation "
-        << this->CenterXEntry->GetValueAsFloat() << " "
-        << this->CenterYEntry->GetValueAsFloat() << " "
-        << this->CenterZEntry->GetValueAsFloat() << endl;
+        << this->CenterXEntry->GetValueAsDouble() << " "
+        << this->CenterYEntry->GetValueAsDouble() << " "
+        << this->CenterZEntry->GetValueAsDouble() << endl;
   
   // Save state of comparative vis manager
   this->GetComparativeVisManagerGUI()->SaveState(file);

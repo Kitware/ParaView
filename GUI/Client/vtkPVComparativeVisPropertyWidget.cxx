@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -102,7 +102,7 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
 
   this->NumberOfFramesEntry->SetParent(this);
   this->NumberOfFramesEntry->Create(app);
-  this->NumberOfFramesEntry->GetWidget()->SetValue(5);
+  this->NumberOfFramesEntry->GetWidget()->SetValueAsInt(5);
   this->NumberOfFramesEntry->GetWidget()->SetWidth(3);
   this->NumberOfFramesEntry->SetLabelText("Number of Frames:");;
   this->Script("pack %s -side left", 
@@ -197,7 +197,7 @@ void vtkPVComparativeVisPropertyWidget::CopyFromVisualization(
     {
     this->LastCue = 0;
     }
-  this->NumberOfFramesEntry->GetWidget()->SetValue(
+  this->NumberOfFramesEntry->GetWidget()->SetValueAsInt(
     static_cast<int>(proxy->GetNumberOfFramesInCue(propIdx)));
 
   this->CueEditor->SetCueProxy(vtkSMAnimationCueProxy::SafeDownCast(

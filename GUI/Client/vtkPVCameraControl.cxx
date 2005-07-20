@@ -27,7 +27,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.10");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -83,9 +83,9 @@ void vtkPVCameraControl::Elevation(double angle)
     return;
     }
 
-  if (this->ElevationEntry->GetValueAsFloat() != angle)
+  if (this->ElevationEntry->GetValueAsDouble() != angle)
     {
-    this->ElevationEntry->SetValue(angle);
+    this->ElevationEntry->SetValueAsDouble(angle);
     }
   
   float *center = this->InteractorStyle->GetCenter();
@@ -126,9 +126,9 @@ void vtkPVCameraControl::Azimuth(double angle)
     return;
     }
   
-  if (this->AzimuthEntry->GetValueAsFloat() != angle)
+  if (this->AzimuthEntry->GetValueAsDouble() != angle)
     {
-    this->AzimuthEntry->SetValue(angle);
+    this->AzimuthEntry->SetValueAsDouble(angle);
     }
   
   float *center = this->InteractorStyle->GetCenter();
@@ -166,9 +166,9 @@ void vtkPVCameraControl::Roll(double angle)
     return;
     }
 
-  if (this->RollEntry->GetValueAsFloat() != angle)
+  if (this->RollEntry->GetValueAsDouble() != angle)
     {
-    this->RollEntry->SetValue(angle);
+    this->RollEntry->SetValueAsDouble(angle);
     }
   
   float *center = this->InteractorStyle->GetCenter();
@@ -280,17 +280,17 @@ void vtkPVCameraControl::Create(vtkKWApplication *app)
 
 void vtkPVCameraControl::ElevationButtonCallback()
 {
-  this->Elevation(this->ElevationEntry->GetValueAsFloat());
+  this->Elevation(this->ElevationEntry->GetValueAsDouble());
 }
 
 void vtkPVCameraControl::AzimuthButtonCallback()
 {
-  this->Azimuth(this->AzimuthEntry->GetValueAsFloat());
+  this->Azimuth(this->AzimuthEntry->GetValueAsDouble());
 }
 
 void vtkPVCameraControl::RollButtonCallback()
 {
-  this->Roll(this->RollEntry->GetValueAsFloat());
+  this->Roll(this->RollEntry->GetValueAsDouble());
 }
 
 void vtkPVCameraControl::SetRenderView(vtkPVRenderView *view)

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.67");
+vtkCxxRevisionMacro(vtkPVScale, "1.68");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -138,7 +138,7 @@ void vtkPVScale::EntryCheckModifiedCallback()
     return;
     }
   
-  this->Scale->SetValue(this->Scale->GetEntry()->GetValueAsFloat());
+  this->Scale->SetValue(this->Scale->GetEntry()->GetValueAsDouble());
   this->CheckModifiedCallback();
 }
 
@@ -285,7 +285,7 @@ void vtkPVScale::Accept()
   if (this->EntryFlag)
     {
     double entryValue;
-    entryValue = this->Scale->GetEntry()->GetValueAsFloat();
+    entryValue = this->Scale->GetEntry()->GetValueAsDouble();
     if (entryValue != this->GetValue())
       {
       this->Scale->SetValue(entryValue);

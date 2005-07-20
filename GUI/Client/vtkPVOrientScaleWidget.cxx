@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -305,7 +305,7 @@ void vtkPVOrientScaleWidget::Trace(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetVectors {"
         << this->VectorsMenu->GetValue() << "}" << endl;
   *file << "$kw(" << this->GetTclName() << ") SetScaleFactor "
-        << this->ScaleFactorEntry->GetValueAsFloat() << endl;
+        << this->ScaleFactorEntry->GetValueAsDouble() << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -632,7 +632,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
     maxBnds /= absMaxRange;
     }
 
-  this->ScaleFactorEntry->SetValue(maxBnds);
+  this->ScaleFactorEntry->SetValueAsDouble(maxBnds);
 }
 
 //----------------------------------------------------------------------------
@@ -815,7 +815,7 @@ void vtkPVOrientScaleWidget::Accept()
     }
   if (scaleFactorProp)
     {
-    scaleFactorProp->SetElement(0, this->ScaleFactorEntry->GetValueAsFloat());
+    scaleFactorProp->SetElement(0, this->ScaleFactorEntry->GetValueAsDouble());
     }
 
   this->Superclass::Accept();
@@ -871,7 +871,7 @@ void vtkPVOrientScaleWidget::ResetInternal()
     }    
   if (scaleFactorProp)
     {
-    this->ScaleFactorEntry->SetValue(scaleFactorProp->GetElement(0));
+    this->ScaleFactorEntry->SetValueAsDouble(scaleFactorProp->GetElement(0));
     }
 
   this->ModifiedFlag = 0;
@@ -915,7 +915,7 @@ void vtkPVOrientScaleWidget::SetVectors(char *vectors)
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetScaleFactor(float factor)
 {
-  this->ScaleFactorEntry->SetValue(factor);
+  this->ScaleFactorEntry->SetValueAsDouble(factor);
   this->ModifiedCallback();
 }
 
@@ -991,7 +991,7 @@ void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
         << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
         << this->SMScaleFactorPropertyName
-        << "] SetElement 0 " << this->ScaleFactorEntry->GetValueAsFloat()
+        << "] SetElement 0 " << this->ScaleFactorEntry->GetValueAsDouble()
         << endl;
 }
 

@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.10");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.11");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -134,21 +134,21 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
 void vtkPVExponentialKeyFrame::BaseChangedCallback()
 {
   this->SetBaseWithTrace(
-    this->BaseThumbWheel->GetEntry()->GetValueAsFloat());
+    this->BaseThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::EndPowerChangedCallback()
 {
   this->SetEndPowerWithTrace(
-    this->EndPowerThumbWheel->GetEntry()->GetValueAsFloat());
+    this->EndPowerThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::StartPowerChangedCallback()
 {
   this->SetStartPowerWithTrace(
-    this->StartPowerThumbWheel->GetEntry()->GetValueAsFloat());
+    this->StartPowerThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------

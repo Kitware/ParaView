@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.30");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -258,7 +258,7 @@ void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
   if ( this->Data->CriterionEnable->GetSelectedState() == 1 )
     { // User just toggled it on, so put in a default value
     this->Data->CriterionValue->SetEnabled( 1 );
-    this->Data->CriterionValue->SetValue( 1.e-5 );
+    this->Data->CriterionValue->SetValueAsDouble( 1.e-5 );
 
     if ( field[fnl] == ':' )
       {
@@ -319,7 +319,7 @@ void vtkPVTempTessellatorEntry::ChangeCriterionCallback()
 
   if ( field[fnl] == ':' )
     {
-    double value = this->Data->CriterionValue->GetValueAsFloat();
+    double value = this->Data->CriterionValue->GetValueAsDouble();
     if ( value <= 0.0 )
       {
       delete [] label;
@@ -447,7 +447,7 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
     this->ToggleCriterionCallback();
     }
 
-  d->CriterionValue->SetValue( crit );
+  d->CriterionValue->SetValueAsDouble( crit );
   this->ChangeCriterionCallback();
 
   this->ModifiedCallback();

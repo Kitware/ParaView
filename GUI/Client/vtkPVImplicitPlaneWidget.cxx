@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.61");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -233,7 +233,7 @@ void vtkPVImplicitPlaneWidget::CommonReset()
   if(sdvp)
     {
     double offset = sdvp->GetElement(0);
-    this->OffsetEntry->SetValue(offset);
+    this->OffsetEntry->SetValueAsDouble(offset);
     }
   else
     {
@@ -315,7 +315,7 @@ void vtkPVImplicitPlaneWidget::Accept()
     this->ImplicitFunctionProxy->GetProperty("Offset"));
   if (sdvp)
     {
-    sdvp->SetElement(0, this->OffsetEntry->GetValueAsFloat());
+    sdvp->SetElement(0, this->OffsetEntry->GetValueAsDouble());
     }
   else
     {
@@ -748,13 +748,13 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
 
     if(l == vtkCommand::WidgetModifiedEvent)
       {
-      this->CenterEntry[0]->SetValue(center[0]);
-      this->CenterEntry[1]->SetValue(center[1]);
-      this->CenterEntry[2]->SetValue(center[2]);
+      this->CenterEntry[0]->SetValueAsDouble(center[0]);
+      this->CenterEntry[1]->SetValueAsDouble(center[1]);
+      this->CenterEntry[2]->SetValueAsDouble(center[2]);
 
-      this->NormalEntry[0]->SetValue(normal[0]);
-      this->NormalEntry[1]->SetValue(normal[1]);
-      this->NormalEntry[2]->SetValue(normal[2]);
+      this->NormalEntry[0]->SetValueAsDouble(normal[0]);
+      this->NormalEntry[1]->SetValueAsDouble(normal[1]);
+      this->NormalEntry[2]->SetValueAsDouble(normal[2]);
 
       this->ModifiedCallback();
       this->ValueChanged = 0;
@@ -845,9 +845,9 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
   this->WidgetProxy->UpdateVTKObjects();
   this->Render();
 
-  this->CenterEntry[0]->SetValue(x);
-  this->CenterEntry[1]->SetValue(y);
-  this->CenterEntry[2]->SetValue(z);
+  this->CenterEntry[0]->SetValueAsDouble(x);
+  this->CenterEntry[1]->SetValueAsDouble(y);
+  this->CenterEntry[2]->SetValueAsDouble(z);
 
   this->UpdateOffsetRange();
 }
@@ -892,9 +892,9 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
   this->WidgetProxy->UpdateVTKObjects();
   this->Render();
 
-  this->NormalEntry[0]->SetValue(x);
-  this->NormalEntry[1]->SetValue(y);
-  this->NormalEntry[2]->SetValue(z);
+  this->NormalEntry[0]->SetValueAsDouble(x);
+  this->NormalEntry[1]->SetValueAsDouble(y);
+  this->NormalEntry[2]->SetValueAsDouble(z);
 
   this->UpdateOffsetRange();
 }
@@ -1022,13 +1022,13 @@ void vtkPVImplicitPlaneWidget::Update()
     this->GetCenterInternal(center);
     this->GetNormalInternal(normal);
   
-    this->CenterEntry[0]->SetValue(center[0]);
-    this->CenterEntry[1]->SetValue(center[1]);
-    this->CenterEntry[2]->SetValue(center[2]);
+    this->CenterEntry[0]->SetValueAsDouble(center[0]);
+    this->CenterEntry[1]->SetValueAsDouble(center[1]);
+    this->CenterEntry[2]->SetValueAsDouble(center[2]);
     
-    this->NormalEntry[0]->SetValue(normal[0]);
-    this->NormalEntry[1]->SetValue(normal[1]);
-    this->NormalEntry[2]->SetValue(normal[2]);
+    this->NormalEntry[0]->SetValueAsDouble(normal[0]);
+    this->NormalEntry[1]->SetValueAsDouble(normal[1]);
+    this->NormalEntry[2]->SetValueAsDouble(normal[2]);
 
     vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
     vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(

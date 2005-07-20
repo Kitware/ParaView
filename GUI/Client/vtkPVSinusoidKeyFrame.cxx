@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.11");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.12");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -146,21 +146,21 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 void vtkPVSinusoidKeyFrame::PhaseChangedCallback()
 {
   this->SetPhaseWithTrace(
-    this->PhaseThumbWheel->GetEntry()->GetValueAsFloat());
+    this->PhaseThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::OffsetChangedCallback()
 {
   this->SetOffsetWithTrace(
-    this->OffsetThumbWheel->GetEntry()->GetValueAsFloat());
+    this->OffsetThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::FrequencyChangedCallback()
 {
   this->SetFrequencyWithTrace(
-    this->FrequencyThumbWheel->GetEntry()->GetValueAsFloat());
+    this->FrequencyThumbWheel->GetEntry()->GetValueAsDouble());
 }
 
 //-----------------------------------------------------------------------------

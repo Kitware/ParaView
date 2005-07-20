@@ -24,7 +24,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.12");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.13");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -99,9 +99,9 @@ void vtkPVInteractorStyleCenterOfRotation::SetCenter(float x, float y, float z)
   vtkPVWindow *window = this->PVWindow;
   if (window)
     {
-    window->GetCenterXEntry()->SetValue(x);
-    window->GetCenterYEntry()->SetValue(y);
-    window->GetCenterZEntry()->SetValue(z);
+    window->GetCenterXEntry()->SetValueAsDouble(x);
+    window->GetCenterYEntry()->SetValueAsDouble(y);
+    window->GetCenterZEntry()->SetValueAsDouble(z);
     window->CenterEntryCallback();
     }
   window->ChangeInteractorStyle(1);

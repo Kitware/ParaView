@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.80");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.81");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
@@ -267,7 +267,7 @@ void vtkPVVectorEntry::Accept()
           entry = this->GetEntry(i);
           if (entry)
             {
-            dvp->SetElement(i, entry->GetValueAsFloat());
+            dvp->SetElement(i, entry->GetValueAsDouble());
             }
           }
         }
@@ -455,14 +455,14 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
-    entry->SetValue(values[idx]);
+    entry->SetValueAsDouble(values[idx]);
     if ( this->EntryValues[idx] )
       {
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = 
       vtksys::SystemTools::DuplicateString(entry->GetValue());
-    scalars[idx] = entry->GetValueAsFloat();
+    scalars[idx] = entry->GetValueAsDouble();
     }
   
   this->ModifiedCallback();

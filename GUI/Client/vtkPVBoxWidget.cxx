@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.60");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -678,9 +678,9 @@ void vtkPVBoxWidget::SetOrientationInternal(double x, double y, double z)
     }
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->OrientationScale[0]->GetEntry()->SetValue(x);
-  this->OrientationScale[1]->GetEntry()->SetValue(y);
-  this->OrientationScale[2]->GetEntry()->SetValue(z);
+  this->OrientationScale[0]->GetEntry()->SetValueAsDouble(x);
+  this->OrientationScale[1]->GetEntry()->SetValueAsDouble(y);
+  this->OrientationScale[2]->GetEntry()->SetValueAsDouble(z);
 }
 
 //----------------------------------------------------------------------------
@@ -694,9 +694,9 @@ void vtkPVBoxWidget::SetTranslateInternal(double x, double y, double z)
     }
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->TranslateThumbWheel[0]->GetEntry()->SetValue(x);
-  this->TranslateThumbWheel[1]->GetEntry()->SetValue(y);
-  this->TranslateThumbWheel[2]->GetEntry()->SetValue(z);
+  this->TranslateThumbWheel[0]->GetEntry()->SetValueAsDouble(x);
+  this->TranslateThumbWheel[1]->GetEntry()->SetValueAsDouble(y);
+  this->TranslateThumbWheel[2]->GetEntry()->SetValueAsDouble(z);
 }
 
 //----------------------------------------------------------------------------
@@ -710,9 +710,9 @@ void vtkPVBoxWidget::SetScaleInternal(double x, double y, double z)
     }
   this->WidgetProxy->UpdateVTKObjects();
   
-  this->ScaleThumbWheel[0]->GetEntry()->SetValue(x);
-  this->ScaleThumbWheel[1]->GetEntry()->SetValue(y);
-  this->ScaleThumbWheel[2]->GetEntry()->SetValue(z);
+  this->ScaleThumbWheel[0]->GetEntry()->SetValueAsDouble(x);
+  this->ScaleThumbWheel[1]->GetEntry()->SetValueAsDouble(y);
+  this->ScaleThumbWheel[2]->GetEntry()->SetValueAsDouble(z);
 }
 
 //----------------------------------------------------------------------------

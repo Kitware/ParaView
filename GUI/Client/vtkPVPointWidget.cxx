@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.56");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -330,9 +330,9 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     double pos[3];
     this->WidgetProxy->UpdateInformation();
     this->GetPositionInternal(pos);
-    this->PositionEntry[0]->SetValue(pos[0]);
-    this->PositionEntry[1]->SetValue(pos[1]);
-    this->PositionEntry[2]->SetValue(pos[2]);
+    this->PositionEntry[0]->SetValueAsDouble(pos[0]);
+    this->PositionEntry[1]->SetValueAsDouble(pos[1]);
+    this->PositionEntry[2]->SetValueAsDouble(pos[2]);
     }
  this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -370,9 +370,9 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->PositionEntry[0]->SetValue(x);
-  this->PositionEntry[1]->SetValue(y);
-  this->PositionEntry[2]->SetValue(z);
+  this->PositionEntry[0]->SetValueAsDouble(x);
+  this->PositionEntry[1]->SetValueAsDouble(y);
+  this->PositionEntry[2]->SetValueAsDouble(z);
 }
 
 //----------------------------------------------------------------------------

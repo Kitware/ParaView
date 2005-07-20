@@ -46,7 +46,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.64");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.65");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -598,10 +598,10 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
       this->WidgetProxy->UpdateInformation();
       this->GetCenterInternal(center);
       radius = this->GetRadiusInternal();
-      this->CenterEntry[0]->SetValue(center[0]);
-      this->CenterEntry[1]->SetValue(center[1]);
-      this->CenterEntry[2]->SetValue(center[2]);
-      this->RadiusEntry->SetValue(radius);
+      this->CenterEntry[0]->SetValueAsDouble(center[0]);
+      this->CenterEntry[1]->SetValueAsDouble(center[1]);
+      this->CenterEntry[2]->SetValueAsDouble(center[2]);
+      this->RadiusEntry->SetValueAsDouble(radius);
       this->ModifiedCallback();
       this->ValueChanged = 0;
       }
@@ -740,9 +740,9 @@ void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->CenterEntry[0]->SetValue(x);
-  this->CenterEntry[1]->SetValue(y);
-  this->CenterEntry[2]->SetValue(z);
+  this->CenterEntry[0]->SetValueAsDouble(x);
+  this->CenterEntry[1]->SetValueAsDouble(y);
+  this->CenterEntry[2]->SetValueAsDouble(z);
 }
 
 //----------------------------------------------------------------------------
@@ -758,7 +758,7 @@ void vtkPVSphereWidget::SetRadiusInternal(double r)
   dvp->SetElements1(r);
   this->WidgetProxy->UpdateVTKObjects(); 
 
-  this->RadiusEntry->SetValue(r);
+  this->RadiusEntry->SetValueAsDouble(r);
 }
 
 //----------------------------------------------------------------------------

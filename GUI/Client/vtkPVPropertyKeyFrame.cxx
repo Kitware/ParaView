@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -552,7 +552,7 @@ void vtkPVPropertyKeyFrame::ValueChangedCallback()
     {
     this->SetKeyValueWithTrace(0, 
       vtkKWThumbWheel::SafeDownCast(this->ValueWidget)->GetEntry()->
-      GetValueAsFloat());
+      GetValueAsDouble());
     }
   else if (vtkPVContourEntry::SafeDownCast(this->ValueWidget))
     {

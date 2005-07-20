@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.25");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.26");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -251,7 +251,7 @@ void vtkPVKeyFrame::UpdateValuesFromProxy()
 void vtkPVKeyFrame::TimeChangedCallback()
 {
   double ntime = this->GetNormalizedTime(
-    this->TimeThumbWheel->GetEntry()->GetValueAsFloat());
+    this->TimeThumbWheel->GetEntry()->GetValueAsDouble());
 
   if (ntime < 0 || ntime <= this->TimeBounds[0] ||
     ntime > 1 || ntime >= this->TimeBounds[1])
@@ -277,7 +277,7 @@ void vtkPVKeyFrame::SetDuration(double duration)
   if (this->TimeThumbWheel && this->TimeThumbWheel->GetEntry())
     {
     double ntime = this->GetNormalizedTime(
-      this->TimeThumbWheel->GetEntry()->GetValueAsFloat());
+      this->TimeThumbWheel->GetEntry()->GetValueAsDouble());
     this->SetKeyTime(ntime);
     }
 }

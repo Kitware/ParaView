@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.70");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.71");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -146,14 +146,14 @@ void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->Point1[0]->SetValue(x);
-  this->Point1[1]->SetValue(y);
-  this->Point1[2]->SetValue(z);
+  this->Point1[0]->SetValueAsDouble(x);
+  this->Point1[1]->SetValueAsDouble(y);
+  this->Point1[2]->SetValueAsDouble(z);
 
   double pos2[3];
   for (int i=0; i<3; i++)
     {
-    pos2[i] = this->Point2[i]->GetValueAsFloat();
+    pos2[i] = this->Point2[i]->GetValueAsDouble();
     }
 
   double d0, d1, d2;
@@ -203,14 +203,14 @@ void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->Point2[0]->SetValue(x);
-  this->Point2[1]->SetValue(y);
-  this->Point2[2]->SetValue(z);
+  this->Point2[0]->SetValueAsDouble(x);
+  this->Point2[1]->SetValueAsDouble(y);
+  this->Point2[2]->SetValueAsDouble(z);
 
   double pos1[3];
   for (int i=0; i<3; i++)
     {
-    pos1[i] = this->Point1[i]->GetValueAsFloat();
+    pos1[i] = this->Point1[i]->GetValueAsDouble();
     }
 
   double d0, d1, d2;
@@ -263,7 +263,7 @@ void vtkPVLineWidget::SetPoint1()
   int i;
   for (i=0; i<3; i++)
     {
-    pos[i] = this->Point1[i]->GetValueAsFloat();
+    pos[i] = this->Point1[i]->GetValueAsDouble();
     }
   this->SetPoint1(pos[0], pos[1], pos[2]);
   this->Render();
@@ -281,7 +281,7 @@ void vtkPVLineWidget::SetPoint2()
   int i;
   for (i=0; i<3; i++)
     {
-    pos[i] = this->Point2[i]->GetValueAsFloat();
+    pos[i] = this->Point2[i]->GetValueAsDouble();
     }
   this->SetPoint2(pos[0], pos[1], pos[2]);
   this->Render();
@@ -725,14 +725,14 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     int res;
     this->WidgetProxy->UpdateInformation();
     this->GetPoint1Internal(pos1);
-    this->Point1[0]->SetValue(pos1[0]);
-    this->Point1[1]->SetValue(pos1[1]);
-    this->Point1[2]->SetValue(pos1[2]);
+    this->Point1[0]->SetValueAsDouble(pos1[0]);
+    this->Point1[1]->SetValueAsDouble(pos1[1]);
+    this->Point1[2]->SetValueAsDouble(pos1[2]);
 
     this->GetPoint2Internal(pos2);
-    this->Point2[0]->SetValue(pos2[0]);
-    this->Point2[1]->SetValue(pos2[1]);
-    this->Point2[2]->SetValue(pos2[2]);
+    this->Point2[0]->SetValueAsDouble(pos2[0]);
+    this->Point2[1]->SetValueAsDouble(pos2[1]);
+    this->Point2[2]->SetValueAsDouble(pos2[2]);
 
     // Display the length of the line.
     double d0, d1, d2;
@@ -742,7 +742,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     this->DisplayLength(sqrt(d0*d0 + d1*d1 + d2*d2));
 
     res = this->GetResolutionInternal();
-    this->ResolutionEntry->SetValue(res);
+    this->ResolutionEntry->SetValueAsDouble(res);
 
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
