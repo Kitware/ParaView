@@ -32,7 +32,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Load the bwidgets.
+  // Load the BWidgets library.
   static void Initialize(Tcl_Interp*);
 
 protected:
@@ -43,6 +43,8 @@ protected:
                       const unsigned char *buffer, 
                       unsigned long length,
                       unsigned long decoded_length);
+
+  static int Initialized;
 
 private:
   vtkKWBWidgets(const vtkKWBWidgets&);   // Not implemented.

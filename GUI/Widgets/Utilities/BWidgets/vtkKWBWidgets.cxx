@@ -23,16 +23,27 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.2");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.3");
+
+int vtkKWBWidgets::Initialized = 0;
 
 //----------------------------------------------------------------------------
 void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 {
+  if (vtkKWBWidgets::Initialized)
+    {
+    return;
+    }
+
+  cout << "vtkKWBWidgets::Initialize" << endl;
+
   if (!interp)
     {
     vtkGenericWarningMacro("An interpreter is needed to initialize bwidgets.");
     return;
     }
+
+  vtkKWBWidgets::Initialized = 1;
 
   // Create the images required for tree.tcl
 
@@ -43,7 +54,8 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
         image_bwminus_width, image_bwminus_height, 
         image_bwminus_pixel_size, image_bwminus_length) ||
       !vtkKWTkUtilities::UpdatePhoto(
-        interp, "bwplus", 
+        interp, 
+        "bwplus", 
         image_bwplus, 
         image_bwplus_width, image_bwplus_height, 
         image_bwplus_pixel_size, image_bwplus_length))

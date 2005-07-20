@@ -15,9 +15,11 @@
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkObjectFactory.h"
 
+#include "Utilities/BWidgets/vtkKWBWidgets.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.6");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -44,6 +46,11 @@ vtkKWFrameWithScrollbar::~vtkKWFrameWithScrollbar()
 //----------------------------------------------------------------------------
 void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
 {
+  // Use BWidget's ScrolledWindow class:
+  // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
+
+  vtkKWBWidgets::Initialize(app ? app->GetMainInterp() : NULL);
+
   // Call the superclass to set the appropriate flags then create manually
 
   if (!this->Superclass::CreateSpecificTkWidget(app, "ScrolledWindow"))
