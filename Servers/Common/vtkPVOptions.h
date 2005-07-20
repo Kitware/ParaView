@@ -89,6 +89,10 @@ public:
   // Is this in render server mode.
   vtkGetMacro(ClientRenderServer, int);
 
+  // Description:
+  // Should this run print the version numbers and exit.
+  vtkGetMacro(TellVersion, int);
+
 protected:
   // Description:
   // Default constructor.
@@ -170,6 +174,7 @@ private:
   vtkSetStringMacro(GroupFileName);
   char* GroupFileName;
 
+  int TellVersion;
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
   void operator=(const vtkPVOptions&); // Not implemented

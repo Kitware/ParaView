@@ -39,7 +39,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.8");
+vtkCxxRevisionMacro(vtkPVMain, "1.9");
 
 
 
@@ -168,6 +168,15 @@ int vtkPVMain::Run(vtkPVOptions* options,
     {
     sscerr << options->GetHelp() << endl;
     vtkOutputWindow::GetInstance()->DisplayText( sscerr.str().c_str() );
+    return 1;
+    }
+  if (options->GetTellVersion() ) 
+    {
+    int MajorVersion = PARAVIEW_VERSION_MAJOR;
+    int MinorVersion = PARAVIEW_VERSION_MINOR;
+    char name[128];
+    sprintf(name, "ParaView%d.%d\n", MajorVersion, MinorVersion);
+    vtkOutputWindow::GetInstance()->DisplayText(name);
     return 1;
     }
 
