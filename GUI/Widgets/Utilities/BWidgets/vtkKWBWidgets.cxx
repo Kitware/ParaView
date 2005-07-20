@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.3");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.4");
 
 int vtkKWBWidgets::Initialized = 0;
 
@@ -34,8 +34,6 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     {
     return;
     }
-
-  cout << "vtkKWBWidgets::Initialize" << endl;
 
   if (!interp)
     {
