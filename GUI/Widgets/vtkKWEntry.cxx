@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.66");
+vtkCxxRevisionMacro(vtkKWEntry, "1.67");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -175,7 +175,7 @@ void vtkKWEntry::SetWidth(int width)
   this->Width = width;
   this->Modified();
 
-  if (this->Width > 0)
+  if (this->IsCreated() && this->Width > 0)
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
