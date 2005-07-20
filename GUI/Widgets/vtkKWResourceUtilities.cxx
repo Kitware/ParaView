@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.11");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.12");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -669,7 +669,7 @@ int vtkKWResourceUtilities::DecodeBuffer(
   unsigned char **output, unsigned long output_expected_length)
 {
   *output = NULL;
-  if (!input || input_length <= 0 || !output || output_expected_length < 0)
+  if (!input || input_length == 0 || !output || output_expected_length == 0)
     {
     return 0;
     }
