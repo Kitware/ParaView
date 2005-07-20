@@ -23,6 +23,7 @@
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWEntry;
+class vtkKWComboBox;
 class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
@@ -145,7 +146,7 @@ protected:
 
   vtkKWLabel *LabelWidget;
   vtkKWPushButton *BrowseButton;
-  vtkKWEntry *Entry;
+  vtkKWComboBox *Entry;
 
   char* Extension;
   int InSetValue;

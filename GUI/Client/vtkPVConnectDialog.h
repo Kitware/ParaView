@@ -35,6 +35,7 @@ class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWScale;
 class vtkKWEntryWithLabel;
+class vtkKWComboBoxWithLabel;
 class vtkKWApplication;
 class vtkStringList;
 
@@ -71,7 +72,7 @@ protected:
   ~vtkPVConnectDialog();
 
   vtkKWEntry* Username;
-  vtkKWEntryWithLabel* Hostname;
+  vtkKWComboBoxWithLabel* Hostname;
   vtkKWEntryWithLabel* Port;
   vtkKWLabel* Label;
   vtkKWCheckButtonWithLabel* MPIMode;

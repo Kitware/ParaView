@@ -14,16 +14,18 @@
 =========================================================================*/
 #include "vtkPVConnectDialog.h"
 
-#include "vtkPVApplication.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWCheckButtonWithLabel.h"
+#include "vtkKWComboBox.h"
+#include "vtkKWComboBoxWithLabel.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWCheckButtonWithLabel.h"
-#include "vtkKWEntryWithLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
 #include "vtkStringList.h"
 
@@ -31,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.24");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.25");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app)
@@ -93,11 +95,11 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app)
   this->MPIMode->GetLabel()->SetText("Use MPI");
   if ( this->MultiProcessMode == 1 )
     {
-    this->MPIMode->GetWidget()->SetState(1);
+    this->MPIMode->GetWidget()->SetSelectedState(1);
     }
   else
     {
-    this->MPIMode->GetWidget()->SetState(0);
+    this->MPIMode->GetWidget()->SetSelectedState(0);
     }
   this->MPIMode->GetWidget()->SetCommand(this, "MPICheckBoxCallback");
   this->MPINumberOfServers->SetParent(frame);
@@ -148,7 +150,7 @@ void vtkPVConnectDialog::OK()
   this->SetHostnameString(this->Hostname->GetWidget()->GetValue());
   this->PortInt = this->Port->GetWidget()->GetValueAsInt();
   this->NumberOfProcesses = static_cast<int>(this->MPINumberOfServers->GetValue());
-  if ( this->MPIMode->GetWidget()->GetState() )
+  if ( this->MPIMode->GetWidget()->GetSelectedState() )
     {
     this->MultiProcessMode = 1;
     }
@@ -208,7 +210,7 @@ int vtkPVConnectDialog::GetPortNumber()
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::MPICheckBoxCallback()
 {
-  if ( this->MPIMode->GetWidget()->GetState() )
+  if ( this->MPIMode->GetWidget()->GetSelectedState() )
     {
     this->MPINumberOfServers->EnabledOn();
     }
@@ -222,8 +224,7 @@ void vtkPVConnectDialog::MPICheckBoxCallback()
 vtkPVConnectDialog::vtkPVConnectDialog()
 {
   this->Username = vtkKWEntry::New();
-  this->Hostname = vtkKWEntryWithLabel::New();
-  this->Hostname->GetWidget()->PullDownOn();
+  this->Hostname = vtkKWComboBoxWithLabel::New();
   this->Port = vtkKWEntryWithLabel::New();
   this->Label = vtkKWLabel::New();
   this->MPINumberOfServers = vtkKWScale::New();

@@ -16,6 +16,7 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
+#include "vtkKWComboBox.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -71,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.115");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.116");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -79,8 +80,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Observer = vtkPVFileEntryObserver::New();
   this->Observer->FileEntry = this;
   this->LabelWidget = vtkKWLabel::New();
-  this->Entry = vtkKWEntry::New();
-  //this->Entry->PullDownOn();
+  this->Entry = vtkKWComboBox::New();
   this->BrowseButton = vtkKWPushButton::New();
   this->Extension = NULL;
   this->InSetValue = 0;
@@ -206,7 +206,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
   this->Entry->Create(app);
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  this->Entry->BindCommand(this, "EntryChangedCallback");
+  this->Entry->SetCommand(this, "EntryChangedCallback");
   // Change the order of the bindings so that the
   // modified command gets called after the entry changes.
   this->Script("bindtags %s [concat Entry [lreplace [bindtags %s] 1 1]]", 
