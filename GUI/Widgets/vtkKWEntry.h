@@ -54,8 +54,7 @@ public:
   // Description:
   // The width is the number of charaters wide the entry box can fit.
   // To keep from changing behavior of the entry,  the default
-  // value is 0 wich means the width is not explicitely set, the width will
-  // be just large enough to hold the value.
+  // value is 0 wich means the width is not explicitely set.
   virtual void SetWidth(int width);
   vtkGetMacro(Width, int);
 

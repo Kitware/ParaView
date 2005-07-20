@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.65");
+vtkCxxRevisionMacro(vtkKWEntry, "1.66");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -38,7 +38,10 @@ void vtkKWEntry::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetConfigurationOptionAsInt("-width", this->Width);
+  if (this->Width > 0)
+    {
+    this->SetConfigurationOptionAsInt("-width", this->Width);
+    }
 
   // Update enable state
 
@@ -172,7 +175,10 @@ void vtkKWEntry::SetWidth(int width)
   this->Width = width;
   this->Modified();
 
-  this->SetConfigurationOptionAsInt("-width", this->Width);
+  if (this->Width > 0)
+    {
+    this->SetConfigurationOptionAsInt("-width", this->Width);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -188,8 +194,6 @@ void vtkKWEntry::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  int disabled = this->ReadOnly || !this->GetEnabled();
-
   if (this->GetEnabled() && this->ReadOnly)
     {
     this->SetStateToReadOnly();
@@ -200,7 +204,7 @@ void vtkKWEntry::UpdateEnableState()
     }
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  if (disabled)
+  if (this->ReadOnly || !this->GetEnabled())
     {
     this->SetForegroundColor(0.0, 0.0, 0.0);
     this->SetbackgroundColor(1.0, 1.0, 1.0);
