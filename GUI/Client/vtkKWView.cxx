@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.21");
+vtkCxxRevisionMacro(vtkKWView, "1.22");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -964,7 +964,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
     if (pw->GetFileMenu()->HasItem(
           vtkKWWindowBase::PrintOptionsMenuLabel))
       {
-      idx = pw->GetFileMenu()->GetIndex(
+      idx = pw->GetFileMenu()->GetIndexOfItem(
         vtkKWWindowBase::PrintOptionsMenuLabel) + 1;  
       }
     else

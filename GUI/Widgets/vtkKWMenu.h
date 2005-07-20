@@ -151,7 +151,7 @@ public:
   // Description:
   // Returns the integer index of the menu item by string, or by the
   // command (object/method) pair associated to it.
-  int GetIndex(const char* item);
+  int GetIndexOfItem(const char* item);
   int GetIndexOfCommand(vtkObject* Object, const char* MethodAndArgString);
 
   // Description:
@@ -205,10 +205,10 @@ public:
   // Description:
   // Set/Get state of the menu entry with a given index or name.
   // Valid constants can be found in vtkKWTkOptions::StateType.
-  virtual void SetState(int index, int state);
-  virtual void SetState(const char* item, int state);
-  virtual int  GetState(int index);
-  virtual int  GetState(const char* item);
+  virtual void SetItemState(int index, int state);
+  virtual void SetItemState(const char* item, int state);
+  virtual int  GetItemState(int index);
+  virtual int  GetItemState(const char* item);
 
   // Description:
   // Convenience method to set the state of all entries.

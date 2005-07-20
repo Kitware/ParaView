@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.14");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.15");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -789,7 +789,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
         ++count;
         if (!(count % 9))
           {
-          menu->ConfigureItem(menu->GetIndex(preset_label.c_str()), 
+          menu->ConfigureItem(menu->GetIndexOfItem(preset_label.c_str()), 
                               "-columnbreak 1");
           }
 

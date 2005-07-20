@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.754");
+vtkCxxRevisionMacro(vtkPVWindow, "1.755");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1390,7 +1390,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
-  this->GetFileMenu()->SetState(
+  this->GetFileMenu()->SetItemState(
     VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWTkOptions::StateDisabled);
 
   if (app->GetSaveUserInterfaceGeometry())
@@ -3333,13 +3333,13 @@ void vtkPVWindow::UpdateSourceMenu()
   // If there are no filters, disable the menu.
   if (numSources > 0)
     {
-    this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
-                              vtkKWTkOptions::StateNormal);
+    this->GetMenu()->SetItemState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+                                  vtkKWTkOptions::StateNormal);
     }
   else
     {
-    this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
-                              vtkKWTkOptions::StateDisabled);
+    this->GetMenu()->SetItemState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+                                  vtkKWTkOptions::StateDisabled);
     }
 }
 
@@ -3436,8 +3436,8 @@ void vtkPVWindow::UpdateFilterMenu()
             this->CurrentPVSource, vi->second) ||
           !vi->second->GetNumberOfProcessorsValid())
         {
-        this->FilterMenu->SetState(ki->first.c_str(), 
-                                   vtkKWTkOptions::StateDisabled);
+        this->FilterMenu->SetItemState(ki->first.c_str(), 
+                                       vtkKWTkOptions::StateDisabled);
         }
       else if (vi->second->GetToolbarModule())
         {
@@ -4422,7 +4422,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     {
     this->ReaderList->AppendItem(prototype);
     }
-  this->GetFileMenu()->SetState(
+  this->GetFileMenu()->SetItemState(
     VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWTkOptions::StateNormal);
 }
 
@@ -4867,21 +4867,21 @@ void vtkPVWindow::UpdateMenuState()
     {
     vtkKWMenu* menu = this->GetMenu();
     menu->SetState(vtkKWTkOptions::StateDisabled);
-    this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
     if (this->WindowMenu)
       {
       this->WindowMenu->SetState(vtkKWTkOptions::StateDisabled);
       }
-    this->WindowMenu->SetState("Command Prompt", menu_state);
-    this->WindowMenu->SetState("Timer Log", menu_state);
-    this->WindowMenu->SetState("Error Log", menu_state);
-    this->WindowMenu->SetState(vtkPVWindow::ComparativeVisMenuLabel, menu_state);
+    this->WindowMenu->SetItemState("Command Prompt", menu_state);
+    this->WindowMenu->SetItemState("Timer Log", menu_state);
+    this->WindowMenu->SetItemState("Error Log", menu_state);
+    this->WindowMenu->SetItemState(vtkPVWindow::ComparativeVisMenuLabel, menu_state);
 
     if (this->FileMenu)
       {
-      this->GetMenu()->SetState(vtkKWWindowBase::FileMenuLabel,  menu_state);
+      this->GetMenu()->SetItemState(vtkKWWindowBase::FileMenuLabel,  menu_state);
       this->FileMenu->SetState(vtkKWTkOptions::StateDisabled);
-      this->FileMenu->SetState(vtkPVWindow::FileExitMenuLabel, menu_state);
+      this->FileMenu->SetItemState(vtkPVWindow::FileExitMenuLabel, menu_state);
       }
     return;
     }
@@ -4915,11 +4915,11 @@ void vtkPVWindow::UpdateMenuState()
 
   if (!source_grabbed)
     {
-    this->GetMenu()->SetState(vtkKWWindowBase::FileMenuLabel,  menu_state);
-    this->GetMenu()->SetState(vtkKWWindowBase::EditMenuLabel,  menu_state);
-    this->GetMenu()->SetState(vtkKWWindowBase::ViewMenuLabel,  menu_state);
-    this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
-    this->GetMenu()->SetState(
+    this->GetMenu()->SetItemState(vtkKWWindowBase::FileMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(vtkKWWindowBase::EditMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(vtkKWWindowBase::ViewMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(
       vtkKWWindowBase::HelpMenuLabel,  menu_state);
     }
 
@@ -4935,13 +4935,13 @@ void vtkPVWindow::UpdateMenuState()
     {
     this->SelectMenu->SetEnabled(no_sources ? 0 : this->GetEnabled());
     }
-  this->GetMenu()->SetState(
+  this->GetMenu()->SetItemState(
     VTK_PV_SELECT_SOURCE_MENU_LABEL, 
     no_sources || source_grabbed ? vtkKWTkOptions::StateDisabled : menu_state);
 
   if (this->ViewMenu)
     {
-    this->ViewMenu->SetState(
+    this->ViewMenu->SetItemState(
       VTK_PV_SOURCE_MENU_LABEL, 
       no_sources || source_grabbed ? vtkKWTkOptions::StateDisabled : menu_state);
     }
@@ -4949,7 +4949,7 @@ void vtkPVWindow::UpdateMenuState()
   // Handle the filter menu
 
   this->UpdateFilterMenu();
-  this->GetMenu()->SetState(
+  this->GetMenu()->SetItemState(
     VTK_PV_VTK_FILTERS_MENU_LABEL,  
     !this->FilterMenu->GetEnabled() || source_grabbed 
     ? vtkKWTkOptions::StateDisabled : menu_state);

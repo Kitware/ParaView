@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.78");
+vtkCxxRevisionMacro(vtkKWMenu, "1.79");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -316,7 +316,7 @@ void vtkKWMenu::SetCascade(const char* item, vtkKWMenu* menu)
     {
     return;
     }
-  this->SetCascade(this->GetIndex(item), menu->GetWidgetName());
+  this->SetCascade(this->GetIndexOfItem(item), menu->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -326,7 +326,7 @@ void vtkKWMenu::SetCascade(const char* item, const char* menu)
     {
     return;
     }
-  this->SetCascade(this->GetIndex(item), menu);
+  this->SetCascade(this->GetIndexOfItem(item), menu);
 }
 
 //----------------------------------------------------------------------------
@@ -636,7 +636,7 @@ void vtkKWMenu::Invoke(const char* item)
     {
     return;
     }
-  this->Invoke(this->GetIndex(item));
+  this->Invoke(this->GetIndexOfItem(item));
 }
 
 //----------------------------------------------------------------------------
@@ -682,7 +682,7 @@ void vtkKWMenu::DeleteAllMenuItems()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetIndex(const char* menuname)
+int vtkKWMenu::GetIndexOfItem(const char* menuname)
 {
   return atoi(this->Script("%s index {%s}", this->GetWidgetName(), menuname));
 }
@@ -781,7 +781,7 @@ void vtkKWMenu::InsertSeparator(int position)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetState(int index)
+int vtkKWMenu::GetItemState(int index)
 {
   const char *state = 
     this->Script("%s entrycget %d -state", this->GetWidgetName(), index);
@@ -789,17 +789,17 @@ int vtkKWMenu::GetState(int index)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetState(const char* item)
+int vtkKWMenu::GetItemState(const char* item)
 {
   if (!this->HasItem(item))
     {
     return vtkKWTkOptions::StateUnknown;
     }
-  return this->GetState(this->GetIndex(item));
+  return this->GetItemState(this->GetIndexOfItem(item));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetState(int index, int state)
+void vtkKWMenu::SetItemState(int index, int state)
 {
   if (this->IsCreated())
     {
@@ -811,13 +811,13 @@ void vtkKWMenu::SetState(int index, int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetState(const char* item, int state)
+void vtkKWMenu::SetItemState(const char* item, int state)
 {
   if (!this->HasItem(item))
     {
     return;
     }
-  this->SetState(this->GetIndex(item), state);
+  this->SetItemState(this->GetIndexOfItem(item), state);
 }
 
 //----------------------------------------------------------------------------
@@ -887,7 +887,7 @@ void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString
     {
     return;
     }
-  this->SetEntryCommand(this->GetIndex(item), MethodAndArgString);
+  this->SetEntryCommand(this->GetIndexOfItem(item), MethodAndArgString);
 }
 
 //----------------------------------------------------------------------------
@@ -898,7 +898,7 @@ void vtkKWMenu::SetEntryCommand(const char* item, vtkObject* object,
     {
     return;
     }
-  int index = this->GetIndex(item);
+  int index = this->GetIndexOfItem(item);
   this->SetEntryCommand(index, object, MethodAndArgString);
 }
 
@@ -930,7 +930,7 @@ const char* vtkKWMenu::GetItemOption(int idx, const char *option)
 //----------------------------------------------------------------------------
 const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
 {
-  return this->GetItemOption(this->GetIndex(item), option);
+  return this->GetItemOption(this->GetIndexOfItem(item), option);
 }
 
 //----------------------------------------------------------------------------
@@ -955,7 +955,7 @@ void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemCompoundImage(const char *item, const char *imagename)
 {
-  this->SetItemCompoundImage(this->GetIndex(item), imagename);
+  this->SetItemCompoundImage(this->GetIndexOfItem(item), imagename);
 }
 
 //----------------------------------------------------------------------------
@@ -974,7 +974,7 @@ void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemAccelerator(const char *item, const char *accelerator)
 {
-  this->SetItemAccelerator(this->GetIndex(item), accelerator);
+  this->SetItemAccelerator(this->GetIndexOfItem(item), accelerator);
 }
 
 //----------------------------------------------------------------------------

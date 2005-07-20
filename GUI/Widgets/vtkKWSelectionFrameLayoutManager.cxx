@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.27");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -499,7 +499,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
     sprintf(label, VTK_KW_SFLMGR_LABEL_PATTERN, res[idx][0], res[idx][1]);
-    this->ResolutionEntriesMenu->SetState(
+    this->ResolutionEntriesMenu->SetItemState(
       label, 
       (size_t)(res[idx][0] * res[idx][1]) <= 
       (size + (res[idx][0] != 1 && res[idx][1] != 1 ? 1 : 0))

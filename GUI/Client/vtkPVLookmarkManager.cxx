@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.51");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.52");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -343,8 +343,8 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuEdit->AddSeparator();
   this->MenuEdit->AddCommand("Select All", this, "AllOnOffCallback 1");
   this->MenuEdit->AddCommand("Clear All", this, "AllOnOffCallback 0");
-  this->MenuEdit->SetState("Undo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetState("Redo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
 
   // Menu : Help
 
@@ -886,8 +886,8 @@ void vtkPVLookmarkManager::Checkpoint()
   this->GetTraceHelper()->AddEntry("$kw(%s) Checkpoint",
                       this->GetTclName());
 
-  this->MenuEdit->SetState("Undo", vtkKWTkOptions::StateNormal);
-  this->MenuEdit->SetState("Redo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateNormal);
+  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
 
 }
 
@@ -899,8 +899,8 @@ void vtkPVLookmarkManager::RedoCallback()
 
   this->UndoRedoInternal();
 
-  this->MenuEdit->SetState("Redo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetState("Undo", vtkKWTkOptions::StateNormal);
+  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateNormal);
 }
 
 
@@ -912,8 +912,8 @@ void vtkPVLookmarkManager::UndoCallback()
 
   this->UndoRedoInternal();
 
-  this->MenuEdit->SetState("Undo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetState("Redo", vtkKWTkOptions::StateNormal);
+  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateNormal);
 }
 
 //----------------------------------------------------------------------------

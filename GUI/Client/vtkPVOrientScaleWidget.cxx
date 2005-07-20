@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -460,7 +460,7 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   if (numScalars == 0)
     {
     // disabled
-    scaleMenu->SetState("Scalar", vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState("Scalar", vtkKWTkOptions::StateDisabled);
     if (!strcmp(scaleMode, "Scalar"))
       {
       if (numVectors == 0)
@@ -477,15 +477,15 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   else
     {
     // normal
-    scaleMenu->SetState("Scalar", vtkKWTkOptions::StateNormal);
+    scaleMenu->SetItemState("Scalar", vtkKWTkOptions::StateNormal);
     }
   
   if (numVectors == 0)
     {
     // disabled
-    orientMenu->SetState("Vector", vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetState("Vector Magnitude", vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetState("Vector Components", vtkKWTkOptions::StateDisabled);
+    orientMenu->SetItemState("Vector", vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState("Vector Magnitude", vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState("Vector Components", vtkKWTkOptions::StateDisabled);
     if (!strcmp(this->OrientModeMenu->GetValue(), "Vector"))
       {
       this->OrientModeMenu->SetValue("Off");
@@ -508,9 +508,9 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   else
     {
     // normal
-    orientMenu->SetState("Vector", vtkKWTkOptions::StateNormal);
-    scaleMenu->SetState("Vector Magnitude", vtkKWTkOptions::StateNormal);
-    scaleMenu->SetState("Vector Components", vtkKWTkOptions::StateNormal);
+    orientMenu->SetItemState("Vector", vtkKWTkOptions::StateNormal);
+    scaleMenu->SetItemState("Vector Magnitude", vtkKWTkOptions::StateNormal);
+    scaleMenu->SetItemState("Vector Components", vtkKWTkOptions::StateNormal);
     }
   
   this->UpdateScaleFactor();
@@ -805,12 +805,12 @@ void vtkPVOrientScaleWidget::Accept()
     }
   if (orientModeProp)
     {
-    orientModeProp->SetElement(0, this->OrientModeMenu->GetMenu()->GetIndex(
+    orientModeProp->SetElement(0, this->OrientModeMenu->GetMenu()->GetIndexOfItem(
       this->OrientModeMenu->GetValue()));
     }
   if (scaleModeProp)
     {
-    scaleModeProp->SetElement(0, this->ScaleModeMenu->GetMenu()->GetIndex(
+    scaleModeProp->SetElement(0, this->ScaleModeMenu->GetMenu()->GetIndexOfItem(
       this->ScaleModeMenu->GetValue()));
     }
   if (scaleFactorProp)
@@ -981,12 +981,12 @@ void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
         << this->VectorsMenu->GetValue() << "}" << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
         << this->SMOrientModePropertyName << "] SetElement 0 " 
-        << this->OrientModeMenu->GetMenu()->GetIndex(
+        << this->OrientModeMenu->GetMenu()->GetIndexOfItem(
           this->OrientModeMenu->GetValue())
         << endl;;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
         << this->SMScaleModePropertyName << "] SetElement 0 " 
-        << this->ScaleModeMenu->GetMenu()->GetIndex(
+        << this->ScaleModeMenu->GetMenu()->GetIndexOfItem(
           this->ScaleModeMenu->GetValue())
         << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 

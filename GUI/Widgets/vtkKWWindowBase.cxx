@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.26");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.27");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -778,7 +778,7 @@ int vtkKWWindowBase::GetFileMenuInsertPosition()
 
   if (this->GetFileMenu()->HasItem(vtkKWWindowBase::PrintOptionsMenuLabel))
     {
-    return this->GetFileMenu()->GetIndex(
+    return this->GetFileMenu()->GetIndexOfItem(
       vtkKWWindowBase::PrintOptionsMenuLabel);
     }
 
@@ -786,13 +786,13 @@ int vtkKWWindowBase::GetFileMenuInsertPosition()
 
   if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileCloseMenuLabel))
     {
-    return this->GetFileMenu()->GetIndex(
+    return this->GetFileMenu()->GetIndexOfItem(
       vtkKWWindowBase::FileCloseMenuLabel);  
     }
 
   if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileExitMenuLabel))
     {
-    return this->GetFileMenu()->GetIndex(vtkKWWindowBase::FileExitMenuLabel);  
+    return this->GetFileMenu()->GetIndexOfItem(vtkKWWindowBase::FileExitMenuLabel);  
     }
 
   return this->GetHelpMenu()->GetNumberOfItems();
@@ -902,7 +902,7 @@ int vtkKWWindowBase::GetHelpMenuInsertPosition()
 
   if (this->GetHelpMenu()->HasItem("About*"))
     {
-    return this->GetHelpMenu()->GetIndex("About*") - 1;
+    return this->GetHelpMenu()->GetIndexOfItem("About*") - 1;
     }
 
   return this->GetHelpMenu()->GetNumberOfItems();

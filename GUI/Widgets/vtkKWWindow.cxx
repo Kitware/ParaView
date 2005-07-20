@@ -44,7 +44,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.262");
+vtkCxxRevisionMacro(vtkKWWindow, "1.263");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -998,11 +998,11 @@ void vtkKWWindow::UpdateMenuState()
     int idx = -1;
     if (this->WindowMenu->HasItem(vtkKWWindow::HideMainPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndex(vtkKWWindow::HideMainPanelMenuLabel);
+      idx = this->WindowMenu->GetIndexOfItem(vtkKWWindow::HideMainPanelMenuLabel);
       }
     else if (this->WindowMenu->HasItem(vtkKWWindow::ShowMainPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndex(vtkKWWindow::ShowMainPanelMenuLabel);
+      idx = this->WindowMenu->GetIndexOfItem(vtkKWWindow::ShowMainPanelMenuLabel);
       }
     if (idx >= 0)
       {
@@ -1022,13 +1022,13 @@ void vtkKWWindow::UpdateMenuState()
     int idx = -1;
     if (this->WindowMenu->HasItem(vtkKWWindow::HideSecondaryPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndex(
+      idx = this->WindowMenu->GetIndexOfItem(
         vtkKWWindow::HideSecondaryPanelMenuLabel);
       }
     else if (this->WindowMenu->HasItem(
                vtkKWWindow::ShowSecondaryPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndex(
+      idx = this->WindowMenu->GetIndexOfItem(
         vtkKWWindow::ShowSecondaryPanelMenuLabel);
       }
     if (idx >= 0)

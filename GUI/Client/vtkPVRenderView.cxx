@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.396");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.397");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -876,7 +876,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
     {
     return;
     }
-  int prop_position = viewmenu->GetIndex(VTK_PV_VIEW_MENU_LABEL);
+  int prop_position = viewmenu->GetIndexOfItem(VTK_PV_VIEW_MENU_LABEL);
 
   // First check where we are in the view menu
 
@@ -902,12 +902,12 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
       {
       // This entry of the view menu must be in "normal" state to switch
       // between source and 3D views.
-      int state = viewmenu->GetState(this->MenuLabelSwitchBackAndForthToViewProperties);
-      viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
+      int state = viewmenu->GetItemState(this->MenuLabelSwitchBackAndForthToViewProperties);
+      viewmenu->SetItemState(this->MenuLabelSwitchBackAndForthToViewProperties,
                          vtkKWTkOptions::StateNormal);
       viewmenu->Invoke(
-        viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
-      viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
+        viewmenu->GetIndexOfItem(this->MenuLabelSwitchBackAndForthToViewProperties));
+      viewmenu->SetItemState(this->MenuLabelSwitchBackAndForthToViewProperties,
                          state);
       }
     }
