@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.49");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -456,6 +456,9 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetApplication(this->GetApplication());
   newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
   newLookmark->Create(this->GetPVApplication());
+  char methodAndArg[200];
+  sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
+  newLookmark->GetCheckbox()->SetCommand(this,methodAndArg);
   newLookmark->UpdateWidgetValues();
   newLookmark->CommentsModifiedCallback();
   this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
@@ -473,6 +476,86 @@ void vtkPVLookmarkManager::SetLookmarkMacros(char *string)
   strcpy(this->LookmarkMacros,string);
 }
 */
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::SelectItemCallback(char *widgetName)
+{
+  // loop thru till you find the widget that this name belongs to 
+  // if it has been selected and it is a lookmark, return, if it is a folder, call selectcallback and return
+  // loop thru folders, checking whether given widget is inside of it
+  // if it is, and the folder is selected, deselect it
+  // if widget is a folder, call selectcallback
+
+  vtkKWWidget *widget = NULL;
+  vtkPVLookmark *lookmarkWidget;
+  vtkKWLookmarkFolder *lmkFolderWidget;
+  vtkIdType numberOfLookmarkWidgets, numberOfLookmarkFolders;
+  numberOfLookmarkWidgets = this->PVLookmarks->GetNumberOfItems();
+  numberOfLookmarkFolders = this->LmkFolderWidgets->GetNumberOfItems();
+  int i = 0;
+  for(i=numberOfLookmarkWidgets-1;i>=0;i--)
+    {
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
+    if(!strcmp(lookmarkWidget->GetWidgetName(),widgetName))
+      {
+      widget = lookmarkWidget;
+      break;
+      }
+    }
+  if(!widget)
+    {
+    for(i=numberOfLookmarkFolders-1;i>=0;i--)
+      {
+      this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
+      if(!strcmp(lmkFolderWidget->GetWidgetName(),widgetName))
+        {
+        widget = lmkFolderWidget;
+        break;
+        }
+      }
+    }
+  if(!widget)
+    {
+    return;
+    }
+
+  lookmarkWidget = vtkPVLookmark::SafeDownCast(widget);
+  vtkKWLookmarkFolder *folderWidget = vtkKWLookmarkFolder::SafeDownCast(widget);
+  if(lookmarkWidget)
+    {
+    if(lookmarkWidget->GetSelectionState())
+      {
+      return;
+      }
+    for(i=numberOfLookmarkFolders-1;i>=0;i--)
+      {
+      this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
+      if(this->IsWidgetInsideFolder(lookmarkWidget,lmkFolderWidget) && lmkFolderWidget->GetSelectionState())
+        {
+        lmkFolderWidget->SetSelectionState(0);
+        }
+      }
+    }
+  else if(folderWidget)
+    {
+    if(folderWidget->GetSelectionState())
+      {
+      folderWidget->SelectCallback();
+      return;
+      }
+    for(i=numberOfLookmarkFolders-1;i>=0;i--)
+      {
+      this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
+      if(this->IsWidgetInsideFolder(folderWidget,lmkFolderWidget) && lmkFolderWidget->GetSelectionState())
+        {
+        lmkFolderWidget->SetSelectionState(0);
+        }
+      }
+    folderWidget->SelectCallback();
+    }
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::ImportMacroExamplesCallback()
 {
@@ -1281,6 +1364,9 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     lmkWidget->UpdateVariableValues();
     newLmkWidget->SetParent(dstPrnt);
     newLmkWidget->Create(this->GetPVApplication());
+    char methodAndArg[200];
+    sprintf(methodAndArg,"SelectItemCallback %s",newLmkWidget->GetWidgetName());
+    newLmkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     newLmkWidget->SetName(lmkWidget->GetName());
     newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
     ostrstream s;
@@ -1343,6 +1429,9 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     newLmkFolder->SetMacroFlag(lmkFolder->GetMacroFlag());
     newLmkFolder->SetParent(dstPrnt);
     newLmkFolder->Create(this->GetPVApplication());
+    char methodAndArg[200];
+    sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
+    newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
     newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetText());
     newLmkFolder->SetLocation(newLoc);
 
@@ -1389,8 +1478,10 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
       }
  //   lmkFolderWidget->SetParent(this->LmkScrollFrame->GetFrame());
     lmkFolderWidget->Create(this->GetPVApplication());
+    char methodAndArg[200];
+    sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
+    lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
-
     lmkFolderWidget->SetFolderName(lmkElement->GetAttribute("Name"));
     lmkFolderWidget->SetLocation(locationOfLmkItemAmongSiblings);
 
@@ -1432,6 +1523,9 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
       }
     lookmarkWidget->SetParent(parent);
     lookmarkWidget->Create(this->GetPVApplication());
+    char methodAndArg[200];
+    sprintf(methodAndArg,"SelectItemCallback %s",lookmarkWidget->GetWidgetName());
+    lookmarkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     lookmarkWidget->UpdateWidgetValues();
     lookmarkWidget->CommentsModifiedCallback();
     this->Script("pack %s -fill both -expand yes -padx 8",lookmarkWidget->GetWidgetName());
@@ -1798,6 +1892,9 @@ void vtkPVLookmarkManager::CreateMacroCallback()
   newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
   newLookmark->SetMacroFlag(1);
   newLookmark->Create(this->GetPVApplication());
+  char methodAndArg[200];
+  sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
+  newLookmark->GetCheckbox()->SetCommand(this,methodAndArg);
   newLookmark->SetName(this->GetUnusedLookmarkName());
   newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream s;
@@ -1879,6 +1976,9 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
   // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
   newLookmark->SetParent(this->LmkScrollFrame->GetFrame());
   newLookmark->Create(this->GetPVApplication());
+  char methodAndArg[200];
+  sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
+  newLookmark->GetCheckbox()->SetCommand(this,methodAndArg);
   newLookmark->SetName(name);
   newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream s;
@@ -3005,6 +3105,9 @@ void vtkPVLookmarkManager::CreateFolderCallback()
   // append to the end of the lookmark manager:
   lmkFolderWidget->SetParent(this->LmkScrollFrame->GetFrame());
   lmkFolderWidget->Create(this->GetPVApplication());
+  char methodAndArg[200];
+  sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
+  lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
   this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
   this->Script("%s configure -height 8",lmkFolderWidget->GetLabelFrame()->GetFrame()->GetWidgetName());
   lmkFolderWidget->SetFolderName("New Folder");
@@ -3107,6 +3210,9 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
       newLmkFolder->SetParent(packingFrame);
       newLmkFolder->Create(this->GetPVApplication());
+      char methodAndArg[200];
+      sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
+      newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
       newLmkFolder->SetFolderName(oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
       newLmkFolder->SetLocation(oldLmkFolder->GetLocation());
       this->Script("pack %s -fill both -expand yes -padx 8",newLmkFolder->GetWidgetName());
@@ -3147,6 +3253,9 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
         }
       newLmkWidget->SetParent(packingFrame);
       newLmkWidget->Create(this->GetPVApplication());
+      char methodAndArg[200];
+      sprintf(methodAndArg,"SelectItemCallback %s",newLmkWidget->GetWidgetName());
+      newLmkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
       newLmkWidget->SetName(oldLmkWidget->GetName());
       newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;

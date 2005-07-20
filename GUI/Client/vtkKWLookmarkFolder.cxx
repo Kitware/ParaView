@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.20");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -122,7 +122,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->Checkbox->SetIndicator(1);
   this->Checkbox->Create(app);
   this->Checkbox->SetState(0);
-  this->Checkbox->SetCommand(this, "SelectCallback");
+//  this->Checkbox->SetCommand(this, "SelectCallback");
 
   if(!this->MacroFlag)
     {
@@ -280,7 +280,13 @@ void vtkKWLookmarkFolder::DragAndDropEndCallback(int, int)
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::SetSelectionState(int flag)
 {
-  this->ToggleNestedCheckBoxes(this, flag);
+  this->Checkbox->SetState(flag);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLookmarkFolder::GetSelectionState()
+{
+  return this->Checkbox->GetState();
 }
 
 //----------------------------------------------------------------------------
@@ -294,12 +300,6 @@ void vtkKWLookmarkFolder::SelectCallback()
     {
     this->ToggleNestedCheckBoxes(this->LabelFrame, 0);
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWLookmarkFolder::GetSelectionState()
-{
-  return this->Checkbox->GetState();
 }
 
 

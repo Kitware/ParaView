@@ -88,6 +88,7 @@ public:
   vtkSetMacro(MacroFlag,int);
   vtkGetMacro(MacroFlag,int);
 
+  vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
 
 protected:
 

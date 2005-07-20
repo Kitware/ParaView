@@ -165,6 +165,8 @@ public:
   void AddMacroExampleCallback(int index);
   void ImportMacroExamplesCallback();
 
+  void SelectItemCallback(char *name);
+
 protected:
 
   vtkPVLookmarkManager();

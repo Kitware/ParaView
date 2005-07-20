@@ -78,6 +78,8 @@ public:
   // Made available for vtkPVLookmarkManager's management of drag-and-drop targets
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
 
+  vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
+
   // Description:
   // When EditLookmarkCallback is called, an editable text widget appears in place of the label and contains the old name.
   // The user edits this as appropriate and pressing 'Return' then calls ChangeLookmarkName
