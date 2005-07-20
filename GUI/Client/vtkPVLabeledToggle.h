@@ -42,8 +42,8 @@ public:
   
   // Description:
   // This method allows scripts to modify the widgets value.
-  void SetState(int val);
-  int GetState();
+  void SetSelectedState(int val);
+  int GetSelectedState();
 
   // Description:
   // This class redefines SetBalloonHelpString since it

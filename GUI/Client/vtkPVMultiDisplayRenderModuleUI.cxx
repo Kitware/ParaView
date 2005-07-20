@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModuleUI::vtkPVMultiDisplayRenderModuleUI()
@@ -45,9 +45,9 @@ void vtkPVMultiDisplayRenderModuleUI::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   // We do not have these options.
-  this->CompositeWithFloatCheck->SetState(0);
+  this->CompositeWithFloatCheck->SetSelectedState(0);
   this->CompositeWithFloatCheck->SetEnabled(0);
-  this->CompositeWithRGBACheck->SetState(0);
+  this->CompositeWithRGBACheck->SetSelectedState(0);
   this->CompositeWithRGBACheck->SetEnabled(0);
 }
 

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.39");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -90,19 +90,25 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::SetState(int val)
+void vtkPVLabeledToggle::SetSelectedState(int val)
 {
   int oldVal;
   
-  oldVal = this->CheckButton->GetState();
+  oldVal = this->CheckButton->GetSelectedState();
   if (val == oldVal)
     {
     return;
     }
 
-  this->CheckButton->SetState(val);
+  this->CheckButton->SetSelectedState(val);
   
   this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLabeledToggle::GetSelectedState() 
+{ 
+  return this->CheckButton->GetSelectedState(); 
 }
 
 //----------------------------------------------------------------------------
@@ -125,8 +131,8 @@ void vtkPVLabeledToggle::Trace(ofstream *file)
     return;
     }
 
-  *file << "$kw(" << this->GetTclName() << ") SetState "
-        << this->GetState() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetSelectedState "
+        << this->GetSelectedState() << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,7 +148,7 @@ void vtkPVLabeledToggle::SaveInBatchScript(ofstream *file)
   
   *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMPropertyName << "] SetElement 0 "
-        << this->GetState() << endl;
+        << this->GetSelectedState() << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -153,7 +159,7 @@ void vtkPVLabeledToggle::Accept()
   
   if (ivp)
     {
-    ivp->SetElement(0, this->GetState());
+    ivp->SetElement(0, this->GetSelectedState());
     }
   else
     {
@@ -173,7 +179,7 @@ void vtkPVLabeledToggle::Initialize()
     this->GetSMProperty());
   if (ivp)
     {
-    this->SetState(ivp->GetElement(0));
+    this->SetSelectedState(ivp->GetElement(0));
     }
 }
 
@@ -261,12 +267,6 @@ void vtkPVLabeledToggle::SetLabel(const char *str)
 const char* vtkPVLabeledToggle::GetLabel() 
 { 
   return this->Label->GetText();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVLabeledToggle::GetState() 
-{ 
-  return this->CheckButton->GetState(); 
 }
 
 //----------------------------------------------------------------------------

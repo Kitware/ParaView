@@ -34,7 +34,7 @@ $kw(vtkTemp196) AddValue 0.500000
 $kw(vtkTemp196) AddValue 0.700000
 $kw(vtkTemp196) AddValue 0.900000
 set kw(vtkTemp202) [$kw(vtkTemp186) GetPVWidget {Compute Normals}]
-$kw(vtkTemp202) SetState 0
+$kw(vtkTemp202) SetSelectedState 0
 $kw(vtkTemp186) AcceptCallback
 set kw(vtkTemp214) [$kw(vtkTemp186) GetPVOutput]
 $kw(vtkTemp214) SetLineWidth 1

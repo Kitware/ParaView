@@ -93,7 +93,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.40");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.41");
 
 //----------------------------------------------------------------------------
 
@@ -467,7 +467,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
     "%s configure -command {%s VisibilityCheckCallback}",
     this->VisibilityCheck->GetWidgetName(),
     this->GetTclName());
-  this->VisibilityCheck->SetState(1);
+  this->VisibilityCheck->SetSelectedState(1);
   this->VisibilityCheck->SetBalloonHelpString(
     "Toggle the visibility of this dataset's geometry.");
 
@@ -552,7 +552,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   this->MapScalarsCheck->SetParent(this->ColorFrame->GetFrame());
   this->MapScalarsCheck->Create(this->GetApplication());
   this->MapScalarsCheck->SetText("Map Scalars");
-  this->MapScalarsCheck->SetState(0);
+  this->MapScalarsCheck->SetSelectedState(0);
   this->MapScalarsCheck->SetBalloonHelpString(
     "Pass attriubte through color map or use unsigned char values as color.");
   this->GetApplication()->Script(
@@ -563,7 +563,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   this->InterpolateColorsCheck->SetParent(this->ColorFrame->GetFrame());
   this->InterpolateColorsCheck->Create(this->GetApplication());
   this->InterpolateColorsCheck->SetText("Interpolate Colors");
-  this->InterpolateColorsCheck->SetState(0);
+  this->InterpolateColorsCheck->SetSelectedState(0);
   this->InterpolateColorsCheck->SetBalloonHelpString(
     "Interpolate colors after mapping.");
   this->GetApplication()->Script(
@@ -1153,7 +1153,7 @@ void vtkPVDisplayGUI::UpdateInternal()
   //law int fixmeEventually; // Use proper SM properties with reset.
   
   // Visibility check
-  this->VisibilityCheck->SetState(this->PVSource->GetVisibility());
+  this->VisibilityCheck->SetSelectedState(this->PVSource->GetVisibility());
   // Cube axis visibility
   this->UpdateCubeAxesVisibilityCheck();
   // Point label visibility
@@ -1217,7 +1217,7 @@ void vtkPVDisplayGUI::UpdateVisibilityCheck()
     }
   if (this->VisibilityCheck->GetApplication())
     {
-    this->VisibilityCheck->SetState(v);
+    this->VisibilityCheck->SetSelectedState(v);
     }
 }
 
@@ -1226,7 +1226,7 @@ void vtkPVDisplayGUI::UpdateCubeAxesVisibilityCheck()
 {
   if (this->PVSource && this->VisibilityCheck->GetApplication())
     {
-    this->CubeAxesCheck->SetState(this->PVSource->GetCubeAxesVisibility());
+    this->CubeAxesCheck->SetSelectedState(this->PVSource->GetCubeAxesVisibility());
     }
 }
 
@@ -1235,7 +1235,7 @@ void vtkPVDisplayGUI::UpdatePointLabelVisibilityCheck()
 {
   if (this->PVSource && this->VisibilityCheck->GetApplication())
     {
-    this->PointLabelCheck->SetState(this->PVSource->GetPointLabelVisibility());
+    this->PointLabelCheck->SetSelectedState(this->PVSource->GetPointLabelVisibility());
     }
 }
 
@@ -1271,12 +1271,12 @@ void vtkPVDisplayGUI::UpdateScalarBarVisibilityCheck()
   // Set check on or off.
   if (this->ScalarBarCheckVisible)
     {
-    this->ScalarBarCheck->SetState(
+    this->ScalarBarCheck->SetSelectedState(
           this->PVSource->GetPVColorMap()->GetScalarBarVisibility());
     }
   else
     {
-    this->ScalarBarCheck->SetState(0);
+    this->ScalarBarCheck->SetSelectedState(0);
     }
 
   this->UpdateEnableState();
@@ -1402,12 +1402,12 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
     == vtkDataSet::CELL_DATA_FIELD)
     {
     this->InterpolateColorsCheckVisible = 0;
-    this->InterpolateColorsCheck->SetState(0);
+    this->InterpolateColorsCheck->SetSelectedState(0);
     }
   else
     {
     this->InterpolateColorsCheckVisible = 1;
-    this->InterpolateColorsCheck->SetState(
+    this->InterpolateColorsCheck->SetSelectedState(
       !this->PVSource->GetDisplayProxy()->GetInterpolateScalarsBeforeMappingCM());
     }
   this->UpdateEnableState();
@@ -1581,10 +1581,10 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
   vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
 
   this->MapScalarsCheckVisible = 0;  
-  this->MapScalarsCheck->SetState(0);  
+  this->MapScalarsCheck->SetSelectedState(0);  
   if (colorMap)
     {
-    this->MapScalarsCheck->SetState(1);
+    this->MapScalarsCheck->SetSelectedState(1);
     // See if the array satisfies conditions necessary for direct coloring.  
     vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
@@ -1605,7 +1605,7 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         { // I would like to have two as an option also ...
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
-        this->MapScalarsCheck->SetState(this->PVSource->GetDisplayProxy()->GetColorModeCM());
+        this->MapScalarsCheck->SetSelectedState(this->PVSource->GetDisplayProxy()->GetColorModeCM());
         }
       else
         { // Keep VTK from directly coloring single component arrays.
@@ -2002,7 +2002,7 @@ void vtkPVDisplayGUI::CenterCamera()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::VisibilityCheckCallback()
 {
-  this->GetPVSource()->SetVisibility(this->VisibilityCheck->GetState());
+  this->GetPVSource()->SetVisibility(this->VisibilityCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
@@ -2043,7 +2043,7 @@ void vtkPVDisplayGUI::ScalarBarCheckCallback()
     return;
     }
   this->PVSource->GetPVColorMap()->SetScalarBarVisibility(
-          this->ScalarBarCheck->GetState());
+          this->ScalarBarCheck->GetSelectedState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2057,8 +2057,8 @@ void vtkPVDisplayGUI::CubeAxesCheckCallback()
   // Move the tracing into vtkPVSource.
   this->GetTraceHelper()->AddEntry("$kw(%s) SetCubeAxesVisibility %d", 
                       this->PVSource->GetTclName(),
-                      this->CubeAxesCheck->GetState());
-  this->PVSource->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
+                      this->CubeAxesCheck->GetSelectedState());
+  this->PVSource->SetCubeAxesVisibility(this->CubeAxesCheck->GetSelectedState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2072,8 +2072,8 @@ void vtkPVDisplayGUI::PointLabelCheckCallback()
   // Move the tracing into vtkPVSource.
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", 
                       this->PVSource->GetTclName(),
-                      this->PointLabelCheck->GetState());
-  this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetState());
+                      this->PointLabelCheck->GetSelectedState());
+  this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetSelectedState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2083,7 +2083,7 @@ void vtkPVDisplayGUI::PointLabelCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::MapScalarsCheckCallback()
 {
-  this->SetMapScalarsFlag(this->MapScalarsCheck->GetState());
+  this->SetMapScalarsFlag(this->MapScalarsCheck->GetSelectedState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2094,9 +2094,9 @@ void vtkPVDisplayGUI::MapScalarsCheckCallback()
 void vtkPVDisplayGUI::SetMapScalarsFlag(int val)
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
-  if (this->MapScalarsCheck->GetState() != val)
+  if (this->MapScalarsCheck->GetSelectedState() != val)
     {
-    this->MapScalarsCheck->SetState(val);
+    this->MapScalarsCheck->SetSelectedState(val);
     }
 
   this->UpdateEnableState();
@@ -2108,7 +2108,7 @@ void vtkPVDisplayGUI::SetMapScalarsFlag(int val)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::InterpolateColorsCheckCallback()
 {
-  this->SetInterpolateColorsFlag(this->InterpolateColorsCheck->GetState());
+  this->SetInterpolateColorsFlag(this->InterpolateColorsCheck->GetSelectedState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2119,9 +2119,9 @@ void vtkPVDisplayGUI::InterpolateColorsCheckCallback()
 void vtkPVDisplayGUI::SetInterpolateColorsFlag(int val)
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
-  if (this->InterpolateColorsCheck->GetState() != val)
+  if (this->InterpolateColorsCheck->GetSelectedState() != val)
     {
-    this->InterpolateColorsCheck->SetState(val);
+    this->InterpolateColorsCheck->SetSelectedState(val);
     }
 
   this->PVSource->GetDisplayProxy()->SetInterpolateScalarsBeforeMappingCM(!val);

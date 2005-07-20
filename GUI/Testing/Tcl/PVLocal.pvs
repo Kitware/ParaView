@@ -23,7 +23,7 @@ $kw(vtkTemp960) SetValue 0.5
 set kw(vtkTemp966) [$kw(vtkTemp948) GetPVWidget {Height}]
 $kw(vtkTemp966) SetValue 1
 set kw(vtkTemp971) [$kw(vtkTemp948) GetPVWidget {Capping}]
-$kw(vtkTemp971) SetState 1
+$kw(vtkTemp971) SetSelectedState 1
 $kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
 $kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
 $kw(vtkTemp948) AcceptCallback

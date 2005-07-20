@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.47");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.48");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -362,7 +362,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
   this->DurationThumbWheel->ExpandEntryOn();
   this->DurationThumbWheel->SetEntryCommand(this, "DurationChangedCallback");
   this->DurationThumbWheel->SetEndCommand(this, "DurationChangedCallback");
-  this->DurationThumbWheel->GetEntry()->BindCommand(this, 
+  this->DurationThumbWheel->GetEntry()->SetCommand(this, 
     "DurationChangedCallback");
   this->DurationThumbWheel->GetEntry()->AddBinding(
     "<KeyRelease>", this, "DurationChangedKeyReleaseCallback");

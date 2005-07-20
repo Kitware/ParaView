@@ -11,7 +11,7 @@ $kw(vtkTemp2) FinalizeRead $kw(vtkTemp793) "$DataDir/Data/SPCTH/ball_and_box.spc
 set kw(vtkTemp803) [$kw(vtkTemp793) GetPVWidget {Filename}]
 $kw(vtkTemp803) SetValue "$DataDir/Data/SPCTH/ball_and_box.spcth"
 set kw(vtkTemp794) [$kw(vtkTemp793) GetPVWidget {file_flag}]
-$kw(vtkTemp794) SetState 1
+$kw(vtkTemp794) SetSelectedState 1
 set kw(vtkTemp796) [$kw(vtkTemp793) GetPVWidget {TimeStep}]
 $kw(vtkTemp796) SetValue 0
 set kw(vtkTemp802) [$kw(vtkTemp793) GetPVWidget {CellArrays}]

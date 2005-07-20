@@ -17,17 +17,17 @@ $pv(vtkTemp563) SetValue "$DataDir/Data/combxyz.bin"
 set pv(vtkTemp534) [$pv(vtkTemp533) GetPVWidget {QFileName}]
 $pv(vtkTemp534) SetValue "$DataDir/Data/combq.bin"
 set pv(vtkTemp541) [$pv(vtkTemp533) GetPVWidget {BinaryFile}]
-$pv(vtkTemp541) SetState 1
+$pv(vtkTemp541) SetSelectedState 1
 set pv(vtkTemp544) [$pv(vtkTemp533) GetPVWidget {MultiGrid}]
-$pv(vtkTemp544) SetState 0
+$pv(vtkTemp544) SetSelectedState 0
 set pv(vtkTemp547) [$pv(vtkTemp533) GetPVWidget {HasByteCount}]
-$pv(vtkTemp547) SetState 0
+$pv(vtkTemp547) SetSelectedState 0
 set pv(vtkTemp550) [$pv(vtkTemp533) GetPVWidget {IBlanking}]
-$pv(vtkTemp550) SetState 0
+$pv(vtkTemp550) SetSelectedState 0
 set pv(vtkTemp553) [$pv(vtkTemp533) GetPVWidget {TwoDimensionalGeometry}]
-$pv(vtkTemp553) SetState 0
+$pv(vtkTemp553) SetSelectedState 0
 set pv(vtkTemp556) [$pv(vtkTemp533) GetPVWidget {ForceRead}]
-$pv(vtkTemp556) SetState 0
+$pv(vtkTemp556) SetSelectedState 0
 set pv(vtkTemp560) [$pv(vtkTemp533) GetPVWidget {ByteOrder}]
 $pv(vtkTemp560) SetCurrentValue {0}
 $pvWindow SetCenterOfRotation 8.255000 0.000000 29.763084
@@ -85,9 +85,9 @@ $pv(vtkTemp720) SetScaleFactor 0.001
 set pv(vtkTemp723) [$pv(vtkTemp711) GetPVWidget {Max Glyphs}]
 $pv(vtkTemp723) SetValue 5000
 set pv(vtkTemp728) [$pv(vtkTemp711) GetPVWidget {MaskPoints}]
-$pv(vtkTemp728) SetState 1
+$pv(vtkTemp728) SetSelectedState 1
 set pv(vtkTemp731) [$pv(vtkTemp711) GetPVWidget {RandomMask}]
-$pv(vtkTemp731) SetState 0
+$pv(vtkTemp731) SetSelectedState 0
 $pv(vtkTemp711) AcceptCallback
 
 $pv(vtkTemp41) ColorByProperty
@@ -119,9 +119,9 @@ $pv(vtkTemp820) SetScaleFactor 0.008
 set pv(vtkTemp823) [$pv(vtkTemp811) GetPVWidget {Max Glyphs}]
 $pv(vtkTemp823) SetValue 300
 set pv(vtkTemp828) [$pv(vtkTemp811) GetPVWidget {MaskPoints}]
-$pv(vtkTemp828) SetState 1
+$pv(vtkTemp828) SetSelectedState 1
 set pv(vtkTemp831) [$pv(vtkTemp811) GetPVWidget {RandomMask}]
-$pv(vtkTemp831) SetState 0
+$pv(vtkTemp831) SetSelectedState 0
 $pv(vtkTemp811) AcceptCallback
 
 $pv(vtkTemp41) ColorByProperty
@@ -153,9 +153,9 @@ $pv(vtkTemp850) SetScaleFactor 2
 set pv(vtkTemp853) [$pv(vtkTemp841) GetPVWidget {Max Glyphs}]
 $pv(vtkTemp853) SetValue 5000
 set pv(vtkTemp858) [$pv(vtkTemp841) GetPVWidget {MaskPoints}]
-$pv(vtkTemp858) SetState 1
+$pv(vtkTemp858) SetSelectedState 1
 set pv(vtkTemp861) [$pv(vtkTemp841) GetPVWidget {RandomMask}]
-$pv(vtkTemp861) SetState 0
+$pv(vtkTemp861) SetSelectedState 0
 $pv(vtkTemp841) AcceptCallback
 
 $pv(vtkTemp41) ColorByArray {Momentum} 3

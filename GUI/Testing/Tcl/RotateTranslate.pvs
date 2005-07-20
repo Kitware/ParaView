@@ -18,7 +18,7 @@ set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {ThetaRoundness}]
 set pv(vtkTemp132) [$pv(vtkTemp98) GetPVWidget {PhiRoundness}]
 set pv(vtkTemp135) [$pv(vtkTemp98) GetPVWidget {Size}]
 set pv(vtkTemp138) [$pv(vtkTemp98) GetPVWidget {Toroidal}]
-$pv(vtkTemp138) SetState 1
+$pv(vtkTemp138) SetSelectedState 1
 $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp77) [$pv(vtkTemp1) GetRotateCameraInteractor]
 $pv(vtkTemp77) MotionCallback 49 171

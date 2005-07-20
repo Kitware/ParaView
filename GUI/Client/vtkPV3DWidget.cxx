@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.72");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.73");
 
 //===========================================================================
 //***************************************************************************
@@ -160,7 +160,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     "Toggle the visibility of the 3D widget on/off.");
   if ( this->Visible )
     {
-    this->Visibility->SetState(1);
+    this->Visibility->SetSelectedState(1);
     }
   this->Visibility->SetCommand(this, "SetVisibility");
     
@@ -271,7 +271,7 @@ void vtkPV3DWidget::SetValueChanged()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibility()
 {
-  int visibility = this->Visibility->GetState();
+  int visibility = this->Visibility->GetSelectedState();
   this->SetVisibility(visibility);
 }
 
@@ -284,7 +284,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     }
   this->SetVisibilityNoTrace(visibility);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetVisibility %d", this->GetTclName(), visibility);
-  this->Visibility->SetState(visibility);
+  this->Visibility->SetSelectedState(visibility);
   this->Visible = visibility;
 }
 

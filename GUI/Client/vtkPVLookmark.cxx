@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.21");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.22");
 
 
 //*****************************************************************************
@@ -859,7 +859,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
             {
             ptr = strtok(NULL,"\r\n");
             sscanf(ptr,ThirdToken_Int,&ival);
-            labeledToggle->SetState(ival);
+            labeledToggle->SetSelectedState(ival);
             labeledToggle->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }

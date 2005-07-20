@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVPluginsDialog::vtkPVPluginsDialog()
@@ -179,13 +179,13 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app)
   vtkKWCheckButton *PluginIsLoaded=vtkKWCheckButton::New();
   PluginIsLoaded->SetParent(this->PluginsFrame->GetFrame());
   PluginIsLoaded->Create(app);
-  PluginIsLoaded->SetState(FooIsLoaded);
+  PluginIsLoaded->SetSelectedState(FooIsLoaded);
   this->Script("grid config %s -column 2 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginIsLoaded->GetWidgetName(),PluginIndex);
 
   vtkKWCheckButton *PluginAutoLoad=vtkKWCheckButton::New();
   PluginAutoLoad->SetParent(this->PluginsFrame->GetFrame());
   PluginAutoLoad->Create(app);
-  PluginAutoLoad->SetState(FooAutoLoad);
+  PluginAutoLoad->SetSelectedState(FooAutoLoad);
   this->Script("grid config %s -column 3 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginAutoLoad->GetWidgetName(),PluginIndex);
   
   vtkKWLabel *PluginPath=vtkKWLabel::New();

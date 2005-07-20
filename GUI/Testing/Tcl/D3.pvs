@@ -5,7 +5,7 @@ source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp43) $argv $argc
 
 set kw(vtkTemp24) [$kw(vtkTemp1) GetMainView]
-[$kw(vtkTemp1) GetRotateCameraButton] SetState 1
+[$kw(vtkTemp1) GetRotateCameraButton] SetSelectedState 1
 $kw(vtkTemp1) ChangeInteractorStyle 1
 set kw(vtkTemp247) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 set kw(vtkTemp253) [$kw(vtkTemp247) GetPVWidget {WholeExtent}]
@@ -50,7 +50,7 @@ set kw(vtkTemp575) [$kw(vtkTemp569) GetPVWidget {Scalars}]
 set kw(vtkTemp566) [$kw(vtkTemp575) GetPVWidget {Offset}]
 $kw(vtkTemp566) SetValue 220
 set kw(vtkTemp570) [$kw(vtkTemp479) GetPVWidget {InsideOut}]
-$kw(vtkTemp570) SetState 0
+$kw(vtkTemp570) SetSelectedState 0
 $kw(vtkTemp479) AcceptCallback
 set kw(vtkTemp579) [$kw(vtkTemp479) GetPVOutput]
 $kw(vtkTemp579) ColorByArray {RTData} 3
@@ -108,7 +108,7 @@ $kw(vtkTemp1255) SetCurrentValue {0}
 set kw(vtkTemp1258) [$kw(vtkTemp1247) GetPVWidget {GlobalNodeIdArrayName}]
 $kw(vtkTemp1258) SetValue {}
 set kw(vtkTemp1261) [$kw(vtkTemp1247) GetPVWidget {UseMinimalMemory}]
-$kw(vtkTemp1261) SetState 0
+$kw(vtkTemp1261) SetSelectedState 0
 $kw(vtkTemp1247) AcceptCallback
 set kw(vtkTemp1268) [$kw(vtkTemp1247) GetPVOutput]
 $kw(vtkTemp1268) ColorByArray {Elevation} 3
@@ -119,7 +119,7 @@ set kw(vtkTemp1379) [$kw(vtkTemp1) CreatePVSource PieceScalars]
 set kw(vtkTemp1389) [$kw(vtkTemp1379) GetPVWidget {Input}]
 $kw(vtkTemp1389) SetCurrentValue $kw(vtkTemp1247)
 set kw(vtkTemp1386) [$kw(vtkTemp1379) GetPVWidget {RandomMode}]
-$kw(vtkTemp1386) SetState 0
+$kw(vtkTemp1386) SetSelectedState 0
 $kw(vtkTemp1379) AcceptCallback
 set kw(vtkTemp1393) [$kw(vtkTemp1379) GetPVOutput]
 $kw(vtkTemp1393) ColorByArray {Piece} 3

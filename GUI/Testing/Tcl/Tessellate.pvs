@@ -4,7 +4,7 @@ set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp24) $argv $argc
 
-[$kw(vtkTemp5) GetRotateCameraButton] SetState 1
+[$kw(vtkTemp5) GetRotateCameraButton] SetSelectedState 1
 $kw(vtkTemp5) ChangeInteractorStyle 1
 set kw(vtkTemp999) [$kw(vtkTemp5) CreatePVSource SphereSource]
 set kw(vtkTemp1005) [$kw(vtkTemp999) GetPVWidget {Center}]

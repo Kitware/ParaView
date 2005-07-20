@@ -139,7 +139,7 @@ proc clip_run {} {
     DemoAfter 500
 
     set clip(vtkTemp623) [$clip(vtkTemp572) GetPVWidget {InsideOut}]
-    $clip(vtkTemp623) SetState 1
+    $clip(vtkTemp623) SetSelectedState 1
     $clip(vtkTemp572) AcceptCallback
     [$clip(vtkTemp572) GetPVOutput] DrawSurface
     update
@@ -1393,7 +1393,7 @@ proc iso_init {} {
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
     set iso(vtkTemp450) [$iso(vtkTemp449) GetPVWidget {Compute Scalars}]
-    $iso(vtkTemp450) SetState 1
+    $iso(vtkTemp450) SetSelectedState 1
     $iso(vtkTemp449) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -1444,7 +1444,7 @@ proc iso_init {} {
     $iso(vtkTemp828) AddValue 1.400000
     $iso(vtkTemp828) AddValue 1.600000
     set iso(vtkTemp830) [$iso(vtkTemp820) GetPVWidget {Compute Scalars}]
-    $iso(vtkTemp830) SetState 1
+    $iso(vtkTemp830) SetSelectedState 1
     $iso(vtkTemp820) AcceptCallback
     set iso(vtkTemp852) [$iso(vtkTemp820) GetPVOutput]
     $iso(vtkTemp852) SetActorTranslate 3.000000 0.000000 0.000000
@@ -1648,7 +1648,7 @@ proc stream_init {} {
     set streams(vtkTemp398) [$streams(vtkTemp384) GetPVWidget {QFileName}]
     $streams(vtkTemp398) SetValue "$DemoDir/postbin.q"
     set streams(vtkTemp569) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
-    $streams(vtkTemp569) SetState 1
+    $streams(vtkTemp569) SetSelectedState 1
     set streams(vtkTemp581) [$streams(vtkTemp384) GetPVWidget {Filename}]
     $streams(vtkTemp581) SetValue "$DemoDir/postbin.xyz"
     $streams(vtkTemp384) AcceptCallback
@@ -4590,7 +4590,7 @@ if ![info exists DemoDir] {
         grab .control.main.stop
 
         set rv [[$Application GetMainWindow] GetMainView]
-        set parallelState  [[$rv GetParallelProjectionCheck] GetState]
+        set parallelState  [[$rv GetParallelProjectionCheck] GetSelectedState]
         $rv ParallelProjectionOff
 
         clip_init

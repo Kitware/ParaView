@@ -27,9 +27,9 @@ set pv(vtkTemp198) [$pv(vtkTemp187) GetPVWidget {Contour Values}]
 $pv(vtkTemp198) RemoveAllValues
 $pv(vtkTemp198) AddValue 600.000000
 set pv(vtkTemp204) [$pv(vtkTemp187) GetPVWidget {Compute Normals}]
-$pv(vtkTemp204) SetState 0
+$pv(vtkTemp204) SetSelectedState 0
 set kw(vtkTemp1029) [$pv(vtkTemp187) GetPVWidget {Compute Scalars}]
-$kw(vtkTemp1029) SetState 1
+$kw(vtkTemp1029) SetSelectedState 1
 $pv(vtkTemp187) AcceptCallback
 
 [$pv(vtkTemp187) GetPVColorMap] SetScalarRange 0 3926

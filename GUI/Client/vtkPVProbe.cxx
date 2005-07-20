@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.152");
+vtkCxxRevisionMacro(vtkPVProbe, "1.153");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -240,7 +240,7 @@ void vtkPVProbe::CreateProperties()
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
   this->ShowXYPlotToggle->Create(pvApp);
   this->ShowXYPlotToggle->SetText("Show XY-Plot");
-  this->ShowXYPlotToggle->SetState(1);
+  this->ShowXYPlotToggle->SetSelectedState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
 
@@ -337,9 +337,9 @@ void vtkPVProbe::SetVisibilityNoTrace(int val)
 void vtkPVProbe::AcceptCallbackInternal()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  this->GetTraceHelper()->AddEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
+  this->GetTraceHelper()->AddEntry("[$kw(%s) GetShowXYPlotToggle] SetSelectedState %d",
                       this->GetTclName(),
-                      this->ShowXYPlotToggle->GetState());
+                      this->ShowXYPlotToggle->GetSelectedState());
  
   int initialized = this->GetInitialized();
   
@@ -498,7 +498,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       }
     }
 
-  if (this->ShowXYPlotToggle->GetState() && !(!initialized && (numPts == 1)))
+  if (this->ShowXYPlotToggle->GetSelectedState() && !(!initialized && (numPts == 1)))
     {
     this->PlotDisplayProxy->SetVisibilityCM(1);
     this->Script("pack %s", this->ArraySelection->GetWidgetName());  
@@ -509,7 +509,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->PlotDisplayProxy->SetVisibilityCM(0);
     this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
     this->SaveButton->SetEnabled(0);
-    this->ShowXYPlotToggle->SetState(0);
+    this->ShowXYPlotToggle->SetSelectedState(0);
     }
 
 }

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -53,7 +53,7 @@ void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
                this->ParallelRenderParametersFrame->GetWidgetName());
   //this->CompositeCompressionCheck->EnabledOff();
 
-  //this->SquirtCheck->SetState(0);
+  //this->SquirtCheck->SetSelectedState(0);
   //this->SquirtLabel->EnabledOff();
   //this->SquirtCheck->EnabledOff();
   //this->SquirtLevelScale->EnabledOff();

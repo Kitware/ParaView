@@ -93,7 +93,7 @@ $kw(vtkTemp1219) SetValue 1
 set kw(vtkTemp1222) [$kw(vtkTemp1191) GetPVWidget {Size}]
 $kw(vtkTemp1222) SetValue 0.5
 set kw(vtkTemp1225) [$kw(vtkTemp1191) GetPVWidget {Toroidal}]
-$kw(vtkTemp1225) SetState 1
+$kw(vtkTemp1225) SetSelectedState 1
 $kw(vtkTemp1191) AcceptCallback
 set kw(vtkTemp1333) [$kw(vtkTemp1) CreatePVSource GroupParts]
 set kw(vtkTemp1339) [$kw(vtkTemp1333) GetPVWidget {inputs}]

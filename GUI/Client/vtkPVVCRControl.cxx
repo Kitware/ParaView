@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.12");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.13");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -146,7 +146,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     //  Animation Control: loop button to loop the animation.
     this->LoopCheckButton->SetParent(this->GetFrame());
     this->LoopCheckButton->Create(app);
-    this->LoopCheckButton->SetState(0);
+    this->LoopCheckButton->SetSelectedState(0);
     this->LoopCheckButton->SetIndicator(0);
     icon->SetImage(vtkKWIcon::IconTransportLoop);
     this->LoopCheckButton->SetImageToIcon(icon);
@@ -168,7 +168,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     this->RecordCheckButton->SetParent(this->GetFrame());
     this->RecordCheckButton->Create(app);
     this->RecordCheckButton->SetConfigurationOption("-image", "PVRecord");
-    this->RecordCheckButton->SetState(0);
+    this->RecordCheckButton->SetSelectedState(0);
     this->RecordCheckButton->SetIndicator(0);
     this->RecordCheckButton->SetBalloonHelpString("Start/Stop recording of the animation.");
     this->RecordCheckButton->SetCommand(this, "RecordCheckCallback");
@@ -264,24 +264,24 @@ void vtkPVVCRControl::SetSaveAnimationCommand(vtkKWObject* calledObject, const c
 //-----------------------------------------------------------------------------
 void vtkPVVCRControl::SetRecordCheckButtonState(int state)
 {
-  this->RecordCheckButton->SetState(state);
+  this->RecordCheckButton->SetSelectedState(state);
 }
 //-----------------------------------------------------------------------------
 int vtkPVVCRControl::GetRecordCheckButtonState()
 {
-  return this->RecordCheckButton->GetState();
+  return this->RecordCheckButton->GetSelectedState();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVVCRControl::SetLoopButtonState(int state)
 {
-  this->LoopCheckButton->SetState(state);
+  this->LoopCheckButton->SetSelectedState(state);
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVVCRControl::GetLoopButtonState()
 {
-  return this->LoopCheckButton->GetState();
+  return this->LoopCheckButton->GetSelectedState();
 }
 
 //-----------------------------------------------------------------------------

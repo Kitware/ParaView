@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.9");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.10");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -81,7 +81,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->BaseThumbWheel->DisplayLabelOff();
   this->BaseThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->BaseThumbWheel->ExpandEntryOn();
-  this->BaseThumbWheel->GetEntry()->BindCommand(this, "BaseChangedCallback");
+  this->BaseThumbWheel->GetEntry()->SetCommand(this, "BaseChangedCallback");
   this->BaseThumbWheel->SetEndCommand(this, "BaseChangedCallback");
   this->BaseThumbWheel->SetEntryCommand(this, "BaseChangedCallback");
 
@@ -98,7 +98,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->StartPowerThumbWheel->DisplayLabelOff();
   this->StartPowerThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->StartPowerThumbWheel->ExpandEntryOn();
-  this->StartPowerThumbWheel->GetEntry()->BindCommand(this, "StartPowerChangedCallback");
+  this->StartPowerThumbWheel->GetEntry()->SetCommand(this, "StartPowerChangedCallback");
   this->StartPowerThumbWheel->SetEndCommand(this, "StartPowerChangedCallback");
   this->StartPowerThumbWheel->SetEntryCommand(this, "StartPowerChangedCallback");
 
@@ -115,7 +115,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->EndPowerThumbWheel->DisplayLabelOff();
   this->EndPowerThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->EndPowerThumbWheel->ExpandEntryOn();
-  this->EndPowerThumbWheel->GetEntry()->BindCommand(this, "EndPowerChangedCallback");
+  this->EndPowerThumbWheel->GetEntry()->SetCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEndCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEntryCommand(this, "EndPowerChangedCallback");
 

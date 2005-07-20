@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.26");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -116,7 +116,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "In auto accept mode filters automatically update "
     "when a parameters is changed."
     " This option is also available in the accept button pulldown menu.");
-  this->AutoAcceptCheckButton->SetState(this->AutoAccept);
+  this->AutoAcceptCheckButton->SetSelectedState(this->AutoAccept);
 
   tk_cmd << "pack " << this->AutoAcceptCheckButton->GetWidgetName()
     << "  -side top -anchor w -expand no -fill none" << endl;
@@ -183,11 +183,11 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
       VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY,0)||
     app->GetIntRegistryValue(2,"RunTime",VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY))
     {
-    this->ShowTraceFilesCheckButton->SetState(1);
+    this->ShowTraceFilesCheckButton->SetSelectedState(1);
     }
   else
     {
-    this->ShowTraceFilesCheckButton->SetState(0);
+    this->ShowTraceFilesCheckButton->SetSelectedState(0);
     }
 
   tk_cmd << "pack " << this->ShowTraceFilesCheckButton->GetWidgetName()
@@ -214,11 +214,11 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   if (app->GetIntRegistryValue(2,"RunTime",
                                VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY))
     {
-    this->CreateLogFilesCheckButton->SetState(1);
+    this->CreateLogFilesCheckButton->SetSelectedState(1);
     }
   else
     {
-    this->CreateLogFilesCheckButton->SetState(0);
+    this->CreateLogFilesCheckButton->SetSelectedState(0);
     }
 
   tk_cmd << "pack " << this->CreateLogFilesCheckButton->GetWidgetName()
@@ -260,7 +260,7 @@ void vtkPVApplicationSettingsInterface::Update()
 
   if (this->ShowSourcesDescriptionCheckButton && app)
     {
-    this->ShowSourcesDescriptionCheckButton->SetState(
+    this->ShowSourcesDescriptionCheckButton->SetSelectedState(
       app->GetShowSourcesLongHelp());
     }
 
@@ -268,7 +268,7 @@ void vtkPVApplicationSettingsInterface::Update()
 
   if (this->ShowSourcesNameCheckButton && app)
     {
-    this->ShowSourcesNameCheckButton->SetState(
+    this->ShowSourcesNameCheckButton->SetSelectedState(
       app->GetSourcesBrowserAlwaysShowName());
     }
 }
@@ -282,7 +282,7 @@ void vtkPVApplicationSettingsInterface::AutoAcceptCallback()
    return;
    }
 
- int flag = this->AutoAcceptCheckButton->GetState() ? 1 : 0;
+ int flag = this->AutoAcceptCheckButton->GetSelectedState() ? 1 : 0;
  this->SetAutoAccept(flag);
 }
 
@@ -305,7 +305,7 @@ void vtkPVApplicationSettingsInterface::SetAutoAccept(int val)
     {
     return;
     }
-  this->AutoAcceptCheckButton->SetState(val);
+  this->AutoAcceptCheckButton->SetSelectedState(val);
 
   // Let the PVSource notebook handle registry.
   // This class does not even get created until the GUI is shown.
@@ -320,7 +320,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
    return;
    }
 
- int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
+ int flag = this->ShowSourcesDescriptionCheckButton->GetSelectedState() ? 1 : 0;
 
  this->GetApplication()->SetRegistryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
@@ -341,7 +341,7 @@ void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
     return;
     }
 
-  int flag = this->ShowTraceFilesCheckButton->GetState() ? 1 : 0;
+  int flag = this->ShowTraceFilesCheckButton->GetSelectedState() ? 1 : 0;
 
   this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
@@ -356,7 +356,7 @@ void vtkPVApplicationSettingsInterface::CreateLogFilesCallback()
     return;
     }
 
-  int flag = this->CreateLogFilesCheckButton->GetState() ? 1 : 0;
+  int flag = this->CreateLogFilesCheckButton->GetSelectedState() ? 1 : 0;
 
   this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY, "%d", flag);
@@ -371,7 +371,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
    return;
    }
 
- int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
+ int flag = this->ShowSourcesNameCheckButton->GetSelectedState() ? 1 : 0;
 
  this->GetApplication()->SetRegistryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);

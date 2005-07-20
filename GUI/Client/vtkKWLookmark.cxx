@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.21");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -177,7 +177,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->Checkbox->SetParent(this->LmkMainFrame->GetLabelFrame());
   this->Checkbox->SetIndicator(1);
   this->Checkbox->Create(app);
-  this->Checkbox->SetState(0);
+  this->Checkbox->SetSelectedState(0);
 
   this->GetDragAndDropTargetSet()->SetSourceAnchor(
     this->LmkMainFrame->GetLabel());
@@ -377,13 +377,13 @@ void vtkKWLookmark::ChangeLookmarkName()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::SetSelectionState(int flag)
 {
-  this->Checkbox->SetState(flag);
+  this->Checkbox->SetSelectedState(flag);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWLookmark::GetSelectionState()
 {
-  return this->Checkbox->GetState();
+  return this->Checkbox->GetSelectedState();
 }
 
 //----------------------------------------------------------------------------

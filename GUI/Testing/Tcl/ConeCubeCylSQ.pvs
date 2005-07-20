@@ -47,7 +47,7 @@ $pv(vtkTemp452) AcceptCallback
 
 set pv(vtkTemp486) [$pv(vtkTemp1) CreatePVSource SuperquadricSource]
 set pv(vtkTemp526) [$pv(vtkTemp486) GetPVWidget {Toroidal}]
-$pv(vtkTemp526) SetState 1
+$pv(vtkTemp526) SetSelectedState 1
 set pv(vtkTemp498) [$pv(vtkTemp486) GetPVWidget {Center}]
 $pv(vtkTemp498) SetValue 0 2 0
 set pv(vtkTemp514) [$pv(vtkTemp486) GetPVWidget {Thickness}]

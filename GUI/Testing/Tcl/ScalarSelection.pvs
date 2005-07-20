@@ -27,7 +27,7 @@ $pv(vtkTemp146) RemoveAllValues
 $pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 set pv(vtkTemp152) [$pv(vtkTemp136) GetPVWidget {Compute Normals}]
-$pv(vtkTemp152) SetState 0
+$pv(vtkTemp152) SetSelectedState 0
 set pv(vtkTemp155) [$pv(vtkTemp136) GetPVWidget {Compute Gradients}]
 set pv(vtkTemp158) [$pv(vtkTemp136) GetPVWidget {Compute Scalars}]
 $pv(vtkTemp136) AcceptCallback
@@ -61,7 +61,7 @@ set pv(vtkTemp208) [$pv(vtkTemp188) GetPVWidget {UseNormal}]
 set pv(vtkTemp211) [$pv(vtkTemp188) GetPVWidget {XYPlane}]
 $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp136)
-$pv(vtkTemp208) SetState 1
+$pv(vtkTemp208) SetSelectedState 1
 $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
@@ -180,7 +180,7 @@ $pv(vtkTemp292) AddValue 0.050000
 $pv(vtkTemp292) AddValue 0.850000
 $pv(vtkTemp292) AddValue 0.950000
 set pv(vtkTemp298) [$pv(vtkTemp282) GetPVWidget {Compute Normals}]
-$pv(vtkTemp298) SetState 0
+$pv(vtkTemp298) SetSelectedState 0
 set pv(vtkTemp301) [$pv(vtkTemp282) GetPVWidget {Compute Gradients}]
 set pv(vtkTemp304) [$pv(vtkTemp282) GetPVWidget {Compute Scalars}]
 $pv(vtkTemp282) AcceptCallback

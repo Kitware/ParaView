@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.74");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.75");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -301,7 +301,7 @@ void vtkPVArraySelection::UpdateGUI()
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
     vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
-    check->SetState(this->Selection->ArrayIsEnabled(check->GetText()));
+    check->SetSelectedState(this->Selection->ArrayIsEnabled(check->GetText()));
     }
   it->Delete();
 
@@ -342,7 +342,7 @@ void vtkPVArraySelection::Trace(ofstream *file)
     {
     vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     *file << "$kw(" << this->GetTclName() << ") SetArrayStatus {"
-          << check->GetText() << "} " << check->GetState() << endl;
+          << check->GetText() << "} " << check->GetSelectedState() << endl;
     }
   it->Delete();
 }
@@ -385,7 +385,7 @@ void vtkPVArraySelection::SetPropertyFromGUI()
       {
       vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
       const char* aname = check->GetText();
-      int state = check->GetState();
+      int state = check->GetSelectedState();
       // Checking the type of output we need to produce:
       // This could be done by an ivar, but I rather not add another ivar for such
       // simple case
@@ -429,10 +429,10 @@ void vtkPVArraySelection::AllOnCallback()
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    if (check->GetState() == 0)
+    if (check->GetSelectedState() == 0)
       {
       modified = 1;
-      check->SetState(1);
+      check->SetSelectedState(1);
       }
     }
    
@@ -452,10 +452,10 @@ void vtkPVArraySelection::AllOffCallback()
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    if (check->GetState() != 0)
+    if (check->GetSelectedState() != 0)
       {
       modified = 1;
-      check->SetState(0);
+      check->SetSelectedState(0);
       }
     }
    
@@ -475,7 +475,7 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
     {
     if ( strcmp(check->GetText(), name) == 0)
       {
-      check->SetState(status);
+      check->SetSelectedState(status);
       return;
       }
     }  

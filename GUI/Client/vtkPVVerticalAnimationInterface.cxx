@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.23");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.24");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -175,7 +175,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   this->CacheGeometryCheck->Create(app);
   this->CacheGeometryCheck->SetText("Cache Geometry");
   this->CacheGeometryCheck->SetCommand(this, "CacheGeometryCheckCallback");
-  this->CacheGeometryCheck->SetState(this->CacheGeometry);
+  this->CacheGeometryCheck->SetSelectedState(this->CacheGeometry);
   this->CacheGeometryCheck->SetBalloonHelpString(
     "Specify caching of geometry for the animation. Note that cache can be "
     "used only in Sequence mode.");
@@ -184,7 +184,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   this->RecordAllButton->SetParent(this->SaveFrame->GetFrame());
   this->RecordAllButton->Create(app);
   this->RecordAllButton->SetText("Record All properties");
-  this->RecordAllButton->SetState(this->AnimationManager->GetRecordAll());
+  this->RecordAllButton->SetSelectedState(this->AnimationManager->GetRecordAll());
   this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
   this->RecordAllButton->SetBalloonHelpString("Specify if changes in all properties "
     "are to be recorded or only for the highlighted property.");
@@ -194,7 +194,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   this->AdvancedAnimationCheck->Create(app);
   this->AdvancedAnimationCheck->SetText("Show all animatable properties");
   this->AdvancedAnimationCheck->SetCommand(this, "AdvancedAnimationViewCallback");
-  this->AdvancedAnimationCheck->SetState(this->AnimationManager->GetAdvancedView());
+  this->AdvancedAnimationCheck->SetSelectedState(this->AnimationManager->GetAdvancedView());
   this->AdvancedAnimationCheck->SetBalloonHelpString(
     "When checked, all properties that can be animated are shown. Otherwise only a "
     "small usually used subset of these properties are shown in the keyframe animation "
@@ -242,7 +242,7 @@ vtkKWFrame* vtkPVVerticalAnimationInterface::GetPropertiesFrame()
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::CacheGeometryCheckCallback()
 {
-  this->SetCacheGeometry(this->CacheGeometryCheck->GetState());
+  this->SetCacheGeometry(this->CacheGeometryCheck->GetSelectedState());
 }
 
 //-----------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void vtkPVVerticalAnimationInterface::SetCacheGeometry(int cache)
     }
   this->AnimationManager->SetCacheGeometry(cache);
   this->CacheGeometry = this->AnimationManager->GetCacheGeometry();
-  this->CacheGeometryCheck->SetState(this->CacheGeometry);
+  this->CacheGeometryCheck->SetSelectedState(this->CacheGeometry);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetCacheGeometry %d", 
     this->GetTclName(), cache);
 }
@@ -264,7 +264,7 @@ void vtkPVVerticalAnimationInterface::EnableCacheCheck()
 {
   this->EnableCacheCheckButton = 1;
   this->AnimationManager->SetCacheGeometry(
-    this->CacheGeometryCheck->GetState());
+    this->CacheGeometryCheck->GetSelectedState());
   this->UpdateEnableState();
 }
 
@@ -279,7 +279,7 @@ void vtkPVVerticalAnimationInterface::DisableCacheCheck()
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::AdvancedAnimationViewCallback()
 {
-  this->SetAdvancedAnimationView(this->AdvancedAnimationCheck->GetState());
+  this->SetAdvancedAnimationView(this->AdvancedAnimationCheck->GetSelectedState());
 }
 
 //-----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ void vtkPVVerticalAnimationInterface::SetAdvancedAnimationView(int advanced)
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::RecordAllChangedCallback()
 {
-  int state = this->RecordAllButton->GetState();
+  int state = this->RecordAllButton->GetSelectedState();
   this->AnimationManager->SetRecordAll(state);
 }
 

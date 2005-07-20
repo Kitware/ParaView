@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.31");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -317,7 +317,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app)
     this->RenderInterruptsEnabled = 
       pvapp->GetIntRegistryValue(2, "RunTime", "RenderInterruptsEnabled");
     }
-  this->RenderInterruptsEnabledCheck->SetState(this->RenderInterruptsEnabled);
+  this->RenderInterruptsEnabledCheck->SetSelectedState(this->RenderInterruptsEnabled);
   // This call just forwards the value to the render module.
   this->RenderInterruptsEnabledCheckCallback();
 
@@ -347,7 +347,7 @@ void vtkPVLODRenderModuleUI::LODThresholdScaleCallback()
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::LODCheckCallback()
 {
-  if (this->LODCheck->GetState())
+  if (this->LODCheck->GetSelectedState())
     {
     float threshold = this->LODThresholdScale->GetValue();
     this->SetLODThreshold(threshold);
@@ -386,7 +386,7 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
       this->LODResolutionLabel->EnabledOff();
       this->LODResolutionScale->EnabledOff();
       this->LODResolutionValue->EnabledOff();
-      this->LODCheck->SetState(0);
+      this->LODCheck->SetSelectedState(0);
       }
     else
       {
@@ -395,7 +395,7 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
       this->LODResolutionLabel->EnabledOn();
       this->LODResolutionScale->EnabledOn();
       this->LODResolutionValue->EnabledOn();
-      this->LODCheck->SetState(1);
+      this->LODCheck->SetSelectedState(1);
       this->LODThresholdScale->SetValue(threshold);
       }
     this->LODThresholdLabelCallback();
@@ -551,15 +551,15 @@ void vtkPVLODRenderModuleUI::SetOutlineThresholdInternal(float threshold)
 void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
 {
   this->SetRenderInterruptsEnabled(
-    this->RenderInterruptsEnabledCheck->GetState());
+    this->RenderInterruptsEnabledCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
 {
-  if (this->RenderInterruptsEnabledCheck->GetState() != state)
+  if (this->RenderInterruptsEnabledCheck->GetSelectedState() != state)
     {
-    this->RenderInterruptsEnabledCheck->SetState(state);
+    this->RenderInterruptsEnabledCheck->SetSelectedState(state);
     }
   
   this->RenderInterruptsEnabled = state;
@@ -579,7 +579,7 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
   // the trace might not have this module
   this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d}",
                       this->GetTclName(),
-                      this->RenderInterruptsEnabledCheck->GetState());
+                      this->RenderInterruptsEnabledCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------

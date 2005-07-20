@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.10");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -166,7 +166,7 @@ void vtkPVComparativeVisDialog::CueSelected(
     {
     if (this->Internal->Widgets[i] == wid)
       {
-      this->Internal->RadioButtons[i]->SetState(1);
+      this->Internal->RadioButtons[i]->SetSelectedState(1);
       }
     }
 }
@@ -247,7 +247,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
 
   // Choose the first widget by default
   this->CueSelected(static_cast<unsigned int>(0));
-  this->Internal->RadioButtons[0]->SetState(1);
+  this->Internal->RadioButtons[0]->SetSelectedState(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -362,7 +362,7 @@ void vtkPVComparativeVisDialog::CopyFromVisualization(
   this->NameEntry->GetWidget()->SetValue(cv->GetName());
   // Choose the first widget by default
   this->CueSelected(static_cast<unsigned int>(0));
-  this->Internal->RadioButtons[0]->SetState(1);
+  this->Internal->RadioButtons[0]->SetSelectedState(1);
 }
 
 //----------------------------------------------------------------------------

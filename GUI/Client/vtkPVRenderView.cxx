@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.395");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.396");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -310,8 +310,8 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registry)
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 1;
 
-  this->NavigationWindowButton->StateOn();
-  this->SelectionWindowButton->StateOff();
+  this->NavigationWindowButton->SelectedStateOn();
+  this->SelectionWindowButton->SelectedStateOff();
   if ( registry )
     {
     this->GetApplication()->SetRegistryValue(2, "RunTime","SourcesBrowser",
@@ -338,8 +338,8 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
   this->ShowNavigationWindow = 0;
   this->ShowSelectionWindow = 1;
 
-  this->NavigationWindowButton->StateOff();
-  this->SelectionWindowButton->StateOn();
+  this->NavigationWindowButton->SelectedStateOff();
+  this->SelectionWindowButton->SelectedStateOn();
   if ( registry )
     {
     this->GetApplication()->SetRegistryValue(2, "RunTime","SourcesBrowser",
@@ -532,11 +532,11 @@ void vtkPVRenderView::PrepareForDelete()
   if (pvapp)
     {
     pvapp->SetRegistryValue(2, "RunTime", "UseParallelProjection", "%d",
-                             this->ParallelProjectionCheck->GetState());
+                             this->ParallelProjectionCheck->GetSelectedState());
     pvapp->SetRegistryValue(2, "RunTime", "UseStrips", "%d",
-                             this->TriangleStripsCheck->GetState());
+                             this->TriangleStripsCheck->GetSelectedState());
     pvapp->SetRegistryValue(2, "RunTime", "UseImmediateMode", "%d",
-                             this->ImmediateModeCheck->GetState());
+                             this->ImmediateModeCheck->GetSelectedState());
     double *vp = this->OrientationAxes->GetViewport();
     pvapp->SetRegistryValue(2, "RunTime", "OrientationAxesViewport",
                              "%lf %lf %lf %lf", vp[0], vp[1], vp[2], vp[3]);
@@ -904,7 +904,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
       // between source and 3D views.
       int state = viewmenu->GetState(this->MenuLabelSwitchBackAndForthToViewProperties);
       viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
-                         vtkKWMenu::StateNormal);
+                         vtkKWTkOptions::StateNormal);
       viewmenu->Invoke(
         viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
       viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
@@ -922,7 +922,7 @@ vtkKWWidget *vtkPVRenderView::GetSourceParent()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Display3DWidgetsCallback()
 {
-  int val = this->Display3DWidgets->GetState();
+  int val = this->Display3DWidgets->GetSelectedState();
   this->SetDisplay3DWidgets(val);
   this->GetApplication()->SetRegistryValue(2, "RunTime","Display3DWidgets",
                                       (val?"1":"0"));
@@ -931,7 +931,7 @@ void vtkPVRenderView::Display3DWidgetsCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDisplay3DWidgets(int s)
 {
-  this->Display3DWidgets->SetState(s);
+  this->Display3DWidgets->SetSelectedState(s);
   this->GetPVApplication()->SetDisplay3DWidgets(s);
 }
 
@@ -993,14 +993,14 @@ void vtkPVRenderView::CreateViewProperties()
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseParallelProjection", 0))
     {
-    this->ParallelProjectionCheck->SetState(
+    this->ParallelProjectionCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "UseParallelProjection"));
     this->ParallelProjectionCallback();
     }
   else
     {
-    this->ParallelProjectionCheck->SetState(0);
+    this->ParallelProjectionCheck->SetSelectedState(0);
     }
   this->ParallelProjectionCheck->SetCommand(this, 
                                             "ParallelProjectionCallback");
@@ -1017,13 +1017,13 @@ void vtkPVRenderView::CreateViewProperties()
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseStrips", 0))
     {
-    this->TriangleStripsCheck->SetState(
+    this->TriangleStripsCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "UseStrips"));
     }
   else
     {
-    this->TriangleStripsCheck->SetState(0);
+    this->TriangleStripsCheck->SetSelectedState(0);
     }
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
   this->TriangleStripsCheck->SetBalloonHelpString(
@@ -1039,13 +1039,13 @@ void vtkPVRenderView::CreateViewProperties()
   if (pvapp && pvwindow && 
       pvapp->GetRegistryValue(2, "RunTime", "UseImmediateMode", 0))
     {
-    this->ImmediateModeCheck->SetState(
+    this->ImmediateModeCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "UseImmediateMode"));
     }
   else
     {
-    this->ImmediateModeCheck->SetState(1);
+    this->ImmediateModeCheck->SetSelectedState(1);
     }
   this->ImmediateModeCheck->SetBalloonHelpString(
     "When this option is off, OpenGL display lists are used when rendering."
@@ -1406,13 +1406,13 @@ void vtkPVRenderView::CreateViewProperties()
   if (pvapp && pvwindow &&
       pvapp->GetRegistryValue(2, "RunTime", "OrientationAxesVisibility", 0))
     {
-    this->OrientationAxesCheck->SetState(
+    this->OrientationAxesCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "OrientationAxesVisibility"));
     }
   else
     {
-    this->OrientationAxesCheck->SetState(1);
+    this->OrientationAxesCheck->SetSelectedState(1);
     }
   this->OrientationAxesCheckCallback();
   
@@ -1429,13 +1429,13 @@ void vtkPVRenderView::CreateViewProperties()
   if (pvapp && pvwindow &&
       pvapp->GetRegistryValue(2, "RunTime", "OrientationAxesInteractivity", 0))
     {
-    this->OrientationAxesInteractiveCheck->SetState(
+    this->OrientationAxesInteractiveCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "OrientationAxesInteractivity"));
     }
   else
     {
-    this->OrientationAxesInteractiveCheck->SetState(0);
+    this->OrientationAxesInteractiveCheck->SetSelectedState(0);
     }
   
   this->OrientationAxesInteractiveCallback();
@@ -2013,7 +2013,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::TriangleStripsCallback()
 {
-  if (this->TriangleStripsCheck->GetState())
+  if (this->TriangleStripsCheck->GetSelectedState())
     {
     vtkTimerLog::MarkEvent("--- Enable triangle strips.");
     }
@@ -2022,7 +2022,7 @@ void vtkPVRenderView::TriangleStripsCallback()
     vtkTimerLog::MarkEvent("--- Disable triangle strips.");
     }
 
-  this->SetUseTriangleStrips(this->TriangleStripsCheck->GetState());
+  this->SetUseTriangleStrips(this->TriangleStripsCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
@@ -2032,12 +2032,12 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
     state);
 
-  if (this->TriangleStripsCheck->GetState() != state)
+  if (this->TriangleStripsCheck->GetSelectedState() != state)
     {
-    this->TriangleStripsCheck->SetState(state);
+    this->TriangleStripsCheck->SetSelectedState(state);
     }
   
-  if ( ! this->ImmediateModeCheck->GetState() && ! state)
+  if ( ! this->ImmediateModeCheck->GetSelectedState() && ! state)
     { // Make sure immediate mode is on when strips are off.
     this->SetUseImmediateMode(1);
     }
@@ -2066,9 +2066,9 @@ void vtkPVRenderView::ParallelProjectionOn()
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
 
-  if (!this->ParallelProjectionCheck->GetState())
+  if (!this->ParallelProjectionCheck->GetSelectedState())
     {
-    this->ParallelProjectionCheck->SetState(1);
+    this->ParallelProjectionCheck->SetSelectedState(1);
     }
   vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -2088,9 +2088,9 @@ void vtkPVRenderView::ParallelProjectionOn()
 void vtkPVRenderView::ParallelProjectionOff()
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
-  if (this->ParallelProjectionCheck->GetState())
+  if (this->ParallelProjectionCheck->GetSelectedState())
     {
-    this->ParallelProjectionCheck->SetState(0);
+    this->ParallelProjectionCheck->SetSelectedState(0);
     }
 
   vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
@@ -2111,7 +2111,7 @@ void vtkPVRenderView::ParallelProjectionOff()
 void vtkPVRenderView::ParallelProjectionCallback()
 {
 
-  if (this->ParallelProjectionCheck->GetState())
+  if (this->ParallelProjectionCheck->GetSelectedState())
     {
     vtkTimerLog::MarkEvent("--- Enable parallel projection.");
     this->ParallelProjectionOn();
@@ -2126,7 +2126,7 @@ void vtkPVRenderView::ParallelProjectionCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ImmediateModeCallback()
 {
-  if (this->ImmediateModeCheck->GetState())
+  if (this->ImmediateModeCheck->GetSelectedState())
     {
     vtkTimerLog::MarkEvent("--- Disable display lists.");
     }
@@ -2135,7 +2135,7 @@ void vtkPVRenderView::ImmediateModeCallback()
     vtkTimerLog::MarkEvent("--- Enable display lists.");
     }
   
-  this->SetUseImmediateMode(this->ImmediateModeCheck->GetState());
+  this->SetUseImmediateMode(this->ImmediateModeCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
@@ -2144,12 +2144,12 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
     state);
 
-  if (this->ImmediateModeCheck->GetState() != state)
+  if (this->ImmediateModeCheck->GetSelectedState() != state)
     {
-    this->ImmediateModeCheck->SetState(state);
+    this->ImmediateModeCheck->SetSelectedState(state);
     }
   
-  if ( ! state && ! this->TriangleStripsCheck->GetState())
+  if ( ! state && ! this->TriangleStripsCheck->GetSelectedState())
     { // Make sure triangle strips are on.
     // When immediate mode is off, triangle strips must be on.
     this->SetUseTriangleStrips(1);
@@ -2396,7 +2396,7 @@ void vtkPVRenderView::LightEndCallback(int type, int subtype)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::MaintainLuminanceCallback()
 {
-  int val = this->MaintainLuminanceButton->GetState();
+  int val = this->MaintainLuminanceButton->GetSelectedState();
   this->SetMaintainLuminance(val);
 }
 
@@ -2404,7 +2404,7 @@ void vtkPVRenderView::MaintainLuminanceCallback()
 void vtkPVRenderView::SetMaintainLuminance(int s)
 {
   // Set the GUI
-  this->MaintainLuminanceButton->SetState(s);
+  this->MaintainLuminanceButton->SetSelectedState(s);
   vtkSMProperty *prop = this->RenderModuleProxy->GetProperty("MaintainLuminance");
   vtkSMIntVectorProperty *dp = vtkSMIntVectorProperty::SafeDownCast( prop );
   dp->SetElements1(s);
@@ -2418,7 +2418,7 @@ void vtkPVRenderView::SetMaintainLuminance(int s)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::UseLightCallback()
 {
-  int val = this->UseLightButton->GetState();
+  int val = this->UseLightButton->GetSelectedState();
   this->SetUseLight(val);
 }
 
@@ -2426,7 +2426,7 @@ void vtkPVRenderView::UseLightCallback()
 void vtkPVRenderView::SetUseLight(int s)
 {
   // Set the GUI
-  this->UseLightButton->SetState(s);
+  this->UseLightButton->SetSelectedState(s);
   vtkSMProperty* p = this->RenderModuleProxy->GetProperty("UseLight");
   IntVectSetElement(p, s);
   this->RenderModuleProxy->UpdateVTKObjects();
@@ -2490,10 +2490,10 @@ void vtkPVRenderView::SaveState(ofstream* file)
         << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl; 
 
   *file << "$kw(" << this->GetTclName() << ") SetUseTriangleStrips "
-        << this->TriangleStripsCheck->GetState() << endl;
+        << this->TriangleStripsCheck->GetSelectedState() << endl;
   
   *file << "$kw(" << this->GetTclName() << ") SetUseImmediateMode "
-        << this->ImmediateModeCheck->GetState() << endl;
+        << this->ImmediateModeCheck->GetSelectedState() << endl;
   
   if (this->RenderModuleUI)
     {
@@ -2507,9 +2507,9 @@ void vtkPVRenderView::SaveState(ofstream* file)
   this->CornerAnnotation->SaveState(file);
   
   *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesVisibility "
-        << this->OrientationAxesCheck->GetState() << endl;
+        << this->OrientationAxesCheck->GetSelectedState() << endl;
   *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesInteractivity "
-        << this->OrientationAxesInteractiveCheck->GetState() << endl;
+        << this->OrientationAxesInteractiveCheck->GetSelectedState() << endl;
   color = this->OrientationAxesOutlineColor->GetColor();
   *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesOutlineColor "
         << color[0] << " " << color[1] << " " << color[2] << endl;
@@ -2528,12 +2528,12 @@ void vtkPVRenderView::SaveState(ofstream* file)
   this->ManipulatorControl3D->SaveState(file);
 
   // Saving light state:
-  if(  this->UseLightButton->GetState() )
+  if(  this->UseLightButton->GetSelectedState() )
     {
     *file << "$kw(" << this->GetTclName() << ") SetUseLight "
-      << this->UseLightButton->GetState() << endl;
+      << this->UseLightButton->GetSelectedState() << endl;
     *file << "$kw(" << this->GetTclName() << ") SetMaintainLuminance "
-      << this->MaintainLuminanceButton->GetState() << endl;
+      << this->MaintainLuminanceButton->GetSelectedState() << endl;
 
     for(int i = 0; i < 4; i++) // For each light type
       {
@@ -2748,17 +2748,17 @@ int vtkPVRenderView::GetOrientationAxesVisibility()
     {
     return 0;
     }
-  return this->OrientationAxesCheck->GetState();
+  return this->OrientationAxesCheck->GetSelectedState();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 {
-  if (this->OrientationAxesCheck->GetState() != val)
+  if (this->OrientationAxesCheck->GetSelectedState() != val)
     {
     this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesVisibility %d",
                         this->GetTclName(), val);
-    this->OrientationAxesCheck->SetState(val);
+    this->OrientationAxesCheck->SetSelectedState(val);
     }
   
   if (!this->OrientationAxes->GetInteractor())
@@ -2777,7 +2777,7 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::OrientationAxesCheckCallback()
 {
-  int val = this->OrientationAxesCheck->GetState();
+  int val = this->OrientationAxesCheck->GetSelectedState();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesVisibility %d",
                       this->GetTclName(), val);
   this->SetOrientationAxesVisibility(val);
@@ -2790,11 +2790,11 @@ void vtkPVRenderView::OrientationAxesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 {
-  if (this->OrientationAxesInteractiveCheck->GetState() != val)
+  if (this->OrientationAxesInteractiveCheck->GetSelectedState() != val)
     {
     this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesInteractivity %d",
                         this->GetTclName(), val);
-    this->OrientationAxesInteractiveCheck->SetState(val);
+    this->OrientationAxesInteractiveCheck->SetSelectedState(val);
     }
   
   this->OrientationAxes->SetInteractive(val);
@@ -2803,7 +2803,7 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::OrientationAxesInteractiveCallback()
 {
-  int val = this->OrientationAxesInteractiveCheck->GetState();
+  int val = this->OrientationAxesInteractiveCheck->GetSelectedState();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesInteractivity %d",
                       this->GetTclName(), val);
   this->SetOrientationAxesInteractivity(val);

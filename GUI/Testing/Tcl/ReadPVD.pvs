@@ -26,7 +26,7 @@ set kw(vtkTemp1014) [$kw(vtkTemp4) CreatePVSource CellDataToPointData]
 set kw(vtkTemp1024) [$kw(vtkTemp1014) GetPVWidget {Input}]
 $kw(vtkTemp1024) SetCurrentValue $kw(vtkTemp898)
 set kw(vtkTemp1021) [$kw(vtkTemp1014) GetPVWidget {PassCellData}]
-$kw(vtkTemp1021) SetState 0
+$kw(vtkTemp1021) SetSelectedState 0
 $kw(vtkTemp1014) AcceptCallback
 $kw(vtkTemp4) SetCurrentPVSourceCallback $kw(vtkTemp1014)
 set kw(vtkTemp1138) [$kw(vtkTemp4) CreatePVSource Contour]
@@ -38,11 +38,11 @@ set kw(vtkTemp1150) [$kw(vtkTemp1138) GetPVWidget {Contour Values}]
 $kw(vtkTemp1150) RemoveAllValues 
 $kw(vtkTemp1150) AddValue -0.02
 set kw(vtkTemp1176) [$kw(vtkTemp1138) GetPVWidget {Compute Normals}]
-$kw(vtkTemp1176) SetState 1
+$kw(vtkTemp1176) SetSelectedState 1
 set kw(vtkTemp1179) [$kw(vtkTemp1138) GetPVWidget {Compute Gradients}]
-$kw(vtkTemp1179) SetState 0
+$kw(vtkTemp1179) SetSelectedState 0
 set kw(vtkTemp1182) [$kw(vtkTemp1138) GetPVWidget {Compute Scalars}]
-$kw(vtkTemp1182) SetState 1
+$kw(vtkTemp1182) SetSelectedState 1
 $kw(vtkTemp1138) AcceptCallback
 set kw(vtkTemp1190) [$kw(vtkTemp1138) GetPVOutput]
 $kw(vtkTemp1190) ColorByArray {phi} 3

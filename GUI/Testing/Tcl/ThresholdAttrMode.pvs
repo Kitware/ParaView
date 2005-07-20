@@ -21,7 +21,7 @@ set pv(vtkTemp141) [$pv(vtkTemp129) GetPVWidget {MinMax}]
 $pv(vtkTemp141) SetMaxValue 0.41
 $pv(vtkTemp141) SetMinValue 0.14
 set pv(vtkTemp146) [$pv(vtkTemp129) GetPVWidget {AllScalars}]
-$pv(vtkTemp146) SetState 0
+$pv(vtkTemp146) SetSelectedState 0
 $pv(vtkTemp129) AcceptCallback
 
 set pv(vtkTemp304) [$pv(vtkTemp1) CreatePVSource DataSetTriangleFilter]

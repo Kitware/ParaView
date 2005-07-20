@@ -18,7 +18,7 @@ $kw(vtkTemp912) SetValue 4
 set kw(vtkTemp915) [$kw(vtkTemp897) GetPVWidget {RandomSeed}]
 $kw(vtkTemp915) SetValue 111
 set kw(vtkTemp918) [$kw(vtkTemp897) GetPVWidget {ShowSolution}]
-$kw(vtkTemp918) SetState 1
+$kw(vtkTemp918) SetSelectedState 1
 $kw(vtkTemp4) SetCenterOfRotation 10.000000 10.000000 0.000000
 $kw(vtkTemp4) SetCenterOfRotation 10.000000 10.000000 0.000000
 $kw(vtkTemp897) AcceptCallback

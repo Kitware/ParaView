@@ -34,7 +34,7 @@ $pv(vtkTemp170) RemoveAllValues
 $pv(vtkTemp170) AddValue 110.000000
 $pv(vtkTemp170) AddValue 111.000000
 set pv(vtkTemp176) [$pv(vtkTemp159) GetPVWidget {Compute Normals}]
-$pv(vtkTemp176) SetState 0
+$pv(vtkTemp176) SetSelectedState 0
 $pv(vtkTemp159) AcceptCallback
 
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp574)

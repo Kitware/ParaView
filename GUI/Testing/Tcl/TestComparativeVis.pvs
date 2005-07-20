@@ -7,7 +7,7 @@ source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp40) $argv $argc
 
 set kw(vtkTemp1012) [$kw(vtkTemp1) GetAnimationManager]
-[$kw(vtkTemp1) GetRotateCameraButton] SetState 1
+[$kw(vtkTemp1) GetRotateCameraButton] SetSelectedState 1
 $kw(vtkTemp1) ChangeInteractorStyle 1
 set kw(vtkTemp847) [$kw(vtkTemp1) CreatePVSource SphereSource]
 $kw(vtkTemp847) SetLabel {Sphere1}

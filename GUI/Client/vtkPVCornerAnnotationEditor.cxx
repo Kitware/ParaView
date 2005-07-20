@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.8");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()
@@ -291,7 +291,7 @@ void vtkPVCornerAnnotationEditor::Update()
 
   if (this->CheckButton && this->CornerAnnotation)
     {
-    this->CheckButton->SetState(this->CornerAnnotation->GetVisibility());
+    this->CheckButton->SetSelectedState(this->CornerAnnotation->GetVisibility());
     }
 }
 

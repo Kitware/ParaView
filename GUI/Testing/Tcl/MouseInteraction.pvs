@@ -37,7 +37,7 @@ $kw(vtkTemp931) SetValue 1
 set kw(vtkTemp934) [$kw(vtkTemp897) GetPVWidget {Size}]
 $kw(vtkTemp934) SetValue 0.5
 set kw(vtkTemp937) [$kw(vtkTemp897) GetPVWidget {Toroidal}]
-$kw(vtkTemp937) SetState 1
+$kw(vtkTemp937) SetSelectedState 1
 $kw(vtkTemp897) AcceptCallback
 
 # Pan

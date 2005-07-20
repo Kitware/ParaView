@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.19");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
@@ -113,7 +113,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 
   this->SaveImagesCheck->SetParent(this);
   this->SaveImagesCheck->Create(app);
-  this->SaveImagesCheck->SetState(1);
+  this->SaveImagesCheck->SetSelectedState(1);
   this->SaveImagesCheck->SetText("Save Images");
   this->SaveImagesCheck->SetCommand(this, "SaveImagesCheckCallback");
 
@@ -122,7 +122,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 
   this->SaveGeometryCheck->SetParent(this);
   this->SaveGeometryCheck->Create(app);
-  this->SaveGeometryCheck->SetState(0);
+  this->SaveGeometryCheck->SetSelectedState(0);
   this->SaveGeometryCheck->SetText("Save Geometry");
   this->SaveGeometryCheck->SetCommand(this, "SaveGeometryCheckCallback");
 
@@ -208,13 +208,13 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 int vtkPVSaveBatchScriptDialog::GetOffScreen()
 {
-  return this->OffScreenCheck->GetState();
+  return this->OffScreenCheck->GetSelectedState();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVSaveBatchScriptDialog::GetImagesFileName()
 {
-  if ( ! this->SaveImagesCheck->GetState())
+  if ( ! this->SaveImagesCheck->GetSelectedState())
     {
     return NULL;
     }
@@ -225,7 +225,7 @@ const char* vtkPVSaveBatchScriptDialog::GetImagesFileName()
 //----------------------------------------------------------------------------
 const char* vtkPVSaveBatchScriptDialog::GetGeometryFileName()
 {
-  if ( ! this->SaveGeometryCheck->GetState())
+  if ( ! this->SaveGeometryCheck->GetSelectedState())
     {
     return NULL;
     }
@@ -236,7 +236,7 @@ const char* vtkPVSaveBatchScriptDialog::GetGeometryFileName()
 //----------------------------------------------------------------------------
 void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback()
 {
-  if (this->SaveImagesCheck->GetState())
+  if (this->SaveImagesCheck->GetSelectedState())
     {
     this->ImageFileNameEntry->SetEnabled(1);
     this->ImageFileNameBrowseButton->SetEnabled(1);
@@ -251,7 +251,7 @@ void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVSaveBatchScriptDialog::SaveGeometryCheckCallback()
 {
-  if (this->SaveGeometryCheck->GetState())
+  if (this->SaveGeometryCheck->GetSelectedState())
     {
     this->GeometryFileNameEntry->SetEnabled(1);
     this->GeometryFileNameBrowseButton->SetEnabled(1);
@@ -272,9 +272,9 @@ void vtkPVSaveBatchScriptDialog::ImageFileNameBrowseButtonCallback()
   loadDialog->SetTitle("Select File Pattern");
 
   // Look for the current extension.
-  char *fileName = this->ImageFileNameEntry->GetValue();
-  char *ptr;
-  char *ext = NULL;
+  const char *fileName = this->ImageFileNameEntry->GetValue();
+  const char *ptr;
+  const char *ext = NULL;
 
   ptr = fileName;
   while (*ptr != '\0')
@@ -321,9 +321,9 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
   loadDialog->SetTitle("Select Geometry File Pattern");
 
   // Look for the current extension.
-  char *fileName = this->GeometryFileNameEntry->GetValue();
-  char *ptr;
-  char *ext = NULL;
+  const char *fileName = this->GeometryFileNameEntry->GetValue();
+  const char *ptr;
+  const char *ext = NULL;
 
   ptr = fileName;
   while (*ptr != '\0')

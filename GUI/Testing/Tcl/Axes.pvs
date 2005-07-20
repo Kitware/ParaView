@@ -16,7 +16,7 @@ set pv(vtkTemp168) [$pv(vtkTemp1) CreatePVSource Axes]
 set pv(vtkTemp183) [$pv(vtkTemp168) GetPVWidget {Origin}]
 $pv(vtkTemp183) SetValue 0 3 0
 set pv(vtkTemp188) [$pv(vtkTemp168) GetPVWidget {Symmetric}]
-$pv(vtkTemp188) SetState 1
+$pv(vtkTemp188) SetSelectedState 1
 $pv(vtkTemp168) AcceptCallback
 [$pv(vtkTemp168) GetPVOutput] SetLineWidth 3
 $pv(vtkTemp1) ResetCameraCallback

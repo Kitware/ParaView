@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.11");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.12");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
   this->ShowAllLabel->SetText("Show All");
   this->ShowAllCheck->SetParent(this->ButtonFrame);
   this->ShowAllCheck->Create(pvApp);
-  this->ShowAllCheck->SetState(0);
+  this->ShowAllCheck->SetSelectedState(0);
   this->ShowAllCheck->SetCommand(this, "ShowAllArraysCheckCallback");
 
   this->ShowAllCheck->SetBalloonHelpString("Hide arrays that are not called 'Volume Fraction'");
@@ -319,7 +319,7 @@ void vtkPVSelectArrays::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVSelectArrays::Update()
 {
-  int showAll = this->ShowAllCheck->GetState();
+  int showAll = this->ShowAllCheck->GetSelectedState();
   int volumeFlag;
   int voidFlag;
   int num, idx;

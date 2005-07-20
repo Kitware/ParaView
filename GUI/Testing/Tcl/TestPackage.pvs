@@ -22,20 +22,20 @@ if { [catch {
   $cone SetCubeAxesVisibility 1
   $cone SetCubeAxesVisibility 0
   $cone SetCubeAxesVisibility 1
-  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 1
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetSelectedState 1
   [ $cone GetPVOutput ] CubeAxesCheckCallback
   # Cone has no attributes to color by!
-  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 1
+  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetSelectedState 1
   #[ $cone GetPVOutput ] ScalarBarCheckCallback
-  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 0
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetSelectedState 0
   [ $cone GetPVOutput ] CubeAxesCheckCallback
   # Cone has no attributes to color by!
-  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 0
+  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetSelectedState 0
   #[ $cone GetPVOutput ] ScalarBarCheckCallback
-  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 1
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetSelectedState 1
   [ $cone GetPVOutput ] CubeAxesCheckCallback
   # Cone has no attributes to color by!
-  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 1
+  #[ [ $cone GetPVOutput ] GetScalarBarCheck ] SetSelectedState 1
   #[ $cone GetPVOutput ] ScalarBarCheckCallback
   [ $cone GetPVOutput ] CenterCamera
   file delete -force vtkParaViewWriteTest.tcl 

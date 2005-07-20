@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.753");
+vtkCxxRevisionMacro(vtkPVWindow, "1.754");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -957,7 +957,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
                this->GetTclName(),
                INTERACTOR_STYLE_3D);
   this->InteractorToolbar->AddWidget(this->RotateCameraButton);
-  this->RotateCameraButton->SetState(1);
+  this->RotateCameraButton->SetSelectedState(1);
 
   // Translate camera interactor style
 
@@ -1391,7 +1391,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
   this->GetFileMenu()->SetState(
-    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::StateDisabled);
+    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWTkOptions::StateDisabled);
 
   if (app->GetSaveUserInterfaceGeometry())
     {
@@ -1862,7 +1862,7 @@ void vtkPVWindow::SetInteractorStyle(int iStyle)
   switch (iStyle)
     {
     case INTERACTOR_STYLE_3D:
-      this->TranslateCameraButton->SetState(0);
+      this->TranslateCameraButton->SetSelectedState(0);
       // Camera styles are not duplicated on satellites.
       // Cameras are synchronized before each render.
       this->Interactor->SetInteractorStyle(this->CameraStyle3D);
@@ -1871,7 +1871,7 @@ void vtkPVWindow::SetInteractorStyle(int iStyle)
       this->ShowCenterActor();
       break;
     case INTERACTOR_STYLE_2D:
-      this->RotateCameraButton->SetState(0);
+      this->RotateCameraButton->SetSelectedState(0);
       this->Interactor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
       break;
@@ -3118,14 +3118,14 @@ void vtkPVWindow::SaveState(const char* filename)
   if (style == this->CameraStyle3D)
     {
     *file << "[$kw(" << this->GetTclName()
-          << ") GetRotateCameraButton] SetState 1" << endl;
+          << ") GetRotateCameraButton] SetSelectedState 1" << endl;
     *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 1"
           << endl;
     }
   else if (style == this->CameraStyle2D)
     {
     *file << "[$kw(" << this->GetTclName()
-          << ") GetTranslateCameraButton] SetState 1" << endl;
+          << ") GetTranslateCameraButton] SetSelectedState 1" << endl;
     *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 2"
           << endl;
     }
@@ -3334,12 +3334,12 @@ void vtkPVWindow::UpdateSourceMenu()
   if (numSources > 0)
     {
     this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
-                         vtkKWMenu::StateNormal);
+                              vtkKWTkOptions::StateNormal);
     }
   else
     {
     this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
-                         vtkKWMenu::StateDisabled);
+                              vtkKWTkOptions::StateDisabled);
     }
 }
 
@@ -3437,7 +3437,7 @@ void vtkPVWindow::UpdateFilterMenu()
           !vi->second->GetNumberOfProcessorsValid())
         {
         this->FilterMenu->SetState(ki->first.c_str(), 
-                                   vtkKWMenu::StateDisabled);
+                                   vtkKWTkOptions::StateDisabled);
         }
       else if (vi->second->GetToolbarModule())
         {
@@ -4423,7 +4423,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     this->ReaderList->AppendItem(prototype);
     }
   this->GetFileMenu()->SetState(
-    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::StateNormal);
+    VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWTkOptions::StateNormal);
 }
 
 //-----------------------------------------------------------------------------
@@ -4861,16 +4861,16 @@ void vtkPVWindow::UpdateMenuState()
   this->PropagateEnableState(this->GlyphMenu);
 
   int menu_state = 
-    (this->GetEnabled() ? vtkKWMenu::StateNormal: vtkKWMenu::StateDisabled);
+    (this->GetEnabled() ? vtkKWTkOptions::StateNormal: vtkKWTkOptions::StateDisabled);
 
   if (this->InComparativeVis)
     {
     vtkKWMenu* menu = this->GetMenu();
-    menu->SetState(vtkKWMenu::StateDisabled);
+    menu->SetState(vtkKWTkOptions::StateDisabled);
     this->GetMenu()->SetState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
     if (this->WindowMenu)
       {
-      this->WindowMenu->SetState(vtkKWMenu::StateDisabled);
+      this->WindowMenu->SetState(vtkKWTkOptions::StateDisabled);
       }
     this->WindowMenu->SetState("Command Prompt", menu_state);
     this->WindowMenu->SetState("Timer Log", menu_state);
@@ -4880,7 +4880,7 @@ void vtkPVWindow::UpdateMenuState()
     if (this->FileMenu)
       {
       this->GetMenu()->SetState(vtkKWWindowBase::FileMenuLabel,  menu_state);
-      this->FileMenu->SetState(vtkKWMenu::StateDisabled);
+      this->FileMenu->SetState(vtkKWTkOptions::StateDisabled);
       this->FileMenu->SetState(vtkPVWindow::FileExitMenuLabel, menu_state);
       }
     return;
@@ -4937,13 +4937,13 @@ void vtkPVWindow::UpdateMenuState()
     }
   this->GetMenu()->SetState(
     VTK_PV_SELECT_SOURCE_MENU_LABEL, 
-    no_sources || source_grabbed ? vtkKWMenu::StateDisabled : menu_state);
+    no_sources || source_grabbed ? vtkKWTkOptions::StateDisabled : menu_state);
 
   if (this->ViewMenu)
     {
     this->ViewMenu->SetState(
       VTK_PV_SOURCE_MENU_LABEL, 
-      no_sources || source_grabbed ? vtkKWMenu::StateDisabled : menu_state);
+      no_sources || source_grabbed ? vtkKWTkOptions::StateDisabled : menu_state);
     }
 
   // Handle the filter menu
@@ -4952,7 +4952,7 @@ void vtkPVWindow::UpdateMenuState()
   this->GetMenu()->SetState(
     VTK_PV_VTK_FILTERS_MENU_LABEL,  
     !this->FilterMenu->GetEnabled() || source_grabbed 
-    ? vtkKWMenu::StateDisabled : menu_state);
+    ? vtkKWTkOptions::StateDisabled : menu_state);
 
   // Handle the source menu and toolbar buttons.
 

@@ -14,7 +14,7 @@ $kw(vtkTemp554) SetValue 0.5
 set kw(vtkTemp557) [$kw(vtkTemp545) GetPVWidget {Height}]
 $kw(vtkTemp557) SetValue 1
 set kw(vtkTemp560) [$kw(vtkTemp545) GetPVWidget {Capping}]
-$kw(vtkTemp560) SetState 1
+$kw(vtkTemp560) SetSelectedState 1
 $kw(vtkTemp545) AcceptCallback
 set kw(vtkTemp573) [$kw(vtkTemp545) GetPVOutput]
 set kw(vtkTemp667) [$kw(vtkTemp1) CreatePVSource CylinderSource]
@@ -27,7 +27,7 @@ $kw(vtkTemp679) SetValue 0.5
 set kw(vtkTemp682) [$kw(vtkTemp667) GetPVWidget {Center}]
 $kw(vtkTemp682) SetValue 1 0 0
 set kw(vtkTemp687) [$kw(vtkTemp667) GetPVWidget {Capping}]
-$kw(vtkTemp687) SetState 1
+$kw(vtkTemp687) SetSelectedState 1
 $kw(vtkTemp667) AcceptCallback
 set kw(vtkTemp701) [$kw(vtkTemp667) GetPVOutput]
 set kw(vtkTemp795) [$kw(vtkTemp1) CreatePVSource SphereSource]

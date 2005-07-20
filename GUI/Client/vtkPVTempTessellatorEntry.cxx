@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.29");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -244,7 +244,7 @@ void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
 
     if ( ! field )
       {
-      this->Data->CriterionEnable->SetState( 0 );
+      this->Data->CriterionEnable->SetSelectedState( 0 );
       this->Data->CriterionEnable->SetEnabled( 0 );
       this->Data->CriterionValue->SetEnabled( 0 );
       return;
@@ -255,7 +255,7 @@ void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
   while ( fnl && field[ fnl ] != ':' )
     fnl--;
 
-  if ( this->Data->CriterionEnable->GetState() == 1 )
+  if ( this->Data->CriterionEnable->GetSelectedState() == 1 )
     { // User just toggled it on, so put in a default value
     this->Data->CriterionValue->SetEnabled( 1 );
     this->Data->CriterionValue->SetValue( 1.e-5 );
@@ -304,7 +304,7 @@ void vtkPVTempTessellatorEntry::ChangeCriterionCallback()
 
     if ( ! field )
       {
-      this->Data->CriterionEnable->SetState( 0 );
+      this->Data->CriterionEnable->SetSelectedState( 0 );
       this->Data->CriterionEnable->SetEnabled( 0 );
       this->Data->CriterionValue->SetEnabled( 0 );
       return;
@@ -371,7 +371,7 @@ void vtkPVTempTessellatorEntry::PointDataSelectedCallback()
     delete [] value;
 
     this->Data->CriterionEnable->SetEnabled( 1 );
-    this->Data->CriterionEnable->SetState( active ? 1 : 0 );
+    this->Data->CriterionEnable->SetSelectedState( active ? 1 : 0 );
     this->Data->CriterionValue->SetEnabled( active ? 1 : 0 );
     }
 }
@@ -443,7 +443,7 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
   if ( (strcmp( field + flen - 8 /*=strlen("inactive")+1*/, "inactive" ) == 0) ^ want_active )
     {
     d->ScalarFieldList->SetSelectionIndex( fnum );
-    d->CriterionEnable->SetState( want_active ? 1 : 0 );
+    d->CriterionEnable->SetSelectedState( want_active ? 1 : 0 );
     this->ToggleCriterionCallback();
     }
 

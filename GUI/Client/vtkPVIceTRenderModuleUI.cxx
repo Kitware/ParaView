@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.8");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -85,7 +85,7 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
 
   this->CollectCheck->SetParent(this->LODScalesFrame);
   this->CollectCheck->Create(app);
-  this->CollectCheck->SetState(1);
+  this->CollectCheck->SetSelectedState(1);
   this->CollectCheck->SetCommand(this, "CollectCheckCallback");
 
   this->CollectThresholdScale->SetParent(this->LODScalesFrame);
@@ -134,7 +134,7 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
 //-----------------------------------------------------------------------------
 void vtkPVIceTRenderModuleUI::CollectCheckCallback()
 {
-  int val = this->CollectCheck->GetState();
+  int val = this->CollectCheck->GetSelectedState();
 
   if (val)
     {
@@ -180,13 +180,13 @@ void vtkPVIceTRenderModuleUI::SetCollectThreshold(float threshold)
 
   if (threshold == VTK_LARGE_FLOAT)
     {
-    this->CollectCheck->SetState(0);
+    this->CollectCheck->SetSelectedState(0);
     this->CollectThresholdScale->EnabledOff();
     this->CollectThresholdLabel->EnabledOff();
     }
   else
     {
-    this->CollectCheck->SetState(1);
+    this->CollectCheck->SetSelectedState(1);
     this->CollectThresholdScale->EnabledOn();
     this->CollectThresholdLabel->EnabledOn();
     this->CollectThresholdScale->SetValue(threshold);

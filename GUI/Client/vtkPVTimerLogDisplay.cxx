@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.33");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -139,7 +139,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   text->SetWidth(100);
   text->SetHeight(40);
   text->SetWrapToWord();
-  text->EditableTextOff();
+  text->ReadOnlyOn();
 
   this->Script("pack %s -side bottom -expand 1 -fill both",
                this->DisplayText->GetWidgetName());
@@ -208,7 +208,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->EnableLabel->SetBalloonHelpString("Enable or disable loging of new events.");
   this->EnableCheck->SetParent(this->ControlFrame);
   this->EnableCheck->Create(app);
-  this->EnableCheck->SetState(1);
+  this->EnableCheck->SetSelectedState(1);
   this->EnableCheck->SetCommand(this, "EnableCheckCallback");
   this->EnableCheck->SetText("");
   this->EnableCheck->SetBalloonHelpString("Enable or disable loging of new events.");
@@ -299,7 +299,7 @@ void vtkPVTimerLogDisplay::EnableCheckCallback()
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
-         << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetState()
+         << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetSelectedState()
          << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);

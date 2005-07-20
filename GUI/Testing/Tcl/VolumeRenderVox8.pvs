@@ -33,7 +33,7 @@ $kw(vtkTemp1448) SetCurrentValue $kw(vtkTemp1299)
 set kw(vtkTemp1430) [$kw(vtkTemp1422) GetPVWidget {NumberOfSides}]
 $kw(vtkTemp1430) SetValue 6
 set kw(vtkTemp1435) [$kw(vtkTemp1422) GetPVWidget {Capping}]
-$kw(vtkTemp1435) SetState 1
+$kw(vtkTemp1435) SetSelectedState 1
 set kw(vtkTemp1438) [$kw(vtkTemp1422) GetPVWidget {Radius}]
 $kw(vtkTemp1438) SetValue 0.02
 set kw(vtkTemp1442) [$kw(vtkTemp1422) GetPVWidget {VaryRadius}]

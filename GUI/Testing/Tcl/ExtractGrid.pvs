@@ -24,9 +24,9 @@ $kw(vtkTemp358) RemoveAllValues
 $kw(vtkTemp358) AddValue 1.000000
 $kw(vtkTemp358) AddValue 10.000000
 set kw(vtkTemp1029) [$kw(vtkTemp349) GetPVWidget {Compute Scalars}]
-$kw(vtkTemp1029) SetState 1
+$kw(vtkTemp1029) SetSelectedState 1
 set kw(vtkTemp1169) [$kw(vtkTemp349) GetPVWidget {Compute Normals}]
-$kw(vtkTemp1169) SetState 0
+$kw(vtkTemp1169) SetSelectedState 0
 $kw(vtkTemp349) AcceptCallback
 $kw(vtkTemp21) SetCameraState -15.223 0.904 4.858  15.000 15.000 15.000  -0.409 0.911 -0.046
 $kw(vtkTemp21) SetCameraState 6.136 -18.690 13.825  15.000 15.000 15.000  -0.213 0.090 -0.973
@@ -53,7 +53,7 @@ $kw(vtkTemp21) SetCameraState 49.583 19.329 15.491  15.000 15.000 15.000  -0.125
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp400)
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp349)
 set kw(vtkTemp366) [$kw(vtkTemp349) GetPVWidget {Compute Gradients}]
-$kw(vtkTemp366) SetState 1
+$kw(vtkTemp366) SetSelectedState 1
 $kw(vtkTemp349) AcceptCallback
 [$kw(vtkTemp349) GetPVColorMap] SetScalarRange 0 255
 $kw(vtkTemp21) SetCameraState -4.208 17.411 -13.986  15.000 15.000 15.000  0.631 0.687 -0.361

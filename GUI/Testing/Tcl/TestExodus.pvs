@@ -6,7 +6,7 @@ set kw(vtkTemp23) [$kw(vtkTemp4) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp23) $argv $argc
 
-[$kw(vtkTemp4) GetRotateCameraButton] SetState 1
+[$kw(vtkTemp4) GetRotateCameraButton] SetSelectedState 1
 $kw(vtkTemp4) ChangeInteractorStyle 1
 set kw(vtkTemp1076) [$kw(vtkTemp4) InitializeReadCustom "ExodusReader" "$DataDir/Data/box.ex2"]
 $kw(vtkTemp4) ReadFileInformation $kw(vtkTemp1076) "$DataDir/Data/box.ex2"
@@ -39,17 +39,17 @@ set kw(vtkTemp1128) [$kw(vtkTemp1076) GetPVWidget {DisplayType}]
 set kw(vtkTemp1119) [$kw(vtkTemp1128) GetPVWidget {Blocks}]
 $kw(vtkTemp1119) SetArrayStatus {Block: 1 (TETRA)} 1
 set kw(vtkTemp1129) [$kw(vtkTemp1076) GetPVWidget {apply_displacements}]
-$kw(vtkTemp1129) SetState 1
+$kw(vtkTemp1129) SetSelectedState 1
 set kw(vtkTemp1132) [$kw(vtkTemp1076) GetPVWidget {DisplacementMagnitude}]
 $kw(vtkTemp1132) SetValue 0.001
 set kw(vtkTemp1135) [$kw(vtkTemp1076) GetPVWidget {block_ids}]
-$kw(vtkTemp1135) SetState 1
+$kw(vtkTemp1135) SetSelectedState 1
 set kw(vtkTemp1138) [$kw(vtkTemp1076) GetPVWidget {global_node_ids}]
-$kw(vtkTemp1138) SetState 1
+$kw(vtkTemp1138) SetSelectedState 1
 set kw(vtkTemp1141) [$kw(vtkTemp1076) GetPVWidget {global_element_ids}]
-$kw(vtkTemp1141) SetState 1
+$kw(vtkTemp1141) SetSelectedState 1
 set kw(vtkTemp1144) [$kw(vtkTemp1076) GetPVWidget {global_file_ids}]
-$kw(vtkTemp1144) SetState 1
+$kw(vtkTemp1144) SetSelectedState 1
 $kw(vtkTemp1076) AcceptCallback
 set kw(vtkTemp1162) [$kw(vtkTemp1076) GetPVOutput]
 $kw(vtkTemp1162) ColorByArray {disp} 3
