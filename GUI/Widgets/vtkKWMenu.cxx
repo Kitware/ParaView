@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.77");
+vtkCxxRevisionMacro(vtkKWMenu, "1.78");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -817,7 +817,7 @@ void vtkKWMenu::SetState(const char* item, int state)
     {
     return;
     }
-  this->SetState(index, this->GetIndex(item));
+  this->SetState(this->GetIndex(item), state);
 }
 
 //----------------------------------------------------------------------------
