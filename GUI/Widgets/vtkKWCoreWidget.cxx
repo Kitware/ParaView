@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -403,22 +403,17 @@ const char* vtkKWCoreWidget::GetTextOption(const char *option)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetStateOption(int flag)
+void vtkKWCoreWidget::SetState(int state)
 {
-  if (this->IsAlive())
-    {
-    this->SetConfigurationOption("-state", (flag ? "normal" : "disabled")); 
-    }
+  this->SetConfigurationOption(
+    "-state", vtkKWTkOptions::GetStateAsTkOptionValue(state));
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetStateOption()
+int vtkKWCoreWidget::GetState()
 {
-  if (this->IsAlive())
-    {
-    return !strcmp(this->GetConfigurationOption("-state"), "normal") ? 1 : 0; 
-    }
-  return 0;
+  return vtkKWTkOptions::GetStateFromTkOptionValue(
+    this->GetConfigurationOption("-state"));
 }
 
 //----------------------------------------------------------------------------

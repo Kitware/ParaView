@@ -124,20 +124,20 @@ public:
   virtual int SetConfigurationOptionAsDouble(const char* option, double value);
 
   // Description:
-  // Set/Get a textual Tk configuration option (ex: "-bg") 
-  // This should be used instead of SetConfigurationOption as it performs
-  // various characted encoding and escaping tricks.
-  // The characted encoding used in the string will be retrieved by querying
-  // the widget's application CharacterEncoding ivar. Conversion from that
-  // encoding to Tk internal encoding will be performed automatically.
-  virtual void SetTextOption(const char *option, const char *value);
-  virtual const char* GetTextOption(const char *option);
-
-  // Description:
-  // Convenience method to Set/Get the -state option to "normal" (if true) or
-  // "disabled" (if false).
-  virtual void SetStateOption(int flag);
-  virtual int GetStateOption();
+  // Convenience method to Set/Get the -state option to "normal" (1) or
+  // "disabled" (0) or "readonly" (2, if supported).
+  // Valid constants can be found in vtkKWTkOptions::StateType.
+  // This should not be used directly, this is done by 
+  // SetEnabled()/UpdateEnableState(). 
+  // TODO: should be in protected:
+  virtual void SetState(int);
+  virtual int GetState();
+  virtual void SetStateToDisabled() 
+    { this->SetState(vtkKWTkOptions::StateDisabled); };
+  virtual void SetStateToNormal() 
+    { this->SetState(vtkKWTkOptions::StateNormal); };
+  virtual void SetStateToReadOnly() 
+    { this->SetState(vtkKWTkOptions::StateReadOnly); };
 
 protected:
   vtkKWCoreWidget() {};
@@ -169,6 +169,16 @@ protected:
   const char* ConvertInternalStringToTclString(
     const char *source, int options = 0);
   //ETX
+
+  // Description:
+  // Set/Get a textual Tk configuration option (ex: "-bg") 
+  // This should be used instead of SetConfigurationOption as it performs
+  // various characted encoding and escaping tricks.
+  // The characted encoding used in the string will be retrieved by querying
+  // the widget's application CharacterEncoding ivar. Conversion from that
+  // encoding to Tk internal encoding will be performed automatically.
+  virtual void SetTextOption(const char *option, const char *value);
+  virtual const char* GetTextOption(const char *option);
 
 private:
   vtkKWCoreWidget(const vtkKWCoreWidget&); // Not implemented
