@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.38");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -146,17 +146,19 @@ void vtkKWTclInteractor::Evaluate()
   char buffer_tag[32];
   sprintf(buffer_tag, "%d", this->CommandIndex);
 
-  this->DisplayText->GetWidget()->AppendValue(this->CommandEntry->GetValue(),
+  vtksys_stl::string entry(this->CommandEntry->GetValue());
+
+  this->DisplayText->GetWidget()->AppendValue(entry.c_str(),
                                  buffer_tag);
   this->DisplayText->GetWidget()->AppendValue("\n");
 
   this->Script("set commandList [linsert $commandList end [concat {%s}]]",
-               this->CommandEntry->GetValue());
+               entry.c_str());
 
   this->Register(this);
 
   this->Script("catch {eval [list %s]} _tmp_err",  
-               this->CommandEntry->GetValue());
+               entry.c_str());
 
   if (this->GetApplication()->GetInExit())
     {

@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.28");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.29");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1249,8 +1249,8 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   int ok = dlg->Invoke();
   if (ok)
     {
-    const char *new_title = dlg->GetEntry()->GetWidget()->GetValue();
-    ok = this->CanWidgetTitleBeChanged(widget, new_title);
+    vtksys_stl::string new_title(dlg->GetEntry()->GetWidget()->GetValue());
+    ok = this->CanWidgetTitleBeChanged(widget, new_title.c_str());
     if (!ok)
       {
       vtkKWMessageDialog::PopupMessage(
@@ -1260,7 +1260,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
       }
     else
       {
-      widget->SetTitle(new_title);
+      widget->SetTitle(new_title.c_str());
       this->UpdateSelectionLists();
       }
     }
