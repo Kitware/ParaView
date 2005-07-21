@@ -45,8 +45,9 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericDataSet.h"
+#include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.52");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.53");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -60,7 +61,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->GenerateCellNormals = 1;
 
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
-
+  this->GenericGeometryFilter=vtkGenericGeometryFilter::New();
+  
   // Setup a callback for the internal readers to report progress.
   this->InternalProgressObserver = vtkCallbackCommand::New();
   this->InternalProgressObserver->SetCallback(
@@ -80,6 +82,10 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
     {
     this->DataSetSurfaceFilter->Delete();
     }
+  if(this->GenericGeometryFilter!=0)
+    {
+    this->GenericGeometryFilter->Delete();
+    }
   this->OutlineSource->Delete();
   this->InternalProgressObserver->Delete();
   this->SetController(0);
@@ -92,24 +98,24 @@ vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::InternalProgressCallbackFunction(vtkObject*,
+void vtkPVGeometryFilter::InternalProgressCallbackFunction(vtkObject *arg,
                                                            unsigned long,
                                                            void* clientdata,
                                                            void*)
 {
   reinterpret_cast<vtkPVGeometryFilter*>(clientdata)
-    ->InternalProgressCallback();
+    ->InternalProgressCallback(static_cast<vtkAlgorithm *>(arg));
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::InternalProgressCallback()
+void vtkPVGeometryFilter::InternalProgressCallback(vtkAlgorithm *algorithm)
 {
   // This limits progress for only the DataSetSurfaceFilter.
-  float progress = this->DataSetSurfaceFilter->GetProgress();
+  float progress = algorithm->GetProgress();
   this->UpdateProgress(progress);
   if (this->AbortExecute)
     {
-    this->DataSetSurfaceFilter->SetAbortExecute(1);
+    algorithm->SetAbortExecute(1);
     }
 }
 
@@ -483,7 +489,30 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
   double bds[6];
   int procid = 0;
   int numProcs = 1;
-
+  
+  if (!this->UseOutline)
+    {
+    this->OutlineFlag = 0;
+  
+    // Geometry filter
+    this->GenericGeometryFilter->SetInput(input);
+    
+    
+    // Observe the progress of the internal filter.
+    this->GenericGeometryFilter->AddObserver(vtkCommand::ProgressEvent, 
+                                            this->InternalProgressObserver);
+    this->GenericGeometryFilter->Update();
+    // The internal filter is finished.  Remove the observer.
+    this->GenericGeometryFilter->RemoveObserver(this->InternalProgressObserver);
+    
+    output->ShallowCopy(this->GenericGeometryFilter->GetOutput());
+    
+    return;
+    }
+  
+  // Just outline
+  this->OutlineFlag = 1;
+  
   if (!doCommunicate && input->GetNumberOfPoints() == 0)
     {
     return;
@@ -803,6 +832,8 @@ void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
   this->Superclass::ReportReferences(collector);
   vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter,
                             "DataSetSurfaceFilter");
+  vtkGarbageCollectorReport(collector, this->GenericGeometryFilter,
+                            "GenericGeometryFilter");
 }
 
 //----------------------------------------------------------------------------
