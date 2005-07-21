@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -217,7 +217,7 @@ CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *da)
   for (idx = 0; idx < num; ++idx)
     {
     array = da->GetAttribute(idx);
-    if(array->GetCentering()==vtkPointCentered)
+    if(array->GetCentering()==vtkCellCentered)
       {
       if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
         {
