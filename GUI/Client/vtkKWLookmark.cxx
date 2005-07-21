@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.22");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -232,7 +232,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->LmkCommentsText->SetParent(this->LmkCommentsFrame->GetFrame());
   this->LmkCommentsText->Create(app);
-  this->LmkCommentsText->AddBinding("<KeyPress>", this, "CommentsModifiedCallback");
+  this->LmkCommentsText->SetBinding("<KeyPress>", this, "CommentsModifiedCallback");
 
   this->LmkNameField->SetParent(this->LmkMainFrame->GetLabelFrame());
   this->LmkNameField->Create(app);
@@ -351,7 +351,7 @@ void vtkKWLookmark::EditLookmarkCallback()
   this->Script("pack %s", this->LmkNameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetWidgetName(),strlen(temp));
   this->LmkNameField->SetValue(temp);
-  this->LmkNameField->AddBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
+  this->LmkNameField->SetBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
 
   delete [] temp;
 }

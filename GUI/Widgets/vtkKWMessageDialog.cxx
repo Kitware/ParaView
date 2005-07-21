@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.83");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.84");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -338,14 +338,14 @@ int vtkKWMessageDialog::PreInvoke()
     }
   if (this->OKButton->IsCreated() && this->CancelButton->IsCreated())
     {
-    this->OKButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
-    this->OKButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
-    this->CancelButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
-    this->CancelButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
+    this->OKButton->SetBinding("<Right>", "focus [ tk_focusNext %W ]");
+    this->OKButton->SetBinding("<Left>",  "focus [ tk_focusPrev %W ]");
+    this->CancelButton->SetBinding("<Right>", "focus [ tk_focusNext %W ]");
+    this->CancelButton->SetBinding("<Left>",  "focus [ tk_focusPrev %W ]");
     if (this->OtherButton->IsCreated())
       {
-      this->OtherButton->AddBinding("<Right>", "focus [ tk_focusNext %W ]");
-      this->OtherButton->AddBinding("<Left>",  "focus [ tk_focusPrev %W ]");
+      this->OtherButton->SetBinding("<Right>", "focus [ tk_focusNext %W ]");
+      this->OtherButton->SetBinding("<Left>",  "focus [ tk_focusPrev %W ]");
       }
     }
   if (this->Options & vtkKWMessageDialog::InvokeAtPointer)
