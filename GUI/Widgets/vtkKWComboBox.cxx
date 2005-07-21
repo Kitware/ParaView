@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.2");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -38,7 +38,10 @@ void vtkKWComboBox::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetConfigurationOptionAsInt("-width", this->Width);
+  // The default one is too small, use Tk's default
+
+  this->SetConfigurationOptionAsInt(
+    "-width", this->Width >= 0 ? this->Width : 20);
 
   // Update enable state
 
@@ -64,12 +67,12 @@ void vtkKWComboBox::SetValue(const char *s)
 //----------------------------------------------------------------------------
 void vtkKWComboBox::AddValue(const char* value)
 {
-  if (!this->IsCreated() || this->GetValueIndex(value) >= 0)
+  if (!this->IsCreated() || this->HasValue(value))
     {
     return;
     }
 
-  this->Script("%s configure -values [concat [%s cget -values] {%s}]", 
+  this->Script("%s configure -values [concat [%s cget -values] {\"%s\"}]", 
     this->GetWidgetName(), this->GetWidgetName(), value);
 }
 
@@ -135,6 +138,12 @@ const char* vtkKWComboBox::GetValueFromIndex(int idx)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWComboBox::HasValue(const char* value)
+{
+  return this->GetValueIndex(value) < 0 ? 0 : 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWComboBox::GetValueIndex(const char* value)
 {
   if (!this->IsCreated() || !value)
@@ -143,6 +152,20 @@ int vtkKWComboBox::GetValueIndex(const char* value)
     }
   return atoi(this->Script("lsearch [%s cget -values] {%s}",
                            this->GetWidgetName(), value));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::SetCommand(vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetConfigurationOption("-command", command);
+    this->SetConfigurationOption("-modifycmd", command);
+    this->Script("%s bind <FocusOut> {+ %s}", this->GetWidgetName(), command);
+    delete [] command;
+    }
 }
 
 //----------------------------------------------------------------------------

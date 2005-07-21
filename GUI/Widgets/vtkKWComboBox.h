@@ -40,6 +40,7 @@ public:
   // Add and delete values to put in the list.
   virtual void AddValue(const char* value);
   virtual void DeleteValue(int idx);
+  virtual int HasValue(const char* value);
   virtual int GetValueIndex(const char* value);
   virtual const char* GetValueFromIndex(int idx);
   virtual int GetNumberOfValues();
@@ -49,6 +50,16 @@ public:
   // Set/Get the value of the entry in a few different formats.
   // Overriden to comply with the Tk type
   virtual void SetValue(const char *);
+
+  // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the return key is pressed, or the focus is lost,
+  // or a value is picked from the dropdown list.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is evaluated as a simple command.
+  virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
