@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -142,9 +142,8 @@ int vtkKWCoreWidget::GetPadY()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCoreWidget::AddBinding(const char *event, 
-                                 vtkObject *object, 
-                                 const char *method)
+void vtkKWCoreWidget::SetBinding(const char *event, 
+                                 vtkObject *object, const char *method)
 {
   char *command = NULL;
   this->SetObjectMethodCommand(&command, object, method);
@@ -153,15 +152,31 @@ void vtkKWCoreWidget::AddBinding(const char *event,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetBinding(const char *event, const char *command)
+{
+  this->SetBinding(event, NULL, command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::AddBinding(const char *event, 
+                                 vtkObject *object, const char *method)
+{
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  this->Script("bind %s %s {+ %s}", this->GetWidgetName(), event, command);
+  delete [] command;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCoreWidget::AddBinding(const char *event, const char *command)
 {
-  this->Script("bind %s %s {%s}", this->GetWidgetName(), event, command);
+  this->AddBinding(event, NULL, command);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::RemoveBinding(const char *event)
 {
-  this->AddBinding(event, "");
+  this->Script("bind %s %s {}", this->GetWidgetName(), event);
 }
 
 //----------------------------------------------------------------------------

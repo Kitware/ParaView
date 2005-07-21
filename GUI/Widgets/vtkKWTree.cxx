@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.12");
+vtkCxxRevisionMacro(vtkKWTree, "1.13");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -550,7 +550,7 @@ void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *obj,
 void vtkKWTree::SetSelectionChangedCommand(vtkObject *obj, 
                                            const char *method)
 {
-  this->AddBinding("<<TreeSelect>>", obj, method);
+  this->SetBinding("<<TreeSelect>>", obj, method);
 }
 
 //----------------------------------------------------------------------------

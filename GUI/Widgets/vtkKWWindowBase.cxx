@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.27");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.28");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1098,7 +1098,7 @@ void vtkKWWindowBase::SetErrorIcon(int s)
     }
   else
     {
-    this->TrayImageError->AddBinding("<Button-1>", this, "ErrorIconCallback");
+    this->TrayImageError->SetBinding("<Button-1>", this, "ErrorIconCallback");
     }
 }
 

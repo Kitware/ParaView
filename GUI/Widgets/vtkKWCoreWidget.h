@@ -97,9 +97,13 @@ public:
   virtual int GetPadY();
 
   // Description:
-  // Add/remove a binding to a widget. 
+  // Set/add/remove a binding to a widget. 
   // Whenever the 'event' is triggered on the widget, the 'method' is invoked
   // on the 'object' (or called like a regular command if 'object' is NULL)
+  virtual void SetBinding(
+    const char *event, vtkObject *object, const char *method);
+  virtual void SetBinding(
+    const char *event, const char *command);
   virtual void AddBinding(
     const char *event, vtkObject *object, const char *method);
   virtual void AddBinding(
