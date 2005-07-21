@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.34");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -61,7 +61,6 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->Threshold = 0.01;
 
   this->TimerInformation = NULL;
-  this->Modal = 1;
 }
 
 //----------------------------------------------------------------------------
