@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.10");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.11");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -482,5 +482,6 @@ void vtkPVComparativeVisManagerGUI::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(null)" << endl;
     }
+  os << indent << "ComparativeVisList: " << this->GetComparativeVisList() << endl;
 }
 
