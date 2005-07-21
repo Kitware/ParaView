@@ -53,9 +53,9 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
   cbs SetReliefToGroove
   cbs SetMaximumNumberOfWidgetsInPackingDirection 2
 
-  for {set i 0} {$i < 4} {incr i} {
+  for {set id 0} {$id < 4} {incr id} {
 
-    set cb [cbs AddWidget $i] 
+    set cb [cbs AddWidget $id] 
     $cb SetBalloonHelpString \
       "This checkbutton is part of a unique set a vtkKWCheckButtonSet,\
       which provides an easy way to create a bunch of related widgets\

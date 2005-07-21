@@ -76,9 +76,9 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   cbs->SetReliefToGroove();
   cbs->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
-  for (int i = 0; i < 4; i++)
+  for (int id = 0; id < 4; id++)
     {
-    vtkKWCheckButton *cb = cbs->AddWidget(i);
+    vtkKWCheckButton *cb = cbs->AddWidget(id);
     cb->SetBalloonHelpString(
       "This checkbutton is part of a unique set (a vtkKWCheckButtonSet), "
       "which provides an easy way to create a bunch of related widgets "

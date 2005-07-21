@@ -11,11 +11,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWBWidgets - class used to initialized bwidgets
+// .NAME vtkKWBWidgets - class used to initialize BWidgets
 // .SECTION Description
-// This class is used to initialize the bwidgets used by
-// KW widgets.
-
+// This class is used to initialize the BWidgets library.
 
 #ifndef __vtkKWBWidgets_h
 #define __vtkKWBWidgets_h

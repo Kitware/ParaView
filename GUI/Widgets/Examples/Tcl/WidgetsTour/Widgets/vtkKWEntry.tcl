@@ -58,9 +58,9 @@ proc vtkKWEntryEntryPoint {parent win} {
   entry_set SetPadY 1
   entry_set SetMaximumNumberOfWidgetsInPackingDirection 2
 
-  for {set i 0} {$i < 4} {incr i} {
+  for {set id 0} {$id < 4} {incr id} {
 
-    set entry [entry_set AddWidget $i] 
+    set entry [entry_set AddWidget $id] 
     $entry SetBalloonHelpString \
       "This entry is part of a unique set a vtkKWEntrySet,\
       which provides an easy way to create a bunch of related widgets\
@@ -68,12 +68,12 @@ proc vtkKWEntryEntryPoint {parent win} {
       NxM grid."
   }
 
-  # Let's be creative. The first one also set the value of the last one
+  # Let's be creative. The first one sets the value of the third one
   
   [entry_set GetWidget 0] SetValue "Enter a value here..."
-  [entry_set GetWidget 3] SetValue "...and it will show there."
+  [entry_set GetWidget 2] SetValue "...and it will show here."
 
-  [entry_set GetWidget 0] SetCommand [entry_set GetWidget 3] {SetValue [[entry_set GetWidget 0] GetValue]}
+  [entry_set GetWidget 0] SetCommand [entry_set GetWidget 2] {SetValue [[entry_set GetWidget 0] GetValue]}
 
   pack [entry_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 

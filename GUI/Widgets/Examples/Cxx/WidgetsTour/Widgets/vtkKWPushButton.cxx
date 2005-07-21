@@ -84,13 +84,13 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
   pushbutton_set->SetMaximumNumberOfWidgetsInPackingDirection(3);
 
   char buffer[50];
-  for (int i = 0; i < 9; i++)
+  for (int id = 0; id < 9; id++)
     {
-    sprintf(buffer, "Push button %d", i);
-    vtkKWPushButton *pushbutton = pushbutton_set->AddWidget(i);
+    sprintf(buffer, "Push button %d", id);
+    vtkKWPushButton *pushbutton = pushbutton_set->AddWidget(id);
     pushbutton->SetText(buffer);
     pushbutton->SetBackgroundColor(
-      vtkMath::HSVToRGB((double)i / 8.0, 0.3, 0.75));
+      vtkMath::HSVToRGB((double)id / 8.0, 0.3, 0.75));
     pushbutton->SetBalloonHelpString(
       "This pushbutton is part of a unique set (a vtkKWPushButtonSet), "
       "which provides an easy way to create a bunch of related widgets "

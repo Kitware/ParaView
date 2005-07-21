@@ -79,9 +79,9 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   entry_set->SetPadY(1);
   entry_set->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
-  for (int i = 0; i < 4; i++)
+  for (int id = 0; id < 4; id++)
     {
-    vtkKWEntry *entry = entry_set->AddWidget(i);
+    vtkKWEntry *entry = entry_set->AddWidget(id);
     entry->SetBalloonHelpString(
       "This entry is part of a unique set (a vtkKWEntrySet), "
       "which provides an easy way to create a bunch of related widgets "
@@ -89,15 +89,15 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
       "NxM grid.");
     }
 
-  // Let's be creative. The first one also set the value of the last one
+  // Let's be creative. The first one sets the value of the third one
   
   entry_set->GetWidget(0)->SetValue("Enter a value here...");
-  entry_set->GetWidget(3)->SetValue("...and it will show there.");
+  entry_set->GetWidget(2)->SetValue("...and it will show there.");
 
   char buffer[100];
   sprintf(buffer, "SetValue [%s GetValue]", 
           entry_set->GetWidget(0)->GetTclName());
-  entry_set->GetWidget(0)->SetCommand(entry_set->GetWidget(3), buffer);
+  entry_set->GetWidget(0)->SetCommand(entry_set->GetWidget(2), buffer);
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

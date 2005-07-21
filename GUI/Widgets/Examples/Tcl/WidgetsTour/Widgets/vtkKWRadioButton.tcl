@@ -64,10 +64,10 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
   radiob_set SetBorderWidth 2
   radiob_set SetReliefToGroove
 
-  for {set i 0} {$i < 4} {incr i} {
+  for {set id 0} {$id < 4} {incr id} {
 
-    set radiob [radiob_set AddWidget $i] 
-    $radiob SetText "Radiobutton $i"
+    set radiob [radiob_set AddWidget $id] 
+    $radiob SetText "Radiobutton $id"
     $radiob SetBalloonHelpString \
       "This radiobutton is part of a unique set a vtkKWRadioButtonSet,\
       which provides an easy way to create a bunch of related widgets\

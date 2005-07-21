@@ -85,11 +85,11 @@ proc vtkKWLabelEntryPoint {parent win} {
   label_set SetPadY 1
 
   vtkMath math
-  for {set i 0} {$i < 9} {incr i} {
+  for {set id 0} {$id < 9} {incr id} {
 
-    set label [label_set AddWidget $i] 
-    $label SetText "Label $i"
-    eval $label SetBackgroundColor [math HSVToRGB [expr $i / 8.0] 0.3 0.75]
+    set label [label_set AddWidget $id] 
+    $label SetText "Label $id"
+    eval $label SetBackgroundColor [math HSVToRGB [expr $id / 8.0] 0.3 0.75]
     $label SetBalloonHelpString \
       "This label is part of a unique set a vtkKWLabelSet,\
       which provides an easy way to create a bunch of related widgets\
@@ -118,9 +118,9 @@ proc vtkKWLabelEntryPoint {parent win} {
   label_set2 SetPadX 1
   label_set2 SetPadY 1
 
-  for {set i 0} {$i < 3} {incr i} {
+  for {set id 0} {$id < 3} {incr id} {
 
-    set label [label_set2 AddWidget $i] 
+    set label [label_set2 AddWidget $id] 
     $label SetLabelWidth 15
     [$label GetLabel] SetBackgroundColor 0.7 0.7 0.7
     $label SetBalloonHelpString \

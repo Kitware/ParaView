@@ -20,7 +20,7 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
-  int i;
+  int id;
 
   // -----------------------------------------------------------------------
 
@@ -113,12 +113,12 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set->SetPadY(1);
 
   char buffer[50];
-  for (i = 0; i < 9; i++)
+  for (id = 0; id < 9; id++)
     {
-    sprintf(buffer, "Label %d", i);
-    vtkKWLabel *label = label_set->AddWidget(i);
+    sprintf(buffer, "Label %d", id);
+    vtkKWLabel *label = label_set->AddWidget(id);
     label->SetText(buffer);
-    label->SetBackgroundColor(vtkMath::HSVToRGB((double)i / 8.0, 0.3, 0.75));
+    label->SetBackgroundColor(vtkMath::HSVToRGB((double)id / 8.0, 0.3, 0.75));
     label->SetBalloonHelpString(
       "This label is part of a unique set (a vtkKWLabelSet), "
       "which provides an easy way to create a bunch of related widgets "
@@ -148,9 +148,9 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label_set2->SetPadX(1);
   label_set2->SetPadY(1);
 
-  for (i = 0; i < 3; i++)
+  for (id = 0; id < 3; id++)
     {
-    vtkKWLabelWithLabel *label = label_set2->AddWidget(i);
+    vtkKWLabelWithLabel *label = label_set2->AddWidget(id);
     label->SetLabelWidth(15);
     label->GetLabel()->SetBackgroundColor(0.7, 0.7, 0.7);
     label->SetBalloonHelpString(

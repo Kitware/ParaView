@@ -32,10 +32,10 @@ proc vtkKWProgressGaugeEntryPoint {parent win} {
   progress1_pbs SetPadY 1
   progress1_pbs ExpandWidgetsOn
 
-  for {set i 0} {$i <= 100} {incr i 25} {
-    set pushbutton [progress1_pbs AddWidget $i] 
-    $pushbutton SetText "Set Progress to $i%"
-    $pushbutton SetCommand progress1 "SetValue $i"
+  for {set id 0} {$id <= 100} {incr id 25} {
+    set pushbutton [progress1_pbs AddWidget $id] 
+    $pushbutton SetText "Set Progress to $id%"
+    $pushbutton SetCommand progress1 "SetValue $id"
   }
 
   # Add a special button that will iterate from 0 to 100% in Tcl

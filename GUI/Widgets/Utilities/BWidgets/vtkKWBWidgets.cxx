@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.4");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.5");
 
 int vtkKWBWidgets::Initialized = 0;
 
@@ -37,7 +37,8 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 
   if (!interp)
     {
-    vtkGenericWarningMacro("An interpreter is needed to initialize bwidgets.");
+    vtkGenericWarningMacro(
+      "An interpreter is needed to initialize the BWidgets library.");
     return;
     }
 
@@ -58,7 +59,7 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
         image_bwplus_width, image_bwplus_height, 
         image_bwplus_pixel_size, image_bwplus_length))
     {
-    vtkGenericWarningMacro("Can not initialize bwidgets resources.");
+    vtkGenericWarningMacro("Can not initialize BWidgets resources.");
     return;
     }
 

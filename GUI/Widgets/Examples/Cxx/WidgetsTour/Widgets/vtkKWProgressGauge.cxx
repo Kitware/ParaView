@@ -51,12 +51,12 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
   progress1_pbs->ExpandWidgetsOn();
 
   char buffer[250];
-  for (int i = 0; i <= 100; i += 25)
+  for (int id = 0; id <= 100; id += 25)
     {
-    sprintf(buffer, "Set Progress to %d%%", i);
-    vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(i);
+    sprintf(buffer, "Set Progress to %d%%", id);
+    vtkKWPushButton *pushbutton = progress1_pbs->AddWidget(id);
     pushbutton->SetText(buffer);
-    sprintf(buffer, "SetValue %d", i);
+    sprintf(buffer, "SetValue %d", id);
     pushbutton->SetCommand(progress1, buffer);
     }
 

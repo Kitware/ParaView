@@ -61,12 +61,12 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   vtkMath math
 
-  for {set i 0} {$i < 9} {incr i} {
+  for {set id 0} {$id < 9} {incr id} {
 
-    set pushbutton [pushbutton_set AddWidget $i] 
-    $pushbutton SetText "Push button $i"
+    set pushbutton [pushbutton_set AddWidget $id] 
+    $pushbutton SetText "Push button $id"
     eval $pushbutton SetBackgroundColor \
-      [math HSVToRGB [expr $i / 8.0] 0.3 0.75]
+      [math HSVToRGB [expr $id / 8.0] 0.3 0.75]
     $pushbutton SetBalloonHelpString \
       "This pushbutton is part of a unique set a vtkKWPushButtonSet,\
       which provides an easy way to create a bunch of related widgets\

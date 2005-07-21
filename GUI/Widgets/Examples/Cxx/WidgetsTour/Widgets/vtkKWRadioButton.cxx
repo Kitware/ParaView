@@ -86,10 +86,10 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob_set->SetReliefToGroove();
 
   char buffer[50];
-  for (int i = 0; i < 4; i++)
+  for (int id = 0; id < 4; id++)
     {
-    sprintf(buffer, "Radiobutton %d", i);
-    vtkKWRadioButton *radiob = radiob_set->AddWidget(i);
+    sprintf(buffer, "Radiobutton %d", id);
+    vtkKWRadioButton *radiob = radiob_set->AddWidget(id);
     radiob->SetText(buffer);
     radiob->SetBalloonHelpString(
       "This radiobutton is part of a unique set (a vtkKWRadioButtonSet), "

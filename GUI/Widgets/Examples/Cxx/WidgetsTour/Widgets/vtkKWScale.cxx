@@ -89,10 +89,10 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale_set->SetReliefToGroove();
   scale_set->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
-  for (int i = 0; i < 4; i++)
+  for (int id = 0; id < 4; id++)
     {
-    sprintf(buffer, "Scale %d", i);
-    vtkKWScale *scale = scale_set->AddWidget(i);
+    sprintf(buffer, "Scale %d", id);
+    vtkKWScale *scale = scale_set->AddWidget(id);
     scale->DisplayLabel(buffer);
     scale->SetBalloonHelpString(
       "This scale is part of a unique set (a vtkKWScaleSet), "
