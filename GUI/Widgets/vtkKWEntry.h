@@ -56,8 +56,10 @@ public:
   
   // Description:
   // The width is the number of charaters wide the entry box can fit.
-  // To keep from changing behavior of the entry,  the default
-  // value is 0 wich means the width is not explicitely set.
+  // To keep from changing behavior of the entry, the default
+  // value is -1 wich means the width is not explicitly set and will default
+  // to whatever value Tk is using (at this point, 20). Set it to 0
+  // and the widget should pick a size just large enough to hold its text.
   virtual void SetWidth(int width);
   vtkGetMacro(Width, int);
 

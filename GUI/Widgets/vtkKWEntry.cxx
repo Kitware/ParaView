@@ -18,12 +18,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.69");
+vtkCxxRevisionMacro(vtkKWEntry, "1.70");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
 {
-  this->Width       = 0;
+  this->Width       = -1;
   this->ReadOnly    = 0;
   this->InternalValueString = NULL;
 }
@@ -45,7 +45,7 @@ void vtkKWEntry::Create(vtkKWApplication *app)
     return;
     }
 
-  if (this->Width > 0)
+  if (this->Width >= 0)
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
@@ -223,18 +223,17 @@ void vtkKWEntry::SetWidth(int width)
   this->Width = width;
   this->Modified();
 
-  if (this->IsCreated() && this->Width > 0)
+  if (this->IsCreated() && this->Width >= 0)
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetCommand(vtkObject *object, 
-                             const char *method)
+void vtkKWEntry::SetCommand(vtkObject *object, const char *method)
 {
-  this->AddBinding("<Return>", object, method);
-  this->AddBinding("<FocusOut>", object, method);
+  this->SetBinding("<Return>", object, method);
+  this->SetBinding("<FocusOut>", object, method);
 }
 
 //----------------------------------------------------------------------------
