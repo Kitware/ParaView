@@ -70,7 +70,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.2");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -78,7 +78,9 @@ vtkPVLookmark::vtkPVLookmark()
   this->ImageData = NULL;
   this->StateScript= NULL;
   this->CenterOfRotation = new float[3];
+  this->CenterOfRotation[0] = this->CenterOfRotation[1] = this->CenterOfRotation[2] = 0;
   this->Sources = vtkPVSourceCollection::New();
+  this->Location = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -770,7 +772,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
       ptr = strtok(NULL,"\r\n");
 
       vtkSMDisplayProxy *display = reader->GetDisplayProxy();
-      ptr = strtok(NULL,"\r\n");
 
       while(strstr(ptr,data)) 
         {
@@ -864,6 +865,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
     }
 
   reader->GetPVOutput()->Update();
+  ptr = strtok(NULL,"\r\n");
 
   while(ptr)
     {

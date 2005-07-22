@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.13");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.13.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -45,6 +45,7 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->NestedSeparatorFrame = vtkKWFrame::New();
   this->NameField = vtkKWText::New();
   this->Checkbox = vtkKWCheckButton::New();
+  this->Location = 0;
 }
 
 //----------------------------------------------------------------------------

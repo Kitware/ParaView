@@ -117,7 +117,8 @@ public:
 
   // Description:
   // Check/Uncheck the boxes of all lookmarks and folders
-  void AllOnOffCallback(int flag);
+  void SelectAllCallback();
+  void ClearAllCallback();
 
   // Description:
   // This uses the backup file to repopulate the lookmark manager, bringing it up to the point just before the last operation
@@ -159,6 +160,8 @@ protected:
   // Help menu helper functions
   virtual void ConfigureQuickStartGuide();
   virtual void ConfigureUsersTutorial();
+
+  void SetAllCheckboxes(int state);
 
   // The following are drag-and-drop functions
 
@@ -226,7 +229,6 @@ protected:
   // takes a filename, writes out an empty lookmark file, parses to get at the root element, 
   // recursively calls CreateNestedXMLElement and prints the root and all its elements to the file
   void SaveLookmarksInternal(char *path);
-  void SaveLookmarksInternal(ostream *os);
   void CreateNestedXMLElements(vtkKWWidget *wid, vtkXMLDataElement *parentElement);
 
   // Description: 
