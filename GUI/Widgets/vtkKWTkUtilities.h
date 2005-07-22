@@ -164,7 +164,9 @@ public:
   // If RGBA ('pixel_size' > 3), blend the pixels with the background color of
   // the 'blend_with_name' widget (otherwise use a [0.5, 0.5, 0.5] gray).
   // If 'blend_color_option' is not NULL (say -fg or -selectcolor), use this
-  // option to retrieve the color instead of using the background color (-bg).
+  // option to retrieve the color instead of using the background color (-bg)
+  // of the 'blend_with_name'. If 'blend_color_option' does not start with
+  // a dash, interpret it as a Tk color and use it directly.
   // If UPDATE_PHOTO_OPTION_FLIP_V is set in 'update_option', flip the image
   // buffer vertically.
   // A convenience method is provided to specify the vtkKWApplication this

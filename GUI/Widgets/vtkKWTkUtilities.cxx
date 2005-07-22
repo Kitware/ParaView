@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.64");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.65");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -228,7 +228,7 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
                                    const char *color, 
                                    double *r, double *g, double *b)
 {
-  if (!interp || !widget || !color || !r || !g || !b)
+  if (!interp || !widget || !color || !*color || !r || !g || !b)
     {
     return;
     }
@@ -690,13 +690,30 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     // blend with the current background color
 
     double r, g, b;
-    if (blend_with_name)
+    if (blend_with_name && !blend_color_option)
       {
-      vtkKWTkUtilities::GetOptionColor(
-        interp, 
-        blend_with_name, 
-        (blend_color_option ? blend_color_option : "-background"), 
-        &r, &g, &b);
+      blend_color_option = "-background";
+      }
+    if (blend_color_option || blend_with_name)
+      {
+      // If it is not an option, interpret it as a color right away
+      // otherwise retrieve that option color from the widget to blend
+      // it against (blend_with_name)
+
+      if (blend_color_option && *blend_color_option != '-')
+        {
+        vtkKWTkUtilities::GetRGBColor(
+          interp, 
+          blend_with_name ? blend_with_name : ".", 
+          blend_color_option, &r, &g, &b);
+        }
+      else
+        {
+        vtkKWTkUtilities::GetOptionColor(
+          interp, 
+          blend_with_name ? blend_with_name : ".", 
+          blend_color_option, &r, &g, &b);
+        }
       }
     else
       {
