@@ -84,6 +84,8 @@ protected:
   int RequestData(vtkInformation *,
                   vtkInformationVector **, vtkInformationVector *);
 
+  virtual void ReportReferences(vtkGarbageCollector *collector);
+
 private:
   vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &);  // Not implemented.
   void operator=(const vtkOrderedCompositeDistributor &);  // Not implemented.

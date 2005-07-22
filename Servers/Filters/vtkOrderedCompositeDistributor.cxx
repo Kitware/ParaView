@@ -27,6 +27,7 @@
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDistributedDataFilter.h"
+#include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
@@ -35,7 +36,7 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.1");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.2");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -71,6 +72,19 @@ void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
   os << "PKdTree: " << this->PKdTree << endl;
   os << "Controller: " << this->Controller << endl;
   os << "PassThrough: " << this->PassThrough << endl;
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkOrderedCompositeDistributor::ReportReferences(
+                                                 vtkGarbageCollector *collector)
+{
+  this->Superclass::ReportReferences(collector);
+
+  vtkGarbageCollectorReport(collector, this->D3, "D3");
+  vtkGarbageCollectorReport(collector, this->ToPolyData, "ToPolyData");
+  vtkGarbageCollectorReport(collector, this->PKdTree, "PKdTree");
+  vtkGarbageCollectorReport(collector, this->Controller, "Controller");
 }
 
 //-----------------------------------------------------------------------------
