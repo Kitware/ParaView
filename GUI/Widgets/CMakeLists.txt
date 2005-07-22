@@ -72,7 +72,6 @@ SET (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 SET(KWWidgets_SRCS
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   vtkKWBalloonHelpManager.cxx
   vtkKWCanvas.cxx 
   vtkKWChangeColorButton.cxx 
@@ -164,18 +163,21 @@ SET(KWWidgets_SRCS
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
   )
 
 # Abstract/pure virtual classes
 
 SET_SOURCE_FILES_PROPERTIES(
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx
   vtkKWWidgetWithScrollbars.cxx 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
   ABSTRACT
   )
 
@@ -186,6 +188,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
   ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
   WRAP_EXCLUDE
   )
