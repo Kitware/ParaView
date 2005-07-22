@@ -328,11 +328,11 @@ static void realloc_blocks(Structured_Mesh_Data* stm_data, int n_blocks)
       has only 1 block per processor but slight variance in
       the geometry (# cells in x,y or z change slightly from
       processor to processor. */
-  if (n_blocks && (n_blocks <= stm_data->Nblocks))
-    {
-    /* printf("Reused block memory\n"); */
-    return;
-    }
+/*   if (n_blocks && (n_blocks <= stm_data->Nblocks)) */
+/*     { */
+/*     /\* printf("Reused block memory\n"); *\/ */
+/*     return; */
+/*     } */
 
   /* printf("Freeing and allocating block memory!\n"); */
   /* printf("Allocating %d blocks...\n",n_blocks); */
