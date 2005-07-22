@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.7");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -63,6 +63,7 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
 
   this->SetReliefToFlat();
   this->SetBorderWidth(2);
+  this->SetConfigurationOption("-auto", "both");
 
   // ScrollableFrame is a BWidget's ScrollableFrame
   // attached to the ScrolledWindow
@@ -92,19 +93,39 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWFrameWithScrollbar::SetWidth(int width)
 {
-  if (this->IsCreated() && this->HasConfigurationOption("-width"))
+  if (this->ScrollableFrame)
     {
-    this->Script("%s config -width %d", this->GetWidgetName(), width);
+    this->ScrollableFrame->SetConfigurationOptionAsInt("-width", width);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithScrollbar::GetWidth()
+{
+  if (this->ScrollableFrame)
+    {
+    return this->ScrollableFrame->GetConfigurationOptionAsInt("-width");
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWFrameWithScrollbar::SetHeight(int height)
 {
-  if (this->IsCreated() && this->HasConfigurationOption("-height"))
+  if (this->ScrollableFrame)
     {
-    this->Script("%s config -height %d", this->GetWidgetName(), height);
+    this->ScrollableFrame->SetConfigurationOptionAsInt("-height", height);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithScrollbar::GetHeight()
+{
+  if (this->ScrollableFrame)
+    {
+    return this->ScrollableFrame->GetConfigurationOptionAsInt("-height");
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
