@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.4");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -543,6 +543,8 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueDomainUsingCurrentState()
 //-----------------------------------------------------------------------------
 void vtkPVPropertyKeyFrame::ValueChangedCallback()
 {
+  this->BlockUpdates = 1; //we are pushing GUI values on to proxy,
+                          //hence, no need to update GUI when proxy changes.
   if (vtkPVSelectionList::SafeDownCast(this->ValueWidget))
     {
     this->SetKeyValueWithTrace(0, static_cast<double>(
@@ -566,6 +568,7 @@ void vtkPVPropertyKeyFrame::ValueChangedCallback()
       this->SetKeyValueWithTrace(i, contourEntry->GetValue(i));
       }
     }
+  this->BlockUpdates = 0;
 }
 
 //-----------------------------------------------------------------------------

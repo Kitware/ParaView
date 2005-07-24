@@ -190,6 +190,9 @@ protected:
     //if not the entry for time is disabled. Default is true.
   vtkPVAnimationScene* AnimationScene;
 
+  int BlockUpdates; // this flags controls if the GUI is updated when the Keyframe proxy
+                    // raises a ModifiedEvent.
+
 private:
   vtkPVKeyFrame(const vtkPVKeyFrame&); // Not implemented.
   void operator=(const vtkPVKeyFrame&); // Not implemented.
