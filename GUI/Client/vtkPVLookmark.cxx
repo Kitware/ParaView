@@ -80,7 +80,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.25");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.26");
 
 
 //*****************************************************************************
@@ -178,7 +178,6 @@ void vtkPVLookmark::View()
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs;
-  vtkPVSource *currentSource = win->GetCurrentPVSource();
 
   this->UnsetLookmarkIconCommand();
 
@@ -220,7 +219,6 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
   vtkPVSource *pvs1;
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
-  vtkPVSource *currentSource = win->GetCurrentPVSource();
   int i = 0;
   char mesg[400];
 
@@ -312,8 +310,6 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(char *name)
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs1;
   vtkPVSource *source = NULL;
-  vtkPVSource *currentSource = win->GetCurrentPVSource();
-  int i = 0;
 
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
@@ -352,7 +348,6 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
   vtkPVSource *pvs1;
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
-  vtkPVSource *currentSource = win->GetCurrentPVSource();
   vtkPVReaderModule *mod;
   const char *ptr1;
   const char *ptr2;
@@ -502,7 +497,6 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(char *moduleName, char *name)
   vtkPVSource *pvs;
   vtkPVSource *source = NULL;
   vtkPVSource *currentSource = win->GetCurrentPVSource();
-  int i = 0;
   char *targetName;
   vtkPVReaderModule *mod;
   
@@ -1039,7 +1033,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkStdString string1,string2;
   vtkstd::string::size_type beg;
   //vtkstd::string::size_type end;
-  bool match = false;
   bool executeCmd = true;
   char **buf = new char*[100];
   char moduleName[50];
@@ -1294,7 +1287,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       iter = tclNameMap.begin();
       while(iter != tclNameMap.end())
         {
-        const char *tclName = iter->second;
         if(strstr(ptr,iter->second))
           {
           if(strstr(ptr,"SetVisibility"))
@@ -1380,7 +1372,6 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
   char displayName[50];
   int val;
   char ve[6][10];
-  bool foundSource = false;
   char SecondToken_String[] = "%*s %s";
   char FifthToken_WrappedString[] = "%*s %*s %*s %*s {%[^}]";
   char ThirdToken_Float[] = "%*s %*s %lf";
@@ -1398,9 +1389,6 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
   char FifthAndSixthToken_IntAndWrappedString[] = "%*s %*s %*s %*s %d {%[^}]";
   char FourthAndFifthToken_WrappedStringAndInt[] = "%*s %*s %*s {%[^}]} %d";
   vtkStdString string1,string2;
-  bool match = false;
-  bool executeCmd = true;
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 /*
   ptr = strtok(NULL,"\r\n");
 
