@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.11");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -187,91 +187,49 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
     return;
     }
 
-  // From here, we need the vol prop
-
-  if (!this->VolumeProperty)
-    {
-    return;
-    }
-
   // Component selection menu
 
   if (this->ComponentSelectionWidget)
     {
-    this->ComponentSelectionWidget->SetIndependentComponents(
-      this->VolumeProperty->GetIndependentComponents());
+    if (this->VolumeProperty)
+      {
+      this->ComponentSelectionWidget->SetIndependentComponents(
+        this->VolumeProperty->GetIndependentComponents());
+      }
     this->ComponentSelectionWidget->SetNumberOfComponents(
       this->NumberOfComponents);
     this->ComponentSelectionWidget->SetSelectedComponent(
       this->SelectedComponent);
+    this->ComponentSelectionWidget->SetEnabled(
+      this->VolumeProperty ? 0 : this->GetEnabled());
     }
   
   // Shading ?
 
   if (this->EnableShadingCheckButton)
     {
-    this->EnableShadingCheckButton->GetWidget()->SetSelectedState(
-      this->VolumeProperty->GetShade(this->SelectedComponent));
+    if (this->VolumeProperty)
+      {
+      this->EnableShadingCheckButton->GetWidget()->SetSelectedState(
+        this->VolumeProperty->GetShade(this->SelectedComponent));
+      }
+    this->EnableShadingCheckButton->SetEnabled(
+      this->VolumeProperty ? 0 : this->GetEnabled());
     }
 
   // Ambient
 
-  if (this->AmbientScale)
-    { 
-    float ambient = 
+  if (this->VolumeProperty)
+    {
+    double ambient = 
       this->VolumeProperty->GetAmbient(this->SelectedComponent) * 100.0;
-    if (this->AmbientScale->GetValue() != ambient)
-      {
-      int old_disable = this->AmbientScale->GetDisableCommands();
-      this->AmbientScale->SetDisableCommands(1);
-      this->AmbientScale->SetValue(ambient);
-      this->AmbientScale->SetDisableCommands(old_disable);
-      }
-    }
-
-  // Diffuse
-
-  if (this->DiffuseScale)
-    {
-    float diffuse = 
+    double diffuse = 
       this->VolumeProperty->GetDiffuse(this->SelectedComponent) * 100.0;
-    if (this->DiffuseScale->GetValue() != diffuse)
-      {
-      int old_disable = this->DiffuseScale->GetDisableCommands();
-      this->DiffuseScale->SetDisableCommands(1);
-      this->DiffuseScale->SetValue(diffuse);
-      this->DiffuseScale->SetDisableCommands(old_disable);
-      }
-    }
-
-  // Specular
-
-  if (this->SpecularScale)
-    {
-    float specular = 
+    double specular = 
       this->VolumeProperty->GetSpecular(this->SelectedComponent) * 100.0;
-    if (this->SpecularScale->GetValue() != specular)
-      {
-      int old_disable = this->SpecularScale->GetDisableCommands();
-      this->SpecularScale->SetDisableCommands(1);
-      this->SpecularScale->SetValue(specular);
-      this->SpecularScale->SetDisableCommands(old_disable);
-      }
-    }
-
-  // Specular power
-
-  if (this->SpecularPowerScale)
-    {
-    float specular_power = 
+    double specular_power = 
       this->VolumeProperty->GetSpecularPower(this->SelectedComponent);
-    if (this->SpecularPowerScale->GetValue() != specular_power)
-      {
-      int old_disable = this->SpecularPowerScale->GetDisableCommands();
-      this->SpecularPowerScale->SetDisableCommands(1);
-      this->SpecularPowerScale->SetValue(specular_power);
-      this->SpecularPowerScale->SetDisableCommands(old_disable);
-      }
+    this->UpdateScales(ambient, diffuse, specular, specular_power);
     }
 
   // Update the image

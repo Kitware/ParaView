@@ -68,8 +68,8 @@ public:
 
   // Description:
   // Set/Get the grid opacity in the preview/presets
-  virtual void SetGridOpacity(float);
-  vtkGetMacro(GridOpacity, float);
+  virtual void SetGridOpacity(double);
+  vtkGetMacro(GridOpacity, double);
   
   // Description:
   // Set/Get the color of the preview/presets.
@@ -121,15 +121,17 @@ protected:
   int   PreviewSize;
   int   PresetSize;
   int   PopupPreviewSize;
-  float GridOpacity;
+  double GridOpacity;
 
   double MaterialColor[3];
 
+  // Description:
+  // Events
   int   PropertyChangedEvent;
   int   PropertyChangingEvent;
 
+  // Description:
   // Commands
-
   char  *PropertyChangedCommand;
   char  *PropertyChangingCommand;
 
@@ -138,14 +140,13 @@ protected:
   // Presets
 
   //BTX
-
   class Preset
   {
   public:
-    float Ambient;
-    float Diffuse;
-    float Specular;
-    float SpecularPower;
+    double Ambient;
+    double Diffuse;
+    double Specular;
+    double SpecularPower;
     char *HelpString;
 
     Preset() { this->HelpString = 0; };
@@ -155,29 +156,31 @@ protected:
 
   vtkKWMaterialPropertyWidgetInternals *Internals;
   friend class vtkKWMaterialPropertyWidgetInternals;
-
   //ETX
 
   // UI
 
   vtkKWPopupButtonWithLabel   *PopupButton;
   vtkKWFrameWithLabel         *MaterialPropertiesFrame;
-  vtkKWFrame                *LightingFrame;
-  vtkKWScale                *AmbientScale;
-  vtkKWScale                *DiffuseScale;
-  vtkKWScale                *SpecularScale;
-  vtkKWScale                *SpecularPowerScale;
-  vtkKWFrame                *PresetsFrame;
+  vtkKWFrame                  *LightingFrame;
+  vtkKWScale                  *AmbientScale;
+  vtkKWScale                  *DiffuseScale;
+  vtkKWScale                  *SpecularScale;
+  vtkKWScale                  *SpecularPowerScale;
+  vtkKWFrame                  *PresetsFrame;
   vtkKWLabelWithLabel         *PreviewLabel;
   vtkKWPushButtonSetWithLabel *PresetPushButtonSet;
 
-  // Create a preview image given material properties
+  // Description:
+  // Create a preview image given some material properties
   virtual void CreateImage(unsigned char *data, 
-                           float ambient, 
-                           float diffuse,
-                           float specular, 
-                           float specularPower, int size);
+                           double ambient, 
+                           double diffuse,
+                           double specular, 
+                           double specular_power, 
+                           int size);
   
+  // Description:
   // Send an event representing the state of the widget
   virtual void SendStateEvent(int event);
 
@@ -198,6 +201,14 @@ protected:
   // Return 1 if the property was modified, 0 otherwise
   virtual int UpdatePropertyFromInterface() = 0;
   virtual int UpdatePropertyFromPreset(const Preset *preset) = 0;
+
+  // Description:
+  // Update the scales from a preset
+  virtual int UpdateScalesFromPreset(const Preset *preset);
+  virtual void UpdateScales(double ambient, 
+                            double diffuse,
+                            double specular, 
+                            double specular_power);
 
 private:
   vtkKWMaterialPropertyWidget(const vtkKWMaterialPropertyWidget&);  //Not implemented

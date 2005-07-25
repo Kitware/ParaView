@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.18");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -233,8 +233,8 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
 
   preset = new vtkKWMaterialPropertyWidget::Preset;
   preset->Ambient = 0.1;
-  preset->Specular = 0.2;
   preset->Diffuse = 0.9;
+  preset->Specular = 0.2;
   preset->SpecularPower = 10.0;
   preset->HelpString = vtksys::SystemTools::DuplicateString(
     "Smooth material properties (moderate specular lighting");
@@ -446,6 +446,10 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   this->CreatePresets();
 
+  // Set some default values that are more pleasing the black body
+
+  this->UpdateScales(0.1 * 100, 0.9 * 100, 0.2 * 100, 10.0 * 100);
+
   // Update according to the current view/widget
 
   this->Update();
@@ -479,7 +483,7 @@ void vtkKWMaterialPropertyWidget::SetPreviewSize(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::SetGridOpacity(float v)
+void vtkKWMaterialPropertyWidget::SetGridOpacity(double v)
 {
   if (this->GridOpacity == v || v < 0.0 || v > 1.0)
     {
@@ -490,7 +494,6 @@ void vtkKWMaterialPropertyWidget::SetGridOpacity(float v)
   this->Modified();
 
   this->UpdatePreview();
-  this->UpdatePopupPreview();
   this->CreatePresets();
 }
 
@@ -509,8 +512,71 @@ void vtkKWMaterialPropertyWidget::SetMaterialColor(double r, double g, double b)
   this->MaterialColor[2] = b;
 
   this->UpdatePreview();
-  this->UpdatePopupPreview();
   this->CreatePresets();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMaterialPropertyWidget::UpdateScales(double ambient, 
+                                               double diffuse,
+                                               double specular, 
+                                               double specular_power)
+{
+  // Ambient
+
+  if (this->AmbientScale && this->AmbientScale->GetValue() != ambient)
+    {
+    int old_disable = this->AmbientScale->GetDisableCommands();
+    this->AmbientScale->SetDisableCommands(1);
+    this->AmbientScale->SetValue(ambient);
+    this->AmbientScale->SetDisableCommands(old_disable);
+    }
+
+  // Diffuse
+
+  if (this->DiffuseScale && this->DiffuseScale->GetValue() != diffuse)
+    {
+    int old_disable = this->DiffuseScale->GetDisableCommands();
+    this->DiffuseScale->SetDisableCommands(1);
+    this->DiffuseScale->SetValue(diffuse);
+    this->DiffuseScale->SetDisableCommands(old_disable);
+    }
+
+  // Specular
+
+  if (this->SpecularScale && this->SpecularScale->GetValue() != specular)
+    {
+    int old_disable = this->SpecularScale->GetDisableCommands();
+    this->SpecularScale->SetDisableCommands(1);
+    this->SpecularScale->SetValue(specular);
+    this->SpecularScale->SetDisableCommands(old_disable);
+    }
+
+  // Specular power
+
+  if (this->SpecularPowerScale && 
+      this->SpecularPowerScale->GetValue() != specular_power)
+    {
+    int old_disable = this->SpecularPowerScale->GetDisableCommands();
+    this->SpecularPowerScale->SetDisableCommands(1);
+    this->SpecularPowerScale->SetValue(specular_power);
+    this->SpecularPowerScale->SetDisableCommands(old_disable);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMaterialPropertyWidget::UpdateScalesFromPreset(const Preset *preset)
+{
+  if (!preset)
+    {
+    return 0;
+    }
+
+  this->UpdateScales(preset->Ambient * 100.0, 
+                     preset->Diffuse * 100.0,
+                     preset->Specular * 100.0,
+                     preset->SpecularPower * 100.0);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -676,9 +742,14 @@ void vtkKWMaterialPropertyWidget::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::PropertyChangingCallback()
 {
-  if (this->UpdatePropertyFromInterface())
+  // We put UpdatePreview out of the test to make sure the UI can still
+  // be modified/tested without any real VTK object connected to it 
+  // (say, a vtkVolumeProperty)
+
+  int prop_has_changed = this->UpdatePropertyFromInterface();
+  this->UpdatePreview();
+  if (prop_has_changed)
     {
-    this->UpdatePreview();
     this->InvokePropertyChangingCommand();
     this->SendStateEvent(this->PropertyChangingEvent);
     }
@@ -687,18 +758,21 @@ void vtkKWMaterialPropertyWidget::PropertyChangingCallback()
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::PropertyChangedCallback()
 {
-  if (this->UpdatePropertyFromInterface())
-    {
-    this->UpdatePreview();
-    }
+  // We put UpdatePreview out of the test to make sure the UI can still
+  // be modified/tested without any real VTK object connected to it 
+  // (say, a vtkVolumeProperty)
 
-  // Those too are out of the test, because this callback is most of the times
-  // called at the end of an interaction which had triggered 
-  // PropertyChangingCallback until now. Since PropertyChangingCallback will
-  // modify the property, at the time PropertyChangedCallback the property
-  // values are the same, thus UpdatePropertyFromInterface will most likely
-  // return 0. Sacrifice a bit of effiency here to make sure the right
-  // command and event are send.
+  this->UpdatePropertyFromInterface();
+
+  this->UpdatePreview();
+
+  // The ones above are out of the test too, since this callback is most of the
+  // times called at the end of an interaction which had triggered 
+  // PropertyChangingCallback already. Since PropertyChangingCallback will
+  // modify the property, at the time PropertyChangedCallback is invoked
+  // the property values are the same, thus UpdatePropertyFromInterface will
+  // most likely return 0. We Sacrifice a bit of effiency here to make sure
+  // the right command and events are send.
 
   this->InvokePropertyChangedCommand();
   this->SendStateEvent(this->PropertyChangedEvent);
@@ -713,11 +787,16 @@ void vtkKWMaterialPropertyWidget::PresetMaterialCallback(int rank)
     this->Internals->Presets.end();
   for (; it != end && rank; ++it, --rank);
 
-  if (it != end && this->UpdatePropertyFromPreset(*it))
+  if (it != end)
     {
+    int prop_has_changed =  this->UpdatePropertyFromPreset(*it);
+    this->UpdateScalesFromPreset(*it);
     this->Update();
-    this->InvokePropertyChangedCommand();
-    this->SendStateEvent(this->PropertyChangedEvent);
+    if (prop_has_changed)
+      {
+      this->InvokePropertyChangedCommand();
+      this->SendStateEvent(this->PropertyChangedEvent);
+      }
     }
 }
 
@@ -729,16 +808,16 @@ void vtkKWMaterialPropertyWidget::SendStateEvent(int event)
 
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::CreateImage(unsigned char *data,
-                                              float ambient, 
-                                              float diffuse,
-                                              float specular,
-                                              float specularPower,
+                                              double ambient, 
+                                              double diffuse,
+                                              double specular,
+                                              double specular_power,
                                               int size)
 {  
   int i, j;
-  float dist, intensity[3];
-  float pt[3], normal[3], light[3], view[3], ref[3];
-  float diffuseComp, specularComp, specularDot;
+  double dist, intensity[3];
+  double pt[3], normal[3], light[3], view[3], ref[3];
+  double diffuseComp, specularComp, specularDot;
   int iGrid, jGrid;
 
   int pixel_size = 3 + (this->GridOpacity == 1.0 ? 0 : 1);
@@ -748,7 +827,7 @@ void vtkKWMaterialPropertyWidget::CreateImage(unsigned char *data,
     {
     for (j = 0; j < size; j++)
       {
-      dist = sqrt((float)((i-size/2)*(i-size/2) + (j-size/2)*(j-size/2)));
+      dist = sqrt((double)((i-size/2)*(i-size/2) + (j-size/2)*(j-size/2)));
       if (dist <= size/2 - 1)
         {
         normal[0] = pt[0] = (i-size/2) / (size/2.0-1);
@@ -783,7 +862,7 @@ void vtkKWMaterialPropertyWidget::CreateImage(unsigned char *data,
           specularDot = 0;
           }
         
-        specularComp = specular*.01*pow(specularDot, specularPower);
+        specularComp = specular*.01*pow(specularDot, specular_power);
         
         intensity[0] = (ambient*.01 + diffuseComp)*this->MaterialColor[0] 
           + specularComp;        
