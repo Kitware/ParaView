@@ -165,13 +165,17 @@ protected:
   // Description:
   // helper functions for ViewLookmarkCalllback
   void TurnFiltersOff();
-  vtkPVSource *SearchForDefaultDatasetInSourceList();
   // Description:
   // This is a big function because I'm triying to do it all in one pass
   // parses the reader portion of the state file and uses it to initialize the reader module (both parameter and display settings)
   // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
   // the filters so that we can go back and set reset them at the end
-  void ParseAndExecuteStateScript(vtkPVSource *reader, char *state, int useDatasetFlag);
+  void ParseAndExecuteStateScript(char *state, int macroFlag);
+  void InitializeSourceFromScript(vtkPVSource *source, char *script, int macroFlag);
+  vtkPVSource *GetReaderForLookmark(char *module, char *name);
+  vtkPVSource *GetReaderForMacro(char *module, char *name);
+  vtkPVSource *GetSourceForLookmark(char *name);
+  vtkPVSource *GetSourceForMacro(char *name);
 
   char* StateScript;
   char* ImageData;

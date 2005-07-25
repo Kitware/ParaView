@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.52");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.53");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -273,6 +273,7 @@ vtkPVApplication* vtkPVLookmarkManager::GetPVApplication()
 void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 {
   // Check if already created
+  char methodAndArgs[100];
 
   if (this->IsCreated())
     {
@@ -317,14 +318,15 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuEdit->Create(app);
   root_menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
-  //this->MenuEdit->AddCommand("Redo", this, "RedoCallback");
+  this->MenuEdit->AddCommand("Redo", this, "RedoCallback");
   this->MenuEdit->AddSeparator();
 
   this->MenuExamples->SetParent(this->MenuEdit);
   this->MenuExamples->SetTearOff(0);
   this->MenuExamples->Create(app);
   this->MenuEdit->AddCascade("Add Existing Macro", this->MenuExamples,0);
-  this->MenuEdit->AddCommand("Create Macro", this,"CreateMacroCallback");
+  sprintf(methodAndArgs,"CreateLookmarkCallback 1");
+  this->MenuEdit->AddCommand("Create Macro", this, methodAndArgs);
   this->MenuEdit->AddSeparator();
 //  char* cbv = 
 //    this->MenuExamples->CreateCheckButtonVariable(this, "MacroExamples");
@@ -332,7 +334,8 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->ImportMacroExamplesCallback();
 //  delete [] cbv;
 
-  this->MenuEdit->AddCommand("Create Lookmark", this, "CreateLookmarkCallback");
+  sprintf(methodAndArgs,"CreateLookmarkCallback 0");
+  this->MenuEdit->AddCommand("Create Lookmark", this, methodAndArgs);
   this->MenuEdit->AddCommand("Update Lookmark", this, "UpdateLookmarkCallback");
   this->MenuEdit->AddCommand("Rename Lookmark", this, "RenameLookmarkCallback");
   this->MenuEdit->AddSeparator();
@@ -369,7 +372,8 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->CreateLmkButton->SetParent(this->LmkPanelFrame);
   this->CreateLmkButton->Create(this->GetPVApplication());
   this->CreateLmkButton->SetText("Create Lookmark");
-  this->CreateLmkButton->SetCommand(this,"CreateLookmarkCallback");
+  sprintf(methodAndArgs,"CreateLookmarkCallback 0");
+  this->CreateLmkButton->SetCommand(this,methodAndArgs);
 
   this->TopDragAndDropTarget->SetParent(this->LmkScrollFrame->GetFrame());
   this->TopDragAndDropTarget->Create(this->GetPVApplication());
@@ -448,7 +452,9 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetStateScript(lookmarkWidget->GetStateScript());
   newLookmark->SetName(lookmarkWidget->GetName());
   newLookmark->SetComments(lookmarkWidget->GetComments());
+//ds
   newLookmark->SetDataset(lookmarkWidget->GetDataset());
+  newLookmark->CreateDatasetList();
   newLookmark->SetImageData(lookmarkWidget->GetImageData());
   newLookmark->SetPixelSize(lookmarkWidget->GetPixelSize());
   newLookmark->SetMacroFlag(1);
@@ -819,33 +825,146 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   ostrstream str;
 
   str << "A User's Manual for Lookmarks in ParaView" << endl << endl;
+
   str << "Introduction:" << endl << endl;
-  str << "Lookmarks provide a way to save and manage views of what you consider to be the important regions of your dataset in a fashion analogous to how bookmarks are used by a web browser, all within ParaView. They automate the mundane task of recreating complex filter trees, making it possible to easily toggle back and forth between views. They enable more effective data comparison because they can be applied to different datasets with similar geometry. They can be saved to a single file and then imported in a later ParaView session or shared with co-workers for collaboration purposes. A lookmark is a time-saving tool that automates the recreation of a complex view of data." << endl << endl;
+  str << "Lookmarks provide a way to save and manage views of what you consider to ";
+  str << "be the important regions of your dataset in a fashion analogous to how bookmarks ";
+  str << "are used by a web browser, all within ParaView. They automate the mundane task of ";
+  str << "recreating complex filter trees, making it possible to easily toggle back and ";
+  str << "forth between views. They enable more effective data comparison because they can ";
+  str << "be applied to different datasets with similar geometry. They can be saved to a single ";
+  str << "file and then imported in a later ParaView session or shared with co-workers for ";
+  str << "collaboration purposes. A lookmark is a time-saving tool that automates the recreation ";
+  str << "of a complex view of data." << endl << endl;
+
   str << "Feedback:" << endl << endl;
-  str << "Lookmarks in ParaView are still in an early stage of development. Any feedback you have would be of great value. To report errors, suggest features or changes, or comment on the functionality, please send an email to sdm-vs@ca.sandia.gov or call Eric Stanton at 505-284-4422." << endl << endl;
+  str << "Lookmarks in ParaView are still in an early stage of development. Any feedback you ";
+  str << "have would be of great value. To report errors, suggest features or changes, or comment ";
+  str << "on the functionality, please send an email to sdm-vs@ca.sandia.gov or call Eric Stanton ";
+  str << "at 505-284-4422." << endl << endl;
+
   str << "Terminology:" << endl << endl;
-  str << "Lookmark Manager - It is here that you import lookmarks into ParaView, toggle from one lookmark to another, save and remove lookmarks as you deem appropriate, and create new lookmarks of the data. In addition, the Lookmark Manager is hierarchical so that you can organize the lookmarks into nested folders." << endl << endl;
-  str << "Lookmark Widget - You interact with lookmarks through the lookmark widgets displayed in the Lookmark Manager. Each widget contains a thumbnail preview of the lookmark, a collapsible comments area, its default dataset name, and the name of the lookmark itself. A single-click of the thumbnail generates that lookmark in the ParaView window. A checkbox placed in front of each widget enables single or multiple lookmark selections for removing, renaming, and updating lookmarks. A lookmark widget can also be dragged and dropped to other parts of the Lookmark Manager by grabbing its label." << endl << endl;
-  str << "Lookmark File - The contents of the Lookmark Manager or a sub-folder can be saved to a lookmark file, a text-based, XML-structured file that stores the state information of all lookmarks in the Lookmark Manager. This file can be loaded into any ParaView session and is not tied to a particular dataset. It is this file that can easily be shared with co-workers." << endl << endl;
+  str << "Lookmark Manager - It is here that you import lookmarks into ParaView, toggle from ";
+  str << "one lookmark to another, save and remove lookmarks as you deem appropriate, and create ";
+  str << "new lookmarks of the data. In addition, the Lookmark Manager is hierarchical so that you ";
+  str << "can organize the lookmarks into nested folders." << endl << endl;
+
+  str << "Lookmark Widget - You interact with lookmarks through the lookmark widgets displayed in ";
+  str << "the Lookmark Manager. Each widget contains a thumbnail preview of the lookmark, a ";
+  str << "collapsible comments area, its default dataset name, and the name of the lookmark itself. ";
+  str << "A single-click of the thumbnail generates that lookmark in the ParaView window. A checkbox ";
+  str << "placed in front of each widget enables single or multiple lookmark selections for removing, ";
+  str << "renaming, and updating lookmarks. A lookmark widget can also be dragged and dropped to other ";
+  str << "parts of the Lookmark Manager by grabbing its label." << endl << endl;
+
+  str << "Lookmark File - The contents of the Lookmark Manager or a sub-folder can be saved to a ";
+  str << "lookmark file, a text-based, XML-structured file that stores the state information of all ";
+  str << "lookmarks in the Lookmark Manager. This file can be loaded into any ParaView session and is ";
+  str << "not tied to a particular dataset. It is this file that can easily be shared with co-workers." << endl << endl;
+
   str << "How To:" << endl << endl;
-  str << "Display the Lookmark Manager window - Select \"Window\" >> \"Lookmark Manager\" in the top ParaView menu. The window that appears is detached from the main ParaView window. Note that you can interact with the main ParaView window and the Lookmark Manager window remains in the foreground. The Lookmark Manager window can be closed and reopened without affecting the contents of the Lookmark Manager." << endl << endl;
-  str << "Create a new lookmark - Press the \"Create Lookmark\" button or select it in the \"Edit\" menu. Note that the Lookmark Manager will momentarily be moved behind the main ParaView window. This is normal and necessary to generate the thumbnail of the current view. The state of the applicable filters is saved with the lookmark. It is assigned an initial name of the form Lookmark#. A lookmark widget is then appended to the bottom of the Lookmark Manager." << endl << endl;
-  str << "View a lookmark - Click on the thumbnail of the lookmark you wish to view. You will then witness the appropriate filters being created in the main ParaView window. Note the lookmark name has been appended to the filter name of each filter belonging to this lookmark.  Clicking this same lookmark again will cause these filters to be deleted if possible (i.e. if they have not been set as inputs to other filters) and the saved filters will be regenerated. See also How to change the dataset to which lookmarks are applied. " << endl << endl;
-  str << "Update an existing lookmark - Select the lookmark to be updated and then press \"Edit\" >> \"Update Lookmark\". This stores the state of all filters that contribute to the current view in that lookmark. The lookmark's thumbnail is also replaced to reflect the current view. All other attributes of the lookmark widget (name, comments, etc.) remain unchanged." << endl << endl;
-  str << "Save the contents of the Lookmark Manager - Press \"File\" >> \"Save As\". You will be asked to select a new or pre-existing lookmark file (with a .lmk extension) to which to save. All information needed to recreate the current state of the Lookmark Manager is written to this file. This file can be opened and edited in a text editor." << endl << endl;
-  str << "Export the contents of a folder - Press \"File\" >> \"Export Folder\". You will be asked to select a new or pre-existing lookmark file. All information needed to recreate the lookmarks and/or folders nested within the selected folder is written to this file." << endl << endl;
-  str << "Import a lookmark file - Press \"File\" >> \"Import\" >> and either \"Append\" or \"Replace\" in its cascaded menu. The first will append the contents of the imported lookmark file to the existing contents of the Lookmark Manager. The latter will first remove the contents of the Lookmark Manager and then import the new lookmark file." << endl << endl;
-  str << "Automatic saving and loading of the contents of the Lookmark Manager - Any time you modify the Lookmark Manager in some way (create or update a lookmark, move, rename, or remove items, import or export lookmarks), after the modification takes place a lookmark file by the name of \"ParaViewlmk\" is written to the user's home directory containing the state of the Lookmark Manager at that point in time. This file is automatically imported into ParaView at the start of the session. It can be used to recover your lookmarks in the event of a ParaView crash." << endl << endl;
-  str << "Use a lookmark on a different dataset - A permanent folder titled \"Macros\" is located at the top of the Lookmark Manager. A lookmark can be placed in here, or created manually using the \"Edit\" >> \"Create Macro\" option. When invoked, this lookmark will be used on the currently selected dataset instead of the one from which it was originally created. What this means is that you can automate the operations you perform on a dataset and apply those to other datasets with similar properties." << endl << endl;
-  str << "Create a folder - Press \"Edit\" >> \"Create Folder\". This appends to the end of the Lookmark Manager an empty folder named \"New Folder\". You can now drag lookmarks into this folder (see How to move lookmarks and/or folders)." << endl << endl;
-  str << "Move lookmarks and/or folders - A lookmark or folder can be moved in between any other lookmark or folder in the Lookmark Manager. Simply move your mouse over the name of the item you wish to relocate and hold the left mouse button down. Then drag the widget to the desired location (a box will appear under your mouse if the location is a valid drop point) then release the left mouse button. Releasing over the label of a folder will drop the item in the first nested entry of that folder." << endl << endl;
-  str << "Remove lookmarks and/or folders - Select any combination of lookmarks and/or folders and then press \"Edit\" >> \"Remove Item(s)\" button. You will be asked to verify that you wish to delete these. This prompt may be turned off. " << endl << endl;
-  str << "Rename a lookmark or folder - Select the lookmark or folder you wish to rename and press \"Edit\" >> \"Rename Lookmark\" or \"Edit\" >> \"Rename Folder\".  This will replace the name with an editable text field containing the old name. Modify the name and press the Enter/Return key. This will remove the text field and replace it with a label containing the new name." << endl << endl;
-  str << "Comment on a lookmark - When the contents of the Lookmark Manager are saved to a lookmark file, any text you have typed in the comments area of a lookmark widget will also be saved. By default the comments frame is initially collapsed (see How to expand/collapse lookmarks, folders, and the comments field)." << endl << endl;
-  str << "Select lookmarks and/or folders - To select a lookmark or folder to be removed, renamed, or updated (lookmarks only), checkboxes have been placed in front of each item in the Lookmark Manager. Checking a folder will by default check all nested lookmarks and folders as well." << endl << endl;
-  str << "Expand/collapse lookmarks, folders, and the comments field - The frames that encapsulate lookmarks, folders, and the comments field can be expanded or collapsed by clicking on the \"x\" or the \"v\", respectively, in the upper right hand corner of the frame. " << endl << endl;
-  str << "Undo a change to the Lookmark Manager - Press \"Edit\" >> \"Undo\". This will return the Lookmark Manager's contents to its state before the previous action was performed." << endl << endl;
+  str << "Display the Lookmark Manager window - Select \"Window\" >> \"Lookmark Manager\" in the ";
+  str << "top ParaView menu. The window that appears is detached from the main ParaView window. Note that you ";
+  str << "can interact with the main ParaView window and the Lookmark Manager window remains in the foreground. ";
+  str << "The Lookmark Manager window can be closed and reopened without affecting the contents of the Lookmark ";
+  str << "Manager." << endl << endl;
+
+  str << "Create a new lookmark - Press the \"Create Lookmark\" button or select it in the \"Edit\" ";
+  str << "menu. Note that the Lookmark Manager will momentarily be moved behind the main ParaView window. This ";
+  str << "is normal and necessary to generate the thumbnail of the current view. The state of the applicable ";
+  str << "filters is saved with the lookmark. It is assigned an initial name of the form Lookmark#. A lookmark ";
+  str << "widget is then appended to the bottom of the Lookmark Manager." << endl << endl;
+
+  str << "View a lookmark - Click on the thumbnail of the lookmark you wish to view. You will then ";
+  str << "witness the appropriate filters being created in the main ParaView window. Note the lookmark name ";
+  str << "has been appended to the filter name of each filter belonging to this lookmark.  Clicking this same ";
+  str << "lookmark again will cause these filters to be deleted if possible (i.e. if they have not been set as ";
+  str << "inputs to other filters) and the saved filters will be regenerated. See also How to change the dataset ";
+  str << "to which lookmarks are applied. " << endl << endl;
+
+  str << "Update an existing lookmark - Select the lookmark to be updated and then press \"Edit\" >> ";
+  str << "\"Update Lookmark\". This stores the state of all filters that contribute to the current view in that ";
+  str << "lookmark. The lookmark's thumbnail is also replaced to reflect the current view. All other attributes ";
+  str << "of the lookmark widget (name, comments, etc.) remain unchanged." << endl << endl;
+
+  str << "Save the contents of the Lookmark Manager - Press \"File\" >> \"Save As\". You will be asked ";
+  str << "to select a new or pre-existing lookmark file (with a .lmk extension) to which to save. All information ";
+  str << "needed to recreate the current state of the Lookmark Manager is written to this file. This file can be ";
+  str << "opened and edited in a text editor." << endl << endl;
+
+  str << "Export the contents of a folder - Press \"File\" >> \"Export Folder\". You will be asked to ";
+  str << "select a new or pre-existing lookmark file. All information needed to recreate the lookmarks and/or ";
+  str << "folders nested within the selected folder is written to this file." << endl << endl;
+
+  str << "Import a lookmark file - Press \"File\" >> \"Import\" >> and either \"Append\" or \"Replace\" ";
+  str << "in its cascaded menu. The first will append the contents of the imported lookmark file to the existing ";
+  str << "contents of the Lookmark Manager. The latter will first remove the contents of the Lookmark Manager and ";
+  str << "then import the new lookmark file." << endl << endl;
+
+  str << "Automatic saving and loading of the contents of the Lookmark Manager - Any time you modify ";
+  str << "the Lookmark Manager in some way (create or update a lookmark, move, rename, or remove items, import ";
+  str << "or export lookmarks), after the modification takes place a lookmark file by the name of \"ParaViewlmk\" ";
+  str << "is written to the user's home directory containing the state of the Lookmark Manager at that point in ";
+  str << "time. This file is automatically imported into ParaView at the start of the session. It can be used to ";
+  str << "recover your lookmarks in the event of a ParaView crash." << endl << endl;
+
+  str << "Use a lookmark on a different dataset - A permanent folder titled \"Macros\" is located at ";
+  str << "the top of the Lookmark Manager. A lookmark can be placed in here, or created manually using the \"Edit\" ";
+  str << ">> \"Create Macro\" option. When invoked, this lookmark macro will be used on the currently selected dataset ";
+  str << "instead of the one from which it was originally created. It will maintain your existing camera angle and timestep. ";
+  str << "but recreate all other operations associated with that lookmark macro. This will work primarily only on datasets ";
+  str << "with similar properties." << endl << endl;
+
+  str << "Add existing lookmark macros to the \"Macros\" folder - Press \"Edit\" --> \"Add Existing Macro\" and select ";
+  str << "from the available macros (see the following section on where ParaView gets these from). You will then see a lookmark widget ";
+  str << "appear in the Macros folder by that name." << endl << endl;
+
+  str << "Distribute pre-defined lookmark macros with ParaView - While a lookmark macro can be created in ";
+  str << "the Lookmark Manager by the user, it can also be loaded automatically into the \"Edit\" --> \"Add Existing ";
+  str << "Macro\" menu. This can be useful if you want to make available to users a set of \"canned\" views ";
+  str << "of their data. Simply save a lookmark file of the desire lookmarks (using either \"Save As\" or \"Export Folder\") ";
+  str << "to a file in your home directory named \"./LookmarkMacros\" on UNIX or \"#LookmarkMacros\" on Windows. Then, ";
+  str << "when ParaView is launched, it will read from this file to populate the macros menu." << endl << endl;
+
+  str << "Create a folder - Press \"Edit\" >> \"Create Folder\". This appends to the end of the Lookmark ";
+  str << "Manager an empty folder named \"New Folder\". You can now drag lookmarks into this folder (see How to move ";
+  str << "lookmarks and/or folders)." << endl << endl;
+
+  str << "Move lookmarks and/or folders - A lookmark or folder can be moved in between any other lookmark ";
+  str << "or folder in the Lookmark Manager. Simply move your mouse over the name of the item you wish to relocate ";
+  str << "and hold the left mouse button down. Then drag the widget to the desired location (a box will appear under ";
+  str << "your mouse if the location is a valid drop point) then release the left mouse button. Releasing over the ";
+  str << "label of a folder will drop the item in the first nested entry of that folder." << endl << endl;
+
+  str << "Remove lookmarks and/or folders - Select any combination of lookmarks and/or folders and then press ";
+  str << "\"Edit\" >> \"Remove Item(s)\" button. You will be asked to verify that you wish to delete these. This prompt ";
+  str << "may be turned off. " << endl << endl;
+
+  str << "Rename a lookmark or folder - Select the lookmark or folder you wish to rename and press \"Edit\" >> ";
+  str << "\"Rename Lookmark\" or \"Edit\" >> \"Rename Folder\".  This will replace the name with an editable text field ";
+  str << "containing the old name. Modify the name and press the Enter/Return key. This will remove the text field and ";
+  str << "replace it with a label containing the new name." << endl << endl;
+
+  str << "Comment on a lookmark - When the contents of the Lookmark Manager are saved to a lookmark file, any ";
+  str << "text you have typed in the comments area of a lookmark widget will also be saved. By default the comments frame ";
+  str << "is initially collapsed (see How to expand/collapse lookmarks, folders, and the comments field)." << endl << endl;
+
+  str << "Select lookmarks and/or folders - To select a lookmark or folder to be removed, renamed, or updated ";
+  str << "(lookmarks only), checkboxes have been placed in front of each item in the Lookmark Manager. Checking a folder ";
+  str << "will by default check all nested lookmarks and folders as well." << endl << endl;
+
+  str << "Expand/collapse lookmarks, folders, and the comments field - The frames that encapsulate lookmarks, ";
+  str << "folders, and the comments field can be expanded or collapsed by clicking on the \"x\" or the \"v\", respectively, ";
+  str << "in the upper right hand corner of the frame. " << endl << endl;
+
+  str << "Undo a change to the Lookmark Manager - Press \"Edit\" >> \"Undo\". This will return the Lookmark ";
+  str << "Manager's contents to its state before the previous action was performed." << endl << endl;
+
+  str << "Redo a change to the Lookmark Manager - Press \"Edit\" >> \"Redo\". This will return the Lookmark ";
+  str << "Manager's contents to its state before the previous Undo was performed." << endl << endl;
+
   str << ends;
+
   this->UsersTutorialTxt->GetWidget()->SetValue( str.str() );
   str.rdbuf()->freeze(0);
 }
@@ -864,25 +983,21 @@ void vtkPVLookmarkManager::Checkpoint()
   ostrstream str;
 
   #ifdef _WIN32
-
   if ( !getenv("HOMEPATH") )
     {
     return;
     }
   str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
-  this->SaveAll(str.str());
-
   #else
-
   if ( !getenv("HOME") )
     {
     return;
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
-  this->SaveAll(str.str());
-
   #endif
    
+  this->SaveAll(str.str());
+
   this->GetTraceHelper()->AddEntry("$kw(%s) Checkpoint",
                       this->GetTclName());
 
@@ -921,6 +1036,14 @@ void vtkPVLookmarkManager::UndoRedoInternal()
 {
   ostrstream str;
   ostrstream tempstr;
+  FILE *infile;
+  FILE *outfile;
+  char buf[300];
+
+  if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
+    {
+    return;
+    }
 
   // Get the path to the checkpointed file
 
@@ -944,16 +1067,28 @@ void vtkPVLookmarkManager::UndoRedoInternal()
 
   #endif
 
-  ifstream infile(str.str());
+  ifstream checkfile(str.str());
 
-  if ( !infile.fail())
+  if ( !checkfile.fail())
     {
     // save out the current contents to a temp file
     this->SaveAll(tempstr.str());
     this->Import(str.str(),0);
-    this->Checkpoint();
+//    this->Checkpoint();
+    checkfile.close();
+    
+    //read the session state file in to a new vtkPVLookmark
+    if((infile = fopen(tempstr.str(),"r")) && (outfile = fopen(str.str(),"w")))
+      {
+      while(fgets(buf,300,infile))
+        {
+        fputs(buf,outfile);
+        }
+      }
+    fclose(infile);
+    fclose(outfile);
+    remove(tempstr.str());
     }
-
 }
 
 
@@ -1373,7 +1508,9 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
     newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
     s.rdbuf()->freeze(0);
+//ds
     newLmkWidget->SetDataset(lmkWidget->GetDataset());
+    newLmkWidget->CreateDatasetList();
     newLmkWidget->SetLocation(newLoc);
     newLmkWidget->SetComments(lmkWidget->GetComments());
     newLmkWidget->UpdateWidgetValues();
@@ -1624,12 +1761,13 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
     lmk->SetStateScript(lookmarkScript);
     delete [] lookmarkScript;
     }
-
+//ds
   if(elem->GetAttribute("Dataset"))
     {
     char *lookmarkDataset = new char[strlen(elem->GetAttribute("Dataset"))+1];
     strcpy(lookmarkDataset,elem->GetAttribute("Dataset"));
     lmk->SetDataset(lookmarkDataset);
+    lmk->CreateDatasetList();
     delete [] lookmarkDataset;
     }
  
@@ -1690,12 +1828,13 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkPVXMLElement *elem)
     lmk->SetStateScript(lookmarkScript);
     delete [] lookmarkScript;
     }
-
+//ds
   if(elem->GetAttribute("Dataset"))
     {
     char *lookmarkDataset = new char[strlen(elem->GetAttribute("Dataset"))+1];
     strcpy(lookmarkDataset,elem->GetAttribute("Dataset"));
     lmk->SetDataset(lookmarkDataset);
+    lmk->CreateDatasetList();
     delete [] lookmarkDataset;
     }
 
@@ -1815,7 +1954,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::CreateLookmarkCallback()
+void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
@@ -1831,150 +1970,39 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
     return;
     }
 
-  this->CreateLookmark(this->GetUnusedLookmarkName());
+  this->CreateLookmark(this->GetUnusedLookmarkName(), macroFlag);
   
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::CreateMacroCallback()
+void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 {
   vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
   vtkPVReaderModule *mod;
-  vtkPVSource *temp;
-  vtkPVSource *src;
   int indexOfNewLmkWidget;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
-  // if the pipeline is empty, don't add
-  if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), win, "No Data Loaded", 
-      "To create a lookmark macro you must first open your data and view some feature of interest. Then select \"Create Macro\" in the \"Edit\" menu.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-    }
-//  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\"",
-//                      this->GetTclName(),name);
+  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\" %d",
+                      this->GetTclName(),name,macroFlag);
 
   // what if the main window is not maximized in screen? 
-
-  //find the reader to use by getting the reader of the current pvsource
-  src = win->GetCurrentPVSource();
-  while((temp = src->GetPVInput(0)))
-    src = temp;
-  if(src->IsA("vtkPVReaderModule"))
-    {
-    mod = vtkPVReaderModule::SafeDownCast(src);
-    }
-  else
-    {
-/*
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), win, "Error Creating Lookmark", 
-      "Lookmarking ParaView source is not yet supported", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-*/
-    }
 
   this->Checkpoint();
 
   // create and initialize pvlookmark:
   newLookmark = vtkPVLookmark::New();
   // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
-  newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
-  newLookmark->SetMacroFlag(1);
-  newLookmark->Create(this->GetPVApplication());
-  char methodAndArg[200];
-  sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
-  newLookmark->GetCheckbox()->SetCommand(this,methodAndArg);
-  newLookmark->SetName(this->GetUnusedLookmarkName());
-  newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-  ostrstream s;
-  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
-  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
-  s.rdbuf()->freeze(0);
-  newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-  if(src->IsA("vtkPVReaderModule"))
+  if(macroFlag)
     {
-    newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
-    }
+    newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
+    } 
   else
     {
-    newLookmark->SetDataset(src->GetModuleName());
+    newLookmark->SetParent(this->LmkScrollFrame->GetFrame());
     }
-  newLookmark->StoreStateScript();
-  newLookmark->UpdateWidgetValues();
-  newLookmark->CommentsModifiedCallback();
-  this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
-
-  // since the direct children of the LmkListingFrame will always be either lmk widgets or containers
-  // counting them will give us the appropriate location to assign the new lmk:
-  indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame());
-  newLookmark->SetLocation(indexOfNewLmkWidget);
-  newLookmark->CreateIconFromMainView();
-
-  this->PVLookmarks->InsertItem(numLmkWidgets,newLookmark);
-
-  this->ResetDragAndDropTargetSetAndCallbacks();
-
-  this->Script("update");
-
-//   Try to get the scroll bar to initialize properly (show correct portion).
-  this->Script("%s yview moveto 1",
-               this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::CreateLookmark(char *name)
-{
-  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
-  vtkPVLookmark *newLookmark;
-  vtkPVReaderModule *mod;
-  vtkPVSource *temp;
-  vtkPVSource *src;
-  int indexOfNewLmkWidget;
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
-  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\"",
-                      this->GetTclName(),name);
-
-  // what if the main window is not maximized in screen? 
-
-  //find the reader to use by getting the reader of the current pvsource
-  src = win->GetCurrentPVSource();
-  while((temp = src->GetPVInput(0)))
-    src = temp;
-  if(src->IsA("vtkPVReaderModule"))
-    {
-    mod = vtkPVReaderModule::SafeDownCast(src);
-    }
-  else
-    {
-/*
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), win, "Error Creating Lookmark", 
-      "Lookmarking ParaView source is not yet supported", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-
-    return;
-*/
-    }
-
-  this->Checkpoint();
-
-  // create and initialize pvlookmark:
-  newLookmark = vtkPVLookmark::New();
-  // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
-  newLookmark->SetParent(this->LmkScrollFrame->GetFrame());
+  newLookmark->SetMacroFlag(macroFlag);
   newLookmark->Create(this->GetPVApplication());
   char methodAndArg[200];
   sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
@@ -1986,14 +2014,51 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
   newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
   s.rdbuf()->freeze(0);
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-  if(src->IsA("vtkPVReaderModule"))
+//ds
+  //find the reader to use by getting the reader of the current pvsource
+  // Loop though all sources/Data objects and compute total bounds.
+  vtkPVSourceCollection* col = win->GetSourceList("Sources");
+  vtkPVSource *pvs;
+  if (col == NULL)
     {
-    newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+    return;
     }
-  else
+  vtkCollectionIterator *it = col->NewIterator();
+//  char *ds = new char[1];
+//  ds[0] = '\0';
+  vtkStdString ds;
+  char *path;
+  int i=0;
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
     {
-    newLookmark->SetDataset(src->GetModuleName());
+    pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
+    if(!pvs->GetPVInput(0))
+      {
+      if(this->IsSourceOrOutputsVisible(pvs,pvs->GetVisibility()))
+        {
+        if(pvs->IsA("vtkPVReaderModule"))
+          {
+          mod = vtkPVReaderModule::SafeDownCast(pvs);
+          path = (char *)mod->GetFileEntry()->GetValue();
+          }
+        else
+          {
+          path = pvs->GetModuleName();
+          }
+        //ds = (char*)realloc((char*)ds,strlen(ds)+strlen(path)+1);
+        ds.append(path);
+        ds.append(";");
+        //sprintf(ds,"%s%s;",ds,path);
+        i++;
+        }
+      }
+    it->GoToNextItem();
     }
+  it->Delete();
+  ds.erase(ds.find_last_of(';',ds.size()));
+  newLookmark->SetDataset(ds.c_str());
+  newLookmark->CreateDatasetList();
   newLookmark->StoreStateScript();
   newLookmark->UpdateWidgetValues();
   newLookmark->CommentsModifiedCallback();
@@ -2016,6 +2081,30 @@ void vtkPVLookmarkManager::CreateLookmark(char *name)
                this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
 
 }
+
+//-----------------------------------------------------------------------------
+int vtkPVLookmarkManager::IsSourceOrOutputsVisible(vtkPVSource* source, int visibilityFlag)
+{
+  int ret = 0;
+  if ( !source )
+    {
+    return visibilityFlag;
+    }
+  if(visibilityFlag)
+    {
+    return visibilityFlag;
+    }
+  for(int i=0; i<source->GetNumberOfPVConsumers();i++)
+    {
+    vtkPVSource* consumer = source->GetPVConsumer(i);
+    if ( consumer )
+      {
+      ret = this->IsSourceOrOutputsVisible(consumer, consumer->GetVisibility());
+      }
+    }
+  return ret | source->GetVisibility();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::SaveAllCallback()
@@ -2636,6 +2725,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       elem->SetAttribute("StateScript", lookmarkWidget->GetStateScript());
       elem->SetAttribute("ImageData", lookmarkWidget->GetImageData());
       elem->SetIntAttribute("PixelSize", lookmarkWidget->GetPixelSize());
+//ds
       elem->SetAttribute("Dataset", lookmarkWidget->GetDataset());
       
       float *temp2;
@@ -3262,7 +3352,9 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
       newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
+//ds
       newLmkWidget->SetDataset(oldLmkWidget->GetDataset());
+      newLmkWidget->CreateDatasetList();
       newLmkWidget->SetLocation(oldLmkWidget->GetLocation());
       newLmkWidget->SetComments(oldLmkWidget->GetComments());
       newLmkWidget->SetImageData(oldLmkWidget->GetImageData());

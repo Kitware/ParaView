@@ -99,10 +99,8 @@ public:
   // name of the form "Lookmark#". Saves the state of the visible sources in the SourceList
   // and their inputs. The window is moved behind the render window to save the image, but is
   // then moved back in front.
-  void CreateLookmarkCallback();
-  void CreateLookmark(char *name);
-
-  void CreateMacroCallback();
+  void CreateLookmarkCallback(int macroFlag);
+  void CreateLookmark(char *name, int macroFlag);
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
@@ -166,6 +164,8 @@ public:
   void ImportMacroExamplesCallback();
 
   void SelectItemCallback(char *name);
+
+  int IsSourceOrOutputsVisible(vtkPVSource *src,int visibilityFlag);
 
 protected:
 

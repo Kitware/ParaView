@@ -32,10 +32,11 @@
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkStdString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.24");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -56,6 +57,7 @@ vtkKWLookmark::vtkKWLookmark()
   this->Name = NULL;
   this->Comments = NULL;
   this->Dataset = NULL;
+  this->DatasetList = NULL;
   this->Width = this->Height = 48; 
   this->PixelSize = 3;
   this->MacroFlag = 0;
@@ -131,11 +133,16 @@ vtkKWLookmark::~vtkKWLookmark()
     this->LmkFrame->Delete();
     this->LmkFrame= NULL;
     }
-
+//ds 
   if(this->Dataset)
     {
     delete [] this->Dataset;
     this->Dataset = NULL;
+    }
+  if(this->DatasetList)
+    {
+    delete [] this->DatasetList;
+    this->DatasetList = NULL;
     }
   if(this->Name)
     {
@@ -286,27 +293,68 @@ void vtkKWLookmark::UpdateWidgetValues()
   this->LmkCommentsText->SetValue(this->Comments);
   this->LmkMainFrame->SetLabelText(this->Name);
 
-  if(strstr(this->Dataset,"/") && !strstr(this->Dataset,"\\"))
+//ds
+  int i=0;
+  char *ptr;
+  vtkStdString datasetLabel = "Sources: ";
+  while(this->DatasetList[i])
     {
-    char *ptr = this->Dataset;
-    ptr+=strlen(ptr)-1;
-    while(*ptr!='/' && *ptr!='\\')
-      ptr--;
-    ptr++;
-    char *datasetLabel = new char[15+strlen(ptr)];
-    strcpy(datasetLabel,"Dataset: ");
-    strcat(datasetLabel,ptr);
-    this->LmkDatasetLabel->SetText(datasetLabel);
-    delete [] datasetLabel;
+    if(strstr(this->DatasetList[i],"/") && !strstr(this->DatasetList[i],"\\"))
+      {
+      ptr = this->DatasetList[i];
+      ptr+=strlen(ptr)-1;
+      while(*ptr!='/' && *ptr!='\\')
+        ptr--;
+      ptr++;
+      datasetLabel.append(ptr);
+      datasetLabel.append(", ");
+      }
+    else
+      {
+      datasetLabel.append(this->DatasetList[i]);
+      datasetLabel.append(", ");
+      }
+    i++;
     }
-  else
+  
+  datasetLabel.erase(datasetLabel.find_last_of(',',datasetLabel.size()));
+
+  this->LmkDatasetLabel->SetText(datasetLabel.c_str());
+
+}
+
+void vtkKWLookmark::CreateDatasetList()
+{
+  int i=0;
+  char *ds = new char[strlen(this->Dataset)+1];
+  strcpy(ds,this->Dataset);
+  char *ptr = strtok(ds,";");
+
+  while(ptr)
     {
-    char *datasetLabel = new char[15+strlen(this->Dataset)];
-    strcpy(datasetLabel,"Source: ");
-    strcat(datasetLabel,this->Dataset);
-    this->LmkDatasetLabel->SetText(datasetLabel);
-    delete [] datasetLabel;
+    ptr = strtok(NULL,";");
+    i++;
     }
+
+  this->DatasetList = new char*[i+1];
+  // Initialize with NULLs.
+  for (int idx = 0; idx < i+1; ++idx)
+    {
+    this->DatasetList[idx] = NULL;
+    }
+
+  i=0;
+  strcpy(ds,this->Dataset);
+  ptr = strtok(ds,";");
+  while(ptr)
+    {
+    this->DatasetList[i] = new char[strlen(ptr)+1];
+    strcpy(this->DatasetList[i],ptr);
+    ptr = strtok(NULL,";");
+    i++;
+    }
+
+  delete [] ds;
 }
 
 void vtkKWLookmark::UpdateVariableValues()
@@ -436,6 +484,7 @@ void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Name: " << this->GetName() << endl;
   os << indent << "Comments: " << this->GetComments() << endl;
+//ds
   os << indent << "Dataset: " << this->GetDataset() << endl;
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Height: " << this->GetHeight() << endl;

@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.756");
+vtkCxxRevisionMacro(vtkPVWindow, "1.757");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1164,7 +1164,9 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->LookmarkButton->Create(app);
   this->LookmarkButton->SetConfigurationOption("-image", "PVLookmarkButton");
   this->LookmarkButton->SetBalloonHelpString("Create a lookmark of the current view.");
-  this->LookmarkButton->SetCommand(this->PVLookmarkManager, "CreateLookmarkCallback");
+  char methodAndArgs[50];
+  sprintf(methodAndArgs,"CreateLookmarkCallback 0");
+  this->LookmarkButton->SetCommand(this->PVLookmarkManager, methodAndArgs);
   this->LookmarkToolbar->InsertWidget(0,this->LookmarkButton);
 
   this->ToolbarMenuButton->SetParent(this->Toolbar);

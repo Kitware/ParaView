@@ -88,6 +88,8 @@ public:
 
   void CommentsModifiedCallback();
 
+  void CreateDatasetList();
+
   // Description:
   // COnvenience method for encapsulating and reusing code that packs this widget
   // the argument tells Pack() whether to display the hidden widgets or not
@@ -132,6 +134,7 @@ protected:
   vtkKWCheckButton *Checkbox;
 
   char* Dataset;
+  char** DatasetList;
   char* Name;
   char* Comments;
   int Width;
