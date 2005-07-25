@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.53");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.54");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -714,7 +714,7 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
     {
     this->QuickStartGuideTxt->SetParent(this->QuickStartGuideDialog->GetBottomFrame());
     this->QuickStartGuideTxt->Create(app);
-    this->QuickStartGuideTxt->ShowVerticalScrollbarOn();
+    this->QuickStartGuideTxt->VerticalScrollbarVisibilityOn();
 
     vtkKWText *text = this->QuickStartGuideTxt->GetWidget();
     text->ResizeToGridOn();
@@ -801,7 +801,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
     {
     this->UsersTutorialTxt->SetParent(this->UsersTutorialDialog->GetBottomFrame());
     this->UsersTutorialTxt->Create(app);
-    this->UsersTutorialTxt->ShowVerticalScrollbarOn();
+    this->UsersTutorialTxt->VerticalScrollbarVisibilityOn();
 
     vtkKWText *text = this->UsersTutorialTxt->GetWidget();
     text->ResizeToGridOn();

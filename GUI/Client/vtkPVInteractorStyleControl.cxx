@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.52");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -535,7 +535,6 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
-  this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
   this->LabeledFrame->SetLabelText("Camera Manipulators Control");
 

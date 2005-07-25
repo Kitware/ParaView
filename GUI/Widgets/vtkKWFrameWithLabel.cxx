@@ -26,11 +26,11 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.1");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.2");
 
-int vtkKWFrameWithLabel::LabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
-int vtkKWFrameWithLabel::BoldLabel = 1;
-int vtkKWFrameWithLabel::AllowShowHide = 1;
+int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
+int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
+int vtkKWFrameWithLabel::DefaultAllowFrameToCollapse = 1;
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithLabel::vtkKWFrameWithLabel()
@@ -44,9 +44,8 @@ vtkKWFrameWithLabel::vtkKWFrameWithLabel()
   this->Icon       = vtkKWLabel::New();
   this->IconData   = vtkKWIcon::New();
 
-  this->Displayed     = 1;
-  this->ShowHideFrame = 0;
-  this->ShowIconInLimitedEditionMode = 0;
+  this->AllowFrameToCollapse = 1;
+  this->LimitedEditionModeIconVisibility = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +89,7 @@ void vtkKWFrameWithLabel::SetLabelText(const char *text)
     return;
     }
 
-  if (vtkKWFrameWithLabel::LabelCase == 
+  if (vtkKWFrameWithLabel::DefaultLabelCase == 
       vtkKWFrameWithLabel::LabelCaseUserSpecified)
     {
     this->GetLabel()->SetText(text);
@@ -98,7 +97,7 @@ void vtkKWFrameWithLabel::SetLabelText(const char *text)
   else
     {
     vtksys_stl::string res;
-    switch (vtkKWFrameWithLabel::LabelCase)
+    switch (vtkKWFrameWithLabel::DefaultLabelCase)
       {
       case vtkKWFrameWithLabel::LabelCaseUppercaseFirst:
         res = vtksys::SystemTools::CapitalizedWords(text);
@@ -112,7 +111,7 @@ void vtkKWFrameWithLabel::SetLabelText(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::AdjustMargin()
+void vtkKWFrameWithLabel::AdjustMarginCallback()
 {
   if (this->IsCreated())
     {
@@ -136,7 +135,8 @@ void vtkKWFrameWithLabel::AdjustMargin()
     // Don't forget the show/hide collapse icon, it might be bigger than
     // the LabelFrame contents (really ?)
 
-    if (vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame &&
+    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+        this->AllowFrameToCollapse &&
         height < this->IconData->GetHeight())
       {
       height = this->IconData->GetHeight();
@@ -155,7 +155,8 @@ void vtkKWFrameWithLabel::AdjustMargin()
     this->Script("%s configure -height %d", 
                  this->Border2->GetWidgetName(), border2_h);
 
-    if ( vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame )
+    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+        this->AllowFrameToCollapse)
       {
       this->Script("place %s -relx 1 -x %d -rely 0 -y %d -anchor center",
                    this->Icon->GetWidgetName(),
@@ -212,7 +213,7 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   // since it is lazy created/allocated on the fly only when needed.
   // Force label icon to be created now, so that we can set its image option.
 
-  this->Label->ShowLabelOn();
+  this->Label->LabelVisibilityOn();
   this->GetLabelIcon()->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
   this->Script("%s config -bd 0 -pady 0 -padx 0", 
                this->GetLabelIcon()->GetWidgetName());
@@ -226,7 +227,8 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   this->GetLabelIcon()->SetBalloonHelpString(balloon_str.str());
   balloon_str.rdbuf()->freeze(0);
 
-  if (vtkKWFrameWithLabel::BoldLabel)
+  if (vtkKWFrameWithLabel::DefaultLabelFontWeight ==
+      vtkKWFrameWithLabel::LabelFontWeightBold)
     {
     vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
     }
@@ -251,16 +253,17 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
 
   this->Script("raise %s", this->Label->GetWidgetName());
 
-  if ( vtkKWFrameWithLabel::AllowShowHide && this->ShowHideFrame )
+  if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+      this->AllowFrameToCollapse)
     {
-    this->Script("bind %s <ButtonRelease-1> { %s PerformShowHideFrame }",
+    this->Script("bind %s <ButtonRelease-1> { %s CollapseButtonCallback }",
                  this->Icon->GetWidgetName(),
                  this->GetTclName());
     }
 
   // If the label frame get resize, reconfigure the margins
 
-  this->Script("bind %s <Configure> { catch {%s AdjustMargin} }",
+  this->Script("bind %s <Configure> { catch {%s AdjustMarginCallback} }",
                this->LabelFrame->GetWidgetName(), this->GetTclName());
 
   // Update enable state
@@ -269,65 +272,99 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::PerformShowHideFrame()
+void vtkKWFrameWithLabel::ExpandFrame()
 {
-  if ( this->Displayed )
-    {
-    this->Script("pack forget %s", this->Frame->GetWidgetName());
-    this->Displayed = 0;
-    this->IconData->SetImage(vtkKWIcon::IconExpand);
-    }
-  else
+  if (this->Frame && this->Frame->IsCreated())
     {
     this->Script("pack %s -fill both -expand yes",
                  this->Frame->GetWidgetName());
-    this->Displayed = 1;
+    }
+  if (this->IconData && this->Icon)
+    {
     this->IconData->SetImage(vtkKWIcon::IconShrink);
-   }
-  this->Icon->SetImageToIcon(this->IconData);
+    this->Icon->SetImageToIcon(this->IconData);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::AllowShowHideOn() 
-{ 
-  vtkKWFrameWithLabel::AllowShowHide = 1; 
-}
-void vtkKWFrameWithLabel::AllowShowHideOff() 
-{ 
-  vtkKWFrameWithLabel::AllowShowHide = 0; 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::BoldLabelOn() 
-{ 
-  vtkKWFrameWithLabel::BoldLabel = 1; 
-}
-void vtkKWFrameWithLabel::BoldLabelOff() 
-{ 
-  vtkKWFrameWithLabel::BoldLabel = 0; 
-}
-
-//----------------------------------------------------------------------------
-
-void vtkKWFrameWithLabel::SetLabelCase(int v) 
-{ 
-  vtkKWFrameWithLabel::LabelCase = v;
-}
-
-int vtkKWFrameWithLabel::GetLabelCase() 
-{ 
-  return vtkKWFrameWithLabel::LabelCase;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::SetShowIconInLimitedEditionMode(int arg)
+void vtkKWFrameWithLabel::CollapseFrame()
 {
-  if (this->ShowIconInLimitedEditionMode == arg)
+  if (this->Frame && this->Frame->IsCreated())
+    {
+    this->Script("pack forget %s", 
+                 this->Frame->GetWidgetName());
+    }
+  if (this->IconData && this->Icon)
+    {
+    this->IconData->SetImage(vtkKWIcon::IconExpand);
+    this->Icon->SetImageToIcon(this->IconData);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::IsFrameCollapsed()
+{
+  return (this->Frame && this->Frame->IsCreated() && !this->Frame->IsPacked());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::CollapseButtonCallback()
+{
+  if (this->IsFrameCollapsed())
+    {
+    this->ExpandFrame();
+    }
+  else
+    {
+    this->CollapseFrame();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetDefaultAllowFrameToCollapse(int arg) 
+{ 
+  vtkKWFrameWithLabel::DefaultAllowFrameToCollapse = arg; 
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::GetDefaultAllowFrameToCollapse() 
+{ 
+  return vtkKWFrameWithLabel::DefaultAllowFrameToCollapse; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetDefaultLabelFontWeight(int arg) 
+{ 
+  vtkKWFrameWithLabel::DefaultLabelFontWeight = arg; 
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::GetDefaultLabelFontWeight() 
+{ 
+  return vtkKWFrameWithLabel::DefaultLabelFontWeight; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetDefaultLabelCase(int v) 
+{ 
+  vtkKWFrameWithLabel::DefaultLabelCase = v;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::GetDefaultLabelCase() 
+{ 
+  return vtkKWFrameWithLabel::DefaultLabelCase;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetLimitedEditionModeIconVisibility(int arg)
+{
+  if (this->LimitedEditionModeIconVisibility == arg)
     {
     return;
     }
 
-  this->ShowIconInLimitedEditionMode = arg;
+  this->LimitedEditionModeIconVisibility = arg;
   this->Modified();
 
   this->UpdateEnableState();
@@ -346,13 +383,13 @@ void vtkKWFrameWithLabel::UpdateEnableState()
   int limited = (this->GetApplication() && 
                  this->GetApplication()->GetLimitedEditionMode());
   
-  if (limited && this->ShowIconInLimitedEditionMode && !this->GetEnabled())
+  if (limited && this->LimitedEditionModeIconVisibility && !this->GetEnabled())
     {
-    this->Label->ShowLabelOn();
+    this->Label->LabelVisibilityOn();
     }
   else
     {
-    this->Label->ShowLabelOff();
+    this->Label->LabelVisibilityOff();
     }
   this->PropagateEnableState(this->Frame);
   this->PropagateEnableState(this->LabelFrame);
@@ -378,11 +415,11 @@ vtkKWDragAndDropTargetSet* vtkKWFrameWithLabel::GetDragAndDropTargetSet()
 void vtkKWFrameWithLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ShowHideFrame: " 
-     << (this->ShowHideFrame ? "On" : "Off") << endl;
+  os << indent << "AllowFrameToCollapse: " 
+     << (this->AllowFrameToCollapse ? "On" : "Off") << endl;
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "LabelFrame: " << this->LabelFrame << endl;
   os << indent << "Label: " << this->Label << endl;
-  os << indent << "ShowIconInLimitedEditionMode: " 
-     << (this->ShowIconInLimitedEditionMode ? "On" : "Off") << endl;
+  os << indent << "LimitedEditionModeIconVisibility: " 
+     << (this->LimitedEditionModeIconVisibility ? "On" : "Off") << endl;
 }

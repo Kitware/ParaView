@@ -56,8 +56,8 @@ public:
   // Callback used when interaction has been performed.
   virtual void ConfirmExitCallback();
   virtual void SaveUserInterfaceGeometryCallback();
-  virtual void ShowSplashScreenCallback();
-  virtual void ShowBalloonHelpCallback();
+  virtual void SplashScreenVisibilityCallback();
+  virtual void BalloonHelpVisibilityCallback();
   virtual void ResetDragAndDropCallback();
   virtual void FlatFrameCallback();
   virtual void FlatButtonsCallback();
@@ -90,8 +90,8 @@ protected:
 
   vtkKWCheckButton  *ConfirmExitCheckButton;
   vtkKWCheckButton  *SaveUserInterfaceGeometryCheckButton;
-  vtkKWCheckButton  *ShowSplashScreenCheckButton;
-  vtkKWCheckButton  *ShowBalloonHelpCheckButton;
+  vtkKWCheckButton  *SplashScreenVisibilityCheckButton;
+  vtkKWCheckButton  *BalloonHelpVisibilityCheckButton;
 
   // Interface customization
 

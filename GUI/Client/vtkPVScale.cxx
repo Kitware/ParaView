@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.68");
+vtkCxxRevisionMacro(vtkPVScale, "1.69");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -179,7 +179,7 @@ void vtkPVScale::Create(vtkKWApplication *app)
 
   this->Scale->SetParent(this);
   this->Scale->Create(this->GetApplication());
-  this->Scale->SetShowValue(this->DisplayValueFlag);
+  this->Scale->SetValueVisibility(this->DisplayValueFlag);
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");
   if (this->TraceSliderMovement)

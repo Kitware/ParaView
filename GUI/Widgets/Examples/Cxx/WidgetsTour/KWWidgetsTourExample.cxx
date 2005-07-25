@@ -58,7 +58,7 @@ int my_main(int argc, char *argv[])
     app->PromptBeforeExitOff();
     }
   app->SupportSplashScreenOn();
-  app->ShowSplashScreenOn();
+  app->SplashScreenVisibilityOn();
   app->RestoreApplicationSettingsFromRegistry();
 
   // Setup the splash screen
@@ -102,8 +102,8 @@ int my_main(int argc, char *argv[])
 
   vtkKWTreeWithScrollbars *widgets_tree = vtkKWTreeWithScrollbars::New();
   widgets_tree->SetParent(page_widget);
-  widgets_tree->ShowVerticalScrollbarOn();
-  widgets_tree->ShowHorizontalScrollbarOn();
+  widgets_tree->VerticalScrollbarVisibilityOn();
+  widgets_tree->HorizontalScrollbarVisibilityOn();
   widgets_tree->Create(app);
 
   vtkKWTree *tree = widgets_tree->GetWidget();
@@ -158,7 +158,7 @@ int my_main(int argc, char *argv[])
   tcl_source_text->SetLabelText("Tcl Source");
 
   vtkKWTextWithScrollbars *text_widget = tcl_source_text->GetWidget();
-  text_widget->ShowVerticalScrollbarOn();
+  text_widget->VerticalScrollbarVisibilityOn();
 
   vtkKWText *text = text_widget->GetWidget();
   text->ReadOnlyOn();
@@ -181,7 +181,7 @@ int my_main(int argc, char *argv[])
   cxx_source_text->SetLabelText("C++ Source");
 
   text_widget = cxx_source_text->GetWidget();
-  text_widget->ShowVerticalScrollbarOn();
+  text_widget->VerticalScrollbarVisibilityOn();
 
   text = text_widget->GetWidget();
   text->ReadOnlyOn();
@@ -215,7 +215,7 @@ int my_main(int argc, char *argv[])
     panel->Delete();
     panel->AddPage(panel->GetName(), NULL, NULL);
 
-    if (app->GetShowSplashScreen()) 
+    if (app->GetSplashScreenVisibility()) 
       {
       app->GetSplashScreen()->SetProgressMessage(node_ptr->Name);
       }

@@ -19,12 +19,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithLabel);
-vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithLabel::vtkKWWidgetWithLabel()
 {
-  this->ShowLabel       = 1;
+  this->LabelVisibility       = 1;
   this->Label           = NULL;
   this->LabelPosition   = vtkKWWidgetWithLabel::LabelPositionDefault;
 }
@@ -76,7 +76,7 @@ void vtkKWWidgetWithLabel::Create(vtkKWApplication *app)
 
   // Create the label subwidget now if it has to be shown now
 
-  if (this->ShowLabel)
+  if (this->LabelVisibility)
     {
     this->CreateLabel(app);
     }
@@ -162,19 +162,19 @@ int vtkKWWidgetWithLabel::GetLabelWidth()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWWidgetWithLabel::SetShowLabel(int _arg)
+void vtkKWWidgetWithLabel::SetLabelVisibility(int _arg)
 {
-  if (this->ShowLabel == _arg)
+  if (this->LabelVisibility == _arg)
     {
     return;
     }
-  this->ShowLabel = _arg;
+  this->LabelVisibility = _arg;
   this->Modified();
 
   // Make sure that if the label has to be show, we create it on the fly if
   // needed
 
-  if (this->ShowLabel && this->IsCreated())
+  if (this->LabelVisibility && this->IsCreated())
     {
     this->CreateLabel(this->GetApplication());
     }
@@ -216,8 +216,8 @@ void vtkKWWidgetWithLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowLabel: " 
-     << (this->ShowLabel ? "On" : "Off") << endl;
+  os << indent << "LabelVisibility: " 
+     << (this->LabelVisibility ? "On" : "Off") << endl;
 
   os << indent << "LabelPosition: " << this->LabelPosition << endl;
 

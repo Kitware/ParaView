@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.12");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -111,25 +111,25 @@ vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
   this->LongFormat = 0;
   this->LabelOnTop = 1;
 
-  this->ShowLabel = 0;
+  this->LabelVisibility = 0;
   this->Label = vtkKWLabel::New();
 
-  this->ShowColor = 1;
+  this->ColorVisibility = 1;
   this->ChangeColorButton = vtkKWChangeColorButton::New();
 
-  this->ShowFontFamily = 1;
+  this->FontFamilyVisibility = 1;
   this->FontFamilyOptionMenu = vtkKWMenuButtonWithLabel::New();
 
-  this->ShowStyles = 1;
+  this->StylesVisibility = 1;
   this->StylesCheckButtonSet = vtkKWCheckButtonSetWithLabel::New();
 
-  this->ShowOpacity = 1;
+  this->OpacityVisibility = 1;
   this->OpacityScale = vtkKWScale::New();
 
   this->ChangedCommand = NULL;
   this->ColorChangedCommand = NULL;
 
-  this->ShowCopy = 0;
+  this->CopyVisibility = 0;
   this->PushButtonSet = vtkKWPushButtonSetWithLabel::New();
 }
 
@@ -215,7 +215,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   this->ChangeColorButton->Create(app);
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
   this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
-  this->ChangeColorButton->SetDialogText("Text Color");
+  this->ChangeColorButton->SetDialogTitle("Text Color");
 
   // Font Family
 
@@ -341,19 +341,19 @@ void vtkKWTextPropertyEditor::Pack()
   if (this->LongFormat)
     {
     this->ChangeColorButton->GetLabel()->SetText("Color:");
-    this->ChangeColorButton->ShowLabelOn();
+    this->ChangeColorButton->LabelVisibilityOn();
 
     this->FontFamilyOptionMenu->GetWidget()->IndicatorOn();
     this->FontFamilyOptionMenu->GetLabel()->SetText("Font:");
-    this->FontFamilyOptionMenu->ShowLabelOn();
+    this->FontFamilyOptionMenu->LabelVisibilityOn();
 
     this->StylesCheckButtonSet->GetLabel()->SetText("Style:");
-    this->StylesCheckButtonSet->ShowLabelOn();
+    this->StylesCheckButtonSet->LabelVisibilityOn();
 
     this->OpacityScale->DisplayLabel("Opacity:");
 
     this->PushButtonSet->GetLabel()->SetText("Functions:");
-    this->PushButtonSet->ShowLabelOn();
+    this->PushButtonSet->LabelVisibilityOn();
 
     int row = 0, col = 0;
 
@@ -385,16 +385,16 @@ void vtkKWTextPropertyEditor::Pack()
     }
   else
     {
-    this->ChangeColorButton->ShowLabelOff();
+    this->ChangeColorButton->LabelVisibilityOff();
 
     this->FontFamilyOptionMenu->GetWidget()->IndicatorOff();
-    this->FontFamilyOptionMenu->ShowLabelOff();
+    this->FontFamilyOptionMenu->LabelVisibilityOff();
 
-    this->StylesCheckButtonSet->ShowLabelOff();
+    this->StylesCheckButtonSet->LabelVisibilityOff();
 
     this->OpacityScale->DisplayLabel("");
 
-    this->PushButtonSet->ShowLabelOff();
+    this->PushButtonSet->LabelVisibilityOff();
 
     tk_cmd << "grid "
            << this->Label->GetWidgetName() << " "
@@ -499,13 +499,13 @@ void vtkKWTextPropertyEditor::SetLongFormat(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowLabel(int _arg)
+void vtkKWTextPropertyEditor::SetLabelVisibility(int _arg)
 {
-  if (this->ShowLabel == _arg)
+  if (this->LabelVisibility == _arg)
     {
     return;
     }
-  this->ShowLabel = _arg;
+  this->LabelVisibility = _arg;
   this->Modified();
 
   this->UpdateLabel();
@@ -530,19 +530,19 @@ void vtkKWTextPropertyEditor::UpdateLabel()
   if (this->IsCreated() && this->Label)
     {
     this->Script("grid %s %s",
-                 (this->ShowLabel ? "" : "remove"), 
+                 (this->LabelVisibility ? "" : "remove"), 
                  this->Label->GetWidgetName());
     }
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowColor(int _arg)
+void vtkKWTextPropertyEditor::SetColorVisibility(int _arg)
 {
-  if (this->ShowColor == _arg)
+  if (this->ColorVisibility == _arg)
     {
     return;
     }
-  this->ShowColor = _arg;
+  this->ColorVisibility = _arg;
   this->Modified();
 
   this->UpdateColorButton();
@@ -622,7 +622,7 @@ void vtkKWTextPropertyEditor::UpdateColorButton()
       }
 
     this->Script("grid %s %s",
-                 (this->ShowColor ? "" : "remove"), 
+                 (this->ColorVisibility ? "" : "remove"), 
                  this->ChangeColorButton->GetWidgetName());
     }
 }
@@ -634,13 +634,13 @@ void vtkKWTextPropertyEditor::ChangeColorButtonCallback(double r, double g, doub
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowFontFamily(int _arg)
+void vtkKWTextPropertyEditor::SetFontFamilyVisibility(int _arg)
 {
-  if (this->ShowFontFamily == _arg)
+  if (this->FontFamilyVisibility == _arg)
     {
     return;
     }
-  this->ShowFontFamily = _arg;
+  this->FontFamilyVisibility = _arg;
   this->Modified();
 
   this->UpdateFontFamilyOptionMenu();
@@ -689,7 +689,7 @@ void vtkKWTextPropertyEditor::UpdateFontFamilyOptionMenu()
         break;
       }
     this->Script("grid %s %s",
-                 (this->ShowFontFamily ? "" : "remove"), 
+                 (this->FontFamilyVisibility ? "" : "remove"), 
                  this->FontFamilyOptionMenu->GetWidgetName());
     }
 }
@@ -716,13 +716,13 @@ void vtkKWTextPropertyEditor::FontFamilyCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowStyles(int _arg)
+void vtkKWTextPropertyEditor::SetStylesVisibility(int _arg)
 {
-  if (this->ShowStyles == _arg)
+  if (this->StylesVisibility == _arg)
     {
     return;
     }
-  this->ShowStyles = _arg;
+  this->StylesVisibility = _arg;
   this->Modified();
 
   this->UpdateStylesCheckButtonSet();
@@ -734,7 +734,7 @@ void vtkKWTextPropertyEditor::UpdateStylesCheckButtonSet()
   if (this->IsCreated() && this->StylesCheckButtonSet)
     {
     this->Script("grid %s %s",
-                 (this->ShowStyles ? "" : "remove"), 
+                 (this->StylesVisibility ? "" : "remove"), 
                  this->StylesCheckButtonSet->GetWidgetName());
     }
 
@@ -867,13 +867,13 @@ void vtkKWTextPropertyEditor::ShadowCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowOpacity(int _arg)
+void vtkKWTextPropertyEditor::SetOpacityVisibility(int _arg)
 {
-  if (this->ShowOpacity == _arg)
+  if (this->OpacityVisibility == _arg)
     {
     return;
     }
-  this->ShowOpacity = _arg;
+  this->OpacityVisibility = _arg;
   this->Modified();
 
   this->UpdateOpacityScale();
@@ -944,7 +944,7 @@ void vtkKWTextPropertyEditor::UpdateOpacityScale()
     {
     this->OpacityScale->SetValue(this->GetOpacity());
     this->Script("grid %s %s",
-                 (this->ShowOpacity ? "" : "remove"), 
+                 (this->OpacityVisibility ? "" : "remove"), 
                  this->OpacityScale->GetWidgetName());
     }
 }
@@ -968,13 +968,13 @@ void vtkKWTextPropertyEditor::OpacityEndCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::SetShowCopy(int _arg)
+void vtkKWTextPropertyEditor::SetCopyVisibility(int _arg)
 {
-  if (this->ShowCopy == _arg)
+  if (this->CopyVisibility == _arg)
     {
     return;
     }
-  this->ShowCopy = _arg;
+  this->CopyVisibility = _arg;
   this->Modified();
 
   this->UpdatePushButtonSet();
@@ -997,7 +997,7 @@ void vtkKWTextPropertyEditor::UpdatePushButtonSet()
   if (this->IsCreated() && this->PushButtonSet)
     {
     this->PushButtonSet->GetWidget()->SetWidgetVisibility(
-      VTK_KW_TEXT_PROP_COPY_ID, this->ShowCopy);
+      VTK_KW_TEXT_PROP_COPY_ID, this->CopyVisibility);
 
     this->Script("grid %s %s",
                  (this->PushButtonSet->GetWidget()
@@ -1133,16 +1133,16 @@ void vtkKWTextPropertyEditor::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Actor2D: None" << endl;
     }
   os << indent << "LongFormat: " << (this->LongFormat ? "On" : "Off") << endl;
-  os << indent << "ShowLabel: " << (this->ShowLabel ? "On" : "Off") << endl;
+  os << indent << "LabelVisibility: " << (this->LabelVisibility ? "On" : "Off") << endl;
   os << indent << "LabelOnTop: " << (this->LabelOnTop ? "On" : "Off") << endl;
-  os << indent << "ShowColor: " << (this->ShowColor ? "On" : "Off") << endl;
-  os << indent << "ShowFontFamily: " 
-     << (this->ShowFontFamily ? "On" : "Off") << endl;
-  os << indent << "ShowStyles: " 
-     << (this->ShowStyles ? "On" : "Off") << endl;
-  os << indent << "ShowOpacity: " 
-     << (this->ShowOpacity ? "On" : "Off") << endl;
-  os << indent << "ShowCopy: " << (this->ShowCopy ? "On" : "Off") << endl;
+  os << indent << "ColorVisibility: " << (this->ColorVisibility ? "On" : "Off") << endl;
+  os << indent << "FontFamilyVisibility: " 
+     << (this->FontFamilyVisibility ? "On" : "Off") << endl;
+  os << indent << "StylesVisibility: " 
+     << (this->StylesVisibility ? "On" : "Off") << endl;
+  os << indent << "OpacityVisibility: " 
+     << (this->OpacityVisibility ? "On" : "Off") << endl;
+  os << indent << "CopyVisibility: " << (this->CopyVisibility ? "On" : "Off") << endl;
   os << indent << "ChangedCommand: " 
      << (this->ChangedCommand ? this->ChangedCommand : "None") << endl;
   os << indent << "ColorChangedCommand: " 

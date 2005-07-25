@@ -51,10 +51,10 @@ public:
   virtual int SetPointColorAsHSV(int id, double h, double s, double v);
 
   // Description:
-  // Show/Hide the color ramp.
-  vtkBooleanMacro(ShowColorRamp, int);
-  virtual void SetShowColorRamp(int);
-  vtkGetMacro(ShowColorRamp, int);
+  // Set/Get the color ramp visibility.
+  vtkBooleanMacro(ColorRampVisibility, int);
+  virtual void SetColorRampVisibility(int);
+  vtkGetMacro(ColorRampVisibility, int);
 
   // Description:
   // Get/Set a specific function to display in the color ramp. If not
@@ -68,10 +68,10 @@ public:
   vtkGetMacro(ColorRampHeight, int);
 
   // Description:
-  // Show the color ramp at the default position (under the canvas), or 
+  // Display the color ramp at the default position (under the canvas), or 
   // in the canvas itself.
-  // The ShowColorRamp parameter still has to be On for the ramp to be
-  // shown.
+  // The ColorRampVisibility parameter still has to be On for the ramp to be
+  // displayed.
   //BTX
   enum
   {
@@ -111,20 +111,20 @@ public:
       vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleSunken); };
 
   // Description:
-  // Show/Hide the color space option menu.
+  // Set/Get the color space option menu visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  virtual void SetShowColorSpaceOptionMenu(int);
-  vtkBooleanMacro(ShowColorSpaceOptionMenu, int);
-  vtkGetMacro(ShowColorSpaceOptionMenu, int);
+  virtual void SetColorSpaceOptionMenuVisibility(int);
+  vtkBooleanMacro(ColorSpaceOptionMenuVisibility, int);
+  vtkGetMacro(ColorSpaceOptionMenuVisibility, int);
 
   // Description:
-  // Show the value entries UI.
+  // Set/Get the value entries UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowValueEntries, int);
-  virtual void SetShowValueEntries(int);
-  vtkGetMacro(ShowValueEntries, int);
+  vtkBooleanMacro(ValueEntriesVisibility, int);
+  virtual void SetValueEntriesVisibility(int);
+  vtkGetMacro(ValueEntriesVisibility, int);
 
   // Description:
   // Create the widget.
@@ -191,9 +191,9 @@ protected:
   vtkColorTransferFunction *ColorTransferFunction;
   vtkColorTransferFunction *ColorRampTransferFunction;
 
-  int ShowValueEntries;
-  int ShowColorSpaceOptionMenu;
-  int ShowColorRamp;
+  int ValueEntriesVisibility;
+  int ColorSpaceOptionMenuVisibility;
+  int ColorRampVisibility;
   int ColorRampHeight;
   int ColorRampPosition;
   int ColorRampOutlineStyle;

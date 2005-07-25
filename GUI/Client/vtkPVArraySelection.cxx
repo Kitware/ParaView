@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.75");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.76");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -114,7 +114,6 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
   
   this->LabeledFrame->SetParent(this);
-  this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
   if (this->LabelText)
     {

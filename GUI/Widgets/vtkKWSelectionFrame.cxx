@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.41");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -75,10 +75,10 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBackgroundSelectedColor[2] = 0.5;
 
   this->Selected           = 0;
-  this->ShowSelectionList  = 1;
-  this->ShowClose       = 0;
-  this->ShowChangeTitle = 0;
-  this->ShowToolbarSet     = 0;
+  this->SelectionListVisibility  = 1;
+  this->AllowClose       = 0;
+  this->AllowChangeTitle = 0;
+  this->ToolbarSetVisibility     = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   // The toobar
 
   this->ToolbarSet->SetParent(this);
-  this->ToolbarSet->ShowBottomSeparatorOff();
+  this->ToolbarSet->BottomSeparatorVisibilityOff();
   this->ToolbarSet->Create(app);
 
   // The body frame
@@ -259,7 +259,7 @@ void vtkKWSelectionFrame::Pack()
            << " -side top -fill x -expand n" << endl;
     }
 
-  if (this->ShowSelectionList && this->SelectionList->IsCreated())
+  if (this->SelectionListVisibility && this->SelectionList->IsCreated())
     {
     tk_cmd << "pack " << this->SelectionList->GetWidgetName()
            << " -side left -anchor w -fill y -padx 1 -pady 1" << endl;
@@ -277,14 +277,14 @@ void vtkKWSelectionFrame::Pack()
            << " -side left -anchor e -padx 2 -fill x -expand n" << endl;
     }
   
-  if (this->ShowClose && this->CloseButton->IsCreated())
+  if (this->AllowClose && this->CloseButton->IsCreated())
     {
     tk_cmd << "pack " << this->CloseButton->GetWidgetName()
            << " -side left -anchor e -fill y -padx 1 -pady 1 ";
     tk_cmd << endl;
     }
 
-  if (this->ShowToolbarSet && this->ToolbarSet->IsCreated())
+  if (this->ToolbarSetVisibility && this->ToolbarSet->IsCreated())
     {
     tk_cmd << "pack " << this->ToolbarSet->GetWidgetName()
            << " -side top -fill x -expand no -padx 1 -pady 1" << endl;
@@ -462,28 +462,28 @@ void vtkKWSelectionFrame::SetSelected(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetShowSelectionList(int arg)
+void vtkKWSelectionFrame::SetSelectionListVisibility(int arg)
 {
-  if (this->ShowSelectionList == arg)
+  if (this->SelectionListVisibility == arg)
     {
     return;
     }
 
-  this->ShowSelectionList = arg;
+  this->SelectionListVisibility = arg;
 
   this->Modified();
   this->Pack();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetShowClose(int arg)
+void vtkKWSelectionFrame::SetAllowClose(int arg)
 {
-  if (this->ShowClose == arg)
+  if (this->AllowClose == arg)
     {
     return;
     }
 
-  this->ShowClose = arg;
+  this->AllowClose = arg;
 
   this->Modified();
   this->Pack();
@@ -491,28 +491,28 @@ void vtkKWSelectionFrame::SetShowClose(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetShowChangeTitle(int arg)
+void vtkKWSelectionFrame::SetAllowChangeTitle(int arg)
 {
-  if (this->ShowChangeTitle == arg)
+  if (this->AllowChangeTitle == arg)
     {
     return;
     }
 
-  this->ShowChangeTitle = arg;
+  this->AllowChangeTitle = arg;
 
   this->Modified();
   this->UpdateSelectionList();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetShowToolbarSet(int arg)
+void vtkKWSelectionFrame::SetToolbarSetVisibility(int arg)
 {
-  if (this->ShowToolbarSet == arg)
+  if (this->ToolbarSetVisibility == arg)
     {
     return;
     }
 
-  this->ShowToolbarSet = arg;
+  this->ToolbarSetVisibility = arg;
 
   this->Modified();
   this->Pack();
@@ -592,18 +592,18 @@ void vtkKWSelectionFrame::UpdateSelectionList()
 
   // Add more commands
 
-  if (this->ShowClose || this->ShowChangeTitle)
+  if (this->AllowClose || this->AllowChangeTitle)
     {
     if (this->Internals->Pool.size())
       {
       menu->AddSeparator();
       }
-    if (this->ShowChangeTitle)
+    if (this->AllowChangeTitle)
       {
       menu->AddCommand(
         "Change Title", this, "ChangeTitleCallback", "Change frame title");
       }
-    if (this->ShowClose)
+    if (this->AllowClose)
       {
       menu->AddCommand(
         "Close", this, "CloseCallback", "Close frame");
@@ -767,9 +767,9 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundSelectedColor[1] << ", " 
      << this->TitleBackgroundSelectedColor[2] << ")" << endl;
   os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
-  os << indent << "ShowSelectionList: " << (this->ShowSelectionList ? "On" : "Off") << endl;
-  os << indent << "ShowClose: " << (this->ShowClose ? "On" : "Off") << endl;
-  os << indent << "ShowChangeTitle: " << (this->ShowChangeTitle ? "On" : "Off") << endl;
-  os << indent << "ShowToolbarSet: " << (this->ShowToolbarSet ? "On" : "Off") << endl;
+  os << indent << "SelectionListVisibility: " << (this->SelectionListVisibility ? "On" : "Off") << endl;
+  os << indent << "AllowClose: " << (this->AllowClose ? "On" : "Off") << endl;
+  os << indent << "AllowChangeTitle: " << (this->AllowChangeTitle ? "On" : "Off") << endl;
+  os << indent << "ToolbarSetVisibility: " << (this->ToolbarSetVisibility ? "On" : "Off") << endl;
 }
 

@@ -39,7 +39,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.46");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -53,8 +53,8 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->InterfaceSettingsFrame = 0;
   this->ConfirmExitCheckButton = 0;
   this->SaveUserInterfaceGeometryCheckButton = 0;
-  this->ShowSplashScreenCheckButton = 0;
-  this->ShowBalloonHelpCheckButton = 0;
+  this->SplashScreenVisibilityCheckButton = 0;
+  this->BalloonHelpVisibilityCheckButton = 0;
 
   // Interface customization
 
@@ -98,16 +98,16 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     this->SaveUserInterfaceGeometryCheckButton = NULL;
     }
 
-  if (this->ShowSplashScreenCheckButton)
+  if (this->SplashScreenVisibilityCheckButton)
     {
-    this->ShowSplashScreenCheckButton->Delete();
-    this->ShowSplashScreenCheckButton = NULL;
+    this->SplashScreenVisibilityCheckButton->Delete();
+    this->SplashScreenVisibilityCheckButton = NULL;
     }
 
-  if (this->ShowBalloonHelpCheckButton)
+  if (this->BalloonHelpVisibilityCheckButton)
     {
-    this->ShowBalloonHelpCheckButton->Delete();
-    this->ShowBalloonHelpCheckButton = NULL;
+    this->BalloonHelpVisibilityCheckButton->Delete();
+    this->BalloonHelpVisibilityCheckButton = NULL;
     }
 
   // Interface customization
@@ -204,7 +204,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(app);
   this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
     
@@ -259,41 +258,41 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (app->GetSupportSplashScreen())
     {
-    if (!this->ShowSplashScreenCheckButton)
+    if (!this->SplashScreenVisibilityCheckButton)
       {
-      this->ShowSplashScreenCheckButton = vtkKWCheckButton::New();
+      this->SplashScreenVisibilityCheckButton = vtkKWCheckButton::New();
       }
 
-    this->ShowSplashScreenCheckButton->SetParent(frame);
-    this->ShowSplashScreenCheckButton->Create(app);
-    this->ShowSplashScreenCheckButton->SetText("Show splash screen");
-    this->ShowSplashScreenCheckButton->SetCommand(
-      this, "ShowSplashScreenCallback");
-    this->ShowSplashScreenCheckButton->SetBalloonHelpString(
+    this->SplashScreenVisibilityCheckButton->SetParent(frame);
+    this->SplashScreenVisibilityCheckButton->Create(app);
+    this->SplashScreenVisibilityCheckButton->SetText("Show splash screen");
+    this->SplashScreenVisibilityCheckButton->SetCommand(
+      this, "SplashScreenVisibilityCallback");
+    this->SplashScreenVisibilityCheckButton->SetBalloonHelpString(
       "Display the splash information screen at startup.");
 
-    tk_cmd << "pack " << this->ShowSplashScreenCheckButton->GetWidgetName()
+    tk_cmd << "pack " << this->SplashScreenVisibilityCheckButton->GetWidgetName()
            << "  -side top -anchor w -expand no -fill none" << endl;
     }
 
   // --------------------------------------------------------------
   // Interface settings : Show balloon help ?
 
-  if (!this->ShowBalloonHelpCheckButton)
+  if (!this->BalloonHelpVisibilityCheckButton)
     {
-    this->ShowBalloonHelpCheckButton = vtkKWCheckButton::New();
+    this->BalloonHelpVisibilityCheckButton = vtkKWCheckButton::New();
     }
 
-  this->ShowBalloonHelpCheckButton->SetParent(frame);
-  this->ShowBalloonHelpCheckButton->Create(app);
-  this->ShowBalloonHelpCheckButton->SetText("Show balloon help");
-  this->ShowBalloonHelpCheckButton->SetCommand(
-    this, "ShowBalloonHelpCallback");
-  this->ShowBalloonHelpCheckButton->SetBalloonHelpString(
+  this->BalloonHelpVisibilityCheckButton->SetParent(frame);
+  this->BalloonHelpVisibilityCheckButton->Create(app);
+  this->BalloonHelpVisibilityCheckButton->SetText("Show balloon help");
+  this->BalloonHelpVisibilityCheckButton->SetCommand(
+    this, "BalloonHelpVisibilityCallback");
+  this->BalloonHelpVisibilityCheckButton->SetBalloonHelpString(
     "Display help in a yellow popup-box on the screen when you rest the "
     "mouse over an item that supports it.");
 
-  tk_cmd << "pack " << this->ShowBalloonHelpCheckButton->GetWidgetName()
+  tk_cmd << "pack " << this->BalloonHelpVisibilityCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
@@ -305,7 +304,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
-  this->InterfaceCustomizationFrame->ShowHideFrameOn();
   this->InterfaceCustomizationFrame->Create(app);
   this->InterfaceCustomizationFrame->SetLabelText("Interface Customization");
     
@@ -349,7 +347,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->ToolbarSettingsFrame->ShowHideFrameOn();
   this->ToolbarSettingsFrame->Create(app);
   this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
     
@@ -404,7 +401,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->PrintSettingsFrame->ShowHideFrameOn();
   this->PrintSettingsFrame->Create(app);
   this->PrintSettingsFrame->SetLabelText(
     vtkKWApplicationSettingsInterface::PrintSettingsLabel);
@@ -481,21 +477,22 @@ void vtkKWApplicationSettingsInterface::Update()
   
   // Interface settings : Show splash screen ?
 
-  if (this->ShowSplashScreenCheckButton)
+  if (this->SplashScreenVisibilityCheckButton)
     {
-    this->ShowSplashScreenCheckButton->SetSelectedState(
-      this->GetApplication()->GetShowSplashScreen());
+    this->SplashScreenVisibilityCheckButton->SetSelectedState(
+      this->GetApplication()->GetSplashScreenVisibility());
     }
 
   // Interface settings : Show balloon help ?
 
-  if (this->ShowBalloonHelpCheckButton)
+  if (this->BalloonHelpVisibilityCheckButton)
     {
     vtkKWBalloonHelpManager *mgr = 
       this->GetApplication()->GetBalloonHelpManager();
     if (mgr)
       {
-      this->ShowBalloonHelpCheckButton->SetSelectedState(mgr->GetShow());
+      this->BalloonHelpVisibilityCheckButton->SetSelectedState(
+        mgr->GetVisibility());
       }
     }
 
@@ -564,33 +561,33 @@ void vtkKWApplicationSettingsInterface::SaveUserInterfaceGeometryCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
+void vtkKWApplicationSettingsInterface::SplashScreenVisibilityCallback()
 {
-  if (!this->ShowSplashScreenCheckButton ||
-      !this->ShowSplashScreenCheckButton->IsCreated())
+  if (!this->SplashScreenVisibilityCheckButton ||
+      !this->SplashScreenVisibilityCheckButton->IsCreated())
     {
     return;
     }
 
-  int state = this->ShowSplashScreenCheckButton->GetSelectedState() ? 1 : 0;
-  this->GetApplication()->SetShowSplashScreen(state);
+  int state = this->SplashScreenVisibilityCheckButton->GetSelectedState() ? 1 : 0;
+  this->GetApplication()->SetSplashScreenVisibility(state);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
+void vtkKWApplicationSettingsInterface::BalloonHelpVisibilityCallback()
 {
-  if (!this->ShowBalloonHelpCheckButton ||
-      !this->ShowBalloonHelpCheckButton->IsCreated())
+  if (!this->BalloonHelpVisibilityCheckButton ||
+      !this->BalloonHelpVisibilityCheckButton->IsCreated())
     {
     return;
     }
 
-  int state = this->ShowBalloonHelpCheckButton->GetSelectedState() ? 1 : 0;
+  int state = this->BalloonHelpVisibilityCheckButton->GetSelectedState() ? 1 : 0;
   vtkKWBalloonHelpManager *mgr = 
     this->GetApplication()->GetBalloonHelpManager();
   if (mgr)
     {
-    mgr->SetShow(state);
+    mgr->SetVisibility(state);
     }
 }
 
@@ -686,14 +683,14 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
     this->SaveUserInterfaceGeometryCheckButton->SetEnabled(this->GetEnabled());
     }
 
-  if (this->ShowSplashScreenCheckButton)
+  if (this->SplashScreenVisibilityCheckButton)
     {
-    this->ShowSplashScreenCheckButton->SetEnabled(this->GetEnabled());
+    this->SplashScreenVisibilityCheckButton->SetEnabled(this->GetEnabled());
     }
 
-  if (this->ShowBalloonHelpCheckButton)
+  if (this->BalloonHelpVisibilityCheckButton)
     {
-    this->ShowBalloonHelpCheckButton->SetEnabled(this->GetEnabled());
+    this->BalloonHelpVisibilityCheckButton->SetEnabled(this->GetEnabled());
     }
 
   // Interface customization

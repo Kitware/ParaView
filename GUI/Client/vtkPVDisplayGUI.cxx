@@ -93,7 +93,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.41");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.42");
 
 //----------------------------------------------------------------------------
 
@@ -456,7 +456,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   // View frame
 
   this->ViewFrame->SetParent(this->MainFrame->GetFrame());
-  this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->GetApplication());
   this->ViewFrame->SetLabelText("View");
  
@@ -525,7 +524,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
 
   // Color
   this->ColorFrame->SetParent(this->MainFrame->GetFrame());
-  this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->GetApplication());
   this->ColorFrame->SetLabelText("Color");
 
@@ -621,7 +619,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
                                   GetVolumeAppearanceEditor());
 
   this->VolumeAppearanceFrame->SetParent(this->MainFrame->GetFrame());
-  this->VolumeAppearanceFrame->ShowHideFrameOn();
   this->VolumeAppearanceFrame->Create(this->GetApplication());
   this->VolumeAppearanceFrame->SetLabelText("Volume Appearance");
 
@@ -689,7 +686,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
 
   // Display style
   this->DisplayStyleFrame->SetParent(this->MainFrame->GetFrame());
-  this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->GetApplication());
   this->DisplayStyleFrame->SetLabelText("Display Style");
   
@@ -830,7 +826,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   // Actor Control
 
   this->ActorControlFrame->SetParent(this->MainFrame->GetFrame());
-  this->ActorControlFrame->ShowHideFrameOn();
   this->ActorControlFrame->Create(this->GetApplication());
   this->ActorControlFrame->SetLabelText("Actor Control");
 

@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -292,7 +292,6 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->AttributeModeMenu->GetWidgetName());
   
   this->CalculatorFrame->SetParent(this);
-  this->CalculatorFrame->ShowHideFrameOn();
   this->CalculatorFrame->Create(pvApp);
   this->CalculatorFrame->SetLabelText("Calculator");
   this->Script("pack %s -fill x -expand t -side top",

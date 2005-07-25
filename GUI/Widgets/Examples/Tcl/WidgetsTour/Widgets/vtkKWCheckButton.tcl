@@ -21,7 +21,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
   cb2 SetParent $parent
   cb2 Create $app
   cb2 SetImageToPredefinedIcon 62
-  cb2 IndicatorOff
+  cb2 IndicatorVisibilityOff
   cb2 SetBalloonHelpString "This time use one of the predefined icon"
 
   pack [cb2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6

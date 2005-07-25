@@ -46,16 +46,16 @@ public:
   virtual int HasLabel();
 
   // Description:
-  // Show/Hide the internal label (On by default).
+  // Set/Get the internal label visibility (On by default).
   // IMPORTANT: if you know you may not show the label, try to
   // set that flag as early as possible (ideally, before calling Create()) 
   // in order to lower the footprint of the widget: the label will not be
   // allocated and created if there is no need to show it.
   // Later on, you can still use that option to show the label: it will be
   // allocated and created on the fly.
-  virtual void SetShowLabel(int);
-  vtkBooleanMacro(ShowLabel, int);
-  vtkGetMacro(ShowLabel, int);
+  virtual void SetLabelVisibility(int);
+  vtkBooleanMacro(LabelVisibility, int);
+  vtkGetMacro(LabelVisibility, int);
 
   // Description:
   // Convenience method to set the contents label.
@@ -116,8 +116,8 @@ protected:
   ~vtkKWWidgetWithLabel();
 
   // Description:
-  // Show/Hide the label
-  int ShowLabel;
+  // Label visibility
+  int LabelVisibility;
 
   // Description:
   // Label position

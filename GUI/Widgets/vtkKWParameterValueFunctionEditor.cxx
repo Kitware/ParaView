@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.55");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.56");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -75,8 +75,8 @@ const char *vtkKWParameterValueFunctionEditor::ValueTicksTag = "v_ticks_tag";
 //----------------------------------------------------------------------------
 vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 {
-  this->ShowParameterRange          = 1;
-  this->ShowValueRange              = 1;
+  this->ParameterRangeVisibility          = 1;
+  this->ValueRangeVisibility              = 1;
   this->PointPositionInValueRange   = vtkKWParameterValueFunctionEditor::PointPositionValue;
   this->ParameterRangePosition      = vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom;
   this->CanvasHeight                = 55;
@@ -99,22 +99,22 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->PointStyle                  = vtkKWParameterValueFunctionEditor::PointStyleDisc;
   this->FirstPointStyle             = vtkKWParameterValueFunctionEditor::PointStyleDefault;
   this->LastPointStyle              = vtkKWParameterValueFunctionEditor::PointStyleDefault;
-  this->ShowCanvasOutline           = 1;
+  this->CanvasOutlineVisibility           = 1;
   this->CanvasOutlineStyle          = vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides;
   this->ParameterCursorInteractionStyle          = vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleNone;
-  this->ShowParameterTicks          = 0;
-  this->ShowValueTicks              = 0;
+  this->ParameterTicksVisibility          = 0;
+  this->ValueTicksVisibility              = 0;
   this->ComputeValueTicksFromHistogram = 0;
-  this->ShowCanvasBackground        = 1;
-  this->ShowFunctionLine            = 1;
-  this->ShowPointIndex              = 0;
-  this->ShowPointGuideline          = 0;
-  this->ShowSelectedPointIndex      = 1;
-  this->ShowRangeLabel              = 1;
+  this->CanvasBackgroundVisibility        = 1;
+  this->FunctionLineVisibility            = 1;
+  this->PointIndexVisibility              = 0;
+  this->PointGuidelineVisibility          = 0;
+  this->SelectedPointIndexVisibility      = 1;
+  this->RangeLabelVisibility              = 1;
   this->RangeLabelPosition          = vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault;
   this->ParameterEntryPosition      = vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault;
-  this->ShowParameterEntry          = 1;
-  this->ShowUserFrame               = 0;
+  this->ParameterEntryVisibility          = 1;
+  this->UserFrameVisibility               = 0;
   this->PointMarginToCanvas         = vtkKWParameterValueFunctionEditor::PointMarginAllSides;
   this->TicksLength                 = 5;
   this->NumberOfParameterTicks      = 6;
@@ -142,7 +142,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->HistogramColor[1]           = 0.63;
   this->HistogramColor[2]           = 0.63;
 
-  this->ShowHistogramLogModeOptionMenu  = 0;
+  this->HistogramLogModeOptionMenuVisibility  = 0;
   this->HistogramLogModeOptionMenu      = vtkKWMenuButton::New();
   this->HistogramLogModeChangedCommand  = NULL;
 
@@ -204,7 +204,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->DisplayedWholeParameterRange[1] = 
     this->DisplayedWholeParameterRange[0];
 
-  this->ShowParameterCursor         = 0;
+  this->ParameterCursorVisibility         = 0;
   this->ParameterCursorPosition     = this->ParameterRange->GetRange()[0];
 
   this->LastRedrawFunctionTime      = 0;
@@ -1147,14 +1147,14 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
   this->ParameterRange->SetInternalThickness(0.5);
   this->ParameterRange->SetSliderSize(3);
   this->ParameterRange->SliderCanPushOff();
-  this->ParameterRange->ShowLabelOff();
-  this->ParameterRange->ShowEntriesOff();
+  this->ParameterRange->LabelVisibilityOff();
+  this->ParameterRange->EntriesVisibilityOff();
   this->ParameterRange->SetCommand(
     this, "VisibleParameterRangeChangingCallback");
   this->ParameterRange->SetEndCommand(
     this, "VisibleParameterRangeChangedCallback");
 
-  if (this->ShowParameterRange)
+  if (this->ParameterRangeVisibility)
     {
     this->CreateParameterRange(app);
     }
@@ -1175,16 +1175,16 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
     this->ParameterRange->GetSliderSize());
   this->ValueRange->SetSliderCanPush(
     this->ParameterRange->GetSliderCanPush());
-  this->ValueRange->SetShowLabel(
-    this->ParameterRange->GetShowLabel());
-  this->ValueRange->SetShowEntries(
-    this->ParameterRange->GetShowEntries());
+  this->ValueRange->SetLabelVisibility(
+    this->ParameterRange->GetLabelVisibility());
+  this->ValueRange->SetEntriesVisibility(
+    this->ParameterRange->GetEntriesVisibility());
   this->ValueRange->SetCommand(
     this, "VisibleValueRangeChangingCallback");
   this->ValueRange->SetEndCommand(
     this, "VisibleValueRangeChangedCallback");
 
-  if (this->ShowValueRange)
+  if (this->ValueRangeVisibility)
     {
     this->CreateValueRange(app);
     }
@@ -1213,21 +1213,21 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the user frame
 
-  if (this->ShowUserFrame)
+  if (this->UserFrameVisibility)
     {
     this->CreateUserFrame(app);
     }
 
   // Create the label now if it has to be shown now
 
-  if (this->ShowLabel)
+  if (this->LabelVisibility)
     {
     this->CreateLabel(app);
     }
 
   // Create the range label
 
-  if (this->ShowRangeLabel)
+  if (this->RangeLabelVisibility)
     {
     this->CreateRangeLabel(app);
     }
@@ -1238,26 +1238,26 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the parameter entry
 
-  if (this->ShowParameterEntry)
+  if (this->ParameterEntryVisibility)
     {
     this->CreateParameterEntry(app);
     }
 
   // Create the ticks canvas
 
-  if (this->ShowValueTicks)
+  if (this->ValueTicksVisibility)
     {
     this->CreateValueTicksCanvas(app);
     }
 
-  if (this->ShowParameterTicks)
+  if (this->ParameterTicksVisibility)
     {
     this->CreateParameterTicksCanvas(app);
     }
 
   // Histogram log mode
 
-  if (this->ShowHistogramLogModeOptionMenu)
+  if (this->HistogramLogModeOptionMenuVisibility)
     {
     this->CreateHistogramLogModeOptionMenu(app);
     }
@@ -1426,20 +1426,20 @@ void vtkKWParameterValueFunctionEditor::CreateTopLeftContainer(
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::IsTopLeftFrameUsed()
 {
-  return ((this->ShowLabel && 
+  return ((this->LabelVisibility && 
            (this->LabelPosition == 
             vtkKWWidgetWithLabel::LabelPositionDefault)) ||
-          (this->ShowRangeLabel && 
+          (this->RangeLabelVisibility && 
            (this->RangeLabelPosition == 
             vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault)) ||
-          this->ShowHistogramLogModeOptionMenu);
+          this->HistogramLogModeOptionMenuVisibility);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::IsTopRightFrameUsed()
 {
   return 
-    (this->ShowParameterEntry && 
+    (this->ParameterEntryVisibility && 
      (this->ParameterEntryPosition == 
       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault));
 }
@@ -1593,7 +1593,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Note that we span column col_c and col_d because (L) can get quite large
   // whereas TLC is usually small, so we would end up with a too large col_c
 
-  if (this->ShowLabel && 
+  if (this->LabelVisibility && 
       (this->LabelPosition == 
        vtkKWWidgetWithLabel::LabelPositionTop) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
@@ -1609,7 +1609,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Note that we span column col_c and col_d because (L) can get quite large
   // whereas TLC is usually small, so we would end up with a too large col_c
   
-  if (this->ShowRangeLabel && 
+  if (this->RangeLabelVisibility && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionTop) &&
       this->RangeLabel && this->RangeLabel->IsCreated())
@@ -1628,7 +1628,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   if (this->TopLeftContainer && this->TopLeftContainer->IsCreated())
     {
     this->TopLeftContainer->UnpackChildren();
-    if (this->IsTopLeftFrameUsed() || this->ShowUserFrame)
+    if (this->IsTopLeftFrameUsed() || this->UserFrameVisibility)
       {
       tk_cmd << "grid " << this->TopLeftContainer->GetWidgetName() 
              << " -stick ewns -pady 1 "
@@ -1657,7 +1657,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   // Label (L) at default position, i.e inside top left frame (TLF)
 
-  if (this->ShowLabel && 
+  if (this->LabelVisibility && 
       (this->LabelPosition == 
        vtkKWWidgetWithLabel::LabelPositionDefault) &&
       this->HasLabel() && this->GetLabel()->IsCreated() &&
@@ -1670,7 +1670,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Histogram log mode (in top left frame)
 
-  if (this->ShowHistogramLogModeOptionMenu &&
+  if (this->HistogramLogModeOptionMenuVisibility &&
       this->HistogramLogModeOptionMenu && 
       this->HistogramLogModeOptionMenu->IsCreated())
     {
@@ -1680,7 +1680,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // RangeLabel (RL) at default position, i.e. inside top left frame (TLF)
 
-  if (this->ShowRangeLabel && 
+  if (this->RangeLabelVisibility && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->RangeLabel && this->RangeLabel->IsCreated() &&
@@ -1706,7 +1706,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // ParameterEntry (PE) if at default position inside top right frame (TRF)
   
-  if (this->ShowParameterEntry && 
+  if (this->ParameterEntryVisibility && 
       (this->ParameterEntryPosition == 
        vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
       this->ParameterEntry && this->ParameterEntry->IsCreated() &&
@@ -1721,7 +1721,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Parameter range (PR) if at top
   
-  if (this->ShowParameterRange && 
+  if (this->ParameterRangeVisibility && 
       this->ParameterRange && this->ParameterRange->IsCreated() &&
       (this->ParameterRangePosition == 
        vtkKWParameterValueFunctionEditor::ParameterRangePositionTop))
@@ -1734,7 +1734,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   // Label (L) if at left
 
-  if (this->ShowLabel && 
+  if (this->LabelVisibility && 
       (this->LabelPosition == 
        vtkKWWidgetWithLabel::LabelPositionLeft) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
@@ -1747,7 +1747,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Value Ticks (VT)
   
-  if (this->ShowValueTicks && 
+  if (this->ValueTicksVisibility && 
       this->ValueTicksCanvas && this->ValueTicksCanvas->IsCreated())
     {
     tk_cmd << "grid " << this->ValueTicksCanvas->GetWidgetName() 
@@ -1766,7 +1766,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Value range (VR)
   
-  if (this->ShowValueRange && 
+  if (this->ValueRangeVisibility && 
       this->ValueRange && this->ValueRange->IsCreated())
     {
     tk_cmd << "grid " << this->ValueRange->GetWidgetName() 
@@ -1776,7 +1776,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // ParameterEntry (PE) if at right
   
-  if (this->ShowParameterEntry && 
+  if (this->ParameterEntryVisibility && 
       (this->ParameterEntryPosition == 
        vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight) &&
       this->ParameterEntry && this->ParameterEntry->IsCreated())
@@ -1794,7 +1794,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
     
   // Parameter Ticks (PT)
   
-  if (this->ShowParameterTicks && 
+  if (this->ParameterTicksVisibility && 
       this->ParameterTicksCanvas && this->ParameterTicksCanvas->IsCreated())
     {
     tk_cmd << "grid " << this->ParameterTicksCanvas->GetWidgetName() 
@@ -1805,7 +1805,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Parameter range (PR)
   
-  if (this->ShowParameterRange && 
+  if (this->ParameterRangeVisibility && 
       this->ParameterRange && this->ParameterRange->IsCreated() &&
       (this->ParameterRangePosition == 
        vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom))
@@ -2178,19 +2178,19 @@ void vtkKWParameterValueFunctionEditor::SetWholeParameterRangeAndMaintainVisible
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowParameterRange(int arg)
+void vtkKWParameterValueFunctionEditor::SetParameterRangeVisibility(int arg)
 {
-  if (this->ShowParameterRange == arg)
+  if (this->ParameterRangeVisibility == arg)
     {
     return;
     }
 
-  this->ShowParameterRange = arg;
+  this->ParameterRangeVisibility = arg;
 
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowParameterRange && this->IsCreated())
+  if (this->ParameterRangeVisibility && this->IsCreated())
     {
     this->CreateParameterRange(this->GetApplication());
     }
@@ -2291,19 +2291,19 @@ void vtkKWParameterValueFunctionEditor::SetWholeValueRangeAndMaintainVisible(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowValueRange(int arg)
+void vtkKWParameterValueFunctionEditor::SetValueRangeVisibility(int arg)
 {
-  if (this->ShowValueRange == arg)
+  if (this->ValueRangeVisibility == arg)
     {
     return;
     }
 
-  this->ShowValueRange = arg;
+  this->ValueRangeVisibility = arg;
 
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowValueRange && this->IsCreated())
+  if (this->ValueRangeVisibility && this->IsCreated())
     {
     this->CreateValueRange(this->GetApplication());
     }
@@ -2339,7 +2339,7 @@ void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRange(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowLabel(int arg)
+void vtkKWParameterValueFunctionEditor::SetLabelVisibility(int arg)
 {
   // If we are displaying the label in the top left frame, make sure it has
   // been created before we call the superclass (which will call our 
@@ -2353,7 +2353,7 @@ void vtkKWParameterValueFunctionEditor::SetShowLabel(int arg)
     this->CreateTopLeftFrame(this->GetApplication());
     }
 
-  this->Superclass::SetShowLabel(arg);
+  this->Superclass::SetLabelVisibility(arg);
 }
 
 //----------------------------------------------------------------------------
@@ -2387,19 +2387,19 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowRangeLabel(int arg)
+void vtkKWParameterValueFunctionEditor::SetRangeLabelVisibility(int arg)
 {
-  if (this->ShowRangeLabel == arg)
+  if (this->RangeLabelVisibility == arg)
     {
     return;
     }
 
-  this->ShowRangeLabel = arg;
+  this->RangeLabelVisibility = arg;
 
   // If we are displaying the range label in the top left frame, make sure it
   // has been created. 
 
-  if (this->ShowRangeLabel && 
+  if (this->RangeLabelVisibility && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->IsCreated())
@@ -2410,7 +2410,7 @@ void vtkKWParameterValueFunctionEditor::SetShowRangeLabel(int arg)
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowRangeLabel && this->IsCreated())
+  if (this->RangeLabelVisibility && this->IsCreated())
     {
     this->CreateRangeLabel(this->GetApplication());
     }
@@ -2445,7 +2445,7 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
   // If we are displaying the range label in the top left frame, make sure it
   // has been created. 
 
-  if (this->ShowRangeLabel && 
+  if (this->RangeLabelVisibility && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->IsCreated())
@@ -2461,19 +2461,19 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowParameterEntry(int arg)
+void vtkKWParameterValueFunctionEditor::SetParameterEntryVisibility(int arg)
 {
-  if (this->ShowParameterEntry == arg)
+  if (this->ParameterEntryVisibility == arg)
     {
     return;
     }
 
-  this->ShowParameterEntry = arg;
+  this->ParameterEntryVisibility = arg;
 
   // If we are displaying the entry in the top right frame, make sure it
   // has been created. 
 
-  if (this->ShowParameterEntry && 
+  if (this->ParameterEntryVisibility && 
       (this->ParameterEntryPosition == 
        vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
       this->IsCreated())
@@ -2484,7 +2484,7 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterEntry(int arg)
   // Make sure that if the entry has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowParameterEntry && this->IsCreated())
+  if (this->ParameterEntryVisibility && this->IsCreated())
     {
     this->CreateParameterEntry(this->GetApplication());
     }
@@ -2519,7 +2519,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryPosition(int arg)
   // If we are displaying the entry in the top right frame, make sure it
   // has been created. 
 
-  if (this->ShowParameterEntry && 
+  if (this->ParameterEntryVisibility && 
       (this->ParameterEntryPosition == 
        vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
       this->IsCreated())
@@ -2567,19 +2567,19 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryFormat(const char *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowUserFrame(int arg)
+void vtkKWParameterValueFunctionEditor::SetUserFrameVisibility(int arg)
 {
-  if (this->ShowUserFrame == arg)
+  if (this->UserFrameVisibility == arg)
     {
     return;
     }
 
-  this->ShowUserFrame = arg;
+  this->UserFrameVisibility = arg;
 
   // Make sure that if the frame has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowUserFrame && this->IsCreated())
+  if (this->UserFrameVisibility && this->IsCreated())
     {
     this->CreateUserFrame(this->GetApplication());
     }
@@ -2635,14 +2635,14 @@ void vtkKWParameterValueFunctionEditor::SetExpandCanvasWidth(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowFunctionLine(int arg)
+void vtkKWParameterValueFunctionEditor::SetFunctionLineVisibility(int arg)
 {
-  if (this->ShowFunctionLine == arg)
+  if (this->FunctionLineVisibility == arg)
     {
     return;
     }
 
-  this->ShowFunctionLine = arg;
+  this->FunctionLineVisibility = arg;
 
   this->Modified();
 
@@ -2650,7 +2650,7 @@ void vtkKWParameterValueFunctionEditor::SetShowFunctionLine(int arg)
   // coordinates if they already exist. To make sure the line is hidden,
   // we have to remove the item.
 
-  if (!this->ShowFunctionLine)
+  if (!this->FunctionLineVisibility)
     {
     this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::LineTag);
     }
@@ -2806,14 +2806,14 @@ void vtkKWParameterValueFunctionEditor::SetLastPointStyle(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowCanvasOutline(int arg)
+void vtkKWParameterValueFunctionEditor::SetCanvasOutlineVisibility(int arg)
 {
-  if (this->ShowCanvasOutline == arg)
+  if (this->CanvasOutlineVisibility == arg)
     {
     return;
     }
 
-  this->ShowCanvasOutline = arg;
+  this->CanvasOutlineVisibility = arg;
 
   this->Modified();
 
@@ -2850,14 +2850,14 @@ void vtkKWParameterValueFunctionEditor::SetCanvasOutlineStyle(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowCanvasBackground(int arg)
+void vtkKWParameterValueFunctionEditor::SetCanvasBackgroundVisibility(int arg)
 {
-  if (this->ShowCanvasBackground == arg)
+  if (this->CanvasBackgroundVisibility == arg)
     {
     return;
     }
 
-  this->ShowCanvasBackground = arg;
+  this->CanvasBackgroundVisibility = arg;
 
   this->Modified();
 
@@ -2865,14 +2865,14 @@ void vtkKWParameterValueFunctionEditor::SetShowCanvasBackground(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowParameterCursor(int arg)
+void vtkKWParameterValueFunctionEditor::SetParameterCursorVisibility(int arg)
 {
-  if (this->ShowParameterCursor == arg)
+  if (this->ParameterCursorVisibility == arg)
     {
     return;
     }
 
-  this->ShowParameterCursor = arg;
+  this->ParameterCursorVisibility = arg;
 
   this->Modified();
 
@@ -2929,18 +2929,18 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorInteractionStyle(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowParameterTicks(int arg)
+void vtkKWParameterValueFunctionEditor::SetParameterTicksVisibility(int arg)
 {
-  if (this->ShowParameterTicks == arg)
+  if (this->ParameterTicksVisibility == arg)
     {
     return;
     }
 
-  this->ShowParameterTicks = arg;
+  this->ParameterTicksVisibility = arg;
 
   this->Modified();
 
-  if (this->ShowParameterTicks && this->IsCreated())
+  if (this->ParameterTicksVisibility && this->IsCreated())
     {
     this->CreateParameterTicksCanvas(this->GetApplication());
     }
@@ -2950,18 +2950,18 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterTicks(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowValueTicks(int arg)
+void vtkKWParameterValueFunctionEditor::SetValueTicksVisibility(int arg)
 {
-  if (this->ShowValueTicks == arg)
+  if (this->ValueTicksVisibility == arg)
     {
     return;
     }
 
-  this->ShowValueTicks = arg;
+  this->ValueTicksVisibility = arg;
 
   this->Modified();
 
-  if (this->ShowValueTicks && this->IsCreated())
+  if (this->ValueTicksVisibility && this->IsCreated())
     {
     this->CreateValueTicksCanvas(this->GetApplication());
     }
@@ -3043,7 +3043,7 @@ void vtkKWParameterValueFunctionEditor::SetTicksLength(int arg)
 
   this->Modified();
 
-  if (this->ShowParameterTicks || this->ShowValueTicks)
+  if (this->ParameterTicksVisibility || this->ValueTicksVisibility)
     {
     this->Redraw();
     }
@@ -3068,7 +3068,7 @@ void vtkKWParameterValueFunctionEditor::SetNumberOfParameterTicks(int arg)
                           this->ParameterTicksCanvas->GetWidgetName());
     }
 
-  if (this->ShowParameterTicks || this->ShowValueTicks)
+  if (this->ParameterTicksVisibility || this->ValueTicksVisibility)
     {
     this->RedrawRangeTicks();
     }
@@ -3105,7 +3105,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterTicksFormat(const char *arg)
 
   this->Modified();
   
-  if (this->ShowParameterTicks)
+  if (this->ParameterTicksVisibility)
     {
     this->RedrawRangeTicks();
     }
@@ -3130,7 +3130,7 @@ void vtkKWParameterValueFunctionEditor::SetNumberOfValueTicks(int arg)
                           this->ValueTicksCanvas->GetWidgetName());
     }
 
-  if (this->ShowParameterTicks || this->ShowValueTicks)
+  if (this->ParameterTicksVisibility || this->ValueTicksVisibility)
     {
     this->RedrawRangeTicks();
     }
@@ -3181,7 +3181,7 @@ void vtkKWParameterValueFunctionEditor::SetValueTicksFormat(const char *arg)
 
   this->Modified();
   
-  if (this->ShowValueTicks)
+  if (this->ValueTicksVisibility)
     {
     this->RedrawRangeTicks();
     }
@@ -3469,14 +3469,14 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyle(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowPointIndex(int arg)
+void vtkKWParameterValueFunctionEditor::SetPointIndexVisibility(int arg)
 {
-  if (this->ShowPointIndex == arg)
+  if (this->PointIndexVisibility == arg)
     {
     return;
     }
 
-  this->ShowPointIndex = arg;
+  this->PointIndexVisibility = arg;
 
   this->Modified();
 
@@ -3491,14 +3491,14 @@ void vtkKWParameterValueFunctionEditor::SetShowPointIndex(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowPointGuideline(int arg)
+void vtkKWParameterValueFunctionEditor::SetPointGuidelineVisibility(int arg)
 {
-  if (this->ShowPointGuideline == arg)
+  if (this->PointGuidelineVisibility == arg)
     {
     return;
     }
 
-  this->ShowPointGuideline = arg;
+  this->PointGuidelineVisibility = arg;
 
   this->Modified();
 
@@ -3506,7 +3506,7 @@ void vtkKWParameterValueFunctionEditor::SetShowPointGuideline(int arg)
   // coordinates if they already exist. To make sure the line is hidden,
   // we have to remove the item.
 
-  if (!this->ShowPointGuideline)
+  if (!this->PointGuidelineVisibility)
     {
     this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::GuidelineTag);
     }
@@ -3539,14 +3539,14 @@ void vtkKWParameterValueFunctionEditor::SetPointGuidelineStyle(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowSelectedPointIndex(int arg)
+void vtkKWParameterValueFunctionEditor::SetSelectedPointIndexVisibility(int arg)
 {
-  if (this->ShowSelectedPointIndex == arg)
+  if (this->SelectedPointIndexVisibility == arg)
     {
     return;
     }
 
-  this->ShowSelectedPointIndex = arg;
+  this->SelectedPointIndexVisibility = arg;
 
   this->Modified();
 
@@ -3561,19 +3561,19 @@ void vtkKWParameterValueFunctionEditor::SetShowSelectedPointIndex(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetShowHistogramLogModeOptionMenu(int arg)
+void vtkKWParameterValueFunctionEditor::SetHistogramLogModeOptionMenuVisibility(int arg)
 {
-  if (this->ShowHistogramLogModeOptionMenu == arg)
+  if (this->HistogramLogModeOptionMenuVisibility == arg)
     {
     return;
     }
 
-  this->ShowHistogramLogModeOptionMenu = arg;
+  this->HistogramLogModeOptionMenuVisibility = arg;
 
   // Make sure that if the button has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowHistogramLogModeOptionMenu && this->IsCreated())
+  if (this->HistogramLogModeOptionMenuVisibility && this->IsCreated())
     {
     this->CreateHistogramLogModeOptionMenu(this->GetApplication());
     }
@@ -4135,13 +4135,13 @@ void vtkKWParameterValueFunctionEditor::Redraw()
   const char *canv = this->Canvas->GetWidgetName();
 
   const char *v_t_canv = NULL;
-  if (this->ShowValueTicks)
+  if (this->ValueTicksVisibility)
     {
     v_t_canv = this->ValueTicksCanvas->GetWidgetName();
     }
 
   const char *p_t_canv = NULL;
-  if (this->ShowParameterTicks)
+  if (this->ParameterTicksVisibility)
     {
     p_t_canv = this->ParameterTicksCanvas->GetWidgetName();
     }
@@ -4294,7 +4294,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
   int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameForegroundTag);
   if (!has_tag)
     {
-    if (this->ShowCanvasOutline)
+    if (this->CanvasOutlineVisibility)
       {
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
@@ -4326,7 +4326,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
     }
   else 
     {
-    if (!this->ShowCanvasOutline)
+    if (!this->CanvasOutlineVisibility)
       {
       tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << endl;
       }
@@ -4337,7 +4337,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
   has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameBackgroundTag);
   if (!has_tag)
     {
-    if (this->ShowCanvasBackground)
+    if (this->CanvasBackgroundVisibility)
       {
       tk_cmd << canv << " create rectangle 0 0 0 0 "
              << " -tags {" << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << "}" << endl;
@@ -4347,7 +4347,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
     }
   else 
     {
-    if (!this->ShowCanvasBackground)
+    if (!this->CanvasBackgroundVisibility)
       {
       tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << endl;
       }
@@ -4388,7 +4388,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
 
   // Update coordinates and colors
 
-  if (this->ShowCanvasOutline)
+  if (this->CanvasOutlineVisibility)
     {
     double c1_x = p_w_range[0] * factors[0];
     double c1_y = v_w_range[0] * factors[1];
@@ -4425,7 +4425,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
       }
     }
 
-  if (this->ShowCanvasBackground)
+  if (this->CanvasBackgroundVisibility)
     {
     tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
            << " " << p_w_range[0] * factors[0]
@@ -4461,13 +4461,13 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
   const char *canv = this->Canvas->GetWidgetName();
 
   const char *v_t_canv = NULL;
-  if (this->ShowValueTicks)
+  if (this->ValueTicksVisibility)
     {
     v_t_canv = this->ValueTicksCanvas->GetWidgetName();
     }
 
   const char *p_t_canv = NULL;
-  if (this->ShowParameterTicks)
+  if (this->ParameterTicksVisibility)
     {
     p_t_canv = this->ParameterTicksCanvas->GetWidgetName();
     }
@@ -4479,7 +4479,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
   int has_p_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag);
   if (!has_p_tag)
     {
-    if (this->ShowParameterTicks)
+    if (this->ParameterTicksVisibility)
       {
       for (int i = 0; i < this->NumberOfParameterTicks; i++)
         {
@@ -4498,7 +4498,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     }
   else 
     {
-    if (!this->ShowParameterTicks)
+    if (!this->ParameterTicksVisibility)
       {
       tk_cmd << canv << " delete " 
              << vtkKWParameterValueFunctionEditor::ParameterTicksTag << endl;
@@ -4510,7 +4510,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
   int has_v_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ValueTicksTag);
   if (!has_v_tag)
     {
-    if (this->ShowValueTicks)
+    if (this->ValueTicksVisibility)
       {
       for (int i = 0; i < this->NumberOfValueTicks; i++)
         {
@@ -4529,7 +4529,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     }
   else 
     {
-    if (!this->ShowValueTicks)
+    if (!this->ValueTicksVisibility)
       {
       tk_cmd << canv << " delete " 
              << vtkKWParameterValueFunctionEditor::ValueTicksTag << endl;
@@ -4540,7 +4540,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
 
   // Update coordinates and colors
 
-  if (this->ShowParameterTicks || this->ShowValueTicks)
+  if (this->ParameterTicksVisibility || this->ValueTicksVisibility)
     {
     double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
@@ -4551,7 +4551,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
 
     char buffer[100];
 
-    if (this->ShowParameterTicks)
+    if (this->ParameterTicksVisibility)
       {
       double y_t = (v_w_range[1] - v_v_range[1]) * factors[1];
       double y_b = (v_w_range[1] - v_v_range[0]) * factors[1];
@@ -4581,7 +4581,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
         }
       }
 
-    if (this->ShowValueTicks)
+    if (this->ValueTicksVisibility)
       {
       double x_l = (p_v_range[0] * factors[0]);
       double x_r = (p_v_range[1] * factors[0]);
@@ -4662,7 +4662,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
   int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterCursorTag);
   if (!has_tag)
     {
-    if (this->ShowParameterCursor)
+    if (this->ParameterCursorVisibility)
       {
       tk_cmd << canv << " create line 0 0 0 0 "
              << " -tags {" << vtkKWParameterValueFunctionEditor::ParameterCursorTag << "}" << endl;
@@ -4672,7 +4672,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
     }
   else 
     {
-    if (!this->ShowParameterCursor)
+    if (!this->ParameterCursorVisibility)
       {
       tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::ParameterCursorTag<< endl;
       }
@@ -4680,7 +4680,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
 
   // Update the cursor position and style
   
-  if (this->ShowParameterCursor)
+  if (this->ParameterCursorVisibility)
     {
     double v_v_range[2];
     this->GetWholeValueRange(v_v_range);
@@ -4848,7 +4848,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Create the point guideline
 
-  if (this->ShowPointGuideline)
+  if (this->PointGuidelineVisibility)
     {
     if (!this->CanvasHasTag("g", &id))
       {
@@ -4862,7 +4862,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
   
   // Create the line between a point and its predecessor
 
-  if (this->ShowFunctionLine)
+  if (this->FunctionLineVisibility)
     {
     if (id > 0)
       {
@@ -4944,7 +4944,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Update the guideline coordinates and style
 
-  if (this->ShowPointGuideline)
+  if (this->PointGuidelineVisibility)
     {
     double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
@@ -4968,7 +4968,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Update the line coordinates and style
 
-  if (this->ShowFunctionLine)
+  if (this->FunctionLineVisibility)
     {
     if (id > 0)
       {
@@ -5020,8 +5020,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Update the text color
 
-  if (this->ShowPointIndex ||
-      (this->ShowSelectedPointIndex && id == this->SelectedPoint))
+  if (this->PointIndexVisibility ||
+      (this->SelectedPointIndexVisibility && id == this->SelectedPoint))
     {
     if (this->GetFunctionPointTextColorInCanvas(id, rgb))
       {
@@ -5287,7 +5287,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
              << " -image " << img_name.str()
              << " -tags {" << vtkKWParameterValueFunctionEditor::HistogramTag << "}"
              << endl;
-      if (this->ShowCanvasBackground)
+      if (this->CanvasBackgroundVisibility)
         {
         tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::HistogramTag 
                << " " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag
@@ -5727,7 +5727,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
   if (!this->IsCreated() || 
       !this->RangeLabel || 
       !this->RangeLabel->IsAlive() ||
-      !this->ShowRangeLabel)
+      !this->RangeLabelVisibility)
     {
     return;
     }
@@ -5735,7 +5735,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
   ostrstream ranges;
   int nb_ranges = 0;
 
-  if (this->ShowParameterRange)
+  if (this->ParameterRangeVisibility)
     {
     double param[2];
     this->GetDisplayedVisibleParameterRange(param[0], param[1]);
@@ -5746,7 +5746,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
     }
 
   double *value = GetVisibleValueRange();
-  if (value && this->ShowValueRange)
+  if (value && this->ValueRangeVisibility)
     {
     char buffer[1024];
     sprintf(buffer, "[%g, %g]", value[0], value[1]);
@@ -6685,18 +6685,18 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowParameterRange: "
-     << (this->ShowParameterRange ? "On" : "Off") << endl;
-  os << indent << "ShowValueRange: "
-     << (this->ShowValueRange ? "On" : "Off") << endl;
-  os << indent << "ShowRangeLabel: "
-     << (this->ShowRangeLabel ? "On" : "Off") << endl;
+  os << indent << "ParameterRangeVisibility: "
+     << (this->ParameterRangeVisibility ? "On" : "Off") << endl;
+  os << indent << "ValueRangeVisibility: "
+     << (this->ValueRangeVisibility ? "On" : "Off") << endl;
+  os << indent << "RangeLabelVisibility: "
+     << (this->RangeLabelVisibility ? "On" : "Off") << endl;
   os << indent << "RangeLabelPosition: " << this->RangeLabelPosition << endl;
   os << indent << "ParameterEntryPosition: " << this->ParameterEntryPosition << endl;
-  os << indent << "ShowParameterEntry: "
-     << (this->ShowParameterEntry ? "On" : "Off") << endl;
-  os << indent << "ShowUserFrame: "
-     << (this->ShowUserFrame ? "On" : "Off") << endl;
+  os << indent << "ParameterEntryVisibility: "
+     << (this->ParameterEntryVisibility ? "On" : "Off") << endl;
+  os << indent << "UserFrameVisibility: "
+     << (this->UserFrameVisibility ? "On" : "Off") << endl;
   os << indent << "CanvasHeight: "<< this->CanvasHeight << endl;
   os << indent << "CanvasWidth: "<< this->CanvasWidth << endl;
   os << indent << "ExpandCanvasWidth: "
@@ -6773,18 +6773,18 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->ComputeHistogramColorFromValue ? "On" : "Off") << endl;
   os << indent << "HistogramStyle: "<< this->HistogramStyle << endl;
   os << indent << "SecondaryHistogramStyle: "<< this->SecondaryHistogramStyle << endl;
-  os << indent << "ShowFunctionLine: "
-     << (this->ShowFunctionLine ? "On" : "Off") << endl;
-  os << indent << "ShowPointIndex: "
-     << (this->ShowPointIndex ? "On" : "Off") << endl;
-  os << indent << "ShowPointGuideline: "
-     << (this->ShowPointGuideline ? "On" : "Off") << endl;
-  os << indent << "ShowSelectedPointIndex: "
-     << (this->ShowSelectedPointIndex ? "On" : "Off") << endl;
-  os << indent << "ShowHistogramLogModeOptionMenu: "
-     << (this->ShowHistogramLogModeOptionMenu ? "On" : "Off") << endl;
-  os << indent << "ShowParameterCursor: "
-     << (this->ShowParameterCursor ? "On" : "Off") << endl;
+  os << indent << "FunctionLineVisibility: "
+     << (this->FunctionLineVisibility ? "On" : "Off") << endl;
+  os << indent << "PointIndexVisibility: "
+     << (this->PointIndexVisibility ? "On" : "Off") << endl;
+  os << indent << "PointGuidelineVisibility: "
+     << (this->PointGuidelineVisibility ? "On" : "Off") << endl;
+  os << indent << "SelectedPointIndexVisibility: "
+     << (this->SelectedPointIndexVisibility ? "On" : "Off") << endl;
+  os << indent << "HistogramLogModeOptionMenuVisibility: "
+     << (this->HistogramLogModeOptionMenuVisibility ? "On" : "Off") << endl;
+  os << indent << "ParameterCursorVisibility: "
+     << (this->ParameterCursorVisibility ? "On" : "Off") << endl;
   os << indent << "DisplayedWholeParameterRange: ("
      << this->DisplayedWholeParameterRange[0] << ", " 
      << this->DisplayedWholeParameterRange[1] << ")" << endl;
@@ -6799,14 +6799,14 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "PointOutlineWidth: " << this->PointOutlineWidth << endl;
   os << indent << "PointPositionInValueRange: " << this->PointPositionInValueRange << endl;
   os << indent << "ParameterRangePosition: " << this->ParameterRangePosition << endl;
-  os << indent << "ShowCanvasOutline: "
-     << (this->ShowCanvasOutline ? "On" : "Off") << endl;
-  os << indent << "ShowCanvasBackground: "
-     << (this->ShowCanvasBackground ? "On" : "Off") << endl;
-  os << indent << "ShowParameterTicks: "
-     << (this->ShowParameterTicks ? "On" : "Off") << endl;
-  os << indent << "ShowValueTicks: "
-     << (this->ShowValueTicks ? "On" : "Off") << endl;
+  os << indent << "CanvasOutlineVisibility: "
+     << (this->CanvasOutlineVisibility ? "On" : "Off") << endl;
+  os << indent << "CanvasBackgroundVisibility: "
+     << (this->CanvasBackgroundVisibility ? "On" : "Off") << endl;
+  os << indent << "ParameterTicksVisibility: "
+     << (this->ParameterTicksVisibility ? "On" : "Off") << endl;
+  os << indent << "ValueTicksVisibility: "
+     << (this->ValueTicksVisibility ? "On" : "Off") << endl;
   os << indent << "ComputeValueTicksFromHistogram: "
      << (this->ComputeValueTicksFromHistogram ? "On" : "Off") << endl;
 

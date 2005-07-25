@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.50");
+vtkCxxRevisionMacro(vtkKWRange, "1.51");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -72,7 +72,7 @@ vtkKWRange::vtkKWRange()
   this->Orientation           = vtkKWRange::OrientationHorizontal;
   this->Inverted              = 0;
   this->SliderSize            = 3;
-  this->ShowEntries           = 1;
+  this->EntriesVisibility           = 1;
   this->Entry1Position        = vtkKWRange::EntryPositionDefault;
   this->Entry2Position        = vtkKWRange::EntryPositionDefault;
   this->EntriesWidth          = 10;
@@ -203,7 +203,7 @@ void vtkKWRange::Create(vtkKWApplication *app)
 
   // Create more stuff
 
-  if (this->ShowEntries)
+  if (this->EntriesVisibility)
     {
     this->CreateEntries();
     }
@@ -297,7 +297,8 @@ void vtkKWRange::Pack()
 
   // Label
 
-  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
+  if (this->LabelVisibility && this->HasLabel() && 
+      this->GetLabel()->IsCreated())
     {
     if (is_horiz)
       {
@@ -346,7 +347,7 @@ void vtkKWRange::Pack()
 
   // Entries
 
-  if (this->ShowEntries)
+  if (this->EntriesVisibility)
     {
     vtkKWEntry *entry = this->Entries[this->Inverted ? 1 : 0];
     if (entry && entry->IsCreated())
@@ -931,16 +932,16 @@ void vtkKWRange::SetInverted(int arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWRange::SetShowEntries(int _arg)
+void vtkKWRange::SetEntriesVisibility(int _arg)
 {
-  if (this->ShowEntries == _arg)
+  if (this->EntriesVisibility == _arg)
     {
     return;
     }
-  this->ShowEntries = _arg;
+  this->EntriesVisibility = _arg;
   this->Modified();
 
-  if (this->ShowEntries)
+  if (this->EntriesVisibility)
     {
     this->CreateEntries();
     }
@@ -2287,8 +2288,8 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << this->RangeInteractionColor[0] << ", " 
      << this->RangeInteractionColor[1] << ", " 
      << this->RangeInteractionColor[2] << ")" << endl;
-  os << indent << "ShowEntries: " 
-     << (this->ShowEntries ? "On" : "Off") << endl;
+  os << indent << "EntriesVisibility: " 
+     << (this->EntriesVisibility ? "On" : "Off") << endl;
   os << indent << "Entry1Position: " << this->Entry1Position << endl;
   os << indent << "Entry2Position: " << this->Entry2Position << endl;
   os << indent << "EntriesWidth: " << this->EntriesWidth << endl;

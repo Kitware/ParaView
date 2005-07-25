@@ -20,15 +20,15 @@
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.4");
+vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithScrollbars::vtkKWWidgetWithScrollbars()
 {
   this->VerticalScrollBar   = NULL;
   this->HorizontalScrollBar = NULL;
-  this->ShowVerticalScrollbar = 1;
-  this->ShowHorizontalScrollbar = 1;
+  this->VerticalScrollbarVisibility = 1;
+  this->HorizontalScrollbarVisibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -71,12 +71,12 @@ void vtkKWWidgetWithScrollbars::Create(vtkKWApplication *app)
   
   // Create the scrollbars
 
-  if (this->ShowVerticalScrollbar)
+  if (this->VerticalScrollbarVisibility)
     {
     this->CreateVerticalScrollbar(app);
     }
 
-  if (this->ShowHorizontalScrollbar)
+  if (this->HorizontalScrollbarVisibility)
     {
     this->CreateHorizontalScrollbar(app);
     }
@@ -174,14 +174,14 @@ void vtkKWWidgetWithScrollbars::PackScrollbarsWithWidget(vtkKWWidget *widget)
            << " -row 0 -column 0 -sticky news" << endl;
     }
 
-  if (this->ShowVerticalScrollbar && 
+  if (this->VerticalScrollbarVisibility && 
       this->VerticalScrollBar && this->VerticalScrollBar->IsCreated())
     {
     tk_cmd << "grid " << this->VerticalScrollBar->GetWidgetName() 
            << " -row 0 -column 1 -sticky ns" << endl;
     }
 
-  if (this->ShowHorizontalScrollbar && 
+  if (this->HorizontalScrollbarVisibility && 
       this->HorizontalScrollBar && this->HorizontalScrollBar->IsCreated())
     {
     tk_cmd << "grid " << this->HorizontalScrollBar->GetWidgetName() 
@@ -199,15 +199,15 @@ void vtkKWWidgetWithScrollbars::PackScrollbarsWithWidget(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::SetShowVerticalScrollbar(int arg)
+void vtkKWWidgetWithScrollbars::SetVerticalScrollbarVisibility(int arg)
 {
-  if (this->ShowVerticalScrollbar == arg)
+  if (this->VerticalScrollbarVisibility == arg)
     {
     return;
     }
 
-  this->ShowVerticalScrollbar = arg;
-  if (this->ShowVerticalScrollbar)
+  this->VerticalScrollbarVisibility = arg;
+  if (this->VerticalScrollbarVisibility)
     {
     this->CreateVerticalScrollbar(this->GetApplication());
     }
@@ -216,15 +216,15 @@ void vtkKWWidgetWithScrollbars::SetShowVerticalScrollbar(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::SetShowHorizontalScrollbar(int arg)
+void vtkKWWidgetWithScrollbars::SetHorizontalScrollbarVisibility(int arg)
 {
-  if (this->ShowHorizontalScrollbar == arg)
+  if (this->HorizontalScrollbarVisibility == arg)
     {
     return;
     }
 
-  this->ShowHorizontalScrollbar = arg;
-  if (this->ShowHorizontalScrollbar)
+  this->HorizontalScrollbarVisibility = arg;
+  if (this->HorizontalScrollbarVisibility)
     {
     this->CreateHorizontalScrollbar(this->GetApplication());
     }
@@ -246,10 +246,10 @@ void vtkKWWidgetWithScrollbars::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowVerticalScrollbar: " 
-     << (this->ShowVerticalScrollbar ? "On" : "Off") << endl;
-  os << indent << "ShowHorizontalScrollbar: " 
-     << (this->ShowHorizontalScrollbar ? "On" : "Off") << endl;
+  os << indent << "VerticalScrollbarVisibility: " 
+     << (this->VerticalScrollbarVisibility ? "On" : "Off") << endl;
+  os << indent << "HorizontalScrollbarVisibility: " 
+     << (this->HorizontalScrollbarVisibility ? "On" : "Off") << endl;
   os << indent << "VerticalScrollBar: ";
   if (this->VerticalScrollBar)
     {

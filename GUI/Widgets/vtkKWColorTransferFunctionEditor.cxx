@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.39");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.40");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -50,9 +50,9 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
 
   this->ComputePointColorFromValue     = 1;
   this->ComputeHistogramColorFromValue = 0;
-  this->ShowValueEntries               = 1;
-  this->ShowColorSpaceOptionMenu       = 1;
-  this->ShowColorRamp                  = 1;
+  this->ValueEntriesVisibility               = 1;
+  this->ColorSpaceOptionMenuVisibility       = 1;
+  this->ColorRampVisibility                  = 1;
   this->ColorRampHeight                = 10;
   this->LastRedrawColorRampTime        = 0;
   this->ColorRampPosition              = vtkKWColorTransferFunctionEditor::ColorRampPositionDefault;
@@ -67,7 +67,7 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
     this->ValueEntries[i] = vtkKWEntryWithLabel::New();
     }
 
-  this->ShowValueRangeOff();
+  this->ValueRangeVisibilityOff();
 }
 
 //----------------------------------------------------------------------------
@@ -530,21 +530,21 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
 
   // Add the color space option menu
 
-  if (this->ShowColorSpaceOptionMenu)
+  if (this->ColorSpaceOptionMenuVisibility)
     {
     this->CreateColorSpaceOptionMenu(app);
     }
 
   // Create the value entries
 
-  if (this->ShowValueEntries)
+  if (this->ValueEntriesVisibility)
     {
     this->CreateValueEntries(app);
     }
 
   // Create the ramp
 
-  if (this->ShowColorRamp)
+  if (this->ColorRampVisibility)
     {
     this->CreateColorRamp(app);
     }
@@ -630,14 +630,14 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
 int vtkKWColorTransferFunctionEditor::IsTopLeftFrameUsed()
 {
   return (this->Superclass::IsTopLeftFrameUsed() || 
-          this->ShowColorSpaceOptionMenu);
+          this->ColorSpaceOptionMenuVisibility);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWColorTransferFunctionEditor::IsTopRightFrameUsed()
 {
   return (this->Superclass::IsTopRightFrameUsed() || 
-          this->ShowValueEntries);
+          this->ValueEntriesVisibility);
 }
 
 //----------------------------------------------------------------------------
@@ -656,7 +656,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
 
   // Add the color space menu (in top left frame)
 
-  if (this->ShowColorSpaceOptionMenu && 
+  if (this->ColorSpaceOptionMenuVisibility && 
       this->ColorSpaceOptionMenu && this->ColorSpaceOptionMenu->IsCreated())
     {
     tk_cmd << "pack " << this->ColorSpaceOptionMenu->GetWidgetName() 
@@ -665,7 +665,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
 
   // Value entries (in top right frame)
 
-  if (this->ShowValueEntries)
+  if (this->ValueEntriesVisibility)
     {
     int i;
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
@@ -680,7 +680,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
 
   // Color ramp
 
-  if (this->ShowColorRamp && 
+  if (this->ColorRampVisibility && 
       (this->ColorRampPosition == 
        vtkKWColorTransferFunctionEditor::ColorRampPositionDefault) &&
       this->ColorRamp && this->ColorRamp->IsCreated())
@@ -690,7 +690,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
     // the ramp at the end
 
     int show_pr = 
-      (this->ShowParameterRange && 
+      (this->ParameterRangeVisibility && 
        this->ParameterRange && this->ParameterRange->IsCreated()) ? 1 : 0;
 
     int col, row, nb_cols;
@@ -709,7 +709,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
       if (!vtkKWTkUtilities::GetGridSize(
             this->ColorRamp->GetParent(), &nb_cols, &row))
         {
-        row = 2 + (this->ShowParameterTicks ? 1 : 0) + 
+        row = 2 + (this->ParameterTicksVisibility ? 1 : 0) + 
           (show_pr &&
            (this->ParameterRangePosition == 
             vtkKWParameterValueFunctionEditor::ParameterRangePositionTop) 
@@ -906,19 +906,19 @@ void vtkKWColorTransferFunctionEditor::DoubleClickOnPointCallback(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::SetShowColorSpaceOptionMenu(int arg)
+void vtkKWColorTransferFunctionEditor::SetColorSpaceOptionMenuVisibility(int arg)
 {
-  if (this->ShowColorSpaceOptionMenu == arg)
+  if (this->ColorSpaceOptionMenuVisibility == arg)
     {
     return;
     }
 
-  this->ShowColorSpaceOptionMenu = arg;
+  this->ColorSpaceOptionMenuVisibility = arg;
 
   // Make sure that if the button has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowColorSpaceOptionMenu && this->IsCreated())
+  if (this->ColorSpaceOptionMenuVisibility && this->IsCreated())
     {
     this->CreateColorSpaceOptionMenu(this->GetApplication());
     }
@@ -931,19 +931,19 @@ void vtkKWColorTransferFunctionEditor::SetShowColorSpaceOptionMenu(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::SetShowColorRamp(int arg)
+void vtkKWColorTransferFunctionEditor::SetColorRampVisibility(int arg)
 {
-  if (this->ShowColorRamp == arg)
+  if (this->ColorRampVisibility == arg)
     {
     return;
     }
     
-  this->ShowColorRamp = arg;
+  this->ColorRampVisibility = arg;
 
   // Make sure that if the ramp has to be shown, we create it on the fly if
   // needed.
 
-  if (this->ShowColorRamp)
+  if (this->ColorRampVisibility)
     {
     if (this->IsCreated() && !this->ColorRamp->IsCreated())
       {
@@ -1035,19 +1035,19 @@ void vtkKWColorTransferFunctionEditor::SetColorRampHeight(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::SetShowValueEntries(int arg)
+void vtkKWColorTransferFunctionEditor::SetValueEntriesVisibility(int arg)
 {
-  if (this->ShowValueEntries == arg)
+  if (this->ValueEntriesVisibility == arg)
     {
     return;
     }
 
-  this->ShowValueEntries = arg;
+  this->ValueEntriesVisibility = arg;
 
   // Make sure that if the entries have to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowValueEntries && this->IsCreated())
+  if (this->ValueEntriesVisibility && this->IsCreated())
     {
     this->CreateValueEntries(this->GetApplication());
     }
@@ -1206,7 +1206,7 @@ int vtkKWColorTransferFunctionEditor::IsColorRampUpToDate()
     this->ColorRampTransferFunction : this->ColorTransferFunction;
 
   return (func &&
-          this->ShowColorRamp &&
+          this->ColorRampVisibility &&
           this->LastRedrawColorRampTime < func->GetMTime()) ? 0 : 1;
 }
 
@@ -1222,7 +1222,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
 
   double p_v_range_ext[2];
 
-  if (this->ShowColorRamp)
+  if (this->ColorRampVisibility)
     {
     // Which function to use ?
 
@@ -1402,7 +1402,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
     int has_tag = this->CanvasHasTag(VTK_KW_CTFE_COLOR_RAMP_TAG);
     if (!has_tag)
       {
-      if (this->ShowColorRamp)
+      if (this->ColorRampVisibility)
         {
         vtksys_stl::string image_name(
           this->Script("%s cget -image", this->ColorRamp->GetWidgetName()));
@@ -1415,7 +1415,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
       }
     else 
       {
-      if (!this->ShowColorRamp)
+      if (!this->ColorRampVisibility)
         {
         tk_cmd << canv << " delete " << VTK_KW_CTFE_COLOR_RAMP_TAG << endl;
         }
@@ -1423,7 +1423,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
 
     // Update coordinates
 
-    if (this->ShowColorRamp)
+    if (this->ColorRampVisibility)
       {
       double factors[2] = {0.0, 0.0};
       this->GetCanvasScalingFactors(factors);
@@ -1512,14 +1512,14 @@ void vtkKWColorTransferFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowValueEntries: "
-     << (this->ShowValueEntries ? "On" : "Off") << endl;
+  os << indent << "ValueEntriesVisibility: "
+     << (this->ValueEntriesVisibility ? "On" : "Off") << endl;
 
-  os << indent << "ShowColorSpaceOptionMenu: "
-     << (this->ShowColorSpaceOptionMenu ? "On" : "Off") << endl;
+  os << indent << "ColorSpaceOptionMenuVisibility: "
+     << (this->ColorSpaceOptionMenuVisibility ? "On" : "Off") << endl;
 
-  os << indent << "ShowColorRamp: "
-     << (this->ShowColorRamp ? "On" : "Off") << endl;
+  os << indent << "ColorRampVisibility: "
+     << (this->ColorRampVisibility ? "On" : "Off") << endl;
 
   os << indent << "ColorRampHeight: " << this->ColorRampHeight << endl;
   os << indent << "ColorRampPosition: " << this->ColorRampPosition << endl;

@@ -29,7 +29,7 @@ proc vtkKWCheckButtonWithChangeColorButtonEntryPoint {parent win} {
   cbwcc2 SetBorderWidth 2
   cbwcc2 SetReliefToGroove
   [cbwcc2 GetCheckButton] SetText "Another one"
-  [cbwcc2 GetChangeColorButton] ShowLabelOff 
+  [cbwcc2 GetChangeColorButton] LabelVisibilityOff 
   [cbwcc2 GetChangeColorButton] SetColor 0.9 0.3 0.1
   cbwcc2 DisableChangeColorButtonWhenNotCheckedOn
   cbwcc2 SetBalloonHelpString \

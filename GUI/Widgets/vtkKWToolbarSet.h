@@ -73,7 +73,7 @@ public:
   virtual void SetToolbarsWidgetsFlatAspect(int);
 
   // Description:
-  // Convenience method to hide/show a toolbar
+  // Convenience method to set the visibility of a toolbar
   virtual void HideToolbar(vtkKWToolbar *toolbar);
   virtual void ShowToolbar(vtkKWToolbar *toolbar);
   virtual void SetToolbarVisibility(vtkKWToolbar *toolbar, int flag);
@@ -155,16 +155,16 @@ public:
   virtual void InvokeNumberOfToolbarsChangedCommand();
 
   // Description:
-  // Show or hide a separator at the bottom of the set
-  virtual void SetShowBottomSeparator(int);
-  vtkBooleanMacro(ShowBottomSeparator, int); 
-  vtkGetMacro(ShowBottomSeparator, int); 
+  // Set/Get the visibility of the separator at the bottom of the set
+  virtual void SetBottomSeparatorVisibility(int);
+  vtkBooleanMacro(BottomSeparatorVisibility, int); 
+  vtkGetMacro(BottomSeparatorVisibility, int); 
 
   // Description:
-  // Show or hide a separator at the top of the set
-  virtual void SetShowTopSeparator(int);
-  vtkBooleanMacro(ShowTopSeparator, int); 
-  vtkGetMacro(ShowTopSeparator, int); 
+  // Set/Get the visibility of the separator at the top of the set
+  virtual void SetTopSeparatorVisibility(int);
+  vtkBooleanMacro(TopSeparatorVisibility, int); 
+  vtkGetMacro(TopSeparatorVisibility, int); 
 
   // Description:
   // Update the toolbar set 
@@ -193,8 +193,8 @@ protected:
   vtkKWFrame     *ToolbarsFrame;
   vtkKWSeparator *BottomSeparator;
 
-  int ShowBottomSeparator;
-  int ShowTopSeparator;
+  int BottomSeparatorVisibility;
+  int TopSeparatorVisibility;
   int SynchronizeToolbarsVisibilityWithRegistry;
 
   char *ToolbarVisibilityChangedCommand;

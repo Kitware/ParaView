@@ -44,12 +44,6 @@ public:
   void SetLabelText(const char *);
   
   // Description:
-  // Ask the frame to readjust its tops margin according to the content of
-  // the LabelFrame. This method if bound to a Configure event, so
-  // the widget should adjust itself automatically most of the time.
-  void AdjustMargin();
- 
-  // Description:
   // Get the internal frame.
   vtkGetObjectMacro(Frame, vtkKWFrame);
 
@@ -62,20 +56,27 @@ public:
   virtual vtkKWLabel *GetLabel();
 
   // Description:
-  // Show or hide the frame.
-  void PerformShowHideFrame();
+  // Collapse/expand the frame.
+  virtual void CollapseFrame();
+  virtual void ExpandFrame();
+  virtual int IsFrameCollapsed();
 
   // Description:
-  // Globally enable or disable show/hide frame.
-  // By default it is globally disabled.
-  static void AllowShowHideOn();
-  static void AllowShowHideOff();
+  // Set/Get if the frame can be collapsed, i.e. display a button that will
+  // let the user collapse the frame. On by default.
+  vtkSetMacro(AllowFrameToCollapse, int);
+  vtkBooleanMacro(AllowFrameToCollapse, int);
+  vtkGetMacro(AllowFrameToCollapse, int);
 
   // Description:
-  // Set/Get ShowHide for this object.
-  vtkSetMacro(ShowHideFrame, int);
-  vtkBooleanMacro(ShowHideFrame, int);
-  vtkGetMacro(ShowHideFrame, int);
+  // Globally set/get if the frame can be collapsed.
+  // By default it is globally enabled.
+  static int GetDefaultAllowFrameToCollapse();
+  static void SetDefaultAllowFrameToCollapse(int);
+  static void DefaultAllowFrameToCollapseOn()
+    { vtkKWFrameWithLabel::SetDefaultAllowFrameToCollapse(1); };
+  static void DefaultAllowFrameToCollapseOff()
+    { vtkKWFrameWithLabel::SetDefaultAllowFrameToCollapse(0); };
 
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
@@ -89,30 +90,43 @@ public:
     LabelCaseLowercaseFirst
   };
   //ETX
-  static void SetLabelCase(int v);
-  static int GetLabelCase();
-  static void SetLabelCaseToUserSpecified() 
-    { vtkKWFrameWithLabel::SetLabelCase(
+  static void SetDefaultLabelCase(int v);
+  static int GetDefaultLabelCase();
+  static void SetDefaultLabelCaseToUserSpecified() 
+    { vtkKWFrameWithLabel::SetDefaultLabelCase(
       vtkKWFrameWithLabel::LabelCaseUserSpecified);};
-  static void SetLabelCaseToUppercaseFirst() 
-    {vtkKWFrameWithLabel::SetLabelCase(
+  static void SetDefaultLabelCaseToUppercaseFirst() 
+    {vtkKWFrameWithLabel::SetDefaultLabelCase(
       vtkKWFrameWithLabel::LabelCaseUppercaseFirst);};
-  static void SetLabelCaseToLowercaseFirst() 
-    {vtkKWFrameWithLabel::SetLabelCase(
+  static void SetDefaultLabelCaseToLowercaseFirst() 
+    {vtkKWFrameWithLabel::SetDefaultLabelCase(
       vtkKWFrameWithLabel::LabelCaseLowercaseFirst);};
 
   // Description:
-  // Globally enable or disable bold label.
-  // By default it is globally disabled.
-  static void BoldLabelOn();
-  static void BoldLabelOff();
+  // Globally enable or disable the font weight of the label.
+  // By default it is set to bold.
+  //BTX
+  enum
+  {
+    LabelFontWeightNormal = 0,
+    LabelFontWeightBold,
+  };
+  //ETX
+  static void SetDefaultLabelFontWeight(int v);
+  static int GetDefaultLabelFontWeight();
+  static void SetDefaultLabelFontWeightToNormal() 
+    { vtkKWFrameWithLabel::SetDefaultLabelFontWeight(
+      vtkKWFrameWithLabel::LabelFontWeightNormal);};
+  static void SetDefaultLabelFontWeightToBold() 
+    {vtkKWFrameWithLabel::SetDefaultLabelFontWeight(
+      vtkKWFrameWithLabel::LabelFontWeightBold);};
 
   // Description:
-  // Show a special icon (lock) when the application is in 
-  // Limited Edition Mode and the label frame is disabled.
-  virtual void SetShowIconInLimitedEditionMode(int);
-  vtkBooleanMacro(ShowIconInLimitedEditionMode, int);
-  vtkGetMacro(ShowIconInLimitedEditionMode, int);
+  // Set/Get the visibility of a special icon (lock) when the application
+  // is in Limited Edition Mode and the label frame is disabled.
+  virtual void SetLimitedEditionModeIconVisibility(int);
+  vtkBooleanMacro(LimitedEditionModeIconVisibility, int);
+  vtkGetMacro(LimitedEditionModeIconVisibility, int);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -129,28 +143,34 @@ public:
   // the label.
   virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
+  // Description:
+  // Callback
+  // Ask the frame to readjust its tops margin according to the content of
+  // the LabelFrame. This method if bound to a Configure event, so
+  // the widget should adjust itself automatically most of the time.
+  virtual void AdjustMarginCallback();
+  virtual void CollapseButtonCallback();
+ 
 protected:
 
   vtkKWFrameWithLabel();
   ~vtkKWFrameWithLabel();
 
-  vtkKWFrame        *Frame;
-  vtkKWFrame        *LabelFrame;
+  vtkKWFrame          *Frame;
+  vtkKWFrame          *LabelFrame;
   vtkKWLabelWithLabel *Label;
+  vtkKWFrame          *Border;
+  vtkKWFrame          *Border2;
+  vtkKWFrame          *Groove;
+  vtkKWLabel          *Icon;
+  vtkKWIcon           *IconData;
 
-  vtkKWFrame       *Border;
-  vtkKWFrame       *Border2;
-  vtkKWFrame       *Groove;
-  vtkKWLabel        *Icon;
-  vtkKWIcon         *IconData;
+  int AllowFrameToCollapse;
+  int LimitedEditionModeIconVisibility;
 
-  int Displayed;
-  int ShowHideFrame;
-  int ShowIconInLimitedEditionMode;
-
-  static int AllowShowHide;
-  static int BoldLabel;
-  static int LabelCase;
+  static int DefaultAllowFrameToCollapse;
+  static int DefaultLabelFontWeight;
+  static int DefaultLabelCase;
 
   virtual vtkKWLabel *GetLabelIcon();
 

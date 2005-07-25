@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.37");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.38");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -219,7 +219,7 @@ void vtkPVAnimationCue::UnregisterProxies()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SetEnableZoom(int zoom)
 {
-  this->TimeLine->SetShowParameterRange(zoom);
+  this->TimeLine->SetParameterRangeVisibility(zoom);
 }
 
 //-----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
   this->TimeLineFrame->SetHeight(VTK_PV_ANIMATON_ENTRY_HEIGHT);
   
   // Create the time line associated with this entry.
-  this->TimeLine->SetShowLabel(0);
+  this->TimeLine->SetLabelVisibility(0);
   this->TimeLine->SetCanvasHeight(VTK_PV_ANIMATON_ENTRY_HEIGHT);
   this->TimeLine->SetPointMarginToCanvas(
     vtkKWParameterValueFunctionEditor::PointMarginHorizontalSides);
@@ -303,7 +303,7 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
 
   this->Frame->SetParent(this);
   this->Frame->Create(app);
-  int height = (this->TimeLine->GetShowParameterRange())? 
+  int height = (this->TimeLine->GetParameterRangeVisibility())? 
     this->TimeLine->GetParameterRange()->GetThickness() : 0;
   this->Frame->SetHeight(this->TimeLine->GetCanvasHeight() + height);
 
@@ -330,7 +330,7 @@ void vtkPVAnimationCue::InitializeObservers(vtkObject* object)
   this->Observe(object, vtkPVSimpleAnimationCue::KeysModifiedEvent);
   this->Observe(object, vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent);
   this->Observe(object, vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent);
-  if (this->TimeLine->GetShowParameterRange())
+  if (this->TimeLine->GetParameterRangeVisibility())
     {
     this->Observe(object, 
       vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent);

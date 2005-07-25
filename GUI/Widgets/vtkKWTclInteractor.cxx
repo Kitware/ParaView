@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.39");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -112,7 +112,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app);
-  this->DisplayText->ShowVerticalScrollbarOn();
+  this->DisplayText->VerticalScrollbarVisibilityOn();
 
   vtkKWText *text = this->DisplayText->GetWidget();
   text->ResizeToGridOn();

@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.32");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -35,8 +35,8 @@ vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 
   this->WindowLevelMode                  = 0;
   this->WindowLevelModeLockEndPointValue = 0;
-  this->ShowWindowLevelModeButton        = 0;
-  this->ShowValueEntry                   = 1;
+  this->WindowLevelModeButtonVisibility        = 0;
+  this->ValueEntryVisibility                   = 1;
 
   this->Window                           = 1.0;
   this->Level                            = 1.0;
@@ -392,14 +392,14 @@ void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the value entry
 
-  if (this->ShowValueEntry)
+  if (this->ValueEntryVisibility)
     {
     this->CreateValueEntry(app);
     }
 
   // Window/Level mode
 
-  if (this->ShowWindowLevelModeButton)
+  if (this->WindowLevelModeButtonVisibility)
     {
     this->CreateWindowLevelModeCheckButton(app);
     }
@@ -426,7 +426,7 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
     this->WindowLevelModeCheckButton->SetPadX(0);
     this->WindowLevelModeCheckButton->SetPadY(0);
     this->WindowLevelModeCheckButton->SetHighlightThickness(0);
-    this->WindowLevelModeCheckButton->SetIndicator(0);
+    this->WindowLevelModeCheckButton->IndicatorVisibilityOff();
     this->WindowLevelModeCheckButton->SetBalloonHelpString(
       "Place the editor in window/level mode.");
     this->WindowLevelModeCheckButton->SetCommand(
@@ -459,14 +459,14 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
 int vtkKWPiecewiseFunctionEditor::IsTopLeftFrameUsed()
 {
   return (this->Superclass::IsTopLeftFrameUsed() || 
-          this->ShowWindowLevelModeButton);
+          this->WindowLevelModeButtonVisibility);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::IsTopRightFrameUsed()
 {
   return (this->Superclass::IsTopRightFrameUsed() || 
-          this->ShowValueEntry);
+          this->ValueEntryVisibility);
 }
 
 //----------------------------------------------------------------------------
@@ -485,7 +485,7 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 
   // Value entry (in top right frame)
 
-  if (this->ShowValueEntry && 
+  if (this->ValueEntryVisibility && 
       this->ValueEntry && this->ValueEntry->IsCreated())
     {
     tk_cmd << "pack " << this->ValueEntry->GetWidgetName() 
@@ -494,7 +494,7 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 
   // Window/Level mode (in top left frame)
 
-  if (this->ShowWindowLevelModeButton &&
+  if (this->WindowLevelModeButtonVisibility &&
       this->WindowLevelModeCheckButton && 
       this->WindowLevelModeCheckButton->IsCreated())
     {
@@ -595,19 +595,19 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::SetShowValueEntry(int arg)
+void vtkKWPiecewiseFunctionEditor::SetValueEntryVisibility(int arg)
 {
-  if (this->ShowValueEntry == arg)
+  if (this->ValueEntryVisibility == arg)
     {
     return;
     }
 
-  this->ShowValueEntry = arg;
+  this->ValueEntryVisibility = arg;
 
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowValueEntry && this->IsCreated())
+  if (this->ValueEntryVisibility && this->IsCreated())
     {
     this->CreateValueEntry(this->GetApplication());
     }
@@ -620,19 +620,19 @@ void vtkKWPiecewiseFunctionEditor::SetShowValueEntry(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::SetShowWindowLevelModeButton(int arg)
+void vtkKWPiecewiseFunctionEditor::SetWindowLevelModeButtonVisibility(int arg)
 {
-  if (this->ShowWindowLevelModeButton == arg)
+  if (this->WindowLevelModeButtonVisibility == arg)
     {
     return;
     }
 
-  this->ShowWindowLevelModeButton = arg;
+  this->WindowLevelModeButtonVisibility = arg;
 
   // Make sure that if the button has to be shown, we create it on the fly if
   // needed
 
-  if (this->ShowWindowLevelModeButton && this->IsCreated())
+  if (this->WindowLevelModeButtonVisibility && this->IsCreated())
     {
     this->CreateWindowLevelModeCheckButton(this->GetApplication());
     }
@@ -895,14 +895,14 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowValueEntry: "
-     << (this->ShowValueEntry ? "On" : "Off") << endl;
+  os << indent << "ValueEntryVisibility: "
+     << (this->ValueEntryVisibility ? "On" : "Off") << endl;
 
   os << indent << "WindowLevelMode: "
      << (this->WindowLevelMode ? "On" : "Off") << endl;
 
-  os << indent << "ShowWindowLevelModeButton: "
-     << (this->ShowWindowLevelModeButton ? "On" : "Off") << endl;
+  os << indent << "WindowLevelModeButtonVisibility: "
+     << (this->WindowLevelModeButtonVisibility ? "On" : "Off") << endl;
 
   os << indent << "WindowLevelModeLockEndPointValue: "
      << (this->WindowLevelModeLockEndPointValue ? "On" : "Off") << endl;

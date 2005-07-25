@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.61");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.62");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -34,7 +34,7 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
 
   this->LabelOutsideButton = 0;
 
-  this->DialogText = NULL;
+  this->DialogTitle = NULL;
 
   this->ColorButton = vtkKWLabel::New();
   this->ButtonFrame = vtkKWFrame::New();
@@ -52,7 +52,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
     delete [] this->Command;
     }
 
-  this->SetDialogText(NULL);
+  this->SetDialogTitle(NULL);
 
   if (this->ColorButton)
     {
@@ -182,7 +182,8 @@ void vtkKWChangeColorButton::Pack()
   if (this->LabelOutsideButton)
     {
     const char *side = is_before ? "left" : "right";
-    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
+    if (this->LabelVisibility && this->HasLabel() && 
+        this->GetLabel()->IsCreated())
       {
       tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -expand y -fill both -anchor w -in " 
@@ -206,7 +207,8 @@ void vtkKWChangeColorButton::Pack()
       int col = (is_before ? 0 : 1);
       tk_cmd << "pack " << this->ButtonFrame->GetWidgetName() 
              << " -side left -expand y -fill both " << endl;
-      if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
+      if (this->LabelVisibility && this->HasLabel() && 
+          this->GetLabel()->IsCreated())
         {
         tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
                << " -sticky ns -row 0 -column " << col << " -in " 
@@ -406,7 +408,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
   if (vtkKWTkUtilities::QueryUserForColor(
         this->GetApplication(),
         this->GetWidgetName(),
-        this->DialogText,
+        this->DialogTitle,
         this->Color[0], this->Color[1], this->Color[2],
         &this->Color[0], &this->Color[1], &this->Color[2]))
     {
@@ -432,8 +434,8 @@ void vtkKWChangeColorButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "DialogText: " 
-     << (this->GetDialogText() ? this->GetDialogText() : "(none)")
+  os << indent << "DialogTitle: " 
+     << (this->GetDialogTitle() ? this->GetDialogTitle() : "(none)")
      << endl;
 
   os << indent << "LabelOutsideButton: " 

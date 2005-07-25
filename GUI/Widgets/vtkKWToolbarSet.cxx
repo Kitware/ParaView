@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.28");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.29");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -48,8 +48,8 @@ public:
 //----------------------------------------------------------------------------
 vtkKWToolbarSet::vtkKWToolbarSet()
 {
-  this->ShowBottomSeparator  = 0;
-  this->ShowTopSeparator  = 0;
+  this->BottomSeparatorVisibility  = 0;
+  this->TopSeparatorVisibility  = 0;
   this->SynchronizeToolbarsVisibilityWithRegistry  = 0;
 
   this->ToolbarVisibilityChangedCommand  = NULL;
@@ -299,7 +299,7 @@ void vtkKWToolbarSet::PackBottomSeparator()
     return;
     }
 
-  if (this->ShowBottomSeparator && this->GetNumberOfVisibleToolbars())
+  if (this->BottomSeparatorVisibility && this->GetNumberOfVisibleToolbars())
     {
     this->Script(
       "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
@@ -320,7 +320,7 @@ void vtkKWToolbarSet::PackTopSeparator()
     return;
     }
 
-  if (this->ShowTopSeparator && this->GetNumberOfVisibleToolbars())
+  if (this->TopSeparatorVisibility && this->GetNumberOfVisibleToolbars())
     {
     this->Script(
       "pack %s -side top -fill x -expand y -padx 0 -pady 2 -before %s",
@@ -677,28 +677,28 @@ void vtkKWToolbarSet::SetToolbarsWidgetsFlatAspect(int f)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::SetShowBottomSeparator(int arg)
+void vtkKWToolbarSet::SetBottomSeparatorVisibility(int arg)
 {
-  if (this->ShowBottomSeparator == arg)
+  if (this->BottomSeparatorVisibility == arg)
     {
     return;
     }
 
-  this->ShowBottomSeparator = arg;
+  this->BottomSeparatorVisibility = arg;
   this->Modified();
 
   this->PackBottomSeparator();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::SetShowTopSeparator(int arg)
+void vtkKWToolbarSet::SetTopSeparatorVisibility(int arg)
 {
-  if (this->ShowTopSeparator == arg)
+  if (this->TopSeparatorVisibility == arg)
     {
     return;
     }
 
-  this->ShowTopSeparator = arg;
+  this->TopSeparatorVisibility = arg;
   this->Modified();
 
   this->PackTopSeparator();
@@ -932,10 +932,10 @@ void vtkKWToolbarSet::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "ToolbarsFrame: " << this->ToolbarsFrame << endl;
-  os << indent << "ShowBottomSeparator: " 
-     << (this->ShowBottomSeparator ? "On" : "Off") << endl;
-  os << indent << "ShowTopSeparator: " 
-     << (this->ShowTopSeparator ? "On" : "Off") << endl;
+  os << indent << "BottomSeparatorVisibility: " 
+     << (this->BottomSeparatorVisibility ? "On" : "Off") << endl;
+  os << indent << "TopSeparatorVisibility: " 
+     << (this->TopSeparatorVisibility ? "On" : "Off") << endl;
   os << indent << "SynchronizeToolbarsVisibilityWithRegistry: " 
      << (this->SynchronizeToolbarsVisibilityWithRegistry ? "On" : "Off") 
      << endl;

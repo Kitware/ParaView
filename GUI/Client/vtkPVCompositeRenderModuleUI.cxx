@@ -31,7 +31,7 @@
 #include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.28");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -317,7 +317,6 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
   if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1)
     {
     this->ParallelRenderParametersFrame->SetParent(this); 
-    this->ParallelRenderParametersFrame->ShowHideFrameOn();
     this->ParallelRenderParametersFrame->Create(app);
     this->ParallelRenderParametersFrame->SetLabelText(
       "Parallel Rendering Parameters");

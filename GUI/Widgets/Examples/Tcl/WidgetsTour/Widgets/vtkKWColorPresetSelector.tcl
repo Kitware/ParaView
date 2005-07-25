@@ -22,10 +22,10 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
   cpsel_tfunc_editor SetCanvasHeight 30
   cpsel_tfunc_editor SetPadX 2
   cpsel_tfunc_editor SetPadY 2
-  cpsel_tfunc_editor ShowParameterRangeOff
-  cpsel_tfunc_editor ShowParameterEntryOff
-  cpsel_tfunc_editor ShowRangeLabelOff
-  cpsel_tfunc_editor ShowColorSpaceOptionMenuOff
+  cpsel_tfunc_editor ParameterRangeVisibilityOff
+  cpsel_tfunc_editor ParameterEntryVisibilityOff
+  cpsel_tfunc_editor RangeLabelVisibilityOff
+  cpsel_tfunc_editor ColorSpaceOptionMenuVisibilityOff
   cpsel_tfunc_editor ReadOnlyOn
   cpsel_tfunc_editor SetColorTransferFunction cpsel_func
   cpsel_tfunc_editor SetBalloonHelpString \

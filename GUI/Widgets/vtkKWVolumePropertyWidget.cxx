@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.18");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -63,11 +63,11 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->DisableCommands               = 0;
   this->EnableShadingForAllComponents = 0;
 
-  this->ShowComponentSelection = 1;
-  this->ShowInterpolationType = 1;
-  this->ShowMaterialProperty = 1;
-  this->ShowGradientOpacityFunction = 1;
-  this->ShowComponentWeights = 1;
+  this->ComponentSelectionVisibility = 1;
+  this->InterpolationTypeVisibility = 1;
+  this->MaterialPropertyVisibility = 1;
+  this->GradientOpacityFunctionVisibility = 1;
+  this->ComponentWeightsVisibility = 1;
 
   this->VolumePropertyChangedCommand  = NULL;
   this->VolumePropertyChangingCommand = NULL;
@@ -247,7 +247,6 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // Frame
 
   this->EditorFrame->SetParent(this);
-  this->EditorFrame->ShowHideFrameOn();
   this->EditorFrame->Create(app);
   this->EditorFrame->SetLabelText("Volume Appearance Settings");
 
@@ -340,8 +339,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     vtkKWParameterValueFunctionEditor::LabelPositionTop);
   this->ScalarOpacityFunctionEditor->SetRangeLabelPosition(
     vtkKWParameterValueFunctionEditor::RangeLabelPositionTop);
-  this->ScalarOpacityFunctionEditor->ShowValueRangeOff();
-  this->ScalarOpacityFunctionEditor->ShowWindowLevelModeButtonOn();
+  this->ScalarOpacityFunctionEditor->ValueRangeVisibilityOff();
+  this->ScalarOpacityFunctionEditor->WindowLevelModeButtonVisibilityOn();
   this->ScalarOpacityFunctionEditor->Create(app);
 
   this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()->SetText("S:");
@@ -357,7 +356,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Scalar Opacity Unit Distance
 
-  this->ScalarOpacityFunctionEditor->ShowUserFrameOn();
+  this->ScalarOpacityFunctionEditor->UserFrameVisibilityOn();
   this->ScalarOpacityUnitDistanceScale->SetParent(
     this->ScalarOpacityFunctionEditor->GetUserFrame());
   this->ScalarOpacityUnitDistanceScale->PopupScaleOn();
@@ -388,8 +387,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ScalarColorFunctionEditor->LockEndPointsParameterOn();
   this->ScalarColorFunctionEditor->SetPointMarginToCanvas(
     this->ScalarOpacityFunctionEditor->GetPointMarginToCanvas());
-  this->ScalarColorFunctionEditor->SetShowValueRange(
-    this->ScalarOpacityFunctionEditor->GetShowValueRange());
+  this->ScalarColorFunctionEditor->SetValueRangeVisibility(
+    this->ScalarOpacityFunctionEditor->GetValueRangeVisibility());
   this->ScalarColorFunctionEditor->SetLabelPosition(
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->ScalarColorFunctionEditor->SetRangeLabelPosition(
@@ -410,14 +409,14 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Lock opacity and color
 
-  this->ScalarColorFunctionEditor->ShowUserFrameOn();
+  this->ScalarColorFunctionEditor->UserFrameVisibilityOn();
   this->LockOpacityAndColorCheckButton->SetParent(
     this->ScalarColorFunctionEditor->GetUserFrame());
   this->LockOpacityAndColorCheckButton->Create(app);
   this->LockOpacityAndColorCheckButton->SetPadX(0);
   this->LockOpacityAndColorCheckButton->SetPadY(0);
   this->LockOpacityAndColorCheckButton->SetHighlightThickness(0);
-  this->LockOpacityAndColorCheckButton->SetIndicator(0);
+  this->LockOpacityAndColorCheckButton->IndicatorVisibilityOff();
   this->LockOpacityAndColorCheckButton->SetText("Lock");
   this->LockOpacityAndColorCheckButton->SetBalloonHelpString(
     "Lock the opacity and color functions together.");
@@ -441,8 +440,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->ScalarOpacityFunctionEditor->GetPointMarginToCanvas());
   this->GradientOpacityFunctionEditor->SetCanvasHeight(
     this->ScalarColorFunctionEditor->GetCanvasHeight());
-  this->GradientOpacityFunctionEditor->SetShowValueRange(
-    this->ScalarOpacityFunctionEditor->GetShowValueRange());
+  this->GradientOpacityFunctionEditor->SetValueRangeVisibility(
+    this->ScalarOpacityFunctionEditor->GetValueRangeVisibility());
   this->GradientOpacityFunctionEditor->SetLabelPosition(
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->GradientOpacityFunctionEditor->SetRangeLabelPosition(
@@ -462,7 +461,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Enable gradient opacity
 
-  this->GradientOpacityFunctionEditor->ShowUserFrameOn();
+  this->GradientOpacityFunctionEditor->UserFrameVisibilityOn();
   this->EnableGradientOpacityOptionMenu->SetParent(
     this->GradientOpacityFunctionEditor->GetUserFrame());
   this->EnableGradientOpacityOptionMenu->Create(app);
@@ -608,7 +607,7 @@ void vtkKWVolumePropertyWidget::Pack()
   
   // Select Component (SC)
 
-  if (this->ShowComponentSelection)
+  if (this->ComponentSelectionVisibility)
     {
     tk_cmd << "grid " << this->ComponentSelectionWidget->GetWidgetName()
            << " -sticky nw " << col0 << " -row " << row << pad << endl;
@@ -618,7 +617,7 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Interpolation type (IT)
 
-  if (this->ShowInterpolationType)
+  if (this->InterpolationTypeVisibility)
     {
     tk_cmd << "grid " << this->InterpolationTypeOptionMenu->GetWidgetName()
            << " -sticky nw " << col0 << " -row " << row << pad
@@ -628,7 +627,7 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Material Property (MP)
 
-  if (this->ShowMaterialProperty)
+  if (this->MaterialPropertyVisibility)
     {
     tk_cmd << "grid " << this->MaterialPropertyWidget->GetWidgetName()
            << " -sticky nw " << col0 << " -row " << row << pad << endl;
@@ -637,7 +636,7 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Enable Shading (ES)
 
-  if (this->ShowMaterialProperty)
+  if (this->MaterialPropertyVisibility)
     {
     tk_cmd << "grid " << this->EnableShadingCheckButton->GetWidgetName()
            << " -sticky nw " << col0 << " -row " << row << pad << endl;
@@ -670,7 +669,7 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Gradient Opacity Function (GOF)
 
-  if (this->ShowGradientOpacityFunction)
+  if (this->GradientOpacityFunctionVisibility)
     {
     tk_cmd << "grid " << this->GradientOpacityFunctionEditor->GetWidgetName()
            << " -sticky ew -column 0 -row " << row << colspan << pad_ed << endl;
@@ -679,7 +678,7 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Component weights (CW)
 
-  if (this->ShowComponentWeights)
+  if (this->ComponentWeightsVisibility)
     {
     tk_cmd << "grid " << this->ComponentWeightScaleSet->GetWidgetName()
            << " -sticky ew -column 0 -row " << row << colspan << pad << endl;
@@ -1344,14 +1343,14 @@ void vtkKWVolumePropertyWidget::SetEnableShadingForAllComponents(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::SetShowComponentSelection(int arg)
+void vtkKWVolumePropertyWidget::SetComponentSelectionVisibility(int arg)
 {
-  if (this->ShowComponentSelection == arg)
+  if (this->ComponentSelectionVisibility == arg)
     {
     return;
     }
 
-  this->ShowComponentSelection = arg;
+  this->ComponentSelectionVisibility = arg;
 
   this->Modified();
 
@@ -1359,14 +1358,14 @@ void vtkKWVolumePropertyWidget::SetShowComponentSelection(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::SetShowInterpolationType(int arg)
+void vtkKWVolumePropertyWidget::SetInterpolationTypeVisibility(int arg)
 {
-  if (this->ShowInterpolationType == arg)
+  if (this->InterpolationTypeVisibility == arg)
     {
     return;
     }
 
-  this->ShowInterpolationType = arg;
+  this->InterpolationTypeVisibility = arg;
 
   this->Modified();
 
@@ -1374,14 +1373,14 @@ void vtkKWVolumePropertyWidget::SetShowInterpolationType(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::SetShowMaterialProperty(int arg)
+void vtkKWVolumePropertyWidget::SetMaterialPropertyVisibility(int arg)
 {
-  if (this->ShowMaterialProperty == arg)
+  if (this->MaterialPropertyVisibility == arg)
     {
     return;
     }
 
-  this->ShowMaterialProperty = arg;
+  this->MaterialPropertyVisibility = arg;
 
   this->Modified();
 
@@ -1389,14 +1388,14 @@ void vtkKWVolumePropertyWidget::SetShowMaterialProperty(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::SetShowGradientOpacityFunction(int arg)
+void vtkKWVolumePropertyWidget::SetGradientOpacityFunctionVisibility(int arg)
 {
-  if (this->ShowGradientOpacityFunction == arg)
+  if (this->GradientOpacityFunctionVisibility == arg)
     {
     return;
     }
 
-  this->ShowGradientOpacityFunction = arg;
+  this->GradientOpacityFunctionVisibility = arg;
 
   this->Modified();
 
@@ -1404,14 +1403,14 @@ void vtkKWVolumePropertyWidget::SetShowGradientOpacityFunction(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::SetShowComponentWeights(int arg)
+void vtkKWVolumePropertyWidget::SetComponentWeightsVisibility(int arg)
 {
-  if (this->ShowComponentWeights == arg)
+  if (this->ComponentWeightsVisibility == arg)
     {
     return;
     }
 
-  this->ShowComponentWeights = arg;
+  this->ComponentWeightsVisibility = arg;
 
   this->Modified();
 
@@ -1904,16 +1903,16 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DisableCommands ? "On" : "Off") << endl;
   os << indent << "EnableShadingForAllComponents: "
      << (this->EnableShadingForAllComponents ? "On" : "Off") << endl;
-  os << indent << "ShowComponentSelection: "
-     << (this->ShowComponentSelection ? "On" : "Off") << endl;
-  os << indent << "ShowInterpolationType: "
-     << (this->ShowInterpolationType ? "On" : "Off") << endl;
-  os << indent << "ShowMaterialProperty: "
-     << (this->ShowMaterialProperty ? "On" : "Off") << endl;
-  os << indent << "ShowGradientOpacityFunction: "
-     << (this->ShowGradientOpacityFunction ? "On" : "Off") << endl;
-  os << indent << "ShowComponentWeights: "
-     << (this->ShowComponentWeights ? "On" : "Off") << endl;
+  os << indent << "ComponentSelectionVisibility: "
+     << (this->ComponentSelectionVisibility ? "On" : "Off") << endl;
+  os << indent << "InterpolationTypeVisibility: "
+     << (this->InterpolationTypeVisibility ? "On" : "Off") << endl;
+  os << indent << "MaterialPropertyVisibility: "
+     << (this->MaterialPropertyVisibility ? "On" : "Off") << endl;
+  os << indent << "GradientOpacityFunctionVisibility: "
+     << (this->GradientOpacityFunctionVisibility ? "On" : "Off") << endl;
+  os << indent << "ComponentWeightsVisibility: "
+     << (this->ComponentWeightsVisibility ? "On" : "Off") << endl;
   os << indent << "ScalarOpacityFunctionEditor: ";
   if (this->ScalarOpacityFunctionEditor)
     {

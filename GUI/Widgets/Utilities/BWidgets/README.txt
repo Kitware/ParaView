@@ -19,6 +19,17 @@ The changes are:
   namespace eval ::BWIDGET {};
   set ::BWIDGET::LIBRARY {};
 
+- The documentation states: "A <<TreeSelect>> virtual event is generated any
+  time the selection in the tree changes.". It is actually not true, it
+  is only generated for interaction done with the mouse, not the keyboard
+  for example. In order for it to work all the time, the following code
+    switch -- $cmd {
+        "add" - "clear" - "remove" - "set" - "toggle" {
+            event generate $path <<TreeSelect>>
+        }
+    }
+  should be moved from Tree::_mouse_select to the end of Tree::selection
+
 --------------------------------------------------------------------------
 
 BWidget ToolKit 1.7.0				December 2003

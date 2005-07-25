@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.369");
+vtkCxxRevisionMacro(vtkPVApplication, "1.370");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -410,8 +410,8 @@ vtkPVApplication::vtkPVApplication()
 
   // GUI style & consistency
 
-  vtkKWFrameWithLabel::AllowShowHideOn();
-  vtkKWFrameWithLabel::BoldLabelOn();
+  vtkKWFrameWithLabel::SetDefaultAllowFrameToCollapse(1);
+  vtkKWFrameWithLabel::SetDefaultLabelFontWeightToBold();
   
   // The following is necessary to make sure that the tcl object
   // created has the right command function. Without this,
@@ -1091,7 +1091,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Splash screen ?
 
-  if (this->SupportSplashScreen && this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
     this->CreateSplashScreen();
     this->GetSplashScreen()->SetProgressMessage("Initializing application...");
@@ -1116,7 +1116,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   ui->AddObserver(vtkKWEvent::ErrorMessageEvent, ccm);
   ccm->Delete();
 
-  if (this->SupportSplashScreen && this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
     this->GetSplashScreen()->SetProgressMessage("Creating icons...");
     }
@@ -1128,7 +1128,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     ui->InitializeDefaultInterfacesOff();
     }
 
-  if (this->SupportSplashScreen && this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
     this->GetSplashScreen()->SetProgressMessage("Creating UI...");
     }
@@ -1174,14 +1174,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Check if there is an existing ParaViewTrace file.
 
-  if (this->SupportSplashScreen && this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
     this->GetSplashScreen()->SetProgressMessage("Looking for old trace files...");
     }
   char traceName[128];
   int foundTrace = this->CheckForTraceFile(traceName, 128);
 
-  if (this->SupportSplashScreen && this->ShowSplashScreen)
+  if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
     this->GetSplashScreen()->Withdraw();
     }

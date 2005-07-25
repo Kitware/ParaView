@@ -62,32 +62,32 @@ public:
   virtual void SetSelectionListCommand(
     vtkObject *object, const char *method);
   vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
-  virtual void SetShowSelectionList(int);
-  vtkGetMacro(ShowSelectionList, int);
-  vtkBooleanMacro(ShowSelectionList, int);
+  virtual void SetSelectionListVisibility(int);
+  vtkGetMacro(SelectionListVisibility, int);
+  vtkBooleanMacro(SelectionListVisibility, int);
 
   // Description:
-  // Show close (button and menu entry)
+  // Allow the close functionality (button and menu entry)
   // If set, a close button is added in the top right corner,
   // and a "Close" entry is added to the end of the selection list.
   // Set the close command, called when the the close button or the menu entry
   // is selected by the user.
   // This command will be passed a pointer to this object.
-  virtual void SetShowClose(int);
-  vtkGetMacro(ShowClose, int);
-  vtkBooleanMacro(ShowClose, int);
+  virtual void SetAllowClose(int);
+  vtkGetMacro(AllowClose, int);
+  vtkBooleanMacro(AllowClose, int);
   virtual void SetCloseCommand(
     vtkObject *object, const char *method);
   vtkGetObjectMacro(CloseButton, vtkKWPushButton);
 
   // Description:
-  // Show change title (menu entry)
+  // Allow title to be changed (menu entry)
   // If set, a "Change title" entry is added to the end of the selection list.
   // Set the command, called when the menu entry is selected by the user.
   // This command will be passed a pointer to this object.
-  virtual void SetShowChangeTitle(int);
-  vtkGetMacro(ShowChangeTitle, int);
-  vtkBooleanMacro(ShowChangeTitle, int);
+  virtual void SetAllowChangeTitle(int);
+  vtkGetMacro(AllowChangeTitle, int);
+  vtkBooleanMacro(AllowChangeTitle, int);
   virtual void SetChangeTitleCommand(
     vtkObject *object, const char *method);
 
@@ -122,11 +122,11 @@ public:
     { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Show/Hide the toolbar set.
+  // Set/Get the toolbar set visibility.
   vtkGetObjectMacro(ToolbarSet, vtkKWToolbarSet);
-  virtual void SetShowToolbarSet(int);
-  vtkGetMacro(ShowToolbarSet, int);
-  vtkBooleanMacro(ShowToolbarSet, int);
+  virtual void SetToolbarSetVisibility(int);
+  vtkGetMacro(ToolbarSetVisibility, int);
+  vtkBooleanMacro(ToolbarSetVisibility, int);
 
   // Description:
   // Callbacks
@@ -182,10 +182,10 @@ protected:
   char *ChangeTitleCommand;
 
   int Selected;
-  int ShowSelectionList;
-  int ShowClose;
-  int ShowChangeTitle;
-  int ShowToolbarSet;
+  int SelectionListVisibility;
+  int AllowClose;
+  int AllowChangeTitle;
+  int ToolbarSetVisibility;
 
   // PIMPL Encapsulation for STL containers
 

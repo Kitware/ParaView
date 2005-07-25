@@ -90,7 +90,7 @@ public:
   virtual void ErrorMessage(const char* message);
 
   // Description:
-  // Show or hide the error / warning icon in the tray.
+  // Set the error / warning icon in the tray.
   // Note that if StatusFrameVisibility is Off, you may want to move the
   // tray frame to a different position (say, in a toolbar), using
   // the SetTrayFramePosition() method.

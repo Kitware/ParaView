@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.12");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.13");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -145,7 +145,6 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
   this->Superclass::Create(app);
 
   this->KeyFramePropertiesFrame->SetParent(this);
-  this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app);
   this->KeyFramePropertiesFrame->SetLabelText(
     VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);

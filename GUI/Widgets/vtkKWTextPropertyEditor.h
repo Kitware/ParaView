@@ -71,42 +71,42 @@ public:
   vtkGetMacro(LongFormat, int);
 
   // Description:
-  // Show the label on top (default, otherwise on left. 
+  // Display the label on top (default, otherwise on left. 
   // Valid if LongFormat is On.
   virtual void SetLabelOnTop(int);
   vtkBooleanMacro(LabelOnTop, int);
   vtkGetMacro(LabelOnTop, int);
 
   // Description:
-  // Show label.
-  virtual void SetShowLabel(int);
-  vtkBooleanMacro(ShowLabel, int);
-  vtkGetMacro(ShowLabel, int);
+  // Set/Get the label visibility.
+  virtual void SetLabelVisibility(int);
+  vtkBooleanMacro(LabelVisibility, int);
+  vtkGetMacro(LabelVisibility, int);
   vtkGetObjectMacro(Label, vtkKWLabel);
 
   // Description:
-  // Show color.
-  virtual void SetShowColor(int);
-  vtkBooleanMacro(ShowColor, int);
-  vtkGetMacro(ShowColor, int);
+  // Set/Get the color interface visibility.
+  virtual void SetColorVisibility(int);
+  vtkBooleanMacro(ColorVisibility, int);
+  vtkGetMacro(ColorVisibility, int);
 
   // Description:
-  // Show font family.
-  virtual void SetShowFontFamily(int);
-  vtkBooleanMacro(ShowFontFamily, int);
-  vtkGetMacro(ShowFontFamily, int);
+  // Set/Get the font family interface visibility.
+  virtual void SetFontFamilyVisibility(int);
+  vtkBooleanMacro(FontFamilyVisibility, int);
+  vtkGetMacro(FontFamilyVisibility, int);
 
   // Description:
-  // Show style.
-  virtual void SetShowStyles(int);
-  vtkBooleanMacro(ShowStyles, int);
-  vtkGetMacro(ShowStyles, int);
+  // Set/Get the style interface visibility.
+  virtual void SetStylesVisibility(int);
+  vtkBooleanMacro(StylesVisibility, int);
+  vtkGetMacro(StylesVisibility, int);
 
   // Description:
-  // Show opacity.
-  virtual void SetShowOpacity(int);
-  vtkBooleanMacro(ShowOpacity, int);
-  vtkGetMacro(ShowOpacity, int);
+  // Set/Get the opacity interface visibility.
+  virtual void SetOpacityVisibility(int);
+  vtkBooleanMacro(OpacityVisibility, int);
+  vtkGetMacro(OpacityVisibility, int);
 
   // Description:
   // Set/Get the command executed each time a change is made to the
@@ -121,11 +121,11 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
-  // Show copy button. This button can be used to synchronize different
-  // text property widgets.
-  virtual void SetShowCopy(int);
-  vtkBooleanMacro(ShowCopy, int);
-  vtkGetMacro(ShowCopy, int);
+  // Set/Get the copy button visibility. This button can be used to
+  // synchronize different text property widgets.
+  virtual void SetCopyVisibility(int);
+  vtkBooleanMacro(CopyVisibility, int);
+  vtkGetMacro(CopyVisibility, int);
   virtual vtkKWPushButton* GetCopyButton();
 
   // Description:
@@ -186,26 +186,26 @@ protected:
 
   int LongFormat;
 
-  int ShowLabel;
+  int LabelVisibility;
   int LabelOnTop;
   vtkKWLabel *Label;
 
-  int ShowColor;
+  int ColorVisibility;
   vtkKWChangeColorButton *ChangeColorButton;
 
-  int ShowFontFamily;
+  int FontFamilyVisibility;
   vtkKWMenuButtonWithLabel *FontFamilyOptionMenu;
 
-  int ShowStyles;
+  int StylesVisibility;
   vtkKWCheckButtonSetWithLabel *StylesCheckButtonSet;
   
-  int ShowOpacity;
+  int OpacityVisibility;
   vtkKWScale *OpacityScale;
 
   char *ChangedCommand;
   char *ColorChangedCommand;
 
-  int ShowCopy;
+  int CopyVisibility;
   vtkKWPushButtonSetWithLabel *PushButtonSet;
 
 private:

@@ -19,12 +19,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.40");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
 {
-  this->Indicator = 1;
+  this->IndicatorVisibility = 1;
   this->MyText = 0;
   this->VariableName = NULL;
 }
@@ -73,14 +73,14 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::SetIndicator(int ind)
+void vtkKWCheckButton::SetIndicatorVisibility(int ind)
 {
-  if (ind != this->Indicator)
+  if (ind != this->IndicatorVisibility)
     {
-    this->Indicator = ind;
+    this->IndicatorVisibility = ind;
     this->Modified();
     this->SetConfigurationOptionAsInt(
-      "-indicatoron", (this->Indicator ? 1 : 0));
+      "-indicatoron", (this->IndicatorVisibility ? 1 : 0));
     }
   this->SetMyText(0);
 }
@@ -167,7 +167,7 @@ void vtkKWCheckButton::Configure()
   const char *wname = this->GetWidgetName();
 
   this->Script("%s configure -indicatoron %d",
-               wname, (this->Indicator ? 1 : 0));
+               wname, (this->IndicatorVisibility ? 1 : 0));
 
   this->SetTextOption("-text", this->MyText);
 

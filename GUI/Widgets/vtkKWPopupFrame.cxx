@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.11");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrame::vtkKWPopupFrame()
@@ -85,7 +85,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app)
 
   if (this->PopupMode)
     {
-    this->Frame->ShowHideFrameOff();
+    this->Frame->AllowFrameToCollapseOff();
     this->Frame->SetParent(this->PopupButton->GetPopupFrame());
     }
   else

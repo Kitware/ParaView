@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.25");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -176,13 +176,13 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkFrame->Create(app);
 
   this->LmkMainFrame->SetParent(this->LmkFrame);
-  this->LmkMainFrame->ShowHideFrameOn();
+  this->LmkMainFrame->AllowFrameToCollapseOn();
   this->LmkMainFrame->Create(app);
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
 
   this->Checkbox->SetParent(this->LmkMainFrame->GetLabelFrame());
-  this->Checkbox->SetIndicator(1);
+  this->Checkbox->IndicatorVisibilityOn();
   this->Checkbox->Create(app);
   this->Checkbox->SetSelectedState(0);
 
@@ -233,7 +233,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkDatasetLabel->SetText("Dataset: ");
 
   this->LmkCommentsFrame->SetParent(this->LmkRightFrame);
-  this->LmkCommentsFrame->ShowHideFrameOn();
+  this->LmkCommentsFrame->AllowFrameToCollapseOn();
   this->LmkCommentsFrame->Create(app);
   this->LmkCommentsFrame->SetLabelText("Comments:");
 
@@ -246,7 +246,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->Pack();
 
-  this->LmkCommentsFrame->PerformShowHideFrame();
+  this->LmkCommentsFrame->CollapseFrame();
 
   // Update enable state
   this->UpdateEnableState();

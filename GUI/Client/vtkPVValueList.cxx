@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.31");
+vtkCxxRevisionMacro(vtkPVValueList, "1.32");
 
 const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 
@@ -310,8 +310,8 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->GenerateRangeWidget->Create(app);
   this->GenerateRangeWidget->SetWholeRange(
     -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
-  this->GenerateRangeWidget->ShowEntriesOn();
-  this->GenerateRangeWidget->ShowLabelOff();
+  this->GenerateRangeWidget->EntriesVisibilityOn();
+  this->GenerateRangeWidget->LabelVisibilityOff();
   this->GenerateRangeWidget->GetEntry1()->SetWidth(7);
   this->GenerateRangeWidget->GetEntry2()->SetWidth(7);
   this->GenerateRangeWidget->SetEntry1PositionToLeft();

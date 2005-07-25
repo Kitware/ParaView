@@ -44,7 +44,7 @@ const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.263");
+vtkCxxRevisionMacro(vtkKWWindow, "1.264");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -374,8 +374,8 @@ void vtkKWWindow::Create(vtkKWApplication *app)
 
   this->SecondaryToolbarSet->SetParent(this->MainSplitFrame->GetFrame2());
   this->SecondaryToolbarSet->Create(app);
-  this->SecondaryToolbarSet->ShowTopSeparatorOn();
-  this->SecondaryToolbarSet->ShowBottomSeparatorOff();
+  this->SecondaryToolbarSet->TopSeparatorVisibilityOn();
+  this->SecondaryToolbarSet->BottomSeparatorVisibilityOff();
   this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(
     this, "ToolbarVisibilityChangedCallback");

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.24");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -113,13 +113,13 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->MainFrame->Create(app);
 
   this->LabelFrame->SetParent(this->MainFrame);
-  this->LabelFrame->ShowHideFrameOn();
+  this->LabelFrame->AllowFrameToCollapseOn();
   this->LabelFrame->Create(app);
   this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
 
   this->Checkbox->SetParent(this->LabelFrame->GetLabelFrame());
-  this->Checkbox->SetIndicator(1);
+  this->Checkbox->IndicatorVisibilityOn();
   this->Checkbox->Create(app);
   this->Checkbox->SetSelectedState(0);
 //  this->Checkbox->SetCommand(this, "SelectCallback");

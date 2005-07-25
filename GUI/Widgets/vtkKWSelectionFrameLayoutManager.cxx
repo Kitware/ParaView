@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.29");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -956,10 +956,10 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
     this->PropagateEnableState(widget);
     widget->SetCloseCommand(
       this, "CloseWidgetCallback");
-    widget->ShowCloseOn();
+    widget->AllowCloseOn();
     widget->SetChangeTitleCommand(
       this, "ChangeWidgetTitleCallback");
-    widget->ShowChangeTitleOn();
+    widget->AllowChangeTitleOn();
     widget->SetSelectCommand(
       this, "SelectWidgetCallback");
     widget->SetDoubleClickCommand(

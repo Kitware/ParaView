@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.40");
+vtkCxxRevisionMacro(vtkKWExtent, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -30,7 +30,7 @@ vtkKWExtent::vtkKWExtent()
   for (int i = 0; i < 3; i++)
     {
     this->Range[i] = vtkKWRange::New();
-    this->ShowExtent[i] = 1;
+    this->ExtentVisibility[i] = 1;
     this->Extent[i * 2] = VTK_DOUBLE_MAX;
     this->Extent[i * 2 + 1] = VTK_DOUBLE_MIN;
     }
@@ -70,8 +70,8 @@ void vtkKWExtent::Create(vtkKWApplication *app)
   for (int i = 0; i < 3; i++)
     {
     this->Range[i]->SetParent(this);
-    this->Range[i]->ShowLabelOn();
-    this->Range[i]->ShowEntriesOn();
+    this->Range[i]->LabelVisibilityOn();
+    this->Range[i]->EntriesVisibilityOn();
     this->Range[i]->Create(app);
     this->Range[i]->SetCommand(this, "ExtentChangedCallback");
     this->Range[i]->AdjustResolutionOn();
@@ -111,7 +111,7 @@ void vtkKWExtent::Pack()
 
   for (int i = 0; i < 3; i++)
     {
-    if (this->ShowExtent[i])
+    if (this->ExtentVisibility[i])
       {
       tk_cmd << "pack "
              << this->Range[i]->GetWidgetName() << " "
@@ -229,14 +229,14 @@ void vtkKWExtent::SetExtent(double er[6])
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetShowExtent(int index, int arg)
+void vtkKWExtent::SetExtentVisibility(int index, int arg)
 {
-  if (index < 0 || index > 2 || this->ShowExtent[index] == arg)
+  if (index < 0 || index > 2 || this->ExtentVisibility[index] == arg)
     {
     return;
     }
 
-  this->ShowExtent[index] = arg;
+  this->ExtentVisibility[index] = arg;
   this->Pack();
   this->Modified();
 }
@@ -454,8 +454,8 @@ void vtkKWExtent::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Extent: " << this->GetExtent() << endl;
   for (int i = 0; i < 3; i++)
     {
-    os << indent << "ShowExtent[" << i << "]: " 
-       << (this->ShowExtent[i] ? "On" : "Off") << endl;
+    os << indent << "ExtentVisibility[" << i << "]: " 
+       << (this->ExtentVisibility[i] ? "On" : "Off") << endl;
     }
 }
 

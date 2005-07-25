@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.17");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -294,13 +294,13 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   if (this->PopupMode)
     {
-    this->MaterialPropertiesFrame->ShowHideFrameOff();
+    this->MaterialPropertiesFrame->AllowFrameToCollapseOff();
     this->MaterialPropertiesFrame->SetParent(
       this->PopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
-    this->MaterialPropertiesFrame->ShowHideFrameOn();
+    this->MaterialPropertiesFrame->AllowFrameToCollapseOn();
     this->MaterialPropertiesFrame->SetParent(this);
     }
   this->MaterialPropertiesFrame->Create(app);

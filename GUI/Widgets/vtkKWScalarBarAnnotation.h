@@ -97,10 +97,10 @@ public:
   virtual void NumberOfLabelsEndCallback();
 
   // Description:
-  // Show/Hide the LabelFormat UI, which might be a bit confusion
-  virtual void SetShowLabelFormat(int i);
-  vtkGetMacro(ShowLabelFormat, int);
-  vtkBooleanMacro(ShowLabelFormat, int);
+  // Set/Get the LabelFormat UI visibility, which might be a bit confusing
+  virtual void SetLabelFormatVisibility(int i);
+  vtkGetMacro(LabelFormatVisibility, int);
+  vtkBooleanMacro(LabelFormatVisibility, int);
 
   // Description:
   // Access to sub-widgets
@@ -128,7 +128,7 @@ protected:
   int AnnotationChangedEvent;
   int ScalarComponentChangedEvent;
   int NumberOfComponents;
-  int ShowLabelFormat;
+  int LabelFormatVisibility;
 
   vtkScalarBarWidget      *ScalarBarWidget;
   vtkVolumeProperty       *VolumeProperty;

@@ -34,16 +34,16 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Show/Hide vertical scrollbar (default to On).
-  virtual void SetShowVerticalScrollbar(int val);
-  vtkGetMacro(ShowVerticalScrollbar, int);
-  vtkBooleanMacro(ShowVerticalScrollbar, int);
+  // Set/Get the vertical scrollbar visibility (default to On).
+  virtual void SetVerticalScrollbarVisibility(int val);
+  vtkGetMacro(VerticalScrollbarVisibility, int);
+  vtkBooleanMacro(VerticalScrollbarVisibility, int);
 
   // Description:
-  // Show/Hide horizontal scrollbar (default to On).
-  virtual void SetShowHorizontalScrollbar(int val);
-  vtkGetMacro(ShowHorizontalScrollbar, int);
-  vtkBooleanMacro(ShowHorizontalScrollbar, int);
+  // Set/Get the horizontal scrollbar visibility (default to On).
+  virtual void SetHorizontalScrollbarVisibility(int val);
+  vtkGetMacro(HorizontalScrollbarVisibility, int);
+  vtkBooleanMacro(HorizontalScrollbarVisibility, int);
 
   // Description:
   // Access the internal scrollbars.
@@ -65,8 +65,8 @@ protected:
 
   // Description:
   // Scrollbar visibility flags
-  int ShowVerticalScrollbar;
-  int ShowHorizontalScrollbar;
+  int VerticalScrollbarVisibility;
+  int HorizontalScrollbarVisibility;
 
   // Description:
   // Scrollbars

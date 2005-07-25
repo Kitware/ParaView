@@ -80,7 +80,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.24");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.25");
 
 
 //*****************************************************************************
@@ -1726,8 +1726,16 @@ vtkPVLookmarkManager* vtkPVLookmark::GetPVLookmarkManager()
 
 void vtkPVLookmark::EnableScrollBar()
 {
-  this->LmkMainFrame->PerformShowHideFrame();
-  this->LmkMainFrame->PerformShowHideFrame();
+  if (this->LmkMainFrame->IsFrameCollapsed())
+    {
+    this->LmkMainFrame->ExpandFrame();
+    this->LmkMainFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkMainFrame->CollapseFrame();
+    this->LmkMainFrame->ExpandFrame();
+    }
 }
 
 //----------------------------------------------------------------------------

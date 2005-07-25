@@ -55,14 +55,14 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob2->SetParent(parent);
   radiob2->Create(app);
   radiob2->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
-  radiob2->IndicatorOff();
+  radiob2->IndicatorVisibilityOff();
   radiob2->SetValue("foo");
 
   vtkKWRadioButton *radiob2b = vtkKWRadioButton::New();
   radiob2b->SetParent(parent);
   radiob2b->Create(app);
   radiob2b->SetImageToPredefinedIcon(vtkKWIcon::IconMinus);
-  radiob2b->IndicatorOff();
+  radiob2b->IndicatorVisibilityOff();
   radiob2b->SetValue("bar");
 
   radiob2->SetSelectedState(1);

@@ -83,34 +83,34 @@ public:
   virtual int IsInWindowLevelMode();
 
   // Description:
-  // Show/Hide the component selection widget
-  vtkBooleanMacro(ShowComponentSelection, int);
-  virtual void SetShowComponentSelection(int);
-  vtkGetMacro(ShowComponentSelection, int);
+  // Set/Get the component selection widget visibility
+  vtkBooleanMacro(ComponentSelectionVisibility, int);
+  virtual void SetComponentSelectionVisibility(int);
+  vtkGetMacro(ComponentSelectionVisibility, int);
 
   // Description:
-  // Show/Hide the interpolation type widget
-  vtkBooleanMacro(ShowInterpolationType, int);
-  virtual void SetShowInterpolationType(int);
-  vtkGetMacro(ShowInterpolationType, int);
+  // Set/Get the interpolation type widget visibility
+  vtkBooleanMacro(InterpolationTypeVisibility, int);
+  virtual void SetInterpolationTypeVisibility(int);
+  vtkGetMacro(InterpolationTypeVisibility, int);
 
   // Description:
-  // Show/Hide the material widget + enable shading
-  vtkBooleanMacro(ShowMaterialProperty, int);
-  virtual void SetShowMaterialProperty(int);
-  vtkGetMacro(ShowMaterialProperty, int);
+  // Set/Get the material widget + enable shading visibility
+  vtkBooleanMacro(MaterialPropertyVisibility, int);
+  virtual void SetMaterialPropertyVisibility(int);
+  vtkGetMacro(MaterialPropertyVisibility, int);
 
   // Description:
-  // Show/Hide the gradient opacity function
-  vtkBooleanMacro(ShowGradientOpacityFunction, int);
-  virtual void SetShowGradientOpacityFunction(int);
-  vtkGetMacro(ShowGradientOpacityFunction, int);
+  // Set/Get the gradient opacity function visibility
+  vtkBooleanMacro(GradientOpacityFunctionVisibility, int);
+  virtual void SetGradientOpacityFunctionVisibility(int);
+  vtkGetMacro(GradientOpacityFunctionVisibility, int);
 
   // Description:
-  // Show/Hide the component weight
-  vtkBooleanMacro(ShowComponentWeights, int);
-  virtual void SetShowComponentWeights(int);
-  vtkGetMacro(ShowComponentWeights, int);
+  // Set/Get the component weight visibility
+  vtkBooleanMacro(ComponentWeightsVisibility, int);
+  virtual void SetComponentWeightsVisibility(int);
+  vtkGetMacro(ComponentWeightsVisibility, int);
 
   // Description:
   // If true, an "Enable Shading" checkbox will be displayed and will
@@ -192,11 +192,11 @@ protected:
   int   DisableCommands;
   int   EnableShadingForAllComponents;
 
-  int   ShowComponentSelection;
-  int   ShowInterpolationType;
-  int   ShowMaterialProperty;
-  int   ShowGradientOpacityFunction;
-  int   ShowComponentWeights;
+  int   ComponentSelectionVisibility;
+  int   InterpolationTypeVisibility;
+  int   MaterialPropertyVisibility;
+  int   GradientOpacityFunctionVisibility;
+  int   ComponentWeightsVisibility;
 
   // Commands
 

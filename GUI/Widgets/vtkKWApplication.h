@@ -263,9 +263,9 @@ public:
 
   // Description:
   // Set/Get if this application should show the splash screen at startup
-  vtkGetMacro(ShowSplashScreen, int);
-  vtkSetMacro(ShowSplashScreen, int);
-  vtkBooleanMacro(ShowSplashScreen, int);
+  vtkGetMacro(SplashScreenVisibility, int);
+  vtkSetMacro(SplashScreenVisibility, int);
+  vtkBooleanMacro(SplashScreenVisibility, int);
 
   // Description:
   // Retrieve the splash screen object
@@ -375,9 +375,9 @@ public:
   // Some constants
   //BTX
   static const char *ExitDialogName;
-  static const char *ShowBalloonHelpRegKey;
+  static const char *BalloonHelpVisibilityRegKey;
   static const char *SaveUserInterfaceGeometryRegKey;
-  static const char *ShowSplashScreenRegKey;
+  static const char *SplashScreenVisibilityRegKey;
   static const char *PrintTargetDPIRegKey;
   //ETX
 
@@ -451,7 +451,7 @@ protected:
   // Description:
   // Flag stating if application supports splash screen, and shows it
   int SupportSplashScreen;
-  int ShowSplashScreen;
+  int SplashScreenVisibility;
   virtual void CreateSplashScreen() {};
 
   // Description:

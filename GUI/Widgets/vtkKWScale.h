@@ -199,10 +199,10 @@ public:
   vtkBooleanMacro(DisableScaleValueCallback, int);
 
   // Description:
-  // Show/Hide the value on top of the slide.
-  virtual void SetShowValue(int);
-  virtual int GetShowValue();
-  vtkBooleanMacro(ShowValue, int);
+  // Set/Get the visibility of the value on top of the slide.
+  virtual void SetValueVisibility(int);
+  virtual int GetValueVisibility();
+  vtkBooleanMacro(ValueVisibility, int);
 
 protected:
   vtkKWScale();

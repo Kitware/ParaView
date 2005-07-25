@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.7");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -136,7 +136,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
 
   this->Tree->SetParent(this->SplitFrame->GetFrame1());
   this->Tree->Create(app);
-  this->Tree->ShowHorizontalScrollbarOff();
+  this->Tree->HorizontalScrollbarVisibilityOff();
 
   vtkKWTree *tree = this->Tree->GetWidget();
   tree->SetPadX(0);

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.22");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -48,7 +48,7 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
   this->ScalarBarWidget         = NULL;
   this->VolumeProperty          = NULL;
   this->NumberOfComponents      = VTK_MAX_VRCOMP;
-  this->ShowLabelFormat         = 1;
+  this->LabelFormatVisibility         = 1;
 
   // GUI
 
@@ -286,7 +286,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
 
   this->TitleTextPropertyWidget->LongFormatOn();
   this->TitleTextPropertyWidget->LabelOnTopOn();
-  this->TitleTextPropertyWidget->ShowLabelOn();
+  this->TitleTextPropertyWidget->LabelVisibilityOn();
   this->TitleTextPropertyWidget->Create(app);
   this->TitleTextPropertyWidget->GetLabel()->SetText("Title properties:");
   this->TitleTextPropertyWidget->SetChangedCommand(
@@ -349,7 +349,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
 
   this->LabelTextPropertyWidget->LongFormatOn();
   this->LabelTextPropertyWidget->LabelOnTopOn();
-  this->LabelTextPropertyWidget->ShowLabelOn();
+  this->LabelTextPropertyWidget->LabelVisibilityOn();
   this->LabelTextPropertyWidget->Create(app);
   this->LabelTextPropertyWidget->GetLabel()->SetText(
     "Label text properties:");
@@ -429,7 +429,7 @@ void vtkKWScalarBarAnnotation::PackLabelFrameChildren()
 
   this->LabelFrame->UnpackChildren();
   
-  if (this->LabelFormatEntry->IsCreated() && this->ShowLabelFormat)
+  if (this->LabelFormatEntry->IsCreated() && this->LabelFormatVisibility)
     {
     this->Script(
       "pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
@@ -466,14 +466,14 @@ void vtkKWScalarBarAnnotation::PackLabelFrameChildren()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::SetShowLabelFormat(int arg)
+void vtkKWScalarBarAnnotation::SetLabelFormatVisibility(int arg)
 {
-  if (this->ShowLabelFormat == arg)
+  if (this->LabelFormatVisibility == arg)
     {
     return;
     }
 
-  this->ShowLabelFormat = arg;
+  this->LabelFormatVisibility = arg;
   this->Modified();
 
   this->PackLabelFrameChildren();
@@ -858,5 +858,5 @@ void vtkKWScalarBarAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
-  os << indent << "ShowLabelFormat: " << this->ShowLabelFormat << endl;
+  os << indent << "LabelFormatVisibility: " << this->LabelFormatVisibility << endl;
 }

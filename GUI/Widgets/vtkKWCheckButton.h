@@ -45,9 +45,9 @@ public:
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)
-  virtual void SetIndicator(int ind);
-  vtkGetMacro(Indicator, int);
-  vtkBooleanMacro(Indicator, int);
+  virtual void SetIndicatorVisibility(int ind);
+  vtkGetMacro(IndicatorVisibility, int);
+  vtkBooleanMacro(IndicatorVisibility, int);
 
   // Description:
   // Set the text.
@@ -132,7 +132,7 @@ protected:
   vtkKWCheckButton();
   ~vtkKWCheckButton();
 
-  int Indicator;
+  int IndicatorVisibility;
   char *MyText;
   char *VariableName;
 

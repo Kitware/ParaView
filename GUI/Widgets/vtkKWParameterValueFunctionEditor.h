@@ -148,8 +148,8 @@ public:
     { this->SetWholeValueRangeAndMaintainVisible(range[0], range[1]); };
 
   // Description:
-  // Show/Hide the internal label (override the super).
-  virtual void SetShowLabel(int);
+  // Set/Get the internal label visibility (override the super).
+  virtual void SetLabelVisibility(int);
 
   // Description:
   // If supported, set the label position in regards to the rest of
@@ -164,12 +164,12 @@ public:
   virtual void SetLabelPosition(int);
 
   // Description:
-  // Show the parameter range UI (the slider).
+  // Set/Get the parameter range UI visibility (the slider).
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowParameterRange, int);
-  virtual void SetShowParameterRange(int);
-  vtkGetMacro(ShowParameterRange, int);
+  vtkBooleanMacro(ParameterRangeVisibility, int);
+  virtual void SetParameterRangeVisibility(int);
+  vtkGetMacro(ParameterRangeVisibility, int);
 
   // Description:
   // Set the position of the parameter range UI.
@@ -190,12 +190,12 @@ public:
       vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom); };
 
   // Description:
-  // Show the value range UI (the slider).
+  // Set/Get the value range UI visibility (the slider).
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowValueRange, int);
-  virtual void SetShowValueRange(int);
-  vtkGetMacro(ShowValueRange, int);
+  vtkBooleanMacro(ValueRangeVisibility, int);
+  virtual void SetValueRangeVisibility(int);
+  vtkGetMacro(ValueRangeVisibility, int);
 
   // Description:
   // Access to the ranges (the sliders).
@@ -256,18 +256,18 @@ public:
       vtkKWParameterValueFunctionEditor::PointPositionCenter); };
 
   // Description:
-  // Show the range label UI.
+  // Set/Get the range label UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowRangeLabel, int);
-  virtual void SetShowRangeLabel(int);
-  vtkGetMacro(ShowRangeLabel, int);
+  vtkBooleanMacro(RangeLabelVisibility, int);
+  virtual void SetRangeLabelVisibility(int);
+  vtkGetMacro(RangeLabelVisibility, int);
 
   // Description:
-  // Show the range label at the default position (on the same line as all
+  // Display the range label at the default position (on the same line as all
   // other elements), or on top on its own line.
-  // The ShowRangeLabel parameter still has to be On for the label to be
-  // shown.
+  // The RangeLabelVisibility parameter still has to be On for the label to be
+  // displayed.
   //BTX
   enum
   {
@@ -285,18 +285,18 @@ public:
       vtkKWParameterValueFunctionEditor::RangeLabelPositionTop); };
 
   // Description:
-  // Show the parameter entry UI.
+  // Set/Get the parameter entry UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowParameterEntry, int);
-  virtual void SetShowParameterEntry(int);
-  vtkGetMacro(ShowParameterEntry, int);
+  vtkBooleanMacro(ParameterEntryVisibility, int);
+  virtual void SetParameterEntryVisibility(int);
+  vtkGetMacro(ParameterEntryVisibility, int);
 
   // Description:
-  // Show the parameter entry at the default position (on the same line as all
-  // other elements), or on the right of the canvas.
-  // The ShowParameterEntry parameter still has to be On for the entry to be
-  // shown.
+  // Display the parameter entry at the default position (on the same line
+  // as all other elements), or on the right of the canvas.
+  // The ParameterEntryVisibility parameter still has to be On for the entry
+  // to be displayed.
   //BTX
   enum
   {
@@ -323,21 +323,21 @@ public:
   // Description:
   // Access the entry
   // If you need to customize this object, make sure you first set 
-  // ShowParameterEntry to On and call Create().
+  // ParameterEntryVisibility to On and call Create().
   vtkGetObjectMacro(ParameterEntry, vtkKWEntryWithLabel);
 
   // Description:
-  // Show the user frame UI.
+  // Set/Get the user frame UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowUserFrame, int);
-  virtual void SetShowUserFrame(int);
-  vtkGetMacro(ShowUserFrame, int);
+  vtkBooleanMacro(UserFrameVisibility, int);
+  virtual void SetUserFrameVisibility(int);
+  vtkGetMacro(UserFrameVisibility, int);
 
   // Description:
   // Access the user frame
   // If you need to add elements to the user-frame, make sure you first set 
-  // ShowUserFrame to On and call Create().
+  // UserFrameVisibility to On and call Create().
   vtkGetObjectMacro(UserFrame, vtkKWFrame);
 
   // Description:
@@ -355,11 +355,11 @@ public:
   vtkGetMacro(ExpandCanvasWidth, int);
   
   // Description:
-  // Show/Hide the function line 
-  // (i.e, if set to Off, only the points are shown).
-  vtkBooleanMacro(ShowFunctionLine, int);
-  virtual void SetShowFunctionLine(int);
-  vtkGetMacro(ShowFunctionLine, int);
+  // Set/Get the function line visibility 
+  // (i.e, if set to Off, only the points are displayed).
+  vtkBooleanMacro(FunctionLineVisibility, int);
+  virtual void SetFunctionLineVisibility(int);
+  vtkGetMacro(FunctionLineVisibility, int);
 
   // Description:
   // Set/Get the line width for the function
@@ -385,10 +385,10 @@ public:
       vtkKWParameterValueFunctionEditor::LineStyleDash); };
 
   // Description:
-  // Show/Hide the canvas outline
-  vtkBooleanMacro(ShowCanvasOutline, int);
-  virtual void SetShowCanvasOutline(int);
-  vtkGetMacro(ShowCanvasOutline, int);
+  // Set/Get the canvas outline visibility
+  vtkBooleanMacro(CanvasOutlineVisibility, int);
+  virtual void SetCanvasOutlineVisibility(int);
+  vtkGetMacro(CanvasOutlineVisibility, int);
 
   // Description:
   // Set the canvas outline style.
@@ -409,18 +409,18 @@ public:
   vtkGetMacro(CanvasOutlineStyle, int);
   
   // Description:
-  // Show/Hide the canvas background
-  vtkBooleanMacro(ShowCanvasBackground, int);
-  virtual void SetShowCanvasBackground(int);
-  vtkGetMacro(ShowCanvasBackground, int);
+  // Set/Get the canvas background visibility
+  vtkBooleanMacro(CanvasBackgroundVisibility, int);
+  virtual void SetCanvasBackgroundVisibility(int);
+  vtkGetMacro(CanvasBackgroundVisibility, int);
   
   // Description:
-  // Show/Hide the parameter cursor. This is a vertical line spanning the
-  // whole value range, located at a specific position in the parameter
-  // range. Set the position using ParameterCursorPosition.
-  vtkBooleanMacro(ShowParameterCursor, int);
-  virtual void SetShowParameterCursor(int);
-  vtkGetMacro(ShowParameterCursor, int);
+  // Set/Get the parameter cursor visibility. This is a vertical line
+  // spanning the whole value range, located at a specific position in
+  // the parameter range. Set the position using ParameterCursorPosition.
+  vtkBooleanMacro(ParameterCursorVisibility, int);
+  virtual void SetParameterCursorVisibility(int);
+  vtkGetMacro(ParameterCursorVisibility, int);
 
   // Description:
   // Set/Get the parameter cursor position (inside the parameter range)
@@ -451,10 +451,10 @@ public:
   vtkGetMacro(ParameterCursorInteractionStyle, int);
 
   // Description:
-  // Show/Hide the parameter ticks
-  vtkBooleanMacro(ShowParameterTicks, int);
-  virtual void SetShowParameterTicks(int);
-  vtkGetMacro(ShowParameterTicks, int);
+  // Set/Get the parameter ticks visibility
+  vtkBooleanMacro(ParameterTicksVisibility, int);
+  virtual void SetParameterTicksVisibility(int);
+  vtkGetMacro(ParameterTicksVisibility, int);
 
   // Description:
   // Set/Get the number of parameters ticks.
@@ -467,10 +467,10 @@ public:
   vtkGetStringMacro(ParameterTicksFormat);
 
   // Description:
-  // Show/Hide the value ticks
-  vtkBooleanMacro(ShowValueTicks, int);
-  virtual void SetShowValueTicks(int);
-  vtkGetMacro(ShowValueTicks, int);
+  // Set/Get the value ticks visibility
+  vtkBooleanMacro(ValueTicksVisibility, int);
+  virtual void SetValueTicksVisibility(int);
+  vtkGetMacro(ValueTicksVisibility, int);
 
   // Description:
   // Set/Get the number of value ticks.
@@ -715,17 +715,17 @@ public:
   vtkGetMacro(ComputePointColorFromValue, int);
   
   // Description:
-  // Show the point index in the canvas.
-  vtkBooleanMacro(ShowPointIndex, int);
-  virtual void SetShowPointIndex(int);
-  vtkGetMacro(ShowPointIndex, int);
+  // Set/Get the point index visibility for each point in the canvas.
+  vtkBooleanMacro(PointIndexVisibility, int);
+  virtual void SetPointIndexVisibility(int);
+  vtkGetMacro(PointIndexVisibility, int);
 
   // Description:
-  // Show the point guideline in the canvas 
+  // Set/Get the point guideline visibility in the canvas 
   // (for ex: a vertical line at each point).
-  vtkBooleanMacro(ShowPointGuideline, int);
-  virtual void SetShowPointGuideline(int);
-  vtkGetMacro(ShowPointGuideline, int);
+  vtkBooleanMacro(PointGuidelineVisibility, int);
+  virtual void SetPointGuidelineVisibility(int);
+  vtkGetMacro(PointGuidelineVisibility, int);
 
   // Description:
   // Set/Get the line style for the guideline.
@@ -734,10 +734,10 @@ public:
   vtkGetMacro(PointGuidelineStyle, int);
 
   // Description:
-  // Show the selected point index in the canvas.
-  vtkBooleanMacro(ShowSelectedPointIndex, int);
-  virtual void SetShowSelectedPointIndex(int);
-  vtkGetMacro(ShowSelectedPointIndex, int);
+  // Set/Get the selected point index visibility in the canvas.
+  vtkBooleanMacro(SelectedPointIndexVisibility, int);
+  virtual void SetSelectedPointIndexVisibility(int);
+  vtkGetMacro(SelectedPointIndexVisibility, int);
 
   // Description:
   // Set/Get the histogram and secondary histogram over the parameter range.
@@ -776,12 +776,12 @@ public:
   vtkGetMacro(SecondaryHistogramStyle, int);
 
   // Description:
-  // Show/Hide the histogram log mode button.
+  // Set/Get the histogram log mode button visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  virtual void SetShowHistogramLogModeOptionMenu(int);
-  vtkBooleanMacro(ShowHistogramLogModeOptionMenu, int);
-  vtkGetMacro(ShowHistogramLogModeOptionMenu, int);
+  virtual void SetHistogramLogModeOptionMenuVisibility(int);
+  vtkBooleanMacro(HistogramLogModeOptionMenuVisibility, int);
+  vtkGetMacro(HistogramLogModeOptionMenuVisibility, int);
   virtual void SetHistogramLogModeChangedCommand(
     vtkObject* object,const char *method);
   virtual void InvokeHistogramLogModeChangedCommand();
@@ -1013,8 +1013,8 @@ protected:
   vtkBooleanMacro(DisableRedraw, int);
   vtkGetMacro(DisableRedraw, int);
 
-  int   ShowParameterRange;
-  int   ShowValueRange;
+  int   ParameterRangeVisibility;
+  int   ValueRangeVisibility;
   int   PointPositionInValueRange;
   int   ParameterRangePosition;
   int   CanvasHeight;
@@ -1037,22 +1037,22 @@ protected:
   int   LastPointStyle;
   int   DisableCommands;
   int   SelectedPoint;
-  int   ShowCanvasOutline;
+  int   CanvasOutlineVisibility;
   int   CanvasOutlineStyle;
   int   ParameterCursorInteractionStyle;
-  int   ShowCanvasBackground;
-  int   ShowParameterCursor;
-  int   ShowFunctionLine;
-  int   ShowPointIndex;
-  int   ShowPointGuideline;
-  int   ShowSelectedPointIndex;
-  int   ShowRangeLabel;
+  int   CanvasBackgroundVisibility;
+  int   ParameterCursorVisibility;
+  int   FunctionLineVisibility;
+  int   PointIndexVisibility;
+  int   PointGuidelineVisibility;
+  int   SelectedPointIndexVisibility;
+  int   RangeLabelVisibility;
   int   RangeLabelPosition;
   int   ParameterEntryPosition;
-  int   ShowParameterEntry;
-  int   ShowUserFrame;
-  int   ShowParameterTicks;
-  int   ShowValueTicks;
+  int   ParameterEntryVisibility;
+  int   UserFrameVisibility;
+  int   ParameterTicksVisibility;
+  int   ValueTicksVisibility;
   int   ComputeValueTicksFromHistogram;
   int   PointMarginToCanvas;
   int   TicksLength;
@@ -1131,7 +1131,7 @@ protected:
   int           HistogramStyle;
   int           SecondaryHistogramStyle;
   unsigned long LastHistogramBuildTime;
-  int           ShowHistogramLogModeOptionMenu;
+  int           HistogramLogModeOptionMenuVisibility;
   char          *HistogramLogModeChangedCommand;
 
   vtkKWMenuButton  *HistogramLogModeOptionMenu;

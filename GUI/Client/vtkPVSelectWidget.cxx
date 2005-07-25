@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.73");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.74");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -86,7 +86,6 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   this->LabeledFrame->SetParent(this);
-  this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
   if (this->EntryLabel)
     {

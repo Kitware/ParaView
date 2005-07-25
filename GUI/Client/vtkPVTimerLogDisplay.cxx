@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.35");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -131,7 +131,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app);
-  this->DisplayText->ShowVerticalScrollbarOn();
+  this->DisplayText->VerticalScrollbarVisibilityOn();
 
   vtkKWText *text = this->DisplayText->GetWidget();
   text->ResizeToGridOn();

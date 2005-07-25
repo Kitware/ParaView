@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.35");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.36");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -165,12 +165,12 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   this->VolumePropertyWidget = vtkPVVolumePropertyWidget::New();
   this->VolumePropertyWidget->SetParent(this);
-  this->VolumePropertyWidget->ShowComponentSelectionOff();
-  this->VolumePropertyWidget->ShowInterpolationTypeOff();
-  this->VolumePropertyWidget->ShowMaterialPropertyOff();
-  this->VolumePropertyWidget->ShowGradientOpacityFunctionOff();
-  this->VolumePropertyWidget->ShowComponentWeightsOff();
-  this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->ShowWindowLevelModeButtonOff();
+  this->VolumePropertyWidget->ComponentSelectionVisibilityOff();
+  this->VolumePropertyWidget->InterpolationTypeVisibilityOff();
+  this->VolumePropertyWidget->MaterialPropertyVisibilityOff();
+  this->VolumePropertyWidget->GradientOpacityFunctionVisibilityOff();
+  this->VolumePropertyWidget->ComponentWeightsVisibilityOff();
+  this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->WindowLevelModeButtonVisibilityOff();
   this->VolumePropertyWidget->Create(pvApp);
   this->VolumePropertyWidget->AddObserver(
     vtkKWEvent::VolumePropertyChangedEvent, this->VolumeAppearanceObserver);

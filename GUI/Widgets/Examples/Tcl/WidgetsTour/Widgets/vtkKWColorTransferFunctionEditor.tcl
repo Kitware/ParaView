@@ -21,7 +21,7 @@ proc vtkKWColorTransferFunctionEditorEntryPoint {parent win} {
   cpsel_tfunc1_editor SetReliefToGroove
   cpsel_tfunc1_editor SetPadX 2
   cpsel_tfunc1_editor SetPadY 2
-  cpsel_tfunc1_editor ShowParameterRangeOff
+  cpsel_tfunc1_editor ParameterRangeVisibilityOff
   cpsel_tfunc1_editor SetCanvasHeight 30
   cpsel_tfunc1_editor SetBalloonHelpString \
     "A color transfer function editor. Double-click on a point to pop-up\
@@ -92,14 +92,14 @@ proc vtkKWColorTransferFunctionEditorEntryPoint {parent win} {
 
   cpsel_tfunc2_editor SetPointPositionInValueRangeToTop
   cpsel_tfunc2_editor SetPointStyleToCursorDown
-  cpsel_tfunc2_editor ShowFunctionLineOff
-  cpsel_tfunc2_editor ShowPointGuidelineOn
-  cpsel_tfunc2_editor ShowPointIndexOff
-  cpsel_tfunc2_editor ShowSelectedPointIndexOff
+  cpsel_tfunc2_editor FunctionLineVisibilityOff
+  cpsel_tfunc2_editor PointGuidelineVisibilityOn
+  cpsel_tfunc2_editor PointIndexVisibilityOff
+  cpsel_tfunc2_editor SelectedPointIndexVisibilityOff
 
   cpsel_tfunc2_editor SetHistogram cpsel_hist
 
-  cpsel_tfunc2_editor ShowParameterTicksOn
+  cpsel_tfunc2_editor ParameterTicksVisibilityOn
   cpsel_tfunc2_editor ComputeValueTicksFromHistogramOn
   cpsel_tfunc2_editor SetParameterTicksFormat "%-#6.0f"
 

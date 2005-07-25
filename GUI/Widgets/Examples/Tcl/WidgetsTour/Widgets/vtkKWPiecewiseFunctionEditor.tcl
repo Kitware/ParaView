@@ -23,8 +23,8 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   pfed_tfunc1_editor SetPadY 2
   pfed_tfunc1_editor ExpandCanvasWidthOff
   pfed_tfunc1_editor SetCanvasWidth 250
-  pfed_tfunc1_editor ShowParameterRangeOff
-  pfed_tfunc1_editor ShowValueRangeOff
+  pfed_tfunc1_editor ParameterRangeVisibilityOff
+  pfed_tfunc1_editor ValueRangeVisibilityOff
   pfed_tfunc1_editor LockEndPointsParameterOn
   pfed_tfunc1_editor SetBalloonHelpString \
     "A transfer function editor. The parameter range slider is hidden and\
@@ -90,13 +90,13 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   pfed_tfunc2_editor SetWholeParameterRangeToFunctionRange
   pfed_tfunc2_editor SetVisibleParameterRangeToWholeParameterRange
 
-  pfed_tfunc2_editor ShowPointGuidelineOn
-  pfed_tfunc2_editor ShowPointIndexOff
-  pfed_tfunc2_editor ShowSelectedPointIndexOff
+  pfed_tfunc2_editor PointGuidelineVisibilityOn
+  pfed_tfunc2_editor PointIndexVisibilityOff
+  pfed_tfunc2_editor SelectedPointIndexVisibilityOff
 
   pfed_tfunc2_editor SetHistogram pfed_hist
 
-  pfed_tfunc2_editor ShowParameterTicksOn
+  pfed_tfunc2_editor ParameterTicksVisibilityOn
   pfed_tfunc2_editor ComputeValueTicksFromHistogramOn
   pfed_tfunc2_editor SetParameterTicksFormat "%-#6.0f"
 

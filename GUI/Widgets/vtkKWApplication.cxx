@@ -61,14 +61,14 @@ EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 const char *vtkKWApplication::ExitDialogName = "ExitApplication";
-const char *vtkKWApplication::ShowBalloonHelpRegKey = "ShowBalloonHelp";
+const char *vtkKWApplication::BalloonHelpVisibilityRegKey = "ShowBalloonHelp";
 const char *vtkKWApplication::SaveUserInterfaceGeometryRegKey = "SaveUserInterfaceGeometry";
-const char *vtkKWApplication::ShowSplashScreenRegKey = "ShowSplashScreen";
+const char *vtkKWApplication::SplashScreenVisibilityRegKey = "ShowSplashScreen";
 const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.246");
+vtkCxxRevisionMacro(vtkKWApplication, "1.247");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -144,7 +144,7 @@ vtkKWApplication::vtkKWApplication()
   this->AboutRuntimeInfo = NULL;
   this->SplashScreen = NULL;
   this->SupportSplashScreen = 0;
-  this->ShowSplashScreen = 1;
+  this->SplashScreenVisibility = 1;
   this->PrintTargetDPI        = 100.0;
 
   // Setup Tcl
@@ -819,10 +819,11 @@ void vtkKWApplication::RestoreApplicationSettingsFromRegistry()
 
   vtkKWBalloonHelpManager *mgr = this->GetBalloonHelpManager();
   if (mgr && this->HasRegistryValue(
-        2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey))
+        2, "RunTime", vtkKWApplication::BalloonHelpVisibilityRegKey))
     {
-    mgr->SetShow(this->GetIntRegistryValue(
-                   2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey));
+    mgr->SetVisibility(
+      this->GetIntRegistryValue(
+        2, "RunTime", vtkKWApplication::BalloonHelpVisibilityRegKey));
     }
 
   // Save user interface geometry ?
@@ -837,15 +838,15 @@ void vtkKWApplication::RestoreApplicationSettingsFromRegistry()
   // Show splash screen ?
 
   if (this->HasRegistryValue(
-    2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey))
+    2, "RunTime", vtkKWApplication::SplashScreenVisibilityRegKey))
     {
-    this->ShowSplashScreen = this->GetIntRegistryValue(
-      2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey);
+    this->SplashScreenVisibility = this->GetIntRegistryValue(
+      2, "RunTime", vtkKWApplication::SplashScreenVisibilityRegKey);
     }
 
   if (this->RegistryLevel <= 0)
     {
-    this->ShowSplashScreen = 0;
+    this->SplashScreenVisibility = 0;
     this->SaveUserInterfaceGeometry = 0;
     }
 
@@ -887,8 +888,8 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
   if (mgr)
     {
     this->SetRegistryValue(
-      2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey, "%d", 
-      mgr->GetShow());
+      2, "RunTime", vtkKWApplication::BalloonHelpVisibilityRegKey, "%d", 
+      mgr->GetVisibility());
     }
   
   // Save user interface geometry ?
@@ -900,8 +901,8 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
   // Show splash screen ?
 
   this->SetRegistryValue(
-    2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey, "%d", 
-    this->GetShowSplashScreen());
+    2, "RunTime", vtkKWApplication::SplashScreenVisibilityRegKey, "%d", 
+    this->GetSplashScreenVisibility());
 
   // Printer settings
 
@@ -1135,8 +1136,8 @@ void vtkKWApplication::ConfigureAboutDialog()
     {
     this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
     this->AboutRuntimeInfo->Create(this);
-    this->AboutRuntimeInfo->ShowVerticalScrollbarOn();
-    this->AboutRuntimeInfo->ShowHorizontalScrollbarOff();
+    this->AboutRuntimeInfo->VerticalScrollbarVisibilityOn();
+    this->AboutRuntimeInfo->HorizontalScrollbarVisibilityOff();
 
     vtkKWText *text = this->AboutRuntimeInfo->GetWidget();
     text->ResizeToGridOn();
@@ -1974,7 +1975,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "BalloonHelpManager: (none)" << endl;
     }
   os << indent << "SupportSplashScreen: " << (this->SupportSplashScreen ? "on":"off") << endl;
-  os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
+  os << indent << "SplashScreenVisibility: " << (this->SplashScreenVisibility ? "on":"off") << endl;
   os << indent << "PromptBeforeExit: " << (this->GetPromptBeforeExit() ? "on":"off") << endl;
   os << indent << "InstallationDirectory: " 
      << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;

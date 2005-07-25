@@ -47,7 +47,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
   ccb3 SetParent $parent
   ccb3 Create $app
   ccb3 SetColor 0.0 0.0 1.0
-  ccb3 ShowLabelOff
+  ccb3 LabelVisibilityOff
   ccb3 SetBalloonHelpString \
     "A color button. Note that the label is now hidden."
 

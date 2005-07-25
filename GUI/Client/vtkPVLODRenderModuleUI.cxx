@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.32");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -154,7 +154,6 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app)
   
   // LOD parameters
   this->LODFrame->SetParent(this);
-  this->LODFrame->ShowHideFrameOn();
   this->LODFrame->Create(app);
   this->LODFrame->SetLabelText("LOD Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",

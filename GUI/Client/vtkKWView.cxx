@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.22");
+vtkCxxRevisionMacro(vtkKWView, "1.23");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -366,7 +366,6 @@ void vtkKWView::CreateViewProperties()
   this->CornerAnnotation->SetParent(
     this->AnnotationPropertiesFrame->GetFrame());
   this->CornerAnnotation->SetView(this);
-  this->CornerAnnotation->GetFrame()->ShowHideFrameOn();
   this->CornerAnnotation->Create(app);
   this->CornerAnnotation->GetFrame()->SetLabelText("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
@@ -381,7 +380,6 @@ void vtkKWView::CreateViewProperties()
 
   this->ColorsFrame->SetParent(
     this->GeneralPropertiesFrame->GetFrame());
-  this->ColorsFrame->ShowHideFrameOn();
   this->ColorsFrame->Create(app);
   this->ColorsFrame->SetLabelText("Colors");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -396,7 +394,7 @@ void vtkKWView::CreateViewProperties()
     this, "SetRendererBackgroundColor");
   this->RendererBackgroundColor->SetBalloonHelpString(
     "Set the background color");
-  this->RendererBackgroundColor->SetDialogText("Background Color");
+  this->RendererBackgroundColor->SetDialogTitle("Background Color");
   this->Script("pack %s -side top -padx 15 -pady 4 -expand 1 -fill x",
                this->RendererBackgroundColor->GetWidgetName());
 

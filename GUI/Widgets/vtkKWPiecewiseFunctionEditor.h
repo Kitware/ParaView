@@ -58,12 +58,12 @@ public:
   vtkGetMacro(WindowLevelMode, int);
 
   // Description:
-  // Show/Hide the window/level mode button.
+  // Set/Get the window/level mode button visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  virtual void SetShowWindowLevelModeButton(int);
-  vtkBooleanMacro(ShowWindowLevelModeButton, int);
-  vtkGetMacro(ShowWindowLevelModeButton, int);
+  virtual void SetWindowLevelModeButtonVisibility(int);
+  vtkBooleanMacro(WindowLevelModeButtonVisibility, int);
+  vtkGetMacro(WindowLevelModeButtonVisibility, int);
 
   // Description:
   // Set/Get the window/level lock mode. In that mode, provided that
@@ -96,17 +96,17 @@ public:
   virtual void WindowLevelModeCallback();
 
   // Description:
-  // Show the value entry UI.
+  // Set/Get the value entry UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(ShowValueEntry, int);
-  virtual void SetShowValueEntry(int);
-  vtkGetMacro(ShowValueEntry, int);
+  vtkBooleanMacro(ValueEntryVisibility, int);
+  virtual void SetValueEntryVisibility(int);
+  vtkGetMacro(ValueEntryVisibility, int);
 
   // Description:
   // Access the entry
   // If you need to customize this object, make sure you first set 
-  // ShowValueEntry to On and call Create().
+  // ValueEntryVisibility to On and call Create().
   vtkGetObjectMacro(ValueEntry, vtkKWEntryWithLabel);
 
   // Description:
@@ -162,8 +162,8 @@ protected:
   vtkPiecewiseFunction *PiecewiseFunction;
 
   int WindowLevelMode;
-  int ShowValueEntry;
-  int ShowWindowLevelModeButton;
+  int ValueEntryVisibility;
+  int WindowLevelModeButtonVisibility;
   int WindowLevelModeLockEndPointValue;
   double Window;
   double Level;

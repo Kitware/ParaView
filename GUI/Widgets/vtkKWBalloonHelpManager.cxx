@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.5");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -34,7 +34,7 @@ vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
   this->Label = NULL;
 
   this->Delay = 1;
-  this->Show = 1;
+  this->Visibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void vtkKWBalloonHelpManager::TriggerCallback(vtkKWWidget *widget)
 
   // If there is no help string, do not bother
 
-  if (!this->Show || !widget->GetBalloonHelpString() || this->Delay <= 0)
+  if (!this->Visibility || !widget->GetBalloonHelpString() || this->Delay <= 0)
     {
     this->SetAfterTimerId(NULL);
     return;
@@ -179,7 +179,7 @@ void vtkKWBalloonHelpManager::WithdrawCallback()
 void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 {
   if (!this->GetApplication() || this->ApplicationInExit() ||
-      !this->Show || !widget || !widget->IsCreated())
+      !this->Visibility || !widget || !widget->IsCreated())
     {
     return;
     }
@@ -247,17 +247,17 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBalloonHelpManager::SetShow(int v)
+void vtkKWBalloonHelpManager::SetVisibility(int v)
 {
-  if (this->Show == v)
+  if (this->Visibility == v)
     {
     return;
     }
 
-  this->Show = v;
+  this->Visibility = v;
   this->Modified();
 
-  if (!this->Show)
+  if (!this->Visibility)
     {
     this->CancelCallback();
     }
@@ -345,6 +345,6 @@ void vtkKWBalloonHelpManager::AddBindings(vtkKWWidget *widget)
 void vtkKWBalloonHelpManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Show: " << (this->Show ? "on":"off") << endl;
+  os << indent << "Visibility: " << (this->Visibility ? "on":"off") << endl;
   os << indent << "Delay: " << this->GetDelay() << endl;
 }

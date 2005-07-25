@@ -22,7 +22,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.9");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -41,17 +41,17 @@ vtkPVTimeLine::vtkPVTimeLine()
   this->Focus = 0;
   this->AnimationCue = 0;
 
-  this->ShowValueRangeOff();
-  this->ShowParameterRangeOff();
-  this->ShowParameterEntryOff();
-  this->ShowLabelOff();
-  this->ShowCanvasOutlineOn();
-  this->ShowFunctionLineOn();
+  this->ValueRangeVisibilityOff();
+  this->ParameterRangeVisibilityOff();
+  this->ParameterEntryVisibilityOff();
+  this->LabelVisibilityOff();
+  this->CanvasOutlineVisibilityOn();
+  this->FunctionLineVisibilityOn();
   this->SetFunctionLineWidth(2);
-  this->ShowParameterCursorOn();
+  this->ParameterCursorVisibilityOn();
   this->SetParameterCursorPosition(0.0);
   this->LockEndPointsParameterOff();
-  this->ShowRangeLabelOff();
+  this->RangeLabelVisibilityOff();
 }
 
 //----------------------------------------------------------------------------

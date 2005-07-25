@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.24");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.25");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -138,7 +138,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
     this->TopFrame->GetWidgetName());
 
   this->ScenePropertiesFrame->SetParent(this->TopFrame->GetFrame());
-  this->ScenePropertiesFrame->ShowHideFrameOn();
   this->ScenePropertiesFrame->Create(app);
   this->ScenePropertiesFrame->SetLabelText("Animation Control");
   this->Script(
@@ -147,7 +146,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
 
   // SELECTOR FRAME
   this->SelectorFrame->SetParent(this->TopFrame->GetFrame());
-  this->SelectorFrame->ShowHideFrameOn();
   this->SelectorFrame->Create(app);
   this->SelectorFrame->SetLabelText(VTK_PV_SELECTOR_DEFAULT_LABEL); 
   this->Script(
@@ -163,7 +161,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
-  this->SaveFrame->ShowHideFrameOn();
   this->SaveFrame->SetLabelText("Animation Settings");
   this->SaveFrame->Create(app);
   this->Script(

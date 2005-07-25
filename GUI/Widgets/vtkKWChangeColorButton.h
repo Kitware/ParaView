@@ -48,8 +48,8 @@ public:
 
   // Description:
   // Set the text that will be used on the title of the color selection dialog.
-  vtkSetStringMacro(DialogText);
-  vtkGetStringMacro(DialogText);
+  vtkSetStringMacro(DialogTitle);
+  vtkGetStringMacro(DialogTitle);
 
   // Description:
   // Set the command that is called when the color is changed.
@@ -89,7 +89,7 @@ protected:
   vtkKWFrame  *ButtonFrame;
 
   char        *Command;
-  char        *DialogText;
+  char        *DialogTitle;
   double      Color[3];
   int         LabelOutsideButton;
 

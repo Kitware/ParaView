@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.397");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.398");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -761,7 +761,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
   // Configure the navigation frame
 
   this->NavigationFrame->SetParent(this->SplitFrame->GetFrame2());
-  this->NavigationFrame->ShowHideFrameOff();
+  this->NavigationFrame->AllowFrameToCollapseOff();
   this->NavigationFrame->Create(app);
   this->NavigationFrame->SetLabelText("Navigation");
   this->Script("pack %s -fill both -expand t -side top", 
@@ -785,7 +785,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
     this->NavigationFrame->GetLabelFrame());
   this->SelectionWindowButton->Create(app);
   this->SelectionWindowButton->SetHighlightThickness(0);
-  this->SelectionWindowButton->SetIndicator(0);
+  this->SelectionWindowButton->IndicatorVisibilityOff();
   this->SelectionWindowButton->SetConfigurationOption(
     "-image", "PVSelectionWindowButton");
   this->SelectionWindowButton->SetConfigurationOption(
@@ -800,7 +800,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
     this->NavigationFrame->GetLabelFrame());
   this->NavigationWindowButton->Create(app);
   this->NavigationWindowButton->SetHighlightThickness(0);
-  this->NavigationWindowButton->SetIndicator(0);
+  this->NavigationWindowButton->IndicatorVisibilityOff();
   this->NavigationWindowButton->SetConfigurationOption(
     "-image", "PVNavigationWindowButton");
   this->NavigationWindowButton->SetConfigurationOption(
@@ -978,7 +978,6 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->RenderParametersFrame->SetParent(
     this->GeneralPropertiesFrame->GetFrame());
-  this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->GetApplication());
   this->RenderParametersFrame->SetLabelText("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -1093,7 +1092,6 @@ void vtkPVRenderView::CreateViewProperties()
   // Interface settings
 
   this->InterfaceSettingsFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
-  this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(this->GetApplication());
   this->InterfaceSettingsFrame->SetLabelText("3D Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -1136,7 +1134,6 @@ void vtkPVRenderView::CreateViewProperties()
   // 
   // Setup the frame
   this->LightParameterFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
-  this->LightParameterFrame->ShowHideFrameOn();
   this->LightParameterFrame->Create(this->GetApplication());
   this->LightParameterFrame->SetLabelText("Light Kit Parameter");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -1389,7 +1386,6 @@ void vtkPVRenderView::CreateViewProperties()
   // Orientation axes settings
   
   this->OrientationAxesFrame->SetParent(this->AnnotationPropertiesFrame->GetFrame());
-  this->OrientationAxesFrame->ShowHideFrameOn();
   this->OrientationAxesFrame->Create(this->GetApplication());
   this->OrientationAxesFrame->SetLabelText("Orientation Axes");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -1540,7 +1536,6 @@ void vtkPVRenderView::CreateViewProperties()
   // Camera: standard views
 
   this->StandardViewsFrame->SetParent( frame->GetFrame() );
-  this->StandardViewsFrame->ShowHideFrameOn();
   this->StandardViewsFrame->Create(this->GetApplication());
   this->StandardViewsFrame->SetLabelText("Standard Views");
 
@@ -1603,7 +1598,6 @@ void vtkPVRenderView::CreateViewProperties()
   // Camera: stored camera position
 
   this->CameraIconsFrame->SetParent(frame->GetFrame());
-  this->CameraIconsFrame->ShowHideFrameOn();
   this->CameraIconsFrame->Create(this->GetApplication());
   this->CameraIconsFrame->SetLabelText("Stored Camera Positions");
 
@@ -1646,7 +1640,6 @@ void vtkPVRenderView::CreateViewProperties()
   // Camera: camera control frame
 
   this->CameraControlFrame->SetParent(frame->GetFrame());
-  this->CameraControlFrame->ShowHideFrameOn();
   this->CameraControlFrame->Create(this->GetApplication());
   this->CameraControlFrame->SetLabelText("Camera Orientation");
   

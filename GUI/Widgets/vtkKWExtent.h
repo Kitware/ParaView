@@ -56,17 +56,20 @@ public:
   virtual void SetExtent(double, double, double, double, double, double);
 
   // Description:
-  // Show/Hide part of the extent selectively (x, y, z).
-  virtual void SetShowExtent(int index, int arg);
-  vtkBooleanMacro(ShowXExtent, int);
-  virtual int GetShowXExtent() { return this->ShowExtent[0]; };
-  virtual void SetShowXExtent(int arg) { this->SetShowExtent(0, arg); };
-  vtkBooleanMacro(ShowYExtent, int);
-  virtual int GetShowYExtent() { return this->ShowExtent[1]; };
-  virtual void SetShowYExtent(int arg) { this->SetShowExtent(1, arg); };
-  vtkBooleanMacro(ShowZExtent, int);
-  virtual int GetShowZExtent() { return this->ShowExtent[2]; };
-  virtual void SetShowZExtent(int arg) { this->SetShowExtent(2, arg); };
+  // Set/Get the visibility of the extent selectively (x, y, z).
+  virtual void SetExtentVisibility(int index, int arg);
+  vtkBooleanMacro(XExtentVisibility, int);
+  virtual int GetXExtentVisibility() { return this->ExtentVisibility[0]; };
+  virtual void SetXExtentVisibility(int arg) 
+    { this->SetExtentVisibility(0, arg); };
+  vtkBooleanMacro(YExtentVisibility, int);
+  virtual int GetYExtentVisibility() { return this->ExtentVisibility[1]; };
+  virtual void SetYExtentVisibility(int arg) 
+    { this->SetExtentVisibility(1, arg); };
+  vtkBooleanMacro(ZExtentVisibility, int);
+  virtual int GetZExtentVisibility() { return this->ExtentVisibility[2]; };
+  virtual void SetZExtentVisibility(int arg) 
+    { this->SetExtentVisibility(2, arg); };
 
   // Description:
   // Handle the callback, this is called internally when one of the 
@@ -165,7 +168,7 @@ protected:
 
   vtkKWRange  *Range[3];
 
-  int ShowExtent[3];
+  int ExtentVisibility[3];
 
   // Pack or repack the widget
 

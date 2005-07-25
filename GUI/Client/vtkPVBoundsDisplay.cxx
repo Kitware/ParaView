@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.28");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -67,7 +67,6 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   this->Widget->SetParent(this);
-  this->Widget->SetShowHideFrame( this->GetShowHideFrame() );
   this->Widget->Create(app);
   if (this->FrameLabel)
     {

@@ -75,7 +75,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   extent3->SetLabelPositionToRight();
   extent3->SetEntry1PositionToLeft();
   extent3->SetEntry2PositionToLeft();
-  extent3->ShowZExtentOff();
+  extent3->ZExtentVisibilityOff();
   extent3->GetXRange()->SetLabelText("Horizontal");
   extent3->GetYRange()->SetLabelText("Vertical");
   extent3->SetRequestedLength(150);

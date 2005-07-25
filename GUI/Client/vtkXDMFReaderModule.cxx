@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.40");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.41");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -150,8 +150,8 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
     this->GridSelection = vtkKWListBoxWithScrollbars::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
-    this->GridSelection->ShowVerticalScrollbarOn();
-    this->GridSelection->ShowHorizontalScrollbarOff();
+    this->GridSelection->VerticalScrollbarVisibilityOn();
+    this->GridSelection->HorizontalScrollbarVisibilityOff();
     this->GridSelection->Create(pvApp);
 
     this->GridSelection->GetWidget()->SetSelectionModeToExtended();
@@ -330,12 +330,12 @@ void vtkXDMFReaderModule::UpdateGrids()
     {
     this->GridSelection->GetWidget()->SetHeight(
       this->GridSelection->GetWidget()->GetNumberOfItems());
-    this->GridSelection->ShowVerticalScrollbarOff();
+    this->GridSelection->VerticalScrollbarVisibilityOff();
     }
   else
     {
     this->GridSelection->GetWidget()->SetHeight(6);
-    this->GridSelection->ShowVerticalScrollbarOn();
+    this->GridSelection->VerticalScrollbarVisibilityOn();
     }
 }
 

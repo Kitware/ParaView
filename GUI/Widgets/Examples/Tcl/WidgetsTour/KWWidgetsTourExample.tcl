@@ -18,7 +18,7 @@ if {$option_test} {
   app PromptBeforeExitOff
 }
 app SupportSplashScreenOn
-app ShowSplashScreenOn
+app SplashScreenVisibilityOn
 app RestoreApplicationSettingsFromRegistry
 
 # Setup the splash screen
@@ -52,8 +52,8 @@ set page_widget [widgets_panel GetPageWidget "Widgets"]
 
 vtkKWTreeWithScrollbars widgets_tree
 widgets_tree SetParent $page_widget
-widgets_tree ShowVerticalScrollbarOn
-widgets_tree ShowHorizontalScrollbarOff
+widgets_tree VerticalScrollbarVisibilityOn
+widgets_tree HorizontalScrollbarVisibilityOff
 widgets_tree Create app
 
 set tree [widgets_tree GetWidget]
@@ -99,7 +99,7 @@ tcl_source_text SetLabelPositionToTop
 tcl_source_text SetLabelText "Tcl Source"
 
 set text_widget [tcl_source_text GetWidget]
-$text_widget ShowVerticalScrollbarOn
+$text_widget VerticalScrollbarVisibilityOn
 
 set text [$text_widget GetWidget]
 $text ReadOnlyOn
@@ -120,7 +120,7 @@ cxx_source_text SetLabelPositionToTop
 cxx_source_text SetLabelText "C++ Source"
 
 set text_widget [cxx_source_text GetWidget]
-$text_widget ShowVerticalScrollbarOn
+$text_widget VerticalScrollbarVisibilityOn
 
 set text [$text_widget GetWidget]
 $text ReadOnlyOn
@@ -152,7 +152,7 @@ foreach widget $widgets {
   $panel AddPage [$panel GetName] "" ""
   lappend objects $panel
 
-  if {[app GetShowSplashScreen]} {
+  if {[app GetSplashScreenVisibility]} {
     [app GetSplashScreen] SetProgressMessage $name
   }
 

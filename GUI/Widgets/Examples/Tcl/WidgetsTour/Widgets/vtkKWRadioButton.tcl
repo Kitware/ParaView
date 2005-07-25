@@ -36,14 +36,14 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
   radiob2 SetParent $parent
   radiob2 Create $app
   radiob2 SetImageToPredefinedIcon 100
-  radiob2 IndicatorOff
+  radiob2 IndicatorVisibilityOff
   radiob2 SetValue "foo"
 
   vtkKWRadioButton radiob2b
   radiob2b SetParent $parent
   radiob2b Create $app
   radiob2b SetImageToPredefinedIcon 64
-  radiob2b IndicatorOff
+  radiob2b IndicatorVisibilityOff
   radiob2b SetValue "bar"
 
   radiob2 SetSelectedState 1

@@ -165,10 +165,10 @@ public:
     { this->SetRangeInteractionColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Show/Hide the entries.
-  virtual void SetShowEntries(int);
-  vtkBooleanMacro(ShowEntries, int);
-  vtkGetMacro(ShowEntries, int);
+  // Set/Get the entries visibility.
+  virtual void SetEntriesVisibility(int);
+  vtkBooleanMacro(EntriesVisibility, int);
+  vtkGetMacro(EntriesVisibility, int);
 
   // Description:
   // Get the entries object.
@@ -304,7 +304,7 @@ protected:
   int   SliderSize;
   double RangeColor[3];
   double RangeInteractionColor[3];
-  int   ShowEntries;
+  int   EntriesVisibility;
   int   Entry1Position;
   int   Entry2Position;
   int   EntriesWidth;

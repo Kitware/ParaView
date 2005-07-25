@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.13");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.14");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -147,7 +147,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     this->LoopCheckButton->SetParent(this->GetFrame());
     this->LoopCheckButton->Create(app);
     this->LoopCheckButton->SetSelectedState(0);
-    this->LoopCheckButton->SetIndicator(0);
+    this->LoopCheckButton->IndicatorVisibilityOff();
     icon->SetImage(vtkKWIcon::IconTransportLoop);
     this->LoopCheckButton->SetImageToIcon(icon);
     this->LoopCheckButton->SetBalloonHelpString("Specify if the animation is to be played in a loop.");
@@ -169,7 +169,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     this->RecordCheckButton->Create(app);
     this->RecordCheckButton->SetConfigurationOption("-image", "PVRecord");
     this->RecordCheckButton->SetSelectedState(0);
-    this->RecordCheckButton->SetIndicator(0);
+    this->RecordCheckButton->IndicatorVisibilityOff();
     this->RecordCheckButton->SetBalloonHelpString("Start/Stop recording of the animation.");
     this->RecordCheckButton->SetCommand(this, "RecordCheckCallback");
 

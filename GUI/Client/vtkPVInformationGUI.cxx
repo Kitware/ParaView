@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.9");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -36,9 +36,7 @@ vtkPVInformationGUI::vtkPVInformationGUI()
   this->NumPointsLabel = vtkKWLabel::New();
   this->MemorySizeLabel = vtkKWLabel::New();
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
-  this->BoundsDisplay->ShowHideFrameOn();
   this->ExtentDisplay = vtkKWBoundsDisplay::New();
-  this->ExtentDisplay->ShowHideFrameOn();
 }
 
 //----------------------------------------------------------------------------
@@ -81,7 +79,6 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
   this->Superclass::Create(app);
 
   this->StatsFrame->SetParent(this->GetFrame());
-  this->StatsFrame->ShowHideFrameOn();
   this->StatsFrame->Create(this->GetApplication());
   this->StatsFrame->SetLabelText("Statistics");
 

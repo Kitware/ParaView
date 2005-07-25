@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.757");
+vtkCxxRevisionMacro(vtkPVWindow, "1.758");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -944,7 +944,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->RotateCameraButton->Create(app);
-  this->RotateCameraButton->SetIndicator(0);
+  this->RotateCameraButton->IndicatorVisibilityOff();
   this->RotateCameraButton->SetHighlightThickness(0);
   this->RotateCameraButton->SetConfigurationOption("-image", "PVRotateViewButton");
   this->RotateCameraButton->SetConfigurationOption(
@@ -963,7 +963,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->TranslateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->TranslateCameraButton->Create(app);
-  this->TranslateCameraButton->SetIndicator(0);
+  this->TranslateCameraButton->IndicatorVisibilityOff();
   this->TranslateCameraButton->SetHighlightThickness(0);
   this->TranslateCameraButton->SetConfigurationOption(
     "-image", "PVTranslateViewButton");
@@ -1124,7 +1124,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   // Init menus
 
   int use_splash = (app->GetSupportSplashScreen() && 
-                    app->GetShowSplashScreen() && 
+                    app->GetSplashScreenVisibility() && 
                     app->GetNumberOfWindows() == 1);
   if (use_splash)
     {

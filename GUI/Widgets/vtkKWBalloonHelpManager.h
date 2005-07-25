@@ -41,10 +41,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Hide/Show balloon help for all the widgets bound to this helper.
-  virtual void SetShow(int);
-  vtkGetMacro(Show, int);
-  vtkBooleanMacro(Show, int);
+  // Set/Get balloon help visibility for all the widgets bound to this helper.
+  virtual void SetVisibility(int);
+  vtkGetMacro(Visibility, int);
+  vtkBooleanMacro(Visibility, int);
 
   // Description:
   // Set the delay for the balloon help in seconds.
@@ -68,7 +68,7 @@ protected:
   vtkKWBalloonHelpManager();
   ~vtkKWBalloonHelpManager();
 
-  int Show;
+  int Visibility;
   int Delay;
 
   vtkKWTopLevel *TopLevel;
