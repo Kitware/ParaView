@@ -109,7 +109,7 @@ public:
   enum
   {
     LabelFontWeightNormal = 0,
-    LabelFontWeightBold,
+    LabelFontWeightBold
   };
   //ETX
   static void SetDefaultLabelFontWeight(int v);
