@@ -23,7 +23,7 @@
 #include "vtkWindows.h"
 #include "vtkKWMessageDialog.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.23");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.24");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -279,7 +279,7 @@ int vtkPVProcessModuleGUIHelper::UpdatePopup()
     }
   if ( !this->PopupDialogWidget->IsUserDoneWithDialog() )
     {
-    Tcl_DoOneEvent(0);
+    Tcl_DoOneEvent(TCL_DONT_WAIT);
     }
   int res = this->PopupDialogWidget->IsUserDoneWithDialog();
   if ( res )
