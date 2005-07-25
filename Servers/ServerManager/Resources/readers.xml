@@ -720,7 +720,8 @@
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
-#if 1
+#if 0
+   <!-- Removing things associated with vtkCTHData -->
    <SourceProxy name="amrspcthreader" class="vtkAMRSpyPlotReader">
      <StringVectorProperty
         name="FileName"

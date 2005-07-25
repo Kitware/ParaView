@@ -91,6 +91,8 @@ The flow integration fitler  integrates the dot product of a point flow vector f
   </Module>  
 
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
+#if 0
+  <!-- Removing things associated with vtkCTHData -->
   <Module name="CTHAMRCellToPointData"
           root_name="CTHAMRCellToPointData"
           menu_name="CTH AMR Cell to Point Data"
@@ -223,6 +225,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
                    trace_name="PositiveZVisibility"
                    help="Visibility of the six face orientations." />
   </Module>
+#endif
 
   <Module name="StructuredGridOutlineFilter"
           menu_name="Outline (curvilinear)"
@@ -731,6 +734,8 @@ The line can be specified interactively using the 3D line widget. See section 7.
     </Documentation>
   </Module>
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
+#if 0
+  <!-- Removing things associated with vtkCTHData -->
   <Module name="CTHAMRPart"
           menu_name="CTH AMR Extract Parts"
           root_name="CTHAMRPart"
@@ -769,6 +774,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
       </Item>
     </SelectWidget>
   </Module>
+#endif
 <!-- #endif -->
 #if 1
   <Module name="CTHPart"

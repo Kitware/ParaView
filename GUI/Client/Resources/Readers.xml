@@ -390,6 +390,9 @@
             value="1"/>
     </SelectionList>
   </Module>
+
+#if 0
+  <!-- Removing things associated with vtkCTHData -->
   <Module name="amrspcthreader"
           class="vtkPVAdvancedReaderModule" root_name="SPCTH"
           module_type="Reader"
@@ -405,6 +408,7 @@
                     property="CellArrayStatus"
                     trace_name="CellArrays"/>
   </Module>
+#endif
 
  <Module name="spcthreader"
           class="vtkPVAdvancedReaderModule" root_name="SPCTH"

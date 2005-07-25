@@ -33,6 +33,8 @@ The output of the 2D Glyph source is polygonal data.
 </Module>
 
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
+#if 0
+<!-- Removing things associated with vtkCTHData -->
 <Module name="CTHAMRFractal" 
         menu_name="CTH AMR Fractal" 
         root_name="CTHAMRFractal"
@@ -62,6 +64,7 @@ The output of the 2D Glyph source is polygonal data.
                  help="Some blocks have X dimension larger by 2." />
 </Module>
 <!-- #endif -->
+#endif
 
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
 <Module name="HierarchicalFractal" 

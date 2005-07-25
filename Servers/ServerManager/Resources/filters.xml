@@ -635,6 +635,8 @@
    <!-- End ElevationFilter -->
    </SourceProxy>
 
+#if 0
+   <!-- Removing things associated with vtkCTHData -->
    <SourceProxy name="CTHAMRCellToPointData" class="vtkCTHAMRCellToPointData">
     <InputProperty
        name="Input"
@@ -786,6 +788,8 @@
 
    <!-- End CTHAMRSurface -->
    </SourceProxy>
+#endif
+
 #if 1
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
     <InputProperty
@@ -817,6 +821,9 @@
    <!-- End CTHPart -->
    </SourceProxy>
 #endif
+
+#if 0
+   <!-- Removing things associated with vtkCTHData -->
    <SourceProxy name="CTHAMROutline" class="vtkCTHOutlineFilter">
      <InputProperty
         name="Input"
@@ -870,6 +877,7 @@
 
    <!-- End CTHAMRPart -->
    </SourceProxy>
+#endif
 
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
      <InputProperty

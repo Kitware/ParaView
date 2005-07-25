@@ -206,6 +206,8 @@
    <!-- End Cone -->
    </SourceProxy>
 
+#if 0
+   <!-- Removing things associated with vtkCTHData -->
    <SourceProxy name="CTHAMRFractal" class="vtkCTHFractal">
       <IntVectorProperty
          name="Dimensions"
@@ -257,6 +259,7 @@
 
    <!-- End CTHAMRFractal -->
    </SourceProxy>
+#endif
 
    <SourceProxy name="HierarchicalFractal" class="vtkHierarchicalFractal">
       <IntVectorProperty
