@@ -82,7 +82,7 @@ for {set id 0} {$id < [llength $texts]} {incr id} {
 # that we have added our UI
 
 hello_label SetText [lindex $texts 0]
-[rbs GetWidget 0] StateOn
+[rbs GetWidget 0] SelectedStateOn
 # or rb SetVariableValue 0
 
 label_panel Raise
