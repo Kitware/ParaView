@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.3.2.1");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -153,6 +153,7 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
       }
     vtkPVContourEntry* valueList = vtkPVContourEntry::New();
     valueList->SetParent(this);
+    // vtkPVContourEntry complains if the property is not set.
     valueList->SetSMProperty(property);
     valueList->Create(this->GetApplication());
     valueList->SetModifiedCommand(this->GetTclName(),"ValueChangedCallback");
@@ -292,14 +293,14 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueUsingProperty(
       this->ValueWidget);
     if (contourEntry)
       {
-      contourEntry->Initialize(); // since we have set the SMProperty pointer
-      // for this widget properly, it will update itself!
-      int numContours = contourEntry->GetNumberOfValues();
-      this->SetNumberOfKeyValues(numContours);
-      for (int i=0; i < numContours; i++)
-        {
-        this->SetKeyValue(i, contourEntry->GetValue(i));
-        }
+      // This may be the unconventional way, but we achieve the 
+      // updating of the animated property by letting the GUI update
+      // itself first and then update the animated property values.
+      vtkSMProperty* oldProp = contourEntry->GetSMProperty();
+      contourEntry->SetSMProperty(property);
+      contourEntry->Initialize(); // this will update the GUI using the property. 
+      contourEntry->SetSMProperty(oldProp); // restore the property
+      this->UpdateValueFromGUI();
       }
     return;
     }
@@ -543,6 +544,14 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueDomainUsingCurrentState()
 //-----------------------------------------------------------------------------
 void vtkPVPropertyKeyFrame::ValueChangedCallback()
 {
+  this->UpdateValueFromGUI();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPropertyKeyFrame::UpdateValueFromGUI()
+{
+  this->BlockUpdates = 1; //we are pushing GUI values on to proxy,
+                          //hence, no need to update GUI when proxy changes.
   if (vtkPVSelectionList::SafeDownCast(this->ValueWidget))
     {
     this->SetKeyValueWithTrace(0, static_cast<double>(
@@ -566,6 +575,7 @@ void vtkPVPropertyKeyFrame::ValueChangedCallback()
       this->SetKeyValueWithTrace(i, contourEntry->GetValue(i));
       }
     }
+  this->BlockUpdates = 0;
 }
 
 //-----------------------------------------------------------------------------

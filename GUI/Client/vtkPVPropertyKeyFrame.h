@@ -113,6 +113,10 @@ protected:
   virtual void UpdateValuesFromProxy();
 
   // Description:
+  // Updates the animated property values using the GUI.
+  virtual void UpdateValueFromGUI();
+
+  // Description:
   // Updates GUI domain based on vtkSMDomain of the animated property.
   void UpdateDomain();
 

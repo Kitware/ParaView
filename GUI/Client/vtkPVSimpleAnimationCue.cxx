@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.13");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.13.2.1");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
@@ -1152,7 +1152,7 @@ void vtkPVSimpleAnimationCue::RecordState(double ntime, double offset)
         this->PropertyStatusManager->GetInternalProperty(
           vtkSMVectorProperty::SafeDownCast(property)), index);
       }
-    if (old_numOfKeyFrames == 0)
+    if (old_numOfKeyFrames == 0 && id != 0)
       {
       //Pilot keyframe also needs to be initilaized.
       kf = this->GetKeyFrame(0);
