@@ -94,10 +94,6 @@ The output of the 2D Glyph source is polygonal data.
  <LabeledToggle label="RectilinearGrids" trace_name="RectilinearGrids" 
                  property="RectilinearGrids"
                  help="Set whether to generate rectilinear grids or uniform grids" />
-  <Scale property="TimeStep"
-         label="Time step" trace_name="TimeStep"
-         keeps_timesteps="1"
-         help="Set the current timestep."/>
 </Module>
 <!-- #endif -->
 
