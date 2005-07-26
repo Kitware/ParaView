@@ -55,7 +55,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkParallelInstantiator.h"
 #endif
 
-#include "vtkPVCommonInstantiator.h"
+#include "vtkPVServerCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
@@ -216,7 +216,7 @@ extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
 extern "C" void vtkKWParaViewCS_Initialize(vtkClientServerInterpreter*);
@@ -238,7 +238,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkHybridCS_Initialize(pm->GetInterpreter());
   vtkWidgetsCS_Initialize(pm->GetInterpreter());
   vtkParallelCS_Initialize(pm->GetInterpreter());
-  vtkPVCommonCS_Initialize(pm->GetInterpreter());
+  vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkKWParaViewCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
