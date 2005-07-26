@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -1102,10 +1102,10 @@ void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
 
-  rm->AddPropToRenderer(this->ActorProxy);
+  this->AddPropToRenderer(this->ActorProxy, rm);
   if (this->HasVolumePipeline)
     {
-    rm->AddPropToRenderer(this->VolumeActorProxy);
+    this->AddPropToRenderer(this->VolumeActorProxy, rm);
     }
 }
 
@@ -1118,10 +1118,10 @@ void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   
-  rm->RemovePropFromRenderer(this->ActorProxy);
+  this->RemovePropFromRenderer(this->ActorProxy, rm);
   if (this->HasVolumePipeline)
     {
-    rm->RemovePropFromRenderer(this->VolumeActorProxy);
+    this->RemovePropFromRenderer(this->VolumeActorProxy, rm);
     }
 }
 

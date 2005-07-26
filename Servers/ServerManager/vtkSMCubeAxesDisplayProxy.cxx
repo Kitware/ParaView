@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -145,13 +145,13 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
   pp->AddProxy(this->CubeAxesProxy);
   rm->UpdateVTKObjects();
   */
-  rm->AddPropToRenderer2D(this->CubeAxesProxy);
+  this->AddPropToRenderer2D(this->CubeAxesProxy, rm);
 
   // We don't set the Camera proxy for the cube axes actor using 
   // properties since the Camera Proxy provided by the RenderModule is only 
   // on the CLIENT, and CubeAxesActor needs the camera on the servers as well.
   vtkClientServerStream stream;
-  vtkSMProxy* renderer = rm->GetRenderer2DProxy();
+  vtkSMProxy* renderer = this->GetRenderer2DProxy(rm);
   for (unsigned int i=0; i < this->CubeAxesProxy->GetNumberOfIDs(); i++)
     {
     stream << vtkClientServerStream::Invoke
@@ -178,7 +178,7 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
     {
     return;
     }
-   vtkSMProxyProperty* pp;
+  vtkSMProxyProperty* pp;
   /*
   pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
@@ -190,7 +190,7 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
   pp->RemoveProxy(this->CubeAxesProxy);
   rm->UpdateVTKObjects();
   */
-  rm->RemovePropFromRenderer2D(this->CubeAxesProxy);
+  this->RemovePropFromRenderer2D(this->CubeAxesProxy, rm);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CubeAxesProxy->GetProperty("Camera"));

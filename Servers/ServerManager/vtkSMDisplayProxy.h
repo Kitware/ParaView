@@ -196,6 +196,14 @@ protected:
   vtkSMDisplayProxy();
   ~vtkSMDisplayProxy();
 
+  vtkSMProxy* GetInteractorProxy(vtkSMRenderModuleProxy* ren);
+  vtkSMProxy* GetRendererProxy(vtkSMRenderModuleProxy* ren);
+  vtkSMProxy* GetRenderer2DProxy(vtkSMRenderModuleProxy* ren);
+  void AddPropToRenderer(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
+  void AddPropToRenderer2D(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
+  void RemovePropFromRenderer(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
+  void RemovePropFromRenderer2D(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
+
   int GeometryInformationIsValid; //This flag must be managed by the subclasses.
   virtual void GatherGeometryInformation();
   vtkPVGeometryInformation* GeometryInformation;

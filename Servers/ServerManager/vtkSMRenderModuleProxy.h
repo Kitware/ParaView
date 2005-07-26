@@ -222,16 +222,9 @@ protected:
   virtual void RemovePropFromRenderer2D(vtkSMProxy* proxy);
   
   //BTX
-  friend class vtkSMSimpleDisplayProxy;
-  friend class vtkSMAxesProxy;
-  friend class vtkSM3DWidgetProxy;
-  friend class vtkSMScalarBarWidgetProxy;
-  friend class vtkSMCubeAxesDisplayProxy;
-  friend class vtkSMXYPlotDisplayProxy;
-  friend class vtkSMInteractorObserverProxy;
-  friend class vtkSMPointLabelDisplayProxy;
-  
+  friend class vtkSMDisplayProxy;
   //ETX
+
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
   // is called. It must be a proxy belonging to the group "displays"
   // and must be a subclass of vtkSMDisplayProxy.

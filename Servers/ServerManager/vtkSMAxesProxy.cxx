@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.3");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -122,7 +122,7 @@ void vtkSMAxesProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->AddProxy(this->GetSubProxy("Actor"));
   */
-  rm->AddPropToRenderer(this->GetSubProxy("Actor"));
+  this->AddPropToRenderer(this->GetSubProxy("Actor"), rm);
 }
 
 //---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->RemoveProxy(this->GetSubProxy("Actor"));
   */
-  rm->RemovePropFromRenderer(this->GetSubProxy("Actor"));
+  this->RemovePropFromRenderer(this->GetSubProxy("Actor"), rm);
 }
 
 //---------------------------------------------------------------------------

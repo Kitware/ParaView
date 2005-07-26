@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -440,7 +440,7 @@ void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->AddProxy(this->XYPlotActorProxy);
   */
-  rm->AddPropToRenderer2D(this->XYPlotActorProxy);
+  this->AddPropToRenderer2D(this->XYPlotActorProxy, rm);
 
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
@@ -459,7 +459,7 @@ void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->RemoveProxy(this->XYPlotActorProxy);
   */
-  rm->RemovePropFromRenderer2D(this->XYPlotActorProxy);
+  this->RemovePropFromRenderer2D(this->XYPlotActorProxy, rm);
 
   if (this->XYPlotWidget->GetEnabled())
     {
@@ -495,7 +495,8 @@ void vtkSMXYPlotDisplayProxy::SetVisibility(int visible)
   // Set widget interactor.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
-    pm->GetObjectFromID(this->RenderModuleProxy->GetInteractorProxy()->GetID(0)));
+    pm->GetObjectFromID(
+      this->GetInteractorProxy(this->RenderModuleProxy)->GetID(0)));
   if (!iren)
     {
     vtkErrorMacro("Failed to get client side Interactor.");
@@ -504,7 +505,8 @@ void vtkSMXYPlotDisplayProxy::SetVisibility(int visible)
   this->XYPlotWidget->SetInteractor(iren);
   
   vtkRenderer* ren = vtkRenderer::SafeDownCast(
-    pm->GetObjectFromID(this->RenderModuleProxy->GetRenderer2DProxy()->GetID(0)));
+    pm->GetObjectFromID(
+      this->GetRenderer2DProxy(this->RenderModuleProxy)->GetID(0)));
   if (!ren)
     {
     vtkErrorMacro("Failed to get client side 2D renderer.");

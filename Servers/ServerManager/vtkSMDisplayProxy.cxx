@@ -13,14 +13,15 @@
 
 =========================================================================*/
 #include "vtkSMDisplayProxy.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkPVGeometryInformation.h"
-
-#include "vtkSMPropertyIterator.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.2");
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMStringVectorProperty.h"
+
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -32,6 +33,52 @@ vtkSMDisplayProxy::vtkSMDisplayProxy()
 vtkSMDisplayProxy::~vtkSMDisplayProxy()
 {
   this->GeometryInformation->Delete();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMDisplayProxy::GetInteractorProxy(vtkSMRenderModuleProxy* ren)
+{
+  return (ren?ren->GetInteractorProxy():0);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMDisplayProxy::GetRendererProxy(vtkSMRenderModuleProxy* ren)
+{
+  return (ren?ren->GetRendererProxy():0);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMDisplayProxy::GetRenderer2DProxy(vtkSMRenderModuleProxy* ren)
+{
+  return (ren?ren->GetRenderer2DProxy():0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::AddPropToRenderer(
+  vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren)
+{
+  ren->AddPropToRenderer(proxy);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::AddPropToRenderer2D(
+  vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren)
+{
+  ren->AddPropToRenderer2D(proxy);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::RemovePropFromRenderer(
+  vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren)
+{
+  ren->RemovePropFromRenderer(proxy);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::RemovePropFromRenderer2D(
+  vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren)
+{
+  ren->RemovePropFromRenderer2D(proxy);
 }
 
 //-----------------------------------------------------------------------------

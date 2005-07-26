@@ -296,7 +296,7 @@ void vtkSMPointLabelDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->AddProxy(this->ActorProxy);
   */
-  rm->AddPropToRenderer2D(this->ActorProxy);
+  this->AddPropToRenderer2D(this->ActorProxy, rm);
 }
 
 //-----------------------------------------------------------------------------
@@ -313,7 +313,7 @@ void vtkSMPointLabelDisplayProxy::RemoveFromRenderModule(
     }
   pp->RemoveProxy(this->ActorProxy);
   */
-  rm->RemovePropFromRenderer2D(this->ActorProxy);
+  this->RemovePropFromRenderer2D(this->ActorProxy, rm);
 }
 
 //-----------------------------------------------------------------------------

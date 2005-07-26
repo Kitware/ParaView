@@ -55,7 +55,7 @@ protected:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -91,7 +91,7 @@ void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->AddProxy(this->ScalarBarActorProxy);
   */
-  rm->AddPropToRenderer2D(this->ScalarBarActorProxy);
+  this->AddPropToRenderer2D(this->ScalarBarActorProxy, rm);
   
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
@@ -110,7 +110,7 @@ void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* r
     }
   pp->RemoveProxy(this->ScalarBarActorProxy);
   */
-  rm->RemovePropFromRenderer2D(this->ScalarBarActorProxy);
+  this->RemovePropFromRenderer2D(this->ScalarBarActorProxy, rm);
 
   if (this->ScalarBarWidget->GetEnabled())
     {
@@ -172,7 +172,8 @@ void vtkSMScalarBarWidgetProxy::SetVisibility(int visible)
   // Set widget interactor.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
-    pm->GetObjectFromID(this->RenderModuleProxy->GetInteractorProxy()->GetID(0)));
+    pm->GetObjectFromID(
+      this->GetInteractorProxy(this->RenderModuleProxy)->GetID(0)));
   if (!iren)
     {
     vtkErrorMacro("Failed to get client side Interactor.");
@@ -181,7 +182,8 @@ void vtkSMScalarBarWidgetProxy::SetVisibility(int visible)
   this->ScalarBarWidget->SetInteractor(iren);
 
   vtkRenderer* ren = vtkRenderer::SafeDownCast(
-    pm->GetObjectFromID(this->RenderModuleProxy->GetRenderer2DProxy()->GetID(0)));
+    pm->GetObjectFromID(
+      this->GetRenderer2DProxy(this->RenderModuleProxy)->GetID(0)));
   if (!ren)
     {
     vtkErrorMacro("Failed to get client side 2D renderer.");

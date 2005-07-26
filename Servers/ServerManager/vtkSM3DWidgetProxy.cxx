@@ -23,7 +23,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMIntVectorProperty.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -42,8 +42,8 @@ vtkSM3DWidgetProxy::~vtkSM3DWidgetProxy()
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  this->SetInteractor(rm->GetInteractorProxy());
-  this->SetCurrentRenderer(rm->GetRendererProxy());
+  this->SetInteractor(this->GetInteractorProxy(rm));
+  this->SetCurrentRenderer(this->GetRendererProxy(rm));
   this->SetCurrentRenderModuleProxy(rm);
 }
 
