@@ -24,12 +24,10 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-#include "vtkCTHData.h"
-
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.16");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()

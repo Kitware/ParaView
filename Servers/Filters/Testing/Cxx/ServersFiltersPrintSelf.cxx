@@ -19,12 +19,6 @@
 #include "vtkClientCompositeManager.h"
 #include "vtkColorByPart.h"
 #include "vtkCompleteArrays.h"
-#include "vtkCTHData.h"
-#include "vtkCTHDataToPolyDataFilter.h"
-#include "vtkCTHExtractAMRPart.h"
-#include "vtkCTHFractal.h"
-#include "vtkCTHOutlineFilter.h"
-#include "vtkCTHSource.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkGroup.h"
 #include "vtkHDF5RawImageReader.h"
@@ -98,12 +92,6 @@ int main(int , char *[])
   c = vtkClientCompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkColorByPart::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
-  c = vtkCTHData::New(); c->Print(cout); c->Delete();
-  c = vtkCTHDataToPolyDataFilter::New(); c->Print(cout); c->Delete();
-  c = vtkCTHExtractAMRPart::New(); c->Print(cout); c->Delete();
-  c = vtkCTHFractal::New(); c->Print(cout); c->Delete();
-  c = vtkCTHOutlineFilter::New(); c->Print(cout); c->Delete();
-  c = vtkCTHSource::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkGroup::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();

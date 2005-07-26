@@ -3,18 +3,6 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 
 SET(Filters_SRCS
-  vtkAMRSpyPlotReader.cxx
-  vtkCTHAMRCellToPointData.cxx
-  vtkCTHAMRContour.cxx
-  vtkCTHAMRExtractPart.cxx
-  vtkCTHAMRSurface.cxx
-  vtkCTHData.cxx
-  vtkCTHDataToCTHDataFilter.cxx
-  vtkCTHDataToPolyDataFilter.cxx
-  vtkCTHExtractAMRPart.cxx
-  vtkCTHFractal.cxx
-  vtkCTHOutlineFilter.cxx
-  vtkCTHSource.cxx
   vtkCVGeometryCache.cxx
   vtkCaveRenderManager.cxx
   vtkCleanUnstructuredGrid.cxx
@@ -90,8 +78,6 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
-  vtkCTHDataToCTHDataFilter.cxx
-  vtkCTHDataToPolyDataFilter.cxx
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
   vtkImageCompressor.cxx

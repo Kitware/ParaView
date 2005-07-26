@@ -28,7 +28,6 @@ class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
 class vtkImageData;
 class vtkInformationVector;
-class vtkCTHData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
@@ -108,8 +107,6 @@ protected:
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  void CTHDataExecute(vtkCTHData *input, vtkPolyData* output,
-                      int doCommunicate);
 
   int OutlineFlag;
   int UseOutline;

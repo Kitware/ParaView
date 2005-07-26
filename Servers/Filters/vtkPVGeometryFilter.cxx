@@ -15,8 +15,6 @@
 #include "vtkPVGeometryFilter.h"
 
 #include "vtkAppendPolyData.h"
-#include "vtkCTHAMRSurface.h"
-#include "vtkCTHData.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
@@ -47,7 +45,7 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.53");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.54");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -198,12 +196,6 @@ void vtkPVGeometryFilter::ExecuteBlock(
   if (input->IsA("vtkPolyData"))
     {
     this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
-    this->ExecuteCellNormals(output, doCommunicate);
-    return;
-    }
-  if (input->IsA("vtkCTHData"))
-    {
-    this->CTHDataExecute(static_cast<vtkCTHData*>(input), output, doCommunicate);
     this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
@@ -731,37 +723,6 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
   output->CopyStructure(outline->GetOutput());
   outline->Delete();
 }
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::CTHDataExecute(
-  vtkCTHData *input, vtkPolyData* output, int doCommunicate)
-{
-  if (!this->UseOutline)
-    {
-    vtkCTHData* inCopy = vtkCTHData::New();
-    inCopy->ShallowCopy(input);
-    vtkCTHAMRSurface *surface = vtkCTHAMRSurface::New();
-    surface->SetInput(inCopy);
-    surface->Update();
-    output->CopyStructure(surface->GetOutput());
-    output->GetCellData()->PassData(surface->GetOutput()->GetCellData());
-    output->GetPointData()->PassData(surface->GetOutput()->GetPointData());
-    surface->SetInput(0);
-    surface->Delete();
-    surface = 0;
-    inCopy->Delete();
-    inCopy = 0;
-    this->OutlineFlag = 0;
-    return;
-    }  
-  this->OutlineFlag = 1;
-
-  //
-  // Otherwise, let Outline do all the work
-  //
-  this->DataSetExecute(input, output, doCommunicate);
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::UnstructuredGridExecute(

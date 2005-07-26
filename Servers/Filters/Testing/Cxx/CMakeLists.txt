@@ -6,7 +6,6 @@ INCLUDE_DIRECTORIES(
 
 SET(ServersFilters_SRCS
   ServersFiltersPrintSelf
-  TestCTH
   TestMPI
   )
 
