@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.27");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.28");
 
 
 //*****************************************************************************
@@ -236,6 +236,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
     return pvs1;
     }
 
+  // add all the sources into collection
   vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
   vtkCollectionIterator *itChoices;
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
@@ -256,6 +257,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
     } 
   it->Delete();
 
+  // ask user to specify
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetMasterWindow(win);
   dialog->SetOptions(
@@ -284,20 +286,21 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
   dialog->SetTitle( "Multiple Matching Sources" );
   dialog->SetIcon();
   dialog->BeepOn();
-  dialog->Invoke();
-  itChoices->InitTraversal();
-  while(!itChoices->IsDoneWithTraversal())
+  if(dialog->Invoke())
     {
-    pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-    if(!strcmp(menu->GetValue(),pvs2->GetModuleName()))
+    itChoices->InitTraversal();
+    while(!itChoices->IsDoneWithTraversal())
       {
-      source = pvs2;
-      break;
+      pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+      if(!strcmp(menu->GetValue(),pvs2->GetModuleName()))
+        {
+        source = pvs2;
+        break;
+        }
+      itChoices->GoToNextItem();
       }
-    itChoices->GoToNextItem();
     }
   dialog->Delete();
-
   it->Delete();
   choices->Delete();
   itChoices->Delete();
@@ -312,6 +315,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(char *name)
   vtkPVSource *pvs1;
   vtkPVSource *source = NULL;
 
+  // If there is an open source that matches this one, use it, otherwise, create a new one
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
@@ -370,8 +374,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
       }
     }
 
-
-//ds
+  // If there is an open reader of the same type and filename, use it, 
+  // 
   vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
@@ -458,18 +462,20 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
           dialog->SetTitle( "Multiple Matching Sources" );
           dialog->SetIcon();
           dialog->BeepOn();
-          dialog->Invoke();
-          itChoices->InitTraversal();
-          while(!itChoices->IsDoneWithTraversal())
+          if(dialog->Invoke())
             {
-            pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-            mod = vtkPVReaderModule::SafeDownCast(pvs2);
-            if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+            itChoices->InitTraversal();
+            while(!itChoices->IsDoneWithTraversal())
               {
-              source = pvs2;
-              break;
+              pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+              mod = vtkPVReaderModule::SafeDownCast(pvs2);
+              if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+                {
+                source = pvs2;
+                break;
+                }
+              itChoices->GoToNextItem();
               }
-            itChoices->GoToNextItem();
             }
           itChoices->Delete();
           dialog->Delete();
@@ -500,8 +506,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(char *moduleName, char *name)
   vtkPVSource *currentSource = win->GetCurrentPVSource();
   char *targetName;
   vtkPVReaderModule *mod;
-  
-//ds
+  FILE *file;
+
+  // If there is an open dataset of the same type and path, return it
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
@@ -525,65 +532,44 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(char *moduleName, char *name)
           source = pvs;
           }
         }
-      else
-        {
-        if(!strcmp(pvs->GetModuleName(),moduleName))
-          {
-          source = pvs;
-          }
-        }
       }
     it->GoToNextItem();
     }
   it->Delete();
 
- // while(this->DatasetList[i])
- //   {
+  // If there is no match among the open datasets, try to open it automatically, otherwise ask the user
   if(!source)
     {
-    // if this is a source we can create it on our own given the class name
-    if(!strstr(name,"/") && !strstr(name,"\\"))
+    if( (file = fopen(name,"r")) != NULL)
       {
-      source = win->CreatePVSource(name,"Sources",1,1);
-      source = win->GetCurrentPVSource();
-      source->AcceptCallback();
+      fclose(file);
+      if(win->Open(name) == VTK_OK)
+        {
+        source = win->GetCurrentPVSource();
+        source->AcceptCallback();
+        }
       }
     else
       {
-      FILE *file;
-      if( (file = fopen(name,"r")) != NULL)
-        {
-        fclose(file);
-        //look for dataset at stored path and open automatically if found
-        if(win->Open(name) == VTK_OK)
-          {
-          source = win->GetCurrentPVSource();
-          source->AcceptCallback();
-          }
-        }
-      else
-        {
-        //ask user for dataset
-        vtkKWMessageDialog::PopupMessage(
-          this->GetPVApplication(), win, "Could Not Find Default Data Set", 
-          "You will now be asked to select a different data set.", 
-          vtkKWMessageDialog::ErrorIcon);
+      vtkKWMessageDialog::PopupMessage(
+        this->GetPVApplication(), win, "Could Not Find Default Data Set", 
+        "You will now be asked to select a different data set.", 
+        vtkKWMessageDialog::ErrorIcon);
 
-        win->OpenCallback();
-        source = win->GetCurrentPVSource();
-        if(source==currentSource || !source->IsA("vtkPVReaderModule"))
-          {
-          return 0;
-          }
-        source->AcceptCallback();
-
-        this->Script("focus %s",this->GetWidgetName());
+      win->OpenCallback();
+      source = win->GetCurrentPVSource();
+      if(source==currentSource || !source->IsA("vtkPVReaderModule"))
+        {
+        return 0;
         }
+      source->AcceptCallback();
+
+      this->Script("focus %s",this->GetWidgetName());
       }
     }
+
   return source;
- //   i++;
- //   }
+
 }
 
 void vtkPVLookmark::CreateIconFromMainView()
