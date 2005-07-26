@@ -77,10 +77,11 @@
 #include <vtkstd/string>
 #include "vtkStdString.h"
 #include "vtkKWMenuButton.h"
+#include "vtkPVVolumeAppearanceEditor.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.26");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.27");
 
 
 //*****************************************************************************
@@ -1294,6 +1295,10 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             sscanf(ptr,"%*s %*s %d",&ival);
             iter->first->SetVisibility(ival);
             }
+          if(strstr(ptr,"ShowVolumeAppearanceEditor"))
+            {
+            this->InitializeVolumeAppearanceEditor(iter->first,ptr);
+            }
           executeCmd = false;
 
 /*
@@ -1344,6 +1349,51 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     ++iter;
     }
   delete [] buf;
+}
+
+void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, char *firstLine)
+{
+  double fval1,fval2,fval3,fval4;
+  int ival;
+
+  vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
+
+  char *ptr = firstLine;
+  // needed to display edit volume appearance setting button:
+  src->GetPVOutput()->DrawVolume();
+  src->GetPVOutput()->ShowVolumeAppearanceEditor();
+
+  ptr = strtok(NULL,"\r\n");
+  vol->RemoveAllScalarOpacityPoints();
+
+  ptr = strtok(NULL,"\r\n");
+  while(strstr(ptr,"AppendScalarOpacityPoint"))
+    {
+    sscanf(ptr,"%*s %*s %lf %lf",&fval1,&fval2);
+    vol->AppendScalarOpacityPoint(fval1,fval2);
+    ptr = strtok(NULL,"\r\n");
+    }
+
+  sscanf(ptr,"%*s %*s %lf ",&fval1);
+  vol->SetScalarOpacityUnitDistance(fval1);
+
+  ptr = strtok(NULL,"\r\n");
+  vol->RemoveAllColorPoints();
+
+  ptr = strtok(NULL,"\r\n");
+  while(strstr(ptr,"AppendColorPoint"))
+    {
+    sscanf(ptr,"%*s %*s %lf %lf",&fval1,&fval2,&fval3,&fval4);
+    vol->AppendColorPoint(fval1,fval2,fval3,fval4);
+    ptr = strtok(NULL,"\r\n");
+    }
+
+  sscanf(ptr,"%*s %*s %d",&ival);
+  vol->SetHSVWrap(ival);
+
+  ptr = strtok(NULL,"\r\n");
+  sscanf(ptr,"%*s %*s %d",&ival);
+  vol->SetColorSpace(ival);
 }
 
 

@@ -176,6 +176,7 @@ protected:
   vtkPVSource *GetReaderForMacro(char *module, char *name);
   vtkPVSource *GetSourceForLookmark(char *name);
   vtkPVSource *GetSourceForMacro(char *name);
+  void InitializeVolumeAppearanceEditor(vtkPVSource*,char*);
 
   char* StateScript;
   char* ImageData;

@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.54");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -619,8 +619,11 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   for(j=0; j<root->GetNumberOfNestedElements(); j++)
     {
     lmkElement = root->GetNestedElement(j);
-
-    // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
+    // ignore folders for now
+    if(!strcmp(lmkElement->GetName(),"LmkFolder"))
+      {
+      continue;
+      }
     // create lookmark widget
     lookmarkWidget = this->GetPVLookmark(lmkElement);
     lookmarkWidget->SetMacroFlag(1);
@@ -1609,7 +1612,7 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     {
     lmkFolderWidget = vtkKWLookmarkFolder::New();
     lmkFolderWidget->SetParent(parent);
-    if(!strcmp(lmkElement->GetAttribute("Name"),"Macros"))
+    if(lmkElement->GetAttribute("Name") && !strcmp(lmkElement->GetAttribute("Name"),"Macros"))
       {
       lmkFolderWidget->SetMacroFlag(1);
       }
@@ -1918,7 +1921,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "No Lookmark Selected", 
-      "To update a lookmark with a new view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
+      "To update a lookmark to the current view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
 
@@ -1928,7 +1931,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "Multiple Lookmarks Selected", 
-      "To update a lookmark with a new view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
+      "To update a lookmark to the current view, first select only one lookmark by checking its box. Then  go to \"Edit\" --> \"Update Lookmark\".", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
 
@@ -1963,7 +1966,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetPVApplication(), win, "No Data Loaded", 
-      "To create a lookmark you must first open your data and view some feature of interest. Then press \"Create Lookmark\" in either the main window or in the \"Edit\" menu.", 
+      "To create a lookmark you must first open your data and view some feature of interest. Then press \"Create Lookmark\" in the main window of the Lookmark Manager or in its \"Edit\" menu. Also, if the Lookmark toolbar is enabled, you can press the icon of a book in the main ParaView window.", 
       vtkKWMessageDialog::ErrorIcon);
     this->Focus();
 
