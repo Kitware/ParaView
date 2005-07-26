@@ -22,14 +22,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.32.2.1");
+vtkCxxRevisionMacro(vtkPVOptions, "1.32.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
 {
   this->SetProcessType(ALLPROCESS);
   // Initialize vtksys::CommandLineArguments
-  this->MachinesFileName = 0;
   this->RenderModuleName = NULL;
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
@@ -79,7 +78,6 @@ vtkPVOptions::~vtkPVOptions()
   this->SetDataServerHostName(0);
   this->SetRenderServerHostName(0);
   this->SetClientHostName(0);
-  this->SetMachinesFileName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -156,10 +154,6 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
                     "Size of tile display in the number of displays in each column of the display.",
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
-  
-  // This should be deprecated when I get the time 
-  this->AddArgument("--machines", "-m", &this->MachinesFileName, 
-                    "Specify the network configurations file for the render server.");
 }
 
 //----------------------------------------------------------------------------
@@ -330,8 +324,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Using RenderingGroup: " << (this->UseRenderingGroup?"Enabled":"Disabled") << endl;
 
   os << indent << "Render Module Used: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
-
-  os << indent << "Network Configuration: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
 
   os << indent << "Compositing: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
 

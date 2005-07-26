@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4.2.1");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -41,7 +41,6 @@ public:
 
 vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
 {
-  this->MachinesFileName = 0;
   this->Socket = 0;
   this->HostName = 0;
   this->PortNumber = 0;
@@ -83,45 +82,7 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
     os << i3 << "PortNumber: " << this->Internals->ServerInformation[i].PortNumber << "\n";
     os << i3 << "HostName: " << this->Internals->ServerInformation[i].HostName.c_str() << "\n";
     }
-  os << indent << "MachinesFileName: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
   os << indent << "PortNumber: " << this->PortNumber << endl;
-}
-
-void vtkMPIMToNSocketConnection::LoadMachinesFile()
-{
-  if(!this->MachinesFileName)
-    {
-    return;
-    }
-
-  vtkWarningMacro("The names of the machines making up this server should "
-                  "be specified in the XML configuration file. The --machines "
-                  "(and -m) command-line arguments have been deprecated and "
-                  "will be removed in the next ParaView release.");
-
-  FILE* file = fopen(this->MachinesFileName, "r");
-  char machinename[1024];
-  if(!file)
-    {
-    vtkErrorMacro("Could not open file : " << this->MachinesFileName);
-    return;
-    }
-  while(!feof(file))
-    {
-    if(fgets(machinename, 1024, file) != 0)
-      {
-      int pos = strlen(machinename)-1;
-      if(machinename[pos] == '\n')
-        {
-        machinename[pos] = 0;
-        }
-      if(strlen(machinename) > 0)
-        {
-        this->Internals->MachineNames.push_back(machinename);
-        }
-      }
-    }
-  fclose(file);
 }
 
 void vtkMPIMToNSocketConnection::SetMachineName(unsigned int idx,
@@ -166,11 +127,6 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
       }
     else
       {
-      vtkErrorMacro("Bad configuration file more processes than machines listed."
-                    << " Configfile= " << this->MachinesFileName << "\n"
-                    << " process id = " << myId << "\n"
-                    << " number of machines in file: " <<  
-                    this->Internals->MachineNames.size() << "\n");
       this->SetHostName("localhost");
       }
     }
@@ -282,19 +238,7 @@ void vtkMPIMToNSocketConnection::GetPortInformation(
   // not call AddInformation for process 0
   if(myId == 0)
     {
-    this->LoadMachinesFile();
     info->SetPortNumber(0, this->PortNumber);
-    if(this->Internals->MachineNames.size() &&
-       (this->Internals->MachineNames.size() 
-        < static_cast<unsigned int>(info->GetNumberOfConnections())))
-      {
-      vtkErrorMacro("Bad Configuration file, expected " << info->GetNumberOfConnections()
-                    << " machines and found " << this->Internals->MachineNames.size());
-      }
-    for(unsigned int i = 0; i < this->Internals->MachineNames.size(); ++i)
-      {
-      info->SetHostName(i, this->Internals->MachineNames[i].c_str());
-      }
     }
   info->SetHostName(this->HostName);
   info->SetProcessNumber(myId);

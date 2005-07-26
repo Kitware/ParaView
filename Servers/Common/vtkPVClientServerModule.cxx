@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36.2.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -844,12 +844,6 @@ void vtkPVClientServerModule::InitializeRenderServer()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke 
          << id << "SetPortNumber" << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << this->GetProcessModuleID() << "GetMachinesFileName" 
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke 
-         << id << "SetMachinesFileName" << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << this->GetProcessModuleID() << "GetNumberOfMachines"

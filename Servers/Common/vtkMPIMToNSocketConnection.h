@@ -75,10 +75,6 @@ public:
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
   
   // Description:
-  // Set the name of the configure file containing the names of the render hosts.
-  vtkSetStringMacro(MachinesFileName);
-  
-  // Description:
   // Set port to use, if the value is 0, then the system will pick the port.
   vtkSetMacro(PortNumber,int);
 
@@ -87,7 +83,6 @@ public:
   void SetMachineName(unsigned int idx, const char* name);
 
 protected:
-  void LoadMachinesFile();
   virtual void SetController(vtkMultiProcessController*);
   virtual void SetSocketCommunicator(vtkSocketCommunicator*);
   vtkMPIMToNSocketConnection();
@@ -96,7 +91,6 @@ private:
   int PortNumber;
   int Socket;
   char* HostName;
-  char* MachinesFileName;
   vtkSetStringMacro(HostName);
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionInternals* Internals;

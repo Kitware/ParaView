@@ -174,7 +174,6 @@ public:
   // Description:
   // Propagate from the options so that it is available in CS
   int GetRenderNodePort();
-  char* GetMachinesFileName();
   int GetClientMode();
   unsigned int GetNumberOfMachines();
   const char* GetMachineName(unsigned int idx);

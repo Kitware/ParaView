@@ -64,7 +64,6 @@ public:
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetStringMacro(RenderModuleName);
-  vtkGetStringMacro(MachinesFileName);
   vtkGetStringMacro(GroupFileName);
   vtkGetStringMacro(ParaViewDataName);
 
@@ -159,9 +158,6 @@ private:
 
   
   char* RenderModuleName;
-
-  vtkSetStringMacro(MachinesFileName);
-  char* MachinesFileName;
 
   vtkSetStringMacro(GroupFileName);
   char* GroupFileName;

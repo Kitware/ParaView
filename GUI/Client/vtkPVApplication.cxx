@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.365.2.1");
+vtkCxxRevisionMacro(vtkPVApplication, "1.365.2.2");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -681,8 +681,6 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "", 
   "--connect-render-to-data" , "-r2d", 
   "", 
-  "--machines" , "-m", 
-  "",
   "--server" , "-v", 
   "",
   "--render-server" , "-rs", 
