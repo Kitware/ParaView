@@ -62,6 +62,7 @@ IF(UNIX)
     CACHE INTERNAL "Path to tk stub library" FORCE)
   SET(TK_INCLUDE_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/generic 
     CACHE INTERNAL "Path to tk include" FORCE)
+  GET_FILENAME_COMPONENT(TCL_X11_LIBRARY_PATH "${X11_X11_LIB}" PATH)
 
   CONFIGURE_FILE(${TclTk_SOURCE_DIR}/configure_tcltk.sh.in
     ${TclTk_BINARY_DIR}/configure_tcltk.sh IMMEDIATE @ONLY)
