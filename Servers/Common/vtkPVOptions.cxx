@@ -22,14 +22,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.32");
+vtkCxxRevisionMacro(vtkPVOptions, "1.32.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
 {
   this->SetProcessType(ALLPROCESS);
   // Initialize vtksys::CommandLineArguments
-  this->CaveConfigurationFileName = 0;
   this->MachinesFileName = 0;
   this->RenderModuleName = NULL;
   this->UseRenderingGroup = 0;
@@ -75,7 +74,6 @@ vtkPVOptions::vtkPVOptions()
 vtkPVOptions::~vtkPVOptions()
 {
   this->SetRenderModuleName(0);
-  this->SetCaveConfigurationFileName(NULL);
   this->SetGroupFileName(0);
   this->SetServerHostName(0);
   this->SetDataServerHostName(0);
@@ -160,8 +158,6 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   
   // This should be deprecated when I get the time 
-  this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
-    "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
   this->AddArgument("--machines", "-m", &this->MachinesFileName, 
                     "Specify the network configurations file for the render server.");
 }
@@ -222,10 +218,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     {
     this->ClientMode = 1;
     this->RenderServerMode = 2;
-    }
-  if ( this->CaveConfigurationFileName )
-    {
-    this->SetRenderModuleName("CaveRenderModule");
     }
 #ifdef PARAVIEW_ALWAYS_SECURE_CONNECTION
   if ( (this->ClientMode || this->ServerMode) && !this->ConnectID)
@@ -340,8 +332,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Render Module Used: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
 
   os << indent << "Network Configuration: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
-
-  os << indent << "Cave Configuration: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
 
   os << indent << "Compositing: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
 

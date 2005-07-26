@@ -47,7 +47,6 @@ protected:
   // This is called after CreateVTKObjects();
   virtual void InitializeCompositingPipeline();
 
-  void LoadConfigurationFile(int numDisplays);
   void ConfigureFromServerInformation();
 
   // Description:

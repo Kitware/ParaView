@@ -64,7 +64,6 @@ public:
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetStringMacro(RenderModuleName);
-  vtkGetStringMacro(CaveConfigurationFileName);
   vtkGetStringMacro(MachinesFileName);
   vtkGetStringMacro(GroupFileName);
   vtkGetStringMacro(ParaViewDataName);
@@ -160,9 +159,6 @@ private:
 
   
   char* RenderModuleName;
-
-  vtkSetStringMacro(CaveConfigurationFileName);
-  char* CaveConfigurationFileName;
 
   vtkSetStringMacro(MachinesFileName);
   char* MachinesFileName;

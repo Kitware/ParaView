@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5.2.1");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -130,99 +130,8 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
       {
       numDisplays = m2n->GetNumberOfConnections();
       }    
-    this->LoadConfigurationFile(numDisplays);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
-{
-  int idx;
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
-  
-  const char* fileName = pm->GetOptions()->GetCaveConfigurationFileName();
-  ifstream *File = 0;
-  if(!fileName)
-    {
     this->ConfigureFromServerInformation();
-    return;
     }
-
-  vtkWarningMacro("Cave parameters should be specified in the XML "
-                  "configuration file. The --cave-configuration (and -cc) "
-                  "command-line arguments have been deprecated and will be "
-                  "removed in the next ParaView release.");
-  
-  // Open the new file
-  struct stat fs;
-  if ( !stat( fileName, &fs) )
-    {
-#ifdef _WIN32
-    File = new ifstream(fileName, ios::in | ios::binary);
-#else
-    File = new ifstream(fileName, ios::in);
-#endif
-    }
-  if (! File)
-    {
-    vtkErrorMacro(<< "Initialize: Could not open file " << fileName);
-    return;
-    }
-
-  if (File->fail())
-    {
-    File->close();
-    delete File;
-    vtkErrorMacro(<< "Initialize: Could not open file " << fileName);
-    return;
-    }
-
-  vtkCaveRenderManager* crm = 
-    vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
-        this->CompositeManagerProxy->GetID(0)));
-
-  for (idx = 0; idx < numDisplays; ++idx)
-    { // Just a test case.  Configuration file later.
-    char displayName[256];
-    double o[3];
-    double x[3];
-    double y[3];
-
-    File->getline(displayName,256);
-    if (File->fail())
-      {
-      File->close();
-      delete File;
-      vtkErrorMacro(<< "Could not read display " << idx);
-      return;
-      }
-    pm->SetProcessEnvironmentVariable(idx, displayName); 
-
-    *File >> o[0];
-    *File >> o[1];
-    *File >> o[2];
-
-    *File >> x[0];
-    *File >> x[1];
-    *File >> x[2];
-
-    *File >> y[0];
-    *File >> y[1];
-    *File >> y[2];
-
-    if (File->fail())
-      {
-      File->close();
-      delete File;
-      vtkErrorMacro("Unexpected end of configuration file.");
-      return;
-      }
-
-    crm->DefineDisplay(idx, o, x, y);
-    }
-  File->close();
-  delete File;
 }
 
 //-----------------------------------------------------------------------------
