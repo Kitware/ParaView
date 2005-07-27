@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.53");
+vtkCxxRevisionMacro(vtkKWRange, "1.54");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1544,7 +1544,6 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
     return;
     }
 
-  const char *canv = this->Canvas->GetWidgetName();
   int i, pos_min = 0, pos_max, pos_range;
 
   if (this->Orientation == vtkKWRange::OrientationHorizontal)
@@ -2140,7 +2139,6 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     return;
     }
 
-  const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
     this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0];
 
@@ -2201,7 +2199,6 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     return;
     }
 
-  const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
     this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0];
 

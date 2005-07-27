@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -315,10 +315,10 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     this->TextPropertyPopupButton->GetLabel()->SetText("Text properties:");
     this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
 
-    vtkKWFrame *frame = 
+    vtkKWFrame *popupframe = 
       this->TextPropertyPopupButton->GetWidget()->GetPopupFrame();
-    frame->SetBorderWidth(2);
-    frame->SetReliefToGroove();
+    popupframe->SetBorderWidth(2);
+    popupframe->SetReliefToGroove();
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TextPropertyPopupButton->GetWidgetName());
