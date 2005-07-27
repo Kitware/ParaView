@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.10");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -1265,6 +1265,26 @@ int vtkKWMultiColumnList::GetCellTextAsInt(int row_index, int col_index)
 double vtkKWMultiColumnList::GetCellTextAsDouble(int row_index, int col_index)
 {
   return atof(this->GetCellConfigurationOption(row_index, col_index, "-text"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InsertRowText(int row_index, const char *text)
+{
+  int nb_cols = this->GetNumberOfColumns();
+  for (int i = 0; i < nb_cols; i++)
+    {
+    this->InsertCellText(row_index, i, text);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InsertColumnText(int col_index, const char *text)
+{
+  int nb_rows = this->GetNumberOfRows();
+  for (int i = 0; i < nb_rows; i++)
+    {
+    this->InsertCellText(i, col_index, text);
+    }
 }
 
 //----------------------------------------------------------------------------

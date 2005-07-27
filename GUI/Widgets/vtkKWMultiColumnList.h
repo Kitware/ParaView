@@ -49,7 +49,7 @@ public:
   // If width is set to 0, the widget will be large enough to show
   // all columns. If set to a different value, columns will stretch
   // depending on their width (see SetColumnWidth) and on the strech
-  // parameter (see SetColumnStretchable)
+  // parameter (see SetColumnStretchable and StretchableColumns)
   virtual void SetWidth(int width);
   virtual int GetWidth();
   virtual void SetHeight(int height);
@@ -427,6 +427,11 @@ public:
   virtual const char* GetCellText(int row_index, int col_index);
   virtual int GetCellTextAsInt(int row_index, int col_index);
   virtual double GetCellTextAsDouble(int row_index, int col_index);
+
+  // Description:
+  // Convenience method to set the contents of a full row or full column.
+  virtual void InsertRowText(int row_index, const char *text);
+  virtual void InsertColumnText(int col_index, const char *text);
 
   // Description:
   // Activate a cell.
