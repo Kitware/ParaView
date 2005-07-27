@@ -189,6 +189,7 @@ public:
   // Description:
   // Convenience method to set the callback for single click and double
   // click on a node. This, in turn, just calls SetBindText.
+  // The node idenfier on which the event occurs is appended to the command.
   virtual void SetDoubleClickOnNodeCommand(
     vtkObject *obj, const char *method);
   virtual void SetSingleClickOnNodeCommand(
