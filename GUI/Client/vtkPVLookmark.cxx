@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.32");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.33");
 
 
 //*****************************************************************************
@@ -273,12 +273,24 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
 //  itChoices = choices->NewIterator();
   itChoices = sources->NewIterator();
   itChoices->InitTraversal();
+  char *defaultValue = NULL;
   while(!itChoices->IsDoneWithTraversal())
     {
     pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     menu->AddRadioButton(pvs2->GetModuleName());
-    menu->SetValue(pvs2->GetModuleName());
+    if(!strcmp(name,pvs2->GetModuleName()))
+      {
+      defaultValue = name;
+      }
     itChoices->GoToNextItem();
+    }
+  if(defaultValue)
+    {
+    menu->SetValue(defaultValue);
+    }
+  else if(pvs2)
+    {
+    menu->SetValue(pvs2->GetModuleName());
     }
   sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
   dialog->SetText( mesg );
@@ -360,6 +372,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
   const char *ptr1;
   const char *ptr2;
   char mesg[400];
+  char *defaultValue = NULL;
 
   // check if this lookmark has a single source  first
   // if so, use the currently viewed reader
@@ -478,8 +491,20 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
     pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     mod = vtkPVReaderModule::SafeDownCast(pvs);
     menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-    menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+    if(!strcmp(name,mod->RemovePath(mod->GetFileEntry()->GetValue())))
+      {
+      defaultValue = name;
+      }
     itChoices->GoToNextItem();
+    }
+  // if there is an exact filename match, set it as default entry, otherwise, use last one added
+  if(defaultValue)
+    {
+    menu->SetValue(defaultValue);
+    }
+  else if(mod)
+    {
+    menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
     }
   sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
   dialog->SetText( mesg );
