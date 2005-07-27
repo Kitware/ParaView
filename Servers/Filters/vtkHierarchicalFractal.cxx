@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.7");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.8");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -1477,5 +1477,9 @@ void vtkHierarchicalFractal::PrintSelf(ostream& os, vtkIndent indent)
     os << "False";
     }
   os<< endl;
+  os << indent << "TimeStep: " << this->TimeStep << endl;
+  os << indent << "TimeStepRange: " 
+     << this->TimeStepRange[0] << " " << this->TimeStepRange[1]
+     << endl;
 }
 
