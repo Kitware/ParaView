@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.24");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -67,10 +67,7 @@ char* vtkKWPushButton::GetText()
 //----------------------------------------------------------------------------
 void vtkKWPushButton::SetWidth(int width)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -width %d", this->GetWidgetName(), width);
-    }
+  this->SetConfigurationOptionAsInt("-width", width);
 }
 
 //----------------------------------------------------------------------------

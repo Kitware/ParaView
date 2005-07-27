@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.40");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -103,8 +103,8 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->CommandEntry->Create(app);
   this->CommandEntry->SetWidth(40);
   this->CommandEntry->SetHighlightThickness(1);
-  this->Script("bind %s <Return> {%s Evaluate}",
-               this->CommandEntry->GetWidgetName(), this->GetTclName());
+
+  this->CommandEntry->SetBinding("<Return>", this, "Evaluate");
   
   this->Script("pack %s -side left", this->CommandLabel->GetWidgetName());
   this->Script("pack %s -side left -expand 1 -fill x",
@@ -115,7 +115,6 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->DisplayText->VerticalScrollbarVisibilityOn();
 
   vtkKWText *text = this->DisplayText->GetWidget();
-  text->ResizeToGridOn();
   text->SetWidth(100);
   text->SetHeight(20);
   text->SetWrapToWord();
@@ -129,10 +128,8 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
 
   this->Script("set commandList \"\"");
 
-  this->Script("bind %s <Down> {%s DownCallback}",
-               this->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Up> {%s UpCallback}",
-               this->GetWidgetName(), this->GetTclName());
+  this->SetBinding("<Down>", this, "DownCallback");
+  this->SetBinding("<Up>", this, "UpCallback");
   
   this->Withdraw();
 }

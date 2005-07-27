@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.11");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.12");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -255,36 +255,22 @@ void vtkKWHSVColorSelector::Bind()
 
   if (this->HueSatWheelCanvas && this->HueSatWheelCanvas->IsAlive())
     {
-    const char *canv = this->HueSatWheelCanvas->GetWidgetName();
-
-    tk_cmd << "bind " << canv
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " HueSatPickCallback %%x %%y}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <B1-Motion> {" << this->GetTclName() 
-           << " HueSatMoveCallback %%x %%y}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <ButtonRelease-1> {" << this->GetTclName() 
-           << " HueSatReleaseCallback}" << endl;
+    this->HueSatWheelCanvas->SetBinding(
+      "<ButtonPress-1>", this, "HueSatPickCallback %x %y");
+    this->HueSatWheelCanvas->SetBinding(
+      "<B1-Motion>", this, "HueSatMoveCallback %x %y");
+    this->HueSatWheelCanvas->SetBinding(
+      "<ButtonRelease-1>", this, "HueSatReleaseCallback");
     }
 
   if (this->ValueBoxCanvas && this->ValueBoxCanvas->IsAlive())
     {
-    const char *canv = this->ValueBoxCanvas->GetWidgetName();
-
-    tk_cmd << "bind " << canv
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " ValuePickCallback %%x %%y}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <B1-Motion> {" << this->GetTclName() 
-           << " ValueMoveCallback %%x %%y}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <ButtonRelease-1> {" << this->GetTclName() 
-           << " ValueReleaseCallback}" << endl;
+    this->ValueBoxCanvas->SetBinding(
+      "<ButtonPress-1>", this, "ValuePickCallback %x %y");
+    this->ValueBoxCanvas->SetBinding(
+      "<B1-Motion>", this, "ValueMoveCallback %x %y");
+    this->ValueBoxCanvas->SetBinding(
+      "<ButtonRelease-1>", this, "ValueReleaseCallback");
     }
 
   tk_cmd << ends;
@@ -306,30 +292,16 @@ void vtkKWHSVColorSelector::UnBind()
 
   if (this->HueSatWheelCanvas && this->HueSatWheelCanvas->IsAlive())
     {
-    const char *canv = this->HueSatWheelCanvas->GetWidgetName();
-
-    tk_cmd << "bind " << canv
-           << " <ButtonPress-1> {}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <B1-Motion> {}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <ButtonRelease-1> {}" << endl;
+    this->HueSatWheelCanvas->RemoveBinding("<ButtonPress-1>");
+    this->HueSatWheelCanvas->RemoveBinding("<B1-Motion>");
+    this->HueSatWheelCanvas->RemoveBinding("<ButtonRelease-1>");
     }
 
   if (this->ValueBoxCanvas && this->ValueBoxCanvas->IsAlive())
     {
-    const char *canv = this->ValueBoxCanvas->GetWidgetName();
-
-    tk_cmd << "bind " << canv
-           << " <ButtonPress-1> {}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <B1-Motion> {}" << endl;
-
-    tk_cmd << "bind " << canv
-           << " <ButtonRelease-1> {}" << endl;
+    this->ValueBoxCanvas->RemoveBinding("<ButtonPress-1>");
+    this->ValueBoxCanvas->RemoveBinding("<B1-Motion>");
+    this->ValueBoxCanvas->RemoveBinding("<ButtonRelease-1>");
     }
   
   tk_cmd << ends;
@@ -622,15 +594,17 @@ void vtkKWHSVColorSelector::RedrawHueSatWheelCanvas()
   tk_cmd << canv << " coords " << VTK_KW_HSV_SEL_IMAGE_TAG
          << " " << width_offset << " " << height_offset << endl;
 
-  // Reconfigure the canvas given the image size and margins
+  // Resize the canvas given the image size and margins
 
   int c_height = 2 * (this->HueSatWheelRadius + height_offset);
   int c_width  = 2 * (this->HueSatWheelRadius + width_offset);
 
-  tk_cmd << canv << " config "
-         << " -width " << c_width << " -height " << c_height
-         << " -scrollregion {0 0 " << c_width << " " << c_height << "}"
-         << endl;
+  this->HueSatWheelCanvas->SetWidth(c_width);
+  this->HueSatWheelCanvas->SetHeight(c_height);
+
+  char buffer[20];
+  sprintf(buffer, "0 0 %d %d", c_width, c_height);
+  this->HueSatWheelCanvas->SetConfigurationOption("-scrollregion", buffer);
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -641,8 +615,10 @@ void vtkKWHSVColorSelector::RedrawHueSatWheelCanvas()
   int i_height = 2 * this->HueSatWheelRadius;
   int i_width = i_height;
   
-  if (atoi(this->Script("%s cget -width", img_name.str())) != i_width ||
-      atoi(this->Script("%s cget -height", img_name.str())) !=  i_height)
+  vtkKWApplication *app = this->GetApplication();
+
+  if (vtkKWTkUtilities::GetPhotoWidth(app, img_name.str()) != i_width ||
+      vtkKWTkUtilities::GetPhotoHeight(app, img_name.str()) !=  i_height)
     {
     this->UpdateHueSatWheelImage();
     }
@@ -873,15 +849,17 @@ void vtkKWHSVColorSelector::RedrawValueBoxCanvas()
   tk_cmd << canv << " coords " << VTK_KW_HSV_SEL_IMAGE_TAG
          << " " << width_offset << " " << height_offset << endl;
 
-  // Reconfigure the canvas given the image size and margins
+  // Resize the canvas given the image size and margins
 
   int c_height = 2 * (this->HueSatWheelRadius + height_offset);
   int c_width = this->ValueBoxWidth + 2 * width_offset;
 
-  tk_cmd << canv << " config "
-         << " -width " << c_width << " -height " << c_height
-         << " -scrollregion {0 0 " << c_width - 1 << " " << c_height - 1 << "}"
-         << endl;
+  this->ValueBoxCanvas->SetWidth(c_width);
+  this->ValueBoxCanvas->SetHeight(c_height);
+
+  char buffer[20];
+  sprintf(buffer, "0 0 %d %d", c_width - 1, c_height - 1);
+  this->ValueBoxCanvas->SetConfigurationOption("-scrollregion", buffer);
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -892,8 +870,10 @@ void vtkKWHSVColorSelector::RedrawValueBoxCanvas()
   int i_height = 2 * this->HueSatWheelRadius;
   int i_width = this->ValueBoxWidth;
   
-  if (atoi(this->Script("%s cget -width", img_name.str())) != i_width ||
-      atoi(this->Script("%s cget -height", img_name.str())) !=  i_height)
+  vtkKWApplication *app = this->GetApplication();
+
+  if (vtkKWTkUtilities::GetPhotoWidth(app, img_name.str()) != i_width ||
+      vtkKWTkUtilities::GetPhotoHeight(app, img_name.str()) !=  i_height)
     {
     this->UpdateValueBoxImage();
     }

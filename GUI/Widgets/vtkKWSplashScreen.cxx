@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.32");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -99,14 +99,11 @@ void vtkKWSplashScreen::UpdateCanvasSize()
 
   if (this->IsCreated() && this->ImageName)
     {
-    int w, h;
-    const char *res = 
-      this->Script("concat [%s cget -width] [%s cget -height]", 
-                   this->ImageName, this->ImageName);
-    sscanf(res, "%d %d", &w, &h);
-
-    this->Script("%s config -width %d -height %d",
-                 this->Canvas->GetWidgetName(), w, h);
+    vtkKWApplication *app = this->GetApplication();
+    this->Canvas->SetWidth(
+      vtkKWTkUtilities::GetPhotoWidth(app, this->ImageName));
+    this->Canvas->SetHeight(
+      vtkKWTkUtilities::GetPhotoHeight(app, this->ImageName));
     }
 }
 
@@ -115,13 +112,13 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 {
   if (this->IsCreated())
     {
-    int height = atoi(
-      this->Script("%s cget -height", this->Canvas->GetWidgetName()));
+    int width = this->Canvas->GetWidth();
+    int height = this->Canvas->GetHeight();
 
-    this->Script("%s coords msg [expr 0.5 * [%s cget -width]] %d", 
+    this->Script("%s coords msg %lf %d", 
                  this->Canvas->GetWidgetName(), 
-                 this->Canvas->GetWidgetName(), 
-                 (ProgressMessageVerticalOffset < 0 
+                 (double)width * 0.5, 
+                 (this->ProgressMessageVerticalOffset < 0 
                   ? height + ProgressMessageVerticalOffset 
                   : ProgressMessageVerticalOffset));
     }
@@ -268,7 +265,8 @@ int vtkKWSplashScreen::GetRequestedWidth()
 {
   if (this->IsCreated() && this->ImageName)
     {
-    return atoi(this->Script("%s cget -width", this->ImageName));
+    return vtkKWTkUtilities::GetPhotoWidth(this->GetApplication(), 
+                                           this->ImageName);
     }
   return this->Superclass::GetRequestedWidth();
 }
@@ -278,7 +276,8 @@ int vtkKWSplashScreen::GetRequestedHeight()
 {
   if (this->IsCreated() && this->ImageName)
     {
-    return atoi(this->Script("%s cget -height", this->ImageName));
+    return vtkKWTkUtilities::GetPhotoHeight(this->GetApplication(), 
+                                            this->ImageName);
     }
   return this->Superclass::GetRequestedHeight();
 }

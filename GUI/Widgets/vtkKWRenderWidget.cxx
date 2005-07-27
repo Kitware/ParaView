@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.93");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.94");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -50,7 +50,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   this->ParentWindow = NULL;
   
-  this->VTKWidget = vtkKWWidget::New();
+  this->VTKWidget = vtkKWCoreWidget::New();
 
   // Create two renderers by default (main one and overlay)
 
@@ -315,29 +315,17 @@ void vtkKWRenderWidget::AddBindings()
 
   this->RemoveBindings();
 
-  const char *tname = this->GetTclName();
-
   if (this->VTKWidget->IsCreated())
     {
-    const char *wname = this->VTKWidget->GetWidgetName();
-
     // Setup some default bindings
     
-    this->Script("bind %s <Expose> {%s Exposed}",
-                 wname, tname);
-  
-    this->Script("bind %s <Enter> {%s Enter %%x %%y}",
-                 wname, tname);
-
-    this->Script("bind %s <FocusIn> {%s FocusInCallback}", 
-                 wname, tname);
-
-    this->Script("bind %s <FocusOut> {%s FocusOutCallback}", 
-                 wname, tname);
+    this->VTKWidget->SetBinding("<Expose>", this, "Exposed");
+    this->VTKWidget->SetBinding("<Enter>", this, "Enter %x %y");
+    this->VTKWidget->SetBinding("<FocusIn>", this, "FocusInCallback");
+    this->VTKWidget->SetBinding("<FocusOut>", this, "FocusOutCallback");
     }
 
-  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-               this->GetWidgetName(), tname);
+  this->SetBinding("<Configure>", this, "Configure %w %h");
   
   this->AddInteractionBindings();
 }
@@ -352,16 +340,13 @@ void vtkKWRenderWidget::RemoveBindings()
 
   if (this->VTKWidget->IsCreated())
     {
-    const char *wname = this->VTKWidget->GetWidgetName();
-  
-    this->Script("bind %s <Expose> {}", wname);
-    this->Script("bind %s <Enter> {}", wname);
-
-    this->Script("bind %s <FocusIn> {}", wname);
-    this->Script("bind %s <FocusOut> {}", wname);
+    this->VTKWidget->RemoveBinding("<Expose>");
+    this->VTKWidget->RemoveBinding("<Enter>");
+    this->VTKWidget->RemoveBinding("<FocusIn>");
+    this->VTKWidget->RemoveBinding("<FocusOut>");
     }
 
-  this->Script("bind %s <Configure> {}", this->GetWidgetName());
+  this->RemoveBinding("<Configure>");
 
   this->RemoveInteractionBindings();
 }
@@ -387,84 +372,62 @@ void vtkKWRenderWidget::AddInteractionBindings()
 
   if (this->VTKWidget->IsCreated())
     {
-    const char *wname = this->VTKWidget->GetWidgetName();
-    const char *tname = this->GetTclName();
+    this->VTKWidget->SetBinding(
+      "<Any-ButtonPress>", this, "AButtonPress %b %x %y 0 0");
 
-    this->Script(
-      "bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 0}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
 
-    this->Script(
-      "bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-Any-ButtonPress>", this, "AButtonPress %b %x %y 0 1");
 
-    this->Script(
-      "bind %s <Shift-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 1}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
 
-    this->Script(
-      "bind %s <Shift-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-Any-ButtonPress>", this, "AButtonPress %b %x %y 1 0");
 
-    this->Script(
-      "bind %s <Control-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 1 0}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
 
-    this->Script(
-      "bind %s <Control-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<B1-Motion>", this, "MouseMove 1 %x %y");
 
-    this->Script(
-      "bind %s <B1-Motion> {%s MouseMove 1 %%x %%y}",
-      wname, tname);
-
-    this->Script(
-      "bind %s <B2-Motion> {%s MouseMove 2 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<B2-Motion>", this, "MouseMove 2 %x %y");
   
-    this->Script(
-      "bind %s <B3-Motion> {%s MouseMove 3 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<B3-Motion>", this, "MouseMove 3 %x %y");
 
-    this->Script(
-      "bind %s <Shift-B1-Motion> {%s MouseMove 1 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-B1-Motion>", this, "MouseMove 1 %x %y");
 
-    this->Script(
-      "bind %s <Shift-B2-Motion> {%s MouseMove 2 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-B2-Motion>", this, "MouseMove 2 %x %y");
   
-    this->Script(
-      "bind %s <Shift-B3-Motion> {%s MouseMove 3 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-B3-Motion>", this, "MouseMove 3 %x %y");
 
-    this->Script(
-      "bind %s <Control-B1-Motion> {%s MouseMove 1 %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-B1-Motion>", this, "MouseMove 1 %x %y");
 
-    this->Script(
-      "bind %s <Control-B2-Motion> {%s MouseMove 2 %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-B2-Motion>", this, "MouseMove 2 %x %y");
   
-    this->Script(
-      "bind %s <Control-B3-Motion> {%s MouseMove 3 %%x %%y}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-B3-Motion>", this, "MouseMove 3 %x %y");
 
-    this->Script(
-      "bind %s <KeyPress> {%s AKeyPress %%A %%x %%y 0 0 %%K}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<KeyPress>", this, "AKeyPress %A %x %y 0 0 %K");
   
-    this->Script(
-      "bind %s <Shift-KeyPress> {%s AKeyPress %%A %%x %%y 0 1 %%K}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Shift-KeyPress>", this, "AKeyPress %A %x %y 0 1 %K");
   
-    this->Script(
-      "bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0 %%K}",
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Control-KeyPress>", this, "AKeyPress %A %x %y 1 0 %K");
   
-    this->Script(
-      "bind %s <Motion> {%s MouseMove 0 %%x %%y}", 
-      wname, tname);
+    this->VTKWidget->SetBinding(
+      "<Motion>", this, "MouseMove 0 %x %y");
     }
 }
 
@@ -478,32 +441,30 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 
   if (this->VTKWidget->IsCreated())
     {
-    const char *wname = this->VTKWidget->GetWidgetName();
-  
-    this->Script("bind %s <Any-ButtonPress> {}", wname);
-    this->Script("bind %s <Any-ButtonRelease> {}", wname);
-    this->Script("bind %s <Shift-Any-ButtonPress> {}", wname);
-    this->Script("bind %s <Shift-Any-ButtonRelease> {}", wname);
-    this->Script("bind %s <Control-Any-ButtonPress> {}", wname);
-    this->Script("bind %s <Control-Any-ButtonRelease> {}", wname);
+    this->VTKWidget->RemoveBinding("<Any-ButtonPress>");
+    this->VTKWidget->RemoveBinding("<Any-ButtonRelease>");
+    this->VTKWidget->RemoveBinding("<Shift-Any-ButtonPress>");
+    this->VTKWidget->RemoveBinding("<Shift-Any-ButtonRelease>");
+    this->VTKWidget->RemoveBinding("<Control-Any-ButtonPress>");
+    this->VTKWidget->RemoveBinding("<Control-Any-ButtonRelease>");
 
-    this->Script("bind %s <B1-Motion> {}", wname);
-    this->Script("bind %s <B2-Motion> {}", wname);
-    this->Script("bind %s <B3-Motion> {}", wname);
+    this->VTKWidget->RemoveBinding("<B1-Motion>");
+    this->VTKWidget->RemoveBinding("<B2-Motion>");
+    this->VTKWidget->RemoveBinding("<B3-Motion>");
 
-    this->Script("bind %s <Shift-B1-Motion> {}", wname);
-    this->Script("bind %s <Shift-B2-Motion> {}", wname);
-    this->Script("bind %s <Shift-B3-Motion> {}", wname);
+    this->VTKWidget->RemoveBinding("<Shift-B1-Motion>");
+    this->VTKWidget->RemoveBinding("<Shift-B2-Motion>");
+    this->VTKWidget->RemoveBinding("<Shift-B3-Motion>");
 
-    this->Script("bind %s <Control-B1-Motion> {}", wname);
-    this->Script("bind %s <Control-B2-Motion> {}", wname);
-    this->Script("bind %s <Control-B3-Motion> {}", wname);
+    this->VTKWidget->RemoveBinding("<Control-B1-Motion>");
+    this->VTKWidget->RemoveBinding("<Control-B2-Motion>");
+    this->VTKWidget->RemoveBinding("<Control-B3-Motion>");
 
-    this->Script("bind %s <KeyPress> {}", wname);
-    this->Script("bind %s <Shift-KeyPress> {}", wname);
-    this->Script("bind %s <Control-KeyPress> {}", wname);
+    this->VTKWidget->RemoveBinding("<KeyPress>");
+    this->VTKWidget->RemoveBinding("<Shift-KeyPress>");
+    this->VTKWidget->RemoveBinding("<Control-KeyPress>");
 
-    this->Script("bind %s <Motion> {}", wname);
+    this->VTKWidget->RemoveBinding("<Motion>");
     }
 }
 
@@ -1329,8 +1290,7 @@ void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
         }
       if (this->GetParentWindow())
         {
-        this->Script("%s config -cursor %s", 
-                     this->GetParentWindow()->GetWidgetName(), cptr);
+        this->GetParentWindow()->SetConfigurationOption("-cursor", cptr);
         }
       break;
     }

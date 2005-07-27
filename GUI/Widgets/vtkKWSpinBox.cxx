@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.5");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
@@ -98,13 +98,12 @@ void vtkKWSpinBox::SetRestrictValuesToIntegers(int restrict)
 {
   if (restrict)
     {
-    this->Script("%s configure -validate key -validatecommand {string is integer %%P}",
-      this->GetWidgetName());
+    this->SetConfigurationOption("-validate", "key");
+    this->SetConfigurationOption("-validatecommand", "string is integer %%P");
     }
   else
     {
-    this->Script("%s configure -validate none",
-      this->GetWidgetName());
+    this->SetConfigurationOption("-validate", "none");
     }
 }
 

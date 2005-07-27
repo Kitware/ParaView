@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.29");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.30");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -277,6 +277,17 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
+  // Restore Window Geometry
+
+  if (app->GetSaveUserInterfaceGeometry())
+    {
+    this->RestoreWindowGeometryFromRegistry();
+    }
+  else
+    {
+    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
+    }
+
   vtksys_stl::string cmd;
   vtksys_stl::string label;
   vtkKWMenu *menu = NULL;
@@ -404,17 +415,6 @@ void vtkKWWindowBase::Create(vtkKWApplication *app)
   // Pack and restore geometry
 
   this->Pack();
-
-  // Restore Window Geometry
-
-  if (app->GetSaveUserInterfaceGeometry())
-    {
-    this->RestoreWindowGeometryFromRegistry();
-    }
-  else
-    {
-    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
-    }
 
   // Update the enable state
 

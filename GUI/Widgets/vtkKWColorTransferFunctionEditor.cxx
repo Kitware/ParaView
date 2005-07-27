@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.40");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.41");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -569,7 +569,7 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
     this->ColorSpaceOptionMenu->Create(app);
     this->ColorSpaceOptionMenu->SetPadX(1);
     this->ColorSpaceOptionMenu->SetPadY(0);
-    this->ColorSpaceOptionMenu->IndicatorOff();
+    this->ColorSpaceOptionMenu->IndicatorVisibilityOff();
     this->ColorSpaceOptionMenu->SetBalloonHelpString(
       "Change the interpolation color space to RGB or HSV.");
 
@@ -1405,7 +1405,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
       if (this->ColorRampVisibility)
         {
         vtksys_stl::string image_name(
-          this->Script("%s cget -image", this->ColorRamp->GetWidgetName()));
+          this->ColorRamp->GetConfigurationOption("-image"));
         tk_cmd << canv << " create image 0 0 -anchor nw "
                << " -image " << image_name.c_str() 
                << " -tags {" << VTK_KW_CTFE_COLOR_RAMP_TAG << "}" << endl;

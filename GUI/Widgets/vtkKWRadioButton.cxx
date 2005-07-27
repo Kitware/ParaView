@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.20");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.21");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app)
@@ -41,19 +41,13 @@ void vtkKWRadioButton::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::SetValue(int v)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -value %d", this->GetWidgetName(), v);
-    }
+  this->SetConfigurationOptionAsInt("-value", v);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::SetValue(const char *v)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -value {%s}", this->GetWidgetName(), v);
-    }
+  this->SetConfigurationOption("-value", v);
 }
 
 //----------------------------------------------------------------------------
@@ -79,9 +73,11 @@ int vtkKWRadioButton::GetSelectedState()
 {
   if (this->IsCreated())
     {
-    return atoi(
-      this->Script("expr {${%s}} == {[%s cget -value]}",
-                   this->VariableName, this->GetWidgetName()));
+    const char *varvalue = 
+      Tcl_GetVar(
+        this->GetApplication()->GetMainInterp(), this->VariableName, 0);
+    const char *value = this->GetConfigurationOption("-value");
+    return varvalue && value && !strcmp(varvalue, value);
     }
   return 0;
 }

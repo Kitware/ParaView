@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.10");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
@@ -59,11 +59,8 @@ void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -after %s -padx 4 -fill x -expand yes", 
                this->Entry->GetWidgetName(), this->Label->GetWidgetName());
 
-  this->Script("bind %s <Return> {%s OK}",
-               this->Entry->GetWidget()->GetWidgetName(), this->GetTclName());
-
-  this->Script("bind %s <Escape> {%s Cancel}",
-               this->Entry->GetWidget()->GetWidgetName(), this->GetTclName());
+  this->Entry->SetBinding("<Return>", this, "OK");
+  this->Entry->SetBinding("<Escape>", this, "Cancel");
 }
 
 //----------------------------------------------------------------------------

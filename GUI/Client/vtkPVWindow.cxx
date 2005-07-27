@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.758");
+vtkCxxRevisionMacro(vtkPVWindow, "1.759");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1173,7 +1173,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   this->ToolbarMenuButton->Create(app);
   this->ToolbarMenuButton->SetConfigurationOption("-image", "PVToolbarPullDownArrow");
   this->ToolbarMenuButton->SetReliefToFlat();
-  this->ToolbarMenuButton->IndicatorOff();
+  this->ToolbarMenuButton->IndicatorVisibilityOff();
 
   this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->GetPVApplication()->GetRenderModuleProxy()->GetInteractor()));

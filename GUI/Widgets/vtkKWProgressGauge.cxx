@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.33");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -78,8 +78,7 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app)
   this->Script("%s create text 0 0 -anchor c -text \"\" -tags value",
                this->Canvas->GetWidgetName());
 
-  this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->Canvas->GetWidgetName(), this->GetTclName());
+  this->Canvas->SetBinding("<Configure>", this, "ConfigureCallback");
 
   this->Script("pack %s -fill both -expand yes", 
                this->Canvas->GetWidgetName());
@@ -213,7 +212,7 @@ void vtkKWProgressGauge::Redraw()
 
   // Resize the canvas
 
-  tk_cmd << wname << " config -width " << this->Width << endl;
+  this->Canvas->SetWidth(this->Width);
 
   int height = this->Height;
   if (this->ExpandHeight)
@@ -222,12 +221,12 @@ void vtkKWProgressGauge::Redraw()
     if (height < this->MinimumHeight)
       {
       height = this->MinimumHeight;
-      tk_cmd << wname << " config -height " << height << endl;
+      this->Canvas->SetHeight(height);
       }
     }
   else
     {
-    tk_cmd << wname << " config -height " << height << endl;
+    this->Canvas->SetHeight(height);
     }
 
   // If the Value is 0, set the text to nothing and the color

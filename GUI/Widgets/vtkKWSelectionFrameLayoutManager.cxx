@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.30");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1753,7 +1753,8 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
   
   if (this->IsCreated())
     {
-    this->Script("%s configure -cursor watch; update", this->GetWidgetName());
+    this->SetConfigurationOption("-cursor", "watch");
+    this->Script("update");
     }
   
   di.cbSize = sizeof(DOCINFO);
@@ -1889,7 +1890,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 
   if (this->IsCreated())
     {
-    this->Script("%s configure -cursor {}", this->GetWidgetName());
+    this->SetConfigurationOption("-cursor", NULL);
     }
 
   // At that point the Print Dialog does not seem to disappear.

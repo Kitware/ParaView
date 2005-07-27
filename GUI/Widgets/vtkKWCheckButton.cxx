@@ -17,9 +17,11 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.41");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -101,11 +103,13 @@ const char* vtkKWCheckButton::GetText()
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetSelectedState()
 {
-  if (this->IsCreated())
+  if (this->IsCreated() && this->VariableName)
     {
-    return atoi(
-      this->Script("expr {${%s}} == {[%s cget -onvalue]}",
-                   this->VariableName, this->GetWidgetName()));
+    const char *varvalue = 
+      Tcl_GetVar(
+        this->GetApplication()->GetMainInterp(), this->VariableName, 0);
+    const char *onvalue = this->GetConfigurationOption("-onvalue");
+    return varvalue && onvalue && !strcmp(varvalue, onvalue);
     }
   return 0;
 }
@@ -164,24 +168,22 @@ void vtkKWCheckButton::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::Configure()
 {
-  const char *wname = this->GetWidgetName();
-
-  this->Script("%s configure -indicatoron %d",
-               wname, (this->IndicatorVisibility ? 1 : 0));
+  this->SetConfigurationOptionAsInt(
+    "-indicatoron", (this->IndicatorVisibility ? 1 : 0));
 
   this->SetTextOption("-text", this->MyText);
 
   // Set the variable name if not set already
+
   if (!this->VariableName)
     {
-    char *vname = new char [strlen(wname) + 5 + 1];
-    sprintf(vname, "%sValue", wname);
-    this->SetVariableName(vname);
-    delete [] vname;
+    vtksys_stl::string vname(this->GetWidgetName());
+    vname += "Value";
+    this->SetVariableName(vname.c_str());
     }
   else
     {
-    this->Script("%s configure -variable {%s}", wname, this->VariableName);
+    this->SetConfigurationOption("-variable", this->VariableName);
     }
 }
 

@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.13");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.14");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -66,9 +66,11 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app)
   this->ProgressFrame->SetReliefToSunken();
   
   this->ProgressCanvas->Create(app);
-  this->Script("%s configure -bd 0 -highlightthickness 0 -background #008 -width %d -height %d",
-               this->ProgressCanvas->GetWidgetName(),
-               this->Width, this->Height);
+  this->ProgressCanvas->SetBorderWidth(0);
+  this->ProgressCanvas->SetHighlightThickness(0);
+  this->ProgressCanvas->SetWidth(this->Width);
+  this->ProgressCanvas->SetHeight(this->Height);
+  this->ProgressCanvas->SetBackgroundColor(0, 0, 0.5);
   
   this->Script("pack %s -expand yes", this->ProgressCanvas->GetWidgetName());
   this->Script("pack %s -expand yes", this->ProgressFrame->GetWidgetName());

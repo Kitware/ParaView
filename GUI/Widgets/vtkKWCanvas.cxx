@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCanvas );
-vtkCxxRevisionMacro(vtkKWCanvas, "1.7");
+vtkCxxRevisionMacro(vtkKWCanvas, "1.8");
 
 //----------------------------------------------------------------------------
 void vtkKWCanvas::Create(vtkKWApplication *app)
@@ -58,21 +58,27 @@ void vtkKWCanvas::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCanvas::SetHeight(int height)
+void vtkKWCanvas::SetWidth(int width)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s config -height %d", this->GetWidgetName(), height);
-    }
+  this->SetConfigurationOptionAsInt("-width", width);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCanvas::SetWidth(int width)
+int vtkKWCanvas::GetWidth()
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s config -width %d", this->GetWidgetName(), width);
-    }
+  return this->GetConfigurationOptionAsInt("-width");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCanvas::SetHeight(int height)
+{
+  this->SetConfigurationOptionAsInt("-height", height);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCanvas::GetHeight()
+{
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------

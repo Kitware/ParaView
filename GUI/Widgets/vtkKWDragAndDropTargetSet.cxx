@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.8");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -281,12 +281,9 @@ void vtkKWDragAndDropTargetSet::AddBindings()
     return;
     }
   
-  this->Script("bind %s <Button-1> {+ %s StartCallback %%X %%Y}",
-               anchor->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <B1-Motion> {+ %s PerformCallback %%X %%Y}",
-               anchor->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <ButtonRelease-1> {+ %s EndCallback %%X %%Y}",
-               anchor->GetWidgetName(), this->GetTclName());
+  anchor->AddBinding("<Button-1>", this, "StartCallback %X %Y");
+  anchor->AddBinding("<B1-Motion>", this, "PerformCallback %X %Y");
+  anchor->AddBinding("<ButtonRelease-1>", this, "EndCallback %X %Y");
 }
 
 //----------------------------------------------------------------------------
@@ -304,12 +301,9 @@ void vtkKWDragAndDropTargetSet::RemoveBindings()
     return;
     }
 
-  this->Script("bind %s <Button-1> {}",
-               anchor->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <B1-Motion> {}",
-               anchor->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <ButtonRelease-1> {}",
-               anchor->GetWidgetName(), this->GetTclName());
+  anchor->RemoveBinding("<Button-1>");
+  anchor->RemoveBinding("<B1-Motion>");
+  anchor->RemoveBinding("<ButtonRelease-1>");
 }
 
 //----------------------------------------------------------------------------
@@ -500,9 +494,7 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
       this->SourceAnchor ? this->SourceAnchor : this->Source;
     if (anchor && anchor->IsCreated())
       {
-      this->Script("[winfo toplevel %s] config -cursor hand2", 
-                   anchor->GetWidgetName());
-
+      vtkKWTkUtilities::SetTopLevelMouseCursor(anchor, "hand2");
       vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(anchor);
       if (anchor_as_core->HasConfigurationOption("-fg") &&
           anchor_as_core->HasConfigurationOption("-bg"))
@@ -606,9 +598,7 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       this->SourceAnchor ? this->SourceAnchor : this->Source;
     if (anchor && anchor->IsCreated())
       {
-      this->Script("[winfo toplevel %s] config -cursor {}", 
-                   anchor->GetWidgetName());
-
+      vtkKWTkUtilities::SetTopLevelMouseCursor(anchor, NULL);
       vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(anchor);
       if (anchor_as_core->HasConfigurationOption("-fg") &&
           anchor_as_core->HasConfigurationOption("-bg"))

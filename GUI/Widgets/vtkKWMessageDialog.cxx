@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.84");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.85");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -264,13 +264,6 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
-
-#ifdef KW_MESSAGEDIALOG_DEBUG
-  this->Script("%s configure -bg red -height 5", this->TopFrame->GetWidgetName());
-  this->Script("%s configure -bg green", this->MessageDialogFrame->GetWidgetName());
-  this->Script("%s configure -bg blue -height 5", this->BottomFrame->GetWidgetName());
-  this->Script("%s configure -bg purple", this->ButtonFrame->GetWidgetName());
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -408,15 +401,19 @@ void vtkKWMessageDialog::SetIcon()
     }
   else
     {
-    this->Script("%s configure -width 0 -pady 0 -padx 0 -bd 0",
-                 this->Icon->GetWidgetName());
+    this->Icon->SetWidth(0);
+    this->Icon->SetPadY(0);
+    this->Icon->SetPadX(0);
+    this->Icon->SetBorderWidth(0);
     this->Script("pack forget %s", this->Icon->GetWidgetName());
     return;
     }  
   
-  this->Script("%s configure -anchor n "
-               "-pady 5 -padx 4 -bd 4",
-               this->Icon->GetWidgetName());
+  this->Icon->SetAnchorToNorth();
+  this->Icon->SetPadY(5);
+  this->Icon->SetPadX(4);
+  this->Icon->SetBorderWidth(4);
+
   this->Script("pack %s -pady 17 -side left -fill y", 
                this->Icon->GetWidgetName());
 }

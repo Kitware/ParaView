@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.51");
+vtkCxxRevisionMacro(vtkKWRange, "1.52");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -198,8 +198,7 @@ void vtkKWRange::Create(vtkKWApplication *app)
   this->Canvas->SetWidth(0);
   this->Canvas->SetHeight(0);
 
-  this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->CanvasFrame->GetWidgetName(), this->GetTclName());
+  this->CanvasFrame->SetBinding("<Configure>", this, "ConfigureCallback");
 
   // Create more stuff
 
@@ -224,6 +223,8 @@ void vtkKWRange::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWRange::CreateEntries()
 {
+  char callback[30];
+
   for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
     if (!this->Entries[i])
@@ -237,10 +238,10 @@ void vtkKWRange::CreateEntries()
       this->Entries[i]->Create(this->GetApplication());
       this->Entries[i]->SetWidth(this->EntriesWidth);
       this->PropagateEnableState(this->Entries[i]);
-      this->Script("bind %s <Return> {%s EntriesUpdateCallback %d}",
-                   this->Entries[i]->GetWidgetName(), this->GetTclName(), i);
-      this->Script("bind %s <FocusOut> {%s EntriesUpdateCallback %d}",
-                   this->Entries[i]->GetWidgetName(), this->GetTclName(), i);
+
+      sprintf(callback, "EntriesUpdateCallback %d", i);
+      this->Entries[i]->SetBinding("<Return>", this, callback);
+      this->Entries[i]->SetBinding("<FocusOut>", this, callback);
       }
     }
 
@@ -341,8 +342,7 @@ void vtkKWRange::Pack()
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
            << " -row " << row << " -column " << col 
            << " -sticky " << sticky << endl;
-    tk_cmd << this->GetLabel()->GetWidgetName() 
-           << " config -anchor " << anchor << endl;
+    this->GetLabel()->SetConfigurationOption("-anchor", anchor);
     }
 
   // Entries
@@ -1380,8 +1380,6 @@ void vtkKWRange::RedrawCanvas()
     return;
     }
 
-  const char *canv = this->Canvas->GetWidgetName();
-
   // Resize the canvas
 
   int width, height;
@@ -1415,8 +1413,12 @@ void vtkKWRange::RedrawCanvas()
       }
     }
 
-  this->Script("%s config -width %d -height %d -scrollregion {0 0 %d %d}",
-               canv, width, height, width - 1, height - 1);
+  this->Canvas->SetWidth(width);
+  this->Canvas->SetHeight(height);
+
+  char buffer[20];
+  sprintf(buffer, "0 0 %d %d", width - 1, height - 1);
+  this->Canvas->SetConfigurationOption("-scrollregion", buffer);
 
   // Draw the elements
 
@@ -1466,7 +1468,7 @@ void vtkKWRange::RedrawWholeRange()
   if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
     x_min = 0;
-    x_max = atoi(this->Script("%s cget -width", canv)) - 1;
+    x_max = this->Canvas->GetWidth() - 1;
     y_min = (this->Thickness - in_thick) / 2;
     y_max = y_min + in_thick - 1;
     }
@@ -1475,7 +1477,7 @@ void vtkKWRange::RedrawWholeRange()
     x_min = (this->Thickness - in_thick) / 2;
     x_max = x_min + in_thick - 1;
     y_min = 0;
-    y_max = atoi(this->Script("%s cget -height", canv)) - 1;
+    y_max = this->Canvas->GetHeight() - 1;
     }
 
   // '.' part (background)
@@ -1547,11 +1549,11 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
 
   if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
-    pos_max = atoi(this->Script("%s cget -width", canv)) - 1;
+    pos_max = this->Canvas->GetWidth() - 1;
     }
   else
     {
-    pos_max = atoi(this->Script("%s cget -height", canv)) - 1;
+    pos_max = this->Canvas->GetHeight() - 1;
     }
 
   pos_range = pos_max - pos_min;
@@ -2150,13 +2152,13 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     {
     pos = x;
     min = 0;
-    max = atoi(this->Script("%s cget -width", canv)) - 1;
+    max = this->Canvas->GetWidth() - 1;
     }
   else
     {
     pos = y;
     min = 0;
-    max = atoi(this->Script("%s cget -height", canv)) - 1;
+    max = this->Canvas->GetHeight() - 1;
     }
 
   double new_value;
@@ -2211,13 +2213,13 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     {
     pos = x;
     min = 0;
-    max = atoi(this->Script("%s cget -width", canv)) - 1;
+    max = this->Canvas->GetWidth() - 1;
     }
   else
     {
     pos = y;
     min = 0;
-    max = atoi(this->Script("%s cget -height", canv)) - 1;
+    max = this->Canvas->GetHeight() - 1;
     }
 
   double rel_delta = 

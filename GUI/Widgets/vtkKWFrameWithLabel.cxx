@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.2");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.3");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -150,10 +150,8 @@ void vtkKWFrameWithLabel::AdjustMarginCallback()
     border2_h++;
 #endif
 
-    this->Script("%s configure -height %d", 
-                 this->Border->GetWidgetName(), border_h);
-    this->Script("%s configure -height %d", 
-                 this->Border2->GetWidgetName(), border2_h);
+    this->Border->SetHeight(border_h);
+    this->Border2->SetHeight(border2_h);
 
     if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
         this->AllowFrameToCollapse)
@@ -204,8 +202,10 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   this->Label->SetBorderWidth(0);
   this->Label->ExpandWidgetOff();
 
-  this->Script("%s config -bd 1 -pady 0 -padx 0", 
-               this->GetLabel()->GetWidgetName());
+  vtkKWLabel *label = this->GetLabel();
+  label->SetBorderWidth(1);
+  label->SetPadX(0);
+  label->SetPadY(0);
 
   // At this point, although this->Label (a labeled label) has been created,
   // UpdateEnableState() has been called already and ShowLabelOff() has been
@@ -214,9 +214,12 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   // Force label icon to be created now, so that we can set its image option.
 
   this->Label->LabelVisibilityOn();
-  this->GetLabelIcon()->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
-  this->Script("%s config -bd 0 -pady 0 -padx 0", 
-               this->GetLabelIcon()->GetWidgetName());
+
+  label = this->GetLabelIcon();
+  label->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
+  label->SetBorderWidth(0);
+  label->SetPadX(0);
+  label->SetPadY(0);
 
   const char *lem_name = app->GetLimitedEditionModeName() 
     ? app->GetLimitedEditionModeName() : "Limited Edition";
@@ -256,15 +259,15 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
       this->AllowFrameToCollapse)
     {
-    this->Script("bind %s <ButtonRelease-1> { %s CollapseButtonCallback }",
-                 this->Icon->GetWidgetName(),
-                 this->GetTclName());
+    this->Icon->SetBinding("<ButtonRelease-1>",this,"CollapseButtonCallback");
     }
 
-  // If the label frame get resize, reconfigure the margins
+  // If the label frame get resize, reset the margins
 
-  this->Script("bind %s <Configure> { catch {%s AdjustMarginCallback} }",
-               this->LabelFrame->GetWidgetName(), this->GetTclName());
+  vtksys_stl::string callback("catch {");
+  callback += this->GetTclName();
+  callback += " AdjustMarginCallback}";
+  this->LabelFrame->SetBinding("<Configure>", NULL, callback.c_str());
 
   // Update enable state
 

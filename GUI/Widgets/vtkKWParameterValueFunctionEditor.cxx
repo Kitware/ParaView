@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.56");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.57");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1125,14 +1125,9 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetReliefToSolid();
   this->Canvas->SetBorderWidth(0);
-
-  this->Script("%s config -height %d -width %d",
-               this->Canvas->GetWidgetName(), 
-               this->CanvasHeight, 
-               (this->ExpandCanvasWidth ? 0 : this->CanvasWidth));
-
-  this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->Canvas->GetWidgetName(), this->GetTclName());
+  this->Canvas->SetHeight(this->CanvasHeight);
+  this->Canvas->SetWidth(this->ExpandCanvasWidth ? 0 : this->CanvasWidth);
+  this->Canvas->SetBinding("<Configure>", this, "ConfigureCallback");
 
   // Create the ranges
   // Note that if they are created now only if they are supposed to be shown,
@@ -1373,7 +1368,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     this->HistogramLogModeOptionMenu->Create(app);
     this->HistogramLogModeOptionMenu->SetPadX(1);
     this->HistogramLogModeOptionMenu->SetPadY(0);
-    this->HistogramLogModeOptionMenu->IndicatorOff();
+    this->HistogramLogModeOptionMenu->IndicatorVisibilityOff();
     this->HistogramLogModeOptionMenu->SetBalloonHelpString(
       "Change the histogram mode from log to linear.");
 
@@ -1847,9 +1842,8 @@ void vtkKWParameterValueFunctionEditor::Bind()
 
     // Mouse motion
 
-    tk_cmd << "bind " <<  canv
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " StartInteractionCallback %%x %%y}" << endl;
+    this->Canvas->SetBinding(
+      "<ButtonPress-1>", this, "StartInteractionCallback %x %y");
 
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
            << " <B1-Motion> {" << this->GetTclName() 
@@ -1891,13 +1885,16 @@ void vtkKWParameterValueFunctionEditor::Bind()
     if (this->ParameterCursorInteractionStyle & 
         vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleDragWithLeftButton)
       {
-      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+      tk_cmd << canv << " bind " 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <ButtonPress-1> {" << this->GetTclName() 
              << " ParameterCursorStartInteractionCallback %%x}" << endl;
-      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+      tk_cmd << canv << " bind " 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <ButtonRelease-1> {" << this->GetTclName() 
              << " ParameterCursorEndInteractionCallback}" << endl;
-      tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+      tk_cmd << canv << " bind " 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag
              << " <B1-Motion> {" << this->GetTclName() 
              << " ParameterCursorMoveCallback %%x}" << endl;
       }
@@ -1999,9 +1996,8 @@ void vtkKWParameterValueFunctionEditor::UnBind()
 
     // Mouse motion
 
-    tk_cmd << "bind " << canv
-           << " <ButtonPress-1> {}" << endl;
-    
+    this->Canvas->RemoveBinding("<ButtonPress-1>");
+
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <B1-Motion> {}" << endl;
 
@@ -4134,24 +4130,10 @@ void vtkKWParameterValueFunctionEditor::Redraw()
 
   const char *canv = this->Canvas->GetWidgetName();
 
-  const char *v_t_canv = NULL;
-  if (this->ValueTicksVisibility)
-    {
-    v_t_canv = this->ValueTicksCanvas->GetWidgetName();
-    }
-
-  const char *p_t_canv = NULL;
-  if (this->ParameterTicksVisibility)
-    {
-    p_t_canv = this->ParameterTicksCanvas->GetWidgetName();
-    }
-
-  ostrstream tk_cmd;
-
   // Get the new canvas size
 
-  int old_c_width = atoi(this->Script("%s cget -width", canv));
-  int old_c_height = atoi(this->Script("%s cget -height", canv));
+  int old_c_width = this->Canvas->GetWidth();
+  int old_c_height = this->Canvas->GetHeight();
 
   if (this->ExpandCanvasWidth)
     {
@@ -4162,21 +4144,17 @@ void vtkKWParameterValueFunctionEditor::Redraw()
       }
     }
 
-  tk_cmd << canv << " configure "
-         << " -width " << this->CanvasWidth 
-         << " -height " << this->CanvasHeight
-         << endl;
+  this->Canvas->SetWidth(this->CanvasWidth);
+  this->Canvas->SetHeight(this->CanvasHeight);
 
-  if (v_t_canv)
+  if (this->ValueTicksVisibility)
     {
-    tk_cmd << v_t_canv << " configure "
-           << " -height " << this->CanvasHeight << endl;
+    this->ValueTicksCanvas->SetHeight(this->CanvasHeight);
     }
 
-  if (p_t_canv)
+  if (this->ParameterTicksVisibility)
     {
-    tk_cmd << p_t_canv << " configure "
-           << " -width " << this->CanvasWidth << endl;
+    this->ParameterTicksCanvas->SetWidth(this->CanvasWidth);
     }
 
   // In that visible area, we must fit the visible parameter in the
@@ -4186,31 +4164,23 @@ void vtkKWParameterValueFunctionEditor::Redraw()
   double c_x, c_y, c_x2, c_y2;
   this->GetCanvasScrollRegion(&c_x, &c_y, &c_x2, &c_y2);
 
-  tk_cmd << canv << " configure "
-         << " -scrollregion {" 
-         << c_x << " " << c_y << " " << c_x2 << " " << c_y2 << "}" << endl;
+  char buffer[256];
+  sprintf(buffer, "%lf %lf %lf %lf", c_x, c_y, c_x2, c_y2);
+  this->Canvas->SetConfigurationOption("-scrollregion", buffer);
 
-  if (v_t_canv)
+  if (this->ValueTicksVisibility)
     {
-    tk_cmd << v_t_canv << " configure -width " << this->ValueTicksCanvasWidth
-           << " -scrollregion {" 
-           << 0 << " " << c_y << " " 
-           << this->ValueTicksCanvasWidth << " " << c_y2 << "}" 
-           << endl;
+    this->ValueTicksCanvas->SetWidth(this->ValueTicksCanvasWidth);
+    sprintf(buffer, "0 %lf %lf %lf", c_y, this->ValueTicksCanvasWidth, c_y2);
+    this->ValueTicksCanvas->SetConfigurationOption("-scrollregion", buffer);
     }
 
-  if (p_t_canv)
+  if (this->ParameterTicksVisibility)
     {
-    tk_cmd << p_t_canv << " configure "
-           << " -scrollregion {" 
-           << c_x << " " << 0 << " " 
-           << c_x2 << " " << VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT << "}" 
-           << endl;
+    sprintf(buffer, "%lf 0 %lf %lf", 
+            c_x, c_x2, VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
+    this->ParameterTicksCanvas->SetConfigurationOption("-scrollregion",buffer);
     }
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
 
   // If the canvas has been resized,
   // or if the visible range has changed (i.e. if the relative size of the
@@ -6550,8 +6520,7 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
         cursor = "fleur";
         }
       }
-    this->Script("%s config -cursor %s", 
-                 this->Canvas->GetWidgetName(), cursor);
+    this->Canvas->SetConfigurationOption("-cursor", cursor);
     }
 
   // Now update the point given those coords, and update the info label
@@ -6592,9 +6561,9 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 
   // Remove any interaction icon
 
-  if (this->IsCreated() && this->ChangeMouseCursor)
+  if (this->Canvas && this->ChangeMouseCursor)
     {
-    this->Script("%s config -cursor {}", this->Canvas->GetWidgetName());
+    this->Canvas->SetConfigurationOption("-cursor", NULL);
     }
 }
 
@@ -6602,9 +6571,9 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 void vtkKWParameterValueFunctionEditor
 ::ParameterCursorStartInteractionCallback( int vtkNotUsed(x) )
 {
-  if (this->IsCreated() && this->ChangeMouseCursor)
+  if (this->Canvas && this->ChangeMouseCursor)
     {
-    this->Script("%s config -cursor hand2", this->Canvas->GetWidgetName());
+    this->Canvas->SetConfigurationOption("-cursor", "hand2");
     }
 }
 
@@ -6612,9 +6581,9 @@ void vtkKWParameterValueFunctionEditor
 void 
 vtkKWParameterValueFunctionEditor::ParameterCursorEndInteractionCallback()
 {
-  if (this->IsCreated() && this->ChangeMouseCursor)
+  if (this->Canvas && this->ChangeMouseCursor)
     {
-    this->Script("%s config -cursor {}", this->Canvas->GetWidgetName());
+    this->Canvas->SetConfigurationOption("-cursor", NULL);
     }
 
   this->InvokeParameterCursorMovedCommand();

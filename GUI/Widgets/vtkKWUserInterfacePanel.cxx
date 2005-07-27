@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.13");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
@@ -213,7 +213,7 @@ int vtkKWUserInterfacePanel::IsVisible()
 //----------------------------------------------------------------------------
 int vtkKWUserInterfacePanel::Raise()
 {
-  this->Show();
+  //  this->Show();
   if (this->UserInterfaceManager)
     {
     return this->UserInterfaceManager->RaisePanel(this);

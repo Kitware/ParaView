@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -42,41 +42,37 @@ void vtkKWCoreWidget::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::GetBackgroundColor(double *r, double *g, double *b)
 {
-  vtkKWTkUtilities::GetOptionColor(this, "-background", r, g, b);
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
 }
 
 //----------------------------------------------------------------------------
 double* vtkKWCoreWidget::GetBackgroundColor()
 {
-  static double rgb[3];
-  this->GetBackgroundColor(rgb, rgb + 1, rgb + 2);
-  return rgb;
+  return this->GetConfigurationOptionAsColor("-background");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::SetBackgroundColor(double r, double g, double b)
 {
-  vtkKWTkUtilities::SetOptionColor(this, "-background", r, g, b);
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::GetForegroundColor(double *r, double *g, double *b)
 {
-  vtkKWTkUtilities::GetOptionColor(this, "-foreground", r, g, b);
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
 }
 
 //----------------------------------------------------------------------------
 double* vtkKWCoreWidget::GetForegroundColor()
 {
-  static double rgb[3];
-  this->GetForegroundColor(rgb, rgb + 1, rgb + 2);
-  return rgb;
+  return this->GetConfigurationOptionAsColor("-foreground");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::SetForegroundColor(double r, double g, double b)
 {
-  vtkKWTkUtilities::SetOptionColor(this, "-foreground", r, g, b);
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -142,44 +138,6 @@ int vtkKWCoreWidget::GetPadY()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetBinding(const char *event, 
-                                 vtkObject *object, const char *method)
-{
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, object, method);
-  this->Script("bind %s %s {%s}", this->GetWidgetName(), event, command);
-  delete [] command;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetBinding(const char *event, const char *command)
-{
-  this->SetBinding(event, NULL, command);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::AddBinding(const char *event, 
-                                 vtkObject *object, const char *method)
-{
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, object, method);
-  this->Script("bind %s %s {+ %s}", this->GetWidgetName(), event, command);
-  delete [] command;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::AddBinding(const char *event, const char *command)
-{
-  this->AddBinding(event, NULL, command);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::RemoveBinding(const char *event)
-{
-  this->Script("bind %s %s {}", this->GetWidgetName(), event);
-}
-
-//----------------------------------------------------------------------------
 int vtkKWCoreWidget::SetConfigurationOption(
   const char *option, const char *value)
 {
@@ -189,14 +147,15 @@ int vtkKWCoreWidget::SetConfigurationOption(
     return 0;
     }
 
-  if (!option || !value)
+  if (!option)
     {
-    vtkWarningMacro("Wrong option or value !");
+    vtkWarningMacro("Missing option !");
     return 0;
     }
 
   const char *res = 
-    this->Script("%s configure %s {%s}", this->GetWidgetName(), option, value);
+    this->Script("%s configure %s {%s}", 
+                 this->GetWidgetName(), option, value ? value : "");
 
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
@@ -217,7 +176,7 @@ int vtkKWCoreWidget::SetConfigurationOption(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCoreWidget::HasConfigurationOption(const char* option)
+int vtkKWCoreWidget::HasConfigurationOption(const char *option)
 {
   if (!this->IsCreated())
     {
@@ -232,7 +191,7 @@ int vtkKWCoreWidget::HasConfigurationOption(const char* option)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWCoreWidget::GetConfigurationOption(const char* option)
+const char* vtkKWCoreWidget::GetConfigurationOption(const char *option)
 {
   if (!this->HasConfigurationOption(option))
     {
@@ -252,7 +211,7 @@ int vtkKWCoreWidget::SetConfigurationOptionAsInt(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetConfigurationOptionAsInt(const char* option)
+int vtkKWCoreWidget::GetConfigurationOptionAsInt(const char *option)
 {
   if (!this->HasConfigurationOption(option))
     {
@@ -272,7 +231,7 @@ int vtkKWCoreWidget::SetConfigurationOptionAsDouble(
 }
 
 //----------------------------------------------------------------------------
-double vtkKWCoreWidget::GetConfigurationOptionAsDouble(const char* option)
+double vtkKWCoreWidget::GetConfigurationOptionAsDouble(const char *option)
 {
   if (!this->HasConfigurationOption(option))
     {
@@ -280,6 +239,28 @@ double vtkKWCoreWidget::GetConfigurationOptionAsDouble(const char* option)
     }
 
   return atof(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::GetConfigurationOptionAsColor(
+  const char *option, double *r, double *g, double *b)
+{
+  vtkKWTkUtilities::GetOptionColor(this, option, r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCoreWidget::GetConfigurationOptionAsColor(const char *option)
+{
+  static double rgb[3];
+  this->GetConfigurationOptionAsColor(option, rgb, rgb + 1, rgb + 2);
+  return rgb;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::SetConfigurationOptionAsColor(
+  const char *option, double r, double g, double b)
+{
+  vtkKWTkUtilities::SetOptionColor(this, option, r, g, b);
 }
 
 //----------------------------------------------------------------------------

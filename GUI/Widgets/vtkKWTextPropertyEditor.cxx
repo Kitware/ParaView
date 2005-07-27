@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.13");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -221,19 +221,17 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 
   this->FontFamilyOptionMenu->SetParent(this);
   this->FontFamilyOptionMenu->Create(app);
-  this->Script("%s config -width 7 -padx 0 -pady 2", 
-               this->FontFamilyOptionMenu->GetWidget()->GetWidgetName());
   this->FontFamilyOptionMenu->ExpandWidgetOff();
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
-  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
-    VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
+  vtkKWMenuButton *omenu = this->FontFamilyOptionMenu->GetWidget();
+  omenu->SetWidth(7);
+  omenu->SetPadX(0);
+  omenu->SetPadY(2);
 
-  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
-    VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
-
-  this->FontFamilyOptionMenu->GetWidget()->AddRadioButton(
-    VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
+  omenu->AddRadioButton(VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
+  omenu->AddRadioButton(VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
+  omenu->AddRadioButton(VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
 
   // Styles (bold, italic, shadow)
 
@@ -245,12 +243,13 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   cbs->PackHorizontallyOn();
 
   vtkKWCheckButton *cb;
-  const char *styles_options = "-indicator 0 -padx 0 -pady 0";
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_BOLD_ID);
   cb->SetCommand(this, "BoldCallback");
   cb->SetBalloonHelpString("Select bold style.");
-  this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
+  cb->IndicatorVisibilityOff();
+  cb->SetPadX(0);
+  cb->SetPadY(0);
 
   cb->SetImageToPixels(image_bold, 
                        image_bold_width, 
@@ -261,7 +260,9 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_ITALIC_ID);
   cb->SetCommand(this, "ItalicCallback");
   cb->SetBalloonHelpString("Select italic style.");
-  this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
+  cb->IndicatorVisibilityOff();
+  cb->SetPadX(0);
+  cb->SetPadY(0);
 
   cb->SetImageToPixels(image_italic, 
                        image_italic_width, 
@@ -272,7 +273,9 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_SHADOW_ID);
   cb->SetCommand(this, "ShadowCallback");
   cb->SetBalloonHelpString("Select shadow style.");
-  this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
+  cb->IndicatorVisibilityOff();
+  cb->SetPadX(0);
+  cb->SetPadY(0);
 
   cb->SetImageToPixels(image_shadow, 
                        image_shadow_width, 
@@ -284,9 +287,9 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 
   this->OpacityScale->SetParent(this);
   this->OpacityScale->PopupScaleOn();
+  this->OpacityScale->Create(app);
   this->OpacityScale->SetResolution(0.01);
   this->OpacityScale->SetRange(0.0, 1.0);
-  this->OpacityScale->Create(app);
   this->OpacityScale->DisplayEntry();
   this->OpacityScale->DisplayLabel("");
   this->OpacityScale->SetEntryWidth(4);
@@ -343,7 +346,7 @@ void vtkKWTextPropertyEditor::Pack()
     this->ChangeColorButton->GetLabel()->SetText("Color:");
     this->ChangeColorButton->LabelVisibilityOn();
 
-    this->FontFamilyOptionMenu->GetWidget()->IndicatorOn();
+    this->FontFamilyOptionMenu->GetWidget()->IndicatorVisibilityOn();
     this->FontFamilyOptionMenu->GetLabel()->SetText("Font:");
     this->FontFamilyOptionMenu->LabelVisibilityOn();
 
@@ -387,7 +390,7 @@ void vtkKWTextPropertyEditor::Pack()
     {
     this->ChangeColorButton->LabelVisibilityOff();
 
-    this->FontFamilyOptionMenu->GetWidget()->IndicatorOff();
+    this->FontFamilyOptionMenu->GetWidget()->IndicatorVisibilityOff();
     this->FontFamilyOptionMenu->LabelVisibilityOff();
 
     this->StylesCheckButtonSet->LabelVisibilityOff();

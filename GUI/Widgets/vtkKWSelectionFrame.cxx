@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.42");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -176,7 +176,8 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
-  this->Script("%s config -bd 1 -relief ridge",  this->GetWidgetName());
+  this->SetBorderWidth(1);
+  this->SetReliefToRidge();
 
   // The title bar
 
@@ -187,7 +188,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   this->SelectionList->SetParent(this->TitleBar);
   this->SelectionList->Create(app);
-  this->SelectionList->IndicatorOff();
+  this->SelectionList->IndicatorVisibilityOff();
   this->SelectionList->SetImageToPredefinedIcon(vtkKWIcon::IconExpand);
 
   // The close button
@@ -325,12 +326,8 @@ void vtkKWSelectionFrame::Bind()
     {
     if (widgets[i] && widgets[i]->IsCreated())
       {
-      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
-             << " <ButtonPress-1> {" << this->GetTclName() 
-             << " SelectCallback}" << endl;
-      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
-             << " <Double-1> {" << this->GetTclName() 
-             << " DoubleClickCallback}" << endl;
+      widgets[i]->SetBinding("<ButtonPress-1>", this, "SelectCallback");
+      widgets[i]->SetBinding("<Double-1>", this, "DoubleClickCallback");
       }
     }
 
@@ -362,10 +359,8 @@ void vtkKWSelectionFrame::UnBind()
     {
     if (widgets[i] && widgets[i]->IsCreated())
       {
-      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
-             << " <ButtonPress-1> {}" << endl;
-      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
-             << " <Double-1> {}" << endl;
+      widgets[i]->RemoveBinding("<ButtonPress-1>");
+      widgets[i]->RemoveBinding("<Double-1>");
       }
     }
   

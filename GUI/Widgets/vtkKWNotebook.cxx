@@ -53,13 +53,13 @@
 
 // The color of the border of a pinned tab
 
-#define VTK_KW_NB_TAB_PIN_R 255
-#define VTK_KW_NB_TAB_PIN_G 255
-#define VTK_KW_NB_TAB_PIN_B 194
+#define VTK_KW_NB_TAB_PIN_R 1.0
+#define VTK_KW_NB_TAB_PIN_G 1.0
+#define VTK_KW_NB_TAB_PIN_B 0.76
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.87");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.88");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -230,8 +230,10 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
 
   ostrstream cmd;
 
-  cmd << this->GetWidgetName() << " configure -width " << this->MinimumWidth 
-      <<  " -height " << this->MinimumHeight << " -bd 0 -relief flat " << endl;
+  this->SetWidth(this->MinimumWidth);
+  this->SetHeight(this->MinimumHeight);
+  this->SetBorderWidth(0);
+  this->SetReliefToFlat();
 
   // Create the frame that stores the tabs button
 
@@ -246,9 +248,8 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
 
   this->Body->SetParent(this);
   this->Body->Create(app);
-
-  cmd << this->Body->GetWidgetName() << " config -relief raised "
-      << " -bd " << VTK_KW_NB_TAB_BD << endl;
+  this->Body->SetReliefToRaised();
+  this->Body->SetBorderWidth(VTK_KW_NB_TAB_BD);
 
   // Create the mask used to hide the seam between the current active tab and
   // the body (i.e. between the tab and the corresponding page under the tab).
@@ -256,14 +257,11 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   this->Mask->SetParent(this);
   this->Mask->Create(app);
 
-  // Bind <Configure> event to both the tabs frame (in case a tab is added
+  // Associate <Configure> event to both the tabs frame (in case a tab is added
   // and its size requires the whole widget to be resized) and the body.
 
-  cmd << "bind " << this->TabsFrame->GetWidgetName() << " <Configure> {" 
-      << this->GetTclName() << " ScheduleResize}" << endl;
-
-  cmd << "bind " << this->Body->GetWidgetName() << " <Configure> {" 
-      << this->GetTclName() << " ScheduleResize}" << endl;
+  this->TabsFrame->SetBinding("<Configure>", this, "ScheduleResize");
+  this->Body->SetBinding("<Configure>", this, "ScheduleResize");
 
   cmd << ends;
   this->Script(cmd.str());
@@ -682,9 +680,8 @@ int vtkKWNotebook::AddPage(const char *title,
   page->TabFrame = vtkKWFrame::New();
   page->TabFrame->SetParent(this->TabsFrame);
   page->TabFrame->Create(this->GetApplication());
-
-  cmd << page->TabFrame->GetWidgetName() << " config -relief raised "
-      << " -bd " << VTK_KW_NB_TAB_BD << endl;
+  page->TabFrame->SetReliefToRaised();
+  page->TabFrame->SetBorderWidth(VTK_KW_NB_TAB_BD);
 
   // Create the label that holds the page title
 
@@ -764,30 +761,25 @@ void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
     return;
     }
 
-  ostrstream cmd;
+  char callback[50];
 
-  if (page->Label && page->Label->IsCreated())
+  if (page->Label)
     {
-    cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
-        << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl
-        << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-        << this->GetTclName()<<" TogglePagePinnedCallback " << page->Id << "}" 
-        << endl
-        << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
-        << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
-        << " %%X %%Y}" 
-        << endl;
+    sprintf(callback, "RaiseCallback %d", page->Id);
+    page->Label->SetBinding("<Button-1>", this, callback);
+
+    sprintf(callback, "TogglePagePinnedCallback %d", page->Id);
+    page->Label->SetBinding("<Double-1>", this, callback);
+
+    sprintf(callback, "PageTabContextMenuCallback %d %%X %%Y", page->Id);
+    page->Label->SetBinding("<Button-3>", this, callback);
     }
 
-  if (page->ImageLabel && page->ImageLabel->IsCreated())
+  if (page->ImageLabel)
     {
-    cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
-        << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl;
+    sprintf(callback, "RaiseCallback %d", page->Id);
+    page->ImageLabel->SetBinding("<Button-1>", this, callback);
     }
-
-  cmd << ends;
-  this->Script(cmd.str());
-  cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -798,23 +790,17 @@ void vtkKWNotebook::UnBindPage(vtkKWNotebook::Page *page)
     return;
     }
 
-  ostrstream cmd;
-
-  if (page->Label && page->Label->IsCreated())
+  if (page->Label)
     {
-    cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {}\n"
-        << "bind " << page->Label->GetWidgetName() << " <Double-1> {}\n"
-        << "bind " << page->Label->GetWidgetName() << " <Button-3> {}\n";
+    page->Label->RemoveBinding("<Button-1>");
+    page->Label->RemoveBinding("<Double-1>");
+    page->Label->RemoveBinding("<Button-3>");
     }
 
-  if (page->ImageLabel && page->ImageLabel->IsCreated())
+  if (page->ImageLabel)
     {
-    cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {}\n";
+    page->ImageLabel->RemoveBinding("<Button-1>");
     }
-
-  cmd << ends;
-  this->Script(cmd.str());
-  cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1989,18 +1975,13 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
   // If selected, use the same tab color as the page, otherwise use
   // a shade of that page color.
 
-  ostrstream cmd;
-
   if (selected)
     {
-    cmd << page->Label->GetWidgetName() << " config -bg [" 
-        << page->Frame->GetWidgetName() << " cget -bg]" << endl;
+    page->Label->SetBackgroundColor(page->Frame->GetBackgroundColor());
 
     if (page->Icon)
       {
-      this->Script("%s config -bg [%s cget -bg]",
-                   page->ImageLabel->GetWidgetName(), 
-                   page->Frame->GetWidgetName());
+      page->ImageLabel->SetBackgroundColor(page->Frame->GetBackgroundColor());
       // Reset the imagelabel so that the icon is blended with the background
       page->ImageLabel->SetImageToIcon(page->Icon);
       }
@@ -2010,17 +1991,13 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
     if (!page->Pinned)
       {
-      cmd << page->TabFrame->GetWidgetName() << " config -bg [" 
-          << page->Frame->GetWidgetName() << " cget -bg]" << endl;
+      page->TabFrame->SetBackgroundColor(page->Frame->GetBackgroundColor());
       vtkKWTkUtilities::ChangeFontSlantToRoman(page->Label);
       }
     else
       {
-      char color[10];
-      sprintf(color, "#%02x%02x%02x", 
-              VTK_KW_NB_TAB_PIN_R, VTK_KW_NB_TAB_PIN_G, VTK_KW_NB_TAB_PIN_B);
-      cmd << page->TabFrame->GetWidgetName() 
-          << " config -bg " << color << endl;
+      page->TabFrame->SetBackgroundColor(
+        VTK_KW_NB_TAB_PIN_R, VTK_KW_NB_TAB_PIN_G, VTK_KW_NB_TAB_PIN_B);
       vtkKWTkUtilities::ChangeFontSlantToItalic(page->Label);
       }
     }
@@ -2046,16 +2023,11 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
     vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
 
-    char shade[10];
-    sprintf(shade, "#%02x%02x%02x", 
-            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-    
-    cmd << page->Label->GetWidgetName() << " config -bg " << shade << endl;
+    page->Label->SetBackgroundColor(r, g, b);
 
     if (page->Icon)
       {
-      this->Script("%s config -bg %s", 
-                   page->ImageLabel->GetWidgetName(), shade);
+      page->ImageLabel->SetBackgroundColor(r, g, b);
       // Reset the imagelabel so that the icon is blended with the background
       page->ImageLabel->SetImageToIcon(page->Icon);
       }
@@ -2064,14 +2036,13 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
     if (!page->Pinned)
       {
-      cmd << page->TabFrame->GetWidgetName() 
-          << " config -bg " << shade << endl;
+      page->TabFrame->SetBackgroundColor(r, g, b);
       }
     else
       {
-      fr = (double)VTK_KW_NB_TAB_PIN_R / 255.0;
-      fg = (double)VTK_KW_NB_TAB_PIN_G / 255.0;
-      fb = (double)VTK_KW_NB_TAB_PIN_B / 255.0;
+      fr = (double)VTK_KW_NB_TAB_PIN_R;
+      fg = (double)VTK_KW_NB_TAB_PIN_G;
+      fb = (double)VTK_KW_NB_TAB_PIN_B;
 
       if (fr == fg && fg == fb)
         {
@@ -2086,17 +2057,9 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
       vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
 
-      sprintf(shade, "#%02x%02x%02x", 
-              (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-    
-      cmd << page->TabFrame->GetWidgetName() 
-          << " config -bg " << shade << endl;
+      page->TabFrame->SetBackgroundColor(r, g, b);
       }
     }
-
-  cmd << ends;
-  this->Script(cmd.str());
-  cmd.rdbuf()->freeze(0);
 
   // If the page that has just been update was the selected page, update the
   // mask position since the color has an influence on the mask size (win32)
@@ -2325,8 +2288,8 @@ void vtkKWNotebook::Resize()
 
   // Resize the whole notebook to fit the page and the tabs
 
-  this->Script("%s configure -width %d -height %d",
-               this->GetWidgetName(), width, height);
+  this->SetWidth(width);
+  this->SetHeight(height);
 
   // Update the mask position
 

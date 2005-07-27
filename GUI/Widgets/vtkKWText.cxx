@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.41");
+vtkCxxRevisionMacro(vtkKWText, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -291,7 +291,7 @@ void vtkKWText::Create(vtkKWApplication *app)
   // Create the default tags
 
   const char *wname = this->GetWidgetName();
-  vtksys_stl::string font(this->Script("%s cget -font", wname));
+  vtksys_stl::string font(this->GetConfigurationOption("-font"));
 
   char bold_font[512], italic_font[512];
   vtkKWTkUtilities::ChangeFontWeightToBold(
@@ -365,38 +365,25 @@ int vtkKWText::GetHeight()
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToNone()
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -wrap none", this->GetWidgetName());
-    }
+  this->SetConfigurationOption("-wrap", "none");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToChar()
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -wrap char", this->GetWidgetName());
-    }
+  this->SetConfigurationOption("-wrap", "char");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetWrapToWord()
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -wrap word", this->GetWidgetName());
-    }
+  this->SetConfigurationOption("-wrap", "word");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWText::SetResizeToGrid(int arg)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -setgrid %d", 
-                 this->GetWidgetName(), arg);
-    }
+  this->SetConfigurationOptionAsInt("-setgrid", arg);
 }
 
 //----------------------------------------------------------------------------

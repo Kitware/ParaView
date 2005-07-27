@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.25");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -136,15 +136,14 @@ void vtkKWPopupButton::Bind()
     return;
     }
 
-  // Bind the button so that it popups the top level window
+  // Set the button so that it popups the top level window
 
-  this->Script("bind %s <ButtonPress> {%s DisplayPopupCallback}",
-               this->GetWidgetName(), this->GetTclName());
+  this->SetBinding("<ButtonPress>", this, "DisplayPopupCallback");
 
-  if (this->PopupCloseButton && this->PopupCloseButton->IsCreated())
+  if (this->PopupCloseButton)
     {
-    this->Script("bind %s <ButtonPress> {%s WithdrawPopupCallback}",
-                 this->PopupCloseButton->GetWidgetName(), this->GetTclName());
+    this->PopupCloseButton->SetBinding(
+      "<ButtonPress>", this, "WithdrawPopupCallback");
     }
 }
 
@@ -156,13 +155,11 @@ void vtkKWPopupButton::UnBind()
     return;
     }
 
-  this->Script("bind %s <ButtonPress> {}", 
-               this->GetWidgetName());
+  this->RemoveBinding("<ButtonPress>");
 
   if (this->PopupCloseButton && this->PopupCloseButton->IsCreated())
     {
-    this->Script("bind %s <ButtonPress> {}", 
-                 this->PopupCloseButton->GetWidgetName());
+    this->PopupCloseButton->RemoveBinding("<ButtonPress>");
     }
 }
 

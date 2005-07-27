@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.29");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -204,7 +204,7 @@ void vtkKWToolbarSet::Pack()
   // I would rather have that class solves its own problems.
   // Here is one hack. If nothing is visible, and the height is higher
   // than 1, and it is likely we did not collapse correctly, then we
-  // should manually configure the height to be 1 (sadly, it can not be 0:
+  // should manually set the height to be 1 (sadly, it can not be 0:
   // "if this option is less "than or equal to zero then the window 
   // will not request any size at all"). Well that extra pixel still shows.
   // Here is another hack. Hide the whole widget by saving the previous

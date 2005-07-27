@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.44");
+vtkCxxRevisionMacro(vtkKWListBox, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -197,24 +197,15 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 void vtkKWListBox::SetDoubleClickCommand(vtkObject* obj, 
                                           const char *method)
 {
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
-  this->Script("bind %s <Double-1> {%s}", 
-               this->GetWidgetName(), command);
-  delete [] command;
+  this->SetBinding("<Double-1>", obj, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetSingleClickCommand(vtkObject* obj, 
                                           const char* method)
 {
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
-  this->Script("bind %s <ButtonRelease-1> {%s}", 
-               this->GetWidgetName(), command);
-  delete [] command;
+  this->SetBinding("<ButtonRelease-1>", obj, method);
 }
-
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::AppendUnique(const char* name)
@@ -257,13 +248,25 @@ void vtkKWListBox::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetWidth(int w)
 {
-  this->Script("%s configure -width %d", this->GetWidgetName(), w);
+  this->SetConfigurationOptionAsInt("-width", w);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::SetHeight(int h)
 {
-  this->Script("%s configure -height %d", this->GetWidgetName(), h);
+  this->SetConfigurationOptionAsInt("-height", h);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetHeight()
+{
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------

@@ -21,6 +21,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTopLevel.h"
 
+#include <vtksys/stl/string>
+
 #define VTK_KW_TW_BORDER_SIZE      2
 #define VTK_KW_TW_MIN_SIZE_NOTCHES 2
 #define VTK_KW_TW_MIN_WIDTH        7
@@ -32,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.38");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.39");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -640,40 +642,46 @@ void vtkKWThumbWheel::Bind()
 {
   if (this->ThumbWheel && this->ThumbWheel->IsCreated())
     {
-    this->Script("bind %s <ButtonRelease> {%s StopMotionCallback}",
-                 this->ThumbWheel->GetWidgetName(), this->GetTclName());
+    this->ThumbWheel->SetBinding(
+      "<ButtonRelease>", this, "StopMotionCallback");
 
     // Interaction modes
+
+    char button_event[20], motion_event[20];
 
     int i;
     for (i = 0 ; i < 3; i++)
       {
       int b = i + 1;
+
+      sprintf(button_event, "<Button-%d>", b);
+      sprintf(motion_event, "<B%d-Motion>", b);
+
       switch (this->InteractionModes[i])
         {
         case vtkKWThumbWheel::InteractionModeLinearMotion:
-          this->Script("bind %s <Button-%d> {%s StartLinearMotionCallback}",
-                       this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
-          this->Script("bind %s <B%d-Motion> {%s PerformLinearMotionCallback}",
-                       this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
+          this->ThumbWheel->SetBinding(
+            button_event, this, "StartLinearMotionCallback");
+          this->ThumbWheel->SetBinding(
+            motion_event, this, "PerformLinearMotionCallback");
           break;
         case vtkKWThumbWheel::InteractionModeNonLinearMotion:
-          this->Script("bind %s <Button-%d> {%s StartNonLinearMotionCallback}",
-                       this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
-          this->Script("bind %s <B%d-Motion> {}", 
-                       this->ThumbWheel->GetWidgetName(), b);
+          this->ThumbWheel->SetBinding(
+            button_event, this, "StartNonLinearMotionCallback");
+          this->ThumbWheel->RemoveBinding(
+            motion_event);
           break;
         case vtkKWThumbWheel::InteractionModeToggleCenterIndicator:
-          this->Script("bind %s <Button-%d> {%s ToggleDisplayThumbWheelCenterIndicator}",
-                       this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
-          this->Script("bind %s <B%d-Motion> {}", 
-                       this->ThumbWheel->GetWidgetName(), b);
+          this->ThumbWheel->SetBinding(
+            button_event, this, "ToggleDisplayThumbWheelCenterIndicator");
+          this->ThumbWheel->RemoveBinding(
+            motion_event);
           break;
         default:
-          this->Script("bind %s <Button-%d> {}", 
-                       this->ThumbWheel->GetWidgetName(), b);
-          this->Script("bind %s <B%d-Motion> {}", 
-                       this->ThumbWheel->GetWidgetName(), b);
+          this->ThumbWheel->RemoveBinding(
+            button_event);
+          this->ThumbWheel->RemoveBinding(
+            motion_event);
         }
       }
 
@@ -681,12 +689,12 @@ void vtkKWThumbWheel::Bind()
 
     if (this->ResizeThumbWheel)
       {
-      this->Script("bind %s <Configure> {%s ResizeThumbWheelCallback}",
-                   this->ThumbWheel->GetWidgetName(), this->GetTclName());
+      this->ThumbWheel->SetBinding(
+        "<Configure>", this, "ResizeThumbWheelCallback");
       }
     else
       {
-      this->Script("bind %s <Configure> {}", this->ThumbWheel->GetWidgetName());
+      this->ThumbWheel->RemoveBinding("<Configure>");
       }
 
     // If in popup mode and the mouse is leaving the top level window, 
@@ -695,37 +703,39 @@ void vtkKWThumbWheel::Bind()
     if (this->PopupMode &&
         this->TopLevel && this->TopLevel->IsCreated())
       {
-      this->Script("bind %s <Leave> {%s WithdrawPopupCallback}",
-                   this->TopLevel->GetWidgetName(), this->GetTclName());
+      this->TopLevel->SetBinding("<Leave>", this, "WithdrawPopupCallback");
+
+      vtksys_stl::string callback;
+
       int j;
       for (j = 0 ; j < 3; j++)
         {
-        this->Script("bind %s <Button-%d> {+bind %s <Leave> {}}",
-                     this->ThumbWheel->GetWidgetName(),
-                     j + 1,
-                     this->TopLevel->GetWidgetName());
+        sprintf(button_event, "<Button-%d>", j + 1);
+        this->ThumbWheel->AddBinding(
+          button_event, this->TopLevel, "RemoveBinding <Leave>");
         }
-      this->Script("bind %s <ButtonRelease> "
-                   "{+bind %s <Leave> {%s WithdrawPopupCallback}}",
-                   this->ThumbWheel->GetWidgetName(), 
-                   this->TopLevel->GetWidgetName(), 
-                   this->GetTclName());
+
+      callback = "SetBinding ";
+      callback += " <Leave> ";
+      callback += this->GetTclName();
+      callback += " WithdrawPopupCallback";
+
+      this->ThumbWheel->AddBinding(
+        "<ButtonRelease>", this->TopLevel, callback.c_str());
       }
     }
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Script("bind %s <Return> {%s EntryCallback}",
-                 this->Entry->GetWidgetName(), this->GetTclName());
-    this->Script("bind %s <FocusOut> {%s EntryCallback}",
-                 this->Entry->GetWidgetName(), this->GetTclName());
+    this->Entry->SetBinding("<Return>", this, "EntryValueCallback");
+    this->Entry->SetBinding("<FocusOut>", this, "EntryValueCallback");
     }
 
   if (this->PopupMode && 
       this->PopupPushButton && this->PopupPushButton->IsCreated())
     {
-    this->Script("bind %s <ButtonPress> {%s DisplayPopupCallback}",
-                 this->PopupPushButton->GetWidgetName(), this->GetTclName());
+    this->PopupPushButton->SetBinding(
+      "<ButtonPress>", this, "DisplayPopupCallback");
     }
 }
 
@@ -734,32 +744,34 @@ void vtkKWThumbWheel::UnBind()
 {
   if (this->ThumbWheel && this->ThumbWheel->IsCreated())
     {
-    this->Script("bind %s <ButtonPress> {}", this->ThumbWheel->GetWidgetName());
-    this->Script("bind %s <ButtonRelease> {}",this->ThumbWheel->GetWidgetName());
+    this->ThumbWheel->RemoveBinding("<ButtonPress>");
+    this->ThumbWheel->RemoveBinding("<ButtonRelease>");
+
+    char button_event[20], motion_event[20];
 
     int i;
     for (i = 0 ; i < 3; i++)
       {
-      this->Script("bind %s <Button-%d> {}", 
-                   this->ThumbWheel->GetWidgetName(), i + 1);
-      this->Script("bind %s <B%d-Motion> {}", 
-                   this->ThumbWheel->GetWidgetName(), i + 1);
+      sprintf(button_event, "<Button-%d>", i + 1);
+      sprintf(motion_event, "<B%d-Motion>", i + 1);
+
+      this->ThumbWheel->RemoveBinding(button_event);
+      this->ThumbWheel->RemoveBinding(motion_event);
       }
 
-    this->Script("bind %s <Configure> {}", this->ThumbWheel->GetWidgetName());
+    this->ThumbWheel->RemoveBinding("<Configure>");
     }
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Script("bind %s <Return> {}", this->Entry->GetWidgetName());
-    this->Script("bind %s <FocusOut> {}", this->Entry->GetWidgetName());
+    this->Entry->RemoveBinding("<Return>");
+    this->Entry->RemoveBinding("<FocusOut>");
     }
 
   if (this->PopupMode && 
       this->PopupPushButton && this->PopupPushButton->IsCreated())
     {
-    this->Script("bind %s <ButtonPress> {}", 
-                 this->PopupPushButton->GetWidgetName());
+    this->PopupPushButton->RemoveBinding("<ButtonPress>");
     }
 }
 

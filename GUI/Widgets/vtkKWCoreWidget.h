@@ -97,20 +97,6 @@ public:
   virtual int GetPadY();
 
   // Description:
-  // Set/add/remove a binding to a widget. 
-  // Whenever the 'event' is triggered on the widget, the 'method' is invoked
-  // on the 'object' (or called like a regular command if 'object' is NULL)
-  virtual void SetBinding(
-    const char *event, vtkObject *object, const char *method);
-  virtual void SetBinding(
-    const char *event, const char *command);
-  virtual void AddBinding(
-    const char *event, vtkObject *object, const char *method);
-  virtual void AddBinding(
-    const char *event, const char *command);
-  virtual void RemoveBinding(const char *event);
-
-  // Description:
   // Set/Get a Tk configuration option (ex: "-bg") 
   // Please make sure you check the class (and subclasses) API for
   // a C++ method acting as a front-end for the corresponding Tk option.
@@ -126,6 +112,13 @@ public:
   virtual int SetConfigurationOptionAsInt(const char* option, int value);
   virtual double GetConfigurationOptionAsDouble(const char* option);
   virtual int SetConfigurationOptionAsDouble(const char* option, double value);
+  virtual void GetConfigurationOptionAsColor(
+    const char* option, double *r, double *g, double *b);
+  virtual double* GetConfigurationOptionAsColor(const char* option);
+  virtual void SetConfigurationOptionAsColor(
+    const char* option, double r, double g, double b);
+  virtual void SetConfigurationOptionAsColor(const char* option, double rgb[3])
+    { this->SetConfigurationOptionAsColor(option, rgb[0], rgb[1], rgb[2]); };
 
   // Description:
   // Convenience method to Set/Get the -state option to "normal" (1) or

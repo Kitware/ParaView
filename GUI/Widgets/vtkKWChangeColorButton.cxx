@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.62");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.63");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -282,33 +282,27 @@ void vtkKWChangeColorButton::Bind()
 
   if (this->ButtonFrame->IsCreated())
     {
-    this->Script(
-      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback}",
-      this->ButtonFrame->GetWidgetName(), this->GetTclName());
-    this->Script(
-      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback}",
-      this->ButtonFrame->GetWidgetName(), this->GetTclName());
+    this->ButtonFrame->AddBinding(
+      "<Any-ButtonPress>", this, "ButtonPressCallback");
+    this->ButtonFrame->AddBinding(
+      "<Any-ButtonRelease>", this, "ButtonReleaseCallback");
     }
 
   if (!this->LabelOutsideButton && 
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    this->Script(
-      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback}",
-      this->GetLabel()->GetWidgetName(), this->GetTclName());
-    this->Script(
-      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback}",
-      this->GetLabel()->GetWidgetName(), this->GetTclName());
+    this->GetLabel()->AddBinding(
+      "<Any-ButtonPress>", this, "ButtonPressCallback");
+    this->GetLabel()->AddBinding(
+      "<Any-ButtonRelease>", this, "ButtonReleaseCallback");
     }
 
   if (this->ColorButton->IsCreated())
     {
-    this->Script(
-      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback}",
-      this->ColorButton->GetWidgetName(), this->GetTclName());
-    this->Script(
-      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback}",
-      this->ColorButton->GetWidgetName(), this->GetTclName());
+    this->ColorButton->AddBinding(
+      "<Any-ButtonPress>", this, "ButtonPressCallback");
+    this->ColorButton->AddBinding(
+      "<Any-ButtonRelease>", this, "ButtonReleaseCallback");
     }
 }
 
@@ -322,27 +316,21 @@ void vtkKWChangeColorButton::UnBind()
 
   if (this->ButtonFrame->IsCreated())
     {
-    this->Script("bind %s <Any-ButtonPress> {}", 
-                 this->ButtonFrame->GetWidgetName());
-    this->Script("bind %s <Any-ButtonRelease> {}", 
-                 this->ButtonFrame->GetWidgetName());
+    this->ButtonFrame->RemoveBinding("<Any-ButtonPress>");
+    this->ButtonFrame->RemoveBinding("<Any-ButtonRelease>");
     }
 
   if (!this->LabelOutsideButton &&
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    this->Script("bind %s <Any-ButtonPress> {}", 
-                 this->GetLabel()->GetWidgetName());
-    this->Script("bind %s <Any-ButtonRelease> {}", 
-                 this->GetLabel()->GetWidgetName());
+    this->GetLabel()->RemoveBinding("<Any-ButtonPress>");
+    this->GetLabel()->RemoveBinding("<Any-ButtonRelease>");
     }
 
   if (this->ColorButton->IsCreated())
     {
-    this->Script("bind %s <Any-ButtonPress> {}",
-                 this->ColorButton->GetWidgetName());
-    this->Script("bind %s <Any-ButtonRelease> {}", 
-                 this->ColorButton->GetWidgetName());
+    this->ColorButton->RemoveBinding("<Any-ButtonPress>");
+    this->ColorButton->RemoveBinding("<Any-ButtonRelease>");
     }
 }
 
@@ -375,7 +363,7 @@ void vtkKWChangeColorButton::UpdateEnableState()
 
   this->PropagateEnableState(this->ColorButton);
 
-  // Now given the state, bind or unbind
+  // Now given the state, bind, or unbind
 
   if (this->IsCreated())
     {

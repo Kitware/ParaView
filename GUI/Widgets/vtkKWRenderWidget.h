@@ -220,7 +220,7 @@ public:
 
   // Description:
   // Get the VTK widget
-  vtkGetObjectMacro(VTKWidget, vtkKWWidget);
+  vtkGetObjectMacro(VTKWidget, vtkKWCoreWidget);
   
   // Description:
   // Are we printing ?
@@ -264,7 +264,7 @@ protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
   
-  vtkKWWidget *VTKWidget;
+  vtkKWCoreWidget *VTKWidget;
 
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;

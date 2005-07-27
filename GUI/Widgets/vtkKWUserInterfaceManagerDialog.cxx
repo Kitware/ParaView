@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.8");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -120,11 +120,13 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   this->TopLevel->Create(app);
   this->TopLevel->ModalOff();
   this->TopLevel->SetSize(600, 300);
-  this->TopLevel->SetMinimumSize(550, 250);
+  this->TopLevel->SetMinimumSize(600, 300);
+
+  vtkKWWidget *parent = this->TopLevel;
 
   // Create the splitframe
 
-  this->SplitFrame->SetParent(this->TopLevel);
+  this->SplitFrame->SetParent(parent);
   this->SplitFrame->Create(app);
   this->SplitFrame->SetFrame1Size(220);
   this->SplitFrame->SetFrame1MinimumSize(this->SplitFrame->GetFrame1Size());
@@ -156,7 +158,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
     
   // Close button
 
-  this->CloseButton->SetParent(this->TopLevel);
+  this->CloseButton->SetParent(parent);
   this->CloseButton->Create(app);
   this->CloseButton->SetText("Close");
   this->CloseButton->SetWidth(30);

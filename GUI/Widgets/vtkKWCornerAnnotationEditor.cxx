@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -211,6 +211,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -padx 2 -expand t -fill x -anchor nw",
                this->CornerFrame->GetWidgetName());
 
+  char buffer[50];
   int i;
   for (i = 0; i < 4; i++)
     {
@@ -221,12 +222,9 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     text->SetHeight(3);
     text->SetWidth(25);
     text->SetWrapToNone();
-    this->Script(
-      "bind %s <Return> {%s CornerTextCallback %i}",
-      text->GetWidgetName(), this->GetTclName(), i);
-    this->Script(
-      "bind %s <FocusOut> {%s CornerTextCallback %i}",
-      text->GetWidgetName(), this->GetTclName(), i);
+    sprintf(buffer, "CornerTextCallback %i", i);
+    text->SetBinding("<Return>", this, buffer);
+    text->SetBinding("<FocusOut>", this, buffer);
     }
 
   this->CornerText[0]->GetLabel()->SetText("Lower left:");
@@ -277,10 +275,10 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   // Maximum line height
 
   this->MaximumLineHeightScale->SetParent(this->PropertiesFrame);
-  this->MaximumLineHeightScale->SetRange(0.01, 0.2);
-  this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->PopupScaleOn();
   this->MaximumLineHeightScale->Create(app);
+  this->MaximumLineHeightScale->SetRange(0.01, 0.2);
+  this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->DisplayEntry();
   this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
   this->MaximumLineHeightScale->DisplayLabel("Max line height:");
@@ -316,9 +314,11 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->GetLabel()->SetText("Text properties:");
     this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
-    this->Script("%s configure -bd 2 -relief groove", 
-                 this->TextPropertyPopupButton->GetWidget()
-                 ->GetPopupFrame()->GetWidgetName());
+
+    vtkKWFrame *frame = 
+      this->TextPropertyPopupButton->GetWidget()->GetPopupFrame();
+    frame->SetBorderWidth(2);
+    frame->SetReliefToGroove();
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TextPropertyPopupButton->GetWidgetName());

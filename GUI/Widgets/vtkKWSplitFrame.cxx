@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.35");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -104,25 +104,21 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
   // Setup the cursor to indication an action associated with the separator. 
 #ifdef _WIN32
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
-    {  
-    this->Script("%s configure -cursor size_we",
-                 this->Separator->GetWidgetName());
+    {
+    this->Separator->SetConfigurationOption("-cursor", "size_we");
     }
   else
     {
-    this->Script("%s configure -cursor size_ns",
-                 this->Separator->GetWidgetName());
+    this->Separator->SetConfigurationOption("-cursor", "size_ns");
     }
 #else
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {  
-    this->Script("%s configure -cursor sb_h_double_arrow",
-                 this->Separator->GetWidgetName());
+    this->Separator->SetConfigurationOption("-cursor", "sb_h_double_arrow");
     }
   else
     {
-    this->Script("%s configure -cursor sb_v_double_arrow",
-                 this->Separator->GetWidgetName());
+    this->Separator->SetConfigurationOption("-cursor", "sb_v_double_arrow");
     }
 #endif
 
@@ -134,20 +130,18 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::AddSeparatorBindings()
 {
-  if (this->Separator && this->Separator->IsCreated())
+  if (this->Separator)
     {
-    this->Script("bind %s <B1-Motion> {%s DragCallback}",
-                 this->Separator->GetWidgetName(), this->GetTclName());
+    this->Separator->SetBinding("<B1-Motion>", this, "DragCallback");
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::RemoveSeparatorBindings()
 {
-  if (this->Separator && this->Separator->IsCreated())
+  if (this->Separator)
     {
-    this->Script("bind %s <B1-Motion> {}",
-                 this->Separator->GetWidgetName(), this->GetTclName());
+    this->Separator->RemoveBinding("<B1-Motion>");
     }
 }
 
@@ -156,11 +150,7 @@ void vtkKWSplitFrame::AddBindings()
 {
   this->AddSeparatorBindings();
 
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {%s ConfigureCallback}",
-                 this->GetWidgetName(), this->GetTclName());
-    }
+  this->SetBinding("<Configure>", this, "ConfigureCallback");
 }
 
 //----------------------------------------------------------------------------
@@ -168,11 +158,7 @@ void vtkKWSplitFrame::RemoveBindings()
 {
   this->RemoveSeparatorBindings();
 
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {}",
-                 this->GetWidgetName(), this->GetTclName());
-    }
+  this->RemoveBinding("<Configure>");
 }
 
 //----------------------------------------------------------------------------
@@ -197,16 +183,12 @@ void vtkKWSplitFrame::ReConfigure()
     if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
       {
       int margin = this->GetInternalMarginHorizontal();
-      this->Script(
-        "%s configure -width %d", 
-        this->GetWidgetName(), this->Size + margin * 2);
+      this->SetWidth(this->Size + margin * 2);
       }
     else
       {
       int margin = this->GetInternalMarginVertical();
-      this->Script(
-        "%s configure -height %d", 
-        this->GetWidgetName(), this->Size + margin * 2);
+      this->SetHeight(this->Size + margin * 2);
       }
     }
 }
@@ -229,7 +211,7 @@ void vtkKWSplitFrame::ConfigureCallback()
     }
 
   // If size == 1 then the widget has not been packed, it will be later
-  // and the Configure event will bring us back here with the correct size
+  // and the <Configure> event will bring us back here with the correct size
 
   if (size <= 1)
     {

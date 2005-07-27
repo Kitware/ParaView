@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.59");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.60");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -131,20 +131,13 @@ vtkKWToolbar::~vtkKWToolbar()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Bind()
 {
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {%s ScheduleResize}",
-               this->GetWidgetName(), this->GetTclName());
-    }
+  this->SetBinding("<Configure>", this, "ScheduleResize");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbar::UnBind()
 {
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {}", this->GetWidgetName());
-    }
+  this->RemoveBinding("<Configure>");
 }
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Create(vtkKWApplication *app)
@@ -329,8 +322,7 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
           vtkKWCoreWidget *core = vtkKWCoreWidget::SafeDownCast(*it);
           if (core->HasConfigurationOption(options[i]) && core->IsCreated())
             {
-            const char *option = 
-              core->Script("%s cget %s", core->GetWidgetName(), options[i]);
+            const char *option = core->GetConfigurationOption(options[i]);
             if (!strcmp(name, option))
               {
               return core;
@@ -367,10 +359,10 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
 
   if (image_name)
     {
-    this->Script(
-      "%s configure -highlightthickness 0 -image %s -selectimage %s", 
-      rb->GetWidgetName(), 
-      image_name, (select_image_name ? select_image_name : image_name));
+    rb->SetHighlightThickness(0);
+    rb->SetConfigurationOption("-image", image_name);
+    rb->SetConfigurationOption(
+      "-selectimage", (select_image_name ? select_image_name : image_name));
     }
 
   if (object && method)
@@ -416,10 +408,10 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
 
   if (image_name)
     {
-    this->Script(
-      "%s configure -highlightthickness 0 -image %s -selectimage %s", 
-      cb->GetWidgetName(), 
-      image_name, (select_image_name ? select_image_name : image_name));
+    cb->SetHighlightThickness(0);
+    cb->SetConfigurationOption("-image", image_name);
+    cb->SetConfigurationOption(
+      "-selectimage", (select_image_name ? select_image_name : image_name));
     }
 
   if (object && method)
@@ -471,8 +463,6 @@ void vtkKWToolbar::UpdateWidgetsAspect()
     return;
     }
 
-  ostrstream s;
-
   vtkKWToolbarInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
   vtkKWToolbarInternals::WidgetsContainerIterator end = 
@@ -489,14 +479,19 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       int use_relief = core->HasConfigurationOption("-relief");
       if (core->HasConfigurationOption("-indicatoron"))
         {
-        use_relief = atoi(
-          this->Script("%s cget -indicatoron", core->GetWidgetName()));
+        use_relief = core->GetConfigurationOptionAsInt("-indicatoron");
         }
         
       if (use_relief)
         {
-        s << core->GetWidgetName() << " config -relief " 
-          << (this->WidgetsFlatAspect ? "flat" : "raised") << endl;
+        if (this->WidgetsFlatAspect)
+          {
+          core->SetReliefToFlat();
+          }
+        else
+          {
+          core->SetReliefToRaised();
+          }
         }
       else
         {
@@ -507,10 +502,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 
         if (core->HasConfigurationOption("-bd"))
           {
-          int bd = atoi(
-            this->Script("%s cget -bd", core->GetWidgetName()));
-          s << core->GetWidgetName() << " config -bd "
-            << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
+          int bd = core->GetConfigurationOptionAsInt("-bd");
+          core->SetConfigurationOptionAsInt(
+            "-bd", this->WidgetsFlatAspect ? -abs(bd) : abs(bd));
           }
         }
 
@@ -520,14 +514,15 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         {
         if (this->WidgetsFlatAspect)
           {
-          s << core->GetWidgetName() << " config -selectcolor [" 
-            << core->GetWidgetName() << " cget -bg]" << endl; 
+          core->SetConfigurationOptionAsColor(
+            "-selectcolor", core->GetBackgroundColor());
           }
         else
           {
-          s << core->GetWidgetName() << " config -selectcolor [" 
-            << this->DefaultOptionsWidget->GetWidgetName() 
-            << " cget -selectcolor]" << endl; 
+          core->SetConfigurationOptionAsColor(
+            "-selectcolor", 
+            this->DefaultOptionsWidget->GetConfigurationOptionAsColor(
+              "-selectcolor"));
           }
         }
 
@@ -537,22 +532,19 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         {
         if (this->WidgetsFlatAspect)
           {
-          s << core->GetWidgetName() << " config -activebackground [" 
-            << core->GetWidgetName() << " cget -bg]" << endl; 
+          core->SetConfigurationOptionAsColor(
+            "-activebackground", core->GetBackgroundColor());
           }
         else
           {
-          s << core->GetWidgetName() << " config -activebackground [" 
-            << this->DefaultOptionsWidget->GetWidgetName() 
-            << " cget -activebackground]" << endl; 
+          core->SetConfigurationOptionAsColor(
+            "-activebackground", 
+            this->DefaultOptionsWidget->GetConfigurationOptionAsColor(
+              "-activebackground"));
           }
         }
       }
     }
-
-  s << ends;
-  this->Script(s.str());
-  s.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -746,15 +738,15 @@ void vtkKWToolbar::UpdateToolbarFrameAspect()
 
   if (this->FlatAspect)
     {
-    this->Script("%s config -relief flat -bd 0", this->GetWidgetName());
-
+    this->SetReliefToFlat();
+    this->SetBorderWidth(0);
     this->Script("pack %s -ipadx 0 -ipady 0 -padx 0 -pady 0 %s",
                  this->Frame->GetWidgetName(), common_opts);
     }
   else
     {
-    this->Script("%s config -relief raised -bd 1", this->GetWidgetName());
-
+    this->SetReliefToRaised();
+    this->SetBorderWidth(1);
     this->Script("pack %s -ipadx 1 -ipady 1 -padx 0 -pady 0 %s",
                  this->Frame->GetWidgetName(), common_opts);
     }

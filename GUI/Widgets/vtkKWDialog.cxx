@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.53");
+vtkCxxRevisionMacro(vtkKWDialog, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
@@ -28,7 +28,6 @@ vtkKWDialog::vtkKWDialog()
   this->Beep = 0;
   this->BeepType = 0;
   this->Modal = 1;
-  this->DisplayPosition = vtkKWTopLevel::DisplayPositionMasterWindowCenter;
 }
 
 //----------------------------------------------------------------------------

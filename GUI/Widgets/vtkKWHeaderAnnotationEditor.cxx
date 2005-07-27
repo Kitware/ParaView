@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -188,9 +188,11 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
     this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->GetLabel()->SetText("Header properties:");
     this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
-    this->Script("%s configure -bd 2 -relief groove", 
-                 this->TextPropertyPopupButton->GetWidget()
-                 ->GetPopupFrame()->GetWidgetName());
+
+    vtkKWFrame *frame = 
+      this->TextPropertyPopupButton->GetWidget()->GetPopupFrame();
+    frame->SetBorderWidth(2);
+    frame->SetReliefToGroove();
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TextPropertyPopupButton->GetWidgetName());

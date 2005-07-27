@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.4");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
@@ -42,8 +42,7 @@ void vtkKWPushButtonWithMenu::Create(vtkKWApplication *app)
   this->Menu->SetParent(this);
   this->Menu->Create(app);  
 
-  this->Script("bind %s <ButtonPress-3> {%s PopupCallback %%X %%Y}",
-               this->GetWidgetName(), this->GetTclName()); 
+  this->SetBinding("<ButtonPress-3>", this, "PopupCallback %X %Y");
 }
   
   

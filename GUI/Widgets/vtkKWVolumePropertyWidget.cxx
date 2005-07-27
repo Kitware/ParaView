@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.19");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -467,7 +467,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->EnableGradientOpacityOptionMenu->Create(app);
   this->EnableGradientOpacityOptionMenu->SetPadX(1);
   this->EnableGradientOpacityOptionMenu->SetPadY(0);
-  this->EnableGradientOpacityOptionMenu->IndicatorOff();
+  this->EnableGradientOpacityOptionMenu->IndicatorVisibilityOff();
   this->EnableGradientOpacityOptionMenu->SetBalloonHelpString(
     "Enable modulation of the opacity by the magnitude of the gradient "
     "according to the specified function.");

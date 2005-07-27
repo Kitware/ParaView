@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.23");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -266,9 +266,11 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
     this->TitleTextPropertyPopupButton->Create(app);
     this->TitleTextPropertyPopupButton->GetLabel()->SetText("Title properties:");
     this->TitleTextPropertyPopupButton->GetWidget()->SetText("Edit...");
-    this->Script("%s configure -bd 2 -relief groove", 
-                 this->TitleTextPropertyPopupButton->GetWidget()
-                 ->GetPopupFrame()->GetWidgetName());
+
+    vtkKWFrame *frame = 
+      this->TitleTextPropertyPopupButton->GetWidget()->GetPopupFrame();
+    frame->SetBorderWidth(2);
+    frame->SetReliefToGroove();
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TitleTextPropertyPopupButton->GetWidgetName());
@@ -332,9 +334,11 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
     this->LabelTextPropertyPopupButton->Create(app);
     this->LabelTextPropertyPopupButton->GetLabel()->SetText("Label properties:");
     this->LabelTextPropertyPopupButton->GetWidget()->SetText("Edit...");
-    this->Script("%s configure -bd 2 -relief groove", 
-                 this->LabelTextPropertyPopupButton->GetWidget()
-                 ->GetPopupFrame()->GetWidgetName());
+
+    vtkKWFrame *frame = 
+      this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame();
+    frame->SetBorderWidth(2);
+    frame->SetReliefToGroove();
 
     this->LabelTextPropertyWidget->SetParent(
       this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame());

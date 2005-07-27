@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.17");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -33,7 +33,8 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->Menu            = NULL;
   this->HideDecoration  = 0;
   this->Modal           = 0;
-  this->DisplayPosition = vtkKWTopLevel::DisplayPositionDefault;
+  this->DisplayPosition = 
+    vtkKWTopLevel::DisplayPositionMasterWindowCenterFirst;
 }
 
 //----------------------------------------------------------------------------
@@ -117,23 +118,23 @@ void vtkKWTopLevel::Display()
 
   // Position the toplevel.
 
-  if (this->DisplayPosition != vtkKWTopLevel::DisplayPositionDefault)
+  int x, y;
+  if (this->DisplayPosition != vtkKWTopLevel::DisplayPositionDefault &&
+      this->ComputeDisplayPosition(&x, &y))
     {
-    int x, y;
-    this->ComputeDisplayPosition(&x, &y);
     this->SetPosition(x, y);
     }
 
   this->DeIconify();
-
   this->Raise();
+
   this->Focus();
 
   if (this->Modal)
     {
     this->Grab();
     }
-}
+ }
 
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::Withdraw()
@@ -149,54 +150,105 @@ void vtkKWTopLevel::Withdraw()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
+int vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
 {
   if (!this->IsCreated() ||
       this->DisplayPosition == vtkKWTopLevel::DisplayPositionDefault)
     {
-    return;
+    return 0;
     }
 
-  int width, height;
+  int display_pos = this->DisplayPosition;
 
-  if (this->DisplayPosition == vtkKWTopLevel::DisplayPositionPointer)
-    {
-    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
-           "%d %d", x, y);
-    }
-  else if (this->DisplayPosition == 
-           vtkKWTopLevel::DisplayPositionMasterWindowCenter ||
-           this->DisplayPosition == 
-           vtkKWTopLevel::DisplayPositionScreenCenter)
-    {
-    int sw, sh;
-    sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
-           "%d %d", &sw, &sh);
+  int width = this->GetWidth();
+  int reqwidth = this->GetRequestedWidth();
+  
+  int height = this->GetHeight();
+  int reqheight = this->GetRequestedHeight();
 
-    vtkKWTopLevel *master = 
-      vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
-    if (master && this->DisplayPosition == 
-        vtkKWTopLevel::DisplayPositionMasterWindowCenter)
+  int minwidth, minheight;
+  this->GetMinimumSize(&minwidth, &minheight);
+
+  // If we requested to center only the first time we display the toplevel,
+  // check its current size. If it is down to a single pixel width or height,
+  // then it has never been mapped, and we can try to center it. Otherwise just
+  // use the current position
+
+  if (display_pos == vtkKWTopLevel::DisplayPositionMasterWindowCenterFirst ||
+      display_pos == vtkKWTopLevel::DisplayPositionScreenCenterFirst)
+    {
+    if (width == 1 || height == 1 || reqwidth == 1 || reqheight == 1)
       {
-      master->GetSize(&width, &height);
-      master->GetPosition(x, y);
-      
-      *x += width / 2;
-      *y += height / 2;
-      
-      if (*x > sw - 200)
+      if (display_pos == vtkKWTopLevel::DisplayPositionMasterWindowCenterFirst)
         {
-        *x = sw / 2;
+        display_pos = vtkKWTopLevel::DisplayPositionMasterWindowCenter;
         }
-      if (*y > sh - 200)
+      else
         {
-        *y = sh / 2;
+        display_pos = vtkKWTopLevel::DisplayPositionScreenCenter;
         }
       }
     else
       {
-      *x = sw / 2;
-      *y = sh / 2;
+      return 0;
+      }
+    }
+
+  // Try to use the proper width
+
+  if (reqwidth > width)
+    {
+    width = reqwidth;
+    }
+  if (minwidth > width)
+    {
+    width = minwidth;
+    }
+
+  if (reqheight > height)
+    {
+    height = reqheight;
+    }
+  if (minheight > height)
+    {
+    height = minheight;
+    }
+
+  // Display at pointer, or center
+
+  if (display_pos == vtkKWTopLevel::DisplayPositionPointer)
+    {
+    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
+           "%d %d", x, y);
+    }
+  else if (display_pos == 
+           vtkKWTopLevel::DisplayPositionMasterWindowCenter ||
+           display_pos == 
+           vtkKWTopLevel::DisplayPositionScreenCenter)
+    {
+    vtkKWTopLevel *master = 
+      vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
+    
+    if (master && display_pos == 
+        vtkKWTopLevel::DisplayPositionMasterWindowCenter)
+      {
+      int master_width, master_height;
+      master->GetSize(&master_width, &master_height);
+      master->GetPosition(x, y);
+      
+      *x += master_width / 2;
+      *y += master_height / 2;
+      }
+    else
+      {
+      int screen_width, screen_height;
+      sscanf(this->Script(
+               "concat [winfo screenwidth .] [winfo screenheight .]"),
+             "%d %d", 
+             &screen_width, &screen_height);
+
+      *x = screen_width / 2;
+      *y = screen_height / 2;
       }
     }
 
@@ -207,9 +259,6 @@ void vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
   // of the widget behind the scene, and return proper values.
   // this->Script("update idletasks");
 
-  width = this->GetRequestedWidth();
-  height = this->GetRequestedHeight();
-
   if (*x > width / 2)
     {
     *x -= width / 2;
@@ -218,6 +267,8 @@ void vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
     {
     *y -= height / 2;
     }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -461,10 +512,7 @@ vtkKWMenu *vtkKWTopLevel::GetMenu()
     this->Menu->SetParent(this);
     this->Menu->SetTearOff(0);
     this->Menu->Create(this->GetApplication());
-
-    this->Script("%s configure -menu %s", 
-                 this->GetWidgetName(),
-                 this->Menu->GetWidgetName());
+    this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
     }
 
   return this->Menu;

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.3");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.4");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -84,8 +84,8 @@ int vtkKWComboBox::GetNumberOfValues()
     return 0;
     }
 
-  return atoi(this->Script("llength [%s cget -values]",
-                           this->GetWidgetName()));
+  return atoi(
+    this->Script("llength [%s cget -values]", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ void vtkKWComboBox::SetCommand(vtkObject *object, const char *method)
     this->SetObjectMethodCommand(&command, object, method);
     this->SetConfigurationOption("-command", command);
     this->SetConfigurationOption("-modifycmd", command);
-    this->Script("%s bind <FocusOut> {+ %s}", this->GetWidgetName(), command);
+    this->AddBinding("<FocusOut>", NULL, command);
     delete [] command;
     }
 }

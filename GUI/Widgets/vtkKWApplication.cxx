@@ -68,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.247");
+vtkCxxRevisionMacro(vtkKWApplication, "1.248");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1110,8 +1110,7 @@ void vtkKWApplication::ConfigureAboutDialog()
         this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
         this->AboutDialogImage->Create(this);
         }
-      this->Script("%s config -image {%s}",
-                   this->AboutDialogImage->GetWidgetName(), img_name);
+      this->AboutDialogImage->SetConfigurationOption("-image", img_name);
       this->Script("pack %s -side top", 
                    this->AboutDialogImage->GetWidgetName());
       int w = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
@@ -1140,7 +1139,6 @@ void vtkKWApplication::ConfigureAboutDialog()
     this->AboutRuntimeInfo->HorizontalScrollbarVisibilityOff();
 
     vtkKWText *text = this->AboutRuntimeInfo->GetWidget();
-    text->ResizeToGridOn();
     text->SetWidth(60);
     text->SetHeight(8);
     text->SetWrapToWord();

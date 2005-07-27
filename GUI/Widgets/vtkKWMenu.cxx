@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.79");
+vtkCxxRevisionMacro(vtkKWMenu, "1.80");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -45,11 +45,8 @@ void vtkKWMenu::Create(vtkKWApplication* app)
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  this->Script("%s configure -tearoff %d", wname, this->TearOff); 
-
-  this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", 
-               wname, this->GetTclName());
+  this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
+  this->SetBinding("<<MenuSelect>>", this, "DisplayHelp %W");
 
   // Update enable state
   
@@ -66,12 +63,8 @@ void vtkKWMenu::SetTearOff(int val)
   this->Modified();
   this->TearOff = val;
 
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -tearoff %d", this->GetWidgetName(), val);
-    }
+  this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::DisplayHelp(const char* widget)

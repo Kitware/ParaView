@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.13");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.14");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -197,7 +197,7 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
   this->TypeMenuButton->SetBalloonHelpString(
     "Specify the type of interpolation "
     "starting at the active key frame.");
-  this->TypeMenuButton->IndicatorOff();
+  this->TypeMenuButton->IndicatorVisibilityOff();
 
   this->BuildTypeMenu();
 

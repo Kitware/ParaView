@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.43");
+vtkCxxRevisionMacro(vtkKWLabel, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -87,7 +87,7 @@ void vtkKWLabel::UpdateText()
     if (this->LineType != vtkKWLabel::MultiLine && 
         this->Text && *this->Text)
       {
-      this->Script("%s configure -image {}", this->GetWidgetName());
+      this->SetConfigurationOption("-image", NULL);
       }
     }
 }
@@ -154,18 +154,17 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
 
   // Get the widget width and the current wraplength
 
-  int width, wraplength;
-  sscanf(this->Script("concat [winfo width %s] [%s cget -wraplength]", 
-                      this->GetWidgetName(), this->GetWidgetName()),
-         "%d %d", 
-         &width, &wraplength);
+  int wraplength = this->GetConfigurationOptionAsInt("-wraplength");
+
+  int width;
+  sscanf(this->Script("winfo width %s", this->GetWidgetName()), "%d", &width);
 
   // Adjust the wraplength to width (within a tolerance so that it does
   // not put too much stress on the GUI).
 
   if (width < (wraplength - 5) || width > (wraplength + 5))
     {
-    this->Script("%s config -wraplength %d", this->GetWidgetName(), width - 5);
+    this->SetConfigurationOptionAsInt("-wraplength", width - 5);
     }
 }
 
@@ -179,12 +178,11 @@ void vtkKWLabel::UpdateBindings()
 
   if (this->AdjustWrapLengthToWidth)
     {
-    this->Script("bind %s <Configure> {%s AdjustWrapLengthToWidthCallback}",
-                 this->GetWidgetName(), this->GetTclName());
+    this->SetBinding("<Configure>", this, "AdjustWrapLengthToWidthCallback");
     }
   else
     {
-    this->Script("bind %s <Configure>", this->GetWidgetName());
+    this->RemoveBinding("<Configure>");
     }
 }
 

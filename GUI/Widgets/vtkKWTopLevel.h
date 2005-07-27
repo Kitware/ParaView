@@ -75,18 +75,28 @@ public:
 
   // Description:
   // Set/Get the position this toplevel should be centered at when Display()
-  // is called. The default is to not set/change the position at all.
-  // If set to MasterWindowCenter, it will be centered inside its master 
-  // window ; if  the MasterWindow ivar is not set, it will be centered on
-  // screen, as if the ivar was set to ScreenCenter. If set to 
-  // Pointer, it will centered at the current mouse position.
+  // is called. The default setting, Default, is to not set/change the
+  // position at all and let the user or the window manager place the toplevel.
+  // If set to MasterWindowCenter, the toplevel is centered inside its master 
+  // window ; if  the MasterWindow ivar is not set, it is centered on the
+  // screen, which is similar to the ScreenCenter setting. If set to 
+  // Pointer, the toplevel is centered at the current mouse position.
+  // On some sytem, the default setting can lead the window manager to
+  // place the window at the upper left corner (0, 0) the first time it
+  // is displayed. Since this can be fairly annoying, the 
+  // MasterWindowCenterFirst and ScreenCenterFirst can be used to center
+  // the toplevel relative to the master window or the screen only the
+  // first time it is displayed (after that, the toplevel will be displayed
+  // wherever it was left).
   //BTX
   enum
   {
-    DisplayPositionDefault            = 0,
-    DisplayPositionMasterWindowCenter = 1,
-    DisplayPositionScreenCenter       = 2,
-    DisplayPositionPointer            = 3
+    DisplayPositionDefault                 = 0,
+    DisplayPositionMasterWindowCenter      = 1,
+    DisplayPositionMasterWindowCenterFirst = 2,
+    DisplayPositionScreenCenter            = 3,
+    DisplayPositionScreenCenterFirst       = 4,
+    DisplayPositionPointer                 = 5
   };
   //ETX
   vtkSetClampMacro(DisplayPosition, int, 
@@ -99,9 +109,15 @@ public:
   virtual void SetDisplayPositionToMasterWindowCenter() 
     { this->SetDisplayPosition(
       vtkKWTopLevel::DisplayPositionMasterWindowCenter); };
+  virtual void SetDisplayPositionToMasterWindowCenterFirst() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionMasterWindowCenterFirst); };
   virtual void SetDisplayPositionToScreenCenter() 
     { this->SetDisplayPosition(
       vtkKWTopLevel::DisplayPositionScreenCenter); };
+  virtual void SetDisplayPositionToScreenCenterFirst() 
+    { this->SetDisplayPosition(
+      vtkKWTopLevel::DisplayPositionScreenCenterFirst); };
   virtual void SetDisplayPositionToPointer() 
     { this->SetDisplayPosition(
       vtkKWTopLevel::DisplayPositionPointer); };
@@ -234,7 +250,8 @@ protected:
 
   // Description:
   // Compute the display position (centered or at pointer)
-  virtual void ComputeDisplayPosition(int *x, int *y);
+  // Return 1 on success, 0 otherwise
+  virtual int ComputeDisplayPosition(int *x, int *y);
 
 private:
   vtkKWTopLevel(const vtkKWTopLevel&); // Not implemented

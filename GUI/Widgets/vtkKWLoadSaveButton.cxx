@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.14");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -66,18 +66,16 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
   // Do not use SetCommand (we override it to get max compatibility)
   // Save the old command, if any
 
-  this->SetUserCommand(this->Script("%s cget -command", 
-                                    this->GetWidgetName()));
-
-  this->Script("%s configure -command {%s InvokeLoadSaveDialogCallback}",
-               this->GetWidgetName(), this->GetTclName());
+  this->SetUserCommand(this->GetConfigurationOption("-command"));
+  this->SetCommand(this, "InvokeLoadSaveDialogCallback");
 
   // Cosmetic add-on
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
   this->SetImageToPredefinedIcon(vtkKWIcon::IconFolder);
-  this->Script("%s configure -compound left -padx 3 -pady 2", 
-               this->GetWidgetName());
+  this->SetConfigurationOption("-compound", "left");
+  this->SetPadX(3);
+  this->SetPadY(2);
 #endif
 
   // No filename yet, set it to empty

@@ -20,9 +20,11 @@
 
 #include "vtkObjectFactory.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.6");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -319,26 +321,14 @@ void vtkKWBalloonHelpManager::AddBindings(vtkKWWidget *widget)
     return;
     }
 
-  widget->Script("bind %s <Enter> {+%s TriggerCallback %s}", 
-                 widget->GetWidgetName(), 
-                 this->GetTclName(),
-                 widget->GetTclName());
+  vtksys_stl::string command("TriggerCallback ");
+  command += widget->GetTclName();
+  widget->AddBinding("<Enter>", this, command.c_str());
 
-  widget->Script("bind %s <ButtonPress> {+%s WithdrawCallback}", 
-                 widget->GetWidgetName(), 
-                 this->GetTclName());
-
-  widget->Script("bind %s <KeyPress> {+%s WithdrawCallback}", 
-                 widget->GetWidgetName(), 
-                 this->GetTclName());
-
-  widget->Script("bind %s <Leave> {+%s CancelCallback}", 
-                 widget->GetWidgetName(), 
-                 this->GetTclName());
-
-  widget->Script("bind %s <B1-Motion> {+%s WithdrawCallback}", 
-                 widget->GetWidgetName(), 
-                 this->GetTclName());  
+  widget->AddBinding("<ButtonPress>", this, "WithdrawCallback");
+  widget->AddBinding("<KeyPress>", this, "WithdrawCallback");
+  widget->AddBinding("<B1-Motion>", this, "WithdrawCallback");
+  widget->AddBinding("<Leave>", this, "CancelCallback");
 }
 
 //----------------------------------------------------------------------------
