@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.29");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.30");
 
 
 //*****************************************************************************
@@ -1097,7 +1097,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       else
         {
         // this really shouldn't fail, but if it does, quit
-        return;
+        break;
         }
 
       ptr = strtok(NULL,"\r\n");
@@ -1220,7 +1220,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           }
         else
           {
-          return;
+          break;
           }
         }
 
@@ -1328,9 +1328,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
   this->Script("[winfo toplevel %s] config -cursor {}", 
                 this->GetWidgetName());
-
   this->GetPVRenderView()->EndBlockingRender();
-
   // delete tclNameMa
   iter = tclNameMap.begin();
   while(iter != tclNameMap.end())
