@@ -56,8 +56,10 @@ public:
   // Description:
   // Convenience function to set the width and height of the canvas
   // No effect before Create() is called.
-  virtual void SetWidth(int width);
-  virtual void SetHeight(int height);
+  virtual void SetWidth(int);
+  virtual int GetWidth();
+  virtual void SetHeight(int);
+  virtual int GetHeight();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

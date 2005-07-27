@@ -15,10 +15,6 @@
 // .SECTION Description
 // A widget that can have a list of items. 
 // Use vtkKWListBoxWithScrollbars if you need scrollbars.
-// You can configure it into: single, browse, multiple, or extended
-// Another important configuration option is: -exportselection 0
-// Therefore it does not collide with let say tk_getSaveFile 
-// selection
 // .SECTION See Also
 // vtkKWListBoxWithScrollbars
 
@@ -115,11 +111,13 @@ public:
   // Set the width of the list box. If the width is less than or equal to 0,
   // then the width is set to the size of the largest string.
   virtual void SetWidth(int);
+  virtual int GetWidth();
 
   // Description: 
   // Set the height of the list box. If the height is less than or equal to 0,
   // then the height is set to the size of the number of items in the listbox.
   virtual void SetHeight(int);
+  virtual int GetHeight();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
