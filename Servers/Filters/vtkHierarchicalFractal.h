@@ -63,6 +63,11 @@ public:
   vtkGetMacro(GhostLevels, int);
   vtkBooleanMacro(GhostLevels, int);
   
+  // Description:
+  // Dummy time-step
+  vtkSetMacro(TimeStep, int);
+  vtkGetMacro(TimeStep, int);
+  vtkGetVector2Macro(TimeStepRange, int);
   
   // Description:
   // Generate either rectilinear grids either uniform grids.
@@ -90,6 +95,8 @@ protected:
   int StartBlock;
   int EndBlock;
   int BlockCount;
+  int TimeStep;
+  int TimeStepRange[2];
   
   // Description:
   // This is called by the superclass.

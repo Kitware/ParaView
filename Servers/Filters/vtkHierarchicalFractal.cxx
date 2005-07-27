@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.6");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.7");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -63,6 +63,10 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
   this->TopLevelOrigin[2] = 0.0;
   
   this->GenerateRectilinearGrids=0;
+
+  this->TimeStep = 0;
+  this->TimeStepRange[0] = 0;
+  this->TimeStepRange[1] = 10;
 }
 
 //----------------------------------------------------------------------------
@@ -343,7 +347,7 @@ int vtkHierarchicalFractal::MandelbrotTest(double x, double y)
   cReal = x;
   cImag = y;
   zReal = 0.0;
-  zImag = 0.0;
+  zImag = this->TimeStep / 10.0;
 
   zReal2 = zReal * zReal;
   zImag2 = zImag * zImag;
@@ -517,6 +521,7 @@ int vtkHierarchicalFractal::RequestData(
 }
   
 
+//----------------------------------------------------------------------------
 int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
                              float x1, float y1, float z1, 
                              double bds[6]) 
@@ -602,6 +607,7 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
   return 0;
 }
 
+//----------------------------------------------------------------------------
 int vtkHierarchicalFractal::LineTest(float x0, float y0, float z0, 
                             float x1, float y1, float z1,
                             double bds[6], int level, int target) 
@@ -1021,7 +1027,8 @@ void vtkHierarchicalFractal::AddFractalArray(vtkHierarchicalDataSet *output)
         fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
         fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
                                    origin[1]+(spacing[1]*0.5), 
-                                   origin[2]+(spacing[2]*0.5), 0.0);
+                                   origin[2]+(spacing[2]*0.5),
+                                   this->TimeStep/10.0);
         fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
         fractalSource->Update();
         vtkDataArray *fractal;
@@ -1336,7 +1343,7 @@ void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
   origin[0]=coords[0]->GetTuple1(0)+0.5*(coords[0]->GetTuple1(1)-coords[0]->GetTuple1(0));
   origin[1]=coords[0]->GetTuple1(0)+0.5*(coords[1]->GetTuple1(1)-coords[1]->GetTuple1(0));
   origin[2]=coords[0]->GetTuple1(0)+0.5*(coords[2]->GetTuple1(1)-coords[2]->GetTuple1(0));
-  origin[3]=0;
+  origin[3]=this->TimeStep/10.0;
   
   // Copy origin into pixel
   for (idx0 = 0; idx0 < 4; ++idx0)
