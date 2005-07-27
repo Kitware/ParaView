@@ -172,10 +172,10 @@ protected:
   // the filters so that we can go back and set reset them at the end
   void ParseAndExecuteStateScript(char *state, int macroFlag);
   void InitializeSourceFromScript(vtkPVSource *source, char *script, int macroFlag);
-  vtkPVSource *GetReaderForLookmark(char *module, char *name);
-  vtkPVSource *GetReaderForMacro(char *module, char *name);
-  vtkPVSource *GetSourceForLookmark(char *name);
-  vtkPVSource *GetSourceForMacro(char *name);
+  vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name);
+  vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
+  vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
+  vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
   void InitializeVolumeAppearanceEditor(vtkPVSource*,char*);
 
   char* StateScript;

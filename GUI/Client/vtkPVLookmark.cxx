@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.31");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.32");
 
 
 //*****************************************************************************
@@ -214,7 +214,7 @@ void vtkPVLookmark::View()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
+vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,char *name)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs1;
@@ -237,8 +237,9 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
     }
 
   // add all the sources into collection
-  vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
+//  vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
   vtkCollectionIterator *itChoices;
+/*
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
@@ -256,7 +257,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
     it->GoToNextItem();
     } 
   it->Delete();
-
+*/
   // ask user to specify
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetMasterWindow(win);
@@ -269,16 +270,14 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
   menu->SetParent(dialog->GetBottomFrame());
   menu->Create(this->GetPVApplication());
   this->Script("pack %s",menu->GetWidgetName());
-  itChoices = choices->NewIterator();
+//  itChoices = choices->NewIterator();
+  itChoices = sources->NewIterator();
   itChoices->InitTraversal();
   while(!itChoices->IsDoneWithTraversal())
     {
     pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     menu->AddRadioButton(pvs2->GetModuleName());
-    if(!menu->GetValue())
-      {
-      menu->SetValue(pvs2->GetModuleName());
-      }
+    menu->SetValue(pvs2->GetModuleName());
     itChoices->GoToNextItem();
     }
   sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
@@ -301,27 +300,30 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(char *name)
       }
     }
   dialog->Delete();
-  it->Delete();
-  choices->Delete();
+//  it->Delete();
+//  choices->Delete();
   itChoices->Delete();
 
   return source;
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetSourceForLookmark(char *name)
+vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources,char *name)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs1;
   vtkPVSource *source = NULL;
 
   // If there is an open source that matches this one, use it, otherwise, create a new one
+/*
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
     return 0;
     }
   vtkCollectionIterator *it = col->NewIterator();
+*/
+  vtkCollectionIterator *it = sources->NewIterator();
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
@@ -347,9 +349,10 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(char *name)
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,char *moduleName, char *name)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVSource *pvs;
   vtkPVSource *pvs1;
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
@@ -388,6 +391,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
 
   // If there is an open reader of the same type and filename, use it, 
   // 
+/*
   vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
@@ -398,102 +402,111 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
   vtkCollectionIterator *itInner = col->NewIterator();
   vtkCollectionIterator *itChoices = NULL;
   itOuter->InitTraversal();
+*/
+
+  // This lookmark is made up of multiple readers
+  // compare each reader
+/*
+  vtkCollectionIterator *itOuter = readers->NewIterator();
+  vtkCollectionIterator *itInner = readers->NewIterator();
+  itOuter->InitTraversal();
   while ( !itOuter->IsDoneWithTraversal() )
     {
     pvs1 = static_cast<vtkPVSource*>( itOuter->GetCurrentObject() );
     pvs1->SetVisibility(0);
-    if(!pvs1->GetPVInput(0)) // && !strcmp(pvs1->GetModuleName(),moduleName))
-      {
-      // search sources again and if this is the only one of this type, use it
-      // if find a multiple, check its filename for a match, if so use it
-      // else, populate a kwoptionmenu in a popup dialog and prompt user, use their selection
-      mod = vtkPVReaderModule::SafeDownCast(pvs1);
-      ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
-      ptr2 = mod->RemovePath(name);
-      if(!strcmp(ptr1,ptr2))
-        {
-        source = pvs1;
-        }
-      if(!source)
-        {
-        choices->AddItem(pvs1);
-        itInner->InitTraversal();
-        while ( !itInner->IsDoneWithTraversal() )
-          {
-          pvs2 = static_cast<vtkPVSource*>( itInner->GetCurrentObject() );
-          if(pvs2 != pvs1) // && !strcmp(pvs2->GetModuleName(),moduleName))
-            {
-            mod = vtkPVReaderModule::SafeDownCast(pvs2);
-            if(mod)
-              {
-              ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
-              ptr2 = mod->RemovePath(name);
-              // if this source has a matching filename, use it
-              if(!strcmp(ptr1,ptr2))
-                {
-                source = pvs2;
-                }
-              }
-            if(!source)
-              {
-              choices->AddItem(pvs2);
-              }
-            }
-          itInner->GoToNextItem();
-          }
+    //if(!pvs1->GetPVInput(0))  && !strcmp(pvs1->GetModuleName(),moduleName))
+    //  {
+    // search sources again and if this is the only one of this type, use it
+    // if find a multiple, check its filename for a match, if so use it
+    // else, populate a kwoptionmenu in a popup dialog and prompt user, use their selection
 
-        if(!source && choices->GetNumberOfItems()>1)
+    mod = vtkPVReaderModule::SafeDownCast(pvs1);
+    ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
+    ptr2 = mod->RemovePath(name);
+    if(!strcmp(ptr1,ptr2))
+      {
+      source = pvs1;
+      }
+
+    if(!source)
+      {
+//        choices->AddItem(pvs1);
+      itInner->InitTraversal();
+      while ( !itInner->IsDoneWithTraversal() )
+        {
+        pvs2 = static_cast<vtkPVSource*>( itInner->GetCurrentObject() );
+        if(pvs2 != pvs1) // && !strcmp(pvs2->GetModuleName(),moduleName))
           {
-          // found multiple and none of their filenames match the given one
-          vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
-          dialog->SetMasterWindow(win);
-          dialog->SetOptions(
-            vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
-          dialog->SetModal(0);
-          dialog->SetStyleToOkCancel();
-          dialog->Create(this->GetPVApplication());
-          vtkKWMenuButton *menu = vtkKWMenuButton::New();
-          menu->SetParent(dialog->GetBottomFrame());
-          menu->Create(this->GetPVApplication());
-          this->Script("pack %s",menu->GetWidgetName());
-          itChoices = choices->NewIterator();
-          itChoices->InitTraversal();
-          while(!itChoices->IsDoneWithTraversal())
+          mod = vtkPVReaderModule::SafeDownCast(pvs2);
+          if(mod)
             {
-            pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-            mod = vtkPVReaderModule::SafeDownCast(pvs2);
-            menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-            if(!menu->GetValue())
+            ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
+            ptr2 = mod->RemovePath(name);
+            // if this source has a matching filename, use it
+            if(!strcmp(ptr1,ptr2))
               {
-              menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-              }
-            itChoices->GoToNextItem();
-            }
-          sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
-          dialog->SetText( mesg );
-          dialog->SetTitle( "Multiple Matching Sources" );
-          dialog->SetIcon();
-          dialog->BeepOn();
-          if(dialog->Invoke())
-            {
-            itChoices->InitTraversal();
-            while(!itChoices->IsDoneWithTraversal())
-              {
-              pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-              mod = vtkPVReaderModule::SafeDownCast(pvs2);
-              if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
-                {
-                source = pvs2;
-                break;
-                }
-              itChoices->GoToNextItem();
+              source = pvs2;
               }
             }
-          itChoices->Delete();
-          dialog->Delete();
+          if(!source)
+            {
+//             choices->AddItem(pvs2);
+            }
           }
-        choices->RemoveAllItems();
+        itInner->GoToNextItem();
         }
+
+      if(!source) // && choices->GetNumberOfItems()>1)
+        {
+*/
+  vtkCollectionIterator *itChoices = readers->NewIterator();
+  // found multiple and none of their filenames match the given one
+  vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
+  dialog->SetMasterWindow(win);
+  dialog->SetOptions(
+    vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
+  dialog->SetModal(0);
+  dialog->SetStyleToOkCancel();
+  dialog->Create(this->GetPVApplication());
+  vtkKWMenuButton *menu = vtkKWMenuButton::New();
+  menu->SetParent(dialog->GetBottomFrame());
+  menu->Create(this->GetPVApplication());
+  this->Script("pack %s",menu->GetWidgetName());
+  itChoices->InitTraversal();
+  while(!itChoices->IsDoneWithTraversal())
+    {
+    pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+    mod = vtkPVReaderModule::SafeDownCast(pvs);
+    menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+    menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+    itChoices->GoToNextItem();
+    }
+  sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
+  dialog->SetText( mesg );
+  dialog->SetTitle( "Multiple Matching Sources" );
+  dialog->SetIcon();
+  dialog->BeepOn();
+  if(dialog->Invoke())
+    {
+    itChoices->InitTraversal();
+    while(!itChoices->IsDoneWithTraversal())
+      {
+      pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+      mod = vtkPVReaderModule::SafeDownCast(pvs);
+      if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+        {
+        source = pvs;
+        break;
+        }
+      itChoices->GoToNextItem();
+      }
+    }
+  itChoices->Delete();
+  dialog->Delete();
+/*
+        }
+      choices->RemoveAllItems();
+      }
       }
     if(source)
       {
@@ -504,13 +517,13 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
   itOuter->Delete();
   itInner->Delete();
   choices->Delete();
-
+*/
   return source;
 }
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForLookmark(char *moduleName, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,char *moduleName, char *name)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs;
@@ -521,30 +534,32 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(char *moduleName, char *name)
   FILE *file;
 
   // If there is an open dataset of the same type and path, return it
+/*
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
     source = NULL;
     }
-  vtkCollectionIterator *it = col->NewIterator();
+*/
+  vtkCollectionIterator *it = readers->NewIterator();
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
     pvs->SetVisibility(0);
-    if(!pvs->GetPVInput(0))
-      {
+//    if(!pvs->GetPVInput(0))
+//      {
       // this is either a Source or Reader
-      if(pvs->IsA("vtkPVReaderModule"))
-        {
+//      if(pvs->IsA("vtkPVReaderModule"))
+//        {
         mod = vtkPVReaderModule::SafeDownCast(pvs);
         targetName = (char *)mod->GetFileEntry()->GetValue();
         if(!strcmp(targetName,name) && !strcmp(pvs->GetModuleName(),moduleName))
           {
           source = pvs;
           }
-        }
-      }
+ //       }
+//      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -1036,16 +1051,40 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   char **buf = new char*[100];
   char moduleName[50];
 
-//  const char **tclNames = new char*[sources->GetNumberOfItems()];
-
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
+  vtkPVSourceCollection *readers = vtkPVSourceCollection::New();
+  vtkPVSourceCollection *sources = vtkPVSourceCollection::New();
+  if (col == NULL)
+    {
+    return;
+    }
+  vtkCollectionIterator *it = col->NewIterator();
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
+    {
+    src = static_cast<vtkPVSource*>( it->GetCurrentObject() );
+    if(!src->GetPVInput(0))
+      {
+      if(src->IsA("vtkPVReaderModule"))
+        {
+        readers->AddItem(src);
+        }
+      else
+        {
+        sources->AddItem(src);
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
 
   this->Script("[winfo toplevel %s] config -cursor watch", 
                 this->GetWidgetName());
 
   this->GetPVRenderView()->StartBlockingRender();
-
-  ptr = strtok(script,"\r\n");
 
   vtkstd::map<vtkPVSource*, char*> tclNameMap;
   vtkstd::map<vtkPVSource*, char*>::iterator iter = tclNameMap.begin();
@@ -1057,6 +1096,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   // if "createpvsource" and its tcl name does not match any of our stored ones, check for an input widget on a subsequent line, if none, prompt user, else treat as filter
   // if it is a filter, execute commands, looking for input pvwidget (input menu or groupinputwidget) when you get to one, set the appropriate source tied to the tcl name as the currentpvsource
   // when all sources in collection have been initialized, assume we are done and parse rest of script, if we come across "createpvsource" or "Init read custom" prompt user and ignore secion
+
+  ptr = strtok(script,"\r\n");
 
   while(ptr)
     {
@@ -1083,14 +1124,14 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
       if(macroFlag)
         {
-        src = this->GetReaderForMacro(moduleName,ptr1);
+        src = this->GetReaderForMacro(readers,moduleName,ptr1);
         }
       else
         {
         // look for an open dataset of the same path and reader type
         // if none is open, try to open the one at the specified path automatically for user
         // if that fails, prompt user for a new data file
-        src = this->GetReaderForLookmark(moduleName,ptr1);
+        src = this->GetReaderForLookmark(readers,moduleName,ptr1);
         }
 
       if(src)
@@ -1105,6 +1146,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           buf[++i] = strtok(NULL,"\r\n"); 
           }
         this->InitializeSourceFromScript(src,buf[i],macroFlag);
+        // remove this source from the available list
+        readers->RemoveItem(src);
         }
       else
         {
@@ -1216,11 +1259,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           {
           // if multiple sources are open and the lookmark creates multiple source, ask user
           // else if the lookmark is single sources, use the currently selected one
-          src = this->GetSourceForMacro(ptr1);
+          src = this->GetSourceForMacro(sources,ptr1);
           }
         else
           {
-          src = this->GetSourceForLookmark(ptr1);
+          src = this->GetSourceForLookmark(sources,ptr1);
           }
 
         if(src)
@@ -1229,6 +1272,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           strcpy(tclName,srcTclName);
           tclNameMap[src] = tclName;
           this->InitializeSourceFromScript(src,buf[i],macroFlag);
+          // remove this source from the available list
+          sources->RemoveItem(src);
           }
         else
           {
@@ -1349,6 +1394,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     ++iter;
     }
   delete [] buf;
+  readers->Delete();
+  sources->Delete();
 }
 
 void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, char *firstLine)
