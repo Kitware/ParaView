@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.52");
+vtkCxxRevisionMacro(vtkKWRange, "1.53");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1416,7 +1416,7 @@ void vtkKWRange::RedrawCanvas()
   this->Canvas->SetWidth(width);
   this->Canvas->SetHeight(height);
 
-  char buffer[20];
+  char buffer[200];
   sprintf(buffer, "0 0 %d %d", width - 1, height - 1);
   this->Canvas->SetConfigurationOption("-scrollregion", buffer);
 

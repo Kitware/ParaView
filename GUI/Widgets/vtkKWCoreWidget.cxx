@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.8");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -225,7 +225,7 @@ int vtkKWCoreWidget::GetConfigurationOptionAsInt(const char *option)
 int vtkKWCoreWidget::SetConfigurationOptionAsDouble(
   const char *option, double value)
 {
-  char buffer[20];
+  char buffer[256];
   sprintf(buffer, "%lf", value);
   return this->SetConfigurationOption(option, buffer);
 }

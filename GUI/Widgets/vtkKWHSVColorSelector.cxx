@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.12");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.13");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -602,7 +602,7 @@ void vtkKWHSVColorSelector::RedrawHueSatWheelCanvas()
   this->HueSatWheelCanvas->SetWidth(c_width);
   this->HueSatWheelCanvas->SetHeight(c_height);
 
-  char buffer[20];
+  char buffer[256];
   sprintf(buffer, "0 0 %d %d", c_width, c_height);
   this->HueSatWheelCanvas->SetConfigurationOption("-scrollregion", buffer);
 
@@ -857,7 +857,7 @@ void vtkKWHSVColorSelector::RedrawValueBoxCanvas()
   this->ValueBoxCanvas->SetWidth(c_width);
   this->ValueBoxCanvas->SetHeight(c_height);
 
-  char buffer[20];
+  char buffer[256];
   sprintf(buffer, "0 0 %d %d", c_width - 1, c_height - 1);
   this->ValueBoxCanvas->SetConfigurationOption("-scrollregion", buffer);
 

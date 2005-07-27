@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.57");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.58");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4519,7 +4519,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     double *v_v_range = this->GetVisibleValueRange();
     double *v_w_range = this->GetWholeValueRange();
 
-    char buffer[100];
+    char buffer[256];
 
     if (this->ParameterTicksVisibility)
       {
