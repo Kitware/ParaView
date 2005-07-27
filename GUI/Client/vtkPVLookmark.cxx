@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.30");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.31");
 
 
 //*****************************************************************************
@@ -358,7 +358,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
   const char *ptr2;
   char mesg[400];
 
-  // check if this lookmark has a single source of the same module type first
+  // check if this lookmark has a single source  first
+  // if so, use the currently viewed reader
   int i = 0;
   while(this->DatasetList[i]){ i++; }
   if(i==1)
@@ -368,10 +369,21 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
       {
       pvs1 = pvs2;
       }
-    if(!strcmp(pvs1->GetModuleName(),moduleName))
+//    if(!strcmp(pvs1->GetModuleName(),moduleName))
+//      {
+    if(pvs1->IsA("vtkPVReaderModule"))
       {
       return pvs1;
       }
+    else
+      {
+      vtkKWMessageDialog::PopupMessage(
+        this->GetPVApplication(), win, "Attempt to use a macro created from a reader on a source", 
+        "Please select a reader or one of a reader's filters in the Selection Window and try again.", 
+        vtkKWMessageDialog::ErrorIcon);
+      return 0;
+      }
+//      }
     }
 
   // If there is an open reader of the same type and filename, use it, 
@@ -390,7 +402,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
     {
     pvs1 = static_cast<vtkPVSource*>( itOuter->GetCurrentObject() );
     pvs1->SetVisibility(0);
-    if(!pvs1->GetPVInput(0) && !strcmp(pvs1->GetModuleName(),moduleName))
+    if(!pvs1->GetPVInput(0)) // && !strcmp(pvs1->GetModuleName(),moduleName))
       {
       // search sources again and if this is the only one of this type, use it
       // if find a multiple, check its filename for a match, if so use it
@@ -409,7 +421,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(char *moduleName, char *name)
         while ( !itInner->IsDoneWithTraversal() )
           {
           pvs2 = static_cast<vtkPVSource*>( itInner->GetCurrentObject() );
-          if(pvs2 != pvs1 && !strcmp(pvs2->GetModuleName(),moduleName))
+          if(pvs2 != pvs1) // && !strcmp(pvs2->GetModuleName(),moduleName))
             {
             mod = vtkPVReaderModule::SafeDownCast(pvs2);
             if(mod)
