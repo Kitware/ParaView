@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -213,7 +213,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
 
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
-  const char* , int , int )
+                                     const char*, int )
 {
   if (!input)
     {

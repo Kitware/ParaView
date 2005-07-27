@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void vtkSMCubeAxesDisplayProxy::CreateVTKObjects(int num)
 
 //----------------------------------------------------------------------------
 void vtkSMCubeAxesDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
-  int, int)
+                                         int)
 {
   this->SetInput(input);
 }

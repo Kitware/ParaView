@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.3");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -106,7 +106,7 @@ void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects(int numObjects)
 }
 //-----------------------------------------------------------------------------
 void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
-  const char* method, int, int)
+                                              const char* method, int)
 {
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

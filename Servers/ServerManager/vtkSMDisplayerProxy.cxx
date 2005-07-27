@@ -27,7 +27,7 @@
 #include "vtkSMDisplayWindowProxy.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.16");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -402,7 +402,6 @@ void vtkSMDisplayerProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* dw)
 //---------------------------------------------------------------------------
 void vtkSMDisplayerProxy::AddInput(vtkSMSourceProxy *input, 
                                    const char* method, 
-                                   int portIdx, 
                                    int hasMultipleInputs)
 {
   if (!input)

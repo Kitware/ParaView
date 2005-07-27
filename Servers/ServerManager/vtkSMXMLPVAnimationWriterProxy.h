@@ -35,7 +35,7 @@ public:
   // Connects filters/sinks to an input. If the filter(s) is not
   // created, this will create it. 
   void AddInput(vtkSMSourceProxy* input, 
-                const char* method, int , int ); 
+                const char* method, int ); 
 
   void WriteTime(double time);
 

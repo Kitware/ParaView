@@ -35,8 +35,8 @@ public:
   // Sets the input dataset to Plot.
   // Note that all the arrays and all the components of each of the arrays 
   // in the input will be plotted. 
-  void AddInput(vtkSMSourceProxy* input, const char* method, int portIdx, 
-    int hasMultipleInputs);
+  void AddInput(vtkSMSourceProxy* input, const char* method, 
+                int hasMultipleInputs);
 
   // Description:
   // To remove the dataset for the Plot.

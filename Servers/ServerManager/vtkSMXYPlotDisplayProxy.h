@@ -47,7 +47,7 @@ public:
   // I have this funny looking AddInput instead of a simple
   // SetInput as I want to have an InputProperty for the input (rather than
   // a proxy property).
-  void AddInput(vtkSMSourceProxy* input, const char*, int , int );
+  void AddInput(vtkSMSourceProxy* input, const char*,  int );
 
   //BTX
   // Description:

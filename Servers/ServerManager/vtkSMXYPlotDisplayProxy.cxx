@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -122,7 +122,7 @@ void vtkSMXYPlotDisplayProxy::CreateVTKObjects(int numObjects)
 //-----------------------------------------------------------------------------
   
 void vtkSMXYPlotDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
-  int , int )
+                                       int )
 {
   this->InvalidateGeometry();
   this->CreateVTKObjects(1);

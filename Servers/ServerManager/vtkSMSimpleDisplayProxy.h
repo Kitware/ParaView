@@ -42,7 +42,7 @@ public:
   // Description:
   // Method gets called to set input when using Input property.
   // Internally leads to a call to SetInput.
-  virtual void AddInput(vtkSMSourceProxy* input, const char*, int, int);
+  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
 
   // Description:
   // Connect the VTK data object to display pipeline.

@@ -53,7 +53,7 @@ vtkSMPointLabelDisplayProxy::~vtkSMPointLabelDisplayProxy()
 
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::AddInput(vtkSMSourceProxy* input,
-  const char*, int , int)
+                                           const char*, int)
 {
   this->SetInput(input);
 }

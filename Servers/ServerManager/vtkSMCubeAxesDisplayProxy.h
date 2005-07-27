@@ -48,7 +48,7 @@ public:
   // Description:
   // Called when setting input using the Input property.
   // Internally calls SetInput.
-  void AddInput(vtkSMSourceProxy* input, const char*, int, int);
+  void AddInput(vtkSMSourceProxy* input, const char*, int);
 
   // Description:
   // Connects the parts data to the plot actor.
