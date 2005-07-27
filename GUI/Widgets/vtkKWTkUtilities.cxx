@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.65");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.66");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -467,11 +467,11 @@ int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
     return 0;
     }
 
-  ostrstream geometry;
-  geometry << "winfo geometry " << widget << ends;
-  int res = Tcl_GlobalEval(interp, geometry.str());
-  geometry.rdbuf()->freeze(0);
-  if (res != TCL_OK)
+  vtksys_stl::string geometry;
+
+  geometry = "winfo geometry ";
+  geometry += widget;
+  if (Tcl_GlobalEval(interp, geometry.c_str()) != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
     return 0;
@@ -481,7 +481,31 @@ int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
   if (sscanf(
         Tcl_GetStringResult(interp), "%dx%d+%d+%d", &ww, &wh, &wx, &wy) != 4)
     {
+    vtkGenericWarningMacro(<< "Unable to parse geometry!");
     return 0;
+    }
+  
+  // For some unknown reasons, "winfo geometry" can return the wrong
+  // position for the window, if it is a toplevel (it will return (0, 0).
+  // Check for it, and try "wm geometry" instead.
+
+  if ((x || y) && 
+      (wx == 0 && wy == 0) && 
+      vtkKWTkUtilities::IsTopLevel(interp, widget))
+    {
+    geometry = "wm geometry ";
+    geometry += widget;
+    if (Tcl_GlobalEval(interp, geometry.c_str()) != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
+      return 0;
+      }
+    if (sscanf(
+          Tcl_GetStringResult(interp), "%dx%d+%d+%d", &ww, &wh, &wx, &wy) != 4)
+      {
+      vtkGenericWarningMacro(<< "Unable to parse geometry!");
+      return 0;
+      }
     }
 
   if (width)
@@ -1172,7 +1196,7 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
   // Set the font
 
   ostrstream setfont;
-  setfont << widget << " config -font \"" << new_font << "\"" << ends;
+  setfont << widget << " configure -font \"" << new_font << "\"" << ends;
   res = Tcl_GlobalEval(interp, setfont.str());
   setfont.rdbuf()->freeze(0);
   if (res != TCL_OK)
@@ -1338,7 +1362,7 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
   // Set the font
 
   ostrstream setfont;
-  setfont << widget << " config -font \"" << new_font << "\"" << ends;
+  setfont << widget << " configure -font \"" << new_font << "\"" << ends;
   res = Tcl_GlobalEval(interp, setfont.str());
   setfont.rdbuf()->freeze(0);
   if (res != TCL_OK)
@@ -2070,7 +2094,7 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
   ostrstream setwidth;
   for (widget = 0; widget < nb_of_widgets; widget++)
     {
-    setwidth << widgets[widget] << " config -width " << maxwidth;
+    setwidth << widgets[widget] << " configure -width " << maxwidth;
     if (options)
       {
       setwidth << " " << options;
@@ -2358,8 +2382,6 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
     return 0;
     }
 
-  cout << "Trying to writing dump to: " << fname << endl;
-
   ostrstream geometry;
   geometry << "concat [winfo rootx " << widget << "] [winfo rooty "
            << widget << "] [winfo width " << widget << "] [winfo height "
@@ -2522,6 +2544,87 @@ int vtkKWTkUtilities::TakeScreenDump(vtkKWWidget *widget,
     widget->GetWidgetName(),
     fname,
     top, bottom, left, right);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::SetTopLevelMouseCursor(Tcl_Interp *interp,
+                                             const char* widget, 
+                                             const char *cursor)
+{
+  if (!interp || !widget)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string cmd;
+  cmd = "[winfo toplevel ";
+  cmd += widget;
+  cmd += "] configure -cursor {";
+  if (cursor)
+    {
+    cmd += cursor;
+    }
+  cmd += "}";
+
+  if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to change toplevel mouse cursor: " 
+      << Tcl_GetStringResult(interp));
+    return 0;
+    }
+ 
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::SetTopLevelMouseCursor(vtkKWWidget *widget, 
+                                             const char *cursor)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::SetTopLevelMouseCursor(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    cursor);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::IsTopLevel(Tcl_Interp *interp,
+                                 const char* widget)
+{
+  if (!interp || !widget)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string cmd("winfo toplevel ");
+  cmd += widget;
+
+  if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to query toplevel: " << Tcl_GetStringResult(interp));
+    return 0;
+    }
+ 
+  return (!strcmp(Tcl_GetStringResult(interp), widget) ? 1 : 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::IsTopLevel(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::IsTopLevel(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

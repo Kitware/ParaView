@@ -481,6 +481,21 @@ public:
                             int top = 0, int bottom = 0, 
                             int left = 0, int right = 0);
 
+  // Description:
+  // Set widget's toplevel mouse cursor.
+  // Provide a NULL or empty cursor to reset it to default.
+  static int SetTopLevelMouseCursor(Tcl_Interp *interp,
+                                    const char *widget,
+                                    const char *cursor);
+  static int SetTopLevelMouseCursor(vtkKWWidget *widget,
+                                    const char *cursor);
+
+  // Description:
+  // Return 1 if window is a toplevel, 0 otherwise
+  static int IsTopLevel(Tcl_Interp *interp,
+                        const char *widget);
+  static int IsTopLevel(vtkKWWidget *widget);
+
 protected:
   vtkKWTkUtilities() {};
   ~vtkKWTkUtilities() {};
