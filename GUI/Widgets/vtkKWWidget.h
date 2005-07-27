@@ -80,7 +80,22 @@ public:
   vtkGetMacro(Enabled, int);
 
   // Description:
-  // Get the containing vtkKWWindowBase for this Widget if there is one.
+  // Set/add/remove a binding to a widget. 
+  // Whenever the 'event' is triggered on the widget, the 'method' is invoked
+  // on the 'object' (or called like a regular command if 'object' is NULL)
+  virtual void SetBinding(
+    const char *event, vtkObject *object, const char *method);
+  virtual void SetBinding(
+    const char *event, const char *command);
+  virtual void AddBinding(
+    const char *event, vtkObject *object, const char *method);
+  virtual void AddBinding(
+    const char *event, const char *command);
+  virtual void RemoveBinding(const char *event);
+
+  // Description:
+  // Convenience method to get the parent vtkKWWindowBase for
+  // this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
   vtkKWWindowBase* GetWindow();
 

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.137");
+vtkCxxRevisionMacro(vtkKWWidget, "1.138");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -512,14 +512,16 @@ int vtkKWWidget::GetNumberOfPackedChildren()
 //----------------------------------------------------------------------------
 void vtkKWWidget::Unpack()
 {
-  this->Script("catch {eval pack forget %s}",
-               this->GetWidgetName());
+  if (this->IsCreated())
+    {
+    this->Script("catch {eval pack forget %s}", this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::UnpackSiblings()
 {
-  if (this->GetParent())
+  if (this->GetParent() && this->GetParent()->IsCreated())
     {
     this->Script("catch {eval pack forget [pack slaves %s]} \n "
                  "catch {eval grid forget [grid slaves %s]}",
@@ -531,9 +533,12 @@ void vtkKWWidget::UnpackSiblings()
 //----------------------------------------------------------------------------
 void vtkKWWidget::UnpackChildren()
 {
-  this->Script("catch {eval pack forget [pack slaves %s]} \n "
-               "catch {eval grid forget [grid slaves %s]}",
-               this->GetWidgetName(),this->GetWidgetName());
+  if (this->IsCreated())
+    {
+    this->Script("catch {eval pack forget [pack slaves %s]} \n "
+                 "catch {eval grid forget [grid slaves %s]}",
+                 this->GetWidgetName(),this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -589,6 +594,53 @@ int vtkKWWidget::IsGrabbed()
 
   const char *res = this->Script("grab status %s", this->GetWidgetName());
   return (!strcmp(res, "none") ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetBinding(const char *event, 
+                                 vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->Script("bind %s %s {%s}", this->GetWidgetName(), event, command);
+    delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetBinding(const char *event, const char *command)
+{
+  this->SetBinding(event, NULL, command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::AddBinding(const char *event, 
+                                 vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->Script("bind %s %s {+ %s}", this->GetWidgetName(), event, command);
+    delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::AddBinding(const char *event, const char *command)
+{
+  this->AddBinding(event, NULL, command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::RemoveBinding(const char *event)
+{
+  if (this->IsCreated())
+    {
+    this->Script("bind %s %s {}", this->GetWidgetName(), event);
+    }
 }
 
 //----------------------------------------------------------------------------
