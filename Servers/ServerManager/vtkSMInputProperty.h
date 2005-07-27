@@ -39,12 +39,6 @@ public:
   vtkGetMacro(MultipleInput, int);
 
   // Description:
-  // Passed to vtkSMSourceProxy::AddInput, this argument determines which
-  // input port is used.
-  vtkSetMacro(PortIndex, int);
-  vtkGetMacro(PortIndex, int);
-
-  // Description:
   // If InputsUpdateImmediately is true, all input properties push
   // their values as soon as they are modified. Otherwise, the values
   // are pushed UpdateVTKObjects

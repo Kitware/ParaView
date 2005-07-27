@@ -71,7 +71,6 @@ public:
   // one filter and can not apply to the multi-block input.
   void AddInput(vtkSMSourceProxy* input, 
                 const char* method,
-                int portIdx,
                 int hasMultipleInputs);
 
   // Description:

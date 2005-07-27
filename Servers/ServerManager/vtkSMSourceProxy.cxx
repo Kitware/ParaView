@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.30");
 
 struct vtkSMSourceProxyInternals
 {
@@ -252,17 +252,10 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
       stream << vtkClientServerStream::Assign << dataID
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << sourceID
-             << "GetOutputPort" << j <<  vtkClientServerStream::End;
-      vtkClientServerID portID = pm->GetUniqueID();
-      stream << vtkClientServerStream::Assign << portID
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
 
       vtkSMPart* part = vtkSMPart::New();
       part->CreateVTKObjects(0);
       part->SetID(0, dataID);
-      part->SetID(1, portID);
       this->PInternals->Parts.push_back(part);
       part->Delete();
       }
@@ -309,7 +302,6 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input, 
                                 const char* method, 
-                                int portIdx, 
                                 int hasMultipleInputs)
 {
 
@@ -334,15 +326,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
       vtkSMPart* part = input->GetPart(partIdx);
       stream << vtkClientServerStream::Invoke 
              << sourceID << method;
-      if (portIdx >= 0)
-        {
-        stream << portIdx;
-        stream << part->GetID(1);
-        }
-      else
-        {
-        stream << part->GetID(0);
-        }
+      stream << part->GetID(0);
       stream << vtkClientServerStream::End;
       }
     pm->SendStream(this->Servers, stream);
@@ -366,15 +350,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
       vtkSMPart* part = input->GetPart(partIdx);
       stream << vtkClientServerStream::Invoke 
              << sourceID << method; 
-      if (portIdx >= 0)
-        {
-        stream << portIdx;
-        stream << part->GetID(1);
-        }
-      else
-        {
-        stream << part->GetID(0);
-        }
+      stream << part->GetID(0);
       stream << vtkClientServerStream::End;
       }
     pm->SendStream((this->Servers & input->GetServers()), stream);

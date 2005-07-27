@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.11");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -33,7 +33,6 @@ vtkSMInputProperty::vtkSMInputProperty()
   this->ImmediateUpdate = vtkSMInputProperty::InputsUpdateImmediately;
   this->UpdateSelf = 1;
   this->MultipleInput = 0;
-  this->PortIndex = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -104,8 +103,7 @@ void vtkSMInputProperty::AppendCommandToStream(
            << objectId 
            << "AddInput" 
            << proxy
-           << this->Command
-           << this->PortIndex;
+           << this->Command;
       if (this->MultipleInput)
         {
         *str << 1;
@@ -131,14 +129,6 @@ int vtkSMInputProperty::ReadXMLAttributes(vtkSMProxy* parent,
     { 
     this->SetMultipleInput(multiple_input); 
     }
-
-  int port_idx;
-  retVal = element->GetScalarAttribute("port_index", &port_idx);
-  if(retVal) 
-    { 
-    this->SetPortIndex(port_idx); 
-    }
-
 
   return 1;
 }
