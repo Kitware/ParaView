@@ -118,7 +118,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.55");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.56");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -746,20 +746,20 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
   str << "Step 2:" << endl << endl;
   str << "Visit some feature of interest, set the view parameters as desired." << endl << endl;
   str << "Step 3:" << endl << endl;
-  str << "In the Lookmark Manager, press \"Create Lookmark\". Note that a lookmark entry has appeared." << endl << endl;
+  str << "Press \"Create Lookmark\". Note that a lookmark entry has appeared." << endl << endl;
   str << "Step 4:" << endl << endl;
   str << "Visit some other feature of interest, set the view parameters as desired." << endl << endl;
   str << "Step 5:" << endl << endl;
-  str << "In the Lookmark Manager, press \"Create Lookmark\". Note that another lookmark entry has appeared." << endl << endl;
+  str << "Press \"Create Lookmark\". Note that another lookmark entry has appeared." << endl << endl;
   str << "Step 6:" << endl << endl;
   str << "Click the thumbnail of the first lookmark. Note that ParaView returns to those view parameters and then hands control over to you." << endl << endl;
   str << "Step 7:" << endl << endl;
   str << "Click the thumbnail of the second lookmark. Note the same behavior." << endl << endl;
   str << "Step 8:" << endl << endl;
   str << "Read the User's Tutorial also available in the Help menu and explore the Lookmark Manager interface, to learn how to:" << endl << endl;
-  str << "- Organize and edit lookmarks." << endl << endl;
-  str << "- Save and import lookmarks to and from disk." << endl << endl;
-  str << "- Apply a lookmark to a dataset different from the one with which it was created." << endl << endl;
+  str << "- Organize and edit lookmarks" << endl << endl;
+  str << "- Save and import lookmarks to and from disk" << endl << endl;
+  str << "- Use lookmarks on different datasets" << endl << endl;
   str << ends;
   this->QuickStartGuideTxt->GetWidget()->SetValue( str.str() );
   str.rdbuf()->freeze(0);
@@ -836,28 +836,26 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "recreating complex filter trees, making it possible to easily toggle back and ";
   str << "forth between views. They enable more effective data comparison because they can ";
   str << "be applied to different datasets with similar geometry. They can be saved to a single ";
-  str << "file and then imported in a later ParaView session or shared with co-workers for ";
-  str << "collaboration purposes. A lookmark is a time-saving tool that automates the recreation ";
-  str << "of a complex view of data." << endl << endl;
+  str << "file and then imported in a later ParaView session or shared with co-workers." << endl << endl;
 
   str << "Feedback:" << endl << endl;
-  str << "Lookmarks in ParaView are still in an early stage of development. Any feedback you ";
+  str << "Any feedback you ";
   str << "have would be of great value. To report errors, suggest features or changes, or comment ";
   str << "on the functionality, please send an email to sdm-vs@ca.sandia.gov or call Eric Stanton ";
   str << "at 505-284-4422." << endl << endl;
 
   str << "Terminology:" << endl << endl;
   str << "Lookmark Manager - It is here that you import lookmarks into ParaView, toggle from ";
-  str << "one lookmark to another, save and remove lookmarks as you deem appropriate, and create ";
-  str << "new lookmarks of the data. In addition, the Lookmark Manager is hierarchical so that you ";
+  str << "one lookmark to another, save and remove lookmarks as you see fit, create ";
+  str << "new lookmarks of data, and interact with lookmark macros. The Lookmark Manager is also hierarchical so that you ";
   str << "can organize the lookmarks into nested folders." << endl << endl;
 
   str << "Lookmark Widget - You interact with lookmarks through the lookmark widgets displayed in ";
   str << "the Lookmark Manager. Each widget contains a thumbnail preview of the lookmark, a ";
   str << "collapsible comments area, its default dataset name, and the name of the lookmark itself. ";
-  str << "A single-click of the thumbnail generates that lookmark in the ParaView window. A checkbox ";
-  str << "placed in front of each widget enables single or multiple lookmark selections for removing, ";
-  str << "renaming, and updating lookmarks. A lookmark widget can also be dragged and dropped to other ";
+  str << "A single-click of the thumbnail and you will visit that lookmark in the data window. A checkbox ";
+  str << "placed in front of each widget allows lookmarks to be selected for removing, ";
+  str << "renaming, and updating. A lookmark widget can also be dragged and dropped to other ";
   str << "parts of the Lookmark Manager by grabbing its label." << endl << endl;
 
   str << "Lookmark File - The contents of the Lookmark Manager or a sub-folder can be saved to a ";
@@ -865,15 +863,29 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "lookmarks in the Lookmark Manager. This file can be loaded into any ParaView session and is ";
   str << "not tied to a particular dataset. It is this file that can easily be shared with co-workers." << endl << endl;
 
+  str << "Lookmark Macros - Lookmark macros, or simply macros, are special kinds of lookmarks ";
+  str << "that are intended to be general enough to be used on more than one dataset. Standard ";
+  str << "lookmarks store the path to the dataset from which it was created and try to open the ";
+  str << "dataset in ParaView (if it is not already open) when the lookmark is viewed. Macros, ";
+  str << "on the other hand, will use datasets that are currently open in ParaView (see How to ";
+  str << "view a macro and How to use macros with multiple readers and/or sources). All macros ";
+  str << "are stored in the permanent \"Macros\" folder in the Lookmark Manager." << endl << endl;
+
+  str << "Readers, Sources, and Filters - A reader refers to the item in the Selection Window ";
+  str << "representing a dataset that has been opened in ParaView. Sources are models that can ";
+  str << "be created by selecting from the Source menu of the main ParaView window. Filters are ";
+  str << "used to manipulate and operate on readers and sources." << endl << endl;
+
   str << "How To:" << endl << endl;
-  str << "Display the Lookmark Manager window - Select \"Window\" >> \"Lookmark Manager\" in the ";
+  str << "Display the Lookmark Manager window - Select \"Window\" --> \"Lookmark Manager\" in the ";
   str << "top ParaView menu. The window that appears is detached from the main ParaView window. Note that you ";
   str << "can interact with the main ParaView window and the Lookmark Manager window remains in the foreground. ";
   str << "The Lookmark Manager window can be closed and reopened without affecting the contents of the Lookmark ";
   str << "Manager." << endl << endl;
 
-  str << "Create a new lookmark - Press the \"Create Lookmark\" button or select it in the \"Edit\" ";
-  str << "menu. Note that the Lookmark Manager will momentarily be moved behind the main ParaView window. This ";
+  str << "Create a new lookmark - This can be accomplished two ways. The first is by pressing the \"Create Lookmark\" button in the Lookmark Manager. ";
+  str << "The second is by pressing the icon that looks like a book in the Lookmark Toolbar (see How to display the Lookmark Toolbar) which will display the ";
+  str << "Lookmark Manager, if needed and create a lookmark. Note that the Lookmark Manager will momentarily be moved behind the main ParaView window. This ";
   str << "is normal and necessary to generate the thumbnail of the current view. The state of the applicable ";
   str << "filters is saved with the lookmark. It is assigned an initial name of the form Lookmark#. A lookmark ";
   str << "widget is then appended to the bottom of the Lookmark Manager." << endl << endl;
@@ -885,52 +897,41 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "inputs to other filters) and the saved filters will be regenerated. See also How to change the dataset ";
   str << "to which lookmarks are applied. " << endl << endl;
 
-  str << "Update an existing lookmark - Select the lookmark to be updated and then press \"Edit\" >> ";
+  str << "Update an existing lookmark - Select the lookmark to be updated and then press \"Edit\" --> ";
   str << "\"Update Lookmark\". This stores the state of all filters that contribute to the current view in that ";
   str << "lookmark. The lookmark's thumbnail is also replaced to reflect the current view. All other attributes ";
   str << "of the lookmark widget (name, comments, etc.) remain unchanged." << endl << endl;
 
-  str << "Save the contents of the Lookmark Manager - Press \"File\" >> \"Save As\". You will be asked ";
+  str << "Save the contents of the Lookmark Manager - Press \"File\" --> \"Save As\". You will be asked ";
   str << "to select a new or pre-existing lookmark file (with a .lmk extension) to which to save. All information ";
   str << "needed to recreate the current state of the Lookmark Manager is written to this file. This file can be ";
   str << "opened and edited in a text editor." << endl << endl;
 
-  str << "Export the contents of a folder - Press \"File\" >> \"Export Folder\". You will be asked to ";
+  str << "Export the contents of a folder - Press \"File\" --> \"Export Folder\". You will be asked to ";
   str << "select a new or pre-existing lookmark file. All information needed to recreate the lookmarks and/or ";
   str << "folders nested within the selected folder is written to this file." << endl << endl;
 
-  str << "Import a lookmark file - Press \"File\" >> \"Import\" >> and either \"Append\" or \"Replace\" ";
+  str << "Import a lookmark file - Press \"File\" --> \"Import\" --> and either \"Append\" or \"Replace\" ";
   str << "in its cascaded menu. The first will append the contents of the imported lookmark file to the existing ";
   str << "contents of the Lookmark Manager. The latter will first remove the contents of the Lookmark Manager and ";
   str << "then import the new lookmark file." << endl << endl;
 
   str << "Automatic saving and loading of the contents of the Lookmark Manager - Any time you modify ";
   str << "the Lookmark Manager in some way (create or update a lookmark, move, rename, or remove items, import ";
-  str << "or export lookmarks), after the modification takes place a lookmark file by the name of \"ParaViewlmk\" ";
+  str << "or export lookmarks), after the modification takes place a lookmark file by the name of \".ParaViewlmk\" ";
+  str << "on UNIX and \"#ParaViewlmk#\" on Windows ";
   str << "is written to the user's home directory containing the state of the Lookmark Manager at that point in ";
   str << "time. This file is automatically imported into ParaView at the start of the session. It can be used to ";
   str << "recover your lookmarks in the event of a ParaView crash." << endl << endl;
 
-  str << "Use a lookmark on a different dataset - A permanent folder titled \"Macros\" is located at ";
-  str << "the top of the Lookmark Manager. A lookmark can be placed in here, or created manually using the \"Edit\" ";
-  str << ">> \"Create Macro\" option. When invoked, this lookmark macro will be used on the currently selected dataset ";
-  str << "instead of the one from which it was originally created. It will maintain your existing camera angle and timestep. ";
-  str << "but recreate all other operations associated with that lookmark macro. This will work primarily only on datasets ";
-  str << "with similar properties." << endl << endl;
+  str << "Use a lookmark on a different dataset - This is the purpose of lookmark macros (see How to create a macro and How to view a macro." << endl << endl;
 
-  str << "Add existing lookmark macros to the \"Macros\" folder - Press \"Edit\" --> \"Add Existing Macro\" and select ";
-  str << "from the available macros (see the following section on where ParaView gets these from). You will then see a lookmark widget ";
-  str << "appear in the Macros folder by that name." << endl << endl;
-
-  str << "Distribute pre-defined lookmark macros with ParaView - While a lookmark macro can be created in ";
-  str << "the Lookmark Manager by the user, it can also be loaded automatically into the \"Edit\" --> \"Add Existing ";
-  str << "Macro\" menu. This can be useful if you want to make available to users a set of \"canned\" views ";
-  str << "of their data. Simply save a lookmark file of the desire lookmarks (using either \"Save As\" or \"Export Folder\") ";
-  str << "to a file in your home directory named \"./LookmarkMacros\" on UNIX or \"#LookmarkMacros\" on Windows. Then, ";
-  str << "when ParaView is launched, it will read from this file to populate the macros menu." << endl << endl;
-
-  str << "Create a folder - Press \"Edit\" >> \"Create Folder\". This appends to the end of the Lookmark ";
-  str << "Manager an empty folder named \"New Folder\". You can now drag lookmarks into this folder (see How to move ";
+  str << "Display the Lookmark Toolbar - The Lookmark Toolbar consists of a button with an image of a book that will ";
+  str << "display the Lookmark Manager and create a lookmark of the current view when pressed. Also, any macros contained in your ";
+  str << "\"Macros\" folder are displayed next to it. To display this toolbar, press Window --> Toolbars --> Lookmark." << endl << endl;
+  
+  str << "Create a folder - Press \"Edit\" --> \"Create Folder\". This appends to the end of the Lookmark ";
+  str << "Manager an empty folder named \"New Folder\". You can now drag lookmarks or other folders into this folder (see How to move ";
   str << "lookmarks and/or folders)." << endl << endl;
 
   str << "Move lookmarks and/or folders - A lookmark or folder can be moved in between any other lookmark ";
@@ -940,11 +941,11 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "label of a folder will drop the item in the first nested entry of that folder." << endl << endl;
 
   str << "Remove lookmarks and/or folders - Select any combination of lookmarks and/or folders and then press ";
-  str << "\"Edit\" >> \"Remove Item(s)\" button. You will be asked to verify that you wish to delete these. This prompt ";
+  str << "\"Edit\" --> \"Remove Item(s)\" button. You will be asked to verify that you wish to delete these. This prompt ";
   str << "may be turned off. " << endl << endl;
 
-  str << "Rename a lookmark or folder - Select the lookmark or folder you wish to rename and press \"Edit\" >> ";
-  str << "\"Rename Lookmark\" or \"Edit\" >> \"Rename Folder\".  This will replace the name with an editable text field ";
+  str << "Rename a lookmark or folder - Select the lookmark or folder you wish to rename and press \"Edit\" --> ";
+  str << "\"Rename Lookmark\" or \"Edit\" --> \"Rename Folder\".  This will replace the name with an editable text field ";
   str << "containing the old name. Modify the name and press the Enter/Return key. This will remove the text field and ";
   str << "replace it with a label containing the new name." << endl << endl;
 
@@ -960,11 +961,63 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   str << "folders, and the comments field can be expanded or collapsed by clicking on the \"x\" or the \"v\", respectively, ";
   str << "in the upper right hand corner of the frame. " << endl << endl;
 
-  str << "Undo a change to the Lookmark Manager - Press \"Edit\" >> \"Undo\". This will return the Lookmark ";
+  str << "Undo a change to the Lookmark Manager - Press \"Edit\" --> \"Undo\". This will return the Lookmark ";
   str << "Manager's contents to its state before the previous action was performed." << endl << endl;
 
-  str << "Redo a change to the Lookmark Manager - Press \"Edit\" >> \"Redo\". This will return the Lookmark ";
+  str << "Redo a change to the Lookmark Manager - Press \"Edit\" --> \"Redo\". This will return the Lookmark ";
   str << "Manager's contents to its state before the previous Undo was performed." << endl << endl;
+
+  str << "Create a new macro - Select Edit --> Create Macro in the Lookmark Manager. Note that when a macro is ";
+  str << "created the Lookmark Manager will momentarily be moved behind the main ParaView window. This is normal and ";
+  str << "necessary to correctly generate the macro’s thumbnail of the current view. The states of the applicable readers, ";
+  str << "sources, and filters are saved with the macro. It is assigned an initial name of the form Lookmark# (for simplicity, ";
+  str << "since a macro is a type of lookmark). A lookmark widget is then appended to the bottom of the Macros folder and its ";
+  str << "thumbnail is displayed in the Lookmark Toolbar as well (see How to display the Lookmark Toolbar)." << endl << endl;
+
+  str << "Convert a lookmark to a macro - Drag the desired lookmark into the \"Macros\" folder. You will notice the ";
+  str << "dataset label has been removed from the widget. Also, the thumbnail of the macro will be displayed in the Lookmark ";
+  str << "Toolbar (see How to display the Lookmark Toolbar)." << endl << endl;
+
+  str << "Convert a macro to a lookmark - Drag the desired macro out of the \"Macros\" folder elsewhere in the ";
+  str << "Lookmark Manager. You will notice the dataset label has been added back to the widget. Also, the thumbnail of ";
+  str << "the macro has been removed from the Lookmark Toolbar (see How to display the Lookmark Toolbar)." << endl << endl;
+
+  str << "View a macro - This can be accomplished two ways, by clicking on its thumbnail in the Lookmark Manager ";
+  str << "or its counterpart in the Lookmark Toolbar (see How to display the Lookmark Toolbar). If the macro was created ";
+  str << "from a single dataset, it will be used on the currently viewed dataset. The way the \"currently viewed dataset\" ";
+  str << "is determined is by noting which source is currently highlighted in the Selection Window and finding its input ";
+  str << "reader or source. The macro might otherwise have originated from multiple readers and/or sources (see How to use ";
+  str << "macros with multiple readers and/or sources). Macros will maintain the existing camera angle and time step but ";
+  str << "recreate all other operations performed by its filters. They will work primarily only on datasets with similar ";
+  str << "properties as the one(s) from which it was created." << endl << endl;
+
+  str << "Distribute pre-defined macros with ParaView - While a lookmark macro can be created in the Lookmark ";
+  str << "Manager by the user, it can also be loaded automatically into the Edit --> Add Existing Macro menu. This can be ";
+  str << "useful if you want to make available to users a set of \"pre-defined\" views of their data. Simply save a lookmark ";
+  str << "file of the desired lookmarks (using either \"Save As\" or \"Export Folder\") to a file in your home directory named ";
+  str << "\".LookmarkMacros\" on UNIX or \"#LookmarkMacros\" on Windows. Then, when ParaView is launched, it will read from ";
+  str << "this file to populate the macros menu." << endl << endl;
+
+  str << "Add pre-defined macros to the Macros folder - Press Edit --> Add Existing Macro and select from the ";
+  str << "available macros (see How to distribute pre-defined macros in ParaView). You will then see a lookmark widget ";
+  str << "appear in the Macros folder by that name." << endl << endl;
+
+  str << "Use macros with multiple readers and/or sources - When a macro that originated from multiple readers ";
+  str << "and/or sources is selected to be viewed (by clicking its thumbnail), the following algorithm is used to determine ";
+  str << "which open readers and sources should be used in place of the readers and sources stored with the macro." << endl;
+  str << " - For each reader stored with the macro: " << endl;
+  str << "   - If there is only one open reader whose data type matches " << endl;
+  str << "     the one stored with the macro, that reader is used." << endl;
+  str << "   - Otherwise, if the filename of any of the open readers matches " << endl;
+  str << "     the one stored with the macro, that reader is used." << endl;
+  str << "   - Otherwise, if there are multiple open readers of the same ";
+  str << "     type as the one in the macro, ask the user to specify which ";
+  str << "     to use in place of the one stored with the macro." << endl;
+  str << " - For each source stored with the macro:" << endl;
+  str << "   - Unlike readers, macros can be used on sources of different " << endl;
+  str << "     types. If there is only one source open, that source is used. " << endl;
+  str << "     Otherwise, if there are multiple sources open, the user is asked " << endl;
+  str << "     to specify which to use in place of the one stored with the macro." << endl << endl;
 
   str << ends;
 

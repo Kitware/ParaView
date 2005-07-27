@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.27");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -180,6 +180,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkMainFrame->Create(app);
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
+  this->LmkMainFrame->GetLabel()->SetBalloonHelpString("Drag and drop lookmark");
 
   this->Checkbox->SetParent(this->LmkMainFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.26");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -117,6 +117,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->LabelFrame->Create(app);
   this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
+  this->LabelFrame->GetLabel()->SetBalloonHelpString("Drag and drop folder");
 
   this->Checkbox->SetParent(this->LabelFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();

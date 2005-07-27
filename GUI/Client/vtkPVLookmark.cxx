@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.28");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.29");
 
 
 //*****************************************************************************
@@ -1218,6 +1218,10 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           tclNameMap[src] = tclName;
           this->InitializeSourceFromScript(src,buf[i],macroFlag);
           }
+        else
+          {
+          return;
+          }
         }
 
       ptr = strtok(NULL,"\r\n");
@@ -1474,7 +1478,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
         {
         ptr = strtok(NULL,"\r\n");
         sscanf(ptr,ThirdToken_Int,&ival);
-        labeledToggle->SetState(ival);
+        labeledToggle->SetSelectedState(ival);
         labeledToggle->ModifiedCallback();
         ptr = strtok(NULL,"\r\n");
         }
