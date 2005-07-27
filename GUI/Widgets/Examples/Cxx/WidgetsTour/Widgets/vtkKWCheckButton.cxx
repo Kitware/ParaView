@@ -96,10 +96,10 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   cbs->GetWidget(2)->SetSelectedState(1);
   cbs->GetWidget(2)->SetText("Checkbutton 2 also toggles 3");
-  cbs->GetWidget(2)->SetCommand(cbs->GetWidget(3), "ToggleState");
+  cbs->GetWidget(2)->SetCommand(cbs->GetWidget(3), "ToggleSelectedState");
 
   cbs->GetWidget(3)->SetText("Checkbutton 3 also toggles 2");
-  cbs->GetWidget(3)->SetCommand(cbs->GetWidget(2), "ToggleState");
+  cbs->GetWidget(3)->SetCommand(cbs->GetWidget(2), "ToggleSelectedState");
   
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

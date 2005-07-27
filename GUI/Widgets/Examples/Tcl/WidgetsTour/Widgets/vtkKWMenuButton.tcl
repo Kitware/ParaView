@@ -33,7 +33,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
   menubutton2 SetLabelText "Days:"
   menubutton2 SetPadX 2
   menubutton2 SetPadY 2
-  [menubutton2 GetWidget] IndicatorOff 
+  [menubutton2 GetWidget] IndicatorVisibilityOff 
   [menubutton2 GetWidget] SetWidth 20
   menubutton2 SetBalloonHelpString \
     "This is a vtkKWMenuButtonWithLabel i.e. a menu button associated to a\
