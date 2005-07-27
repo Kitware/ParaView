@@ -61,13 +61,6 @@ protected:
   vtkPVPick();
   ~vtkPVPick();
 
-  // Name with which the point label display is registered with the
-  // proxy manager.
-  char* PickLabelDisplayProxyName;
-  vtkSetStringMacro(PickLabelDisplayProxyName);
-
-  int PickLabelDisplayProxyInitialized; // flag to know if the PickLabelDisplayProxy's
-    //input has been set.
   vtkSMPointLabelDisplayProxy* PickLabelDisplayProxy;
   vtkKWFrame *DataFrame;
 

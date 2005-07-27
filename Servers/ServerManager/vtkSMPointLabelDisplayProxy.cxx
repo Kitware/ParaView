@@ -362,9 +362,48 @@ vtkUnstructuredGrid* vtkSMPointLabelDisplayProxy::GetCollectedData()
   return dp->GetUnstructuredGridOutput();
 }
 
+//----------------------------------------------------------------------------
+void vtkSMPointLabelDisplayProxy::SetFontSize(int size) 
+{
+  if (this->TextPropertyProxy)
+    {
+    
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->TextPropertyProxy->GetProperty("FontSize"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
+      return;
+      }
+    ivp->SetElement(0, size);
+    this->TextPropertyProxy->UpdateVTKObjects();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPointLabelDisplayProxy::GetFontSize() 
+{
+  if (this->TextPropertyProxy)
+    {    
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->TextPropertyProxy->GetProperty("FontSize"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
+      return 0;
+      }
+    return ivp->GetElement(0);
+    }
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
+  //os << indent << "FontSize: " << this->GetFontSize() << endl;
 }
+

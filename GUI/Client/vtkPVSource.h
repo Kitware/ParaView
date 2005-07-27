@@ -470,6 +470,9 @@ public:
   void SetDisplayProxy(vtkSMDisplayProxy* pdisp);
   vtkGetObjectMacro(DisplayProxy, vtkSMDisplayProxy);
 
+  // Description
+  // Accessor to the point label text display.
+  vtkGetObjectMacro(PointLabelDisplayProxy, vtkSMPointLabelDisplayProxy);
 
   // Description:
   // Set the volume rendering array and Scalar Mode.

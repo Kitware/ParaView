@@ -71,6 +71,12 @@ public:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes
   // should add their functionality and call this.
   virtual void MarkConsumersAsModified();
+
+  // Description:
+  // Accessor to the font size in the sub proxy.
+  void SetFontSize(int size);
+  int GetFontSize();
+  
 protected:
   vtkSMPointLabelDisplayProxy();
   ~vtkSMPointLabelDisplayProxy();

@@ -21,6 +21,7 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkSMDisplayProxy.h"
+#include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkSMLODDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -93,7 +94,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.42");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.43");
 
 //----------------------------------------------------------------------------
 
@@ -197,6 +198,8 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->PointSizeThumbWheel = vtkKWThumbWheel::New();
   this->LineWidthLabel = vtkKWLabel::New();
   this->LineWidthThumbWheel = vtkKWThumbWheel::New();
+  this->PointLabelFontSizeLabel = vtkKWLabel::New();
+  this->PointLabelFontSizeThumbWheel = vtkKWThumbWheel::New();
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
@@ -304,6 +307,10 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->LineWidthLabel = NULL;
   this->LineWidthThumbWheel->Delete();
   this->LineWidthThumbWheel = NULL;
+  this->PointLabelFontSizeLabel->Delete();
+  this->PointLabelFontSizeLabel = NULL;
+  this->PointLabelFontSizeThumbWheel->Delete();
+  this->PointLabelFontSizeThumbWheel = NULL;
 
   this->ActorControlFrame->Delete();
   this->TranslateLabel->Delete();
@@ -772,6 +779,29 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
     "If your dataset containes lines/edges, "
     "this scale adjusts the width of the rendered lines.");
 
+  this->PointLabelFontSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointLabelFontSizeLabel->Create(this->GetApplication());
+  this->PointLabelFontSizeLabel->SetText("Point Id size:");
+  this->PointLabelFontSizeLabel->SetBalloonHelpString(
+    "This scale adjusts the size of the point ID labels.");
+
+  this->PointLabelFontSizeThumbWheel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointLabelFontSizeThumbWheel->PopupModeOn();
+  this->PointLabelFontSizeThumbWheel->SetValue(24.0);
+  this->PointLabelFontSizeThumbWheel->SetResolution(1.0);
+  this->PointLabelFontSizeThumbWheel->SetMinimumValue(4.0);
+  this->PointLabelFontSizeThumbWheel->ClampMinimumValueOn();
+  this->PointLabelFontSizeThumbWheel->Create(this->GetApplication());
+  this->PointLabelFontSizeThumbWheel->DisplayEntryOn();
+  this->PointLabelFontSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
+  this->PointLabelFontSizeThumbWheel->SetBalloonHelpString("Set the point ID label font size.");
+  this->PointLabelFontSizeThumbWheel->GetEntry()->SetWidth(5);
+  this->PointLabelFontSizeThumbWheel->SetCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSizeEndCallback");
+  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSizeEndCallback");
+  this->PointLabelFontSizeThumbWheel->SetBalloonHelpString(
+    "This scale adjusts the font size of the point ID labels.");
+
   this->Script("grid %s %s -sticky wns",
                this->RepresentationMenuLabel->GetWidgetName(),
                this->RepresentationMenu->GetWidgetName());
@@ -803,6 +833,15 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->LineWidthThumbWheel->GetWidgetName(),
                col_1_padx, button_pady);
+
+  this->Script("grid %s %s -sticky wns",
+               this->PointLabelFontSizeLabel->GetWidgetName(),
+               this->PointLabelFontSizeThumbWheel->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->PointLabelFontSizeThumbWheel->GetWidgetName(), 
+               col_1_padx, button_pady);
+
 
   // Now synchronize all those grids to have them aligned
 
@@ -1192,6 +1231,7 @@ void vtkPVDisplayGUI::UpdateInternal()
     }
   this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
   this->LineWidthThumbWheel->SetValue(pDisp->GetLineWidthCM());
+  this->PointLabelFontSizeThumbWheel->SetValue(source->GetPointLabelDisplayProxy()->GetFontSize());
   this->OpacityScale->SetValue(pDisp->GetOpacityCM());
 
   // Update actor control resolutions
@@ -2193,6 +2233,42 @@ void vtkPVDisplayGUI::ChangeLineWidthEndCallback()
   this->GetTraceHelper()->AddEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
                       (int)(this->LineWidthThumbWheel->GetValue()));
 }
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::SetPointLabelFontSize(int size)
+{
+  if ( this->PointLabelFontSizeThumbWheel->GetValue() == size )
+    {
+    return;
+    }
+  // The following call with trigger the ChangePointLabelFontSize callback (below)
+  // but won't add a trace entry. Let's do it. A trace entry is also
+  // added by the ChangePointLabelFontSizeEndCallback but this callback is only
+  // called when the interaction on the scale is stopped.
+  this->PointLabelFontSizeThumbWheel->SetValue(size);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelFontSize %d", this->GetTclName(),
+                      (int)(this->PointLabelFontSizeThumbWheel->GetValue()));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ChangePointLabelFontSize()
+{
+  this->PVSource->GetPointLabelDisplayProxy()->SetFontSize(
+    (int)this->PointLabelFontSizeThumbWheel->GetValue());
+ 
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ChangePointLabelFontSizeEndCallback()
+{
+  this->ChangePointLabelFontSize();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelFontSize %d", this->GetTclName(),
+                      (int)(this->PointLabelFontSizeThumbWheel->GetValue()));
+} 
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)

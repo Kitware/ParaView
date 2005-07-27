@@ -61,7 +61,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.449");
+vtkCxxRevisionMacro(vtkPVSource, "1.450");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2849,6 +2849,15 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "DisplayProxy: (none)" << endl;
     }
+  if (this->PointLabelDisplayProxy)
+    {
+    this->PointLabelDisplayProxy->PrintSelf(os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "PointLabelDisplayProxy: (none)" << endl;
+    }
+
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
   os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;

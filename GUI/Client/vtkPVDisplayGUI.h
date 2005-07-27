@@ -210,6 +210,7 @@ public:
   // Access to pointSize for scripting.
   void SetPointSize(int size);
   void SetLineWidth(int width);
+  void SetPointLabelFontSize(int size);
   
   // Description:
   // Callbacks for point size and line width sliders.
@@ -217,6 +218,8 @@ public:
   void ChangePointSizeEndCallback();
   void ChangeLineWidth();
   void ChangeLineWidthEndCallback();
+  void ChangePointLabelFontSize();
+  void ChangePointLabelFontSizeEndCallback();
 
   // Description:
   // Access to option menus for scripting.
@@ -345,8 +348,10 @@ protected:
   vtkKWLabel      *PointSizeLabel;
   vtkKWThumbWheel *PointSizeThumbWheel;
   vtkKWLabel      *LineWidthLabel;
-  vtkKWThumbWheel *LineWidthThumbWheel;
-  
+  vtkKWThumbWheel *LineWidthThumbWheel; 
+  vtkKWLabel      *PointLabelFontSizeLabel;
+  vtkKWThumbWheel *PointLabelFontSizeThumbWheel;
+ 
   vtkKWCheckButton *VisibilityCheck;
   vtkKWCheckButton *ScalarBarCheck;
 
