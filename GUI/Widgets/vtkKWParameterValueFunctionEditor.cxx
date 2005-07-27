@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.58");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.59");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4171,13 +4171,13 @@ void vtkKWParameterValueFunctionEditor::Redraw()
   if (this->ValueTicksVisibility)
     {
     this->ValueTicksCanvas->SetWidth(this->ValueTicksCanvasWidth);
-    sprintf(buffer, "0 %lf %lf %lf", c_y, this->ValueTicksCanvasWidth, c_y2);
+    sprintf(buffer, "0 %lf %d %lf", c_y, this->ValueTicksCanvasWidth, c_y2);
     this->ValueTicksCanvas->SetConfigurationOption("-scrollregion", buffer);
     }
 
   if (this->ParameterTicksVisibility)
     {
-    sprintf(buffer, "%lf 0 %lf %lf", 
+    sprintf(buffer, "%lf 0 %lf %d", 
             c_x, c_x2, VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
     this->ParameterTicksCanvas->SetConfigurationOption("-scrollregion",buffer);
     }
