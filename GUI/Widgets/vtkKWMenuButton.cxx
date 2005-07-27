@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.28");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -99,17 +99,16 @@ void vtkKWMenuButton::UpdateOptionMenuLabel()
 {
   if (this->IsCreated())
     {
-    const char *wname = this->GetWidgetName();
     if (this->MaximumLabelWidth <= 0)
       {
-      this->Script("%s configure -text {%s}", wname, this->GetValue());
+      this->SetConfigurationOption("-text", this->GetValue());
       }
     else
       {
       vtksys_stl::string cropped = 
         vtksys::SystemTools::CropString(
           this->GetValue(), (size_t)this->MaximumLabelWidth);
-      this->Script("%s configure -text {%s}", wname, cropped.c_str());
+      this->SetConfigurationOption("-text", cropped.c_str());
       }
     }
 }
@@ -180,18 +179,14 @@ void vtkKWMenuButton::Create(vtkKWApplication *app)
   this->Menu->Create(app);
   this->Menu->SetTearOff(0);
 
-  const char *wname = this->GetWidgetName();
-  
-  this->IndicatorOn();
+  this->IndicatorVisibilityOn();
   this->SetReliefToRaised();
   this->SetBorderWidth(2);
   this->SetHighlightThickness(0);
   this->SetAnchorToCenter();
 
   this->SetConfigurationOption("-direction", "flush");
-
-  this->Script("%s configure -menu %s ",
-               wname, this->Menu->GetWidgetName());
+  this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
 
   this->Script("set %sValue {}", this->GetWidgetName());
   this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",
@@ -203,34 +198,27 @@ void vtkKWMenuButton::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::IndicatorOn()
+void vtkKWMenuButton::SetIndicatorVisibility(int arg)
 {
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  this->Script("%s config -indicatoron 1", this->GetWidgetName());
+  this->SetConfigurationOptionAsInt("-indicatoron", arg);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::IndicatorOff()
+int vtkKWMenuButton::GetIndicatorVisibility()
 {
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  this->Script("%s config -indicatoron 0", this->GetWidgetName());
+  return this->GetConfigurationOptionAsInt("-indicatoron");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenuButton::SetWidth(int width)
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -width %d", this->GetWidgetName(), width);
-    }
+  this->SetConfigurationOptionAsInt("-width", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------

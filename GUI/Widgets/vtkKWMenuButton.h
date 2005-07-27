@@ -63,13 +63,15 @@ public:
 
   // Description
   // Set the indicator On/Off. To be called after creation.
-  void IndicatorOn();
-  void IndicatorOff();
+  virtual void SetIndicatorVisibility(int ind);
+  virtual int GetIndicatorVisibility();
+  vtkBooleanMacro(IndicatorVisibility, int);
 
   // Description:
   // Convenience method to set the button width (in chars if text, 
   // in pixels if image).
-  void SetWidth(int width);
+  virtual void SetWidth(int width);
+  virtual int GetWidth();
   
   // Description:
   // Set/Get the maximum width of the option menu label
