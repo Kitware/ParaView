@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.49");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.50");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -506,7 +506,7 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
   switch(event)
     {
     case vtkCommand::StartAnimationCueEvent:
-      //PVProbe makes use of this.
+      //PVProbe catches this for the temporal plot
       this->InvokeEvent(vtkCommand::StartAnimationCueEvent, calldata);
       break;
     case vtkCommand::EndAnimationCueEvent:
@@ -527,9 +527,9 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
         this->RenderView->GetCornerAnnotation()->UpdateCornerText();
         }
 
-      //PVProbe makes use of this. If anybody else ever does, beware ntime is not an AnimationCueInfo.
+      //PVProbe catches this for the temporal plot
       if (event == vtkCommand::AnimationCueTickEvent) 
-        this->InvokeEvent(vtkCommand::AnimationCueTickEvent, &ntime); 
+        this->InvokeEvent(vtkCommand::AnimationCueTickEvent, calldata); 
 
       break;
       }

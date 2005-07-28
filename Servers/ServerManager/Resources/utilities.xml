@@ -1161,6 +1161,13 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty
+        name="XValues"
+        command="SetXValues"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="xvalues" min="0" max="3" />
+      </IntVectorProperty>
     </XYPlotActorProxy>
 
     <ScalarBarActorProxy name="ScalarBarActor" class="vtkScalarBarActor">

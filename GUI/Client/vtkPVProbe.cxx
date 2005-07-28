@@ -49,6 +49,9 @@
 #include "vtkKWLoadSaveDialog.h"
 
 #include "vtkCommand.h"
+// Some header file is defining CurrentTime so undef it
+#undef CurrentTime
+#include "vtkAnimationCue.h"
 #include "vtkPVAnimationScene.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -57,7 +60,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.153");
+vtkCxxRevisionMacro(vtkPVProbe, "1.154");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -92,10 +95,11 @@ public:
         case vtkCommand::AnimationCueTickEvent:
           {
           //Tell the proxy, to tell the TemporalProbe, to take a time sample.
-          double *ntime = reinterpret_cast<double *>(calldata);
+          vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
+            vtkAnimationCue::AnimationCueInfo*>(calldata);
           vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateTick"));
-          if (prop) prop->SetElement(0, *ntime);
+          if (prop) prop->SetElement(0, cueInfo->CurrentTime);
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }

@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -630,6 +630,20 @@ void vtkSMXYPlotDisplayProxy::SetXAxisLabel(bool IsTemporal)
   else
     {
     vtkErrorMacro("Failed to find property XTitle.");
+    }
+  vtkSMIntVectorProperty* ivp;
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->XYPlotActorProxy->GetProperty("XValues"));
+  if (ivp)
+    {
+    if (IsTemporal) 
+      ivp->SetElement(0, 3); //VTK_XYPLOT_VALUE
+    else 
+      ivp->SetElement(0, 0); //VTK_XYPLOT_INDEX
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property XValues.");
     }
    
   this->XYPlotActorProxy->UpdateVTKObjects();
