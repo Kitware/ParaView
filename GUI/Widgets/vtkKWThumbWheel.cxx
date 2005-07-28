@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.39");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.40");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -841,7 +841,7 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::EntryCallback()
+void vtkKWThumbWheel::EntryValueCallback()
 {
   double value = this->Entry->GetValueAsDouble();
   double old_value = this->GetValue();

@@ -232,7 +232,7 @@ public:
   // Description:
   // Methods that gets invoked when the value has changed
   // or motion is started/end
-  virtual void EntryCallback();
+  virtual void EntryValueCallback();
   virtual void StartLinearMotionCallback();
   virtual void PerformLinearMotionCallback();
   virtual void StartNonLinearMotionCallback();
