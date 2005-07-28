@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.33");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.34");
 
 
 //*****************************************************************************
@@ -361,7 +361,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources,
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,char *moduleName, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,char *, char *name)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs;
@@ -369,8 +369,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
   vtkPVReaderModule *mod;
-  const char *ptr1;
-  const char *ptr2;
+  //  const char *ptr1;
+  //  const char *ptr2;
   char mesg[400];
   char *defaultValue = NULL;
 
