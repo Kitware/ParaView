@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.13");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.14");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -423,24 +423,67 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     int width = 0;
     int height = 0;
     int pixel_size = 0;
+
     unsigned long buffer_length = 0;
     unsigned char *buffer = NULL;
+
+    int file_is_image = 0;
+    vtksys::SystemTools::FileTypeEnum file_type = 
+      vtksys::SystemTools::FileTypeUnknown;
 
     if (vtkKWResourceUtilities::ReadImage(
           filename, &width, &height, &pixel_size, &buffer))
       {
       buffer_length = width * height * pixel_size;
+      file_is_image = 1;
+      file_type = vtksys::SystemTools::FileTypeBinary;
       }
     else
       {
-      buffer_length = vtksys::SystemTools::FileLength(filename);
-      buffer = new unsigned char [buffer_length];
-      FILE *filep = fopen(filename, "rb");
-      if (!filep ||
-          fread(buffer, 1, buffer_length, filep) != buffer_length ||
-          fclose(filep))
+      FILE *filep = NULL;
+      file_type = vtksys::SystemTools::DetectFileType(filename);
+      if (file_type == vtksys::SystemTools::FileTypeText)
         {
-        vtkGenericWarningMacro("Unable to read file " << filename);
+        filep = fopen(filename, "rt");
+        }
+      else
+        {
+        filep = fopen(filename, "rb");
+        file_type = vtksys::SystemTools::FileTypeBinary;
+        }
+      
+      int success = 1;
+      if (!filep)
+        {
+        vtkGenericWarningMacro("Unable to open file " << filename);
+        success = 0;
+        }
+      else
+        {
+        unsigned long file_length = vtksys::SystemTools::FileLength(filename);
+        buffer = new unsigned char [file_length];
+        buffer_length = fread(buffer, 1, file_length, filep);
+        if (ferror(filep))
+          {
+          if (feof(filep))
+            {
+            vtkGenericWarningMacro("Unable to read file " << filename
+                                   << ", end of file reached");
+            }
+          else
+            {
+            vtkGenericWarningMacro("Unable to read file " << filename);
+            }
+          success = 0;
+          }
+        if (fclose(filep))
+          {
+          vtkGenericWarningMacro("Unable to close file " << filename);
+          success = 0;
+          }
+        }
+      if (!success)
+        {
         delete [] buffer;
         all_ok = 0;
         continue;
@@ -499,7 +542,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
       vtksys::SystemTools::GetFilenameName(filename);
     vtksys_stl::string prefix;
     
-    if (width && height && pixel_size)
+    if (file_is_image)
       {
       prefix = "image_";
       prefix += 
@@ -524,6 +567,22 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
           << (opt_zlib && opt_base64 ? ", " : "") 
           << (opt_base64 ? "base64" : "")
           << ")";
+      }
+
+    if (file_is_image)
+      {
+      out << " (image file)";
+      }
+    else
+      {
+      if (file_type == vtksys::SystemTools::FileTypeText)
+        {
+        out << " (text file)";
+        }
+      else
+        {
+        out << " (binary file)";
+        }
       }
 
     out << endl << " */" << endl;
