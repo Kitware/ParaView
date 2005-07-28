@@ -58,7 +58,7 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   char buffer[20];
   for (i = 0; i < 15; i++)
     {
-    sprintf(buffer, "Entry %d", i);
+    sprintf(buffer, "Entry %d", (int)i);
     listbox2->GetWidget()->AppendUnique(buffer);
     }
 
