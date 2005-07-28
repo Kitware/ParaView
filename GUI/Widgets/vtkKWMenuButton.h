@@ -29,7 +29,14 @@ public:
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
-  
+
+  // Description:
+  // Set/Get the current entry of this option menu.
+  // This can be an image name if any entry in the menu uses an image
+  // instead of a label.
+  virtual const char *GetValue();
+  virtual void SetValue(const char *name);
+
   // Description:
   // Add text to the button
   void SetButtonText(const char *text);
@@ -67,6 +74,11 @@ protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
   
+
+  vtkGetStringMacro(CurrentValue);
+  vtkSetStringMacro(CurrentValue);
+
+  char      *CurrentValue;  
   vtkKWMenu *Menu;
 
 private:

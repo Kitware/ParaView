@@ -85,7 +85,6 @@
           writer="vtkXdmfWriter"
           extension=".xmf"
           file_description="Xdmf Data File"/>
-#ifdef PARAVIEW_USE_EXODUS
   <Writer input="vtkUnstructuredGrid"
           class="vtkPVWriter"
           writer="vtkExodusIIWriter"
@@ -98,7 +97,6 @@
           parallel="1"
           extension=".case"
           file_description="EnSight File"/>
-#endif
 </ModuleInterfaces>
 
 

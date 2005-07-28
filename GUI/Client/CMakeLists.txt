@@ -105,6 +105,7 @@ SET( ParaViewClient_SRCS
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVDataSetReaderModule.cxx
+  vtkPVBasicDSPFilterWidget.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx

@@ -18,19 +18,68 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.24");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.24.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
 {
-  this->Menu = vtkKWMenu::New();
+  this->CurrentValue      = NULL;
+  this->Menu              = vtkKWMenu::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::~vtkKWMenuButton()
 {
-  this->Menu->Delete();
-  this->Menu = NULL;
+  this->SetCurrentValue(NULL);
+
+  if (this->Menu)
+    {
+    this->Menu->Delete();
+    this->Menu = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char *vtkKWMenuButton::GetValue()
+{
+  if (this->IsCreated())
+    {
+    // Why we we re-assign to CurrentValue each time GetValue() is 
+    // called
+    // That's because the value of the internal variable is set by Tk
+    // through the -variable settings of the radiobutton entries that
+    // have been added to the menu. Therefore, if a radiobutton entry has
+    // a command that will use the value (very likely), there is no
+    // guarantee the variable has been changed before or after calling the
+    // callback. To ensure it is true, always refresh the value from
+    // the variable itself.
+    this->SetCurrentValue(this->Script("set %sValue", this->GetWidgetName()));
+    }
+  return this->CurrentValue;  
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetValue(const char *s)
+{
+  if (this->IsCreated() && s && strcmp(s, this->GetValue()))
+    {
+    this->Script("set %sValue {%s}", this->GetWidgetName(), s);
+    this->SetButtonText(s);
+
+    if (this->Menu && *s)
+      {
+      int nb_items = this->Menu->GetNumberOfItems();
+      for (int i = 0; i < nb_items; i++)
+        {
+        const char *image = this->Menu->GetItemOption(i, "-image");
+        if (image && !strcmp(image, s))
+          {
+          this->SetConfigurationOption("-image", s);
+          break;
+          }
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

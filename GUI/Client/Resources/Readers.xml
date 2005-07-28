@@ -209,7 +209,6 @@
                     property="CellArrayStatus"
                     trace_name="CellArrays"/>
   </Module>
-#ifdef PARAVIEW_USE_EXODUS
   <Module name="ExodusReader"
           root_name="ExodusReader"
           output="vtkUnstructuredGrid"
@@ -314,7 +313,6 @@
     <BasicDSPFilterWidget trace_name="Apply basic time filtering"
                       help="Apply basic time filtering"/>
   </Module>
-#else
     <Module name="byureader"
           class="vtkPVReaderModule" root_name="BYU"
           module_type="Reader"
@@ -322,7 +320,6 @@
           file_description="BYU Files">
     <Source class="vtkBYUReader"/>
   </Module>
-#endif
   <Module name="XdmfReader"
           root_name="XdmfReader"
           output="vtkDataSet"
