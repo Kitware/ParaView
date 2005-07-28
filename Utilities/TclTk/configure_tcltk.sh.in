@@ -14,7 +14,8 @@ fi
 
 x11LibPath=@TCL_X11_LIBRARY_PATH@
 if [ "x${x11LibPath}" != "x" ]; then
-  export LIB_RUNTIME_DIR="${x11LibPath}"
+  LIB_RUNTIME_DIR="${x11LibPath}"
+  export LIB_RUNTIME_DIR
 fi
 
 EXTRAFLAGS=
