@@ -23,6 +23,7 @@ The changes are:
   time the selection in the tree changes.". It is actually not true, it
   is only generated for interaction done with the mouse, not the keyboard
   for example. In order for it to work all the time, the following code
+  in tree.tcl:
     switch -- $cmd {
         "add" - "clear" - "remove" - "set" - "toggle" {
             event generate $path <<TreeSelect>>

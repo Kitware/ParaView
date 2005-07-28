@@ -710,6 +710,11 @@ proc Tree::selection { path cmd args } {
             return
         }
     }
+    switch -- $cmd {
+        "add" - "clear" - "remove" - "set" - "toggle" {
+            event generate $path <<TreeSelect>>
+        }
+    }
     _redraw_idle $path 1
 }
 
@@ -2175,11 +2180,6 @@ proc Tree::_set_help { path node } {
 
 proc Tree::_mouse_select { path cmd args } {
     eval selection [list $path] [list $cmd] $args
-    switch -- $cmd {
-        "add" - "clear" - "remove" - "set" - "toggle" {
-            event generate $path <<TreeSelect>>
-        }
-    }
 }
 
 
