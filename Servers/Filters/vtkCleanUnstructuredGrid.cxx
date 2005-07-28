@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkCleanUnstructuredGrid.cxx
+Program:   ParaView
+Module:    vtkCleanUnstructuredGrid.cxx
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkCleanUnstructuredGrid.h"
@@ -22,15 +22,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
 #include "vtkCollection.h"
-#include "vtkPointLocator.h"
+#include "vtkMergePoints.h"
 
-vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.6");
+vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.7");
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 
 //----------------------------------------------------------------------------
 vtkCleanUnstructuredGrid::vtkCleanUnstructuredGrid()
 {
-  this->Locator = vtkPointLocator::New();
+  this->Locator = vtkMergePoints::New();
 }
 
 //----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void vtkCleanUnstructuredGrid::Execute()
     output->SetPoints(pts);
     pts->Delete();
     return;
-  }
+    }
 
 
   output->GetPointData()->CopyAllocate(input->GetPointData());
@@ -79,11 +79,19 @@ void vtkCleanUnstructuredGrid::Execute()
   vtkIdType* ptMap = new vtkIdType[num];
   double pt[3];
 
-  this->Locator->SetTolerance(0.00001*input->GetLength());
   this->Locator->InitPointInsertion(newPts, input->GetBounds(), num);
 
+  vtkIdType progressStep = num / 100;
+  if (progressStep == 0)
+    {
+    progressStep = 1;
+    }
   for (id = 0; id < num; ++id)
     {
+    if (id % progressStep == 0)
+      {
+      this->UpdateProgress(0.8*((float)id/num));
+      }
     input->GetPoint(id, pt);
     if (this->Locator->InsertUniquePoint(pt, newId))
       {
@@ -100,6 +108,10 @@ void vtkCleanUnstructuredGrid::Execute()
   output->Allocate(num);
   for (id = 0; id < num; ++id)
     {
+    if (id % progressStep == 0)
+      {
+      this->UpdateProgress(0.8+0.2*((float)id/num));
+      }
     input->GetCellPoints(id, cellPoints);
     for (int i=0; i < cellPoints->GetNumberOfIds(); i++)
       {
