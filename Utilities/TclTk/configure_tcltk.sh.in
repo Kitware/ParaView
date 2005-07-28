@@ -12,13 +12,14 @@ if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4@TCLTK_DEBUG_EXT@.a -a \
   build_tk=false;
 fi
 
+EXTRAFLAGS=
 x11LibPath=@TCL_X11_LIBRARY_PATH@
 if [ "x${x11LibPath}" != "x" ]; then
-  LIB_RUNTIME_DIR="${x11LibPath}"
-  export LIB_RUNTIME_DIR
+  LIBS="-L${x11LibPath}"
+  export LIBS
+  EXTRAFLAGS="$EXTRAFLAGS --x-libraries=${x11LibPath}"
 fi
 
-EXTRAFLAGS=
 if [ "x@TCLTK_BUILD_DEBUG@" = "x1" ]; then
   EXTRAFLAGS="$EXTRAFLAGS --enable-symbols"
 fi
