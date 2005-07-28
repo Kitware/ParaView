@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.25");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -335,10 +335,10 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
     this->LabelTextPropertyPopupButton->GetLabel()->SetText("Label properties:");
     this->LabelTextPropertyPopupButton->GetWidget()->SetText("Edit...");
 
-    vtkKWFrame *frame = 
+    vtkKWFrame *popupframe = 
       this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame();
-    frame->SetBorderWidth(2);
-    frame->SetReliefToGroove();
+    popupframe->SetBorderWidth(2);
+    popupframe->SetReliefToGroove();
 
     this->LabelTextPropertyWidget->SetParent(
       this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame());
