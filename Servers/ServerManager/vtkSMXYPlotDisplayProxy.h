@@ -22,7 +22,7 @@
 #ifndef __vtkSMXYPlotDisplayProxy_h
 #define __vtkSMXYPlotDisplayProxy_h
 
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMConsumerDisplayProxy.h"
 
 class vtkSMXYPlotDisplayProxyObserver;
 class vtkXYPlotWidget;
@@ -30,11 +30,11 @@ class vtkSMRenderModuleProxy;
 
 class vtkPolyData;
 
-class VTK_EXPORT vtkSMXYPlotDisplayProxy : public vtkSMDisplayProxy
+class VTK_EXPORT vtkSMXYPlotDisplayProxy : public vtkSMConsumerDisplayProxy
 {
 public:
   static vtkSMXYPlotDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMXYPlotDisplayProxy, vtkSMDisplayProxy);
+  vtkTypeRevisionMacro(vtkSMXYPlotDisplayProxy, vtkSMConsumerDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,7 +47,7 @@ public:
   // I have this funny looking AddInput instead of a simple
   // SetInput as I want to have an InputProperty for the input (rather than
   // a proxy property).
-  void AddInput(vtkSMSourceProxy* input, const char*,  int );
+  virtual void AddInput(vtkSMSourceProxy* input, const char*,  int );
 
   //BTX
   // Description:

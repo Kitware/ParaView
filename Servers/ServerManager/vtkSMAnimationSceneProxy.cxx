@@ -34,7 +34,7 @@
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 #include "vtkErrorCode.h"
 
-#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.12");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -330,10 +330,9 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
   proxyIter->Begin("displays");
   for (; !proxyIter->IsAtEnd(); proxyIter->Next())
     {
-    vtkSMSimpleDisplayProxy* sDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
+    vtkSMDataObjectDisplayProxy* sDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
       proxyIter->GetProxy());
-    // only displays which sink geometry  as saved.
-    // (i.e. the part displays).
+    // only the data object displays are saved.
     if (sDisp && sDisp->GetVisibilityCM())
       {
       sDisp->SetInputAsGeometryFilter(animWriter);

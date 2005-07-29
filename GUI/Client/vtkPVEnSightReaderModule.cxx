@@ -19,11 +19,11 @@
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVColorMap.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.57");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()

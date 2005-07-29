@@ -19,16 +19,18 @@
 #ifndef __vtkSM3DWidgetProxy_h
 #define __vtkSM3DWidgetProxy_h
 
-#include "vtkSMInteractorObserverProxy.h"
+#include "vtkSMDisplayProxy.h"
 
+class vtk3DWidget;
 class vtkPVProcessModule;
 class vtkRenderer;
-class vtkInteractorObserver;
+class vtkSM3DWidgetProxyObserver;
+class vtkSMRenderModuleProxy;
 
-class VTK_EXPORT vtkSM3DWidgetProxy : public vtkSMInteractorObserverProxy
+class VTK_EXPORT vtkSM3DWidgetProxy : public vtkSMDisplayProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSM3DWidgetProxy, vtkSMInteractorObserverProxy);
+  vtkTypeRevisionMacro(vtkSM3DWidgetProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -59,13 +61,25 @@ public:
   virtual void SetVisibility(int visible) 
     { this->SetEnabled(visible); } 
 
+  // Description:
+  // Get/Set Enabled state of the InteractorObserver
+  virtual void SetEnabled(int e);
+  vtkGetMacro(Enabled,int);
+
+  // Description:
+  // vtkSMDisplayProxy provides a generic SaveInBatchScript.
+  // vtkSM3DWidgets don't use that
+  // since the order in which the properties are set is significant
+  // for them e.g. PlaceWidget must happend before properties are set etc.
+  // This is not favourable, but until that is resolved, we do
+  // this.
   virtual void SaveInBatchScript(ofstream *file);
 
-   // Description:
-   // Update the VTK object on the server by pushing the values of all 
-   // modified properties (un-modified properties are ignored). If the 
-   // object has not been created, it will be created first.
-   virtual void UpdateVTKObjects();
+  // Description:
+  // Update the VTK object on the server by pushing the values of all 
+  // modified properties (un-modified properties are ignored). If the 
+  // object has not been created, it will be created first.
+  virtual void UpdateVTKObjects();
 protected:
   //BTX
   vtkSM3DWidgetProxy();
@@ -91,9 +105,38 @@ protected:
   double Bounds[6]; //PlaceWidget bounds
 
   friend class vtkPV3DWidget;
-  virtual void InitializeObservers(vtkInteractorObserver* widget3D); 
+  void InitializeObservers(vtk3DWidget* widget3D); 
   virtual void CreateVTKObjects(int numObjects);
 
+  void SetCurrentRenderModuleProxy(vtkSMRenderModuleProxy* rm);
+
+  // I keep this pointer since some interactor observers may need to access
+  // the rendermodule (eg. ScalarBarWidget).
+  // Widgets are not enabled until CurrentRenderModuleProxy is set.
+  vtkSMRenderModuleProxy* CurrentRenderModuleProxy;
+
+  int Enabled; //flag indicating if the widget is enabled.
+  //This is needed since change the Current renderer of the vtk3DWidget
+  //does not lead to a call to Enable. 
+
+  // Description
+  // Sets the server 3D widget's current renderer and interactor.
+  void SetCurrentRenderer(vtkSMProxy* renderer);
+  void SetInteractor(vtkSMProxy* interactor);
+
+  // Description:
+  // Subclasses override this method to get the values from
+  // server objects and update the proxy state. This must be
+  // done before calling vtkSM3DWidgetProxy::ExecuteEvent
+  // since it raises vtkCommand::WidgetModifiedEvent
+  // which tells the GUI to update itself using the Proxy 
+  // values.
+  virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+
+  vtkSM3DWidgetProxyObserver* Observer;
+//BTX
+  friend class vtkSM3DWidgetProxyObserver;
+//ETX
 private:  
   vtkSM3DWidgetProxy(const vtkSM3DWidgetProxy&); // Not implemented
   void operator=(const vtkSM3DWidgetProxy&); // Not implemented

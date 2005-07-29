@@ -50,7 +50,7 @@
 #include "vtkPVFileEntry.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVSelectTimeSet.h"
@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.35");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.36");
 
 
 //*****************************************************************************

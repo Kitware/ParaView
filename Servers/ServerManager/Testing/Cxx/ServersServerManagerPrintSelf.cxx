@@ -69,7 +69,7 @@
 #include "vtkSMXMLParser.h"
 
 // Display Proxies
-#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMCompositeDisplayProxy.h"
 #include "vtkSMMultiDisplayProxy.h"
 #include "vtkSMXYPlotDisplayProxy.h"
@@ -152,7 +152,7 @@ int main(int , char *[])
   c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
 
-  c = vtkSMSimpleDisplayProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMDataObjectDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCompositeDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMMultiDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMXYPlotDisplayProxy::New(); c->Print( cout ); c->Delete();

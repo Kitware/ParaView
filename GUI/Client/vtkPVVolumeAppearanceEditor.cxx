@@ -14,35 +14,34 @@
 =========================================================================*/
 #include "vtkPVVolumeAppearanceEditor.h"
  
-#include "vtkObjectFactory.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVWindow.h"
-#include "vtkPVSource.h"
-#include "vtkPVDisplayGUI.h"
-#include "vtkKWScale.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPiecewiseFunction.h"
-#include "vtkPVProcessModule.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkPVDataInformation.h"
-#include "vtkVolumeProperty.h"
-#include "vtkPVVolumePropertyWidget.h"
-#include "vtkKWPiecewiseFunctionEditor.h"
-#include "vtkKWColorTransferFunctionEditor.h"
-#include "vtkPVTraceHelper.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkCommand.h"
+#include "vtkKWColorTransferFunctionEditor.h"
 #include "vtkKWEvent.h"
-
-#include "vtkSMIntVectorProperty.h"
+#include "vtkKWPiecewiseFunctionEditor.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDisplayGUI.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVTraceHelper.h"
+#include "vtkPVVolumePropertyWidget.h"
+#include "vtkPVWindow.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkVolumeProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.36");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.37");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -194,7 +193,7 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
       vtkPVApplication::SafeDownCast(this->GetApplication());
     }
 
-  vtkSMDisplayProxy* pDisp  = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp  = this->PVSource->GetDisplayProxy();
 
   // Scalar Opacity (vtkPiecewiseFunction)
   vtkKWPiecewiseFunctionEditor *kwfunc =
@@ -284,7 +283,7 @@ void vtkPVVolumeAppearanceEditor::SetColorSpace(int w)
     }
 
   // Save trace 
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetColorSpace %d", 
     this->GetTclName(), w );
@@ -311,7 +310,7 @@ void vtkPVVolumeAppearanceEditor::SetHSVWrap(int w)
     }
 
   // Save trace 
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetHSVWrap %d", 
     this->GetTclName(), w );
@@ -403,7 +402,7 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
   this->VolumePropertyWidget->SetDataInformation(dataInfo);
   this->VolumePropertyWidget->SetArrayName(this->ArrayInfo->GetName());
   if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == 
-    vtkSMDisplayProxy::POINT_FIELD_DATA)
+    vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
     {
     this->VolumePropertyWidget->SetScalarModeToUsePointFieldData();
     }
@@ -450,7 +449,7 @@ void vtkPVVolumeAppearanceEditor::UpdateFromProxy()
   opacityFunc->RemoveAllPoints();
   
   
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   vtkSMDoubleVectorProperty* dvp ;
   vtkSMIntVectorProperty* ivp;
   
@@ -535,7 +534,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
     }
 
   // Save trace 
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   
   this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarOpacityUnitDistance %f", 
     this->GetTclName(), d );
@@ -565,7 +564,7 @@ void vtkPVVolumeAppearanceEditor::AppendColorPoint(double s, double r,
   this->GetTraceHelper()->AddEntry("$kw(%s) AppendColorPoint %f %f %f %f", 
     this->GetTclName(), s, r, g, b);
 
-  vtkSMDisplayProxy *pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy *pDisp = this->PVSource->GetDisplayProxy();
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     pDisp->GetProperty("RGBPoints")); 
   int num = dvp->GetNumberOfElements();
@@ -589,7 +588,7 @@ void vtkPVVolumeAppearanceEditor::RemoveAllColorPoints()
     }
 
   // Save trace:
-  vtkSMDisplayProxy *pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy *pDisp = this->PVSource->GetDisplayProxy();
   this->GetTraceHelper()->AddEntry("$kw(%s) RemoveAllColorPoints ",
     this->GetTclName());
 
@@ -608,7 +607,7 @@ void vtkPVVolumeAppearanceEditor::RemoveAllScalarOpacityPoints()
     return;
     }
 
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   // Save trace:
   this->GetTraceHelper()->AddEntry("$kw(%s) RemoveAllScalarOpacityPoints ", 
@@ -630,7 +629,7 @@ void vtkPVVolumeAppearanceEditor::AppendScalarOpacityPoint(double scalar,
     return;
     }
   
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   // Save trace:
   this->GetTraceHelper()->AddEntry("$kw(%s) AppendScalarOpacityPoint %f %f", this->GetTclName(), 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSimpleRenderModuleProxy.cxx
+  Module:    vtkSMConsumerDisplayProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,25 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSimpleRenderModuleProxy.h"
+
+#include "vtkSMConsumerDisplayProxy.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMProxyManager.h"
 
-vtkStandardNewMacro(vtkSMSimpleRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMSimpleRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMConsumerDisplayProxy, "1.1");
 //-----------------------------------------------------------------------------
-vtkSMSimpleRenderModuleProxy::vtkSMSimpleRenderModuleProxy()
-{
-  this->SetDisplayXMLName("DataObjectDisplay");
-}
-
-//-----------------------------------------------------------------------------
-vtkSMSimpleRenderModuleProxy::~vtkSMSimpleRenderModuleProxy()
+vtkSMConsumerDisplayProxy::vtkSMConsumerDisplayProxy()
 {
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
+vtkSMConsumerDisplayProxy::~vtkSMConsumerDisplayProxy()
+{
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMConsumerDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

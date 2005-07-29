@@ -55,7 +55,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkSMSimpleDisplayProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 // Some header file is defining CurrentTime so undef it
@@ -72,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.50");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.51");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 

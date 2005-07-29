@@ -19,6 +19,14 @@
 // be added to the vtkSMRenderModule, and hence cannot be rendered.
 // This can have inputs (but not required, for displays such as 3Dwidgets/ Scalarbar).
 // This is an abstract class, merely defining the interface.
+//  This class (or subclasses) has a bunch of 
+// "convenience methods" (method names appended with CM). These methods
+// do the equivalent of getting the property by the name and
+// setting/getting its value. They are there to simplify using the property
+// interface for display objects. When adding a method to the proxies
+// that merely sets some property on the proxy, make sure to append the method
+// name with "CM" - implying it's a convenience method. That way, one knows
+// its purpose and will not be confused with a update-self property method.
 
 #ifndef __vtkSMDisplayProxy_h
 #define __vtkSMDisplayProxy_h
@@ -35,162 +43,32 @@ public:
 
   // Description:
   // Get information about the geometry.
-  // Some displays (like Scalar bar), may return an empty
-  // vtkPVGeometryInformation object.
-  vtkPVGeometryInformation* GetGeometryInformation();
+  // Some displays (like Scalar bar, 3DWidgets), may return NULL.
+  virtual vtkPVGeometryInformation* GetGeometryInformation() { return NULL; }
   
   // Description:
   // Called when the display is added/removed to/from a RenderModule.
-  virtual void AddToRenderModule(vtkSMRenderModuleProxy*) = 0;
-  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*) = 0;
+  // Default implementation searches for a subproxies with name
+  // Prop/Prop2D. If found, they are added/removed to/from the 
+  // Renderer/2DRenderer respectively. 
+  // If such subproxies are not found no error is raised.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
   // Description:
   // Called to update the Display. Default implementation does nothing.
   virtual void Update() { }
   
   // Description:
-  // Convenience method to get/set the Interpolation for this proxy.
-  int GetInterpolationCM();
-  void SetInterpolationCM(int interpolation);
-  
-  //BTX
-  enum {POINTS=0, WIREFRAME, SURFACE,  OUTLINE, VOLUME};
-  enum {FLAT=0, GOURAND, PHONG};
-  enum {DEFAULT=0, POINT_DATA, CELL_DATA, POINT_FIELD_DATA, CELL_FIELD_DATA};
-  //ETX
-  
-  // Description:
-  // Convenience method to get/set Point Size.
-  void SetPointSizeCM(double size);
-  double GetPointSizeCM();
-
-  // Description:
-  // Convenience method to get/set Line Width.
-  void SetLineWidthCM(double width);
-  double GetLineWidthCM();
-
-  // Description:
-  // Convenience method to get/set Scalar Mode.
-  void SetScalarModeCM(int  mode);
-  int GetScalarModeCM();
-
-  // Description:
-  // Convenience method to get/set ScalarArray (Volume Mapper).
-  void SetScalarArrayCM(const char* arrayname);
-  const char* GetScalarArrayCM();
-  
-  // Description:
-  // Convenience methods for switching between volume
-  // mappers.
-  virtual void SetVolumeMapperToBunyk() {}
-  virtual void SetVolumeMapperToPT() {}
-  virtual void SetVolumeMapperToZSweep() {}
-  
-  // Description:
-  // Convenience method for determining the volume mapper
-  virtual int GetVolumeMapperType() {return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;}
-  
-  // Description:
-  // Convenience method to get/set Opacity.
-  void SetOpacityCM(double op);
-  double GetOpacityCM();
-
-  // Description:
-  // Convenience method to get/set ColorMode.
-  void SetColorModeCM(int mode);
-  int GetColorModeCM();
-
-  // Description:
-  // Convenience method to get/set Actor color.
-  void SetColorCM(double rgb[3]);
-  void GetColorCM(double rgb[3]);
-  void SetColorCM(double r, double g, double b)
-    { 
-    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->SetColorCM(rgb);
-    }
-    
-    
-  // Description:
-  // Convenience method to get/set InterpolateColorsBeforeMapping property.
-  void SetInterpolateScalarsBeforeMappingCM(int flag);
-  int GetInterpolateScalarsBeforeMappingCM();
-
-  // Description:
-  // Convenience method to get/set ScalarVisibility property.
-  void SetScalarVisibilityCM(int);
-  int GetScalarVisibilityCM();
-
-  // Description:
-  // Convenience method to get/set Position property.
-  void SetPositionCM(double pos[3]);
-  void GetPositionCM(double pos[3]);
-  void SetPositionCM(double r, double g, double b)
-    { 
-    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->SetPositionCM(rgb);
-    }
-
-  // Description:
-  // Convenience method to get/set Scale property.
-  void SetScaleCM(double scale[3]);
-  void GetScaleCM(double scale[3]);
-  void SetScaleCM(double r, double g, double b)
-    { 
-    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->SetScaleCM(rgb);
-    } 
-   
-  // Description:
-  // Convenience method to get/set Orientation property.
-  void SetOrientationCM(double orientation[3]);
-  void GetOrientationCM(double orientation[3]);
-  void SetOrientationCM(double r, double g, double b)
-    { 
-    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->SetOrientationCM(rgb);
-    }
-
-  // Description
-  // Convenience method to get/set Origin property.
-  void GetOriginCM(double origin[3]);
-  void SetOriginCM(double origin[3]);
-  void SetOriginCM(double r, double g, double b)
-    { 
-    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->SetOriginCM(rgb);
-    }
-
-  // Description:
   // Convenience method to get/set Visibility property.
   void SetVisibilityCM(int v);
-  int GetVisibilityCM();
+  int GetVisibilityCM(); 
 
-  // Description:
-  // Convenience method to get/set Representation.
-  void SetRepresentationCM(int r);
-  int GetRepresentationCM();
-
-  // Description:
-  // Convenience method to get/set ImmediateModeRendering property.
-  void SetImmediateModeRenderingCM(int f);
-  int GetImmediateModeRenderingCM();
- 
   // Description:
   // Save the display in batch script. This will eventually get 
   // removed as we will generate batch script from ServerManager
   // state. However, until then.
   virtual void SaveInBatchScript(ofstream* file);
-  
-//BTX
-  enum 
-  {
-    PROJECTED_TETRA_VOLUME_MAPPER =0,
-    ZSWEEP_VOLUME_MAPPER,
-    BUNYK_RAY_CAST_VOLUME_MAPPER,
-    UNKNOWN_VOLUME_MAPPER
-  };
-//ETX
   
 protected:
   vtkSMDisplayProxy();
@@ -204,9 +82,6 @@ protected:
   void RemovePropFromRenderer(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
   void RemovePropFromRenderer2D(vtkSMProxy* proxy, vtkSMRenderModuleProxy* ren);
 
-  int GeometryInformationIsValid; //This flag must be managed by the subclasses.
-  virtual void GatherGeometryInformation();
-  vtkPVGeometryInformation* GeometryInformation;
 private:
   vtkSMDisplayProxy(const vtkSMDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDisplayProxy&); // Not implemented.

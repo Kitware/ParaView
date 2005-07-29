@@ -1597,7 +1597,7 @@
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="Actor"
+        <Proxy name="Prop2D"
           proxygroup="props" proxyname="Actor2D">
         </Proxy>
         <ExposedProperties>
@@ -1627,7 +1627,7 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <SubProxy>
-        <Proxy name="ScalarBarActor" 
+        <Proxy name="Prop2D" 
           proxygroup="annotations"
           proxyname="ScalarBarActor">
         </Proxy>
@@ -1694,7 +1694,7 @@
       </SubProxy>
       <SubProxy>
         <Proxy 
-          name="XYPlotActor" 
+          name="Prop2D" 
           proxygroup="annotations" proxyname="XYPlotActor">
         </Proxy>
         <ExposedProperties>
@@ -1743,13 +1743,13 @@
       </IntVectorProperty>
 
       <SubProxy>
-        <Proxy name="CubeAxes" 
+        <Proxy name="Prop2D" 
           proxygroup="annotations" proxyname="CubeAxesActor2D">
         </Proxy>
       </SubProxy>
     </CubeAxesDisplayProxy>
     
-    <SimpleDisplayProxy name="SimpleDisplay">
+    <DataObjectDisplayProxy name="DataObjectDisplay">
       <InputProperty
         name="Input"
         command="SetInput_not_used"
@@ -1836,7 +1836,7 @@
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="Actor" proxygroup="props" proxyname="LODActor" />
+        <Proxy name="Prop" proxygroup="props" proxyname="LODActor" />
         <ExposedProperties>
           <Property name="Position" />
           <Property name="Scale" />
@@ -1930,7 +1930,7 @@
 
       <SubProxy>
         <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
-        <ShareProperties subproxy="Actor">
+        <ShareProperties subproxy="Prop">
           <Exception name="Mapper" />
           <Exception name="LODMapper" />
           <Exception name="Property" />
@@ -1966,11 +1966,11 @@
           <Property name="HSVWrap" />
         </ExposedProperties>
       </SubProxy>
-    </SimpleDisplayProxy>
+    </DataObjectDisplayProxy>
 
     <!-- Display Proxy with support for LOD -->
     <LODDisplayProxy name="LODDisplay" 
-      base_proxygroup="displays" base_proxyname="SimpleDisplay">
+      base_proxygroup="displays" base_proxyname="DataObjectDisplay">
      
       <IntVectorProperty name="LODResolution" 
         command="SetLODResolution"

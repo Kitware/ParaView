@@ -17,15 +17,15 @@
 #ifndef __vtkSMLODDisplayProxy_h
 #define __vtkSMLODDisplayProxy_h
 
-#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 class vtkSMProxy;
 class vtkPVLODPartDisplayInformation;
 
-class VTK_EXPORT vtkSMLODDisplayProxy : public vtkSMSimpleDisplayProxy
+class VTK_EXPORT vtkSMLODDisplayProxy : public vtkSMDataObjectDisplayProxy
 {
 public:
   static vtkSMLODDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMLODDisplayProxy, vtkSMSimpleDisplayProxy);
+  vtkTypeRevisionMacro(vtkSMLODDisplayProxy, vtkSMDataObjectDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

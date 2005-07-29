@@ -55,7 +55,7 @@ protected:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -81,17 +81,8 @@ vtkSMScalarBarWidgetProxy::~vtkSMScalarBarWidgetProxy()
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->ScalarBarActorProxy);
-  */
-  this->AddPropToRenderer2D(this->ScalarBarActorProxy, rm);
+  // adds this->ScalarBarActorProxy to the render module.
+  this->Superclass::AddToRenderModule(rm); 
   
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
@@ -100,18 +91,9 @@ void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->ScalarBarActorProxy);
-  */
-  this->RemovePropFromRenderer2D(this->ScalarBarActorProxy, rm);
-
+  // removes this->ScalarBarActorProxy from the render module.
+  this->Superclass::RemoveFromRenderModule(rm);
+  
   if (this->ScalarBarWidget->GetEnabled())
     {
     this->ScalarBarWidget->SetEnabled(0);
@@ -129,10 +111,10 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
 
-  this->ScalarBarActorProxy = this->GetSubProxy("ScalarBarActor");
+  this->ScalarBarActorProxy = this->GetSubProxy("Prop2D");
   if (!this->ScalarBarActorProxy)
     {
-    vtkErrorMacro("Failed to find subproxy ScalarBarActor.");
+    vtkErrorMacro("Failed to find subproxy Prop2D.");
     return;
     }
 
@@ -281,150 +263,6 @@ void vtkSMScalarBarWidgetProxy::SaveInBatchScript(ofstream* file)
     ->SaveTextPropertiesInBatchScript(file);
   
   this->Superclass::SaveInBatchScript(file);
-/*
-  *file << endl;
-  unsigned int cc;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  vtkSMStringVectorProperty* svp;
-  vtkSMIntVectorProperty* ivp;
-  vtkSMDoubleVectorProperty* dvp;
-  for (cc=0; cc< numObjects; cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    *file << "set pvTemp" << id.ID
-      << " [$proxyManager NewProxy scalarbar_widget ScalarBarWidget]"
-      << endl;
-    *file << "  $proxyManager RegisterProxy scalarbar_widget pvTemp"
-      << id.ID << " $pvTemp" << id.ID
-      << endl;
-    *file << "  $pvTemp" << id.ID << " UnRegister {}"
-      << endl;
-    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp"
-      << id.ID <<endl; 
-
-    //Set Positions & orientation.
-    *file << "  [$pvTemp" << id.ID << " GetProperty Position1]"
-      << " SetElements2 "
-      << this->Position1[0] << " " << this->Position1[1] << endl;
-    *file << "  [$pvTemp" << id.ID << " GetProperty Position2]"
-      << " SetElements2 "
-      << this->Position2[0] << " " << this->Position2[1] << endl;
-    *file << "  [$pvTemp" << id.ID << " GetProperty Orientation]"
-      << " SetElements1 "
-      << this->Orientation << endl;
-
-    //Set Tile & label format
-    svp = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetProperty("Title"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty Title]"
-      << " SetElement 0 \""
-      << svp->GetElement(0) << "\"" << endl;
-
-    svp = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormat"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormat]"
-      << " SetElement 0 \""
-      << svp->GetElement(0) << "\"" << endl;
-
-    //Set visibility
-    *file << "  [$pvTemp" << id.ID << " GetProperty Visibility]"
-      << " SetElements1 "
-      << this->Enabled <<endl;
-
-    //Set Title text property
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatColor"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatColor]"
-      << " SetElements3 "
-      << dvp->GetElement(0) << " "
-      << dvp->GetElement(1) << " "
-      << dvp->GetElement(2) << endl;
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatOpacity"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatOpacity]"
-      << " SetElements1 "
-      << dvp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatFont"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatFont]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatBold"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatBold]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatItalic"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatItalic]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("TitleFormatShadow"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty TitleFormatShadow]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-
-    //Set Labels text property
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatColor"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatColor]"
-      << " SetElements3 "
-      << dvp->GetElement(0) << " "
-      << dvp->GetElement(1) << " "
-      << dvp->GetElement(2) << endl;
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatOpacity"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatOpacity]"
-      << " SetElements1 "
-      << dvp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatFont"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatFont]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatBold"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatBold]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatItalic"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatItalic]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("LabelFormatShadow"));
-    *file << "  [$pvTemp" << id.ID << " GetProperty LabelFormatShadow]"
-      << " SetElements1 "
-      << ivp->GetElement(0) << endl;
-
-    vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-      this->GetProperty("LookupTable"));
-    if (pp && pp->GetNumberOfProxies() == 1 && pp->GetProxy(0) )
-      {
-      *file << "  [$pvTemp" << id.ID << " GetProperty LookupTable]"
-        << " RemoveAllProxies" << endl;
-      *file << "  [$pvTemp" << id.ID << " GetProperty LookupTable]"
-        << " AddProxy $pvTemp" << pp->GetProxy(0)->GetID(0).ID
-        << endl;
-      }
-
-    *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
-    *file << endl;
-    }
-*/
 }
 
 //----------------------------------------------------------------------------

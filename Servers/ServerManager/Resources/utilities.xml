@@ -82,7 +82,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Actor" proxygroup="props" proxyname="Actor">
+        <Proxy name="Prop" proxygroup="props" proxyname="Actor">
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" />

@@ -6,21 +6,8 @@ SET( ServerManagerCS_SRCS
   )
  
 SET( ServerManagerCommon_SRCS
-  vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
-  vtkSMBoxWidgetProxy.cxx
-  vtkSMImplicitPlaneWidgetProxy.cxx
-  vtkSMLineWidgetProxy.cxx
-  vtkSMPointWidgetProxy.cxx 
-  vtkSMSphereWidgetProxy.cxx
-  vtkSMKeyFrameProxy.cxx
-  vtkSMBooleanKeyFrameProxy.cxx
-  vtkSMRampKeyFrameProxy.cxx
-  vtkSMExponentialKeyFrameProxy.cxx
-  vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
-  vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMApplication.cxx
@@ -30,14 +17,18 @@ SET( ServerManagerCommon_SRCS
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMAxesProxy.cxx
   vtkSMBooleanDomain.cxx
+  vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
+  vtkSMBoxWidgetProxy.cxx
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
   vtkSMComparativeVisProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
+  vtkSMConsumerDisplayProxy.cxx
+  vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayProxy.cxx
   vtkSMDomain.cxx
@@ -45,6 +36,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
+  vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
@@ -53,11 +45,16 @@ SET( ServerManagerCommon_SRCS
   vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
+  vtkSMImplicitPlaneWidgetProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
+  vtkSMKeyFrameProxy.cxx
+  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
+  vtkSMLinearAnimationCueManipulatorProxy.cxx
+  vtkSMLineWidgetProxy.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMLODDisplayProxy.cxx
   vtkSMLODRenderModuleProxy.cxx
@@ -69,6 +66,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMPart.cxx
   vtkSMPickLineWidgetProxy.cxx
   vtkSMPickPointWidgetProxy.cxx
+  vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
@@ -78,19 +76,21 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderModuleProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
   vtkSMShrunkContoursProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
-  vtkSMSimpleDisplayProxy.cxx
+  vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleProxyInformationHelper.cxx
   vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMMPIRenderModuleProxy.cxx
   vtkSMSourceProxy.cxx
+  vtkSMSphereWidgetProxy.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
@@ -121,14 +121,14 @@ SET( ServerManager_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMConsumerDisplayProxy.cxx
   vtkSMDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
-  vtkSMVectorProperty.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMVectorProperty.cxx
   ABSTRACT
   )
 

@@ -33,7 +33,7 @@
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
 #include "vtkPVCornerAnnotationEditor.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -61,9 +61,9 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.450");
+vtkCxxRevisionMacro(vtkPVSource, "1.451");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
-vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
+vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
 
 vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
@@ -1251,7 +1251,10 @@ void vtkPVSource::SetupDisplays()
   
   // Create the display and add it to the render module.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-  vtkSMDisplayProxy* pDisp = rm->CreateDisplayProxy();
+
+  // Probably rendermodule should directly returns a vtkSMDataObjectDisplayProxy.
+  vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
+    rm->CreateDisplayProxy());
 
   // register display proxy with pxm.
   ostrstream str;
@@ -1384,7 +1387,7 @@ void vtkPVSource::SetDefaultColorParameters()
       }
     if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
       { // No input or different scalars: use the new scalars.
-      this->ColorByArray(arrayInfo->GetName(), vtkSMDisplayProxy::POINT_FIELD_DATA);
+      this->ColorByArray(arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
       return;
       }
     }
@@ -1401,7 +1404,7 @@ void vtkPVSource::SetDefaultColorParameters()
       }
     if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
       { // No input or different scalars: use the new scalars.
-      this->ColorByArray(arrayInfo->GetName(), vtkSMDisplayProxy::CELL_FIELD_DATA);
+      this->ColorByArray(arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       return;
       }
     }
@@ -1418,23 +1421,23 @@ void vtkPVSource::SetDefaultColorParameters()
       // Find the array in our info.
       switch (colorField)
         {
-      case vtkSMDisplayProxy::POINT_FIELD_DATA:
+      case vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA:
           attrInfo = dataInfo->GetPointDataInformation();
           arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->ColorByArray(colorMap, vtkSMDisplayProxy::POINT_FIELD_DATA);
+            this->ColorByArray(colorMap, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
             return;
             }
           break;
-        case vtkSMDisplayProxy::CELL_FIELD_DATA:
+        case vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA:
           attrInfo = dataInfo->GetCellDataInformation();
           arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->ColorByArray(colorMap, vtkSMDisplayProxy::CELL_FIELD_DATA);
+            this->ColorByArray(colorMap, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
             return;
             }
           break;
@@ -1459,8 +1462,8 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
     return;
     }
 
-  if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
-    field != vtkSMDisplayProxy::CELL_FIELD_DATA)
+  if (field != vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA &&
+    field != vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
     {
     vtkErrorMacro("Can color only with Point Field Data or Cell Field data.");
     return;
@@ -1468,7 +1471,7 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
   
   vtkPVDataInformation* dataInfo = this->GetDataInformation();
   vtkPVDataSetAttributesInformation* attrInfo =
-    (field == vtkSMDisplayProxy::POINT_FIELD_DATA) ?
+    (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA) ?
     dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
   vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
     arrayname);
@@ -1497,7 +1500,7 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
       this->DisplayProxy->GetProperty("LookupTable"));
     if (!pp)
       {
-      vtkErrorMacro("Failed to find property LookupTable on vtkSMDisplayProxy.");
+      vtkErrorMacro("Failed to find property LookupTable on vtkSMDataObjectDisplayProxy.");
       return;
       }
     pp->RemoveAllProxies();
@@ -1507,7 +1510,7 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
       this->DisplayProxy->GetProperty("ScalarMode"));
     if (!ivp)
       {
-      vtkErrorMacro("Failed to find property ScalarMode on vtkSMDisplayProxy.");
+      vtkErrorMacro("Failed to find property ScalarMode on vtkSMDataObjectDisplayProxy.");
       return;
       }
     ivp->SetElement(0, field);
@@ -1516,7 +1519,7 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
       this->DisplayProxy->GetProperty("Specular"));
     if (!dvp)
       {
-      vtkErrorMacro("Failed to find propery Specular on vtkSMDisplayProxy.");
+      vtkErrorMacro("Failed to find propery Specular on vtkSMDataObjectDisplayProxy.");
       return;
       }
     // Turn off specular so that it does not interfere with data.
@@ -1547,7 +1550,7 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
       this->DisplayProxy->GetProperty("LookupTable"));
     if (!pp)
       {
-      vtkErrorMacro("Failed to find property LookupTable on vtkSMDisplayProxy.");
+      vtkErrorMacro("Failed to find property LookupTable on vtkSMDataObjectDisplayProxy.");
       return;
       }
     pp->RemoveAllProxies();
@@ -1559,7 +1562,7 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
     this->DisplayProxy->GetProperty("ScalarVisibility"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property ScalarVisibility on vtkSMDisplayProxy.");
+    vtkErrorMacro("Failed to find property ScalarVisibility on vtkSMDataObjectDisplayProxy.");
     return;
     }
   if (colorMap)
@@ -2090,7 +2093,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
       this->PVColorMap->SaveInBatchScript(file);
       }
     
-    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
+    vtkSMDataObjectDisplayProxy* pDisp = this->GetDisplayProxy();
     if (pDisp)
       {
       *file << "#Display Proxy" << endl;
@@ -2244,7 +2247,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
   if (this->PVColorMap)
     {
     if (this->DisplayProxy->GetScalarModeCM() == 
-      vtkSMDisplayProxy::POINT_FIELD_DATA)
+      vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
             << ") GetPVOutput] ColorByArray {" 
@@ -2252,7 +2255,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
             << 3 << endl;
       }
     if (this->DisplayProxy->GetScalarModeCM() == 
-      vtkSMDisplayProxy::CELL_FIELD_DATA)
+      vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
             << ") GetPVOutput] ColorByArray {" 

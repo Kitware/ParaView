@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -98,7 +98,7 @@ void vtkSMXYPlotDisplayProxy::CreateVTKObjects(int numObjects)
     }
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->CollectProxy = this->GetSubProxy("Collect");
-  this->XYPlotActorProxy = this->GetSubProxy("XYPlotActor");
+  this->XYPlotActorProxy = this->GetSubProxy("Prop2D");
   this->PropertyProxy = this->GetSubProxy("Property");
 
   if (!this->UpdateSuppressorProxy || !this->CollectProxy || !this->XYPlotActorProxy
@@ -430,18 +430,7 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->XYPlotActorProxy);
-  */
-  this->AddPropToRenderer2D(this->XYPlotActorProxy, rm);
-
+  this->Superclass::AddToRenderModule(rm);
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
 }
@@ -449,17 +438,7 @@ void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->XYPlotActorProxy);
-  */
-  this->RemovePropFromRenderer2D(this->XYPlotActorProxy, rm);
+  this->Superclass::RemoveFromRenderModule(rm);
 
   if (this->XYPlotWidget->GetEnabled())
     {

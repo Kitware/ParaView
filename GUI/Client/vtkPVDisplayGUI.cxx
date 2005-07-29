@@ -20,6 +20,7 @@
 #include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkSMLODDisplayProxy.h"
@@ -94,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.43");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.44");
 
 //----------------------------------------------------------------------------
 
@@ -1136,7 +1137,7 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
     vtkPVArrayInformation *arrayInfo;
     vtkPVDataSetAttributesInformation *attrInfo;
     
-    if (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)
+    if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1176,7 +1177,7 @@ void vtkPVDisplayGUI::Update()
 void vtkPVDisplayGUI::UpdateInternal()
 {
   vtkPVSource* source = this->GetPVSource();
-  vtkSMDisplayProxy* pDisp = source->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = source->GetDisplayProxy();
   
   // First reset all the values of the widgets.
   // Active states, and menu items will ge generated later.  
@@ -1198,19 +1199,19 @@ void vtkPVDisplayGUI::UpdateInternal()
   // Representation menu.
   switch(pDisp->GetRepresentationCM())
     {
-  case vtkSMDisplayProxy::OUTLINE:
+  case vtkSMDataObjectDisplayProxy::OUTLINE:
     this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
     break;
-  case vtkSMDisplayProxy::SURFACE:
+  case vtkSMDataObjectDisplayProxy::SURFACE:
     this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
     break;
-  case vtkSMDisplayProxy::WIREFRAME:
+  case vtkSMDataObjectDisplayProxy::WIREFRAME:
     this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
     break;
-  case vtkSMDisplayProxy::POINTS:
+  case vtkSMDataObjectDisplayProxy::POINTS:
     this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
     break;
-  case vtkSMDisplayProxy::VOLUME:
+  case vtkSMDataObjectDisplayProxy::VOLUME:
     this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
     break;
   default:
@@ -1220,10 +1221,10 @@ void vtkPVDisplayGUI::UpdateInternal()
   // Interpolation menu.
   switch (pDisp->GetInterpolationCM())
     {
-  case vtkSMDisplayProxy::FLAT:
+  case vtkSMDataObjectDisplayProxy::FLAT:
     this->InterpolationMenu->SetValue("Flat");
     break;
-  case vtkSMDisplayProxy::GOURAND:
+  case vtkSMDataObjectDisplayProxy::GOURAND:
     this->InterpolationMenu->SetValue("Gouraud");
     break;
   default:
@@ -1231,7 +1232,8 @@ void vtkPVDisplayGUI::UpdateInternal()
     }
   this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
   this->LineWidthThumbWheel->SetValue(pDisp->GetLineWidthCM());
-  this->PointLabelFontSizeThumbWheel->SetValue(source->GetPointLabelDisplayProxy()->GetFontSize());
+  this->PointLabelFontSizeThumbWheel->SetValue(
+    source->GetPointLabelDisplayProxy()->GetFontSizeCM());
   this->OpacityScale->SetValue(pDisp->GetOpacityCM());
 
   // Update actor control resolutions
@@ -1338,7 +1340,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   // If not, set a new default.
   if (colorMap)
     {
-    if (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)
+    if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1372,7 +1374,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   if (colorMap)
     {
     // Verify that the old colorby array has not disappeared.
-    attrInfo = (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)?
+    attrInfo = (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)?
       dataInfo->GetPointDataInformation() : dataInfo->GetCellDataInformation();
     arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
     if (!attrInfo)
@@ -1451,7 +1453,7 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
 //-----------------------------------------------------------------------------
 void vtkPVDisplayGUI::UpdateVolumeGUI()
 {
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   // Determine if this is unstructured grid data and add the 
   // volume rendering option
@@ -1460,7 +1462,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     this->RepresentationMenu->GetMenu()->DeleteMenuItem( VTK_PV_VOLUME_LABEL );
     }
   
-  if (!vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetHasVolumePipeline())
+  if (!pDisp->GetHasVolumePipeline())
     {
     this->VolumeRenderMode = 0;
     return;
@@ -1480,7 +1482,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   p->Modified();
 */
   this->VolumeRenderMode = 
-    (pDisp->GetRepresentationCM() == vtkSMDisplayProxy::VOLUME)? 1 : 0;
+    (pDisp->GetRepresentationCM() == vtkSMDataObjectDisplayProxy::VOLUME)? 1 : 0;
   this->VolumeScalarSelectionWidget->SetPVSource(this->PVSource);
   this->VolumeScalarSelectionWidget->SetColorSelectionCommand(
     "VolumeRenderByArray");
@@ -1490,28 +1492,28 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   this->VolumeRenderMethodMenu->AddRadioButton(
     VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
   
-  if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsZSweepMapper() )
+  if (pDisp->GetSupportsZSweepMapper() )
     {
     this->VolumeRenderMethodMenu->AddRadioButton(
       VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
     }
-  if (vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetSupportsBunykMapper() )
+  if (pDisp->GetSupportsBunykMapper() )
     {
     this->VolumeRenderMethodMenu->AddRadioButton(
       VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
     }
   
-  switch (this->PVSource->GetDisplayProxy()->GetVolumeMapperType())
+  switch (this->PVSource->GetDisplayProxy()->GetVolumeMapperTypeCM())
     {
-    case vtkSMDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
+    case vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER:
       this->VolumeRenderMethodMenu->SetValue
         (VTK_PV_VOLUME_PT_METHOD_LABEL);
       break;
-    case vtkSMDisplayProxy::ZSWEEP_VOLUME_MAPPER:
+    case vtkSMDataObjectDisplayProxy::ZSWEEP_VOLUME_MAPPER:
       this->VolumeRenderMethodMenu->SetValue
         (VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL);
       break;
-    case vtkSMDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
+    case vtkSMDataObjectDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
       this->VolumeRenderMethodMenu->SetValue
         (VTK_PV_VOLUME_BUNYK_METHOD_LABEL);
       break;
@@ -1623,7 +1625,7 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
     // See if the array satisfies conditions necessary for direct coloring.  
     vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
-    if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == vtkSMDisplayProxy::POINT_FIELD_DATA)
+    if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1694,7 +1696,7 @@ void vtkPVDisplayGUI::DrawWireframe()
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::WIREFRAME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::WIREFRAME);
 
   if ( this->GetPVRenderView() )
     {
@@ -1711,7 +1713,7 @@ void vtkPVDisplayGUI::DrawPoints()
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::POINTS);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::POINTS);
   
   if ( this->GetPVRenderView() )
     {
@@ -1728,7 +1730,7 @@ void vtkPVDisplayGUI::DrawVolume()
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
   this->VolumeRenderModeOn();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::VOLUME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::VOLUME);
 
   this->GetPVRenderView()->GetRenderWindow()->AddObserver( vtkCommand::StartEvent,
                                                            this->VRObserver );
@@ -1752,7 +1754,7 @@ void vtkPVDisplayGUI::DrawVolumePT()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawVolumePTInternal()
 {
-  this->PVSource->GetDisplayProxy()->SetVolumeMapperToPT();
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToPTCM();
 }
 
 //----------------------------------------------------------------------------
@@ -1767,7 +1769,7 @@ void vtkPVDisplayGUI::DrawVolumeZSweep()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawVolumeZSweepInternal()
 {
-  this->PVSource->GetDisplayProxy()->SetVolumeMapperToZSweep();
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToZSweepCM();
 }
 
 //----------------------------------------------------------------------------
@@ -1782,7 +1784,7 @@ void vtkPVDisplayGUI::DrawVolumeBunyk()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawVolumeBunykInternal()
 {
-  this->PVSource->GetDisplayProxy()->SetVolumeMapperToBunyk();
+  this->PVSource->GetDisplayProxy()->SetVolumeMapperToBunykCM();
 }
 
 //----------------------------------------------------------------------------
@@ -1797,7 +1799,7 @@ void vtkPVDisplayGUI::DrawSurface()
   
   // fixme
   // It would be better to loop over part displays from the render module.
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::SURFACE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1814,7 +1816,7 @@ void vtkPVDisplayGUI::DrawOutline()
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::OUTLINE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1841,7 +1843,7 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
   // rendering.
   if (this->VolumeRenderMode)
     {
-    vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+    vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       pDisp->GetProperty("SelectScalarArray"));
     if (svp)
@@ -1877,7 +1879,7 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
     const char *colorSelection = this->ColorSelectionMenu->GetValue();
     if (strcmp(colorSelection, "Property") != 0)
       {
-      vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+      vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
       vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
         pDisp->GetProperty("ColorArray"));
       if (svp)
@@ -1924,7 +1926,7 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
   this->GetTraceHelper()->AddEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
-  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDisplayProxy::FLAT);
+  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDataObjectDisplayProxy::FLAT);
 
   if ( this->GetPVRenderView() )
     {
@@ -1940,7 +1942,7 @@ void vtkPVDisplayGUI::SetInterpolationToGouraud()
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
-  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDisplayProxy::GOURAND);
+  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDataObjectDisplayProxy::GOURAND);
   
   if ( this->GetPVRenderView() )
     {
@@ -2253,7 +2255,7 @@ void vtkPVDisplayGUI::SetPointLabelFontSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointLabelFontSize()
 {
-  this->PVSource->GetPointLabelDisplayProxy()->SetFontSize(
+  this->PVSource->GetPointLabelDisplayProxy()->SetFontSizeCM(
     (int)this->PointLabelFontSizeThumbWheel->GetValue());
  
   if ( this->GetPVRenderView() )
@@ -2323,7 +2325,7 @@ void vtkPVDisplayGUI::OpacityChangedEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorTranslate(double* point)
 {
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   if (pDisp)
     {
     pDisp->GetPositionCM(point);
@@ -2395,7 +2397,7 @@ void vtkPVDisplayGUI::ActorTranslateEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorScale(double* point)
 {
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   if (pDisp)
     {
     pDisp->GetScaleCM(point);
@@ -2467,7 +2469,7 @@ void vtkPVDisplayGUI::ActorScaleEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorOrientation(double* point)
 {
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   if (pDisp)
     {
     pDisp->GetOrientationCM(point);
@@ -2616,7 +2618,7 @@ void vtkPVDisplayGUI::UpdateActorControl()
   double scale[3];
   double origin[3];
   double orientation[3];
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   pDisp->GetPositionCM(translate);
   pDisp->GetScaleCM(scale);
   pDisp->GetOrientationCM(orientation);

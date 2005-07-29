@@ -32,14 +32,14 @@
 #include "vtkKWPushButton.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVTraceHelper.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.41");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.42");
 
 class vtkXDMFReaderModuleInternal
 {

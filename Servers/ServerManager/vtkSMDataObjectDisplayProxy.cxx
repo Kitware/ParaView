@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSimpleDisplayProxy.cxx
+  Module:    vtkSMDataObjectDisplayProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,33 +12,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMInputProperty.h"
-#include "vtkPVProcessModule.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkClientServerStream.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkSMDataTypeDomain.h"
+#include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkMath.h"
-#include "vtkSMPropertyIterator.h"
-
-#include "vtkPolyData.h"
+#include "vtkPVGeometryInformation.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVUpdateSuppressor.h"
+#include "vtkSMDataTypeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
-vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.12");
+
+vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.1");
 //-----------------------------------------------------------------------------
-vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
+vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
 {
   this->GeometryFilterProxy = 0;
   this->UpdateSuppressorProxy = 0;
@@ -66,10 +66,14 @@ vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 
   this->Visibility = 1;
   this->Representation = -1;
+
+  this->GeometryInformationIsValid = 0;
+  this->GeometryInformation = vtkPVGeometryInformation::New();
+
 }
 
 //-----------------------------------------------------------------------------
-vtkSMSimpleDisplayProxy::~vtkSMSimpleDisplayProxy()
+vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
 {
   this->GeometryFilterProxy = 0;
   this->UpdateSuppressorProxy = 0;
@@ -86,17 +90,18 @@ vtkSMSimpleDisplayProxy::~vtkSMSimpleDisplayProxy()
   this->VolumePropertyProxy = 0;
   this->OpacityFunctionProxy = 0;
   this->ColorTransferFunctionProxy = 0;
+  this->GeometryInformation->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::MarkConsumersAsModified()
+void vtkSMDataObjectDisplayProxy::MarkConsumersAsModified()
 {
   this->Superclass::MarkConsumersAsModified();
   this->InvalidateGeometry();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
@@ -106,7 +111,7 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->MapperProxy = this->GetSubProxy("Mapper");
   this->PropertyProxy = this->GetSubProxy("Property");
-  this->ActorProxy = this->GetSubProxy("Actor");
+  this->ActorProxy = this->GetSubProxy("Prop");
 
   this->GeometryFilterProxy->SetServers(vtkProcessModule::DATA_SERVER);
   this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
@@ -166,14 +171,14 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
+void vtkSMDataObjectDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
                                        int)
 {
   this->SetInput(input);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetInput(vtkSMProxy* input)
+void vtkSMDataObjectDisplayProxy::SetInput(vtkSMProxy* input)
 {
   if (input == NULL)
     {
@@ -185,7 +190,7 @@ void vtkSMSimpleDisplayProxy::SetInput(vtkSMProxy* input)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
+void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
 {
   int num = 0;
   if (input)
@@ -271,7 +276,7 @@ void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
     }
 }
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetupPipeline()
+void vtkSMDataObjectDisplayProxy::SetupPipeline()
 {
   vtkSMInputProperty* ipp = 0;
   vtkSMProxyProperty* pp = 0;
@@ -334,7 +339,7 @@ void vtkSMSimpleDisplayProxy::SetupPipeline()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetupDefaults()
+void vtkSMDataObjectDisplayProxy::SetupDefaults()
 {
   vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
@@ -485,7 +490,7 @@ void vtkSMSimpleDisplayProxy::SetupDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
+void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
 {
   if (!this->HasVolumePipeline)
     {
@@ -592,7 +597,7 @@ void vtkSMSimpleDisplayProxy::SetupVolumePipeline()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetupVolumeDefaults()
+void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
 {
   if (!this->HasVolumePipeline)
     {
@@ -651,7 +656,21 @@ void vtkSMSimpleDisplayProxy::SetupVolumeDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
+vtkPVGeometryInformation* vtkSMDataObjectDisplayProxy::GetGeometryInformation()
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created yet!");
+    return 0;
+    }
+  if (!this->GeometryInformationIsValid)
+    {
+    this->GatherGeometryInformation();
+    }
+  return this->GeometryInformation;
+}
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetRepresentation(int representation)
 {
   if (!this->ObjectsCreated)
     {
@@ -664,7 +683,7 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
     }
   
   vtkSMIntVectorProperty* ivp;
-  if (representation == vtkSMDisplayProxy::VOLUME)
+  if (representation == vtkSMDataObjectDisplayProxy::VOLUME)
     {
     if (!this->HasVolumePipeline)
       {
@@ -680,13 +699,13 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GeometryFilterProxy->GetProperty("UseOutline"));
-  int outline = (representation == vtkSMDisplayProxy::OUTLINE)? 1 : 0;
+  int outline = (representation == vtkSMDataObjectDisplayProxy::OUTLINE)? 1 : 0;
   ivp->SetElement(0, outline);
   this->GeometryFilterProxy->UpdateVTKObjects();
 
-  if (representation == vtkSMDisplayProxy::POINTS ||
-    representation == vtkSMDisplayProxy::WIREFRAME || 
-    representation == vtkSMDisplayProxy::SURFACE)
+  if (representation == vtkSMDataObjectDisplayProxy::POINTS ||
+    representation == vtkSMDataObjectDisplayProxy::WIREFRAME || 
+    representation == vtkSMDataObjectDisplayProxy::SURFACE)
     {
     ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->PropertyProxy->GetProperty("Representation"));
@@ -698,7 +717,7 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
   double ambient = 1.0;
   double specularity = 0.0;
 
-  if (representation == vtkSMDisplayProxy::SURFACE)
+  if (representation == vtkSMDataObjectDisplayProxy::SURFACE)
     {
     diffuse = 1.0;
     ambient = 0.0;
@@ -725,7 +744,7 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::VolumeRenderModeOn()
+void vtkSMDataObjectDisplayProxy::VolumeRenderModeOn()
 {
   if (this->VolumeRenderMode)
     {
@@ -739,7 +758,7 @@ void vtkSMSimpleDisplayProxy::VolumeRenderModeOn()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::VolumeRenderModeOff()
+void vtkSMDataObjectDisplayProxy::VolumeRenderModeOff()
 {
   if (!this->VolumeRenderMode)
     {
@@ -753,7 +772,7 @@ void vtkSMSimpleDisplayProxy::VolumeRenderModeOff()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
+void vtkSMDataObjectDisplayProxy::ResetTransferFunctions()
 {
   if (!this->HasVolumePipeline)
     {
@@ -772,8 +791,8 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->VolumePTMapperProxy->GetProperty("ScalarMode"));
   mode = ivp->GetElement(0);
-  if (mode != vtkSMDisplayProxy::POINT_FIELD_DATA && 
-    mode != vtkSMDisplayProxy::CELL_FIELD_DATA)
+  if (mode != vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA && 
+    mode != vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
     {
     vtkErrorMacro("Only Point Field Data and Cell Field Data can be used for "
       "volume rendering.");
@@ -803,7 +822,7 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
   
   vtkPVDataInformation* dataInfo = sp->GetDataInformation();
   vtkPVDataSetAttributesInformation* attrInfo =
-    (mode == vtkSMDisplayProxy::POINT_FIELD_DATA) ?
+    (mode == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA) ?
     dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
   vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(arrayname);
 
@@ -811,7 +830,7 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::ResetTransferFunctions(
+void vtkSMDataObjectDisplayProxy::ResetTransferFunctions(
   vtkPVDataInformation* dataInfo, vtkPVArrayInformation* arrayInfo)
 {
   if (!dataInfo || !arrayInfo)
@@ -881,7 +900,7 @@ void vtkSMSimpleDisplayProxy::ResetTransferFunctions(
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetVolumeMapperToBunyk()
+void vtkSMDataObjectDisplayProxy::SetVolumeMapperToBunykCM()
 {
   if ( !this->HasVolumePipeline )
     {
@@ -902,7 +921,7 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToBunyk()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetVolumeMapperToPT()
+void vtkSMDataObjectDisplayProxy::SetVolumeMapperToPTCM()
 {
   if ( !this->HasVolumePipeline )
     {
@@ -923,7 +942,7 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToPT()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetVolumeMapperToZSweep()
+void vtkSMDataObjectDisplayProxy::SetVolumeMapperToZSweepCM()
 {
   if ( !this->HasVolumePipeline )
     {
@@ -944,11 +963,11 @@ void vtkSMSimpleDisplayProxy::SetVolumeMapperToZSweep()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMSimpleDisplayProxy::GetVolumeMapperType()
+int vtkSMDataObjectDisplayProxy::GetVolumeMapperTypeCM()
 {
   if ( !this->HasVolumePipeline )
     {
-    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
     }
   
   vtkSMProxyProperty* pp;
@@ -957,7 +976,7 @@ int vtkSMSimpleDisplayProxy::GetVolumeMapperType()
   if (!pp)
     {
     vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
-    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
     }
   
   vtkSMProxy *p = pp->GetProxy(0);
@@ -965,29 +984,29 @@ int vtkSMSimpleDisplayProxy::GetVolumeMapperType()
   if ( !p )
     {
     vtkErrorMacro("Failed to find proxy in Mapper proxy property!");
-    return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
     }
   
   if ( !strcmp(p->GetVTKClassName(), "vtkProjectedTetrahedraMapper" ) )
     {
-    return vtkSMDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::PROJECTED_TETRA_VOLUME_MAPPER;
     }
 
   if ( !strcmp(p->GetVTKClassName(), "vtkUnstructuredGridVolumeZSweepMapper" ) )
     {
-    return vtkSMDisplayProxy::ZSWEEP_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::ZSWEEP_VOLUME_MAPPER;
     }
   
   if ( !strcmp(p->GetVTKClassName(), "vtkUnstructuredGridVolumeRayCastMapper" ) )
     {
-    return vtkSMDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER;
+    return vtkSMDataObjectDisplayProxy::BUNYK_RAY_CAST_VOLUME_MAPPER;
     }
   
-  return vtkSMDisplayProxy::UNKNOWN_VOLUME_MAPPER;
+  return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetVisibility(int visible)
+void vtkSMDataObjectDisplayProxy::SetVisibility(int visible)
 {
   this->Visibility = visible;
   int geom_visibility = (!this->VolumeRenderMode && visible)? 1 : 0;
@@ -1020,7 +1039,7 @@ void vtkSMSimpleDisplayProxy::SetVisibility(int visible)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::CacheUpdate(int idx, int total)
+void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
 {
   if (!this->UpdateSuppressorProxy)
     {
@@ -1047,13 +1066,13 @@ void vtkSMSimpleDisplayProxy::CacheUpdate(int idx, int total)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::InvalidateGeometry()
+void vtkSMDataObjectDisplayProxy::InvalidateGeometry()
 {
   this->InvalidateGeometryInternal();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::InvalidateGeometryInternal()
+void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal()
 {
   this->GeometryIsValid = 0;
   this->VolumeGeometryIsValid = 0;
@@ -1066,7 +1085,7 @@ void vtkSMSimpleDisplayProxy::InvalidateGeometryInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::Update()
+void vtkSMDataObjectDisplayProxy::Update()
 {
   if (this->VolumeRenderMode)
     {
@@ -1094,15 +1113,15 @@ void vtkSMSimpleDisplayProxy::Update()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+void vtkSMDataObjectDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
   if (!this->ObjectsCreated)
     {
     vtkErrorMacro("Display proxy not created!");
     return;
     }
-
-  this->AddPropToRenderer(this->ActorProxy, rm);
+  // add this->ActorProxy to the render module.
+  this->Superclass::AddToRenderModule(rm);
   if (this->HasVolumePipeline)
     {
     this->AddPropToRenderer(this->VolumeActorProxy, rm);
@@ -1110,15 +1129,15 @@ void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
+void vtkSMDataObjectDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
   if (!this->ObjectsCreated)
     {
     vtkErrorMacro("Display proxy not created!");
     return;
     }
-  
-  this->RemovePropFromRenderer(this->ActorProxy, rm);
+  // removes this->ActorProxy from the render module.
+  this->Superclass::RemoveFromRenderModule(rm);
   if (this->HasVolumePipeline)
     {
     this->RemovePropFromRenderer(this->VolumeActorProxy, rm);
@@ -1126,7 +1145,7 @@ void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::GatherGeometryInformation()
+void vtkSMDataObjectDisplayProxy::GatherGeometryInformation()
 {
   this->GeometryInformation->Initialize();
   if (this->GeometryFilterProxy->GetNumberOfIDs() < 1)
@@ -1156,7 +1175,7 @@ void vtkSMSimpleDisplayProxy::GatherGeometryInformation()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
+void vtkSMDataObjectDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
 {
   if (!onProxy || !this->GeometryFilterProxy)
     {
@@ -1173,7 +1192,451 @@ void vtkSMSimpleDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSimpleDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMDataObjectDisplayProxy::SetInterpolationCM(int flag)
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Interpolation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Interpolation on Display Proxy.");
+    return ;
+    }
+  ivp->SetElement(0, flag);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetInterpolationCM()
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Interpolation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Interpolation on Display Proxy.");
+    return -1;
+    } 
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetPointSizeCM(double size)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("PointSize"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property PointSize on DisplayProxy.");
+    return ;
+    }
+  dvp->SetElement(0, size);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+double vtkSMDataObjectDisplayProxy::GetPointSizeCM()
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("PointSize"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property PointSize on DisplayProxy.");
+    return 0.0;
+    }
+  return dvp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetLineWidthCM(double width)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("LineWidth"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property LineWidth on DisplayProxy.");
+    return ;
+    }
+  dvp->SetElement(0, width);
+  this->UpdateVTKObjects(); 
+}
+
+//-----------------------------------------------------------------------------
+double vtkSMDataObjectDisplayProxy::GetLineWidthCM()
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("LineWidth"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property LineWidth on DisplayProxy.");
+    return 0.0;
+    }
+  return dvp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetScalarModeCM(int mode)
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ScalarMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, mode);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetScalarModeCM()
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ScalarMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return -1;
+    }
+  return ivp->GetElement(0);
+}
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetColorModeCM(int mode)
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ColorMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, mode);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetColorModeCM()
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ColorMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetScalarArrayCM(const char* arrayname)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetProperty("SelectScalarArray"));
+  
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return;
+    }
+  svp->SetElement(0, arrayname);
+  this->UpdateVTKObjects();
+    
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMDataObjectDisplayProxy::GetScalarArrayCM()
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetProperty("SelectScalarArray"));
+
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return 0;
+    }
+  return svp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetOpacityCM(double op)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Opacity"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Opacity on DisplayProxy.");
+    return ;
+    }
+  dvp->SetElement(0, op);
+  this->UpdateVTKObjects(); 
+
+}
+
+//-----------------------------------------------------------------------------
+double vtkSMDataObjectDisplayProxy::GetOpacityCM()
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Opacity"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Opacity on DisplayProxy.");
+    return 0;
+    }
+  return dvp->GetElement(0);
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetColorCM(double rgb[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Color"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Color on DisplayProxy.");
+    return;
+    }
+  dvp->SetElements(rgb);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::GetColorCM(double rgb[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Color"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Color on DisplayProxy.");
+    return;
+    }
+  rgb[0] = dvp->GetElement(0);
+  rgb[1] = dvp->GetElement(1);
+  rgb[2] = dvp->GetElement(2);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetInterpolateScalarsBeforeMappingCM(int flag)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("InterpolateScalarsBeforeMapping"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property InterpolateScalarsBeforeMapping on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, flag);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetInterpolateScalarsBeforeMappingCM()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("InterpolateScalarsBeforeMapping"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property InterpolateScalarsBeforeMapping on DisplayProxy.");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetScalarVisibilityCM(int v)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ScalarVisibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarVisibility on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, v);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetScalarVisibilityCM()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ScalarVisibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarVisibility on DisplayProxy.");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetPositionCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Position"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Position on DisplayProxy.");
+    return;
+    }
+  dvp->SetElements(pos);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::GetPositionCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Position"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Position on DisplayProxy.");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+  pos[2] = dvp->GetElement(2);
+}
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::GetScaleCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Scale"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Scale on DisplayProxy.");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+  pos[2] = dvp->GetElement(2);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetScaleCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Scale"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Scale on DisplayProxy.");
+    return;
+    }
+  dvp->SetElements(pos);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::GetOrientationCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Orientation"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Orientation on DisplayProxy.");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+  pos[2] = dvp->GetElement(2);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetOrientationCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Orientation"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Orientation on DisplayProxy.");
+    return;
+    }
+  dvp->SetElements(pos);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::GetOriginCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Origin"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Origin on DisplayProxy.");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+  pos[2] = dvp->GetElement(2);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetOriginCM(double pos[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Origin"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Origin on DisplayProxy.");
+    return;
+    }
+  dvp->SetElements(pos);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetRepresentationCM(int r)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Representation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Representation on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, r);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetRepresentationCM()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Representation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Representation on DisplayProxy.");
+    return 0;
+    } 
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetImmediateModeRenderingCM(int i)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ImmediateModeRendering"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ImmediateModeRendering.");
+    return;
+    }
+  ivp->SetElement(0, i);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetImmediateModeRenderingCM()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ImmediateModeRendering"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ImmediateModeRendering.");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GeometryFilterProxy: " << this->GeometryFilterProxy << endl;

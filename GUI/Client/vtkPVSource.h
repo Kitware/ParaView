@@ -28,26 +28,27 @@
 class vtkCollection;
 class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
-class vtkPVSourceNotebook;
 class vtkKWView;
 class vtkPVApplication;
+class vtkPVColorMap;
+class vtkPVDataInformation;
+class vtkPVDisplayGUI;
 class vtkPVInputProperty;
+class vtkPVLookmark;
+class vtkPVNumberOfOutputsInformation;
 class vtkPVRenderView;
+class vtkPVSourceNotebook;
 class vtkPVWidget;
 class vtkPVWidgetCollection;
 class vtkPVWindow;
-class vtkSMSourceProxy;
+class vtkSMCubeAxesDisplayProxy;
+class vtkSMDataObjectDisplayProxy;
 class vtkSMDisplayProxy;
+class vtkSMPart;
+class vtkSMPointLabelDisplayProxy;
+class vtkSMSourceProxy;
 class vtkSource;
 class vtkStringList;
-class vtkSMPart;
-class vtkPVDataInformation;
-class vtkPVNumberOfOutputsInformation;
-class vtkSMCubeAxesDisplayProxy;
-class vtkSMPointLabelDisplayProxy;
-class vtkPVColorMap;
-class vtkPVDisplayGUI;
-class vtkPVLookmark;
 
 
 class VTK_EXPORT vtkPVSource : public vtkPVTracedWidget
@@ -467,8 +468,8 @@ public:
   
   // Description
   // This is the Display for this source.
-  void SetDisplayProxy(vtkSMDisplayProxy* pdisp);
-  vtkGetObjectMacro(DisplayProxy, vtkSMDisplayProxy);
+  void SetDisplayProxy(vtkSMDataObjectDisplayProxy* pdisp);
+  vtkGetObjectMacro(DisplayProxy, vtkSMDataObjectDisplayProxy);
 
   // Description
   // Accessor to the point label text display.
@@ -482,7 +483,7 @@ public:
   // Sets the array name and field type to color with.
   // This also sets the LUT on the mapper.
   // field (3 == PointFieldData, 4==CellFieldData)
-  // enums in vtkSMDisplayProxy
+  // enums in vtkSMDataObjectDisplayProxy
   void ColorByArray(const char* arrayname, int field);
 
   // Description:
@@ -543,7 +544,7 @@ protected:
   int PointLabelVisibility;
 
   vtkKWFrameWithScrollbar *ParameterFrame;
-  vtkSMDisplayProxy* DisplayProxy;
+  vtkSMDataObjectDisplayProxy* DisplayProxy;
 
   // Description:
   // Helper methods for subclasses to add displays to the

@@ -28,7 +28,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
@@ -38,7 +38,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.5");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -433,7 +433,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
   vtkCollectionIterator* iter = displays->NewIterator();
   for(iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
+    vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
       iter->GetCurrentObject());
     if (pDisp && pDisp->GetVisibilityCM())
       {
@@ -635,7 +635,7 @@ int vtkSMComparativeVisProxy::Show()
 
     for(; iter2 != this->Internal->Displays[i].end(); iter2++)
       {
-      vtkSMSimpleDisplayProxy* display = vtkSMSimpleDisplayProxy::SafeDownCast(
+      vtkSMDataObjectDisplayProxy* display = vtkSMDataObjectDisplayProxy::SafeDownCast(
         iter2->GetPointer());
 
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -816,8 +816,8 @@ void vtkSMComparativeVisProxy::Hide()
       this->Internal->Displays[i].begin();
     for(; iter2 != this->Internal->Displays[i].end(); iter2++)
       {
-      vtkSMSimpleDisplayProxy* display = vtkSMSimpleDisplayProxy::SafeDownCast(
-        iter2->GetPointer());
+      vtkSMDataObjectDisplayProxy* display = 
+        vtkSMDataObjectDisplayProxy::SafeDownCast(iter2->GetPointer());
       pp->RemoveProxy(vtkSMDisplayProxy::SafeDownCast(display));
       }
     }

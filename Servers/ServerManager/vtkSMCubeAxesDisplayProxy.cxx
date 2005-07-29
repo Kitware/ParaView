@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ void vtkSMCubeAxesDisplayProxy::CreateVTKObjects(int num)
     {
     vtkErrorMacro("Only one cube axes per source.");
     }
-  this->CubeAxesProxy = this->GetSubProxy("CubeAxes");
+  this->CubeAxesProxy = this->GetSubProxy("Prop2D");
   if (!this->CubeAxesProxy)
     {
     vtkErrorMacro("SubProxy CubeAxes must be defined.");
@@ -133,19 +133,7 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     vtkErrorMacro("Can be added only to one render module.");
     return;
     }
-  /*
-  vtkSMProxyProperty* pp; 
-  pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->CubeAxesProxy);
-  rm->UpdateVTKObjects();
-  */
-  this->AddPropToRenderer2D(this->CubeAxesProxy, rm);
+  this->Superclass::AddToRenderModule(rm);
 
   // We don't set the Camera proxy for the cube axes actor using 
   // properties since the Camera Proxy provided by the RenderModule is only 
@@ -178,20 +166,9 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
     {
     return;
     }
-  vtkSMProxyProperty* pp;
-  /*
-  pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->CubeAxesProxy);
-  rm->UpdateVTKObjects();
-  */
-  this->RemovePropFromRenderer2D(this->CubeAxesProxy, rm);
+  this->Superclass::AddToRenderModule(rm);
 
+  vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CubeAxesProxy->GetProperty("Camera"));
   pp->RemoveAllProxies();

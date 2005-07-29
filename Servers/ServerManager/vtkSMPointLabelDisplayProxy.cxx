@@ -103,7 +103,7 @@ void vtkSMPointLabelDisplayProxy::CreateVTKObjects(int numObjects)
   this->CollectProxy = this->GetSubProxy("Collect");
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->MapperProxy = this->GetSubProxy("Mapper");
-  this->ActorProxy = this->GetSubProxy("Actor");
+  this->ActorProxy = this->GetSubProxy("Prop2D");
   this->TextPropertyProxy =  this->GetSubProxy("Property");
 
   if (!this->CollectProxy || !this->UpdateSuppressorProxy || !this->MapperProxy
@@ -283,40 +283,6 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
-{
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->ActorProxy);
-  */
-  this->AddPropToRenderer2D(this->ActorProxy, rm);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::RemoveFromRenderModule(
-  vtkSMRenderModuleProxy* rm)
-{
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->ActorProxy);
-  */
-  this->RemovePropFromRenderer2D(this->ActorProxy, rm);
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::Update()
 {
   if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
@@ -363,7 +329,7 @@ vtkUnstructuredGrid* vtkSMPointLabelDisplayProxy::GetCollectedData()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::SetFontSize(int size) 
+void vtkSMPointLabelDisplayProxy::SetFontSizeCM(int size) 
 {
   if (this->TextPropertyProxy)
     {
@@ -382,7 +348,7 @@ void vtkSMPointLabelDisplayProxy::SetFontSize(int size)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMPointLabelDisplayProxy::GetFontSize() 
+int vtkSMPointLabelDisplayProxy::GetFontSizeCM() 
 {
   if (this->TextPropertyProxy)
     {    
@@ -404,6 +370,5 @@ void vtkSMPointLabelDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
-  //os << indent << "FontSize: " << this->GetFontSize() << endl;
 }
 

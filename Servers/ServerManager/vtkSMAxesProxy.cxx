@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.4");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -64,7 +64,7 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
 
   // Setup the pipeline.
   vtkSMProxy* mapper = this->GetSubProxy("Mapper");
-  vtkSMProxy* actor = this->GetSubProxy("Actor");
+  vtkSMProxy* actor = this->GetSubProxy("Prop");
 
   if (!mapper)
     {
@@ -78,13 +78,6 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
     return;
     }
  
-  /*
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-    mapper->GetProperty("Input"));
-  ip->RemoveAllProxies();
-  ip->AddProxy(this);
-  */
-  
   for (cc=0; cc< numObjects; cc++)
     {
     str << vtkClientServerStream::Invoke << this->GetID(cc) 
@@ -106,88 +99,11 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
 
   this->UpdateVTKObjects();
 
-//  this->cmSetVisibility(0);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMAxesProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
-{
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->AddProxy(this->GetSubProxy("Actor"));
-  */
-  this->AddPropToRenderer(this->GetSubProxy("Actor"), rm);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
-{
-  /*
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find ViewProps on vtkSMRenderModuleProxy.");
-    return;
-    }
-  pp->RemoveProxy(this->GetSubProxy("Actor"));
-  */
-  this->RemovePropFromRenderer(this->GetSubProxy("Actor"), rm);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMAxesProxy::SaveInBatchScript(ofstream* file)
 {
-  /*
-  *file << endl;
-  unsigned int cc;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  vtkSMIntVectorProperty* ivp;
-  vtkSMDoubleVectorProperty* dvp;
-  
-  for (cc=0; cc < numObjects; cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    *file << "set pvTemp" << id
-      << " [$proxyManager NewProxy axes Axes]" << endl;
-    *file << "  $proxyManager RegisterProxy axes pvTemp"
-      << id << " $pvTemp" << id << endl;
-    *file << "  $pvTemp" << id << " UnRegister {}" << endl;
-    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp"
-      << id << endl;
-  
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("Visibility"));
-    if (ivp)
-      {
-      *file << "  [$pvTemp" << id << " GetProperty Visibility]"
-        << " SetElements1 " << ivp->GetElement(0) << endl;
-      }
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("Position"));
-    if (dvp)
-      {
-      *file << "  [$pvTemp" << id << " GetProperty Position]"
-        << " SetElements3 " << dvp->GetElement(0) << " "
-        << dvp->GetElement(1) << " " << dvp->GetElement(2) << endl;
-      }
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetProperty("Scale"));
-    if (dvp)
-      {
-      *file << "  [$pvTemp" << id << " GetProperty Scale]"
-        << " SetElements3 " << dvp->GetElement(0) << " "
-        << dvp->GetElement(1) << " " << dvp->GetElement(2) << endl;
-      }
-    *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
-    }
-    */
   this->Superclass::SaveInBatchScript(file);
 }
 

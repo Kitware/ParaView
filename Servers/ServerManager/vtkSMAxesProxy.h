@@ -18,7 +18,7 @@
 // as the center axes in ParaView. Proxifying it makes the axes
 // accessible in batch mode. The only reason why Axes is even a 
 // separate display proxy instead of the the generic Axes source proxy,
-// and the vtkSMSimpleDisplayProxy subclass is because we don't want the 
+// and the vtkSMDataObjectDisplayProxy(or subclass) is because we don't want the 
 // additional overhead of update suppressor etc for the Axes proxy.
 // .SECTION See Also
 // vtkSMDisplayProxy 
@@ -39,11 +39,6 @@ public:
   // Description:
   // Save the proxy in batch script.
   virtual void SaveInBatchScript(ofstream* file);  
-
-  // Description:
-  // Called when the display is added/removed to/from a RenderModule.
-  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
-  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
 //BTX
 protected:

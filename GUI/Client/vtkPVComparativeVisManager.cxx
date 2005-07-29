@@ -29,11 +29,11 @@
 #include "vtkPVWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSMAnimationCueProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkSMSimpleDisplayProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.15");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.16");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -56,7 +56,7 @@ struct vtkPVComparativeVisManagerInternals
 
   // These are used to store the state of the main window prior
   // to Show(). This state is later restored after Hide().
-  vtkstd::list<vtkSMSimpleDisplayProxy*> VisibleDisplayProxies;
+  vtkstd::list<vtkSMDataObjectDisplayProxy*> VisibleDisplayProxies;
   int MainPanelVisibility;
   int OrientationAxesVisibility;
   int InteractorStyle;
@@ -271,7 +271,7 @@ int vtkPVComparativeVisManager::Show()
         !iter->IsDoneWithTraversal(); 
         iter->GoToNextItem())
       {
-      vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
+      vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
         iter->GetCurrentObject());
       if (pDisp && pDisp->GetVisibilityCM())
         {
@@ -345,7 +345,7 @@ void vtkPVComparativeVisManager::Hide()
 
   window->SetInteractorStyle(this->Internal->InteractorStyle);
 
-  vtkstd::list<vtkSMSimpleDisplayProxy*>::iterator iter2 = 
+  vtkstd::list<vtkSMDataObjectDisplayProxy*>::iterator iter2 = 
       this->Internal->VisibleDisplayProxies.begin();
   for(; iter2 != this->Internal->VisibleDisplayProxies.end(); iter2++)
     {

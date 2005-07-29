@@ -22,24 +22,19 @@
 #ifndef __vtkSMPointLabelDisplayProxy_h
 #define __vtkSMPointLabelDisplayProxy_h
 
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMConsumerDisplayProxy.h"
 
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkSMPointLabelDisplayProxy : public vtkSMDisplayProxy
+class VTK_EXPORT vtkSMPointLabelDisplayProxy : public vtkSMConsumerDisplayProxy
 {
 public:
   static vtkSMPointLabelDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMPointLabelDisplayProxy, vtkSMDisplayProxy);
+  vtkTypeRevisionMacro(vtkSMPointLabelDisplayProxy, vtkSMConsumerDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Called when the display is added/removed to/from a RenderModule.
-  virtual void AddToRenderModule(vtkSMRenderModuleProxy* rm);
-  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy* rm);
-  
   // Description:
   // Set the input. 
   void SetInput (vtkSMSourceProxy* input);
@@ -48,7 +43,7 @@ public:
   // I have this funny looking AddInput instead of a simple
   // SetInput as I want to have an InputProperty for the input (rather than
   // a proxy property).
-  void AddInput(vtkSMSourceProxy* input, const char*, int);
+  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
 
   // Description:
   // This method updates the piece that has been assigned to this process.
@@ -74,8 +69,8 @@ public:
 
   // Description:
   // Accessor to the font size in the sub proxy.
-  void SetFontSize(int size);
-  int GetFontSize();
+  void SetFontSizeCM(int size);
+  int GetFontSizeCM();
   
 protected:
   vtkSMPointLabelDisplayProxy();

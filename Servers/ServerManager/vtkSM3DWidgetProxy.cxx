@@ -14,17 +14,41 @@
 =========================================================================*/
 #include "vtkSM3DWidgetProxy.h"
 
+#include "vtk3DWidget.h"
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVProcessModule.h"
-#include "vtkClientServerStream.h"
 #include "vtkRenderer.h"
-#include "vtkInteractorObserver.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMIntVectorProperty.h"
-//----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.11");
+#include "vtkSMRenderModuleProxy.h"
 
+//----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.12");
+//===========================================================================
+//***************************************************************************
+class vtkSM3DWidgetProxyObserver : public vtkCommand
+{
+public:
+  static vtkSM3DWidgetProxyObserver *New() 
+    {return new vtkSM3DWidgetProxyObserver;};
+
+  vtkSM3DWidgetProxyObserver()
+    {
+      this->Target = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event, void* calldata)
+    {
+      if ( this->Target )
+        {
+        this->Target->ExecuteEvent(wdg, event, calldata);
+        }
+    }
+  vtkSM3DWidgetProxy* Target;
+};
+//***************************************************************************
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
 {
@@ -32,12 +56,45 @@ vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
   this->IgnorePlaceWidgetChanges = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = 0.0;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = 1.0;
+
+  this->Observer = vtkSM3DWidgetProxyObserver::New();
+  this->Observer->Target = this;
+  this->Enabled = 0;
+  this->CurrentRenderModuleProxy = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::~vtkSM3DWidgetProxy()
 {
+  this->Observer->Target = NULL;
+  this->Observer->Delete();
 }
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SetEnabled(int e)
+{ 
+  this->Enabled = e;
+
+  if (!this->CurrentRenderModuleProxy)
+    {
+    return; // widgets are not enabled till rendermodule is set.
+    }
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream str;
+  unsigned int cc;
+  unsigned int numObjects = this->GetNumberOfIDs();
+  for(cc=0;cc < numObjects; cc++)
+    {
+    str << vtkClientServerStream::Invoke << this->GetID(cc)
+      << "SetEnabled" << this->Enabled << vtkClientServerStream::End;
+    }
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers,str,0);
+    } 
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
@@ -59,13 +116,14 @@ void vtkSM3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 }
 
 //----------------------------------------------------------------------------
-void vtkSM3DWidgetProxy::InitializeObservers(vtkInteractorObserver* widget3D) 
+void vtkSM3DWidgetProxy::InitializeObservers(vtk3DWidget* wdg) 
 {
-  this->Superclass::InitializeObservers(widget3D);
-  if (widget3D)
+  if(wdg)
     {
-    widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
-      reinterpret_cast<vtkCommand*>(this->Observer));
+    wdg->AddObserver(vtkCommand::InteractionEvent, this->Observer);
+    wdg->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
+    wdg->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
+    wdg->AddObserver(vtkCommand::PlaceWidgetEvent, this->Observer);
     }
 }
 
@@ -125,11 +183,21 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+  //Superclass creates the actual VTK objects
   this->Superclass::CreateVTKObjects(numObjects);
+  
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  unsigned int cc;
+  //additional initialization 
+  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+    {
+    vtk3DWidget* widget = vtk3DWidget::SafeDownCast(
+      pm->GetObjectFromID(this->GetID(cc)));
+    this->InitializeObservers(widget);
+    }
 
   vtkClientServerStream stream;
-  for (unsigned int cc=0; cc <this->GetNumberOfIDs(); cc++)
+  for (cc=0; cc <this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke << id
@@ -142,6 +210,94 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
     // this->Bounds have already been initialized to 0,1,0,1,0,1
     pm->SendStream(this->GetServers(), stream);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::ExecuteEvent(vtkObject*, unsigned long event, void*)
+{
+  this->InvokeEvent(vtkCommand::WidgetModifiedEvent);
+  vtkPVGenericRenderWindowInteractor* iren = 0;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (this->CurrentRenderModuleProxy)
+    {
+    iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      pm->GetObjectFromID( 
+        this->GetInteractorProxy(this->CurrentRenderModuleProxy)->GetID(0)));
+    }
+  if ( event == vtkCommand::StartInteractionEvent && iren)
+    {
+    iren->InteractiveRenderEnabledOn();
+    }
+  else if ( event == vtkCommand::EndInteractionEvent && iren)
+    {
+    this->UpdateVTKObjects();
+    iren->InteractiveRenderEnabledOff();
+    }
+  else if ( event == vtkCommand::PlaceWidgetEvent )
+    {
+    this->InvokeEvent(vtkCommand::PlaceWidgetEvent);
+    }
+  else
+    {
+    // So the the client object changes are sent over to the Servers
+    this->UpdateVTKObjects();
+    }
+
+  if (iren)
+    {
+    iren->Render();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SetCurrentRenderer(vtkSMProxy *renderer)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID null = {0 };
+  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+    {
+    stream << vtkClientServerStream::Invoke << this->GetID(cc)
+           << "SetCurrentRenderer" 
+           << ( (renderer)? renderer->GetID(0) : null )
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SetInteractor(vtkSMProxy* interactor)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID null = {0 };
+  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+    {
+    stream << vtkClientServerStream::Invoke << this->GetID(cc)
+           << "SetInteractor" 
+           << ((interactor)? interactor->GetID(0) : null)
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
+    } 
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SetCurrentRenderModuleProxy(
+  vtkSMRenderModuleProxy* rm)
+{
+  if (this->CurrentRenderModuleProxy && rm != this->CurrentRenderModuleProxy
+    && rm)
+    {
+    vtkErrorMacro("CurrentRenderModuleProxy already set.");
+    return;
+    }
+  this->CurrentRenderModuleProxy = rm;
+  // since enabling is delayed until CurrentRenderModule is set,
+  // we must update the widget enable state once rendermodule is set.
+  // if rm==NULL, this will automatically disable the 3D widget.
+  this->SetEnabled(this->Enabled);
 }
 
 //----------------------------------------------------------------------------
@@ -162,7 +318,7 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << "  $pvTemp" << id.ID << " UnRegister {}" << endl;
 
     *file << "  [$pvTemp" << id.ID << " GetProperty IgnorePlaceWidgetChanges]"
-      << " SetElements1 1" << endl;
+      << " SetElements1 0" << endl;
     for(int i=0;i < 6; i++)
       {
       *file << "  [$pvTemp" << id.ID << " GetProperty PlaceWidget] "
@@ -196,7 +352,9 @@ void vtkSM3DWidgetProxy::SaveState(const char* name, ostream* file,
 void vtkSM3DWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  
-  os << indent << "IgnorePlaceWidgetChanges: " 
-    << this->IgnorePlaceWidgetChanges << endl;
+  os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "CurrentRenderModuleProxy: " << 
+    this->CurrentRenderModuleProxy << endl;  
+  os << indent << "IgnorePlaceWidgetChanges: " << 
+    this->IgnorePlaceWidgetChanges << endl;
 }

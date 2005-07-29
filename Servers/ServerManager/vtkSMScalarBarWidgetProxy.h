@@ -37,13 +37,16 @@ public:
   // widget on the client.
   virtual void SetVisibility(int visible);
   vtkGetMacro(Visibility, int);
- 
-  virtual void SaveInBatchScript(ofstream* file);
-  
+
   // Description:
   // Called when the display is added/removed to/from a RenderModule.
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
+
+  // Description:
+  // Save the proxy in batch.
+  virtual void SaveInBatchScript(ofstream* file);
+  
 protected:
 //BTX
   vtkSMScalarBarWidgetProxy();

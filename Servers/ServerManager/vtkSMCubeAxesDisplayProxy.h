@@ -21,7 +21,7 @@
 #define __vtkSMCubeAxesDisplayProxy_h
 
 
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMConsumerDisplayProxy.h"
 
 class vtkDataSet;
 class vtkPVDataInformation;
@@ -33,11 +33,11 @@ class vtkUnstructuredGrid;
 class vtkSMRenderModuleProxy;
 
 
-class VTK_EXPORT vtkSMCubeAxesDisplayProxy : public vtkSMDisplayProxy
+class VTK_EXPORT vtkSMCubeAxesDisplayProxy : public vtkSMConsumerDisplayProxy
 {
 public:
   static vtkSMCubeAxesDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMCubeAxesDisplayProxy, vtkSMDisplayProxy);
+  vtkTypeRevisionMacro(vtkSMCubeAxesDisplayProxy, vtkSMConsumerDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,7 +48,7 @@ public:
   // Description:
   // Called when setting input using the Input property.
   // Internally calls SetInput.
-  void AddInput(vtkSMSourceProxy* input, const char*, int);
+  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
 
   // Description:
   // Connects the parts data to the plot actor.

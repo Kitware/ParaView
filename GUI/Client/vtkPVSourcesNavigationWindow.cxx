@@ -13,25 +13,26 @@
 
 =========================================================================*/
 #include "vtkPVSourcesNavigationWindow.h"
-#include "vtkPVConfig.h"
-#include "vtkProperty.h"
+
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWScrollbar.h"
 #include "vtkObjectFactory.h"
+#include "vtkProperty.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
-#include "vtkSMDisplayProxy.h"
-#include "vtkPVWindow.h"
+#include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVWindow.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
 #include <stdarg.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.30");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.31");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -193,16 +194,16 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
   // Representation
   this->PopupMenu->AddSeparator();
   var = this->PopupMenu->CreateRadioButtonVariable(this, "Representation");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::OUTLINE, "Outline", var, 
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::OUTLINE, "Outline", var, 
       this, "PopupOutlineRepresentationCallback",
       "Outline is edges of the bounding box.");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::SURFACE, "Surface", var,
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::SURFACE, "Surface", var,
       this, "PopupSurfaceRepresentationCallback",
       "Only external (non shared) faces of cells are displayed.");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::WIREFRAME, "Wireframe of Surface", var,
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::WIREFRAME, "Wireframe of Surface", var,
       this, "PopupWireframeRepresentationCallback",
       "Wirefrace of surface (non shared) faces.");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::POINTS, "Points of Surface", var,
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::POINTS, "Points of Surface", var,
       this, "PopupPointsRepresentationCallback",
       "Points of surface (non shared) faces.");
   delete [] var;
@@ -210,10 +211,10 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
   // Interpolation
   this->PopupMenu->AddSeparator();
   var = this->PopupMenu->CreateRadioButtonVariable(this, "Interpolation");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::FLAT, "Flat", var, 
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::FLAT, "Flat", var, 
                                   this, "PopupFlatInterpolationCallback",
                                   "Flat shading makes the surfaace look faceted.");
-  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::GOURAND, "Gouraud", var,
+  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::GOURAND, "Gouraud", var,
       this, "PopupGouraudInterpolationCallback",
       "When the data has normals, Gouraud shading make the surface look smooth.");
   delete [] var;
@@ -341,7 +342,7 @@ void vtkPVSourcesNavigationWindow::PopupVisibilityCallback()
 void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetInterpolationCM(
-    vtkSMDisplayProxy::FLAT);
+    vtkSMDataObjectDisplayProxy::FLAT);
   this->PopupModule->UpdateProperties(); 
     // so that DisplayGUI also shows
    // the correect interpolation/representation.
@@ -351,7 +352,7 @@ void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()
 void vtkPVSourcesNavigationWindow::PopupGouraudInterpolationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetInterpolationCM(
-    vtkSMDisplayProxy::GOURAND);
+    vtkSMDataObjectDisplayProxy::GOURAND);
   this->PopupModule->UpdateProperties();
     // so that DisplayGUI also shows
    // the correect interpolation/representation.
@@ -361,7 +362,7 @@ void vtkPVSourcesNavigationWindow::PopupGouraudInterpolationCallback()
 void vtkPVSourcesNavigationWindow::PopupOutlineRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
-    vtkSMDisplayProxy::OUTLINE);
+    vtkSMDataObjectDisplayProxy::OUTLINE);
   this->PopupModule->UpdateProperties();
     // so that DisplayGUI also shows
    // the correect interpolation/representation.
@@ -371,7 +372,7 @@ void vtkPVSourcesNavigationWindow::PopupOutlineRepresentationCallback()
 void vtkPVSourcesNavigationWindow::PopupSurfaceRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
-    vtkSMDisplayProxy::SURFACE);
+    vtkSMDataObjectDisplayProxy::SURFACE);
   this->PopupModule->UpdateProperties();
     // so that DisplayGUI also shows
    // the correect interpolation/representation.
@@ -381,7 +382,7 @@ void vtkPVSourcesNavigationWindow::PopupSurfaceRepresentationCallback()
 void vtkPVSourcesNavigationWindow::PopupWireframeRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
-    vtkSMDisplayProxy::WIREFRAME);
+    vtkSMDataObjectDisplayProxy::WIREFRAME);
   this->PopupModule->UpdateProperties();
     // so that DisplayGUI also shows
    // the correect interpolation/representation.
@@ -391,7 +392,7 @@ void vtkPVSourcesNavigationWindow::PopupWireframeRepresentationCallback()
 void vtkPVSourcesNavigationWindow::PopupPointsRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
-    vtkSMDisplayProxy::POINTS);
+    vtkSMDataObjectDisplayProxy::POINTS);
   this->PopupModule->UpdateProperties();
     // so that DisplayGUI also shows
    // the correect interpolation/representation.

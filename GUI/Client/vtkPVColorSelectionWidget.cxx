@@ -16,16 +16,16 @@
 #include "vtkPVColorSelectionWidget.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVSource.h"
 #include "vtkKWMenu.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
+#include "vtkPVSource.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -67,10 +67,10 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
   vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
   vtkPVDataSetAttributesInformation* attrInfo = dataInfo->
     GetPointDataInformation();
-  this->AddArray(attrInfo, vtkSMDisplayProxy::POINT_FIELD_DATA);
+  this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
   
   attrInfo = dataInfo->GetCellDataInformation();
-  this->AddArray(attrInfo, vtkSMDisplayProxy::CELL_FIELD_DATA);
+  this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
 }
 
 //-----------------------------------------------------------------------------
@@ -116,13 +116,13 @@ int vtkPVColorSelectionWidget::FormLabel(vtkPVArrayInformation* arrayInfo,
     vtkErrorMacro("Invalid arrayinfo.");
     return 0;
     }
-  if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
-    field != vtkSMDisplayProxy::CELL_FIELD_DATA)
+  if (field != vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA &&
+    field != vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
     {
     vtkErrorMacro("Field  must be POINT_FIELD_DATA or CELL_FIELD_DATA.");
     return 0;
     } 
-  const char* pre_text = (field == vtkSMDisplayProxy::POINT_FIELD_DATA)?
+  const char* pre_text = (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)?
     "Point" : "Cell";
   int numComps = arrayInfo->GetNumberOfComponents();
   if (numComps > 1)
@@ -144,10 +144,10 @@ void vtkPVColorSelectionWidget::SetValue(const char* arrayname, int field)
   vtkPVDataSetAttributesInformation* attrInfo;
   switch(field)
     {
-  case vtkSMDisplayProxy::POINT_FIELD_DATA:
+  case vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA:
     attrInfo = dataInfo->GetPointDataInformation();
     break;
-  case vtkSMDisplayProxy::CELL_FIELD_DATA:
+  case vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA:
     attrInfo = dataInfo->GetCellDataInformation();
     break;
   default:

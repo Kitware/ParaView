@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSimpleDisplayProxy.h
+  Module:    vtkSMDataObjectDisplayProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,34 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSimpleDisplayProxy - a simple display proxy.
+// .NAME vtkSMDataObjectDisplayProxy - a simple display proxy.
 // .SECTION Description
-// vtkSMSimpleDisplayProxy is a sink for display objects. 
+// vtkSMDataObjectDisplayProxy is a sink for display objects. 
 // This is the superclass for objects that display PVParts.
 // Not meant to be used directly, although this implements the simplest
-// serial display with no LOD.
+// serial display with no LOD. This class has a bunch of 
+// "convenience methods" (method names appended with CM). These methods
+// do the equivalent of getting the property by the name and
+// setting/getting its value. They are there to simplify using the property
+// interface for display objects. When adding a method to the proxies
+// that merely sets some property on the proxy, make sure to append the method
+// name with "CM" - implying it's a convenience method. That way, one knows
+// its purpose and will not be confused with a update-self property method.
 
-#ifndef __vtkSMSimpleDisplayProxy_h
-#define __vtkSMSimpleDisplayProxy_h
+#ifndef __vtkSMDataObjectDisplayProxy_h
+#define __vtkSMDataObjectDisplayProxy_h
 
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMConsumerDisplayProxy.h"
 class vtkSMProxy;
 class vtkPVDataInformation;
 class vtkPVArrayInformation;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMSimpleDisplayProxy : public vtkSMDisplayProxy
+class VTK_EXPORT vtkSMDataObjectDisplayProxy : public vtkSMConsumerDisplayProxy
 {
 public:
-  static vtkSMSimpleDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMSimpleDisplayProxy, vtkSMDisplayProxy);
+  static vtkSMDataObjectDisplayProxy* New();
+  vtkTypeRevisionMacro(vtkSMDataObjectDisplayProxy, vtkSMConsumerDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,7 +53,7 @@ public:
 
   // Description:
   // Connect the VTK data object to display pipeline.
-  virtual void SetInput(vtkSMProxy* input);
+  void SetInput(vtkSMProxy* input);
   
   // Description:
   // This method calls a ForceUpdate on the UpdateSuppressor
@@ -64,6 +71,12 @@ public:
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
+  // Description:
+  // Get information about the geometry.
+  // Some displays (like Scalar bar, 3DWidgets), may return NULL.
+  virtual vtkPVGeometryInformation* GetGeometryInformation();
+  
+  
   // Description:
   // Set the representation for this display.
   virtual void SetRepresentation(int representation);
@@ -94,14 +107,14 @@ public:
   // Description:
   // Convenience methods for switching between volume
   // mappers.
-  void SetVolumeMapperToBunyk();
-  void SetVolumeMapperToPT();
-  void SetVolumeMapperToZSweep();
+  void SetVolumeMapperToBunykCM();
+  void SetVolumeMapperToPTCM();
+  void SetVolumeMapperToZSweepCM();
   
   // Description:
   // Convenience method for determining which
   // volume mapper is in use
-  virtual int GetVolumeMapperType();
+  virtual int GetVolumeMapperTypeCM();
   
   // Description:
   // This method will set the subproxy GeometryFilterProxy
@@ -115,11 +128,133 @@ public:
   // Overridden to clean up cached geometry as well. 
   virtual void MarkConsumersAsModified(); 
 
-protected:
-  vtkSMSimpleDisplayProxy();
-  ~vtkSMSimpleDisplayProxy();
+  //BTX
+  // Interpolation types.
+  enum {FLAT=0, GOURAND, PHONG};
+  // Scalar mode types.
+  enum {DEFAULT=0, POINT_DATA, CELL_DATA, POINT_FIELD_DATA, CELL_FIELD_DATA};
+  // Representation types.
+  enum {POINTS=0, WIREFRAME, SURFACE,  OUTLINE, VOLUME};
+  // Volume mapper types.
+  enum 
+  {
+    PROJECTED_TETRA_VOLUME_MAPPER =0,
+    ZSWEEP_VOLUME_MAPPER,
+    BUNYK_RAY_CAST_VOLUME_MAPPER,
+    UNKNOWN_VOLUME_MAPPER
+  };
+  //ETX
+  
+  // Description:
+  // Convenience method to get/set the Interpolation for this proxy.
+  int GetInterpolationCM();
+  void SetInterpolationCM(int interpolation);
 
-  virtual void SetInputInternal(vtkSMSourceProxy* input);
+  // Description:
+  // Convenience method to get/set Point Size.
+  void SetPointSizeCM(double size);
+  double GetPointSizeCM();
+
+  // Description:
+  // Convenience method to get/set Line Width.
+  void SetLineWidthCM(double width);
+  double GetLineWidthCM();
+
+  // Description:
+  // Convenience method to get/set Scalar Mode.
+  void SetScalarModeCM(int  mode);
+  int GetScalarModeCM();
+
+  // Description:
+  // Convenience method to get/set ScalarArray (Volume Mapper).
+  void SetScalarArrayCM(const char* arrayname);
+  const char* GetScalarArrayCM();
+
+  // Description:
+  // Convenience method to get/set Opacity.
+  void SetOpacityCM(double op);
+  double GetOpacityCM();
+
+  // Description:
+  // Convenience method to get/set ColorMode.
+  void SetColorModeCM(int mode);
+  int GetColorModeCM();
+
+  // Description:
+  // Convenience method to get/set Actor color.
+  void SetColorCM(double rgb[3]);
+  void GetColorCM(double rgb[3]);
+  void SetColorCM(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->SetColorCM(rgb);
+    }
+    
+    
+  // Description:
+  // Convenience method to get/set InterpolateColorsBeforeMapping property.
+  void SetInterpolateScalarsBeforeMappingCM(int flag);
+  int GetInterpolateScalarsBeforeMappingCM();
+
+  // Description:
+  // Convenience method to get/set ScalarVisibility property.
+  void SetScalarVisibilityCM(int);
+  int GetScalarVisibilityCM();
+
+  // Description:
+  // Convenience method to get/set Position property.
+  void SetPositionCM(double pos[3]);
+  void GetPositionCM(double pos[3]);
+  void SetPositionCM(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->SetPositionCM(rgb);
+    }
+
+  // Description:
+  // Convenience method to get/set Scale property.
+  void SetScaleCM(double scale[3]);
+  void GetScaleCM(double scale[3]);
+  void SetScaleCM(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->SetScaleCM(rgb);
+    } 
+   
+  // Description:
+  // Convenience method to get/set Orientation property.
+  void SetOrientationCM(double orientation[3]);
+  void GetOrientationCM(double orientation[3]);
+  void SetOrientationCM(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->SetOrientationCM(rgb);
+    }
+
+  // Description
+  // Convenience method to get/set Origin property.
+  void GetOriginCM(double origin[3]);
+  void SetOriginCM(double origin[3]);
+  void SetOriginCM(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->SetOriginCM(rgb);
+    }
+
+  // Description:
+  // Convenience method to get/set Representation.
+  void SetRepresentationCM(int r);
+  int GetRepresentationCM();
+
+  // Description:
+  // Convenience method to get/set ImmediateModeRendering property.
+  void SetImmediateModeRenderingCM(int f);
+  int GetImmediateModeRenderingCM();
+protected:
+  vtkSMDataObjectDisplayProxy();
+  ~vtkSMDataObjectDisplayProxy();
+
+  void SetInputInternal(vtkSMSourceProxy* input);
 
   void ResetTransferFunctions(vtkPVDataInformation* dataInfo,
     vtkPVArrayInformation* arrayInfo);
@@ -190,10 +325,13 @@ protected:
   int VolumeGeometryIsValid;
   int CanCreateProxy;
 
+  int GeometryInformationIsValid;
+  vtkPVGeometryInformation* GeometryInformation;
+
   void InvalidateGeometryInternal();
 private:
-  vtkSMSimpleDisplayProxy(const vtkSMSimpleDisplayProxy&); // Not implemented.
-  void operator=(const vtkSMSimpleDisplayProxy&); // Not implemented.
+  vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
+  void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.
 };
 
 
