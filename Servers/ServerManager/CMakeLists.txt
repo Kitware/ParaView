@@ -220,6 +220,7 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
+  ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )
 
 ADD_CUSTOM_COMMAND(

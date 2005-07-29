@@ -375,6 +375,7 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
+  ${PARAVIEW_EXTRA_GUI_RESOURCES}
   )
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
