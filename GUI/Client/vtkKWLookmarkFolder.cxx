@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.27");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -282,12 +282,17 @@ void vtkKWLookmarkFolder::DragAndDropEndCallback(int, int)
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::SetSelectionState(int flag)
 {
-  this->Checkbox->SetSelectedState(flag);
+  // if this is a macros folder don't let it be selected
+  if(!this->MacroFlag)
+    {
+    this->Checkbox->SetSelectedState(flag);
+    }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWLookmarkFolder::GetSelectionState()
 {
+  
   return this->Checkbox->GetSelectedState();
 }
 

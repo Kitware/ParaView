@@ -96,6 +96,7 @@
 #include "vtkRenderer.h"
 #include "vtkVectorIterator.txx"
 #include "vtkImageClip.h"
+#include <vtkstd/string>
 #include "vtkStdString.h"
 #include "vtkPVTraceHelper.h"
 
@@ -118,7 +119,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.56");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1660,16 +1661,28 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
   vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType j,numLmks, numFolders;
+  const char *nameAttribute;
 
   if(!strcmp("LmkFolder",lmkElement->GetName()))
     {
+    nameAttribute = lmkElement->GetAttribute("Name");
+    // if its a macros folder and we already have one, don't create but visit its children, passing as the parent the currrent macros folder packing frame
+    if(nameAttribute && !strcmp(nameAttribute,"Macros") && this->GetMacrosFolder())
+      {     
+      for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+        {
+        ImportInternal(j,lmkElement->GetNestedElement(j),this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
+        }
+      return;
+      }
+
     lmkFolderWidget = vtkKWLookmarkFolder::New();
     lmkFolderWidget->SetParent(parent);
-    if(lmkElement->GetAttribute("Name") && !strcmp(lmkElement->GetAttribute("Name"),"Macros"))
+    if(nameAttribute && !strcmp(nameAttribute,"Macros") )
       {
       lmkFolderWidget->SetMacroFlag(1);
       }
- //   lmkFolderWidget->SetParent(this->LmkScrollFrame->GetFrame());
+//   lmkFolderWidget->SetParent(this->LmkScrollFrame->GetFrame());
     lmkFolderWidget->Create(this->GetPVApplication());
     char methodAndArg[200];
     sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
@@ -1680,7 +1693,7 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
 
     numFolders = this->LmkFolderWidgets->GetNumberOfItems();
     this->LmkFolderWidgets->InsertItem(numFolders,lmkFolderWidget);
-    
+
     // use the label frame of this lmk container as the parent frame in which to pack into (constant)
     // for each xml element (either lookmark or lookmark container) recursively call import with the appropriate location and vtkXMLDataElement
     for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
@@ -2112,7 +2125,11 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
     it->GoToNextItem();
     }
   it->Delete();
-  ds.erase(ds.find_last_of(';',ds.size()));
+  int ret = ds.find_last_of(';',ds.size());
+  if(ret != vtkstd::string::npos)
+    {
+    ds.erase(ret);
+    }
   newLookmark->SetDataset(ds.c_str());
   newLookmark->CreateDatasetList();
   newLookmark->StoreStateScript();
@@ -2122,7 +2139,14 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 
   // since the direct children of the LmkListingFrame will always be either lmk widgets or containers
   // counting them will give us the appropriate location to assign the new lmk:
-  indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame());
+  if(macroFlag)
+    {
+    indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
+    }
+  else
+    {
+    indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame());
+    }
   newLookmark->SetLocation(indexOfNewLmkWidget);
   newLookmark->CreateIconFromMainView();
 
