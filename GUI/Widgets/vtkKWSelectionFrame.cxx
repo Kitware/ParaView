@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.44");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.45");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -286,6 +286,7 @@ vtkKWToolbarSet* vtkKWSelectionFrame::GetToolbarSet()
     this->ToolbarSet->BottomSeparatorVisibilityOff();
     this->ToolbarSet->Create(this->GetApplication());
     this->Pack();
+    this->UpdateEnableState();
     }
 
   return this->ToolbarSet;
@@ -304,6 +305,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetTitleBarUserFrame()
     this->TitleBarUserFrame->SetParent(this->TitleBarFrame);
     this->TitleBarUserFrame->Create(this->GetApplication());
     this->Pack();
+    this->UpdateEnableState();
     }
 
   return this->TitleBarUserFrame;
@@ -322,6 +324,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetLeftUserFrame()
     this->LeftUserFrame->SetParent(this->OuterSelectionFrame);
     this->LeftUserFrame->Create(this->GetApplication());
     this->Pack();
+    this->UpdateEnableState();
     }
 
   return this->LeftUserFrame;
@@ -340,6 +343,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetRightUserFrame()
     this->RightUserFrame->SetParent(this->OuterSelectionFrame);
     this->RightUserFrame->Create(this->GetApplication());
     this->Pack();
+    this->UpdateEnableState();
     }
 
   return this->RightUserFrame;
