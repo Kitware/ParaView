@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.43");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.44");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -44,13 +44,16 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
   this->Internals             = new vtkKWSelectionFrameInternals;
 
-  this->TitleBar              = vtkKWFrame::New();
+  this->OuterSelectionFrame   = vtkKWFrame::New();
+  this->TitleBarFrame         = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
   this->CloseButton           = vtkKWPushButton::New();
-  this->ToolbarSet            = vtkKWToolbarSet::New();
-  this->TitleBarRightSubframe = vtkKWFrame::New();
   this->BodyFrame             = vtkKWFrame::New();
+  this->ToolbarSet            = NULL;
+  this->LeftUserFrame         = NULL;
+  this->RightUserFrame        = NULL;
+  this->TitleBarUserFrame     = NULL;
 
   this->CloseCommand          = NULL;
   this->SelectionListCommand  = NULL;
@@ -70,15 +73,27 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBackgroundColor[1]         = 0.6;
   this->TitleBackgroundColor[2]         = 0.6;
 
-  this->TitleBackgroundSelectedColor[0] = 0.0;
-  this->TitleBackgroundSelectedColor[1] = 0.0;
-  this->TitleBackgroundSelectedColor[2] = 0.5;
+  this->TitleSelectedBackgroundColor[0] = 0.0;
+  this->TitleSelectedBackgroundColor[1] = 0.0;
+  this->TitleSelectedBackgroundColor[2] = 0.5;
 
-  this->Selected           = 0;
+  this->OuterSelectionFrameColor[0]     = 0.6;
+  this->OuterSelectionFrameColor[1]     = 0.6;
+  this->OuterSelectionFrameColor[2]     = 0.6;
+
+  this->OuterSelectionFrameSelectedColor[0] = 1.0;
+  this->OuterSelectionFrameSelectedColor[1] = 0.93;
+  this->OuterSelectionFrameSelectedColor[2] = 0.79;
+
+  this->Selected                 = 0;
+  this->TitleBarVisibility       = 1;
   this->SelectionListVisibility  = 1;
-  this->AllowClose       = 0;
-  this->AllowChangeTitle = 0;
+  this->AllowClose               = 1;
+  this->AllowChangeTitle         = 1;
   this->ToolbarSetVisibility     = 0;
+  this->LeftUserFrameVisibility  = 0;
+  this->RightUserFrameVisibility = 0;
+  this->OuterSelectionFrameWidth = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -88,10 +103,16 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 
   delete this->Internals;
 
-  if (this->TitleBar)
+  if (this->OuterSelectionFrame)
     {
-    this->TitleBar->Delete();
-    this->TitleBar = NULL;
+    this->OuterSelectionFrame->Delete();
+    this->OuterSelectionFrame = NULL;
+    }
+
+  if (this->TitleBarFrame)
+    {
+    this->TitleBarFrame->Delete();
+    this->TitleBarFrame = NULL;
     }
 
   if (this->Title)
@@ -112,16 +133,28 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     this->CloseButton = NULL;
     }
 
-  if (this->TitleBarRightSubframe)
+  if (this->TitleBarUserFrame)
     {
-    this->TitleBarRightSubframe->Delete();
-    this->TitleBarRightSubframe = NULL;
+    this->TitleBarUserFrame->Delete();
+    this->TitleBarUserFrame = NULL;
     }
 
   if (this->ToolbarSet)
     {
     this->ToolbarSet->Delete();
     this->ToolbarSet = NULL;
+    }
+
+  if (this->LeftUserFrame)
+    {
+    this->LeftUserFrame->Delete();
+    this->LeftUserFrame = NULL;
+    }
+
+  if (this->RightUserFrame)
+    {
+    this->RightUserFrame->Delete();
+    this->RightUserFrame = NULL;
     }
 
   if (this->BodyFrame)
@@ -179,21 +212,30 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   this->SetBorderWidth(1);
   this->SetReliefToRidge();
 
+  // The outer selection frame
+
+  this->OuterSelectionFrame->SetParent(this);
+  this->OuterSelectionFrame->Create(app);
+  this->OuterSelectionFrame->SetReliefToFlat();
+  this->OuterSelectionFrame->SetBorderWidth(this->OuterSelectionFrameWidth);
+
+  vtkKWWidget *parent = this->OuterSelectionFrame;
+
   // The title bar
 
-  this->TitleBar->SetParent(this);
-  this->TitleBar->Create(app);
+  this->TitleBarFrame->SetParent(parent);
+  this->TitleBarFrame->Create(app);
 
   // The selection button
 
-  this->SelectionList->SetParent(this->TitleBar);
+  this->SelectionList->SetParent(parent);
   this->SelectionList->Create(app);
   this->SelectionList->IndicatorVisibilityOff();
   this->SelectionList->SetImageToPredefinedIcon(vtkKWIcon::IconExpand);
 
   // The close button
 
-  this->CloseButton->SetParent(this->TitleBar);
+  this->CloseButton->SetParent(parent);
   this->CloseButton->Create(app);
   this->CloseButton->SetImageToPredefinedIcon(vtkKWIcon::IconShrink);
   this->CloseButton->SetCommand(this, "CloseCallback");
@@ -201,26 +243,15 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   // The title itself
 
-  this->Title->SetParent(this->TitleBar);
+  this->Title->SetParent(this->TitleBarFrame);
   this->Title->Create(app);
   this->Title->SetJustificationToLeft();
   this->Title->SetAnchorToWest();
   this->Title->SetText("<Click to Select>");
   
-  // The subframe on the right
-
-  this->TitleBarRightSubframe->SetParent(this->TitleBar);
-  this->TitleBarRightSubframe->Create(app);
-
-  // The toobar
-
-  this->ToolbarSet->SetParent(this);
-  this->ToolbarSet->BottomSeparatorVisibilityOff();
-  this->ToolbarSet->Create(app);
-
   // The body frame
 
-  this->BodyFrame->SetParent(this);
+  this->BodyFrame->SetParent(parent);
   this->BodyFrame->Create(app);
   this->BodyFrame->SetBackgroundColor(0.0, 0.0, 0.0);
 
@@ -228,9 +259,9 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   this->Pack();
 
-  // Update colors
+  // Update aspect
 
-  this->UpdateColors();
+  this->UpdateSelectedAspect();
   
   // Bind
 
@@ -239,6 +270,79 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+vtkKWToolbarSet* vtkKWSelectionFrame::GetToolbarSet()
+{
+  if (!this->ToolbarSet)
+    {
+    this->ToolbarSet = vtkKWToolbarSet::New();
+    }
+
+  if (!this->ToolbarSet->IsCreated() && this->IsCreated())
+    {
+    this->ToolbarSet->SetParent(this->OuterSelectionFrame);
+    this->ToolbarSet->BottomSeparatorVisibilityOff();
+    this->ToolbarSet->Create(this->GetApplication());
+    this->Pack();
+    }
+
+  return this->ToolbarSet;
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWSelectionFrame::GetTitleBarUserFrame()
+{
+  if (!this->TitleBarUserFrame)
+    {
+    this->TitleBarUserFrame = vtkKWFrame::New();
+    }
+
+  if (!this->TitleBarUserFrame->IsCreated() && this->IsCreated())
+    {
+    this->TitleBarUserFrame->SetParent(this->TitleBarFrame);
+    this->TitleBarUserFrame->Create(this->GetApplication());
+    this->Pack();
+    }
+
+  return this->TitleBarUserFrame;
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWSelectionFrame::GetLeftUserFrame()
+{
+  if (!this->LeftUserFrame)
+    {
+    this->LeftUserFrame = vtkKWFrame::New();
+    }
+
+  if (!this->LeftUserFrame->IsCreated() && this->IsCreated())
+    {
+    this->LeftUserFrame->SetParent(this->OuterSelectionFrame);
+    this->LeftUserFrame->Create(this->GetApplication());
+    this->Pack();
+    }
+
+  return this->LeftUserFrame;
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWSelectionFrame::GetRightUserFrame()
+{
+  if (!this->RightUserFrame)
+    {
+    this->RightUserFrame = vtkKWFrame::New();
+    }
+
+  if (!this->RightUserFrame->IsCreated() && this->IsCreated())
+    {
+    this->RightUserFrame->SetParent(this->OuterSelectionFrame);
+    this->RightUserFrame->Create(this->GetApplication());
+    this->Pack();
+    }
+
+  return this->RightUserFrame;
 }
 
 //----------------------------------------------------------------------------
@@ -253,17 +357,48 @@ void vtkKWSelectionFrame::Pack()
 
   ostrstream tk_cmd;
 
-  if (this->TitleBar->IsCreated())
+  int has_list     = this->SelectionListVisibility;
+  int has_close    = this->AllowClose;
+  int has_titlebar = this->TitleBarVisibility;
+  int has_toolbar  = this->ToolbarSetVisibility;
+
+  int need_left = this->LeftUserFrameVisibility || 
+    (this->SelectionListVisibility && !TitleBarVisibility);
+
+  int need_right = this->RightUserFrameVisibility || 
+    (this->AllowClose && !TitleBarVisibility);
+
+  vtkKWWidget *parent = this->OuterSelectionFrame;
+
+  tk_cmd 
+    << "pack " << this->OuterSelectionFrame->GetWidgetName()
+    << " -expand y -fill both -padx 0 -pady 0 -ipadx 0 -ipady 0" << endl;
+
+  if (has_titlebar && this->TitleBarFrame->IsCreated())
     {
-    this->TitleBar->UnpackChildren();
-    tk_cmd << "pack " << this->TitleBar->GetWidgetName()
-           << " -side top -fill x -expand n" << endl;
+    this->TitleBarFrame->UnpackChildren();
+    tk_cmd 
+      << "grid " << this->TitleBarFrame->GetWidgetName()
+      << " -column " << (need_left && has_list ? 1 : 0)
+      << " -columnspan " 
+      << (1+(need_left && has_list ? 0 : 1)+(need_right && has_close ? 0 : 1))
+      << " -row 0 -ipadx 1 -ipady 1 -sticky news" << endl;
     }
 
   if (this->SelectionListVisibility && this->SelectionList->IsCreated())
     {
-    tk_cmd << "pack " << this->SelectionList->GetWidgetName()
-           << " -side left -anchor w -fill y -padx 1 -pady 1" << endl;
+    if (need_left)
+      {
+      tk_cmd << "grid " << this->SelectionList->GetWidgetName()
+             << " -column 0 -row 0 -sticky news -ipadx 1 -ipady 1"
+             << " -in " << parent->GetWidgetName() << endl;
+      }
+    else
+      {
+      tk_cmd << "pack " << this->SelectionList->GetWidgetName()
+             << " -side left -anchor w -fill y -ipadx 1 -ipady 1"
+             << " -in " << this->TitleBarFrame->GetWidgetName() << endl;
+      }
     }
 
   if (this->Title->IsCreated())
@@ -272,30 +407,81 @@ void vtkKWSelectionFrame::Pack()
            << " -side left -anchor w -fill x -expand y" << endl;
     }
   
-  if (this->TitleBarRightSubframe->IsCreated())
+  if (this->TitleBarUserFrame && this->TitleBarUserFrame->IsCreated())
     {
-    tk_cmd << "pack " << this->TitleBarRightSubframe->GetWidgetName()
+    tk_cmd << "pack " << this->TitleBarUserFrame->GetWidgetName()
            << " -side left -anchor e -padx 2 -fill x -expand n" << endl;
     }
   
   if (this->AllowClose && this->CloseButton->IsCreated())
     {
-    tk_cmd << "pack " << this->CloseButton->GetWidgetName()
-           << " -side left -anchor e -fill y -padx 1 -pady 1 ";
-    tk_cmd << endl;
+    if (need_right)
+      {
+      tk_cmd << "grid " << this->CloseButton->GetWidgetName()
+             << " -column 2 -row 0 -sticky news -ipadx 1 -ipady 1"
+             << " -in " << parent->GetWidgetName() << endl;
+      }
+    else
+      {
+      tk_cmd << "pack " << this->CloseButton->GetWidgetName()
+             << " -side left -anchor e -fill y -ipadx 1 -ipady 1 "
+             << " -in " << this->TitleBarFrame->GetWidgetName() << endl;
+      }
     }
 
-  if (this->ToolbarSetVisibility && this->ToolbarSet->IsCreated())
+  if (has_toolbar && this->ToolbarSet && this->ToolbarSet->IsCreated())
     {
-    tk_cmd << "pack " << this->ToolbarSet->GetWidgetName()
-           << " -side top -fill x -expand no -padx 1 -pady 1" << endl;
+    tk_cmd 
+      << "grid " << this->ToolbarSet->GetWidgetName()
+      << " -column " << (need_left && has_list ? 1 : 0)
+      << " -columnspan " 
+      << (1+(need_left && has_list ? 0 : 1)+(need_right && has_close ? 0 : 1))
+      << " -row " << (has_titlebar ? 1 : 0)
+      << " -sticky news -padx 0 -pady 0" << endl;
     this->ToolbarSet->Pack();
+    }
+
+  for (int i = 0; i < 2; i++)
+    {
+    tk_cmd << "grid columnconfig " << parent->GetWidgetName() << " " << i 
+           << " -weight 0" << endl;
+    tk_cmd << "grid rowconfig " << parent->GetWidgetName() << " " << i 
+           << " -weight 0" << endl;
+    }
+
+  if (this->LeftUserFrameVisibility && 
+      this->LeftUserFrame && this->LeftUserFrame->IsCreated())
+    {
+    tk_cmd << "grid " << this->LeftUserFrame->GetWidgetName()
+           << " -column 0 " << " -row " << (has_titlebar || has_list ? 1 : 0)
+           << " -rowspan 3 -sticky news -padx 0 -pady 0" << endl;
     }
 
   if (this->BodyFrame->IsCreated())
     {
-    tk_cmd << "pack " << this->BodyFrame->GetWidgetName()
-           << " -side top -fill both -expand yes" << endl;
+    int row = ((has_titlebar ? 1 : 0) + (has_toolbar ? 1 : 0));
+
+    tk_cmd 
+      << "grid " << this->BodyFrame->GetWidgetName()
+      << " -column " << (need_left ? 1 : 0)
+      << " -columnspan "  << (1 + (need_left ? 0 : 1) + (need_right ? 0 : 1))
+      << " -row " << row << " -rowspan 3 -sticky news -padx 0 -pady 0" << endl;
+    tk_cmd << "grid columnconfig " << parent->GetWidgetName() << " " 
+           << (need_left ? 1 : 0) << " -weight 1" << endl;
+    if (row == 0 && !has_titlebar && !has_toolbar && (has_list || has_close))
+      {
+      row++; // we do not want to expand the row that has the buttons
+      }
+    tk_cmd << "grid rowconfig " << parent->GetWidgetName() << " " 
+           << row << " -weight 1" << endl;
+    }
+
+  if (this->RightUserFrameVisibility && 
+      this->RightUserFrame && this->RightUserFrame->IsCreated())
+    {
+    tk_cmd << "grid " << this->RightUserFrame->GetWidgetName()
+           << " -column 2 " << " -row " << (has_titlebar || has_close ? 1 : 0)
+           << " -rowspan 3 -sticky news -padx 0 -pady 0" << endl;
     }
 
   tk_cmd << ends;
@@ -311,29 +497,41 @@ void vtkKWSelectionFrame::Bind()
     return;
     }
 
-  ostrstream tk_cmd;
-
-  const int nb_widgets = 4;
-  vtkKWWidget *widgets[nb_widgets] = 
+  vtkKWWidget *widgets_b[] = 
     {
-      this->TitleBar,
+      this->OuterSelectionFrame,
+      this->TitleBarFrame,
+      this->Title,
       this->SelectionList,
+      this->CloseButton,
+      this->BodyFrame,
       this->ToolbarSet,
+      this->LeftUserFrame,
+      this->RightUserFrame,
+      this->TitleBarUserFrame
+    };
+  vtkKWWidget *widgets_db[] = 
+    {
+      this->OuterSelectionFrame,
+      this->TitleBarFrame,
       this->Title
     };
       
-  for (int i = 0; i < nb_widgets; i++)
+  size_t i;
+  for (i = 0; i < (sizeof(widgets_b) / sizeof(widgets_b[0])); i++)
     {
-    if (widgets[i] && widgets[i]->IsCreated())
+    if (widgets_b[i])
       {
-      widgets[i]->SetBinding("<ButtonPress-1>", this, "SelectCallback");
-      widgets[i]->SetBinding("<Double-1>", this, "DoubleClickCallback");
+      widgets_b[i]->SetBinding("<ButtonPress-1>", this, "SelectCallback");
       }
     }
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
+  for (i = 0; i < (sizeof(widgets_db) / sizeof(widgets_db[0])); i++)
+    {
+    if (widgets_db[i])
+      {
+      widgets_db[i]->SetBinding("<Double-1>", this, "DoubleClickCallback");
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -344,29 +542,42 @@ void vtkKWSelectionFrame::UnBind()
     return;
     }
 
-  ostrstream tk_cmd;
 
-  const int nb_widgets = 4;
-  vtkKWWidget *widgets[nb_widgets] = 
+  vtkKWWidget *widgets_b[] = 
     {
-      this->TitleBar,
+      this->OuterSelectionFrame,
+      this->TitleBarFrame,
+      this->Title,
       this->SelectionList,
+      this->CloseButton,
+      this->BodyFrame,
       this->ToolbarSet,
+      this->LeftUserFrame,
+      this->RightUserFrame,
+      this->TitleBarUserFrame
+    };
+  vtkKWWidget *widgets_db[] = 
+    {
+      this->OuterSelectionFrame,
+      this->TitleBarFrame,
       this->Title
     };
       
-  for (int i = 0; i < nb_widgets; i++)
+  size_t i;
+  for (i = 0; i < (sizeof(widgets_b) / sizeof(widgets_b[0])); i++)
     {
-    if (widgets[i] && widgets[i]->IsCreated())
+    if (widgets_b[i])
       {
-      widgets[i]->RemoveBinding("<ButtonPress-1>");
-      widgets[i]->RemoveBinding("<Double-1>");
+      widgets_b[i]->RemoveBinding("<ButtonPress-1>");
       }
     }
-  
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
+  for (i = 0; i < (sizeof(widgets_db) / sizeof(widgets_db[0])); i++)
+    {
+    if (widgets_db[i])
+      {
+      widgets_db[i]->RemoveBinding("<Double-1>");
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -405,7 +616,7 @@ void vtkKWSelectionFrame::SetTitleColor(
   if (this->SetColor(this->TitleColor, r, g, b))
     {
     this->Modified();
-    this->UpdateColors();
+    this->UpdateSelectedAspect();
     }
 }
 
@@ -416,7 +627,7 @@ void vtkKWSelectionFrame::SetTitleSelectedColor(
   if (this->SetColor(this->TitleSelectedColor, r, g, b))
     {
     this->Modified();
-    this->UpdateColors();
+    this->UpdateSelectedAspect();
     }
 }
 
@@ -427,19 +638,55 @@ void vtkKWSelectionFrame::SetTitleBackgroundColor(
   if (this->SetColor(this->TitleBackgroundColor, r, g, b))
     {
     this->Modified();
-    this->UpdateColors();
+    this->UpdateSelectedAspect();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetTitleBackgroundSelectedColor(
+void vtkKWSelectionFrame::SetTitleSelectedBackgroundColor(
   double r, double g, double b)
 {
-  if (this->SetColor(this->TitleBackgroundSelectedColor, r, g, b))
+  if (this->SetColor(this->TitleSelectedBackgroundColor, r, g, b))
     {
     this->Modified();
-    this->UpdateColors();
+    this->UpdateSelectedAspect();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetOuterSelectionFrameColor(
+  double r, double g, double b)
+{
+  if (this->SetColor(this->OuterSelectionFrameColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateSelectedAspect();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetOuterSelectionFrameSelectedColor(
+  double r, double g, double b)
+{
+  if (this->SetColor(this->OuterSelectionFrameSelectedColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateSelectedAspect();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetOuterSelectionFrameWidth(int arg)
+{
+  if (this->OuterSelectionFrameWidth == arg)
+    {
+    return;
+    }
+
+  this->OuterSelectionFrameWidth = arg;
+
+  this->Modified();
+  this->UpdateSelectedAspect();
 }
 
 //----------------------------------------------------------------------------
@@ -453,7 +700,7 @@ void vtkKWSelectionFrame::SetSelected(int arg)
   this->Selected = arg;
 
   this->Modified();
-  this->UpdateColors();
+  this->UpdateSelectedAspect();
 }
 
 //----------------------------------------------------------------------------
@@ -514,37 +761,90 @@ void vtkKWSelectionFrame::SetToolbarSetVisibility(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::UpdateColors()
+void vtkKWSelectionFrame::SetLeftUserFrameVisibility(int arg)
+{
+  if (this->LeftUserFrameVisibility == arg)
+    {
+    return;
+    }
+
+  this->LeftUserFrameVisibility = arg;
+
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetRightUserFrameVisibility(int arg)
+{
+  if (this->RightUserFrameVisibility == arg)
+    {
+    return;
+    }
+
+  this->RightUserFrameVisibility = arg;
+
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleBarVisibility(int arg)
+{
+  if (this->TitleBarVisibility == arg)
+    {
+    return;
+    }
+
+  this->TitleBarVisibility = arg;
+
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::UpdateSelectedAspect()
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  double *fgcolor, *bgcolor;
+  double *title_fgcolor, *title_bgcolor, *selection_frame_bgcolor;
 
   if (this->Selected)
     {
-    fgcolor = this->TitleSelectedColor;
-    bgcolor = this->TitleBackgroundSelectedColor;
+    title_fgcolor = this->TitleSelectedColor;
+    title_bgcolor = this->TitleSelectedBackgroundColor;
+    selection_frame_bgcolor = this->OuterSelectionFrameSelectedColor;
     }
   else
     {
-    fgcolor = this->TitleColor;
-    bgcolor = this->TitleBackgroundColor;
+    title_fgcolor = this->TitleColor;
+    title_bgcolor = this->TitleBackgroundColor;
+    selection_frame_bgcolor = this->OuterSelectionFrameColor;
     }
 
-  this->TitleBar->SetBackgroundColor(
-    bgcolor[0], bgcolor[1], bgcolor[2]);
+  this->TitleBarFrame->SetBackgroundColor(
+    title_bgcolor[0], title_bgcolor[1], title_bgcolor[2]);
 
   this->Title->SetBackgroundColor(
-    bgcolor[0], bgcolor[1], bgcolor[2]);
+    title_bgcolor[0], title_bgcolor[1], title_bgcolor[2]);
 
   this->Title->SetForegroundColor(
-    fgcolor[0], fgcolor[1], fgcolor[2]);
+    title_fgcolor[0], title_fgcolor[1], title_fgcolor[2]);
 
-  this->TitleBarRightSubframe->SetBackgroundColor(
-    bgcolor[0], bgcolor[1], bgcolor[2]);
+  if (this->TitleBarUserFrame)
+    {
+    this->TitleBarUserFrame->SetBackgroundColor(
+      title_bgcolor[0], title_bgcolor[1], title_bgcolor[2]);
+    }
+
+  if (this->OuterSelectionFrame)
+    {
+    this->OuterSelectionFrame->SetBackgroundColor(selection_frame_bgcolor);
+    this->OuterSelectionFrame->SetBorderWidth(this->OuterSelectionFrameWidth);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -709,12 +1009,15 @@ void vtkKWSelectionFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->TitleBar);
+  this->PropagateEnableState(this->OuterSelectionFrame);
+  this->PropagateEnableState(this->TitleBarFrame);
   this->PropagateEnableState(this->SelectionList);
   this->PropagateEnableState(this->CloseButton);
   this->PropagateEnableState(this->Title);
-  this->PropagateEnableState(this->TitleBarRightSubframe);
+  this->PropagateEnableState(this->TitleBarUserFrame);
   this->PropagateEnableState(this->ToolbarSet);
+  this->PropagateEnableState(this->LeftUserFrame);
+  this->PropagateEnableState(this->RightUserFrame);
   this->PropagateEnableState(this->BodyFrame);
 
   if (this->SelectionList &&
@@ -740,11 +1043,13 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   
   os << indent << "BodyFrame: " << this->BodyFrame << endl;
-  os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
+  os << indent << "TitleBarUserFrame: " << this->TitleBarUserFrame
      << endl;
   os << indent << "SelectionList: " << this->SelectionList << endl;
   os << indent << "CloseButton: " << this->CloseButton << endl;
   os << indent << "ToolbarSet: " << this->ToolbarSet << endl;
+  os << indent << "LeftUserFrame: " << this->LeftUserFrame << endl;
+  os << indent << "RightUserFrame: " << this->RightUserFrame << endl;
   os << indent << "TitleColor: ("
      << this->TitleColor[0] << ", " 
      << this->TitleColor[1] << ", " 
@@ -757,14 +1062,22 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundColor[0] << ", " 
      << this->TitleBackgroundColor[1] << ", " 
      << this->TitleBackgroundColor[2] << ")" << endl;
-  os << indent << "TitleBackgroundSelectedColor: ("
-     << this->TitleBackgroundSelectedColor[0] << ", " 
-     << this->TitleBackgroundSelectedColor[1] << ", " 
-     << this->TitleBackgroundSelectedColor[2] << ")" << endl;
+  os << indent << "TitleSelectedBackgroundColor: ("
+     << this->TitleSelectedBackgroundColor[0] << ", " 
+     << this->TitleSelectedBackgroundColor[1] << ", " 
+     << this->TitleSelectedBackgroundColor[2] << ")" << endl;
+  os << indent << "OuterSelectionFrameColor: ("
+     << this->OuterSelectionFrameColor[0] << ", " 
+     << this->OuterSelectionFrameColor[1] << ", " 
+     << this->OuterSelectionFrameColor[2] << ")" << endl;
   os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
   os << indent << "SelectionListVisibility: " << (this->SelectionListVisibility ? "On" : "Off") << endl;
   os << indent << "AllowClose: " << (this->AllowClose ? "On" : "Off") << endl;
   os << indent << "AllowChangeTitle: " << (this->AllowChangeTitle ? "On" : "Off") << endl;
   os << indent << "ToolbarSetVisibility: " << (this->ToolbarSetVisibility ? "On" : "Off") << endl;
+  os << indent << "LeftUserFrameVisibility: " << (this->LeftUserFrameVisibility ? "On" : "Off") << endl;
+  os << indent << "RightUserFrameVisibility: " << (this->RightUserFrameVisibility ? "On" : "Off") << endl;
+  os << indent << "TitleBarVisibility: " << (this->TitleBarVisibility ? "On" : "Off") << endl;
+  os << indent << "OuterSelectionFrameWidth: " << this->OuterSelectionFrameWidth << endl;
 }
 

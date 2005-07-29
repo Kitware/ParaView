@@ -53,14 +53,13 @@ public:
 
   // Description:
   // Set the selection list (array of num strings) and the command
-  // that will be called when a selection is made by the user. 
-  // This command will be passed both the selected string and 
+  // that is called when a selection is made by the user. 
+  // This command is passed both the selected string and 
   // a pointer to this object.
   // The selection list is represented as a pull down menu, which
   // visibility can be set.
   virtual void SetSelectionList(int num, const char **list);
-  virtual void SetSelectionListCommand(
-    vtkObject *object, const char *method);
+  virtual void SetSelectionListCommand(vtkObject *object, const char *method);
   vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
   virtual void SetSelectionListVisibility(int);
   vtkGetMacro(SelectionListVisibility, int);
@@ -72,62 +71,118 @@ public:
   // and a "Close" entry is added to the end of the selection list.
   // Set the close command, called when the the close button or the menu entry
   // is selected by the user.
-  // This command will be passed a pointer to this object.
+  // This command is passed a pointer to this object.
   virtual void SetAllowClose(int);
   vtkGetMacro(AllowClose, int);
   vtkBooleanMacro(AllowClose, int);
-  virtual void SetCloseCommand(
-    vtkObject *object, const char *method);
+  virtual void SetCloseCommand(vtkObject *object, const char *method);
   vtkGetObjectMacro(CloseButton, vtkKWPushButton);
 
   // Description:
   // Allow title to be changed (menu entry)
   // If set, a "Change title" entry is added to the end of the selection list.
-  // Set the command, called when the menu entry is selected by the user.
-  // This command will be passed a pointer to this object.
+  // Set the command called when the menu entry is selected by the user.
+  // This command is passed a pointer to this object.
   virtual void SetAllowChangeTitle(int);
   vtkGetMacro(AllowChangeTitle, int);
   vtkBooleanMacro(AllowChangeTitle, int);
-  virtual void SetChangeTitleCommand(
-    vtkObject *object, const char *method);
+  virtual void SetChangeTitleCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Set the select command, called when the frame is selected by the user
+  // Set the command called when the frame title is selected by the user
   // (click in title bar).
-  // the double-click command is called when the frame title is double-clicked
-  // (note that it will also invoke the select command, since the first
-  // click acts as a select event).
-  // This command will be passed a pointer to this object.
+  // This command is passed a pointer to this object.
   virtual void SetSelectCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Set the command called when the frame title is double-clicked on.
+  // Note that this will also invoke the SelectCommand, since the first
+  // click acts as a select event.
+  // This command is passed a pointer to this object.
   virtual void SetDoubleClickCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 
   // selected mode). 
   vtkGetVector3Macro(TitleColor, double);
-  vtkGetVector3Macro(TitleSelectedColor, double);
-  vtkGetVector3Macro(TitleBackgroundColor, double);
-  vtkGetVector3Macro(TitleBackgroundSelectedColor, double);
   virtual void SetTitleColor(double r, double g, double b);
   virtual void SetTitleColor(double rgb[3])
     { this->SetTitleColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(TitleSelectedColor, double);
   virtual void SetTitleSelectedColor(double r, double g, double b);
   virtual void SetTitleSelectedColor(double rgb[3])
     { this->SetTitleSelectedColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(TitleBackgroundColor, double);
   virtual void SetTitleBackgroundColor(double r, double g, double b);
   virtual void SetTitleBackgroundColor(double rgb[3])
     { this->SetTitleBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void SetTitleBackgroundSelectedColor(double r, double g, double b);
-  virtual void SetTitleBackgroundSelectedColor(double rgb[3])
-    { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(TitleSelectedBackgroundColor, double);
+  virtual void SetTitleSelectedBackgroundColor(double r, double g, double b);
+  virtual void SetTitleSelectedBackgroundColor(double rgb[3])
+    { this->SetTitleSelectedBackgroundColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Set/Get the toolbar set visibility.
-  vtkGetObjectMacro(ToolbarSet, vtkKWToolbarSet);
+  // Set/Get the title bar visibility.
+  virtual void SetTitleBarVisibility(int);
+  vtkGetMacro(TitleBarVisibility, int);
+  vtkBooleanMacro(TitleBarVisibility, int);
+
+  // Description:
+  // Set/Get the toolbar set visibility, and retrieve the toolbar set.
+  // The toolbar set is usually displayed below the title bar
+  virtual vtkKWToolbarSet* GetToolbarSet();
   virtual void SetToolbarSetVisibility(int);
   vtkGetMacro(ToolbarSetVisibility, int);
   vtkBooleanMacro(ToolbarSetVisibility, int);
 
+  // Description:
+  // Retrieve the title bar user frame. This frame sits in the title
+  // bar, on the right side of the title itself, and be used to insert
+  // user-defined UI elements. It is not visible if TitleBarVisibility
+  // is Off.
+  virtual vtkKWFrame* GetTitleBarUserFrame();
+
+  // Description:
+  // Retrieve the body frame. This is the main frame, below the title bar,
+  // where to pack the real contents of whatever that object is supposed\
+  // to display (say, a render widget).
+  vtkGetObjectMacro(BodyFrame, vtkKWFrame);
+  
+  // Description:
+  // Set/Get the left user frame visibility, and retrieve the frame.
+  // The left user frame is displayed on the left side of the BodyFrame.
+  virtual vtkKWFrame* GetLeftUserFrame();
+  virtual void SetLeftUserFrameVisibility(int);
+  vtkGetMacro(LeftUserFrameVisibility, int);
+  vtkBooleanMacro(LeftUserFrameVisibility, int);
+
+  // Description:
+  // Set/Get the left user frame visibility, and retrieve the frame.
+  // The left user frame is displayed on the left side of the BodyFrame.
+  virtual vtkKWFrame* GetRightUserFrame();
+  virtual void SetRightUserFrameVisibility(int);
+  vtkGetMacro(RightUserFrameVisibility, int);
+  vtkBooleanMacro(RightUserFrameVisibility, int);
+
+  // Description:
+  // Set/Get the outer selection frame width and color. The outer selection
+  // frame is a thin frame around the whole widget which color is changed
+  // when the widget is selected. This is useful, for example, when the
+  // title bar is not visible (the title bar color also changes when the
+  // widget is selected). Set the widget of the selection frame to 0 to
+  // discard this feature. Colors can be customized.
+  virtual void SetOuterSelectionFrameWidth(int);
+  vtkGetMacro(OuterSelectionFrameWidth, int);
+  vtkGetVector3Macro(OuterSelectionFrameColor, double);
+  virtual void SetOuterSelectionFrameColor(double r, double g, double b);
+  virtual void SetOuterSelectionFrameColor(double rgb[3])
+    { this->SetOuterSelectionFrameColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(OuterSelectionFrameSelectedColor, double);
+  virtual void SetOuterSelectionFrameSelectedColor(
+    double r, double g, double b);
+  virtual void SetOuterSelectionFrameSelectedColor(double rgb[3])
+    { this->SetOuterSelectionFrameSelectedColor(rgb[0], rgb[1], rgb[2]); };
+  
   // Description:
   // Callbacks
   virtual void CloseCallback();
@@ -145,21 +200,15 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  // Description:
-  // Access to sub-widgets
-  vtkGetObjectMacro(TitleBarRightSubframe, vtkKWFrame);
-  vtkGetObjectMacro(BodyFrame, vtkKWFrame);
-  
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();
   
-  vtkKWFrame      *TitleBar;
+  vtkKWFrame      *OuterSelectionFrame;
+  vtkKWFrame      *TitleBarFrame;
   vtkKWMenuButton *SelectionList;
   vtkKWPushButton *CloseButton;
-  vtkKWToolbarSet *ToolbarSet;
   vtkKWLabel      *Title;
-  vtkKWFrame      *TitleBarRightSubframe;
   vtkKWFrame      *BodyFrame;
 
   virtual void Pack();
@@ -167,13 +216,16 @@ protected:
   virtual void UnBind();
 
   virtual int SetColor(double *color, double r, double g, double b);
-  virtual void UpdateColors();
+  virtual void UpdateSelectedAspect();
   virtual void UpdateSelectionList();
 
   double TitleColor[3];
   double TitleSelectedColor[3];
   double TitleBackgroundColor[3];
-  double TitleBackgroundSelectedColor[3];
+  double TitleSelectedBackgroundColor[3];
+
+  double OuterSelectionFrameColor[3];
+  double OuterSelectionFrameSelectedColor[3];
 
   char *CloseCommand;
   char *SelectionListCommand;
@@ -186,12 +238,22 @@ protected:
   int AllowClose;
   int AllowChangeTitle;
   int ToolbarSetVisibility;
+  int LeftUserFrameVisibility;
+  int RightUserFrameVisibility;
+  int TitleBarVisibility;
+  int OuterSelectionFrameWidth;
 
   // PIMPL Encapsulation for STL containers
 
   vtkKWSelectionFrameInternals *Internals;
 
 private:
+
+  vtkKWToolbarSet *ToolbarSet;
+  vtkKWFrame      *LeftUserFrame;
+  vtkKWFrame      *RightUserFrame;
+  vtkKWFrame      *TitleBarUserFrame;
+
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
   void operator=(const vtkKWSelectionFrame&);  // Not implemented
 };
