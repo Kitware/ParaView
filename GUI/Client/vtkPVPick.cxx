@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.20");
+vtkCxxRevisionMacro(vtkPVPick, "1.21");
 
 
 //----------------------------------------------------------------------------
@@ -109,6 +109,9 @@ void vtkPVPick::AcceptCallbackInternal()
     this->SetPointLabelVisibility(1);
     }
 
+
+  this->PointLabelDisplayProxy->Update();
+  this->PointLabelDisplayProxy->SetVisibilityCM(1);
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
   this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);

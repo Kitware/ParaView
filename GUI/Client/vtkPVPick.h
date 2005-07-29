@@ -61,7 +61,6 @@ protected:
   vtkPVPick();
   ~vtkPVPick();
 
-  vtkSMPointLabelDisplayProxy* PickLabelDisplayProxy;
   vtkKWFrame *DataFrame;
 
   vtkCollection* LabelCollection;
