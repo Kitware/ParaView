@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.88");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.89");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -2085,12 +2085,15 @@ void vtkKWNotebook::UpdateBodyPosition()
 
   if (!this->AreTabsVisible())
     {
+    this->Body->SetBorderWidth(0);
     this->Script("place %s -x 0 -y 0 -relwidth 1.0 -relheight 1.0 -height 0",
                  this->Body->GetWidgetName());
     }
   else
     {
-    // Otherwise get the size of the frame hold the tabs, and place the body
+    this->Body->SetBorderWidth(VTK_KW_NB_TAB_BD);
+
+    // Otherwise get the size of the frame holding the tabs, and place the body
     // right under it, but slightly higher so that the bottom border of the
     // tabs is hidden (which will give the "notebook" look).
 
@@ -2122,7 +2125,7 @@ void vtkKWNotebook::UpdateMaskPosition()
     }
 
   // If the tabs should not be displayed, don't bother about the mask,
-  // just forget it.
+  // just "forget" it.
 
   if (!this->AreTabsVisible())
     {
