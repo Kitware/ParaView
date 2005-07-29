@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.30");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -299,16 +299,19 @@ void vtkKWToolbarSet::PackBottomSeparator()
     return;
     }
 
-  if (this->BottomSeparatorVisibility && this->GetNumberOfVisibleToolbars())
+  if (this->BottomSeparator)
     {
-    this->Script(
-      "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
-      this->BottomSeparator->GetWidgetName(),
-      this->ToolbarsFrame->GetWidgetName());
-    }
-  else
-    {
-    this->BottomSeparator->Unpack();
+    if (this->BottomSeparatorVisibility && this->GetNumberOfVisibleToolbars())
+      {
+      this->Script(
+        "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
+        this->BottomSeparator->GetWidgetName(),
+        this->ToolbarsFrame->GetWidgetName());
+      }
+    else
+      {
+      this->BottomSeparator->Unpack();
+      }
     }
 }
 
@@ -320,16 +323,19 @@ void vtkKWToolbarSet::PackTopSeparator()
     return;
     }
 
-  if (this->TopSeparatorVisibility && this->GetNumberOfVisibleToolbars())
+  if (this->TopSeparator)
     {
-    this->Script(
-      "pack %s -side top -fill x -expand y -padx 0 -pady 2 -before %s",
-      this->TopSeparator->GetWidgetName(),
-      this->ToolbarsFrame->GetWidgetName());
-    }
-  else
-    {
-    this->TopSeparator->Unpack();
+    if (this->TopSeparatorVisibility && this->GetNumberOfVisibleToolbars())
+      {
+      this->Script(
+        "pack %s -side top -fill x -expand y -padx 0 -pady 2 -before %s",
+        this->TopSeparator->GetWidgetName(),
+        this->ToolbarsFrame->GetWidgetName());
+      }
+    else
+      {
+      this->TopSeparator->Unpack();
+      }
     }
 }
 
