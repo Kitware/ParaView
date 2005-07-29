@@ -41,7 +41,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.16");
+vtkCxxRevisionMacro(vtkSMApplication, "1.16.2.1");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -101,41 +101,8 @@ void vtkSMApplication::Initialize()
   this->SetProxyManager(proxyM);
   this->SetApplication(this);
 
-  vtkSMXMLParser* parser = vtkSMXMLParser::New();
-
-  char* init_string;
-
-  init_string =  vtkSMDefaultModulesfiltersGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  init_string =  vtkSMDefaultModulesreadersGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  init_string =  vtkSMDefaultModulessourcesGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  init_string =  vtkSMDefaultModulesutilitiesGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  init_string =  vtkSMDefaultModulesrenderingGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  init_string =  vtkSMDefaultModuleswritersGetInterfaces();
-  parser->Parse(init_string);
-  parser->ProcessConfiguration(proxyM);
-  delete[] init_string;
-
-  parser->Delete();
+  // Load the generated modules
+#include "vtkParaViewIncludeModulesToSMApplication.h"
 
 // //  const char* directory = args->GetValue("--configuration-path");
 //   const char* directory =  "/home/berk/etc/servermanager";
