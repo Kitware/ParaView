@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.34");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.35");
 
 
 //*****************************************************************************
@@ -1455,7 +1455,7 @@ void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, char *fir
   ptr = strtok(NULL,"\r\n");
   while(strstr(ptr,"AppendColorPoint"))
     {
-    sscanf(ptr,"%*s %*s %lf %lf",&fval1,&fval2,&fval3,&fval4);
+    sscanf(ptr,"%lf %lf %lf %lf",&fval1,&fval2,&fval3,&fval4);
     vol->AppendColorPoint(fval1,fval2,fval3,fval4);
     ptr = strtok(NULL,"\r\n");
     }
