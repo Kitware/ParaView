@@ -144,7 +144,7 @@ public:
 
   // Description:
   // Retrieve the body frame. This is the main frame, below the title bar,
-  // where to pack the real contents of whatever that object is supposed\
+  // where to pack the real contents of whatever that object is supposed
   // to display (say, a render widget).
   vtkGetObjectMacro(BodyFrame, vtkKWFrame);
   
