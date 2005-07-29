@@ -308,7 +308,7 @@ MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
     ELSE(${OTHER_TEST})
       MESSAGE(STATUS "Performing Other Test ${OTHER_TEST} - Failed")
       SET(${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
-      WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeError.log 
+      WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log 
         "Performing Other Test ${OTHER_TEST} failed with the following output:\n"
         "${OUTPUT}\n" APPEND)
     ENDIF(${OTHER_TEST})
@@ -390,7 +390,7 @@ ELSE(WINDOWS)
           #MESSAGE("Width with ${HDF5_PRINTF_LL} failed with result: ${HDF5_PRINTF_LL_TEST_RUN}")
         ENDIF(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
       ELSE(HDF5_PRINTF_LL_TEST_COMPILE)
-        WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeError.log
+        WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
           "Test PRINTF_LL_WIDTH for ${HDF5_PRINTF_LL} failed with the following output:\n"
           "${OUTPUT}\n" APPEND)
       ENDIF(HDF5_PRINTF_LL_TEST_COMPILE)
