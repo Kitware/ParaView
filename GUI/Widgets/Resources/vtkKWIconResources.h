@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    connection.png (zlib, base64)
+ *    connection.png (zlib, base64) (image file)
  */
 static const unsigned int  image_connection_width          = 16;
 static const unsigned int  image_connection_height         = 16;
@@ -15,7 +15,7 @@ static const unsigned char image_connection[] =
 
 /* 
  * Resource generated for file:
- *    empty_16x16.png (zlib, base64)
+ *    empty_16x16.png (zlib, base64) (image file)
  */
 static const unsigned int  image_empty_16x16_width          = 16;
 static const unsigned int  image_empty_16x16_height         = 16;
@@ -28,7 +28,7 @@ static const unsigned char image_empty_16x16[] =
 
 /* 
  * Resource generated for file:
- *    error.png (zlib, base64)
+ *    error.png (zlib, base64) (image file)
  */
 static const unsigned int  image_error_width          = 32;
 static const unsigned int  image_error_height         = 32;
@@ -53,7 +53,7 @@ static const unsigned char image_error[] =
 
 /* 
  * Resource generated for file:
- *    error_mini.png (zlib, base64)
+ *    error_mini.png (zlib, base64) (image file)
  */
 static const unsigned int  image_error_mini_width          = 16;
 static const unsigned int  image_error_mini_height         = 16;
@@ -67,7 +67,7 @@ static const unsigned char image_error_mini[] =
 
 /* 
  * Resource generated for file:
- *    error_red_mini.png (zlib, base64)
+ *    error_red_mini.png (zlib, base64) (image file)
  */
 static const unsigned int  image_error_red_mini_width          = 16;
 static const unsigned int  image_error_red_mini_height         = 16;
@@ -81,7 +81,7 @@ static const unsigned char image_error_red_mini[] =
 
 /* 
  * Resource generated for file:
- *    expand.png (zlib, base64)
+ *    expand.png (zlib, base64) (image file)
  */
 static const unsigned int  image_expand_width          = 10;
 static const unsigned int  image_expand_height         = 10;
@@ -95,7 +95,7 @@ static const unsigned char image_expand[] =
 
 /* 
  * Resource generated for file:
- *    folder.png (zlib, base64)
+ *    folder.png (zlib, base64) (image file)
  */
 static const unsigned int  image_folder_width          = 15;
 static const unsigned int  image_folder_height         = 13;
@@ -109,7 +109,7 @@ static const unsigned char image_folder[] =
 
 /* 
  * Resource generated for file:
- *    folder_open.png (zlib, base64)
+ *    folder_open.png (zlib, base64) (image file)
  */
 static const unsigned int  image_folder_open_width          = 16;
 static const unsigned int  image_folder_open_height         = 13;
@@ -123,7 +123,7 @@ static const unsigned char image_folder_open[] =
 
 /* 
  * Resource generated for file:
- *    grid_linear.png (zlib, base64)
+ *    grid_linear.png (zlib, base64) (image file)
  */
 static const unsigned int  image_grid_linear_width          = 16;
 static const unsigned int  image_grid_linear_height         = 16;
@@ -136,7 +136,7 @@ static const unsigned char image_grid_linear[] =
 
 /* 
  * Resource generated for file:
- *    grid_log.png (zlib, base64)
+ *    grid_log.png (zlib, base64) (image file)
  */
 static const unsigned int  image_grid_log_width          = 16;
 static const unsigned int  image_grid_log_height         = 16;
@@ -149,7 +149,7 @@ static const unsigned char image_grid_log[] =
 
 /* 
  * Resource generated for file:
- *    helpbubble.png (zlib, base64)
+ *    helpbubble.png (zlib, base64) (image file)
  */
 static const unsigned int  image_helpbubble_width          = 16;
 static const unsigned int  image_helpbubble_height         = 16;
@@ -164,7 +164,7 @@ static const unsigned char image_helpbubble[] =
 
 /* 
  * Resource generated for file:
- *    info_mini.png (zlib, base64)
+ *    info_mini.png (zlib, base64) (image file)
  */
 static const unsigned int  image_info_mini_width          = 16;
 static const unsigned int  image_info_mini_height         = 16;
@@ -180,7 +180,7 @@ static const unsigned char image_info_mini[] =
 
 /* 
  * Resource generated for file:
- *    lock.png (zlib, base64)
+ *    lock.png (zlib, base64) (image file)
  */
 static const unsigned int  image_lock_width          = 14;
 static const unsigned int  image_lock_height         = 14;
@@ -194,7 +194,7 @@ static const unsigned char image_lock[] =
 
 /* 
  * Resource generated for file:
- *    mag_glass.png (zlib, base64)
+ *    mag_glass.png (zlib, base64) (image file)
  */
 static const unsigned int  image_mag_glass_width          = 16;
 static const unsigned int  image_mag_glass_height         = 16;
@@ -209,7 +209,7 @@ static const unsigned char image_mag_glass[] =
 
 /* 
  * Resource generated for file:
- *    minus.png (zlib, base64)
+ *    minus.png (zlib, base64) (image file)
  */
 static const unsigned int  image_minus_width          = 12;
 static const unsigned int  image_minus_height         = 12;
@@ -224,7 +224,7 @@ static const unsigned char image_minus[] =
 
 /* 
  * Resource generated for file:
- *    move.png (zlib, base64)
+ *    move.png (zlib, base64) (image file)
  */
 static const unsigned int  image_move_width          = 9;
 static const unsigned int  image_move_height         = 9;
@@ -237,7 +237,7 @@ static const unsigned char image_move[] =
 
 /* 
  * Resource generated for file:
- *    move_h.png (zlib, base64)
+ *    move_h.png (zlib, base64) (image file)
  */
 static const unsigned int  image_move_h_width          = 9;
 static const unsigned int  image_move_h_height         = 9;
@@ -250,7 +250,7 @@ static const unsigned char image_move_h[] =
 
 /* 
  * Resource generated for file:
- *    move_v.png (zlib, base64)
+ *    move_v.png (zlib, base64) (image file)
  */
 static const unsigned int  image_move_v_width          = 9;
 static const unsigned int  image_move_v_height         = 9;
@@ -263,7 +263,7 @@ static const unsigned char image_move_v[] =
 
 /* 
  * Resource generated for file:
- *    plus.png (zlib, base64)
+ *    plus.png (zlib, base64) (image file)
  */
 static const unsigned int  image_plus_width          = 12;
 static const unsigned int  image_plus_height         = 12;
@@ -278,7 +278,7 @@ static const unsigned char image_plus[] =
 
 /* 
  * Resource generated for file:
- *    question.png (zlib, base64)
+ *    question.png (zlib, base64) (image file)
  */
 static const unsigned int  image_question_width          = 32;
 static const unsigned int  image_question_height         = 32;
@@ -302,7 +302,7 @@ static const unsigned char image_question[] =
 
 /* 
  * Resource generated for file:
- *    reload.png (zlib, base64)
+ *    reload.png (zlib, base64) (image file)
  */
 static const unsigned int  image_reload_width          = 14;
 static const unsigned int  image_reload_height         = 14;
@@ -316,21 +316,20 @@ static const unsigned char image_reload[] =
 
 /* 
  * Resource generated for file:
- *    shrink.png (zlib, base64)
+ *    shrink.png (zlib, base64) (image file)
  */
 static const unsigned int  image_shrink_width          = 10;
 static const unsigned int  image_shrink_height         = 10;
 static const unsigned int  image_shrink_pixel_size     = 4;
-static const unsigned long image_shrink_length         = 108;
+static const unsigned long image_shrink_length         = 56;
 static const unsigned long image_shrink_decoded_length = 400;
 
 static const unsigned char image_shrink[] = 
-  "eNr7//8/w38iMRB8B+InQBwBxExQHAEV+46kDsQHMS4CcSgUX4SKPUFSF4Ek/gKKYfoikN"
-  "QxAnEYkjxMPUiMkQx1xNpLrD+IChdiMABK75XF";
+  "eNr7//8/w38iMRCAiP/EiKOL4dKLLIdPDTHmkGIeMe4jxb/UwgDCL/cJ";
 
 /* 
  * Resource generated for file:
- *    stopwatch.png (zlib, base64)
+ *    stopwatch.png (zlib, base64) (image file)
  */
 static const unsigned int  image_stopwatch_width          = 16;
 static const unsigned int  image_stopwatch_height         = 16;
@@ -346,7 +345,7 @@ static const unsigned char image_stopwatch[] =
 
 /* 
  * Resource generated for file:
- *    transport_beginning.png (zlib, base64)
+ *    transport_beginning.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_beginning_width          = 16;
 static const unsigned int  image_transport_beginning_height         = 16;
@@ -361,7 +360,7 @@ static const unsigned char image_transport_beginning[] =
 
 /* 
  * Resource generated for file:
- *    transport_end.png (zlib, base64)
+ *    transport_end.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_end_width          = 16;
 static const unsigned int  image_transport_end_height         = 16;
@@ -376,7 +375,7 @@ static const unsigned char image_transport_end[] =
 
 /* 
  * Resource generated for file:
- *    transport_fast_forward.png (zlib, base64)
+ *    transport_fast_forward.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_fast_forward_width          = 16;
 static const unsigned int  image_transport_fast_forward_height         = 16;
@@ -391,7 +390,7 @@ static const unsigned char image_transport_fast_forward[] =
 
 /* 
  * Resource generated for file:
- *    transport_fast_forward_to_key.png (zlib, base64)
+ *    transport_fast_forward_to_key.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_fast_forward_to_key_width          = 16;
 static const unsigned int  image_transport_fast_forward_to_key_height         = 16;
@@ -406,7 +405,7 @@ static const unsigned char image_transport_fast_forward_to_key[] =
 
 /* 
  * Resource generated for file:
- *    transport_loop.png (zlib, base64)
+ *    transport_loop.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_loop_width          = 16;
 static const unsigned int  image_transport_loop_height         = 16;
@@ -422,7 +421,7 @@ static const unsigned char image_transport_loop[] =
 
 /* 
  * Resource generated for file:
- *    transport_pause.png (zlib, base64)
+ *    transport_pause.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_pause_width          = 16;
 static const unsigned int  image_transport_pause_height         = 16;
@@ -436,7 +435,7 @@ static const unsigned char image_transport_pause[] =
 
 /* 
  * Resource generated for file:
- *    transport_play.png (zlib, base64)
+ *    transport_play.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_play_width          = 16;
 static const unsigned int  image_transport_play_height         = 16;
@@ -450,7 +449,7 @@ static const unsigned char image_transport_play[] =
 
 /* 
  * Resource generated for file:
- *    transport_play_to_key.png (zlib, base64)
+ *    transport_play_to_key.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_play_to_key_width          = 16;
 static const unsigned int  image_transport_play_to_key_height         = 16;
@@ -465,7 +464,7 @@ static const unsigned char image_transport_play_to_key[] =
 
 /* 
  * Resource generated for file:
- *    transport_rewind.png (zlib, base64)
+ *    transport_rewind.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_rewind_width          = 16;
 static const unsigned int  image_transport_rewind_height         = 16;
@@ -480,7 +479,7 @@ static const unsigned char image_transport_rewind[] =
 
 /* 
  * Resource generated for file:
- *    transport_rewind_to_key.png (zlib, base64)
+ *    transport_rewind_to_key.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_rewind_to_key_width          = 16;
 static const unsigned int  image_transport_rewind_to_key_height         = 16;
@@ -495,7 +494,7 @@ static const unsigned char image_transport_rewind_to_key[] =
 
 /* 
  * Resource generated for file:
- *    transport_stop.png (zlib, base64)
+ *    transport_stop.png (zlib, base64) (image file)
  */
 static const unsigned int  image_transport_stop_width          = 16;
 static const unsigned int  image_transport_stop_height         = 16;
@@ -508,7 +507,7 @@ static const unsigned char image_transport_stop[] =
 
 /* 
  * Resource generated for file:
- *    trashcan.png (zlib, base64)
+ *    trashcan.png (zlib, base64) (image file)
  */
 static const unsigned int  image_trashcan_width          = 9;
 static const unsigned int  image_trashcan_height         = 10;
@@ -521,7 +520,7 @@ static const unsigned char image_trashcan[] =
 
 /* 
  * Resource generated for file:
- *    tree_close.png (zlib, base64)
+ *    tree_close.png (zlib, base64) (image file)
  */
 static const unsigned int  image_tree_close_width          = 16;
 static const unsigned int  image_tree_close_height         = 16;
@@ -535,7 +534,7 @@ static const unsigned char image_tree_close[] =
 
 /* 
  * Resource generated for file:
- *    tree_open.png (zlib, base64)
+ *    tree_open.png (zlib, base64) (image file)
  */
 static const unsigned int  image_tree_open_width          = 16;
 static const unsigned int  image_tree_open_height         = 16;
@@ -549,7 +548,7 @@ static const unsigned char image_tree_open[] =
 
 /* 
  * Resource generated for file:
- *    warning.png (zlib, base64)
+ *    warning.png (zlib, base64) (image file)
  */
 static const unsigned int  image_warning_width          = 32;
 static const unsigned int  image_warning_height         = 32;
@@ -570,7 +569,7 @@ static const unsigned char image_warning[] =
 
 /* 
  * Resource generated for file:
- *    warning_mini.png (zlib, base64)
+ *    warning_mini.png (zlib, base64) (image file)
  */
 static const unsigned int  image_warning_mini_width          = 16;
 static const unsigned int  image_warning_mini_height         = 16;
@@ -586,7 +585,7 @@ static const unsigned char image_warning_mini[] =
 
 /* 
  * Resource generated for file:
- *    window_level.png (zlib, base64)
+ *    window_level.png (zlib, base64) (image file)
  */
 static const unsigned int  image_window_level_width          = 14;
 static const unsigned int  image_window_level_height         = 14;

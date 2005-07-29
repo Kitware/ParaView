@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    KWWindowLayout1x1.png (zlib, base64)
+ *    KWWindowLayout1x1.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout1x1_width          = 19;
 static const unsigned int  image_KWWindowLayout1x1_height         = 19;
@@ -13,7 +13,7 @@ static const unsigned char image_KWWindowLayout1x1[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout1x1c.png (zlib, base64)
+ *    KWWindowLayout1x1c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout1x1c_width          = 19;
 static const unsigned int  image_KWWindowLayout1x1c_height         = 19;
@@ -26,7 +26,7 @@ static const unsigned char image_KWWindowLayout1x1c[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout1x2.png (zlib, base64)
+ *    KWWindowLayout1x2.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout1x2_width          = 19;
 static const unsigned int  image_KWWindowLayout1x2_height         = 19;
@@ -39,7 +39,7 @@ static const unsigned char image_KWWindowLayout1x2[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout1x2c.png (zlib, base64)
+ *    KWWindowLayout1x2c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout1x2c_width          = 19;
 static const unsigned int  image_KWWindowLayout1x2c_height         = 19;
@@ -52,7 +52,7 @@ static const unsigned char image_KWWindowLayout1x2c[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x1.png (zlib, base64)
+ *    KWWindowLayout2x1.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x1_width          = 19;
 static const unsigned int  image_KWWindowLayout2x1_height         = 19;
@@ -65,7 +65,7 @@ static const unsigned char image_KWWindowLayout2x1[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x1c.png (zlib, base64)
+ *    KWWindowLayout2x1c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x1c_width          = 19;
 static const unsigned int  image_KWWindowLayout2x1c_height         = 19;
@@ -78,7 +78,7 @@ static const unsigned char image_KWWindowLayout2x1c[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x2.png (zlib, base64)
+ *    KWWindowLayout2x2.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x2_width          = 19;
 static const unsigned int  image_KWWindowLayout2x2_height         = 19;
@@ -91,7 +91,7 @@ static const unsigned char image_KWWindowLayout2x2[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x2c.png (zlib, base64)
+ *    KWWindowLayout2x2c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x2c_width          = 19;
 static const unsigned int  image_KWWindowLayout2x2c_height         = 19;
@@ -104,7 +104,7 @@ static const unsigned char image_KWWindowLayout2x2c[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x3.png (zlib, base64)
+ *    KWWindowLayout2x3.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x3_width          = 19;
 static const unsigned int  image_KWWindowLayout2x3_height         = 19;
@@ -117,7 +117,7 @@ static const unsigned char image_KWWindowLayout2x3[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout2x3c.png (zlib, base64)
+ *    KWWindowLayout2x3c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout2x3c_width          = 19;
 static const unsigned int  image_KWWindowLayout2x3c_height         = 19;
@@ -130,7 +130,7 @@ static const unsigned char image_KWWindowLayout2x3c[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout3x2.png (zlib, base64)
+ *    KWWindowLayout3x2.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout3x2_width          = 19;
 static const unsigned int  image_KWWindowLayout3x2_height         = 19;
@@ -143,7 +143,7 @@ static const unsigned char image_KWWindowLayout3x2[] =
 
 /* 
  * Resource generated for file:
- *    KWWindowLayout3x2c.png (zlib, base64)
+ *    KWWindowLayout3x2c.png (zlib, base64) (image file)
  */
 static const unsigned int  image_KWWindowLayout3x2c_width          = 19;
 static const unsigned int  image_KWWindowLayout3x2c_height         = 19;
