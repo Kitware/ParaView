@@ -119,7 +119,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.57");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -2125,7 +2125,7 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
     it->GoToNextItem();
     }
   it->Delete();
-  int ret = ds.find_last_of(';',ds.size());
+  unsigned int ret = ds.find_last_of(';',ds.size());
   if(ret != vtkstd::string::npos)
     {
     ds.erase(ret);
