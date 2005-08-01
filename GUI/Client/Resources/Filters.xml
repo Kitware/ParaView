@@ -698,6 +698,10 @@ The Extract Parts filter operates on any type of data, but its input reader/sour
     <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
+    <LabeledToggle label="Piece Invariant"
+                   trace_name="PieceInvariant"
+                   property="PieceInvariant"
+                   help="Turn this on to remove internal surface between processes. NOTE: Enabling this option might cause multiple executions of the data source because more information is needed to remove internal surfaces."/>
     <Documentation>
 The Extract Surface filter extracts the polygons forming the outer surface of the input data set. The Input menu allows the user to select the data set to which this filter will be applied. This filter operates on any type of data and produces polygonal data as output.
     </Documentation>
@@ -1198,14 +1202,14 @@ The Outline Corners filter generates the corners of a bounding box for the input
 The Part Id Scalars filter assigns a unique scalar value to each part in the input. The input parts must have been collected together either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
-  <Module name="PieceScalars"
+  <Module name="ProcessIdScalars"
           menu_name="Process Id Scalars"
-          root_name="ColorPieces"
+          root_name="PIScalars"
           module_type="Filter"
           multiprocess_support="multiple_processes"
           long_help="This filter uses colors to show how data is partitioned across processes."
           short_help="Generate point scalars from process id.">
-    <Filter class="vtkPieceScalars">
+    <Filter class="vtkProcessIdScalars">
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
