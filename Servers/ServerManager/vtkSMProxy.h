@@ -303,7 +303,6 @@ protected:
   // public interface exposed by vtkSMProxy. Each of these classes
   // use a small subset of protected methods. This should be kept
   // as such.
-  friend class vtkSMDisplayWindowProxy;
   friend class vtkSMProperty;
   friend class vtkSMProxyManager;
   friend class vtkSMInputProperty;
@@ -311,12 +310,6 @@ protected:
   friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
-  friend class vtkSMPartDisplay;
-  friend class vtkSMLODPartDisplay;
-  friend class vtkSMCompositePartDisplay;
-  friend class vtkSMDisplayerProxy;
-  friend class vtkSMPointLabelDisplay;
-  friend class vtkSMPlotDisplay;
 //ETX
 
   // Description:
@@ -355,7 +348,7 @@ protected:
   // proxy->CreateVTKObjects(0);
   // proxy->SetID(0, id1);
   // proxy->SetID(1, id2);
-  void SetID(unsigned int idx, vtkClientServerID id);
+  virtual void SetID(unsigned int idx, vtkClientServerID id);
 
   // Server IDs determine on which server(s) the VTK objects are
   // instantiated. Use the following methods to set/get the server
