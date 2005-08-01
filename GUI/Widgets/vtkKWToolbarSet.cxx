@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.31");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -249,6 +249,9 @@ void vtkKWToolbarSet::Pack()
             this->Internals->PreviousPackInfo += " -before ";
             this->Internals->PreviousPackInfo += next_slave.str();
             }
+          master.rdbuf()->freeze(0);
+          previous_slave.rdbuf()->freeze(0);
+          next_slave.rdbuf()->freeze(0);
           }
         this->Script("pack forget %s", this->GetWidgetName());
         this->Internals->PreviousGridInfo.assign("");
