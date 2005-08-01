@@ -49,6 +49,12 @@ protected:
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
+
+  vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input,
+                                     vtkInformationVector **inputVector);
+
 private:
   vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&); // Not implemented.
   void operator=(const vtkIntegrateFlowThroughSurface&);  // Not implemented.

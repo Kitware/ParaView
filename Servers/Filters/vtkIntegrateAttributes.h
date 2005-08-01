@@ -25,17 +25,19 @@
 #ifndef __vtkIntegrateAttributes_h
 #define __vtkIntegrateAttributes_h
 
-#include "vtkDataSetToUnstructuredGridFilter.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkDataSet;
 class vtkIdList;
+class vtkInformation;
+class vtkInformationVector;
 class vtkDataSetAttributes;
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkIntegrateAttributes : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkIntegrateAttributes : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkIntegrateAttributes,vtkDataSetToUnstructuredGridFilter);
+  vtkTypeRevisionMacro(vtkIntegrateAttributes,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkIntegrateAttributes *New();
   
@@ -45,10 +47,18 @@ protected:
 
   vtkMultiProcessController* Controller;
 
-  // Usual data generation method
-  void Execute();
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
 
-  int CompareIntegrationDimension(int dim);
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
+
+  virtual int FillInputPortInformation(int, vtkInformation*);
+
+  void ExecuteBlock(vtkDataSet* input, vtkUnstructuredGrid* output);
+
+  int CompareIntegrationDimension(vtkDataSet* output, int dim);
   int IntegrationDimension;
 
   // The length, area or volume of the data set.  Computed by Execute;

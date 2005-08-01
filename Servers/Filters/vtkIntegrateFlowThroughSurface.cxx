@@ -15,8 +15,12 @@
 #include "vtkIntegrateFlowThroughSurface.h"
 
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
+#include "vtkHierarchicalDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntegrateAttributes.h"
@@ -26,7 +30,7 @@
 #include "vtkSurfaceVectors.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.2");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.3");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
@@ -60,9 +64,41 @@ int vtkIntegrateFlowThroughSurface::RequestUpdateExtent(
 }
 
 //-----------------------------------------------------------------------------
-int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *vtkNotUsed(request),
-                                   vtkInformationVector **inputVector,
-                                   vtkInformationVector *outputVector)
+vtkDataSet* vtkIntegrateFlowThroughSurface::GenerateSurfaceVectors(
+  vtkDataSet* input, vtkInformationVector **inputVector)
+{
+  vtkDataSet* inputCopy = input->NewInstance();
+  inputCopy->CopyStructure(input);
+  vtkDataArray *vectors = this->GetInputArrayToProcess(0,inputVector);
+  if (vectors == 0)
+    {
+    vtkErrorMacro("Missing Vectors.");
+    inputCopy->Delete();
+    return 0;
+    }
+  inputCopy->GetPointData()->SetVectors(vectors);
+  inputCopy->GetCellData()->AddArray(
+    input->GetCellData()->GetArray("vtkGhostLevels"));
+
+  vtkSurfaceVectors* dot = vtkSurfaceVectors::New();
+  dot->SetInput(inputCopy);
+  dot->SetConstraintModeToPerpendicularScale();
+  dot->Update();
+
+  vtkDataSet* output = dot->GetOutput();
+  vtkDataSet* outputCopy = output->NewInstance();
+  outputCopy->ShallowCopy(output);
+
+  dot->Delete();
+  inputCopy->Delete();
+
+  return outputCopy;
+}
+
+//-----------------------------------------------------------------------------
+int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *request,
+                                                vtkInformationVector **inputVector,
+                                                vtkInformationVector *outputVector)
 {
   // get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
@@ -73,46 +109,69 @@ int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *vtkNotUsed(reque
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkDataSet* inputCopy;
 
-  inputCopy = input->NewInstance();
-  inputCopy->CopyStructure(input);
-  vtkDataArray *vectors = this->GetInputArrayToProcess(0,inputVector);
-  if (vectors == 0)
-    {
-    vtkErrorMacro("Missing Vectors.");
-    inputCopy->Delete();
-    return 1;
-    }
-  inputCopy->GetPointData()->SetVectors(vectors);
-  inputCopy->GetCellData()->AddArray(
-                               input->GetCellData()->GetArray("vtkGhostLevels"));
-
-  vtkSurfaceVectors* dot = vtkSurfaceVectors::New();
-  dot->SetInput(inputCopy);
-  dot->SetConstraintModeToPerpendicularScale();
   vtkIntegrateAttributes* integrate = vtkIntegrateAttributes::New();
-  integrate->SetInput(dot->GetOutput());
-  vtkUnstructuredGrid* integrateOutput = integrate->GetOutput();
-  integrateOutput->Update();
+  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
+    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+  if (hdInput) 
+    {
+    vtkHierarchicalDataSet* hds = vtkHierarchicalDataSet::New();
+    vtkCompositeDataIterator* iter = hdInput->NewIterator();
+    iter->GoToFirstItem();
+    while (!iter->IsDoneWithTraversal())
+      {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (ds)
+        {
+        vtkDataSet* intermData = this->GenerateSurfaceVectors(input, inputVector);
+        hds->SetDataSet(0, hds->GetNumberOfDataSets(0), intermData);
+        intermData->Delete();
+        }
+      iter->GoToNextItem();
+      }
+    iter->Delete();
+    inInfo->Set(vtkCompositeDataSet::COMPOSITE_DATA_SET(), hds);
+    hds->Delete();
+    }
+  else
+    {
+    vtkDataSet* intermData = this->GenerateSurfaceVectors(input, inputVector);
+    if (!intermData)
+      {
+      return 0;
+      }
+    inInfo->Set(vtkDataSet::DATA_OBJECT(), intermData);
+    intermData->Delete();
+    }
 
-  output->CopyStructure(integrateOutput);
-  output->GetPointData()->PassData(integrateOutput->GetPointData());
+  integrate->ProcessRequest(request, inputVector, outputVector);
+
+  if (hdInput) 
+    {
+    inInfo->Set(vtkCompositeDataSet::COMPOSITE_DATA_SET(), hdInput);
+    }
+  else
+    {
+    inInfo->Set(vtkDataObject::DATA_OBJECT(), input);
+    }
+  
   vtkDataArray* flow = output->GetPointData()->GetArray("Perpendicular Scale");
   if (flow)
     {
     flow->SetName("Surface Flow");
     }  
   
-  dot->Delete();
-  dot = 0;
   integrate->Delete();
   integrate = 0;
-  inputCopy->Delete();
-  inputCopy = 0;
 
   return 1;
 }        
+
+//----------------------------------------------------------------------------
+vtkExecutive* vtkIntegrateFlowThroughSurface::CreateDefaultExecutive()
+{
+  return vtkCompositeDataPipeline::New();
+}
 
 //-----------------------------------------------------------------------------
 void vtkIntegrateFlowThroughSurface::PrintSelf(ostream& os, vtkIndent indent)
@@ -122,8 +181,14 @@ void vtkIntegrateFlowThroughSurface::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkIntegrateFlowThroughSurface::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+  int port, vtkInformation* info)
 {
+  if(!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
+            "vtkCompositeDataSet");
   return 1;
 }
