@@ -170,11 +170,12 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         --to "$INTERMEDIATE_DOX_DIR" \
         --relativeto "@DOXYGEN_SOURCE_LOCATIONS_DIR@" \
         @DOXYGEN_SOURCE_LOCATIONS@ || echoexit "Problem converting VTK headers"
-
-    $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
+    if test "x@DOXYGEN_BINARY_LOCATIONS_DIR@" != "x"; then
+      $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
         --relativeto "@DOXYGEN_BINARY_LOCATIONS_DIR@" \
         @DOXYGEN_BINARY_LOCATIONS@ || echoexit "Problem converting VTK headers"
+    fi
 fi
 
 # ----------------------------------------------------------------------------

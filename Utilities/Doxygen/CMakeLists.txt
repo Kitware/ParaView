@@ -1,8 +1,7 @@
 #
 # Build the documentation
 #
-
-INCLUDE (${CMAKE_ROOT}/Modules/Documentation.cmake)
+INCLUDE (Documentation)
 
 IF (BUILD_DOCUMENTATION)
   SET(BUILD_DOXYGEN ON)
@@ -25,7 +24,7 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/GUI/Client\"")
   SET(DOXYGEN_BINARY_LOCATIONS_DIR "${ParaView_BINARY_DIR}")
   SET(DOXYGEN_BINARY_LOCATIONS
-     "\"@ParaView_BINARY_DIR@/GUI/Widgets/Templates\"")
+       "\"${ParaView_BINARY_DIR}/GUI/Widgets/Templates\"")
   SET(DOXYGEN_PARSED_INPUT_DIRS
 " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
  \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
@@ -38,8 +37,6 @@ IF (BUILD_DOCUMENTATION)
 
   SET(DOXYGEN_IGNORE_PREFIX "vtkKW vtkPV vtkSM vtk")
 
-  SET(RM "NOTFOUND")
-
   #
   # Configure the script and the doxyfile, then add target
   #
@@ -48,15 +45,15 @@ IF (BUILD_DOCUMENTATION)
   ENDIF(NOT DOT_PATH)
 
   CONFIGURE_FILE(
-    ${ParaView_SOURCE_DIR}/Utilities/Doxygen/doxyfile.in
-    ${ParaView_BINARY_DIR}/Utilities/Doxygen/doxyfile @ONLY IMMEDIATE)
+    ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/doxyfile @ONLY IMMEDIATE)
 
   CONFIGURE_FILE(
-    ${ParaView_SOURCE_DIR}/Utilities/Doxygen/doc_makeall.sh.in
-    ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.sh @ONLY IMMEDIATE)
+    ${CMAKE_CURRENT_SOURCE_DIR}/doc_makeall.sh.in
+    ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh @ONLY IMMEDIATE)
 
-  ADD_CUSTOM_TARGET(ParaViewDoxygenDoc
+  ADD_CUSTOM_TARGET(${DOXYGEN_PROJECT_NAME}DoxygenDoc
     ${BASH}
-    ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.sh)
+    ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
 
 ENDIF (BUILD_DOCUMENTATION)
