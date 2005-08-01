@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.36");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.37");
 
 
 //*****************************************************************************
@@ -1643,14 +1643,16 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
         ptr = strtok(NULL,"\r\n");
         ptr = strtok(NULL,"\r\n");
         }
-      else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
+      else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)) && !macroFlag)
         {
+        // If this is a macro, don't initialize since the two datasets could be made up of a 
+        // different range of files. 
         ptr = strtok(NULL,"\r\n");
-        sscanf(ptr,ThirdToken_Int,&ival);
-        minMaxWidget->SetMaxValue(ival);
+        sscanf(ptr,ThirdToken_Int,&fval);
+        minMaxWidget->SetMaxValue(fval);
         ptr = strtok(NULL,"\r\n");
-        sscanf(ptr,ThirdToken_Int,&ival);
-        minMaxWidget->SetMinValue(ival);
+        sscanf(ptr,ThirdToken_Int,&fval);
+        minMaxWidget->SetMinValue(fval);
         minMaxWidget->ModifiedCallback();
         ptr = strtok(NULL,"\r\n");
         }
