@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.21");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.22");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -144,6 +144,8 @@ int vtkPVGlyphFilter::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
+  this->BlockOnRatio = 0;
+
   vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
     inputVector[0]->GetInformationObject(0)->Get(
       vtkCompositeDataSet::COMPOSITE_DATA_SET()));
@@ -230,6 +232,11 @@ int vtkPVGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
 //----------------------------------------------------------------------------
 int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
+  if (this->BlockOnRatio == 0)
+    {
+    return 1;
+    }
+
   if (this->InputIsUniformGrid)
     {
     vtkUniformGrid* ug = static_cast<vtkUniformGrid*>(ds);
@@ -237,21 +244,18 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
       {
       return 0;
       }
-    if (this->BlockOnRatio == 0)
-      {
-      return 1;
-      }
-    if (this->BlockNumPts < this->BlockMaxNumPts &&
-        this->BlockPointCounter++ == this->BlockNextPoint)
-      {
-      this->BlockNumPts++;
-      this->BlockNextPoint += static_cast<vtkIdType>(
-        1+2*vtkMath::Random()*this->BlockOnRatio);
-      return 1;
-      }
-    return 0;
     }
-  return 1;
+
+  if (this->BlockNumPts < this->BlockMaxNumPts &&
+      this->BlockPointCounter++ == this->BlockNextPoint)
+    {
+    this->BlockNumPts++;
+    this->BlockNextPoint += static_cast<vtkIdType>(
+      1+2*vtkMath::Random()*this->BlockOnRatio);
+    return 1;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -308,7 +312,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         if (ds->IsA("vtkUniformGrid"))
           {
           this->InputIsUniformGrid = 1;
-        }
+          }
         else
           {
           this->InputIsUniformGrid = 0;
@@ -330,7 +334,10 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         vtkIdType blockMaxNumPts = (vtkIdType)(
           (double)(maxNumPts)*(double)(blockNumPts)/(double)(totalNumPts));
         this->BlockMaxNumPts = (blockMaxNumPts < 1) ? 1 : blockMaxNumPts;
-        this->BlockOnRatio = blockNumPts/this->BlockMaxNumPts;
+        if (this->UseMaskPoints)
+          {
+          this->BlockOnRatio = blockNumPts/this->BlockMaxNumPts;
+          }
         this->BlockPointCounter = 0;
         this->BlockNumPts = 0;
         this->BlockNextPoint = static_cast<vtkIdType>(
