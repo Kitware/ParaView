@@ -78,10 +78,12 @@
 #include "vtkStdString.h"
 #include "vtkKWMenuButton.h"
 #include "vtkPVVolumeAppearanceEditor.h"
+#include "vtkPVThumbWheel.h"
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.37");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.38");
 
 
 //*****************************************************************************
@@ -1481,6 +1483,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
   vtkPVStringEntry *stringEntry;
   vtkPVSelectWidget *selectWidget;
   vtkPVMinMax *minMaxWidget;
+  vtkPVThumbWheel *thumbWheel;
 #ifdef PARAVIEW_USE_EXODUS
   vtkPVBasicDSPFilterWidget *dspWidget;
 #endif
@@ -1637,24 +1640,48 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
         selectionList->ModifiedCallback();
         ptr = strtok(NULL,"\r\n");
         }
-      else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
+      else if((thumbWheel = vtkPVThumbWheel::SafeDownCast(pvWidget)))
         {
-        //  This widget is used
         ptr = strtok(NULL,"\r\n");
+        sscanf(ptr,ThirdToken_Float,&fval);
+        thumbWheel->SetValue(fval);
+        thumbWheel->ModifiedCallback();
         ptr = strtok(NULL,"\r\n");
         }
-      else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)) && !macroFlag)
+      else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
+        {
+        ptr = strtok(NULL,"\r\n");
+        ptr = strtok(NULL,"\r\n");
+
+        /*
+          ptr = strtok(NULL,"\r\n");
+          sscanf(ptr,ThirdToken_WrappedString,sval);
+          stringEntry->SetValue(sval);
+          stringEntry->ModifiedCallback();
+          ptr = strtok(NULL,"\r\n");
+        */
+        }
+      else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
         {
         // If this is a macro, don't initialize since the two datasets could be made up of a 
         // different range of files. 
-        ptr = strtok(NULL,"\r\n");
-        sscanf(ptr,ThirdToken_Int,&fval);
-        minMaxWidget->SetMaxValue(fval);
-        ptr = strtok(NULL,"\r\n");
-        sscanf(ptr,ThirdToken_Int,&fval);
-        minMaxWidget->SetMinValue(fval);
-        minMaxWidget->ModifiedCallback();
-        ptr = strtok(NULL,"\r\n");
+        if(macroFlag)
+          {
+          ptr = strtok(NULL,"\r\n");
+          ptr = strtok(NULL,"\r\n");
+          ptr = strtok(NULL,"\r\n");
+          }
+        else
+          {
+          ptr = strtok(NULL,"\r\n");
+          sscanf(ptr,ThirdToken_Float,&fval);
+          minMaxWidget->SetMaxValue(fval);
+          ptr = strtok(NULL,"\r\n");
+          sscanf(ptr,ThirdToken_Float,&fval);
+          minMaxWidget->SetMinValue(fval);
+          minMaxWidget->ModifiedCallback();
+          ptr = strtok(NULL,"\r\n");
+          }
         }
 #ifdef PARAVIEW_USE_EXODUS
       else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
