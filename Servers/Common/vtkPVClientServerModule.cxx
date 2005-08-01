@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.39");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.40");
 
 
 //----------------------------------------------------------------------------
@@ -791,8 +791,8 @@ int vtkPVClientServerModule::WaitForConnectionOnSocket(vtkSocketCommunicator* co
   int not_abort_connection = 1;
   while ( not_abort_connection )
     {
-    // Wait for 1/2 second
-    res = comm->WaitForConnectionOnSocket(sock, 333);
+    // Wait for 1/100 second
+    res = comm->WaitForConnectionOnSocket(sock, 10);
     if ( res > 0 )
       {
       break;
