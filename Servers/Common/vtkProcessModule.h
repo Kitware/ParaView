@@ -270,7 +270,9 @@ public:
     TreeCompositeStatus,
     DuplicatePDNProcs,
     DuplicatePDNRecLen,
-    DuplicatePDNAllBuffers
+    DuplicatePDNAllBuffers,
+    IntegrateAttrInfo,
+    IntegrateAttrData
   };
 //ETX
 
