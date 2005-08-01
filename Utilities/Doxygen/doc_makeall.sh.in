@@ -32,23 +32,23 @@ export WGET_PROG="@WGET@"              # wget (remote file retrieval)
 # Example: 
 #   PROJECT_NAME=VTK
 #
-export PROJECT_NAME=ParaView
+export PROJECT_NAME=@DOXYGEN_PROJECT_NAME@
 
 # PATH_TO_VTK_DOX_SCRIPTS:
 # Path to the directory holding the Perl scripts used to produce the VTK doc
 # in Doxygen format. You need the VTK source files or a local copy of 
 # these scripts.
 # Example: 
-#   PATH_TO_VTK_DOX_SCRIPTS=@VTK_DOXYGEN_HOME@
+#   PATH_TO_VTK_DOX_SCRIPTS=@CMAKE_CURRENT_SOURCE_DIR@
 #
-export PATH_TO_VTK_DOX_SCRIPTS="@VTK_DOXYGEN_HOME@"
+export PATH_TO_VTK_DOX_SCRIPTS="@DOXYGEN_SOURCE_DIR@"
 
 # SOURCE_DIR:
 # Source directory. The top directory of the source files.
 # Example: 
-#   SOURCE_DIR=@ParaView_SOURCE_DIR@
+#   SOURCE_DIR=@DOXYGEN_PROJECT_SOURCE_DIR@
 #
-export SOURCE_DIR="@ParaView_SOURCE_DIR@"
+export SOURCE_DIR="@DOXYGEN_PROJECT_SOURCE_DIR@"
 
 # REL_PATH_TO_TOP:
 # Relative path from the top directory of the source files to the directory
@@ -67,10 +67,10 @@ export REL_PATH_TO_TOP=.
 # the corresponding line.
 # DOXTEMP might be used to simplify the syntax.
 # Example: 
-#   DOXTEMP=DOXTEMP=@ParaView_BINARY_DIR@/Utilities/Doxygen
+#   DOXTEMP=DOXTEMP=@CMAKE_CURRENT_BINARY_DIR@
 #   INTERMEDIATE_DOX_DIR=$DOXTEMP/dox
 #
-export DOXTEMP="@ParaView_BINARY_DIR@/Utilities/Doxygen"
+export DOXTEMP="@CMAKE_CURRENT_BINARY_DIR@"
 export INTERMEDIATE_DOX_DIR="$DOXTEMP/dox"
 
 # CVSWEB_CHECKOUT, CVSWEB_CHECKOUT_SUFFIX:
@@ -81,8 +81,8 @@ export INTERMEDIATE_DOX_DIR="$DOXTEMP/dox"
 #   CVSWEB_CHECKOUT=http://public.kitware.com/cgi-bin/cvsweb.cgi/~checkout~/VTK
 #   CVSWEB_CHECKOUT_SUFFIX=?cvsroot=CMake
 #
-export CVSWEB_CHECKOUT="http://public.kitware.com/cgi-bin/cvsweb.cgi/~checkout~/ParaView/"
-export CVSWEB_CHECKOUT_SUFFIX="?cvsroot=ParaView"
+export CVSWEB_CHECKOUT="@DOXYGEN_CVSWEB_CHECKOUT@"
+export CVSWEB_CHECKOUT_SUFFIX="@DOXYGEN_CVSWEB_CHECKOUT_SUFFIX@"
 
 # DOXYFILE:
 # Path to the Doxygen configuration file (i.e. doxyfile).
@@ -154,25 +154,27 @@ export VTK_TAGFILE=vtkNightlyDoc.tag
 export VTK_TAGFILE_REMOTE_DIR="http://www.vtk.org/files/nightly"
 export VTK_TAGFILE_DEST_DIR="$DOXTEMP"
 
+echoexit()
+{
+  echo "$1"
+  exit 1
+}
+
+cd "${DOXTEMP}" || echoexit "Cannot find Doxygen output directory: ${DOXTEMP}"
+
 # ----------------------------------------------------------------------------
 # Convert the VTK headers to the Doxygen format.
 
 if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
-        --relativeto "$SOURCE_DIR/$REL_PATH_TO_TOP" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Utilities/Xdmf/vtk" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Common/KWCommon" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/Common" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/Filters" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/ServerManager" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Widgets" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Client"
+        --relativeto "@DOXYGEN_SOURCE_LOCATIONS_DIR@" \
+        @DOXYGEN_SOURCE_LOCATIONS@ || echoexit "Problem converting VTK headers"
 
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
-        --relativeto "@ParaView_BINARY_DIR@" \
-        "@ParaView_BINARY_DIR@/GUI/Widgets/Templates"
+        --relativeto "@DOXYGEN_BINARY_LOCATIONS_DIR@" \
+        @DOXYGEN_BINARY_LOCATIONS@ || echoexit "Problem converting VTK headers"
 fi
 
 # ----------------------------------------------------------------------------
@@ -184,14 +186,8 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         --stop  "$PATH_TO_VTK_DOX_SCRIPTS/doc_index.stop" \
         --store "doc_""$PROJECT_NAME""_index.dox" \
         --to "$INTERMEDIATE_DOX_DIR" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Utilities/Xdmf/vtk" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Common/KWCommon" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/Common" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/Filters" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/ServerManager" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Widgets" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Client" \
-        "@ParaView_BINARY_DIR@/GUI/Widgets/Templates"
+        @DOXYGEN_SOURCE_LOCATIONS@ \
+        @DOXYGEN_BINARY_LOCATIONS@ || echoexit "Problem building full-text index"
 fi
 
 #  # ----------------------------------------------------------------------------
@@ -222,7 +218,7 @@ if test "x$DOWNLOAD_VTK_TAGFILE" == "xON" ; then
                 "$VTK_TAGFILE_REMOTE_DIR/$VTK_TAGFILE.gz" \
                 -O "$VTK_TAGFILE_DEST_DIR/$VTK_TAGFILE.gz"
             if test "x$GZIP_PROG" != "xNOTFOUND" ; then
-                $GZIP_PROG -d "$VTK_TAGFILE_DEST_DIR/$VTK_TAGFILE.gz"
+                $GZIP_PROG -f -d "$VTK_TAGFILE_DEST_DIR/$VTK_TAGFILE.gz"
             fi        
         fi        
     fi
@@ -237,7 +233,7 @@ if test "x$DOXYGEN_PROG" != "xNOTFOUND" ; then
         $RM_PROG -fr "$OUTPUT_DIRECTORY"
     fi
 
-    $DOXYGEN_PROG "$DOXYFILE"
+    $DOXYGEN_PROG "$DOXYFILE" || echoexit "Problem running doxygen"
 fi
 
 # ----------------------------------------------------------------------------
@@ -246,7 +242,7 @@ fi
 if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_rmpath.pl" \
         --to "$INTERMEDIATE_DOX_DIR" \
-        --html "$OUTPUT_DIRECTORY/html"
+        --html "$OUTPUT_DIRECTORY/html" || echoexit "Problem cleaning HTML pages"
 fi
 
 # ----------------------------------------------------------------------------
@@ -256,7 +252,7 @@ if test "x$COMPILE_HTML_HELP" == "xON" ; then
     if test "x$RESULTING_HTML_HELP_FILE" != "x" ; then
         cd "$OUTPUT_DIRECTORY/html"
         if test "x$HHC_PROG" != "xNOTFOUND" ; then
-            $HHC_PROG index.hhp
+            $HHC_PROG index.hhp || echoexit "Problem generating CHM"
             if test "x$MV_PROG" != "xNOTFOUND" ; then
                 $MV_PROG -f index.chm "$RESULTING_HTML_HELP_FILE"
             fi

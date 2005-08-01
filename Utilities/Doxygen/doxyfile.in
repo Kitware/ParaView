@@ -1,9 +1,9 @@
 # -------------------------------------------------------------------------
-# doxyfile for MedVIP
+# doxyfile for generic project
 # modified by S. Barre (Time-stamp: <2005-06-17 15:13:59 barre>
 # -------------------------------------------------------------------------
 
-PROJECT_NAME         = ParaView
+PROJECT_NAME         = @DOXYGEN_PROJECT_NAME@
 
 FULL_PATH_NAMES      = YES
 WARN_IF_UNDOCUMENTED = NO
@@ -16,7 +16,7 @@ GENERATE_HTMLHELP    = YES
 GENERATE_LATEX       = NO
 GENERATE_MAN         = NO
 GENERATE_RTF         = NO
-GENERATE_TAGFILE     = "@ParaView_BINARY_DIR@/Utilities/Doxygen/ParaView.tag"
+GENERATE_TAGFILE     = "@CMAKE_CURRENT_BINARY_DIR@/@DOXYGEN_PROJECT_NAME@.tag"
 
 HAVE_DOT             = YES
 #HAVE_DOT            = NO
@@ -32,22 +32,15 @@ GRAPHICAL_HIERARCHY  = YES
 
 ALLEXTERNALS         = NO
 
-IMAGE_PATH           = "@ParaView_SOURCE_DIR@/Utilities/Doxygen"
+IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@"
 
-OUTPUT_DIRECTORY     = "@ParaView_BINARY_DIR@/Utilities/Doxygen/doc"
+OUTPUT_DIRECTORY     = "@CMAKE_CURRENT_BINARY_DIR@/doc"
 
 INPUT                = \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Utilities/Xdmf/vtk" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Common/KWCommon" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Servers/Common" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Servers/Filters" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Servers/ServerManager" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/GUI/Widgets" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/GUI/Widgets/Templates" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/GUI/Client" \
- "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/doc_ParaView_index.dox" 
+ "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_@DOXYGEN_PROJECT_NAME@_index.dox" \
+ @DOXYGEN_PARSED_INPUT_DIRS@
 
-TAGFILES             = "@ParaView_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
+TAGFILES             = "@CMAKE_CURRENT_BINARY_DIR@/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
 
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO
@@ -73,7 +66,7 @@ EXCLUDE_PATTERNS     =
 HTML_ALIGN_MEMBERS   = YES
 ALPHABETICAL_INDEX   = YES
 COLS_IN_ALPHA_INDEX  = 3
-IGNORE_PREFIX        = vtkKW vtkPV vtkSM vtk
+IGNORE_PREFIX        = @DOXYGEN_IGNORE_PREFIX@
 
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION      = YES
