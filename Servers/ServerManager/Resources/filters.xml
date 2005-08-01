@@ -719,6 +719,14 @@
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
+
+     <IntVectorProperty 
+        name="PieceInvariant" 
+        command="SetPieceInvariant" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
 
@@ -1286,7 +1294,7 @@
    <!-- End  PartScalars -->
    </SourceProxy>
 
-   <SourceProxy name="PieceScalars" class="vtkPieceScalars">
+   <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars">
      <InputProperty
         name="Input"
         command="SetInput">
