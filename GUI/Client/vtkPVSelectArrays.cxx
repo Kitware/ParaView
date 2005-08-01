@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.12");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.13");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -178,7 +178,6 @@ void vtkPVSelectArrays::Accept()
   int num, idx;
   const char* arrayName;
   int state;
-  int modFlag = this->GetModifiedFlag();
 
   if ( ! this->Active)
     {
@@ -189,7 +188,7 @@ void vtkPVSelectArrays::Accept()
 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (modFlag && this->Deactivate)
+  if ( this->Deactivate)
     {
     this->Inactivate();
     }
@@ -276,7 +275,7 @@ void vtkPVSelectArrays::SetSelectState(const char* arrayName, int val)
 //---------------------------------------------------------------------------
 void vtkPVSelectArrays::Trace(ofstream *file)
 {
-  int num, idx, state;
+  int num, idx;
   const char* arrayName;
 
   if ( ! this->GetTraceHelper()->Initialize(file))
@@ -286,16 +285,12 @@ void vtkPVSelectArrays::Trace(ofstream *file)
 
   *file << "$kw(" << this->GetTclName() << ") ClearAllSelections\n";
 
-  num = this->ArraySelectionList->GetNumberOfItems();
+  num = this->SelectedArrayNames->GetNumberOfStrings();
   for (idx = 0; idx < num; ++idx)
     {
-    state = this->ArraySelectionList->GetSelectState(idx);
-    if (state)
-      {
-      arrayName = this->ArraySelectionList->GetItem(idx); 
-      *file << "$kw(" << this->GetTclName() << ") SetSelectState {"
-            << arrayName << "} 1\n"; 
-      }
+    arrayName = this->SelectedArrayNames->GetString(idx);
+    *file << "$kw(" << this->GetTclName() << ") SetSelectState {"
+      << arrayName << "} 1\n"; 
     }
 }
 
