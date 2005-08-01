@@ -436,6 +436,48 @@ IF (VTK_DATA_ROOT)
     )
 ENDIF (VTK_DATA_ROOT)
 
+# Test timings for tiled display (Ice-T)
+IF (PARAVIEW_TEST_TILED_DISPLAY)
+  IF (VTK_MPI_SERVER_TD_PREFLAGS)
+    ADD_TEST(TiledTiming
+      ${PARAVIEW_CS_EXECUTABLE}
+      --test-server
+      --ignore-mpi-preflags
+      ${TIMEOUT}
+      --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
+      --server-preflags ${VTK_MPI_SERVER_TD_PREFLAGS}
+      --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
+      --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/TiledTiming.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
+      -FrontBuffer
+      -NoRerender
+      )
+  ELSE (VTK_MPI_SERVER_TD_PREFLAGS)
+    ADD_TEST(TiledTiming
+      ${PARAVIEW_CS_EXECUTABLE}
+      --test-server
+      --ignore-mpi-preflags
+      ${TIMEOUT}
+      --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
+      --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
+      --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/TiledTiming.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
+      -FrontBuffer
+      -NoRerender
+      )
+  ENDIF (VTK_MPI_SERVER_TD_PREFLAGS)
+ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
+
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
   IF(BUILD_SHARED_LIBS)
