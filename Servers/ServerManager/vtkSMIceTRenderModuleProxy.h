@@ -33,6 +33,10 @@ public:
   vtkSetMacro(CollectGeometryThreshold, double);
   vtkGetMacro(CollectGeometryThreshold, double);
 
+  // Description:
+  // Indicates if we should locally render.
+  virtual int IsRenderLocal() { return 0; }
+
 protected:
   vtkSMIceTRenderModuleProxy();
   ~vtkSMIceTRenderModuleProxy();
