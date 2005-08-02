@@ -115,14 +115,14 @@ $kw(vtkTemp1268) ColorByArray {Elevation} 3
 $kw(vtkTemp1268) DrawSurface
 $kw(vtkTemp1247) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1247)
-set kw(vtkTemp1379) [$kw(vtkTemp1) CreatePVSource PieceScalars]
+set kw(vtkTemp1379) [$kw(vtkTemp1) CreatePVSource ProcessIdScalars]
 set kw(vtkTemp1389) [$kw(vtkTemp1379) GetPVWidget {Input}]
 $kw(vtkTemp1389) SetCurrentValue $kw(vtkTemp1247)
 set kw(vtkTemp1386) [$kw(vtkTemp1379) GetPVWidget {RandomMode}]
 $kw(vtkTemp1386) SetSelectedState 0
 $kw(vtkTemp1379) AcceptCallback
 set kw(vtkTemp1393) [$kw(vtkTemp1379) GetPVOutput]
-$kw(vtkTemp1393) ColorByArray {Piece} 3
+$kw(vtkTemp1393) ColorByArray {ProcessId} 3
 $kw(vtkTemp1393) DrawSurface
 $kw(vtkTemp1379) SetVisibility 1
 set kw(vtkTemp426) [$kw(vtkTemp1) GetPVColorMap {RTData} 1]
@@ -137,7 +137,7 @@ $kw(vtkTemp834) SetStartHSV 0.6667 1 1
 $kw(vtkTemp834) SetEndHSV 0 1 1
 $kw(vtkTemp834) VectorModeMagnitudeCallback
 $kw(vtkTemp834) SetScalarBarVisibility 0
-set kw(vtkTemp1507) [$kw(vtkTemp1) GetPVColorMap {Piece} 1]
+set kw(vtkTemp1507) [$kw(vtkTemp1) GetPVColorMap {ProcessId} 1]
 $kw(vtkTemp1507) ResetScalarRange
 $kw(vtkTemp1507) SetStartHSV 0.6667 1 1
 $kw(vtkTemp1507) SetEndHSV 0 1 1
