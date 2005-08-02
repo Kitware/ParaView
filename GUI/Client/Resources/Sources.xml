@@ -66,6 +66,8 @@ The output of the 2D Glyph source is polygonal data.
   <Scale property="TimeStep"
          label="Time step" trace_name="TimeStep"
          keeps_timesteps="1"
+         entry_and_label_on_top="0"
+         display_value="0"
          help="Set the current timestep."/>
 </Module>
 <!-- #endif -->
