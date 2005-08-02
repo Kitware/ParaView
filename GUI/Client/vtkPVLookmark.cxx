@@ -75,15 +75,16 @@
 #include "vtkCommand.h"
 #include <vtkstd/map>
 #include <vtkstd/string>
+#include <vtkstd/vector>
 #include "vtkStdString.h"
 #include "vtkKWMenuButton.h"
 #include "vtkPVVolumeAppearanceEditor.h"
 #include "vtkPVThumbWheel.h"
-
+//#include "Tokenizer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.38");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.39");
 
 
 //*****************************************************************************
@@ -704,7 +705,6 @@ void vtkPVLookmark::StoreStateScript()
   FILE *lookmarkScript;
   char buf[300];
   char filter[50];
-  char *cmd;
   char *stateScript;
   ostrstream state;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
@@ -712,20 +712,28 @@ void vtkPVLookmark::StoreStateScript()
   win->SetSaveVisibleSourcesOnlyFlag(1);
   win->SaveState("tempLookmarkState.pvs");
   win->SetSaveVisibleSourcesOnlyFlag(0);
-//ds
-  cmd = new char[200];
-  if(strstr(this->Dataset,"/") && !strstr(this->Dataset,"\\"))
+
+  int i=0;
+  char *ptr;
+  vtkStdString opsList = "Operations: ";
+  while(this->DatasetList[i])
     {
-    char *ptr = this->Dataset;
-    ptr+=strlen(ptr)-1;
-    while(*ptr!='/' && *ptr!='\\')
-      ptr--;
-    ptr++;
-    sprintf(cmd,"Operations: %s", ptr);
-    }
-  else
-    {
-    sprintf(cmd,"Operations: %s", this->Dataset);
+    if(strstr(this->DatasetList[i],"/") && !strstr(this->DatasetList[i],"\\"))
+      {
+      ptr = this->DatasetList[i];
+      ptr+=strlen(ptr)-1;
+      while(*ptr!='/' && *ptr!='\\')
+        ptr--;
+      ptr++;
+      opsList.append(ptr);
+      opsList.append(", ");
+      }
+    else
+      {
+      opsList.append(this->DatasetList[i]);
+      opsList.append(", ");
+      }
+    i++;
     }
 
   //read the session state file in to a new vtkPVLookmark
@@ -736,25 +744,26 @@ void vtkPVLookmark::StoreStateScript()
       if(strstr(buf,"CreatePVSource") && !strstr(buf,this->Dataset))
         {
         sscanf(buf,"%*s %*s %*s %*s %[^]]",filter);
-        cmd = (char *)realloc(cmd,strlen(cmd)+strlen(filter)+5);
-        sprintf(cmd,"%s, %s ",cmd,filter);
+        opsList.append(filter);
+        opsList.append(", ");
         }
       state << buf;
       }
     }
   state << ends;
+  unsigned int ret = opsList.find_last_of(',',opsList.size());
+  if(ret != vtkstd::string::npos)
+    {
+    opsList.erase(ret);
+    }
+
   fclose(lookmarkScript);
   stateScript = new char[strlen(state.str())+1];
   strcpy(stateScript,state.str());
   this->SetStateScript(stateScript);
+  this->SetComments(opsList.c_str());
+
   delete [] stateScript;
-
-  if(!this->GetComments())
-    {
-    this->SetComments(cmd);
-    }
-
-  delete [] cmd;
   remove("tempLookmarkState.pvs");
 }
 
@@ -1055,8 +1064,27 @@ void vtkPVLookmark::TurnFiltersOff()
     }
   it->Delete();
 }
+/*
+void vtkPVLookmark::TokenizeScript(const vtkstd::string& str,
+                      vtkVector<string>& tokens,
+                      const vtkstd::string& delimiters)
+{
+  // Skip delimiters at beginning.
+  vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+  // Find first "non-delimiter".
+  vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-
+  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
+    {
+    // Found a token, add it to the vector.
+    tokens.push_back(str.substr(lastPos, pos - lastPos));
+    // Skip delimiters.  Note the "not_of"
+    lastPos = str.find_first_not_of(delimiters, pos);
+    // Find next "non-delimiter"
+    pos = str.find_first_of(delimiters, lastPos);
+    }
+}
+*/
 //----------------------------------------------------------------------------
 void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 {
@@ -1079,6 +1107,27 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   char moduleName[50];
 
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+
+  // Tokenize the script:
+
+  vtkstd::vector<vtkstd::string> tokens;
+  vtkstd::string delimiters = "\r\n";
+  vtkstd::string str = script;
+  // Skip delimiters at beginning.
+  vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+  // Find first "non-delimiter".
+  vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
+
+  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
+    {
+    // Found a token, add it to the vector.
+    tokens.push_back(str.substr(lastPos, pos - lastPos));
+    // Skip delimiters.  Note the "not_of"
+    lastPos = str.find_first_not_of(delimiters, pos);
+    // Find next "non-delimiter"
+    pos = str.find_first_of(delimiters, lastPos);
+    }
+//  Tokenizer tokenizer(script);
 
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   vtkPVSourceCollection *readers = vtkPVSourceCollection::New();
@@ -1810,7 +1859,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, char *firstL
 
   source->GetPVOutput()->Update();
   source->GetPVOutput()->UpdateColorGUI();
-
+  source->GetPVOutput()->DataColorRangeCallback();
 }
 
 //----------------------------------------------------------------------------

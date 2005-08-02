@@ -177,6 +177,7 @@ protected:
   vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
   void InitializeVolumeAppearanceEditor(vtkPVSource*,char*);
+  //void TokenizeScript(const vtkstd::string& str, vtkVector<string>& tokens, const vtkstd::string& delimiters = " ")
 
   char* StateScript;
   char* ImageData;
