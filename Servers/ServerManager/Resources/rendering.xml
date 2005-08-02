@@ -398,7 +398,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
     </SourceProxy>
-    
+
     <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
@@ -666,6 +666,32 @@
       </DoubleVectorProperty>
       <!-- End of Actor2D -->
     </Proxy>
+
+    <Proxy name="TextActor" class="vtkTextActor">
+      <StringVectorProperty 
+        name="Text" 
+        command="SetInput" 
+        number_of_elements="1"
+        animateable="0"> 
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="2"
+        default_values="0 0"
+        animateable="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+    
     
     <Proxy name="Actor" class="vtkActor">
       <ProxyProperty
@@ -2082,6 +2108,20 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </IceTMultiDisplayProxy>
+
+    <DisplayProxy name="LabelDisplay">
+      <SubProxy>
+        <Proxy name="Prop2D"
+          proxygroup="props" proxyname="TextActor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Text" />
+          <Property name="Visibility" />
+          <Property name="Position" />
+        </ExposedProperties>
+      </SubProxy>
+    </DisplayProxy>
+    <!-- End of displays group -->
   </ProxyGroup>
 
 </ServerManagerConfiguration>
