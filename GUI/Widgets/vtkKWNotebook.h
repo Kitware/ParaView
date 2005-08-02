@@ -422,6 +422,11 @@ protected:
 
   void SendEventForPage(unsigned long event, int id);
 
+  // Description:
+  // Bind/Unbind events.
+  virtual void Bind();
+  virtual void UnBind();
+
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented
   void operator=(const vtkKWNotebook&); // Not implemented

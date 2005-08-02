@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.89");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.90");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -169,6 +169,11 @@ vtkKWNotebook::vtkKWNotebook()
 //----------------------------------------------------------------------------
 vtkKWNotebook::~vtkKWNotebook()
 {
+  if (this->IsAlive())
+    {
+    this->UnBind();
+    }
+
   if (this->Body)
     {
     this->Body->Delete();
@@ -257,11 +262,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   this->Mask->SetParent(this);
   this->Mask->Create(app);
 
-  // Associate <Configure> event to both the tabs frame (in case a tab is added
-  // and its size requires the whole widget to be resized) and the body.
-
-  this->TabsFrame->SetBinding("<Configure>", this, "ScheduleResize");
-  this->Body->SetBinding("<Configure>", this, "ScheduleResize");
+  this->Bind();
 
   cmd << ends;
   this->Script(cmd.str());
@@ -272,6 +273,34 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
+void vtkKWNotebook::Bind()
+{
+  // Associate <Configure> event to both the tabs frame (in case a tab is added
+  // and its size requires the whole widget to be resized) and the body.
+
+  if (this->TabsFrame)
+    {
+    this->TabsFrame->SetBinding("<Configure>", this, "ScheduleResize");
+    }
+  if (this->Body)
+    {
+    this->Body->SetBinding("<Configure>", this, "ScheduleResize");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::UnBind()
+{
+  if (this->TabsFrame)
+    {
+    this->TabsFrame->RemoveBinding("<Configure>");
+    }
+  if (this->Body)
+    {
+    this->Body->RemoveBinding("<Configure>");
+    }
+}
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(int id)
 {
