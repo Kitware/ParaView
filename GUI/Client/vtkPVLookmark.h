@@ -35,6 +35,9 @@
 
 #include "vtkKWLookmark.h"
 
+#include <vtkstd/string>
+#include <vtkstd/vector>
+
 class vtkKWApplication;
 class vtkPVSource;
 class vtkPVSourceCollection;
@@ -171,12 +174,14 @@ protected:
   // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
   // the filters so that we can go back and set reset them at the end
   void ParseAndExecuteStateScript(char *state, int macroFlag);
-  void InitializeSourceFromScript(vtkPVSource *source, char *script, int macroFlag);
+//BTX
+  void InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &it, int macroFlag);
+  void InitializeVolumeAppearanceEditor(vtkPVSource*, vtkstd::vector<vtkstd::string>::iterator &it);
+//ETX
   vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name);
   vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
   vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
-  void InitializeVolumeAppearanceEditor(vtkPVSource*,char*);
   //void TokenizeScript(const vtkstd::string& str, vtkVector<string>& tokens, const vtkstd::string& delimiters = " ")
 
   char* StateScript;
