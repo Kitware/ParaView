@@ -182,8 +182,9 @@ protected:
   vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
   vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
-  //void TokenizeScript(const vtkstd::string& str, vtkVector<string>& tokens, const vtkstd::string& delimiters = " ")
-
+//BTX
+  void Tokenize(const vtkstd::string& str, vtkstd::vector<vtkstd::string>& tokens, const vtkstd::string& delimiters = " ");
+//ETX
   char* StateScript;
   char* ImageData;
   float* CenterOfRotation;

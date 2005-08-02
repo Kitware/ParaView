@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.41");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.42");
 
 
 //*****************************************************************************
@@ -1064,9 +1064,9 @@ void vtkPVLookmark::TurnFiltersOff()
     }
   it->Delete();
 }
-/*
-void vtkPVLookmark::TokenizeScript(const vtkstd::string& str,
-                      vtkVector<string>& tokens,
+
+void vtkPVLookmark::Tokenize(const vtkstd::string& str,
+                      vtkstd::vector<vtkstd::string>& tokens,
                       const vtkstd::string& delimiters)
 {
   // Skip delimiters at beginning.
@@ -1084,21 +1084,21 @@ void vtkPVLookmark::TokenizeScript(const vtkstd::string& str,
     pos = str.find_first_of(delimiters, lastPos);
     }
 }
-*/
+
 //----------------------------------------------------------------------------
 void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 {
   vtkPVSource *src;
   vtkstd::string ptr;
   char *ptr1;
-  char *ptr2;
   int ival;
   int i=0;
   char srcTclName[20]; 
   char *tclName;
   char cmd[200];
+  char path[300];
   bool foundSource = false;
-  char srcLabel[100];
+  vtkstd::string srcLabel;
   vtkStdString string1,string2;
   vtkstd::string::size_type beg;
   //vtkstd::string::size_type end;
@@ -1106,6 +1106,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   //char **buf = new char*[100];
   vtkstd::vector<vtkstd::string> buf;
   char moduleName[50];
+  vtkstd::string::size_type ret;
 
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
@@ -1116,6 +1117,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkstd::vector<vtkstd::string>::iterator tokMrkr;
   vtkstd::string delimiters = "\r\n";
   vtkstd::string str = script;
+  this->Tokenize(str,tokens,delimiters);
+/*
   // Skip delimiters at beginning.
   vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".
@@ -1131,7 +1134,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     pos = str.find_first_of(delimiters, lastPos);
     }
 //  Tokenizer tokenizer(script);
-
+*/
   vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
   vtkPVSourceCollection *readers = vtkPVSourceCollection::New();
   vtkPVSourceCollection *sources = vtkPVSourceCollection::New();
@@ -1188,30 +1191,20 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       }
     else if(ptr.rfind("InitializeReadCustom",ptr.size())!=vtkstd::string::npos )
       {
-      // get tcl name for source
-      sscanf(ptr.c_str(),"%*s %s %*s %*s \"%[^\"]",srcTclName,moduleName);
       foundSource = true;
-      // next line should be readfileinformation with path in quotes
-      ptr = *(++tokIter);
-      // get at the file name without path or extension
-      ptr1 = (char *)strstr(ptr.c_str(),"\"");
-      ptr1++;
-      ptr2 = ptr1;
-      ptr2+=strlen(ptr1);
-      while(*ptr2!='\"')
-        ptr2--;
-      *ptr2 = '\0';
+
+      sscanf(ptr.c_str(),"%*s %s %*s %*s \"%[^\"]\" \"%[^\"]",srcTclName,moduleName,path);
 
       if(macroFlag)
         {
-        src = this->GetReaderForMacro(readers,moduleName,ptr1);
+        src = this->GetReaderForMacro(readers,moduleName,path);
         }
       else
         {
         // look for an open dataset of the same path and reader type
         // if none is open, try to open the one at the specified path automatically for user
         // if that fails, prompt user for a new data file
-        src = this->GetReaderForLookmark(readers,moduleName,ptr1);
+        src = this->GetReaderForLookmark(readers,moduleName,path);
         }
 
       if(src)
@@ -1234,46 +1227,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         }
 
       ptr = *(++tokIter);
-
-/*
-      sscanf(ptr,SecondToken_String,srcTclName);
-      string1 = ptr;
-      beg = string1.find_first_of('\"',0);
-      end = string1.find_first_of('\"',beg+1);
-      string1 = string1.substr(beg+1,end-beg-1);
-      strcpy(moduleName,string1.c_str());
-      string1 = ptr;
-      beg = string1.find_first_of("\"",end+1);
-      end = string1.find_first_of('\"',beg+1);
-      string1 = string1.substr(beg+1,end-beg-1);
-      strcpy(path,string1.c_str());
-*/
-
       }
     else if(ptr.rfind("CreatePVSource",ptr.size())!=vtkstd::string::npos )
       {
-      strcpy(cmd,ptr.c_str());
-      sscanf(cmd,"%*s %s",srcTclName);
- //     ptr1 = ptr;
- //     const char *tclName = ptr1+=4;
-/*
-      string1 = ptr;
-      end = string1.find_last_of("]",string1.size());
-      string2 = string1.substr(0,end);
-      beg = string2.find_first_of("CreatePVSource",0);
-      string1 = string2.substr(beg,end-beg);
-      beg = string1.find_first_of(" ",0);
-      string2 = string1.substr(beg,end-beg);
-*/
-      ptr1 = strstr(cmd,"]");
-      *ptr1 = '\0';
-      while(*ptr1 != ' ')
-        {
-        ptr1--;
-        }
-      ptr1++;
-
       foundSource = true;
+      sscanf(ptr.c_str(),"%*s %*s %*s %*s %[^]]",moduleName);
 
       // ASSUMPTION: the first pvwidget listed in script will be an input if it is a filter
       
@@ -1344,11 +1302,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           {
           // if multiple sources are open and the lookmark creates multiple source, ask user
           // else if the lookmark is single sources, use the currently selected one
-          src = this->GetSourceForMacro(sources,ptr1);
+          src = this->GetSourceForMacro(sources,moduleName);
           }
         else
           {
-          src = this->GetSourceForLookmark(sources,ptr1);
+          src = this->GetSourceForLookmark(sources,moduleName);
           }
 
         if(src)
@@ -1375,14 +1333,15 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       src = this->GetPVApplication()->GetMainWindow()->GetCurrentPVSource();
 
       // append the lookmark name to its filter name : strip off any characters after '-' because a lookmark name could already have been appended to this filter name
-      strcpy(srcLabel,src->GetLabel());
-      if((ptr1 = strstr(srcLabel,"-")))
+      srcLabel = src->GetLabel();
+      ret = srcLabel.find_last_of('-',srcLabel.size());
+      if(ret!=vtkstd::string::npos)
         {
-        *ptr1 = '\0';
+        srcLabel.erase(ret,srcLabel.size()-ret);
         }
-      strcat(srcLabel,"-");
-      strcat(srcLabel,this->GetName());
-      src->SetLabel(srcLabel);
+      srcLabel.append("-");
+      srcLabel.append(this->GetName());
+      src->SetLabel(srcLabel.c_str());
 
       //add all pvsources created by this lmk to its collection
       this->AddPVSource(src);
@@ -1574,6 +1533,9 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
   char FifthAndSixthToken_IntAndWrappedString[] = "%*s %*s %*s %*s %d {%[^}]";
   char FourthAndFifthToken_WrappedStringAndInt[] = "%*s %*s %*s {%[^}]} %d";
   vtkStdString string1,string2;
+  vtkstd::string::size_type beg;
+  vtkstd::string::size_type end;
+
 /*
   ptr = strtok(NULL,"\r\n");
 
@@ -1610,7 +1572,6 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
           {
           sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
-          //val = this->GetArrayStatus(name,ptr);
           //only turn the variable on, not off, because some other filter might be using the variable
           if(ival)
             arraySelection->SetArrayStatus(sval,ival);
@@ -1710,16 +1671,25 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         }
       else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
         {
-        ptr = *(++tokIter);
-        ptr = *(++tokIter);
-
-        /*
+        if(macroFlag)
+          {
           ptr = *(++tokIter);
-          sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
-          stringEntry->SetValue(sval);
-          stringEntry->ModifiedCallback();
           ptr = *(++tokIter);
-        */
+          }
+        else
+          {
+          ptr = *(++tokIter);
+          beg = ptr.find_first_of('{',0);
+          if(beg!=vtkstd::string::npos)
+            {
+            end = ptr.find_last_of('}',ptr.size());
+            //sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
+            ptr = ptr.substr(beg+1,end-beg-1);
+            stringEntry->SetValue(ptr.c_str());
+            stringEntry->ModifiedCallback();
+            }
+          ptr = *(++tokIter);
+          }
         }
       else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
         {
