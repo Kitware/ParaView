@@ -39,12 +39,11 @@
    </SourceProxy>
 
    <SourceProxy name="VectorText" class="vtkVectorText">
-<!-- TODO is the {} the best way? -->
      <StringVectorProperty
         name="Text"
         command="SetText"
         number_of_elements="1"
-        default_values="{3D Text}">
+        default_values="3D Text">
      </StringVectorProperty>
    <!-- End 3DText -->
    </SourceProxy>
