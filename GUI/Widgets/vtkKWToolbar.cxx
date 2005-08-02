@@ -52,7 +52,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.60");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.61");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -101,6 +101,11 @@ vtkKWToolbar::vtkKWToolbar()
 //----------------------------------------------------------------------------
 vtkKWToolbar::~vtkKWToolbar()
 {
+  if (this->IsAlive())
+    {
+    this->UnBind();
+    }
+
   if (this->Frame)
     {
     this->Frame->Delete();

@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.32");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.33");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -380,7 +380,7 @@ void vtkKWToolbarSet::PackToolbars()
 
         // Pack a separator
 
-        (*it)->Toolbar->Bind();
+        //(*it)->Toolbar->Bind();
         if ((anchor_w && previous_w) || (!anchor_w && previous_e))
           {
           if (!(*it)->Separator->IsCreated())
@@ -414,7 +414,7 @@ void vtkKWToolbarSet::PackToolbars()
       else
         {
         // Unpack separator and toolbar
-        (*it)->Toolbar->UnBind();
+        //(*it)->Toolbar->UnBind();
         if ((*it)->Separator->IsCreated())
           {
           tk_cmd << "pack forget " 

@@ -163,11 +163,6 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Bind/Unbind events.
-  virtual void Bind();
-  virtual void UnBind();
-
-  // Description:
   // Some constants
   //BTX
   static const char *FlatAspectRegKey;
@@ -208,6 +203,11 @@ protected:
   vtkKWRadioButton *DefaultOptionsWidget;
 
   char *Name;
+
+  // Description:
+  // Bind/Unbind events.
+  virtual void Bind();
+  virtual void UnBind();
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented
