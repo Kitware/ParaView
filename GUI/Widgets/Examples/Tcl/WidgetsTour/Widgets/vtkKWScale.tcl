@@ -69,9 +69,7 @@ proc vtkKWScaleEntryPoint {parent win} {
   scale3 SetBalloonHelpString \
     "It's a pop-up and it sets the previous scale value too"
 
-  char [lindex $buffer 100]
-  sprintf buffer "SetValue [%s GetValue]" [scale3 GetTclName] 
-  scale3 SetCommand scale2b buffer
+  scale3 SetCommand scale2b {SetValue [scale3 GetValue]}
 
   pack [scale3 GetWidgetName] -side top -anchor nw -expand n -fill none -padx 2 -pady 6
 
@@ -90,7 +88,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
   for {set id 0} {$id < 4} {incr id} {
 
-    set scale [scale_set AddWidget id] 
+    set scale [scale_set AddWidget $id] 
     $scale SetLabelText "Scale $id"
     $scale SetOrientationToVertical
     $scale SetBalloonHelpString \
