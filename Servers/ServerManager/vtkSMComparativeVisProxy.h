@@ -44,6 +44,8 @@
 
 #include "vtkSMProxy.h"
 
+class vtkSMAnimationCueProxy;
+class vtkSMPropertyAdaptor;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 //BTX
@@ -117,7 +119,7 @@ public:
   // Description:
   // Returns the cue associated with a property.
   // This is the cue used in generating the vis.
-  vtkSMProxy* GetCue(unsigned int idx);
+  vtkSMAnimationCueProxy* GetCue(unsigned int idx);
 
   // Description:
   // MultiActorHelper stores pointer to all actors in the scene.
@@ -202,12 +204,16 @@ private:
   unsigned int NumberOfFrames;
   unsigned int CurrentFrame;
 
+  unsigned int  PropertyIndex;
+
   // Private implementation
   vtkSMComparativeVisProxyInternals* Internal;
 
   int ShouldAbort;
 
   static const double BorderWidth;
+
+  vtkSMPropertyAdaptor* Adaptor;
 
   vtkSMComparativeVisProxy(const vtkSMComparativeVisProxy&); // Not implemented.
   void operator=(const vtkSMComparativeVisProxy&); // Not implemented.

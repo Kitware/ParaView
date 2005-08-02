@@ -21,9 +21,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVProcessModule.h"
+#include "vtkSMAnimationCueProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyAdaptor.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -38,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.6");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -52,6 +54,8 @@ struct vtkSMComparativeVisProxyInternals
   ProxiesVectorType Caches;
   // Display objects: geometry filters, mappers, actors etc.
   ProxiesVectorType Displays;
+  // Labels
+  ProxiesType Labels;
 
   typedef vtkstd::vector<double> BoundsType;
   typedef vtkstd::vector<BoundsType> BoundsVectorType;
@@ -88,6 +92,7 @@ public:
   virtual void Execute(vtkObject* obj, unsigned long event, void*)
     {
       this->Vis->ExecuteEvent(obj, event, this->PropertyIndex);
+      this->Vis->PropertyIndex = this->PropertyIndex;
     }
 
   vtkSMComparativeVisProxy* Vis;
@@ -122,6 +127,10 @@ vtkSMComparativeVisProxy::vtkSMComparativeVisProxy()
   this->ShouldAbort = 0;
 
   this->RenderModule = 0;
+
+  this->PropertyIndex = 0;
+
+  this->Adaptor = vtkSMPropertyAdaptor::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,8 +138,14 @@ vtkSMComparativeVisProxy::~vtkSMComparativeVisProxy()
 {
   this->SetRenderModule(0);
   delete this->Internal;
+
   this->MultiActorHelper->Delete();
+  this->MultiActorHelper = 0;
+
   this->SetName(0);
+
+  this->Adaptor->Delete();
+  this->Adaptor = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -277,13 +292,13 @@ unsigned int vtkSMComparativeVisProxy::GetNumberOfFramesInCue(
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMComparativeVisProxy::GetCue(unsigned int idx)
+vtkSMAnimationCueProxy* vtkSMComparativeVisProxy::GetCue(unsigned int idx)
 {
   if (idx >= this->GetNumberOfCues())
     {
     return 0;
     }
-  return this->Internal->Cues[idx];
+  return vtkSMAnimationCueProxy::SafeDownCast(this->Internal->Cues[idx]);
 }
 
 //-----------------------------------------------------------------------------
@@ -412,7 +427,10 @@ void vtkSMComparativeVisProxy::StoreGeometry()
   unsigned int prevSize = this->Internal->Caches.size();
   this->Internal->Caches.resize(prevSize+1);
   this->Internal->Displays.resize(prevSize+1);
+  this->Internal->Labels.resize(prevSize+1);
   this->Internal->Bounds.resize(prevSize+1);
+
+  vtkSMProxyManager* proxM = vtkSMProxy::GetProxyManager();
 
   // Initialize bounds for this case. These bounds are
   // later used in Show()
@@ -429,23 +447,56 @@ void vtkSMComparativeVisProxy::StoreGeometry()
     totBounds[ii] = VTK_DOUBLE_MIN;
     }
   
+  // Create the label
+  vtkSMProxy* label = proxM->NewProxy("displays", "LabelDisplay");
+  label->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->Internal->Labels[prevSize] = label;
+  vtkSMStringVectorProperty* text = 
+    vtkSMStringVectorProperty::SafeDownCast(
+      label->GetProperty("Text"));
+  if (text)
+    {
+    unsigned int numCues = this->GetNumberOfCues();
+    ostrstream text_s;
+    for (unsigned int i=0; i<numCues; i++)
+      {
+      vtkSMAnimationCueProxy* cue = this->GetCue(i);
+      if (cue && cue->GetAnimatedProperty())
+        {
+        this->Adaptor->SetProperty(cue->GetAnimatedProperty());
+        text_s << cue->GetAnimatedPropertyName() 
+             << " = " 
+             << this->Adaptor->GetRangeValue(cue->GetAnimatedElement());
+        if (i != numCues - 1)
+          {
+          text_s << " , ";
+          }
+        }
+      }
+    text_s << ends;
+    text->SetElement(0, text_s.str());
+    delete[] text_s.str();
+    }
+  label->UpdateVTKObjects();
+  label->Delete();
+
   vtkCollection* displays = this->RenderModule->GetDisplays();
   vtkCollectionIterator* iter = displays->NewIterator();
   for(iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
+    vtkSMDataObjectDisplayProxy* pDisp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(
       iter->GetCurrentObject());
     if (pDisp && pDisp->GetVisibilityCM())
       {
       // Geometry cache will make copies (shallow) of all geometry objects
       // and cache them.
-      vtkSMProxyManager* proxM = vtkSMProxy::GetProxyManager();
       vtkSMProxy* proxy = 
         proxM->NewProxy("ComparativeVisHelpers", "GeometryCache");
       vtkSMProxyProperty* prop = 
         vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("AddGeometry"));
       prop->AddProxy(pDisp->GetGeometryFilterProxy());
-      //prop->AddProxy(pDisp->GetMapperProxy());
+
       proxy->UpdateVTKObjects();
       this->Internal->Caches[prevSize].push_back(proxy);
       proxy->Delete();
@@ -465,6 +516,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
         this->Internal->Displays[prevSize].push_back(display);
         display->Delete();
         }
+
       // Collect bounds of all geometry
       vtkPVGeometryInformation* geomInfo = pDisp->GetGeometryInformation();
       if (geomInfo)
@@ -476,6 +528,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
       }
     }
   iter->Delete();
+
   vtkTimerLog::MarkEndEvent("Store Geometry");
 }
 
@@ -621,6 +674,9 @@ int vtkSMComparativeVisProxy::Show()
   vtkSMProxyProperty* actorsP = vtkSMProxyProperty::SafeDownCast(
     this->MultiActorHelper->GetProperty("Actors"));
 
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->RenderModule->GetProperty("Displays"));
+
   for(i=0; i<numEntries; i++)
     {
     this->ComputeIndices(i);
@@ -633,15 +689,17 @@ int vtkSMComparativeVisProxy::Show()
       yPos = cellSpacing[1]*this->Internal->Indices[1];
       }
 
+    vtkSMDisplayProxy* label = vtkSMDisplayProxy::SafeDownCast(
+      this->Internal->Labels[i]);
+    pp->AddProxy(label);
+
     for(; iter2 != this->Internal->Displays[i].end(); iter2++)
       {
-      vtkSMDataObjectDisplayProxy* display = vtkSMDataObjectDisplayProxy::SafeDownCast(
-        iter2->GetPointer());
-
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        this->RenderModule->GetProperty("Displays"));
-      pp->AddProxy(vtkSMDisplayProxy::SafeDownCast(display));
-
+      vtkSMDataObjectDisplayProxy* display = 
+        vtkSMDataObjectDisplayProxy::SafeDownCast(
+          iter2->GetPointer());
+      pp->AddProxy(display);
+      
       // If showing the first time, set the position as well as the
       // clipping planes of actors. Clipping planes simulate multiple
       // renderer.
@@ -731,6 +789,23 @@ int vtkSMComparativeVisProxy::Show()
         pnormal->SetElements3(0, -1, 0);
         planeU->UpdateVTKObjects();
         planeU->Delete();
+
+        // Update the label
+        vtkSMDoubleVectorProperty* pos = 
+          vtkSMDoubleVectorProperty::SafeDownCast(
+            label->GetProperty("Position"));
+        int delx = winSize[0] / nx;
+        int dely = winSize[1] / ny;
+        pos->SetElement(0, this->Internal->Indices[0]*delx);
+        if (numProps > 1)
+          {
+          pos->SetElement(1, this->Internal->Indices[1]*dely);
+          }
+        else
+          {
+          pos->SetElement(1, 0);
+          }
+        label->UpdateVTKObjects();
         }
       else
         {
@@ -806,11 +881,13 @@ void vtkSMComparativeVisProxy::Hide()
     return;
     }
 
+  unsigned int i;
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->RenderModule->GetProperty("Displays"));
 
   unsigned int numEntries = this->Internal->Displays.size();
-  for(unsigned int i=0; i<numEntries; i++)
+  for(i=0; i<numEntries; i++)
     {
     vtkSMComparativeVisProxyInternals::ProxiesType::iterator iter2 = 
       this->Internal->Displays[i].begin();
@@ -820,6 +897,14 @@ void vtkSMComparativeVisProxy::Hide()
         vtkSMDataObjectDisplayProxy::SafeDownCast(iter2->GetPointer());
       pp->RemoveProxy(vtkSMDisplayProxy::SafeDownCast(display));
       }
+    }
+
+  numEntries = this->Internal->Labels.size();
+  for(i=0; i<numEntries; i++)
+    {
+    vtkSMDisplayProxy* label = 
+      vtkSMDisplayProxy::SafeDownCast(this->Internal->Labels[i]);
+    pp->RemoveProxy(vtkSMDisplayProxy::SafeDownCast(label));
     }
   this->RenderModule->UpdateVTKObjects();
 }
