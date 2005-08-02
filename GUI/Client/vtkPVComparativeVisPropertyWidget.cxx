@@ -33,12 +33,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMComparativeVisProxy.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.10");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -146,9 +147,15 @@ void vtkPVComparativeVisPropertyWidget::CopyToVisualization(
       keyFrame->SetKeyTime(1.0);
       }
  
+    vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+    
+    vtkSMAnimationCueProxy* acp = vtkSMAnimationCueProxy::SafeDownCast(
+      pm->NewProxy("animation", "AnimationCue"));
+    acp->CloneCopy(this->CueEditor->GetCueProxy());
     vtkSMProxyProperty::SafeDownCast(
       cv->GetProperty("Cues"))->AddProxy(
         this->CueEditor->GetCueProxy());
+    acp->Delete();
 
     vtkSMIntVectorProperty* numProps = vtkSMIntVectorProperty::SafeDownCast(
       cv->GetProperty("NumberOfFramesInCue"));
@@ -200,8 +207,12 @@ void vtkPVComparativeVisPropertyWidget::CopyFromVisualization(
   this->NumberOfFramesEntry->GetWidget()->SetValueAsInt(
     static_cast<int>(proxy->GetNumberOfFramesInCue(propIdx)));
 
-  this->CueEditor->SetCueProxy(vtkSMAnimationCueProxy::SafeDownCast(
-                                 proxy->GetCue(propIdx)));
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  vtkSMAnimationCueProxy* acp = vtkSMAnimationCueProxy::SafeDownCast(
+    pm->NewProxy("animation", "AnimationCue"));
+  acp->CloneCopy(proxy->GetCue(propIdx));
+  this->CueEditor->SetCueProxy(acp);
+  acp->Delete();
 
   this->TrackEditor->SetAnimationCue(0);
   this->TrackEditor->SetAnimationCue(this->CueEditor);

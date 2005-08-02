@@ -85,7 +85,9 @@ protected:
   vtkKWFrameWithLabel* VisualizationListFrame;
 
   vtkKWFrame* MainFrame;
-  vtkKWPushButton* CloseButton;
+  vtkKWFrame* ButtonFrame;
+  vtkKWPushButton* OKButton;
+  vtkKWPushButton* CancelButton;
 
   // Used in assigning unique default names to visualization
   static int NumberOfVisualizationsCreated;

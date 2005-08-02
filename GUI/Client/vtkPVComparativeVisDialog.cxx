@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.10");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.11");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -115,7 +115,10 @@ vtkPVComparativeVisDialog::vtkPVComparativeVisDialog()
     vtkPVTrackEditor::LAST_KEYFRAME_TIME_NOTCHANGABLE);
   this->NameEntry = vtkKWEntryWithLabel::New();
   this->VisualizationListFrame = vtkKWFrameWithLabel::New();
-  this->CloseButton = vtkKWPushButton::New();
+
+  this->ButtonFrame = vtkKWFrame::New();
+  this->OKButton = vtkKWPushButton::New();
+  this->CancelButton = vtkKWPushButton::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +142,9 @@ vtkPVComparativeVisDialog::~vtkPVComparativeVisDialog()
   this->TrackEditor->Delete();
   this->NameEntry->Delete();
   this->VisualizationListFrame->Delete();
-  this->CloseButton->Delete();
+  this->ButtonFrame->Delete();
+  this->OKButton->Delete();
+  this->CancelButton->Delete();
   this->MainFrame->Delete();
 }
 
@@ -285,12 +290,24 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -expand t -fill both", 
                this->TrackEditor->GetWidgetName());
 
-  this->CloseButton->SetParent(this->MainFrame);
-  this->CloseButton->Create(app);
-  this->CloseButton->SetCommand(this, "OK");
-  this->CloseButton->SetText("Done");
+  this->ButtonFrame->SetParent(this->MainFrame);
+  this->ButtonFrame->Create(app);
   this->Script("pack %s -side top -fill x -pady 5", 
-               this->CloseButton->GetWidgetName());
+               this->ButtonFrame->GetWidgetName());
+  
+  this->OKButton->SetParent(this->ButtonFrame);
+  this->OKButton->Create(app);
+  this->OKButton->SetCommand(this, "OK");
+  this->OKButton->SetText("OK");
+  this->Script("pack %s -side left -fill x -expand t", 
+               this->OKButton->GetWidgetName());
+
+  this->CancelButton->SetParent(this->ButtonFrame);
+  this->CancelButton->Create(app);
+  this->CancelButton->SetCommand(this, "Cancel");
+  this->CancelButton->SetText("Cancel");
+  this->Script("pack %s -side left -fill x -expand t", 
+               this->CancelButton->GetWidgetName());
 
   this->SetSize(vtkPVComparativeVisDialog::DialogWidth, 
                 vtkPVComparativeVisDialog::DialogHeight);
