@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.16");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.17");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -271,7 +271,8 @@ int vtkPVComparativeVisManager::Show()
         !iter->IsDoneWithTraversal(); 
         iter->GoToNextItem())
       {
-      vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
+      vtkSMDataObjectDisplayProxy* pDisp = 
+        vtkSMDataObjectDisplayProxy::SafeDownCast(
         iter->GetCurrentObject());
       if (pDisp && pDisp->GetVisibilityCM())
         {
