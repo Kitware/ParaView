@@ -38,6 +38,7 @@ class vtkPVGeometryInformation;
 class VTK_EXPORT vtkSMDisplayProxy : public vtkSMProxy
 {
 public:
+  static vtkSMDisplayProxy* New();
   vtkTypeRevisionMacro(vtkSMDisplayProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

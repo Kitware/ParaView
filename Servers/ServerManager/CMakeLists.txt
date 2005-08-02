@@ -124,7 +124,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
-  vtkSMDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMRenderModuleProxy.cxx

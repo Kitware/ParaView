@@ -13,6 +13,8 @@
 
 =========================================================================*/
 #include "vtkSMDisplayProxy.h"
+
+#include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -20,7 +22,9 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.4");
+vtkStandardNewMacro(vtkSMDisplayProxy);
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.5");
+
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
