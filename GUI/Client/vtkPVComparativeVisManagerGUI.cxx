@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.11");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.12");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -205,11 +205,10 @@ void vtkPVComparativeVisManagerGUI::Create(vtkKWApplication *app)
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   this->Manager->SetApplication(pvApp);
 
-  this->EditDialog->Create(app);
   this->EditDialog->SetMasterWindow(pvApp->GetMainWindow());
+  this->EditDialog->Create(app);
   this->EditDialog->SetTitle("Edit visualization");
 
-  this->ProgressDialog->Create(app);
   this->ProgressDialog->SetMasterWindow(pvApp->GetMainWindow());
   this->ProgressDialog->SetTitle("Comparative vis progress");
 
@@ -326,6 +325,10 @@ void vtkPVComparativeVisManagerGUI::ShowVisualization()
         aMan->SetCacheGeometry(0);
         vis->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);
         this->VisBeingGenerated = vis;
+        if (!this->ProgressDialog->IsCreated())
+          {
+          this->ProgressDialog->Create(app);
+          }
         this->ProgressDialog->Display();
         this->ProgressDialog->SetProgress(0.01);
         this->Manager->GenerateVisualization(vis);
