@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.42");
+vtkCxxRevisionMacro(vtkSMProxy, "1.43");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1103,7 +1103,8 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             }
           if (!subproxy)
             {
-            vtkErrorMacro("Failed to create subproxy.");
+            vtkErrorMacro("Failed to create subproxy: " 
+                          << (pname?pname:"(none"));
             return 0;
             }
           this->SetupSharedProperties(subproxy, propElement);
