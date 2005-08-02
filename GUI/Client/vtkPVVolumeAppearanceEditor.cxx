@@ -20,9 +20,8 @@
 #include "vtkKWEvent.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
-#include "vtkPiecewiseFunction.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -34,6 +33,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVVolumePropertyWidget.h"
 #include "vtkPVWindow.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.37");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.38");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -202,7 +202,7 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
   double *points = func->GetDataPointer();
 
   // Unit distance:
-  vtkKWScale* scale =
+  vtkKWScaleWithEntry* scale =
     this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale();
   double unitDistance = scale->GetValue();
 
@@ -679,7 +679,7 @@ void vtkPVVolumeAppearanceEditor::SaveState(ofstream *file)
   double *points = func->GetDataPointer();
 
   // Unit distance:
-  vtkKWScale* scale =
+  vtkKWScaleWithEntry* scale =
     this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale();
   double unitDistance = scale->GetValue();
 

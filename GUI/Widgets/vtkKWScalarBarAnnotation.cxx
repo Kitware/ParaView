@@ -24,7 +24,7 @@
 #include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWTextPropertyEditor.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.26");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -66,7 +66,7 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
   this->LabelTextPropertyPopupButton    = NULL;
 
   this->MaximumNumberOfColorsThumbWheel = vtkKWThumbWheel::New();
-  this->NumberOfLabelsScale             = vtkKWScale::New();
+  this->NumberOfLabelsScale             = vtkKWScaleWithEntry::New();
 }
 
 //----------------------------------------------------------------------------
@@ -378,7 +378,6 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
   this->MaximumNumberOfColorsThumbWheel->DisplayLabelOn();
   this->MaximumNumberOfColorsThumbWheel->GetLabel()->SetText("Maximum number of colors:");
   this->MaximumNumberOfColorsThumbWheel->DisplayEntryOn();
-  this->MaximumNumberOfColorsThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->MaximumNumberOfColorsThumbWheel->GetEntry()->SetWidth(5);
 
   this->MaximumNumberOfColorsThumbWheel->SetBalloonHelpString(
@@ -397,11 +396,9 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
   this->NumberOfLabelsScale->SetRange(
     foo->GetNumberOfLabelsMinValue(), foo->GetNumberOfLabelsMaxValue());
   this->NumberOfLabelsScale->SetResolution(1);
-  this->NumberOfLabelsScale->PopupScaleOn();
+  this->NumberOfLabelsScale->PopupModeOn();
   this->NumberOfLabelsScale->Create(app);
-  this->NumberOfLabelsScale->DisplayEntry();
-  this->NumberOfLabelsScale->DisplayEntryAndLabelOnTopOff();
-  this->NumberOfLabelsScale->DisplayLabel("Number of labels:");
+  this->NumberOfLabelsScale->SetLabelText("Number of labels:");
   this->NumberOfLabelsScale->SetEntryWidth(5);
 
   this->NumberOfLabelsScale->SetBalloonHelpString(

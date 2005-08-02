@@ -11,7 +11,6 @@ proc vtkKWThumbWheelEntryPoint {parent win} {
   thumbwheel1 Create $app
   thumbwheel1 SetLength 150
   thumbwheel1 DisplayEntryOn
-  thumbwheel1 DisplayEntryAndLabelOnTopOff
   thumbwheel1 DisplayLabelOn
   [thumbwheel1 GetLabel] SetText "A thumbwheel:"
 

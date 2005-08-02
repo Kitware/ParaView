@@ -35,7 +35,7 @@ class vtkKWChangeColorButton;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWTopLevel;
 class vtkPVSourceNotebook;
 class vtkKWSplitFrame;
@@ -387,10 +387,10 @@ protected:
   vtkKWLabel        *FillLightLabel;
   vtkKWLabel        *BackLightLabel;
   vtkKWLabel        *HeadLightLabel;
-  vtkKWScale        *KeyLightScale[4];
-  vtkKWScale        *FillLightScale[4];
-  vtkKWScale        *BackLightScale[4];
-  vtkKWScale        *HeadLightScale[4];
+  vtkKWScaleWithEntry        *KeyLightScale[4];
+  vtkKWScaleWithEntry        *FillLightScale[4];
+  vtkKWScaleWithEntry        *BackLightScale[4];
+  vtkKWScaleWithEntry        *HeadLightScale[4];
   vtkKWCheckButton  *MaintainLuminanceButton;
   // Main proxy to access the vtkLightKit
 

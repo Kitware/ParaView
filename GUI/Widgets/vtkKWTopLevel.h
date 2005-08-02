@@ -44,6 +44,7 @@ public:
   // For convenience purposes, the MasterWindow does not have to be a
   // toplevel, it can be a plain widget (its toplevel will be found
   // at runtime).
+  // Has to be called before Create().
   virtual void SetMasterWindow(vtkKWWidget* win);
   vtkGetObjectMacro(MasterWindow, vtkKWWidget);
 

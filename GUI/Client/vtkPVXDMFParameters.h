@@ -22,7 +22,6 @@
 
 class vtkKWLabel;
 class vtkKWFrameWithLabel;
-class vtkKWScale;
 class vtkPVXDMFParametersInternals;
 
 class VTK_EXPORT vtkPVXDMFParameters : public vtkPVObjectWidget

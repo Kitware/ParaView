@@ -25,7 +25,7 @@ class vtkPVAnimationSceneObserver;
 class vtkKWFrame;
 class vtkKWPushButton;
 class vtkKWCheckButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWMenuButton;
 class vtkKWThumbWheel;
 class vtkKWLabel;
@@ -194,7 +194,7 @@ protected:
   vtkPVVCRControl* VCRToolbar;
 
   vtkKWLabel* TimeLabel;
-  vtkKWScale* TimeScale;
+  vtkKWScaleWithEntry* TimeScale;
 
   vtkKWLabel* DurationLabel;
   vtkKWThumbWheel* DurationThumbWheel; 

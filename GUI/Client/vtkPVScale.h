@@ -20,7 +20,7 @@
 
 #include "vtkPVObjectWidget.h"
 
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWLabel;
 
 class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
@@ -45,13 +45,13 @@ public:
 
   // Description:
   // The resolution of the scale
-  void SetResolution(float res);
+  void SetResolution(double res);
 
   // Description:
   // Set the range of the scale.
-  void SetRange(float min, float max);
-  float GetRangeMin();
-  float GetRangeMax();
+  void SetRange(double min, double max);
+  double GetRangeMin();
+  double GetRangeMax();
   
   // Description:
   // Turn on display of the entry box widget that lets the user entry
@@ -142,7 +142,7 @@ protected:
   vtkPVScale();
   ~vtkPVScale();
   
-  int RoundValue(float val);
+  int RoundValue(double val);
 
   int EntryFlag;
   int EntryAndLabelOnTopFlag;
@@ -150,7 +150,7 @@ protected:
   int Round;
   
   vtkKWLabel *LabelWidget;
-  vtkKWScale *Scale;
+  vtkKWScaleWithEntry *Scale;
 
   vtkPVScale(const vtkPVScale&); // Not implemented
   void operator=(const vtkPVScale&); // Not implemented

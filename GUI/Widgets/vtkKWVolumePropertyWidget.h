@@ -30,11 +30,11 @@ class vtkKWHSVColorSelector;
 class vtkKWHistogramSet;
 class vtkKWFrameWithLabel;
 class vtkKWMenuButtonWithLabel;
-class vtkKWScaleSetWithLabel;
+class vtkKWScaleWithEntrySetWithLabel;
 class vtkKWMenuButton;
 class vtkKWPiecewiseFunctionEditor;
 class vtkKWScalarComponentSelectionWidget;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWVolumeMaterialPropertyWidget;
 class vtkVolumeProperty;
 
@@ -169,7 +169,7 @@ public:
   vtkGetObjectMacro(ScalarOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
   vtkGetObjectMacro(ScalarColorFunctionEditor, vtkKWColorTransferFunctionEditor);
   vtkGetObjectMacro(GradientOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
-  vtkGetObjectMacro(ScalarOpacityUnitDistanceScale, vtkKWScale);
+  vtkGetObjectMacro(ScalarOpacityUnitDistanceScale, vtkKWScaleWithEntry);
  
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -215,12 +215,12 @@ protected:
   vtkKWCheckButton                    *EnableShadingCheckButton;
   vtkKWCheckButton                    *InteractiveApplyCheckButton;
   vtkKWPiecewiseFunctionEditor        *ScalarOpacityFunctionEditor;
-  vtkKWScale                          *ScalarOpacityUnitDistanceScale;
+  vtkKWScaleWithEntry                 *ScalarOpacityUnitDistanceScale;
   vtkKWColorTransferFunctionEditor    *ScalarColorFunctionEditor;
   vtkKWCheckButton                    *LockOpacityAndColorCheckButton;
   vtkKWPiecewiseFunctionEditor        *GradientOpacityFunctionEditor;
   vtkKWMenuButton                     *EnableGradientOpacityOptionMenu;
-  vtkKWScaleSetWithLabel                *ComponentWeightScaleSet;
+  vtkKWScaleWithEntrySetWithLabel     *ComponentWeightScaleSet;
 
   int                                 LockOpacityAndColor[VTK_MAX_VRCOMP];
   int                                 WindowLevelMode[VTK_MAX_VRCOMP];

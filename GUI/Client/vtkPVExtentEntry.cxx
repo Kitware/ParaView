@@ -21,7 +21,7 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.58");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -191,14 +191,14 @@ void vtkPVExtentEntry::Create(vtkKWApplication *app)
     this->MinMax[i]->SetMinimumLabel(labels[i]);
     this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ModifiedCallback");
-    this->MinMax[i]->GetMinScale()->SetDisplayEntryAndLabelOnTop(1);
-    this->MinMax[i]->GetMinScale()->DisplayEntry();
-    this->MinMax[i]->GetMinScale()->DisplayLabel(" Min.");
+    this->MinMax[i]->GetMinScale()->SetEntryPositionToTop();
+    this->MinMax[i]->GetMinScale()->SetLabelPositionToTop();
+    this->MinMax[i]->GetMinScale()->SetLabelText(" Min.");
     this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMaxScale()->SetEntryCommand(this, "ModifiedCallback");
-    this->MinMax[i]->GetMaxScale()->SetDisplayEntryAndLabelOnTop(1);
-    this->MinMax[i]->GetMaxScale()->DisplayEntry();
-    this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max.");
+    this->MinMax[i]->GetMaxScale()->SetEntryPositionToTop();
+    this->MinMax[i]->GetMaxScale()->SetLabelPositionToTop();
+    this->MinMax[i]->GetMaxScale()->SetLabelText(" Max.");
     }
   
   for(i=0; i<3; i++)
@@ -334,7 +334,7 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
 void vtkPVExtentEntry::SetValueInternal(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
-  float range[2];
+  double range[2];
 
   // First, restrict value to current range.
   this->MinMax[0]->GetRange(range);

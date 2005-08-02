@@ -31,9 +31,9 @@
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
-#include "vtkKWScale.h"
-#include "vtkKWScaleSet.h"
-#include "vtkKWScaleSetWithLabel.h"
+#include "vtkKWScaleWithEntry.h"
+#include "vtkKWScaleWithEntrySet.h"
+#include "vtkKWScaleWithEntrySetWithLabel.h"
 #include "vtkKWVolumeMaterialPropertyWidget.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -47,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.20");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -84,11 +84,11 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->LockOpacityAndColorCheckButton  = vtkKWCheckButton::New();
 
-  this->ScalarOpacityUnitDistanceScale  = vtkKWScale::New();
+  this->ScalarOpacityUnitDistanceScale  = vtkKWScaleWithEntry::New();
 
   this->EnableGradientOpacityOptionMenu = vtkKWMenuButton::New();
 
-  this->ComponentWeightScaleSet         = vtkKWScaleSetWithLabel::New();
+  this->ComponentWeightScaleSet         = vtkKWScaleWithEntrySetWithLabel::New();
 
   this->ComponentSelectionWidget = 
     vtkKWScalarComponentSelectionWidget::New();
@@ -359,11 +359,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ScalarOpacityFunctionEditor->UserFrameVisibilityOn();
   this->ScalarOpacityUnitDistanceScale->SetParent(
     this->ScalarOpacityFunctionEditor->GetUserFrame());
-  this->ScalarOpacityUnitDistanceScale->PopupScaleOn();
+  this->ScalarOpacityUnitDistanceScale->PopupModeOn();
   this->ScalarOpacityUnitDistanceScale->Create(app);
-  this->ScalarOpacityUnitDistanceScale->DisplayEntry();
-  this->ScalarOpacityUnitDistanceScale->DisplayLabel("Scale:");
-  this->ScalarOpacityUnitDistanceScale->DisplayEntryAndLabelOnTopOff();
+  this->ScalarOpacityUnitDistanceScale->SetLabelText("Scale:");
   this->ScalarOpacityUnitDistanceScale->SetEndCommand(
     this, "ScalarOpacityUnitDistanceChangedCallback");
   this->ScalarOpacityUnitDistanceScale->SetEntryCommand(
@@ -486,7 +484,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ComponentWeightScaleSet->Create(app);
   this->ComponentWeightScaleSet->GetLabel()->SetText("Component Weights:");
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+  vtkKWScaleWithEntrySet *scaleset = 
+    this->ComponentWeightScaleSet->GetWidget();
 
   scaleset->PackHorizontallyOn();
   scaleset->SetMaximumNumberOfWidgetsInPackingDirection(2);
@@ -499,12 +498,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     {
     scaleset->AddWidget(i);
     scaleset->HideWidget(i);
-    vtkKWScale *scale = scaleset->GetWidget(i);
+    vtkKWScaleWithEntry *scale = scaleset->GetWidget(i);
     scale->SetResolution(0.01);
-    scale->DisplayEntry();
     sprintf(label, "%d:", i + 1);
-    scale->DisplayLabel(label);
-    scale->DisplayEntryAndLabelOnTopOff();
+    scale->SetLabelText(label);
     sprintf(command, "ComponentWeightChangedCallback %d", i);
     scale->SetEndCommand(this, command);
     scale->SetEntryCommand(this, command);
@@ -1081,7 +1078,8 @@ void vtkKWVolumePropertyWidget::Update()
 
   if (this->ComponentWeightScaleSet)
     {
-    vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+    vtkKWScaleWithEntrySet *scaleset = 
+      this->ComponentWeightScaleSet->GetWidget();
     if (has_prop)
       {
       for (i = 0; i < VTK_MAX_VRCOMP; i++)
@@ -1846,7 +1844,8 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangedCallback(int index)
     return;
     }
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+  vtkKWScaleWithEntrySet *scaleset = 
+    this->ComponentWeightScaleSet->GetWidget();
   if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
     {
     return;
@@ -1871,7 +1870,8 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(int index)
     return;
     }
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+  vtkKWScaleWithEntrySet *scaleset = 
+    this->ComponentWeightScaleSet->GetWidget();
   if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
     {
     return;

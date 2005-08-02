@@ -22,7 +22,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.117");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.118");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -86,7 +86,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->InSetValue = 0;
 
   this->TimestepFrame = vtkKWFrame::New();
-  this->Timestep = vtkKWScale::New();
+  this->Timestep = vtkKWScaleWithEntry::New();
   this->TimeStep = 0;
   
   this->Path = 0;
@@ -230,10 +230,8 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
   this->Script("pack %s -expand 1 -fill both", this->Timestep->GetWidgetName());
   this->Script("pack %s -side bottom -expand 1 -fill x", this->TimestepFrame->GetWidgetName());
   this->Script("pack forget %s", this->TimestepFrame->GetWidgetName());
-  this->Timestep->DisplayLabel("Timestep");
-  this->Timestep->DisplayRangeOn();
-  this->Timestep->DisplayEntryAndLabelOnTopOff();
-  this->Timestep->DisplayEntry();
+  this->Timestep->SetLabelText("Timestep");
+  this->Timestep->RangeVisibilityOn();
   this->Timestep->SetEndCommand(this, "TimestepChangedCallback");
   this->Timestep->SetEntryCommand(this, "TimestepChangedCallback");
 

@@ -23,7 +23,7 @@
 #include "vtkKWTextWithLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWText.h"
 #include "vtkKWTextPropertyEditor.h"
 #include "vtkObjectFactory.h"
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -55,7 +55,7 @@ vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
 
   this->CornerFrame             = vtkKWFrame::New();
   this->PropertiesFrame         = vtkKWFrame::New();
-  this->MaximumLineHeightScale  = vtkKWScale::New();
+  this->MaximumLineHeightScale  = vtkKWScaleWithEntry::New();
   this->TextPropertyWidget      = vtkKWTextPropertyEditor::New();
   this->TextPropertyPopupButton = NULL;
 
@@ -275,13 +275,14 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   // Maximum line height
 
   this->MaximumLineHeightScale->SetParent(this->PropertiesFrame);
-  this->MaximumLineHeightScale->PopupScaleOn();
+  this->MaximumLineHeightScale->PopupModeOn();
   this->MaximumLineHeightScale->Create(app);
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
-  this->MaximumLineHeightScale->DisplayEntry();
-  this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
-  this->MaximumLineHeightScale->DisplayLabel("Max line height:");
+  this->MaximumLineHeightScale->EntryVisibilityOn();
+  this->MaximumLineHeightScale->SetEntryPositionToTop();
+  this->MaximumLineHeightScale->SetLabelPositionToTop();
+  this->MaximumLineHeightScale->SetLabelText("Max line height:");
   this->MaximumLineHeightScale->SetEntryWidth(5);
 
   this->MaximumLineHeightScale->SetBalloonHelpString(

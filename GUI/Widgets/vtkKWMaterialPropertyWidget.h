@@ -27,7 +27,7 @@ class vtkKWLabelWithLabel;
 class vtkKWPushButtonSetWithLabel;
 class vtkKWPopupButtonWithLabel;
 class vtkKWPushButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWMaterialPropertyWidgetInternals;
 
 class KWWIDGETS_EXPORT vtkKWMaterialPropertyWidget : public vtkKWCompositeWidget
@@ -163,10 +163,10 @@ protected:
   vtkKWPopupButtonWithLabel   *PopupButton;
   vtkKWFrameWithLabel         *MaterialPropertiesFrame;
   vtkKWFrame                  *LightingFrame;
-  vtkKWScale                  *AmbientScale;
-  vtkKWScale                  *DiffuseScale;
-  vtkKWScale                  *SpecularScale;
-  vtkKWScale                  *SpecularPowerScale;
+  vtkKWScaleWithEntry         *AmbientScale;
+  vtkKWScaleWithEntry         *DiffuseScale;
+  vtkKWScaleWithEntry         *SpecularScale;
+  vtkKWScaleWithEntry         *SpecularPowerScale;
   vtkKWFrame                  *PresetsFrame;
   vtkKWLabelWithLabel         *PreviewLabel;
   vtkKWPushButtonSetWithLabel *PresetPushButtonSet;

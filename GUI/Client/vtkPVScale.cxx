@@ -21,6 +21,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -36,14 +37,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.69");
+vtkCxxRevisionMacro(vtkPVScale, "1.70");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
 {
   this->EntryLabel = 0;
   this->LabelWidget = vtkKWLabel::New();
-  this->Scale = vtkKWScale::New();
+  this->Scale = vtkKWScaleWithEntry::New();
   this->EntryFlag = 0;
   this->Round = 0;
   this->EntryAndLabelOnTopFlag = 1;
@@ -85,25 +86,25 @@ void vtkPVScale::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::SetResolution(float res)
+void vtkPVScale::SetResolution(double res)
 {
   this->Scale->SetResolution(res);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::SetRange(float min, float max)
+void vtkPVScale::SetRange(double min, double max)
 {
   this->Scale->SetRange(min, max);
 }
 
 //----------------------------------------------------------------------------
-float vtkPVScale::GetRangeMin()
+double vtkPVScale::GetRangeMin()
 {
   return this->Scale->GetRangeMin();
 }
 
 //----------------------------------------------------------------------------
-float vtkPVScale::GetRangeMax()
+double vtkPVScale::GetRangeMax()
 {
   return this->Scale->GetRangeMax();
 }
@@ -111,14 +112,23 @@ float vtkPVScale::GetRangeMax()
 //----------------------------------------------------------------------------
 void vtkPVScale::DisplayEntry()
 {
-  this->Scale->DisplayEntry();
+  this->Scale->EntryVisibilityOn();
   this->EntryFlag = 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScale::SetDisplayEntryAndLabelOnTop(int value)
 {
-  this->Scale->SetDisplayEntryAndLabelOnTop(value);
+  if (value)
+    {
+    this->Scale->SetEntryPositionToTop();
+    this->Scale->SetLabelPositionToTop();
+    }
+  else
+    {
+    this->Scale->SetEntryPositionToDefault();
+    this->Scale->SetLabelPositionToDefault();
+    }
   this->EntryAndLabelOnTopFlag = value;
 }
 
@@ -179,7 +189,7 @@ void vtkPVScale::Create(vtkKWApplication *app)
 
   this->Scale->SetParent(this);
   this->Scale->Create(this->GetApplication());
-  this->Scale->SetValueVisibility(this->DisplayValueFlag);
+  this->Scale->GetScale()->SetValueVisibility(this->DisplayValueFlag);
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");
   if (this->TraceSliderMovement)
@@ -404,7 +414,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVScale* pvs = vtkPVScale::SafeDownCast(clone);
   if (pvs)
     {
-    //float min, max;
+    //double min, max;
     //this->Scale->GetRange(min, max);
     //pvs->SetRange(min, max);
     pvs->SetResolution(this->Scale->GetResolution());
@@ -447,7 +457,7 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
   this->SetLabel(label);
 
   // Setup the Resolution.
-  float resolution;
+  double resolution;
   if(!element->GetScalarAttribute("resolution",&resolution))
     {
     resolution = 1;
@@ -495,7 +505,7 @@ void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVScale::RoundValue(float val)
+int vtkPVScale::RoundValue(double val)
 {
   if(val >= 0)
     {

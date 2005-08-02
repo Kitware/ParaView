@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithLabel);
-vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.2");
+vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithLabel::vtkKWWidgetWithLabel()
@@ -123,6 +123,16 @@ void vtkKWWidgetWithLabel::CreateLabel(vtkKWApplication *app)
 void vtkKWWidgetWithLabel::SetLabelText(const char *text)
 {
   this->GetLabel()->SetText(text);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidgetWithLabel::GetLabelText()
+{
+  if (this->HasLabel())
+    {
+    return this->GetLabel()->GetText();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

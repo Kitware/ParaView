@@ -25,7 +25,7 @@
 #include "vtkKWPopupButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -80,13 +80,13 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   this->LightingFrame = vtkKWFrame::New();
 
-  this->AmbientScale  = vtkKWScale::New();
+  this->AmbientScale  = vtkKWScaleWithEntry::New();
 
-  this->DiffuseScale  = vtkKWScale::New();
+  this->DiffuseScale  = vtkKWScaleWithEntry::New();
 
-  this->SpecularScale = vtkKWScale::New();
+  this->SpecularScale = vtkKWScaleWithEntry::New();
 
-  this->SpecularPowerScale = vtkKWScale::New();
+  this->SpecularPowerScale = vtkKWScaleWithEntry::New();
 
   this->PresetsFrame = vtkKWFrame::New();
 
@@ -329,13 +329,11 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   this->AmbientScale->SetParent(this->LightingFrame);
   this->AmbientScale->Create(app);
-  this->AmbientScale->DisplayEntryAndLabelOnTopOff();
   this->AmbientScale->SetCommand(this, "PropertyChangingCallback");
   this->AmbientScale->SetEndCommand(this, "PropertyChangedCallback");
   this->AmbientScale->SetEntryCommand(this, "PropertyChangedCallback");
-  this->AmbientScale->DisplayEntry();
   this->AmbientScale->SetEntryWidth(entry_width);
-  this->AmbientScale->DisplayLabel("Ambient:");
+  this->AmbientScale->SetLabelText("Ambient:");
   this->AmbientScale->SetLabelWidth(label_width);
   this->AmbientScale->SetRange(0, 100);
   this->AmbientScale->SetBalloonHelpString(
@@ -352,13 +350,11 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   this->DiffuseScale->SetParent(this->LightingFrame);
   this->DiffuseScale->Create(app);
-  this->DiffuseScale->DisplayEntryAndLabelOnTopOff();
   this->DiffuseScale->SetCommand(this, "PropertyChangingCallback");
   this->DiffuseScale->SetEndCommand(this, "PropertyChangedCallback");
   this->DiffuseScale->SetEntryCommand(this, "PropertyChangedCallback");
-  this->DiffuseScale->DisplayEntry();
   this->DiffuseScale->SetEntryWidth(entry_width);
-  this->DiffuseScale->DisplayLabel("Diffuse:");
+  this->DiffuseScale->SetLabelText("Diffuse:");
   this->DiffuseScale->SetLabelWidth(label_width);
   this->DiffuseScale->SetRange(0, 100);
   this->DiffuseScale->SetBalloonHelpString(
@@ -372,13 +368,11 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   this->SpecularScale->SetParent(this->LightingFrame);
   this->SpecularScale->Create(app);
-  this->SpecularScale->DisplayEntryAndLabelOnTopOff();
   this->SpecularScale->SetCommand(this, "PropertyChangingCallback");
   this->SpecularScale->SetEndCommand(this, "PropertyChangedCallback");
   this->SpecularScale->SetEntryCommand(this, "PropertyChangedCallback");
-  this->SpecularScale->DisplayEntry();
   this->SpecularScale->SetEntryWidth(entry_width);
-  this->SpecularScale->DisplayLabel("Specular:");
+  this->SpecularScale->SetLabelText("Specular:");
   this->SpecularScale->SetLabelWidth(label_width);
   this->SpecularScale->SetRange(0, 100);
   this->SpecularScale->SetBalloonHelpString(
@@ -392,13 +386,11 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   this->SpecularPowerScale->SetParent(this->LightingFrame);
   this->SpecularPowerScale->Create(app);
-  this->SpecularPowerScale->DisplayEntryAndLabelOnTopOff();
   this->SpecularPowerScale->SetCommand(this, "PropertyChangingCallback");
   this->SpecularPowerScale->SetEndCommand(this, "PropertyChangedCallback");
   this->SpecularPowerScale->SetEntryCommand(this, "PropertyChangedCallback");
-  this->SpecularPowerScale->DisplayEntry();
   this->SpecularPowerScale->SetEntryWidth(entry_width);
-  this->SpecularPowerScale->DisplayLabel("Power:");
+  this->SpecularPowerScale->SetLabelText("Power:");
   this->SpecularPowerScale->SetLabelWidth(label_width);
   this->SpecularPowerScale->SetRange(1, 50);
   this->SpecularPowerScale->SetBalloonHelpString(

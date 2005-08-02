@@ -36,16 +36,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Get the internal label.
-  // IMPORTANT: the internal label is "lazy created", i.e. it is neither
-  // allocated nor created until GetLabel() is called. This allows 
-  // for a lower footprint and faster UI startup. Therefore, do *not* use
-  // GetLabel() to check if the label exists, as it will automatically
-  // allocate the label. Use HasLabel() instead. 
-  virtual vtkKWLabel* GetLabel();
-  virtual int HasLabel();
-
-  // Description:
   // Set/Get the internal label visibility (On by default).
   // IMPORTANT: if you know you may not show the label, try to
   // set that flag as early as possible (ideally, before calling Create()) 
@@ -58,10 +48,21 @@ public:
   vtkGetMacro(LabelVisibility, int);
 
   // Description:
-  // Convenience method to set the contents label.
-  // IMPORTANT: this method will create the label on the fly, use it only if
+  // Get the internal label.
+  // IMPORTANT: the internal label is "lazy created", i.e. it is neither
+  // allocated nor created until GetLabel() is called. This allows 
+  // for a lower footprint and faster UI startup. Therefore, do *not* use
+  // GetLabel() to check if the label exists, as it will automatically
+  // allocate the label. Use HasLabel() instead. 
+  virtual vtkKWLabel* GetLabel();
+  virtual int HasLabel();
+
+  // Description:
+  // Convenience method to set/get the contents label.
+  // IMPORTANT: SetLabelText will create the label on the fly, use it only if
   // you are confident that you will indeed display the label.
   virtual void SetLabelText(const char *);
+  const char* GetLabelText();
   
   // Description:
   // Convenience method to set/get the label width.
@@ -124,12 +125,12 @@ protected:
   int LabelPosition;
 
   // Description:
-  // Pack or repack the widget. To be implemented by subclasses.
-  virtual void Pack() {};
-
-  // Description:
   // Create the label
   virtual void CreateLabel(vtkKWApplication *app);
+
+  // Description:
+  // Pack or repack the widget. To be implemented by subclasses.
+  virtual void Pack() {};
 
 private:
 

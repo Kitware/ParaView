@@ -39,7 +39,7 @@
 #include "vtkPVSourceNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.398");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.399");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -212,10 +212,10 @@ vtkPVRenderView::vtkPVRenderView()
   int cc;
   for ( cc = 0; cc < 4; cc ++ )
     {
-    this->KeyLightScale[cc]  = vtkKWScale::New();
-    this->FillLightScale[cc] = vtkKWScale::New();
-    this->BackLightScale[cc] = vtkKWScale::New();
-    this->HeadLightScale[cc] = vtkKWScale::New();
+    this->KeyLightScale[cc]  = vtkKWScaleWithEntry::New();
+    this->FillLightScale[cc] = vtkKWScaleWithEntry::New();
+    this->BackLightScale[cc] = vtkKWScaleWithEntry::New();
+    this->HeadLightScale[cc] = vtkKWScaleWithEntry::New();
     }
   this->MaintainLuminanceButton = vtkKWCheckButton::New(); 
 
@@ -948,7 +948,7 @@ void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
     }
 }
 
-void InitializeScale(vtkKWScale *scale, vtkSMProperty *prop);
+void InitializeScale(vtkKWScaleWithEntry *scale, vtkSMProperty *prop);
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CreateViewProperties()
 {
@@ -1233,13 +1233,11 @@ void vtkPVRenderView::CreateViewProperties()
     {
     subtype = vtkLightKit::GetSubType(vtkLightKit::TKeyLight, cc);
     this->KeyLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
-    this->KeyLightScale[cc]->PopupScaleOn();
+    this->KeyLightScale[cc]->PopupModeOn();
     this->KeyLightScale[cc]->Create(this->GetApplication());
-    this->KeyLightScale[cc]->DisplayEntry();
-    this->KeyLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->KeyLightScale[cc]->ExpandEntryOn();
     this->KeyLightScale[cc]->SetEntryWidth(4);
-    this->KeyLightScale[cc]->DisplayLabel ( 
+    this->KeyLightScale[cc]->SetLabelText( 
       vtkLightKit::GetShortStringFromSubType( subtype ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TKeyLight, subtype );
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TKeyLight, subtype);
@@ -1255,13 +1253,11 @@ void vtkPVRenderView::CreateViewProperties()
 
     subtype = vtkLightKit::GetSubType(vtkLightKit::TFillLight, cc);
     this->FillLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
-    this->FillLightScale[cc]->PopupScaleOn();
+    this->FillLightScale[cc]->PopupModeOn();
     this->FillLightScale[cc]->Create(this->GetApplication());
-    this->FillLightScale[cc]->DisplayEntry();
-    this->FillLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->FillLightScale[cc]->ExpandEntryOn();
     this->FillLightScale[cc]->SetEntryWidth(4);
-    this->FillLightScale[cc]->DisplayLabel ( 
+    this->FillLightScale[cc]->SetLabelText( 
       vtkLightKit::GetShortStringFromSubType( subtype ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TFillLight, subtype);
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TFillLight, subtype);
@@ -1277,13 +1273,11 @@ void vtkPVRenderView::CreateViewProperties()
 
     subtype = vtkLightKit::GetSubType(vtkLightKit::TBackLight, cc);
     this->BackLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
-    this->BackLightScale[cc]->PopupScaleOn();
+    this->BackLightScale[cc]->PopupModeOn();
     this->BackLightScale[cc]->Create(this->GetApplication());
-    this->BackLightScale[cc]->DisplayEntry();
-    this->BackLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->BackLightScale[cc]->ExpandEntryOn();
     this->BackLightScale[cc]->SetEntryWidth(4);
-    this->BackLightScale[cc]->DisplayLabel (
+    this->BackLightScale[cc]->SetLabelText(
       vtkLightKit::GetShortStringFromSubType( subtype ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TBackLight, subtype);
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TBackLight, subtype);
@@ -1301,13 +1295,11 @@ void vtkPVRenderView::CreateViewProperties()
       {
       subtype = vtkLightKit::GetSubType(vtkLightKit::THeadLight, cc);
       this->HeadLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
-      this->HeadLightScale[cc]->PopupScaleOn();
+      this->HeadLightScale[cc]->PopupModeOn();
       this->HeadLightScale[cc]->Create(this->GetApplication());
-      this->HeadLightScale[cc]->DisplayEntry();
-      this->HeadLightScale[cc]->DisplayEntryAndLabelOnTopOff();
       this->HeadLightScale[cc]->ExpandEntryOn();
       this->HeadLightScale[cc]->SetEntryWidth(4);
-      this->HeadLightScale[cc]->DisplayLabel (
+      this->HeadLightScale[cc]->SetLabelText(
         vtkLightKit::GetShortStringFromSubType( subtype ));
       sprintf(command,   "LightCallback %d %d", vtkLightKit::THeadLight, subtype);
       sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::THeadLight, subtype);
@@ -3061,7 +3053,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 // Special method to enforce the relationship between a GUI element / vtkSMproxy
 // in our case only do the relationship vtkKWScale / vtkSMProperty
-void InitializeScale(vtkKWScale *scale, vtkSMProperty *prop)
+void InitializeScale(vtkKWScaleWithEntry *scale, vtkSMProperty *prop)
 {
   // First set the domain(=range) of the KWScale
   vtkSMDoubleRangeDomain *domain = 

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.138");
+vtkCxxRevisionMacro(vtkKWWidget, "1.139");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -96,11 +96,12 @@ vtkKWWidget::~vtkKWWidget()
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetParent(vtkKWWidget *p)
 {
-  if (this->Parent && p)
+  if (this->Parent && p && this->IsCreated())
     {
-    vtkErrorMacro("Error attempt to reparent a widget!");
+    vtkErrorMacro("Error attempt to reparent a widget that has been created!");
     return;
     }
+
   if (this->Parent)
     {
     vtkKWWidget *tmp = this->Parent;
@@ -108,7 +109,8 @@ void vtkKWWidget::SetParent(vtkKWWidget *p)
     tmp->UnRegister(this);
     tmp->RemoveChild(this);
     }
-  else if (p)
+
+  if (p)
     {
     this->Parent = p;
     p->Register(this);
@@ -121,27 +123,31 @@ const char *vtkKWWidget::GetWidgetName()
 {
   static unsigned long count = 0;
 
-  // is the name is already set the just return it
+  // Is the name is already set the just return it
+
   if (this->WidgetName)
     {
     return this->WidgetName;
     }
 
-  // create this widgets name
+  // Create this widgets name
+
   char local[256];
-  // get the parents name
+
   if (this->Parent)
     {
     const char *tmp = this->Parent->GetWidgetName();
-    sprintf(local,"%s.%lu",tmp,count);
+    sprintf(local, "%s.%lu", tmp, count);
     }
   else
     {
-    sprintf(local,".%lu",count);
+    sprintf(local, ".%lu", count);
     }
   count++;
-  this->WidgetName = new char [strlen(local)+1];
-  strcpy(this->WidgetName,local);
+
+  this->WidgetName = new char [strlen(local) + 1];
+  strcpy(this->WidgetName, local);
+
   return this->WidgetName;
 }
 
@@ -523,10 +529,10 @@ void vtkKWWidget::UnpackSiblings()
 {
   if (this->GetParent() && this->GetParent()->IsCreated())
     {
-    this->Script("catch {eval pack forget [pack slaves %s]} \n "
-                 "catch {eval grid forget [grid slaves %s]}",
-                 this->GetParent()->GetWidgetName(),
-                 this->GetParent()->GetWidgetName());
+    this->GetParent()->Script("catch {eval pack forget [pack slaves %s]} \n "
+                              "catch {eval grid forget [grid slaves %s]}",
+                              this->GetParent()->GetWidgetName(),
+                              this->GetParent()->GetWidgetName());
     }
 }
 

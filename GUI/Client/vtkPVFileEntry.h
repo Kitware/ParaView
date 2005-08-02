@@ -25,7 +25,7 @@ class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWEntry;
 class vtkPVSource;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWFrame;
 class vtkKWListBoxToListBoxSelectionEditor;
 class vtkPVFileEntryObserver;
@@ -153,7 +153,7 @@ protected:
 
   // Timestep scale
   vtkKWFrame *TimestepFrame;
-  vtkKWScale *Timestep;
+  vtkKWScaleWithEntry *Timestep;
   int TimeStep;
 
   vtkSetStringMacro(Path);

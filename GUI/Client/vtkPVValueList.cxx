@@ -24,7 +24,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRange.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.32");
+vtkCxxRevisionMacro(vtkPVValueList, "1.33");
 
 const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 
@@ -51,7 +51,7 @@ vtkPVValueList::vtkPVValueList()
 
   this->NewValueFrame = vtkKWFrameWithLabel::New();
   this->NewValueLabel = vtkKWLabel::New();
-  this->NewValueEntry = vtkKWScale::New();
+  this->NewValueEntry = vtkKWScaleWithEntry::New();
   this->NewValueEntry->ClampValueOff();
   this->AddValueButton = vtkKWPushButton::New();
 
@@ -60,7 +60,7 @@ vtkPVValueList::vtkPVValueList()
   this->GenerateRangeFrame = vtkKWFrame::New();
 
   this->GenerateLabel = vtkKWLabel::New();
-  this->GenerateEntry = vtkKWScale::New();
+  this->GenerateEntry = vtkKWScaleWithEntry::New();
   this->GenerateButton = vtkKWPushButton::New();
 
   this->GenerateRangeLabel = vtkKWLabel::New();
@@ -219,8 +219,6 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->NewValueEntry->SetParent(this->NewValueFrame->GetFrame());
   this->NewValueEntry->Create(app);
-  this->NewValueEntry->SetDisplayEntryAndLabelOnTop(0);
-  this->NewValueEntry->DisplayEntry();
   this->NewValueEntry->SetRange(-VTK_LARGE_FLOAT, 
                                  VTK_LARGE_FLOAT);
   this->NewValueEntry->SetResolution(1);
@@ -267,8 +265,6 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->GenerateEntry->SetParent(this->GenerateNumberFrame);
   this->GenerateEntry->Create(app);
-  this->GenerateEntry->SetDisplayEntryAndLabelOnTop(0);
-  this->GenerateEntry->DisplayEntry();
   this->GenerateEntry->SetRange(1, vtkPVValueList::MAX_NUMBER_ENTRIES);
   this->GenerateEntry->SetValue(1);
   this->GenerateEntry->SetResolution(1);
@@ -359,8 +355,8 @@ void vtkPVValueList::Update()
     return;
     }
 
-  float oldRange[2];
-  float range[2];
+  double oldRange[2];
+  double range[2];
   range[0] = this->WidgetRange[0];
   range[1] = this->WidgetRange[1];
   

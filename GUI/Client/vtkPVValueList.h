@@ -29,7 +29,7 @@ class vtkKWFrameWithLabel;
 class vtkKWListBox;
 class vtkKWPushButton;
 class vtkKWRange;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 
 class VTK_EXPORT vtkPVValueList : public vtkPVWidget
 {
@@ -113,7 +113,7 @@ protected:
 
   vtkKWFrameWithLabel* NewValueFrame;
   vtkKWLabel* NewValueLabel;
-  vtkKWScale* NewValueEntry;
+  vtkKWScaleWithEntry* NewValueEntry;
   vtkKWPushButton* AddValueButton;
 
   vtkKWFrameWithLabel* GenerateFrame;
@@ -122,7 +122,7 @@ protected:
 
   vtkKWLabel* GenerateLabel;
   vtkKWLabel* GenerateRangeLabel;
-  vtkKWScale* GenerateEntry;
+  vtkKWScaleWithEntry* GenerateEntry;
   vtkKWPushButton* GenerateButton;
 
   vtkKWRange* GenerateRangeWidget;

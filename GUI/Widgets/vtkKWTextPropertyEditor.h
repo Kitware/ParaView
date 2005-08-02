@@ -30,7 +30,7 @@ class vtkKWCheckButtonSetWithLabel;
 class vtkKWMenuButtonWithLabel;
 class vtkKWPushButtonSetWithLabel;
 class vtkKWPushButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkTextProperty;
 
 class KWWIDGETS_EXPORT vtkKWTextPropertyEditor : public vtkKWCompositeWidget
@@ -200,7 +200,7 @@ protected:
   vtkKWCheckButtonSetWithLabel *StylesCheckButtonSet;
   
   int OpacityVisibility;
-  vtkKWScale *OpacityScale;
+  vtkKWScaleWithEntry *OpacityScale;
 
   char *ChangedCommand;
   char *ColorChangedCommand;

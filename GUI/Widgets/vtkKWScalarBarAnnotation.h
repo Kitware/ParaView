@@ -24,7 +24,7 @@ class vtkKWFrame;
 class vtkKWEntryWithLabel;
 class vtkKWPopupButtonWithLabel;
 class vtkKWScalarComponentSelectionWidget;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWTextPropertyEditor;
 class vtkKWThumbWheel;
 class vtkScalarBarWidget;
@@ -145,7 +145,7 @@ protected:
   vtkKWTextPropertyEditor             *LabelTextPropertyWidget;
   vtkKWPopupButtonWithLabel             *LabelTextPropertyPopupButton;
   vtkKWThumbWheel                     *MaximumNumberOfColorsThumbWheel;
-  vtkKWScale                          *NumberOfLabelsScale;
+  vtkKWScaleWithEntry                  *NumberOfLabelsScale;
 
   virtual void PackLabelFrameChildren();
   virtual void Render();

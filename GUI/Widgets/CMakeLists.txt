@@ -131,6 +131,7 @@ SET(KWWidgets_SRCS
   vtkKWScalarBarAnnotation.cxx 
   vtkKWScalarComponentSelectionWidget.cxx
   vtkKWScale.cxx 
+  vtkKWScaleWithEntry.cxx 
   vtkKWScrollbar.cxx 
   vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
@@ -219,6 +220,7 @@ FOREACH (WidgetType
     vtkKWLabelWithLabel
     vtkKWPushButton
     vtkKWScale
+    vtkKWScaleWithEntry
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (
@@ -246,11 +248,12 @@ FOREACH (WidgetType
     vtkKWPopupButton
     vtkKWPushButton
     vtkKWPushButtonSet
+    vtkKWRadioButtonSet
+    vtkKWScale
+    vtkKWScaleWithEntrySet
     vtkKWSpinBox
     vtkKWText
     vtkKWTextWithScrollbars
-    vtkKWRadioButtonSet
-    vtkKWScaleSet
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (

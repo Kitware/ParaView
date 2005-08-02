@@ -13,13 +13,14 @@
 =========================================================================*/
 // .NAME vtkKWScale - a scale (slider) widget
 // .SECTION Description
-// A widget that repsentes a scale (or slider) with options for 
-// a label string and a text entry box.
+// A widget that repsentes a scale (or slider).
+// .SECTION See Also
+// vtkKWScaleWithEntry
 
 #ifndef __vtkKWScale_h
 #define __vtkKWScale_h
 
-#include "vtkKWCompositeWidget.h"
+#include "vtkKWCoreWidget.h"
 
 class vtkKWApplication;
 class vtkKWEntry;
@@ -27,11 +28,11 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-class KWWIDGETS_EXPORT vtkKWScale : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWScale : public vtkKWCoreWidget
 {
 public:
   static vtkKWScale* New();
-  vtkTypeRevisionMacro(vtkKWScale,vtkKWCompositeWidget);
+  vtkTypeRevisionMacro(vtkKWScale,vtkKWCoreWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -41,16 +42,9 @@ public:
   // Description:
   // Set the range for this scale.
   virtual void SetRange(double min, double max);
-  virtual void SetRange(const float *range) { this->SetRange(range[0], range[1]); };
-  virtual void SetRange(const double *range) { this->SetRange(range[0], range[1]); };
+  virtual void SetRange(const double *range) 
+    { this->SetRange(range[0], range[1]); };
   vtkGetVector2Macro(Range, double);
-  virtual void GetRange(float &min, float &max) {
-    min = (float)this->GetRange()[0];
-    max = (float)this->GetRange()[1];
-    }
-  virtual void GetRange(float array[2]) {
-    this->GetRange(array[0], array[1]);
-    }
   virtual double GetRangeMin() { return this->GetRange()[0]; };
   virtual double GetRangeMax() { return this->GetRange()[1]; };
 
@@ -72,54 +66,69 @@ public:
   vtkGetMacro(Resolution, double);
   
   // Description:
-  // Set/get whether to display the range of the scale
-  void SetDisplayRange(int flag);
-  vtkGetMacro(DisplayRange, int);
-  vtkBooleanMacro(DisplayRange, int);
+  // Set/Get the orientation type.
+  // For widgets that can lay themselves out with either a horizontal or
+  // vertical orientation, such as scales, this option specifies which 
+  // orientation should be used. 
+  // Valid constants can be found in vtkKWTkOptions::OrientationType.
+  virtual void SetOrientation(int);
+  virtual int GetOrientation();
+  virtual void SetOrientationToHorizontal() 
+    { this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); };
+  virtual void SetOrientationToVertical() 
+    { this->SetOrientation(vtkKWTkOptions::OrientationVertical); };
+
+  // Description:
+  // Set/Get the trough color, i.e. the color to use for the rectangular
+  // trough areas in widgets such as scrollbars and scales.
+  virtual void GetTroughColor(double *r, double *g, double *b);
+  virtual double* GetTroughColor();
+  virtual void SetTroughColor(double r, double g, double b);
+  virtual void SetTroughColor(double rgb[3])
+    { this->SetTroughColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description
+  // Set/Get the narrow dimension of scale. For vertical 
+  // scales this is the trough's width; for horizontal scales this is the 
+  // trough's height. In pixel.
+  virtual void SetWidth(int width);
+  virtual int GetWidth();
+
+  // Description
+  // Set/Get the desired long dimension of the scale. 
+  // For vertical scales this is the scale's height, for horizontal scales
+  // it is the scale's width. In pixel.
+  virtual void SetLength(int length);
+  virtual int GetLength();
+
+  // Description
+  // Set/Get the size of the slider, measured in screen units along 
+  // the slider's long dimension.
+  virtual void SetSliderLength(int length);
+  virtual int GetSliderLength();
+
+  // Description:
+  // Set/Get the visibility of the value on top of the slider.
+  virtual void SetValueVisibility(int);
+  virtual int GetValueVisibility();
+  vtkBooleanMacro(ValueVisibility, int);
+
+  // Description:
+  // Method to set/get the tick interval.
+  // Determines the spacing between numerical tick marks displayed below or to
+  // the left of the slider. If 0, no tick marks will be displayed. 
+  virtual void SetTickInterval(double val);
+  virtual double GetTickInterval();
   
-  // Description:
-  // Display a label and/or a text entry box. These are optional.
-  // Get the corresponding internal objects.
-  void DisplayEntry();  
-  void DisplayLabel(const char *l);  
-  vtkGetObjectMacro(Label, vtkKWLabel);
-  vtkGetObjectMacro(Entry, vtkKWEntry);
-  vtkGetObjectMacro(Scale, vtkKWWidget);
-  vtkSetStringMacro(ShortLabel);
-  vtkGetStringMacro(ShortLabel);
-  
-  // Description:
-  // Set/Get the position of the label and/or entry (on top, or on the side).
-  virtual void SetDisplayEntryAndLabelOnTop(int flag);
-  vtkGetMacro(DisplayEntryAndLabelOnTop, int);
-  vtkBooleanMacro(DisplayEntryAndLabelOnTop, int);  
-
-  // Description:
-  // Set/Get a popup scale. 
-  // WARNING: must be set *before* Create() is called.
-  vtkSetMacro(PopupScale, int);
-  vtkGetMacro(PopupScale, int);
-  vtkBooleanMacro(PopupScale, int);  
-  void DisplayPopupScaleCallback();
-  void WithdrawPopupScaleCallback();
-  vtkGetObjectMacro(PopupPushButton, vtkKWPushButton);
-
-  // Description:
-  // Set/Get the entry expansion flag. This flag is only used if PopupScale 
-  // mode is On. In that case, the default behaviour is to provide a widget
-  // as compact as possible, i.e. the Entry won't be expanded if the widget
-  // grows. Set ExpandEntry to On to override this behaviour.
-  virtual void SetExpandEntry(int flag);
-  vtkGetMacro(ExpandEntry, int);
-  vtkBooleanMacro(ExpandEntry, int);  
-
-  // Description:
-  // Method that gets invoked when the sliders value has changed.
-  virtual void ScaleValueCallback(double num);
-  virtual void EntryValueCallback();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
-  virtual void InvokeEntryCommand();
+  // Description
+  // Set/Get the sting to display as a label for the scale. 
+  // For vertical scales the label is displayed just to the right of the top
+  // end of the scale. For horizontal scales the label is displayed just above
+  // the left end of the scale. If the option is specified as an empty string, 
+  // no label is displayed. The position of the label can not be changed. For
+  // more elaborated options, check vtkKWScaleWithEntry
+  virtual void SetLabelText(const char *);
+  virtual const char* GetLabelText();
 
   // Description:
   // Specifies commands to associate with the widget. 
@@ -130,52 +139,17 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
-  virtual void SetEntryCommand(vtkObject *object, const char *method);
+  virtual void InvokeCommand();
+  virtual void InvokeStartCommand();
+  virtual void InvokeEndCommand();
 
   // Description:
   // Set/get whether the above commands should be called or not.
-  // This allow you to disable the commands while you are setting the scale
+  // This make it easier to disable the commands while setting the scale
   // value for example.
   vtkSetMacro(DisableCommands, int);
   vtkGetMacro(DisableCommands, int);
   vtkBooleanMacro(DisableCommands, int);
-
-  // Description:
-  // Setting this string enables balloon help for this widget.
-  // Override to pass down to children for cleaner behavior
-  virtual void SetBalloonHelpString(const char *str);
-
-  // Description:
-  // Bind/Unbind all components so that values can be changed, but
-  // no command will be called.
-  void Bind();
-  void UnBind();
-
-  // Description:
-  // Set/Get the resize mode to be smart. In that mode, some elements like the
-  // label and the entry will disappear if the widget gets to small.
-  vtkSetMacro(SmartResize, int);
-  vtkGetMacro(SmartResize, int);
-  vtkBooleanMacro(SmartResize, int);  
-
-  void Resize();
-
-  // Description
-  // Convenience method to set the width of the label or entry
-  virtual void SetLabelWidth(int width);
-  virtual void SetEntryWidth(int width);
-
-  // Description
-  // Convenience method to set the narrow dimension of scale. For vertical 
-  // scales this is the trough's width; for horizontal scales this is the 
-  // trough's height. In pixel.
-  virtual void SetWidth(int width);
-
-  // Description
-  // Convenience method to set the desired long dimension of the scale. 
-  // For vertical scales this is the scale's height, for horizontal scales
-  // it is the scale's width. In pixel.
-  virtual void SetLength(int length);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -194,27 +168,25 @@ public:
   vtkBooleanMacro(ClampValue, int);
 
   // Description:
-  // Internal
+  // Callbacks. Internal, do not use.
+  vtkGetMacro(DisableScaleValueCallback, int);
   vtkSetMacro(DisableScaleValueCallback, int);
   vtkBooleanMacro(DisableScaleValueCallback, int);
-
-  // Description:
-  // Set/Get the visibility of the value on top of the slide.
-  virtual void SetValueVisibility(int);
-  virtual int GetValueVisibility();
-  vtkBooleanMacro(ValueVisibility, int);
+  virtual void ScaleValueCallback(double num);
 
 protected:
   vtkKWScale();
   ~vtkKWScale();
 
-  int         DisplayEntryAndLabelOnTop;
-  int         PopupScale;
-  int         ExpandEntry;
-  int         DisplayRange;
-  int         SmartResize;
-  int         DisableCommands;
-  int         DisableScaleValueCallback;
+  // Description:
+  // Bind/Unbind all components so that values can be changed, but
+  // no command will be called.
+  void Bind();
+  void UnBind();
+
+  int DisableCommands;
+  int DisableScaleValueCallback;
+  int ClampValue;
 
   char        *Command;
   char        *StartCommand;
@@ -225,31 +197,15 @@ protected:
   double       Resolution;
   double       Range[2];
 
-  vtkKWCoreWidget *Scale;
-  vtkKWEntry    *Entry;
-  vtkKWLabel    *Label;
-  vtkKWTopLevel *TopLevel;
-  vtkKWPushButton *PopupPushButton;
+  // Description:
+  // Update internal widgets value
+  virtual void UpdateRange();
+  virtual void UpdateResolution();
+  virtual void UpdateValue();
 
-  vtkKWLabel *RangeMinLabel;
-  vtkKWLabel *RangeMaxLabel;
-  
-  char *NormalLabel;
-  char *ShortLabel;
-  int LongWidth;
-  int MediumWidth;
-  int MediumShortWidth;
-  int ShortWidth;
-  int PackEntry;
-  int PackRange;
-
-  int ClampValue;
-
-  vtkSetStringMacro(NormalLabel);
-  
-  void PackWidget();
-  void UpdateEntryResolution();
-  void RefreshValue();
+  //BTX
+  friend class vtkKWScaleWithEntry;
+  //ETX
 
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented
@@ -258,6 +214,3 @@ private:
 
 
 #endif
-
-
-

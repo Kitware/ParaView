@@ -23,7 +23,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.25");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.26");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app)
@@ -103,10 +103,9 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app)
     }
   this->MPIMode->GetWidget()->SetCommand(this, "MPICheckBoxCallback");
   this->MPINumberOfServers->SetParent(frame);
-  this->MPINumberOfServers->PopupScaleOn();
+  this->MPINumberOfServers->PopupModeOn();
   this->MPINumberOfServers->Create(app);
-  this->MPINumberOfServers->DisplayEntry();
-  this->MPINumberOfServers->DisplayLabel("Number of processes");
+  this->MPINumberOfServers->SetLabelText("Number of processes");
   this->MPINumberOfServers->SetRange(2, 10);
   this->MPINumberOfServers->SetValue(this->NumberOfProcesses);
   this->Script("pack %s -side left -expand 1 -fill x", 
@@ -227,7 +226,7 @@ vtkPVConnectDialog::vtkPVConnectDialog()
   this->Hostname = vtkKWComboBoxWithLabel::New();
   this->Port = vtkKWEntryWithLabel::New();
   this->Label = vtkKWLabel::New();
-  this->MPINumberOfServers = vtkKWScale::New();
+  this->MPINumberOfServers = vtkKWScaleWithEntry::New();
   this->MPIMode = vtkKWCheckButtonWithLabel::New();
 
   this->HostnameString = 0;

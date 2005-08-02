@@ -25,7 +25,6 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
   thumbwheel1->Create(app);
   thumbwheel1->SetLength(150);
   thumbwheel1->DisplayEntryOn();
-  thumbwheel1->DisplayEntryAndLabelOnTopOff();
   thumbwheel1->DisplayLabelOn();
   thumbwheel1->GetLabel()->SetText("A thumbwheel:");
 
@@ -45,7 +44,6 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
   thumbwheel2->ClampMaximumValueOn();
   thumbwheel2->SetLength(275);
   thumbwheel2->SetSizeOfNotches(thumbwheel2->GetSizeOfNotches() * 3);
-  thumbwheel2->DisplayEntryOn();
   thumbwheel2->DisplayEntryAndLabelOnTopOn();
   thumbwheel2->DisplayLabelOn();
   thumbwheel2->GetLabel()->SetText("A thumbwheel with label/entry on top:");

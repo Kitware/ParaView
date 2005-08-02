@@ -38,7 +38,7 @@ class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
 class vtkKWMenuButton;
 class vtkKWPushButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkPVTextPropertyEditor;
 class vtkPVApplication;
 class vtkPVRenderView;
@@ -312,7 +312,7 @@ protected:
   vtkKWFrame*       ScalarRangeFrame;
   vtkKWCheckButton*  ScalarRangeLockCheck;
   vtkKWRange*        ScalarRangeWidget;
-  vtkKWScale*        NumberOfColorsScale;
+  vtkKWScaleWithEntry* NumberOfColorsScale;
   // Stuff for selecting start and end colors.
   vtkKWFrame*            ColorEditorFrame;
   vtkKWChangeColorButton* StartColorButton;

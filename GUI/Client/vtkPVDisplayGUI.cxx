@@ -46,7 +46,7 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.44");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.45");
 
 //----------------------------------------------------------------------------
 
@@ -220,12 +220,12 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
     {
     this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
     this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
-    this->OrientationScale[cc] = vtkKWScale::New();
+    this->OrientationScale[cc] = vtkKWScaleWithEntry::New();
     this->OriginThumbWheel[cc] = vtkKWThumbWheel::New();
     }
 
   this->OpacityLabel = vtkKWLabel::New();
-  this->OpacityScale = vtkKWScale::New();
+  this->OpacityScale = vtkKWScaleWithEntry::New();
   
   this->ActorColor[0] = this->ActorColor[1] = this->ActorColor[2] = 1.0;
 
@@ -901,8 +901,8 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
     this->TranslateThumbWheel[cc]->SetValue(0.0);
     this->TranslateThumbWheel[cc]->Create(this->GetApplication());
     this->TranslateThumbWheel[cc]->DisplayEntryOn();
-    this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
+    this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
     this->TranslateThumbWheel[cc]->SetCommand(this, "ActorTranslateCallback");
     this->TranslateThumbWheel[cc]->SetEndCommand(this, 
@@ -930,13 +930,11 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
       "Scale the geometry relative to the size of the dataset.");
 
     this->OrientationScale[cc]->SetParent(this->ActorControlFrame->GetFrame());
-    this->OrientationScale[cc]->PopupScaleOn();
+    this->OrientationScale[cc]->PopupModeOn();
     this->OrientationScale[cc]->Create(this->GetApplication());
     this->OrientationScale[cc]->SetRange(0, 360);
     this->OrientationScale[cc]->SetResolution(1);
     this->OrientationScale[cc]->SetValue(0);
-    this->OrientationScale[cc]->DisplayEntry();
-    this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->OrientationScale[cc]->ExpandEntryOn();
     this->OrientationScale[cc]->GetEntry()->SetWidth(5);
     this->OrientationScale[cc]->SetCommand(this, "ActorOrientationCallback");
@@ -971,13 +969,11 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
     "because primatives are not sorted.");
 
   this->OpacityScale->SetParent(this->ActorControlFrame->GetFrame());
-  this->OpacityScale->PopupScaleOn();
+  this->OpacityScale->PopupModeOn();
   this->OpacityScale->Create(this->GetApplication());
   this->OpacityScale->SetRange(0, 1);
   this->OpacityScale->SetResolution(0.1);
   this->OpacityScale->SetValue(1);
-  this->OpacityScale->DisplayEntry();
-  this->OpacityScale->DisplayEntryAndLabelOnTopOff();
   this->OpacityScale->ExpandEntryOn();
   this->OpacityScale->GetEntry()->SetWidth(5);
   this->OpacityScale->SetCommand(this, "OpacityChangedCallback");

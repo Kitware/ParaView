@@ -20,7 +20,7 @@
 
 #include "vtkPVWidget.h"
 
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWLabel;
 class vtkPVArrayMenu;
 class vtkKWFrame;
@@ -46,14 +46,14 @@ public:
 
   // Description:
   // This method allows scripts to modify the widgets value.
-  void  SetMinValue(float val);
-  float GetMinValue();
-  void  SetMaxValue(float val);
-  float GetMaxValue();
-  void  SetResolution(float res);
-  float GetResolution();
-  void  SetRange(float min, float max);
-  void  GetRange(float range[2]);
+  void  SetMinValue(double val);
+  double GetMinValue();
+  void  SetMaxValue(double val);
+  double GetMaxValue();
+  void  SetResolution(double res);
+  double GetResolution();
+  void  SetRange(double min, double max);
+  void  GetRange(double range[2]);
 
   // Description:
   // Use the scalar range of the selected array to set the min max range.
@@ -114,8 +114,8 @@ public:
 
   // Description:
   // The underlying scales.
-  vtkGetObjectMacro(MinScale, vtkKWScale);
-  vtkGetObjectMacro(MaxScale, vtkKWScale);
+  vtkGetObjectMacro(MinScale, vtkKWScaleWithEntry);
+  vtkGetObjectMacro(MaxScale, vtkKWScaleWithEntry);
 
 //BTX
   // Description:
@@ -162,8 +162,8 @@ protected:
 
   vtkKWLabel *MinLabel;
   vtkKWLabel *MaxLabel;
-  vtkKWScale *MinScale;
-  vtkKWScale *MaxScale;
+  vtkKWScaleWithEntry *MinScale;
+  vtkKWScaleWithEntry *MaxScale;
   vtkKWFrame *MinFrame;
   vtkKWFrame *MaxFrame;
 
@@ -190,8 +190,8 @@ protected:
 
   // Description:
   // These methods don't call ModifiedCallback().
-  void  SetMinValueInternal(float val);
-  void  SetMaxValueInternal(float val); 
+  void  SetMinValueInternal(double val);
+  void  SetMaxValueInternal(double val); 
 private:
   vtkPVMinMax(const vtkPVMinMax&); // Not implemented
   void operator=(const vtkPVMinMax&); // Not implemented

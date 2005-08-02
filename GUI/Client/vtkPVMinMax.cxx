@@ -17,7 +17,7 @@
 #include "vtkArrayMap.txx"
 #include "vtkKWLabel.h"
 #include "vtkKWFrame.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.50");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -47,8 +47,8 @@ vtkPVMinMax::vtkPVMinMax()
   this->MaxFrame->SetParent(this);
   this->MinLabel = vtkKWLabel::New();
   this->MaxLabel = vtkKWLabel::New();
-  this->MinScale = vtkKWScale::New();
-  this->MaxScale = vtkKWScale::New();
+  this->MinScale = vtkKWScaleWithEntry::New();
+  this->MaxScale = vtkKWScaleWithEntry::New();
   // Disabling Clamp to allow advanced user full interaction
   this->MinScale->ClampValueOff();
   this->MaxScale->ClampValueOff();
@@ -181,9 +181,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
 
   this->MinScale->SetParent(this->MinFrame);
   this->MinScale->Create(this->GetApplication());
-  this->MinScale->SetDisplayEntryAndLabelOnTop(0);
-  this->MinScale->DisplayEntry();
-  this->MinScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
+  this->MinScale->SetRange(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX);
   this->MinScale->SetCommand(this, "MinValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MinScale->GetWidgetName());
@@ -214,9 +212,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
     this->MaxScale->SetParent(this->MinFrame);
     }
   this->MaxScale->Create(this->GetApplication());
-  this->MaxScale->SetDisplayEntryAndLabelOnTop(0);
-  this->MaxScale->DisplayEntry();
-  this->MaxScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
+  this->MaxScale->SetRange(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX);
   this->MaxScale->SetCommand(this, "MaxValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MaxScale->GetWidgetName());
@@ -226,27 +222,27 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::SetMinValue(float val)
+void vtkPVMinMax::SetMinValue(double val)
 {
   this->SetMinValueInternal(val);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::SetMaxValue(float val)
+void vtkPVMinMax::SetMaxValue(double val)
 {
   this->SetMaxValueInternal(val);
   this->ModifiedCallback();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVMinMax::SetMinValueInternal(float val)
+void vtkPVMinMax::SetMinValueInternal(double val)
 {
   this->MinScale->SetValue(val);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVMinMax::SetMaxValueInternal(float val)
+void vtkPVMinMax::SetMaxValueInternal(double val)
 {
   this->MaxScale->SetValue(val);
 }
@@ -354,8 +350,8 @@ void vtkPVMinMax::Update()
   double range[2];
   double oldRange[2];
 
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = VTK_DOUBLE_MIN;
 
   vtkSMProperty* prop = this->GetSMProperty();
   vtkSMDomain* dom = 0;
@@ -455,21 +451,21 @@ void vtkPVMinMax::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::SetResolution(float res)
+void vtkPVMinMax::SetResolution(double res)
 {
   this->MinScale->SetResolution(res);
   this->MaxScale->SetResolution(res);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::SetRange(float min, float max)
+void vtkPVMinMax::SetRange(double min, double max)
 {
   this->MinScale->SetRange(min, max);
   this->MaxScale->SetRange(min, max);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::GetRange(float range[2])
+void vtkPVMinMax::GetRange(double range[2])
 {
   this->MinScale->GetRange(range);
 }
@@ -526,7 +522,7 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvmm->SetMinimumHelp(this->MinHelp);
     pvmm->SetMaximumHelp(this->MaxHelp);
     pvmm->SetResolution(this->MinScale->GetResolution());
-    float min, max;
+    double min, max;
     this->MinScale->GetRange(min, max);
     pvmm->SetRange(min, max);
     pvmm->SetMinValue(this->GetMinValue());
@@ -607,15 +603,15 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-float vtkPVMinMax::GetMinValue() 
+double vtkPVMinMax::GetMinValue() 
 { return this->MinScale->GetValue(); }
 
 //----------------------------------------------------------------------------
-float vtkPVMinMax::GetMaxValue() 
+double vtkPVMinMax::GetMaxValue() 
 { return this->MaxScale->GetValue(); }
 
 //----------------------------------------------------------------------------
-float vtkPVMinMax::GetResolution() 
+double vtkPVMinMax::GetResolution() 
 { return this->MinScale->GetResolution(); }
 
 //----------------------------------------------------------------------------

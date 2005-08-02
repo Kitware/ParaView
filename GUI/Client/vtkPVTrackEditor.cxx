@@ -21,7 +21,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWMenuButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWTkUtilities.h"
@@ -36,7 +36,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.14");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.15");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -92,7 +92,7 @@ vtkPVTrackEditor::vtkPVTrackEditor()
 
   this->SimpleAnimationCue = NULL;
 
-  this->IndexScale = vtkKWScale::New();
+  this->IndexScale = vtkKWScaleWithEntry::New();
 
   this->TitleLabelLabel = vtkKWLabel::New();
   this->TitleLabel = vtkKWLabel::New();
@@ -168,10 +168,8 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
 
   this->IndexScale->SetParent(this->PropertiesFrame);
   this->IndexScale->Create(app);
-  this->IndexScale->DisplayEntry();
-  this->IndexScale->DisplayEntryAndLabelOnTopOff();
   this->IndexScale->SetResolution(1);
-  this->IndexScale->DisplayLabel("Index:");
+  this->IndexScale->SetLabelText("Index:");
   this->IndexScale->SetCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEntryCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEndCommand(this, "IndexChangedCallback");

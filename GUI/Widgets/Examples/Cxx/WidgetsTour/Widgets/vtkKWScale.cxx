@@ -1,4 +1,5 @@
 #include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWScaleSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
@@ -25,55 +26,75 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale1->SetRange(0.0, 100.0);
   scale1->SetResolution(1.0);
   scale1->SetLength(150);
-  scale1->DisplayEntry();
-  scale1->DisplayEntryAndLabelOnTopOff();
-  scale1->DisplayLabel("A scale:");
+  scale1->SetLabelText("A simple scale:");
 
   app->Script(
-    "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+    "pack %s -side top -anchor nw -expand n -fill none -padx 2 -pady 2", 
     scale1->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
   // Create another scale, but put the label and entry on top
 
-  vtkKWScale *scale2 = vtkKWScale::New();
+  vtkKWScaleWithEntry *scale2 = vtkKWScaleWithEntry::New();
   scale2->SetParent(parent);
   scale2->Create(app);
   scale2->SetRange(0.0, 100.0);
   scale2->SetResolution(1.0);
-  scale2->SetLength(350);
-  scale2->DisplayEntry();
-  scale2->DisplayEntryAndLabelOnTopOn();
-  scale2->DisplayLabel("A scale with label/entry on top:");
-  scale2->SetBalloonHelpString("This time, the label and entry are on top");
+  //  scale2->GetScale()->SetLength(350);
+  scale2->RangeVisibilityOn();
+  scale2->SetLabelText("A more complex scale:");
+  scale2->SetBalloonHelpString(
+    "The vtkKWScaleWithEntry class allows a label and entry to be displayed "
+    "at different location around the scale (here, on the side). The range "
+    "of the scale can be displayed on the side too.");
 
   app->Script(
-    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    "pack %s -side top -anchor nw -expand n -fill none -padx 2 -pady 6", 
     scale2->GetWidgetName());
 
   // -----------------------------------------------------------------------
 
-  // Create another scale, popup mode
-  // It also sets scale2 to the same value
+  // Create another scale, different layout, with range
 
-  vtkKWScale *scale3 = vtkKWScale::New();
+  vtkKWScaleWithEntry *scale2b = vtkKWScaleWithEntry::New();
+  scale2b->SetParent(parent);
+  scale2b->Create(app);
+  scale2b->SetRange(0.0, 100.0);
+  scale2b->SetResolution(1.0);
+  scale2b->GetScale()->SetLength(350);
+  scale2b->SetLabelText("Another scale:");
+  scale2b->SetLabelPositionToTop();
+  scale2b->SetEntryPositionToTop();
+  scale2b->SetBalloonHelpString(
+    "This time the label and entry are displayed on top, and the range is "
+    "not visible.");
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -fill none -padx 2 -pady 6", 
+    scale2b->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
+  // Create another scale, popup mode
+  // It also sets scale2b to the same value
+
+  vtkKWScaleWithEntry *scale3 = vtkKWScaleWithEntry::New();
   scale3->SetParent(parent);
-  scale3->PopupScaleOn();
+  scale3->PopupModeOn();
   scale3->Create(app);
   scale3->SetRange(0.0, 100.0);
   scale3->SetResolution(1.0);
-  scale3->DisplayEntry();
-  scale3->DisplayLabel("A popup scale:");
+  scale3->SetLabelText("A popup scale:");
   scale3->SetBalloonHelpString(
     "It's a pop-up, and it sets the previous scale value too");
 
   char buffer[100];
   sprintf(buffer, "SetValue [%s GetValue]", scale3->GetTclName());
-  scale3->SetCommand(scale2, buffer);
+  scale3->SetCommand(scale2b, buffer);
 
   app->Script(
-    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    "pack %s -side top -anchor nw -expand n -fill none -padx 2 -pady 6", 
     scale3->GetWidgetName());
 
   // -----------------------------------------------------------------------
@@ -93,7 +114,8 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     {
     sprintf(buffer, "Scale %d", id);
     vtkKWScale *scale = scale_set->AddWidget(id);
-    scale->DisplayLabel(buffer);
+    scale->SetLabelText(buffer);
+    scale->SetOrientationToVertical();
     scale->SetBalloonHelpString(
       "This scale is part of a unique set (a vtkKWScaleSet), "
       "which provides an easy way to create a bunch of related widgets "
@@ -107,6 +129,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   scale1->Delete();
   scale2->Delete();
+  scale2b->Delete();
   scale3->Delete();
   scale_set->Delete();
 

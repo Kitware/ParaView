@@ -30,7 +30,7 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
 class vtkKWThumbWheel;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkXMProxy;
 class vtkPVInputMenu;
 
@@ -152,7 +152,7 @@ protected:
   vtkKWLabel*        ScaleLabel;
   vtkKWThumbWheel*   ScaleThumbWheel[3];
   vtkKWLabel*        OrientationLabel;
-  vtkKWScale*        OrientationScale[3];
+  vtkKWScaleWithEntry* OrientationScale[3];
 
   vtkPVInputMenu*   InputMenu;
 

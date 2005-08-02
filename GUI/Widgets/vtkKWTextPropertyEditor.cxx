@@ -25,7 +25,7 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.14");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -124,7 +124,7 @@ vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
   this->StylesCheckButtonSet = vtkKWCheckButtonSetWithLabel::New();
 
   this->OpacityVisibility = 1;
-  this->OpacityScale = vtkKWScale::New();
+  this->OpacityScale = vtkKWScaleWithEntry::New();
 
   this->ChangedCommand = NULL;
   this->ColorChangedCommand = NULL;
@@ -286,14 +286,12 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   // Opacity
 
   this->OpacityScale->SetParent(this);
-  this->OpacityScale->PopupScaleOn();
+  this->OpacityScale->PopupModeOn();
   this->OpacityScale->Create(app);
   this->OpacityScale->SetResolution(0.01);
   this->OpacityScale->SetRange(0.0, 1.0);
-  this->OpacityScale->DisplayEntry();
-  this->OpacityScale->DisplayLabel("");
+  this->OpacityScale->SetLabelText("");
   this->OpacityScale->SetEntryWidth(4);
-  this->OpacityScale->DisplayEntryAndLabelOnTopOff();
   this->OpacityScale->SetCommand(this, "OpacityCallback");
   this->OpacityScale->SetEndCommand(this, "OpacityEndCallback");
   this->OpacityScale->SetEntryCommand(this, "OpacityEndCallback");
@@ -353,7 +351,7 @@ void vtkKWTextPropertyEditor::Pack()
     this->StylesCheckButtonSet->GetLabel()->SetText("Style:");
     this->StylesCheckButtonSet->LabelVisibilityOn();
 
-    this->OpacityScale->DisplayLabel("Opacity:");
+    this->OpacityScale->SetLabelText("Opacity:");
 
     this->PushButtonSet->GetLabel()->SetText("Functions:");
     this->PushButtonSet->LabelVisibilityOn();
@@ -395,7 +393,7 @@ void vtkKWTextPropertyEditor::Pack()
 
     this->StylesCheckButtonSet->LabelVisibilityOff();
 
-    this->OpacityScale->DisplayLabel("");
+    this->OpacityScale->SetLabelText("");
 
     this->PushButtonSet->LabelVisibilityOff();
 

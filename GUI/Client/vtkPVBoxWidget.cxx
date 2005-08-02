@@ -21,7 +21,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWView.h"
 #include "vtkMatrix4x4.h" 
@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.61");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -61,7 +61,7 @@ vtkPVBoxWidget::vtkPVBoxWidget()
     {
     this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
     this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
-    this->OrientationScale[cc] = vtkKWScale::New();
+    this->OrientationScale[cc] = vtkKWScaleWithEntry::New();
     }
 
   this->BoxProxy = 0; // This is the implicit function proxy
@@ -498,13 +498,11 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
       "Scale the geometry relative to the size of the dataset.");
 
     this->OrientationScale[cc]->SetParent(this->ControlFrame);
-    this->OrientationScale[cc]->PopupScaleOn();
+    this->OrientationScale[cc]->PopupModeOn();
     this->OrientationScale[cc]->Create(this->GetApplication());
     this->OrientationScale[cc]->SetRange(0, 360);
     this->OrientationScale[cc]->SetResolution(.001);
     this->OrientationScale[cc]->SetValue(0);
-    this->OrientationScale[cc]->DisplayEntry();
-    this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->OrientationScale[cc]->ExpandEntryOn();
     this->OrientationScale[cc]->GetEntry()->SetWidth(5);
     this->OrientationScale[cc]->GetEntry()->AddBinding(

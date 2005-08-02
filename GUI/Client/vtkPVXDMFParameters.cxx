@@ -23,7 +23,7 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -84,7 +84,7 @@ public:
     vtkCollectionIterator* sit = this->GetWidgetsIterator();
     for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
       {
-      vtkKWScale* scale = (vtkKWScale*)sit->GetCurrentObject();
+      vtkKWScaleWithEntry* scale = (vtkKWScaleWithEntry*)sit->GetCurrentObject();
       if ( scale )
         {
         scale->SetParent(0);
@@ -92,20 +92,19 @@ public:
       }
     this->Widgets->RemoveAllItems();
     ParametersMap::iterator it;
-    vtkKWScale* scale;
+    vtkKWScaleWithEntry* scale;
     for ( it = this->Parameters.begin(); it != this->Parameters.end(); it ++ )
       {
       Parameter* p = &it->second;
       const vtkstd::string *name  = &it->first;
-      scale = vtkKWScale::New();
+      scale = vtkKWScaleWithEntry::New();
       scale->SetParent(parent->GetFrame()->GetFrame());
       scale->SetRange(p->Min, p->Max);
       scale->SetResolution(1);
       scale->Create(parent->GetApplication());
-      scale->DisplayRangeOn();
-      scale->DisplayEntry();
+      scale->RangeVisibilityOn();
       scale->SetValue(p->Value);
-      scale->DisplayLabel(name->c_str());
+      scale->SetLabelText(name->c_str());
       scale->SetCommand(parent, "ModifiedCallback");
       parent->Script("pack %s -fill x -expand 1 -side top", scale->GetWidgetName());
       this->Widgets->AddItem(scale);
@@ -150,7 +149,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.39");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -339,8 +338,9 @@ void vtkPVXDMFParameters::Accept()
       int idx=0;
       for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
-        vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
-        const char* label = scale->GetShortLabel();
+        vtkKWScaleWithEntry* scale = 
+          (vtkKWScaleWithEntry*)it->GetCurrentObject();
+        const char* label = scale->GetLabelText();
         vtkPVXDMFParametersInternals::Parameter* par =
           this->Internals->GetParameter(label);
         par->Value = static_cast<int>(scale->GetValue());
@@ -384,8 +384,8 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
-    vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
-    const char* label = scale->GetShortLabel();
+    vtkKWScaleWithEntry* scale = (vtkKWScaleWithEntry*)it->GetCurrentObject();
+    const char* label = scale->GetLabelText();
     //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
     *file << "$kw(" << this->GetTclName() << ") SetParameterIndex {"
@@ -475,7 +475,7 @@ void vtkPVXDMFParameters::UpdateEnableState()
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
-    vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
+    vtkKWScaleWithEntry* scale = (vtkKWScaleWithEntry*)it->GetCurrentObject();
     this->PropagateEnableState(scale);
     }
 }

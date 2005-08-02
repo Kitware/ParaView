@@ -29,7 +29,7 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWToolbarSet.h"
@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.51");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.52");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -157,7 +157,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->VCRToolbar->SetName(VTK_PV_TOOLBARS_ANIMATION_LABEL);
 
   this->TimeLabel = vtkKWLabel::New();
-  this->TimeScale = vtkKWScale::New();
+  this->TimeScale = vtkKWScaleWithEntry::New();
   this->DurationLabel = vtkKWLabel::New();
   this->DurationThumbWheel = vtkKWThumbWheel::New();
   this->PlayModeMenuButton = vtkKWMenuButton::New();
@@ -335,8 +335,6 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
 
   this->TimeScale->SetParent(this);
   this->TimeScale->Create(app);
-  this->TimeScale->DisplayEntry();
-  this->TimeScale->DisplayEntryAndLabelOnTopOff();
   this->TimeScale->SetResolution(0.01);
   this->TimeScale->SetEndCommand(this, "TimeScaleCallback");
   this->TimeScale->SetEntryCommand(this, "TimeScaleCallback");

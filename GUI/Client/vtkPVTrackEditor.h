@@ -27,7 +27,7 @@ class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWMenuButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkPVSimpleAnimationCue;
 class vtkPVKeyFrame;
 class vtkPVTrackEditorObserver;
@@ -113,7 +113,7 @@ protected:
   vtkKWPushButton* AddKeyFrameButton;
   vtkKWPushButton* DeleteKeyFrameButton;
   vtkKWLabel* TypeLabel;
-  vtkKWScale* IndexScale;
+  vtkKWScaleWithEntry* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
 
 

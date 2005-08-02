@@ -294,7 +294,6 @@ protected:
   void CreateLabel();
   void UpdateThumbWheelImage(double pos = -1.0);
   void PackWidget();
-  void UpdateEntryResolution();
   double GetMousePositionInThumbWheel();
 
   //BTX

@@ -37,7 +37,7 @@ class vtkKWLabel;
 class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWThumbWheel;
 class vtkKWWidget;
 class vtkPVApplication;
@@ -365,11 +365,11 @@ protected:
   vtkKWLabel*        ScaleLabel;
   vtkKWThumbWheel*   ScaleThumbWheel[3];
   vtkKWLabel*        OrientationLabel;
-  vtkKWScale*        OrientationScale[3];
+  vtkKWScaleWithEntry* OrientationScale[3];
   vtkKWLabel*        OriginLabel;
   vtkKWThumbWheel*   OriginThumbWheel[3];
   vtkKWLabel*        OpacityLabel;
-  vtkKWScale*        OpacityScale;
+  vtkKWScaleWithEntry* OpacityScale;
 
   vtkKWCheckButton *CubeAxesCheck;
   // Adding point labelling back in.  This should now work in multi process mode too.

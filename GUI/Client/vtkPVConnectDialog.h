@@ -33,7 +33,7 @@
 class vtkKWCheckButtonWithLabel;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWScale;
+class vtkKWScaleWithEntry;
 class vtkKWEntryWithLabel;
 class vtkKWComboBoxWithLabel;
 class vtkKWApplication;
@@ -76,7 +76,7 @@ protected:
   vtkKWEntryWithLabel* Port;
   vtkKWLabel* Label;
   vtkKWCheckButtonWithLabel* MPIMode;
-  vtkKWScale* MPINumberOfServers;
+  vtkKWScaleWithEntry* MPINumberOfServers;
 
   vtkSetStringMacro(HostnameString);
   char* HostnameString;
