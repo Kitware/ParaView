@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.27");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -393,11 +393,11 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app)
   // Number of labels
 
   this->NumberOfLabelsScale->SetParent(frame);
+  this->NumberOfLabelsScale->PopupModeOn();
+  this->NumberOfLabelsScale->Create(app);
   this->NumberOfLabelsScale->SetRange(
     foo->GetNumberOfLabelsMinValue(), foo->GetNumberOfLabelsMaxValue());
   this->NumberOfLabelsScale->SetResolution(1);
-  this->NumberOfLabelsScale->PopupModeOn();
-  this->NumberOfLabelsScale->Create(app);
   this->NumberOfLabelsScale->SetLabelText("Number of labels:");
   this->NumberOfLabelsScale->SetEntryWidth(5);
 
