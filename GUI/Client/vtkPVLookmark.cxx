@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.40");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.41");
 
 
 //*****************************************************************************
@@ -1194,7 +1194,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       // next line should be readfileinformation with path in quotes
       ptr = *(++tokIter);
       // get at the file name without path or extension
-      ptr1 = strstr(ptr.c_str(),"\"");
+      ptr1 = (char *)strstr(ptr.c_str(),"\"");
       ptr1++;
       ptr2 = ptr1;
       ptr2+=strlen(ptr1);
