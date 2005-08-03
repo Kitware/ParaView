@@ -1,0 +1,95 @@
+INCLUDE_DIRECTORIES(
+  ${MPI_INCLUDE_PATH}
+  ${PYTHON_INCLUDE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${ParaView_BINARY_DIR}/VTK"
+  "${ParaView_SOURCE_DIR}/VTK/Common"
+  "${ParaView_SOURCE_DIR}/VTK/Parallel"
+  "${ParaView_SOURCE_DIR}/Servers/Common"
+  "${ParaView_SOURCE_DIR}/Servers/Filters"
+  "${ParaView_SOURCE_DIR}/Servers/ServerManager"
+  "${ParaView_BINARY_DIR}/Servers/ServerManager"
+  "${ParaView_BINARY_DIR}/Servers/Filters"
+  "${ParaView_BINARY_DIR}/Servers/Common"
+  "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer"
+  "${ParaView_BINARY_DIR}/Utilities/VTKClientServer"
+  )
+
+# create the VTK/Python  executable
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
+
+
+
+ADD_EXECUTABLE(ParaViewServerManager
+  vtkPythonAppInit.cxx
+  vtkPVPythonOptions.cxx
+  vtkPVProcessModulePythonHelper.cxx)
+IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
+  GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
+  FIND_FILE(CMAKE_PYTHON_LIBRARY_EXPORT python.exp "${CMAKE_PYTHON_LIB_PREFIX}")
+  SET_TARGET_PROPERTIES( ParaViewServerManager PROPERTIES LINK_FLAGS
+    "-Wl,-bE:${CMAKE_PYTHON_LIBRARY_EXPORT}")
+ENDIF(CMAKE_SYSTEM_NAME MATCHES "AIX")
+
+IF(VTK_USE_CARBON)
+  FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
+  IF(VTK_APPLE_RESOURCE)
+    ADD_CUSTOM_COMMAND(
+      SOURCE ParaViewServerManager
+      COMMAND ${VTK_APPLE_RESOURCE}
+      ARGS Carbon.r -o ${VTK_EXECUTABLE_DIR}/ParaViewServerManager
+      TARGET ParaViewServerManager
+      )
+  ENDIF(VTK_APPLE_RESOURCE)
+ENDIF(VTK_USE_CARBON)
+
+
+FIND_LIBRARY(PYTHON_UTIL_LIBRARY
+  NAMES util
+  PATHS /usr/lib
+  DOC "Utility library needed for ParaViewServerManager"
+  )
+MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
+IF(PYTHON_UTIL_LIBRARY)
+  SET(PYTHON_UTIL_LIBRARY_LIB ${PYTHON_UTIL_LIBRARY})
+ENDIF(PYTHON_UTIL_LIBRARY)
+
+
+IF (APPLE)
+  SET_TARGET_PROPERTIES(ParaViewServerManager PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
+ENDIF (APPLE)
+
+# Link against all the kit wrappers.
+TARGET_LINK_LIBRARIES(ParaViewServerManager 
+  vtkPVServerManagerPython
+  vtkCommon 
+  vtkFiltering
+  vtkIO
+  vtkGraphics
+  vtkImaging
+  ${PYTHON_UTIL_LIBRARY_LIB})
+IF(VTK_WRAP_TCL)
+  TARGET_LINK_LIBRARIES(ParaViewServerManager ${VTK_TK_LIBRARIES})
+ENDIF(VTK_WRAP_TCL)
+
+IF(BORLAND)
+  SET(KITS Common PVServerCommon PVServerManager)
+  FOREACH(KIT ${KITS})
+    WRITE_FILE(${LIBRARY_OUTPUT_PATH}/vtk${KIT}Python.def
+      "EXPORTS\ninitvtk${KIT}Python=_initvtk${KIT}Python\n")
+  ENDFOREACH(KIT)
+ENDIF(BORLAND)
+
+
+TARGET_LINK_LIBRARIES(ParaViewServerManager vtkPVServerManager)
+
+IF(NOT VTK_INSTALL_NO_RUNTIME)
+  INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} ParaViewServerManager)
+ENDIF(NOT VTK_INSTALL_NO_RUNTIME)
+
+# Allow the user to customize their build with some local options
+#
+INCLUDE (${VTK_BINARY_DIR}/Wrapping/Tcl/LocalUserOptions.cmake OPTIONAL)
+INCLUDE (${VTK_SOURCE_DIR}/Wrapping/Tcl/LocalUserOptions.cmake OPTIONAL)
