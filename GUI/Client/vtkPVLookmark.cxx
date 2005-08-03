@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.43");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.44");
 
 
 //*****************************************************************************
@@ -529,6 +529,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
       itChoices->GoToNextItem();
       }
     }
+  menu->Delete();
   itChoices->Delete();
   dialog->Delete();
 /*
@@ -551,15 +552,16 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,char *moduleName, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,char *moduleName, char *name, int &newDatasetFlag, int &updateLookmarkFlag)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs;
   vtkPVSource *source = NULL;
   vtkPVSource *currentSource = win->GetCurrentPVSource();
   char *targetName;
-  vtkPVReaderModule *mod;
-  FILE *file;
+  vtkPVReaderModule *mod = NULL;
+  char mesg[400];
+  char *defaultValue = NULL;
 
   // If there is an open dataset of the same type and path, return it
 /*
@@ -575,19 +577,12 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
     {
     pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
     pvs->SetVisibility(0);
-//    if(!pvs->GetPVInput(0))
-//      {
-      // this is either a Source or Reader
-//      if(pvs->IsA("vtkPVReaderModule"))
-//        {
-        mod = vtkPVReaderModule::SafeDownCast(pvs);
-        targetName = (char *)mod->GetFileEntry()->GetValue();
-        if(!strcmp(targetName,name) && !strcmp(pvs->GetModuleName(),moduleName))
-          {
-          source = pvs;
-          }
- //       }
-//      }
+    mod = vtkPVReaderModule::SafeDownCast(pvs);
+    targetName = (char *)mod->GetFileEntry()->GetValue();
+    if(!strcmp(targetName,name) && !strcmp(pvs->GetModuleName(),moduleName))
+      {
+      source = pvs;
+      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -595,31 +590,115 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
   // If there is no match among the open datasets, try to open it automatically, otherwise ask the user
   if(!source)
     {
-    if( (file = fopen(name,"r")) != NULL)
+    if(win->Open(name) == VTK_OK)
       {
-      fclose(file);
-      if(win->Open(name) == VTK_OK)
-        {
-        source = win->GetCurrentPVSource();
-        source->AcceptCallback();
-        }
+      source = win->GetCurrentPVSource();
+      source->AcceptCallback();
       }
     else
       {
-      vtkKWMessageDialog::PopupMessage(
-        this->GetPVApplication(), win, "Could Not Find Default Data Set", 
-        "You will now be asked to select a different data set.", 
-        vtkKWMessageDialog::ErrorIcon);
-
-      win->OpenCallback();
-      source = win->GetCurrentPVSource();
-      if(source==currentSource || !source->IsA("vtkPVReaderModule"))
+      // in the dialog, give user option to select an open reader via a kwmenubutton or one from disk via a dialog. then ask them if they want to make it the new default dataset
+      vtkCollectionIterator *itChoices = readers->NewIterator();
+      vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
+      dialog->SetMasterWindow(win);
+      dialog->SetOptions(
+        vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
+      //dialog->SetModal(0);
+      dialog->SetStyleToOkOtherCancel();
+      dialog->SetOtherButtonText("Open");
+      dialog->Create(this->GetPVApplication());
+      vtkKWMenuButton *menu = vtkKWMenuButton::New();
+      menu->SetParent(dialog->GetBottomFrame());
+      menu->Create(this->GetPVApplication());
+      this->Script("pack %s",menu->GetWidgetName());
+      itChoices->InitTraversal();
+      while(!itChoices->IsDoneWithTraversal())
         {
-        return 0;
+        pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+        mod = vtkPVReaderModule::SafeDownCast(pvs);
+        menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+        if(!strcmp(name,mod->RemovePath(mod->GetFileEntry()->GetValue())))
+          {
+          defaultValue = name;
+          }
+        itChoices->GoToNextItem();
         }
-      source->AcceptCallback();
+      // if there is an exact filename match, set it as default entry, otherwise, use last one added
+      if(defaultValue)
+        {
+        menu->SetValue(defaultValue);
+        }
+      else if(mod)
+        {
+        menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+        }
+      sprintf(mesg,"The dataset stored with this lookmark could not be located at %s. Either select an open one from the drop down menu or an unopen one by pressing \"Open\".",name);
+      dialog->SetText( mesg );
+      dialog->SetTitle( "Could Not Find Default Data Set" );
+      dialog->SetIcon();
+      dialog->BeepOn();
+      if(dialog->Invoke())
+        {
+        if(dialog->GetStatus()==2)
+          {
+          itChoices->InitTraversal();
+          while(!itChoices->IsDoneWithTraversal())
+            {
+            pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
+            mod = vtkPVReaderModule::SafeDownCast(pvs);
+            if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+              {
+              source = pvs;
+              break;
+              }
+            itChoices->GoToNextItem();
+            }
+          }
+        else if(dialog->GetStatus()==3)
+          {
+          // this is necessary because otherwise the application will think a dialog is still up and not exit when asked to:
+          this->GetPVApplication()->UnRegisterDialogUp(dialog);
+          pvs = win->GetCurrentPVSource();
+          win->OpenCallback();
+          source = win->GetCurrentPVSource();
+          // dialog may have been canceled in which case the current source has not changed
+          if(source==currentSource || !source->IsA("vtkPVReaderModule"))
+            {
+            source = NULL;
+            }
+          else
+            {
+            source->AcceptCallback();
+            }
+          }
 
-      this->Script("focus %s",this->GetWidgetName());
+        if(source)
+          {
+          // ask user if this should be made the default dataset
+          int yes = vtkKWMessageDialog::PopupYesNo(
+            this->GetPVApplication(), win, "Replace Dataset?", 
+            "Should this new dataset be used as the default dataset for this lookmark in the future?", 
+            vtkKWMessageDialog::QuestionIcon);
+          if(yes)
+            {
+            updateLookmarkFlag = 1;
+            mod = vtkPVReaderModule::SafeDownCast(source);
+            vtkstd::string newDataset = this->GetDataset();
+            vtkstd::string::size_type idx = newDataset.rfind(name,newDataset.size());
+            if(idx!=vtkstd::string::npos)
+              {
+              newDataset.replace(idx,strlen(name),mod->GetFileEntry()->GetValue());
+              this->SetDataset(newDataset.c_str());
+              this->CreateDatasetList();
+              }
+            }
+          // set flag to make sure that during parsing of the state script, certain file specific vtkPVWidgets are not set
+          newDatasetFlag = 1;
+          }
+        }
+      menu->Delete();
+      itChoices->Delete();
+      dialog->Delete();
       }
     }
 
@@ -1107,6 +1186,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkstd::vector<vtkstd::string> buf;
   char moduleName[50];
   vtkstd::string::size_type ret;
+  int newDatasetFlag = 0;
+  int updateLookmarkFlag = 0;
 
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
@@ -1204,7 +1285,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         // look for an open dataset of the same path and reader type
         // if none is open, try to open the one at the specified path automatically for user
         // if that fails, prompt user for a new data file
-        src = this->GetReaderForLookmark(readers,moduleName,path);
+        newDatasetFlag = 0;
+        src = this->GetReaderForLookmark(readers,moduleName,path,newDatasetFlag,updateLookmarkFlag);
         }
 
       if(src)
@@ -1216,7 +1298,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           {
           ptr = *(++tokIter);
           }
-        this->InitializeSourceFromScript(src,tokIter,macroFlag);
+        this->InitializeSourceFromScript(src,tokIter,macroFlag,newDatasetFlag);
         // remove this source from the available list
         readers->RemoveItem(src);
         }
@@ -1314,7 +1396,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           tclName = new char[20]; 
           strcpy(tclName,srcTclName);
           tclNameMap[src] = tclName;
-          this->InitializeSourceFromScript(src,tokIter,macroFlag);
+          this->InitializeSourceFromScript(src,tokIter,macroFlag,0);
           // remove this source from the available list
           sources->RemoveItem(src);
           }
@@ -1433,6 +1515,13 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   this->Script("[winfo toplevel %s] config -cursor {}", 
                 this->GetWidgetName());
   this->GetPVRenderView()->EndBlockingRender();
+
+  // if the dataset changed for a lookmark and the user agreed to use it from now on, update lookmark
+  if(updateLookmarkFlag)
+    {
+    this->Update();
+    }
+
   // delete tclNameMa
   iter = tclNameMap.begin();
   while(iter != tclNameMap.end())
@@ -1490,7 +1579,7 @@ void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkstd::v
 }
 
 
-void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &tokIter, int macroFlag)
+void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &tokIter, int macroFlag, int newDatasetFlag)
 {
   vtkPVScale *scale;
   vtkPVArraySelection *arraySelection;
@@ -1574,11 +1663,13 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
           sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
           //only turn the variable on, not off, because some other filter might be using the variable
           if(ival)
+            {
             arraySelection->SetArrayStatus(sval,ival);
-          ptr = *(++tokIter);  
+            arraySelection->ModifiedCallback();
+            }
+          arraySelection->Accept();
+          ptr = *(++tokIter);
           }
-        arraySelection->ModifiedCallback();
-        arraySelection->Accept();
         }
       else if((labeledToggle = vtkPVLabeledToggle::SafeDownCast(pvWidget)))
         {
@@ -1652,6 +1743,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         {
         ptr = *(++tokIter);
         ptr = *(++tokIter);
+        // check newDatasetFlag
         }
       else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
         {
@@ -1671,7 +1763,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         }
       else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
         {
-        if(macroFlag)
+        if(macroFlag || newDatasetFlag)
           {
           ptr = *(++tokIter);
           ptr = *(++tokIter);
@@ -1695,7 +1787,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         {
         // If this is a macro, don't initialize since the two datasets could be made up of a 
         // different range of files. 
-        if(macroFlag)
+        if(macroFlag || newDatasetFlag)
           {
           ptr = *(++tokIter);
           ptr = *(++tokIter);

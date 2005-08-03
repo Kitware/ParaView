@@ -175,10 +175,10 @@ protected:
   // the filters so that we can go back and set reset them at the end
   void ParseAndExecuteStateScript(char *state, int macroFlag);
 //BTX
-  void InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &it, int macroFlag);
+  void InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &it, int macroFlag, int newDatasetFlag);
   void InitializeVolumeAppearanceEditor(vtkPVSource*, vtkstd::vector<vtkstd::string>::iterator &it);
 //ETX
-  vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name);
+  vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name, int &newDatasetFlag, int &updateLookmarkFlag);
   vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
   vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
