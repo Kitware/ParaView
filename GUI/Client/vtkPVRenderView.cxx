@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.399");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.400");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -736,7 +736,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app)
 
   this->SplitFrame->SetParent(this->GetPropertiesParent());
   this->SplitFrame->SetOrientationToVertical();
-  this->SplitFrame->SetExpandFrameToFrame1();
+  this->SplitFrame->SetExpandableFrameToFrame1();
   this->SplitFrame->SetSeparatorSize(5);
   this->SplitFrame->SetFrame2MinimumSize(80);
 
