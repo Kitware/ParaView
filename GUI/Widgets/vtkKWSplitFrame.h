@@ -36,19 +36,25 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
-  // Get the the left/bottom internal frame.
+  // Get Frame1. In horizontal orientation, this is the one on the left of the
+  // separator. In vertical orientation, the one at the bottom.
+  // Both Frame1 and Frame2 position can be swapped using the SetFrameLayout
+  // method.
   vtkKWFrame *GetFrame1() {return this->Frame1;};
 
   // Description:
-  // Get the the right/top internal frame.
+  // Get Frame2. In horizontal orientation, this is the one on the right of the
+  // separator. In vertical orientation, the one at the top.
+  // Both Frame1 and Frame2 position can be swapped using the SetFrameLayout
+  // method.
   vtkKWFrame *GetFrame2() {return this->Frame2;};
 
   // Description:
-  // Horizontal orientation has first frame to left of second.
-  // Vertical orientation has the first frame at the bottom of 
-  // the second frame.
-  // At the moment, this state has to be set before the
-  // widget is created.  I should extend it in the future to be more flexible.
+  // Set/Get the orientation of the split frame.
+  // If horizontal, Frame1 is on the left of the separator, Frame2 on the
+  // right. If Vertical, Frame1 is below the separator, Frame2 is on top.
+  // Both Frame1 and Frame2 position can be swapped using the SetFrameLayout
+  // method.
   //BTX
   enum 
   {
@@ -56,7 +62,7 @@ public:
     OrientationVertical
   };
   //ETX
-  vtkSetMacro(Orientation, int);
+  virtual void SetOrientation(int);
   vtkGetMacro(Orientation, int);
   virtual void SetOrientationToHorizontal()
     { this->SetOrientation(vtkKWSplitFrame::OrientationHorizontal); };
@@ -64,58 +70,74 @@ public:
     { this->SetOrientation(vtkKWSplitFrame::OrientationVertical); };
 
   // Description:
+  // Set/Get the the frame layout.
+  // If set to Default, depending on the orientation, Frame1 is on the left
+  // (respectively bottom) of the separator, Frame2 on the right (top).
+  // If set to Swapped, Frame1 and Frame2 position are exchanged.
+  //BTX
+  enum 
+  {
+    FrameLayoutDefault = 0,
+    FrameLayoutSwapped
+  };
+  //ETX
+  virtual void SetFrameLayout(int);
+  vtkGetMacro(FrameLayout, int);
+  virtual void SetFrameLayoutToDefault()
+    { this->SetFrameLayout(vtkKWSplitFrame::FrameLayoutDefault); };
+  virtual void SetFrameLayoutToSwapped()
+    { this->SetFrameLayout(vtkKWSplitFrame::FrameLayoutSwapped); };
+
+  // Description:
   // Set/Get which frame is automatically expanded when the whole widget
   // is resized. By default, Frame2 (i.e. right or top frame)
   //BTX
   enum 
   {
-    ExpandFrame1 = 0,
-    ExpandFrame2,
-    ExpandBothFrames
+    ExpandableFrame1 = 0,
+    ExpandableFrame2,
+    ExpandableFrameBoth
   };
   //ETX
-  vtkSetClampMacro(ExpandFrame, int, 
-                   vtkKWSplitFrame::ExpandFrame1, 
-                   vtkKWSplitFrame::ExpandBothFrames);
-  vtkGetMacro(ExpandFrame, int);
-  virtual void SetExpandFrameToFrame1()
-    { this->SetExpandFrame(vtkKWSplitFrame::ExpandFrame1); };
-  virtual void SetExpandFrameToFrame2()
-    { this->SetExpandFrame(vtkKWSplitFrame::ExpandFrame2); };
-  virtual void SetExpandFrameToBothFrames()
-    { this->SetExpandFrame(vtkKWSplitFrame::ExpandBothFrames); };
+  vtkSetClampMacro(ExpandableFrame, int, 
+                   vtkKWSplitFrame::ExpandableFrame1, 
+                   vtkKWSplitFrame::ExpandableFrameBoth);
+  vtkGetMacro(ExpandableFrame, int);
+  virtual void SetExpandableFrameToFrame1()
+    { this->SetExpandableFrame(vtkKWSplitFrame::ExpandableFrame1); };
+  virtual void SetExpandableFrameToFrame2()
+    { this->SetExpandableFrame(vtkKWSplitFrame::ExpandableFrame2); };
+  virtual void SetExpandableFrameToBothFrames()
+    { this->SetExpandableFrame(vtkKWSplitFrame::ExpandableFrameBoth); };
 
   // Description:
-  // Set/Get The minimum size for the two frames.
+  // Set/Get The minimum size, size and visibility of Frame1.
   vtkGetMacro(Frame1MinimumSize, int);
-  vtkGetMacro(Frame2MinimumSize, int);
   virtual void SetFrame1MinimumSize(int minSize);
-  virtual void SetFrame2MinimumSize(int minSize);
-
-  // Description:
-  // Set/Get the size of the frames.  
   vtkGetMacro(Frame1Size, int);
-  vtkGetMacro(Frame2Size, int);
   virtual void SetFrame1Size(int size);
-  virtual void SetFrame2Size(int size);
+  vtkGetMacro(Frame1Visibility, int);
+  virtual void SetFrame1Visibility(int flag);
+  vtkBooleanMacro(Frame1Visibility, int);  
 
   // Description:
-  // Set/Get the visibility of the left or right frame.  
-  virtual void SetFrame1Visibility(int flag);
-  vtkGetMacro(Frame1Visibility, int);
-  vtkBooleanMacro(Frame1Visibility, int);  
-  virtual void SetFrame2Visibility(int flag);
+  // Set/Get The minimum size, size and visibility of Frame2.
+  vtkGetMacro(Frame2MinimumSize, int);
+  virtual void SetFrame2MinimumSize(int minSize);
+  vtkGetMacro(Frame2Size, int);
+  virtual void SetFrame2Size(int size);
   vtkGetMacro(Frame2Visibility, int);
+  virtual void SetFrame2Visibility(int flag);
   vtkBooleanMacro(Frame2Visibility, int);  
 
   // Description:
-  // This sets the separators narrow dimension.
+  // Set/Get the separator narrow dimension.
   // If the size is 0, then the two frames cannot be adjusted by the user.
   virtual void SetSeparatorSize(int size);
   vtkGetMacro(SeparatorSize, int);
 
   // Description:
-  // This sets the separators narrow margin, i.e. the empty space around the
+  // Set/Get the separator narrow margin, i.e. the empty space around the
   // separator itself.
   virtual void SetSeparatorMargin(int size);
   vtkGetMacro(SeparatorMargin, int);
@@ -126,6 +148,7 @@ public:
   vtkGetMacro(SeparatorVisibility, int);
   vtkBooleanMacro(SeparatorVisibility, int);  
 
+  // Description:
   // Callbacks used internally to adjust the size,
   virtual void DragCallback();
   virtual void ConfigureCallback();
@@ -164,7 +187,8 @@ protected:
   int Frame2MinimumSize;
 
   int Orientation;
-  int ExpandFrame;
+  int FrameLayout;
+  int ExpandableFrame;
 
   // Reset the actual windows to match our size IVars.
 
@@ -176,6 +200,7 @@ protected:
   virtual void ReConfigure();
   virtual int GetInternalMarginHorizontal();
   virtual int GetInternalMarginVertical();
+  virtual void ConfigureSeparatorCursor();
 
 private:
   vtkKWSplitFrame(const vtkKWSplitFrame&); // Not implemented
