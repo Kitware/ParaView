@@ -25,7 +25,7 @@
 
 
 vtkStandardNewMacro(vtkSMPickPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickPointWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPickPointWidgetProxy, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMPickPointWidgetProxy::vtkSMPickPointWidgetProxy()
@@ -87,11 +87,94 @@ void vtkSMPickPointWidgetProxy::OnChar()
       }
     int X = this->Interactor->GetEventPosition()[0];
     int Y = this->Interactor->GetEventPosition()[1];
-    float z = this->CurrentRenderModuleProxy->GetZBufferValue(X, Y);
+    float Z = this->CurrentRenderModuleProxy->GetZBufferValue(X, Y);
+
+    if (Z == 1.0) 
+      {      
+
+      //missed, search around in image space until we hit something
+      int Xnew = X;
+      int Ynew = Y;
+      float Znew = Z;
+      bool missed = true;
+      bool OOBLeft = false;
+      bool OOBRight = false;
+      bool OOBDown = false;
+      bool OOBUp = false;
+      int winSize[2];
+      int keepsearching =
+        this->CurrentRenderModuleProxy->GetServerRenderWindowSize(winSize);
+      int incr = 0;
+      while (missed && keepsearching)
+        {
+        incr++;
+
+        if (incr <= X) 
+          {          
+          Znew = this->CurrentRenderModuleProxy->GetZBufferValue(X-incr, Y);
+          if (Znew < Z) 
+            {
+            Xnew = X-incr;
+            Ynew = Y;
+            Z = Znew;          
+            missed = false;
+            }
+          }
+        else 
+          OOBLeft = true;
+
+        if (X+incr < winSize[0]) 
+          {
+          Znew = this->CurrentRenderModuleProxy->GetZBufferValue(X+incr, Y);
+          if (Znew < Z) 
+            {
+            Xnew = X+incr;
+            Ynew = Y;
+            Z = Znew; 
+            missed = false;
+            }
+          }
+        else
+          OOBRight = true;
+
+        if (incr <= Y) 
+          {
+          Znew = this->CurrentRenderModuleProxy->GetZBufferValue(X, Y-incr);
+          if (Znew < Z) 
+            {
+            Xnew = X;
+            Ynew = Y-incr;
+            Z = Znew;
+            missed = false;
+            }
+          }
+        else
+          OOBDown = true;
+
+        if (Y+incr < winSize[1]) 
+          {
+          Znew = this->CurrentRenderModuleProxy->GetZBufferValue(X, Y+incr);
+          if (Znew < Z) 
+            {
+            Xnew = X; 
+            Ynew = Y+incr;
+            Z = Znew;
+            missed = false;
+            }
+          }
+        else
+          OOBUp = true;
+
+        if (OOBLeft && OOBRight && OOBDown && OOBUp) keepsearching = 0;
+        }
+      X = Xnew;
+      Y = Ynew;
+      }
+    
     double pt[4];
     
     // ComputeDisplayToWorld
-    ren->SetDisplayPoint(double(X), double(Y), z);
+    ren->SetDisplayPoint(double(X), double(Y), Z);
     ren->DisplayToWorld();
     ren->GetWorldPoint(pt);
 
