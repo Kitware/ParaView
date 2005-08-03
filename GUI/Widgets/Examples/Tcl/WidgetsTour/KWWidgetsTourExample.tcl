@@ -86,7 +86,7 @@ set page_widget [source_panel GetPageWidget "Source"]
 
 vtkKWSplitFrame source_split
 source_split SetParent $page_widget
-source_split SetExpandFrameToBothFrames
+source_split SetExpandableFrameToBothFrames
 source_split Create app
 
 pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
