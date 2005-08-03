@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWVolumeMaterialPropertyWidget - widget to control the material property of a volume
+// .NAME vtkKWVolumeMaterialPropertyWidget - widget to control the material property of a volume  (vtkVolumeProperty)
 // .SECTION Description
 
 #ifndef __vtkKWVolumeMaterialPropertyWidget_h
@@ -36,7 +36,7 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
-  // Set/get the volume property observed by this widget
+  // Set/get the volume property to edit with this widget
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
 
@@ -59,7 +59,7 @@ public:
   vtkGetMacro(AllowEnableShading, int);
 
   // Description:
-  // Refresh the interface given the value extracted from the current widget.
+  // Refresh the interface given the value extracted from the current property.
   virtual void Update();
 
   // Description:
@@ -92,6 +92,7 @@ protected:
   vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
   vtkKWCheckButtonWithLabel             *EnableShadingCheckButton;
 
+  // Description:
   // Pack
   virtual void Pack();
 
@@ -101,6 +102,7 @@ protected:
   virtual int UpdatePropertyFromInterface();
   virtual int UpdatePropertyFromPreset(const Preset *preset);
 
+  // Description:
   // Send an event representing the state of the widget
   virtual void SendStateEvent(int event);
 

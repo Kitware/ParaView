@@ -141,6 +141,7 @@ SET(KWWidgets_SRCS
   vtkKWSpinBox.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
+  vtkKWSurfaceMaterialPropertyWidget.cxx
   vtkKWTclInteractor.cxx
   vtkKWText.cxx 
   vtkKWTextPropertyEditor.cxx
