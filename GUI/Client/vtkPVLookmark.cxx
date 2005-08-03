@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.42");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.43");
 
 
 //*****************************************************************************
@@ -1231,7 +1231,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     else if(ptr.rfind("CreatePVSource",ptr.size())!=vtkstd::string::npos )
       {
       foundSource = true;
-      sscanf(ptr.c_str(),"%*s %*s %*s %*s %[^]]",moduleName);
+      sscanf(ptr.c_str(),"%*s %s %*s %*s %[^]]",srcTclName,moduleName);
 
       // ASSUMPTION: the first pvwidget listed in script will be an input if it is a filter
       
