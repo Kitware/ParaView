@@ -21,6 +21,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWRegistryHelper.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -35,7 +36,6 @@ const char *vtkKWWindow::MainPanelVisibilityRegKey = "MainPanelVisibility";
 const char *vtkKWWindow::MainPanelVisibilityKeyAccelerator = "F5";
 const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
 const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
-
 const char *vtkKWWindow::SecondaryPanelSizeRegKey = "SecondaryPanelSize";
 const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibility";
 const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
@@ -43,8 +43,9 @@ const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
 const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
 const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
+const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.264");
+vtkCxxRevisionMacro(vtkKWWindow, "1.265");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -237,6 +238,8 @@ void vtkKWWindow::Create(vtkKWApplication *app)
     this->MainSplitFrame->GetSeparatorSize());
   this->SecondarySplitFrame->SetOrientationToVertical();
 
+  this->MainSplitFrame->SetExpandableFrameToFrame2();
+
   if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
     {
     this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
@@ -395,6 +398,59 @@ void vtkKWWindow::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::SetViewPanelPosition(int val)
+{
+  if (val < vtkKWWindow::ViewPanelPositionLeft)
+    {
+    val = vtkKWWindow::ViewPanelPositionLeft;
+    }
+  if (val > vtkKWWindow::ViewPanelPositionRight)
+    {
+    val = vtkKWWindow::ViewPanelPositionRight;
+    }
+
+  if (this->GetViewPanelPosition() == val)
+    {
+    return;
+    }
+
+  if (this->MainSplitFrame)
+    {
+    if (val == vtkKWWindow::ViewPanelPositionRight)
+      {
+      this->MainSplitFrame->SetFrameLayoutToDefault();
+      }
+    else
+      {
+      this->MainSplitFrame->SetFrameLayoutToSwapped();
+      }
+    }
+
+  // Update the UI (the app settings reflect this change)
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindow::GetViewPanelPosition()
+{
+  if (this->MainSplitFrame)
+    {
+    if (this->MainSplitFrame->GetFrameLayout() == 
+        vtkKWSplitFrame::FrameLayoutDefault)
+      {
+      return vtkKWWindow::ViewPanelPositionRight;
+      }
+    else
+      {
+      return vtkKWWindow::ViewPanelPositionLeft;
+      }
+    }
+
+  return vtkKWWindow::ViewPanelPositionRight;
+}
+
+//----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface* 
 vtkKWWindow::GetApplicationSettingsInterface()
 {
@@ -538,26 +594,33 @@ void vtkKWWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
 //----------------------------------------------------------------------------
 vtkKWFrame* vtkKWWindow::GetMainPanelFrame()
 {
-  if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
+  if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView ||
+      this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMainAndView)
     {
-    return this->MainSplitFrame ? this->MainSplitFrame->GetFrame1() : NULL;
+    if (this->MainSplitFrame)
+      {
+      return this->MainSplitFrame->GetFrame1();
+      }
     }
   else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
     {
-    return this->SecondarySplitFrame 
-      ? this->SecondarySplitFrame->GetFrame2() : NULL;
+    if (this->SecondarySplitFrame)
+      {
+      return this->SecondarySplitFrame->GetFrame2();
+      }
     }
-  else
-    {
-    return this->MainSplitFrame ? this->MainSplitFrame->GetFrame1() : NULL;
-    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindow::GetMainPanelVisibility()
 {
-  return (this->MainSplitFrame && 
-          this->MainSplitFrame->GetFrame1Visibility() ? 1 : 0);
+  if (this->MainSplitFrame)
+    { 
+    return this->MainSplitFrame->GetFrame1Visibility();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -699,14 +762,15 @@ vtkKWFrame* vtkKWWindow::GetViewPanelFrame()
     {
     return this->SecondarySplitFrame->GetFrame2();
     }
-  else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
+  else 
     {
-    return this->MainSplitFrame->GetFrame2();
+    if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain ||
+        this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMainAndView)
+      {
+      return this->MainSplitFrame->GetFrame2();
+      }
     }
-  else
-    {
-    return this->MainSplitFrame->GetFrame2();
-    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -822,6 +886,23 @@ void vtkKWWindow::SaveWindowGeometryToRegistry()
   this->GetApplication()->SetRegistryValue(
     2, "Geometry", vtkKWWindow::SecondaryPanelVisibilityRegKey, "%d", 
     this->GetSecondaryPanelVisibility());
+
+  // View panel
+
+  const char *pos = NULL;
+  if (this->GetViewPanelPosition() == vtkKWWindow::ViewPanelPositionLeft)
+    {
+    pos = "Left";
+    }
+  else if (this->GetViewPanelPosition() == vtkKWWindow::ViewPanelPositionRight)
+    {
+    pos = "Right";
+    }
+  if (pos)
+    {
+    this->GetApplication()->SetRegistryValue(
+      2, "Geometry", vtkKWWindow::ViewPanelPositionRegKey, "%s", pos);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -874,6 +955,22 @@ void vtkKWWindow::RestoreWindowGeometryFromRegistry()
     this->SetSecondaryPanelVisibility(
       this->GetApplication()->GetIntRegistryValue(
         2, "Geometry", vtkKWWindow::SecondaryPanelVisibilityRegKey));
+    }
+
+  // View panel
+
+  char pos[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
+  if (this->GetApplication()->GetRegistryValue(
+        2, "Geometry", vtkKWWindow::ViewPanelPositionRegKey, pos))
+    {
+    if (!strcmp(pos, "Left"))
+      {
+      this->SetViewPanelPositionToLeft();
+      }
+    else if (!strcmp(pos, "Right"))
+      {
+      this->SetViewPanelPositionToRight();
+      }
     }
 }
 

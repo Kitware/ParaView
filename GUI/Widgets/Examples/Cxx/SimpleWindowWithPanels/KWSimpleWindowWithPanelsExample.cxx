@@ -61,6 +61,7 @@ int my_main(int argc, char *argv[])
   // Set 'SupportHelp' to automatically add a menu entry for the help link
 
   vtkKWWindow *win = vtkKWWindow::New();
+  win->SetViewPanelPositionToLeft();
   win->SupportHelpOn();
   app->AddWindow(win);
   win->Create(app);

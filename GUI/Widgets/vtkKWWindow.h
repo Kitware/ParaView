@@ -218,6 +218,24 @@ public:
     {this->SetPanelLayout(vtkKWWindow::PanelLayoutSecondaryBelowMainAndView);};
 
   // Description:
+  // Set the view panel position. Default is on the right of the window.
+  // IMPORTANT: this ivar has to be set before calling Create(), and can
+  // not be changed afterwards.
+  //BTX
+  enum 
+  {
+    ViewPanelPositionLeft = 0,
+    ViewPanelPositionRight
+  };
+  //ETX
+  virtual void SetViewPanelPosition(int);
+  virtual int GetViewPanelPosition();
+  virtual void SetViewPanelPositionToLeft()
+    { this->SetViewPanelPosition(vtkKWWindow::ViewPanelPositionLeft);};
+  virtual void SetViewPanelPositionToRight()
+    { this->SetViewPanelPosition(vtkKWWindow::ViewPanelPositionRight);};
+
+  // Description:
   // Convenience method to get the frame available for "viewing". 
   // Override the superclass to return a page in the notebook of the
   // view user interface manager (located in the first part of the 
@@ -309,6 +327,7 @@ public:
   static const char *ShowSecondaryPanelMenuLabel;
   static const char *DefaultViewPanelName;
   static const char *TclInteractorMenuLabel;
+  static const char *ViewPanelPositionRegKey;
   //ETX
 
 protected:
@@ -337,10 +356,10 @@ protected:
   int PanelLayout;
 
   vtkKWSplitFrame *MainSplitFrame;
-  vtkKWNotebook *MainNotebook;
+  vtkKWNotebook   *MainNotebook;
 
   vtkKWSplitFrame *SecondarySplitFrame;
-  vtkKWNotebook *SecondaryNotebook;
+  vtkKWNotebook   *SecondaryNotebook;
 
   vtkKWNotebook *ViewNotebook;
 

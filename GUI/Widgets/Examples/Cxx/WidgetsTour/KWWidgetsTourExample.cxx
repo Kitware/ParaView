@@ -142,7 +142,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWSplitFrame *source_split = vtkKWSplitFrame::New();
   source_split->SetParent(page_widget);
-  source_split->SetExpandFrameToBothFrames();
+  source_split->SetExpandableFrameToBothFrames();
   source_split->Create(app);
 
   app->Script("pack %s -side top -expand y -fill both -padx 0 -pady 0", 

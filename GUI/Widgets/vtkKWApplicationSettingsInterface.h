@@ -62,6 +62,7 @@ public:
   virtual void FlatFrameCallback();
   virtual void FlatButtonsCallback();
   virtual void DPICallback(double dpi);
+  virtual void ViewPanelPositionCallback();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -92,6 +93,7 @@ protected:
   vtkKWCheckButton  *SaveUserInterfaceGeometryCheckButton;
   vtkKWCheckButton  *SplashScreenVisibilityCheckButton;
   vtkKWCheckButton  *BalloonHelpVisibilityCheckButton;
+  vtkKWMenuButtonWithLabel *ViewPanelPositionOptionMenu;
 
   // Interface customization
 

@@ -39,7 +39,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.47");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -55,6 +55,7 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->SaveUserInterfaceGeometryCheckButton = 0;
   this->SplashScreenVisibilityCheckButton = 0;
   this->BalloonHelpVisibilityCheckButton = 0;
+  this->ViewPanelPositionOptionMenu = 0;
 
   // Interface customization
 
@@ -108,6 +109,12 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     {
     this->BalloonHelpVisibilityCheckButton->Delete();
     this->BalloonHelpVisibilityCheckButton = NULL;
+    }
+
+  if (this->ViewPanelPositionOptionMenu)
+    {
+    this->ViewPanelPositionOptionMenu->Delete();
+    this->ViewPanelPositionOptionMenu = NULL;
     }
 
   // Interface customization
@@ -296,6 +303,28 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
+  // Interface settings : View Panel Position
+
+  if (!this->ViewPanelPositionOptionMenu)
+    {
+    this->ViewPanelPositionOptionMenu = vtkKWMenuButtonWithLabel::New();
+    }
+
+  this->ViewPanelPositionOptionMenu->SetParent(frame);
+  this->ViewPanelPositionOptionMenu->Create(app);
+
+  this->ViewPanelPositionOptionMenu->GetLabel()->SetText(
+    "View panel position:");
+
+  this->ViewPanelPositionOptionMenu->GetWidget()->AddRadioButton(
+    "Left", this, "ViewPanelPositionCallback");
+  this->ViewPanelPositionOptionMenu->GetWidget()->AddRadioButton(
+    "Right", this, "ViewPanelPositionCallback");
+
+  tk_cmd << "pack " << this->ViewPanelPositionOptionMenu->GetWidgetName()
+         << " -side top -anchor w -padx 2 -pady 2" << endl;
+
+  // --------------------------------------------------------------
   // Interface customization : main frame
 
   if (!this->InterfaceCustomizationFrame)
@@ -305,7 +334,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceCustomizationFrame->Create(app);
-  this->InterfaceCustomizationFrame->SetLabelText("Interface Customization");
+  this->InterfaceCustomizationFrame->SetLabelText("Drag & Drop Settings");
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 " 
@@ -411,6 +440,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   
   frame = this->PrintSettingsFrame->GetFrame();
 
+  // --------------------------------------------------------------
   // Print settings : DPI
 
   if (!this->DPIOptionMenu)
@@ -496,6 +526,23 @@ void vtkKWApplicationSettingsInterface::Update()
       }
     }
 
+  // Interface settings : View Panel Position
+
+  if (this->ViewPanelPositionOptionMenu && 
+      this->ViewPanelPositionOptionMenu->GetWidget() && this->Window)
+    {
+    if (this->Window->GetViewPanelPosition() == 
+        vtkKWWindow::ViewPanelPositionLeft)
+      {
+      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue("Left");
+      }
+    else if (this->Window->GetViewPanelPosition() == 
+             vtkKWWindow::ViewPanelPositionRight)
+      {
+      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue("Right");
+      }
+    }
+
   // Interface customization : Drag & Drop : Enable
 
   vtkKWUserInterfaceManagerNotebook *uim_nb = 
@@ -510,7 +557,8 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatFrameCheckButton)
     {
-    this->FlatFrameCheckButton->SetSelectedState(vtkKWToolbar::GetGlobalFlatAspect());
+    this->FlatFrameCheckButton->SetSelectedState(
+      vtkKWToolbar::GetGlobalFlatAspect());
     }
 
   // Toolbar settings : flat buttons
@@ -556,7 +604,8 @@ void vtkKWApplicationSettingsInterface::SaveUserInterfaceGeometryCallback()
     return;
     }
   
-  int state = this->SaveUserInterfaceGeometryCheckButton->GetSelectedState() ? 1 : 0;
+  int state = 
+    this->SaveUserInterfaceGeometryCheckButton->GetSelectedState() ? 1 : 0;
   this->GetApplication()->SetSaveUserInterfaceGeometry(state);
 }
 
@@ -569,7 +618,8 @@ void vtkKWApplicationSettingsInterface::SplashScreenVisibilityCallback()
     return;
     }
 
-  int state = this->SplashScreenVisibilityCheckButton->GetSelectedState() ? 1 : 0;
+  int state = 
+    this->SplashScreenVisibilityCheckButton->GetSelectedState() ? 1 : 0;
   this->GetApplication()->SetSplashScreenVisibility(state);
 }
 
@@ -582,12 +632,35 @@ void vtkKWApplicationSettingsInterface::BalloonHelpVisibilityCallback()
     return;
     }
 
-  int state = this->BalloonHelpVisibilityCheckButton->GetSelectedState() ? 1 : 0;
+  int state = 
+    this->BalloonHelpVisibilityCheckButton->GetSelectedState() ? 1 : 0;
   vtkKWBalloonHelpManager *mgr = 
     this->GetApplication()->GetBalloonHelpManager();
   if (mgr)
     {
     mgr->SetVisibility(state);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWApplicationSettingsInterface::ViewPanelPositionCallback()
+{
+  if (this->ViewPanelPositionOptionMenu && 
+      this->ViewPanelPositionOptionMenu->GetWidget() && this->Window)
+    {
+    const char *pos = 
+      this->ViewPanelPositionOptionMenu->GetWidget()->GetValue();
+    if (pos)
+      {
+      if (!strcmp(pos, "Left"))
+        {
+        this->Window->SetViewPanelPositionToLeft();
+        }
+      else if (!strcmp(pos, "Right"))
+        {
+        this->Window->SetViewPanelPositionToRight();
+        }
+      }
     }
 }
 
@@ -603,7 +676,7 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
         this->GetApplication(), this->Window, 
         "Reset Interface", 
         "All Drag & Drop events performed so far will be discarded. "
-        "Note that your interface will be reset the next time you "
+        "Note that the interface will be reset the next time you "
         "start this application.",
         vtkKWMessageDialog::WarningIcon);
 
@@ -691,6 +764,11 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
   if (this->BalloonHelpVisibilityCheckButton)
     {
     this->BalloonHelpVisibilityCheckButton->SetEnabled(this->GetEnabled());
+    }
+
+  if (this->ViewPanelPositionOptionMenu)
+    {
+    this->ViewPanelPositionOptionMenu->SetEnabled(this->GetEnabled());
     }
 
   // Interface customization
