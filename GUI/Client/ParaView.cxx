@@ -60,6 +60,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
+
+#include <vtksys/SystemTools.hxx>
         
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
