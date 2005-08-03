@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.45");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.46");
 
 //----------------------------------------------------------------------------
 
@@ -835,15 +835,19 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
                this->LineWidthThumbWheel->GetWidgetName(),
                col_1_padx, button_pady);
 
-  this->Script("grid %s %s -sticky wns",
-               this->PointLabelFontSizeLabel->GetWidgetName(),
-               this->PointLabelFontSizeThumbWheel->GetWidgetName());
+  if ((this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions() == 1) &&
+      (!this->GetPVApplication()->GetOptions()->GetClientMode()))
+    {
 
-  this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->PointLabelFontSizeThumbWheel->GetWidgetName(), 
-               col_1_padx, button_pady);
-
-
+    this->Script("grid %s %s -sticky wns",
+                 this->PointLabelFontSizeLabel->GetWidgetName(),
+                 this->PointLabelFontSizeThumbWheel->GetWidgetName());
+    
+    this->Script("grid %s -sticky news -padx %d -pady %d",
+                 this->PointLabelFontSizeThumbWheel->GetWidgetName(), 
+                 col_1_padx, button_pady);
+    }
+  
   // Now synchronize all those grids to have them aligned
 
   const char *widgets[4];
