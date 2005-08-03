@@ -414,6 +414,23 @@ SET(VTKCLIENTSERVER_INCLUDE_DIR
 SUBDIRS(Utilities/VTKClientServer)
 
 #########################################################################
+# Configure Python wrapping
+OPTION(PARAVIEW_WRAP_PYTHON "Wrap ParaView server manager into Python" OFF)
+MARK_AS_ADVANCED(PARAVIEW_WRAP_PYTHON)
+IF(PARAVIEW_WRAP_PYTHON)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  SUBDIRS(Utilities/VTKPythonWrapping)
+  IF(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKPythonWrapping_INSTALL_LIBRARIES 0)
+  ELSE(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKPythonWrapping_INSTALL_LIBRARIES 1)
+  ENDIF(PV_INSTALL_NO_LIBRARIES)
+  SET(VTKPythonWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(VTKPythonWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+ENDIF(PARAVIEW_WRAP_PYTHON)
+
+
+#########################################################################
 # Configure Tcl wrapping
 IF (PARAVIEW_BUILD_GUI)
   SUBDIRS(Utilities/VTKTclWrapping)
@@ -427,7 +444,7 @@ IF (PARAVIEW_BUILD_GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
-# Import external projects, such as EXODUS and SAF
+# Import external projects, such as SAF
 
 SET(PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES)
 
@@ -502,7 +519,7 @@ ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external EXODUS SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
@@ -551,8 +568,18 @@ IF (PARAVIEW_BUILD_GUI)
   SUBDIRS(GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
+#########################################################################
+# Configure Python executable
+IF(PARAVIEW_WRAP_PYTHON)
+  SUBDIRS(Utilities/VTKPythonWrapping/Executable)
+ENDIF(PARAVIEW_WRAP_PYTHON)
+
+#########################################################################
+# Configure ParaView Data
 SUBDIRS(Data)
 
+#########################################################################
+# Configure Servers executables
 SUBDIRS(Servers/Executables)
 
 #-----------------------------------------------------------------------------

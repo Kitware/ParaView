@@ -122,7 +122,7 @@ SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 INCLUDE_DIRECTORIES(
   ${PVFilters_BINARY_DIR}
   ${PVFilters_SOURCE_DIR}
-  ${PVCommon_SOURCE_DIR}
+  ${PVServerCommon_SOURCE_DIR}
   ${HDF5_INCLUDE_DIR}
   ${SPCTH_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
@@ -189,8 +189,8 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFilters
-  vtkPVCommon
-  vtkPVCommonCS vtkXdmfCS
+  vtkPVServerCommon
+  vtkPVServerCommonCS vtkXdmfCS
   vtkHybridCS
   vtkParallelCS
   vtkVolumeRenderingCS
