@@ -26,6 +26,24 @@ SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
 SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
 
+# See VTK/CMakeLists.txt for an explanation of this default selection.
+IF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+  # This is a release version.  Default to not use rpath.
+  SET(VTK_USE_RPATH_DEFAULT OFF)
+ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+  # This is a development version.  Default to use rpath.
+  SET(VTK_USE_RPATH_DEFAULT ON)
+ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+
+# If we are using the rpath feature in the build tree then it is not
+# safe to allow anything to be installed.
+IF(NOT WIN32)
+  IF(NOT CMAKE_SKIP_RPATH)
+    SET(PV_INSTALL_NO_DEVELOPMENT 1)
+    SET(PV_INSTALL_NO_RUNTIME 1)
+  ENDIF(NOT CMAKE_SKIP_RPATH)
+ENDIF(NOT WIN32)
+
 # Setup install directories.
 IF(NOT PV_INSTALL_BIN_DIR)
   SET(PV_INSTALL_BIN_DIR ${PV_INSTALL_ROOT}/bin)
