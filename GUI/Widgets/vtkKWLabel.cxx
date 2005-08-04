@@ -19,23 +19,21 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.44");
+vtkCxxRevisionMacro(vtkKWLabel, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
 {
   this->Text                    = NULL;
-  this->LineType                = vtkKWLabel::SingleLine;
-  this->Width                   = 0;
   this->AdjustWrapLengthToWidth = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabel::~vtkKWLabel()
 {
-  if (this->Text)
-    {
-    delete [] this->Text;
+  if (this->Text) 
+    { 
+    delete [] this->Text; 
     this->Text = NULL;
     }
 }
@@ -78,14 +76,13 @@ void vtkKWLabel::UpdateText()
 {
   if (this->IsCreated())
     {
-    this->SetTextOption("-text", this->Text); 
     // NULL is handled correctly as ""
+    this->SetTextOption("-text", this->Text); 
 
     // Whatever the label, -image always takes precedence, unless it's empty
     // so change it accordingly
     
-    if (this->LineType != vtkKWLabel::MultiLine && 
-        this->Text && *this->Text)
+    if (this->Text && *this->Text)
       {
       this->SetConfigurationOption("-image", NULL);
       }
@@ -97,7 +94,7 @@ void vtkKWLabel::Create(vtkKWApplication *app)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, this->LineType == vtkKWLabel::MultiLine ? "message" : "label"))
+  if (!this->Superclass::CreateSpecificTkWidget(app, "label"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -129,6 +126,18 @@ int vtkKWLabel::GetWidth()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWLabel::SetHeight(int height)
+{
+  this->SetConfigurationOptionAsInt("-height", height);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetHeight()
+{
+  return this->GetConfigurationOptionAsInt("-height");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
 {
   if (this->AdjustWrapLengthToWidth == v)
@@ -146,15 +155,14 @@ void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
 void vtkKWLabel::AdjustWrapLengthToWidthCallback()
 {
   if (!this->IsCreated() || 
-      !this->AdjustWrapLengthToWidth || 
-      this->LineType == vtkKWLabel::MultiLine)
+      !this->AdjustWrapLengthToWidth)
     {
     return;
     }
 
   // Get the widget width and the current wraplength
 
-  int wraplength = this->GetConfigurationOptionAsInt("-wraplength");
+  int wraplength = atoi(this->GetWrapLength());
 
   int width;
   sscanf(this->Script("winfo width %s", this->GetWidgetName()), "%d", &width);
@@ -263,20 +271,16 @@ void vtkKWLabel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->LineType != vtkKWLabel::MultiLine)
-    {
-    this->SetState(this->GetEnabled());
-    }
+  this->SetState(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "LineType: " << this->LineType << endl;
   os << indent << "AdjustWrapLengthToWidth: " 
      << (this->AdjustWrapLengthToWidth ? "On" : "Off") << endl;
-  os << indent << "Label: ";
+  os << indent << "Text: ";
   if (this->Text)
     {
     os << this->Text << endl;

@@ -107,6 +107,7 @@ SET(KWWidgets_SRCS
   vtkKWMaterialPropertyWidget.cxx
   vtkKWMenu.cxx 
   vtkKWMenuButton.cxx 
+  vtkKWMessage.cxx 
   vtkKWMessageDialog.cxx 
   vtkKWMostRecentFilesManager.cxx
   vtkKWMultiColumnList.cxx
@@ -246,6 +247,7 @@ FOREACH (WidgetType
     vtkKWLabel
     vtkKWLoadSaveButton
     vtkKWMenuButton
+    vtkKWMessage
     vtkKWPopupButton
     vtkKWPushButton
     vtkKWPushButtonSet

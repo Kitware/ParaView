@@ -23,6 +23,7 @@
 class vtkKWApplication;
 class vtkKWCheckButton;
 class vtkKWFrame;
+class vtkKWMessage;
 class vtkKWLabel;
 class vtkKWPushButton;
 
@@ -48,19 +49,22 @@ public:
   //BTX
   enum 
   {
-    Message = 0,
-    YesNo,
-    OkCancel,
-    OkOtherCancel
+    StyleMessage = 0,
+    StyleYesNo,
+    StyleOkCancel,
+    StyleOkOtherCancel
   };
   //ETX
   vtkSetMacro(Style,int);
   vtkGetMacro(Style,int);
-  void SetStyleToMessage() {this->SetStyle(vtkKWMessageDialog::Message);};
-  void SetStyleToYesNo() {this->SetStyle(vtkKWMessageDialog::YesNo);};
-  void SetStyleToOkCancel() {this->SetStyle(vtkKWMessageDialog::OkCancel);};
+  void SetStyleToMessage() 
+    { this->SetStyle(vtkKWMessageDialog::StyleMessage); };
+  void SetStyleToYesNo() 
+    { this->SetStyle(vtkKWMessageDialog::StyleYesNo); };
+  void SetStyleToOkCancel() 
+    { this->SetStyle(vtkKWMessageDialog::StyleOkCancel); };
   void SetStyleToOkOtherCancel() 
-    {this->SetStyle(vtkKWMessageDialog::OkOtherCancel);};
+    { this->SetStyle(vtkKWMessageDialog::StyleOkOtherCancel); };
 
   // Description:
   // Set or get the message dialog name
@@ -185,7 +189,7 @@ protected:
   vtkKWFrame       *TopFrame;
   vtkKWFrame       *MessageDialogFrame;
   vtkKWFrame       *BottomFrame;
-  vtkKWLabel       *Label;
+  vtkKWMessage     *Message;
   vtkKWFrame       *ButtonFrame;
   vtkKWPushButton  *OKButton;
   vtkKWPushButton  *CancelButton;  

@@ -19,6 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMessage.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWRegistryHelper.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.85");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.86");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -34,7 +35,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->MessageDialogFrame = vtkKWFrame::New();
   this->TopFrame           = vtkKWFrame::New();
   this->BottomFrame        = vtkKWFrame::New();
-  this->Label              = vtkKWLabel::New();
+  this->Message            = vtkKWMessage::New();
   this->CheckButton        = vtkKWCheckButton::New();
   this->ButtonFrame        = vtkKWFrame::New();
   this->OKFrame            = vtkKWFrame::New();
@@ -43,7 +44,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->OKButton           = vtkKWPushButton::New();
   this->CancelButton       = vtkKWPushButton::New();
   this->OtherButton        = vtkKWPushButton::New();
-  this->Style              = vtkKWMessageDialog::Message;
+  this->Style              = vtkKWMessageDialog::StyleMessage;
   this->Icon               = vtkKWLabel::New();
 
   this->DialogName = 0;
@@ -63,7 +64,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::~vtkKWMessageDialog()
 {
-  this->Label->Delete();
+  this->Message->Delete();
   this->CheckButton->Delete();
   this->ButtonFrame->Delete();
   this->OKFrame->Delete();
@@ -114,17 +115,16 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true",
                this->BottomFrame->GetWidgetName());
 
-  this->Label->SetParent(this->MessageDialogFrame);
-  this->Label->SetLineType(vtkKWLabel::MultiLine);
-  this->Label->Create(app);
-  this->Label->SetWidth(300);
+  this->Message->SetParent(this->MessageDialogFrame);
+  this->Message->Create(app);
+  this->Message->SetWidth(300);
   if ( this->DialogText )
     {
-    this->Label->SetText(this->DialogText);
+    this->Message->SetText(this->DialogText);
     }
 
   this->Script("pack %s -side top -fill x -padx 20 -pady 5",
-               this->Label->GetWidgetName());
+               this->Message->GetWidgetName());
 
   this->CheckButton->SetParent(this->MessageDialogFrame);
   this->CheckButton->Create(app);
@@ -142,18 +142,19 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
 
-  int one_b = (this->Style == vtkKWMessageDialog::Message) ? 1 : 0;
-  int two_b = (this->Style == vtkKWMessageDialog::YesNo || 
-               this->Style == vtkKWMessageDialog::OkCancel) ? 2 : 0;
-  int three_b = (this->Style == vtkKWMessageDialog::OkOtherCancel)  ? 3 : 0;
+  int one_b = (this->Style == vtkKWMessageDialog::StyleMessage) ? 1 : 0;
+  int two_b = (this->Style == vtkKWMessageDialog::StyleYesNo || 
+               this->Style == vtkKWMessageDialog::StyleOkCancel) ? 2 : 0;
+  int three_b = 
+    (this->Style == vtkKWMessageDialog::StyleOkOtherCancel)  ? 3 : 0;
   int nb_buttons = one_b + two_b + three_b;
 
-  if (this->Style == vtkKWMessageDialog::YesNo)
+  if (this->Style == vtkKWMessageDialog::StyleYesNo)
     {
     this->SetOKButtonText("Yes");
     this->SetCancelButtonText("No");
     }
-  else if (this->Style == vtkKWMessageDialog::Message)
+  else if (this->Style == vtkKWMessageDialog::StyleMessage)
     {
     this->SetOKButtonText("OK");
     }
@@ -270,27 +271,27 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->SetDialogText(txt);
-  if (this->Label)
+  if (this->Message)
     {
-    this->Label->SetText(this->DialogText);
+    this->Message->SetText(this->DialogText);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMessageDialog::SetTextWidth(int w)
 {
-  if (this->Label)
+  if (this->Message)
     {
-    this->Label->SetWidth(w);
+    this->Message->SetWidth(w);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialog::GetTextWidth()
 {
-  if (this->Label)
+  if (this->Message)
     {
-    return this->Label->GetWidth();
+    return this->Message->GetWidth();
     }
   return 0;
 }

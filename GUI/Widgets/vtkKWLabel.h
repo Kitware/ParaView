@@ -13,8 +13,13 @@
 =========================================================================*/
 // .NAME vtkKWLabel - label widget
 // .SECTION Description
-// A simple widget that represents a label. The label can be set with 
-// the SetText method.
+// A simple widget that represents a label. A label is a widget that displays
+// a textual string (or image). If text is displayed, it must all be in
+// a single font, but it can occupy multiple lines on the screen (if it
+// contains newlines or if wrapping occurs because of the WrapLength option).
+// For longer text and more justification options, see vtkKWMessage.
+// .SECTION See Also
+// vtkKWMessage
 
 #ifndef __vtkKWLabel_h
 #define __vtkKWLabel_h
@@ -40,28 +45,18 @@ public:
   vtkGetStringMacro(Text);
 
   // Description:
-  // Set the way label treats long text. 
-  // Multiline will wrap text. You have to specify width
-  // when using multiline label.
-  // Call this method before Create()
-  //BTX
-  enum 
-  {
-    SingleLine,
-    MultiLine
-  };
-  //ETX
-  vtkGetMacro(LineType, int);
-  vtkSetMacro(LineType, int);
-  virtual void SetLineTypeToSingleLine()
-    { this->SetLineType(vtkKWLabel::SingleLine); };
-  virtual void SetLineTypeToMultiLine()
-    { this->SetLineType(vtkKWLabel::MultiLine); };
-
-  // Description:
   // Set/Get width of the label.
+  // If an image is being displayed in the label then the value is in screen
+  // units; for text it is in characters.
   virtual void SetWidth(int);
   virtual int GetWidth();
+
+  // Description:
+  // Set/Get height of the label.
+  // If an image is being displayed in the label then the value is in screen
+  // units; for text it is in lines of text.
+  virtual void SetHeight(int);
+  virtual int GetHeight();
 
   // Description:
   // Set/Get the justification mode.
@@ -109,7 +104,9 @@ public:
   // maximum line length. Lines that would exceed this length are wrapped onto
   // the next line, so that no line is longer than the specified length. 
   // The value may be specified in any of the standard forms for screen
-  // distances.
+  // distances (i.e, "2i" means 2 inches).
+  // If this value is less than or equal to 0 then no wrapping is done: lines
+  // will break only at newline characters in the text. 
   virtual void SetWrapLength(const char *length);
   virtual const char* GetWrapLength();
   
@@ -119,7 +116,6 @@ public:
   virtual void SetAdjustWrapLengthToWidth(int);
   vtkGetMacro(AdjustWrapLengthToWidth, int);
   vtkBooleanMacro(AdjustWrapLengthToWidth, int);
-  virtual void AdjustWrapLengthToWidthCallback();
 
   // Description:
   // Specifies an image to display in the widget. Typically, if the image
@@ -152,6 +148,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Do not use.
+  virtual void AdjustWrapLengthToWidthCallback();
+
 protected:
   vtkKWLabel();
   ~vtkKWLabel();
@@ -161,8 +161,6 @@ protected:
 
 private:
   char* Text;
-  int LineType;
-  int Width;
   int AdjustWrapLengthToWidth;
 
   vtkKWLabel(const vtkKWLabel&); // Not implemented

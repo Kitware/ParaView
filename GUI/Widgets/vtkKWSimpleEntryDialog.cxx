@@ -15,14 +15,14 @@
 
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
+#include "vtkKWMessage.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.11");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
@@ -57,7 +57,7 @@ void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app)
   this->Entry->Create(app);
 
   this->Script("pack %s -side top -after %s -padx 4 -fill x -expand yes", 
-               this->Entry->GetWidgetName(), this->Label->GetWidgetName());
+               this->Entry->GetWidgetName(), this->Message->GetWidgetName());
 
   this->Entry->SetBinding("<Return>", this, "OK");
   this->Entry->SetBinding("<Escape>", this, "Cancel");
