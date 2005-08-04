@@ -45,8 +45,10 @@ ENDIF(UNIX)
 CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/pkgIndex.tcl.in
                ${KWWidgets_BINARY_DIR}/Wrapping/Tcl/Install/Hide/pkgIndex.tcl
                @ONLY IMMEDIATE)
-INSTALL_FILES(${KW_INSTALL_LIB_DIR}/tcl FILES
-              ${KWWidgets_BINARY_DIR}/Wrapping/Tcl/Install/Hide/pkgIndex.tcl)
+IF(NOT KW_INSTALL_NO_RUNTIME)
+  INSTALL_FILES(${KW_INSTALL_LIB_DIR}/tcl FILES
+                ${KWWidgets_BINARY_DIR}/Wrapping/Tcl/Install/Hide/pkgIndex.tcl)
+ENDIF(NOT KW_INSTALL_NO_RUNTIME)
 
 # Install kits
 

@@ -1,1 +1,3 @@
-INSTALL_FILES(${KW_INSTALL_LIB_DIR}/tcl/kwwidgets .tcl kwwidgets)
+IF(NOT KW_INSTALL_NO_RUNTIME)
+  INSTALL_FILES(${KW_INSTALL_LIB_DIR}/tcl/kwwidgets .tcl kwwidgets)
+ENDIF(NOT KW_INSTALL_NO_RUNTIME)
