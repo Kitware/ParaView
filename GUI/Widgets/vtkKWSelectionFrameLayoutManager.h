@@ -55,9 +55,16 @@ public:
   vtkGetVector2Macro(Resolution, int);
 
   // Description:
-  // Allocate and add a new widget (a unique name is required).
-  // Return the widget, or NULL on error
-  virtual vtkKWSelectionFrame* AddWidget(const char *name);
+  // Add a new selection frame to the pool (a unique name is required).
+  // This will call Register() on the widget (increasing its ref count).
+  // Return 1 on success, 0 otherwise
+  virtual int AddWidget(vtkKWSelectionFrame *widget, const char *name);
+
+  // Description:
+  // Allocate a new selection frame and add it to the pool (a unique name is
+  // required).
+  // Return the allocated widget, or NULL on error
+  virtual vtkKWSelectionFrame* AllocateAndAddWidget(const char *name);
 
   // Description:
   // Get widget with given name (the unique one that was used to add it to the 
@@ -65,7 +72,7 @@ public:
   // its own title), or with given rank (n-th widget), or with given
   // rank (n-th widget) but not matching another widget 'avoid'.
   // Return the widget, or NULL if not found
-  virtual vtkKWSelectionFrame* GetWidget(const char *name);
+  virtual vtkKWSelectionFrame* GetWidgetWithName(const char *name);
   virtual vtkKWSelectionFrame* GetWidgetWithTitle(const char *title);
   virtual vtkKWSelectionFrame* GetNthWidget(int index);
   virtual vtkKWSelectionFrame* GetNthWidgetNotMatching(
@@ -79,27 +86,27 @@ public:
   // (i.e. identifier) of the widget within the pool.
   // Return 1 on success, 0 on error
   virtual int RenameWidget(vtkKWSelectionFrame*, const char *new_name);
-  virtual int RenameWidget(const char *old_name, const char *new_name);
+  virtual int RenameWidgetWithName(const char *old_name, const char *new_name);
 
   // Description:
   // Set/Get position of widget with given name, or widget
   // at given position.
   // Return 1 (or widget) on success, 0 (or NULL) on error
   virtual int GetWidgetPosition(vtkKWSelectionFrame*, int pos[2]);
-  virtual int GetWidgetPosition(const char *name, int pos[2]);
-  virtual int SetWidgetPosition(const char *name, int pos[2]);
+  virtual int GetWidgetPositionWithName(const char *name, int pos[2]);
   virtual int SetWidgetPosition(vtkKWSelectionFrame*, int pos[2]);
+  virtual int SetWidgetPositionWithName(const char *name, int pos[2]);
   virtual vtkKWSelectionFrame* GetWidgetAtPosition(int pos[2]);
 
   // Description:
   // Query if widget in the pool
-  virtual int HasWidget(const char *name);
+  virtual int HasWidgetWithName(const char *name);
   virtual int HasWidget(vtkKWSelectionFrame *dswidget);
 
   // Description:
   // Selected a given widget.
   // If arg is NULL, nothing is selected (all others are deselected)
-  virtual void SelectWidget(const char *name);
+  virtual void SelectWidgetWithName(const char *name);
   virtual void SelectWidget(vtkKWSelectionFrame *dswidget);
 
   // Description:
@@ -109,10 +116,15 @@ public:
   virtual const char* GetSelectedWidgetName();
 
   // Description:
-  // Delete widget (or all) of them. This will close
-  // the widget, deallocate it
+  // Specifies a command to be invoked when the selection has changed
+  virtual void SetSelectionChangedCommand(
+    vtkObject* object, const char *method);
+
+  // Description:
+  // Delete widget (or all) of them. This will call the widget's Close() 
+  // method, and UnRegister() it.
   // Return 1 on success, 0 on error
-  virtual int DeleteWidget(const char *name);
+  virtual int DeleteWidgetWithName(const char *name);
   virtual int DeleteWidget(vtkKWSelectionFrame *dswidget);
   virtual int DeleteAllWidgets();
 
@@ -123,7 +135,7 @@ public:
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
   virtual int SaveScreenshotAllWidgets();
-  virtual int SaveScreenshotAllWidgets(const char* fileName);
+  virtual int SaveScreenshotAllWidgetsToFile(const char* fileName);
   virtual int CopyScreenshotAllWidgetsToClipboard();
 
   // Description:
@@ -139,9 +151,9 @@ public:
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
   virtual int PrintAllWidgets();
-  virtual int PrintAllWidgets(double dpi);
+  virtual int PrintAllWidgetsAtResolution(double dpi);
   virtual int PrintSelectedWidget();
-  virtual int PrintSelectedWidget(double dpi);
+  virtual int PrintSelectedWidgetAtResolution(double dpi);
 
   // Description:
   // Create a resolution entries menu (specifies its parent).
@@ -188,21 +200,24 @@ protected:
   int Resolution[2];
   vtkKWMenu    *ResolutionEntriesMenu;
   vtkKWToolbar *ResolutionEntriesToolbar;
+  char *SelectionChangedCommand;
 
   // Description:
   // Allocate a new widget.
-  virtual vtkKWSelectionFrame* AllocateNewWidget();
+  virtual vtkKWSelectionFrame* AllocateWidget();
 
   // Description:
-  // Create a widget (i.e., create the underlying Tk widget)
+  // Create a widget (i.e., create the underlying Tk widget) and configure it.
   // If the layout manager has not been created, the widget won't be
   // created either, since it is used as parent.
   virtual void CreateWidget(vtkKWSelectionFrame*);
+  virtual void ConfigureWidget(vtkKWSelectionFrame*);
 
   // Description:
   // Get the render widget (if any) associated to the selection
   // frame and visible at that point. 
   // Used to Print, Save/Copy screenshot, etc.
+  // This should be reimplemented by subclasses (return NULL at the moment).
   virtual vtkKWRenderWidget* GetVisibleRenderWidget(vtkKWSelectionFrame*);
 
   // Description:
@@ -244,6 +259,11 @@ protected:
   // PIMPL Encapsulation for STL containers
 
   vtkKWSelectionFrameLayoutManagerInternals *Internals;
+
+  // Description:
+  // Add/Remove callbacks on a selection frame
+  virtual void AddCallbacksToWidget(vtkKWSelectionFrame *widget);
+  virtual void RemoveCallbacksFromWidget(vtkKWSelectionFrame *widget);
 
 private:
 

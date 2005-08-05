@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.31");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -101,11 +101,19 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
   
   this->ResolutionEntriesMenu    = NULL;
   this->ResolutionEntriesToolbar = NULL;
+
+  this->SelectionChangedCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
 {
+  if (this->SelectionChangedCommand)
+    {
+    delete [] this->SelectionChangedCommand;
+    this->SelectionChangedCommand = NULL;
+    }
+
   // Delete all widgets
 
   this->DeleteAllWidgets();
@@ -232,10 +240,10 @@ void vtkKWSelectionFrameLayoutManager::Pack()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
+int vtkKWSelectionFrameLayoutManager::SetWidgetPositionWithName(
   const char *name, int pos[2])
 {
-  return this->SetWidgetPosition(this->GetWidget(name), pos);
+  return this->SetWidgetPosition(this->GetWidgetWithName(name), pos);
 }
 
 //----------------------------------------------------------------------------
@@ -264,10 +272,10 @@ int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::GetWidgetPosition(
+int vtkKWSelectionFrameLayoutManager::GetWidgetPositionWithName(
   const char *name, int pos[2])
 {
-  return this->GetWidgetPosition(this->GetWidget(name), pos);
+  return this->GetWidgetPosition(this->GetWidgetWithName(name), pos);
 }
 
 //----------------------------------------------------------------------------
@@ -744,7 +752,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesToolbar()
 }
 
 //----------------------------------------------------------------------------
-vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidget(
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithName(
   const char *name)
 {
   if (name)
@@ -868,9 +876,9 @@ int vtkKWSelectionFrameLayoutManager::GetNumberOfWidgets()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::HasWidget(const char *name)
+int vtkKWSelectionFrameLayoutManager::HasWidgetWithName(const char *name)
 {
-  return this->GetWidget(name) ? 1 : 0;
+  return this->GetWidgetWithName(name) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -893,35 +901,45 @@ int vtkKWSelectionFrameLayoutManager::HasWidget(
 }
 
 //----------------------------------------------------------------------------
-vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AddWidget(
+int vtkKWSelectionFrameLayoutManager::AddWidget(
+  vtkKWSelectionFrame *widget,
   const char *name)
 {
-  if (!name || !*name)
+  if (!widget || !name || !*name)
     {
     return NULL;
     }
 
   // If we have that widget already
 
-  vtkKWSelectionFrame *widget = this->GetWidget(name);
-  if (widget)
+  if (this->HasWidgetWithName(name))
     {
     return NULL;
     }
 
-  // Create a new node and allocate a new widget
+  // Create a new node
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolNode node;
   node.Name.assign(name); 
-  node.Widget = this->AllocateNewWidget();
+  node.Widget = widget;
   node.Widget->Register(this);
-  node.Widget->Delete();
 
-  // Create the widget, set its window title, callback
+  // Create the widget (if needed), configure the callbacks
+  // Set the title only if we have created the widget (otherwise we assume
+  // we should interfere with it at least as possible).
 
-  this->CreateWidget(node.Widget);
-  node.Widget->SetTitle(name);
-  node.Widget->SetSelectionListCommand(this, "SwitchWidgetCallback");
+  if (!node.Widget->IsCreated())
+    {
+    this->CreateWidget(node.Widget);
+    if (!node.Widget->GetTitle() || !*node.Widget->GetTitle())
+      {
+      node.Widget->SetTitle(name);
+      }
+    }
+  else
+    {
+    this->ConfigureWidget(node.Widget);
+    }
 
   // Unitialize its position. It will be updated automatically the first
   // time this widget is packed.
@@ -934,13 +952,56 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AddWidget(
 
   this->NumberOfWidgetsHasChanged();
 
-  return node.Widget;
+  // If we just added a widget, and there was nothing else before, let's
+  // select it for convenience purposes
+
+  if (this->GetNumberOfWidgets() == 1 && !this->GetSelectedWidget())
+    {
+    this->SelectWidget(this->GetNthWidget(0));
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AllocateNewWidget()
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AllocateAndAddWidget(
+  const char *name)
 {
-  return vtkKWSelectionFrame::New();
+  if (!name || !*name)
+    {
+    return NULL;
+    }
+
+  // If we have that widget already
+
+  if (this->HasWidgetWithName(name))
+    {
+    return NULL;
+    }
+
+  // Allocate a widget and add it
+
+  vtkKWSelectionFrame *widget = this->AllocateWidget();
+  if (widget)
+    {
+    int ok =  this->AddWidget(widget, name); // this will Register() the widget
+    widget->Delete();
+    if (!ok)
+      {
+      widget = NULL;
+      }
+    }
+
+  return widget;
+}
+
+//----------------------------------------------------------------------------
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AllocateWidget()
+{
+  vtkKWSelectionFrame *widget = vtkKWSelectionFrame::New();
+  widget->AllowChangeTitleOn();
+  widget->AllowCloseOn();
+  return widget;
 }
 
 //----------------------------------------------------------------------------
@@ -953,17 +1014,43 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
     widget->Create(this->GetApplication());
     widget->SetWidth(350);
     widget->SetHeight(350);
-    this->PropagateEnableState(widget);
-    widget->SetCloseCommand(
-      this, "CloseWidgetCallback");
-    widget->AllowCloseOn();
-    widget->SetChangeTitleCommand(
-      this, "ChangeWidgetTitleCallback");
-    widget->AllowChangeTitleOn();
-    widget->SetSelectCommand(
-      this, "SelectWidgetCallback");
-    widget->SetDoubleClickCommand(
-      this, "SelectAndMaximizeWidgetCallback");
+    this->ConfigureWidget(widget);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::ConfigureWidget(
+  vtkKWSelectionFrame *widget)
+{
+  this->PropagateEnableState(widget);
+  this->AddCallbacksToWidget(widget);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::AddCallbacksToWidget(
+  vtkKWSelectionFrame *widget)
+{
+  if (widget)
+    {
+    widget->SetCloseCommand(this, "CloseWidgetCallback");
+    widget->SetChangeTitleCommand(this, "ChangeWidgetTitleCallback");
+    widget->SetSelectCommand(this, "SelectWidgetCallback");
+    widget->SetDoubleClickCommand(this, "SelectAndMaximizeWidgetCallback");
+    widget->SetSelectionListCommand(this, "SwitchWidgetCallback");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::RemoveCallbacksFromWidget(
+  vtkKWSelectionFrame *widget)
+{
+  if (widget)
+    {
+    widget->SetCloseCommand(NULL, NULL);
+    widget->SetChangeTitleCommand(NULL, NULL);
+    widget->SetSelectCommand(NULL, NULL);
+    widget->SetDoubleClickCommand(NULL, NULL);
+    widget->SetSelectionListCommand(NULL, NULL);
     }
 }
 
@@ -1013,7 +1100,9 @@ int vtkKWSelectionFrameLayoutManager::DeleteWidget(
           this->SelectWidget(this->GetNthWidget(0));
           }
 
-        widget->Delete();
+        this->RemoveCallbacksFromWidget(widget);
+        widget->Close();
+        widget->UnRegister(this);
         this->NumberOfWidgetsHasChanged();
         return 1;
         }
@@ -1024,9 +1113,9 @@ int vtkKWSelectionFrameLayoutManager::DeleteWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::DeleteWidget(const char *name)
+int vtkKWSelectionFrameLayoutManager::DeleteWidgetWithName(const char *name)
 {
-  return this->DeleteWidget(this->GetWidget(name));
+  return this->DeleteWidget(this->GetWidgetWithName(name));
 }
 
 //----------------------------------------------------------------------------
@@ -1044,7 +1133,9 @@ int vtkKWSelectionFrameLayoutManager::DeleteAllWidgets()
       {
       if (it->Widget)
         {
-        it->Widget->Delete();
+        this->RemoveCallbacksFromWidget(it->Widget);
+        it->Widget->Close();
+        it->Widget->UnRegister(this);
         }
       }
     
@@ -1069,7 +1160,7 @@ int vtkKWSelectionFrameLayoutManager::RenameWidget(
 
   // If we have a widget with that name already
 
-  if (this->GetWidget(new_name))
+  if (this->GetWidgetWithName(new_name))
     {
     return 0;
     }
@@ -1093,11 +1184,11 @@ int vtkKWSelectionFrameLayoutManager::RenameWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::RenameWidget(
+int vtkKWSelectionFrameLayoutManager::RenameWidgetWithName(
   const char *old_name, 
   const char *new_name)
 {
-  return this->RenameWidget(this->GetWidget(old_name), new_name);
+  return this->RenameWidget(this->GetWidgetWithName(old_name), new_name);
 }
 
 //----------------------------------------------------------------------------
@@ -1156,13 +1247,26 @@ void vtkKWSelectionFrameLayoutManager::SelectWidget(
   if (widget)
     {
     widget->SelectedOn();
+
+    if (this->SelectionChangedCommand && *this->SelectionChangedCommand && 
+        this->IsCreated())
+      {
+      this->Script("eval %s", this->SelectionChangedCommand);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::SelectWidget(const char *name)
+void vtkKWSelectionFrameLayoutManager::SelectWidgetWithName(const char *name)
 {
-  this->SelectWidget(this->GetWidget(name));
+  this->SelectWidget(this->GetWidgetWithName(name));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::SetSelectionChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->SelectionChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -1238,7 +1342,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   // Create a dialog to ask for a new title
 
   vtkKWSimpleEntryDialog *dlg = vtkKWSimpleEntryDialog::New();
-  dlg->SetMasterWindow(this->GetWindow());
+  dlg->SetMasterWindow(this->GetParentWindow());
   dlg->SetDisplayPositionToPointer();
   dlg->SetTitle("Change frame title");
   dlg->SetStyleToOkCancel();
@@ -1254,7 +1358,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
     if (!ok)
       {
       vtkKWMessageDialog::PopupMessage(
-        this->GetApplication(), this->GetWindow(), "Change frame title - Error",
+        this->GetApplication(), this->GetParentWindow(), "Change frame title - Error",
         "There was a problem with the new title you provided.\n",
         vtkKWMessageDialog::ErrorIcon);
       }
@@ -1482,13 +1586,13 @@ int vtkKWSelectionFrameLayoutManager::AppendSelectedWidgetToImageData(
 //---------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
 {
-  if (!this->GetWindow() || !this->IsCreated())
+  if (!this->IsCreated())
     {
     return 0;
     }
 
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
-  save_dialog->SetParent(this->GetWindow());
+  save_dialog->SetParent(this->GetParentWindow());
   save_dialog->Create(this->GetApplication());
   save_dialog->SetTitle("Save Screenshot");
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
@@ -1496,7 +1600,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
   
   int res = 0;
   if (save_dialog->Invoke() && 
-      this->SaveScreenshotAllWidgets(save_dialog->GetFileName()))
+      this->SaveScreenshotAllWidgetsToFile(save_dialog->GetFileName()))
     {
     this->GetApplication()->SaveDialogLastPathRegistryValue(save_dialog, "SavePath");
     res = 1;
@@ -1508,7 +1612,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
 }
 
 //---------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets(
+int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgetsToFile(
   const char* fname)
 {
   if (!fname)
@@ -1603,7 +1707,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets(
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this->GetWindow(), "Write Error",
+      this->GetApplication(), this->GetParentWindow(), "Write Error",
       "There was a problem writing the image file.\n"
       "Please check the location and make sure you have write\n"
       "permissions and enough disk space.",
@@ -1911,14 +2015,14 @@ int vtkKWSelectionFrameLayoutManager::PrintAllWidgets()
 {
   if (this->GetApplication())
     {
-    return this->PrintAllWidgets(
+    return this->PrintAllWidgetsAtResolution(
       this->GetApplication()->GetPrintTargetDPI());
     }
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::PrintAllWidgets(double dpi)
+int vtkKWSelectionFrameLayoutManager::PrintAllWidgetsAtResolution(double dpi)
 {
   return this->PrintWidgets(dpi, 0);
 }
@@ -1928,14 +2032,15 @@ int vtkKWSelectionFrameLayoutManager::PrintSelectedWidget()
 {
   if (this->GetApplication())
     {
-    return this->PrintSelectedWidget(
+    return this->PrintSelectedWidgetAtResolution(
       this->GetApplication()->GetPrintTargetDPI());
     }
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::PrintSelectedWidget(double dpi)
+int vtkKWSelectionFrameLayoutManager::PrintSelectedWidgetAtResolution(
+  double dpi)
 {
   return this->PrintWidgets(dpi, 1);
 }
