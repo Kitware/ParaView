@@ -48,6 +48,8 @@ SET(PROJECT_TESTS
   ExtractGrid
   ExtractPart
   Flow
+  fractal2d
+  fractal3d
   Glyph
   Group
   Transform
@@ -285,6 +287,8 @@ SET (PROJECT_TESTS_NO_BATCH
   DefaultAnimation
   DeleteSource
   DualSphereAnimation
+  fractal2d
+  fractal3d
   MouseInteraction
   OrientationWidget
   RecordAnimation
