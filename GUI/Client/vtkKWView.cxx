@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.23");
+vtkCxxRevisionMacro(vtkKWView, "1.24");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -741,7 +741,7 @@ void vtkKWView::SaveAsImage()
 {
   char *path = 0;
   
-  vtkKWWindowBase* window = this->GetWindow();
+  vtkKWWindowBase* window = this->GetParentWindow();
 
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
