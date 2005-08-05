@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.11");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -1288,6 +1288,20 @@ void vtkKWMultiColumnList::InsertColumnText(int col_index, const char *text)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::FindAndInsertCellText(
+    int look_for_col_index, const char *look_for_text, 
+    int col_index, const char *text)
+{
+  int row_index = 
+    this->FindCellTextInColumn(look_for_col_index, look_for_text);
+  
+  if (row_index >= 0)
+    {
+    this->InsertCellText(row_index, col_index, text);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::ActivateCell(int row_index, int col_index)
 {
   if (this->IsCreated())
@@ -2175,7 +2189,8 @@ void vtkKWMultiColumnList::SetSelectionChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectionChangedCallback()
 {
-  if (this->SelectionChangedCommand)
+  if (this->SelectionChangedCommand && *this->SelectionChangedCommand && 
+      this->IsCreated())
     {
     this->Script("eval %s", this->SelectionChangedCommand);
     }

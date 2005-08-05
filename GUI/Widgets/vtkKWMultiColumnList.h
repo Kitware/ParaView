@@ -434,6 +434,14 @@ public:
   virtual void InsertColumnText(int col_index, const char *text);
 
   // Description:
+  // Convenience method to set the contents of the cell given a column index
+  // only and a text to look for in a specific column. If that text is
+  // found, its row index is used to set the contents of the cell.
+  virtual void FindAndInsertCellText(
+    int look_for_col_index, const char *look_for_text , 
+    int col_index, const char *text);
+
+  // Description:
   // Activate a cell.
   virtual void ActivateCell(int row_index, int col_index);
 
@@ -762,7 +770,7 @@ protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
 
-  char  *SelectionChangedCommand;
+  char *SelectionChangedCommand;
 
   // Description:
   // Set/Get a column configuration option (ex: "-bg") 
