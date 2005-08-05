@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.32");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.33");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -907,14 +907,14 @@ int vtkKWSelectionFrameLayoutManager::AddWidget(
 {
   if (!widget || !name || !*name)
     {
-    return NULL;
+    return 0;
     }
 
   // If we have that widget already
 
   if (this->HasWidgetWithName(name))
     {
-    return NULL;
+    return 0;
     }
 
   // Create a new node
