@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.103");
+vtkCxxRevisionMacro(vtkKWScale, "1.104");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -280,7 +280,8 @@ void vtkKWScale::SetCommand(vtkObject *object, const char *method)
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeCommand()
 {
-  if (this->Command && !this->DisableCommands && this->IsCreated())
+  if (this->Command && *this->Command && !this->DisableCommands && 
+      this->IsCreated())
     {
     this->Script("eval %s", this->Command);
     }
@@ -296,7 +297,8 @@ void vtkKWScale::SetStartCommand(vtkObject *object, const char * method)
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeStartCommand()
 {
-  if (this->StartCommand && !this->DisableCommands && this->IsCreated())
+  if (this->StartCommand && *this->StartCommand && !this->DisableCommands &&
+      this->IsCreated())
     {
     this->Script("eval %s", this->StartCommand);
     }
@@ -312,7 +314,8 @@ void vtkKWScale::SetEndCommand(vtkObject *object, const char * method)
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeEndCommand()
 {
-  if (this->EndCommand && !this->DisableCommands && this->IsCreated())
+  if (this->EndCommand && *this->EndCommand && !this->DisableCommands &&
+      this->IsCreated())
     {
     this->Script("eval %s", this->EndCommand);
     }

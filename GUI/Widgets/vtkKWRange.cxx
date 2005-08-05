@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.54");
+vtkCxxRevisionMacro(vtkKWRange, "1.55");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1254,7 +1254,7 @@ void vtkKWRange::GetSliderColor(int type, double &r, double &g, double &b)
 //----------------------------------------------------------------------------
 void vtkKWRange::InvokeCommand()
 {
-  if (this->Command && !this->DisableCommands)
+  if (this->Command && *this->Command && !this->DisableCommands)
     {
     this->Script("eval %s",this->Command);
     }
@@ -1263,7 +1263,7 @@ void vtkKWRange::InvokeCommand()
 //----------------------------------------------------------------------------
 void vtkKWRange::InvokeStartCommand()
 {
-  if (this->StartCommand && !this->DisableCommands)
+  if (this->StartCommand && *this->StartCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->StartCommand);
     }
@@ -1272,7 +1272,7 @@ void vtkKWRange::InvokeStartCommand()
 //----------------------------------------------------------------------------
 void vtkKWRange::InvokeEndCommand()
 {
-  if (this->EndCommand && !this->DisableCommands)
+  if (this->EndCommand && *this->EndCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->EndCommand);
     }
@@ -1281,7 +1281,7 @@ void vtkKWRange::InvokeEndCommand()
 //----------------------------------------------------------------------------
 void vtkKWRange::InvokeEntriesCommand()
 {
-  if (this->EntriesCommand && !this->DisableCommands)
+  if (this->EntriesCommand && *this->EntriesCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->EntriesCommand);
     }
