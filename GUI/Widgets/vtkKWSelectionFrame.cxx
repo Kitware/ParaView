@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.45");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.46");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -44,9 +44,12 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
   this->Internals             = new vtkKWSelectionFrameInternals;
 
+  this->CallbackCommand       = vtkKWSelectionFrameCallbackCommand::New();
+
   this->OuterSelectionFrame   = vtkKWFrame::New();
   this->TitleBarFrame         = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
+  this->Title->SetText("<Click to Select>");
   this->SelectionList         = vtkKWMenuButton::New();
   this->CloseButton           = vtkKWPushButton::New();
   this->BodyFrame             = vtkKWFrame::New();
@@ -99,9 +102,18 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::~vtkKWSelectionFrame()
 {
+  this->Close();
+
   // Delete our pool
 
   delete this->Internals;
+
+  if (this->CallbackCommand)
+    {
+    this->RemoveCallbackCommandBindings();
+    this->CallbackCommand->Delete();
+    this->CallbackCommand = NULL;
+    }
 
   if (this->OuterSelectionFrame)
     {
@@ -247,7 +259,6 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   this->Title->Create(app);
   this->Title->SetJustificationToLeft();
   this->Title->SetAnchorToWest();
-  this->Title->SetText("<Click to Select>");
   
   // The body frame
 
@@ -263,11 +274,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   this->UpdateSelectedAspect();
   
-  // Bind
-
-  this->Bind();
-
-  // Update enable state
+  // Update enable state (this will Bind() too)
 
   this->UpdateEnableState();
 }
@@ -501,6 +508,8 @@ void vtkKWSelectionFrame::Bind()
     return;
     }
 
+  this->AddCallbackCommandBindings();
+
   vtkKWWidget *widgets_b[] = 
     {
       this->OuterSelectionFrame,
@@ -546,6 +555,7 @@ void vtkKWSelectionFrame::UnBind()
     return;
     }
 
+  this->RemoveCallbackCommandBindings();
 
   vtkKWWidget *widgets_b[] = 
     {
@@ -581,6 +591,24 @@ void vtkKWSelectionFrame::UnBind()
       {
       widgets_db[i]->RemoveBinding("<Double-1>");
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::AddCallbackCommandBindings()
+{
+  if (this->CallbackCommand)
+    {
+    this->CallbackCommand->SetSelectionFrame(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::RemoveCallbackCommandBindings()
+{
+  if (this->CallbackCommand)
+    {
+    this->CallbackCommand->SetSelectionFrame(NULL);
     }
 }
 
@@ -952,7 +980,8 @@ void vtkKWSelectionFrame::SetChangeTitleCommand(vtkObject *object,
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
 {
-  if (this->SelectionListCommand)
+  if (this->SelectionListCommand && *this->SelectionListCommand && 
+      this->IsCreated())
     {
     this->Script("eval {%s {%s} %s}",
                  this->SelectionListCommand, menuItem, this->GetTclName());
@@ -962,7 +991,22 @@ void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::CloseCallback()
 {
-  if (this->CloseCommand)
+  this->Close();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::Close()
+{
+  this->UnBind();
+
+  if (this->CallbackCommand)
+    {
+    this->RemoveCallbackCommandBindings();
+    this->CallbackCommand->Delete();
+    this->CallbackCommand = NULL;
+    }
+
+  if (this->CloseCommand && *this->CloseCommand && this->IsCreated())
     {
     this->Script("eval {%s %s}",
                  this->CloseCommand, this->GetTclName());
@@ -979,10 +1023,9 @@ void vtkKWSelectionFrame::SelectCallback()
 
   this->SelectedOn();
 
-  if (this->SelectCommand)
+  if (this->SelectCommand && *this->SelectCommand && this->IsCreated())
     {
-    this->Script("eval {%s %s}",
-                 this->SelectCommand, this->GetTclName());
+    this->Script("eval {%s %s}", this->SelectCommand, this->GetTclName());
     }
 }
 
@@ -991,7 +1034,7 @@ void vtkKWSelectionFrame::DoubleClickCallback()
 {
   this->SelectCallback();
 
-  if (this->DoubleClickCommand)
+  if (this->DoubleClickCommand && *this->DoubleClickCommand)
     {
     this->Script("eval {%s %s}",
                  this->DoubleClickCommand, this->GetTclName());
@@ -1001,7 +1044,7 @@ void vtkKWSelectionFrame::DoubleClickCallback()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::ChangeTitleCallback()
 {
-  if (this->ChangeTitleCommand)
+  if (this->ChangeTitleCommand && *this->ChangeTitleCommand)
     {
     this->Script("eval {%s %s}",
                  this->ChangeTitleCommand, this->GetTclName());
@@ -1038,6 +1081,48 @@ void vtkKWSelectionFrame::UpdateEnableState()
   else
     {
     this->UnBind();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkKWSelectionFrameCallbackCommand::vtkKWSelectionFrameCallbackCommand()
+{ 
+  this->SelectionFrame = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWSelectionFrameCallbackCommand::~vtkKWSelectionFrameCallbackCommand()
+{
+  this->SetSelectionFrame(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameCallbackCommand::SetSelectionFrame(
+  vtkKWSelectionFrame *arg)
+{
+  if (this->SelectionFrame != arg)
+    {
+    if (this->SelectionFrame)
+      {
+      this->SelectionFrame->UnRegister(NULL);
+      }
+    this->SelectionFrame = arg;
+    if (arg)
+      {
+      arg->Register(NULL);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameCallbackCommand::Execute(vtkObject *caller,
+                                                unsigned long event, 
+                                                void *calldata)
+{  
+  if (this->SelectionFrame)
+    {
+    this->SelectionFrame->ProcessEvent(caller, event, calldata);
+    this->AbortFlagOn();
     }
 }
 

@@ -21,13 +21,16 @@
 #define __vtkKWSelectionFrame_h
 
 #include "vtkKWCompositeWidget.h"
+#include "vtkCommand.h" // Needed for the callback command
 
+class vtkCommand;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
-class vtkKWToolbarSet;
+class vtkKWSelectionFrameCallbackCommand;
 class vtkKWSelectionFrameInternals;
+class vtkKWToolbarSet;
 
 class KWWIDGETS_EXPORT vtkKWSelectionFrame : public vtkKWCompositeWidget
 {
@@ -69,14 +72,20 @@ public:
   // Allow the close functionality (button and menu entry)
   // If set, a close button is added in the top right corner,
   // and a "Close" entry is added to the end of the selection list.
-  // Set the close command, called when the the close button or the menu entry
-  // is selected by the user.
-  // This command is passed a pointer to this object.
+  // When any of them is selected, the Close() method is invoked, which
+  // triggers the CloseCommand (it is passed a pointer to this object).
   virtual void SetAllowClose(int);
   vtkGetMacro(AllowClose, int);
   vtkBooleanMacro(AllowClose, int);
   virtual void SetCloseCommand(vtkObject *object, const char *method);
   vtkGetObjectMacro(CloseButton, vtkKWPushButton);
+
+  // Description:
+  // Close the selection frame. It can be re-implemented by
+  // subclasses to add more functionalities, release resources, etc.
+  // The only thing it does in this implementation is invoking the
+  // CloseCommand.
+  virtual void Close();
 
   // Description:
   // Allow title to be changed (menu entry)
@@ -192,6 +201,11 @@ public:
   virtual void ChangeTitleCallback();
   
   // Description:
+  // Method that processes the events
+  virtual void ProcessEvent(
+    vtkObject *caller, unsigned long event, void *calldata) {};
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -247,6 +261,13 @@ protected:
 
   vtkKWSelectionFrameInternals *Internals;
 
+  vtkKWSelectionFrameCallbackCommand *CallbackCommand;
+
+  // Description:
+  // Add/remove the callback command bindings.
+  virtual void AddCallbackCommandBindings();
+  virtual void RemoveCallbackCommandBindings();
+
 private:
 
   vtkKWToolbarSet *ToolbarSet;
@@ -257,6 +278,29 @@ private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
   void operator=(const vtkKWSelectionFrame&);  // Not implemented
 };
+
+//BTX
+//----------------------------------------------------------------------------
+class KWWIDGETS_EXPORT vtkKWSelectionFrameCallbackCommand : public vtkCommand
+{
+public:
+  static vtkKWSelectionFrameCallbackCommand *New() 
+    { return new vtkKWSelectionFrameCallbackCommand; };
+  
+  void Execute(vtkObject *caller, unsigned long event, void *callData);
+  void SetSelectionFrame(vtkKWSelectionFrame *widget);
+  
+protected:
+  vtkKWSelectionFrameCallbackCommand();
+  ~vtkKWSelectionFrameCallbackCommand();
+  
+  vtkKWSelectionFrame  *SelectionFrame;
+
+private:
+  vtkKWSelectionFrameCallbackCommand(const vtkKWSelectionFrameCallbackCommand&); // Not implemented
+  void operator=(const vtkKWSelectionFrameCallbackCommand&); // Not implemented
+};
+//ETX
 
 #endif
 
