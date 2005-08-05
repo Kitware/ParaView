@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.2");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.3");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -171,7 +171,7 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
 void vtkPVTraceHelper::OutputEntryInternal(
   ostream *os, int estimated_length, const char *format, va_list ap)
 {
-  if (os == NULL || estimated_length <= 0 || !format || !ap)
+  if (os == NULL || estimated_length <= 0 || !format)
     {
     return;
     }
