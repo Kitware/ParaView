@@ -203,7 +203,9 @@ public:
   // Description:
   // Method that processes the events
   virtual void ProcessEvent(
-    vtkObject *caller, unsigned long event, void *calldata) {};
+    vtkObject *vtkNotUsed(caller), 
+    unsigned long vtkNotUsed(event), 
+    void *vtkNotUsed(calldata)) {};
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
