@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.759");
+vtkCxxRevisionMacro(vtkPVWindow, "1.760");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2341,6 +2341,14 @@ vtkPVReaderModule* vtkPVWindow::InitializeRead(vtkPVReaderModule* proto,
 int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
                                      const char *fileName)
 {
+  if (!clone)
+    {
+    vtkErrorMacro("Cannot read file information when no reader is specified. "
+                  "This probably means that the reader for the file with name: "
+                  << (fileName?fileName:"(none)")
+                  << " cannot be found");
+    return VTK_ERROR;
+    }
   int retVal = clone->ReadFileInformation(fileName);
 
   if (retVal == VTK_OK)
@@ -2363,6 +2371,10 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
 // correctly.
 int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
 {
+  if (!clone)
+    {
+    return VTK_ERROR;
+    }
   this->GetTraceHelper()->AddEntry(
     "$kw(%s) FinalizeRead $kw(%s) \"%s\"", 
     this->GetTclName(), clone->GetTclName(), fileName);
