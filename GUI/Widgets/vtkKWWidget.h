@@ -97,7 +97,7 @@ public:
   // Convenience method to get the parent vtkKWWindowBase for
   // this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
-  vtkKWWindowBase* GetWindow();
+  vtkKWWindowBase* GetParentWindow();
 
   // Description:
   // Query if widget is packed

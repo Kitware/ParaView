@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.80");
+vtkCxxRevisionMacro(vtkKWMenu, "1.81");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -76,7 +76,7 @@ void vtkKWMenu::DisplayHelp(const char* widget)
     tname, tname, widget, tname, tname, tname );
   if(res)
     {
-    vtkKWWindowBase* window = this->GetWindow();
+    vtkKWWindowBase* window = this->GetParentWindow();
     if ( window )
       {
       window->SetStatusText(res);

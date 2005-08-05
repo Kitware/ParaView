@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.139");
+vtkCxxRevisionMacro(vtkKWWidget, "1.140");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -436,7 +436,7 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWindowBase* vtkKWWidget::GetWindow()
+vtkKWWindowBase* vtkKWWidget::GetParentWindow()
 {
   vtkKWWindowBase* win =0;
   vtkKWWidget* widget = this->GetParent();

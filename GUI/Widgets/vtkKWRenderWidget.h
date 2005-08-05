@@ -43,11 +43,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set the widget's parent window.
-  virtual void SetParentWindow(vtkKWWindow *window);
-  vtkGetObjectMacro(ParentWindow, vtkKWWindow);
-
-  // Description:
   // Render the scene.
   virtual void Render();
 
@@ -260,6 +255,13 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // For debugging purposes. This class is usually the center of the
+  // whole "a vtkTkRenderWidget is being destroyed before its render window"
+  // problem.
+  virtual void Register(vtkObjectBase* o);
+  virtual void UnRegister(vtkObjectBase* o);
+  
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -267,7 +269,6 @@ protected:
   vtkKWCoreWidget *VTKWidget;
 
   vtkRenderWindow *RenderWindow;
-  vtkKWWindow     *ParentWindow;
   vtkKWGenericRenderWindowInteractor *Interactor;
 
   vtkCornerAnnotation *CornerAnnotation;

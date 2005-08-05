@@ -36,7 +36,19 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.94");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.95");
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::Register(vtkObjectBase* o)
+{
+  this->Superclass::Register(o);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::UnRegister(vtkObjectBase* o)
+{
+  this->Superclass::UnRegister(o);
+}
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -48,8 +60,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   // The vtkTkRenderWidget
 
-  this->ParentWindow = NULL;
-  
   this->VTKWidget = vtkKWCoreWidget::New();
 
   // Create two renderers by default (main one and overlay)
@@ -150,8 +160,6 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->RenderWindow->Delete();
     this->RenderWindow = NULL;
     }
-
-  this->SetParentWindow(NULL);
 
   if (this->Interactor)
     {
@@ -306,7 +314,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddBindings()
 {
-  if (!this->IsCreated())
+  if (!this->IsAlive())
     {
     return;
     }
@@ -315,7 +323,7 @@ void vtkKWRenderWidget::AddBindings()
 
   this->RemoveBindings();
 
-  if (this->VTKWidget->IsCreated())
+  if (this->VTKWidget->IsAlive())
     {
     // Setup some default bindings
     
@@ -333,12 +341,12 @@ void vtkKWRenderWidget::AddBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveBindings()
 {
-  if (!this->IsCreated())
+  if (!this->IsAlive())
     {
     return;
     }
 
-  if (this->VTKWidget->IsCreated())
+  if (this->VTKWidget->IsAlive())
     {
     this->VTKWidget->RemoveBinding("<Expose>");
     this->VTKWidget->RemoveBinding("<Enter>");
@@ -370,7 +378,7 @@ void vtkKWRenderWidget::AddInteractionBindings()
     return;
     }
 
-  if (this->VTKWidget->IsCreated())
+  if (this->VTKWidget->IsAlive())
     {
     this->VTKWidget->SetBinding(
       "<Any-ButtonPress>", this, "AButtonPress %b %x %y 0 0");
@@ -439,7 +447,7 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
     return;
     }
 
-  if (this->VTKWidget->IsCreated())
+  if (this->VTKWidget->IsAlive())
     {
     this->VTKWidget->RemoveBinding("<Any-ButtonPress>");
     this->VTKWidget->RemoveBinding("<Any-ButtonRelease>");
@@ -689,34 +697,6 @@ const char* vtkKWRenderWidget::GetRenderModeAsString()
     default:
       return "Unknown (error)";
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
-{
-  if (this->ParentWindow == window)
-    {
-    return;
-    }
-
-  // Remove old observers 
-  // (some of them may use the parent window, to display progress for example)
-
-  if (this->ParentWindow)
-    {
-    this->RemoveObservers();
-    }
-
-  this->ParentWindow = window;
-
-  // Reinstall observers
-
-  if (this->ParentWindow)
-    {
-    this->AddObservers();
-    }
-  
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1323,15 +1303,6 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Printing: " << this->Printing << endl;
   os << indent << "VTKWidget: " << this->VTKWidget << endl;
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
-  os << indent << "ParentWindow: ";
-  if (this->ParentWindow)
-    {
-    os << this->ParentWindow << endl;
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
   os << indent << "RenderMode: " << this->GetRenderModeAsString() << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->GetRenderer() << endl;
