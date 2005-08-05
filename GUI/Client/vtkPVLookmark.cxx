@@ -84,24 +84,27 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.46");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.47");
 
 
 typedef vtkstd::vector<vtkstd::string> VectorTypeBase;
-class vtkPVLookmarkVectorType : public VectorTypeBase {};
+class vtkPVLookmarkVectorType: public VectorTypeBase {};
 typedef vtkstd::vector<vtkstd::string>::iterator VectorIteratorTypeBase;
-class vtkPVLookmarkVectorIteratorType: public vtkstd::vector<vtkstd::string>::iterator
+class vtkPVLookmarkVectorIteratorType: public VectorIteratorTypeBase
  {
   public: 
+  void operator=(const VectorIteratorTypeBase& it){ VectorIteratorTypeBase::operator=(it); };
+/*
   vtkstd::vector<vtkstd::string>::iterator& operator=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator=(it); };
   vtkstd::string operator*(){ return vtkstd::vector<vtkstd::string>::iterator::operator*(); };
-  bool operator!=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator!=(it); };
-  bool operator<=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator<=(it); };
-  bool operator>=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator>=(it); };
+  int operator!=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator!=(it); };
+  int operator<=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator<=(it); };
+  int operator>=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator>=(it); };
   vtkstd::vector<vtkstd::string>::iterator& operator++(){ return vtkstd::vector<vtkstd::string>::iterator::operator++(); };
+*/
  };
 typedef vtkstd::string StringTypeBase;
-class vtkPVLookmarkStringType : public StringTypeBase {};
+class vtkPVLookmarkStringType: public StringTypeBase {};
 
 //*****************************************************************************
 class vtkPVLookmarkObserver : public vtkCommand
@@ -1523,7 +1526,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         }
       executeCmd = true;
 
-      ++tokIter;
+      tokIter++;
       if(tokIter>=tokens.end())
         break;
       ptr.assign(*tokIter);
