@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.41");
+vtkCxxRevisionMacro(vtkKWExtent, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -265,7 +265,7 @@ void vtkKWExtent::ExtentChangedCallback()
   this->Extent[4] = this->Range[2]->GetRange()[0];
   this->Extent[5] = this->Range[2]->GetRange()[1];
  
-  if ( this->Command )
+  if (this->Command && *this->Command)
     {
     this->Script("eval %s",this->Command);
     }

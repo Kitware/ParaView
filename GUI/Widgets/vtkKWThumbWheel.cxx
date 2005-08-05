@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.40");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.41");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1048,10 +1048,11 @@ void vtkKWThumbWheel::StopMotionCallback()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeCommand()
 {
-  if (!this->Command || this->InInvokeCommand)
+  if (!this->Command || !*this->Command || this->InInvokeCommand)
     {
     return;
     }
+
   this->InInvokeCommand = 1;
 
   this->Script("eval %s", this->Command);
@@ -1062,7 +1063,7 @@ void vtkKWThumbWheel::InvokeCommand()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeStartCommand()
 {
-  if (this->StartCommand)
+  if (this->StartCommand && *this->StartCommand && this->IsCreated())
     {
     this->Script("eval %s", this->StartCommand);
     }
@@ -1071,7 +1072,7 @@ void vtkKWThumbWheel::InvokeStartCommand()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeEndCommand()
 {
-  if (this->EndCommand)
+  if (this->EndCommand && *this->EndCommand && this->IsCreated())
     {
     this->Script("eval %s", this->EndCommand);
     }
@@ -1080,7 +1081,7 @@ void vtkKWThumbWheel::InvokeEndCommand()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeEntryCommand()
 {
-  if (this->EntryCommand)
+  if (this->EntryCommand && *this->EntryCommand && this->IsCreated())
     {
     this->Script("eval %s",this->EntryCommand);
     }

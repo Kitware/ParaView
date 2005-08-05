@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.9");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -480,7 +480,7 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
     return;
     }
 
-  if (this->StartCommand)
+  if (this->StartCommand && *this->StartCommand)
     {
     this->Script("eval %s %d %d", this->StartCommand, x, y);
     }
@@ -515,7 +515,7 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
-      if (*it && (*it)->StartCommand)
+      if (*it && (*it)->StartCommand && *(*it)->StartCommand)
         {
         if (this->Source && !this->Source->GetApplication())
           {
@@ -545,7 +545,7 @@ void vtkKWDragAndDropTargetSet::PerformCallback(int x, int y)
     return;
     }
 
-  if (this->PerformCommand)
+  if (this->PerformCommand && *this->PerformCommand)
     {
     this->Script("eval %s %d %d", this->PerformCommand, x, y);
     }
@@ -560,7 +560,7 @@ void vtkKWDragAndDropTargetSet::PerformCallback(int x, int y)
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
-      if (*it && (*it)->PerformCommand)
+      if (*it && (*it)->PerformCommand && *(*it)->PerformCommand)
         {
         if (this->Source && !this->Source->GetApplication())
           {
@@ -619,7 +619,7 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
-      if (*it && (*it)->EndCommand && 
+      if (*it && (*it)->EndCommand && *(*it)->EndCommand &&
           (*it)->Target && 
           (*it)->Target->IsCreated() &&
           vtkKWTkUtilities::ContainsCoordinates((*it)->Target, x, y))
@@ -644,7 +644,7 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       }
     }
 
-  if (this->EndCommand)
+  if (this->EndCommand && *this->EndCommand)
     {
     this->Script("eval %s %d %d", this->EndCommand, x, y);
     }

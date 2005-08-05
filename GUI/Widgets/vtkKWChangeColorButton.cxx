@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.63");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.64");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -402,7 +402,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
     {
     this->UpdateColorButton();
     
-    if (this->Command)
+    if (this->Command && *this->Command)
       {
       this->Script("eval %s %lf %lf %lf", 
                    this->Command, 

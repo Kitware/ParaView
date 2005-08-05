@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.16");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.17");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -661,7 +661,7 @@ void vtkKWColorPresetSelector::PresetSelectedCallback(const char *name)
         preset_func, preset_range, 
         this->ColorTransferFunction, scalar_range))
     {
-    if (this->PresetSelectedCommand)
+    if (this->PresetSelectedCommand && *this->PresetSelectedCommand)
       {
       this->Script("eval %s", this->PresetSelectedCommand);
       }
