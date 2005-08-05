@@ -47,9 +47,11 @@ class vtkKWPushButton;
 class vtkPVLookmarkObserver;
 class vtkKWIcon;
 
+/*
 class vtkPVLookmarkVectorType;
 class vtkPVLookmarkVectorIteratorType;
 class vtkPVLookmarkStringType;
+*/
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
@@ -179,8 +181,8 @@ protected:
   //void InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &it, int macroFlag, int newDatasetFlag);
   //void InitializeVolumeAppearanceEditor(vtkPVSource*, vtkstd::vector<vtkstd::string>::iterator &it);
 //BTX
-  void InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmarkVectorIteratorType &it, int macroFlag, int newDatasetFlag);
-  void InitializeVolumeAppearanceEditor(vtkPVSource*, vtkPVLookmarkVectorIteratorType &it);
+//  void InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmarkVectorIteratorType &it, int macroFlag, int newDatasetFlag);
+//  void InitializeVolumeAppearanceEditor(vtkPVSource*, vtkPVLookmarkVectorIteratorType &it);
 //ETX
   vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name, int &newDatasetFlag, int &updateLookmarkFlag);
   vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
@@ -188,7 +190,7 @@ protected:
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
   //void Tokenize(const vtkstd::string& str, vtkstd::vector<vtkstd::string>& tokens, const vtkstd::string& delimiters = " ");
 //BTX
-  void Tokenize(const vtkPVLookmarkStringType& str, vtkPVLookmarkVectorType& tokens, const vtkPVLookmarkStringType& delimiters);
+//  void Tokenize(const vtkPVLookmarkStringType& str, vtkPVLookmarkVectorType& tokens, const vtkPVLookmarkStringType& delimiters);
 //ETX
   char* StateScript;
   char* ImageData;

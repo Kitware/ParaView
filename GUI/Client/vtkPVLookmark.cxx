@@ -84,27 +84,27 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.47");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.48");
 
-
+/*
 typedef vtkstd::vector<vtkstd::string> VectorTypeBase;
-class vtkPVLookmarkVectorType: public VectorTypeBase {};
+class vtkstd::vector<vtkstd::string>: public VectorTypeBase {};
 typedef vtkstd::vector<vtkstd::string>::iterator VectorIteratorTypeBase;
-class vtkPVLookmarkVectorIteratorType: public VectorIteratorTypeBase
+class vtkstd::vector<vtkstd::string>::iterator: public vtkstd::vector<vtkstd::string>::iterator
  {
   public: 
-  void operator=(const VectorIteratorTypeBase& it){ VectorIteratorTypeBase::operator=(it); };
-/*
+
   vtkstd::vector<vtkstd::string>::iterator& operator=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator=(it); };
   vtkstd::string operator*(){ return vtkstd::vector<vtkstd::string>::iterator::operator*(); };
-  int operator!=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator!=(it); };
-  int operator<=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator<=(it); };
-  int operator>=(const vtkstd::vector<vtkstd::string>::iterator& it){ return vtkstd::vector<vtkstd::string>::iterator::operator>=(it); };
+  bool operator!=(const vtkstd::vector<vtkstd::string>::iterator& it) const { return it != *this; }; //return vtkstd::vector<vtkstd::string>::iterator::operator!=(it); };
+  bool operator<=(const vtkstd::vector<vtkstd::string>::iterator& it) const { return it <= *this; }; //return vtkstd::vector<vtkstd::string>::iterator::operator<=(it); };
+  bool operator>=(const vtkstd::vector<vtkstd::string>::iterator& it) const { return it >= *this; }; //return vtkstd::vector<vtkstd::string>::iterator::operator>=(it); };
   vtkstd::vector<vtkstd::string>::iterator& operator++(){ return vtkstd::vector<vtkstd::string>::iterator::operator++(); };
-*/
+
  };
 typedef vtkstd::string StringTypeBase;
-class vtkPVLookmarkStringType: public StringTypeBase {};
+class vtkstd::string: public StringTypeBase {};
+*/
 
 //*****************************************************************************
 class vtkPVLookmarkObserver : public vtkCommand
@@ -702,10 +702,10 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
             {
             updateLookmarkFlag = 1;
             mod = vtkPVReaderModule::SafeDownCast(source);
-            vtkPVLookmarkStringType newDataset;
+            vtkstd::string newDataset;
             newDataset.assign(this->GetDataset());
-            vtkPVLookmarkStringType::size_type idx = newDataset.rfind(name,newDataset.size());
-            if(idx!=vtkPVLookmarkStringType::npos)
+            vtkstd::string::size_type idx = newDataset.rfind(name,newDataset.size());
+            if(idx!=vtkstd::string::npos)
               {
               newDataset.replace(idx,strlen(name),mod->GetFileEntry()->GetValue());
               this->SetDataset(newDataset.c_str());
@@ -793,7 +793,7 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     this->ToolbarButton->Create(this->GetPVApplication());
     this->ToolbarButton->SetImageToIcon(icon);
     this->ToolbarButton->SetBalloonHelpString(this->GetName());
-    this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
+//    this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
     win->GetLookmarkToolbar()->AddWidget(this->ToolbarButton);
     }
 }
@@ -851,7 +851,7 @@ void vtkPVLookmark::StoreStateScript()
     }
   state << ends;
   unsigned int ret = opsList.find_last_of(',',opsList.size());
-  if(ret != vtkPVLookmarkStringType::npos)
+  if(ret != vtkstd::string::npos)
     {
     opsList.erase(ret);
     }
@@ -1113,6 +1113,7 @@ char *vtkPVLookmark::GetEncodedImageData(vtkKWIcon *icon)
 //----------------------------------------------------------------------------
 void vtkPVLookmark::SetLookmarkIconCommand()
 {
+/*
   if(this->MacroFlag)
     {
     this->LmkIcon->SetBinding(
@@ -1125,6 +1126,7 @@ void vtkPVLookmark::SetLookmarkIconCommand()
     this->LmkIcon->SetBinding("<Button-1>", this, "View");
     this->LmkIcon->SetBinding("<Double-1>", this, "View");
     }
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -1163,17 +1165,17 @@ void vtkPVLookmark::TurnFiltersOff()
     }
   it->Delete();
 }
-
-void vtkPVLookmark::Tokenize(const vtkPVLookmarkStringType& str,
-                      vtkPVLookmarkVectorType& tokens,
-                      const vtkPVLookmarkStringType& delimiters)
+/*
+void vtkPVLookmark::Tokenize(const vtkstd::string& str,
+                      vtkstd::vector<vtkstd::string>& tokens,
+                      const vtkstd::string& delimiters)
 {
   // Skip delimiters at beginning.
-  vtkPVLookmarkStringType::size_type lastPos = str.find_first_not_of(delimiters, 0);
+  vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".
-  vtkPVLookmarkStringType::size_type pos = str.find_first_of(delimiters, lastPos);
+  vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-  while (vtkPVLookmarkStringType::npos != pos || vtkPVLookmarkStringType::npos != lastPos)
+  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
     {
     // Found a token, add it to the vector.
     tokens.push_back(str.substr(lastPos, pos - lastPos));
@@ -1183,12 +1185,12 @@ void vtkPVLookmark::Tokenize(const vtkPVLookmarkStringType& str,
     pos = str.find_first_of(delimiters, lastPos);
     }
 }
-
+*/
 //----------------------------------------------------------------------------
 void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 {
   vtkPVSource *src;
-  vtkPVLookmarkStringType ptr;
+  vtkstd::string ptr;
   char *ptr1;
   int ival;
   int i=0;
@@ -1197,15 +1199,15 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   char cmd[200];
   char path[300];
   bool foundSource = false;
-  vtkPVLookmarkStringType srcLabel;
+  vtkstd::string srcLabel;
   vtkStdString string1,string2;
-  vtkPVLookmarkStringType::size_type beg;
-  //vtkPVLookmarkStringType::size_type end;
+  vtkstd::string::size_type beg;
+  //vtkstd::string::size_type end;
   bool executeCmd = true;
   //char **buf = new char*[100];
-  vtkPVLookmarkVectorType buf;
+  vtkstd::vector<vtkstd::string> buf;
   char moduleName[50];
-  vtkPVLookmarkStringType::size_type ret;
+  vtkstd::string::size_type ret;
   int newDatasetFlag = 0;
   int updateLookmarkFlag = 0;
 
@@ -1213,21 +1215,21 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
   // Tokenize the script:
 
-  vtkPVLookmarkVectorType tokens;
-  vtkPVLookmarkVectorIteratorType tokIter;
-  vtkPVLookmarkVectorIteratorType tokMrkr;
-  vtkPVLookmarkStringType delimiters;
+  vtkstd::vector<vtkstd::string> tokens;
+  vtkstd::vector<vtkstd::string>::iterator tokIter;
+  vtkstd::vector<vtkstd::string>::iterator tokMrkr;
+  vtkstd::string delimiters;
   delimiters.assign("\r\n");
-  vtkPVLookmarkStringType str;
+  vtkstd::string str;
   str.assign(script);
-  this->Tokenize(str,tokens,delimiters);
+  //this->Tokenize(str,tokens,delimiters);
 /*
   // Skip delimiters at beginning.
-  vtkPVLookmarkStringType::size_type lastPos = str.find_first_not_of(delimiters, 0);
+  vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".
-  vtkPVLookmarkStringType::size_type pos = str.find_first_of(delimiters, lastPos);
+  vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-  while (vtkPVLookmarkStringType::npos != pos || vtkPVLookmarkStringType::npos != lastPos)
+  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
     {
     // Found a token, add it to the vector.
     tokens.push_back(str.substr(lastPos, pos - lastPos));
@@ -1287,12 +1289,12 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
   while(tokIter <= tokens.end())
     {
-    if(!foundSource && ptr.rfind("InitializeReadCustom",ptr.size())==vtkPVLookmarkStringType::npos && ptr.rfind("CreatePVSource",ptr.size())==vtkPVLookmarkStringType::npos)
+    if(!foundSource && ptr.rfind("InitializeReadCustom",ptr.size())==vtkstd::string::npos && ptr.rfind("CreatePVSource",ptr.size())==vtkstd::string::npos)
       {
       this->Script(ptr.c_str());
       ptr.assign(*(++tokIter));
       }
-    else if(ptr.rfind("InitializeReadCustom",ptr.size())!=vtkPVLookmarkStringType::npos )
+    else if(ptr.rfind("InitializeReadCustom",ptr.size())!=vtkstd::string::npos )
       {
       foundSource = true;
 
@@ -1316,11 +1318,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         tclName = new char[20];
         strcpy(tclName,srcTclName);
         tclNameMap[src] = tclName;
-        while(ptr.rfind("GetPVWidget",ptr.size())==vtkPVLookmarkStringType::npos)
+        while(ptr.rfind("GetPVWidget",ptr.size())==vtkstd::string::npos)
           {
           ptr.assign(*(++tokIter));
           }
-        this->InitializeSourceFromScript(src,tokIter,macroFlag,newDatasetFlag);
+        //this->InitializeSourceFromScript(src,tokIter,macroFlag,newDatasetFlag);
         // remove this source from the available list
         readers->RemoveItem(src);
         }
@@ -1332,7 +1334,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
       ptr.assign(*(++tokIter));
       }
-    else if(ptr.rfind("CreatePVSource",ptr.size())!=vtkPVLookmarkStringType::npos )
+    else if(ptr.rfind("CreatePVSource",ptr.size())!=vtkstd::string::npos )
       {
       foundSource = true;
       sscanf(ptr.c_str(),"%*s %s %*s %*s %[^]]",srcTclName,moduleName);
@@ -1341,12 +1343,12 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       
       // mark the current line with second iterator
       tokMrkr = tokIter;
-      while(ptr.rfind("GetPVWidget",ptr.size())==vtkPVLookmarkStringType::npos)
+      while(ptr.rfind("GetPVWidget",ptr.size())==vtkstd::string::npos)
         {
         ptr.assign(*(++tokIter));
         }
 
-      if(ptr.rfind("inputs",ptr.size())!=vtkPVLookmarkStringType::npos)
+      if(ptr.rfind("inputs",ptr.size())!=vtkstd::string::npos)
         {
         // group input widget
         // execute the createpvsource command
@@ -1371,13 +1373,13 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         dlg2->Invoke();
         dlg2->Delete();
         this->GetPVLookmarkManager()->Display();
-        while(ptr.rfind("AcceptCallback",ptr.size())==vtkPVLookmarkStringType::npos)
+        while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)
           {
           ptr.assign(*(++tokIter));
           }
         this->Script(ptr.c_str());
         }
-      else if(ptr.rfind("Input",ptr.size())!=vtkPVLookmarkStringType::npos)
+      else if(ptr.rfind("Input",ptr.size())!=vtkstd::string::npos)
         {
         // input menu widget
         ptr.assign(*(++tokIter));
@@ -1418,7 +1420,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           tclName = new char[20]; 
           strcpy(tclName,srcTclName);
           tclNameMap[src] = tclName;
-          this->InitializeSourceFromScript(src,tokIter,macroFlag,0);
+          //this->InitializeSourceFromScript(src,tokIter,macroFlag,0);
           // remove this source from the available list
           sources->RemoveItem(src);
           }
@@ -1431,7 +1433,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       ptr.assign(*(++tokIter));
 
       }
-    else if(ptr.rfind("AcceptCallback",ptr.size())!=vtkPVLookmarkStringType::npos )
+    else if(ptr.rfind("AcceptCallback",ptr.size())!=vtkstd::string::npos )
       {
       // the current source would be the filter just created
       src = this->GetPVApplication()->GetMainWindow()->GetCurrentPVSource();
@@ -1439,7 +1441,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       // append the lookmark name to its filter name : strip off any characters after '-' because a lookmark name could already have been appended to this filter name
       srcLabel.assign(src->GetLabel());
       ret = srcLabel.find_last_of('-',srcLabel.size());
-      if(ret!=vtkPVLookmarkStringType::npos)
+      if(ret!=vtkstd::string::npos)
         {
         srcLabel.erase(ret,srcLabel.size()-ret);
         }
@@ -1454,7 +1456,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       this->Script(ptr.c_str());
       ptr.assign(*(++tokIter));
       }
-    else if(ptr.rfind("SetCameraState",ptr.size())!=vtkPVLookmarkStringType::npos && macroFlag)
+    else if(ptr.rfind("SetCameraState",ptr.size())!=vtkstd::string::npos && macroFlag)
       {
       ptr.assign(*(++tokIter));
       }
@@ -1483,16 +1485,16 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
       iter = tclNameMap.begin();
       while(iter != tclNameMap.end())
         {
-        if(ptr.rfind(iter->second,ptr.size())!=vtkPVLookmarkStringType::npos)
+        if(ptr.rfind(iter->second,ptr.size())!=vtkstd::string::npos)
           {
-          if(ptr.rfind("SetVisibility",ptr.size())!=vtkPVLookmarkStringType::npos)
+          if(ptr.rfind("SetVisibility",ptr.size())!=vtkstd::string::npos)
             {
             sscanf(ptr.c_str(),"%*s %*s %d",&ival);
             iter->first->SetVisibility(ival);
             }
-          if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkPVLookmarkStringType::npos)
+          if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkstd::string::npos)
             {
-            this->InitializeVolumeAppearanceEditor(iter->first,tokIter);
+            //this->InitializeVolumeAppearanceEditor(iter->first,tokIter);
             }
           executeCmd = false;
 
@@ -1515,7 +1517,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         string1 = ptr;
 
         // the command does not contain a source tcl name
-        if(ptr.rfind("ColorByArray",ptr.size())!=vtkPVLookmarkStringType::npos)
+        if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
           {
           string1.erase(string1.find_first_of('[',0),1);
           beg = string1.rfind("GetPVOutput]",string1.size());
@@ -1526,7 +1528,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         }
       executeCmd = true;
 
-      tokIter++;
+      ++tokIter;
       if(tokIter>=tokens.end())
         break;
       ptr.assign(*tokIter);
@@ -1554,15 +1556,15 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   readers->Delete();
   sources->Delete();
 }
-
-void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkPVLookmarkVectorIteratorType &it)
+/*
+void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkstd::vector<vtkstd::string>::iterator &it)
 {
   double fval1,fval2,fval3,fval4;
   int ival;
 
   vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
 
-  vtkPVLookmarkStringType ptr;
+  vtkstd::string ptr;
   ptr.assign(*it);
   // needed to display edit volume appearance setting button:
   src->GetPVOutput()->DrawVolume();
@@ -1572,7 +1574,7 @@ void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkPVLook
   vol->RemoveAllScalarOpacityPoints();
 
   ptr.assign(*(++it));
-  while(ptr.rfind("AppendScalarOpacityPoint",ptr.size())!=vtkPVLookmarkStringType::npos)
+  while(ptr.rfind("AppendScalarOpacityPoint",ptr.size())!=vtkstd::string::npos)
     {
     sscanf(ptr.c_str(),"%*s %*s %lf %lf",&fval1,&fval2);
     vol->AppendScalarOpacityPoint(fval1,fval2);
@@ -1586,7 +1588,7 @@ void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkPVLook
   vol->RemoveAllColorPoints();
 
   ptr.assign(*(++it));
-  while(ptr.rfind("AppendColorPoint",ptr.size())!=vtkPVLookmarkStringType::npos)
+  while(ptr.rfind("AppendColorPoint",ptr.size())!=vtkstd::string::npos)
     {
     sscanf(ptr.c_str(),"%lf %lf %lf %lf",&fval1,&fval2,&fval3,&fval4);
     vol->AppendColorPoint(fval1,fval2,fval3,fval4);
@@ -1601,8 +1603,7 @@ void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkPVLook
   vol->SetColorSpace(ival);
 }
 
-
-void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmarkVectorIteratorType &tokIter, int macroFlag, int newDatasetFlag)
+void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string>::iterator &tokIter, int macroFlag, int newDatasetFlag)
 {
   vtkPVScale *scale;
   vtkPVArraySelection *arraySelection;
@@ -1620,7 +1621,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
 #endif
 
   vtkPVWidget *pvWidget;
-  vtkPVLookmarkStringType ptr;
+  vtkstd::string ptr;
   char sval[100];
   double fval; 
   int ival;
@@ -1645,17 +1646,9 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
   char FifthAndSixthToken_IntAndWrappedString[] = "%*s %*s %*s %*s %d {%[^}]";
   char FourthAndFifthToken_WrappedStringAndInt[] = "%*s %*s %*s {%[^}]} %d";
   vtkStdString string1,string2;
-  vtkPVLookmarkStringType::size_type beg;
-  vtkPVLookmarkStringType::size_type end;
+  vtkstd::string::size_type beg;
+  vtkstd::string::size_type end;
 
-/*
-  ptr = strtok(NULL,"\r\n");
-
-  while(!strstr(ptr,"GetPVWidget"))
-    {
-    ptr = strtok(NULL,"\r\n");
-    }
-*/
   ptr.assign(*tokIter);
 
   //loop through collection till found, operate accordingly leaving else statement with ptr one line past 
@@ -1681,7 +1674,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
       else if((arraySelection = vtkPVArraySelection::SafeDownCast(pvWidget)))
         { 
         ptr.assign(*(++tokIter));
-        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkPVLookmarkStringType::npos)
+        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
           {
           sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
           //only turn the variable on, not off, because some other filter might be using the variable
@@ -1714,7 +1707,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
         sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
         arraySelection = vtkPVArraySelection::SafeDownCast(selectWidget->GetPVWidget(sval));
         ptr.assign(*(++tokIter));
-        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkPVLookmarkStringType::npos)
+        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
           {
           sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
           arraySelection->SetArrayStatus(sval,ival);
@@ -1795,7 +1788,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
           {
           ptr.assign(*(++tokIter));
           beg = ptr.find_first_of('{',0);
-          if(beg!=vtkPVLookmarkStringType::npos)
+          if(beg!=vtkstd::string::npos)
             {
             end = ptr.find_last_of('}',ptr.size());
             //sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
@@ -1857,7 +1850,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
     }
   it->Delete();
 
-  while(ptr.rfind("AcceptCallback",ptr.size())==vtkPVLookmarkStringType::npos)
+  while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)
     {
     ptr.assign(*(++tokIter));
     }
@@ -1879,9 +1872,9 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
 
   vtkSMDisplayProxy *display = source->GetDisplayProxy();
 
-  while(ptr.rfind(displayName,ptr.size())!=vtkPVLookmarkStringType::npos) 
+  while(ptr.rfind(displayName,ptr.size())!=vtkstd::string::npos) 
     {
-    if(ptr.rfind("UpdateVTKObjects",ptr.size())!=vtkPVLookmarkStringType::npos)
+    if(ptr.rfind("UpdateVTKObjects",ptr.size())!=vtkstd::string::npos)
       {
       display->UpdateVTKObjects();
       ptr.assign(*(++tokIter));
@@ -1938,17 +1931,17 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
 //  source->UpdateVTKObjects();
 //  source->InvalidateDataInformation();
 
-  if(ptr.rfind("ColorByArray",ptr.size())!=vtkPVLookmarkStringType::npos)
+  if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
     {
     sscanf(ptr.c_str(),FourthAndFifthToken_WrappedStringAndInt,sval,&ival);
     source->ColorByArray(sval, ival);
     }
-  else if(ptr.rfind("VolumeRenderByArray",ptr.size())!=vtkPVLookmarkStringType::npos)
+  else if(ptr.rfind("VolumeRenderByArray",ptr.size())!=vtkstd::string::npos)
     {
     sscanf(ptr.c_str(),FourthAndFifthToken_WrappedStringAndInt,sval,&ival);
     source->VolumeRenderByArray(sval, ival);
     }
-  else if(ptr.rfind("ColorByProperty",ptr.size())!=vtkPVLookmarkStringType::npos)
+  else if(ptr.rfind("ColorByProperty",ptr.size())!=vtkstd::string::npos)
     {
     source->GetPVOutput()->ColorByProperty();
     }
@@ -1957,6 +1950,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkPVLookmar
   source->GetPVOutput()->UpdateColorGUI();
   source->GetPVOutput()->DataColorRangeCallback();
 }
+*/
 
 //----------------------------------------------------------------------------
 int vtkPVLookmark::DeletePVSources()
