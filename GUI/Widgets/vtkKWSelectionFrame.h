@@ -28,7 +28,7 @@ class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
-class vtkKWSelectionFrameCallbackCommand;
+class vtkCallbackCommand;
 class vtkKWSelectionFrameInternals;
 class vtkKWToolbarSet;
 
@@ -263,12 +263,17 @@ protected:
 
   vtkKWSelectionFrameInternals *Internals;
 
-  vtkKWSelectionFrameCallbackCommand *CallbackCommand;
+  vtkCallbackCommand *CallbackCommand;
 
   // Description:
   // Add/remove the callback command bindings.
   virtual void AddCallbackCommandBindings();
   virtual void RemoveCallbackCommandBindings();
+
+  // Description:
+  // Callback commmand. Pass the parameters to the virtual ProcessEvent method
+  static void ProcessEvent(
+    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:
 
@@ -280,29 +285,6 @@ private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
   void operator=(const vtkKWSelectionFrame&);  // Not implemented
 };
-
-//BTX
-//----------------------------------------------------------------------------
-class KWWIDGETS_EXPORT vtkKWSelectionFrameCallbackCommand : public vtkCommand
-{
-public:
-  static vtkKWSelectionFrameCallbackCommand *New() 
-    { return new vtkKWSelectionFrameCallbackCommand; };
-  
-  void Execute(vtkObject *caller, unsigned long event, void *callData);
-  void SetSelectionFrame(vtkKWSelectionFrame *widget);
-  
-protected:
-  vtkKWSelectionFrameCallbackCommand();
-  ~vtkKWSelectionFrameCallbackCommand();
-  
-  vtkKWSelectionFrame  *SelectionFrame;
-
-private:
-  vtkKWSelectionFrameCallbackCommand(const vtkKWSelectionFrameCallbackCommand&); // Not implemented
-  void operator=(const vtkKWSelectionFrameCallbackCommand&); // Not implemented
-};
-//ETX
 
 #endif
 

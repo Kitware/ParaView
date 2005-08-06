@@ -139,7 +139,6 @@ SET(KWWidgets_SRCS
   vtkKWRange.cxx 
   vtkKWRegistryHelper.cxx
   vtkKWRenderWidget.cxx 
-  vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWResourceUtilities.cxx 
   vtkKWSaveImageDialog.cxx 
   vtkKWScalarBarAnnotation.cxx 
@@ -202,7 +201,6 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
-  vtkKWRenderWidgetCallbackCommand.cxx 
   ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
@@ -225,7 +223,6 @@ ENDIF (WIN32)
 
 # The "set of widgets" are automatically generated from some core widgets
 # (i.e., vtkKWCheckButton => vtkKWCheckButtonSet).
-# If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
     vtkKWCheckButton 
@@ -250,7 +247,6 @@ ENDFOREACH (WidgetType)
 
 # The "labeled widgets" are automatically generated from some core widgets
 # (i.e., vtkKWCheckButton => vtkKWCheckButtonWithLabel)
-# If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
     vtkKWCheckButton 
@@ -285,7 +281,6 @@ ENDFOREACH (WidgetType)
 # The "widgets with scrollbars" are automatically generated from some core
 # widgets
 # (i.e., vtkKWText => vtkKWTextWithScrollbars)
-# If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
     vtkKWCanvas
@@ -303,6 +298,29 @@ FOREACH (WidgetType
     ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
     ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx)
+ENDFOREACH (WidgetType)
+
+# The "callback commands" are automatically generated from some widgets
+# (i.e., vtkKWRenderWidget => vtkKWRenderWidgetCallbackCommand)
+# Not used anymore in favor of vtkCallbackCommand, but let's keep it around
+# as a good superclass basis
+
+FOREACH (WidgetType 
+#    vtkKWRenderWidget
+    )
+  SET (WidgetType ${WidgetType})
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetCallbackCommand.h.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}CallbackCommand.h IMMEDIATE)
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetCallbackCommand.cxx.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}CallbackCommand.cxx IMMEDIATE)
+  SET (KWWidgets_SRCS 
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}CallbackCommand.cxx)
+  SET_SOURCE_FILES_PROPERTIES(
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}CallbackCommand.cxx
+    WRAP_EXCLUDE
+  )
 ENDFOREACH (WidgetType)
 
 # Include dirs

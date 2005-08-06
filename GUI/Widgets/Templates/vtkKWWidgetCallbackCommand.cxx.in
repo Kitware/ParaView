@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWRenderWidgetCallbackCommand.cxx
+  Module:    vtkKWWidgetCallbackCommand.cxx.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,32 +11,38 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWRenderWidgetCallbackCommand.h"
 
-#include "vtkKWRenderWidget.h"
+#include "@WidgetType@CallbackCommand.h"
+#include "@WidgetType@.h"
 
 //----------------------------------------------------------------------------
-vtkKWRenderWidgetCallbackCommand::vtkKWRenderWidgetCallbackCommand()
+@WidgetType@CallbackCommand::@WidgetType@CallbackCommand()
 { 
-  this->RenderWidget = NULL;
+  this->Target = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkKWRenderWidgetCallbackCommand::~vtkKWRenderWidgetCallbackCommand()
+@WidgetType@CallbackCommand::~@WidgetType@CallbackCommand()
 {
-  this->SetRenderWidget(NULL);
+  this->SetTarget(NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidgetCallbackCommand::SetRenderWidget(vtkKWRenderWidget *arg)
+@WidgetType@* @WidgetType@CallbackCommand::GetTarget()
 {
-  if (this->RenderWidget != arg)
+  return this->Target;
+}
+
+//----------------------------------------------------------------------------
+void @WidgetType@CallbackCommand::SetTarget(@WidgetType@ *arg)
+{
+  if (this->Target != arg)
     {
-    if (this->RenderWidget)
+    if (this->Target)
       {
-      this->RenderWidget->UnRegister(NULL);
+      this->Target->UnRegister(NULL);
       }
-    this->RenderWidget = arg;
+    this->Target = arg;
     if (arg)
       {
       arg->Register(NULL);
@@ -45,13 +51,13 @@ void vtkKWRenderWidgetCallbackCommand::SetRenderWidget(vtkKWRenderWidget *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidgetCallbackCommand::Execute(vtkObject *caller,
-                                               unsigned long event, 
-                                               void *calldata)
+void @WidgetType@CallbackCommand::Execute(vtkObject *caller,
+                                          unsigned long event, 
+                                          void *calldata)
 {  
-  if (this->RenderWidget)
+  if (this->Target)
     {
-    this->RenderWidget->ProcessEvent(caller, event, calldata);
+    this->Target->ProcessEvent(caller, event, calldata);
     this->AbortFlagOn();
     }
 }

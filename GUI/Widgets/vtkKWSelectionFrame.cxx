@@ -22,12 +22,13 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWIcon.h"
 #include "vtkKWToolbarSet.h"
+#include "vtkCallbackCommand.h"
 
 #include <vtksys/stl/list>
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.46");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -44,8 +45,8 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
   this->Internals             = new vtkKWSelectionFrameInternals;
 
-  this->CallbackCommand       = vtkKWSelectionFrameCallbackCommand::New();
-
+  this->CallbackCommand       = vtkCallbackCommand::New();
+  
   this->OuterSelectionFrame   = vtkKWFrame::New();
   this->TitleBarFrame         = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
@@ -599,7 +600,8 @@ void vtkKWSelectionFrame::AddCallbackCommandBindings()
 {
   if (this->CallbackCommand)
     {
-    this->CallbackCommand->SetSelectionFrame(this);
+    this->CallbackCommand->SetClientData(this); 
+    this->CallbackCommand->SetCallback(vtkKWSelectionFrame::ProcessEvent);
     }
 }
 
@@ -608,10 +610,28 @@ void vtkKWSelectionFrame::RemoveCallbackCommandBindings()
 {
   if (this->CallbackCommand)
     {
-    this->CallbackCommand->SetSelectionFrame(NULL);
+    this->CallbackCommand->SetClientData(NULL); 
+    this->CallbackCommand->SetCallback(NULL);
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::ProcessEvent(
+  vtkObject *object,
+  unsigned long event,
+  void *clientdata,
+  void *calldata)
+{
+  // Pass to the virtual ProcessEvent method
+
+  vtkKWSelectionFrame *self =
+    reinterpret_cast<vtkKWSelectionFrame *>(clientdata);
+  if (self)
+    {
+    self->ProcessEvent(object, event, calldata);
+    }
+}
+  
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
@@ -1081,48 +1101,6 @@ void vtkKWSelectionFrame::UpdateEnableState()
   else
     {
     this->UnBind();
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkKWSelectionFrameCallbackCommand::vtkKWSelectionFrameCallbackCommand()
-{ 
-  this->SelectionFrame = NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkKWSelectionFrameCallbackCommand::~vtkKWSelectionFrameCallbackCommand()
-{
-  this->SetSelectionFrame(NULL);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSelectionFrameCallbackCommand::SetSelectionFrame(
-  vtkKWSelectionFrame *arg)
-{
-  if (this->SelectionFrame != arg)
-    {
-    if (this->SelectionFrame)
-      {
-      this->SelectionFrame->UnRegister(NULL);
-      }
-    this->SelectionFrame = arg;
-    if (arg)
-      {
-      arg->Register(NULL);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSelectionFrameCallbackCommand::Execute(vtkObject *caller,
-                                                unsigned long event, 
-                                                void *calldata)
-{  
-  if (this->SelectionFrame)
-    {
-    this->SelectionFrame->ProcessEvent(caller, event, calldata);
-    this->AbortFlagOn();
     }
 }
 

@@ -20,7 +20,6 @@
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
-#include "vtkKWRenderWidgetCallbackCommand.h"
 #include "vtkKWWindow.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -36,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.95");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.96");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -55,7 +54,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 {
   // The main callback
 
-  this->Observer = vtkKWRenderWidgetCallbackCommand::New();
+  this->Observer = vtkCallbackCommand::New();
   this->EventIdentifier = -1;
 
   // The vtkTkRenderWidget
@@ -336,6 +335,8 @@ void vtkKWRenderWidget::AddBindings()
   this->SetBinding("<Configure>", this, "Configure %w %h");
   
   this->AddInteractionBindings();
+
+  this->AddObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -357,6 +358,8 @@ void vtkKWRenderWidget::RemoveBindings()
   this->RemoveBinding("<Configure>");
 
   this->RemoveInteractionBindings();
+
+  this->RemoveObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -1155,24 +1158,33 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddObservers()
 {
-  this->Observer->SetRenderWidget(this);
-
-  if (this->RenderWindow)
+  if (this->Observer)
     {
-    this->RenderWindow->AddObserver(
-      vtkCommand::CursorChangedEvent, this->Observer);
+    this->Observer->SetClientData(this); 
+    this->Observer->SetCallback(vtkKWRenderWidget::ProcessEvent);
+    this->Observer->AbortFlagOnExecuteOn();
+    
+    if (this->RenderWindow)
+      {
+      this->RenderWindow->AddObserver(
+        vtkCommand::CursorChangedEvent, this->Observer);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveObservers()
 {
-  this->Observer->SetRenderWidget(NULL);
-
-  if (this->RenderWindow)
+  if (this->Observer)
     {
-    this->RenderWindow->RemoveObservers(
-      vtkCommand::CursorChangedEvent, this->Observer);
+    this->Observer->SetClientData(NULL); 
+    this->Observer->SetCallback(NULL);
+    
+    if (this->RenderWindow)
+      {
+      this->RenderWindow->RemoveObservers(
+        vtkCommand::CursorChangedEvent, this->Observer);
+      }
     }
 }
 
@@ -1183,6 +1195,23 @@ void vtkKWRenderWidget_InteractorTimer(ClientData arg)
   me->InvokeEvent(vtkCommand::TimerEvent);
 }
 
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ProcessEvent(
+  vtkObject *object,
+  unsigned long event,
+  void *clientdata,
+  void *calldata)
+{
+  // Pass to the virtual ProcessEvent method
+
+  vtkKWRenderWidget *self =
+    reinterpret_cast<vtkKWRenderWidget *>(clientdata);
+  if (self)
+    {
+    self->ProcessEvent(object, event, calldata);
+    }
+}
+  
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
                                      unsigned long event,

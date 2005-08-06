@@ -23,7 +23,7 @@
 class vtkCamera;
 class vtkCornerAnnotation;
 class vtkKWGenericRenderWindowInteractor;
-class vtkKWRenderWidgetCallbackCommand;
+class vtkCallbackCommand;
 class vtkKWWindow;
 class vtkProp;
 class vtkRenderWindow;
@@ -297,10 +297,16 @@ protected:
   // Add/remove the observers.
   virtual void AddObservers();
   virtual void RemoveObservers();
-  vtkKWRenderWidgetCallbackCommand *Observer;
+  vtkCallbackCommand *Observer;
   int EventIdentifier;
   
   virtual void RemovePropInternal(vtkProp* prop);
+
+  // Description:
+  // Callback commmand. Pass the parameters to the virtual ProcessEvent method
+  static void ProcessEvent(
+    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
+
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
   void operator=(const vtkKWRenderWidget&);  // Not implemented
@@ -311,7 +317,6 @@ private:
 
   vtkRenderer     *Renderer;
   vtkRenderer     *OverlayRenderer;
-
 };
 
 #endif
