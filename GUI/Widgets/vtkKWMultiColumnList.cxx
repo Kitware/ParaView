@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.12");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -527,10 +527,13 @@ double* vtkKWMultiColumnList::GetColumnBackgroundColor(int col_index)
 void vtkKWMultiColumnList::SetColumnBackgroundColor(
   int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetColumnConfigurationOption(col_index, "-bg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetColumnConfigurationOption(col_index, "-bg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -554,10 +557,13 @@ double* vtkKWMultiColumnList::GetColumnForegroundColor(int col_index)
 void vtkKWMultiColumnList::SetColumnForegroundColor(
   int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetColumnConfigurationOption(col_index, "-fg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetColumnConfigurationOption(col_index, "-fg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -972,10 +978,13 @@ double* vtkKWMultiColumnList::GetRowBackgroundColor(int row_index)
 void vtkKWMultiColumnList::SetRowBackgroundColor(
   int row_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetRowConfigurationOption(row_index, "-bg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetRowConfigurationOption(row_index, "-bg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -999,10 +1008,13 @@ double* vtkKWMultiColumnList::GetRowForegroundColor(int row_index)
 void vtkKWMultiColumnList::SetRowForegroundColor(
   int row_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetRowConfigurationOption(row_index, "-fg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetRowConfigurationOption(row_index, "-fg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1343,10 +1355,13 @@ double* vtkKWMultiColumnList::GetCellBackgroundColor(
 void vtkKWMultiColumnList::SetCellBackgroundColor(
   int row_index, int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetCellConfigurationOption(row_index, col_index, "-bg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetCellConfigurationOption(row_index, col_index, "-bg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1370,10 +1385,13 @@ double* vtkKWMultiColumnList::GetCellForegroundColor(int row_index, int col_inde
 void vtkKWMultiColumnList::SetCellForegroundColor(
   int row_index, int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetCellConfigurationOption(row_index, col_index, "-fg", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetCellConfigurationOption(row_index, col_index, "-fg", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1869,10 +1887,13 @@ double* vtkKWMultiColumnList::GetColumnSelectionBackgroundColor(int col_index)
 void vtkKWMultiColumnList::SetColumnSelectionBackgroundColor(
   int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetColumnConfigurationOption(col_index, "-selectbackground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetColumnConfigurationOption(col_index, "-selectbackground", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1896,10 +1917,13 @@ double* vtkKWMultiColumnList::GetColumnSelectionForegroundColor(int col_index)
 void vtkKWMultiColumnList::SetColumnSelectionForegroundColor(
   int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetColumnConfigurationOption(col_index, "-selectforeground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetColumnConfigurationOption(col_index, "-selectforeground", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1923,10 +1947,13 @@ double* vtkKWMultiColumnList::GetRowSelectionBackgroundColor(int row_index)
 void vtkKWMultiColumnList::SetRowSelectionBackgroundColor(
   int row_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetRowConfigurationOption(row_index, "-selectbackground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetRowConfigurationOption(row_index, "-selectbackground", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1950,10 +1977,13 @@ double* vtkKWMultiColumnList::GetRowSelectionForegroundColor(int row_index)
 void vtkKWMultiColumnList::SetRowSelectionForegroundColor(
   int row_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetRowConfigurationOption(row_index, "-selectforeground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetRowConfigurationOption(row_index, "-selectforeground", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1980,11 +2010,14 @@ double* vtkKWMultiColumnList::GetCellSelectionBackgroundColor(
 void vtkKWMultiColumnList::SetCellSelectionBackgroundColor(
   int row_index, int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetCellConfigurationOption(
-    row_index, col_index, "-selectbackground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-selectbackground", color);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2010,11 +2043,14 @@ double* vtkKWMultiColumnList::GetCellSelectionForegroundColor(
 void vtkKWMultiColumnList::SetCellSelectionForegroundColor(
   int row_index, int col_index, double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->SetCellConfigurationOption(
-    row_index, col_index, "-selectforeground", color);
+  if (r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0)
+    {
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-selectforeground", color);
+    }
 }
 
 //----------------------------------------------------------------------------

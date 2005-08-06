@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.59");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.60");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4397,7 +4397,8 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
 
   if (this->CanvasBackgroundVisibility)
     {
-    tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
+    tk_cmd << canv << " coords " 
+           << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
            << " " << p_w_range[0] * factors[0]
            << " " << v_w_range[0] * factors[1]
            << " " << p_w_range[1] * factors[0]

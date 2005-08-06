@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.66");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.67");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -327,7 +327,8 @@ void vtkKWTkUtilities::SetOptionColor(Tcl_Interp *interp,
                                       const char *option,
                                       double r, double g, double b)
 {
-  if (!interp || !widget || !option)
+  if (!interp || !widget || !option ||
+      !(r >= 0.0 && r <= 1.0 && g >= 0.0 && g <= 1.0 && b >= 0.0 && b <= 1.0))
     {
     return;
     }
@@ -411,12 +412,17 @@ int vtkKWTkUtilities::QueryUserForColor(
     cmd += "}";
     }
   
-  char color_hex[8];
-  sprintf(color_hex, "#%02x%02x%02x", 
-          (int)(in_r * 255.5), (int)(in_g * 255.5), (int)(in_b * 255.5));
-  cmd += " -initialcolor {";
-  cmd += color_hex;
-  cmd += "}";
+  if (in_r >= 0.0 && in_r <= 1.0 && 
+      in_g >= 0.0 && in_g <= 1.0 && 
+      in_b >= 0.0 && in_b <= 1.0)
+    {
+    char color_hex[8];
+    sprintf(color_hex, "#%02x%02x%02x", 
+            (int)(in_r * 255.5), (int)(in_g * 255.5), (int)(in_b * 255.5));
+    cmd += " -initialcolor {";
+    cmd += color_hex;
+    cmd += "}";
+    }
 
   if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
     {
