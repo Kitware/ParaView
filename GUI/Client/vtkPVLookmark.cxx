@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.49");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.50");
 
 
 //*****************************************************************************
@@ -1440,12 +1440,12 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         ptr.assign(*tokIter);
 
         //loop through collection till found, operate accordingly leaving else statement with ptr one line past 
-        vtkCollectionIterator *it = src->GetWidgets()->NewIterator();
-        it->InitTraversal();
+        vtkCollectionIterator *widgetIter = src->GetWidgets()->NewIterator();
+        widgetIter->InitTraversal();
         
-        while( !it->IsDoneWithTraversal() )
+        while( !widgetIter->IsDoneWithTraversal() )
           {
-          pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
+          pvWidget = static_cast<vtkPVWidget*>(widgetIter->GetCurrentObject());
           sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
           if(!strcmp(sval,pvWidget->GetTraceHelper()->GetObjectName()))
             {
@@ -1644,14 +1644,14 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
               ptr.assign(*(++tokIter));
               }
             }
-          it->GoToNextItem();
+          widgetIter->GoToNextItem();
           }
         //widget in state file is not in widget collection
         if(i==src->GetWidgets()->GetNumberOfItems())
           {
           ptr.assign(*(++tokIter));
           }
-        it->Delete();
+        widgetIter->Delete();
 
         while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)
           {
@@ -1688,12 +1688,12 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
           // Borrowed the following code to loop through properties from vtkPVsrc::SaveState()
 
-          vtkSMPropertyIterator* iter = src->GetDisplayProxy()->NewPropertyIterator();
+          vtkSMPropertyIterator* propIter = src->GetDisplayProxy()->NewPropertyIterator();
 
           // Even in state we have to use ServerManager API for displays.
-          for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+          for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
             {
-            vtkSMProperty* p = iter->GetProperty();
+            vtkSMProperty* p = propIter->GetProperty();
             if(strcmp(sval,p->GetXMLName()))
               { 
               continue;
@@ -1724,7 +1724,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             break;
             }
 
-          iter->Delete();
+          propIter->Delete();
 
           ptr.assign(*(++tokIter));
 
@@ -1828,13 +1828,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             sscanf(ptr.c_str(),"%*s %*s %d",&ival);
             iter->first->SetVisibility(ival);
             }
+
           if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkstd::string::npos)
             {
-            //this->InitializeVolumeAppearanceEditor(iter->first,tokIter);
-
             vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
 
-            vtkstd::string ptr;
             ptr.assign(*tokIter);
             // needed to display edit volume appearance setting button:
             src->GetPVOutput()->ShowVolumeAppearanceEditor();
@@ -1870,9 +1868,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             ptr.assign(*(++tokIter));
             sscanf(ptr.c_str(),"%*s %*s %d",&ival);
             vol->SetColorSpace(ival);
-
-
             }
+
           executeCmd = false;
 
 /*
