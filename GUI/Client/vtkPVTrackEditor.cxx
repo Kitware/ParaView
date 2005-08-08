@@ -23,7 +23,6 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWApplication.h"
 #include "vtkKWMenu.h"
@@ -36,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.15");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.16");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -443,7 +442,7 @@ void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
 //-----------------------------------------------------------------------------
 void vtkPVTrackEditor::IndexChangedCallback()
 {
-  int val = this->IndexScale->GetEntry()->GetValueAsInt() -1;
+  int val = static_cast<int>(this->IndexScale->GetValue()) - 1;
   this->SetKeyFrameIndex(val);
 }
 
