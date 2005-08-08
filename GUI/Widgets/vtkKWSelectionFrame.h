@@ -16,6 +16,8 @@
 // The selction frame is what contains a render widget.  
 // It is called a "selection frame" because in its title bar, you can 
 // select which render widget to display in it.
+// .SECTION See Also
+// vtkKWSelectionFrameLayoutManager
 
 #ifndef __vtkKWSelectionFrame_h
 #define __vtkKWSelectionFrame_h
@@ -56,7 +58,7 @@ public:
 
   // Description:
   // Set the selection list (array of num strings) and the command
-  // that is called when a selection is made by the user. 
+  // that is called when a selection is made by the user in this list.
   // This command is passed both the selected string and 
   // a pointer to this object.
   // The selection list is represented as a pull down menu, which
@@ -88,10 +90,26 @@ public:
   virtual void Close();
 
   // Description:
+  // Set the TitleChangedCommand command invoked when the title is changed.
+  // This command is passed a pointer to this object. It can be used, for
+  // example, to notify a layout manager that it should refresh its list
+  // of available selection frame titles (see vtkKWSelectionFrameLayoutManager)
+  // Do not confuse this command with the ChangeTitleCommand, which is invoked
+  // when the "Change Title" menu entry is selected by the user, and is used
+  // to allow a third-party class to provide some user-dialog and change
+  // the title (given some potential constraints). This user-dialog will, in
+  // turn, most probably call SetTitle, which will trigger TitleChangedCommand.
+  virtual void SetTitleChangedCommand(vtkObject *object, const char *method);
+
+  // Description:
   // Allow title to be changed (menu entry)
   // If set, a "Change title" entry is added to the end of the selection list.
-  // Set the command called when the menu entry is selected by the user.
-  // This command is passed a pointer to this object.
+  // When this entry is selected, the ChangeTitleCommand command is invoked.
+  // This command is passed a pointer to this object. This command is 
+  // usually implemented by a different class and will, for example, query
+  // the user for a new title, check that this title meet some constraints,
+  // and call SetTitle() on this object (which in turn will trigger
+  // the TitleChangedCommand).
   virtual void SetAllowChangeTitle(int);
   vtkGetMacro(AllowChangeTitle, int);
   vtkBooleanMacro(AllowChangeTitle, int);
@@ -248,6 +266,7 @@ protected:
   char *SelectCommand;
   char *DoubleClickCommand;
   char *ChangeTitleCommand;
+  char *TitleChangedCommand;
 
   int Selected;
   int SelectionListVisibility;

@@ -28,7 +28,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.48");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -64,6 +64,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->SelectCommand         = NULL;
   this->DoubleClickCommand    = NULL;
   this->ChangeTitleCommand    = NULL;
+  this->TitleChangedCommand    = NULL;
 
   this->TitleColor[0]                   = 1.0;
   this->TitleColor[1]                   = 1.0;
@@ -204,6 +205,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     {
     delete [] this->ChangeTitleCommand;
     this->ChangeTitleCommand = NULL;
+    }
+
+  if (this->TitleChangedCommand)
+    {
+    delete [] this->TitleChangedCommand;
+    this->TitleChangedCommand = NULL;
     }
 }
 
@@ -634,13 +641,30 @@ void vtkKWSelectionFrame::ProcessEventFunction(
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
-  this->Title->SetText(title);
+  if (this->Title)
+    {
+    vtksys_stl::string old_title(this->GetTitle());
+    this->Title->SetText(title);
+    if (strcmp(old_title.c_str(), this->GetTitle()))
+      {
+      if (this->TitleChangedCommand && *this->TitleChangedCommand && 
+          this->IsCreated())
+        {
+        this->Script("eval {%s %s}",
+                     this->TitleChangedCommand, this->GetTclName());
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWSelectionFrame::GetTitle()
 {
-  return this->Title->GetText();
+  if (this->Title)
+    {
+    return this->Title->GetText();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -997,6 +1021,13 @@ void vtkKWSelectionFrame::SetChangeTitleCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleChangedCommand(vtkObject *object,
+                                                const char *method)
+{
+  this->SetObjectMethodCommand(&this->TitleChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
 {
   if (this->SelectionListCommand && *this->SelectionListCommand && 
@@ -1063,7 +1094,8 @@ void vtkKWSelectionFrame::DoubleClickCallback()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::ChangeTitleCallback()
 {
-  if (this->ChangeTitleCommand && *this->ChangeTitleCommand)
+  if (this->ChangeTitleCommand && *this->ChangeTitleCommand && 
+      this->IsCreated())
     {
     this->Script("eval {%s %s}",
                  this->ChangeTitleCommand, this->GetTclName());
