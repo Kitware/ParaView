@@ -119,7 +119,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.58");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1055,8 +1055,8 @@ void vtkPVLookmarkManager::Checkpoint()
    
   this->SaveAll(str.str());
 
-  this->GetTraceHelper()->AddEntry("$kw(%s) Checkpoint",
-                      this->GetTclName());
+  //this->GetTraceHelper()->AddEntry("$kw(%s) Checkpoint",
+  //                    this->GetTclName());
 
   this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateNormal);
   this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
