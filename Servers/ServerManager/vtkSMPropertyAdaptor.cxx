@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.14");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -540,8 +540,15 @@ int vtkSMPropertyAdaptor::SetEnumerationValue(const char* sidx)
 
   if (this->ProxyGroupDomain && this->ProxyProperty)
     {
-    return this->ProxyProperty->SetProxy(
-      0, this->ProxyGroupDomain->GetProxy(enumName));
+    vtkSMProxy* toadd = this->ProxyGroupDomain->GetProxy(enumName);
+    if (this->ProxyProperty->GetNumberOfProxies() < 1)
+      {
+      this->ProxyProperty->AddProxy(toadd);
+      }
+    else
+      {
+      return this->ProxyProperty->SetProxy(0, toadd);
+      }
     }
 
   return 0;
