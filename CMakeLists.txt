@@ -45,6 +45,17 @@ IF(NOT WIN32)
   IF(NOT CMAKE_SKIP_RPATH)
     SET(PV_INSTALL_NO_DEVELOPMENT 1)
     SET(PV_INSTALL_NO_RUNTIME 1)
+
+    # If someone is trying to install do not do an entire build with
+    # the wrong rpath feature setting just to report failed
+    # installation.
+    SET(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY 1)
+
+    # Add a dummy target and attach an install rule that will always fail
+    # and produce a message explaining why installation is disabled.
+    ADD_CUSTOM_TARGET(pv_install_disabled)
+    SET_TARGET_PROPERTIES(pv_install_disabled PROPERTIES PRE_INSTALL_SCRIPT
+      ${ParaView_SOURCE_DIR}/VTK/CMake/InstallDisabled.cmake)
   ENDIF(NOT CMAKE_SKIP_RPATH)
 ENDIF(NOT WIN32)
 
