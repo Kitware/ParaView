@@ -485,7 +485,21 @@ ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
   IF(BUILD_SHARED_LIBS)
+    # Default to single-configuration behavior.
+    SET(PVLOCAL_TEST_CONFIG_TYPE)
+    SET(PVLOCAL_TEST_RUN_DIR "${EXECUTABLE_OUTPUT_PATH}")
+
+    # Enable multi-configuration behavior if support is available.
+    IF(CMAKE_CONFIGURATION_TYPES AND VTK_TEST_WITH_CTEST)
+      SET(DOLLAR "$")
+      IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.0)
+        SET(PVLOCAL_TEST_CONFIG_TYPE -C "${DOLLAR}{CTEST_CONFIGURATION_TYPE}")
+        SET(PVLOCAL_TEST_RUN_DIR "${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE}")
+      ENDIF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.0)
+    ENDIF(CMAKE_CONFIGURATION_TYPES AND VTK_TEST_WITH_CTEST)
+
     ADD_TEST(PVLocal ${CMAKE_CTEST_COMMAND}
+      ${PVLOCAL_TEST_CONFIG_TYPE}
       --build-and-test
       ${ParaView_SOURCE_DIR}/Examples/PVLocal
       ${PVClientTests_BINARY_DIR}/Examples/PVLocal
@@ -493,6 +507,7 @@ IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
       --build-generator ${CMAKE_GENERATOR}
       --build-makeprogram ${MAKEPROGRAM}
       --build-project PVLocal
+      --build-run-dir ${PVLOCAL_TEST_RUN_DIR}
       --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
       --test-command
       ${PARAVIEW_EXECUTABLE} --disable-registry
