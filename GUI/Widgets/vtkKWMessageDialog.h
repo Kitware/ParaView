@@ -52,7 +52,8 @@ public:
     StyleMessage = 0,
     StyleYesNo,
     StyleOkCancel,
-    StyleOkOtherCancel
+    StyleOkOtherCancel,
+    StyleCancel
   };
   //ETX
   vtkSetMacro(Style,int);
@@ -65,6 +66,8 @@ public:
     { this->SetStyle(vtkKWMessageDialog::StyleOkCancel); };
   void SetStyleToOkOtherCancel() 
     { this->SetStyle(vtkKWMessageDialog::StyleOkOtherCancel); };
+  void SetStyleToCancel() 
+    { this->SetStyle(vtkKWMessageDialog::StyleCancel); };
 
   // Description:
   // Set or get the message dialog name

@@ -23,7 +23,7 @@
 #include "vtkWindows.h"
 #include "vtkKWMessageDialog.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.24");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.25");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -264,6 +264,7 @@ void vtkPVProcessModuleGUIHelper::PopupDialog(const char* title, const char* tex
   this->InitializeApplication();
   this->PopupDialogWidget = vtkKWMessageDialog::New();
   this->PopupDialogWidget->SetOptions(vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault);
+  this->PopupDialogWidget->SetStyleToCancel();
   this->PopupDialogWidget->Create(this->PVApplication);
   this->PopupDialogWidget->SetText(text);
   this->PopupDialogWidget->SetTitle(title);

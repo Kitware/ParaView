@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.42");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43");
 
 
 //----------------------------------------------------------------------------
@@ -711,7 +711,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     {
     cout << "Waiting for server..." << endl;
     this->GUIHelper->PopupDialog("Waiting for server",
-      "Waiting for server to connect to this client via the reverse connection. Press OK to exit.");
+      "Waiting for server to connect to this client via the reverse connection.");
     }
   else
     {

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.86");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.87");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -142,7 +142,8 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
 
-  int one_b = (this->Style == vtkKWMessageDialog::StyleMessage) ? 1 : 0;
+  int one_b = (this->Style == vtkKWMessageDialog::StyleMessage ||
+               this->Style == vtkKWMessageDialog::StyleCancel) ? 1 : 0;
   int two_b = (this->Style == vtkKWMessageDialog::StyleYesNo || 
                this->Style == vtkKWMessageDialog::StyleOkCancel) ? 2 : 0;
   int three_b = 
@@ -157,6 +158,10 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   else if (this->Style == vtkKWMessageDialog::StyleMessage)
     {
     this->SetOKButtonText("OK");
+    }
+  else if (this->Style == vtkKWMessageDialog::StyleCancel)
+    {
+    this->SetOKButtonText("Cancel");
     }
 
   // Pack buttons
