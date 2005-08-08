@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.97");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.98");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -119,7 +119,11 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     {
     cam->ParallelProjectionOn();
     }
-  this->GetOverlayRenderer()->SetActiveCamera(cam);
+  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
+  if (overlay_ren)
+    {
+    overlay_ren->SetActiveCamera(cam);
+    }
 
   // Current state (render mode, in expose, printing, etc)
 
@@ -584,11 +588,17 @@ void vtkKWRenderWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::ResetCamera()
 {
+  vtkRenderer *ren = this->GetRenderer();
+  if (!ren)
+    {
+    return;
+    }
+
   double bounds[6];
   double center[3];
   double distance, width, viewAngle, vn[3], *vup;
   
-  this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+  ren->ComputeVisiblePropBounds(bounds);
   if (bounds[0] == VTK_LARGE_FLOAT)
     {
     vtkDebugMacro(<< "Cannot reset camera!");
@@ -647,7 +657,7 @@ void vtkKWRenderWidget::ResetCamera()
                    (double)((double)center[1] + distance * vn[1]),
                    (double)((double)center[2] + distance * vn[2]));
 
-  this->GetRenderer()->ResetCameraClippingRange(bounds);
+  ren->ResetCameraClippingRange(bounds);
 
   // Setup default parallel scale
 
@@ -677,7 +687,11 @@ void vtkKWRenderWidget::Render()
 
   if (this->RenderMode != vtkKWRenderWidget::DisabledRender)
     {
-    this->GetRenderer()->ResetCameraClippingRange();
+    vtkRenderer *ren = this->GetRenderer();
+    if (ren)
+      {
+      ren->ResetCameraClippingRange();
+      }
     this->RenderWindow->Render();
     }
   
@@ -841,20 +855,30 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddProp(vtkProp *prop)
 {
-  this->GetRenderer()->AddViewProp(prop);
+  vtkRenderer *ren = this->GetRenderer();
+  if (ren)
+    {
+    ren->AddViewProp(prop);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
 {
-  this->GetOverlayRenderer()->AddViewProp(prop);
+  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
+  if (overlay_ren)
+    {
+    overlay_ren->AddViewProp(prop);
+    }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::HasProp(vtkProp *prop)
 {
-  if (this->GetRenderer()->GetProps()->IsItemPresent(prop) ||
-      this->GetOverlayRenderer()->GetProps()->IsItemPresent(prop))
+  vtkRenderer *ren = this->GetRenderer();
+  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
+  if ((ren && ren->GetProps()->IsItemPresent(prop)) ||
+      (overlay_ren && overlay_ren->GetProps()->IsItemPresent(prop)))
     {
     return 1;
     }
@@ -884,23 +908,33 @@ void vtkKWRenderWidget::RemoveProp(vtkProp* p)
 void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
 {
   // safe to call both, vtkViewport does a check first
-  this->GetRenderer()->RemoveViewProp(prop);
-  this->GetOverlayRenderer()->RemoveViewProp(prop);
+
+  vtkRenderer *ren = this->GetRenderer();
+  if (ren)
+    {
+    ren->RemoveViewProp(prop);
+    }
+
+  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
+  if (overlay_ren)
+    {
+    overlay_ren->RemoveViewProp(prop);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
-  vtkRenderer *renderer = this->GetRenderer();
-  if (renderer)
+  vtkRenderer *ren = this->GetRenderer();
+  if (ren)
     {
-    renderer->RemoveAllProps();
+    ren->RemoveAllProps();
     }
 
-  renderer = this->GetOverlayRenderer();
-  if (renderer)
+  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
+  if (overlay_ren)
     {
-    renderer->RemoveAllProps();
+    overlay_ren->RemoveAllProps();
     }
 }
 
