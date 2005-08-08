@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.96");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.97");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -1161,7 +1161,7 @@ void vtkKWRenderWidget::AddObservers()
   if (this->Observer)
     {
     this->Observer->SetClientData(this); 
-    this->Observer->SetCallback(vtkKWRenderWidget::ProcessEvent);
+    this->Observer->SetCallback(vtkKWRenderWidget::ProcessEventFunction);
     this->Observer->AbortFlagOnExecuteOn();
     
     if (this->RenderWindow)
@@ -1196,7 +1196,7 @@ void vtkKWRenderWidget_InteractorTimer(ClientData arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ProcessEvent(
+void vtkKWRenderWidget::ProcessEventFunction(
   vtkObject *object,
   unsigned long event,
   void *clientdata,
@@ -1204,8 +1204,7 @@ void vtkKWRenderWidget::ProcessEvent(
 {
   // Pass to the virtual ProcessEvent method
 
-  vtkKWRenderWidget *self =
-    reinterpret_cast<vtkKWRenderWidget *>(clientdata);
+  vtkKWRenderWidget* self = static_cast<vtkKWRenderWidget*>(clientdata);
   if (self)
     {
     self->ProcessEvent(object, event, calldata);
