@@ -55,65 +55,84 @@ public:
   vtkGetVector2Macro(Resolution, int);
 
   // Description:
-  // Add a new selection frame to the pool (a unique name is required).
+  // Add a new selection frame to the pool
   // This will call Register() on the widget (increasing its ref count).
   // Return 1 on success, 0 otherwise
-  virtual int AddWidget(vtkKWSelectionFrame *widget, const char *name);
+  virtual int AddWidget(vtkKWSelectionFrame *widget);
 
   // Description:
-  // Allocate a new selection frame and add it to the pool (a unique name is
-  // required).
+  // Allocate a new selection frame and add it to the pool.
   // Return the allocated widget, or NULL on error
-  virtual vtkKWSelectionFrame* AllocateAndAddWidget(const char *name);
+  virtual vtkKWSelectionFrame* AllocateAndAddWidget();
 
   // Description:
-  // Get widget with given name (the unique one that was used to add it to the 
-  // pool), with given title (each widget/selection-frame can customize 
-  // its own title), or with given rank (n-th widget), or with given
-  // rank (n-th widget) but not matching another widget 'avoid'.
+  // Set the widget's tag in the pool.
+  // This provide an alternate way of accessing the widget in the pool.
+  // Note that this is *not* the title of the frame, as set using the
+  // vtkKWSelectionFrame::SetTitle method.
+  // If several widgets have the same tag, the first one is usually
+  // retrieved. No constraints is put on the uniqueness of the tag.
+  // Return 1 on success, 0 on error
+  virtual int SetWidgetTag(vtkKWSelectionFrame*, const char *tag);
+  virtual const char* GetWidgetTag(vtkKWSelectionFrame*);
+
+  // Description:
+  // Set the widget's group in the pool.
+  // This provide an way of grouping widgets logicaly in the pool.
+  // Return 1 on success, 0 on error
+  virtual int SetWidgetGroup(vtkKWSelectionFrame*, const char *group);
+  virtual const char* GetWidgetGroup(vtkKWSelectionFrame*);
+
+  // Description:
+  // Get the number of widgets in the pool
+  virtual int GetNumberOfWidgets();
+  virtual int GetNumberOfWidgetsWithTag(const char *tag);
+  virtual int GetNumberOfWidgetsWithGroup(const char *group);
+
+  // Description:
+  // Query if widget is in the pool
+  virtual int HasWidget(vtkKWSelectionFrame *widget);
+  virtual int HasWidgetWithTag(const char *tag);
+  virtual int HasWidgetWithTagAndGroup(const char *tag, const char *group);
+
+  // Description:
+  // Retrieve a widget given its tag (as set using SetWidgetTag()), its 
+  // tag and group, its title (as set using vtkKWSelectionFrame::SetTitle), 
+  // its rank in the pool (n-th widget), or its rank (n-th widget) but not
+  // matching another widget 'avoid'.
   // Return the widget, or NULL if not found
-  virtual vtkKWSelectionFrame* GetWidgetWithName(const char *name);
+  virtual vtkKWSelectionFrame* GetWidgetWithTag(const char *tag);
+  virtual vtkKWSelectionFrame* GetWidgetWithTagAndGroup(
+    const char *tag, const char *group);
   virtual vtkKWSelectionFrame* GetWidgetWithTitle(const char *title);
   virtual vtkKWSelectionFrame* GetNthWidget(int index);
   virtual vtkKWSelectionFrame* GetNthWidgetNotMatching(
     int index, vtkKWSelectionFrame *avoid);
-  virtual const char* GetNthWidgetName(int index);
-  virtual int GetNumberOfWidgets();
+  virtual vtkKWSelectionFrame* GetNthWidgetWithGroup(
+    int index, const char *group);
 
   // Description:
-  // Change widget's name in pool (it still has to be unique).
-  // This is not the title of the frame, it is the unique name 
-  // (i.e. identifier) of the widget within the pool.
-  // Return 1 on success, 0 on error
-  virtual int RenameWidget(vtkKWSelectionFrame*, const char *new_name);
-  virtual int RenameWidgetWithName(const char *old_name, const char *new_name);
-
-  // Description:
-  // Set/Get position of widget with given name, or widget
-  // at given position.
+  // Set/Get position of widget (given the widget or its tag).
   // Return 1 (or widget) on success, 0 (or NULL) on error
-  virtual int GetWidgetPosition(vtkKWSelectionFrame*, int pos[2]);
-  virtual int GetWidgetPositionWithName(const char *name, int pos[2]);
-  virtual int SetWidgetPosition(vtkKWSelectionFrame*, int pos[2]);
-  virtual int SetWidgetPositionWithName(const char *name, int pos[2]);
-  virtual vtkKWSelectionFrame* GetWidgetAtPosition(int pos[2]);
+  virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int *col, int *row);
+  virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int pos[2])
+    { return this->GetWidgetPosition(w, pos, pos + 1); }
+  virtual int SetWidgetPosition(vtkKWSelectionFrame *w, int col, int row);
+  virtual int SetWidgetPosition(vtkKWSelectionFrame *w, int pos[2])
+    { return this->SetWidgetPosition(w, pos[0], pos[1]); }
+  virtual vtkKWSelectionFrame* GetWidgetAtPosition(int col, int row);
+  virtual vtkKWSelectionFrame* GetWidgetAtPosition(int pos[2])
+    { return this->GetWidgetAtPosition(pos[0], pos[1]); }
 
   // Description:
-  // Query if widget in the pool
-  virtual int HasWidgetWithName(const char *name);
-  virtual int HasWidget(vtkKWSelectionFrame *dswidget);
-
-  // Description:
-  // Selected a given widget.
+  // Select a a widget.
   // If arg is NULL, nothing is selected (all others are deselected)
-  virtual void SelectWidgetWithName(const char *name);
-  virtual void SelectWidget(vtkKWSelectionFrame *dswidget);
+  virtual void SelectWidget(vtkKWSelectionFrame *widget);
 
   // Description:
   // Get the selected widget.
   // Return the widget, or NULL if none is selected
   virtual vtkKWSelectionFrame* GetSelectedWidget();
-  virtual const char* GetSelectedWidgetName();
 
   // Description:
   // Specifies a command to be invoked when the selection has changed
@@ -121,12 +140,19 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
-  // Delete widget (or all) of them. This will call the widget's Close() 
-  // method, and UnRegister() it.
+  // Remove a widget, or all of them, or all of the widgets in a group.
+  // This will call each widget's Close() method, and UnRegister() it.
   // Return 1 on success, 0 on error
-  virtual int DeleteWidgetWithName(const char *name);
-  virtual int DeleteWidget(vtkKWSelectionFrame *dswidget);
-  virtual int DeleteAllWidgets();
+  virtual int RemoveWidget(vtkKWSelectionFrame *widget);
+  virtual int RemoveAllWidgets();
+  virtual int RemoveAllWidgetsWithGroup(const char *group);
+
+  // Description:
+  // Try to show all the widgets belonging to a specific group.
+  // This method will check if the visible widgets belong to the group,
+  // and exchange change if this is not the case.
+  // Return 1 on success, 0 on error
+  virtual int ShowWidgetsWithGroup(const char *group);
 
   // Description:
   // Save all widgets into an image (as a screenshot) or into the 
@@ -186,6 +212,7 @@ public:
   virtual void SelectAndMaximizeWidgetCallback(vtkKWSelectionFrame*);
   virtual void CloseWidgetCallback(vtkKWSelectionFrame*);
   virtual int  ChangeWidgetTitleCallback(vtkKWSelectionFrame*);
+  virtual void WidgetTitleChangedCallback(vtkKWSelectionFrame*);
   virtual void SwitchWidgetCallback(
     const char *title, vtkKWSelectionFrame *widget);
 
@@ -264,6 +291,11 @@ protected:
   // Add/Remove callbacks on a selection frame
   virtual void AddCallbacksToWidget(vtkKWSelectionFrame *widget);
   virtual void RemoveCallbacksFromWidget(vtkKWSelectionFrame *widget);
+
+  // Description:
+  // Delete a widget, i.e. Close and UnRegister it. Internal use only, as
+  // a helper to the public RemoveWidget methods.
+  virtual void DeleteWidget(vtkKWSelectionFrame *widget);
 
 private:
 

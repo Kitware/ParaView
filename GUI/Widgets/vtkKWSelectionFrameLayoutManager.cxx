@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.33");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.34");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -80,7 +80,8 @@ class vtkKWSelectionFrameLayoutManagerInternals
 public:
   struct PoolNode
   {
-    vtksys_stl::string Name;
+    vtksys_stl::string Tag;
+    vtksys_stl::string Group;
     vtkKWSelectionFrame *Widget;
     int Position[2];
   };
@@ -114,9 +115,9 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
     this->SelectionChangedCommand = NULL;
     }
 
-  // Delete all widgets
+  // Remove all widgets
 
-  this->DeleteAllWidgets();
+  this->RemoveAllWidgets();
 
   // Delete our pool
 
@@ -240,17 +241,10 @@ void vtkKWSelectionFrameLayoutManager::Pack()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::SetWidgetPositionWithName(
-  const char *name, int pos[2])
-{
-  return this->SetWidgetPosition(this->GetWidgetWithName(name), pos);
-}
-
-//----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
-  vtkKWSelectionFrame *widget, int pos[2])
+  vtkKWSelectionFrame *widget, int col, int row)
 {
-  if (pos && widget)
+  if (widget)
     {
     vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
       this->Internals->Pool.begin();
@@ -260,8 +254,8 @@ int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
       {
       if (it->Widget && it->Widget == widget)
         {
-        it->Position[0] = pos[0];
-        it->Position[1] = pos[1];
+        it->Position[0] = col;
+        it->Position[1] = row;
         this->Pack();
         return 1;
         }
@@ -272,17 +266,10 @@ int vtkKWSelectionFrameLayoutManager::SetWidgetPosition(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::GetWidgetPositionWithName(
-  const char *name, int pos[2])
-{
-  return this->GetWidgetPosition(this->GetWidgetWithName(name), pos);
-}
-
-//----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::GetWidgetPosition(
-  vtkKWSelectionFrame *widget, int pos[2])
+  vtkKWSelectionFrame *widget, int *col, int *row)
 {
-  if (pos && widget)
+  if (widget)
     {
     vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
       this->Internals->Pool.begin();
@@ -292,8 +279,8 @@ int vtkKWSelectionFrameLayoutManager::GetWidgetPosition(
       {
       if (it->Widget && it->Widget == widget)
         {
-        pos[0] = it->Position[0];
-        pos[1] = it->Position[1];
+        *col = it->Position[0];
+        *row = it->Position[1];
         return 1;
         }
       }
@@ -304,21 +291,18 @@ int vtkKWSelectionFrameLayoutManager::GetWidgetPosition(
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame* 
-vtkKWSelectionFrameLayoutManager::GetWidgetAtPosition(int pos[2])
+vtkKWSelectionFrameLayoutManager::GetWidgetAtPosition(int col, int row)
 {
-  if (pos)
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+    this->Internals->Pool.begin();
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+    this->Internals->Pool.end();
+  for (; it != end; ++it)
     {
-    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
-      this->Internals->Pool.begin();
-    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
-      this->Internals->Pool.end();
-    for (; it != end; ++it)
+    if (it->Widget && 
+        it->Position[0] == col && it->Position[1] == row)
       {
-      if (it->Widget && 
-          it->Position[0] == pos[0] && it->Position[1] == pos[1])
-        {
-        return it->Widget;
-        }
+      return it->Widget;
       }
     }
 
@@ -752,10 +736,10 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesToolbar()
 }
 
 //----------------------------------------------------------------------------
-vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithName(
-  const char *name)
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithTag(
+  const char *tag)
 {
-  if (name)
+  if (tag && *tag)
     {
     vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
       this->Internals->Pool.begin();
@@ -763,7 +747,30 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithName(
       this->Internals->Pool.end();
     for (; it != end; ++it)
       {
-      if (it->Widget && !it->Name.compare(name))
+      if (it->Widget && !it->Tag.compare(tag))
+        {
+        return it->Widget;
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWSelectionFrame* 
+vtkKWSelectionFrameLayoutManager::GetWidgetWithTagAndGroup(
+  const char *tag, const char *group)
+{
+  if (tag && *tag && group && *group)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && !it->Tag.compare(tag)  && !it->Group.compare(group))
         {
         return it->Widget;
         }
@@ -823,6 +830,32 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetNthWidgetNotMatching(
 }
 
 //----------------------------------------------------------------------------
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetNthWidgetWithGroup(
+  int index, const char *group)
+{
+  if (index >= 0 && group && *group)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && !it->Group.compare(group))
+        {
+        index--;
+        if (index < 0)
+          {
+          return it->Widget;
+          }
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithTitle(
   const char *title)
 {
@@ -847,38 +880,55 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithTitle(
 }
 
 //----------------------------------------------------------------------------
-const char * vtkKWSelectionFrameLayoutManager::GetNthWidgetName(
-  int index)
-{
-  if (index < 0 || index >= (int)this->Internals->Pool.size())
-    {
-    return NULL;
-    }
-  
-#if 0
-  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
-    this->Internals->Pool.begin();
-  while (index != 0)
-    {
-    ++it;
-    index--;
-    }
-  return it->Name.c_str();
-#else
-  return this->Internals->Pool[index].Name.c_str();
-#endif
-}
-
-//----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::GetNumberOfWidgets()
 {
   return this->Internals->Pool.size();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::HasWidgetWithName(const char *name)
+int vtkKWSelectionFrameLayoutManager::GetNumberOfWidgetsWithTag(
+  const char *tag)
 {
-  return this->GetWidgetWithName(name) ? 1 : 0;
+  int count = 0;
+  if (tag && *tag)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && !it->Tag.compare(tag))
+        {
+        count++;
+        }
+      }
+    }
+
+  return count;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::GetNumberOfWidgetsWithGroup(
+  const char *group)
+{
+  int count = 0;
+  if (group && *group)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && !it->Group.compare(group))
+        {
+        count++;
+        }
+      }
+    }
+
+  return count;
 }
 
 //----------------------------------------------------------------------------
@@ -901,18 +951,30 @@ int vtkKWSelectionFrameLayoutManager::HasWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::AddWidget(
-  vtkKWSelectionFrame *widget,
-  const char *name)
+int vtkKWSelectionFrameLayoutManager::HasWidgetWithTag(const char *tag)
 {
-  if (!widget || !name || !*name)
+  return this->GetWidgetWithTag(tag) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::HasWidgetWithTagAndGroup(
+  const char *tag, const char *group)
+{
+  return this->GetWidgetWithTagAndGroup(tag, group) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::AddWidget(
+  vtkKWSelectionFrame *widget)
+{
+  if (!widget)
     {
     return 0;
     }
 
   // If we have that widget already
 
-  if (this->HasWidgetWithName(name))
+  if (this->HasWidget(widget))
     {
     return 0;
     }
@@ -920,21 +982,14 @@ int vtkKWSelectionFrameLayoutManager::AddWidget(
   // Create a new node
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolNode node;
-  node.Name.assign(name); 
   node.Widget = widget;
   node.Widget->Register(this);
 
   // Create the widget (if needed), configure the callbacks
-  // Set the title only if we have created the widget (otherwise we assume
-  // we should interfere with it at least as possible).
 
   if (!node.Widget->IsCreated())
     {
     this->CreateWidget(node.Widget);
-    if (!node.Widget->GetTitle() || !*node.Widget->GetTitle())
-      {
-      node.Widget->SetTitle(name);
-      }
     }
   else
     {
@@ -964,27 +1019,14 @@ int vtkKWSelectionFrameLayoutManager::AddWidget(
 }
 
 //----------------------------------------------------------------------------
-vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AllocateAndAddWidget(
-  const char *name)
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::AllocateAndAddWidget()
 {
-  if (!name || !*name)
-    {
-    return NULL;
-    }
-
-  // If we have that widget already
-
-  if (this->HasWidgetWithName(name))
-    {
-    return NULL;
-    }
-
   // Allocate a widget and add it
 
   vtkKWSelectionFrame *widget = this->AllocateWidget();
   if (widget)
     {
-    int ok =  this->AddWidget(widget, name); // this will Register() the widget
+    int ok =  this->AddWidget(widget); // this will Register() the widget
     widget->Delete();
     if (!ok)
       {
@@ -1033,6 +1075,7 @@ void vtkKWSelectionFrameLayoutManager::AddCallbacksToWidget(
   if (widget)
     {
     widget->SetCloseCommand(this, "CloseWidgetCallback");
+    widget->SetTitleChangedCommand(this, "WidgetTitleChangedCallback");
     widget->SetChangeTitleCommand(this, "ChangeWidgetTitleCallback");
     widget->SetSelectCommand(this, "SelectWidgetCallback");
     widget->SetDoubleClickCommand(this, "SelectAndMaximizeWidgetCallback");
@@ -1080,7 +1123,19 @@ void vtkKWSelectionFrameLayoutManager::NumberOfWidgetsHasChanged()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::DeleteWidget(
+void vtkKWSelectionFrameLayoutManager::DeleteWidget(
+  vtkKWSelectionFrame *widget)
+{
+  if (widget)
+    {
+    this->RemoveCallbacksFromWidget(widget);
+    widget->Close();
+    widget->UnRegister(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::RemoveWidget(
   vtkKWSelectionFrame *widget)
 {
   if (this->Internals && widget)
@@ -1093,16 +1148,15 @@ int vtkKWSelectionFrameLayoutManager::DeleteWidget(
       {
       if (it->Widget == widget)
         {
+        // If we are removing the selectiong, make sure we select another one
+        // instead
         vtkKWSelectionFrame *sel = this->GetSelectedWidget();
         this->Internals->Pool.erase(it);
         if (sel == widget)
           {
           this->SelectWidget(this->GetNthWidget(0));
           }
-
-        this->RemoveCallbacksFromWidget(widget);
-        widget->Close();
-        widget->UnRegister(this);
+        this->DeleteWidget(widget);
         this->NumberOfWidgetsHasChanged();
         return 1;
         }
@@ -1113,18 +1167,17 @@ int vtkKWSelectionFrameLayoutManager::DeleteWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::DeleteWidgetWithName(const char *name)
+int vtkKWSelectionFrameLayoutManager::RemoveAllWidgets()
 {
-  return this->DeleteWidget(this->GetWidgetWithName(name));
-}
+  // Is faster than calling RemoveWidget on each widget
+  // since the selection is set to NULL first, and no callbacks is going
+  // to be invoked until every widget is cleared.
 
-//----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::DeleteAllWidgets()
-{
   if (this->Internals)
     {
     this->SelectWidget((vtkKWSelectionFrame*)NULL);
-    
+
+    int nb_deleted = 0;
     vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
       this->Internals->Pool.begin();
     vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
@@ -1133,39 +1186,75 @@ int vtkKWSelectionFrameLayoutManager::DeleteAllWidgets()
       {
       if (it->Widget)
         {
-        this->RemoveCallbacksFromWidget(it->Widget);
-        it->Widget->Close();
-        it->Widget->UnRegister(this);
+        this->DeleteWidget(it->Widget);
+        nb_deleted++;
         }
       }
     
     this->Internals->Pool.clear();
-    this->NumberOfWidgetsHasChanged();
+    if (nb_deleted)
+      {
+      this->NumberOfWidgetsHasChanged();
+      }
     }
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::RenameWidget(
-  vtkKWSelectionFrame *widget, 
-  const char *new_name)
+int vtkKWSelectionFrameLayoutManager::RemoveAllWidgetsWithGroup(
+  const char *group)
 {
-  // Valid new name ?
+  // Is faster than calling RemoveWidget on each widget
+  // since the selection is saved first, and no callbacks is going
+  // to be invoked until every widget is cleared.
 
-  if (!widget || !new_name || !*new_name)
+  if (this->Internals && group && *group)
+    {
+    vtkKWSelectionFrame *sel = this->GetSelectedWidget();
+    
+    int nb_deleted = 0;
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && !it->Group.compare(group))
+        {
+        vtkKWSelectionFrame *widget = it->Widget;
+        this->Internals->Pool.erase(it);
+        this->DeleteWidget(widget);
+        nb_deleted++;
+        }
+      }
+    
+    if (nb_deleted)
+      {
+      if (!this->HasWidget(sel))
+        {
+        this->SelectWidget(this->GetNthWidget(0));
+        }
+      this->NumberOfWidgetsHasChanged();
+      }
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::SetWidgetTag(
+  vtkKWSelectionFrame *widget, 
+  const char *tag)
+{
+  // Valid tag ?
+
+  if (!widget || !tag || !*tag)
     {
     return 0;
     }
 
-  // If we have a widget with that name already
-
-  if (this->GetWidgetWithName(new_name))
-    {
-    return 0;
-    }
-
-  // OK, rename it
+  // OK, tag it
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
     this->Internals->Pool.begin();
@@ -1175,7 +1264,7 @@ int vtkKWSelectionFrameLayoutManager::RenameWidget(
     {
     if (it->Widget && it->Widget == widget)
       {
-      it->Name = new_name;
+      it->Tag = tag;
       return 1;
       }
     }
@@ -1184,11 +1273,123 @@ int vtkKWSelectionFrameLayoutManager::RenameWidget(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSelectionFrameLayoutManager::RenameWidgetWithName(
-  const char *old_name, 
-  const char *new_name)
+const char* vtkKWSelectionFrameLayoutManager::GetWidgetTag(
+  vtkKWSelectionFrame *widget)
 {
-  return this->RenameWidget(this->GetWidgetWithName(old_name), new_name);
+  if (widget)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget == widget)
+        {
+        return it->Tag.c_str();
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::SetWidgetGroup(
+  vtkKWSelectionFrame *widget, 
+  const char *group)
+{
+  // Valid group ?
+
+  if (!widget || !group || !*group)
+    {
+    return 0;
+    }
+
+  // OK, group it
+
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+    this->Internals->Pool.begin();
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+    this->Internals->Pool.end();
+  for (; it != end; ++it)
+    {
+    if (it->Widget && it->Widget == widget)
+      {
+      it->Group = group;
+      return 1;
+      }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWSelectionFrameLayoutManager::GetWidgetGroup(
+  vtkKWSelectionFrame *widget)
+{
+  if (widget)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget == widget)
+        {
+        return it->Group.c_str();
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
+{
+  if (!group || !*group)
+    {
+    return 0;
+    }
+
+  int nb_widgets_in_group = this->GetNumberOfWidgetsWithGroup(group);
+  int row, col, i;
+
+  for (row = 0; row < this->Resolution[1]; row++)
+    {
+    for (col = 0; col < this->Resolution[0]; col++)
+      {
+      vtkKWSelectionFrame *widget = this->GetWidgetAtPosition(col, row);
+      if (widget)
+        {
+        const char *widget_group = this->GetWidgetGroup(widget);
+        if (widget_group && strcmp(widget_group, group))
+          {
+          for (i = 0; i < nb_widgets_in_group; i++)
+            {
+            vtkKWSelectionFrame *new_widget = 
+              this->GetNthWidgetWithGroup(i, group);
+            if (new_widget)
+              {
+              int new_row, new_col;
+              this->GetWidgetPosition(new_widget, &new_col, &new_row);
+              if (new_col < 0 || new_row < 0 || 
+                  new_row > row || (new_row == row && new_col > col))
+                {
+                this->SetWidgetPosition(new_widget, col, row);
+                this->SetWidgetPosition(widget, new_col, new_row);
+                break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1203,24 +1404,6 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetSelectedWidget()
     if (it->Widget && it->Widget->GetSelected())
       {
       return it->Widget;
-      }
-    }
-
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWSelectionFrameLayoutManager::GetSelectedWidgetName()
-{
-  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
-    this->Internals->Pool.begin();
-  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
-    this->Internals->Pool.end();
-  for (; it != end; ++it)
-    {
-    if (it->Widget && it->Widget->GetSelected())
-      {
-      return it->Name.c_str();
       }
     }
 
@@ -1254,12 +1437,6 @@ void vtkKWSelectionFrameLayoutManager::SelectWidget(
       this->Script("eval %s", this->SelectionChangedCommand);
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::SelectWidgetWithName(const char *name)
-{
-  this->SelectWidget(this->GetWidgetWithName(name));
 }
 
 //----------------------------------------------------------------------------
@@ -1327,7 +1504,14 @@ void vtkKWSelectionFrameLayoutManager::SwitchWidgetCallback(
 void vtkKWSelectionFrameLayoutManager::CloseWidgetCallback(
   vtkKWSelectionFrame *widget)
 {
-  this->DeleteWidget(widget);
+  this->RemoveWidget(widget);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::WidgetTitleChangedCallback(
+  vtkKWSelectionFrame *)
+{
+  this->UpdateSelectionLists();
 }
 
 //----------------------------------------------------------------------------
@@ -1358,7 +1542,8 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
     if (!ok)
       {
       vtkKWMessageDialog::PopupMessage(
-        this->GetApplication(), this->GetParentWindow(), "Change frame title - Error",
+        this->GetApplication(), this->GetParentWindow(), 
+        "Change frame title - Error",
         "There was a problem with the new title you provided.\n",
         vtkKWMessageDialog::ErrorIcon);
       }
@@ -1415,9 +1600,9 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
     return;
     }
   
-  // Allocate array of names
+  // Allocate array of titles
 
-  const char **names_list = new const char *[this->Internals->Pool.size()];
+  const char **titles_list = new const char *[this->Internals->Pool.size()];
 
   // Set the selection list for each widget
 
@@ -1429,7 +1614,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
     {
     if (it->Widget)
       {
-      int nb_names = 0;
+      int nb_titles = 0;
       vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it2 = 
         this->Internals->Pool.begin();
       for (; it2 != end; ++it2)
@@ -1438,16 +1623,16 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
             it2->Widget != it->Widget &&
             it2->Widget->GetTitle())
           {
-          names_list[nb_names++] = it2->Widget->GetTitle();
+          titles_list[nb_titles++] = it2->Widget->GetTitle();
           }
         }
-      it->Widget->SetSelectionList(nb_names, names_list);
+      it->Widget->SetSelectionList(nb_titles, titles_list);
       }
     }
 
-  // Free names
+  // Free titles
 
-  delete [] names_list;
+  delete [] titles_list;
 }
 
 //----------------------------------------------------------------------------
