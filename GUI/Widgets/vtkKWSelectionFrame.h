@@ -272,7 +272,7 @@ protected:
 
   // Description:
   // Callback commmand. Pass the parameters to the virtual ProcessEvent method
-  static void ProcessEvent(
+  static void ProcessEventFunction(
     vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:

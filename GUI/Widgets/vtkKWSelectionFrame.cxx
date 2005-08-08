@@ -28,7 +28,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.47");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.48");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -601,7 +601,7 @@ void vtkKWSelectionFrame::AddCallbackCommandBindings()
   if (this->CallbackCommand)
     {
     this->CallbackCommand->SetClientData(this); 
-    this->CallbackCommand->SetCallback(vtkKWSelectionFrame::ProcessEvent);
+    this->CallbackCommand->SetCallback(vtkKWSelectionFrame::ProcessEventFunction);
     }
 }
 
@@ -616,7 +616,7 @@ void vtkKWSelectionFrame::RemoveCallbackCommandBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::ProcessEvent(
+void vtkKWSelectionFrame::ProcessEventFunction(
   vtkObject *object,
   unsigned long event,
   void *clientdata,
@@ -624,8 +624,7 @@ void vtkKWSelectionFrame::ProcessEvent(
 {
   // Pass to the virtual ProcessEvent method
 
-  vtkKWSelectionFrame *self =
-    reinterpret_cast<vtkKWSelectionFrame *>(clientdata);
+  vtkKWSelectionFrame* self = static_cast<vtkKWSelectionFrame*>(clientdata);
   if (self)
     {
     self->ProcessEvent(object, event, calldata);
