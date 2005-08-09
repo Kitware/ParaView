@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.760");
+vtkCxxRevisionMacro(vtkPVWindow, "1.761");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1445,6 +1445,23 @@ void vtkPVWindow::Create(vtkKWApplication *app)
       vtkErrorMacro("Could not create glyph source: ConeSource");
       }
     
+    // ===== Cube
+    pvs = this->CreatePVSource("CubeSource", "GlyphSources", 0, 0);
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->Accept(1);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: CubeSource");
+      }
+
     // ==== Line
     pvs = this->CreatePVSource("LineSource", "GlyphSources", 0, 0);
     if (pvs)
