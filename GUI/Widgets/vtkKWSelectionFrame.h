@@ -23,9 +23,7 @@
 #define __vtkKWSelectionFrame_h
 
 #include "vtkKWCompositeWidget.h"
-#include "vtkCommand.h" // Needed for the callback command
 
-class vtkCommand;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;

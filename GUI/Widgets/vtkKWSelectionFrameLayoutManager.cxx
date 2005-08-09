@@ -57,7 +57,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageAppend.h"
 #include "vtkImageConstantPad.h"
 
-#include <vtksys/stl/list>
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
 
@@ -72,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.34");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
