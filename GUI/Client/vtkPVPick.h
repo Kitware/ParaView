@@ -31,6 +31,9 @@ class vtkCollection;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkDataSetAttributes;
+class vtkKWFrameWithLabel;
+class vtkKWCheckButton;
+class vtkKWThumbWheel;
 
 class VTK_EXPORT vtkPVPick : public vtkPVSource
 {
@@ -44,26 +47,22 @@ public:
   virtual void CreateProperties();
 
   // Description:
-  // Control the visibility of the pick display as well.
-  virtual void SetVisibilityNoTrace(int val);
-
-  // Description:
   // Called when the delete button is pressed.
   virtual void DeleteCallback();
 
-  // Description:
-  // Save the pipeline to a batch file which can be run without
-  // a user interface. Overridden to save PickLabelDisplayProxy
-  // in batch
-  virtual void SaveInBatchScript(ofstream *file);
+  void PointLabelCheckCallback();
+  void ChangePointLabelFontSize();
+
+  void UpdatePointLabelCheck();
+  void UpdatePointLabelFontSize();
 
 protected:
   vtkPVPick();
   ~vtkPVPick();
 
   vtkKWFrame *DataFrame;
-
   vtkCollection* LabelCollection;
+
   virtual void Select();
   void UpdateGUI();
   void ClearDataLabels();
@@ -74,6 +73,21 @@ protected:
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
 
+  vtkKWFrameWithLabel *PointLabelFrame;
+  vtkKWCheckButton *PointLabelCheck;
+  vtkKWLabel       *PointLabelFontSizeLabel;
+  vtkKWThumbWheel  *PointLabelFontSizeThumbWheel;
+
+  //FOR TEMPORAL PLOT
+  /*
+  vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
+  char* PlotDisplayProxyName; // Name used to register the plot display proxy
+                              // with the Proxy Manager.
+  vtkSetStringMacro(PlotDisplayProxyName);
+  vtkPVArraySelection *ArraySelection;
+  */
+
+private:
   vtkPVPick(const vtkPVPick&); // Not implemented
   void operator=(const vtkPVPick&); // Not implemented
 };

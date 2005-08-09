@@ -219,7 +219,6 @@ public:
   void ChangeLineWidth();
   void ChangeLineWidthEndCallback();
   void ChangePointLabelFontSize();
-  void ChangePointLabelFontSizeEndCallback();
 
   // Description:
   // Access to option menus for scripting.

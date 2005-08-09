@@ -57,11 +57,12 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkPVLookmark.h"
+#include "vtkPVPick.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.451");
+vtkCxxRevisionMacro(vtkPVSource, "1.452");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -132,6 +133,7 @@ vtkPVSource::vtkPVSource()
   this->CubeAxesVisibility = 0;
   this->PointLabelDisplayProxy = 0;
   this->PointLabelVisibility = 0;
+  this->PointLabelFontSize = 24;
   
   this->PVColorMap = 0;  
 
@@ -888,12 +890,59 @@ void vtkPVSource::SetPointLabelVisibilityNoTrace(int val)
     return;
     }
   this->PointLabelVisibility = val;
-  this->PointLabelDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
+
+  if (this->PointLabelDisplayProxy)
+    this->PointLabelDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
   
-  if (this->Notebook)
+  if (this->Notebook && this->Notebook->GetDisplayGUI())
     {
     this->Notebook->GetDisplayGUI()->UpdatePointLabelVisibilityCheck();
     }
+
+  //for PVPick, Display page changes must update Parameter page GUI too
+  vtkPVPick *asPick = vtkPVPick::SafeDownCast(this);
+  if (asPick) asPick->UpdatePointLabelCheck();
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPointLabelFontSize(int val)
+{
+  if (this->PointLabelFontSize == val)
+    {
+    return;
+    }
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelFontSize %d", this->GetTclName(), val);
+  this->SetPointLabelFontSizeNoTrace(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPointLabelFontSizeNoTrace(int val)
+{
+  if (this->PointLabelFontSize == val)
+    {
+    return;
+    }
+  this->PointLabelFontSize = val;
+  
+  if (this->PointLabelDisplayProxy)
+    {
+    this->PointLabelDisplayProxy->SetFontSizeCM(this->PointLabelFontSize);
+    }
+  
+  if (this->Notebook && this->Notebook->GetDisplayGUI())
+    {
+    this->Notebook->GetDisplayGUI()->UpdatePointLabelVisibilityCheck();
+    }
+
+  //for PVPick, Display page changes must update Parameter page GUI too
+  vtkPVPick *asPick = vtkPVPick::SafeDownCast(this);
+  if (asPick) asPick->UpdatePointLabelFontSize();
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2863,6 +2912,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
+  os << indent << "PointLabelFontSize: " << this->PointLabelFontSize << endl;
   os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;
 
   os << indent << "Lookmark: ";

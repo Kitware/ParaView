@@ -118,6 +118,10 @@ public:
   void SetPointLabelVisibilityNoTrace(int val);
   vtkGetMacro(PointLabelVisibility, int);
 
+  void SetPointLabelFontSize(int val);
+  void SetPointLabelFontSizeNoTrace(int val);
+  vtkGetMacro(PointLabelFontSize, int);
+
   // Description:
   // Connect an input to this pvsource. 
   // Note: SetPVInput() first disconnects all inputs of the
@@ -542,6 +546,7 @@ protected:
   // This is the state of the user selection. The PointLabelDisplay
   // visibility is the value "visibility and PointLabelVisibility".
   int PointLabelVisibility;
+  int PointLabelFontSize;
 
   vtkKWFrameWithScrollbar *ParameterFrame;
   vtkSMDataObjectDisplayProxy* DisplayProxy;

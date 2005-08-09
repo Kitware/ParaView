@@ -30,12 +30,18 @@
 #include "vtkSMInputProperty.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWThumbWheel.h"
+#include "vtkKWEntry.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVTraceHelper.h"
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.21");
+vtkCxxRevisionMacro(vtkPVPick, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -47,8 +53,16 @@ vtkPVPick::vtkPVPick()
   // We cannot process inputs that have more than one part yet.
   this->RequiredNumberOfInputParts = 1;
   
+  this->PointLabelFrame = vtkKWFrameWithLabel::New();
+  this->PointLabelCheck = vtkKWCheckButton::New();
+  this->PointLabelVisibility = 1;
+
   this->DataFrame = vtkKWFrame::New();
   this->LabelCollection = vtkCollection::New();
+
+  this->PointLabelFontSizeLabel = vtkKWLabel::New();
+  this->PointLabelFontSizeThumbWheel = vtkKWThumbWheel::New();
+
 }
 
 //----------------------------------------------------------------------------
@@ -60,19 +74,15 @@ vtkPVPick::~vtkPVPick()
   this->LabelCollection->Delete();
   this->LabelCollection = NULL;
   this->LabelRow = 1;
-}
 
-//----------------------------------------------------------------------------
-void vtkPVPick::SetVisibilityNoTrace(int val)
-{
-  this->Superclass::SetVisibilityNoTrace(val);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPick::SaveInBatchScript(ofstream *file)
-{
-  this->Superclass::SaveInBatchScript(file);  
+  this->PointLabelFrame->Delete();
+  this->PointLabelFrame = NULL;
+  this->PointLabelCheck->Delete();
+  this->PointLabelCheck = NULL;
+  this->PointLabelFontSizeLabel->Delete();
+  this->PointLabelFontSizeLabel = NULL;
+  this->PointLabelFontSizeThumbWheel->Delete();
+  this->PointLabelFontSizeThumbWheel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -88,11 +98,59 @@ void vtkPVPick::CreateProperties()
 
   this->Superclass::CreateProperties();
 
+  this->PointLabelFrame->SetParent(this->ParameterFrame->GetFrame());
+  this->PointLabelFrame->Create(pvApp);
+  this->PointLabelFrame->SetLabelText("Point Label Display");
+  this->Script("pack %s -fill x -expand true",
+               this->PointLabelFrame->GetWidgetName());
+  this->PointLabelFrame->CollapseButtonCallback();
+
+  this->PointLabelCheck->SetParent(this->PointLabelFrame->GetFrame());
+  this->PointLabelCheck->Create(pvApp);
+  this->PointLabelCheck->SetText("Label Point Ids");
+  this->PointLabelCheck->SetCommand(this, "PointLabelCheckCallback");
+  this->PointLabelCheck->SetBalloonHelpString(
+    "Toggle the visibility of point id labels for this dataset.");
+  this->Script("grid %s -sticky wns",
+               this->PointLabelCheck->GetWidgetName());
+  this->PointLabelCheck->SetSelectedState(this->GetPointLabelVisibility());
+
+  this->PointLabelFontSizeLabel->SetParent(this->PointLabelFrame->GetFrame());
+  this->PointLabelFontSizeLabel->Create(pvApp);
+  this->PointLabelFontSizeLabel->SetText("Point Id size:");
+  this->PointLabelFontSizeLabel->SetBalloonHelpString(
+    "This scale adjusts the size of the point ID labels.");
+
+  this->PointLabelFontSizeThumbWheel->SetParent(this->PointLabelFrame->GetFrame());
+  this->PointLabelFontSizeThumbWheel->PopupModeOn();
+  this->PointLabelFontSizeThumbWheel->SetValue(this->GetPointLabelFontSize());
+  this->PointLabelFontSizeThumbWheel->SetResolution(1.0);
+  this->PointLabelFontSizeThumbWheel->SetMinimumValue(4.0);
+  this->PointLabelFontSizeThumbWheel->ClampMinimumValueOn();
+  this->PointLabelFontSizeThumbWheel->Create(pvApp);
+  this->PointLabelFontSizeThumbWheel->DisplayEntryOn();
+  this->PointLabelFontSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
+  this->PointLabelFontSizeThumbWheel->SetBalloonHelpString("Set the point ID label font size.");
+  this->PointLabelFontSizeThumbWheel->GetEntry()->SetWidth(5);
+  this->PointLabelFontSizeThumbWheel->SetCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetBalloonHelpString(
+    "This scale adjusts the font size of the point ID labels.");
+
+  this->Script("grid %s %s -sticky wns",
+               this->PointLabelFontSizeLabel->GetWidgetName(),
+               this->PointLabelFontSizeThumbWheel->GetWidgetName());
+  this->Script("grid %s -sticky wns -padx 1 -pady 2",
+               this->PointLabelFontSizeThumbWheel->GetWidgetName());
+
+
+
   this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
   this->DataFrame->Create(pvApp);
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
-
+  
 }
 
 
@@ -100,18 +158,21 @@ void vtkPVPick::CreateProperties()
 void vtkPVPick::AcceptCallbackInternal()
 {
   int initialized = this->GetInitialized();
+  int vis = this->GetPointLabelVisibility();
+  int fsize = this->GetPointLabelFontSize();
 
   // call the superclass's method
   this->Superclass::AcceptCallbackInternal();
 
   if (!initialized)
     {
-    this->SetPointLabelVisibility(1);
+    this->PointLabelDisplayProxy->SetVisibilityCM(vis);
+    this->PointLabelDisplayProxy->SetFontSizeCM(fsize);
+    this->SetPointLabelFontSize(fsize);
     }
 
-
+  // We need to update manually for the case we are probing one point.
   this->PointLabelDisplayProxy->Update();
-  this->PointLabelDisplayProxy->SetVisibilityCM(1);
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
   this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
@@ -131,12 +192,16 @@ void vtkPVPick::Select()
 //----------------------------------------------------------------------------
 void vtkPVPick::UpdateGUI()
 {
+  this->UpdatePointLabelCheck();
+  this->UpdatePointLabelFontSize();
+
   this->ClearDataLabels();
   // Get the collected data from the display.
   if (!this->GetInitialized())
     {
     return;
     }
+
   vtkUnstructuredGrid* d = this->PointLabelDisplayProxy->GetCollectedData();
   if (d == 0)
     {
@@ -334,6 +399,32 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   kwl->Delete();
   kwl = NULL;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVPick::PointLabelCheckCallback()
+{
+  //PVSource does tracing for us
+  this->SetPointLabelVisibility(this->PointLabelCheck->GetSelectedState());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPick::UpdatePointLabelCheck()
+{
+  this->PointLabelCheck->SetSelectedState(this->GetPointLabelVisibility());
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVPick::ChangePointLabelFontSize()
+{
+  this->SetPointLabelFontSize(
+    (int)this->PointLabelFontSizeThumbWheel->GetValue());
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVPick::UpdatePointLabelFontSize()
+{
+  this->PointLabelFontSizeThumbWheel->SetValue(this->GetPointLabelFontSize());
+} 
 
 //----------------------------------------------------------------------------
 void vtkPVPick::PrintSelf(ostream& os, vtkIndent indent)

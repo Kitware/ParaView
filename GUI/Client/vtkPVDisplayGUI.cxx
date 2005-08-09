@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.47");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.48");
 
 //----------------------------------------------------------------------------
 
@@ -790,7 +790,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
 
   this->PointLabelFontSizeThumbWheel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->PointLabelFontSizeThumbWheel->PopupModeOn();
-  this->PointLabelFontSizeThumbWheel->SetValue(24.0);
   this->PointLabelFontSizeThumbWheel->SetResolution(1.0);
   this->PointLabelFontSizeThumbWheel->SetMinimumValue(4.0);
   this->PointLabelFontSizeThumbWheel->ClampMinimumValueOn();
@@ -800,8 +799,8 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app)
   this->PointLabelFontSizeThumbWheel->SetBalloonHelpString("Set the point ID label font size.");
   this->PointLabelFontSizeThumbWheel->GetEntry()->SetWidth(5);
   this->PointLabelFontSizeThumbWheel->SetCommand(this, "ChangePointLabelFontSize");
-  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSizeEndCallback");
-  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSizeEndCallback");
+  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSize");
   this->PointLabelFontSizeThumbWheel->SetBalloonHelpString(
     "This scale adjusts the font size of the point ID labels.");
 
@@ -1275,6 +1274,7 @@ void vtkPVDisplayGUI::UpdatePointLabelVisibilityCheck()
   if (this->PVSource && this->VisibilityCheck->GetApplication())
     {
     this->PointLabelCheck->SetSelectedState(this->PVSource->GetPointLabelVisibility());
+    this->PointLabelFontSizeThumbWheel->SetValue(this->PVSource->GetPointLabelFontSize());    
     }
 }
 
@@ -2107,16 +2107,8 @@ void vtkPVDisplayGUI::CubeAxesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PointLabelCheckCallback()
 {
-  //law int fixme;  // Loading the trace will not trace the visibility.
-  // Move the tracing into vtkPVSource.
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", 
-                      this->PVSource->GetTclName(),
-                      this->PointLabelCheck->GetSelectedState());
+  //PVSource does tracing for us
   this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetSelectedState());
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -2245,34 +2237,15 @@ void vtkPVDisplayGUI::SetPointLabelFontSize(int size)
     {
     return;
     }
-  // The following call with trigger the ChangePointLabelFontSize callback (below)
-  // but won't add a trace entry. Let's do it. A trace entry is also
-  // added by the ChangePointLabelFontSizeEndCallback but this callback is only
-  // called when the interaction on the scale is stopped.
   this->PointLabelFontSizeThumbWheel->SetValue(size);
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelFontSize %d", this->GetTclName(),
-                      (int)(this->PointLabelFontSizeThumbWheel->GetValue()));
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointLabelFontSize()
 {
-  this->PVSource->GetPointLabelDisplayProxy()->SetFontSizeCM(
+  this->PVSource->SetPointLabelFontSize(
     (int)this->PointLabelFontSizeThumbWheel->GetValue());
- 
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-} 
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangePointLabelFontSizeEndCallback()
-{
-  this->ChangePointLabelFontSize();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelFontSize %d", this->GetTclName(),
-                      (int)(this->PointLabelFontSizeThumbWheel->GetValue()));
-} 
+ } 
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
