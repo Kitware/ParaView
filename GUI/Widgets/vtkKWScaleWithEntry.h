@@ -288,7 +288,7 @@ protected:
   // Description:
   // Update internal widgets value
   virtual void UpdateValue();
-  virtual void UpdateEntryValue();
+  virtual void SetEntryValue(double num);
   virtual void UpdateRange();
 
 private:
