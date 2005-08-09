@@ -60,7 +60,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.154");
+vtkCxxRevisionMacro(vtkPVProbe, "1.155");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -224,7 +224,7 @@ void vtkPVProbe::CreateProperties()
   this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
   this->ProbeFrame->Create(pvApp);
   
-  this->Script("pack %s",
+  this->Script("pack %s -fill x -expand true",
                this->ProbeFrame->GetWidgetName());
 
   // widgets for points
@@ -505,7 +505,7 @@ void vtkPVProbe::AcceptCallbackInternal()
   if (this->ShowXYPlotToggle->GetSelectedState() && !(!initialized && (numPts == 1)))
     {
     this->PlotDisplayProxy->SetVisibilityCM(1);
-    this->Script("pack %s", this->ArraySelection->GetWidgetName());  
+    this->Script("pack %s -fill x -expand true", this->ArraySelection->GetWidgetName());  
     this->SaveButton->SetEnabled(1);
     }
   else
