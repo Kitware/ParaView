@@ -60,7 +60,11 @@ public:
   // This command is passed both the selected string and 
   // a pointer to this object.
   // The selection list is represented as a pull down menu, which
-  // visibility can be set.
+  // visibility can be set. As a convenience, any entry made of two
+  // dashes "--" is used as a separator.
+  // This selection list can be used, for example, to display the titles
+  // of other selection frames that can be switched with the current 
+  // selection frame.
   virtual void SetSelectionList(int num, const char **list);
   virtual void SetSelectionListCommand(vtkObject *object, const char *method);
   vtkGetObjectMacro(SelectionList, vtkKWMenuButton);

@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.35");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1497,6 +1497,19 @@ void vtkKWSelectionFrameLayoutManager::SwitchWidgetCallback(
   // Select the new one
 
   new_widget->SelectCallback();
+
+  // Make sure each selection list is updated to point at the right title
+  // (since this callback was most likely triggered by selecting a 
+  // *different* title in the list
+  
+  if (widget->GetSelectionList() && widget->GetTitle())
+    {
+    widget->GetSelectionList()->SetValue(widget->GetTitle());
+    }
+  if (new_widget->GetSelectionList() && new_widget->GetTitle())
+    {
+    new_widget->GetSelectionList()->SetValue(new_widget->GetTitle());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1600,32 +1613,44 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
     }
   
   // Allocate array of titles
+  // Separate each group
 
-  const char **titles_list = new const char *[this->Internals->Pool.size()];
+  const char **titles_list = 
+    new const char *[this->Internals->Pool.size() * 2];
 
-  // Set the selection list for each widget
-
-  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
-    this->Internals->Pool.begin();
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
     this->Internals->Pool.end();
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator begin = 
+    this->Internals->Pool.begin();
+
+  int nb_titles = 0;
+  const char *separator = "--";
+  const char *prev_group = (begin != end ? begin->Group.c_str() : NULL);
+
+  vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = begin;
+  for (; it != end; ++it)
+    {
+    if (it->Widget && it->Widget->GetTitle())
+      {
+      if (strcmp(it->Group.c_str(), prev_group))
+        {
+        titles_list[nb_titles++] = separator;
+        prev_group = it->Group.c_str();
+        }
+      titles_list[nb_titles++] = it->Widget->GetTitle();
+      }
+    }
+
+  it = begin;
   for (; it != end; ++it)
     {
     if (it->Widget)
       {
-      int nb_titles = 0;
-      vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it2 = 
-        this->Internals->Pool.begin();
-      for (; it2 != end; ++it2)
-        {
-        if (it2->Widget &&
-            it2->Widget != it->Widget &&
-            it2->Widget->GetTitle())
-          {
-          titles_list[nb_titles++] = it2->Widget->GetTitle();
-          }
-        }
       it->Widget->SetSelectionList(nb_titles, titles_list);
+      if (it->Widget->GetSelectionList() && it->Widget->GetTitle())
+        {
+        it->Widget->GetSelectionList()->SetValue(it->Widget->GetTitle());
+        }
       }
     }
 

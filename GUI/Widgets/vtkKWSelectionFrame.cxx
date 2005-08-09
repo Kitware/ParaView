@@ -28,7 +28,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.49");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.50");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -954,10 +954,18 @@ void vtkKWSelectionFrame::UpdateSelectionList()
     this->Internals->Pool.end();
   for (; it != end; ++it)
     {
-    callback = "SelectionListCallback {";
-    callback += *it;
-    callback += "}";
-    menu->AddCommand((*it).c_str(), this, callback.c_str());
+    if (!strcmp((*it).c_str(), "--"))
+      {
+      menu->AddSeparator();
+      }
+    else
+      {
+      callback = "SelectionListCallback {";
+      callback += *it;
+      callback += "}";
+      this->SelectionList->AddRadioButton(
+        (*it).c_str(), this, callback.c_str());
+      }
     }
 
   // Add more commands
