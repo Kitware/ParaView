@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.59");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.60");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1271,7 +1271,8 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
         child->AddNewKeyFrame(0.0);
         child->AddNewKeyFrame(1.0);
         this->AnimationScene->ShowAnimationToolbar();
-        this->AnimationScene->SetDuration(numOfTimeSteps-1);
+        this->AnimationScene->SetDuration(numOfTimeSteps);
+        this->AnimationScene->SetPlayModeToSequence();
         this->AnimationScene->SetFrameRate(1);
         break;
         }
