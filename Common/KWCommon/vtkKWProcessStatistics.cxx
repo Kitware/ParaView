@@ -13,7 +13,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.8");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.9");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -153,31 +153,30 @@ float vtkKWProcessStatistics::GetProcessCPUTimeInMilliseconds()
 
 int vtkKWProcessStatistics::QueryMemory()
 {
-  unsigned long tv=0;
-  unsigned long tp=0;
-  unsigned long av=0;
-  unsigned long ap=0;
-
   this->TotalVirtualMemory = -1;
   this->TotalPhysicalMemory = -1;
   this->AvailableVirtualMemory = -1;
   this->AvailablePhysicalMemory = -1;
 #ifdef __CYGWIN__
   return 0;
-#elif _WIN32  
+#elif _WIN32
   MEMORYSTATUS ms;
   GlobalMemoryStatus(&ms);
-  
-  tv = ms.dwTotalVirtual;
-  tp = ms.dwTotalPhys;
-  av = ms.dwAvailVirtual;
-  ap = ms.dwAvailPhys;
+
+  unsigned long tv = ms.dwTotalVirtual;
+  unsigned long tp = ms.dwTotalPhys;
+  unsigned long av = ms.dwAvailVirtual;
+  unsigned long ap = ms.dwAvailPhys;
   this->TotalVirtualMemory = tv>>10;
   this->TotalPhysicalMemory = tp>>10;
   this->AvailableVirtualMemory = av>>10;
   this->AvailablePhysicalMemory = ap>>10;
   return 1;
 #elif __linux
+  unsigned long tv=0;
+  unsigned long tp=0;
+  unsigned long av=0;
+  unsigned long ap=0;
   
   char buffer[1024]; // for skipping unused lines
   
@@ -267,6 +266,10 @@ int vtkKWProcessStatistics::QueryMemory()
   fclose( fd );
   return 1;
 #elif __hpux
+  unsigned long tv=0;
+  unsigned long tp=0;
+  unsigned long av=0;
+  unsigned long ap=0;
   struct pst_static pst;
   struct pst_dynamic pdy;
      
@@ -322,6 +325,3 @@ void vtkKWProcessStatistics::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
-
-
-
