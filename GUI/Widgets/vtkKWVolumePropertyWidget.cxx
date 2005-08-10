@@ -41,13 +41,15 @@
 #include "vtkPointData.h"
 #include "vtkVolumeProperty.h"
 
+#include <vtksys/stl/string>
+
 #define VTK_KW_VPW_INTERPOLATION_LINEAR     "Linear"
 #define VTK_KW_VPW_INTERPOLATION_NEAREST    "Nearest"
 
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.20");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.21");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -331,7 +333,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Scalar opacity editor
 
-  this->ScalarOpacityFunctionEditor->SetParent(frame);
+  if (!this->ScalarOpacityFunctionEditor->GetParent())
+    {
+    this->ScalarOpacityFunctionEditor->SetParent(frame);
+    }
   this->ScalarOpacityFunctionEditor->GetLabel()->SetText("Scalar Opacity Mapping:");
   this->ScalarOpacityFunctionEditor->ComputePointColorFromValueOff();
   this->ScalarOpacityFunctionEditor->LockEndPointsParameterOn();
@@ -357,8 +362,11 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // Scalar Opacity Unit Distance
 
   this->ScalarOpacityFunctionEditor->UserFrameVisibilityOn();
-  this->ScalarOpacityUnitDistanceScale->SetParent(
-    this->ScalarOpacityFunctionEditor->GetUserFrame());
+  if (!this->ScalarOpacityUnitDistanceScale->GetParent())
+    {
+    this->ScalarOpacityUnitDistanceScale->SetParent(
+      this->ScalarOpacityFunctionEditor->GetUserFrame());
+    }
   this->ScalarOpacityUnitDistanceScale->PopupModeOn();
   this->ScalarOpacityUnitDistanceScale->Create(app);
   this->ScalarOpacityUnitDistanceScale->SetLabelText("Scale:");
@@ -378,7 +386,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Color transfer function editor
 
-  this->ScalarColorFunctionEditor->SetParent(frame);
+  if (!this->ScalarColorFunctionEditor->GetParent())
+    {
+    this->ScalarColorFunctionEditor->SetParent(frame);
+    }
   this->ScalarColorFunctionEditor->GetLabel()->SetText("Scalar Color Mapping:");
   this->ScalarColorFunctionEditor->SetCanvasHeight(
     this->ScalarOpacityFunctionEditor->GetCanvasHeight());
@@ -430,7 +441,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Gradient opacity editor
 
-  this->GradientOpacityFunctionEditor->SetParent(frame);
+  if (!this->GradientOpacityFunctionEditor->GetParent())
+    {
+    this->GradientOpacityFunctionEditor->SetParent(frame);
+    }
   this->GradientOpacityFunctionEditor->GetLabel()->SetText("Gradient Opacity Mapping:");
   this->GradientOpacityFunctionEditor->ComputePointColorFromValueOn();
   this->GradientOpacityFunctionEditor->LockEndPointsParameterOn();
@@ -573,12 +587,16 @@ void vtkKWVolumePropertyWidget::Pack()
   frame->UnpackChildren();
 
   int row = 0;
+
   const char *colspan = " -columnspan 2 ";
   const char *col0 = " -column 0 ";
   const char *col1 = " -column 1 ";
   const char *pad = " -padx 2 -pady 2";
   const char *pad_ed = " -padx 2 -pady 3";
   
+  vtksys_stl::string in_frame(" -in ");
+  in_frame += frame->GetWidgetName();
+
   /*
                col0       col1
          +-------------------------
@@ -655,13 +673,15 @@ void vtkKWVolumePropertyWidget::Pack()
   // Scalar Opacity Function (SOF)
 
   tk_cmd << "grid " << this->ScalarOpacityFunctionEditor->GetWidgetName()
-         << " -sticky ew -column 0 -row " << row << colspan << pad_ed << endl;
+         << " -sticky ew -column 0 -row " << row << colspan << pad_ed 
+         << in_frame.c_str() << endl;
   row++;
 
   // Color Transfer Function (CTF)
 
   tk_cmd << "grid " << this->ScalarColorFunctionEditor->GetWidgetName()
-         << " -sticky ew -column 0 -row " << row << colspan << pad_ed << endl;
+         << " -sticky ew -column 0 -row " << row << colspan << pad_ed
+         << in_frame.c_str() << endl;
   row++;
 
   // Gradient Opacity Function (GOF)
@@ -669,7 +689,8 @@ void vtkKWVolumePropertyWidget::Pack()
   if (this->GradientOpacityFunctionVisibility)
     {
     tk_cmd << "grid " << this->GradientOpacityFunctionEditor->GetWidgetName()
-           << " -sticky ew -column 0 -row " << row << colspan << pad_ed << endl;
+           << " -sticky ew -column 0 -row " << row << colspan << pad_ed
+           << in_frame.c_str() << endl;
     row++;
     }
 

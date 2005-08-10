@@ -172,6 +172,10 @@ public:
   vtkGetObjectMacro(ScalarOpacityUnitDistanceScale, vtkKWScaleWithEntry);
  
   // Description:
+  // Pack or repack the UI
+  virtual void Pack();
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -224,10 +228,6 @@ protected:
 
   int                                 LockOpacityAndColor[VTK_MAX_VRCOMP];
   int                                 WindowLevelMode[VTK_MAX_VRCOMP];
-
-  // Pack
-
-  virtual void Pack();
 
   // Are the components independent of each other?
 
