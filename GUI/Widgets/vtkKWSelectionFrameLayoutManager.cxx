@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.37");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -110,6 +110,8 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
   this->GetResolution(this->Internals->ResolutionBeforeMaximize);
   this->Internals->SelectionPositionBeforeMaximize[0] = 1;
   this->Internals->SelectionPositionBeforeMaximize[1] = 1;
+
+  this->SetResolution(1, 1);
 }
 
 //----------------------------------------------------------------------------
