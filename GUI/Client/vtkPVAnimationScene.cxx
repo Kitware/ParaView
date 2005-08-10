@@ -71,11 +71,16 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.52");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.53");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
-
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
+
+#define VTK_PV_DURATION_SEQUENCE_LABEL "No. of Frames:"
+#define VTK_PV_DURATION_SEQUENCE_TIP   "Adjust the number of frames in the animation."
+#define VTK_PV_DURATION_REALTIME_LABEL "Duration:"
+#define VTK_PV_DURATION_REALTIME_TIP  "Adjust the duration for the animation (in seconds)."
+  
 
 //*****************************************************************************
 class vtkPVAnimationSceneObserver : public vtkCommand
@@ -171,6 +176,8 @@ vtkPVAnimationScene::vtkPVAnimationScene()
 
   this->InvokingError = 0;
   this->PropertiesChangedCallbackCommand = 0;
+
+  this->InterpretDurationAsFrameMax = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -347,7 +354,6 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
 
   this->DurationLabel->SetParent(this);
   this->DurationLabel->Create(app);
-  this->DurationLabel->SetText("Duration:");
   
   this->DurationThumbWheel->SetParent(this);
   this->DurationThumbWheel->PopupModeOn();
@@ -363,8 +369,6 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
     "DurationChangedCallback");
   this->DurationThumbWheel->GetEntry()->AddBinding(
     "<KeyRelease>", this, "DurationChangedKeyReleaseCallback");
-  this->DurationThumbWheel->SetBalloonHelpString("Adjust the duration for "
-    "the animation (in seconds).");
   this->SetDuration(10.0);
   this->Script("grid %s %s -sticky ew",
     this->DurationLabel->GetWidgetName(),
@@ -548,7 +552,8 @@ double vtkPVAnimationScene::GetDuration()
     {
     return 0;
     }
-  return this->AnimationSceneProxy->GetEndTime();
+  double val = this->AnimationSceneProxy->GetEndTime();
+  return (this->InterpretDurationAsFrameMax)? (val + 1) : val;
 }
 
 //-----------------------------------------------------------------------------
@@ -583,17 +588,28 @@ void vtkPVAnimationScene::SetDuration(double duration)
     {
     return;
     }
+  if (this->InterpretDurationAsFrameMax)
+    {
+    // in sequence mode, duration has to be whole numbers.
+    duration = static_cast<int>(duration);
+    }
   if (duration < 1.0)
     {
     duration = this->GetDuration();
     }
   double ntime = this->GetNormalizedCurrentTime();
-  
-  DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime",duration);
+
+  double end_time = (this->InterpretDurationAsFrameMax)? (duration -1) : duration;
+  DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", end_time);
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->DurationThumbWheel->SetValue(duration);
-  this->TimeScale->SetRange(0, duration);
-  this->TimeScale->SetValue(duration*ntime);
+  this->TimeScale->SetRange(0, end_time);
+  double current_time = duration*ntime;
+  if (this->InterpretDurationAsFrameMax)
+    {
+    current_time = static_cast<int>(current_time);
+    }
+  this->TimeScale->SetValue(current_time);
   this->InvalidateAllGeometries();
   this->InvokePropertiesChangedCallback();
 }
@@ -727,12 +743,14 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
     {
   case vtkAnimationScene::PLAYMODE_SEQUENCE:
     this->PlayModeMenuButton->SetValue(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
-    this->AnimationManager->EnableCacheCheck();
     // Change the time scale increment to 1.
     this->TimeScale->SetResolution(1);
+    this->SetInterpretDurationAsFrameMax(1);
+    this->AnimationManager->EnableCacheCheck();
     break;
   case vtkAnimationScene::PLAYMODE_REALTIME:
     this->PlayModeMenuButton->SetValue(VTK_PV_PLAYMODE_REALTIME_TITLE);
+    this->SetInterpretDurationAsFrameMax(0);
     this->AnimationManager->DisableCacheCheck();
       // disable cahce check when in real time mode.
       // Note that when we switch the mode to realtime,
@@ -749,6 +767,27 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", 
     this->GetTclName(), mode);
   this->InvokePropertiesChangedCallback();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetInterpretDurationAsFrameMax(int val)
+{
+  if (this->InterpretDurationAsFrameMax == val)
+    {
+    return;
+    }
+  // Interpretation of duration value is going to change.
+  // Obtain the current val.
+  double old_duration = this->DurationThumbWheel->GetValue();
+  this->InterpretDurationAsFrameMax = val;
+  this->SetDuration(old_duration);
+  const char* label = (this->InterpretDurationAsFrameMax)?
+    VTK_PV_DURATION_SEQUENCE_LABEL : VTK_PV_DURATION_REALTIME_LABEL;
+  const char* tip = (this->InterpretDurationAsFrameMax)?
+    VTK_PV_DURATION_SEQUENCE_TIP : VTK_PV_DURATION_REALTIME_TIP;
+  
+  this->DurationLabel->SetText(label);
+  this->DurationThumbWheel->SetBalloonHelpString(tip);
 }
 
 //-----------------------------------------------------------------------------

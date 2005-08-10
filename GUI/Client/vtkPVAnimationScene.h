@@ -215,6 +215,12 @@ protected:
   int InPlay;
   int InvokingError;
 
+  // This flag is set when the play mode is Sequence mode.
+  // It implies that the duration widget is to treated as 
+  // an indication of max no. of frames.
+  int InterpretDurationAsFrameMax;
+  void SetInterpretDurationAsFrameMax(int val);
+
   unsigned long ErrorEventTag;
 
   char* PropertiesChangedCallbackCommand;
