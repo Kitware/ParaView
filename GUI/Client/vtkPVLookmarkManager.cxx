@@ -119,7 +119,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.59");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1094,7 +1094,7 @@ void vtkPVLookmarkManager::UndoRedoInternal()
   ostrstream str;
   ostrstream tempstr;
   FILE *infile;
-  FILE *outfile;
+  FILE *outfile = NULL;
   char buf[300];
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
@@ -1143,7 +1143,10 @@ void vtkPVLookmarkManager::UndoRedoInternal()
         }
       }
     fclose(infile);
-    fclose(outfile);
+    if (outfile)
+      {
+      fclose(outfile);
+      }
     remove(tempstr.str());
     }
 }
@@ -2125,7 +2128,7 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
     it->GoToNextItem();
     }
   it->Delete();
-  unsigned int ret = ds.find_last_of(';',ds.size());
+  vtkstd::string::size_type ret = ds.find_last_of(';',ds.size());
   if(ret != vtkstd::string::npos)
     {
     ds.erase(ret);

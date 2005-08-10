@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.50");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.51");
 
 
 //*****************************************************************************
@@ -219,7 +219,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   vtkPVSource *pvs1;
-  vtkPVSource *pvs2;
+  vtkPVSource *pvs2 = NULL;
   vtkPVSource *source = NULL;
   int i = 0;
   char mesg[400];
@@ -369,7 +369,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
   vtkPVSource *pvs1;
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
-  vtkPVReaderModule *mod;
+  vtkPVReaderModule *mod = NULL;
   //  const char *ptr1;
   //  const char *ptr2;
   char mesg[400];
@@ -832,7 +832,7 @@ void vtkPVLookmark::StoreStateScript()
       }
     }
   state << ends;
-  unsigned int ret = opsList.find_last_of(',',opsList.size());
+  vtkstd::string::size_type ret = opsList.find_last_of(',',opsList.size());
   if(ret != vtkstd::string::npos)
     {
     opsList.erase(ret);
@@ -1205,7 +1205,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   char FourthAndFifthToken_WrappedStringAndInt[] = "%*s %*s %*s {%[^}]} %d";
   vtkstd::string::size_type beg;
   vtkstd::string::size_type end;
-  vtkPVSource *src;
+  vtkPVSource *src = NULL;
   vtkstd::string ptr;
   char *ptr1;
   char srcTclName[20]; 
@@ -1835,7 +1835,10 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
             ptr.assign(*tokIter);
             // needed to display edit volume appearance setting button:
-            src->GetPVOutput()->ShowVolumeAppearanceEditor();
+            if (src)
+              {
+              src->GetPVOutput()->ShowVolumeAppearanceEditor();
+              }
 
             ptr.assign(*(++tokIter));
             vol->RemoveAllScalarOpacityPoints();
