@@ -153,8 +153,13 @@ public:
   virtual void UpdateEnableState();
 
 
-  void SaveImages(const char* fileRoot, const char* ext, int width, int height, 
-                                         double framerate);
+  // Description:
+  // Called when user requests saving of an animation in a movie file
+  // or as a set of images.
+  void SaveImages(const char* fileRoot, const char* ext, int width, int height,
+    double framerate);
+  // Description:
+  // Called when the user requests saving of animation geometry.
   void SaveGeometry(const char* filename);
 
   void InvalidateAllGeometries();
@@ -178,6 +183,12 @@ public:
     const char* methodAndArgs);
 
   void PrepareForDelete();
+
+  // Description:
+  // Methods called before and after play. They update the state of the VCR control
+  // to reflect the playing state.
+  void OnBeginPlay();
+  void OnEndPlay();
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();

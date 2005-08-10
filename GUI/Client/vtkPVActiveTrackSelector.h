@@ -97,6 +97,12 @@ public:
   vtkSetMacro(DisplayOnlyPVSourceProperties, int);
   vtkGetMacro(DisplayOnlyPVSourceProperties, int);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's Limited
+  // Edition Mode, etc.), the "enable" state of the object is updated and
+  // propagated to its internal parts/subwidgets. 
+  virtual void UpdateEnableState();
 protected:
   vtkPVActiveTrackSelector();
   ~vtkPVActiveTrackSelector();

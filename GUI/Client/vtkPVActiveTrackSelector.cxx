@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.11");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.12");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -408,6 +408,13 @@ void vtkPVActiveTrackSelector::SelectPropertyCallbackInternal(int cue_index)
   vtkPVAnimationCue* cue= 
     this->Internals->PropertyCues[cue_index].GetPointer();
   this->CurrentCue = cue;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVActiveTrackSelector::UpdateEnableState()
+{
+  this->PropagateEnableState(this->SourceMenuButton);
+  this->PropagateEnableState(this->PropertyMenuButton);
 }
 
 //-----------------------------------------------------------------------------

@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.53");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.54");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -459,10 +459,12 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %f",
     this->GetTclName(), fileRoot, ext, width, height, framerate);
-  this->CaptureErrorEvents();
+ 
+  this->OnBeginPlay();
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
     width, height, framerate);
-  this->ReleaseErrorEvents();
+  this->OnEndPlay();
+
   if (savefailed)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -477,9 +479,11 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
 {
   // Start at the beginning.
   this->GetTraceHelper()->AddEntry("$kw(%s) SaveGeometry %s", this->GetTclName(), filename);
-  this->CaptureErrorEvents();
+  
+  this->OnBeginPlay();
   int error = this->AnimationSceneProxy->SaveGeometry(filename);
-  this->ReleaseErrorEvents();
+  this->OnEndPlay();
+
   if (error == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -635,8 +639,12 @@ void vtkPVAnimationScene::ReleaseErrorEvents()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::Play()
+void vtkPVAnimationScene::OnBeginPlay()
 {
+  if (this->InPlay)
+    {
+    return;
+    }
   this->InPlay = 1;
   if (this->Window)
     {
@@ -647,7 +655,15 @@ void vtkPVAnimationScene::Play()
   this->VCRToolbar->SetInPlay(1);
   this->VCRToolbar->UpdateEnableState();
   this->CaptureErrorEvents(); 
-  this->AnimationSceneProxy->Play();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::OnEndPlay()
+{
+  if (!this->InPlay)
+    {
+    return;
+    }
   this->ReleaseErrorEvents();
   this->InPlay = 0;
   if (this->Window)
@@ -658,6 +674,14 @@ void vtkPVAnimationScene::Play()
   this->VCRControl->UpdateEnableState();
   this->VCRToolbar->SetInPlay(0);
   this->VCRToolbar->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::Play()
+{
+  this->OnBeginPlay();
+  this->AnimationSceneProxy->Play();
+  this->OnEndPlay();
   this->GetTraceHelper()->AddEntry("$kw(%s) Play", this->GetTclName());
 }
 

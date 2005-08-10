@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.60");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.61");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -968,6 +968,11 @@ void vtkPVAnimationManager::UpdateEnableState()
   if (this->HAnimationInterface)
     {
     this->HAnimationInterface->SetEnabled(inPlay ? 0 : this->GetEnabled());
+    }
+
+  if (this->ActiveTrackSelector)
+    {
+    this->ActiveTrackSelector->SetEnabled(inPlay? 0 : this->GetEnabled());
     }
 }
 
