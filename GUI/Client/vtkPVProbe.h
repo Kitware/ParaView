@@ -57,6 +57,8 @@ public:
   // Overridden to save the plot display in batch.
   virtual void SaveInBatchScript(ofstream *file);
 
+  // Description:
+  // Called when scalars are selected or deselected for the plot.
   void ArraySelectionInternalCallback();
 
   // Description:
