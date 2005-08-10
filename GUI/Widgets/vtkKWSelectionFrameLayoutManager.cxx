@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.36");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -88,6 +88,9 @@ public:
   typedef vtksys_stl::vector<PoolNode> PoolType;
   typedef vtksys_stl::vector<PoolNode>::iterator PoolIterator;
 
+  int ResolutionBeforeMaximize[2];
+  int SelectionPositionBeforeMaximize[2];
+
   PoolType Pool;
 };
 
@@ -98,11 +101,15 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
 
   this->Resolution[0] = 0;
   this->Resolution[1] = 0;
-  
+
   this->ResolutionEntriesMenu    = NULL;
   this->ResolutionEntriesToolbar = NULL;
 
   this->SelectionChangedCommand = NULL;
+
+  this->GetResolution(this->Internals->ResolutionBeforeMaximize);
+  this->Internals->SelectionPositionBeforeMaximize[0] = 1;
+  this->Internals->SelectionPositionBeforeMaximize[1] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1456,17 +1463,90 @@ void vtkKWSelectionFrameLayoutManager::SelectWidgetCallback(
 void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
-  // Select the widget to maximize
-  // Set the resolution to full (1, 1)
-  // then switch whichever dataset was at [0, 0] with our selection
-
   this->SelectWidget(selection);
 
-  this->SetResolution(1, 1);
+  // If we are already maximized, go back to the previous resolution
+  // otherwise maximize
 
-  int pos[2] = {0, 0};
-  this->SwitchWidgetCallback(selection->GetTitle(), 
-                             this->GetWidgetAtPosition(pos));
+  if (this->Resolution[0] == 1 && this->Resolution[1] == 1)
+    {
+    if (this->Internals)
+      {
+      this->SetResolution(this->Internals->ResolutionBeforeMaximize);
+
+      vtkKWSelectionFrame *atpos = 
+        this->GetWidgetAtPosition(
+          this->Internals->SelectionPositionBeforeMaximize);
+      if (atpos)
+        {
+        this->SwitchWidgetsPosition(selection, atpos);
+        }
+      else
+        {
+        this->SetWidgetPosition(
+          selection, 
+          this->Internals->SelectionPositionBeforeMaximize);
+        }
+      }
+    }
+  else
+    {
+    // Save the resolution and the selection position so that both can
+    // be restored on minimize
+
+    this->GetResolution(this->Internals->ResolutionBeforeMaximize);
+    if (selection)
+      {
+      this->GetWidgetPosition(
+        selection, 
+        this->Internals->SelectionPositionBeforeMaximize);
+      }
+    else
+      {
+      this->Internals->SelectionPositionBeforeMaximize[0] = 1;
+      this->Internals->SelectionPositionBeforeMaximize[0] = 1;
+      }
+
+    // Set the resolution to full (1, 1)
+    // then switch whichever dataset was at [0, 0] with our selection
+
+    this->SetResolution(1, 1);
+    
+    if (selection)
+      {
+      vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
+      if (at00)
+        {
+        this->SwitchWidgetsPosition(selection, at00);
+        }
+      else
+        {
+        this->SetWidgetPosition(selection, 0, 0);
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::SwitchWidgetsPosition(
+  vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2)
+{
+  if (!w1 || !w2 || w1 == w2)
+    {
+    return 0;
+    }
+
+  int pos1[2], pos2[2];
+  if (!this->GetWidgetPosition(w1, pos1) ||
+      !this->GetWidgetPosition(w2, pos2))
+    {
+    return 0;
+    }
+  
+  this->SetWidgetPosition(w1, pos2);
+  this->SetWidgetPosition(w2, pos1);
+  
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -1484,15 +1564,7 @@ void vtkKWSelectionFrameLayoutManager::SwitchWidgetCallback(
 
   // Switch both
 
-  int pos[2], new_pos[2];
-  if (!this->GetWidgetPosition(widget, pos) ||
-      !this->GetWidgetPosition(new_widget, new_pos))
-    {
-    return;
-    }
-  
-  this->SetWidgetPosition(widget, new_pos);
-  this->SetWidgetPosition(new_widget, pos);
+  this->SwitchWidgetsPosition(widget, new_widget);
 
   // Select the new one
 

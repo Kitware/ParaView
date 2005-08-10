@@ -112,7 +112,7 @@ public:
     int index, const char *group);
 
   // Description:
-  // Set/Get position of widget (given the widget or its tag).
+  // Set/Get position of widget
   // Return 1 (or widget) on success, 0 (or NULL) on error
   virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int *col, int *row);
   virtual int GetWidgetPosition(vtkKWSelectionFrame *w, int pos[2])
@@ -123,6 +123,13 @@ public:
   virtual vtkKWSelectionFrame* GetWidgetAtPosition(int col, int row);
   virtual vtkKWSelectionFrame* GetWidgetAtPosition(int pos[2])
     { return this->GetWidgetAtPosition(pos[0], pos[1]); }
+
+  // Description:
+  // Switch widgets position (convenience method to set the position of
+  // two widgets)
+  // Return 1 (or widget) on success, 0 (or NULL) on error
+  virtual int SwitchWidgetsPosition(
+    vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2);
 
   // Description:
   // Select a a widget.
