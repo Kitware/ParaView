@@ -39,25 +39,52 @@ ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
   SET(VTK_USE_RPATH_DEFAULT ON)
 ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 
-# If we are using the rpath feature in the build tree then it is not
-# safe to allow anything to be installed.
+#########################################################################
+# Configure VTK
+# force some values to be set by default as they are required by ParaView
+# 
+# something_ISSET is set for vtkDependentOption to not change it to bool. For
+# more information, check VTK/CMake/vtkDependentOption.cmake
+SET(VTK_USE_HYBRID_ISSET ON)
+SET(VTK_USE_PARALLEL_ISSET ON)
+SET(VTK_USE_VOLUMERENDERING_ISSET ON)
+SET(VTK_USE_VIDEO_FOR_WINDOWS_ISSET ON)
+SET(VTK_USE_GL2PS_ISSET OFF)
+SET(VTK_USE_ANSI_STDLIB ${PARAVIEW_USE_ANSI_STDLIB})
+SET(VTK_HEADER_TESTING_PY "${ParaView_SOURCE_DIR}/VTK/Common/Testing/HeaderTesting.py")
+SET(VTK_PRINT_SELF_CHECK_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/PrintSelfCheck.tcl")
+SET(VTK_FIND_STRING_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/FindString.tcl")
+
+SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
+SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
+SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
+SET(VTK_WRAP_JAVA OFF CACHE INTERNAL "" FORCE)
+SET(VTK_USE_VIDEO_FOR_WINDOWS ON CACHE INTERNAL "" FORCE)
+SET(VTK_USE_MATROX_IMAGING OFF CACHE INTERNAL "" FORCE)
+
+SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK" CACHE INTERNAL "" FORCE)
+SET(VTK_SOURCE_DIR "${ParaView_SOURCE_DIR}/VTK" CACHE INTERNAL "" FORCE)
+SET(VTK_FOUND 1)
+FIND_PATH(VTK_DATA_ROOT VTKData.readme ${ParaView_SOURCE_DIR}/../VTKData $ENV{VTK_DATA_ROOT})
+MARK_AS_ADVANCED(VTK_DATA_ROOT)
+MARK_AS_ADVANCED(BUILD_EXAMPLES)
+
+# Choose static or shared libraries.  This provides BUILD_SHARED_LIBS
+# and VTK_USE_RPATH.
+INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkSelectSharedLibraries.cmake)
+
+# Disable the install targets if using the rpath feature.
 IF(NOT WIN32)
-  IF(NOT CMAKE_SKIP_RPATH)
+  IF(VTK_USE_RPATH)
     SET(PV_INSTALL_NO_DEVELOPMENT 1)
     SET(PV_INSTALL_NO_RUNTIME 1)
-
-    # If someone is trying to install do not do an entire build with
-    # the wrong rpath feature setting just to report failed
-    # installation.
-    SET(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY 1)
-
-    # Add a dummy target and attach an install rule that will always fail
-    # and produce a message explaining why installation is disabled.
-    ADD_CUSTOM_TARGET(pv_install_disabled)
-    SET_TARGET_PROPERTIES(pv_install_disabled PROPERTIES PRE_INSTALL_SCRIPT
-      ${ParaView_SOURCE_DIR}/VTK/CMake/InstallDisabled.cmake)
-  ENDIF(NOT CMAKE_SKIP_RPATH)
+  ENDIF(VTK_USE_RPATH)
 ENDIF(NOT WIN32)
+
+# ParaView needs static Tcl/Tk if not using shared libraries.
+IF(NOT BUILD_SHARED_LIBS)
+  SET(VTK_TCL_TK_STATIC ON CACHE INTERNAL "" FORCE)
+ENDIF(NOT BUILD_SHARED_LIBS)
 
 # Setup install directories.
 IF(NOT PV_INSTALL_BIN_DIR)
@@ -250,39 +277,6 @@ IF (PARAVIEW_BUILD_GUI)
   SET(TclTk_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR}/TclTk/lib)
   SUBDIRS(Utilities/TclTk)
 ENDIF (PARAVIEW_BUILD_GUI)
-
-#########################################################################
-# Configure VTK
-# force some values to be set by default as they are required by ParaView
-# 
-# something_ISSET is set for vtkDependentOption to not change it to bool. For
-# more information, check VTK/CMake/vtkDependentOption.cmake
-SET(VTK_USE_HYBRID_ISSET ON)
-SET(VTK_USE_PARALLEL_ISSET ON)
-SET(VTK_USE_VOLUMERENDERING_ISSET ON)
-SET(VTK_USE_VIDEO_FOR_WINDOWS_ISSET ON)
-SET(VTK_USE_GL2PS_ISSET OFF)
-SET(VTK_USE_ANSI_STDLIB ${PARAVIEW_USE_ANSI_STDLIB})
-SET(VTK_HEADER_TESTING_PY "${ParaView_SOURCE_DIR}/VTK/Common/Testing/HeaderTesting.py")
-SET(VTK_PRINT_SELF_CHECK_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/PrintSelfCheck.tcl")
-SET(VTK_FIND_STRING_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/FindString.tcl")
-
-SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
-SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
-SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
-SET(VTK_WRAP_JAVA OFF CACHE INTERNAL "" FORCE)
-SET(VTK_USE_VIDEO_FOR_WINDOWS ON CACHE INTERNAL "" FORCE)
-SET(VTK_USE_MATROX_IMAGING OFF CACHE INTERNAL "" FORCE)
-
-SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK" CACHE INTERNAL "" FORCE)
-SET(VTK_SOURCE_DIR "${ParaView_SOURCE_DIR}/VTK" CACHE INTERNAL "" FORCE)
-SET(VTK_FOUND 1)
-FIND_PATH(VTK_DATA_ROOT VTKData.readme ${ParaView_SOURCE_DIR}/../VTKData $ENV{VTK_DATA_ROOT})
-MARK_AS_ADVANCED(VTK_DATA_ROOT)
-MARK_AS_ADVANCED(BUILD_EXAMPLES)
-IF(NOT BUILD_SHARED_LIBS)
-  SET(VTK_TCL_TK_STATIC ON CACHE INTERNAL "" FORCE)
-ENDIF(NOT BUILD_SHARED_LIBS)
 
 # Specify python build so that we can use vtkTkRenderWidget with no
 # vtkRenderWindow wrapped.
