@@ -32,7 +32,7 @@
 
 #include <vtksys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.60");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.61");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -976,12 +976,15 @@ int vtkKWParameterValueFunctionEditor::MoveFunctionPoint(
     }
 
   // Redraw the point
-
+  // the point we just moved will be redrawn by
+  // the call to RedrawFunctionDependentElements
+  /*
   this->RedrawPoint(id); 
   if (id == this->SelectedPoint)
     {
     this->UpdatePointEntries(id);
     }
+  */
 
   // If we are moving the end points and we should rescale
 
@@ -1507,10 +1510,6 @@ void vtkKWParameterValueFunctionEditor::Update()
   if (!this->HasSelection())
     {
     this->ParameterEntry->SetEnabled(0);
-    }
-  else
-    {
-    this->UpdatePointEntries(this->SelectedPoint);
     }
 
   this->UpdateHistogramLogModeOptionMenu();
@@ -2086,6 +2085,7 @@ void vtkKWParameterValueFunctionEditor::SetWholeParameterRange(
 {
   this->ParameterRange->SetWholeRange(r0, r1);
 
+  this->UpdateRangeLabel();
   this->Redraw();
 }
 
@@ -2162,15 +2162,15 @@ void vtkKWParameterValueFunctionEditor::SetWholeParameterRangeAndMaintainVisible
 {
   double range[2];
   this->GetRelativeVisibleParameterRange(range);
-  this->ParameterRange->SetWholeRange(r0, r1);
+
+  this->SetWholeParameterRange(r0, r1);
+
   if (range[0] == range[1]) // avoid getting stuck
     {
     range[0] = 0.0;
     range[1] = 1.0;
     }
   this->SetRelativeVisibleParameterRange(range);
-
-  this->Redraw();
 }
 
 //----------------------------------------------------------------------------
@@ -2233,6 +2233,7 @@ void vtkKWParameterValueFunctionEditor::SetWholeValueRange(double r0, double r1)
 {
   this->ValueRange->SetWholeRange(r0, r1);
 
+  this->UpdateRangeLabel();
   this->Redraw();
 }
 
@@ -2275,15 +2276,15 @@ void vtkKWParameterValueFunctionEditor::SetWholeValueRangeAndMaintainVisible(
 {
   double range[2];
   this->GetRelativeVisibleValueRange(range);
-  this->ValueRange->SetWholeRange(r0, r1);
+
+  this->SetWholeValueRange(r0, r1);
+
   if (range[0] == range[1]) // avoid getting stuck
     {
     range[0] = 0.0;
     range[1] = 1.0;
     }
   this->SetRelativeVisibleValueRange(range);
-
-  this->Redraw();
 }
 
 //----------------------------------------------------------------------------
@@ -4239,6 +4240,11 @@ void vtkKWParameterValueFunctionEditor::RedrawFunctionDependentElements()
 {
   this->RedrawFunction();
   this->RedrawRangeFrame();
+
+  if (this->HasSelection())
+    {
+    this->UpdatePointEntries(this->SelectedPoint);
+    }
 }
 
 //----------------------------------------------------------------------------
