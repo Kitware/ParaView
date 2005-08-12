@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.33");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -542,6 +542,10 @@ void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangedCommand()
   if (this->WindowLevelMode)
     {
     this->UpdateWindowLevelFromPoints();
+    float fargs[2];
+    fargs[0] = this->GetWindow();
+    fargs[1] = this->GetLevel();
+    this->InvokeEvent(vtkKWEvent::WindowLevelChangedEvent, fargs);
     }
 
   this->Superclass::InvokeFunctionChangedCommand();
@@ -553,6 +557,10 @@ void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangingCommand()
   if (this->WindowLevelMode)
     {
     this->UpdateWindowLevelFromPoints();
+    float fargs[2];
+    fargs[0] = this->GetWindow();
+    fargs[1] = this->GetLevel();
+    this->InvokeEvent(vtkKWEvent::WindowLevelChangingEvent, fargs);
     }
 
   this->Superclass::InvokeFunctionChangingCommand();
