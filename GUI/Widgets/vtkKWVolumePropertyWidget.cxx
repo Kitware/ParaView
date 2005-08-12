@@ -49,7 +49,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.21");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.22");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -879,10 +879,12 @@ void vtkKWVolumePropertyWidget::Update()
 
     if (this->HistogramSet)
       {
-      const char *name = this->GetDataSetScalarName();
-      sprintf(hist_name, "%s%d", (name ? name : ""), scalar_field);
-      this->ScalarOpacityFunctionEditor->SetHistogram(
-        this->HistogramSet->GetHistogram(hist_name));
+      if (this->HistogramSet->ComputeHistogramName(
+            this->GetDataSetScalarName(), scalar_field, NULL, hist_name))
+        {
+        this->ScalarOpacityFunctionEditor->SetHistogram(
+          this->HistogramSet->GetHistogramWithName(hist_name));
+        }
       }
     else
       {
@@ -950,10 +952,12 @@ void vtkKWVolumePropertyWidget::Update()
 
     if (!no_rgb && this->HistogramSet)
       {
-      const char *name = this->GetDataSetScalarName();
-      sprintf(hist_name, "%s%d", (name ? name : ""), scalar_field);
-      this->ScalarColorFunctionEditor->SetHistogram(
-        this->HistogramSet->GetHistogram(hist_name));
+      if (this->HistogramSet->ComputeHistogramName(
+            this->GetDataSetScalarName(), scalar_field, NULL, hist_name))
+        {
+        this->ScalarColorFunctionEditor->SetHistogram(
+          this->HistogramSet->GetHistogramWithName(hist_name));
+        }
       }
     else
       {
@@ -1082,10 +1086,15 @@ void vtkKWVolumePropertyWidget::Update()
 
     if (this->HistogramSet)
       {
-      sprintf(hist_name, "%s%d", "gradient", 
-              this->GetIndependentComponents() ? this->SelectedComponent : 0);
-      this->GradientOpacityFunctionEditor->SetHistogram(
-        this->HistogramSet->GetHistogram(hist_name));
+      if (this->HistogramSet->ComputeHistogramName(
+            this->GetDataSetScalarName(), 
+            this->GetIndependentComponents() ? this->SelectedComponent : 0, 
+            "gradient", 
+            hist_name))
+        {
+        this->GradientOpacityFunctionEditor->SetHistogram(
+          this->HistogramSet->GetHistogramWithName(hist_name));
+        }
       }
     else
       {

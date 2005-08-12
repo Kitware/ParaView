@@ -34,76 +34,68 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Add an histogram. 
+  // Add an histogram to the pool under a given name. 
   // Return 1 on success, 0 otherwise.
-  int AddHistogram(const char *name);
-  vtkIdType GetNumberOfHistograms();
+  virtual int AddHistogram(vtkKWHistogram*, const char *name);
 
   // Description:
-  // Get/query an histogram, given its name.
-  vtkKWHistogram* GetHistogram(const char *name);
-  const char* GetHistogramName(vtkKWHistogram *hist);
-  int HasHistogram(const char *name);
-  int HasHistogram(vtkKWHistogram *hist);
+  // Allocate an histogram and add it in the pool under a given name. 
+  // Return a pointer to the new histogram on success, NULL otherwise.
+  virtual vtkKWHistogram* AllocateAndAddHistogram(const char *name);
 
   // Description:
-  // Get the n-th histogram.
-  vtkKWHistogram* GetNthHistogram(vtkIdType index);
+  // Get the number of histogram in the pool
+  virtual int GetNumberOfHistograms();
 
   // Description:
-  // Add and build histograms for all components of a scalar array.
-  // Each histogram name is built by appending the component index to
-  // the array name or 'prefix' if not NULL.
-  // If 'independent' == 1, all components are considered independent
-  // and an histogram will be built for each one of them.
-  // If independent == 0, components 0 to 3 will be ignored if the number of
-  // components == 3 or 4, as we do not need the histogram for the RGB
-  // channels most of the time (if always needed, then set the param to 1)
-  // Return 1 on success, 0 otherwise.
-  int AddHistograms(
-    vtkDataArray *array, int independent = 1, const char *prefix = NULL);
+  // Retrieve an histogram (or its name) from the pool.
+  virtual vtkKWHistogram* GetHistogramWithName(const char *name);
+  virtual const char* GetHistogramName(vtkKWHistogram *hist);
+  virtual vtkKWHistogram* GetNthHistogram(int index);
+
+  // Description:
+  // Query if the pool has a given histogram
+  virtual int HasHistogramWithName(const char *name);
+  virtual int HasHistogram(vtkKWHistogram *hist);
 
   // Description:
   // Remove one or all histograms. 
   // Return 1 on success, 0 otherwise.
-  int RemoveHistogram(const char *name);
-  void RemoveAllHistograms();
+  virtual int RemoveHistogramWithName(const char *name);
+  virtual int RemoveHistogram(vtkKWHistogram *hist);
+  virtual void RemoveAllHistograms();
+
+  // Description:
+  // The histogram set class is designed to share histogram between several
+  // classes in an application. As such, since histogram are retrieved by
+  // names, it makes sense to follow some naming guidelines. This method
+  // provides such a guideline by computing an histogram name given the 
+  // name of the array this histogram will be built upon, the component
+  // that will be used in that array, and an optional tag.
+  // The histogram name is stored in 'buffer', which should be large enough.
+  // Return 1 on success, 0 otherwise.
+  static int ComputeHistogramName(
+    const char *array_name, int comp, const char *tag, char *buffer);
+
+  // Description:
+  // Allocate, add and build histograms for all components of a scalar array.
+  // Each histogram name is built by calling ComputeHistogramName with
+  // the scalar array, component index and 'tag' arguments.
+  // The 'skip_components_mask' is a binary mask specifying which component
+  // should be skipped (i.e., if the n-th bit in that mask is set, then the
+  // histogram for that n-th component will not be considered)
+  // Return 1 on success, 0 otherwise.
+  virtual int AddHistograms(vtkDataArray *array, 
+                            const char *tag = NULL, 
+                            int skip_components_mask = 0);
 
 protected:
   vtkKWHistogramSet();
   ~vtkKWHistogramSet();
 
   //BTX
-
-  // An histogram slot.
- 
-  class HistogramSlot
-  {
-  public:
-    
-    HistogramSlot();
-    virtual ~HistogramSlot();
-
-    virtual void SetName(const char *name);
-    virtual char* GetName() { return this->Name; }
-    virtual vtkKWHistogram * GetHistogram()  { return this->Histogram; };
-    
-  protected:
-
-    char *Name;
-    vtkKWHistogram *Histogram;
-  };
-
   // PIMPL Encapsulation for STL containers
-
   vtkKWHistogramSetInternals *Internals;
-  friend class vtkKWHistogramSetInternals;
-
-  // Helper methods
-
-  HistogramSlot* GetHistogramSlot(const char *name);
-  HistogramSlot* GetHistogramSlot(vtkKWHistogram *hist);
-
   //ETX
 
 private:
