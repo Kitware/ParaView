@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.28");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -217,7 +217,7 @@ void vtkKWLookmarkFolder::EditCallback()
   this->Script("pack %s", this->NameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetWidgetName(), strlen(temp));
   if(this->NameField)
-    this->NameField->SetValue(temp);
+    this->NameField->SetText(temp);
   this->NameField->SetBinding("<KeyPress-Return>", this, "ChangeName");
 
   delete [] temp;
@@ -228,7 +228,7 @@ void vtkKWLookmarkFolder::ChangeName()
 {
   char *lmkName = new char[100];
 
-  strcpy(lmkName,this->NameField->GetValue());
+  strcpy(lmkName,this->NameField->GetText());
   this->NameField->Unpack();
   this->Script("pack %s -side left -fill x -expand t -padx 2", this->LabelFrame->GetLabel()->GetWidgetName());
   this->LabelFrame->SetLabelText(lmkName);

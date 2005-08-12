@@ -119,7 +119,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.60");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -762,7 +762,7 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
   str << "- Save and import lookmarks to and from disk" << endl << endl;
   str << "- Use lookmarks on different datasets" << endl << endl;
   str << ends;
-  this->QuickStartGuideTxt->GetWidget()->SetValue( str.str() );
+  this->QuickStartGuideTxt->GetWidget()->SetText( str.str() );
   str.rdbuf()->freeze(0);
 }
 
@@ -1022,7 +1022,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
 
   str << ends;
 
-  this->UsersTutorialTxt->GetWidget()->SetValue( str.str() );
+  this->UsersTutorialTxt->GetWidget()->SetText( str.str() );
   str.rdbuf()->freeze(0);
 }
 

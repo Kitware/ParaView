@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.36");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -338,7 +338,7 @@ void vtkPVTimerLogDisplay::Save(const char *fileName)
 
   // Read back the log from the list.
   this->Update();
-  *fptr << this->DisplayText->GetWidget()->GetValue() << endl;
+  *fptr << this->DisplayText->GetWidget()->GetText() << endl;
 
   fptr->close();
   delete fptr;
@@ -365,8 +365,8 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
       }
     ++str;
     }
-  this->DisplayText->GetWidget()->AppendValue(newStr);
-  this->DisplayText->GetWidget()->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendText(newStr);
+  this->DisplayText->GetWidget()->AppendText("\n");
   delete [] newStr;
 
   // Try to get the scroll bar to initialize properly (show correct portion).
@@ -418,7 +418,7 @@ void vtkPVTimerLogDisplay::DisplayLog()
  
   numLogs = this->TimerInformation->GetNumberOfLogs();
 
-  this->DisplayText->GetWidget()->SetValue("");
+  this->DisplayText->GetWidget()->SetText("");
   for (id = 0; id < numLogs; ++id)
     {
     char* str = this->TimerInformation->GetLog(id);

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.13");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVErrorLogDisplay::vtkPVErrorLogDisplay()
@@ -99,7 +99,7 @@ void vtkPVErrorLogDisplay::Create(vtkKWApplication *app)
 void vtkPVErrorLogDisplay::Update()
 {
   int cc;
-  this->DisplayText->GetWidget()->SetValue("");
+  this->DisplayText->GetWidget()->SetText("");
   if ( this->ErrorMessages )
     {
     for ( cc = 0; cc < this->ErrorMessages->GetNumberOfItems(); cc ++ )
@@ -113,7 +113,7 @@ void vtkPVErrorLogDisplay::Update()
     }
   else
     {
-    this->DisplayText->GetWidget()->SetValue("");
+    this->DisplayText->GetWidget()->SetText("");
     this->Append("No errors");
     }
 }

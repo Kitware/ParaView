@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.28");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -261,7 +261,7 @@ void vtkKWLookmark::CommentsModifiedCallback()
   char words[4][50];
   char str[250];
 
-  this->SetComments(this->LmkCommentsText->GetValue());
+  this->SetComments(this->LmkCommentsText->GetText());
 
   num = sscanf(this->Comments,"%s %s %s %s",words[0],words[1],words[2],words[3]);
   switch (num)
@@ -293,7 +293,7 @@ void vtkKWLookmark::CommentsModifiedCallback()
 
 void vtkKWLookmark::UpdateWidgetValues()
 {
-  this->LmkCommentsText->SetValue(this->Comments);
+  this->LmkCommentsText->SetText(this->Comments);
   this->LmkMainFrame->SetLabelText(this->Name);
 
 //ds
@@ -362,7 +362,7 @@ void vtkKWLookmark::CreateDatasetList()
 
 void vtkKWLookmark::UpdateVariableValues()
 {
-  this->SetComments(this->LmkCommentsText->GetValue());
+  this->SetComments(this->LmkCommentsText->GetText());
   this->SetName(this->LmkMainFrame->GetLabel()->GetText());
 }
 
@@ -401,7 +401,7 @@ void vtkKWLookmark::EditLookmarkCallback()
   this->LmkMainFrame->SetLabelText("");
   this->Script("pack %s", this->LmkNameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetWidgetName(),strlen(temp));
-  this->LmkNameField->SetValue(temp);
+  this->LmkNameField->SetText(temp);
   this->LmkNameField->SetBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
 
   delete [] temp;
@@ -410,14 +410,14 @@ void vtkKWLookmark::EditLookmarkCallback()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::ChangeLookmarkName()
 {
-  if(!strcmp(this->LmkNameField->GetValue(),"Macros"))
+  if(!strcmp(this->LmkNameField->GetText(),"Macros"))
     {
     return;
     }
 
   char *lmkName = new char[100];
 
-  strcpy(lmkName,this->LmkNameField->GetValue());
+  strcpy(lmkName,this->LmkNameField->GetText());
   this->LmkNameField->Unpack();
   this->Script("pack %s -anchor nw -side left -fill both -expand true -padx 2 -pady 0", this->LmkMainFrame->GetLabel()->GetWidgetName());
   this->LmkMainFrame->SetLabelText(lmkName);

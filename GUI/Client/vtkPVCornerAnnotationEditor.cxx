@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.10");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()
@@ -179,7 +179,7 @@ void vtkPVCornerAnnotationEditor::UpdateCornerText()
       if (this->CornerText[i])
         {
         this->SetCornerTextInternal(
-          this->CornerText[i]->GetWidget()->GetValue(), i);
+          this->CornerText[i]->GetWidget()->GetText(), i);
         }
       }
     }
@@ -209,7 +209,7 @@ void vtkPVCornerAnnotationEditor::CornerTextCallback(int i)
 {
   if (this->IsCreated() && this->CornerText[i])
     {
-    char* text = this->CornerText[i]->GetWidget()->GetValue();
+    char* text = this->CornerText[i]->GetWidget()->GetText();
     this->SetCornerTextInternal(text, i);
 
     this->Update();
@@ -242,10 +242,10 @@ void vtkPVCornerAnnotationEditor::SetMaximumLineHeight(float v)
 //----------------------------------------------------------------------------
 void vtkPVCornerAnnotationEditor::SetCornerText(const char *text, int corner) 
 {
-  char* oldValue = this->CornerText[corner]->GetWidget()->GetValue();
-  if (this->CornerAnnotation && (strcmp(oldValue, text)))
+  char* oldText = this->CornerText[corner]->GetWidget()->GetText();
+  if (this->CornerAnnotation && (strcmp(oldText, text)))
     {
-    this->CornerText[corner]->GetWidget()->SetValue(text);
+    this->CornerText[corner]->GetWidget()->SetText(text);
     this->SetCornerTextInternal(text, corner);
 
     this->Update();
@@ -314,9 +314,9 @@ void vtkPVCornerAnnotationEditor::SaveState(ofstream *file)
   for (i = 0; i < 4; i++)
     {
     *file << "$kw(" << this->GetTclName() << ") SetCornerText {";
-    if (this->CornerText[i]->GetWidget()->GetValue())
+    if (this->CornerText[i]->GetWidget()->GetText())
       {
-      *file << this->CornerText[i]->GetWidget()->GetValue();
+      *file << this->CornerText[i]->GetWidget()->GetText();
       }
     *file << "} " << i << endl;
     }
