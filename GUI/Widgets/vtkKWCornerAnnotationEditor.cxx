@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -368,7 +368,7 @@ void vtkKWCornerAnnotationEditor::Update()
     {
     if (this->CornerText[i])
       {
-      this->CornerText[i]->GetWidget()->SetValue(
+      this->CornerText[i]->GetWidget()->SetText(
         this->CornerAnnotation ? this->CornerAnnotation->GetText(i) : "");
       }
     }
@@ -577,7 +577,7 @@ void vtkKWCornerAnnotationEditor::CornerTextCallback(int i)
 {
   if (this->IsCreated() && this->CornerText[i])
     {
-    this->SetCornerText(this->CornerText[i]->GetWidget()->GetValue(), i);
+    this->SetCornerText(this->CornerText[i]->GetWidget()->GetText(), i);
     }
 }
 

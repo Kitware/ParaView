@@ -39,14 +39,14 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set/Get the value of the text. AppendValue() is a convenience function
+  // Set/Get the value of the text. AppendText() is a convenience function
   // to add text at the end. If a tag is provided, it will be used to 
   // tag the corresponding text.
-  virtual char *GetValue();
-  virtual void SetValue(const char *);
-  virtual void SetValue(const char *, const char *tag);
-  virtual void AppendValue(const char *);
-  virtual void AppendValue(const char *, const char *tag);
+  virtual char *GetText();
+  virtual void SetText(const char *);
+  virtual void SetText(const char *, const char *tag);
+  virtual void AppendText(const char *);
+  virtual void AppendText(const char *, const char *tag);
 
   // Description:
   // Set/Get if this text is read-only. Default is Off.
@@ -60,12 +60,12 @@ public:
   // ** : bold      (ex: this is **bold**)
   // ~~ : italic    (ex: this is ~~italic~~)
   // __ : underline (ex: this is __underline__)
-  vtkSetMacro(QuickFormatting, int);
+  virtual void SetQuickFormatting(int);
   vtkGetMacro(QuickFormatting, int);
   vtkBooleanMacro(QuickFormatting, int);
 
   // Description:
-  // Convenience method to get/set the width/height.
+  // Convenience method to get/set the width/height, in characters.
   virtual void SetWidth(int);
   virtual int GetWidth();
   virtual void SetHeight(int);
@@ -134,14 +134,14 @@ protected:
   vtkKWTextInternals *Internals;
   //ETX
 
-  virtual void AppendValueInternalTagging(const char *, const char *tag);
-  virtual void AppendValueInternal(const char *, const char *tag);
+  virtual void AppendTextInternalTagging(const char *, const char *tag);
+  virtual void AppendTextInternal(const char *, const char *tag);
 
 private:
 
-  char *InternalValueString;
-  vtkGetStringMacro(InternalValueString);
-  vtkSetStringMacro(InternalValueString);
+  char *InternalTextString;
+  vtkGetStringMacro(InternalTextString);
+  vtkSetStringMacro(InternalTextString);
 
   vtkKWText(const vtkKWText&); // Not implemented
   void operator=(const vtkKWText&); // Not implemented

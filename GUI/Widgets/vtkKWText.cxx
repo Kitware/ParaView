@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.42");
+vtkCxxRevisionMacro(vtkKWText, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -57,7 +57,7 @@ public:
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
 {
-  this->InternalValueString = NULL;
+  this->InternalTextString = NULL;
   this->ReadOnly            = 0;
   this->QuickFormatting     = 0;
 
@@ -67,7 +67,7 @@ vtkKWText::vtkKWText()
 //----------------------------------------------------------------------------
 vtkKWText::~vtkKWText()
 {
-  this->SetInternalValueString(NULL);
+  this->SetInternalTextString(NULL);
 
   // Delete all presets
 
@@ -79,7 +79,7 @@ vtkKWText::~vtkKWText()
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWText::GetValue()
+char *vtkKWText::GetText()
 {
   if (!this->IsCreated())
     {
@@ -88,18 +88,18 @@ char *vtkKWText::GetValue()
 
   const char *val = this->Script("%s get 1.0 {end -1 chars}", 
                                  this->GetWidgetName());
-  this->SetInternalValueString(this->ConvertTclStringToInternalString(val));
-  return this->GetInternalValueString();
+  this->SetInternalTextString(this->ConvertTclStringToInternalString(val));
+  return this->GetInternalTextString();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::SetValue(const char *s)
+void vtkKWText::SetText(const char *s)
 {
-  this->SetValue(s, NULL);
+  this->SetText(s, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::SetValue(const char *s, const char *tag)
+void vtkKWText::SetText(const char *s, const char *tag)
 {
   if (!this->IsCreated() || !s)
     {
@@ -117,17 +117,17 @@ void vtkKWText::SetValue(const char *s, const char *tag)
 
   // Append to the end
 
-  this->AppendValue(s, tag);
+  this->AppendText(s, tag);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::AppendValue(const char *s)
+void vtkKWText::AppendText(const char *s)
 {
-  this->AppendValue(s, NULL);
+  this->AppendText(s, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::AppendValue(const char *s, const char *tag)
+void vtkKWText::AppendText(const char *s, const char *tag)
 {
   if (!this->IsCreated() || !s)
     {
@@ -137,16 +137,16 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
   int state = this->GetState();
   this->SetStateToNormal();
 
-  this->AppendValueInternalTagging(s, tag);
+  this->AppendTextInternalTagging(s, tag);
   
   this->SetState(state);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
+void vtkKWText::AppendTextInternalTagging(const char *str, const char *tag)
 {
   // Don't check for this->Created() for speed, since it is called
-  // by AppendValue which does the check already
+  // by AppendText which does the check already
 
   // In QuickFormatting mode, look for markers, and use tags accordingly
 
@@ -187,7 +187,7 @@ void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
 
         vtksys_stl::string before;
         before.append(str, closest_marker - str);
-        this->AppendValueInternalTagging(before.c_str(), tag);
+        this->AppendTextInternalTagging(before.c_str(), tag);
 
         // Zone inside the marker, using the current tag + the marker's tag
 
@@ -200,13 +200,13 @@ void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
         vtksys_stl::string zone;
         zone.append(closest_marker + len_marker, 
                     end_marker - closest_marker - len_marker);
-        this->AppendValueInternalTagging(zone.c_str(), new_tag.c_str());
+        this->AppendTextInternalTagging(zone.c_str(), new_tag.c_str());
 
         // Text after the marker, using the current tag
 
         vtksys_stl::string after;
         after.append(end_marker + len_marker);
-        this->AppendValueInternalTagging(after.c_str(), tag);
+        this->AppendTextInternalTagging(after.c_str(), tag);
 
         return;
         }
@@ -246,9 +246,9 @@ void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
       vtksys_stl::string after;
       after.append(str + re.end());
 
-      this->AppendValueInternalTagging(before.c_str(), tag);
-      this->AppendValueInternal(zone.c_str(), new_tag.c_str());
-      this->AppendValueInternalTagging(after.c_str(), tag);
+      this->AppendTextInternalTagging(before.c_str(), tag);
+      this->AppendTextInternal(zone.c_str(), new_tag.c_str());
+      this->AppendTextInternalTagging(after.c_str(), tag);
       found_regexp = 1;
       break;
       }
@@ -256,15 +256,15 @@ void vtkKWText::AppendValueInternalTagging(const char *str, const char *tag)
 
   if (!found_regexp)
     {
-    this->AppendValueInternal(str, tag);
+    this->AppendTextInternal(str, tag);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::AppendValueInternal(const char *s, const char *tag)
+void vtkKWText::AppendTextInternal(const char *s, const char *tag)
 {
   // Don't check for this->Created() for speed, since it is called
-  // by AppendValue which does the check already
+  // by AppendText which does the check already
 
   const char *val = this->ConvertInternalStringToTclString(
     s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
@@ -339,6 +339,20 @@ void vtkKWText::SetReadOnly(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWText::SetQuickFormatting(int arg)
+{
+  if (this->QuickFormatting == arg)
+    {
+    return;
+    }
+
+  this->QuickFormatting = arg;
+  this->Modified();
+
+  this->SetText(this->GetText());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWText::SetWidth(int width)
 {
   this->SetConfigurationOptionAsInt("-width", width);
@@ -397,7 +411,7 @@ void vtkKWText::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetState(this->ReadOnly ? this->GetEnabled() : 0);
+  this->SetState(this->ReadOnly ? 0 : this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------

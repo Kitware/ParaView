@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.41");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -145,9 +145,8 @@ void vtkKWTclInteractor::Evaluate()
 
   vtksys_stl::string entry(this->CommandEntry->GetValue());
 
-  this->DisplayText->GetWidget()->AppendValue(entry.c_str(),
-                                 buffer_tag);
-  this->DisplayText->GetWidget()->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendText(entry.c_str(), buffer_tag);
+  this->DisplayText->GetWidget()->AppendText("\n");
 
   this->Script("set commandList [linsert $commandList end [concat {%s}]]",
                entry.c_str());
@@ -165,8 +164,8 @@ void vtkKWTclInteractor::Evaluate()
   this->UnRegister(this);
 
   vtksys_stl::string res(this->Script("set _tmp_err"));
-  this->DisplayText->GetWidget()->AppendValue(res.c_str());
-  this->DisplayText->GetWidget()->AppendValue("\n\n");
+  this->DisplayText->GetWidget()->AppendText(res.c_str());
+  this->DisplayText->GetWidget()->AppendText("\n\n");
 
   this->Script("%s yview end", 
                this->DisplayText->GetWidget()->GetWidgetName());
@@ -177,8 +176,8 @@ void vtkKWTclInteractor::Evaluate()
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::AppendText(const char* text)
 {
-  this->DisplayText->GetWidget()->AppendValue(text);
-  this->DisplayText->GetWidget()->AppendValue("\n");
+  this->DisplayText->GetWidget()->AppendText(text);
+  this->DisplayText->GetWidget()->AppendText("\n");
 }
 
 //----------------------------------------------------------------------------
