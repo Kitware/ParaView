@@ -300,8 +300,8 @@ int my_main(int argc, char *argv[])
   sprintf(buffer, 
           "if [%s HasSelection] {"
           "%s ShowViewUserInterface [%s GetSelection] ; "
-          "%s SetValue $cxx_source([%s GetSelection]) ; "
-          "%s SetValue $tcl_source([%s GetSelection]) } ",
+          "%s SetText $cxx_source([%s GetSelection]) ; "
+          "%s SetText $tcl_source([%s GetSelection]) } ",
           widgets_tree->GetWidget()->GetTclName(),
           win->GetTclName(),
           widgets_tree->GetWidget()->GetTclName(),

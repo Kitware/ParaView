@@ -192,8 +192,8 @@ foreach widget $widgets {
 set cmd {
   if [[widgets_tree GetWidget] HasSelection] {
     win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection]
-    [[tcl_source_text GetWidget] GetWidget] SetValue $tcl_source([[widgets_tree GetWidget] GetSelection]) 
-    [[cxx_source_text GetWidget] GetWidget] SetValue $cxx_source([[widgets_tree GetWidget] GetSelection])
+    [[tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[widgets_tree GetWidget] GetSelection]) 
+    [[cxx_source_text GetWidget] GetWidget] SetText $cxx_source([[widgets_tree GetWidget] GetSelection])
   } 
 }
 
