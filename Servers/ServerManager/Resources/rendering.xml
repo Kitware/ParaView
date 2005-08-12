@@ -1906,8 +1906,9 @@
         <Proxy name="VolumeUpdateSuppressor" 
           proxygroup="filters" proxyname="UpdateSuppressor" />
         <ShareProperties subproxy="UpdateSuppressor">
-          <Exception name="Input" />
+          <Exception name="CacheUpdate" />
           <Exception name="ForceUpdate" />
+          <Exception name="Input" />
           <Exception name="OutputType" />
         </ShareProperties>
       </SubProxy>

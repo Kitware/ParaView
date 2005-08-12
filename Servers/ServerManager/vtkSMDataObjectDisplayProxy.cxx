@@ -36,7 +36,7 @@
 
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
 {
@@ -1046,8 +1046,21 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
     vtkErrorMacro("Objects not created yet.");
     return;
     }
-  vtkSMIntVectorProperty* ivp  = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("CacheUpdate"));
+
+  
+  vtkSMIntVectorProperty* ivp;
+  // Cache at the appropriate update suppressor depending
+  // on if we are rendering volume or polygons.
+  if (this->VolumeRenderMode)
+    {
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->VolumeUpdateSuppressorProxy->GetProperty("CacheUpdate"));
+    }
+  else
+    {
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->UpdateSuppressorProxy->GetProperty("CacheUpdate"));
+    }
   ivp->SetElement(0, idx);
   ivp->SetElement(1, total);
   this->UpdateVTKObjects();
