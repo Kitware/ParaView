@@ -68,6 +68,7 @@ SET(PROJECT_TESTS
   SPCTH
   TestDemo
   TestLookmarks
+  TestMBPlot3D
   TestPackage
   Threshold
   ThresholdAttrMode
