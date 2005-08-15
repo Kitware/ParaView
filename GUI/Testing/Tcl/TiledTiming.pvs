@@ -5,7 +5,7 @@ $kw(vtkTemp24) SetOrientationAxesVisibility 0
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp24) $argv $argc
 
-$Application ExitAfterLoadScriptOff
+# $Application ExitAfterLoadScriptOff
 
 set t0 [clock clicks -milliseconds]
 set FrameLogFile "TiledTiming_FrameLog.txt"
