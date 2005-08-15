@@ -72,7 +72,7 @@ public:
   // orientation should be used. 
   // Valid constants can be found in vtkKWTkOptions::OrientationType.
   virtual void SetOrientation(int);
-  virtual int GetOrientation();
+  vtkGetMacro(Orientation, int);
   virtual void SetOrientationToHorizontal() 
     { this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); };
   virtual void SetOrientationToVertical() 
@@ -197,11 +197,14 @@ protected:
   double       Resolution;
   double       Range[2];
 
+  int Orientation;
+
   // Description:
   // Update internal widgets value
   virtual void UpdateRange();
   virtual void UpdateResolution();
   virtual void UpdateValue();
+  virtual void UpdateOrientation();
 
   //BTX
   friend class vtkKWScaleWithEntry;

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.104");
+vtkCxxRevisionMacro(vtkKWScale, "1.105");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -31,6 +31,7 @@ vtkKWScale::vtkKWScale()
   this->Range[1]   = 100;  
   this->Resolution = 1;
 
+  this->Orientation = vtkKWTkOptions::OrientationHorizontal;
   this->Command      = NULL;
   this->StartCommand = NULL;
   this->EndCommand   = NULL;
@@ -79,11 +80,11 @@ void vtkKWScale::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetOrientationToHorizontal();
   this->ValueVisibilityOff();
   this->SetBorderWidth(2);
   this->SetHighlightThickness(0);
 
+  this->UpdateOrientation();
   this->UpdateResolution();
   this->UpdateRange();
   this->UpdateValue();
@@ -92,17 +93,30 @@ void vtkKWScale::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::SetOrientation(int orientation)
+void vtkKWScale::UpdateOrientation()
 {
-  this->SetConfigurationOption(
-    "-orient", vtkKWTkOptions::GetOrientationAsTkOptionValue(orientation));
+  if (this->IsCreated())
+    {
+    this->SetConfigurationOption(
+      "-orient", vtkKWTkOptions::GetOrientationAsTkOptionValue(
+        this->Orientation));
+    }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWScale::GetOrientation()
+void vtkKWScale::SetOrientation(int orientation)
 {
-  return vtkKWTkOptions::GetOrientationFromTkOptionValue(
-    this->GetConfigurationOption("-orient"));
+  if (this->Orientation == orientation ||
+      (orientation != vtkKWTkOptions::OrientationHorizontal &&
+       orientation != vtkKWTkOptions::OrientationVertical))
+    {
+    return;
+    }
+      
+  this->Orientation = orientation;
+  this->Modified();
+
+  this->UpdateOrientation();
 }
 
 //----------------------------------------------------------------------------
@@ -407,6 +421,7 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Value: " << this->Value << endl;
   os << indent << "Resolution: " << this->Resolution << endl;
+  os << indent << "Orientation: " << this->Orientation << endl;
   os << indent << "Range: " << this->Range[0] << "..." <<  this->Range[1] << endl;
   os << indent << "DisableCommands: "
      << (this->DisableCommands ? "On" : "Off") << endl;
