@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.64");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.65");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -186,7 +186,7 @@ void vtkKWChangeColorButton::Pack()
         this->GetLabel()->IsCreated())
       {
       tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
-             << " -expand y -fill both -anchor w -in " 
+             << " -expand y -fill both -anchor w -padx 2 -in " 
              << this->GetWidgetName() << " -side " << side << endl;
       }
     if (this->ButtonFrame && this->ButtonFrame->IsCreated())
