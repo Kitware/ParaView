@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.98");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.99");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -211,6 +211,12 @@ vtkRenderer* vtkKWRenderWidget::GetNthRenderer(int id)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetNumberOfRenderers()
+{
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWRenderWidget::GetRendererId(vtkRenderer *ren)
 {
   if (!ren || ren != this->Renderer)
@@ -297,7 +303,8 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app)
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid %s -sticky nsew", this->VTKWidget->GetWidgetName());
+  this->Script("grid %s -row 0 -column 0 -sticky nsew", 
+               this->VTKWidget->GetWidgetName());
   
   this->RenderWindow->Render();
 
@@ -335,6 +342,17 @@ void vtkKWRenderWidget::AddBindings()
     this->VTKWidget->SetBinding("<FocusIn>", this, "FocusInCallback");
     this->VTKWidget->SetBinding("<FocusOut>", this, "FocusOutCallback");
     }
+
+  // Many attemps have been made to attach <Configure> to the VTKWidget
+  // instead, this sounds more logical since the side effect of the callback
+  // is to resize the window, but it seems impossible to do so effetively,
+  // the <Configure> event for the VTKWidget is probably called to early
+  // in respect to when we can resize the renderwindow
+  // Both the vtkRenderWindow and vtkTkRenderWidget have callbacks that
+  // react to the window manager's configure event, and as such they
+  // resize the render window properly, but this binding is actually only
+  // a helper in case the whole widget is resized but we do not want
+  // to explicitly 'update' or Render.
 
   this->SetBinding("<Configure>", this, "Configure %w %h");
   
@@ -953,15 +971,13 @@ void vtkKWRenderWidget::SetRendererBackgroundColor(double r, double g, double b)
     return;
     }
   
-  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
-  if (renderers)
+  int nb_renderers = this->GetNumberOfRenderers();
+  for (int i = 0; i < nb_renderers; i++)
     {
-    renderers->InitTraversal();
-    vtkRenderer *renderer = renderers->GetNextItem();
-    while (renderer)
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
       {
       renderer->SetBackground(r, g, b);
-      renderer = renderers->GetNextItem();
       }
     }
 
@@ -971,11 +987,10 @@ void vtkKWRenderWidget::SetRendererBackgroundColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double *b)
 {
-  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
-  if (renderers)
+  int nb_renderers = this->GetNumberOfRenderers();
+  for (int i = 0; i < nb_renderers; i++)
     {
-    renderers->InitTraversal();
-    vtkRenderer *renderer = renderers->GetNextItem();
+    vtkRenderer *renderer = this->GetNthRenderer(i);
     if (renderer)
       {
       renderer->GetBackground(*r, *g, *b);

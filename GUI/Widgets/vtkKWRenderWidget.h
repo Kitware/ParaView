@@ -210,6 +210,7 @@ public:
   // does not belong to this widget)
   virtual vtkRenderer* GetRenderer() { return this->GetNthRenderer(0); }
   virtual vtkRenderer* GetNthRenderer(int id);
+  virtual int GetNumberOfRenderers();
   virtual int GetRendererId(vtkRenderer*);
   virtual vtkRenderer* GetOverlayRenderer();
 
