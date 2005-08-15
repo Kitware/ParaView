@@ -23,6 +23,7 @@
 
 #include "vtkSMDisplayProxy.h"
 
+class vtkSMSourceProxy;
 class VTK_EXPORT vtkSMConsumerDisplayProxy : public vtkSMDisplayProxy
 {
 public:
