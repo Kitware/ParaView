@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.51");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.52");
 
 
 //*****************************************************************************
@@ -1994,9 +1994,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
   vtkPVSelectWidget *selectWidget;
   vtkPVMinMax *minMaxWidget;
   vtkPVThumbWheel *thumbWheel;
-#ifdef PARAVIEW_USE_EXODUS
   vtkPVBasicDSPFilterWidget *dspWidget;
-#endif
 
   vtkPVWidget *pvWidget;
   vtkstd::string ptr;
@@ -2015,9 +2013,7 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
   char ThirdToken_WrappedString[] = "%*s %*s {%[^}]";
   char ThirdToken_OptionalWrappedString[] = "%*s %*s %*[{\"]%[^}\"]";
   char ThirdThruEighthToken_String[] = "%*s %*s %s %s %s %s %s %s";
-#ifdef PARAVIEW_USE_EXODUS
   char ThirdToken_String[] = "%*s %*s %s";
-#endif
   char ThirdToken_RightBracketedString[] = "%*s %*s %[^]] %*s %*s %*s";
   char FifthAndSixthToken_IntAndInt[] = "%*s %*s %*s %*s %d %d";
   char FifthAndSixthToken_IntAndFloat[] = "%*s %*s %*s %*s %d %lf";
@@ -2200,7 +2196,6 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
           ptr.assign(*(++tokIter));
           }
         }
-#ifdef PARAVIEW_USE_EXODUS
       else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
         {
         ptr.assign(*(++tokIter));
@@ -2214,7 +2209,6 @@ void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vect
         dspWidget->SetFilterLength(atoi(sval));
         ptr.assign(*(++tokIter));
         }
-#endif
       else   //if we do not support this widget yet, advance and break loop
         {
         ptr.assign(*(++tokIter));

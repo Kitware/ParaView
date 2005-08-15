@@ -47,9 +47,7 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVMinMax.h"
-#ifdef PARAVIEW_USE_EXODUS
 #include "vtkPVBasicDSPFilterWidget.h"
-#endif
 #include "vtkPVGUIClientOptions.h"
 
 #include "vtkKWMenuButton.h"
@@ -119,7 +117,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.61");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.62");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()

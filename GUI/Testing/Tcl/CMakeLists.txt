@@ -76,6 +76,7 @@ SET(PROJECT_TESTS
   VectorTextSpace
   Write
   Tessellate
+  TestExodus
   TestComparativeVis
   TestPolyDataIO
   TestUnstructuredGridIO
@@ -91,14 +92,6 @@ SET(PROJECT_TESTS
   XdmfReadRectilinearGridCollection
 #  TestAnimationSaveLoad
   )
-
-IF(PARAVIEW_USE_EXODUS)
-  SET(PROJECT_TESTS
-    ${PROJECT_TESTS}
-    TestExodus
-    )
-ENDIF(PARAVIEW_USE_EXODUS)
-
 
 # some tests require MPI because the classes do not get built otherwise
 IF(VTK_USE_MPI)
