@@ -20,10 +20,11 @@
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/list>
+#include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWHistogramSet);
-vtkCxxRevisionMacro(vtkKWHistogramSet, "1.6");
+vtkCxxRevisionMacro(vtkKWHistogramSet, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWHistogramSetInternals
