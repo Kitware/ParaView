@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.38");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1365,6 +1365,16 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
   int nb_widgets_in_group = this->GetNumberOfWidgetsWithGroup(group);
   int row, col, i;
 
+  int sel_row, sel_col;
+  vtkKWSelectionFrame *old_selection = this->GetSelectedWidget();
+  if (old_selection)
+    {
+    this->GetWidgetPosition(old_selection, &sel_col, &sel_row);
+    }
+
+  // Inspect all selection frame, and check if they already display the group
+  // we want to make visible
+
   for (row = 0; row < this->Resolution[1]; row++)
     {
     for (col = 0; col < this->Resolution[0]; col++)
@@ -1375,6 +1385,9 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
         const char *widget_group = this->GetWidgetGroup(widget);
         if (widget_group && strcmp(widget_group, group))
           {
+          // The selection frame is not the right group, look for another one
+          // with the right group, and exchange both
+
           for (i = 0; i < nb_widgets_in_group; i++)
             {
             vtkKWSelectionFrame *new_widget = 
@@ -1394,6 +1407,17 @@ int vtkKWSelectionFrameLayoutManager::ShowWidgetsWithGroup(const char *group)
             }
           }
         }
+      }
+    }
+
+  // Restore the selection
+
+  if (old_selection)
+    {
+    vtkKWSelectionFrame *atpos = this->GetWidgetAtPosition(sel_col, sel_row);
+    if (atpos && atpos != old_selection)
+      {
+      this->SelectWidget(atpos);
       }
     }
 
