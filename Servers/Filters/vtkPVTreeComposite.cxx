@@ -51,7 +51,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.60");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.61");
 
 
 //=========================================================================
@@ -665,7 +665,7 @@ void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren,
   bounds[1] = bounds[3] = bounds[5] = -VTK_DOUBLE_MAX;
   
   // Are there any pickable visible props?
-  props = ren->GetProps();
+  props = ren->GetViewProps();
   numProps = props->GetNumberOfItems();
   for (props->InitTraversal(); (prop = props->GetNextProp()); )
     {
