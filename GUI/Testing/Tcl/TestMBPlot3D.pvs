@@ -54,7 +54,11 @@ $pvDisp(vtkTemp1076) UpdateVTKObjects
 
 $kw(vtkTemp75) SetCameraState 14.8701 -4.18591 51.0991 1.4911 4.28009 8.02658 -0.929357 0.177703 0.3236
 
+# Threshold 10 is too small on some platforms. This is due to
+# the orientation axis not being on batch.
+set batchThreshold 15
+
 source [file join [file dirname [info script]] Compare.tcl]
-Compare $Application $argv $argc 15
+Compare $Application $argv $argc
 
 $Application Exit

@@ -1,4 +1,6 @@
 proc Compare {Application argv argc {threshold 10}} {
+   global batchThreshold
+
    # Fix the size of the image.
    set MainView [[$Application GetMainWindow] GetMainView]
    $MainView SetRenderWindowSize 300 300
