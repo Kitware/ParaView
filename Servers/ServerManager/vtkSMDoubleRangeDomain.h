@@ -113,6 +113,11 @@ public:
   void RemoveAllResolutions();
 
   // Description:
+  // Update self checking the "unchecked" values of all required
+  // properties. Overwritten by sub-classes.
+  virtual void Update(vtkSMProperty*);
+  
+  // Description:
   // Set the value of an element of a property from the animation editor.
   virtual void SetAnimationValue(vtkSMProperty *property, int idx,
                                  double value);
