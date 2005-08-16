@@ -1,16 +1,10 @@
-proc CompareImage { view } {
+proc CompareImage { view {threshold 10}} {
    global argc argv
 
    vtkKWTesting testing
    testing SetRenderView $view
    for {set i 1} {$i < $argc} {incr i} {
      testing AddArgument "[lindex $argv $i]"
-   }
-
-   set threshold -1
-   
-   if {$threshold == -1} {
-      set threshold 10
    }
 
    set res [ testing RegressionTest ${threshold} ]

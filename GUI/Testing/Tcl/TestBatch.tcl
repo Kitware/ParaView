@@ -28,10 +28,13 @@ if { ![$Application GetExitStatus] } {
             }
         }
 
+        if {![info exists batchThreshold]} {
+            set batchThreshold 10
+        }
         for {set i  1} {$i < [expr $argc - 1]} {incr i} {
             if {[lindex $argv $i] == "-BC"} {
                 source [lindex $argv [expr $i + 1]]
-                $Application SetExitStatus [ComparePNG $batchName $batchValid]
+                $Application SetExitStatus [ComparePNG $batchName $batchValid $batchThreshold]
             }
         }
         catch { file delete -force "$batchName.png" }
