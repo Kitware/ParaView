@@ -21,6 +21,7 @@
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWHistogramSet.h"
@@ -49,7 +50,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.22");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.23");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   // GUI
 
   this->EditorFrame                     = vtkKWFrameWithLabel::New();
+
+  this->InnerLeftFrame                  = vtkKWFrame::New();
 
   this->InterpolationTypeOptionMenu     = vtkKWMenuButtonWithLabel::New();
 
@@ -139,6 +142,12 @@ vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
     {
     this->EditorFrame->Delete();
     this->EditorFrame = NULL;
+    }
+
+  if (this->InnerLeftFrame)
+    {
+    this->InnerLeftFrame->Delete();
+    this->InnerLeftFrame = NULL;
     }
 
   if (this->ComponentSelectionWidget)
@@ -255,9 +264,15 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   vtkKWFrame *frame = this->EditorFrame->GetFrame();
 
   // --------------------------------------------------------------
+  // Inner frame
+
+  this->InnerLeftFrame->SetParent(frame);
+  this->InnerLeftFrame->Create(app);
+
+  // --------------------------------------------------------------
   // Component selection
 
-  this->ComponentSelectionWidget->SetParent(frame);
+  this->ComponentSelectionWidget->SetParent(this->InnerLeftFrame);
   this->ComponentSelectionWidget->Create(app);
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
@@ -275,7 +290,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->InterpolationTypeOptionMenu = vtkKWMenuButtonWithLabel::New();
     }
 
-  this->InterpolationTypeOptionMenu->SetParent(frame);
+  this->InterpolationTypeOptionMenu->SetParent(this->InnerLeftFrame);
   this->InterpolationTypeOptionMenu->Create(app);
   this->InterpolationTypeOptionMenu->ExpandWidgetOff();
   this->InterpolationTypeOptionMenu->GetLabel()->SetText("Interpolation:");
@@ -297,7 +312,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Enable shading
 
-  this->EnableShadingCheckButton->SetParent(frame);
+  this->EnableShadingCheckButton->SetParent(this->InnerLeftFrame);
   this->EnableShadingCheckButton->Create(app);
   this->EnableShadingCheckButton->SetText("Enable Shading");
   this->EnableShadingCheckButton->SetBalloonHelpString(
@@ -308,7 +323,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Material properties : widget
 
-  this->MaterialPropertyWidget->SetParent(frame);
+  this->MaterialPropertyWidget->SetParent(this->InnerLeftFrame);
   this->MaterialPropertyWidget->PopupModeOn();
   this->MaterialPropertyWidget->Create(app);
   this->MaterialPropertyWidget->GetPopupButton()->SetLabelWidth(label_width);
@@ -322,7 +337,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Interactive Apply
 
-  this->InteractiveApplyCheckButton->SetParent(frame);
+  this->InteractiveApplyCheckButton->SetParent(this->InnerLeftFrame);
   this->InteractiveApplyCheckButton->Create(app);
   this->InteractiveApplyCheckButton->SetText("Interactive Apply");
   this->InteractiveApplyCheckButton->SetBalloonHelpString(
@@ -586,6 +601,8 @@ void vtkKWVolumePropertyWidget::Pack()
   vtkKWFrame *frame = this->EditorFrame->GetFrame();
   frame->UnpackChildren();
 
+  this->InnerLeftFrame->UnpackChildren();
+
   int row = 0;
 
   const char *colspan = " -columnspan 2 ";
@@ -603,70 +620,63 @@ void vtkKWVolumePropertyWidget::Pack()
          |     SC        HSV
          |     IT         |
          |     MP         |
-         |     IA         |
          |     ES         |
-         |     SC         |
-         |     LOC        |
-         |     WL         | 
-         |     DGO        v
+         |     IA         v
          |     SOF ------->
          |     CTF ------->
          |     GOF ------->
          |     CW  ------->
   */
 
+  // Inner Frame
+
+
+  tk_cmd << "grid " << this->InnerLeftFrame->GetWidgetName()
+         << " -padx 0 -pady 0 -sticky nw " << col0 << " -row " << row << endl;
+  
   // HSV Color Selector (HSV)
 
   tk_cmd << "grid " << this->HSVColorSelector->GetWidgetName()
          << " -sticky nw " << col1 << " -row " << row << pad << endl;
-  
+
   // Select Component (SC)
 
   if (this->ComponentSelectionVisibility)
     {
-    tk_cmd << "grid " << this->ComponentSelectionWidget->GetWidgetName()
-           << " -sticky nw " << col0 << " -row " << row << pad << endl;
-
-    row++;
+    tk_cmd << "pack " << this->ComponentSelectionWidget->GetWidgetName()
+           << " -side top -anchor nw " << pad << endl;
     }
 
   // Interpolation type (IT)
 
   if (this->InterpolationTypeVisibility)
     {
-    tk_cmd << "grid " << this->InterpolationTypeOptionMenu->GetWidgetName()
-           << " -sticky nw " << col0 << " -row " << row << pad
-           << endl;
-    row++;
+    tk_cmd << "pack " << this->InterpolationTypeOptionMenu->GetWidgetName()
+           << " -side top -anchor nw " << pad << endl;
     }
 
   // Material Property (MP)
 
   if (this->MaterialPropertyVisibility)
     {
-    tk_cmd << "grid " << this->MaterialPropertyWidget->GetWidgetName()
-           << " -sticky nw " << col0 << " -row " << row << pad << endl;
-    row++;
+    tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
+           << " -side top -anchor nw " << pad << endl;
     }
 
   // Enable Shading (ES)
 
   if (this->MaterialPropertyVisibility)
     {
-    tk_cmd << "grid " << this->EnableShadingCheckButton->GetWidgetName()
-           << " -sticky nw " << col0 << " -row " << row << pad << endl;
-    row++;
+    tk_cmd << "pack " << this->EnableShadingCheckButton->GetWidgetName()
+           << " -side top -anchor nw " << pad << endl;
     }
 
   // Interactive Apply (IA)
 
-  tk_cmd << "grid " << this->InteractiveApplyCheckButton->GetWidgetName()
-         << " -sticky nw " << col0 << " -row " << row << pad << endl;
+  tk_cmd << "pack " << this->InteractiveApplyCheckButton->GetWidgetName()
+         << " -side top -anchor nw " << pad << endl;
 
   row++;
-
-  tk_cmd << "grid " << this->HSVColorSelector->GetWidgetName()
-         << " -rowspan " << row << endl;
 
   // --------------------------------------------------------------
 
@@ -811,9 +821,17 @@ void vtkKWVolumePropertyWidget::Update()
       }
     if (EnableShadingCheckButton->IsCreated())
       {
-      tk_cmd << "grid " 
-             << (this->EnableShadingForAllComponents ? "" : "remove")
-            << " " << this->EnableShadingCheckButton->GetWidgetName() << endl;
+      if (this->EnableShadingForAllComponents)
+        {
+        tk_cmd << "pack "
+               << this->EnableShadingCheckButton->GetWidgetName() 
+               << " -side top -anchor nw" << endl;
+        }
+      else
+        {
+        tk_cmd << "pack forget "
+               << this->EnableShadingCheckButton->GetWidgetName() << endl;
+        }
       }
     }
   if (this->EnableShadingForAllComponents && has_prop)
@@ -1177,6 +1195,7 @@ void vtkKWVolumePropertyWidget::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->EditorFrame);
+  this->PropagateEnableState(this->InnerLeftFrame);
   this->PropagateEnableState(this->ComponentSelectionWidget);
   this->PropagateEnableState(this->InterpolationTypeOptionMenu);
   this->PropagateEnableState(this->InteractiveApplyCheckButton);
@@ -2008,6 +2027,16 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << endl;
     this->HistogramSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "HSVColorSelector: ";
+  if (this->HSVColorSelector)
+    {
+    os << endl;
+    this->HSVColorSelector->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {

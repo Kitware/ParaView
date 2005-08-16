@@ -28,6 +28,7 @@ class vtkKWCheckButton;
 class vtkKWColorTransferFunctionEditor;
 class vtkKWHSVColorSelector;
 class vtkKWHistogramSet;
+class vtkKWFrame;
 class vtkKWFrameWithLabel;
 class vtkKWMenuButtonWithLabel;
 class vtkKWScaleWithEntrySetWithLabel;
@@ -170,6 +171,7 @@ public:
   vtkGetObjectMacro(ScalarColorFunctionEditor, vtkKWColorTransferFunctionEditor);
   vtkGetObjectMacro(GradientOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
   vtkGetObjectMacro(ScalarOpacityUnitDistanceScale, vtkKWScaleWithEntry);
+  vtkGetObjectMacro(HSVColorSelector, vtkKWHSVColorSelector);
  
   // Description:
   // Pack or repack the UI
@@ -211,10 +213,11 @@ protected:
   
   // GUI
 
-  vtkKWFrameWithLabel                   *EditorFrame;
+  vtkKWFrameWithLabel                 *EditorFrame;
   vtkKWHSVColorSelector               *HSVColorSelector;
+  vtkKWFrame                          *InnerLeftFrame;
   vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
-  vtkKWMenuButtonWithLabel              *InterpolationTypeOptionMenu;
+  vtkKWMenuButtonWithLabel            *InterpolationTypeOptionMenu;
   vtkKWVolumeMaterialPropertyWidget   *MaterialPropertyWidget;
   vtkKWCheckButton                    *EnableShadingCheckButton;
   vtkKWCheckButton                    *InteractiveApplyCheckButton;
