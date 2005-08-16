@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.100");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.101");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -896,7 +896,7 @@ int vtkKWRenderWidget::HasViewProp(vtkProp *prop)
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
   if ((ren && ren->GetProps()->IsItemPresent(prop)) ||
-      (overlay_ren && overlay_ren->GetProps()->IsItemPresent(prop)))
+      (overlay_ren && overlay_ren->GetViewProps()->IsItemPresent(prop)))
     {
     return 1;
     }
@@ -928,13 +928,13 @@ void vtkKWRenderWidget::RemoveAllViewProps()
   vtkRenderer *ren = this->GetRenderer();
   if (ren)
     {
-    ren->RemoveAllProps();
+    ren->RemoveAllViewProps();
     }
 
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
   if (overlay_ren)
     {
-    overlay_ren->RemoveAllProps();
+    overlay_ren->RemoveAllViewProps();
     }
 }
 
