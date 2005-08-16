@@ -71,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.54");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.55");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -80,6 +80,8 @@ vtkCxxRevisionMacro(vtkPVAnimationScene, "1.54");
 #define VTK_PV_DURATION_SEQUENCE_TIP   "Adjust the number of frames in the animation."
 #define VTK_PV_DURATION_REALTIME_LABEL "Duration:"
 #define VTK_PV_DURATION_REALTIME_TIP  "Adjust the duration for the animation (in seconds)."
+#define VTK_PV_TIME_SEQUENCE_LABEL "Current Frame:"
+#define VTK_PV_TIME_REALTIME_LABEL "Current Time:"
   
 
 //*****************************************************************************
@@ -338,7 +340,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app)
   // Animation Control: Time scale
   this->TimeLabel->SetParent(this);
   this->TimeLabel->Create(app);
-  this->TimeLabel->SetText("Current Time:");
+  //this->TimeLabel->SetText("Current Time:");
 
   this->TimeScale->SetParent(this);
   this->TimeScale->Create(app);
@@ -812,6 +814,8 @@ void vtkPVAnimationScene::SetInterpretDurationAsFrameMax(int val)
   
   this->DurationLabel->SetText(label);
   this->DurationThumbWheel->SetBalloonHelpString(tip);
+  this->TimeLabel->SetText( (this->InterpretDurationAsFrameMax)?
+    VTK_PV_TIME_SEQUENCE_LABEL : VTK_PV_TIME_REALTIME_LABEL);
 }
 
 //-----------------------------------------------------------------------------
