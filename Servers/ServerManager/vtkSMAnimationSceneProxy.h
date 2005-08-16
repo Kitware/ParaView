@@ -30,7 +30,7 @@ class vtkCollection;
 class vtkCollectionIterator;
 class vtkSMRenderModuleProxy;
 class vtkImageWriter;
-class vtkKWGenericMovieWriter;
+class vtkGenericMovieWriter;
 class vtkWindowToImageFilter;
 
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMAnimationCueProxy
@@ -125,7 +125,7 @@ protected:
 
   // Stuff for saving Animation Images.
   vtkImageWriter* ImageWriter;
-  vtkKWGenericMovieWriter* MovieWriter;
+  vtkGenericMovieWriter* MovieWriter;
   vtkWindowToImageFilter* WindowToImageFilter;
   char* FileRoot;
   char* FileExtension;
