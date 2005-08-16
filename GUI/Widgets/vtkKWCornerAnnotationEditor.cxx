@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -415,7 +415,7 @@ int vtkKWCornerAnnotationEditor::GetVisibility()
   return (this->CornerAnnotation &&
           this->CornerAnnotation->GetVisibility() &&
           this->RenderWidget &&
-          this->RenderWidget->HasProp(this->CornerAnnotation)) ? 1 : 0;
+          this->RenderWidget->HasViewProp(this->CornerAnnotation)) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------

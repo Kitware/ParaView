@@ -102,7 +102,7 @@ int my_main(int argc, char *argv[])
 
   // Add the actor to the scene
 
-  rw->AddProp(actor);
+  rw->AddViewProp(actor);
   rw->ResetCamera();
 
   // Start the application

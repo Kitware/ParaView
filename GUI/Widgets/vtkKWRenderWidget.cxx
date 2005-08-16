@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.99");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.100");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -871,7 +871,7 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AddProp(vtkProp *prop)
+void vtkKWRenderWidget::AddViewProp(vtkProp *prop)
 {
   vtkRenderer *ren = this->GetRenderer();
   if (ren)
@@ -881,7 +881,7 @@ void vtkKWRenderWidget::AddProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
+void vtkKWRenderWidget::AddOverlayViewProp(vtkProp *prop)
 {
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
   if (overlay_ren)
@@ -891,7 +891,7 @@ void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRenderWidget::HasProp(vtkProp *prop)
+int vtkKWRenderWidget::HasViewProp(vtkProp *prop)
 {
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
@@ -905,25 +905,7 @@ int vtkKWRenderWidget::HasProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-# undef RemoveProp
-// Define possible mangled names.
-void vtkKWRenderWidget::RemovePropA(vtkProp* p)
-{
-  this->RemovePropInternal(p);
-}
-void vtkKWRenderWidget::RemovePropW(vtkProp* p)
-{
-  this->RemovePropInternal(p);
-}
-#endif
-void vtkKWRenderWidget::RemoveProp(vtkProp* p)
-{
-  this->RemovePropInternal(p);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
+void vtkKWRenderWidget::RemoveViewProp(vtkProp* prop)
 {
   // safe to call both, vtkViewport does a check first
 
@@ -941,7 +923,7 @@ void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveAllProps()
+void vtkKWRenderWidget::RemoveAllViewProps()
 {
   vtkRenderer *ren = this->GetRenderer();
   if (ren)
@@ -1002,7 +984,7 @@ void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Close()
 {
-  this->RemoveAllProps();
+  this->RemoveAllViewProps();
 
   this->RemoveBindings();
 
@@ -1025,7 +1007,7 @@ void vtkKWRenderWidget::SetAnnotationsVisibility(int v)
 int vtkKWRenderWidget::GetCornerAnnotationVisibility()
 {
   return (this->CornerAnnotation &&
-          this->HasProp(this->CornerAnnotation) && 
+          this->HasViewProp(this->CornerAnnotation) && 
           this->CornerAnnotation->GetVisibility());
 }
 
@@ -1040,17 +1022,17 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
   if (v)
     {
     this->CornerAnnotation->VisibilityOn();
-    if (!this->HasProp(this->CornerAnnotation))
+    if (!this->HasViewProp(this->CornerAnnotation))
       {
-      this->AddOverlayProp(this->CornerAnnotation);
+      this->AddOverlayViewProp(this->CornerAnnotation);
       }
     }
   else
     {
     this->CornerAnnotation->VisibilityOff();
-    if (this->HasProp(this->CornerAnnotation))
+    if (this->HasViewProp(this->CornerAnnotation))
       {
-      this->RemoveProp(this->CornerAnnotation);
+      this->RemoveViewProp(this->CornerAnnotation);
       }
     }
 
@@ -1096,7 +1078,7 @@ double* vtkKWRenderWidget::GetCornerAnnotationColor()
 int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
 {
   return (this->HeaderAnnotation && 
-          this->HasProp(this->HeaderAnnotation) && 
+          this->HasViewProp(this->HeaderAnnotation) && 
           this->HeaderAnnotation->GetVisibility());
 }
 
@@ -1111,17 +1093,17 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
   if (v)
     {
     this->HeaderAnnotation->VisibilityOn();
-    if (!this->HasProp(this->HeaderAnnotation))
+    if (!this->HasViewProp(this->HeaderAnnotation))
       {
-      this->AddOverlayProp(this->HeaderAnnotation);
+      this->AddOverlayViewProp(this->HeaderAnnotation);
       }
     }
   else
     {
     this->HeaderAnnotation->VisibilityOff();
-    if (this->HasProp(this->HeaderAnnotation))
+    if (this->HasViewProp(this->HeaderAnnotation))
       {
-      this->RemoveProp(this->HeaderAnnotation);
+      this->RemoveViewProp(this->HeaderAnnotation);
       }
     }
 

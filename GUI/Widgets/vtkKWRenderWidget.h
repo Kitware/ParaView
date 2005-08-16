@@ -100,30 +100,14 @@ public:
   
   // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
-  virtual void AddProp(vtkProp *prop);
-  virtual void AddOverlayProp(vtkProp *prop);
-  virtual int  HasProp(vtkProp *prop);
-  virtual void RemoveAllProps();
-
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-  // Avoid windows name mangling.
-# define RemovePropA RemoveProp
-# define RemovePropW RemoveProp
-#endif
+  virtual void AddViewProp(vtkProp *prop);
+  virtual void AddOverlayViewProp(vtkProp *prop);
+  virtual int  HasViewProp(vtkProp *prop);
+  virtual void RemoveAllViewProps();
 
   // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
-  void RemoveProp(vtkProp *prop);
-
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-# undef RemovePropA
-# undef RemovePropW
-  //BTX
-  // Define possible mangled names.
-  void RemovePropA(vtkProp*);
-  void RemovePropW(vtkProp*);
-  //ETX
-#endif
+  virtual void RemoveViewProp(vtkProp *prop);
 
   // Description:
   // Set the widget background color
@@ -301,8 +285,6 @@ protected:
   vtkCallbackCommand *Observer;
   int EventIdentifier;
   
-  virtual void RemovePropInternal(vtkProp* prop);
-
   // Description:
   // Callback commmand. Pass the parameters to the virtual ProcessEvent method
   static void ProcessEventFunction(
