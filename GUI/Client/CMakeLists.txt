@@ -290,8 +290,7 @@ TARGET_LINK_LIBRARIES(vtkKWParaView
   ${KWCommon_LIBRARIES} 
   ${KWWidgets_LIBRARIES} 
   vtkPVServerManagerTCL 
-  vtkPVServerCommonTCL 
-  vtkMPEG2Encode)
+  vtkPVServerCommonTCL)
 
 CONFIGURE_FILE(
   ${PVGUI_SOURCE_DIR}/Client/vtkPVSourceInterfaceDirectories.h.in

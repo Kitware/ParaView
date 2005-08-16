@@ -413,7 +413,6 @@ SET(VTKMPEG2_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(VTKMPEG2_INCLUDE_DIRS
   "${ParaView_SOURCE_DIR}/Utilities/vtkmpeg2"
   "${ParaView_BINARY_DIR}/Utilities/vtkmpeg2")
-SUBDIRS(Utilities/vtkmpeg2)
 
 #########################################################################
 # Configure IceT

@@ -39,28 +39,11 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET( KWCommon_SRCS
   vtkContainer.cxx
   vtkKWArguments.cxx
-  vtkKWGenericMovieWriter.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRemoteExecute.cxx
   vtkKWSerializer.cxx
   vtkQueue.cxx
   )
-
-# include mpeg2 writer if the mpeg2 lib has been defined
-IF (DEFINED vtkMPEG2Encode_INCLUDE_PATH)
-  SET( KWCommon_SRCS ${KWCommon_SRCS} vtkMPEG2Writer.cxx)
-  INCLUDE_DIRECTORIES(${vtkMPEG2Encode_INCLUDE_PATH})
-  SET( KWCommon_LINK_LIBS ${KWCommon_LINK_LIBS} vtkMPEG2Encode)
-ENDIF (DEFINED vtkMPEG2Encode_INCLUDE_PATH)
-
-IF (WIN32)
-  SET( KWCommon_SRCS ${KWCommon_SRCS} 
-    vtkAVIWriter.cxx
-    )
-  SET( KWCommon_LINK_LIBS ${KWCommon_LINK_LIBS} vfw32)
-ELSE (WIN32)
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-ENDIF (WIN32)
 
 IF(VTK_ZLIB_INCLUDE_DIRS)
   INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
