@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.2");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -143,8 +143,8 @@ void vtkKWTkcon::Create(vtkKWApplication *app)
 
   // Remove some dangerous entries
 
-  int i, nb_items;
-  for (i = 0; i < sizeof(menus) / sizeof(menus[0]); i++)
+  int nb_items;
+  for (size_t i = 0; i < sizeof(menus) / sizeof(menus[0]); i++)
     {
     menus[i]->DeleteMenuItem("Console");
 
