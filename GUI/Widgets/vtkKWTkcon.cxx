@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.1");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -107,6 +107,7 @@ void vtkKWTkcon::Create(vtkKWApplication *app)
          << "set tkcon::PRIV(protocol) {tkcon hide}" << endl
          << "set tkcon::OPT(showstatusbar) 0" << endl
          << "set tkcon::OPT(exec) \"\"" << endl
+         << "proc ::tkcon::InitInterp {name type} {}" << endl
          << "tkcon::Init" << endl
          << endl;
 
@@ -127,14 +128,55 @@ void vtkKWTkcon::Create(vtkKWApplication *app)
   this->Internals->MainMenu = vtkKWMenu::New();
   this->Internals->MainMenu->SetWidgetName(name.c_str());
   this->Internals->MainMenu->vtkKWCoreWidget::Create(app);
-  this->Internals->MainMenu->DeleteMenuItem("Console");
 
   name = this->Script("set ::tkcon::PRIV(menubar)");
   name += ".pop";
   this->Internals->PopupMenu = vtkKWMenu::New();
   this->Internals->PopupMenu->SetWidgetName(name.c_str());
   this->Internals->PopupMenu->vtkKWCoreWidget::Create(app);
-  this->Internals->PopupMenu->DeleteMenuItem("Console");
+
+  vtkKWMenu *menus[] = 
+    {
+      this->Internals->MainMenu,
+      this->Internals->PopupMenu
+    };
+
+  // Remove some dangerous entries
+
+  int i, nb_items;
+  for (i = 0; i < sizeof(menus) / sizeof(menus[0]); i++)
+    {
+    menus[i]->DeleteMenuItem("Console");
+
+    vtkKWMenu *filemenu = vtkKWMenu::New();
+    name = menus[i]->GetWidgetName();
+    name += ".file";
+    filemenu->SetParent(menus[i]);
+    filemenu->SetWidgetName(name.c_str());
+    filemenu->vtkKWCoreWidget::Create(app);
+    nb_items = filemenu->GetNumberOfItems();
+    filemenu->DeleteMenuItem(nb_items - 1); // Quit
+    filemenu->DeleteMenuItem(nb_items - 2); // separator
+    filemenu->DeleteMenuItem("Quit"); // to make sure
+    filemenu->Delete();
+
+    /*
+    // No effect because the Interp menu is built on the fly
+    // Let's redefine ::tkcon::InitInterp to empty proc instead (see above)
+
+    vtkKWMenu *interpmenu = vtkKWMenu::New();
+    name = menus[i]->GetWidgetName();
+    name += ".interp";
+    interpmenu->SetParent(menus[i]);
+    interpmenu->SetWidgetName(name.c_str());
+    interpmenu->vtkKWCoreWidget::Create(app);
+    nb_items = interpmenu->GetNumberOfItems();
+    interpmenu->DeleteMenuItem(nb_items - 1); // Send tkcon commands
+    interpmenu->DeleteMenuItem(nb_items - 2); // separator
+    interpmenu->DeleteMenuItem("Send tkcon Commands"); // to make sure
+    interpmenu->Delete();
+    */
+    }
 
   this->PostCreate();
 }
