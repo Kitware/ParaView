@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.30");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.31");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1289,6 +1289,7 @@ void vtkKWWindowBase::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::UpdateMenuState()
 {
+  this->PropagateEnableState(this->Menu);
   this->PropagateEnableState(this->FileMenu);
   this->PropagateEnableState(this->EditMenu);
   this->PropagateEnableState(this->ViewMenu);
