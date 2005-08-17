@@ -45,7 +45,7 @@ const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.265");
+vtkCxxRevisionMacro(vtkKWWindow, "1.266");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -1095,11 +1095,13 @@ void vtkKWWindow::UpdateMenuState()
     int idx = -1;
     if (this->WindowMenu->HasItem(vtkKWWindow::HideMainPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndexOfItem(vtkKWWindow::HideMainPanelMenuLabel);
+      idx = this->WindowMenu->GetIndexOfItem(
+        vtkKWWindow::HideMainPanelMenuLabel);
       }
     else if (this->WindowMenu->HasItem(vtkKWWindow::ShowMainPanelMenuLabel))
       {
-      idx = this->WindowMenu->GetIndexOfItem(vtkKWWindow::ShowMainPanelMenuLabel);
+      idx = this->WindowMenu->GetIndexOfItem(
+        vtkKWWindow::ShowMainPanelMenuLabel);
       }
     if (idx >= 0)
       {
