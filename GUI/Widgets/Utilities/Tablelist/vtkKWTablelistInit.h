@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTablelist.h
+  Module:    vtkKWTablelistInit.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,22 +11,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWTablelist - class used to initialize Tablelist
+// .NAME vtkKWTablelistInit - class used to initialize Tablelist
 // .SECTION Description
 // This class is used to initialize the Tablelist library.
 
-#ifndef __vtkKWTablelist_h
-#define __vtkKWTablelist_h
+#ifndef __vtkKWTablelistInit_h
+#define __vtkKWTablelistInit_h
 
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 #include "vtkTcl.h" // Needed for Tcl interpreter
 
-class KWWIDGETS_EXPORT vtkKWTablelist : public vtkObject
+class KWWIDGETS_EXPORT vtkKWTablelistInit : public vtkObject
 {
 public:
-  static vtkKWTablelist* New();
-  vtkTypeRevisionMacro(vtkKWTablelist,vtkObject);
+  static vtkKWTablelistInit* New();
+  vtkTypeRevisionMacro(vtkKWTablelistInit,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -34,8 +34,8 @@ public:
   static void Initialize(Tcl_Interp*);
 
 protected:
-  vtkKWTablelist() {};
-  ~vtkKWTablelist() {};
+  vtkKWTablelistInit() {};
+  ~vtkKWTablelistInit() {};
 
   static void Execute(Tcl_Interp* interp, 
                       const unsigned char *buffer, 
@@ -45,8 +45,8 @@ protected:
   static int Initialized;
 
 private:
-  vtkKWTablelist(const vtkKWTablelist&);   // Not implemented.
-  void operator=(const vtkKWTablelist&);  // Not implemented.
+  vtkKWTablelistInit(const vtkKWTablelistInit&);   // Not implemented.
+  void operator=(const vtkKWTablelistInit&);  // Not implemented.
 };
 
 #endif

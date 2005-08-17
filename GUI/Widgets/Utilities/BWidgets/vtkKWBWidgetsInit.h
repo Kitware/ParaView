@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWBWidgets.h
+  Module:    vtkKWBWidgetsInit.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,22 +11,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWBWidgets - class used to initialize BWidgets
+// .NAME vtkKWBWidgetsInit - class used to initialize BWidgets
 // .SECTION Description
 // This class is used to initialize the BWidgets library.
 
-#ifndef __vtkKWBWidgets_h
-#define __vtkKWBWidgets_h
+#ifndef __vtkKWBWidgetsInit_h
+#define __vtkKWBWidgetsInit_h
 
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 #include "vtkTcl.h" // Needed for Tcl interpreter
 
-class KWWIDGETS_EXPORT vtkKWBWidgets : public vtkObject
+class KWWIDGETS_EXPORT vtkKWBWidgetsInit : public vtkObject
 {
 public:
-  static vtkKWBWidgets* New();
-  vtkTypeRevisionMacro(vtkKWBWidgets,vtkObject);
+  static vtkKWBWidgetsInit* New();
+  vtkTypeRevisionMacro(vtkKWBWidgetsInit,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -34,8 +34,8 @@ public:
   static void Initialize(Tcl_Interp*);
 
 protected:
-  vtkKWBWidgets() {};
-  ~vtkKWBWidgets() {};
+  vtkKWBWidgetsInit() {};
+  ~vtkKWBWidgetsInit() {};
 
   static void Execute(Tcl_Interp* interp, 
                       const unsigned char *buffer, 
@@ -45,8 +45,8 @@ protected:
   static int Initialized;
 
 private:
-  vtkKWBWidgets(const vtkKWBWidgets&);   // Not implemented.
-  void operator=(const vtkKWBWidgets&);  // Not implemented.
+  vtkKWBWidgetsInit(const vtkKWBWidgetsInit&);   // Not implemented.
+  void operator=(const vtkKWBWidgetsInit&);  // Not implemented.
 };
 
 #endif

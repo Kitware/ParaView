@@ -16,11 +16,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 
-#include "Utilities/BWidgets/vtkKWBWidgets.h"
+#include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.4");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -28,7 +28,7 @@ void vtkKWComboBox::Create(vtkKWApplication *app)
   // Use BWidget's ComboBox class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
 
-  vtkKWBWidgets::Initialize(app ? app->GetMainInterp() : NULL);
+  vtkKWBWidgetsInit::Initialize(app ? app->GetMainInterp() : NULL);
 
   // Call the superclass to set the appropriate flags then create manually
 

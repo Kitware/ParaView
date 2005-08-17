@@ -19,11 +19,11 @@
 
 #include <vtksys/stl/string>
 
-#include "Utilities/Tablelist/vtkKWTablelist.h"
+#include "Utilities/Tablelist/vtkKWTablelistInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.13");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -47,7 +47,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   // Use Tablelist class:
   // http://www.nemethi.de/
 
-  vtkKWTablelist::Initialize(app ? app->GetMainInterp() : NULL);
+  vtkKWTablelistInit::Initialize(app ? app->GetMainInterp() : NULL);
 
   // Call the superclass to set the appropriate flags then create manually
 

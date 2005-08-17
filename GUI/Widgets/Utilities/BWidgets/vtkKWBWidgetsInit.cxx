@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWBWidgets.cxx
+  Module:    vtkKWBWidgetsInit.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWBWidgets.h"
+#include "vtkKWBWidgetsInit.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
@@ -22,15 +22,15 @@
 #include "Utilities/BWidgets/vtkKWBWidgetsTclLibrary.h"
  
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.5");
+vtkStandardNewMacro( vtkKWBWidgetsInit );
+vtkCxxRevisionMacro(vtkKWBWidgetsInit, "1.1");
 
-int vtkKWBWidgets::Initialized = 0;
+int vtkKWBWidgetsInit::Initialized = 0;
 
 //----------------------------------------------------------------------------
-void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
+void vtkKWBWidgetsInit::Initialize(Tcl_Interp* interp)
 {
-  if (vtkKWBWidgets::Initialized)
+  if (vtkKWBWidgetsInit::Initialized)
     {
     return;
     }
@@ -42,7 +42,7 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  vtkKWBWidgets::Initialized = 1;
+  vtkKWBWidgetsInit::Initialized = 1;
 
   // Create the images required for tree.tcl
 
@@ -65,78 +65,78 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 
   // Evaluate the library
   
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_utils_tcl, 
                          file_utils_tcl_length,
                          file_utils_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_widget_tcl, 
                          file_widget_tcl_length,
                          file_widget_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_dragsite_tcl, 
                          file_dragsite_tcl_length,
                          file_dragsite_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_dropsite_tcl, 
                          file_dropsite_tcl_length,
                          file_dropsite_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_dynhelp_tcl, 
                          file_dynhelp_tcl_length,
                          file_dynhelp_tcl_decoded_length);
 
   // Combobox
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_arrow_tcl, 
                          file_arrow_tcl_length,
                          file_arrow_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_entry_tcl, 
                          file_entry_tcl_length,
                          file_entry_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_listbox_tcl, 
                          file_listbox_tcl_length,
                          file_listbox_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_combobox_tcl, 
                          file_combobox_tcl_length,
                          file_combobox_tcl_decoded_length);
 
   // ScrolledWindow/Frame
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_scrollframe_tcl, 
                          file_scrollframe_tcl_length,
                          file_scrollframe_tcl_decoded_length);
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_scrollw_tcl, 
                          file_scrollw_tcl_length,
                          file_scrollw_tcl_decoded_length);
 
   // Tree
 
-  vtkKWBWidgets::Execute(interp, 
+  vtkKWBWidgetsInit::Execute(interp, 
                          file_tree_tcl, 
                          file_tree_tcl_length,
                          file_tree_tcl_decoded_length);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBWidgets::Execute(Tcl_Interp* interp, 
-                            const unsigned char *buffer, 
-                            unsigned long length,
-                            unsigned long decoded_length)
+void vtkKWBWidgetsInit::Execute(Tcl_Interp* interp, 
+                                const unsigned char *buffer, 
+                                unsigned long length,
+                                unsigned long decoded_length)
 {
   // Is the data encoded (zlib and/or base64) ?
 
@@ -167,7 +167,7 @@ void vtkKWBWidgets::Execute(Tcl_Interp* interp,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBWidgets::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWBWidgetsInit::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTablelist.cxx
+  Module:    vtkKWTablelistInit.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWTablelist.h"
+#include "vtkKWTablelistInit.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
@@ -22,15 +22,15 @@
 #include "Utilities/Tablelist/vtkKWTablelistTclLibrary.h"
  
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWTablelist );
-vtkCxxRevisionMacro(vtkKWTablelist, "1.1");
+vtkStandardNewMacro( vtkKWTablelistInit );
+vtkCxxRevisionMacro(vtkKWTablelistInit, "1.1");
 
-int vtkKWTablelist::Initialized = 0;
+int vtkKWTablelistInit::Initialized = 0;
 
 //----------------------------------------------------------------------------
-void vtkKWTablelist::Initialize(Tcl_Interp* interp)
+void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
 {
-  if (vtkKWTablelist::Initialized)
+  if (vtkKWTablelistInit::Initialized)
     {
     return;
     }
@@ -42,7 +42,7 @@ void vtkKWTablelist::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  vtkKWTablelist::Initialized = 1;
+  vtkKWTablelistInit::Initialized = 1;
 
   // Create the images required for tree.tcl
 
@@ -65,64 +65,64 @@ void vtkKWTablelist::Initialize(Tcl_Interp* interp)
 
   // Evaluate the library
   
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistPublic_tcl, 
                           file_tablelistPublic_tcl_length,
                           file_tablelistPublic_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelist_tcl, 
                           file_tablelist_tcl_length,
                           file_tablelist_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_mwutil_tcl, 
                           file_mwutil_tcl_length,
                           file_mwutil_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistBind_tcl, 
                           file_tablelistBind_tcl_length,
                           file_tablelistBind_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistConfig_tcl, 
                           file_tablelistConfig_tcl_length,
                           file_tablelistConfig_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistEdit_tcl, 
                           file_tablelistEdit_tcl_length,
                           file_tablelistEdit_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistMove_tcl, 
                           file_tablelistMove_tcl_length,
                           file_tablelistMove_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistSort_tcl, 
                           file_tablelistSort_tcl_length,
                           file_tablelistSort_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistUtil_tcl, 
                           file_tablelistUtil_tcl_length,
                           file_tablelistUtil_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistUtil2_tcl, 
                           file_tablelistUtil2_tcl_length,
                           file_tablelistUtil2_tcl_decoded_length);
 
-  vtkKWTablelist::Execute(interp, 
+  vtkKWTablelistInit::Execute(interp, 
                           file_tablelistWidget_tcl, 
                           file_tablelistWidget_tcl_length,
                           file_tablelistWidget_tcl_decoded_length);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTablelist::Execute(Tcl_Interp* interp, 
+void vtkKWTablelistInit::Execute(Tcl_Interp* interp, 
                             const unsigned char *buffer, 
                             unsigned long length,
                             unsigned long decoded_length)
@@ -156,7 +156,7 @@ void vtkKWTablelist::Execute(Tcl_Interp* interp,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTablelist::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWTablelistInit::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

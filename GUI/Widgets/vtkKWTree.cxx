@@ -40,11 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtksys/stl/string>
 
-#include "Utilities/BWidgets/vtkKWBWidgets.h"
+#include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.13");
+vtkCxxRevisionMacro(vtkKWTree, "1.14");
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -52,7 +52,7 @@ void vtkKWTree::Create(vtkKWApplication *app)
   // Use BWidget's Tree class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
 
-  vtkKWBWidgets::Initialize(app ? app->GetMainInterp() : NULL);
+  vtkKWBWidgetsInit::Initialize(app ? app->GetMainInterp() : NULL);
 
   // Call the superclass to create the widget and set the appropriate flags
 
