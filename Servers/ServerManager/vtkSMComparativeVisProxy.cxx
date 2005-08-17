@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.7");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -465,8 +465,24 @@ void vtkSMComparativeVisProxy::StoreGeometry()
         {
         this->Adaptor->SetProperty(cue->GetAnimatedProperty());
         text_s << cue->GetAnimatedPropertyName() 
-             << " = " 
-             << this->Adaptor->GetRangeValue(cue->GetAnimatedElement());
+               << " = ";
+        int animEl = cue->GetAnimatedElement();
+        if (animEl < 0)
+          {
+          unsigned int numEls = this->Adaptor->GetNumberOfRangeElements();
+          for (unsigned int i=0; i<numEls; i++)
+            {
+            text_s << this->Adaptor->GetRangeValue(i);
+            if (i < numEls - 1)
+              {
+              text_s << ",";
+              }
+            }
+          }
+        else
+          {
+          text_s << this->Adaptor->GetRangeValue(cue->GetAnimatedElement());
+          }
         if (i != numCues - 1)
           {
           text_s << " , ";
