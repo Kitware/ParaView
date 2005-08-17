@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.18");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.19");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -734,9 +734,9 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
     for(i=0; i<num_time_steps; i++)
       {
       timeStepValues[i] = spcth_getTimeStepValue(spcth,i);
-      cout << "Time value for step " << i << " is " 
-           << timeStepValues[i]
-           << endl;
+      //cout << "Time value for step " << i << " is " 
+      //     << timeStepValues[i]
+      //    << endl;
       }
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
@@ -776,7 +776,7 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
   int field;
   for(field=0; field<fieldsCount; ++field)
     {
-    const char*fieldName=spcth_getCellFieldName(spcth,field);
+    const char*fieldName=spcth_getCellFieldDescription(spcth,field);
     vtkDebugMacro("Field #" << field << ": " << fieldName << " -- " << spcth_getCellFieldDescription(spcth, field));
     fileFields.insert(fieldName);
     
@@ -1345,7 +1345,7 @@ int vtkSpyPlotReader::RequestData(
       {
       for ( field = 0; field < numFields; field ++ )
         {
-        fname = spcth_getCellFieldName(spcth, field);
+        fname = spcth_getCellFieldDescription(spcth, field);
         if (this->CellDataArraySelection->ArrayIsEnabled(fname))
           {
           vtkDataArray *array=cd->GetArray(fname);
@@ -1474,7 +1474,7 @@ int vtkSpyPlotReader::RequestData(
       
       for ( field = 0; field < numFields; field ++ )
         {
-        fname = spcth_getCellFieldName(spcth, field);
+        fname = spcth_getCellFieldDescription(spcth, field);
         if (this->CellDataArraySelection->ArrayIsEnabled(fname))
           {
           vtkDataArray *array=cd->GetArray(fname);
