@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.8");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -470,10 +470,10 @@ void vtkSMComparativeVisProxy::StoreGeometry()
         if (animEl < 0)
           {
           unsigned int numEls = this->Adaptor->GetNumberOfRangeElements();
-          for (unsigned int i=0; i<numEls; i++)
+          for (unsigned int j=0; j<numEls; j++)
             {
-            text_s << this->Adaptor->GetRangeValue(i);
-            if (i < numEls - 1)
+            text_s << this->Adaptor->GetRangeValue(j);
+            if (j < numEls - 1)
               {
               text_s << ",";
               }
