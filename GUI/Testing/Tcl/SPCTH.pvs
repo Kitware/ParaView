@@ -15,13 +15,13 @@ $kw(vtkTemp794) SetSelectedState 1
 set kw(vtkTemp796) [$kw(vtkTemp793) GetPVWidget {TimeStep}]
 $kw(vtkTemp796) SetValue 0
 set kw(vtkTemp802) [$kw(vtkTemp793) GetPVWidget {CellArrays}]
-$kw(vtkTemp802) SetArrayStatus {M - 0} 1
-$kw(vtkTemp802) SetArrayStatus {M - 1} 1
-$kw(vtkTemp802) SetArrayStatus {VX} 1
-$kw(vtkTemp802) SetArrayStatus {VZ} 1
-$kw(vtkTemp802) SetArrayStatus {P} 1
-$kw(vtkTemp802) SetArrayStatus {VOLM - 0} 1
-$kw(vtkTemp802) SetArrayStatus {VOLM - 1} 1
+$kw(vtkTemp802) SetArrayStatus {Mass (g) - 0} 1
+$kw(vtkTemp802) SetArrayStatus {Mass (g) - 1} 1
+$kw(vtkTemp802) SetArrayStatus {X velocity (cm/s)} 1
+$kw(vtkTemp802) SetArrayStatus {Z velocity (cm/s)} 1
+$kw(vtkTemp802) SetArrayStatus {Pressure (dynes/cm^2^)} 1
+$kw(vtkTemp802) SetArrayStatus {Material volume fraction - 0} 1
+$kw(vtkTemp802) SetArrayStatus {Material volume fraction - 1} 1
 $kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
 $kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
 $kw(vtkTemp793) AcceptCallback
@@ -30,8 +30,8 @@ set kw(vtkTemp834) [$kw(vtkTemp833) GetPVWidget {Input}]
 $kw(vtkTemp834) SetCurrentValue $kw(vtkTemp793)
 set kw(vtkTemp837) [$kw(vtkTemp833) GetPVWidget {ArraySelection}]
 $kw(vtkTemp837) ClearAllSelections
-$kw(vtkTemp837) SetSelectState {VOLM - 0} 1
-$kw(vtkTemp837) SetSelectState {VOLM - 1} 1
+$kw(vtkTemp837) SetSelectState {Material volume fraction - 0} 1
+$kw(vtkTemp837) SetSelectState {Material volume fraction - 1} 1
 set kw(vtkTemp853) [$kw(vtkTemp833) GetPVWidget {Clipping}]
 $kw(vtkTemp853) SetCurrentValue {On}
 set kw(vtkTemp846) [$kw(vtkTemp853) GetPVWidget {On}]
