@@ -22,14 +22,14 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
 
 
 
-ADD_EXECUTABLE(ParaViewServerManager
+ADD_EXECUTABLE(pvpython
   vtkPythonAppInit.cxx
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
 IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
   GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
   FIND_FILE(CMAKE_PYTHON_LIBRARY_EXPORT python.exp "${CMAKE_PYTHON_LIB_PREFIX}")
-  SET_TARGET_PROPERTIES( ParaViewServerManager PROPERTIES LINK_FLAGS
+  SET_TARGET_PROPERTIES( pvpython PROPERTIES LINK_FLAGS
     "-Wl,-bE:${CMAKE_PYTHON_LIBRARY_EXPORT}")
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "AIX")
 
@@ -37,10 +37,10 @@ IF(VTK_USE_CARBON)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
   IF(VTK_APPLE_RESOURCE)
     ADD_CUSTOM_COMMAND(
-      SOURCE ParaViewServerManager
+      SOURCE pvpython
       COMMAND ${VTK_APPLE_RESOURCE}
-      ARGS Carbon.r -o ${VTK_EXECUTABLE_DIR}/ParaViewServerManager
-      TARGET ParaViewServerManager
+      ARGS Carbon.r -o ${VTK_EXECUTABLE_DIR}/pvpython
+      TARGET pvpython 
       )
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
@@ -49,7 +49,7 @@ ENDIF(VTK_USE_CARBON)
 FIND_LIBRARY(PYTHON_UTIL_LIBRARY
   NAMES util
   PATHS /usr/lib
-  DOC "Utility library needed for ParaViewServerManager"
+  DOC "Utility library needed for pvpython"
   )
 MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
 IF(PYTHON_UTIL_LIBRARY)
@@ -58,11 +58,11 @@ ENDIF(PYTHON_UTIL_LIBRARY)
 
 
 IF (APPLE)
-  SET_TARGET_PROPERTIES(ParaViewServerManager PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
+  SET_TARGET_PROPERTIES(pvpython PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
 # Link against all the kit wrappers.
-TARGET_LINK_LIBRARIES(ParaViewServerManager 
+TARGET_LINK_LIBRARIES(pvpython
   vtkPVServerManagerPython
   vtkCommon 
   vtkFiltering
@@ -71,7 +71,7 @@ TARGET_LINK_LIBRARIES(ParaViewServerManager
   vtkImaging
   ${PYTHON_UTIL_LIBRARY_LIB})
 IF(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(ParaViewServerManager ${VTK_TK_LIBRARIES})
+  TARGET_LINK_LIBRARIES(pvpython ${VTK_TK_LIBRARIES})
 ENDIF(VTK_WRAP_TCL)
 
 IF(BORLAND)
@@ -83,10 +83,10 @@ IF(BORLAND)
 ENDIF(BORLAND)
 
 
-TARGET_LINK_LIBRARIES(ParaViewServerManager vtkPVServerManager)
+TARGET_LINK_LIBRARIES(pvpython vtkPVServerManager)
 
 IF(NOT VTK_INSTALL_NO_RUNTIME)
-  INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} ParaViewServerManager)
+  INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} pvpython)
 ENDIF(NOT VTK_INSTALL_NO_RUNTIME)
 
 # Allow the user to customize their build with some local options
