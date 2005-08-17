@@ -24,7 +24,7 @@
 #include "vtkKWMostRecentFilesManager.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSeparator.h"
-#include "vtkKWTclInteractor.h"
+#include "vtkKWTkcon.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.31");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.32");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1125,7 +1125,7 @@ vtkKWTclInteractor* vtkKWWindowBase::GetTclInteractor()
 {
   if (!this->TclInteractor)
     {
-    this->TclInteractor = vtkKWTclInteractor::New();
+    this->TclInteractor = vtkKWTkcon::New();
     }
 
   if (!this->TclInteractor->IsCreated() && this->IsCreated())

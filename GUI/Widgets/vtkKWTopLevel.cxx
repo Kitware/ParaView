@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.18");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -80,6 +80,17 @@ void vtkKWTopLevel::Create(vtkKWApplication *app)
   if (!this->Superclass::CreateSpecificTkWidget(app, "toplevel", opts.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
+    }
+
+  this->PostCreate();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::PostCreate()
+{
+  if (!this->IsCreated())
+    {
     return;
     }
 

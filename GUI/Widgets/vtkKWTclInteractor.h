@@ -39,8 +39,14 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
+  // Append text to the display window. Can be used for sending
+  // debugging information to the command prompt when no standard
+  // output is available.
+  virtual void AppendText(const char* text);
+
+  // Description:
   // Evaluate the tcl string
-  virtual void Evaluate();
+  virtual void EvaluateCallback();
 
   // Description:
   // Callback for the down arrow key
@@ -49,12 +55,6 @@ public:
   // Description:
   // Callback for the up arrow key
   virtual void UpCallback();
-
-  // Description:
-  // Append text to the display window. Can be used for sending
-  // debugging information to the command prompt when no standard
-  // output is available.
-  virtual void AppendText(const char* text);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

@@ -254,6 +254,13 @@ protected:
   // Return 1 on success, 0 otherwise
   virtual int ComputeDisplayPosition(int *x, int *y);
 
+  // Description:
+  // Setup transient, protocol, title and other settings right after
+  // the widget has been created. This can be used by subclass that
+  // really need to create the toplevel manually, but want to have
+  // the ivar setup properly
+  virtual void PostCreate();
+
 private:
   vtkKWTopLevel(const vtkKWTopLevel&); // Not implemented
   void operator=(const vtkKWTopLevel&); // Not Implemented

@@ -159,8 +159,9 @@ SET(KWWidgets_SRCS
   vtkKWText.cxx 
   vtkKWTextPropertyEditor.cxx
   vtkKWThumbWheel.cxx
-  vtkKWTkUtilities.cxx
   vtkKWTkOptions.cxx
+  vtkKWTkUtilities.cxx
+  vtkKWTkcon.cxx
   vtkKWToolbar.cxx 
   vtkKWToolbarSet.cxx 
   vtkKWTopLevel.cxx 
@@ -177,10 +178,16 @@ SET(KWWidgets_SRCS
   vtkKWWidgetWithScrollbars.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
+)
+
+SET(KWWidgets_Utils_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgetsInit.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelistInit.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/tkcon/vtkKWTkconInit.cxx
   )
+
+SET(KWWidgets_SRCS ${KWWidgets_SRCS} ${KWWidgets_Utils_SRCS})
 
 # Abstract/pure virtual classes
 
@@ -191,8 +198,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx
   vtkKWWidgetWithScrollbars.cxx 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
+  ${KWWidgets_Utils_SRCS}
   ABSTRACT
   )
 
@@ -201,9 +207,7 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/BWidgets/vtkKWBWidgets.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/Tablelist/vtkKWTablelist.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/vtkKWWidgetsInitializeCommand.cxx 
+  ${KWWidgets_Utils_SRCS}
   WRAP_EXCLUDE
   )
 

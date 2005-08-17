@@ -25,5 +25,6 @@ square           crlf=input
 tcltk-man2html.tcl  crlf=input
 tcolor           crlf=input
 timer            crlf=input
+tkcon.tcl        crlf=input
 uniClass.tcl     crlf=input
 widget           crlf=input

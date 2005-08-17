@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.42");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -104,7 +104,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->CommandEntry->SetWidth(40);
   this->CommandEntry->SetHighlightThickness(1);
 
-  this->CommandEntry->SetBinding("<Return>", this, "Evaluate");
+  this->CommandEntry->SetBinding("<Return>", this, "EvaluateCallback");
   
   this->Script("pack %s -side left", this->CommandLabel->GetWidgetName());
   this->Script("pack %s -side left -expand 1 -fill x",
@@ -135,7 +135,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTclInteractor::Evaluate()
+void vtkKWTclInteractor::EvaluateCallback()
 {
   this->CommandIndex = this->TagNumber;
   this->TagNumber++;
