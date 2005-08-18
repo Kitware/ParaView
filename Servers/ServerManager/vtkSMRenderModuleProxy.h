@@ -160,6 +160,10 @@ public:
   // Indicates if we should locally render.
   virtual int IsRenderLocal() { return 1; }
 
+  // Description:
+  // Update all visible displays (therefore sources)
+  virtual void UpdateAllDisplays();  
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -174,11 +178,6 @@ protected:
   // Overridden since Interactor properties must be cleared.
   void UnRegisterVTKObjects();
 
-  // Description:
-  // This is used before a render to make sure all visible sources
-  // have been updated.
-  virtual void UpdateAllDisplays();
-  
   // This collection keeps a reference to all Display Proxies added
   // to this module.
   vtkCollection* Displays;

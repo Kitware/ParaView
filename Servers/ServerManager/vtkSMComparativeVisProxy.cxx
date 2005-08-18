@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.9");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -164,11 +164,11 @@ void vtkSMComparativeVisProxy::Generate()
 {
   this->RemoveAllCache();
 
-  vtkTimerLog::MarkStartEvent("Play One (all)");
+  vtkTimerLog::MarkStartEvent("CV: Play One (all)");
   this->CurrentFrame = 0;
   this->ComputeNumberOfFrames();
   this->PlayOne(0);
-  vtkTimerLog::MarkEndEvent("Play One (all)");
+  vtkTimerLog::MarkEndEvent("CV: Play One (all)");
   this->InFirstShow = 1;
   if (!this->ShouldAbort)
     {
@@ -337,7 +337,7 @@ void vtkSMComparativeVisProxy::SetNumberOfCues(unsigned int num)
 // is varied (played) over it's range while others are kept constant
 void vtkSMComparativeVisProxy::PlayOne(unsigned int idx)
 {
-  vtkTimerLog::MarkStartEvent("Play One");
+  vtkTimerLog::MarkStartEvent("CV: Play One");
   if (!this->RenderModule)
     {
     vtkErrorMacro("No RenderModule has been assigned. Cannot generate.");
@@ -374,7 +374,7 @@ void vtkSMComparativeVisProxy::PlayOne(unsigned int idx)
 
   observer->Delete();
   player->Delete();
-  vtkTimerLog::MarkEndEvent("Play One");
+  vtkTimerLog::MarkEndEvent("CV: Play One");
 }
 
 //-----------------------------------------------------------------------------
@@ -400,9 +400,9 @@ void vtkSMComparativeVisProxy::ExecuteEvent(
         // If last property, render the frame and store the geometry
         else
           {
-          vtkTimerLog::MarkStartEvent("Force Render");
-          this->RenderModule->StillRender();
-          vtkTimerLog::MarkEndEvent("Force Render");
+          vtkTimerLog::MarkStartEvent("CV: Update Displays");
+          this->RenderModule->UpdateAllDisplays();
+          vtkTimerLog::MarkEndEvent("CV: Update Displays");
           this->StoreGeometry();
           this->UpdateProgress(static_cast<double>(this->CurrentFrame)/
                                this->NumberOfFrames);
@@ -423,7 +423,8 @@ void vtkSMComparativeVisProxy::UpdateProgress(double progress)
 // Cache the geometry on the server
 void vtkSMComparativeVisProxy::StoreGeometry()
 {
-  vtkTimerLog::MarkStartEvent("Store Geometry");
+  vtkTimerLog::MarkStartEvent("CV: Store Geometry");
+
   unsigned int prevSize = this->Internal->Caches.size();
   this->Internal->Caches.resize(prevSize+1);
   this->Internal->Displays.resize(prevSize+1);
@@ -516,7 +517,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
       proxy->UpdateVTKObjects();
       this->Internal->Caches[prevSize].push_back(proxy);
       proxy->Delete();
-      
+
       // Create the display and copy setting from original.
       vtkSMProxy* display = proxM->NewProxy("displays", pDisp->GetXMLName());
       if (display)
@@ -545,7 +546,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
     }
   iter->Delete();
 
-  vtkTimerLog::MarkEndEvent("Store Geometry");
+  vtkTimerLog::MarkEndEvent("CV: Store Geometry");
 }
 
 //-----------------------------------------------------------------------------
