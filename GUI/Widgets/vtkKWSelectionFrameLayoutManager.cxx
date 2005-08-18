@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.40");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1256,18 +1256,25 @@ int vtkKWSelectionFrameLayoutManager::RemoveAllWidgetsWithGroup(
     vtkKWSelectionFrame *sel = this->GetSelectedWidget();
     
     int nb_deleted = 0;
-    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
-      this->Internals->Pool.begin();
-    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
-      this->Internals->Pool.end();
-    for (; it != end; ++it)
+    int done = 0;
+    while (!done)
       {
-      if (it->Widget && !it->Group.compare(group))
+      done = 1;
+      vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+        this->Internals->Pool.begin();
+      vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+        this->Internals->Pool.end();
+      for (; it != end; ++it)
         {
-        vtkKWSelectionFrame *widget = it->Widget;
-        this->Internals->Pool.erase(it);
-        this->DeleteWidget(widget);
-        nb_deleted++;
+        if (it->Widget && !it->Group.compare(group))
+          {
+          vtkKWSelectionFrame *widget = it->Widget;
+          this->Internals->Pool.erase(it);
+          this->DeleteWidget(widget);
+          nb_deleted++;
+          done = 0;
+          break;
+          }
         }
       }
     
