@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.39");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1107,9 +1107,43 @@ void vtkKWSelectionFrameLayoutManager::RemoveCallbacksFromWidget(
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget* vtkKWSelectionFrameLayoutManager::GetVisibleRenderWidget(
-  vtkKWSelectionFrame *vtkNotUsed(widget))
+  vtkKWSelectionFrame *widget)
 {
-  return NULL;
+  vtkKWRenderWidget *rw = NULL;
+  if (widget)
+    {
+    vtkKWFrame *frame = widget->GetBodyFrame();
+    if (frame)
+      {
+      int nb_children = frame->GetNumberOfChildren();
+      for (int i = 0; i < nb_children; i++)
+        {
+        vtkKWWidget *child = frame->GetNthChild(i);
+        if (child)
+          {
+          rw = vtkKWRenderWidget::SafeDownCast(child);
+          if (rw)
+            {
+            return rw;
+            }
+          int nb_grand_children = child->GetNumberOfChildren();
+          for (int j = 0; j < nb_grand_children; j++)
+            {
+            vtkKWWidget *grand_child = child->GetNthChild(j);
+            if (grand_child)
+              {
+              rw = vtkKWRenderWidget::SafeDownCast(grand_child);
+              if (rw)
+                {
+                return rw;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  return rw;
 }
 
 //----------------------------------------------------------------------------
@@ -1759,7 +1793,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
-  vtkImageData *image, int selection_only)
+  vtkImageData *image, int selection_only, int direct)
 {
   int nb_slots = this->Resolution[0] * this->Resolution[1];
 
@@ -1803,10 +1837,17 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
         vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
         if (rwwidget)
           {
-          int offscreen = rwwidget->GetOffScreenRendering();
-          rwwidget->SetOffScreenRendering(1);
           int idx = j * this->Resolution[0] + i;
           w2i_filters[idx] = vtkWindowToImageFilter::New();
+          int offscreen = rwwidget->GetOffScreenRendering();
+          if (direct)
+            {
+            w2i_filters[idx]->ShouldRerenderOff();
+            }
+          else
+            {
+            rwwidget->SetOffScreenRendering(1);
+            }
           w2i_filters[idx]->SetInput(rwwidget->GetRenderWindow());
           w2i_filters[idx]->Update();
           rwwidget->SetOffScreenRendering(offscreen);
@@ -1856,7 +1897,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
       if (widget && (!selection_only || widget->GetSelected()))
         {
         vtkKWRenderWidget *rwwidget = this->GetVisibleRenderWidget(widget);
-        if (rwwidget)
+        if (rwwidget && !direct)
           {
           rwwidget->Render();
           }
@@ -1881,6 +1922,13 @@ int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageData(
   vtkImageData *image)
 {
   return this->AppendWidgetsToImageData(image, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageDataFast(
+  vtkImageData *image)
+{
+  return this->AppendWidgetsToImageData(image, 0, 1);
 }
 
 //----------------------------------------------------------------------------

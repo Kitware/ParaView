@@ -172,10 +172,15 @@ public:
   virtual int CopyScreenshotAllWidgetsToClipboard();
 
   // Description:
-  // Append widgets to image data
+  // Append widgets to image data.
+  // The 'Fast' version of each method does not set the render widget to 
+  // Offscreen rendering and re-render them, the backbuffer of the
+  // render widget is taken as-is (this is useful for lower quality 
+  // screenshot or thumbnails).
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
   virtual int AppendAllWidgetsToImageData(vtkImageData *image);
+  virtual int AppendAllWidgetsToImageDataFast(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageData(vtkImageData *image);
 
   // Description:
@@ -251,7 +256,9 @@ protected:
   // Get the render widget (if any) associated to the selection
   // frame and visible at that point. 
   // Used to Print, Save/Copy screenshot, etc.
-  // This should be reimplemented by subclasses (return NULL at the moment).
+  // This should be reimplemented by subclasses.
+  // This implementation searches for a vtkKWRenderWidget in the children
+  // of the frame.
   virtual vtkKWRenderWidget* GetVisibleRenderWidget(vtkKWSelectionFrame*);
 
   // Description:
@@ -269,10 +276,15 @@ protected:
   virtual int PrintWidgets(double dpi, int selection_only);
 
   // Description:
-  // Append dataset widgets to image data (if selection_only is true, only
-  // the selected dataset widget is printed, otherwise all of them).
+  // Append dataset widgets to image data.
+  // If selection_only is true, onlythe selected dataset widget is printed, 
+  // otherwise all of them. If direct is true, the renderwidgets are not
+  // set to Offscreen rendering and re-rendered, the backbuffer of the
+  // window is taken as-is (this is useful for lower quality screenshot or
+  // thumbnails).
   // Return 1 on success, 0 otherwise
-  virtual int AppendWidgetsToImageData(vtkImageData *image,int selection_only);
+  virtual int AppendWidgetsToImageData(
+    vtkImageData *image,int selection_only, int direct = 0);
 
   // Description:
   // Called when the number of widgets has changed
