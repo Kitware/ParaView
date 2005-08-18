@@ -117,7 +117,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.62");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -405,11 +405,11 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
   #else
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE") )
     {
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
   #endif
   ifstream infile(str.str());
   if ( !infile.fail())
@@ -581,11 +581,12 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   ostrstream str;
 
   #ifdef _WIN32
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE") )
     {
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#LookmarkMacros#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#LookmarkMacros#" << ends;
+
   #else
   if ( !getenv("HOME") )
     {
@@ -1038,11 +1039,12 @@ void vtkPVLookmarkManager::Checkpoint()
   ostrstream str;
 
   #ifdef _WIN32
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE") )
     {
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+
   #else
   if ( !getenv("HOME") )
     {
@@ -1113,12 +1115,12 @@ void vtkPVLookmarkManager::UndoRedoInternal()
 
   #else
 
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE") )
     {
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
-  tempstr << "C:" << getenv("HOMEPATH") << "\\#TempParaViewlmk#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  tempstr << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#TempParaViewlmk#" << ends;
 
   #endif
 
@@ -2027,6 +2029,7 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
 void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
 {
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVLookmark *lmk;
 
   // if the pipeline is empty, don't add
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
@@ -2040,17 +2043,17 @@ void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
     return;
     }
 
-  this->CreateLookmark(this->GetUnusedLookmarkName(), macroFlag);
-  
+  lmk = this->CreateLookmark(this->GetUnusedLookmarkName(), macroFlag);
+
+  return;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
+vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 {
   vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
-  vtkPVReaderModule *mod;
   int indexOfNewLmkWidget;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
@@ -2084,55 +2087,7 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
   newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
   s.rdbuf()->freeze(0);
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-//ds
-  //find the reader to use by getting the reader of the current pvsource
-  // Loop though all sources/Data objects and compute total bounds.
-  vtkPVSourceCollection* col = win->GetSourceList("Sources");
-  vtkPVSource *pvs;
-  if (col == NULL)
-    {
-    return;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
-//  char *ds = new char[1];
-//  ds[0] = '\0';
-  vtkStdString ds;
-  char *path;
-  int i=0;
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    if(!pvs->GetPVInput(0))
-      {
-      if(this->IsSourceOrOutputsVisible(pvs,pvs->GetVisibility()))
-        {
-        if(pvs->IsA("vtkPVReaderModule"))
-          {
-          mod = vtkPVReaderModule::SafeDownCast(pvs);
-          path = (char *)mod->GetFileEntry()->GetValue();
-          }
-        else
-          {
-          path = pvs->GetModuleName();
-          }
-        //ds = (char*)realloc((char*)ds,strlen(ds)+strlen(path)+1);
-        ds.append(path);
-        ds.append(";");
-        //sprintf(ds,"%s%s;",ds,path);
-        i++;
-        }
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-  vtkstd::string::size_type ret = ds.find_last_of(';',ds.size());
-  if(ret != vtkstd::string::npos)
-    {
-    ds.erase(ret);
-    }
-  newLookmark->SetDataset(ds.c_str());
-  newLookmark->CreateDatasetList();
+  newLookmark->InitializeDataset();
   newLookmark->StoreStateScript();
   newLookmark->UpdateWidgetValues();
   newLookmark->CommentsModifiedCallback();
@@ -2161,29 +2116,7 @@ void vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
   this->Script("%s yview moveto 1",
                this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
 
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVLookmarkManager::IsSourceOrOutputsVisible(vtkPVSource* source, int visibilityFlag)
-{
-  int ret = 0;
-  if ( !source )
-    {
-    return visibilityFlag;
-    }
-  if(visibilityFlag)
-    {
-    return visibilityFlag;
-    }
-  for(int i=0; i<source->GetNumberOfPVConsumers();i++)
-    {
-    vtkPVSource* consumer = source->GetPVConsumer(i);
-    if ( consumer )
-      {
-      ret = this->IsSourceOrOutputsVisible(consumer, consumer->GetVisibility());
-      }
-    }
-  return ret | source->GetVisibility();
+  return newLookmark;
 }
 
 
@@ -2213,11 +2146,11 @@ void vtkPVLookmarkManager::SaveAllCallback()
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
 #else
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE"))
     {
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
 #endif
 
   if(!strcmp(filename,str.str()))
@@ -2283,12 +2216,12 @@ void vtkPVLookmarkManager::ExportFolderCallback()
     }
   str << getenv("HOME") << "/.ParaViewlmk" << ends;
 #else
-  if ( !getenv("HOMEPATH") )
+  if ( !getenv("HOMEPATH") || !getenv("HOMEDRIVE") )
     {
-    this->SetButtonFrameState(1);
     return;
     }
-  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  str << getenv("HOMEDRIVE") << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+
 #endif
 
   if(!strcmp(filename,str.str()))

@@ -100,7 +100,7 @@ public:
   // and their inputs. The window is moved behind the render window to save the image, but is
   // then moved back in front.
   void CreateLookmarkCallback(int macroFlag);
-  void CreateLookmark(char *name, int macroFlag);
+  vtkPVLookmark* CreateLookmark(char *name, int macroFlag);
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
@@ -164,8 +164,6 @@ public:
   void ImportMacroExamplesCallback();
 
   void SelectItemCallback(char *name);
-
-  int IsSourceOrOutputsVisible(vtkPVSource *src,int visibilityFlag);
 
 protected:
 

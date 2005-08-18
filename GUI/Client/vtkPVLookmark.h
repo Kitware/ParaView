@@ -122,10 +122,14 @@ public:
   vtkGetObjectMacro(ToolbarButton,vtkKWPushButton);
   void AddLookmarkToolbarButton(vtkKWIcon *icon);
 
+  void InitializeDataset();
+
 protected:
 
   vtkPVLookmark();
   ~vtkPVLookmark();
+  
+  int IsSourceOrOutputsVisible(vtkPVSource *src,int visibilityFlag);
 
   // convenience methods
   vtkPVApplication *GetPVApplication();
