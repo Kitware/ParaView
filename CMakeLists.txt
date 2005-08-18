@@ -268,7 +268,9 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 SUBDIRS(VTK)
 
+# Find hints file for the tcl wrapping
 FIND_FILE(VTK_WRAP_HINTS hints ${VTK_SOURCE_DIR}/Wrapping)
+MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 # Set the ICET MPI variables from the VTK ones.
 # use a set cache internal so people don't try and use them
@@ -331,6 +333,7 @@ SET(SPCTH_INCLUDE_DIR
 #########################################################################
 # Configure HDF5
 OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
+MARK_AS_ADVANCED(PARAVIEW_USE_SYSTEM_HDF5)
 IF(PARAVIEW_USE_SYSTEM_HDF5)
 
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindHDF5.cmake)
@@ -470,6 +473,7 @@ MACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES DIRS)
   ENDFOREACH(dir)
   SET(PARAVIEW_EXTRA_LINK_DIRECTORIES "${current_dirs}" CACHE INTERNAL "")
 ENDMACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES)
+LINK_DIRECTORIES(${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 
 #
 # Imported project adds source files
