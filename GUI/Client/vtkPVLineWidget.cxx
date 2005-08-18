@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.72");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.73");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -351,6 +351,9 @@ void vtkPVLineWidget::Trace(ofstream *file)
     {
     return;
     }
+
+  // Called to save the state of the widget's visibility
+  this->Superclass::Trace(file);
 
   *file << "$kw(" << this->GetTclName() << ") SetPoint1 "
         << this->Point1[0]->GetValueAsDouble() << " "

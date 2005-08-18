@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -190,6 +190,9 @@ void vtkPVPointWidget::Trace(ofstream *file)
     {
     return;
     }
+
+  // Called to save the state of the widget's visibility
+  this->Superclass::Trace(file);
 
   *file << "$kw(" << this->GetTclName() << ") SetPosition "
         << this->PositionEntry[0]->GetValue() << " "

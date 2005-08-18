@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.73");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.74");
 
 //===========================================================================
 //***************************************************************************
@@ -410,6 +410,18 @@ void vtkPV3DWidget::UpdateEnableState()
   this->PropagateEnableState(this->Frame);
   this->PropagateEnableState(this->LabeledFrame);
   this->PropagateEnableState(this->Visibility);
+}
+
+//---------------------------------------------------------------------------
+void vtkPV3DWidget::Trace(ofstream *file)
+{
+  if ( ! this->GetTraceHelper()->Initialize(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetVisibility "
+    << this->Visible << endl;
 }
 
 //----------------------------------------------------------------------------

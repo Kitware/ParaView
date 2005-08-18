@@ -127,6 +127,10 @@ public:
   vtkGetStringMacro(WidgetProxyXMLName);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file);
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();

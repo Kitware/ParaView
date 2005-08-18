@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -242,6 +242,9 @@ void vtkPVBoxWidget::Trace(ofstream *file)
     {
     return;
     }
+
+  // Called to save the state of the widget's visibility
+  this->Superclass::Trace(file);
 
   this->GetRotationFromGUI();
   this->GetScaleFromGUI();

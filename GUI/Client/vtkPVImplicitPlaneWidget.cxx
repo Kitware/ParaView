@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -362,6 +362,9 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
     {
     return;
     }
+
+  // Called to save the state of the widget's visibility
+  this->Superclass::Trace(file);
 
   for ( cc = 0; cc < 3; cc ++ )
     {

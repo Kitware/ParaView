@@ -46,7 +46,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.66");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -253,6 +253,9 @@ void vtkPVSphereWidget::Trace(ofstream *file)
     {
     return;
     }
+
+  // Called to save the state of the widget's visibility
+  this->Superclass::Trace(file);
 
   for ( cc = 0; cc < 3; cc ++ )
     {
