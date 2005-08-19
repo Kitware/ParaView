@@ -54,6 +54,13 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
    source "[$Application GetTraceFileName]"
 }
 
+# Lookmark Test
+set lookmarkManager [[ $Application GetMainWindow ] GetPVLookmarkManager]
+set lookmark [$lookmarkManager CreateLookmark "CalcInput" 0]
+[ $Application GetMainWindow ] DeleteAllSources
+$lookmark View
+$lookmarkManager Withdraw
+
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
