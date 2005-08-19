@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.16");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -63,7 +63,6 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 
   this->SetBackgroundColor(0.98, 0.98, 0.98);
   this->SetStripeBackgroundColor(0.878, 0.909, 0.941);
-  this->SetWidth(0);
   this->SetHeight(15);
   this->SetColumnSeparatorsVisibility(1);
   this->SetSortArrowVisibility(0);
