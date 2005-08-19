@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.29");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -47,6 +47,7 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->Checkbox = vtkKWCheckButton::New();
   this->MacroFlag = 0;
   this->Location=0;
+  this->MainFrameCollapsedState = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -264,6 +265,8 @@ void vtkKWLookmarkFolder::Pack()
   this->Script("%s configure -height 12",
               this->SeparatorFrame->GetWidgetName());
 
+  this->UpdateWidgetValues();
+
 }
 
 //----------------------------------------------------------------------------
@@ -390,6 +393,45 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWLookmarkFolder::UpdateWidgetValues()
+{
+  if(this->MainFrameCollapsedState)
+    {
+    this->LabelFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LabelFrame->ExpandFrame();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLookmarkFolder::UpdateVariableValues()
+{
+  this->SetMainFrameCollapsedState(this->LabelFrame->IsFrameCollapsed());
+}
+
+/*
+//----------------------------------------------------------------------------
+int vtkKWLookmarkFolder::GetMainFrameCollapsedState()
+{
+  return this->LabelFrame->IsFrameCollapsed();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLookmarkFolder::SetMainFrameCollapsedState(int val)
+{
+  if(val)
+    {
+    this->LabelFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LabelFrame->ExpandFrame();
+    }
+}
+*/
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::UpdateEnableState()
 {

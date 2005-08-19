@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.66");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.67");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -284,6 +284,8 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "FinalizeRead $kw(" << this->GetTclName() << ") \""
         << this->FileEntry->GetValue() << "\"" << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabel {" 
+        << this->GetLabel() << "}" << endl;
 
   // Let the PVWidgets set up the object.
   vtkCollectionIterator *it = this->Widgets->NewIterator();

@@ -90,6 +90,12 @@ public:
 
   vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
 
+  vtkGetMacro(MainFrameCollapsedState,int);
+  vtkSetMacro(MainFrameCollapsedState,int);
+
+  void UpdateWidgetValues();
+  void UpdateVariableValues();
+
 protected:
 
   vtkKWLookmarkFolder();
@@ -107,6 +113,7 @@ protected:
 
   // This lmk container's location amongst its sibling lmk items
   int Location;
+  int MainFrameCollapsedState;
 
 private:
   vtkKWLookmarkFolder(const vtkKWLookmarkFolder&); // Not implemented

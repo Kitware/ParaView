@@ -115,6 +115,11 @@ public:
   vtkSetMacro(MacroFlag,int);
   vtkGetMacro(MacroFlag,int);
 
+  vtkGetMacro(MainFrameCollapsedState,int);
+  vtkSetMacro(MainFrameCollapsedState,int);
+  vtkGetMacro(CommentsFrameCollapsedState,int);
+  vtkSetMacro(CommentsFrameCollapsedState,int);
+
 protected:
 
   vtkKWLookmark();
@@ -143,6 +148,8 @@ protected:
 
   int SelectionFlag;
   int MacroFlag;
+  int MainFrameCollapsedState;
+  int CommentsFrameCollapsedState;
 
 private:
   vtkKWLookmark(const vtkKWLookmark&); // Not implemented

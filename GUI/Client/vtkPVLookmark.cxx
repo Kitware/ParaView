@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.53");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.54");
 
 
 //*****************************************************************************
@@ -376,7 +376,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
   //  const char *ptr1;
   //  const char *ptr2;
   char mesg[400];
-  char *defaultValue = NULL;
+  const char *defaultValue = NULL;
 
   // check if this lookmark has a single source  first
   // if so, use the currently viewed reader
@@ -495,9 +495,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
     pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     mod = vtkPVReaderModule::SafeDownCast(pvs);
     menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-    if(!strcmp(name,mod->RemovePath(mod->GetFileEntry()->GetValue())))
+    if(!strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue())))
       {
-      defaultValue = name;
+      defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());
       }
     itChoices->GoToNextItem();
     }
@@ -562,7 +562,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
   char *targetName;
   vtkPVReaderModule *mod = NULL;
   char mesg[400];
-  char *defaultValue = NULL;
+  const char *defaultValue = NULL;
 
   // If there is an open dataset of the same type and path, return it
 /*
@@ -628,9 +628,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
         pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
         mod = vtkPVReaderModule::SafeDownCast(pvs);
         menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-        if(!strcmp(name,mod->RemovePath(mod->GetFileEntry()->GetValue())))
+        if(!strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue())))
           {
-          defaultValue = name;
+          defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());
           }
         itChoices->GoToNextItem();
         }
@@ -1330,6 +1330,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkPVReaderModule *mod;
   vtkXDMFReaderModule *xdmfmod;
   vtkPVXDMFParameters *xdmfParameters;
+  char sourceLabel[50];
 
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
@@ -1491,6 +1492,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
                 xdmfmod = vtkXDMFReaderModule::SafeDownCast(clone);
                 xdmfmod->EnableGrid(cmd);
                 }
+              else if(ptr.rfind("SetLabel",ptr.size())!=vtkstd::string::npos)
+                {
+                sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
+                xdmfmod->SetLabel(sval);
+                }
               ptr.assign(*(++tokIter));
               }
 
@@ -1527,6 +1533,10 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         tokMrkr = tokIter;
         while(ptr.rfind("GetPVWidget",ptr.size())==vtkstd::string::npos)
           {
+          if(ptr.rfind("SetLabel",ptr.size())!=vtkstd::string::npos)
+            {
+            sscanf(ptr.c_str(),ThirdToken_WrappedString,sourceLabel);
+            }
           ptr.assign(*(++tokIter));
           }
 
@@ -1632,10 +1642,13 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             {
             src = this->GetSourceForLookmark(sources,moduleName);
             }
+
           if(!src)
             {
             break;
             }
+
+          src->SetLabel(sourceLabel);
           }
         }
 
@@ -1646,6 +1659,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         srcTclNameMap[src] = tclName;
         while(ptr.rfind("GetPVWidget",ptr.size())==vtkstd::string::npos)
           {
+          if(ptr.rfind("SetLabel",ptr.size())!=vtkstd::string::npos)
+            {
+            sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
+            src->SetLabel(sval);
+            }
           ptr.assign(*(++tokIter));
           }
 

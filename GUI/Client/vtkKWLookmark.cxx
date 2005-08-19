@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.29");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -61,7 +61,8 @@ vtkKWLookmark::vtkKWLookmark()
   this->Width = this->Height = 48; 
   this->PixelSize = 3;
   this->MacroFlag = 0;
-
+  this->MainFrameCollapsedState = 0;
+  this->CommentsFrameCollapsedState = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -295,6 +296,22 @@ void vtkKWLookmark::UpdateWidgetValues()
 {
   this->LmkCommentsText->SetText(this->Comments);
   this->LmkMainFrame->SetLabelText(this->Name);
+  if(this->MainFrameCollapsedState)
+    {
+    this->LmkMainFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkMainFrame->ExpandFrame();
+    }
+  if(this->CommentsFrameCollapsedState)
+    {
+    this->LmkCommentsFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkCommentsFrame->ExpandFrame();
+    }
 
 //ds
   int i=0;
@@ -364,6 +381,8 @@ void vtkKWLookmark::UpdateVariableValues()
 {
   this->SetComments(this->LmkCommentsText->GetText());
   this->SetName(this->LmkMainFrame->GetLabel()->GetText());
+  this->SetMainFrameCollapsedState(this->LmkMainFrame->IsFrameCollapsed());
+  this->SetCommentsFrameCollapsedState(this->LmkCommentsFrame->IsFrameCollapsed());
 }
 
 
@@ -436,7 +455,45 @@ int vtkKWLookmark::GetSelectionState()
 {
   return this->Checkbox->GetSelectedState();
 }
+/*
+//----------------------------------------------------------------------------
+int vtkKWLookmark::GetMainFrameCollapsedState()
+{
+  return this->LmkMainFrame->IsFrameCollapsed();
+}
 
+//----------------------------------------------------------------------------
+void vtkKWLookmark::SetMainFrameCollapsedState(int val)
+{
+  if(val)
+    {
+    this->LmkMainFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkMainFrame->ExpandFrame();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLookmark::GetCommentsFrameCollapsedState()
+{
+  return this->LmkCommentsFrame->IsFrameCollapsed();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLookmark::SetCommentsFrameCollapsedState(int val)
+{
+  if(val)
+    {
+    this->LmkCommentsFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkCommentsFrame->ExpandFrame();
+    }
+}
+*/
 //----------------------------------------------------------------------------
 void vtkKWLookmark::UpdateEnableState()
 {
@@ -479,6 +536,22 @@ void vtkKWLookmark::Pack()
   this->Script("%s configure -height 12",this->SeparatorFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -expand t -fill x", this->SeparatorFrame->GetWidgetName());
 
+  if(this->MainFrameCollapsedState)
+    {
+    this->LmkMainFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkMainFrame->ExpandFrame();
+    }
+  if(this->CommentsFrameCollapsedState)
+    {
+    this->LmkCommentsFrame->CollapseFrame();
+    }
+  else
+    {
+    this->LmkCommentsFrame->ExpandFrame();
+    }
 }
 
 //----------------------------------------------------------------------------

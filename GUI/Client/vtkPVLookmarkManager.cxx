@@ -117,7 +117,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.63");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -457,7 +457,8 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetImageData(lookmarkWidget->GetImageData());
   newLookmark->SetPixelSize(lookmarkWidget->GetPixelSize());
   newLookmark->SetMacroFlag(1);
-
+  newLookmark->SetMainFrameCollapsedState(lookmarkWidget->GetMainFrameCollapsedState());
+  newLookmark->SetCommentsFrameCollapsedState(lookmarkWidget->GetCommentsFrameCollapsedState());
   newLookmark->SetApplication(this->GetApplication());
   newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
   newLookmark->Create(this->GetPVApplication());
@@ -1573,6 +1574,8 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     newLmkWidget->CreateDatasetList();
     newLmkWidget->SetLocation(newLoc);
     newLmkWidget->SetComments(lmkWidget->GetComments());
+    newLmkWidget->SetMainFrameCollapsedState(lmkWidget->GetMainFrameCollapsedState());
+    newLmkWidget->SetCommentsFrameCollapsedState(lmkWidget->GetCommentsFrameCollapsedState());
     newLmkWidget->UpdateWidgetValues();
     newLmkWidget->CommentsModifiedCallback();
     newLmkWidget->SetImageData(lmkWidget->GetImageData());
@@ -1630,9 +1633,10 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
     newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
     newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetText());
+    newLmkFolder->SetMainFrameCollapsedState(lmkFolder->GetMainFrameCollapsedState());
     newLmkFolder->SetLocation(newLoc);
-
     this->Script("pack %s -fill both -expand yes -padx 8",newLmkFolder->GetWidgetName());
+    newLmkFolder->UpdateWidgetValues();
     this->LmkFolderWidgets->FindItem(lmkFolder,loc);
     this->LmkFolderWidgets->RemoveItem(loc);
     this->LmkFolderWidgets->InsertItem(loc,newLmkFolder);
@@ -1665,6 +1669,7 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType j,numLmks, numFolders;
   const char *nameAttribute;
+  int ival;
 
   if(!strcmp("LmkFolder",lmkElement->GetName()))
     {
@@ -1672,6 +1677,9 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     // if its a macros folder and we already have one, don't create but visit its children, passing as the parent the currrent macros folder packing frame
     if(nameAttribute && !strcmp(nameAttribute,"Macros") && this->GetMacrosFolder())
       {     
+      lmkElement->GetScalarAttribute("MainFrameCollapsedState",ival);
+      this->GetMacrosFolder()->SetMainFrameCollapsedState(ival);
+      this->GetMacrosFolder()->UpdateWidgetValues();
       for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
         {
         ImportInternal(j,lmkElement->GetNestedElement(j),this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
@@ -1692,6 +1700,9 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
     lmkFolderWidget->SetFolderName(lmkElement->GetAttribute("Name"));
+    lmkElement->GetScalarAttribute("MainFrameCollapsedState",ival);
+    lmkFolderWidget->SetMainFrameCollapsedState(ival);
+    lmkFolderWidget->UpdateWidgetValues();
     lmkFolderWidget->SetLocation(locationOfLmkItemAmongSiblings);
 
     numFolders = this->LmkFolderWidgets->GetNumberOfItems();
@@ -1810,7 +1821,7 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(char *name)
 vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
 {
   vtkPVLookmark *lmk = vtkPVLookmark::New();
-
+ 
   char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1]; 
   strcpy(lookmarkName,elem->GetAttribute("Name"));
   lmk->SetName(lookmarkName);
@@ -1849,6 +1860,23 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
     strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
     lmk->SetImageData(lookmarkImage);
     delete [] lookmarkImage;
+    }
+
+  int ival;
+  if(elem->GetScalarAttribute("MainFrameCollapsedState",ival))
+    {
+   // char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+   // strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetMainFrameCollapsedState(ival);
+   // delete [] lookmarkImage;
+    }
+
+  if(elem->GetScalarAttribute("CommentsFrameCollapsedState",ival))
+    {
+   // char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+   // strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetCommentsFrameCollapsedState(ival);
+   // delete [] lookmarkImage;
     }
 
   if(elem->GetAttribute("PixelSize"))
@@ -1916,6 +1944,23 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkPVXMLElement *elem)
     strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
     lmk->SetImageData(lookmarkImage);
     delete [] lookmarkImage;
+    }
+
+  int ival;
+  if(elem->GetScalarAttribute("MainFrameCollapsedState",&ival))
+    {
+   // char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+   // strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetMainFrameCollapsedState(ival);
+   // delete [] lookmarkImage;
+    }
+
+  if(elem->GetScalarAttribute("CommentsFrameCollapsedState",&ival))
+    {
+   // char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+   // strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetCommentsFrameCollapsedState(ival);
+   // delete [] lookmarkImage;
     }
 
   if(elem->GetAttribute("PixelSize"))
@@ -2604,7 +2649,9 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         {
         folder = vtkXMLDataElement::New();
         folder->SetName("LmkFolder");
+        oldLmkFolder->UpdateVariableValues();
         folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
+        folder->SetIntAttribute("MainFrameCollapsedState",oldLmkFolder->GetMainFrameCollapsedState());
         dest->AddNestedElement(folder);
 
         vtkPVLookmark *lookmarkWidget;
@@ -2741,6 +2788,8 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       elem->SetIntAttribute("PixelSize", lookmarkWidget->GetPixelSize());
 //ds
       elem->SetAttribute("Dataset", lookmarkWidget->GetDataset());
+      elem->SetIntAttribute("MainFrameCollapsedState", lookmarkWidget->GetMainFrameCollapsedState());
+      elem->SetIntAttribute("CommentsFrameCollapsedState", lookmarkWidget->GetCommentsFrameCollapsedState());
       
       float *temp2;
       temp2 = lookmarkWidget->GetCenterOfRotation();
@@ -3318,6 +3367,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
       newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
       newLmkFolder->SetFolderName(oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
+      newLmkFolder->SetMainFrameCollapsedState(oldLmkFolder->GetMainFrameCollapsedState());
       newLmkFolder->SetLocation(oldLmkFolder->GetLocation());
       this->Script("pack %s -fill both -expand yes -padx 8",newLmkFolder->GetWidgetName());
 
@@ -3375,6 +3425,8 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       newLmkWidget->SetPixelSize(oldLmkWidget->GetPixelSize());
       newLmkWidget->CreateIconFromImageData();
       newLmkWidget->SetStateScript(oldLmkWidget->GetStateScript());
+      newLmkWidget->SetMainFrameCollapsedState(oldLmkWidget->GetMainFrameCollapsedState());
+      newLmkWidget->SetCommentsFrameCollapsedState(oldLmkWidget->GetCommentsFrameCollapsedState());
       newLmkWidget->UpdateWidgetValues();
       newLmkWidget->CommentsModifiedCallback();
       this->Script("pack %s -fill both -expand yes -padx 8",newLmkWidget->GetWidgetName());
