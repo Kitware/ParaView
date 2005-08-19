@@ -32,6 +32,7 @@
 #include "vtkKWCoreWidget.h"
 
 class vtkKWIcon;
+class vtkKWMultiColumnListInternals;
 
 class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWCoreWidget
 {
@@ -556,27 +557,6 @@ public:
   virtual void RefreshAllCellWindowCommands();
 
   // Description:
-  // If On, all cells with a WindowCommand will be refreshed automatically
-  // each time the selection is changed.
-  vtkBooleanMacro(RefreshCellWindowCommandOnSelectionChanged, int);
-  vtkSetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
-  vtkGetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
-
-  // Description:
-  // If On, all cells with a WindowCommand will be refreshed automatically
-  // each time any change is made that can potentially affect the background
-  // color of a cell. 
-  // This is useful if a user-defined dynamic widget created in a cell
-  // is setting its own background color to match the background color
-  // of a cell (using GetCellCurrentBackgroundColor).
-  // Since changing the selection can affect this color too, you usually do
-  // not need to set RefreshCellWindowCommandOnSelectionChanged if this ivar
-  // is set already.
-  vtkBooleanMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged, int);
-  vtkSetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
-  vtkGetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
-
-  // Description:
   // Retrieve the path of the window contained in the cell as created by 
   // the WindowCommand.
   virtual const char* GetCellWindowWidgetName(int row_index, int col_index);
@@ -791,6 +771,16 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
+  // Specifies a command to be invoked when the any change is made that
+  // can potentially affect the background color of a cell. 
+  // This is useful if a user-defined dynamic widget created in a cell
+  // is setting its own background color to match the background color
+  // of a cell (using GetCellCurrentBackgroundColor). In that case,
+  // set this command to RefreshAllCellWindowCommands. 
+  virtual void SetPotentialCellBackgroundColorChangedCommand(
+    vtkObject* object, const char *method);
+
+  // Description:
   // Specifies a command to be invoked when the interactive editing of a cell's
   // contents is started. The command is automatically concatenated with the
   // name of the tablelist widget (TableList), the cell's row and column
@@ -851,8 +841,10 @@ protected:
   ~vtkKWMultiColumnList();
 
   char *SelectionChangedCommand;
-  int RefreshCellWindowCommandOnSelectionChanged;
-  int RefreshCellWindowCommandOnPotentialBackgroundColorChanged;
+  virtual void InvokeSelectionChangedCommand();
+
+  char *PotentialCellBackgroundColorChangedCommand;
+  virtual void InvokePotentialCellBackgroundColorChangedCommand();
 
   // Description:
   // Called when the number of rows changed
@@ -904,6 +896,11 @@ protected:
     int row_index, int col_index, const char *option, const char *value);
   virtual const char* GetCellConfigurationOptionAsText(
     int row_index, int col_index, const char *option);
+
+  // PIMPL Encapsulation for STL containers
+  //BTX
+  vtkKWMultiColumnListInternals *Internals;
+  //ETX
 
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented
