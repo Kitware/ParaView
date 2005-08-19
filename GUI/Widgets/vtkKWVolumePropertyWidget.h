@@ -84,6 +84,12 @@ public:
   virtual int IsInWindowLevelMode();
 
   // Description:
+  // Set/Get the HSV color selector visibility
+  vtkBooleanMacro(HSVColorSelectorVisibility, int);
+  virtual void SetHSVColorSelectorVisibility(int);
+  vtkGetMacro(HSVColorSelectorVisibility, int);
+
+  // Description:
   // Set/Get the component selection widget visibility
   vtkBooleanMacro(ComponentSelectionVisibility, int);
   virtual void SetComponentSelectionVisibility(int);
@@ -198,6 +204,7 @@ protected:
   int   DisableCommands;
   int   EnableShadingForAllComponents;
 
+  int   HSVColorSelectorVisibility;
   int   ComponentSelectionVisibility;
   int   InterpolationTypeVisibility;
   int   MaterialPropertyVisibility;

@@ -50,7 +50,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.23");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.24");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -66,6 +66,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->DisableCommands               = 0;
   this->EnableShadingForAllComponents = 0;
 
+  this->HSVColorSelectorVisibility = 1;
   this->ComponentSelectionVisibility = 1;
   this->InterpolationTypeVisibility = 1;
   this->MaterialPropertyVisibility = 1;
@@ -636,8 +637,11 @@ void vtkKWVolumePropertyWidget::Pack()
   
   // HSV Color Selector (HSV)
 
-  tk_cmd << "grid " << this->HSVColorSelector->GetWidgetName()
-         << " -sticky nw " << col1 << " -row " << row << pad << endl;
+  if (this->HSVColorSelectorVisibility)
+    {
+    tk_cmd << "grid " << this->HSVColorSelector->GetWidgetName()
+           << " -sticky nw " << col1 << " -row " << row << pad << endl;
+    }
 
   // Select Component (SC)
 
@@ -821,7 +825,8 @@ void vtkKWVolumePropertyWidget::Update()
       }
     if (EnableShadingCheckButton->IsCreated())
       {
-      if (this->EnableShadingForAllComponents)
+      if (this->EnableShadingForAllComponents &&
+          this->MaterialPropertyVisibility)
         {
         tk_cmd << "pack "
                << this->EnableShadingCheckButton->GetWidgetName() 
@@ -1405,6 +1410,21 @@ void vtkKWVolumePropertyWidget::SetComponentSelectionVisibility(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetHSVColorSelectorVisibility(int arg)
+{
+  if (this->HSVColorSelectorVisibility == arg)
+    {
+    return;
+    }
+
+  this->HSVColorSelectorVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetInterpolationTypeVisibility(int arg)
 {
   if (this->InterpolationTypeVisibility == arg)
@@ -1954,6 +1974,8 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->EnableShadingForAllComponents ? "On" : "Off") << endl;
   os << indent << "ComponentSelectionVisibility: "
      << (this->ComponentSelectionVisibility ? "On" : "Off") << endl;
+  os << indent << "HSVColorSelectorVisibility: "
+     << (this->HSVColorSelectorVisibility ? "On" : "Off") << endl;
   os << indent << "InterpolationTypeVisibility: "
      << (this->InterpolationTypeVisibility ? "On" : "Off") << endl;
   os << indent << "MaterialPropertyVisibility: "
