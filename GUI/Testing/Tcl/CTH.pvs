@@ -56,7 +56,7 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
 
 # Lookmark Test
 set lookmarkManager [[ $Application GetMainWindow ] GetPVLookmarkManager]
-set lookmark [$lookmarkManager CreateLookmark "CalcInput" 0]
+set lookmark [$lookmarkManager CreateLookmark "CTH" 0]
 [ $Application GetMainWindow ] DeleteAllSources
 $lookmark View
 $lookmarkManager Withdraw
