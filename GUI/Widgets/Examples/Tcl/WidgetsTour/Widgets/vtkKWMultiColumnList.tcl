@@ -20,6 +20,7 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
     "A simple multicolumn list. Columns can be resized moved and sorted.\
     Double-click on some entries to edit them."
   mcl1 MovableColumnsOn
+  mcl1 SetWidth 0
 
   # Add the columns make some of them editable
 
