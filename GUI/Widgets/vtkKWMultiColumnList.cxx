@@ -18,17 +18,21 @@
 #include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
+#include <vtksys/stl/vector>
+#include <vtksys/SystemTools.hxx>
 
 #include "Utilities/Tablelist/vtkKWTablelistInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.14");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
 {
   this->SelectionChangedCommand = NULL;
+  this->RefreshCellWindowCommandOnSelectionChanged = 0;
+  this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -68,6 +72,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   this->SetLabelCommand(NULL, "tablelist::sortByColumn");
   this->SetReliefToSunken();
   this->SetBorderWidth(2);
+  this->SetRowSpacing(2);
 
   this->SetConfigurationOption("-activestyle", "none");
 
@@ -165,6 +170,18 @@ void vtkKWMultiColumnList::SetMovableColumns(int arg)
 int vtkKWMultiColumnList::GetMovableColumns()
 {
   return this->GetConfigurationOptionAsInt("-movablecolumns");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetRowSpacing(int arg)
+{
+  this->SetConfigurationOptionAsInt("-spacing", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetRowSpacing()
+{
+  return this->GetConfigurationOptionAsInt("-spacing");
 }
 
 //----------------------------------------------------------------------------
@@ -283,78 +300,13 @@ int vtkKWMultiColumnList::GetColumnMaximumWidth(int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnStretchable(int col_index, int flag)
 {
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  char buffer[10];
-  vtksys_stl::string stretch(this->GetConfigurationOption("-stretch"));
-
-  // If we are stretching all columns already, do not bother
-  // Otherwise translate all into a list of all columns
-
-  if (!strcmp("all", stretch.c_str()))
-    {
-    if (flag == 1)
-      {
-      return;
-      }
-    stretch = "";
-    int nb_columns = this->GetNumberOfColumns();
-    for (int i = 0; i < nb_columns; i++)
-      {
-      sprintf(buffer, " %d", i);
-      stretch += buffer;
-      }
-    }
-
-  // Is the column in the stretch list already. Remove or add it if needed
-
-  int pos = atoi(
-    this->Script("lsearch -exact {%s} %d", stretch.c_str(), col_index));
-
-  if (flag == 1)
-    {
-    if (pos < 0)
-      {
-      sprintf(buffer, " %d", col_index);
-      stretch += buffer;
-      this->SetConfigurationOption("-stretch", stretch.c_str());
-      }
-    }
-  else
-    {
-    if (pos >= 0)
-      {
-      stretch = this->Script("lreplace {%s} %d %d", stretch.c_str(), pos, pos);
-      this->SetConfigurationOption("-stretch", stretch.c_str());
-      }
-    }
+  this->SetColumnConfigurationOptionAsInt(col_index, "-stretchable",flag?1:0);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetColumnStretchable(int col_index)
 {
-  if (!this->IsCreated())
-    {
-    return 0;
-    }
-
-  vtksys_stl::string stretch(this->GetConfigurationOption("-stretch"));
-
-  // If we are stretching all columns already, do not bother
-
-  if (!strcmp("all", stretch.c_str()))
-    {
-    return 1;
-    }
-  
-  // Is the column in the stretch list
-
-  int pos = atoi(
-    this->Script("lsearch -exact {%s} %d", stretch.c_str(), col_index));
-  return pos >= 0 ? 1 : 0;
+  return this->GetColumnConfigurationOptionAsInt(col_index, "-stretchable");
 }
 
 //----------------------------------------------------------------------------
@@ -533,6 +485,10 @@ void vtkKWMultiColumnList::SetColumnBackgroundColor(
     sprintf(color, "#%02x%02x%02x", 
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetColumnConfigurationOption(col_index, "-bg", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -903,9 +859,26 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         {
         item += "\"\" ";
         }
+      int nb_rows = this->GetNumberOfRows();
       this->Script("%s insert %d {%s}", 
                    this->GetWidgetName(), row_index, item.c_str());
+      if (this->GetNumberOfRows() != nb_rows)
+        {
+        this->NumberOfRowsChanged();
+        }
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::NumberOfRowsChanged()
+{
+  // Trigger this because inserting/removing rows can change the background
+  // color of a row (given the stripes, or the specific row colors, etc.)
+
+  if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+    {
+    this->RefreshAllCellWindowCommands();
     }
 }
 
@@ -943,8 +916,13 @@ void vtkKWMultiColumnList::DeleteRow(int row_index)
 {
   if (this->IsCreated())
     {
+    int nb_rows = this->GetNumberOfRows();
     this->Script("%s delete %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    if (this->GetNumberOfRows() != nb_rows)
+      {
+      this->NumberOfRowsChanged();
+      }
     }
 }
 
@@ -953,7 +931,12 @@ void vtkKWMultiColumnList::DeleteAllRows()
 {
   if (this->IsCreated())
     {
+    int nb_rows = this->GetNumberOfRows();
     this->Script("%s delete 0 end", this->GetWidgetName());
+    if (this->GetNumberOfRows() != nb_rows)
+      {
+      this->NumberOfRowsChanged();
+      }
     }
 }
 
@@ -984,6 +967,10 @@ void vtkKWMultiColumnList::SetRowBackgroundColor(
     sprintf(color, "#%02x%02x%02x", 
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetRowConfigurationOption(row_index, "-bg", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -1036,6 +1023,10 @@ double* vtkKWMultiColumnList::GetStripeBackgroundColor()
 void vtkKWMultiColumnList::SetStripeBackgroundColor(double r, double g, double b)
 {
   vtkKWTkUtilities::SetOptionColor(this, "-stripebackground", r, g, b);
+  if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+    {
+    this->RefreshAllCellWindowCommands();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1062,6 +1053,12 @@ void vtkKWMultiColumnList::SetStripeForegroundColor(double r, double g, double b
 void vtkKWMultiColumnList::SetStripeHeight(int height)
 {
   this->SetConfigurationOptionAsInt("-stripeheight", height);
+  // Trigger this method since the stripe will be re-organized, hence
+  // the background color of a cell will change
+  if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+    {
+    this->RefreshAllCellWindowCommands();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1361,6 +1358,10 @@ void vtkKWMultiColumnList::SetCellBackgroundColor(
     sprintf(color, "#%02x%02x%02x", 
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetCellConfigurationOption(row_index, col_index, "-bg", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -1400,6 +1401,39 @@ void vtkKWMultiColumnList::GetCellCurrentBackgroundColor(
 {
   const char *bgcolor;
 
+  // Selection has priority
+
+  if (this->IsCellSelected(row_index, col_index))
+    {
+    // Cell selection color has priority, then row, column
+
+    bgcolor = this->GetCellConfigurationOption(
+      row_index, col_index, "-selectbackground");
+    if (bgcolor && *bgcolor)
+      {
+      this->GetCellSelectionBackgroundColor(row_index, col_index, r, g, b);
+      return;
+      }
+
+    bgcolor = this->GetRowConfigurationOption(row_index, "-selectbackground");
+    if (bgcolor && *bgcolor)
+      {
+      this->GetRowSelectionBackgroundColor(row_index, r, g, b);
+      return;
+      }
+
+    bgcolor = this->GetColumnConfigurationOption(
+      col_index, "-selectbackground");
+    if (bgcolor && *bgcolor)
+      {
+      this->GetColumnSelectionBackgroundColor(col_index, r, g, b);
+      return;
+      }
+
+    this->GetSelectionBackgroundColor(r, g, b);
+    return;
+    }
+
   // Cell color has priority
 
   bgcolor =  this->GetCellConfigurationOption(row_index, col_index, "-bg");
@@ -1409,7 +1443,7 @@ void vtkKWMultiColumnList::GetCellCurrentBackgroundColor(
     return;
     }
   
-  // The row color
+  // Then row color
 
   bgcolor = this->GetRowConfigurationOption(row_index, "-bg");
   if (bgcolor && *bgcolor)
@@ -1557,16 +1591,62 @@ void vtkKWMultiColumnList::SetCellImageToPixels(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellWindowCommand(int row_index, 
                                                 int col_index, 
-                      
-                          vtkObject* object, 
+                                                vtkObject* object, 
                                                 const char *method)
 {
   if (this->IsCreated())
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
-    this->SetCellConfigurationOption(row_index, col_index, "-window", command);
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-window", command);
     delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index, 
+                                                       int col_index, 
+                                                       vtkObject* object, 
+                                                       const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-windowdestroy", command);
+    delete [] command;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshCellWindowCommand(int row_index, 
+                                                    int col_index)
+{
+  const char *command = 
+    this->GetCellConfigurationOption(row_index, col_index, "-window");
+  if (command && *command)
+    {
+    vtksys_stl::string command_str(command);
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-window", "");
+    this->SetCellConfigurationOption(
+      row_index, col_index, "-window", command_str.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshAllCellWindowCommands()
+{
+  int nb_rows = this->GetNumberOfRows();
+  int nb_cols = this->GetNumberOfColumns();
+  for (int row = 0; row < nb_rows; row++)
+    {
+    for (int col = 0; col < nb_cols; col++)
+      {
+      this->RefreshCellWindowCommand(row, col);
+      }
     }
 }
 
@@ -1662,11 +1742,29 @@ int vtkKWMultiColumnList::FindCellTextInColumn(
   if (this->IsCreated() && text)
     {
     int nb_rows = this->GetNumberOfRows();
-
     for (int j = 0; j < nb_rows; j++)
       {
       const char *cell_text = this->GetCellText(j, col_index);
       if (cell_text && !strcmp(cell_text, text))
+        {
+        return j;
+        }
+      }
+    }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::FindCellTextAsIntInColumn(
+  int col_index, int value)
+{
+  if (this->IsCreated())
+    {
+    int nb_rows = this->GetNumberOfRows();
+    for (int j = 0; j < nb_rows; j++)
+      {
+      if (value == this->GetCellTextAsInt(j, col_index))
         {
         return j;
         }
@@ -1826,6 +1924,16 @@ const char* vtkKWMultiColumnList::GetCellConfigurationOptionAsText(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetBackgroundColor(double r, double g, double b)
+{
+  this->Superclass::SetBackgroundColor(r, g, b);
+  if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+    {
+    this->RefreshAllCellWindowCommands();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::GetSelectionBackgroundColor(
   double *r, double *g, double *b)
 {
@@ -1844,6 +1952,10 @@ double* vtkKWMultiColumnList::GetSelectionBackgroundColor()
 void vtkKWMultiColumnList::SetSelectionBackgroundColor(double r, double g, double b)
 {
   vtkKWTkUtilities::SetOptionColor(this, "-selectbackground", r, g, b);
+  if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+    {
+    this->RefreshAllCellWindowCommands();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1893,6 +2005,10 @@ void vtkKWMultiColumnList::SetColumnSelectionBackgroundColor(
     sprintf(color, "#%02x%02x%02x", 
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetColumnConfigurationOption(col_index, "-selectbackground", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -1953,6 +2069,10 @@ void vtkKWMultiColumnList::SetRowSelectionBackgroundColor(
     sprintf(color, "#%02x%02x%02x", 
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetRowConfigurationOption(row_index, "-selectbackground", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -2017,6 +2137,10 @@ void vtkKWMultiColumnList::SetCellSelectionBackgroundColor(
             (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     this->SetCellConfigurationOption(
       row_index, col_index, "-selectbackground", color);
+    if (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
+      {
+      this->RefreshAllCellWindowCommands();
+      }
     }
 }
 
@@ -2152,6 +2276,57 @@ int vtkKWMultiColumnList::IsRowSelected(int row_index)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetNumberOfSelectedRows()
+{
+  if (this->IsCreated())
+    {
+    return atoi(
+      this->Script("llength [%s curselection]", this->GetWidgetName()));
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetSelectedRows(int *indices)
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  vtksys_stl::string curselection(
+    this->Script("%s curselection", this->GetWidgetName()));
+
+  vtksys_stl::vector<vtksys_stl::string> split_elems;
+  vtksys::SystemTools::Split(curselection.c_str(), split_elems, ' ');
+  
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = split_elems.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = split_elems.end();
+  int index = 0;
+  for (; it != end; index++, it++)
+    {
+    indices[index] = atoi((*it).c_str());
+    }
+
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetIndexOfFirstSelectedRow()
+{
+  if (this->IsCreated())
+    {
+    const char *sel = this->Script("lindex [%s curselection] 0", 
+                                   this->GetWidgetName());
+    if (sel && *sel)
+      {
+      return atoi(sel);
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectSingleCell(int row_index, int col_index)
 {
   this->ClearSelection();
@@ -2192,18 +2367,44 @@ int vtkKWMultiColumnList::IsCellSelected(int row_index, int col_index)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMultiColumnList::GetIndexOfFirstSelectedRow()
+int vtkKWMultiColumnList::GetNumberOfSelectedCells()
 {
   if (this->IsCreated())
     {
-    const char *sel = this->Script("lindex [%s curselection] 0", 
-                                   this->GetWidgetName());
-    if (sel && *sel)
+    return atoi(
+      this->Script("llength [%s curcellselection]", this->GetWidgetName()));
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetSelectedCells(int *row_indices, int *col_indices)
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  vtksys_stl::string curselection(
+    this->Script("%s curcellselection", this->GetWidgetName()));
+
+  vtksys_stl::vector<vtksys_stl::string> split_elems;
+  vtksys::SystemTools::Split(curselection.c_str(), split_elems, ' ');
+  
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = split_elems.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = split_elems.end();
+  int index = 0, row, col;
+  for (; it != end; it++)
+    {
+    if (sscanf((*it).c_str(), "%d,%d", &row, &col) == 2)
       {
-      return atoi(sel);
+      row_indices[index] = row;
+      col_indices[index] = col;
+      index++;
       }
     }
-  return -1;
+
+  return index;
 }
 
 //----------------------------------------------------------------------------
@@ -2225,6 +2426,11 @@ void vtkKWMultiColumnList::SetSelectionChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectionChangedCallback()
 {
+  if (this->RefreshCellWindowCommandOnSelectionChanged)
+    {
+    this->RefreshAllCellWindowCommands();
+    }
+    
   if (this->SelectionChangedCommand && *this->SelectionChangedCommand && 
       this->IsCreated())
     {
@@ -2296,4 +2502,11 @@ void vtkKWMultiColumnList::UpdateEnableState()
 void vtkKWMultiColumnList::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "RefreshCellWindowCommandOnSelectionChanged: " 
+     << (this->RefreshCellWindowCommandOnSelectionChanged ? "On" : "Off") 
+     << endl;
+  os << indent << "RefreshCellWindowCommandOnPotentialBackgroundColorChanged: " 
+     << (this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged ? "On" : "Off") 
+     << endl;
 }

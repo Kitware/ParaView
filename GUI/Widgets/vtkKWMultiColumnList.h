@@ -56,6 +56,12 @@ public:
   virtual int GetHeight();
 
   // Description:
+  // Convenience method to Set the current background color of the widget
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
   // Add a column at the end.
   // Returns the index of the column
   virtual int AddColumn(const char *title);
@@ -80,6 +86,12 @@ public:
   vtkBooleanMacro(MovableColumns, int);
   virtual void SetMovableColumns(int);
   virtual int GetMovableColumns();
+
+  // Description:
+  // Specifies additional space to provide above and below each row of the
+  // widget.
+  virtual void SetRowSpacing(int);
+  virtual int GetRowSpacing();
 
   // Description:
   // Specifies a boolean value that determines whether the columns can be 
@@ -471,8 +483,10 @@ public:
       row_index, col_index, rgb[0], rgb[1], rgb[2]); };
 
   // Description:
-  // Get a the current cell background color
-  // In order of priority: cell > row > stripe > column > background color.
+  // Get the current cell background color
+  // In order of priority:
+  // - for background color: cell > row > stripe > column > widget.
+  // - if selected, selection background color: cell > row > column > widget
   virtual void GetCellCurrentBackgroundColor(
     int row_index, int col_index, double *r, double *g, double *b);
   virtual double* GetCellCurrentBackgroundColor(int row_index, int col_index);
@@ -515,6 +529,16 @@ public:
   // widget, the cell's row and column indices, as well as the path name of
   // the embedded window to be created, and the resulting script is evaluated
   // in the global scope.
+  // The SetCellWindowDestroyCommand method can be used to pecify a Tcl 
+  // command to be invoked when the window embedded into the cell is 
+  // destroyed. It is automatically concatenated the same parameter as the
+  // above command.
+  // The RefreshCellWindowCommand can be used to force the cell to
+  // recreate its dynamic content. 
+  // If RefreshCellWindowCommandOnSelectionChanged is On, this refresh will
+  // be done automatically each time the selection is changed.
+  // If RefreshCellWindowCommandOnPotentialBackgroundColorChanged is On, this refresh
+  // will be done automatically each time any background color is changed.
   // The path of the window contained in the cell as created by that
   // command can be retrieved using GetCellWindowWidgetName.
   // Note that once the widget is created by the command, clicking on it
@@ -531,8 +555,18 @@ public:
   // the bindings to be passed on too. Use AddBindingsToWidgetAndChildren
   // to pass the bindings to a widget and its chilren automatically (or
   // call AddBindingsToWidget manually on each sub-widgets).
-  virtual void SetCellWindowCommand(int row_index, int col_index, 
-                                    vtkObject* object, const char *method);
+  virtual void SetCellWindowCommand(
+    int row_index, int col_index, vtkObject* object, const char *method);
+  virtual void SetCellWindowDestroyCommand(
+    int row_index, int col_index, vtkObject* object, const char *method);
+  virtual void RefreshCellWindowCommand(int row_index, int col_index);
+  virtual void RefreshAllCellWindowCommands();
+  vtkBooleanMacro(RefreshCellWindowCommandOnSelectionChanged, int);
+  vtkSetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
+  vtkGetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
+  vtkBooleanMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged, int);
+  vtkSetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
+  vtkGetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
   virtual const char* GetCellWindowWidgetName(int row_index, int col_index);
   virtual void AddBindingsToWidgetName(const char *widget_name);
   virtual void AddBindingsToWidget(vtkKWWidget *widget);
@@ -549,6 +583,7 @@ public:
   virtual int FindCellText(const char *text, int *row_index, int *col_index);
   virtual int* FindCellText(const char *text);
   virtual int FindCellTextInColumn(int col_index, const char *text);
+  virtual int FindCellTextAsIntInColumn(int col_index, int value);
 
   // Description:
   // Edit cell (or cancel edit). If supported, edit cell contents interactively
@@ -689,6 +724,18 @@ public:
   virtual int IsRowSelected(int row_index);
 
   // Description:
+  // Get the number of selected rows, and retrieve their indices (it is up
+  // to the caller to provide a large enough buffer). Both returns the
+  // number of selected rows.
+  virtual int GetNumberOfSelectedRows();
+  virtual int GetSelectedRows(int *indices);
+
+  // Description:
+  // Get index of first selected row.
+  // Returns -1 on error.
+  virtual int GetIndexOfFirstSelectedRow();
+
+  // Description:
   // Select/deselect a cell, or single cell (any other selection is cleared).
   virtual void SelectCell(int row_index, int col_index);
   virtual void DeselectCell(int row_index, int col_index);
@@ -699,9 +746,11 @@ public:
   virtual int IsCellSelected(int row_index, int col_index);
 
   // Description:
-  // Get index of first selected row.
-  // Returns -1 on error.
-  virtual int GetIndexOfFirstSelectedRow();
+  // Get the number of selected cells, and retrieve their indices (it is up
+  // to the caller to provide large enough buffers). Both returns the
+  // number of selected cells.
+  virtual int GetNumberOfSelectedCells();
+  virtual int GetSelectedCells(int *row_indices, int *col_indices);
 
   // Description:
   // Clear selection
@@ -771,6 +820,12 @@ protected:
   ~vtkKWMultiColumnList();
 
   char *SelectionChangedCommand;
+  int RefreshCellWindowCommandOnSelectionChanged;
+  int RefreshCellWindowCommandOnPotentialBackgroundColorChanged;
+
+  // Description:
+  // Called when the number of rows changed
+  virtual void NumberOfRowsChanged();
 
   // Description:
   // Set/Get a column configuration option (ex: "-bg") 
