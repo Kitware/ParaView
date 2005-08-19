@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.19");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.20");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -2206,8 +2206,12 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
   void *pn = newArray->GetVoidPointer(0);
   switch (a1->GetDataType())
     {
-    vtkTemplateMacro5(vtkMergeVectorComponents, length, 
-      (VTK_TT*)p1,(VTK_TT*)p2,(VTK_TT*)p3,(VTK_TT*)pn);
+    vtkTemplateMacro(
+      vtkMergeVectorComponents( length, 
+                                (VTK_TT*)p1,
+                                (VTK_TT*)p2,
+                                (VTK_TT*)p3,
+                                (VTK_TT*)pn));
   default:
     vtkErrorMacro(<< "Execute: Unknown ScalarType");
     return 0;
@@ -2299,8 +2303,12 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
   void *pn = newArray->GetVoidPointer(0);
   switch (a1->GetDataType())
     {
-    vtkTemplateMacro5(vtkMergeVectorComponents, length, 
-      (VTK_TT*)p1,(VTK_TT*)p2,(VTK_TT*)0,(VTK_TT*)pn);
+    vtkTemplateMacro(
+      vtkMergeVectorComponents( length, 
+                                (VTK_TT*)p1,
+                                (VTK_TT*)p2,
+                                (VTK_TT*)0,
+                                (VTK_TT*)pn));
   default:
     vtkErrorMacro(<< "Execute: Unknown ScalarType");
     return 0;
