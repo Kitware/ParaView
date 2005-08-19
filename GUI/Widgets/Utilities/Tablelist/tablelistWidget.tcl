@@ -55,6 +55,8 @@ namespace eval tablelist {
 	-highlightcolor		 {highlightColor	  HighlightColor      f}
 	-highlightthickness	 {highlightThickness	  HighlightThickness  f}
 	-incrarrowtype		 {incrArrowType		  IncrArrowType	      w}
+	-labelactivebackground	 {labelActiveBackground	  Foreground          l}
+	-labelactiveforeground	 {labelActiveForeground	  Background          l}
 	-labelbackground	 {labelBackground	  Background	      l}
 	-labelbg		 -labelbackground
 	-labelborderwidth	 {labelBorderWidth	  BorderWidth	      l}
@@ -72,6 +74,7 @@ namespace eval tablelist {
 	-movablerows		 {movableRows		  MovableRows	      w}
 	-movecolumncursor	 {moveColumnCursor	  MoveColumnCursor    w}
 	-movecursor		 {moveCursor		  MoveCursor	      w}
+	-protecttitlecolumns	 {protectTitleColumns	  ProtectTitleColumns w}
 	-relief			 {relief		  Relief	      f}
 	-resizablecolumns	 {resizableColumns	  ResizableColumns    w}
 	-resizecursor		 {resizeCursor		  ResizeCursor	      w}
@@ -86,6 +89,7 @@ namespace eval tablelist {
 	-showseparators		 {showSeparators	  ShowSeparators      w}
 	-snipstring		 {snipString		  SnipString	      w}
 	-sortcommand		 {sortCommand		  SortCommand	      w}
+	-spacing		 {spacing		  Spacing	      w}
 	-state			 {state			  State		      w}
 	-stretch		 {stretch		  Stretch	      w}
 	-stripebackground	 {stripeBackground	  Background	      w}
@@ -162,6 +166,7 @@ namespace eval tablelist {
 	-showarrow		{showArrow		ShowArrow	}
 	-sortcommand		{sortCommand		SortCommand	}
 	-sortmode		{sortMode		SortMode	}
+	-stretchable		{stretchable		Stretchable	}
 	-text			{text			Text		}
 	-title			{title			Title		}
 	-width			{width			Width		}
@@ -200,6 +205,7 @@ namespace eval tablelist {
 	-font			{font			Font		}
 	-foreground		{foreground		Foreground	}
 	-fg			-foreground
+	-name			{name			Name		}
 	-selectable		{selectable		Selectable	}
 	-selectbackground	{selectBackground	Foreground	}
 	-selectforeground	{selectForeground	Background	}
@@ -234,6 +240,7 @@ namespace eval tablelist {
 	-selectforeground	{selectForeground	Background	}
 	-text			{text			Text		}
 	-window			{window			Window		}
+	-windowdestroy		{windowDestroy		WindowDestroy	}
     }
 
     #
@@ -345,6 +352,13 @@ namespace eval tablelist {
     }
 
     #
+    # Define some TablelistWindow class bindings
+    #
+    bind TablelistWindow <Destroy> {
+	tablelist::cleanupWindow %W
+    }
+
+    #
     # Define the binding tags TablelistKeyNav and TablelistBody
     #
     mwutil::defineKeyNav Tablelist
@@ -366,6 +380,7 @@ namespace eval tablelist {
     #
     bind TablelistLabel <Enter>		  { tablelist::labelEnter    %W %x }
     bind TablelistLabel <Motion>	  { tablelist::labelEnter    %W %x }
+    bind TablelistLabel <Leave>		  { tablelist::labelLeave %W %X %x %y }
     bind TablelistLabel <Button-1>	  { tablelist::labelB1Down   %W %x }
     bind TablelistLabel <B1-Motion>	  { tablelist::labelB1Motion %W %x %y }
     bind TablelistLabel <B1-Enter>	  { tablelist::labelB1Enter  %W }
@@ -478,6 +493,7 @@ proc tablelist::tablelist args {
 	    forceAdjust		 0
 	    fmtCmdFlagList	 {}
 	    scrlColOffset	 0
+	    cellsToReconfig	 {}
 	}
 
 	#
@@ -540,13 +556,15 @@ proc tablelist::tablelist args {
     $w window create 1.0 -window $data(hdrTxtFr)
     set w $data(hdrLbl)			;# filler label within the header frame
     if {$usingTile} {
-	ttk::label $data(hdrTxtFrLbl)0
-	ttk::label $w -image "" -padding {1 1 1 1} -takefocus 0 -text "" \
+	ttk::label $data(hdrTxtFrLbl)0 -style TablelistHeader.TLabel
+	ttk::label $w -style TablelistHeader.TLabel -image "" \
+		      -padding {1 1 1 1} -takefocus 0 -text "" \
 		      -textvariable "" -underline -1 -wraplength 0
     } else {
 	tk::label $data(hdrTxtFrLbl)0 
-	tk::label $w -bitmap "" -highlightthickness 0 -image "" -takefocus 0 \
-		     -text "" -textvariable "" -underline -1 -wraplength 0
+	tk::label $w -bitmap "" -highlightthickness 0 -image "" \
+		     -takefocus 0 -text "" -textvariable "" -underline -1 \
+		     -wraplength 0
     }
     place $w -relheight 1.0 -relwidth 1.0
 
@@ -1505,10 +1523,14 @@ proc tablelist::bboxSubCmd {win index} {
 	return {}
     }
 
+    set selectBd [winfo pixels $w $data(-selectborderwidth)]
+    if {$selectBd < 0} {
+	set selectBd 0
+    }
     foreach {x y width height baselinePos} $dlineinfo {}
     lappend bbox [expr {$x + [winfo x $w]}] \
-		 [expr {$y + [winfo y $w] + $data(-selectborderwidth)}] \
-		 $width [expr {$height - 2*$data(-selectborderwidth) - 1}]
+		 [expr {$y + [winfo y $w] + $selectBd}] \
+		 $width [expr {$height - 2*$selectBd - 1}]
     return $bbox
 }
 
@@ -2041,6 +2063,9 @@ proc tablelist::deleteRows {win first last updateListVar} {
 	if {$count != $data(itemCount)} {
 	    lappend data(freeKeyList) $key
 	}
+	if {[info exists data($key-name)]} {
+	    unset data($key-name)
+	}
 	array set itemData [array get data $key*-\[bfse\]*]	;# for speed
 
 	foreach name [array names itemData $key-\[bfs\]*] {
@@ -2065,11 +2090,10 @@ proc tablelist::deleteRows {win first last updateListVar} {
 		unset data($key-$col-window)
 		unset data($key-$col-reqWidth)
 		unset data($key-$col-reqHeight)
-		if {[info exists data($key-$col-reconfigId]} {
-		    after cancel $data($key-$col-reconfigId)
-		    unset data($key-$col-reconfigId)
-		}
 		incr data(winCount) -1
+	    }
+	    if {[info exists data($key-$col-windowdestroy)]} {
+		unset data($key-$col-windowdestroy)
 	    }
 	}
 
@@ -3587,7 +3611,8 @@ proc tablelist::restoreUsingTile {origVal varName index op} {
     set usingTile $origVal
     switch $op {
 	w {
-	    return -code error "it is a read-only variable"
+	    return -code error "it is not allowed to use both Tablelist and\
+				Tablelist_tile in the same application"
 	}
 
 	u {

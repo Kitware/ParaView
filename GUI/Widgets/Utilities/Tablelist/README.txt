@@ -25,7 +25,7 @@ The changes are:
      to the empty script: bind TablelistBody <Double-Button-1> { ... }
      then remove everything below: tablelist::condEditContainingCell ... \ 
   b) in: bind TablelistBody <Button-1> {...}
-     remove the line: tablelist::condEditContainingCell ... \ 
+     remove the line: tablelist::condEditContainingCell ... \ + next line
          
 --------------------------------------------------------------------------
 

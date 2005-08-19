@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.15");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -1621,6 +1621,26 @@ void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowDestroyCommandToRemoveChild(
+  int row_index, 
+  int col_index)
+{
+  this->SetCellWindowDestroyCommand(
+    row_index, col_index, this, "CellWindowDestroyRemoveChildCallback");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowDestroyRemoveChildCallback(
+  const char *, int, int, const char *widget)
+{
+  vtkKWWidget *child = this->GetChildWidgetWithName(widget);
+  if (child)
+    {
+    child->SetParent(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::RefreshCellWindowCommand(int row_index, 
                                                     int col_index)
 {
@@ -2426,7 +2446,8 @@ void vtkKWMultiColumnList::SetSelectionChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectionChangedCallback()
 {
-  if (this->RefreshCellWindowCommandOnSelectionChanged)
+  if (this->RefreshCellWindowCommandOnSelectionChanged ||
+      this->RefreshCellWindowCommandOnPotentialBackgroundColorChanged)
     {
     this->RefreshAllCellWindowCommands();
     }

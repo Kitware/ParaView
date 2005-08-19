@@ -4,86 +4,6 @@
 # Copyright (c) 2000-2005  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 #==============================================================================
 
-namespace eval tablelist {
-    if {$usingTile} {
-	#
-	# Temporary workaround for missing introspection capabilities:
-	#
-	variable labelDefaults
-	array set labelDefaults {
-	    alt-background	  #d9d9d9
-	    alt-foreground	  black
-	    alt-font		  TkDefaultFont
-
-	    aqua-background	  #f0f0f0
-	    aqua-foreground	  black
-	    aqua-font		  System
-
-	    Aquativo-background	  #fafafa
-	    Aquativo-foreground	  black
-	    Aquativo-font	  TkDefaultFont
-
-	    blue-background	  #6699cc
-	    blue-foreground	  black
-	    blue-font		  TkDefaultFont
-
-	    clam-background	  #dcdad5
-	    clam-foreground	  black
-	    clam-font		  TkDefaultFont
-
-	    classic-background	  #d9d9d9
-	    classic-foreground	  black
-	    classic-font	  TkClassicDefaultFont
-
-	    default-background	  #d9d9d9
-	    default-foreground	  black
-	    default-font	  TkDefaultFont
-
-	    keramik-background	  #cccccc
-	    keramik-foreground	  black
-	    keramik-font	  TkDefaultFont
-
-	    kroc-background	  #fcb64f
-	    kroc-foreground	  black
-	    kroc-font		  TkDefaultFont
-
-	    plastik-background	  #cccccc
-	    plastik-foreground	  black
-	    plastik-font	  TkDefaultFont
-
-	    sriv-background	  #a0a0a0
-	    sriv-foreground	  black
-	    sriv-font		  TkDefaultFont
-
-	    srivlg-background	  #6699cc
-	    srivlg-foreground	  black
-	    srivlg-font		  TkDefaultFont
-
-	    step-background	  #a0a0a0
-	    step-foreground	  black
-	    step-font		  TkDefaultFont
-
-	    tileqt-background	  "[tile::theme::tileqt::currentThemeColour \
-				    -background]"
-	    tileqt-foreground	  "[tile::theme::tileqt::currentThemeColour \
-				    -foreground]"
-	    tileqt-font		  TkDefaultFont
-
-	    winnative-background  SystemButtonFace
-	    winnative-foreground  SystemWindowText
-	    winnative-font	  $tile::WinGUIFont
-
-	    winxpblue-background  #ece9d8
-	    winxpblue-foreground  black
-	    winxpblue-font	  TkDefaultFont
-
-	    xpnative-background	  SystemButtonFace
-	    xpnative-foreground	  SystemWindowText
-	    xpnative-font	  "Tahoma 8"
-	}
-    }
-}
-
 #------------------------------------------------------------------------------
 # tablelist::extendConfigSpecs
 #
@@ -115,31 +35,69 @@ proc tablelist::extendConfigSpecs {} {
     }
     destroy $helpListbox
 
-    #
-    # Append the default values of some configuration options
-    # of an invisible label widget to the values of the
-    # corresponding -label* elements of the array configSpecs
-    #
     set helpLabel .__helpLabel
     for {set n 0} {[winfo exists $helpLabel]} {incr n} {
 	set helpLabel .__helpLabel$n
     }
+
+    lappend configSpecs(-titlecolumns) 0
     if {$usingTile} {
-	ttk::label $helpLabel
-	variable labelDefaults
-	foreach optTail {background foreground font} {
-	    lappend configSpecs(-label$optTail) \
-		    [subst $labelDefaults($tile::currentTheme-$optTail)]
+	foreach opt {-highlightbackground -highlightcolor -highlightthickness
+		     -labelactivebackground -labelactiveforeground
+		     -labeldisabledforeground -labelheight} {
+	    unset configSpecs($opt)
 	}
+
+	#
+	# Append theme-specific values to some elements of the array configSpecs
+	#
+	ttk::label $helpLabel
+	variable themeDefaults
+	${tile::currentTheme}Theme	;# pupulates the array themeDefaults
+	foreach opt {-labelbackground -labelforeground -labelfont
+		     -labelborderwidth -labelpady} {
+	    lappend configSpecs($opt) $themeDefaults($opt)
+	}
+	foreach opt {-background -foreground -disabledforeground -font
+		     -selectbackground -selectforeground -selectborderwidth} {
+	    lset configSpecs($opt) 3 $themeDefaults($opt)
+	}
+
+	#
+	# Define the header label layout
+	#
+	style layout TablelistHeader.TLabel {
+	    Treeheading.border -children {
+		Label.padding -children {
+		    Label.label
+		}
+	    }
+	}
+	style map TablelistHeader.TLabel -foreground [list background black]
     } else {
+	if {$::tk_version < 8.3} {
+	    unset configSpecs(-titlecolumns)
+	}
+
+	#
+	# Append the default values of some configuration options
+	# of an invisible label widget to the values of the
+	# corresponding -label* elements of the array configSpecs
+	#
 	tk::label $helpLabel
 	foreach optTail {font height} {
-	    set configSet [$helpLabel config -$optTail]
+	    set configSet [$helpLabel configure -$optTail]
 	    lappend configSpecs(-label$optTail) [lindex $configSet 3]
 	}
-	if {[catch {$helpLabel config -state disabled}] == 0 &&
-	    [catch {$helpLabel config -state normal}] == 0 &&
-	    [catch {$helpLabel config -disabledforeground} configSet] == 0} {
+	if {[catch {$helpLabel configure -activebackground} configSet1] == 0 &&
+	    [catch {$helpLabel configure -activeforeground} configSet2] == 0} {
+	    lappend configSpecs(-labelactivebackground) [lindex $configSet1 3]
+	    lappend configSpecs(-labelactiveforeground) [lindex $configSet2 3]
+	} else {
+	    unset configSpecs(-labelactivebackground)
+	    unset configSpecs(-labelactiveforeground)
+	}
+	if {[catch {$helpLabel configure -disabledforeground} configSet] == 0} {
 	    lappend configSpecs(-labeldisabledforeground) [lindex $configSet 3]
 	} else {
 	    unset configSpecs(-labeldisabledforeground)
@@ -148,26 +106,10 @@ proc tablelist::extendConfigSpecs {} {
 	    $::tcl_platform(osVersion) < 5.1} {
 	    lappend configSpecs(-labelpady) 0
 	} else {
-	    set configSet [$helpLabel config -pady]
+	    set configSet [$helpLabel configure -pady]
 	    lappend configSpecs(-labelpady) [lindex $configSet 3]
 	}
-    }
 
-    if {$usingTile} {
-	#
-	# Set the default values of the -labelborderwidth and -labelpady options
-	#
-	if {[regexp {^(aqua|default)$} $tile::currentTheme]} {
-	    lappend configSpecs(-labelborderwidth) 1
-	} else {
-	    lappend configSpecs(-labelborderwidth) 2
-	}
-	if {[string compare $tile::currentTheme "winnative"] == 0} {
-	    lappend configSpecs(-labelpady) 0
-	} else {
-	    lappend configSpecs(-labelpady) 1
-	}
-    } else {
 	#
 	# Steal the default values of some configuration
 	# options from a temporary, invisible button widget
@@ -178,18 +120,20 @@ proc tablelist::extendConfigSpecs {} {
 	}
 	button $helpButton
 	foreach opt {-disabledforeground -state} {
-	    set configSet [$helpButton config $opt]
-	    lappend configSpecs($opt) [lindex $configSet 3]
+	    if {[llength $configSpecs($opt)] == 3} {
+		set configSet [$helpButton configure $opt]
+		lappend configSpecs($opt) [lindex $configSet 3]
+	    }
 	}
 	foreach optTail {background foreground} {
-	    set configSet [$helpButton config -$optTail]
+	    set configSet [$helpButton configure -$optTail]
 	    lappend configSpecs(-label$optTail) [lindex $configSet 3]
 	}
 	if {[string compare $winSys "classic"] == 0 ||
 	    [string compare $winSys "aqua"] == 0} {
 	    lappend configSpecs(-labelborderwidth) 1
 	} else {
-	    set configSet [$helpButton config -borderwidth]
+	    set configSet [$helpButton configure -borderwidth]
 	    lappend configSpecs(-labelborderwidth) [lindex $configSet 3]
 	}
 	destroy $helpButton
@@ -213,6 +157,7 @@ proc tablelist::extendConfigSpecs {} {
     lappend configSpecs(-movablerows)		0
     lappend configSpecs(-movecolumncursor)	icon
     lappend configSpecs(-movecursor)		hand2
+    lappend configSpecs(-protecttitlecolumns)	0
     lappend configSpecs(-resizablecolumns)	1
     lappend configSpecs(-resizecursor)		sb_h_double_arrow
     lappend configSpecs(-selecttype)		row
@@ -221,21 +166,12 @@ proc tablelist::extendConfigSpecs {} {
     lappend configSpecs(-showseparators)	0
     lappend configSpecs(-snipstring)		...
     lappend configSpecs(-sortcommand)		{}
+    lappend configSpecs(-spacing)		0
     lappend configSpecs(-stretch)		{}
     lappend configSpecs(-stripebackground)	{}
     lappend configSpecs(-stripeforeground)	{}
     lappend configSpecs(-stripeheight)		1
     lappend configSpecs(-targetcolor)		black
-    lappend configSpecs(-titlecolumns)		0
-
-    if {$::tk_version < 8.3} {
-	unset configSpecs(-titlecolumns)
-    } elseif {$usingTile} {
-	foreach opt {-highlightbackground -highlightcolor -highlightthickness
-		     -labeldisabledforeground -labelheight} {
-	    unset configSpecs($opt)
-	}
-    }
 }
 
 #------------------------------------------------------------------------------
@@ -363,24 +299,19 @@ proc tablelist::doConfig {win opt val} {
 		    configLabel $w -$optTail $val
 		}
 	    }
-	    set data($opt) [$data(hdrLbl) cget -$optTail]
+	    if {$usingTile && [string compare $opt "-labelpady"] == 0} {
+		set data($opt) $val
+	    } else {
+		set data($opt) [$data(hdrLbl) cget -$optTail]
+	    }
 
 	    switch -- $opt {
 		-labelbackground {
 		    #
-		    # Apply the value to the children of the header frame and
-		    # conditionally both to the children of the labels (if
-		    # any) and to the canvas displaying an up- or down-arrow
+		    # Apply the value to $data(hdrTxt) and conditionally
+		    # to the canvas displaying an up- or down-arrow
 		    #
 		    $data(hdrTxt) configure -$optTail $data($opt)
-		    for {set col 0} {$col < $data(colCount)} {incr col} {
-			set w $data(hdrTxtFrLbl)$col
-			if {![info exists data($col$opt)]} {
-			    foreach c [winfo children $w] {
-				$c configure -$optTail $data($opt)
-			    }
-			}
-		    }
 		    if {$data(arrowCol) >= 0 &&
 			![info exists data($data(arrowCol)$opt)]} {
 			configCanvas $win
@@ -393,31 +324,12 @@ proc tablelist::doConfig {win opt val} {
 		    #
 		    adjustColumns $win allLabels 1
 		}
-		-labeldisabledforeground {
-		    #
-		    # Apply the value to the children of the labels (if any)
-		    #
-		    foreach w [winfo children $data(hdrTxtFr)] {
-			foreach c [winfo children $w] {
-			    $c configure -$optTail $data($opt)
-			}
-		    }
-		}
 		-labelfont {
 		    #
-		    # Conditionally apply the value to the children of
-		    # the labels (if any), conditionally resize the canvas
-		    # displaying an up- or down-arrow, and adjust the
-		    # columns (including the height of the header frame)
+		    # Conditionally resize the canvas displaying
+		    # an up- or down-arrow and adjust the columns
+		    # (including the height of the header frame)
 		    #
-		    for {set col 0} {$col < $data(colCount)} {incr col} {
-			set w $data(hdrTxtFrLbl)$col
-			if {![info exists data($col$opt)]} {
-			    foreach c [winfo children $w] {
-				$c configure -$optTail $data($opt)
-			    }
-			}
-		    }
 		    if {$data(arrowCol) >= 0 &&
 			![info exists data($data(arrowCol)$opt)]} {
 			configCanvas $win
@@ -425,29 +337,12 @@ proc tablelist::doConfig {win opt val} {
 		    }
 		    adjustColumns $win allLabels 1
 		}
-		-labelforeground {
-		    #
-		    # Conditionally apply the value to
-		    # the children of the labels (if any)
-		    #
-		    for {set col 0} {$col < $data(colCount)} {incr col} {
-			set w $data(hdrTxtFrLbl)$col
-			if {![info exists data($col$opt)]} {
-			    foreach c [winfo children $w] {
-				$c configure -$optTail $data($opt)
-			    }
-			}
-		    }
-		}
 		-labelheight -
 		-labelpady {
 		    #
 		    # Adjust the height of the header frame
 		    #
 		    adjustHeaderHeight $win
-		    if {$usingTile && [string compare $opt "-labelpady"] == 0} {
-			set data($opt) [format "%d" $val]
-		    }
 		}
 	    }
 	}
@@ -554,6 +449,7 @@ proc tablelist::doConfig {win opt val} {
 		-forceeditendcommand -
 		-movablecolumns -
 		-movablerows -
+		-protecttitlecolumns -
 		-resizablecolumns {
 		    #
 		    # Save the boolean value specified by val in data($opt)
@@ -648,10 +544,16 @@ proc tablelist::doConfig {win opt val} {
 		    set optTail [string range $opt 7 end] ;# remove the -select
 		    $w tag configure select -$optTail $val
 		    set data($opt) [$w tag cget select -$optTail]
-		    if {$val < 0} {
-			set val 0
+		    set pixVal [winfo pixels $w $val]
+		    if {$pixVal < 0} {
+			set pixVal 0
 		    }
-		    $w configure -spacing1 $val -spacing3 [expr {$val + 1}]
+		    set spacing [winfo pixels $w $data(-spacing)]
+		    if {$spacing < 0} {
+			set spacing 0
+		    }
+		    $w configure -spacing1 [expr {$spacing + $pixVal}] \
+				 -spacing3 [expr {$spacing + $pixVal + 1}]
 		    $data(lb) configure $opt $val
 		}
 		-setgrid {
@@ -710,6 +612,23 @@ proc tablelist::doConfig {win opt val} {
 		    adjustColumns $win {} 0
 		    redisplayWhenIdle $win
 		}
+		-spacing {
+		    #
+		    # Adjust the line spacing and save val in data($opt)
+		    #
+		    set w $data(body)
+		    set pixVal [winfo pixels $w $val]
+		    if {$pixVal < 0} {
+			set pixVal 0
+		    }
+		    set selectBd [winfo pixels $w $data(-selectborderwidth)]
+		    if {$selectBd < 0} {
+			set selectBd 0
+		    }
+		    $w configure -spacing1 [expr {$pixVal + $selectBd}] \
+				 -spacing3 [expr {$pixVal + $selectBd + 1}]
+		    set data($opt) $val
+		}
 		-state {
 		    #
 		    # Apply the value to all labels and their children (if
@@ -724,10 +643,7 @@ proc tablelist::doConfig {win opt val} {
 		    set val [mwutil::fullOpt "state" $val $states]
 		    catch {
 			foreach w [winfo children $data(hdrTxtFr)] {
-			    $w configure $opt $val
-			    foreach c [winfo children $w] {
-				$c configure $opt $val
-			    }
+			    configLabel $w $opt $val
 			}
 		    }
 		    if {$data(editRow) >= 0} {
@@ -1137,10 +1053,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# and conditionally to the canvas displaying an up-
 		# or down-arrow, and unset data($col$opt)
 		#
-		$w configure -$optTail $data($opt)
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $data($opt)
-		}
+		configLabel $w -$optTail $data($opt)
 		if {$col == $data(arrowCol)} {
 		    configCanvas $win
 		}
@@ -1154,10 +1067,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# displaying an up- or down-arrow, and save the
 		# properly formatted value of val in data($col$opt)
 		#
-		$w configure -$optTail $val
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $val
-		}
+		configLabel $w -$optTail $val
 		if {$col == $data(arrowCol)} {
 		    configCanvas $win
 		}
@@ -1213,10 +1123,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# configuration option to the col'th label and
 		# its children (if any), and unset data($col$opt)
 		#
-		$w configure -$optTail $data($opt)
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $data($opt)
-		}
+		configLabel $w -$optTail $data($opt)
 		if {[info exists data($col$opt)]} {
 		    unset data($col$opt)
 		}
@@ -1226,10 +1133,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# its children (if any), and save the properly
 		# formatted value of val in data($col$opt)
 		#
-		$w configure -$optTail $val
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $val
-		}
+		configLabel $w -$optTail $val
 		set data($col$opt) [$w cget -$optTail]
 	    }
 
@@ -1253,10 +1157,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# configuration option to the col'th label and
 		# its children (if any), and unset data($col$opt)
 		#
-		$w configure -$optTail $data($opt)
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $data($opt)
-		}
+		configLabel $w -$optTail $data($opt)
 		if {[info exists data($col$opt)]} {
 		    unset data($col$opt)
 		}
@@ -1266,10 +1167,7 @@ proc tablelist::doColConfig {col win opt val} {
 		# its children (if any), and save the properly
 		# formatted value of val in data($col$opt)
 		#
-		$w configure -$optTail $val
-		foreach c [winfo children $w] {
-		    $c configure -$optTail $val
-		}
+		configLabel $w -$optTail $val
 		set data($col$opt) [$w cget -$optTail]
 	    }
 	}
@@ -1294,8 +1192,8 @@ proc tablelist::doColConfig {col win opt val} {
 		#
 		configLabel $w -$optTail $val
 		variable usingTile
-		if {$usingTile && [string compare $opt "-labelpady"] == 0} {
-		    set data($col$opt) [format "%d" $val]
+		if {$usingTile} {
+		    set data($col$opt) $val
 		} else {
 		    set data($col$opt) [$w cget -$optTail]
 		}
@@ -1318,27 +1216,18 @@ proc tablelist::doColConfig {col win opt val} {
 		}
 	    } else {
 		if {![winfo exists $w.il]} {
-		    #
-		    # Create the image and text labels
-		    #
-		    tk::label $w.il -borderwidth 0 -height 0 \
-				    -highlightthickness 0 -padx 0 \
-				    -pady 0 -takefocus 0 -width 0
-		    variable usingTile
-		    if {$usingTile} {
-			ttk::label $w.tl -borderwidth 0 -padding {0 0 0 0} \
-					 -takefocus 0 -width 0
-		    } else {
-			tk::label $w.tl -borderwidth 0 -height 0 \
-					-highlightthickness 0 -padx 0 \
-					-pady 0 -takefocus 0 -width 0
-		    }
-
 		    variable configSpecs
 		    variable configOpts
-		    foreach c [list $w.il $w.tl] {
+		    foreach c [list $w.il $w.tl] {	;# image and text labels
 			#
-			# Apply the current configuration options to the label
+			# Create the label $c
+			#
+			tk::label $c -borderwidth 0 -height 0 \
+				     -highlightthickness 0 -padx 0 \
+				     -pady 0 -takefocus 0 -width 0
+
+			#
+			# Apply to it the current configuration options
 			#
 			foreach opt2 $configOpts {
 			    if {[string compare \
@@ -1349,13 +1238,14 @@ proc tablelist::doColConfig {col win opt val} {
 			foreach opt2 {-background -font -foreground} {
 			    $c configure $opt2 [$w cget $opt2]
 			}
-			foreach opt2 {-disabledforeground -state} {
+			foreach opt2 {-activebackground -activeforeground
+				      -disabledforeground -state} {
 			    catch {$c configure $opt2 [$w cget $opt2]}
 			}
 
 			#
-			# Replace the binding tag Label or TLabel
-			# with $w and TablelistSubLabel in the
+			# Replace the binding tag Label with
+			# $w and TablelistSubLabel in the
 			# list of binding tags of the label $c
 			#
 			bindtags $c [lreplace [bindtags $c] 1 1 \
@@ -1498,6 +1388,56 @@ proc tablelist::doColConfig {col win opt val} {
 	    set data($col$opt) [mwutil::fullOpt "sort mode" $val $sortModes]
 	}
 
+	-stretchable {
+	    set flag [expr {$val ? 1 : 0}]
+	    if {$flag} {
+		if {[string compare $data(-stretch) "all"] != 0 &&
+		    [lsearch -exact $data(-stretch) $col] < 0} {
+		    #
+		    # col was not found in data(-stretch): add it to the list
+		    #
+		    lappend data(-stretch) $col
+		    sortStretchableColList $win
+		    set data(forceAdjust) 1
+		    stretchColumnsWhenIdle $win
+		}
+	    } elseif {[string compare $data(-stretch) "all"] == 0} {
+		#
+		# Replace the value "all" of data(-stretch) with
+		# the list of all column indices different from col
+		#
+		set data(-stretch) {}
+		for {set n 0} {$n < $data(colCount)} {incr n} {
+		    if {$n != $col} {
+			lappend data(-stretch) $n
+		    }
+		}
+		set data(forceAdjust) 1
+		stretchColumnsWhenIdle $win
+	    } else {
+		#
+		# If col is contained in data(-stretch)
+		# then remove it from the list
+		#
+		if {[set n [lsearch -exact $data(-stretch) $col]] >= 0} {
+		    set data(-stretch) [lreplace $data(-stretch) $n $n]
+		    set data(forceAdjust) 1
+		    stretchColumnsWhenIdle $win
+		}
+
+		#
+		# If col indicates the last column and data(-stretch)
+		# contains "end" then remove "end" from the list
+		#
+		if {$col == $data(lastCol) &&
+		    [string compare [lindex $data(-stretch) end] "end"] == 0} {
+		    set data(-stretch) [lreplace $data(-stretch) end end]
+		    set data(forceAdjust) 1
+		    stretchColumnsWhenIdle $win
+		}
+	    }
+	}
+
 	-text {
 	    if {$data(isDisabled)} {
 		return ""
@@ -1564,6 +1504,15 @@ proc tablelist::doColCget {col win opt} {
     switch -- $opt {
 	-align {
 	    return [lindex $data(-columns) [expr {3*$col + 2}]]
+	}
+
+	-stretchable {
+	    return [expr {
+		[string compare $data(-stretch) "all"] == 0 ||
+		[lsearch -exact $data(-stretch) $col] >= 0 ||
+		($col == $data(lastCol) && \
+		 [string compare [lindex $data(-stretch) end] "end"] == 0)
+	    }]
 	}
 
 	-text {
@@ -1807,6 +1756,18 @@ proc tablelist::doRowConfig {row win opt val} {
 	    adjustSepsWhenIdle $win
 	    adjustElidedTextWhenIdle $win
 	    updateImgLabelsWhenIdle $win
+	}
+
+	-name {
+	    set item [lindex $data(itemList) $row]
+	    set key [lindex $item end]
+	    if {[string compare $val ""] == 0} {
+		if {[info exists data($key$opt)]} {
+		    unset data($key$opt)
+		}
+	    } else {
+		set data($key$opt) $val
+	    }
 	}
 
 	-selectable {
@@ -2135,9 +2096,9 @@ proc tablelist::doCellConfig {row col win opt val} {
 	    #
 	    set item [lindex $data(itemList) $row]
 	    set key [lindex $item end]
+	    set name $key-$col$opt
 	    set oldCellFont [getCellFont $win $key $col]
 
-	    set name $key-$col$opt
 	    if {[info exists data($name)] && !$data($col-hide)} {
 		#
 		# Remove the tag cell$opt-$data($name) from the given cell
@@ -2269,12 +2230,12 @@ proc tablelist::doCellConfig {row col win opt val} {
 	    #
 	    set item [lindex $data(itemList) $row]
 	    set key [lindex $item end]
+	    set name $key-$col$opt
 	    getAuxData $win $key $col oldAuxWidth oldAuxType
 
 	    #
 	    # Delete data($name) or save the specified value in it
 	    #
-	    set name $key-$col$opt
 	    if {[string compare $val ""] == 0} {
 		if {[info exists data($name)]} {
 		    unset data($name)
@@ -2557,20 +2518,26 @@ proc tablelist::doCellConfig {row col win opt val} {
 	    #
 	    set item [lindex $data(itemList) $row]
 	    set key [lindex $item end]
+	    set name $key-$col$opt
 	    getAuxData $win $key $col oldAuxWidth oldAuxType
 
 	    #
 	    # Delete data($name) or save the specified value in it
 	    #
-	    set name $key-$col$opt
 	    if {[string compare $val ""] == 0} {
 		if {[info exists data($name)]} {
 		    unset data($name)
 		    unset data($key-$col-reqWidth)
 		    unset data($key-$col-reqHeight)
-		    if {[info exists data($key-$col-reconfigId]} {
-			after cancel $data($key-$col-reconfigId)
-			unset data($key-$col-reconfigId)
+
+		    #
+		    # If the cell index is contained in the list
+		    # data(cellsToReconfig) then remove it from the list
+		    #
+		    set n [lsearch -exact $data(cellsToReconfig) $row,$col]
+		    if {$n >= 0} {
+			set data(cellsToReconfig) \
+			    [lreplace $data(cellsToReconfig) $n $n]
 		    }
 		    incr data(winCount) -1
 		}
@@ -2592,22 +2559,28 @@ proc tablelist::doCellConfig {row col win opt val} {
 		    # Create the frame and evaluate the specified script
 		    # that creates a child widget within the frame
 		    #
-		    tk::frame $aux -borderwidth 0 -container 0 \
-				   -highlightthickness 0 -relief flat \
-				   -takefocus 0
+		    tk::frame $aux -borderwidth 0 -class TablelistWindow \
+				   -container 0 -highlightthickness 0 \
+				   -relief flat -takefocus 0
 		    uplevel #0 $val [list $win $row $col $aux.w]
 		}
 		set data($name) $val
 		set data($key-$col-reqWidth) [winfo reqwidth $aux.w]
 		set data($key-$col-reqHeight) [winfo reqheight $aux.w]
 		$aux configure -height $data($key-$col-reqHeight)
-		if {[info exists data($key-$col-reconfigId)]} {
-		    unset data($key-$col-reconfigId)
-		} elseif {$data($key-$col-reqWidth) == 1 ||
-			  $data($key-$col-reqHeight) == 1} {
-		    set data($key-$col-reconfigId) \
-			[after idle [list tablelist::doCellConfig \
-				     $row $col $win -window $val]]
+
+		#
+		# Add the cell index to the list data(cellsToReconfig) if
+		# the window's requested width or height is not yet known
+		#
+		if {($data($key-$col-reqWidth) == 1 ||
+		     $data($key-$col-reqHeight) == 1) &&
+		    [lsearch -exact $data(cellsToReconfig) $row,$col] < 0} {
+		    lappend data(cellsToReconfig) $row,$col
+		    if {![info exists data(reconfigId)]} {
+			set data(reconfigId) \
+			    [after idle [list tablelist::reconfigWindows $win]]
+		    }
 		}
 	    }
 
@@ -2695,6 +2668,23 @@ proc tablelist::doCellConfig {row col win opt val} {
 	    adjustSepsWhenIdle $win
 	    adjustElidedTextWhenIdle $win
 	    updateImgLabelsWhenIdle $win
+	}
+
+	-windowdestroy {
+	    set item [lindex $data(itemList) $row]
+	    set key [lindex $item end]
+	    set name $key-$col$opt
+
+	    #
+	    # Delete data($name) or save the specified value in it
+	    #
+	    if {[string compare $val ""] == 0} {
+		if {[info exists data($name)]} {
+		    unset data($name)
+		}
+	    } else {
+		set data($name) $val
+	    }
 	}
     }
 }
@@ -2818,6 +2808,38 @@ proc tablelist::getCellFont {win key col} {
     } else {
 	return [lindex $data(colFontList) $col]
     }
+}
+
+#------------------------------------------------------------------------------
+# tablelist::reconfigWindows
+#
+# Invoked as an after idle callback, this procedure forces any geometry manager
+# calculations to be completed and then applies the -window option a second
+# time to those cells whose embedded windows' requested widths or heights were
+# still unknown.
+#------------------------------------------------------------------------------
+proc tablelist::reconfigWindows win {
+    upvar ::tablelist::ns${win}::data data
+
+    #
+    # Force any geometry manager calculations to be completed first
+    #
+    update idletasks
+
+    #
+    # Reconfigure the cells specified in the list data(cellsToReconfig)
+    #
+    foreach cellIdx $data(cellsToReconfig) {
+	foreach {row col} [split $cellIdx ","] {}
+	set item [lindex $data(itemList) $row]
+	set key [lindex $item end]
+	if {[info exists data($key-$col-window)]} {
+	    doCellConfig $row $col $win -window $data($key-$col-window)
+	}
+    }
+
+    unset data(reconfigId)
+    set data(cellsToReconfig) {}
 }
 
 #------------------------------------------------------------------------------

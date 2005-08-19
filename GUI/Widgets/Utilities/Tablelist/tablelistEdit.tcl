@@ -148,7 +148,7 @@ namespace eval tablelist {
 	# Define some bindings for the binding tag TablelistEdit that
 	# propagate the mousewheel events to the tablelist's body
 	#
-	if {[string compare $::tk_patchLevel "8.0.4"] >= 0} {
+	catch {
 	    bind TablelistEdit <MouseWheel> {
 		if {![tablelist::isComboTopMapped %W]} {
 		    tablelist::genMouseWheelEvent \
@@ -916,6 +916,10 @@ proc tablelist::createCheckbutton {w args} {
 	    variable uncheckedImg
 	    if {![info exists checkedImg]} {
 		variable library
+#		set checkedImg [image create bitmap -file \
+#		    [file join $library images checked.xbm]]
+#		set uncheckedImg [image create bitmap -file \
+#		    [file join $library images unchecked.xbm]]
 		set checkedImg tablelistChecked
 		set uncheckedImg tablelistUnchecked
 	    }
@@ -1201,7 +1205,7 @@ proc tablelist::editcellSubCmd {win row col restore {cmd ""} {charPos -1}} {
     catch {$w configure -highlightthickness 0}
     set class [winfo class $w]
     set isMentry [expr {[string compare $class "Mentry"] == 0}]
-    set isCheckbtn [regexp {^T?Checkbutton$} $class]
+    set isCheckbtn [string match "*Checkbutton" $class]
     set alignment [lindex $data(colList) [expr {2*$col + 1}]]
     if {!$isMentry} {
 	catch {$w configure -justify $alignment}
@@ -1357,6 +1361,7 @@ proc tablelist::editcellSubCmd {win row col restore {cmd ""} {charPos -1}} {
 	}
 	incr pixels $data($col-delta)
 	adjustEditWindow $win $pixels
+	update idletasks
     }
 
     adjustSepsWhenIdle $win
@@ -1433,7 +1438,7 @@ proc tablelist::finisheditingSubCmd win {
     set w $data(bodyFrEd)
     set class [winfo class $w]
     set isMentry [expr {[string compare $class "Mentry"] == 0}]
-    set isCheckbtn [regexp {^T?Checkbutton$} $class]
+    set isCheckbtn [string match "*Checkbutton" $class]
     if {$isMentry} {
 	set text [$w getstring]
     } elseif {$isCheckbtn} {
@@ -1643,7 +1648,7 @@ proc tablelist::saveEditData win {
     set entry $data(editFocus)
     set class [winfo class $w]
     set isMentry [expr {[string compare $class "Mentry"] == 0}]
-    set isCheckbtn [regexp {^T?Checkbutton$} $class]
+    set isCheckbtn [string match "*Checkbutton" $class]
 
     #
     # Miscellaneous data
@@ -1720,7 +1725,7 @@ proc tablelist::restoreEditData win {
     set entry $data(editFocus)
     set class [winfo class $w]
     set isMentry [expr {[string compare $class "Mentry"] == 0}]
-    set isCheckbtn [regexp {^T?Checkbutton$} $class]
+    set isCheckbtn [string match "*Checkbutton" $class]
     set isIncrDateTimeWidget [regexp {^(Date.+|Time.+)$} $class]
 
     #

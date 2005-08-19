@@ -529,45 +529,74 @@ public:
   // widget, the cell's row and column indices, as well as the path name of
   // the embedded window to be created, and the resulting script is evaluated
   // in the global scope.
-  // The SetCellWindowDestroyCommand method can be used to pecify a Tcl 
-  // command to be invoked when the window embedded into the cell is 
-  // destroyed. It is automatically concatenated the same parameter as the
-  // above command.
-  // The RefreshCellWindowCommand can be used to force the cell to
-  // recreate its dynamic content. 
-  // If RefreshCellWindowCommandOnSelectionChanged is On, this refresh will
-  // be done automatically each time the selection is changed.
-  // If RefreshCellWindowCommandOnPotentialBackgroundColorChanged is On, this refresh
-  // will be done automatically each time any background color is changed.
-  // The path of the window contained in the cell as created by that
-  // command can be retrieved using GetCellWindowWidgetName.
-  // Note that once the widget is created by the command, clicking on it
-  // is likely not to trigger the same interactive behavior as clicking
-  // on a regular cell (i.e., clicking on the widget will not select the
-  // row or cell for example). This can be a good thing if clicking on
-  // the widget is meant to be intercepted by the widget to trigger a
-  // different behaviour. In other cases, one would want the interaction 
-  // bindings to remain the same. In order to do so, these bindings
-  // have to be added to the widget the was just created. To do so, 
-  // call AddBindingsToWidget, either on the Tk widget name, or on a
-  // vtkKWWidget that may have been used to wrap around that Tk widget name.
+  virtual void SetCellWindowCommand(
+    int row_index, int col_index, vtkObject* object, const char *method);
+
+  // Description:
+  // Specifies a Tcl command to be invoked when the window embedded into
+  // the cell is destroyed. It is automatically concatenated the same
+  // parameter as SetCellWindowCommand.
+  // The SetCellWindowDestroyCommandToRemoveChild method is a convenient
+  // way to automatically set the command to a callback that will
+  // remove the child widget that matches the name of the Tk widget about
+  // to be destroyed. This is very useful if the SetCellWindowCommand
+  // is set to a callback at actually allocate a new vtkKWWidget subclass.
+  // That way, each time the cell is about to be destroyed, it is
+  // cleanly de-allocated first (by setting its Parent to NULL).
+  virtual void SetCellWindowDestroyCommand(
+    int row_index, int col_index, vtkObject* object, const char *method);
+  virtual void SetCellWindowDestroyCommandToRemoveChild(
+    int row_index, int col_index);
+
+  // Description:
+  // Force a cell (or all cells) to recreate its dynamic content (i.e.
+  // the content that is likely to be created by using SetCellWindowCommand
+  // previously on that cell).
+  virtual void RefreshCellWindowCommand(int row_index, int col_index);
+  virtual void RefreshAllCellWindowCommands();
+
+  // Description:
+  // If On, all cells with a WindowCommand will be refreshed automatically
+  // each time the selection is changed.
+  vtkBooleanMacro(RefreshCellWindowCommandOnSelectionChanged, int);
+  vtkSetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
+  vtkGetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
+
+  // Description:
+  // If On, all cells with a WindowCommand will be refreshed automatically
+  // each time any change is made that can potentially affect the background
+  // color of a cell. 
+  // This is useful if a user-defined dynamic widget created in a cell
+  // is setting its own background color to match the background color
+  // of a cell (using GetCellCurrentBackgroundColor).
+  // Since changing the selection can affect this color too, you usually do
+  // not need to set RefreshCellWindowCommandOnSelectionChanged if this ivar
+  // is set already.
+  vtkBooleanMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged, int);
+  vtkSetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
+  vtkGetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
+
+  // Description:
+  // Retrieve the path of the window contained in the cell as created by 
+  // the WindowCommand.
+  virtual const char* GetCellWindowWidgetName(int row_index, int col_index);
+
+  // Description:
+  // Once a user-defined dynamic widget is created by the WindowCommand, 
+  // clicking on it is likely *not* to trigger the same interactive behavior
+  // as clicking on a regular cell (i.e., clicking on the widget will not
+  // select the row or cell for example). This can be a good thing if
+  // clicking on the widget is meant to be intercepted by the widget to
+  // trigger a different behaviour, but in many other cases, one would want
+  // the interaction bindings to remain the same and consistent for all rows.
+  // In order to do so, the common widget row bindings have to be added to the
+  // widget the was just created. To do so, call AddBindingsToWidget, either on
+  // the Tk widget name, or on avtkKWWidget that may have been used to wrap
+  // around that Tk widget name.
   // A complex widget can be made of several other sub-widgets that need
   // the bindings to be passed on too. Use AddBindingsToWidgetAndChildren
   // to pass the bindings to a widget and its chilren automatically (or
   // call AddBindingsToWidget manually on each sub-widgets).
-  virtual void SetCellWindowCommand(
-    int row_index, int col_index, vtkObject* object, const char *method);
-  virtual void SetCellWindowDestroyCommand(
-    int row_index, int col_index, vtkObject* object, const char *method);
-  virtual void RefreshCellWindowCommand(int row_index, int col_index);
-  virtual void RefreshAllCellWindowCommands();
-  vtkBooleanMacro(RefreshCellWindowCommandOnSelectionChanged, int);
-  vtkSetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
-  vtkGetMacro(RefreshCellWindowCommandOnSelectionChanged,int);
-  vtkBooleanMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged, int);
-  vtkSetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
-  vtkGetMacro(RefreshCellWindowCommandOnPotentialBackgroundColorChanged,int);
-  virtual const char* GetCellWindowWidgetName(int row_index, int col_index);
   virtual void AddBindingsToWidgetName(const char *widget_name);
   virtual void AddBindingsToWidget(vtkKWWidget *widget);
   virtual void AddBindingsToWidgetAndChildren(vtkKWWidget *widget);
@@ -805,6 +834,8 @@ public:
   // Description:
   // Callbacks
   virtual void SelectionChangedCallback();
+  virtual void CellWindowDestroyRemoveChildCallback(
+    const char*, int, int, const char*);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
