@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.30");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -452,4 +452,6 @@ void vtkKWLookmarkFolder::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NestedSeparatorFrame: " << this->NestedSeparatorFrame << endl;
   os << indent << "MacroFlag: " << this->GetMacroFlag() << endl;
   os << indent << "Checkbox: " << this->GetCheckbox() << endl;
+  os << indent << "MainFrameCollapsedState: " << this->GetMainFrameCollapsedState() << endl;
+
 }

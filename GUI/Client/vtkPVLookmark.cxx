@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.54");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.55");
 
 
 //*****************************************************************************
@@ -191,6 +191,7 @@ void vtkPVLookmark::View()
 
   // this prevents other filters' visibility from disturbing the lookmark view
   this->TurnFiltersOff();
+  this->TurnScalarBarsOff();
 
 //ds
   // for every dataset or source belonging to the lookmark,
@@ -1239,12 +1240,27 @@ void vtkPVLookmark::TurnFiltersOff()
   while ( !it->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    // the following is necessary to remove scalar bars from scene
-    if(pvs->GetPVColorMap())
-      {
-      pvs->GetPVColorMap()->SetScalarBarVisibility(0);
-      }
     pvs->SetVisibility(0);
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::TurnScalarBarsOff()
+{
+  vtkPVColorMap *colormap;
+  vtkCollection *col = this->GetPVApplication()->GetMainWindow()->GetPVColorMaps();
+  vtkCollectionIterator *it = col->NewIterator();
+  it->InitTraversal();
+  while(!it->IsDoneWithTraversal())
+    {
+    colormap = static_cast<vtkPVColorMap*>( it->GetCurrentObject() );
+    if(colormap)
+      {
+      colormap->SetScalarBarVisibility(0);
+      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -1973,8 +1989,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
           // make sure that the data information is up to date
         //  src->UpdateVTKObjects();
-          //src->GetProxy()->UpdateDataInformation();
           src->MarkSourcesForUpdate();
+          src->GetProxy()->UpdateDataInformation();
 
           if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
             {

@@ -170,6 +170,7 @@ protected:
   // Description:
   // helper functions for ViewLookmarkCalllback
   void TurnFiltersOff();
+  void TurnScalarBarsOff();
   // Description:
   // This is a big function because I'm triying to do it all in one pass
   // parses the reader portion of the state file and uses it to initialize the reader module (both parameter and display settings)

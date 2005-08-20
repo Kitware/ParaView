@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.30");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -568,4 +568,6 @@ void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SeparatorFrame: " << this->GetSeparatorFrame() << endl;
   os << indent << "MacroFlag: " << this->GetMacroFlag() << endl;
   os << indent << "Checkbox: " << this->GetCheckbox() << endl;
+  os << indent << "MainFrameCollapsedState: " << this->GetMainFrameCollapsedState() << endl;
+  os << indent << "CommentsFrameCollapsedState: " << this->GetCommentsFrameCollapsedState() << endl;
 }
