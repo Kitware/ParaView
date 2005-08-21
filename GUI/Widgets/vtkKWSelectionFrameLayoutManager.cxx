@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.41");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -2219,7 +2219,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
   
   if (this->IsCreated())
     {
-    this->SetConfigurationOption("-cursor", "watch");
+    vtkKWTkUtilities::SetTopLevelMouseCursor(this, "watch");
     this->Script("update");
     }
   
@@ -2356,7 +2356,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 
   if (this->IsCreated())
     {
-    this->SetConfigurationOption("-cursor", NULL);
+    vtkKWTkUtilities::SetTopLevelMouseCursor(this, NULL);
     }
 
   // At that point the Print Dialog does not seem to disappear.
