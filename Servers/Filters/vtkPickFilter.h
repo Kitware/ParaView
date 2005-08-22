@@ -54,7 +54,7 @@ public:
   vtkGetVector3Macro(WorldPoint,double);
 
   // Description:
-  // Select whether you are us9ing a world point to pick, or
+  // Select whether you are using a world point to pick, or
   // a cell / point id.
   vtkSetMacro(PickCell,int);
   vtkGetMacro(PickCell,int);

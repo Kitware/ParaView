@@ -42,14 +42,14 @@ public:
 //BTX
   // Description:
   // Methods for setting the value of the VTKReader from the widget.
-  // User internally when user hits Accept.
+  // Used internally when user hits Accept.
   virtual void Accept();
   virtual void PostAccept();
 //ETX
 
   // Description:
   // Methods for setting the value of the widget from the VTKReader.
-  // User internally when user hits Reset.
+  // Used internally when user hits Reset.
   virtual void ResetInternal();
 
   // Description:
