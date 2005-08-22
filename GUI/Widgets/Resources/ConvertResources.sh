@@ -21,6 +21,7 @@ KWConvertImageToHeader --zlib --base64 \
     error_mini.png \
     error_red_mini.png \
     expand.png \
+    floppy.png \
     folder.png \
     folder_open.png \
     grid_linear.png \
