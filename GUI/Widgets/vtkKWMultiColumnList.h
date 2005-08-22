@@ -513,6 +513,7 @@ public:
   //   - use images that do not have an alpha component, or 
   //   - set the cell image once all rows have been inserted,
   //   - refresh the image periodically (or each time a row is added/removed)
+  //     see SetPotentialCellBackgroundColorChangedCommand
   virtual void SetCellImage(int row_index, int col_index, const char *);
   virtual void SetCellImageToIcon(
     int row_index, int col_index, vtkKWIcon *icon);
@@ -522,6 +523,7 @@ public:
     int row_index, int col_index,
     const unsigned char *pixels, int width, int height, int pixel_size,
     unsigned long buffer_length = 0);
+  virtual const char* GetCellImage(int row_index, int col_index);
 
   // Description:
   // Specifies a Tcl command to create the window (i.e. widget) to be embedded
@@ -550,11 +552,21 @@ public:
     int row_index, int col_index);
 
   // Description:
-  // Force a cell (or all cells) to recreate its dynamic content (i.e.
-  // the content that is likely to be created by using SetCellWindowCommand
-  // previously on that cell).
-  virtual void RefreshCellWindowCommand(int row_index, int col_index);
-  virtual void RefreshAllCellWindowCommands();
+  // Force a cell (or all cells) for which a WindowCommand has been defined
+  // to recreate its dynamic content. It does so by setting the WindowCommand
+  // to NULL, than setting it to its previous value (per author's suggestion).
+  virtual void RefreshCellWithWindowCommand(int row_index, int col_index);
+  virtual void RefreshAllCellsWithWindowCommand();
+
+  // Description:
+  // Force a cell (or all cells) for which a WindowCommand has been defined
+  // to set the background color to the cell current background color.
+  // It does so by tyring to safe down-cast the widget inside that cell into
+  // a vtkKWCoreWidget and set its backgroud color to the color returned
+  // by GetCellCurrentBackgroundColor.
+  virtual void RefreshBackgroundColorOfCellWithWindowCommand(
+    int row_index, int col_index);
+  virtual void RefreshBackgroundColorOfAllCellsWithWindowCommand();
 
   // Description:
   // Retrieve the path of the window contained in the cell as created by 

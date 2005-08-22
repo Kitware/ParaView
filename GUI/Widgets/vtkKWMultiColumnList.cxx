@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.18");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -1504,6 +1504,14 @@ int vtkKWMultiColumnList::GetCellEditable(
 }
 
 //----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::GetCellImage(
+  int row_index, int col_index)
+{
+  return this->GetCellConfigurationOption(
+    row_index, col_index, "-image");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellImage(
   int row_index, int col_index, const char *image_name)
 {
@@ -1639,8 +1647,8 @@ void vtkKWMultiColumnList::CellWindowDestroyRemoveChildCallback(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::RefreshCellWindowCommand(int row_index, 
-                                                    int col_index)
+void vtkKWMultiColumnList::RefreshCellWithWindowCommand(int row_index, 
+                                                        int col_index)
 {
   const char *command = 
     this->GetCellConfigurationOption(row_index, col_index, "-window");
@@ -1655,7 +1663,7 @@ void vtkKWMultiColumnList::RefreshCellWindowCommand(int row_index,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::RefreshAllCellWindowCommands()
+void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommand()
 {
   int nb_rows = this->GetNumberOfRows();
   int nb_cols = this->GetNumberOfColumns();
@@ -1663,7 +1671,45 @@ void vtkKWMultiColumnList::RefreshAllCellWindowCommands()
     {
     for (int col = 0; col < nb_cols; col++)
       {
-      this->RefreshCellWindowCommand(row, col);
+      this->RefreshCellWithWindowCommand(row, col);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshBackgroundColorOfCellWithWindowCommand(
+  int row_index, 
+  int col_index)
+{
+  const char *command = 
+    this->GetCellConfigurationOption(row_index, col_index, "-window");
+  if (command && *command)
+    {
+    const char *child_name = 
+      this->GetCellWindowWidgetName(row_index, col_index);
+    if (child_name && *child_name)
+      {
+      vtkKWCoreWidget *child = vtkKWCoreWidget::SafeDownCast(
+        this->GetChildWidgetWithName(child_name));
+      if (child)
+        {
+        child->SetBackgroundColor(
+          this->GetCellCurrentBackgroundColor(row_index, col_index));
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshBackgroundColorOfAllCellsWithWindowCommand()
+{
+  int nb_rows = this->GetNumberOfRows();
+  int nb_cols = this->GetNumberOfColumns();
+  for (int row = 0; row < nb_rows; row++)
+    {
+    for (int col = 0; col < nb_cols; col++)
+      {
+      this->RefreshBackgroundColorOfCellWithWindowCommand(row, col);
       }
     }
 }
