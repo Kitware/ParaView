@@ -62,7 +62,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.452");
+vtkCxxRevisionMacro(vtkPVSource, "1.453");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -979,6 +979,7 @@ void vtkPVSource::SetPVColorMap(vtkPVColorMap *colorMap)
     // Use count to manage color map visibility.
     if (this->GetVisibility())
       {
+      this->PVColorMap->SetScalarBarVisibility(0);
       this->PVColorMap->DecrementUseCount();
       }
     this->PVColorMap->UnRegister(this);
@@ -1533,6 +1534,7 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
   vtkPVColorMap* colorMap = this->GetPVWindow()->GetPVColorMap(arrayname,
     arrayInfo->GetNumberOfComponents());
   this->ColorByArray( colorMap, field);
+
 }
 
 //----------------------------------------------------------------------------

@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.55");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.56");
 
 
 //*****************************************************************************
@@ -1917,6 +1917,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           }
 
         src->AcceptCallback();
+        src->Select();
         ptr.assign(*(++tokIter));
 
         while(ptr.rfind("#",ptr.size())!=vtkstd::string::npos )
@@ -1989,8 +1990,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
           // make sure that the data information is up to date
         //  src->UpdateVTKObjects();
-          src->MarkSourcesForUpdate();
-          src->GetProxy()->UpdateDataInformation();
+      //    src->MarkSourcesForUpdate();
+     //     src->GetProxy()->UpdateDataInformation();
 
           if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
             {
@@ -2054,6 +2055,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
       this->Script(ptr.c_str());
 
+      src->Select();
+
       // store the filter's tcl name with the new source
       sscanf(ptr.c_str(),"%s",srcTclName);
       tclName = new char[20];
@@ -2098,8 +2101,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             sscanf(ptr.c_str(),"%*s %*s %d",&ival);
             srcTclNameMapIter->first->SetVisibility(ival);
             }
-
-          if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkstd::string::npos)
+          else if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkstd::string::npos)
             {
             vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
             src = srcTclNameMapIter->first;
@@ -2131,7 +2133,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             ptr.assign(*(++tokIter));
             while(ptr.rfind("AppendColorPoint",ptr.size())!=vtkstd::string::npos)
               {
-              sscanf(ptr.c_str(),"%lf %lf %lf %lf",&fval1,&fval2,&fval3,&fval4);
+              sscanf(ptr.c_str(),"%*s %*s %lf %lf %lf %lf",&fval1,&fval2,&fval3,&fval4);
               vol->AppendColorPoint(fval1,fval2,fval3,fval4);
               ptr.assign(*(++tokIter));
               }
@@ -2143,7 +2145,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             sscanf(ptr.c_str(),"%*s %*s %d",&ival);
             vol->SetColorSpace(ival);
 
-            vol->VolumePropertyChangedCallback();
+            vol->RefreshGUI();
+           // vol->VolumePropertyChangedCallback();
             vol->BackButtonCallback();
             }
 
@@ -2165,21 +2168,29 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
       if(executeCmd)
         {
-        string1 = ptr;
-
-        // the command does not contain a source tcl name
-        if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
+        if(ptr.rfind("ColorBy",ptr.size())!=vtkstd::string::npos)
           {
- //         string1.erase(string1.find_first_of('[',0),1);
- //         beg = string1.rfind("GetPVOutput]",string1.size());
- //         string1.erase(beg,13);
+          src = win->GetCurrentPVSource();
+          // for actor color if this is colorbyproperty
+          src->GetPVOutput()->UpdateColorGUI();
+          // if this is volume rendered
+          if(src->GetDisplayProxy()->GetRepresentationCM() == vtkSMDataObjectDisplayProxy::VOLUME)
+            {
+            src->GetPVOutput()->DrawVolume();
+            src->GetPVColorMap()->UpdateForSource(src);
+            }
           }
-        else if(ptr.rfind("ColorByProperty",ptr.size())!=vtkstd::string::npos)
+        else if(ptr.rfind("SetColorSpace",ptr.size())!=vtkstd::string::npos)
           {
-          win->GetCurrentPVSource()->GetPVOutput()->UpdateColorGUI();
+          vtkPVVolumeAppearanceEditor *vol = win->GetVolumeAppearanceEditor();
+          if(vol)
+            {
+            vol->RefreshGUI();
+            // vol->VolumePropertyChangedCallback();
+            vol->BackButtonCallback();
+            }
           }
-
-        this->Script(string1.c_str());
+        this->Script(ptr.c_str());
         }
       executeCmd = true;
 
@@ -2201,16 +2212,18 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     this->Update();
     }
 
-  // delete tclNameMa
+  // delete tclNameMap and update sources
   srcTclNameMapIter = srcTclNameMap.begin();
   while(srcTclNameMapIter != srcTclNameMap.end())
     {
+    srcTclNameMapIter->first->GetPVOutput()->Update();
     delete [] srcTclNameMapIter->second;
     ++srcTclNameMapIter;
     }
   fltrTclNameMapIter = fltrTclNameMap.begin();
   while(fltrTclNameMapIter != fltrTclNameMap.end())
     {
+    fltrTclNameMapIter->first->GetPVOutput()->Update();
     delete [] fltrTclNameMapIter->second;
     ++fltrTclNameMapIter;
     }
