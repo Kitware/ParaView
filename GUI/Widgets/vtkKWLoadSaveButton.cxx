@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.16");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -67,7 +67,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
   // Save the old command, if any
 
   this->SetUserCommand(this->GetConfigurationOption("-command"));
-  this->SetCommand(this, "InvokeLoadSaveDialogCallback");
+  this->Superclass::SetCommand(this, "InvokeLoadSaveDialogCallback");
 
   // Cosmetic add-on
 
