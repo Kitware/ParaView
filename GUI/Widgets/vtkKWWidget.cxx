@@ -17,15 +17,17 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindowBase.h"
 #include "vtkKWDragAndDropTargetSet.h"
-#include "vtkObjectFactory.h"
 #include "vtkKWBalloonHelpManager.h"
+#include "vtkObjectFactory.h"
+#include "vtkKWIcon.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/algorithm>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.140");
+vtkCxxRevisionMacro(vtkKWWidget, "1.141");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -51,6 +53,8 @@ vtkKWWidget::vtkKWWidget()
   this->Parent                   = NULL;
 
   this->BalloonHelpString        = NULL;  
+  this->BalloonHelpIcon          = NULL;  
+  this->BalloonHelpManager       = NULL;
 
   this->Enabled                  = 1;
 
@@ -74,9 +78,19 @@ vtkKWWidget::~vtkKWWidget()
     this->DragAndDropTargetSet = NULL;
     }
 
+  if (this->BalloonHelpManager )
+    {
+    this->SetBalloonHelpManager(NULL);
+    }
+
   if (this->BalloonHelpString)
     {
     this->SetBalloonHelpString(NULL);
+    }
+
+  if (this->BalloonHelpIcon)
+    {
+    this->SetBalloonHelpIcon(NULL);
     }
 
   if (this->IsCreated())
@@ -242,15 +256,7 @@ int vtkKWWidget::CreateSpecificTkWidget(vtkKWApplication *app,
     // If the balloon help string has been set, make sure the bindings
     // are set too, now that we have been created
 
-    if (this->BalloonHelpString)
-      {
-      vtkKWBalloonHelpManager *mgr = 
-        this->GetApplication()->GetBalloonHelpManager();
-      if (mgr)
-        {
-        mgr->AddBindings(this);
-        }
-      }
+    this->AddBalloonHelpBindings();
     }
 
   return 1;
@@ -423,11 +429,82 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     this->BalloonHelpString = new char[strlen(str) + 1];
     strcpy(this->BalloonHelpString, str);
     }
-  
-  if (this->BalloonHelpString && this->GetApplication() && this->IsCreated())
+
+  this->AddBalloonHelpBindings();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetBalloonHelpIcon(vtkKWIcon *arg)
+{
+  if (this->BalloonHelpIcon == arg)
     {
-    vtkKWBalloonHelpManager *mgr = 
-      this->GetApplication()->GetBalloonHelpManager();
+    return;
+    }
+
+  if (this->BalloonHelpIcon)
+    {
+    this->BalloonHelpIcon->UnRegister(this);
+    }
+    
+  this->BalloonHelpIcon = arg;
+
+  if (this->BalloonHelpIcon)
+    {
+    this->BalloonHelpIcon->Register(this);
+    }
+
+  this->Modified();
+
+  this->AddBalloonHelpBindings();
+}
+
+//----------------------------------------------------------------------------
+vtkKWBalloonHelpManager* vtkKWWidget::GetBalloonHelpManager()
+{
+  if (this->BalloonHelpManager)
+    {
+    return this->BalloonHelpManager;
+    }
+
+  if (this->GetApplication())
+    {
+    return this->GetApplication()->GetBalloonHelpManager();
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetBalloonHelpManager(vtkKWBalloonHelpManager *arg)
+{
+  if (this->BalloonHelpManager == arg)
+    {
+    return;
+    }
+
+  if (this->BalloonHelpManager)
+    {
+    this->BalloonHelpManager->RemoveBindings(this);
+    this->BalloonHelpManager->UnRegister(this);
+    }
+    
+  this->BalloonHelpManager = arg;
+
+  if (this->BalloonHelpManager)
+    {
+    this->BalloonHelpManager->Register(this);
+    this->AddBalloonHelpBindings();
+    }
+
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::AddBalloonHelpBindings()
+{
+  if (this->IsCreated() && (this->BalloonHelpString || this->BalloonHelpIcon))
+    {
+    vtkKWBalloonHelpManager *mgr = this->GetBalloonHelpManager();
     if (mgr)
       {
       mgr->AddBindings(this);
@@ -604,7 +681,7 @@ int vtkKWWidget::IsGrabbed()
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBinding(const char *event, 
-                                 vtkObject *object, const char *method)
+                             vtkObject *object, const char *method)
 {
   if (this->IsCreated())
     {
@@ -623,13 +700,13 @@ void vtkKWWidget::SetBinding(const char *event, const char *command)
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::AddBinding(const char *event, 
-                                 vtkObject *object, const char *method)
+                             vtkObject *object, const char *method)
 {
   if (this->IsCreated())
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
-    this->Script("bind %s %s {+ %s}", this->GetWidgetName(), event, command);
+    this->Script("bind %s %s {+%s}", this->GetWidgetName(), event, command);
     delete [] command;
     }
 }
@@ -638,6 +715,28 @@ void vtkKWWidget::AddBinding(const char *event,
 void vtkKWWidget::AddBinding(const char *event, const char *command)
 {
   this->AddBinding(event, NULL, command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::RemoveBinding(const char *event, 
+                                vtkObject *object, const char *method)
+{
+  if (this->IsCreated())
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+
+    // Retrieve the bindings, remove the command, re-assign
+
+    vtksys_stl::string bindings(
+      this->Script("bind %s %s", this->GetWidgetName(), event));
+
+    vtksys::SystemTools::ReplaceString(bindings, command, "");
+  
+    this->Script(
+      "bind %s %s {%s}", this->GetWidgetName(), event, bindings.c_str());
+    delete [] command;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -657,6 +756,28 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
   os << indent << "Enabled: " << (this->GetEnabled() ? "On" : "Off") << endl;
+
+  os << indent << "BalloonHelpIcon: ";
+  if (this->BalloonHelpIcon)
+    {
+    os << this->BalloonHelpIcon << endl;
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+
+
+  os << indent << "BalloonHelpManager: ";
+  if (this->BalloonHelpManager)
+    {
+    os << this->BalloonHelpManager << endl;
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+
   os << indent << "DragAndDropTargetSet: ";
   if (this->DragAndDropTargetSet)
     {
@@ -666,6 +787,7 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "None" << endl;
     }
+
   os << indent << "WidgetName: ";
   if (this->WidgetName)
     {

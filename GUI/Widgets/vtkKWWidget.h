@@ -28,6 +28,8 @@
 class vtkKWWindowBase;
 class vtkKWDragAndDropTargetSet;
 class vtkKWWidgetInternals;
+class vtkKWBalloonHelpManager;
+class vtkKWIcon;
 
 class KWWIDGETS_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -83,6 +85,9 @@ public:
   // Set/add/remove a binding to a widget. 
   // Whenever the 'event' is triggered on the widget, the 'method' is invoked
   // on the 'object' (or called like a regular command if 'object' is NULL)
+  // SetBinding will replace any old bindings, whereas AddBinding will
+  // add the binding to the list of bindings already defined for that event.
+  // RemoveBinding can remove a specific binding or all bindings for an event.
   virtual void SetBinding(
     const char *event, vtkObject *object, const char *method);
   virtual void SetBinding(
@@ -92,6 +97,8 @@ public:
   virtual void AddBinding(
     const char *event, const char *command);
   virtual void RemoveBinding(const char *event);
+  virtual void RemoveBinding(
+    const char *event, vtkObject *object, const char *method);
 
   // Description:
   // Convenience method to get the parent vtkKWWindowBase for
@@ -111,9 +118,31 @@ public:
   virtual void UnpackChildren();
   
   // Description:
-  // Setting this string enables balloon help for this widget.
+  // Set the balloon help string or icon for this widget.
+  // This will popup a small tooltip window over the widget after some delay.
+  // The tooltip settings are common to all widgets within the application
+  // and can be accessed by retrieving the balloon help manager using
+  // the GetBalloonHelpManager method. In some very specific case, a new
+  // tooltip manager can be set specifically for a widget instance.
   virtual void SetBalloonHelpString(const char *str);
   vtkGetStringMacro(BalloonHelpString);
+  virtual void SetBalloonHelpIcon(vtkKWIcon *icon);
+  vtkGetObjectMacro(BalloonHelpIcon, vtkKWIcon);
+
+  // Description:
+  // Set/Get the balloon help manager.
+  // If the widget has been created, this returns the application
+  // balloon help manager. Be aware that changing its settings will
+  // affect all widgets. 
+  // Setting the manager to a different instance allows a widget to use
+  // specific balloon help settings (say, a different delay or color)
+  // without affecting the other widgets. This has to be done before
+  // calling Create().
+  // This is an advanced feature, SetBalloonHelpString or
+  // SetBalloonHelpIcon are the only methods that are really needed to setup
+  // a proper tooltip 99% of the time.
+  virtual vtkKWBalloonHelpManager *GetBalloonHelpManager();
+  virtual void SetBalloonHelpManager(vtkKWBalloonHelpManager *mgr);
 
   // Description:
   // Query if there are drag and drop targets between this widget and
@@ -202,10 +231,13 @@ protected:
   // The parent of the widget
   vtkKWWidget *Parent;
 
-  // Ballon help
-  // The tooltip associated to the widget
+  // Description:
+  // The tooltip associated to the widget, and the balloon help manager
   char *BalloonHelpString;
-  
+  vtkKWIcon *BalloonHelpIcon;
+  vtkKWBalloonHelpManager *BalloonHelpManager;
+  virtual void AddBalloonHelpBindings();
+
   // Description:
   // PIMPL Encapsulation for STL containers
   vtkKWWidgetInternals *Internals;
