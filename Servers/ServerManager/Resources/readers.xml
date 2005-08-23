@@ -938,19 +938,19 @@
         repeat_command="1"
         number_of_elements_per_command="1">
        <EnumerationDomain name="array_list">
-         <Entry value="100" text="Scalar - Density"/>
+         <!-- <Entry value="100" text="Scalar - Density"/> -->
          <Entry value="110" text="Scalar - Pressure"/>
          <Entry value="120" text="Scalar - Temperature"/>
          <Entry value="130" text="Scalar - Enthalpy"/>
          <Entry value="140" text="Scalar - Internal energy"/>
          <Entry value="144" text="Scalar - Kinetic energy"/>
          <Entry value="153" text="Scalar - Velocity magnitude"/>
-         <Entry value="163" text="Scalar - Stagnation energy"/>
+         <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
          <Entry value="170" text="Scalar - Entropy"/>
          <Entry value="184" text="Scalar - Swirl."/>
          <Entry value="200" text="Vector - Velocity"/>
          <Entry value="201" text="Vector - Vorticity"/>
-         <Entry value="202" text="Vector - Momentum"/>
+         <!-- <Entry value="202" text="Vector - Momentum"/> -->
          <Entry value="210" text="Vector - Pressure gradient"/>
        </EnumerationDomain>
      </IntVectorProperty>
