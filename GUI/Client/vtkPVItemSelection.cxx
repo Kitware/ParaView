@@ -43,7 +43,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.2");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -457,7 +457,11 @@ void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
   int numElems=0;
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    numElems++;
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
+    if ( this->Selection->ArrayIsEnabled(check->GetText()) )
+      {
+      numElems++;
+      }
     }
 
   if (numElems > 0)
@@ -469,7 +473,7 @@ void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
       << "$pvTemp" << sourceID << " UpdateInformation\n";
     *file << "  [$pvTemp" << sourceID << " GetProperty "
       << this->SMPropertyName << "] SetNumberOfElements " 
-      << 2*numElems << endl;
+      << numElems << endl;
     }
   numElems=0;
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
@@ -478,23 +482,13 @@ void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
     // Since they default to on.
     if(this->Selection->ArrayIsEnabled(check->GetText()))
       {
+      int value;
+      this->GetNumberFromName(check->GetText(), &value);
       *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMPropertyName << "] SetElement " 
-        << 2*numElems << " {" << check->GetText() << "}" << endl;
-      *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << this->SMPropertyName << "] SetElement " 
-        << 2*numElems+1 << " " << 1 << endl;
+        << numElems << " " << value << endl;
+      numElems++;
       }
-    else
-      {
-      *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << this->SMPropertyName << "] SetElement " 
-        << 2*numElems << " {" << check->GetText() << "}" << endl;
-      *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << this->SMPropertyName << "] SetElement " 
-        << 2*numElems+1 << " " << 0 << endl;
-      }
-    numElems++;
     }
   it->Delete();
 }
