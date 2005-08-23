@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.79");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.80");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -255,7 +255,7 @@ void vtkPVArrayMenu::Initialize()
   if (svp)
     {
     // Get the selected array.
-    this->SetValue(svp->GetElement(0));
+    this->SetValue(svp->GetElement(4));
     }
 
   this->Update();
