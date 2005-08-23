@@ -43,7 +43,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.3");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -486,7 +486,7 @@ void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
       this->GetNumberFromName(check->GetText(), &value);
       *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMPropertyName << "] SetElement " 
-        << numElems << " " << value << endl;
+        << numElems << " " << value << " #--- " << check->GetText() << endl;
       numElems++;
       }
     }
