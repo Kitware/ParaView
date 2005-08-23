@@ -117,7 +117,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.64");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.65");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -285,7 +285,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   this->SetGeometry("380x700+0+0");
-
+  this->SetDisplayPositionToScreenCenterFirst();
   // Menu : File
 
   vtkKWMenu *root_menu = this->GetMenu();
@@ -445,9 +445,12 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetName(lookmarkWidget->GetName());
   newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream s;
-  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
-  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
-  s.rdbuf()->freeze(0);
+  if(newLookmark->GetName())
+    {
+    s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
+    newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
+    }
   newLookmark->SetStateScript(lookmarkWidget->GetStateScript());
   newLookmark->SetName(lookmarkWidget->GetName());
   newLookmark->SetComments(lookmarkWidget->GetComments());
@@ -567,8 +570,7 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
 {
   vtkXMLDataParser *parser;
   vtkXMLDataElement *root;
-  vtkPVLookmark *lookmarkWidget;
-  int j, numLmks, retval;
+  int retval;
   char msg[500];
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
@@ -616,6 +618,9 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
     } 
   root = parser->GetRootElement();
 
+  this->ImportMacroExamplesInternal(0,root,this->MenuExamples);
+
+/*
   vtkXMLDataElement *lmkElement;
   for(j=0; j<root->GetNumberOfNestedElements(); j++)
     {
@@ -637,11 +642,60 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
 
     checkCommand.rdbuf()->freeze(0);
     }
-
+*/
   parser->Delete();
 //  delete [] init_string;
 
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::ImportMacroExamplesInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWMenu *parentMenu)
+{
+  vtkPVLookmark *lookmarkWidget;
+  vtkIdType j,numLmks;
+
+  if(!strcmp("LmkFolder",lmkElement->GetName()))
+    {
+/*
+    vtkKWMenu *childMenu = vtkKWMenu::New();
+    childMenu->SetParent(this->MenuEdit);
+    childMenu->SetTearOff(0);
+    childMenu->Create(this->GetPVApplication());
+    parentMenu->AddCascade(lmkElement->GetAttribute("Name"), childMenu,0);
+*/
+    // use the label frame of this lmk container as the parent frame in which to pack into (constant)
+    // for each xml element (either lookmark or lookmark container) recursively call import with the appropriate location and vtkXMLDataElement
+    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+      {
+      ImportMacroExamplesInternal(j,lmkElement->GetNestedElement(j),parentMenu);
+      }
+//    childMenu->Delete();
+    }
+  else if(!strcmp("LmkFile",lmkElement->GetName()))
+    {
+    // in this case locationOfLmkItemAmongSiblings is the number of lookmark element currently in the first level of the lookmark manager which is why we start from that index
+    // the parent is the lookmark manager's label frame
+    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+      {
+      ImportMacroExamplesInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parentMenu);
+      }
+    }
+  else if(!strcmp("Lmk",lmkElement->GetName()))
+    {
+    // create lookmark widget
+    lookmarkWidget = this->GetPVLookmark(lmkElement);
+    lookmarkWidget->SetMacroFlag(1);
+    numLmks = this->MacroExamples->GetNumberOfItems();
+    this->MacroExamples->InsertItem(numLmks,lookmarkWidget);
+    ostrstream checkCommand;
+    checkCommand << "AddMacroExampleCallback " << numLmks << ends;
+    parentMenu->AddCommand(lookmarkWidget->GetName(), this, checkCommand.str());
+
+    checkCommand.rdbuf()->freeze(0);
+    }
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -1253,8 +1307,16 @@ void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
   this->Script("[winfo toplevel %s] config -cursor {}", 
                 this->GetWidgetName());
 
-  this->Script("%s yview moveto 0",
+  if(appendFlag)
+    {
+  this->Script("%s yview moveto 1",
                this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s yview moveto 0",
+                this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
+    }
 
   // this is needed to enable the scrollbar in the lmk mgr
   this->PVLookmarks->GetItem(0,lookmarkWidget);
@@ -1566,9 +1628,12 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     newLmkWidget->SetName(lmkWidget->GetName());
     newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
     ostrstream s;
-    s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
-    newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
+    if(newLmkWidget->GetName())
+      {
+      s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
+      newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
 //ds
     newLmkWidget->SetDataset(lmkWidget->GetDataset());
     newLmkWidget->CreateDatasetList();
@@ -1677,9 +1742,9 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     // if its a macros folder and we already have one, don't create but visit its children, passing as the parent the currrent macros folder packing frame
     if(nameAttribute && !strcmp(nameAttribute,"Macros") && this->GetMacrosFolder())
       {     
-      lmkElement->GetScalarAttribute("MainFrameCollapsedState",ival);
-      this->GetMacrosFolder()->SetMainFrameCollapsedState(ival);
-      this->GetMacrosFolder()->UpdateWidgetValues();
+      //lmkElement->GetScalarAttribute("MainFrameCollapsedState",ival);
+      //this->GetMacrosFolder()->SetMainFrameCollapsedState(ival);
+      //this->GetMacrosFolder()->UpdateWidgetValues();
       for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
         {
         ImportInternal(j,lmkElement->GetNestedElement(j),this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
@@ -1733,9 +1798,12 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
     lookmarkWidget = this->GetPVLookmark(lmkElement);
     lookmarkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
     ostrstream s;
-    s << "GetPVLookmark \"" << lookmarkWidget->GetName() << "\"" << ends;
-    lookmarkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
+    if(lookmarkWidget->GetName())
+      {
+      s << "GetPVLookmark \"" << lookmarkWidget->GetName() << "\"" << ends;
+      lookmarkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
     vtkKWLookmarkFolder *folder = this->GetMacrosFolder();
     if(folder)
       {
@@ -1822,10 +1890,13 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
 {
   vtkPVLookmark *lmk = vtkPVLookmark::New();
  
-  char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1]; 
-  strcpy(lookmarkName,elem->GetAttribute("Name"));
-  lmk->SetName(lookmarkName);
-  delete [] lookmarkName;
+  if(elem->GetAttribute("Name"))
+    {
+    char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1]; 
+    strcpy(lookmarkName,elem->GetAttribute("Name"));
+    lmk->SetName(lookmarkName);
+    delete [] lookmarkName;
+    }
 
   if(elem->GetAttribute("Comments"))
     {
@@ -2128,9 +2199,12 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
   newLookmark->SetName(name);
   newLookmark->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream s;
-  s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
-  newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
-  s.rdbuf()->freeze(0);
+  if(newLookmark->GetName())
+    {
+    s << "GetPVLookmark \"" << newLookmark->GetName() << "\"" << ends;
+    newLookmark->GetTraceHelper()->SetReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
+    }
   newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
   newLookmark->InitializeDataset();
   newLookmark->StoreStateScript();
@@ -2650,7 +2724,11 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         folder = vtkXMLDataElement::New();
         folder->SetName("LmkFolder");
         oldLmkFolder->UpdateVariableValues();
-        folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
+        if(strlen(oldLmkFolder->GetFolderName())==0)
+          {
+          oldLmkFolder->SetFolderName("Unnamed Folder");
+          }
+        folder->SetAttribute("Name",oldLmkFolder->GetFolderName());
         folder->SetIntAttribute("MainFrameCollapsedState",oldLmkFolder->GetMainFrameCollapsedState());
         dest->AddNestedElement(folder);
 
@@ -2781,6 +2859,11 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
 
       vtkXMLLookmarkElement *elem = vtkXMLLookmarkElement::New();
       elem->SetName("Lmk");
+
+      if(strlen(lookmarkWidget->GetName())==0)
+        {
+        lookmarkWidget->SetName("Unnamed Lookmark");
+        }
       elem->SetAttribute("Name",lookmarkWidget->GetName());
       elem->SetAttribute("Comments", lookmarkWidget->GetComments());
       elem->SetAttribute("StateScript", lookmarkWidget->GetStateScript());
@@ -3413,9 +3496,12 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       newLmkWidget->SetName(oldLmkWidget->GetName());
       newLmkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
-      s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
-      newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
-      s.rdbuf()->freeze(0);
+      if(newLmkWidget->GetName())
+        {
+        s << "GetPVLookmark \"" << newLmkWidget->GetName() << "\"" << ends;
+        newLmkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+        s.rdbuf()->freeze(0);
+        }
 //ds
       newLmkWidget->SetDataset(oldLmkWidget->GetDataset());
       newLmkWidget->CreateDatasetList();

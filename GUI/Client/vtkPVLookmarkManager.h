@@ -219,6 +219,7 @@ protected:
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkKWLookmark, vtkPVLookmark, and vtkKWLookmarkFolders as appropriate
   void ImportInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
+  void ImportMacroExamplesInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWMenu *parentMenu);
 
   // Description:
   // Convenience method for creating a Load/Save dialog box and returning the filename chosen by the user

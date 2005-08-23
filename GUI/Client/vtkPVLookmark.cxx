@@ -82,10 +82,11 @@
 #include "vtkXDMFReaderModule.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVXDMFParameters.h"
+#include "vtkPVSourceNotebook.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.56");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.57");
 
 
 //*****************************************************************************
@@ -789,7 +790,10 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     this->ToolbarButton->SetParent(win->GetLookmarkToolbar()->GetFrame());
     this->ToolbarButton->Create(this->GetPVApplication());
     this->ToolbarButton->SetImageToIcon(icon);
-    this->ToolbarButton->SetBalloonHelpString(this->GetName());
+    ostrstream os;
+    os << this->GetName() << " -- " << this->LmkCommentsText->GetText() << ends;
+    this->ToolbarButton->SetBalloonHelpString(os.str());
+    os.rdbuf()->freeze(0);
     this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
     win->GetLookmarkToolbar()->AddWidget(this->ToolbarButton);
     }
@@ -1613,7 +1617,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
                 }
               }
             ptr.assign(*(++tokIter));
-            }
+            } 
           dlg2->SetText( string1.c_str() );
           dlg2->SetTitle( "Group Input Widget Detected" );
           dlg2->SetIcon();
@@ -1711,12 +1715,13 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
               }
             else if((arraySelection = vtkPVArraySelection::SafeDownCast(pvWidget)))
               { 
+              sscanf(ptr.c_str(),FifthToken_WrappedString,cmd);
               ptr.assign(*(++tokIter));
               while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
                 {
                 sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
-                //only turn the variable on, not off, because some other filter might be using the variable
-                if(ival)
+                // if we are turning the widget on OR if we are turning off and this widget is for a variable selection, do not turn off
+                if(ival ==1 || (ival==0 && !(strstr(cmd,"Point") || strstr(cmd,"point") || strstr(cmd,"Cell") || strstr(cmd,"cell") || strstr(cmd,"variable"))))
                   {
                   arraySelection->SetArrayStatus(sval,ival);
                   arraySelection->ModifiedCallback();
