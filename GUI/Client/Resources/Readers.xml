@@ -386,6 +386,9 @@
       <Item name="little endian"
             value="1"/>
     </SelectionList>
+    <ItemSelection label_text="Function"
+                    property="Functions"
+                    trace_name="FunctionSelection"/>
   </Module>
 
   <Module name="MBP3DReader"

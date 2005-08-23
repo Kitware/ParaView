@@ -85,6 +85,7 @@ SET( ParaViewClient_SRCS
   vtkPVApplicationSettingsInterface.cxx
   vtkPVArrayMenu.cxx
   vtkPVArraySelection.cxx
+  vtkPVItemSelection.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
   vtkPVCalculatorWidget.cxx
