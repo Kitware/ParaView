@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.7");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -35,7 +35,7 @@ vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
   this->TopLevel = NULL;
   this->Label = NULL;
 
-  this->Delay = 1;
+  this->Delay = 1200;
   this->Visibility = 1;
 }
 
@@ -104,14 +104,15 @@ void vtkKWBalloonHelpManager::CreateBalloon()
 //----------------------------------------------------------------------------
 void vtkKWBalloonHelpManager::TriggerCallback(vtkKWWidget *widget)
 {
-  if (!widget || !widget->IsCreated() || this->ApplicationInExit())
+  if (!widget || !widget->IsAlive() || this->ApplicationInExit())
     {
     return;
     }
 
   // If there is no help string, do not bother
 
-  if (!this->Visibility || !widget->GetBalloonHelpString() || this->Delay <= 0)
+  if (!this->Visibility || 
+      (!widget->GetBalloonHelpString() && !widget->GetBalloonHelpIcon()))
     {
     this->SetAfterTimerId(NULL);
     return;
@@ -124,7 +125,7 @@ void vtkKWBalloonHelpManager::TriggerCallback(vtkKWWidget *widget)
   this->SetCurrentWidget(widget);
   this->SetAfterTimerId(
     widget->Script("after %d {catch {%s DisplayCallback %s}}", 
-                   this->Delay * 1000,
+                   this->Delay,
                    this->GetTclName(), widget->GetTclName()));
 }
 
@@ -181,14 +182,14 @@ void vtkKWBalloonHelpManager::WithdrawCallback()
 void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 {
   if (!this->GetApplication() || this->ApplicationInExit() ||
-      !this->Visibility || !widget || !widget->IsCreated())
+      !this->Visibility || !widget || !widget->IsAlive())
     {
     return;
     }
 
   // If there is no help string, return
 
-  if (!widget->GetBalloonHelpString())
+  if (!widget->GetBalloonHelpString() && !widget->GetBalloonHelpIcon())
     {
     this->SetAfterTimerId(NULL);
     return;
@@ -198,7 +199,14 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 
   this->CreateBalloon();
 
-  this->Label->SetText(widget->GetBalloonHelpString());
+  if (widget->GetBalloonHelpIcon())
+    {
+    this->Label->SetImageToIcon(widget->GetBalloonHelpIcon());
+    }
+  else
+    {
+    this->Label->SetText(widget->GetBalloonHelpString());
+    }
 
   // Get the position of the mouse
 
@@ -309,7 +317,7 @@ int vtkKWBalloonHelpManager::ApplicationInExit()
 //----------------------------------------------------------------------------
 void vtkKWBalloonHelpManager::AddBindings(vtkKWWidget *widget)
 {
-  if (!widget || !widget->IsCreated())
+  if (!widget || !widget->IsAlive())
     {
     return;
     }
@@ -329,6 +337,24 @@ void vtkKWBalloonHelpManager::AddBindings(vtkKWWidget *widget)
   widget->AddBinding("<KeyPress>", this, "WithdrawCallback");
   widget->AddBinding("<B1-Motion>", this, "WithdrawCallback");
   widget->AddBinding("<Leave>", this, "CancelCallback");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWBalloonHelpManager::RemoveBindings(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsAlive())
+    {
+    return;
+    }
+
+  vtksys_stl::string command("TriggerCallback ");
+  command += widget->GetTclName();
+  widget->RemoveBinding("<Enter>", this, command.c_str());
+
+  widget->RemoveBinding("<ButtonPress>", this, "WithdrawCallback");
+  widget->RemoveBinding("<KeyPress>", this, "WithdrawCallback");
+  widget->RemoveBinding("<B1-Motion>", this, "WithdrawCallback");
+  widget->RemoveBinding("<Leave>", this, "CancelCallback");
 }
 
 //----------------------------------------------------------------------------

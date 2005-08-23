@@ -47,15 +47,16 @@ public:
   vtkBooleanMacro(Visibility, int);
 
   // Description:
-  // Set the delay for the balloon help in seconds.
-  vtkSetClampMacro(Delay, int, 0, 15);
+  // Set the delay for the balloon help in milliseconds.
+  vtkSetClampMacro(Delay, int, 0, 15000);
   vtkGetMacro(Delay, int);
 
   // Description:
-  // Add bindings for a given widget, effectively providing balloon help
-  // feature for this widget (provided that the vtkKWWidget's 
-  // BalloonHelpString ivar is set.
+  // Add/remove bindings for a given widget, effectively providing balloon help
+  // feature for this widget.
+  // On the widget side, one has to set the balloon help string or image.
   virtual void AddBindings(vtkKWWidget *widget);
+  virtual void RemoveBindings(vtkKWWidget *widget);
 
   // Description:
   // Callbacks.
