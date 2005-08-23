@@ -43,7 +43,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.1");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -159,7 +159,7 @@ void vtkPVItemSelection::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVItemSelection::UpdateSelections(int fromReader)
+void vtkPVItemSelection::UpdateSelections(int)
 {
   vtkSMIntVectorProperty* svp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -181,7 +181,7 @@ void vtkPVItemSelection::UpdateSelections(int fromReader)
           continue;
           }
         int value = dom3->GetEntryValue(i);
-        int cc;
+        unsigned int cc;
         int found = 0;
         for ( cc = 0; cc < svp->GetNumberOfElements(); ++ cc )
           {
@@ -325,10 +325,6 @@ void vtkPVItemSelection::Accept()
     }
 
   this->SetPropertyFromGUI();
-
-  vtkSMIntVectorProperty *svp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetSMProperty());
-
   this->Superclass::Accept();
 }
 
@@ -590,7 +586,7 @@ const char* vtkPVItemSelection::GetNameFromNumber(int num)
     {
     return 0;
     }
-  int cc;
+  unsigned int cc;
   for ( cc = 0; cc < dom3->GetNumberOfEntries(); ++ cc )
     {
     if ( num == dom3->GetEntryValue(cc) )
@@ -617,7 +613,7 @@ int vtkPVItemSelection::GetNumberFromName(const char* name, int* val)
     {
     return 0;
     }
-  int cc;
+  unsigned int cc;
   for ( cc = 0; cc < dom3->GetNumberOfEntries(); ++ cc )
     {
     if ( strcmp(name, dom3->GetEntryText(cc)) == 0 )
