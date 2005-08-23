@@ -267,6 +267,34 @@ public:
   vtkGetObjectMacro(SecondaryToolbarSet, vtkKWToolbarSet);
 
   // Description:
+  // Set the status frame position. The default position is at the
+  // bottom of the window, but this object can also be displayed
+  // at the bottom of the main, secondary or view panel.
+  //BTX
+  enum 
+  {
+    StatusFramePositionWindow = 0,
+    StatusFramePositionMainPanel,
+    StatusFramePositionSecondaryPanel,
+    StatusFramePositionViewPanel
+  };
+  //ETX
+  vtkGetMacro(StatusFramePosition, int);
+  virtual void SetStatusFramePosition(int);
+  virtual void SetStatusFramePositionToWindow()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionWindow); };
+  virtual void SetStatusFramePositionToMainPanel()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionMainPanel); };
+  virtual void SetStatusFramePositionToSecondaryPanel()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionSecondaryPanel); };
+  virtual void SetStatusFramePositionToViewPanel()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionViewPanel); };
+
+  // Description:
   // Call render on all widgets and elements that support that functionality
   virtual void Render();
 
@@ -353,6 +381,10 @@ protected:
   virtual void ShowViewUserInterface(vtkKWUserInterfacePanel *panel);
   virtual void ShowApplicationSettingsUserInterface(vtkKWUserInterfacePanel *panel);
 
+  // Description:
+  // Pack/repack the UI
+  virtual void Pack();
+
   int PanelLayout;
 
   vtkKWSplitFrame *MainSplitFrame;
@@ -366,6 +398,8 @@ protected:
   vtkKWApplicationSettingsInterface *ApplicationSettingsInterface;
 
   vtkKWToolbarSet *SecondaryToolbarSet;
+
+  int             StatusFramePosition;
 
 private:
 

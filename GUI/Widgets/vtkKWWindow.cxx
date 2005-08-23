@@ -22,6 +22,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWRegistryHelper.h"
+#include "vtkKWSeparator.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -45,7 +46,7 @@ const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.266");
+vtkCxxRevisionMacro(vtkKWWindow, "1.267");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -107,6 +108,8 @@ vtkKWWindow::vtkKWWindow()
 
   this->ApplicationSettingsInterface = NULL;
   this->ApplicationSettingsUserInterfaceManager = NULL;
+
+  this->StatusFramePosition = vtkKWWindow::StatusFramePositionWindow;
 }
 
 //----------------------------------------------------------------------------
@@ -395,6 +398,55 @@ void vtkKWWindow::Create(vtkKWApplication *app)
   // Udpate the enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Superclass::Pack();
+
+  // Status frame and status frame separator
+  // Override the parent 
+
+  if (this->StatusFrame && this->StatusFrame->IsCreated())
+    {
+    vtkKWWidget *in = NULL;
+    switch (this->StatusFramePosition)
+      {
+      case vtkKWWindow::StatusFramePositionMainPanel:
+        in = this->GetMainPanelFrame();
+        break;
+      case vtkKWWindow::StatusFramePositionSecondaryPanel:
+        in = this->GetSecondaryPanelFrame();
+        break;
+      case vtkKWWindow::StatusFramePositionViewPanel:
+        in = this->GetViewPanelFrame();
+        break;
+      case vtkKWWindow::StatusFramePositionWindow:
+      default:
+        in = this;
+        break;
+      }
+    if (this->StatusFrameVisibility && in && in->IsCreated())
+      {
+      this->Script("pack %s -side bottom -fill x -pady 0 -in %s",
+                   this->StatusFrame->GetWidgetName(),
+                   in->GetWidgetName());
+
+      if (this->StatusFrameSeparator && 
+          this->StatusFrameSeparator->IsCreated())
+        {
+        this->Script("pack %s -side bottom -fill x -pady 2 -in %s",
+                     this->StatusFrameSeparator->GetWidgetName(),
+                     in->GetWidgetName());
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -831,6 +883,27 @@ void vtkKWWindow::ShowViewUserInterface(vtkKWUserInterfacePanel *panel)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWWindow::SetStatusFramePosition(int s)
+{
+  if (s < vtkKWWindow::StatusFramePositionWindow)
+    {
+    s = vtkKWWindow::StatusFramePositionWindow;
+    }
+  else if (s > vtkKWWindow::StatusFramePositionViewPanel) 
+    {
+    s = vtkKWWindow::StatusFramePositionViewPanel;
+    }
+  if (s == this->StatusFramePosition)
+    {
+    return;
+    }
+
+  this->StatusFramePosition = s;
+  this->Modified();
+  this->Pack();
+}
+
 //-----------------------------------------------------------------------------
 void vtkKWWindow::PrintSettingsCallback()
 {
@@ -1154,4 +1227,5 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SecondarySplitFrame: " << this->SecondarySplitFrame << endl;
   os << indent << "SecondaryToolbarSet: " << this->SecondaryToolbarSet << endl;
   os << indent << "PanelLayout: " << this->PanelLayout << endl;
+  os << indent << "StatusFramePosition: " << this->StatusFramePosition << endl;
 }
