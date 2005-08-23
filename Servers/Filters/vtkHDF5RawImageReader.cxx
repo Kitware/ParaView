@@ -38,7 +38,7 @@
 #define VTK_HDF5_DEBUG 1
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.14");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.15");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -315,7 +315,7 @@ void vtkHDF5RawImageReader::Execute()
     hid_t dataspace = H5Screate_simple(this->Rank, h_total, 0);
 
     if(H5Sselect_hyperslab(dataspace, H5S_SELECT_SET,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >= 6 && H5_VERS_RELEASE >= 4
+#if (H5_VERS_MAJOR>1)||((H5_VERS_MAJOR==1)&&((H5_VERS_MINOR>6)||((H5_VERS_MINOR==6)&&(H5_VERS_RELEASE>=4))))
                               (hsize_t *)h_start, h_stride, h_count, 0) < 0)
 #else
                               h_start, h_stride, h_count, 0) < 0)
@@ -331,7 +331,7 @@ void vtkHDF5RawImageReader::Execute()
     hssize_t moffset[3] = {0, 0, 0};
 
     if(H5Sselect_hyperslab(memspace, H5S_SELECT_SET,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >= 6 && H5_VERS_RELEASE >= 4
+#if (H5_VERS_MAJOR>1)||((H5_VERS_MAJOR==1)&&((H5_VERS_MINOR>6)||((H5_VERS_MINOR==6)&&(H5_VERS_RELEASE>=4))))
                               (hsize_t *)moffset, 0, h_count, 0) < 0)
 #else
                               moffset, 0, h_count, 0) < 0)
