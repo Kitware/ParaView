@@ -561,9 +561,9 @@ public:
   // Description:
   // Force a cell (or all cells) for which a WindowCommand has been defined
   // to set the background color to the cell current background color.
-  // It does so by tyring to safe down-cast the widget inside that cell into
-  // a vtkKWCoreWidget and set its backgroud color to the color returned
-  // by GetCellCurrentBackgroundColor.
+  // It does so by tyring to safe-down-cast the widget inside that cell into
+  // a vtkKWCoreWidget and set its background color to the color returned
+  // by GetCellCurrentBackgroundColor (and its first level children as well).
   virtual void RefreshBackgroundColorOfCellWithWindowCommand(
     int row_index, int col_index);
   virtual void RefreshBackgroundColorOfAllCellsWithWindowCommand();

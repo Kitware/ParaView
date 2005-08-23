@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.19");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -1693,8 +1693,19 @@ void vtkKWMultiColumnList::RefreshBackgroundColorOfCellWithWindowCommand(
         this->GetChildWidgetWithName(child_name));
       if (child)
         {
-        child->SetBackgroundColor(
-          this->GetCellCurrentBackgroundColor(row_index, col_index));
+        double r, g, b;
+        this->GetCellCurrentBackgroundColor(row_index, col_index, &r, &g, &b);
+        child->SetBackgroundColor(r, g, b);
+        int nb_grand_children = child->GetNumberOfChildren();
+        for (int i = 0; i < nb_grand_children; i++)
+          {
+          vtkKWCoreWidget *grand_child = vtkKWCoreWidget::SafeDownCast(
+            child->GetNthChild(i));
+          if (grand_child)
+            {
+            grand_child->SetBackgroundColor(r, g, b);
+            }
+          }
         }
       }
     }
