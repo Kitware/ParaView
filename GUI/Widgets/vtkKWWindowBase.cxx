@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.32");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.33");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1345,6 +1345,7 @@ void vtkKWWindowBase::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "MainToolbarSet: " << this->GetMainToolbarSet() << endl;
   os << indent << "StatusFrameVisibility: " << (this->StatusFrameVisibility ? "On" : "Off") << endl;
+  os << indent << "TrayFramePosition: " << this->TrayFramePosition << endl;
 }
 
 

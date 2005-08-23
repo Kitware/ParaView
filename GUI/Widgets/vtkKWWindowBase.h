@@ -186,6 +186,7 @@ public:
     TrayFramePositionToolbar
   };
   //ETX
+  vtkGetMacro(TrayFramePosition, int);
   virtual void SetTrayFramePosition(int);
   virtual void SetTrayFramePositionToStatusFrame()
     { this->SetTrayFramePosition(
