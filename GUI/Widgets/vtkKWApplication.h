@@ -110,9 +110,9 @@ public:
 
   // Description:
   // Set/Get the application version name - this usually is the application 
-  // name postfixed with the version number (major/minor), no spaces.
+  // name postfixed with the version number (major/minor).
   // It is typically used as the master key to store registry settings
-  // (ex: VolView20, ParaView1.1, etc.)
+  // (ex: VolView 3.0, ParaView1.1, etc.)
   // If it has not been set, it will use the value of Name and append
   // the major/minor version.
   vtkSetStringMacro(VersionName);
