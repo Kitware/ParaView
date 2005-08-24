@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.401");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.402");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1167,15 +1167,17 @@ void vtkPVRenderView::CreateViewProperties()
   InitializeScale(this->DefaultLightIntensity, this->RenderModuleProxy->GetProperty("LightIntensity"));
 
   this->DefaultLightAmbientColor->SetParent( this->DefaultLightFrame->GetFrame());
-  this->DefaultLightAmbientColor->GetLabel()->SetText("Set Ambient Label Color");
+  this->DefaultLightAmbientColor->GetLabel()->SetText("Set Ambient Light Color");
   this->DefaultLightAmbientColor->Create(this->GetApplication());
   this->DefaultLightAmbientColor->SetCommand(this, "SetDefaultLightAmbientColor");
   this->DefaultLightAmbientColor->SetBalloonHelpString(
     "Choose the ambient color of the default light.");
+  /*
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
                this->DefaultLightAmbientColor->GetWidgetName());
+  */
   this->DefaultLightDiffuseColor->SetParent( this->DefaultLightFrame->GetFrame());
-  this->DefaultLightDiffuseColor->GetLabel()->SetText("Set Diffuse Label Color");
+  this->DefaultLightDiffuseColor->GetLabel()->SetText("Set Light Color");
   this->DefaultLightDiffuseColor->Create(this->GetApplication());
   this->DefaultLightDiffuseColor->SetCommand(this, "SetDefaultLightDiffuseColor");
   this->DefaultLightDiffuseColor->SetBalloonHelpString(
@@ -1183,13 +1185,15 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
                this->DefaultLightDiffuseColor->GetWidgetName());
   this->DefaultLightSpecularColor->SetParent( this->DefaultLightFrame->GetFrame());
-  this->DefaultLightSpecularColor->GetLabel()->SetText("Set Specular Label Color");
+  this->DefaultLightSpecularColor->GetLabel()->SetText("Set Specular Light Color");
   this->DefaultLightSpecularColor->Create(this->GetApplication());
   this->DefaultLightSpecularColor->SetCommand(this, "SetDefaultLightSpecularColor");
   this->DefaultLightSpecularColor->SetBalloonHelpString(
     "Choose the specular color of the default light.");
+  /*
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
                this->DefaultLightSpecularColor->GetWidgetName());
+  */
   this->DefaultLightSwitch->SetParent(this->DefaultLightFrame->GetFrame());
   this->DefaultLightSwitch->Create(this->GetApplication());
   this->DefaultLightSwitch->SetText("Enable Default Light");
