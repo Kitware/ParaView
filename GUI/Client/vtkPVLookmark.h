@@ -188,10 +188,10 @@ protected:
   // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
   // the filters so that we can go back and set reset them at the end
   void ParseAndExecuteStateScript(char *state, int macroFlag);
-  vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *name, int &newDatasetFlag, int &updateLookmarkFlag);
-  vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col,char *module, char *name);
-  vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *name);
-  vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *name);
+  vtkPVSource *GetReaderForLookmark(vtkPVSourceCollection *col,char *module, char *pathname, int &newDatasetFlag, int &updateLookmarkFlag);
+  vtkPVSource *GetReaderForMacro(vtkPVSourceCollection *col, char *pathname);
+  vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *sourcename);
+  vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *sourcename);
 
   char* StateScript;
   char* ImageData;

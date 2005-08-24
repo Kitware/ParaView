@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.58");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.59");
 
 
 //*****************************************************************************
@@ -339,7 +339,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources,
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, char *, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, char *name)
 {
   vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
@@ -1200,7 +1200,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkstd::string srcLabel;
   vtkStdString string1,string2;
   bool executeCmd = true;
-  //char **buf = new char*[100];
   vtkstd::vector<vtkstd::string> buf;
   char moduleName[50];
   vtkstd::string::size_type ret;
@@ -1211,6 +1210,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkXDMFReaderModule *xdmfmod;
   vtkPVXDMFParameters *xdmfParameters;
   char sourceLabel[50];
+  vtkstd::string str;
 
   vtkPVWindow *win = this->GetPVWindow();
 
@@ -1218,18 +1218,68 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkstd::vector<vtkstd::string> initCmds;
   vtkstd::vector<vtkstd::string>::iterator tokIter;
   vtkstd::vector<vtkstd::string>::iterator tokMrkr;
+  vtkstd::map<vtkPVSource*, char*> srcTclNameMap;
+  vtkstd::map<vtkPVSource*, char*> fltrTclNameMap;
+  vtkstd::map<vtkPVSource*, char*>::iterator srcTclNameMapIter = srcTclNameMap.begin();
+  vtkstd::map<vtkPVSource*, char*>::iterator fltrTclNameMapIter = fltrTclNameMap.begin();
+
+
+  // The reason behind the parsing of the state script is because executing it as is will create a new reader/source
+  // and we'd like to reuse the same reader/source for the lookmark. Simply replacing the tcl names of the reader/source 
+  // in the state script with the ones that are open in paraview does not work either since the tcl interpreter does
+  // not recognize the open reader/source tcl name as valid. 
+  //
+  // The idea here is to take existing readers and/or sources, or ones that we will create ourselves, 
+  // and use the state script to initialize their vtkPVWidgets and display properties. We create a mapping between the 
+  // open readers/sources and the tcl name of its counterpart in the state script so that for the case of a lookmark
+  // with multiple readers and/or sources the right ones get matched up. We also keeps a collection of the available readers/sources
+  // and remove each as it gets initialized. The rest of the script that creates the filters, etc, is executed on its own with a few exceptions. 
+
+  // Reader format assumptions:
+  // InitializeReadCuston command followed by ReadFileInformation and FinalizeRead (exception is the Xdmf reader which is specially handled)
+  // Ignore lines between FinalizeRead and the first vtkPVWidget command *except* for the SetLabel command which sets the name of the item in the
+  // selection window.
+  // The vtkPVWidget section contains commands containing "GetPVWidget" followed by commands to set the value of that widget
+  // Once all the reader's pvwidgets have been initialized, lines are ignored until "AcceptCallback" is reached.
+  // Lines are then ignored until the optional "GetDisplayProxy" command is reached which indicates the beginning of section that sets the display properties. 
+  // This section is ended by a "UpdateVTKObjects" command
+  // The next line might be one of "ColorByArray" or "ColorByProperty"
+  
+  // Source format assumptions:
+  // Same as reader format assumptions except a "CreatePVSource" commands replaces the InitReadCustom, ReadFile, and Finalize commands.
+
+  // Filter format assumptions:
+  // The first vtkPVWidget in the script is its input widget. 
+  // This input widget can either be a vtkPVInputMenu or a vtkPVGroupInputWidget. 
+  // The first is denoted with a trace name of "Input" or "Source". The second by a trace name of "inputs".
+
+  // Finding a reader for the lookmark:
+  // Look for an open dataset of the same path and reader type
+  // if none is open, try to open the one at the specified path automatically for user
+  // if that fails, prompt user for a new data file
+
+  // Finding a reader for a macro:
+  // If the lookmark contains only a single reader or source, use the currently viewed reader/source as input By "currently viewed" I mean either the reader/source
+  //    itself is selected in the Selection Window OR one of its descendant filters are.
+  // If the lookmark is made up of multiple readers and/or sources, prompt the user and ask them to specify
+
+  // Finding a source for a lookmark:
+  // Look for one that is created of the same type and use that one
+  // Otherwise create a new one
+ 
+  // Finding a source for a macro:
+  // If the lookmark is made up of only one source, use the currently view one.
+  // Otherwise prompt user for specify one in selection window
+
+
+  // Tokenize script into lines:
   vtkstd::string delimiters;
   delimiters.assign("\r\n");
-  vtkstd::string str;
   str.assign(script);
-
-  // TOKENIZE:
-
   // Skip delimiters at beginning.
   vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".
   vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
-
   while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
     {
     // Found a token, add it to the vector.
@@ -1272,19 +1322,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
   this->GetPVRenderView()->StartBlockingRender();
 
-  vtkstd::map<vtkPVSource*, char*> srcTclNameMap;
-  vtkstd::map<vtkPVSource*, char*> fltrTclNameMap;
-  vtkstd::map<vtkPVSource*, char*>::iterator srcTclNameMapIter = srcTclNameMap.begin();
-  vtkstd::map<vtkPVSource*, char*>::iterator fltrTclNameMapIter = fltrTclNameMap.begin();
-
-  // parse script for "createpvsource" or "initialize read custom" commands
-  // if filename (not including extension) matches one and only one source from collection, initialize, store tclname, and continue
-  // if they do not, prompt user to match open sources to ones in state script, continue parsing and initializing, store tclname
-  // if more sources in script than in collection or vice versa, fail for now
-  // if "createpvsource" and its tcl name does not match any of our stored ones, check for an input widget on a subsequent line, if none, prompt user, else treat as filter
-  // if it is a filter, execute commands, looking for input pvwidget (input menu or groupinputwidget) when you get to one, set the appropriate source tied to the tcl name as the currentpvsource
-  // when all sources in collection have been initialized, assume we are done and parse rest of script, if we come across "createpvsource" or "Init read custom" prompt user and ignore secion
-
   tokIter = tokens.begin();
   ptr.assign(*tokIter);
 
@@ -1308,17 +1345,15 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
         if(macroFlag)
           {
-          src = this->GetReaderForMacro(readers,moduleName,path);
+          src = this->GetReaderForMacro(readers,path);
           }
         else
           {
-          // look for an open dataset of the same path and reader type
-          // if none is open, try to open the one at the specified path automatically for user
-          // if that fails, prompt user for a new data file
           src = this->GetReaderForLookmark(readers,moduleName,path,newDatasetFlag,updateLookmarkFlag);
           }
         if(!src)
           {
+          // Special case for Xdmf readers because they have commands between InitializeReadCustom and ReadFileInformation commands:
           if(strcmp(moduleName,"XdmfReader")==0)
             { 
             vtkPVReaderModule* clone = win->InitializeReadCustom(moduleName, path);
@@ -1332,8 +1367,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
               {
               if(ptr.rfind("SetDomain",ptr.size())!=vtkstd::string::npos)
                 {
-                // third token could be wrapped in brackets, quotes, or nothing
-                //sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
                 sscanf(ptr.c_str(),ThirdToken_String,sval);
                 if(sval[0] == '{')
                   {
@@ -1387,10 +1420,8 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             retVal = win->FinalizeRead(clone, path);
             if (retVal != VTK_OK)
               {
-              // Clone should delete itself on an error
               break;
               }
-            //clone->AcceptCallback();
             src = clone;
             }
           else
@@ -1417,10 +1448,11 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           }
 
         sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
+
+        // ASSUMPTION: group input widgets will have trace name "inputs" to identify them
         if(strcmp(sval,"inputs") == 0)
           {
           // group input widget
-          // execute the createpvsource command
           ptr.assign(*tokMrkr);
           while(tokMrkr!=tokIter)
             {
@@ -1428,7 +1460,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             ptr.assign(*(++tokMrkr));
             }
 
-          // Goal: display the list of input names that were used in the script to the user
+          // Display the list of input names that were used in the script to the user
           this->GetPVLookmarkManager()->Withdraw();
           vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
           dlg2->SetMasterWindow(win);
@@ -1437,6 +1469,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           dlg2->SetModal(0);
           dlg2->Create(this->GetPVApplication());
           string1 = "Please use the Append filter panel to select the inputs to the filter. Below is a list of recommendations based one the inputs used when this lookmark was created. Press OK when you are done.";
+          string1.append("\n");
           while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)
             {
             if(ptr.rfind("SetSelectState",ptr.size())!=vtkstd::string::npos)
@@ -1511,7 +1544,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           if(macroFlag)
             {
             // if multiple sources are open and the lookmark creates multiple source, ask user
-            // else if the lookmark is single sources, use the currently selected one
+            // else if the lookmark is single source, use the currently selected one
             src = this->GetSourceForMacro(sources,moduleName);
             }
           else
@@ -1546,8 +1579,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
         ///////////////////////////////////////
         //  Initialize the source or reader:
         /////////////////////////////////////        
-
-        //ptr.assign(*tokIter);
 
         //loop through collection till found, operate accordingly leaving else statement with ptr one line past 
         vtkCollectionIterator *widgetIter = src->GetWidgets()->NewIterator();
@@ -1876,8 +1907,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
           src->GetPVOutput()->Update();
           src->GetPVOutput()->DataColorRangeCallback();
-
-
           }
 
         ////////////////////////////////////////

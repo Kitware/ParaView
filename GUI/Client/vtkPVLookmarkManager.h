@@ -212,7 +212,7 @@ protected:
   // Description
   // Helper functions for drag and drop capability
   void MoveCheckedChildren(vtkKWWidget *recursiveWidget, vtkKWWidget *frameToPackLmkItemInto);
-  void DestroyUnusedLmkWidgets(vtkKWWidget *widget);
+  void DestroyUnusedFoldersFromWidget(vtkKWWidget *widget);
   int GetNumberOfChildLmkItems(vtkKWWidget *prnt);
 
   // Description:

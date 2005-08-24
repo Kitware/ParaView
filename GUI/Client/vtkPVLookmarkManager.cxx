@@ -55,7 +55,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.66");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.67");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1408,7 +1408,7 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
     this->TopDragAndDropTarget->SetReliefToFlat();
     }
 
-  this->DestroyUnusedLmkWidgets(this->ScrollFrame);
+  this->DestroyUnusedFoldersFromWidget(this->ScrollFrame);
 
   this->ResetDragAndDropTargetSetAndCallbacks();
 
@@ -2495,8 +2495,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         // the two loops are necessary because the user can change location of lmk items and
         // the vtkKWWidgetCollection of children is ordered by when the item was created, not reordered each time its packed (moved)
 
-        vtkKWWidget *parent = 
-          oldLmkFolder->GetLabelFrame()->GetFrame();
+       parent = oldLmkFolder->GetLabelFrame()->GetFrame();
        counter = nextLmkItemIndex = nb_children = 0;
         while (counter < parent->GetNumberOfChildren())
           {
@@ -3134,7 +3133,7 @@ int vtkPVLookmarkManager::GetNumberOfChildLmkItems(vtkKWWidget *parentFrame)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
+void vtkPVLookmarkManager::DestroyUnusedFoldersFromWidget(vtkKWWidget *lmkItem)
 {
   if(lmkItem->IsA("vtkKWLookmarkFolder"))
     {
@@ -3155,7 +3154,7 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
       int nb_children = parent->GetNumberOfChildren();
       for (int i = 0; i < nb_children; i++)
         {
-        this->DestroyUnusedLmkWidgets(parent->GetNthChild(i));
+        this->DestroyUnusedFoldersFromWidget(parent->GetNthChild(i));
         }
       }
     }
@@ -3165,7 +3164,7 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
     int nb_children = parent->GetNumberOfChildren();
     for (int i = 0; i < nb_children; i++)
       {
-      this->DestroyUnusedLmkWidgets(parent->GetNthChild(i));
+      this->DestroyUnusedFoldersFromWidget(parent->GetNthChild(i));
       }
     }
 }
