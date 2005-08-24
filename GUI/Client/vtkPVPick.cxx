@@ -37,11 +37,87 @@
 #include "vtkKWEntry.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTraceHelper.h"
+//the following are part of the temporal plot
+#include "vtkPVArraySelection.h"
+#include "vtkSMXYPlotDisplayProxy.h"
+#include "vtkSMXYPlotActorProxy.h"
+#include "vtkKWLoadSaveButton.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkCommand.h"
+#include "vtkPVWindow.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVAnimationScene.h"
+#include "vtkPVAnimationManager.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkXYPlotActor.h"
+#include "vtkXYPlotWidget.h"
+#include "vtkSMIntVectorProperty.h"
+// Some header file is defining CurrentTime so undef it
+#undef CurrentTime
+#include "vtkAnimationCue.h"
+
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.22");
+vtkCxxRevisionMacro(vtkPVPick, "1.23");
+
+
+//*****************************************************************************
+//TODO: merge this with the identical code in vtkPVProbe
+class vtkTemporalPickObserver : public vtkCommand
+{
+public:
+  static vtkTemporalPickObserver* New()
+    {
+    return new vtkTemporalPickObserver;
+    }
+  void SetTemporalProbeProxy(vtkSMProxy * proxy)
+    {
+    this->TemporalProbeProxy = proxy;
+    }
+  virtual void Execute(vtkObject * vtkNotUsed(obj), unsigned long event, void* calldata)
+    {
+    if (this->TemporalProbeProxy)
+      {
+      switch(event)
+        {
+        case vtkCommand::StartAnimationCueEvent:
+          {
+          //Tell the proxy, to tell the TemporalProbe, to get ready to make a set of samples.
+          vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
+            this->TemporalProbeProxy->GetProperty("AnimateInit"));
+          if (prop) prop->Modified();
+          this->TemporalProbeProxy->UpdateVTKObjects();
+          break;
+          }
+        case vtkCommand::AnimationCueTickEvent:
+          {
+          //Tell the proxy, to tell the TemporalProbe, to take a time sample.
+          vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
+            vtkAnimationCue::AnimationCueInfo*>(calldata);
+          vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
+            this->TemporalProbeProxy->GetProperty("AnimateTick"));
+          if (prop) prop->SetElement(0, cueInfo->CurrentTime);
+          this->TemporalProbeProxy->UpdateVTKObjects();
+          break;
+          }
+        }
+      }
+    }
+protected:
+  vtkTemporalPickObserver()
+    {
+    this->TemporalProbeProxy = 0;
+    }
+  vtkSMProxy* TemporalProbeProxy;
+};
 
 
 //----------------------------------------------------------------------------
@@ -63,6 +139,18 @@ vtkPVPick::vtkPVPick()
   this->PointLabelFontSizeLabel = vtkKWLabel::New();
   this->PointLabelFontSizeThumbWheel = vtkKWThumbWheel::New();
 
+  //the following are part of the temporal plot
+  this->XYPlotFrame = vtkKWFrameWithLabel::New();
+  this->ShowXYPlotToggle = vtkKWCheckButton::New();
+  this->PlotDisplayProxy = 0; 
+  this->PlotDisplayProxyName = 0;
+  this->TemporalProbeProxy = 0;
+  this->TemporalProbeProxyName = 0;
+  this->ArraySelection = vtkPVArraySelection::New();
+  this->SaveButton = vtkKWLoadSaveButton::New();
+  this->Observer = 0;
+  this->LastPorC = -1;
+  this->LastUseId = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -83,6 +171,51 @@ vtkPVPick::~vtkPVPick()
   this->PointLabelFontSizeLabel = NULL;
   this->PointLabelFontSizeThumbWheel->Delete();
   this->PointLabelFontSizeThumbWheel = NULL;
+
+  //the following are part of the temporal plot
+  this->XYPlotFrame->Delete();
+  this->XYPlotFrame = NULL;
+  this->ShowXYPlotToggle->Delete();
+  this->ShowXYPlotToggle = NULL;
+  if (this->PlotDisplayProxy)
+    {
+    if (this->GetPVApplication() && this->GetPVApplication()->GetRenderModuleProxy())
+      {
+      this->RemoveDisplayFromRenderModule(this->PlotDisplayProxy);
+      }
+    if  (this->PlotDisplayProxyName)
+      {
+      vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+      pxm->UnRegisterProxy("displays", this->PlotDisplayProxyName);
+      this->SetPlotDisplayProxyName(0);
+      }
+    this->PlotDisplayProxy->Delete();
+    this->PlotDisplayProxy = NULL;
+    }
+  if (this->TemporalProbeProxy)
+    {
+    if  (this->TemporalProbeProxyName)
+      {
+      vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+      pxm->UnRegisterProxy("filters", this->TemporalProbeProxyName);
+      this->SetTemporalProbeProxyName(0);
+      }
+    this->TemporalProbeProxy->Delete();
+    this->TemporalProbeProxy = NULL;
+    }
+  this->ArraySelection->Delete();
+  this->ArraySelection = NULL;
+  this->SaveButton->Delete();
+  this->SaveButton =  NULL;
+  if (this->Observer) 
+    {
+    vtkPVAnimationScene *animScene = 
+      this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
+    animScene->RemoveObserver(this->Observer);   
+    this->Observer->Delete();
+    this->Observer = NULL;
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -94,10 +227,13 @@ void vtkPVPick::DeleteCallback()
 //----------------------------------------------------------------------------
 void vtkPVPick::CreateProperties()
 {
+  //sets up the GUI
+  //TODO: move as much of this as possible into XML
   vtkPVApplication* pvApp = this->GetPVApplication();
 
   this->Superclass::CreateProperties();
 
+  //point label controls
   this->PointLabelFrame->SetParent(this->ParameterFrame->GetFrame());
   this->PointLabelFrame->Create(pvApp);
   this->PointLabelFrame->SetLabelText("Point Label Display");
@@ -145,12 +281,91 @@ void vtkPVPick::CreateProperties()
                this->PointLabelFontSizeThumbWheel->GetWidgetName());
 
 
+  //temporal plot
+  this->XYPlotFrame->SetParent(this->ParameterFrame->GetFrame());
+  this->XYPlotFrame->Create(pvApp);
+  this->XYPlotFrame->SetLabelText("Temporal Plot");
+  this->Script("pack %s -fill x -expand true",
+               this->XYPlotFrame->GetWidgetName());
+  this->XYPlotFrame->CollapseButtonCallback();
 
+  this->ShowXYPlotToggle->SetParent(this->XYPlotFrame->GetFrame());
+  this->ShowXYPlotToggle->Create(pvApp);
+  this->ShowXYPlotToggle->SetText("Show XY-Plot");
+  this->ShowXYPlotToggle->SetSelectedState(0);
+  this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
+               this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s",
+               this->ShowXYPlotToggle->GetWidgetName());
+
+  if (!this->TemporalProbeProxy)
+    {
+    //create the proxy for the TemporalProbeFilter
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    this->TemporalProbeProxy = vtkSMProxy::SafeDownCast(
+      pxm->NewProxy("filters", "TemporalProbe"));
+    if (!this->TemporalProbeProxy)
+      {
+      vtkErrorMacro("Failed to create TemporalProbe Proxy!");
+      return;
+      }
+
+    vtksys_ios::ostringstream str;
+    str << this->GetSourceList() << "."
+      << this->GetName() << "."
+      << "TemporalProbeProxy";
+    this->SetTemporalProbeProxyName(str.str().c_str());
+    pxm->RegisterProxy("filters", this->TemporalProbeProxyName, this->TemporalProbeProxy);
+    //Register the Proxy to receive events.
+    this->Observer = vtkTemporalPickObserver::New();
+    this->Observer->SetTemporalProbeProxy(this->TemporalProbeProxy);
+    vtkPVAnimationScene *animScene = 
+      this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
+    animScene->AddObserver(vtkCommand::StartAnimationCueEvent, this->Observer);
+    animScene->AddObserver(vtkCommand::AnimationCueTickEvent, this->Observer);
+    }
+
+  if (!this->PlotDisplayProxy)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    this->PlotDisplayProxy = vtkSMXYPlotDisplayProxy::SafeDownCast(
+      pxm->NewProxy("displays", "XYPlotDisplay"));
+    if (!this->PlotDisplayProxy)
+      {
+      vtkErrorMacro("Failed to create Plot Display Proxy!");
+      return;
+      }
+    vtksys_ios::ostringstream str;
+    // SourceListName.SourceProxyName.XYPlotDisplay == name for the 
+    // Display proxy.
+    str << this->GetSourceList() << "."
+      << this->GetName() << "."
+      << "XYPlotDisplay";
+    this->SetPlotDisplayProxyName(str.str().c_str());
+    pxm->RegisterProxy("displays", this->PlotDisplayProxyName, this->PlotDisplayProxy);
+    }
+  
+  this->ArraySelection->SetParent(this->XYPlotFrame->GetFrame());
+  this->ArraySelection->SetPVSource(this);
+  this->ArraySelection->SetLabelText("Cell Scalars");
+  this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
+
+  this->SaveButton->SetParent(this->XYPlotFrame->GetFrame());
+  this->SaveButton->Create(pvApp); 
+  this->SaveButton->SetCommand(this, "SaveDialogCallback");
+  this->SaveButton->SetText("Save as CSV");
+  vtkKWLoadSaveDialog *dlg = this->SaveButton->GetLoadSaveDialog();
+  dlg->SetDefaultExtension(".csv");
+  dlg->SetFileTypes("{{CSV Document} {.csv}}");
+  dlg->SaveDialogOn();
+  this->Script("pack %s",
+               this->SaveButton->GetWidgetName());
+
+  //data values drawn on parameters tab
   this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
   this->DataFrame->Create(pvApp);
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
-  
 }
 
 
@@ -166,12 +381,153 @@ void vtkPVPick::AcceptCallbackInternal()
 
   if (!initialized)
     {
+    //TODO: move as much of this as possible into XML
+
+    //on first accept callback, set up auxiliary filters
     this->PointLabelDisplayProxy->SetVisibilityCM(vis);
     this->PointLabelDisplayProxy->SetFontSizeCM(fsize);
     this->SetPointLabelFontSize(fsize);
+
+    //temporal plot
+    vtkSMInputProperty* tip = vtkSMInputProperty::SafeDownCast(
+      this->TemporalProbeProxy->GetProperty("Input"));
+    if (!tip)
+      {
+      vtkErrorMacro("Failed to find property Input on TemporalProbeProxy.");
+      return;
+      }
+    tip->AddProxy(this->GetProxy());    
+    this->TemporalProbeProxy->UpdateVTKObjects();
+
+    this->PlotDisplayProxy->SetPolyOrUGrid(1);
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+      this->PlotDisplayProxy->GetProperty("Input"));
+    if (!ip)
+      {
+      vtkErrorMacro("Failed to find property Input on PlotDisplayProxy.");
+      return;
+      }
+    ip->RemoveAllProxies();  
+    ip->AddProxy(this->TemporalProbeProxy);
+    this->PlotDisplayProxy->SetXAxisLabel(true);
+    this->AddDisplayToRenderModule(this->PlotDisplayProxy);
     }
 
-  // We need to update manually for the case we are probing one point.
+  //choose either point or cell input to the temporal plot
+  vtkSMIntVectorProperty *PorCIprop = 
+    vtkSMIntVectorProperty::SafeDownCast(this->Proxy->GetProperty("PickCell"));
+  int PorC = PorCIprop->GetElement(0);
+  vtkSMIntVectorProperty *PorCOprop = vtkSMIntVectorProperty::SafeDownCast(
+    this->TemporalProbeProxy->GetProperty("PointOrCell"));
+  if (PorCOprop) PorCOprop->SetElement(0, PorC);
+  this->TemporalProbeProxy->UpdateVTKObjects();
+
+  //pick by Id changes arrays too (by Id doesn't pass Id)
+  vtkSMIntVectorProperty *UseIdprop = 
+    vtkSMIntVectorProperty::SafeDownCast(this->Proxy->GetProperty("UseIdToPick"));
+  int useId = UseIdprop->GetElement(0);
+
+  //set up the array selection area and pass names to plot
+  if ((this->LastPorC != PorC) || (this->LastUseId != useId))
+    {     
+    this->LastPorC = PorC;
+    this->LastUseId = useId;
+
+    if (initialized) 
+      {
+      this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
+      
+      this->ArraySelection->Delete();
+
+      this->ArraySelection = vtkPVArraySelection::New();
+      this->ArraySelection->SetParent(this->XYPlotFrame->GetFrame());
+      this->ArraySelection->SetPVSource(this);
+      this->ArraySelection->SetLabelText("Cell Scalars");
+      this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
+      }
+
+    int numArrays;
+    if (PorC) 
+      {
+      this->ArraySelection->SetLabelText("Cell Scalars");
+      
+      numArrays = this->GetDataInformation()->GetCellDataInformation()->GetNumberOfArrays();
+      }
+    else
+      {
+      this->ArraySelection->SetLabelText("Point Scalars");
+      numArrays = this->GetDataInformation()->GetPointDataInformation()->GetNumberOfArrays();
+      }
+    
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->PlotDisplayProxy->GetProperty("ArrayNames"));
+    if (svp)
+      {     
+      vtkSMStringListDomain *arrayList = vtkSMStringListDomain::SafeDownCast(svp->GetDomain( "array_list" ));
+      arrayList->RemoveAllStrings();
+      
+      int e=0;
+      for(int i=0; i<numArrays; i++)
+        {
+        vtkPVArrayInformation* arrayInfo;
+        if (PorC)
+          {
+          arrayInfo = this->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(i);
+          }
+        else
+          {
+          arrayInfo = this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(i);
+          }
+        
+        if( arrayInfo->GetNumberOfComponents() == 1 )
+          {
+          svp->SetElement(e++, arrayInfo->GetName());
+          arrayList->AddString(arrayInfo->GetName());
+          }
+        }
+
+      svp->SetNumberOfElements(e);
+
+      this->ArraySelection->SetSMProperty(svp);
+      this->ArraySelection->Create(this->GetPVApplication());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property ArrayNames.");
+      }
+    
+    this->Script("pack %s -fill x -expand true", this->ArraySelection->GetWidgetName());  
+
+    //get correct value for plot
+    vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
+      this->TemporalProbeProxy->GetProperty("AnimateInit"));
+    if (prop) prop->Modified();
+
+    vtkPVAnimationScene *animScene = 
+      this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
+    double currTime = animScene->GetCurrentTime();
+
+    vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->TemporalProbeProxy->GetProperty("AnimateTick"));
+    if (prop2) prop2->SetElement(0, currTime);
+    this->TemporalProbeProxy->UpdateVTKObjects();
+    }
+
+  //execute pipeline to have valid data to start off in plot
+  this->TemporalProbeProxy->UpdateVTKObjects();
+  this->PlotDisplayProxy->Update();
+  if (this->ShowXYPlotToggle->GetSelectedState())
+    {
+    this->PlotDisplayProxy->SetVisibilityCM(1);
+    this->SaveButton->SetEnabled(1);
+    }
+  else
+    {
+    this->PlotDisplayProxy->SetVisibilityCM(0);
+    this->SaveButton->SetEnabled(0);
+    }
+
+  //We need to update manually for the case we are probing one point.
   this->PointLabelDisplayProxy->Update();
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
@@ -430,4 +786,26 @@ void vtkPVPick::UpdatePointLabelFontSize()
 void vtkPVPick::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVPick::ArraySelectionInternalCallback()
+{
+  this->ArraySelection->Accept();
+  this->PlotDisplayProxy->UpdateVTKObjects();
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPick::SaveDialogCallback()
+{
+  vtkXYPlotActor *xy = this->PlotDisplayProxy->GetXYPlotWidget()->GetXYPlotActor();
+  
+  ofstream f;
+  const char *filename = this->SaveButton->GetFileName();
+  f.open( filename );
+  xy->PrintAsCSV(f);
+  f.close();
+}
+

@@ -87,6 +87,10 @@ public:
   // Sets the label of the plot to reflect either time or space sampling.
   void SetXAxisLabel(bool IsTemporal);
 
+  // Description:
+  // Tell the display whether to pass on PolyData(0=default) or UnstructuredGrid(1)
+  void SetPolyOrUGrid(int which);
+
 protected:
   vtkSMXYPlotDisplayProxy();
   ~vtkSMXYPlotDisplayProxy();
@@ -112,6 +116,8 @@ protected:
   vtkSMXYPlotDisplayProxyObserver* Observer;
   void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
   //ETX
+
+  int PolyOrUGrid;
 private:
   vtkSMXYPlotDisplayProxy(const vtkSMXYPlotDisplayProxy&); // Not implemented.
   void operator=(const vtkSMXYPlotDisplayProxy&); // Not implemented.

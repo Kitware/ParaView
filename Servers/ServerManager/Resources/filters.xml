@@ -2487,6 +2487,17 @@
           <DoubleRangeDomain name="range" min="0" max="1" />
     </DoubleVectorProperty>
 
+    <IntVectorProperty 
+       name="PointOrCell" 
+       command="SetPointOrCell" 
+       number_of_elements="1"
+       default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="On"/>
+         <Entry value="1" text="Off"/>
+       </EnumerationDomain>
+    </IntVectorProperty>
+
    <!-- End TemporalProbe -->
    </SourceProxy>
 

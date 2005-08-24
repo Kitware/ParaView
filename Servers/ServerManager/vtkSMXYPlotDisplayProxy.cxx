@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -73,6 +73,7 @@ vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
   this->RenderModuleProxy = 0;
   this->Visibility = 0;
   this->GeometryIsValid = 0;
+  this->PolyOrUGrid = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +166,15 @@ void vtkSMXYPlotDisplayProxy::SetupWidget()
     this->Observer);
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::SetPolyOrUGrid(int which)
+{
+  if (which < 0) which = 0;
+  if (which > 1) which = 1;
+  this->PolyOrUGrid = which;
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::SetupPipeline()
 {
@@ -175,13 +185,16 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
   for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
     stream
-      << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
+      << vtkClientServerStream::Invoke;
+    if (this->PolyOrUGrid)
+      stream << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput";   
+    else
+      stream << this->CollectProxy->GetID(i) << "GetPolyDataOutput";
+    stream << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     }
   if (stream.GetNumberOfMessages() > 0)
     {
@@ -196,7 +209,10 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
     vtkErrorMacro("Failed to find property OutputType on UpdateSuppressorProxy.");
     return;
     }
-  svp->SetElement(0,"vtkPolyData");
+  if (this->PolyOrUGrid)
+    svp->SetElement(0,"vtkUnstructuredGrid");
+  else
+    svp->SetElement(0,"vtkPolyData");
   this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   // We hook up the XY plot's input here itself.

@@ -60,7 +60,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.155");
+vtkCxxRevisionMacro(vtkPVProbe, "1.156");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -367,6 +367,18 @@ void vtkPVProbe::AcceptCallbackInternal()
 
     this->PlotDisplayProxy->SetVisibilityCM(0); // also calls UpdateVTKObjects().
     this->AddDisplayToRenderModule(this->PlotDisplayProxy);
+
+    //get correct value for plot
+    vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
+      this->TemporalProbeProxy->GetProperty("AnimateInit"));
+    if (prop) prop->Modified();
+    vtkPVAnimationScene *animScene = 
+      this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
+    double currTime = animScene->GetCurrentTime();
+    vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->TemporalProbeProxy->GetProperty("AnimateTick"));
+    if (prop2) prop2->SetElement(0, currTime);
+    this->TemporalProbeProxy->UpdateVTKObjects();
     }
 
   // Use this to determine if acting as a point probe or line probe.

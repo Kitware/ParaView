@@ -41,6 +41,13 @@ public:
   // Records the input data at this point in time.
   void AnimateTick(double TheTime);
 
+    // Description:
+  // Select whether you are probing point(0) or cell(1) data.
+  // The default value of this flag is off (points).
+  vtkSetMacro(PointOrCell,int);
+  vtkGetMacro(PointOrCell,int);
+  vtkBooleanMacro(PointOrCell,int);
+
 protected:
   vtkTemporalProbeFilter();
   ~vtkTemporalProbeFilter();
@@ -52,6 +59,9 @@ protected:
   //If empty, will simply pass input data through, otherwise will use recorded
   //data.
   bool Empty;
+
+  int PointOrCell;
+
 private:
   vtkTemporalProbeFilter(const vtkTemporalProbeFilter&);  // Not implemented.
   void operator=(const vtkTemporalProbeFilter&);  // Not implemented.

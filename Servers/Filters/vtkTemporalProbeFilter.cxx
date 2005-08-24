@@ -18,10 +18,11 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkCellData.h"
 #include "vtkPoints.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.2");
+vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.3");
 vtkStandardNewMacro(vtkTemporalProbeFilter);
 
 
@@ -30,6 +31,7 @@ vtkTemporalProbeFilter::vtkTemporalProbeFilter()
 {
   this->History = NULL;
   this->Empty = true;
+  this->PointOrCell = 0; 
 }
 
 //----------------------------------------------------------------------------
@@ -54,8 +56,19 @@ void vtkTemporalProbeFilter::AnimateInit()
 
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   if (!input) return;
-  vtkPointData *ipd = input->GetPointData();
-  if (!ipd) return;
+
+  vtkCellData *icd;
+  vtkPointData *ipd;
+  if (this->PointOrCell)
+    {
+    icd = input->GetCellData();
+    if (!icd) return;
+    }
+  else
+    {
+    ipd = input->GetPointData();
+    if (!ipd) return;
+    }
 
   this->History = vtkUnstructuredGrid::New();
 
@@ -64,25 +77,34 @@ void vtkTemporalProbeFilter::AnimateInit()
   opts->Delete();
 
   vtkPointData *opd = this->History->GetPointData();
-  int numArrs = ipd->GetNumberOfArrays();
+  int numArrs = this->PointOrCell ? icd->GetNumberOfArrays() : ipd->GetNumberOfArrays();
   for (int i = 0; i < numArrs; i++) 
     {
-    vtkDataArray *ida = ipd->GetArray(i);
+    vtkDataArray *ida = this->PointOrCell ? icd->GetArray(i) : ipd->GetArray(i);
     opd->AddArray(ida->NewInstance());
     vtkDataArray *oda = opd->GetArray(i);
     oda->SetName(ida->GetName());
     }
-
 }
 
 //----------------------------------------------------------------------------
 void vtkTemporalProbeFilter::AnimateTick(double TheTime)
 {
-
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   if (!input) return;
-  vtkPointData *ipd = input->GetPointData();
-  if (!ipd) return;
+
+  vtkCellData *icd;
+  vtkPointData *ipd;
+  if (this->PointOrCell)
+    {
+    icd = input->GetCellData();
+    if (!icd) return;
+    }
+  else
+    {
+    ipd = input->GetPointData();
+    if (!ipd) return;
+    }
 
   //Want to run silently even when input is the line probe, so do not warn.
   //int numPts = input->GetNumberOfPoints();
@@ -96,10 +118,10 @@ void vtkTemporalProbeFilter::AnimateTick(double TheTime)
 
   vtkPointData *opd = this->History->GetPointData();
 
-  int numArrs = ipd->GetNumberOfArrays();
+  int numArrs = (this->PointOrCell) ? icd->GetNumberOfArrays() : ipd->GetNumberOfArrays();
   for (int i = 0; i < numArrs; i++) 
     {
-    vtkDataArray *ida = ipd->GetArray(i);
+    vtkDataArray *ida = (this->PointOrCell) ? icd->GetArray(i) : ipd->GetArray(i);
     vtkDataArray *oda = opd->GetArray(i);
     int numComp = ida->GetNumberOfComponents();
     double *x = new double[numComp];
@@ -144,5 +166,7 @@ int vtkTemporalProbeFilter::RequestData(
 void vtkTemporalProbeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "PointOrCell: " << this->PointOrCell << endl;
+
 }
 

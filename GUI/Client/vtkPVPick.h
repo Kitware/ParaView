@@ -34,6 +34,11 @@ class vtkDataSetAttributes;
 class vtkKWFrameWithLabel;
 class vtkKWCheckButton;
 class vtkKWThumbWheel;
+class vtkPVArraySelection;
+class vtkSMXYPlotDisplayProxy;
+class vtkSMProxy;
+class vtkTemporalPickObserver;
+class vtkKWLoadSaveButton;
 
 class VTK_EXPORT vtkPVPick : public vtkPVSource
 {
@@ -50,11 +55,27 @@ public:
   // Called when the delete button is pressed.
   virtual void DeleteCallback();
 
+  // Description:
+  // Called by GUI to change Point Label appearance
   void PointLabelCheckCallback();
   void ChangePointLabelFontSize();
 
+  // Description:
+  // Refreshes GUI with current Point Label appearance
   void UpdatePointLabelCheck();
   void UpdatePointLabelFontSize();
+
+  // Description:
+  // Called when scalars are selected or deselected for the plot.
+  void ArraySelectionInternalCallback();
+
+  // Description:
+  // Callback for the Save as comma separated values button.
+  void SaveDialogCallback();
+
+  // Description:
+  // Access to the ShowXYPlotToggle from Tcl
+  vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
 protected:
   vtkPVPick();
@@ -73,19 +94,26 @@ protected:
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
 
+  // Point label controls
   vtkKWFrameWithLabel *PointLabelFrame;
   vtkKWCheckButton *PointLabelCheck;
   vtkKWLabel       *PointLabelFontSizeLabel;
   vtkKWThumbWheel  *PointLabelFontSizeThumbWheel;
 
-  //FOR TEMPORAL PLOT
-  /*
-  vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
-  char* PlotDisplayProxyName; // Name used to register the plot display proxy
-                              // with the Proxy Manager.
-  vtkSetStringMacro(PlotDisplayProxyName);
+  // Added for temporal plot
+  vtkKWFrameWithLabel *XYPlotFrame;
+  vtkKWCheckButton *ShowXYPlotToggle;
   vtkPVArraySelection *ArraySelection;
-  */
+  vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
+  char* PlotDisplayProxyName; 
+  vtkSetStringMacro(PlotDisplayProxyName);
+  vtkSMProxy* TemporalProbeProxy;
+  char* TemporalProbeProxyName; 
+  vtkSetStringMacro(TemporalProbeProxyName);
+  vtkTemporalPickObserver *Observer;
+  vtkKWLoadSaveButton *SaveButton;
+  int LastPorC;
+  int LastUseId;
 
 private:
   vtkPVPick(const vtkPVPick&); // Not implemented
