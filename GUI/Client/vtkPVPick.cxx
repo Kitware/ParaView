@@ -66,7 +66,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.23");
+vtkCxxRevisionMacro(vtkPVPick, "1.24");
 
 
 //*****************************************************************************
@@ -416,7 +416,7 @@ void vtkPVPick::AcceptCallbackInternal()
   //choose either point or cell input to the temporal plot
   vtkSMIntVectorProperty *PorCIprop = 
     vtkSMIntVectorProperty::SafeDownCast(this->Proxy->GetProperty("PickCell"));
-  int PorC = PorCIprop->GetElement(0);
+  int PorC = (PorCIprop)?PorCIprop->GetElement(0):0;
   vtkSMIntVectorProperty *PorCOprop = vtkSMIntVectorProperty::SafeDownCast(
     this->TemporalProbeProxy->GetProperty("PointOrCell"));
   if (PorCOprop) PorCOprop->SetElement(0, PorC);
@@ -425,7 +425,7 @@ void vtkPVPick::AcceptCallbackInternal()
   //pick by Id changes arrays too (by Id doesn't pass Id)
   vtkSMIntVectorProperty *UseIdprop = 
     vtkSMIntVectorProperty::SafeDownCast(this->Proxy->GetProperty("UseIdToPick"));
-  int useId = UseIdprop->GetElement(0);
+  int useId = (UseIdprop)?UseIdprop->GetElement(0):0;
 
   //set up the array selection area and pass names to plot
   if ((this->LastPorC != PorC) || (this->LastUseId != useId))
