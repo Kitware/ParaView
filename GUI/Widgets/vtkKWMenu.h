@@ -49,9 +49,9 @@ public:
   // Description:
   // Set cascade menu for menu entry.
   void SetCascade(int index, vtkKWMenu*);
-  void SetCascade(const char* item, vtkKWMenu*);
-  void SetCascade(int index, const char*);
-  void SetCascade(const char* item, const char*);
+  void SetCascade(const char *label, vtkKWMenu*);
+  void SetCascade(int index, const char *menu_name);
+  void SetCascade(const char *label, const char *menu_name);
 
   // Description:
   // Copy the radio button variable logic.
@@ -138,20 +138,20 @@ public:
   // Description:
   // Call the menu item callback at the given index
   void Invoke(int position);
-  void Invoke(const char* item);
+  void Invoke(const char *label);
 
   // Description:
   // Delete the menu item at the given position.
   // Be careful, there is a bug in tk, that will break other items
   // in the menu below the one being deleted, unless a new item is added.
   void DeleteMenuItem(int position);
-  void DeleteMenuItem(const char* item);
+  void DeleteMenuItem(const char *label);
   void DeleteAllMenuItems();
   
   // Description:
   // Returns the integer index of the menu item by string, or by the
   // command (object/method) pair associated to it.
-  int GetIndexOfItem(const char* item);
+  int GetIndexOfItem(const char *label);
   int GetIndexOfCommand(vtkObject* Object, const char* MethodAndArgString);
 
   // Description:
@@ -172,21 +172,21 @@ public:
   // Get the option of an entry
   int HasItemOption(int position, const char *option);
   const char* GetItemOption(int position, const char *option);
-  const char* GetItemOption(const char *item, const char *option);
+  const char* GetItemOption(const char *label, const char *option);
 
   // Description:
   // Set the compound image of an entry
   void SetItemCompoundImage(int position, const char *imagename);
-  void SetItemCompoundImage(const char *item, const char *imagename);
+  void SetItemCompoundImage(const char *label, const char *imagename);
 
   // Description:
   // Set/Get the accelerator for a given item.
   void SetItemAccelerator(int position, const char *accelerator);
-  void SetItemAccelerator(const char *item, const char *accelerator);
+  void SetItemAccelerator(const char *label, const char *accelerator);
 
   // Description:
   // Checks if an item is in the menu
-  int HasItem(const char* item);
+  int HasItem(const char* label);
 
   // Description:
   // Returns the number of items
@@ -206,9 +206,9 @@ public:
   // Set/Get state of the menu entry with a given index or name.
   // Valid constants can be found in vtkKWTkOptions::StateType.
   virtual void SetItemState(int index, int state);
-  virtual void SetItemState(const char* item, int state);
+  virtual void SetItemState(const char *label, int state);
   virtual int  GetItemState(int index);
-  virtual int  GetItemState(const char* item);
+  virtual int  GetItemState(const char *label);
 
   // Description:
   // Convenience method to set the state of all entries.

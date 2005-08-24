@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.81");
+vtkCxxRevisionMacro(vtkKWMenu, "1.82");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -83,7 +83,6 @@ void vtkKWMenu::DisplayHelp(const char* widget)
       }
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::AddGeneric(const char* addtype, 
@@ -242,9 +241,9 @@ int vtkKWMenu::GetCascadeIndex(vtkKWMenu* menu)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(int index, const char* menu)
+void vtkKWMenu::SetCascade(int index, const char* menu_name)
 {
-  if (!menu)
+  if (!menu_name)
     {
     return;
     }
@@ -259,11 +258,11 @@ void vtkKWMenu::SetCascade(int index, const char* menu)
   // If not, clone it.
 
   int parent_length = (int)(strlen(wname));
-  int child_length = (int)(strlen(menu));
+  int child_length = (int)(strlen(menu_name));
 
   if (child_length < (parent_length + 2) || 
-      strncmp(wname, menu, parent_length) ||
-      menu[parent_length] != '.')
+      strncmp(wname, menu_name, parent_length) ||
+      menu_name[parent_length] != '.')
     {
     ostrstream clone_menu;
     clone_menu << wname << ".clone_";
@@ -279,13 +278,13 @@ void vtkKWMenu::SetCascade(int index, const char* menu)
       }
     clone_menu << ends;
     this->Script("catch { destroy %s } \n %s clone %s", 
-                 clone_menu.str(), menu, clone_menu.str());
+                 clone_menu.str(), menu_name, clone_menu.str());
     str << " -menu {" << clone_menu.str() << "}" << ends;
     clone_menu.rdbuf()->freeze(0); 
     }
   else
     {
-    str << " -menu {" << menu << "}" << ends;
+    str << " -menu {" << menu_name << "}" << ends;
     }
 
   this->Script(str.str());
@@ -303,23 +302,23 @@ void vtkKWMenu::SetCascade(int index, vtkKWMenu* menu)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char* item, vtkKWMenu* menu)
+void vtkKWMenu::SetCascade(const char *label, vtkKWMenu* menu)
 {
-  if (!menu )
+  if (!menu || !this->HasItem(label))
     {
     return;
     }
-  this->SetCascade(this->GetIndexOfItem(item), menu->GetWidgetName());
+  this->SetCascade(this->GetIndexOfItem(label), menu->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char* item, const char* menu)
+void vtkKWMenu::SetCascade(const char *label, const char* menu_name)
 {
-  if (!menu )
+  if (!menu_name || !this->HasItem(label))
     {
     return;
     }
-  this->SetCascade(this->GetIndexOfItem(item), menu);
+  this->SetCascade(this->GetIndexOfItem(label), menu_name);
 }
 
 //----------------------------------------------------------------------------
@@ -623,13 +622,13 @@ void vtkKWMenu::Invoke(int position)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::Invoke(const char* item)
+void vtkKWMenu::Invoke(const char *label)
 {
-  if ( !this->HasItem(item) )
+  if (!this->HasItem(label))
     {
     return;
     }
-  this->Invoke(this->GetIndexOfItem(item));
+  this->Invoke(this->GetIndexOfItem(label));
 }
 
 //----------------------------------------------------------------------------
@@ -643,11 +642,13 @@ void vtkKWMenu::DeleteMenuItem(int position)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::DeleteMenuItem(const char* menuitem)
+void vtkKWMenu::DeleteMenuItem(const char *label)
 {
-  const char *wname = this->GetWidgetName();
-  this->Script("catch {%s delete {%s}} ; set {%sHelpArray(%s)} {}",
-               wname, menuitem, wname, menuitem);
+  if (!this->HasItem(label))
+    {
+    return;
+    }
+  this->DeleteMenuItem(this->GetIndexOfItem(label));
 }
 
 //----------------------------------------------------------------------------
@@ -675,9 +676,79 @@ void vtkKWMenu::DeleteAllMenuItems()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetIndexOfItem(const char* menuname)
+int vtkKWMenu::GetNumberOfItems()
 {
-  return atoi(this->Script("%s index {%s}", this->GetWidgetName(), menuname));
+  if (this->IsAlive())
+    {
+    const char *end = this->Script("%s index end", this->GetWidgetName());
+    if (strcmp(end, "none"))
+      {
+      return atoi(end) + 1;
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::HasItem(const char *label)
+{
+  return this->GetIndexOfItem(label) >= 0 ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfItem(const char *label)
+{
+  // This one is tricky
+  // Calling 'index' only works if the parameter is not a number, or
+  // not any of 'active', 'end', 'last', 'none' or '@number', which are
+  // interpreted differently. Detect that, and loop over all entries if
+  // required
+
+  if (!label || !*label)
+    {
+    return -1;
+    }
+
+  // Check if it is a number
+
+  const char *ptr = label;
+  while (*ptr && isdigit(*ptr))
+    {
+    ++ptr;
+    }
+
+  // If it is not a number, and it is not of the special keyword, use 'index'
+
+  if (*ptr &&
+      strcmp(label, "active") &&
+      strcmp(label, "end") &&
+      strcmp(label, "last") &&
+      strcmp(label, "none") &&
+      *label != '@')
+    {
+    int not_ok = atoi(
+      this->Script("catch {%s index {%s}} %s_getindex", 
+                   this->GetWidgetName(), label, this->GetTclName()));
+    if (not_ok)
+      {
+      return -1;
+      }
+    return atoi(this->Script("set %s_getindex", this->GetTclName()));
+    }
+
+  // OK, it is either a number or one of the special keywords, check manually
+
+  int nb_of_items = this->GetNumberOfItems();
+  for (int i = 0; i < nb_of_items; i++)
+    {
+    const char *label_opt = this->GetItemOption(i, "-label");
+    if (label_opt && *label_opt && !strcmp(label_opt, label))
+      {
+      return i;
+      }
+    }
+
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -737,31 +808,6 @@ const char* vtkKWMenu::GetItemLabel(int position)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::HasItem(const char* menuname)
-{
-  if (this->IsCreated())
-    {
-    return !atoi(
-      this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname));
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetNumberOfItems()
-{
-  if (this->IsAlive())
-    {
-    const char *end = this->Script("%s index end", this->GetWidgetName());
-    if (strcmp(end, "none"))
-      {
-      return atoi(end) + 1;
-      }
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWMenu::AddSeparator()
 {
   this->Script( "%s add separator", this->GetWidgetName());
@@ -782,13 +828,13 @@ int vtkKWMenu::GetItemState(int index)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetItemState(const char* item)
+int vtkKWMenu::GetItemState(const char *label)
 {
-  if (!this->HasItem(item))
+  if (!this->HasItem(label))
     {
     return vtkKWTkOptions::StateUnknown;
     }
-  return this->GetItemState(this->GetIndexOfItem(item));
+  return this->GetItemState(this->GetIndexOfItem(label));
 }
 
 //----------------------------------------------------------------------------
@@ -804,13 +850,13 @@ void vtkKWMenu::SetItemState(int index, int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemState(const char* item, int state)
+void vtkKWMenu::SetItemState(const char *label, int state)
 {
-  if (!this->HasItem(item))
+  if (!this->HasItem(label))
     {
     return;
     }
-  this->SetItemState(this->GetIndexOfItem(item), state);
+  this->SetItemState(this->GetIndexOfItem(label), state);
 }
 
 //----------------------------------------------------------------------------
@@ -874,25 +920,25 @@ void vtkKWMenu::SetEntryCommand(int idx, const char* MethodAndArgString)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString)
+void vtkKWMenu::SetEntryCommand(const char *label, const char* MethodAndArgString)
 {
-  if (!this->HasItem(item))
+  if (!this->HasItem(label))
     {
     return;
     }
-  this->SetEntryCommand(this->GetIndexOfItem(item), MethodAndArgString);
+  this->SetEntryCommand(this->GetIndexOfItem(label), MethodAndArgString);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(const char* item, vtkObject* object, 
+void vtkKWMenu::SetEntryCommand(const char *label, vtkObject* object, 
                            const char* MethodAndArgString)
 {
-  if ( !this->HasItem(item) )
+  if ( !this->HasItem(label))
     {
     return;
     }
-  int index = this->GetIndexOfItem(item);
-  this->SetEntryCommand(index, object, MethodAndArgString);
+  this->SetEntryCommand(
+    this->GetIndexOfItem(label), object, MethodAndArgString);
 }
 
 
@@ -921,9 +967,9 @@ const char* vtkKWMenu::GetItemOption(int idx, const char *option)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
+const char* vtkKWMenu::GetItemOption(const char *label, const char *option)
 {
-  return this->GetItemOption(this->GetIndexOfItem(item), option);
+  return this->GetItemOption(this->GetIndexOfItem(label), option);
 }
 
 //----------------------------------------------------------------------------
@@ -946,9 +992,9 @@ void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundImage(const char *item, const char *imagename)
+void vtkKWMenu::SetItemCompoundImage(const char *label, const char *imagename)
 {
-  this->SetItemCompoundImage(this->GetIndexOfItem(item), imagename);
+  this->SetItemCompoundImage(this->GetIndexOfItem(label), imagename);
 }
 
 //----------------------------------------------------------------------------
@@ -965,9 +1011,9 @@ void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemAccelerator(const char *item, const char *accelerator)
+void vtkKWMenu::SetItemAccelerator(const char *label, const char *accelerator)
 {
-  this->SetItemAccelerator(this->GetIndexOfItem(item), accelerator);
+  this->SetItemAccelerator(this->GetIndexOfItem(label), accelerator);
 }
 
 //----------------------------------------------------------------------------
