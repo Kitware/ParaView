@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.33");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.34");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -795,7 +795,7 @@ int vtkKWWindowBase::GetFileMenuInsertPosition()
     return this->GetFileMenu()->GetIndexOfItem(vtkKWWindowBase::FileExitMenuLabel);  
     }
 
-  return this->GetHelpMenu()->GetNumberOfItems();
+  return this->GetFileMenu()->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
