@@ -26,6 +26,7 @@
 #include "vtkSMProxy.h"
 class vtkSMRenderModuleProxy;
 class vtkPVGeometryInformation;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMDisplayProxy : public vtkSMProxy
 {
