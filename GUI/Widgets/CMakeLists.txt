@@ -262,6 +262,7 @@ FOREACH (WidgetType
     vtkKWLabel
     vtkKWLoadSaveButton
     vtkKWMenuButton
+    vtkKWMenuButtonWithSpinButtons
     vtkKWMessage
     vtkKWPopupButton
     vtkKWPushButton
