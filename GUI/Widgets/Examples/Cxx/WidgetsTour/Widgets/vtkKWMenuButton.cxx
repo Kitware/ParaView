@@ -1,4 +1,5 @@
 #include "vtkKWMenuButton.h"
+#include "vtkKWMenuButtonWithSpinButtons.h"
 #include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
@@ -40,6 +41,28 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   // -----------------------------------------------------------------------
 
+  // Create a menu button with spin buttons
+
+  vtkKWMenuButtonWithSpinButtons *menubutton1b = vtkKWMenuButtonWithSpinButtons::New();
+  menubutton1b->SetParent(parent);
+  menubutton1b->Create(app);
+  menubutton1b->GetWidget()->SetWidth(20);
+  menubutton1b->SetBalloonHelpString(
+    "This is a vtkKWMenuButtonWithSpinButtons, i.e. a menu button associated "
+    "to a set of spin buttons (vtkKWSpinButtons) that can be used to "
+    "increment and decrement the value");
+
+  for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
+    {
+    menubutton1b->GetWidget()->AddRadioButton(days[i]);
+    }
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
+    menubutton1b->GetWidgetName());
+
+  // -----------------------------------------------------------------------
+
   // Create another menu button, this time with a label
 
   vtkKWMenuButtonWithLabel *menubutton2 = vtkKWMenuButtonWithLabel::New();
@@ -69,6 +92,7 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     menubutton2->GetWidgetName());
 
   menubutton1->Delete();
+  menubutton1b->Delete();
   menubutton2->Delete();
 
   // TODO: use callbacks

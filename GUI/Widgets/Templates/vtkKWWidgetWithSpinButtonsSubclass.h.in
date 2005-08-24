@@ -1,0 +1,85 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetWithSpinButtonsSubclass.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME @WidgetType@WithSpinButtons - a @WidgetType@ associated to a vtkKWSpinButtons
+// .SECTION Description
+// This class creates a composite widget associating a @WidgetType@ to a
+// vtkKWSpinButtons.
+// As a subclass of vtkKWWidgetWithSpinButtons, it inherits a set of
+// spin buttons.
+// The only requirement is for the @WidgetType@ class to implement the
+// IncrementValue() and DecrementValue() callbacks.
+// .SECTION See Also
+// vtkKWWidgetWithSpinButtons @WidgetType@
+
+#ifndef __@WidgetType@WithSpinButtons_h
+#define __@WidgetType@WithSpinButtons_h
+
+#include "vtkKWWidgetWithSpinButtons.h"
+
+class vtkKWApplication;
+class @WidgetType@;
+
+class KWWIDGETS_EXPORT @WidgetType@WithSpinButtons : public vtkKWWidgetWithSpinButtons
+{
+public:
+  static @WidgetType@WithSpinButtons* New();
+  vtkTypeRevisionMacro(@WidgetType@WithSpinButtons, vtkKWWidgetWithSpinButtons);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Create the widget
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Get the @WidgetType@ that is being associated to the spin buttons
+  virtual @WidgetType@* GetWidget();
+  
+  // Description:
+  // Set the string that enables balloon help for this widget.
+  // Override to pass down to children.
+  virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks
+  virtual void IncrementValueCallback();
+  virtual void DecrementValueCallback();
+
+protected:
+  @WidgetType@WithSpinButtons();
+  ~@WidgetType@WithSpinButtons();
+
+  // Description:
+  // Pack or repack the widget. To be implemented by subclasses.
+  virtual void Pack();
+
+  // Description:
+  // Internal widget
+  @WidgetType@ *Widget;
+
+private:
+
+  @WidgetType@WithSpinButtons(const @WidgetType@WithSpinButtons&); // Not implemented
+  void operator=(const @WidgetType@WithSpinButtons&); // Not implemented
+};
+
+#endif

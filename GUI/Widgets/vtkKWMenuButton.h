@@ -44,6 +44,12 @@ public:
   virtual void SetValue(const char *name);
 
   // Description:
+  // Set/Get the current entry to the previous or next entry
+  // and call the corresponding callback if any.
+  virtual void IncrementValue();
+  virtual void DecrementValue();
+
+  // Description:
   // Get the menu object
   vtkGetObjectMacro(Menu, vtkKWMenu);
 

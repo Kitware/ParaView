@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.29");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -85,6 +85,54 @@ void vtkKWMenuButton::SetValue(const char *s)
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::IncrementValue()
+{
+  const char *value = this->GetValue();
+  if (!this->Menu || !this->Menu->IsCreated())
+    {
+    return;
+    }
+  int pos;
+  if (!this->Menu->HasItem(value))
+    {
+    pos = 0;
+    }
+  else
+    {
+    pos = this->Menu->GetIndexOfItem(value) + 1;
+    if (pos >= this->Menu->GetNumberOfItems())
+      {
+      pos = 0;
+      }
+    }
+  this->Menu->Invoke(pos);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::DecrementValue()
+{
+  const char *value = this->GetValue();
+  if (!this->Menu || !this->Menu->IsCreated() || !this->Menu->HasItem(value))
+    {
+    return;
+    }
+  int pos;
+  if (!this->Menu->HasItem(value))
+    {
+    pos = this->Menu->GetNumberOfItems() - 1;
+    }
+  else
+    {
+    pos = this->Menu->GetIndexOfItem(value) - 1;
+    if (pos < 0)
+      {
+      pos = this->Menu->GetNumberOfItems() - 1;
+      }
+    }
+  this->Menu->Invoke(pos);
 }
 
 //----------------------------------------------------------------------------

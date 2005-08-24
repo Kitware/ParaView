@@ -23,6 +23,26 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
+  # Create a menu button with spin buttons
+
+  vtkKWMenuButtonWithSpinButtons menubutton1b
+  menubutton1b SetParent $parent
+  menubutton1b Create $app
+  [menubutton1b GetWidget] SetWidth 20
+  menubutton1b SetBalloonHelpString \
+    "This is a vtkKWMenuButtonWithSpinButtons i.e. a menu button associated\
+    to a set of spin buttons vtkKWSpinButtons that can be used to\
+    increment and decrement the value"
+
+  for {set i 0} {$i < [llength $days]} {incr i} {
+
+    [menubutton1b GetWidget] AddRadioButton [lindex $days $i]
+    }
+
+  pack [menubutton1b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+
+  # -----------------------------------------------------------------------
+
   # Create another menu button this time with a label
 
   vtkKWMenuButtonWithLabel menubutton2
@@ -56,6 +76,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
 proc vtkKWMenuButtonFinalizePoint {} {
   menubutton1 Delete
+  menubutton1b Delete
   menubutton2 Delete
 }
 

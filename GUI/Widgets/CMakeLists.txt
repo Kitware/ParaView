@@ -152,6 +152,7 @@ SET(KWWidgets_SRCS
   vtkKWSeparator.cxx
   vtkKWSimpleEntryDialog.cxx
   vtkKWSpinBox.cxx
+  vtkKWSpinButtons.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
   vtkKWSurfaceMaterialPropertyWidget.cxx
@@ -173,9 +174,10 @@ SET(KWWidgets_SRCS
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
-  vtkKWWidgetWithLabel.cxx 
   vtkKWWidgetSet.cxx 
+  vtkKWWidgetWithLabel.cxx 
   vtkKWWidgetWithScrollbars.cxx 
+  vtkKWWidgetWithSpinButtons.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
 )
@@ -302,6 +304,24 @@ FOREACH (WidgetType
     ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
     ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithScrollbars.cxx)
+ENDFOREACH (WidgetType)
+
+# The "widgets with spinbuttons" are automatically generated from some
+# core widgets
+# (i.e., vtkKWMenuButton => vtkKWMenuButtonWithSpinButtons)
+
+FOREACH (WidgetType 
+    vtkKWMenuButton
+    )
+  SET (WidgetType ${WidgetType})
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithSpinButtonsSubclass.h.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithSpinButtons.h IMMEDIATE)
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetWithSpinButtonsSubclass.cxx.in 
+    ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithSpinButtons.cxx IMMEDIATE)
+  SET (KWWidgets_SRCS 
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/Templates/${WidgetType}WithSpinButtons.cxx)
 ENDFOREACH (WidgetType)
 
 # The "callback commands" are automatically generated from some widgets
