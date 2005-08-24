@@ -326,6 +326,19 @@ public:
   vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   //ETX
 
+
+  // Description:
+  // Set the value of default light
+  void DefaultLightIntensityCallback();
+  void DefaultLightIntensityEndCallback();
+  void SetDefaultLightIntensity(double intensity);
+  void SetDefaultLightIntensityNoTrace(double intensity);
+  void SetDefaultLightAmbientColor(double r, double g, double b);
+  void SetDefaultLightDiffuseColor(double r, double g, double b);
+  void SetDefaultLightSpecularColor(double r, double g, double b);
+  void DefaultLightSwitchCallback();
+  void SetDefaultLightSwitch(int val);
+
   // Description:
   // Callback when modifying the light kit via a slider
   void              LightCallback(int type, int subtype);
@@ -379,6 +392,14 @@ protected:
 
   vtkKWFrameWithLabel *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
+
+  // Default light
+  vtkKWFrameWithLabel    *DefaultLightFrame;
+  vtkKWChangeColorButton *DefaultLightAmbientColor;
+  vtkKWChangeColorButton *DefaultLightSpecularColor;
+  vtkKWChangeColorButton *DefaultLightDiffuseColor;
+  vtkKWScaleWithEntry    *DefaultLightIntensity;
+  vtkKWCheckButton       *DefaultLightSwitch;
 
   // Lighting stuff:
   vtkKWFrameWithLabel *LightParameterFrame;

@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.400");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.401");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -203,6 +203,14 @@ vtkPVRenderView::vtkPVRenderView()
   this->Display3DWidgets = vtkKWCheckButton::New();
 
   // Light
+  this->DefaultLightFrame         = vtkKWFrameWithLabel::New();
+  this->DefaultLightAmbientColor  = vtkKWChangeColorButton::New();
+  this->DefaultLightSpecularColor = vtkKWChangeColorButton::New();
+  this->DefaultLightDiffuseColor  = vtkKWChangeColorButton::New();
+  this->DefaultLightIntensity     = vtkKWScaleWithEntry::New();
+  this->DefaultLightSwitch        = vtkKWCheckButton::New();
+
+  // Light kit
   this->LightParameterFrame = vtkKWFrameWithLabel::New();
   this->UseLightButton      = vtkKWCheckButton::New();
   this->KeyLightLabel       = vtkKWLabel::New();
@@ -353,6 +361,13 @@ vtkPVRenderView::~vtkPVRenderView()
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
+
+  this->DefaultLightFrame->Delete();
+  this->DefaultLightAmbientColor->Delete();
+  this->DefaultLightSpecularColor->Delete();
+  this->DefaultLightDiffuseColor->Delete();
+  this->DefaultLightIntensity->Delete();
+  this->DefaultLightSwitch->Delete();
 
   this->LightParameterFrame->Delete();
   this->UseLightButton->Delete();
@@ -1129,6 +1144,61 @@ void vtkPVRenderView::CreateViewProperties()
 
 
 
+  // Default light control
+  this->DefaultLightFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
+  this->DefaultLightFrame->Create(this->GetApplication());
+  this->DefaultLightFrame->SetLabelText("Default Light Control");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->DefaultLightFrame->GetWidgetName());
+  /*
+  this->DefaultLightSwitch        = vtkKWCheckButton::New();
+  */
+  this->DefaultLightIntensity->SetParent(this->DefaultLightFrame->GetFrame());
+  this->DefaultLightIntensity->Create(this->GetApplication());
+  this->DefaultLightIntensity->ExpandEntryOn();
+  this->DefaultLightIntensity->SetEntryWidth(4);
+  this->DefaultLightIntensity->SetLabelText("Intensity");
+  this->DefaultLightIntensity->SetCommand(this, "DefaultLightIntensityCallback");
+  this->DefaultLightIntensity->SetEndCommand(this, "DefaultLightIntensityEndCallback");
+  this->DefaultLightIntensity->SetEntryCommand(this, "DefaultLightIntensityEndCallback");
+  this->DefaultLightIntensity->SetBalloonHelpString( "Set the intensity of the default light" );
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
+               this->DefaultLightIntensity->GetWidgetName());
+  InitializeScale(this->DefaultLightIntensity, this->RenderModuleProxy->GetProperty("LightIntensity"));
+
+  this->DefaultLightAmbientColor->SetParent( this->DefaultLightFrame->GetFrame());
+  this->DefaultLightAmbientColor->GetLabel()->SetText("Set Ambient Label Color");
+  this->DefaultLightAmbientColor->Create(this->GetApplication());
+  this->DefaultLightAmbientColor->SetCommand(this, "SetDefaultLightAmbientColor");
+  this->DefaultLightAmbientColor->SetBalloonHelpString(
+    "Choose the ambient color of the default light.");
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
+               this->DefaultLightAmbientColor->GetWidgetName());
+  this->DefaultLightDiffuseColor->SetParent( this->DefaultLightFrame->GetFrame());
+  this->DefaultLightDiffuseColor->GetLabel()->SetText("Set Diffuse Label Color");
+  this->DefaultLightDiffuseColor->Create(this->GetApplication());
+  this->DefaultLightDiffuseColor->SetCommand(this, "SetDefaultLightDiffuseColor");
+  this->DefaultLightDiffuseColor->SetBalloonHelpString(
+    "Choose the diffuse color of the default light.");
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
+               this->DefaultLightDiffuseColor->GetWidgetName());
+  this->DefaultLightSpecularColor->SetParent( this->DefaultLightFrame->GetFrame());
+  this->DefaultLightSpecularColor->GetLabel()->SetText("Set Specular Label Color");
+  this->DefaultLightSpecularColor->Create(this->GetApplication());
+  this->DefaultLightSpecularColor->SetCommand(this, "SetDefaultLightSpecularColor");
+  this->DefaultLightSpecularColor->SetBalloonHelpString(
+    "Choose the specular color of the default light.");
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
+               this->DefaultLightSpecularColor->GetWidgetName());
+  this->DefaultLightSwitch->SetParent(this->DefaultLightFrame->GetFrame());
+  this->DefaultLightSwitch->Create(this->GetApplication());
+  this->DefaultLightSwitch->SetText("Enable Default Light");
+  this->DefaultLightSwitch->SetCommand(this, "DefaultLightSwitchCallback");
+  this->DefaultLightSwitch->SetSelectedState(1);
+  this->DefaultLightSwitch->SetBalloonHelpString(
+    "Chose wther the default light is on or off.");
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w -fill x -expand true",
+               this->DefaultLightSwitch->GetWidgetName());
 
   // Light Parameter frame
   // 
@@ -2257,6 +2327,82 @@ inline int IntVectSetElement(vtkSMProperty* prop, int value)
 {
   vtkSMIntVectorProperty* ip = vtkSMIntVectorProperty::SafeDownCast(prop);
   return ip->SetElement(0, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DefaultLightIntensityCallback()
+{
+  double value = this->DefaultLightIntensity->GetValue();
+  this->SetDefaultLightIntensityNoTrace(value);
+  this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DefaultLightIntensityEndCallback()
+{
+  double value = this->DefaultLightIntensity->GetValue();
+  this->SetDefaultLightIntensity(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightIntensity(double intensity)
+{
+  this->SetDefaultLightIntensityNoTrace(intensity);
+  this->EventuallyRender();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDefaultLightIntensity %f", this->GetTclName(), intensity);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightIntensityNoTrace(double intensity)
+{
+  DoubleVectSetElement(this->RenderModuleProxy->GetProperty("LightIntensity"), intensity);
+  this->RenderModuleProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightAmbientColor(double r, double g, double b)
+{
+  vtkSMDoubleVectorProperty *dp = vtkSMDoubleVectorProperty::SafeDownCast(this->RenderModuleProxy->GetProperty("LightAmbientColor"));
+  dp->SetElements3(r, g, b);
+  this->RenderModuleProxy->UpdateVTKObjects();
+  this->EventuallyRender();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDefaultLightAmbientColor %f %f %f", this->GetTclName(), r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightDiffuseColor(double r, double g, double b)
+{
+  vtkSMDoubleVectorProperty *dp = vtkSMDoubleVectorProperty::SafeDownCast(this->RenderModuleProxy->GetProperty("LightDiffuseColor"));
+  dp->SetElements3(r, g, b);
+  this->RenderModuleProxy->UpdateVTKObjects();
+  this->EventuallyRender();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDefaultLightDiffuseColor %f %f %f", this->GetTclName(), r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightSpecularColor(double r, double g, double b)
+{
+  vtkSMDoubleVectorProperty *dp = vtkSMDoubleVectorProperty::SafeDownCast(this->RenderModuleProxy->GetProperty("LightSpecularColor"));
+  dp->SetElements3(r, g, b);
+  this->RenderModuleProxy->UpdateVTKObjects();
+  this->EventuallyRender();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDefaultLightSpecularColor %f %f %f", this->GetTclName(), r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DefaultLightSwitchCallback()
+{
+  int value = this->DefaultLightSwitch->GetSelectedState();
+  this->SetDefaultLightSwitch(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDefaultLightSwitch(int val)
+{
+  IntVectSetElement(this->RenderModuleProxy->GetProperty("LightSwitch"), val);
+  this->RenderModuleProxy->UpdateVTKObjects();
+  this->EventuallyRender();
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDefaultLightIntensity %d", this->GetTclName(), val);
 }
 
 //----------------------------------------------------------------------------
