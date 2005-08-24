@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.13");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -162,6 +162,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
   this->InteractorProxy = this->GetSubProxy("Interactor");
   this->LightKitProxy = this->GetSubProxy("LightKit");
+  this->LightProxy = this->GetSubProxy("Light");
 
   if (!this->RendererProxy)
     {
@@ -197,6 +198,13 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     {
     vtkErrorMacro("LightKit subproxy must be defined in the configuration "
                   "file.");
+    return;
+    }
+  if (!this->LightProxy)
+    {
+    vtkErrorMacro("Light subproxy must be defined in the configuration "
+                  "file.");
+    return;
     }
     
 
@@ -219,6 +227,8 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->InteractorProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightKitProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->LightProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects(numObjects);
@@ -327,6 +337,33 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     }
   pp->RemoveAllProxies();
   pp->AddProxy(this->RendererProxy);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Renderer2DProxy->GetProperty("AutomaticLightCreation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property AutomaticLightCreation.");
+    return;
+    }
+  ivp->SetElement(0, 0);
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->RendererProxy->GetProperty("Lights"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Lights.");
+    return;
+    }
+  pp->AddProxy(this->LightProxy);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LightProxy->GetProperty("LightType"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property LightType.");
+    return;
+    }
+  ivp->SetElement(0, 1); // Headlight
+
   this->RendererProxy->UpdateVTKObjects();
   this->Renderer2DProxy->UpdateVTKObjects();
   this->RenderWindowProxy->UpdateVTKObjects();

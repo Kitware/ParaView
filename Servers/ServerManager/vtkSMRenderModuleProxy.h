@@ -194,12 +194,14 @@ protected:
   vtkSMProxy* RenderWindowProxy;
   vtkSMProxy* InteractorProxy;
   vtkSMProxy* LightKitProxy;
+  vtkSMProxy* LightProxy;
 
   vtkGetObjectMacro(RendererProxy, vtkSMProxy);
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
   vtkGetObjectMacro(ActiveCameraProxy, vtkSMProxy);
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
   vtkGetObjectMacro(LightKitProxy, vtkSMProxy);
+  vtkGetObjectMacro(LightProxy, vtkSMProxy);
 
   // Pointer to client side objects,
   // for convienience.
