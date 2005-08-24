@@ -34,7 +34,7 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
   # Add the actor to the scene
 
-  rw_renderwidget AddProp rw_actor
+  rw_renderwidget AddViewProp rw_actor
   rw_renderwidget ResetCamera
 
   return "TypeVTK"
