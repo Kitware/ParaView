@@ -19,14 +19,12 @@
 
 #include "vtkPVLookmark.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWIcon.h"
-#include "vtkKWTclInteractor.h"
 #include "vtkPVLookmarkManager.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVReaderModule.h"
@@ -59,7 +57,6 @@
 #include "vtkPVMinMax.h"
 #include "vtkPVBasicDSPFilterWidget.h"
 #include "vtkKWFrameWithLabel.h"
-#include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkKWText.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMIntVectorProperty.h"
@@ -86,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.57");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.58");
 
 
 //*****************************************************************************
@@ -174,15 +171,27 @@ void vtkPVLookmark::ExecuteEvent(vtkObject* vtkNotUsed(obj), unsigned long event
 {
   if ( event == vtkKWEvent::ErrorMessageEvent || event == vtkKWEvent::WarningMessageEvent )
     {
-    this->GetPVApplication()->GetMainWindow()->ShowErrorLog();
+    this->GetPVWindow()->ShowErrorLog();
     }
 }
 
+//----------------------------------------------------------------------------
+vtkPVWindow* vtkPVLookmark::GetPVWindow()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp == NULL)
+    {
+    return NULL;
+    }
+  
+  return pvApp->GetMainWindow();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::View()
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
 
   this->UnsetLookmarkIconCommand();
@@ -190,15 +199,9 @@ void vtkPVLookmark::View()
   //try to delete preexisting filters belonging to this lookmark - for when lmk has been visited before in this session
   this->DeletePVSources();
 
-  // this prevents other filters' visibility from disturbing the lookmark view
+  // this prevents other filters' visibility or other scalar bars from disturbing the lookmark view
   this->TurnFiltersOff();
   this->TurnScalarBarsOff();
-
-//ds
-  // for every dataset or source belonging to the lookmark,
-  //  If the dataset is currently loaded, do nothing
-  //  if the dataset is not loaded but exists on disk at the stored path load the dataset into paraview without prompting the user OR it is a source create it
-  //  if the dataset is not loaded and does not exist on disk at the stored path - prompt the user for dataset, give the user the option to cancel the operation or continue visiting lookmark without this dataset, also ask if they want to update the path for this dataset
 
   char *temp_script = new char[strlen(this->StateScript)+1];
   strcpy(temp_script,this->GetStateScript());
@@ -212,17 +215,18 @@ void vtkPVLookmark::View()
   // handle case where there is no source in the source window
   pvs = win->GetCurrentPVSource();
   if(pvs && pvs->GetNotebook())
+    {
     this->GetPVRenderView()->UpdateNavigationWindow(pvs,0);
+    }
 
   this->SetLookmarkIconCommand();
-//  win->SetCenterOfRotation(this->CenterOfRotation);
   delete [] temp_script;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,char *name)
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs1;
   vtkPVSource *pvs2 = NULL;
   vtkPVSource *source = NULL;
@@ -230,8 +234,8 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
   char mesg[400];
 
   // check if this lookmark has a single source of the same module type first
-  // FIXME: better test for number of source items
   while(this->DatasetList[i]){ i++; }
+
   if(i==1)
     {
     pvs1 = win->GetCurrentPVSource();
@@ -242,29 +246,8 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
     return pvs1;
     }
 
-  // add all the sources into collection
-//  vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
+  // ask user to specify which source they want to use
   vtkCollectionIterator *itChoices;
-/*
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return 0;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    pvs1 = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    if( !pvs1->IsA("vtkPVReaderModule") )
-      {
-      choices->AddItem(pvs1);
-      }
-    it->GoToNextItem();
-    } 
-  it->Delete();
-*/
-  // ask user to specify
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetMasterWindow(win);
   dialog->SetOptions(
@@ -276,7 +259,6 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
   menu->SetParent(dialog->GetBottomFrame());
   menu->Create(this->GetPVApplication());
   this->Script("pack %s",menu->GetWidgetName());
-//  itChoices = choices->NewIterator();
   itChoices = sources->NewIterator();
   itChoices->InitTraversal();
   char *defaultValue = NULL;
@@ -284,7 +266,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
     {
     pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     menu->AddRadioButton(pvs2->GetModuleName());
-    if(!strcmp(name,pvs2->GetModuleName()))
+    if(strcmp(name,pvs2->GetModuleName())==0)
       {
       defaultValue = name;
       }
@@ -309,7 +291,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
     while(!itChoices->IsDoneWithTraversal())
       {
       pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-      if(!strcmp(menu->GetValue(),pvs2->GetModuleName()))
+      if(strcmp(menu->GetValue(),pvs2->GetModuleName())==0)
         {
         source = pvs2;
         break;
@@ -318,35 +300,25 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
       }
     }
   dialog->Delete();
-//  it->Delete();
-//  choices->Delete();
   itChoices->Delete();
 
   return source;
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources,char *name)
+vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources, char *name)
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs1;
   vtkPVSource *source = NULL;
 
   // If there is an open source that matches this one, use it, otherwise, create a new one
-/*
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return 0;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
-*/
   vtkCollectionIterator *it = sources->NewIterator();
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
     pvs1 = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    if( !pvs1->IsA("vtkPVReaderModule") && !strcmp(pvs1->GetModuleName(),name))
+    if( !pvs1->IsA("vtkPVReaderModule") && strcmp(pvs1->GetModuleName(),name)==0)
       {
       source = pvs1;
       break;
@@ -367,23 +339,23 @@ vtkPVSource* vtkPVLookmark::GetSourceForLookmark(vtkPVSourceCollection *sources,
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,char *, char *name)
+vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, char *, char *name)
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
   vtkPVSource *pvs1;
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
   vtkPVReaderModule *mod = NULL;
-  //  const char *ptr1;
-  //  const char *ptr2;
   char mesg[400];
   const char *defaultValue = NULL;
 
-  // check if this lookmark has a single source  first
-  // if so, use the currently viewed reader
+  // check if this lookmark has a single source first
+  // if so, use reader that the current filter/reader belongs to 
+
   int i = 0;
   while(this->DatasetList[i]){ i++; }
+
   if(i==1)
     {
     pvs1 = win->GetCurrentPVSource();
@@ -391,8 +363,6 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
       {
       pvs1 = pvs2;
       }
-//    if(!strcmp(pvs1->GetModuleName(),moduleName))
-//      {
     if(pvs1->IsA("vtkPVReaderModule"))
       {
       return pvs1;
@@ -405,81 +375,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
         vtkKWMessageDialog::ErrorIcon);
       return 0;
       }
-//      }
     }
 
-  // If there is an open reader of the same type and filename, use it, 
-  // 
-/*
-  vtkPVSourceCollection *choices = vtkPVSourceCollection::New();
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    source = NULL;
-    }
-  vtkCollectionIterator *itOuter = col->NewIterator();
-  vtkCollectionIterator *itInner = col->NewIterator();
-  vtkCollectionIterator *itChoices = NULL;
-  itOuter->InitTraversal();
-*/
-
-  // This lookmark is made up of multiple readers
-  // compare each reader
-/*
-  vtkCollectionIterator *itOuter = readers->NewIterator();
-  vtkCollectionIterator *itInner = readers->NewIterator();
-  itOuter->InitTraversal();
-  while ( !itOuter->IsDoneWithTraversal() )
-    {
-    pvs1 = static_cast<vtkPVSource*>( itOuter->GetCurrentObject() );
-    pvs1->SetVisibility(0);
-    //if(!pvs1->GetPVInput(0))  && !strcmp(pvs1->GetModuleName(),moduleName))
-    //  {
-    // search sources again and if this is the only one of this type, use it
-    // if find a multiple, check its filename for a match, if so use it
-    // else, populate a kwoptionmenu in a popup dialog and prompt user, use their selection
-
-    mod = vtkPVReaderModule::SafeDownCast(pvs1);
-    ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
-    ptr2 = mod->RemovePath(name);
-    if(!strcmp(ptr1,ptr2))
-      {
-      source = pvs1;
-      }
-
-    if(!source)
-      {
-//        choices->AddItem(pvs1);
-      itInner->InitTraversal();
-      while ( !itInner->IsDoneWithTraversal() )
-        {
-        pvs2 = static_cast<vtkPVSource*>( itInner->GetCurrentObject() );
-        if(pvs2 != pvs1) // && !strcmp(pvs2->GetModuleName(),moduleName))
-          {
-          mod = vtkPVReaderModule::SafeDownCast(pvs2);
-          if(mod)
-            {
-            ptr1 = mod->RemovePath(mod->GetFileEntry()->GetValue());
-            ptr2 = mod->RemovePath(name);
-            // if this source has a matching filename, use it
-            if(!strcmp(ptr1,ptr2))
-              {
-              source = pvs2;
-              }
-            }
-          if(!source)
-            {
-//             choices->AddItem(pvs2);
-            }
-          }
-        itInner->GoToNextItem();
-        }
-
-      if(!source) // && choices->GetNumberOfItems()>1)
-        {
-*/
   vtkCollectionIterator *itChoices = readers->NewIterator();
-  // found multiple and none of their filenames match the given one
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetMasterWindow(win);
   dialog->SetOptions(
@@ -497,7 +395,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
     pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     mod = vtkPVReaderModule::SafeDownCast(pvs);
     menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-    if(!strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+    if(strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
       {
       defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());
       }
@@ -524,7 +422,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
       {
       pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
       mod = vtkPVReaderModule::SafeDownCast(pvs);
-      if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+      if(strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
         {
         source = pvs;
         break;
@@ -535,21 +433,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
   menu->Delete();
   itChoices->Delete();
   dialog->Delete();
-/*
-        }
-      choices->RemoveAllItems();
-      }
-      }
-    if(source)
-      {
-      break;
-      } 
-    itOuter->GoToNextItem();
-    }
-  itOuter->Delete();
-  itInner->Delete();
-  choices->Delete();
-*/
+
   return source;
 }
 
@@ -557,7 +441,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers,cha
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,char *moduleName, char *name, int &newDatasetFlag, int &updateLookmarkFlag)
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
   vtkPVSource *source = NULL;
   vtkPVSource *currentSource = win->GetCurrentPVSource();
@@ -566,14 +450,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
   char mesg[400];
   const char *defaultValue = NULL;
 
-  // If there is an open dataset of the same type and path, return it
-/*
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    source = NULL;
-    }
-*/
+  // If there is an open dataset of the same type and path, use it
+
   vtkCollectionIterator *it = readers->NewIterator();
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
@@ -582,7 +460,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
     pvs->SetVisibility(0);
     mod = vtkPVReaderModule::SafeDownCast(pvs);
     targetName = (char *)mod->GetFileEntry()->GetValue();
-    if(!strcmp(targetName,name) && !strcmp(pvs->GetModuleName(),moduleName))
+    if(strcmp(targetName,name)==0 && strcmp(pvs->GetModuleName(),moduleName)==0)
       {
       source = pvs;
       }
@@ -595,7 +473,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
     {
     if (win->CheckIfFileIsReadable(name))
       {
-      if(!strcmp(moduleName,"XdmfReader"))
+      // Special case or xdfm readers:
+      if(strcmp(moduleName,"XdmfReader")==0)
         {
         return 0;
         }
@@ -630,7 +509,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
         pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
         mod = vtkPVReaderModule::SafeDownCast(pvs);
         menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
-        if(!strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+        if(strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
           {
           defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());
           }
@@ -659,7 +538,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
             {
             pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
             mod = vtkPVReaderModule::SafeDownCast(pvs);
-            if(!strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue())))
+            if(strcmp(menu->GetValue(),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
               {
               source = pvs;
               break;
@@ -672,7 +551,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
           // this is necessary because otherwise the application will think a dialog is still up and not exit when asked to:
           this->GetPVApplication()->UnRegisterDialogUp(dialog);
           pvs = win->GetCurrentPVSource();
-          if(!strcmp(moduleName,"XdmfReader"))
+          if(strcmp(moduleName,"XdmfReader")==0)
             {
             return 0;
             }
@@ -726,10 +605,11 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
 
 void vtkPVLookmark::CreateIconFromMainView()
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
+  vtkKWIcon *lmkIcon;
 
   // withdraw the pane so that the lookmark will be added corrrectly
-  this->Script("wm withdraw %s", this->GetPVLookmarkManager()->GetWidgetName());
+  this->GetPVLookmarkManager()->Withdraw();
   //if(win->GetTclInteractor())
    // this->Script("wm withdraw %s", win->GetTclInteractor()->GetWidgetName());
   this->Script("focus %s",win->GetWidgetName());
@@ -739,10 +619,15 @@ void vtkPVLookmark::CreateIconFromMainView()
     this->GetPVRenderView()->ForceRender();
     }
 
-  vtkKWIcon *lmkIcon = this->GetIconOfRenderWindow(this->GetPVRenderView()->GetRenderWindow());
+  lmkIcon = this->GetIconOfRenderWindow(this->GetPVRenderView()->GetRenderWindow());
+  if(!lmkIcon)
+    {
+    return;
+    }
   this->GetPVRenderView()->ForceRender();
   this->GetPVLookmarkManager()->Display();
   this->SetLookmarkImage(lmkIcon);
+
   this->SetImageData(this->GetEncodedImageData(lmkIcon));
   this->SetLookmarkIconCommand();
 
@@ -782,7 +667,7 @@ void vtkPVLookmark::CreateIconFromImageData()
 //----------------------------------------------------------------------------
 void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
 
   if(!this->ToolbarButton)
     {
@@ -791,7 +676,7 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     this->ToolbarButton->Create(this->GetPVApplication());
     this->ToolbarButton->SetImageToIcon(icon);
     ostrstream os;
-    os << this->GetName() << " -- " << this->LmkCommentsText->GetText() << ends;
+    os << this->GetName() << " -- " << this->CommentsText->GetText() << ends;
     this->ToolbarButton->SetBalloonHelpString(os.str());
     os.rdbuf()->freeze(0);
     this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
@@ -807,14 +692,14 @@ void vtkPVLookmark::StoreStateScript()
   char filter[50];
   char *stateScript;
   ostrstream state;
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
+  int i=0;
+  char *ptr;
 
   win->SetSaveVisibleSourcesOnlyFlag(1);
   win->SaveState("tempLookmarkState.pvs");
   win->SetSaveVisibleSourcesOnlyFlag(0);
 
-  int i=0;
-  char *ptr;
   vtkStdString opsList = "Operations: ";
   while(this->DatasetList[i])
     {
@@ -823,7 +708,9 @@ void vtkPVLookmark::StoreStateScript()
       ptr = this->DatasetList[i];
       ptr+=strlen(ptr)-1;
       while(*ptr!='/' && *ptr!='\\')
+        {
         ptr--;
+        }
       ptr++;
       opsList.append(ptr);
       opsList.append(", ");
@@ -870,9 +757,9 @@ void vtkPVLookmark::StoreStateScript()
 //----------------------------------------------------------------------------
 void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
 
-  // if the pipeline is empty, don't add
+  // if the pipeline is empty fail
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -897,7 +784,7 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 
   if(!this->ErrorEventTag)
     {
- //   this->ErrorEventTag = this->GetPVApplication()->GetMainWindow()->AddObserver(
+ //   this->ErrorEventTag = this->GetPVWindow()->AddObserver(
 //      vtkKWEvent::ErrorMessageEvent, this->Observer);
     }
 
@@ -908,6 +795,7 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 
   // this prevents other filters' visibility from disturbing the lookmark view
   this->TurnFiltersOff();
+  this->TurnScalarBarsOff();
 
   this->ParseAndExecuteStateScript(temp_script,1);
 
@@ -915,11 +803,13 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
 
   vtkPVSource *pvs = win->GetCurrentPVSource();
   if(pvs && pvs->GetNotebook())
+    {
     this->GetPVRenderView()->UpdateNavigationWindow(pvs,0);
+    }
 
   if (this->ErrorEventTag)
     {
-//    this->GetPVApplication()->GetMainWindow()->RemoveObserver(this->ErrorEventTag);
+//    this->GetPVWindow()->RemoveObserver(this->ErrorEventTag);
 //    this->ErrorEventTag = 0;
     }
 
@@ -1028,24 +918,21 @@ int vtkPVLookmark::IsSourceOrOutputsVisible(vtkPVSource* source, int visibilityF
 
 void vtkPVLookmark::InitializeDataset()
 {
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
+  vtkPVWindow *win = this->GetPVWindow();
   vtkPVReaderModule *mod;
+  char *path;
+  int i=0;
 
-//ds
-  //find the reader to use by getting the reader of the current pvsource
-  // Loop though all sources/Data objects and compute total bounds.
   vtkPVSourceCollection* col = win->GetSourceList("Sources");
   vtkPVSource *pvs;
   if (col == NULL)
     {
     return;
     }
+
   vtkCollectionIterator *it = col->NewIterator();
-//  char *ds = new char[1];
-//  ds[0] = '\0';
   vtkStdString ds;
-  char *path;
-  int i=0;
+
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
@@ -1063,10 +950,8 @@ void vtkPVLookmark::InitializeDataset()
           {
           path = pvs->GetModuleName();
           }
-        //ds = (char*)realloc((char*)ds,strlen(ds)+strlen(path)+1);
         ds.append(path);
         ds.append(";");
-        //sprintf(ds,"%s%s;",ds,path);
         i++;
         }
       }
@@ -1092,14 +977,13 @@ void vtkPVLookmark::Update()
   this->StoreStateScript();
   if(this->MacroFlag)
     {
-    this->GetPVApplication()->GetMainWindow()->GetLookmarkToolbar()->RemoveWidget(this->ToolbarButton);
+    this->GetPVWindow()->GetLookmarkToolbar()->RemoveWidget(this->ToolbarButton);
     this->ToolbarButton->Delete();
     this->ToolbarButton = 0;
     }
   this->CreateIconFromMainView();
   this->UpdateWidgetValues();
 
-//  this->SetCenterOfRotation(this->PVApplication->GetMainWindow()->GetCenterOfRotationStyle()->GetCenter());
 }
 
 
@@ -1150,9 +1034,6 @@ vtkKWIcon *vtkPVLookmark::GetIconOfRenderWindow(vtkRenderWindow *renderWindow)
   iclip->SetInput(w2i->GetOutput());
   iclip->Update();
 
-//  int scaledW = width/20;
-//  int scaledH = height/20;
-
   vtkImageResample *resample = vtkImageResample::New();
   resample->SetAxisMagnificationFactor(0,this->Width/extentN);
   resample->SetAxisMagnificationFactor(1,this->Height/extentN);
@@ -1201,40 +1082,39 @@ void vtkPVLookmark::SetLookmarkIconCommand()
 {
   if(this->MacroFlag)
     {
-    this->LmkIcon->SetBinding(
+    this->Icon->SetBinding(
       "<Button-1>", this, "ViewLookmarkWithCurrentDataset");
-    this->LmkIcon->SetBinding(
+    this->Icon->SetBinding(
       "<Double-1>", this, "ViewLookmarkWithCurrentDataset");
     }
   else
     {
-    this->LmkIcon->SetBinding("<Button-1>", this, "View");
-    this->LmkIcon->SetBinding("<Double-1>", this, "View");
+    this->Icon->SetBinding("<Button-1>", this, "View");
+    this->Icon->SetBinding("<Double-1>", this, "View");
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::UnsetLookmarkIconCommand()
 {
-  this->LmkIcon->RemoveBinding("<Button-1>");
-  this->LmkIcon->RemoveBinding("<Double-1>");
+  this->Icon->RemoveBinding("<Button-1>");
+  this->Icon->RemoveBinding("<Double-1>");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::SetLookmarkImage(vtkKWIcon *icon)
 {
-  if(this->LmkIcon)
+  if(this->Icon)
     {
-    this->LmkIcon->SetImageToIcon(icon);
+    this->Icon->SetImageToIcon(icon);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::TurnFiltersOff()
 {
-  //turn all sources invisible
   vtkPVSource *pvs;
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
+  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
   if (col == NULL)
     {
     return;
@@ -1255,7 +1135,7 @@ void vtkPVLookmark::TurnFiltersOff()
 void vtkPVLookmark::TurnScalarBarsOff()
 {
   vtkPVColorMap *colormap;
-  vtkCollection *col = this->GetPVApplication()->GetMainWindow()->GetPVColorMaps();
+  vtkCollection *col = this->GetPVWindow()->GetPVColorMaps();
   vtkCollectionIterator *it = col->NewIterator();
   it->InitTraversal();
   while(!it->IsDoneWithTraversal())
@@ -1269,27 +1149,7 @@ void vtkPVLookmark::TurnScalarBarsOff()
     }
   it->Delete();
 }
-/*
-void vtkPVLookmark::Tokenize(const vtkstd::string& str,
-                      vtkstd::vector<vtkstd::string>& tokens,
-                      const vtkstd::string& delimiters)
-{
-  // Skip delimiters at beginning.
-  vtkstd::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-  // Find first "non-delimiter".
-  vtkstd::string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
-    {
-    // Found a token, add it to the vector.
-    tokens.push_back(str.substr(lastPos, pos - lastPos));
-    // Skip delimiters.  Note the "not_of"
-    lastPos = str.find_first_not_of(delimiters, pos);
-    // Find next "non-delimiter"
-    pos = str.find_first_of(delimiters, lastPos);
-    }
-}
-*/
 //----------------------------------------------------------------------------
 void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 {
@@ -1352,9 +1212,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   vtkPVXDMFParameters *xdmfParameters;
   char sourceLabel[50];
 
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
-  // Tokenize the script:
+  vtkPVWindow *win = this->GetPVWindow();
 
   vtkstd::vector<vtkstd::string> tokens;
   vtkstd::vector<vtkstd::string> initCmds;
@@ -1364,7 +1222,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   delimiters.assign("\r\n");
   vtkstd::string str;
   str.assign(script);
-  //this->Tokenize(str,tokens,delimiters);
 
   // TOKENIZE:
 
@@ -1383,7 +1240,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     pos = str.find_first_of(delimiters, lastPos);
     }
 
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
+  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
   vtkPVSourceCollection *readers = vtkPVSourceCollection::New();
   vtkPVSourceCollection *sources = vtkPVSourceCollection::New();
   if (col == NULL)
@@ -1428,7 +1285,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   // if it is a filter, execute commands, looking for input pvwidget (input menu or groupinputwidget) when you get to one, set the appropriate source tied to the tcl name as the currentpvsource
   // when all sources in collection have been initialized, assume we are done and parse rest of script, if we come across "createpvsource" or "Init read custom" prompt user and ignore secion
 
-//  ptr = strtok(script,"\r\n");
   tokIter = tokens.begin();
   ptr.assign(*tokIter);
 
@@ -1463,7 +1319,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           }
         if(!src)
           {
-          if(!strcmp(moduleName,"XdmfReader"))
+          if(strcmp(moduleName,"XdmfReader")==0)
             { 
             vtkPVReaderModule* clone = win->InitializeReadCustom(moduleName, path);
             if (!clone)
@@ -1701,7 +1557,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           {
           pvWidget = static_cast<vtkPVWidget*>(widgetIter->GetCurrentObject());
           sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
-          if(!strcmp(sval,pvWidget->GetTraceHelper()->GetObjectName()))
+          if(strcmp(sval,pvWidget->GetTraceHelper()->GetObjectName())==0)
             {
             if((scale = vtkPVScale::SafeDownCast(pvWidget)))
               {
@@ -1993,11 +1849,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
             }
 
-          // make sure that the data information is up to date
-        //  src->UpdateVTKObjects();
-      //    src->MarkSourcesForUpdate();
-     //     src->GetProxy()->UpdateDataInformation();
-
           if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
             {
             sscanf(ptr.c_str(),FourthAndFifthToken_WrappedStringAndInt,sval,&ival);
@@ -2026,6 +1877,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           src->GetPVOutput()->Update();
           src->GetPVOutput()->DataColorRangeCallback();
 
+
           }
 
         ////////////////////////////////////////
@@ -2041,7 +1893,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
     else if(ptr.rfind("AcceptCallback",ptr.size())!=vtkstd::string::npos )
       {
       // the current source would be the filter just created
-      src = this->GetPVApplication()->GetMainWindow()->GetCurrentPVSource();
+      src = this->GetPVWindow()->GetCurrentPVSource();
 
       // append the lookmark name to its filter name : strip off any characters after '-' because a lookmark name could already have been appended to this filter name
       srcLabel.assign(src->GetLabel());
@@ -2108,7 +1960,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             }
           else if(ptr.rfind("ShowVolumeAppearanceEditor",ptr.size())!=vtkstd::string::npos)
             {
-            vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
+            vtkPVVolumeAppearanceEditor *vol = this->GetPVWindow()->GetVolumeAppearanceEditor();
             src = srcTclNameMapIter->first;
 
             ptr.assign(*tokIter);
@@ -2157,16 +2009,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
 
           executeCmd = false;
 
-/*
-          string1 = ptr;
-          beg = string1.rfind(srcTclNameMapIter->second,string1.size());
-          ival = strlen(srcTclNameMapIter->second);
-          //val = strlen(srcTclNameMapIter->first->GetTclName());
-          sprintf(srcTclName,"kw(%s)",srcTclNameMapIter->first->GetTclName());
-          string1.replace(beg,ival,srcTclName);
-          this->Script(string1.c_str());
-          executeCmd = false;
-*/
           }
         ++srcTclNameMapIter;
         }
@@ -2191,7 +2033,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           if(vol)
             {
             vol->RefreshGUI();
-            // vol->VolumePropertyChangedCallback();
             vol->BackButtonCallback();
             }
           }
@@ -2235,397 +2076,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
   readers->Delete();
   sources->Delete();
 }
-/*
-void vtkPVLookmark::InitializeVolumeAppearanceEditor(vtkPVSource *src, vtkstd::vector<vtkstd::string>::iterator &it)
-{
-  double fval1,fval2,fval3,fval4;
-  int ival;
 
-  vtkPVVolumeAppearanceEditor *vol = this->GetPVApplication()->GetMainWindow()->GetVolumeAppearanceEditor();
-
-  vtkstd::string ptr;
-  ptr.assign(*it);
-  // needed to display edit volume appearance setting button:
-  src->GetPVOutput()->DrawVolume();
-  src->GetPVOutput()->ShowVolumeAppearanceEditor();
-
-  ptr.assign(*(++it));
-  vol->RemoveAllScalarOpacityPoints();
-
-  ptr.assign(*(++it));
-  while(ptr.rfind("AppendScalarOpacityPoint",ptr.size())!=vtkstd::string::npos)
-    {
-    sscanf(ptr.c_str(),"%*s %*s %lf %lf",&fval1,&fval2);
-    vol->AppendScalarOpacityPoint(fval1,fval2);
-    ptr.assign(*(++it));
-    }
-
-  sscanf(ptr.c_str(),"%*s %*s %lf ",&fval1);
-  vol->SetScalarOpacityUnitDistance(fval1);
-
-  ptr.assign(*(++it));
-  vol->RemoveAllColorPoints();
-
-  ptr.assign(*(++it));
-  while(ptr.rfind("AppendColorPoint",ptr.size())!=vtkstd::string::npos)
-    {
-    sscanf(ptr.c_str(),"%lf %lf %lf %lf",&fval1,&fval2,&fval3,&fval4);
-    vol->AppendColorPoint(fval1,fval2,fval3,fval4);
-    ptr.assign(*(++it));
-    }
-
-  sscanf(ptr.c_str(),"%*s %*s %d",&ival);
-  vol->SetHSVWrap(ival);
-
-  ptr.assign(*(++it));
-  sscanf(ptr.c_str(),"%*s %*s %d",&ival);
-  vol->SetColorSpace(ival);
-}
-*/
-/*
-void vtkPVLookmark::InitializeSourceFromScript(vtkPVSource *source, vtkstd::vector<vtkstd::string> &tokens, int macroFlag, int newDatasetFlag)
-{
-  vtkPVScale *scale;
-  vtkPVArraySelection *arraySelection;
-  vtkPVLabeledToggle *labeledToggle;
-  vtkPVFileEntry *fileEntry;
-  vtkPVSelectTimeSet *selectTimeSet;
-  vtkPVVectorEntry *vectorEntry;
-  vtkPVSelectionList *selectionList;
-  vtkPVStringEntry *stringEntry;
-  vtkPVSelectWidget *selectWidget;
-  vtkPVMinMax *minMaxWidget;
-  vtkPVThumbWheel *thumbWheel;
-  vtkPVBasicDSPFilterWidget *dspWidget;
-
-  vtkPVWidget *pvWidget;
-  vtkstd::string ptr;
-  char sval[100];
-  double fval; 
-  int ival;
-  int i=0;
-  char displayName[50];
-  int val;
-  char ve[6][10];
-  char SecondToken_String[] = "%*s %s";
-  char FifthToken_WrappedString[] = "%*s %*s %*s %*s {%[^}]";
-  char ThirdToken_Float[] = "%*s %*s %lf";
-  char ThirdAndFourthTokens_WrappedStringAndInt[] = "%*s %*s {%[^}]} %d";
-  char ThirdToken_Int[] = "%*s %*s %d";
-  char ThirdToken_WrappedString[] = "%*s %*s {%[^}]";
-  char ThirdToken_OptionalWrappedString[] = "%*s %*s %*[{\"]%[^}\"]";
-  char ThirdThruEighthToken_String[] = "%*s %*s %s %s %s %s %s %s";
-  char ThirdToken_String[] = "%*s %*s %s";
-  char ThirdToken_RightBracketedString[] = "%*s %*s %[^]] %*s %*s %*s";
-  char FifthAndSixthToken_IntAndInt[] = "%*s %*s %*s %*s %d %d";
-  char FifthAndSixthToken_IntAndFloat[] = "%*s %*s %*s %*s %d %lf";
-  char FifthAndSixthToken_IntAndWrappedString[] = "%*s %*s %*s %*s %d {%[^}]";
-  char FourthAndFifthToken_WrappedStringAndInt[] = "%*s %*s %*s {%[^}]} %d";
-  vtkStdString string1,string2;
-  vtkstd::string::size_type beg;
-  vtkstd::string::size_type end;
-  tokens::iterator tokIter;
-
-  ptr.assign(*tokIter);
-
-  //loop through collection till found, operate accordingly leaving else statement with ptr one line past 
-  vtkCollectionIterator *it = source->GetWidgets()->NewIterator();
-  it->InitTraversal();
-  
-  while( !it->IsDoneWithTraversal() )
-    {
-    pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-    sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
-    if(!strcmp(sval,pvWidget->GetTraceHelper()->GetObjectName()))
-      {
-      if((scale = vtkPVScale::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        if(!macroFlag)
-          {
-          sscanf(ptr.c_str(),ThirdToken_Float,&fval);
-          scale->SetValue(fval);
-          }
-        ptr.assign(*(++tokIter));
-        }
-      else if((arraySelection = vtkPVArraySelection::SafeDownCast(pvWidget)))
-        { 
-        ptr.assign(*(++tokIter));
-        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
-          {
-          sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
-          //only turn the variable on, not off, because some other filter might be using the variable
-          if(ival)
-            {
-            arraySelection->SetArrayStatus(sval,ival);
-            arraySelection->ModifiedCallback();
-            }
-          arraySelection->Accept();
-          ptr.assign(*(++tokIter));
-          }
-        }
-      else if((labeledToggle = vtkPVLabeledToggle::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_Int,&ival);
-        labeledToggle->SetSelectedState(ival);
-        labeledToggle->ModifiedCallback();
-        ptr.assign(*(++tokIter));
-        }
-      else if((selectWidget = vtkPVSelectWidget::SafeDownCast(pvWidget)))
-        {
-        //get the third token of the next line and take off brackets which will give you the value of select widget:
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
-        selectWidget->SetCurrentValue(sval); 
-        //ignore next line
-        ptr.assign(*(++tokIter));
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),FifthToken_WrappedString,sval);
-        arraySelection = vtkPVArraySelection::SafeDownCast(selectWidget->GetPVWidget(sval));
-        ptr.assign(*(++tokIter));
-        while(ptr.rfind("SetArrayStatus",ptr.size())!=vtkstd::string::npos)
-          {
-          sscanf(ptr.c_str(),ThirdAndFourthTokens_WrappedStringAndInt,sval,&ival);
-          arraySelection->SetArrayStatus(sval,ival);
-          ptr.assign(*(++tokIter)); 
-          }
-        //arraySelection->Accept();
-        arraySelection->ModifiedCallback();
-        } 
-      else if((selectTimeSet = vtkPVSelectTimeSet::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_OptionalWrappedString,sval);
-        selectTimeSet->SetTimeValueCallback(sval);
-        selectTimeSet->ModifiedCallback();
-        ptr.assign(*(++tokIter));
-        }
-      else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
-        {
-        // could be up to 6 fields
-        ptr.assign(*(++tokIter));
-        ival = sscanf(ptr.c_str(),ThirdThruEighthToken_String,ve[0], ve[1], ve[2], ve[3], ve[4], ve[5]);
-
-        switch (ival)
-          {
-          case 1:
-            vectorEntry->SetValue(ve[0]);
-            break;
-          case 2:
-            vectorEntry->SetValue(ve[0],ve[1]);
-            break;
-          case 3:
-            vectorEntry->SetValue(ve[0],ve[1],ve[2]);
-            break;
-          case 4:
-            vectorEntry->SetValue(ve[0],ve[1],ve[2],ve[3]);
-            break;
-          case 5:
-            vectorEntry->SetValue(ve[0],ve[1],ve[2],ve[3],ve[4]);
-            break;
-          case 6:
-            vectorEntry->SetValue(ve[0],ve[1],ve[2],ve[3],ve[4],ve[5]);
-            break;
-          }
-
-        vectorEntry->ModifiedCallback();
-        ptr.assign(*(++tokIter));
-        }
-      else if((fileEntry = vtkPVFileEntry::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        ptr.assign(*(++tokIter));
-        // check newDatasetFlag
-        }
-      else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_Int,&ival);
-        selectionList->SetCurrentValue(ival);
-        selectionList->ModifiedCallback();
-        ptr.assign(*(++tokIter));
-        }
-      else if((thumbWheel = vtkPVThumbWheel::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_Float,&fval);
-        thumbWheel->SetValue(fval);
-        thumbWheel->ModifiedCallback();
-        ptr.assign(*(++tokIter));
-        }
-      else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
-        {
-        if(macroFlag || newDatasetFlag)
-          {
-          ptr.assign(*(++tokIter));
-          ptr.assign(*(++tokIter));
-          }
-        else
-          {
-          ptr.assign(*(++tokIter));
-          beg = ptr.find_first_of('{',0);
-          if(beg!=vtkstd::string::npos)
-            {
-            end = ptr.find_last_of('}',ptr.size());
-            //sscanf(ptr.c_str(),ThirdToken_WrappedString,sval);
-            ptr.assign(ptr.substr(beg+1,end-beg-1));
-            stringEntry->SetValue(ptr.c_str());
-            stringEntry->ModifiedCallback();
-            }
-          ptr.assign(*(++tokIter));
-          }
-        }
-      else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
-        {
-        // If this is a macro, don't initialize since the two datasets could be made up of a 
-        // different range of files. 
-        if(macroFlag || newDatasetFlag)
-          {
-          ptr.assign(*(++tokIter));
-          ptr.assign(*(++tokIter));
-          ptr.assign(*(++tokIter));
-          }
-        else
-          {
-          ptr.assign(*(++tokIter));
-          sscanf(ptr.c_str(),ThirdToken_Float,&fval);
-          minMaxWidget->SetMaxValue(fval);
-          ptr.assign(*(++tokIter));
-          sscanf(ptr.c_str(),ThirdToken_Float,&fval);
-          minMaxWidget->SetMinValue(fval);
-          minMaxWidget->ModifiedCallback();
-          ptr.assign(*(++tokIter));
-          }
-        }
-      else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
-        {
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_String,sval);
-        dspWidget->ChangeDSPFilterMode(sval);
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_String,sval);
-        dspWidget->ChangeCutoffFreq(sval);
-        ptr.assign(*(++tokIter));
-        sscanf(ptr.c_str(),ThirdToken_String,sval);
-        dspWidget->SetFilterLength(atoi(sval));
-        ptr.assign(*(++tokIter));
-        }
-      else   //if we do not support this widget yet, advance and break loop
-        {
-        ptr.assign(*(++tokIter));
-        }
-      }
-    it->GoToNextItem();
-    }
-  //widget in state file is not in widget collection
-  if(i==source->GetWidgets()->GetNumberOfItems())
-    {
-    ptr.assign(*(++tokIter));
-    }
-  it->Delete();
-
-  while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)
-    {
-    ptr.assign(*(++tokIter));
-    }
-
-  source->AcceptCallback();
-
-  ptr.assign(*(++tokIter));
-
-  // ignore comments
-  while(ptr[0]=='#')
-    {
-    ptr.assign(*(++tokIter));
-    }
-
-  // this line sets the partdisplay variable
-  sscanf(ptr.c_str(),SecondToken_String,displayName);
-
-  ptr.assign(*(++tokIter));
-
-  vtkSMDisplayProxy *display = source->GetDisplayProxy();
-
-  while(ptr.rfind(displayName,ptr.size())!=vtkstd::string::npos) 
-    {
-    if(ptr.rfind("UpdateVTKObjects",ptr.size())!=vtkstd::string::npos)
-      {
-      display->UpdateVTKObjects();
-      ptr.assign(*(++tokIter));
-      continue;
-      }
-
-    sscanf(ptr.c_str(),ThirdToken_RightBracketedString,sval);
-
-    // Borrowed the following code to loop through properties from vtkPVSource::SaveState()
-
-    vtkSMPropertyIterator* iter = source->GetDisplayProxy()->NewPropertyIterator();
-
-    // Even in state we have to use ServerManager API for displays.
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-      {
-      vtkSMProperty* p = iter->GetProperty();
-      if(strcmp(sval,p->GetXMLName()))
-        { 
-        continue;
-        }
-
-      vtkSMIntVectorProperty* ivp = 
-        vtkSMIntVectorProperty::SafeDownCast(p);
-      vtkSMDoubleVectorProperty* dvp = 
-        vtkSMDoubleVectorProperty::SafeDownCast(p);
-      vtkSMStringVectorProperty* svp =
-        vtkSMStringVectorProperty::SafeDownCast(p);
-      if (ivp)
-        {
-        sscanf(ptr.c_str(),FifthAndSixthToken_IntAndInt,&val,&ival);
-        ivp->SetElement(val,ival);
-        }
-      else if (dvp)
-        {
-        sscanf(ptr.c_str(),FifthAndSixthToken_IntAndFloat,&val,&fval);
-        dvp->SetElement(val,fval);
-        }
-      else if (svp)
-        {
-        sscanf(ptr.c_str(),FifthAndSixthToken_IntAndWrappedString,&val,sval);
-        svp->SetElement(val,sval);
-        }
-
-      break;
-      }
-
-    iter->Delete();
-
-    ptr.assign(*(++tokIter));
-
-    }
-
-  // make sure that the data information is up to date
-//  source->UpdateVTKObjects();
-//  source->InvalidateDataInformation();
-
-  if(ptr.rfind("ColorByArray",ptr.size())!=vtkstd::string::npos)
-    {
-    sscanf(ptr.c_str(),FourthAndFifthToken_WrappedStringAndInt,sval,&ival);
-    source->ColorByArray(sval, ival);
-    }
-  else if(ptr.rfind("VolumeRenderByArray",ptr.size())!=vtkstd::string::npos)
-    {
-    sscanf(ptr.c_str(),FourthAndFifthToken_WrappedStringAndInt,sval,&ival);
-    source->VolumeRenderByArray(sval, ival);
-    }
-  else if(ptr.rfind("ColorByProperty",ptr.size())!=vtkstd::string::npos)
-    {
-    source->GetPVOutput()->ColorByProperty();
-    }
-
-  source->GetPVOutput()->Update();
-  source->GetPVOutput()->UpdateColorGUI();
-  source->GetPVOutput()->DataColorRangeCallback();
-}
-*/
 //----------------------------------------------------------------------------
 int vtkPVLookmark::DeletePVSources()
 {
@@ -2637,7 +2088,9 @@ int vtkPVLookmark::DeletePVSources()
     {
     // pvs could have been deleted manually by user - is there a better test for whether the source hass been deleeted?
     if(lastPVSource->GetNotebook() && lastPVSource->IsDeletable())
+      {
       lastPVSource->DeleteCallback();
+      }
     this->Sources->RemoveItem(lastPVSource);
     lastPVSource = this->Sources->GetLastPVSource();
     }
@@ -2672,21 +2125,21 @@ vtkPVApplication* vtkPVLookmark::GetPVApplication()
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager* vtkPVLookmark::GetPVLookmarkManager()
 {
-  return this->GetPVApplication()->GetMainWindow()->GetPVLookmarkManager();
+  return this->GetPVWindow()->GetPVLookmarkManager();
 }
 
 
 void vtkPVLookmark::EnableScrollBar()
 {
-  if (this->LmkMainFrame->IsFrameCollapsed())
+  if (this->MainFrame->IsFrameCollapsed())
     {
-    this->LmkMainFrame->ExpandFrame();
-    this->LmkMainFrame->CollapseFrame();
+    this->MainFrame->ExpandFrame();
+    this->MainFrame->CollapseFrame();
     }
   else
     {
-    this->LmkMainFrame->CollapseFrame();
-    this->LmkMainFrame->ExpandFrame();
+    this->MainFrame->CollapseFrame();
+    this->MainFrame->ExpandFrame();
     }
 }
 

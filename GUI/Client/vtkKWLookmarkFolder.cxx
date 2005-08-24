@@ -20,7 +20,6 @@
 
 #include "vtkKWLookmarkFolder.h"
 
-#include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWDragAndDropTargetSet.h"
@@ -34,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.31");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -99,7 +98,6 @@ void vtkKWLookmarkFolder::RemoveFolder()
 void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 {
   // Check if already created
-
   if (this->IsCreated())
     {
     vtkErrorMacro(<< this->GetClassName() << " already created");
@@ -107,7 +105,6 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     }
 
   // Call the superclass to create the whole widget
-
   this->Superclass::Create(app);
 
   this->MainFrame->SetParent(this);
@@ -117,14 +114,12 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->LabelFrame->AllowFrameToCollapseOn();
   this->LabelFrame->Create(app);
   this->LabelFrame->SetLabelText("Folder");
-//  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->LabelFrame->GetLabel()->SetBalloonHelpString("Drag and drop folder");
 
   this->Checkbox->SetParent(this->LabelFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();
   this->Checkbox->Create(app);
   this->Checkbox->SetSelectedState(0);
-//  this->Checkbox->SetCommand(this, "SelectCallback");
 
   if(!this->MacroFlag)
     {
@@ -141,8 +136,6 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 
   this->NestedSeparatorFrame->SetParent(this->LabelFrame->GetFrame());
   this->NestedSeparatorFrame->Create(app);
-
-//  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
 
   this->NameField->SetParent(this->LabelFrame->GetLabelFrame());
   this->NameField->Create(app);
@@ -273,7 +266,6 @@ void vtkKWLookmarkFolder::Pack()
 void vtkKWLookmarkFolder::DragAndDropStartCallback(int, int )
 {
   this->ToggleNestedLabels(this->LabelFrame,1);
-
 }
 
 //----------------------------------------------------------------------------
@@ -295,7 +287,6 @@ void vtkKWLookmarkFolder::SetSelectionState(int flag)
 //----------------------------------------------------------------------------
 int vtkKWLookmarkFolder::GetSelectionState()
 {
-  
   return this->Checkbox->GetSelectedState();
 }
 
@@ -353,7 +344,6 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
     lmkWidget = vtkKWLookmark::SafeDownCast(widget);
     if(lmkWidget)
       {
-//      lmkWidget->SetLookmarkState(onoff);
       double fr, fg, fb, br, bg, bb;
       vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
         lmkWidget->GetDragAndDropTargetSet()->GetSourceAnchor());
@@ -368,18 +358,14 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
     lmkFolder = vtkKWLookmarkFolder::SafeDownCast(widget);
     if(lmkFolder)
       {
-//      if(lmkFolder->GetSelectionFlag() != onoff)
-//        {
-        double fr, fg, fb, br, bg, bb;
-        vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
-          lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor());
-        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
-        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
-        anchor_as_core->SetForegroundColor(br, bg, bb);
-        anchor_as_core->SetBackgroundColor(fr, fg, fb);
+      double fr, fg, fb, br, bg, bb;
+      vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
+        lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor());
+      anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
+      anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
+      anchor_as_core->SetForegroundColor(br, bg, bb);
+      anchor_as_core->SetBackgroundColor(fr, fg, fb);
 
-//        lmkFolder->SetSelectionFlag(onoff);
-//        }
       lmkFolder->ToggleNestedLabels(lmkFolder->GetLabelFrame()->GetFrame(), onoff);
       }
     }
@@ -412,34 +398,16 @@ void vtkKWLookmarkFolder::UpdateVariableValues()
   this->SetMainFrameCollapsedState(this->LabelFrame->IsFrameCollapsed());
 }
 
-/*
-//----------------------------------------------------------------------------
-int vtkKWLookmarkFolder::GetMainFrameCollapsedState()
-{
-  return this->LabelFrame->IsFrameCollapsed();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmarkFolder::SetMainFrameCollapsedState(int val)
-{
-  if(val)
-    {
-    this->LabelFrame->CollapseFrame();
-    }
-  else
-    {
-    this->LabelFrame->ExpandFrame();
-    }
-}
-*/
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-//  this->PropagateEnableState(this->MainFrame);
+  this->PropagateEnableState(this->MainFrame);
   this->PropagateEnableState(this->LabelFrame);
-//  this->PropagateEnableState(this->CheckBox);
+  this->PropagateEnableState(this->Checkbox);
+  this->PropagateEnableState(this->SeparatorFrame);
+  this->PropagateEnableState(this->NestedSeparatorFrame);
 }
 
 //----------------------------------------------------------------------------

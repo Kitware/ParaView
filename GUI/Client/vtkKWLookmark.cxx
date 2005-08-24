@@ -26,7 +26,6 @@
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
-#include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWText.h"
@@ -36,22 +35,22 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.31");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
 {
-  this->LmkIcon= vtkKWLabel::New();
+  this->Icon= vtkKWLabel::New();
   this->Checkbox= vtkKWCheckButton::New();
-  this->LmkLeftFrame= vtkKWFrame::New();
-  this->LmkRightFrame= vtkKWFrame::New();
-  this->LmkFrame = vtkKWFrame::New();
-  this->LmkMainFrame = vtkKWFrameWithLabel::New();
-  this->LmkCommentsFrame= vtkKWFrameWithLabel::New();
-  this->LmkDatasetLabel= vtkKWLabel::New();
-  this->LmkDatasetFrame = vtkKWFrame::New();
-  this->LmkCommentsText= vtkKWText::New();
-  this->LmkNameField = vtkKWText::New();
+  this->LeftFrame= vtkKWFrame::New();
+  this->RightFrame= vtkKWFrame::New();
+  this->Frame = vtkKWFrame::New();
+  this->MainFrame = vtkKWFrameWithLabel::New();
+  this->CommentsFrame= vtkKWFrameWithLabel::New();
+  this->DatasetLabel= vtkKWLabel::New();
+  this->DatasetFrame = vtkKWFrame::New();
+  this->CommentsText= vtkKWText::New();
+  this->NameField = vtkKWText::New();
   this->SeparatorFrame = vtkKWFrame::New();
 
   this->Name = NULL;
@@ -69,47 +68,47 @@ vtkKWLookmark::vtkKWLookmark()
 vtkKWLookmark::~vtkKWLookmark()
 {
 
-  if(this->LmkIcon)
+  if(this->Icon)
     {
-    this->LmkIcon->Delete();
-    this->LmkIcon = 0;
+    this->Icon->Delete();
+    this->Icon = 0;
     }
 
-  if(this->LmkDatasetLabel)
+  if(this->DatasetLabel)
     {
-    this->LmkDatasetLabel->Delete();
-    this->LmkDatasetLabel = NULL;
+    this->DatasetLabel->Delete();
+    this->DatasetLabel = NULL;
     }
 
-  if(this->LmkCommentsText)
+  if(this->CommentsText)
     {
-    this->LmkCommentsText->Delete();
-    this->LmkCommentsText= NULL;
+    this->CommentsText->Delete();
+    this->CommentsText= NULL;
     }
-  if(this->LmkNameField)
+  if(this->NameField)
     {
-    this->LmkNameField->Delete();
-    this->LmkNameField = NULL;
+    this->NameField->Delete();
+    this->NameField = NULL;
     }
-  if(this->LmkCommentsFrame)
+  if(this->CommentsFrame)
     {
-    this->LmkCommentsFrame->Delete();
-    this->LmkCommentsFrame = NULL;
+    this->CommentsFrame->Delete();
+    this->CommentsFrame = NULL;
     }
-  if(this->LmkDatasetFrame)
+  if(this->DatasetFrame)
     {
-    this->LmkDatasetFrame->Delete();
-    this->LmkDatasetFrame = NULL;
+    this->DatasetFrame->Delete();
+    this->DatasetFrame = NULL;
     }
-  if(this->LmkLeftFrame)
+  if(this->LeftFrame)
     {
-    this->LmkLeftFrame->Delete();
-    this->LmkLeftFrame= NULL;
+    this->LeftFrame->Delete();
+    this->LeftFrame= NULL;
     }
-  if(this->LmkRightFrame)
+  if(this->RightFrame)
     {
-    this->LmkRightFrame->Delete();
-    this->LmkRightFrame= NULL;
+    this->RightFrame->Delete();
+    this->RightFrame= NULL;
     }
 
   if(this->Checkbox)
@@ -118,10 +117,10 @@ vtkKWLookmark::~vtkKWLookmark()
     this->Checkbox = 0;
     }
 
-  if(this->LmkMainFrame)
+  if(this->MainFrame)
     {
-    this->LmkMainFrame->Delete();
-    this->LmkMainFrame = NULL;
+    this->MainFrame->Delete();
+    this->MainFrame = NULL;
     }
   if(this->SeparatorFrame)
     {
@@ -129,12 +128,12 @@ vtkKWLookmark::~vtkKWLookmark()
     this->SeparatorFrame = 0;
     }
 
-  if(this->LmkFrame)
+  if(this->Frame)
     {
-    this->LmkFrame->Delete();
-    this->LmkFrame= NULL;
+    this->Frame->Delete();
+    this->Frame= NULL;
     }
-//ds 
+
   if(this->Dataset)
     {
     delete [] this->Dataset;
@@ -173,86 +172,83 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
-  this->LmkFrame->SetParent(this);
-  this->LmkFrame->Create(app);
+  this->Frame->SetParent(this);
+  this->Frame->Create(app);
 
-  this->LmkMainFrame->SetParent(this->LmkFrame);
-  this->LmkMainFrame->AllowFrameToCollapseOn();
-  this->LmkMainFrame->Create(app);
-  this->LmkMainFrame->SetLabelText("Lookmark");
-//  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
-  this->LmkMainFrame->GetLabel()->SetBalloonHelpString("Drag and drop lookmark");
+  this->MainFrame->SetParent(this->Frame);
+  this->MainFrame->AllowFrameToCollapseOn();
+  this->MainFrame->Create(app);
+  this->MainFrame->SetLabelText("Lookmark");
+  //  this->MainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
+  this->MainFrame->GetLabel()->SetBalloonHelpString("Drag and drop lookmark");
 
-  this->Checkbox->SetParent(this->LmkMainFrame->GetLabelFrame());
+  this->Checkbox->SetParent(this->MainFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();
   this->Checkbox->Create(app);
   this->Checkbox->SetSelectedState(0);
 
   this->GetDragAndDropTargetSet()->SetSourceAnchor(
-    this->LmkMainFrame->GetLabel());
+    this->MainFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
   this->SeparatorFrame->Create(app);
 
+  this->LeftFrame->SetParent(this->MainFrame->GetFrame());
+  this->LeftFrame->Create(app);
 
-  this->LmkLeftFrame->SetParent(this->LmkMainFrame->GetFrame());
-  this->LmkLeftFrame->Create(app);
+  this->RightFrame->SetParent(this->MainFrame->GetFrame());
+  this->RightFrame->Create(app);
 
-  this->LmkRightFrame->SetParent(this->LmkMainFrame->GetFrame());
-  this->LmkRightFrame->Create(app);
-
-  this->LmkIcon->SetParent(this->LmkLeftFrame);
-  this->LmkIcon->Create(app);
-
-  this->LmkIcon->SetText("Empty");
+  this->Icon->SetParent(this->LeftFrame);
+  this->Icon->Create(app);
+  this->Icon->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
-               this->LmkIcon->GetWidgetName());
+               this->Icon->GetWidgetName());
 
   int rw, rh, padx, pady, bd;
   this->Script("concat [winfo reqwidth %s] [winfo reqheight %s] "
                "[%s cget -padx] [%s cget -pady] [%s cget -bd]",
-               this->LmkIcon->GetWidgetName(), this->LmkIcon->GetWidgetName(), 
-               this->LmkIcon->GetWidgetName(), this->LmkIcon->GetWidgetName(), 
-               this->LmkIcon->GetWidgetName());
+               this->Icon->GetWidgetName(), this->Icon->GetWidgetName(), 
+               this->Icon->GetWidgetName(), this->Icon->GetWidgetName(), 
+               this->Icon->GetWidgetName());
 
   sscanf(this->GetApplication()->GetMainInterp()->result, 
          "%d %d %d %d %d", 
          &rw, &rh, &padx, &pady, &bd);
   
   this->Script("%s configure -padx %d -pady %d", 
-               this->LmkIcon->GetWidgetName(), 
+               this->Icon->GetWidgetName(), 
                padx + (int)ceil((double)(this->Width  - rw) / 2.0) + bd, 
                pady + (int)ceil((double)(this->Height - rh) / 2.0) + bd);
 
-  this->LmkIcon->SetBalloonHelpString("Left click to visit lookmark");
+  this->Icon->SetBalloonHelpString("Left click to visit lookmark");
 
 
-  this->LmkDatasetFrame->SetParent(this->LmkRightFrame);
-  this->LmkDatasetFrame->Create(app);
+  this->DatasetFrame->SetParent(this->RightFrame);
+  this->DatasetFrame->Create(app);
 
-  this->LmkDatasetLabel->SetParent(this->LmkDatasetFrame);
-  this->LmkDatasetLabel->Create(app);
-  this->LmkDatasetLabel->SetText("Dataset: ");
+  this->DatasetLabel->SetParent(this->DatasetFrame);
+  this->DatasetLabel->Create(app);
+  this->DatasetLabel->SetText("Dataset: ");
 
-  this->LmkCommentsFrame->SetParent(this->LmkRightFrame);
-  this->LmkCommentsFrame->AllowFrameToCollapseOn();
-  this->LmkCommentsFrame->Create(app);
-  this->LmkCommentsFrame->SetLabelText("Comments:");
+  this->CommentsFrame->SetParent(this->RightFrame);
+  this->CommentsFrame->AllowFrameToCollapseOn();
+  this->CommentsFrame->Create(app);
+  this->CommentsFrame->SetLabelText("Comments:");
 
-  this->LmkCommentsText->SetParent(this->LmkCommentsFrame->GetFrame());
-  this->LmkCommentsText->Create(app);
-  this->LmkCommentsText->SetBinding("<KeyPress>", this, "CommentsModifiedCallback");
-  this->LmkCommentsText->SetState(vtkKWTkOptions::StateNormal);
+  this->CommentsText->SetParent(this->CommentsFrame->GetFrame());
+  this->CommentsText->Create(app);
+  this->CommentsText->SetBinding("<KeyPress>", this, "CommentsModifiedCallback");
+  this->CommentsText->SetState(vtkKWTkOptions::StateNormal);
 
-  this->LmkNameField->SetParent(this->LmkMainFrame->GetLabelFrame());
-  this->LmkNameField->Create(app);
-  this->LmkNameField->SetState(vtkKWTkOptions::StateNormal);
+  this->NameField->SetParent(this->MainFrame->GetLabelFrame());
+  this->NameField->Create(app);
+  this->NameField->SetState(vtkKWTkOptions::StateNormal);
 
   this->Pack();
 
-  this->LmkCommentsFrame->CollapseFrame();
+  this->CommentsFrame->CollapseFrame();
 
-  // Update enable state
   this->UpdateEnableState();
 }
 
@@ -262,7 +258,7 @@ void vtkKWLookmark::CommentsModifiedCallback()
   char words[4][50];
   char str[250];
 
-  this->SetComments(this->LmkCommentsText->GetText());
+  this->SetComments(this->CommentsText->GetText());
 
   num = sscanf(this->Comments,"%s %s %s %s",words[0],words[1],words[2],words[3]);
   switch (num)
@@ -289,31 +285,34 @@ void vtkKWLookmark::CommentsModifiedCallback()
     strcat(str,"...");
     }
 
-  this->LmkCommentsFrame->SetLabelText(str);
+  this->CommentsFrame->SetLabelText(str);
 }
 
 void vtkKWLookmark::UpdateWidgetValues()
 {
-  this->LmkCommentsText->SetText(this->Comments);
-  this->LmkMainFrame->SetLabelText(this->Name);
+  // Use variable values to initialize widgets
+
+  this->CommentsText->SetText(this->Comments);
+  this->MainFrame->SetLabelText(this->Name);
+
   if(this->MainFrameCollapsedState)
     {
-    this->LmkMainFrame->CollapseFrame();
+    this->MainFrame->CollapseFrame();
     }
   else
     {
-    this->LmkMainFrame->ExpandFrame();
-    }
-  if(this->CommentsFrameCollapsedState)
-    {
-    this->LmkCommentsFrame->CollapseFrame();
-    }
-  else
-    {
-    this->LmkCommentsFrame->ExpandFrame();
+    this->MainFrame->ExpandFrame();
     }
 
-//ds
+  if(this->CommentsFrameCollapsedState)
+    {
+    this->CommentsFrame->CollapseFrame();
+    }
+  else
+    {
+    this->CommentsFrame->ExpandFrame();
+    }
+
   int i=0;
   char *ptr;
   vtkStdString datasetLabel = "Sources: ";
@@ -337,15 +336,23 @@ void vtkKWLookmark::UpdateWidgetValues()
     i++;
     }
   
-  datasetLabel.erase(datasetLabel.find_last_of(',',datasetLabel.size()));
+  vtkstd::string::size_type ret = datasetLabel.find_last_of(',',datasetLabel.size());
+  if(ret != vtkstd::string::npos)
+    {
+    datasetLabel.erase(ret);
+    }
 
-  this->LmkDatasetLabel->SetText(datasetLabel.c_str());
+  this->DatasetLabel->SetText(datasetLabel.c_str());
 
 }
 
 void vtkKWLookmark::CreateDatasetList()
 {
   int i=0;
+  if(!this->Dataset)
+    { 
+    return;
+    }
   char *ds = new char[strlen(this->Dataset)+1];
   strcpy(ds,this->Dataset);
   char *ptr = strtok(ds,";");
@@ -379,10 +386,11 @@ void vtkKWLookmark::CreateDatasetList()
 
 void vtkKWLookmark::UpdateVariableValues()
 {
-  this->SetComments(this->LmkCommentsText->GetText());
-  this->SetName(this->LmkMainFrame->GetLabel()->GetText());
-  this->SetMainFrameCollapsedState(this->LmkMainFrame->IsFrameCollapsed());
-  this->SetCommentsFrameCollapsedState(this->LmkCommentsFrame->IsFrameCollapsed());
+  // Use the current widget values to update the internal variables
+  this->SetComments(this->CommentsText->GetText());
+  this->SetName(this->MainFrame->GetLabel()->GetText());
+  this->SetMainFrameCollapsedState(this->MainFrame->IsFrameCollapsed());
+  this->SetCommentsFrameCollapsedState(this->CommentsFrame->IsFrameCollapsed());
 }
 
 
@@ -416,12 +424,12 @@ void vtkKWLookmark::EditLookmarkCallback()
 
   this->SetSelectionState(0);
 
-  strcpy(temp,this->LmkMainFrame->GetLabel()->GetText());
-  this->LmkMainFrame->SetLabelText("");
-  this->Script("pack %s", this->LmkNameField->GetWidgetName());
-  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetWidgetName(),strlen(temp));
-  this->LmkNameField->SetText(temp);
-  this->LmkNameField->SetBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
+  strcpy(temp,this->MainFrame->GetLabel()->GetText());
+  this->MainFrame->SetLabelText("");
+  this->Script("pack %s", this->NameField->GetWidgetName());
+  this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetWidgetName(),strlen(temp));
+  this->NameField->SetText(temp);
+  this->NameField->SetBinding("<KeyPress-Return>", this, "ChangeLookmarkName");
 
   delete [] temp;
 }
@@ -429,17 +437,17 @@ void vtkKWLookmark::EditLookmarkCallback()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::ChangeLookmarkName()
 {
-  if(!strcmp(this->LmkNameField->GetText(),"Macros"))
+  if(strcmp(this->NameField->GetText(),"Macros")==0)
     {
     return;
     }
 
   char *lmkName = new char[100];
 
-  strcpy(lmkName,this->LmkNameField->GetText());
-  this->LmkNameField->Unpack();
-  this->Script("pack %s -anchor nw -side left -fill both -expand true -padx 2 -pady 0", this->LmkMainFrame->GetLabel()->GetWidgetName());
-  this->LmkMainFrame->SetLabelText(lmkName);
+  strcpy(lmkName,this->NameField->GetText());
+  this->NameField->Unpack();
+  this->Script("pack %s -anchor nw -side left -fill both -expand true -padx 2 -pady 0", this->MainFrame->GetLabel()->GetWidgetName());
+  this->MainFrame->SetLabelText(lmkName);
 
   delete [] lmkName;
 }
@@ -455,102 +463,67 @@ int vtkKWLookmark::GetSelectionState()
 {
   return this->Checkbox->GetSelectedState();
 }
-/*
-//----------------------------------------------------------------------------
-int vtkKWLookmark::GetMainFrameCollapsedState()
-{
-  return this->LmkMainFrame->IsFrameCollapsed();
-}
 
-//----------------------------------------------------------------------------
-void vtkKWLookmark::SetMainFrameCollapsedState(int val)
-{
-  if(val)
-    {
-    this->LmkMainFrame->CollapseFrame();
-    }
-  else
-    {
-    this->LmkMainFrame->ExpandFrame();
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWLookmark::GetCommentsFrameCollapsedState()
-{
-  return this->LmkCommentsFrame->IsFrameCollapsed();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmark::SetCommentsFrameCollapsedState(int val)
-{
-  if(val)
-    {
-    this->LmkCommentsFrame->CollapseFrame();
-    }
-  else
-    {
-    this->LmkCommentsFrame->ExpandFrame();
-    }
-}
-*/
 //----------------------------------------------------------------------------
 void vtkKWLookmark::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-//  this->PropagateEnableState(this->LmkFrame);
-  this->PropagateEnableState(this->LmkMainFrame);
-  this->PropagateEnableState(this->LmkRightFrame);
-  this->PropagateEnableState(this->LmkLeftFrame);
-//  this->PropagateEnableState(this->LmkCheckBox);
-  this->PropagateEnableState(this->LmkCommentsFrame);
-  this->PropagateEnableState(this->LmkCommentsText);
-  this->PropagateEnableState(this->LmkIcon);
-  this->PropagateEnableState(this->LmkDatasetLabel);
+  this->PropagateEnableState(this->Frame);
+  this->PropagateEnableState(this->MainFrame);
+  this->PropagateEnableState(this->RightFrame);
+  this->PropagateEnableState(this->LeftFrame);
+  this->PropagateEnableState(this->Checkbox);
+  this->PropagateEnableState(this->CommentsFrame);
+  this->PropagateEnableState(this->SeparatorFrame);
+  this->PropagateEnableState(this->CommentsText);
+  this->PropagateEnableState(this->Icon);
+  this->PropagateEnableState(this->DatasetLabel);
+  this->PropagateEnableState(this->DatasetFrame);
+  this->PropagateEnableState(this->NameField);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLookmark::Pack()
 {
   // Unpack everything
-  this->LmkFrame->Unpack();
+  this->Frame->Unpack();
   this->SeparatorFrame->Unpack();
 
   // Repack everything
-  this->Script("pack %s -anchor nw -side left -padx 1 -pady 1", this->LmkIcon->GetWidgetName());
+  this->Script("pack %s -anchor nw -side left -padx 1 -pady 1", this->Icon->GetWidgetName());
   if(!this->MacroFlag)
     {
-    this->Script("pack %s -anchor w", this->LmkDatasetLabel->GetWidgetName());
-    this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
+    this->Script("pack %s -anchor w", this->DatasetLabel->GetWidgetName());
+    this->Script("pack %s -anchor w -fill x -expand true", this->DatasetFrame->GetWidgetName());
     }
-  this->Script("pack %s -anchor w", this->LmkCommentsText->GetWidgetName());
-  this->Script("%s configure -bg white -height 3 -width 50 -wrap word", this->LmkCommentsText->GetWidgetName());
-  this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->LmkCommentsFrame->GetWidgetName());
-  this->Script("pack %s -anchor nw -side left", this->LmkLeftFrame->GetWidgetName());
-  this->Script("pack %s -anchor w -side left -expand true -fill x -padx 3", this->LmkRightFrame->GetWidgetName());
-  this->Script("pack %s -before %s -anchor nw -side left", this->Checkbox->GetWidgetName(),this->LmkMainFrame->GetLabel()->GetWidgetName());
-  this->Script("pack %s -fill x -expand true -side left", this->LmkMainFrame->GetWidgetName());
-  this->Script("pack %s -anchor nw -fill x -expand true", this->LmkFrame->GetWidgetName());
+  this->Script("pack %s -anchor w", this->CommentsText->GetWidgetName());
+  this->Script("%s configure -bg white -height 3 -width 50 -wrap word", this->CommentsText->GetWidgetName());
+  this->Script("pack %s -anchor w -fill x -expand true -padx 2 -pady 2", this->CommentsFrame->GetWidgetName());
+  this->Script("pack %s -anchor nw -side left", this->LeftFrame->GetWidgetName());
+  this->Script("pack %s -anchor w -side left -expand true -fill x -padx 3", this->RightFrame->GetWidgetName());
+  this->Script("pack %s -before %s -anchor nw -side left", this->Checkbox->GetWidgetName(),this->MainFrame->GetLabel()->GetWidgetName());
+  this->Script("pack %s -fill x -expand true -side left", this->MainFrame->GetWidgetName());
+  this->Script("pack %s -anchor nw -fill x -expand true", this->Frame->GetWidgetName());
   this->Script("pack %s -anchor nw -expand t -fill both", this->SeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",this->SeparatorFrame->GetWidgetName());
   this->Script("pack %s -anchor nw -expand t -fill x", this->SeparatorFrame->GetWidgetName());
 
   if(this->MainFrameCollapsedState)
     {
-    this->LmkMainFrame->CollapseFrame();
+    this->MainFrame->CollapseFrame();
     }
   else
     {
-    this->LmkMainFrame->ExpandFrame();
+    this->MainFrame->ExpandFrame();
     }
   if(this->CommentsFrameCollapsedState)
     {
-    this->LmkCommentsFrame->CollapseFrame();
+    this->CommentsFrame->CollapseFrame();
     }
   else
     {
-    this->LmkCommentsFrame->ExpandFrame();
+    this->CommentsFrame->ExpandFrame();
     }
 }
 
@@ -560,7 +533,6 @@ void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Name: " << this->GetName() << endl;
   os << indent << "Comments: " << this->GetComments() << endl;
-//ds
   os << indent << "Dataset: " << this->GetDataset() << endl;
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Height: " << this->GetHeight() << endl;

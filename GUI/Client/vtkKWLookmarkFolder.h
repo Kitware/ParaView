@@ -47,14 +47,17 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Callback to double-clicking the lookmark container's label. Pressing 'Return' then calls ChangeName
+  // Callback to menu item in lookmark manager to rename a folder. Pressing 'Return' calls ChangeName
   void EditCallback();
   void ChangeName();
 
+  // Description:
+  // Deletes folder
   void RemoveFolder();
 
   // Description:
-  // When a lmk container's checkbox is selected, we want all nested lmk items to also be selected (and vice versa)
+  // When a folder's checkbox is selected, we want all nested lmk items to also be selected (and vice versa)
+  // When a folders lable is pressed and highlighted, we want all nested lmk items to also be highlighted
   void SelectCallback();
   void ToggleNestedLabels(vtkKWWidget *prnt, int state);
   void ToggleNestedCheckBoxes(vtkKWWidget *prnt, int state);
@@ -63,38 +66,39 @@ public:
   // Set/Get methods that hide underlying widgets
   void SetFolderName(const char *val);
   char *GetFolderName();
+  void SetSelectionState(int state);
+  int GetSelectionState();
+
+  vtkSetMacro(MacroFlag,int);
+  vtkGetMacro(MacroFlag,int);
+
+  vtkGetMacro(MainFrameCollapsedState,int);
+  vtkSetMacro(MainFrameCollapsedState,int);
+
+  vtkGetMacro(Location,int);
+  vtkSetMacro(Location,int);
 
   // Direct Access to underlying widgets:
   vtkGetObjectMacro(LabelFrame,vtkKWFrameWithLabel);
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
   vtkGetObjectMacro(NestedSeparatorFrame,vtkKWFrame);
-
-  vtkGetMacro(Location,int);
-  vtkSetMacro(Location,int);
+  vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
 
   virtual void Pack();
 
-  void SetSelectionState(int state);
-  int GetSelectionState();
+  // Description:
+  // Update the widget based on either its widget values or its variable values
+  void UpdateWidgetValues();
+  void UpdateVariableValues();
 
+  // Description:
+  // Drag and Drop routines
   void DragAndDropStartCallback(int x, int y);
   void DragAndDropEndCallback(int x, int y);
-
-  virtual void UpdateEnableState();
-
   void DragAndDropPerformCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor);
   void RemoveDragAndDropTargetCues();
 
-  vtkSetMacro(MacroFlag,int);
-  vtkGetMacro(MacroFlag,int);
-
-  vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
-
-  vtkGetMacro(MainFrameCollapsedState,int);
-  vtkSetMacro(MainFrameCollapsedState,int);
-
-  void UpdateWidgetValues();
-  void UpdateVariableValues();
+  virtual void UpdateEnableState();
 
 protected:
 

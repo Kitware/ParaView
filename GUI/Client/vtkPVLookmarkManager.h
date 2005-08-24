@@ -37,23 +37,18 @@
 #include "vtkKWTopLevel.h"
 
 class vtkKWLookmarkFolder;
-class vtkKWLookmark;
 class vtkPVLookmark;
 class vtkXMLDataElement;
-class vtkKWIcon;
 class vtkKWFrame;
 class vtkKWFrameWithScrollbar;
 class vtkKWPushButton;
 class vtkPVApplication;
-class vtkPVSource;
 class vtkPVRenderView;
-class vtkRenderWindow;
 class vtkKWMenu;
 class vtkKWMessageDialog;
-class vtkKWWindow;
 class vtkKWTextWithScrollbars;
 class vtkPVTraceHelper;
-class vtkPVXMLElement;
+class vtkPVWindow;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -71,13 +66,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Get the trace helper framework.
-  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
-
-  // Description
-  vtkPVLookmark* GetPVLookmark(char *name);
-
-  // Description:
   // Display the toplevel.
   virtual void Display();
 
@@ -85,27 +73,34 @@ public:
   // Close the toplevel.
   virtual void Withdraw();
 
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
+
+  // Description
+  // Returns the first lookmark found with the given name
+  vtkPVLookmark* GetPVLookmark(char *name);
+
   // Callbacks to interface widgets
 
   // Description:
   // Called from File --> Import --> Replace/Append
   // Takes the user specified .lmk file and parses it to populate the panel with its contents
   void ImportCallback();
-  void Import(char *path, int appendFlag);
+  void Import(const char *path, int appendFlag);
 
   // Description:
-  // Invoked from either the push button in the panel or via Edit --> Create Lookmark.
-  // Adds a vtkKWLookmark widget to the bottom of the lookmark manager with a default
+  // Create either a Lookmark or a Lookmark Macro.
+  // Adds a vtkKWLookmark widget to the lookmark manager with a default
   // name of the form "Lookmark#". Saves the state of the visible sources in the SourceList
-  // and their inputs. The window is moved behind the render window to save the image, but is
-  // then moved back in front.
+  // and their inputs.
   void CreateLookmarkCallback(int macroFlag);
   vtkPVLookmark* CreateLookmark(char *name, int macroFlag);
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
   void SaveAllCallback();
-  void SaveAll(char *path);
+  void SaveAll(const char *path);
 
   // Description: 
   // This is called when File --> Export Folder is selected
@@ -128,7 +123,7 @@ public:
 
   // Description:
   // Check/Uncheck the boxes of all lookmarks and folders
-  void AllOnOffCallback(int flag);
+  void SetStateOfAllLookmarkItems(int state);
 
   // Description:
   // This uses the backup file to repopulate the lookmark manager, bringing it up to the point just before the last operation
@@ -141,14 +136,38 @@ public:
   void RenameFolderCallback();
 
   // Description:
+  // Access to the specialized vtkKWLookmarkFolder that holds the lookmark macros
+  vtkKWLookmarkFolder *GetMacrosFolder();
+
+  // Description:
+  // When the manager is created, this looks for a file called #LookmarkMacros# or .LookmarkMacros in the users home directory
+  // If found, this lookmark file is used to populate the Edit --> Add Macro Example menu. The idea is to have a way to 
+  // distribute pre-defined macros with paraview that users might find useful for the type of data they work with.
+  void ImportMacroExamplesCallback();
+
+  // Description: 
+  // Callback when an entry is selected in the Edit menu. Adds the selection to the "Macros" folder and to the Lookmark toolbar if enabled
+  void AddMacroExampleCallback(int index);
+
+  // Description:
+  // Callback added to all lookmark and folder checkboxes. This does some bookkeeping like making sure that if an item nested in a selected folder
+  // is deselected, the folder is also deselected
+  void SelectItemCallback(char *name);
+
+  // Description:
   // Callbacks for the help menu
   void DisplayUsersTutorial();
   void DisplayQuickStartGuide();
 
   // Description:
-  // All lookmark items (lookmarks and folders) in the manager are assigned these end and perform drag and drop commands
-  void DragAndDropEndCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
+  // Called when a lookmark item (lookmark or folder) is being dragged. If the mouse is over the first frame in the 
+  // lookmark manager before the first lookmark item (so that user can drag to the top of the lookmark manager)
   void DragAndDropPerformCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor);
+
+  // Description:
+  // All lookmark items (lookmarks and folders) in the manager are assigned this end command when the left button is release after it
+  // has been dragging a lookmark item
+  void DragAndDropEndCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -159,12 +178,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  vtkKWLookmarkFolder *GetMacrosFolder();
-  void AddMacroExampleCallback(int index);
-  void ImportMacroExamplesCallback();
-
-  void SelectItemCallback(char *name);
-
 protected:
 
   vtkPVLookmarkManager();
@@ -173,12 +186,15 @@ protected:
   // convenience methods
   vtkPVApplication* GetPVApplication();
   vtkPVRenderView* GetPVRenderView(); 
+  vtkPVWindow* GetPVWindow(); 
+
+  // Description:
+  // Helper function to construct path to file in user's home directory
+  const char* GetPathToFileInHomeDirectory(const char* filename);
 
   // Help menu helper functions
   virtual void ConfigureQuickStartGuide();
   virtual void ConfigureUsersTutorial();
-
-  // The following are drag-and-drop functions
 
   // Description:
   // Sets up the drag and drop targets for each lookmark and folder in manager. Often called after a change to the lookmark manager (such as Add, Remove, etc.)
@@ -204,21 +220,23 @@ protected:
   // containers that are siblings in the lookmark manager hierarchy
   // depending on whether we are inserting or removing a lmk item
   // used in conjunction with Move and Remove callbacks
-
   void DecrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int location);
   void IncrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int location);
 
   // Description:
-  // Just what the name implies - pack the child lmk items at a certain level in the hierarchy using their location values
+  // Just what the name implies - pack the lookmark items (lookmarks or folders) that are children of parent using their location values
   void PackChildrenBasedOnLocation(vtkKWWidget *parent);
 
-
-  // helper function for removing checked lookmarks and folders
+  // Description:
+  // helper function for removing checked lookmarks and folders that are children of parent
   void RemoveCheckedChildren(vtkKWWidget *parent, int forceRemoveFlag);
 
   // Description:
-  // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkKWLookmark, vtkPVLookmark, and vtkKWLookmarkFolders as appropriate
+  // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkPVLookmarks and vtkKWLookmarkFolders as appropriate
   void ImportInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
+
+  // Description:
+  // Recursively visit each xml element of the lookmark file, creatings entries in the "Add Macro Examples" menu
   void ImportMacroExamplesInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWMenu *parentMenu);
 
   // Description:
@@ -229,11 +247,10 @@ protected:
   // Description:
   // Takes a vtkKWLookmarkElement and uses its attributes to initialize and return a new vtkPVLookmark
   vtkPVLookmark* GetPVLookmark(vtkXMLDataElement *elem);
-  vtkPVLookmark* GetPVLookmark(vtkPVXMLElement *elem);
 
   // Description:
-  // Necessary to encode/decode newlines in the comments text and image data before/after being written/read to/from a lookmark file since they get lost in the call to WriteObject()
-  // uses a '~' to encode
+  // Necessary to encode/decode newlines in the comments text and image data before/after being written/read 
+  // to/from a lookmark file since they get lost in the call to WriteObject() uses a '~' to encode
   void EncodeNewlines(char *str);
   void DecodeNewlines(char *str);
 
@@ -251,20 +268,23 @@ protected:
   // recursively calls CreateNestedXMLElement and prints the folder and all its elements to the file
   void SaveFolderInternal(char *path, vtkKWLookmarkFolder *folder);
 
-  // Convenience method called from CreateLookmark to assign a default name to the new lookmark that does not match any of the ones currently in the lookmark manager
+  // Convenience method called from CreateLookmark to assign a default name to the new lookmark that 
+  // does not match any of the ones currently in the lookmark manager
   // of the form: "LookmarkN" where 'N' is an integer between 0 and numberOfLookmarks
   char* GetUnusedLookmarkName();
 
+  // Description:
+  // Check to see if lookmark item is a descendant of container
+  int IsWidgetInsideFolder(vtkKWWidget *widget, vtkKWWidget *folder);
 
   // Description:
-  // Check to see if lmkItem is a descendant of container
-  int IsWidgetInsideFolder(vtkKWWidget *container,vtkKWWidget *lmkItem);
-
-  // Description:
-  // Before any action that changes the state of the lookmark manager (Add,Update,etc), this method is called to write out a lookmark file 
-  // in the current directory of the current state of the lookmark manager. The file name is "LookmarkManager.lmk" by default until a lookmark file is imported or one is saved out
+  // Before any action that changes the state of the lookmark manager (Add,Update,etc), this 
+  // method is called to write out a lookmark file in the current directory of the current state 
+  // of the lookmark manager. The file name is "LookmarkManager.lmk" by default until a lookmark file is imported or one is saved out
   void Checkpoint();
 
+  // Description:
+  // Undo and redo share same underlying function
   void UndoRedoInternal();
 
 private:
@@ -273,17 +293,16 @@ vtkPVLookmarkManager(const vtkPVLookmarkManager&); // Not implemented
 void operator=(const vtkPVLookmarkManager&); // Not implemented
 
 //BTX
-  vtkVector<vtkPVLookmark*> *PVLookmarks;
+  vtkVector<vtkPVLookmark*> *Lookmarks;
   vtkVector<vtkPVLookmark*> *MacroExamples;
-  vtkVector<vtkKWLookmarkFolder*> *LmkFolderWidgets;
+  vtkVector<vtkKWLookmarkFolder*> *Folders;
 //ETX
   
-  vtkKWFrame              *LmkPanelFrame;
-  vtkKWFrameWithScrollbar *LmkScrollFrame;
+  vtkKWFrame              *WindowFrame;
+  vtkKWFrameWithScrollbar *ScrollFrame;
   vtkKWFrame              *SeparatorFrame;
 
   vtkKWFrame *TopDragAndDropTarget;
-  vtkKWFrame *BottomDragAndDropTarget;
 
   vtkKWMenu *MenuFile;
   vtkKWMenu *MenuEdit;
@@ -291,7 +310,7 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWMenu *MenuHelp;
   vtkKWMenu *MenuExamples;
 
-  vtkKWPushButton *CreateLmkButton;
+  vtkKWPushButton *CreateLookmarkButton;
 
   vtkKWMessageDialog *QuickStartGuideDialog;
   vtkKWTextWithScrollbars *QuickStartGuideTxt;

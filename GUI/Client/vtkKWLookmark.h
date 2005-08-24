@@ -36,9 +36,7 @@ class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWFrameWithLabel;
 class vtkKWCheckButton;
-class vtkPVCameraIcon;
 class vtkKWText;
-class vtkKWRadioButtonSet;
 
 
 class VTK_EXPORT vtkKWLookmark : public vtkKWCompositeWidget
@@ -75,9 +73,8 @@ public:
   int GetSelectionState();
 
   // Description:
-  // Made available for vtkPVLookmarkManager's management of drag-and-drop targets
+  // Access to underlying widgets
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
-
   vtkGetObjectMacro(Checkbox,vtkKWCheckButton);
 
   // Description:
@@ -86,31 +83,27 @@ public:
   void EditLookmarkCallback();
   void ChangeLookmarkName();
 
+  // Description:
+  // Updates the comments frame label to display the first few words when modified
   void CommentsModifiedCallback();
 
+  // Description:
+  // Breaks up the dataset string into an array
   void CreateDatasetList();
 
   // Description:
-  // COnvenience method for encapsulating and reusing code that packs this widget
-  // the argument tells Pack() whether to display the hidden widgets or not
+  // Convenience method for encapsulating and reusing code that packs this widget
   void Pack();
 
+  // Description:
+  // Drag and Drop functionality - highlight frame when moused over
   void DragAndDropPerformCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor);
   void RemoveDragAndDropTargetCues();
 
-  vtkSetMacro(PixelSize,int);
-  vtkGetMacro(PixelSize,int);
-  vtkSetMacro(Width,int);
-  vtkGetMacro(Width,int);
-  vtkSetMacro(Height,int);
-  vtkGetMacro(Height,int);
-
   // Description:
-  // Uses the name and comments widget values (which may have been modified) to initialize LookmarkName and Comments variables
+  // Update the widget based on either its widget values or its variable values
   void UpdateVariableValues();
   void UpdateWidgetValues();
-
-  virtual void UpdateEnableState();
 
   vtkSetMacro(MacroFlag,int);
   vtkGetMacro(MacroFlag,int);
@@ -120,21 +113,30 @@ public:
   vtkGetMacro(CommentsFrameCollapsedState,int);
   vtkSetMacro(CommentsFrameCollapsedState,int);
 
+  vtkSetMacro(PixelSize,int);
+  vtkGetMacro(PixelSize,int);
+  vtkSetMacro(Width,int);
+  vtkGetMacro(Width,int);
+  vtkSetMacro(Height,int);
+  vtkGetMacro(Height,int);
+
+  virtual void UpdateEnableState();
+
 protected:
 
   vtkKWLookmark();
   ~vtkKWLookmark();
 
-  vtkKWFrame *LmkLeftFrame;
-  vtkKWFrame *LmkRightFrame;
-  vtkKWFrame *LmkFrame;
-  vtkKWFrameWithLabel *LmkMainFrame;
-  vtkKWFrameWithLabel *LmkCommentsFrame;
-  vtkKWLabel *LmkDatasetLabel;
-  vtkKWFrame *LmkDatasetFrame;
-  vtkKWLabel *LmkIcon;
-  vtkKWText *LmkCommentsText;
-  vtkKWText *LmkNameField;
+  vtkKWFrame *LeftFrame;
+  vtkKWFrame *RightFrame;
+  vtkKWFrame *Frame;
+  vtkKWFrameWithLabel *MainFrame;
+  vtkKWFrameWithLabel *CommentsFrame;
+  vtkKWLabel *DatasetLabel;
+  vtkKWFrame *DatasetFrame;
+  vtkKWLabel *Icon;
+  vtkKWText *CommentsText;
+  vtkKWText *NameField;
   vtkKWFrame *SeparatorFrame;
   vtkKWCheckButton *Checkbox;
 

@@ -20,22 +20,18 @@
 // .NAME vtkPVLookmark - An interface widget for a container of lookmarks in the Lookmark Manager
 // .SECTION Description
 // This class represents a lookmark object and stores several attributes such as name, default dataset,
-// comments, state script, and image data. I separated it from the interface (vtkKWLookmark). Although it should probably be a subclass of vtkLookmark
-// instead of vtkObject to a) be consistent with the naming convention in paraview and b) they both share several attributes. 
-// Each object of this class
-// keeps a collection of the vtkPVSources used to make up the view this lookmark represents. Encapsulating loookmark data
+// comments, state script, and image data. I separated it from the interface (vtkKWLookmark). Encapsulating loookmark data
 // in one class such as this also helps when writing to the xml lookmark file since we can make use of the vtkXMLLookmarkWriter->SetObject()
 // method.
 //
 // .SECTION See Also
-// vtkObject vtkPVLookmarkManager
+// vtkObject vtkPVLookmarkManager, vtkKWLookmark
 
 #ifndef __vtkPVLookmark_h
 #define __vtkPVLookmark_h
 
 #include "vtkKWLookmark.h"
 
-class vtkKWApplication;
 class vtkPVSource;
 class vtkPVSourceCollection;
 class vtkRenderWindow;
@@ -46,7 +42,7 @@ class vtkPVTraceHelper;
 class vtkKWPushButton;
 class vtkPVLookmarkObserver;
 class vtkKWIcon;
-
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
@@ -61,14 +57,16 @@ public:
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
   // Description: 
-  // It is called when the user clicks on a lookmark's thumbnail
-  // If "Lock to Dataset" is ON, it tries to find/open the lookmark's dataset and apply the pipeline
-  // to it. Otherwise, the lookmark is applied to the currently selected source's dataset, maintaining
-  // the current camera view and timestep. 
-  // The reader is initialized using the attributes in the lookmark's state script. The rest of the
+  // This will execute the lookmark. It is called when the user clicks on a lookmark's thumbnail.
+  // It tries to find/open the lookmark's dataset(s) and/or source(s) and apply the pipeline
+  // to them. The reader is initialized using the attributes in the lookmark's state script. The rest of the
   // script is then executed.
   void View();
-  // called when lookmark's thumbnail is pressed and "Lock to dataset" is OFF
+
+  // Description: 
+  // This is called when the user clicks on a macro's thumbnail. 
+  // It uses the stored script to initialize the currently selected dataset, maintaining
+  // the current camera view and timestep. 
   void ViewLookmarkWithCurrentDataset();
 
   // Description:
@@ -76,18 +74,19 @@ public:
   void Update();
 
   // Description:
-  // Converts the image in the render window to a vtkKWIcon stored with the lookmark
+  // Converts the image in the render window to a vtkKWIcon stored with the lookmark - called when lookmark is first being created or updated
   void CreateIconFromMainView();
 
   // Description:
-  // Given an encoded string of raw image data, set up the lookmark's icon
+  // Use the ImageData to set up the lookmark's icon - called when lookmark is being imported into manager
   void CreateIconFromImageData();
 
   // Description:
-  // Called from Add and Update. 
+  // Called when lookmark is being created or updated. 
   // Turns vtkPVWindow->SaveVisibleSourcesOnlyFlag ON before the call to SaveState and OFF afterwards.
   // This ensures that only those sources that are visible, and all of their inputs leading up to the reader, are saved.
   // Writes out the current session state and stores in lmk.
+  // Also initializes the comments field with filter names if first being created
   void StoreStateScript();
 
   //Description:
@@ -107,7 +106,7 @@ public:
   vtkSetVector3Macro(CenterOfRotation,float); 
 
   // Description:
-  // The value represents this lookmark widget's packing location among sibling lmk widgets and lmk containers.
+  // The value represents this lookmark widget's packed location among sibling lmk widgets and lmk folder.
   // Used for moving widget.
   vtkGetMacro(Location,int);
   vtkSetMacro(Location,int);
@@ -117,11 +116,17 @@ public:
   // need to find a better way.
   void EnableScrollBar();
 
+  // Description:
+  // Called from vtkPVSource when being deleted to remove itself from this lookmark's collection of pvsources
   void RemovePVSource(vtkPVSource *src);
 
+  // Description:
+  // Adding a copy of this lookmark's thumbnail to the window's Lookmark Toolbar if this is a macro
   vtkGetObjectMacro(ToolbarButton,vtkKWPushButton);
   void AddLookmarkToolbarButton(vtkKWIcon *icon);
 
+  // Description:
+  // Finds which readers or sources should be stored with this lookmark when created and initializes the dataset ivar
   void InitializeDataset();
 
 protected:
@@ -129,11 +134,15 @@ protected:
   vtkPVLookmark();
   ~vtkPVLookmark();
   
+  // Description:
+  // Since there could be entire pipelines in the selection window that are invisible and thus be ignored when creating this lookmark
+  // this is a check to see if atleast one of a reader's or source's filters are visible and thus contribute to the lookmark view
   int IsSourceOrOutputsVisible(vtkPVSource *src,int visibilityFlag);
 
   // convenience methods
   vtkPVApplication *GetPVApplication();
   vtkPVRenderView* GetPVRenderView(); 
+  vtkPVWindow* GetPVWindow(); 
   vtkPVLookmarkManager* GetPVLookmarkManager(); 
 
   virtual void ExecuteEvent(vtkObject* , unsigned long event, void* calldata);
@@ -141,7 +150,6 @@ protected:
   vtkPVLookmarkObserver* Observer;
   friend class vtkPVLookmarkObserver;
 //ETX
-
 
   // Description:
   // When a lookmark is recreated/viewed and the stored state script is parsed, each filter that is created gets stored in this object's vtkPVSourceCOllection
@@ -153,7 +161,7 @@ protected:
   int DeletePVSources();
 
   // Description:
-  // An added or updated lookmark widgets uses the return value of this to setup its thumbnail
+  // An added or updated lookmark widget uses the return value of this to setup its thumbnail
   vtkKWIcon *GetIconOfRenderWindow(vtkRenderWindow *window);
 
   // Description:
@@ -164,13 +172,16 @@ protected:
   // Assigns the vtkKWIcon to the lookmark's vtkKWLabel
   void SetLookmarkImage(vtkKWIcon *icon);
 
+  // Description: 
+  // This is used to make sure the user cannot click on a lookmark at certain times
   void SetLookmarkIconCommand();
   void UnsetLookmarkIconCommand();
 
   // Description:
-  // helper functions for ViewLookmarkCalllback
+  // helper functions when viewing this lookmark
   void TurnFiltersOff();
   void TurnScalarBarsOff();
+
   // Description:
   // This is a big function because I'm triying to do it all in one pass
   // parses the reader portion of the state file and uses it to initialize the reader module (both parameter and display settings)
