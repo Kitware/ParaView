@@ -95,9 +95,7 @@ int my_main(int argc, char *argv[])
   viewer->SetRenderWindow(rw->GetRenderWindow());
   viewer->SetRenderer(rw->GetRenderer());
   viewer->SetInput(reader->GetOutput());
-
-  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-  viewer->SetupInteractor(iren);
+  viewer->SetupInteractor(rw->GetRenderWindow()->GetInteractor());
 
   // Reset the window/level and the camera
 
@@ -161,7 +159,6 @@ int my_main(int argc, char *argv[])
   reader->Delete();
   slice_scale->Delete();
   viewer->Delete();
-  iren->Delete();
   rw->Delete();
   win->Delete();
   app->Delete();

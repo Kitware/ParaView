@@ -30,9 +30,7 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
   hae_viewer SetRenderWindow [hae_renderwidget GetRenderWindow] 
   hae_viewer SetRenderer [hae_renderwidget GetRenderer] 
   hae_viewer SetInput [hae_reader GetOutput] 
-
-  vtkRenderWindowInteractor hae_iren
-  hae_viewer SetupInteractor hae_iren
+  hae_viewer SetupInteractor [[hae_renderwidget GetRenderWindow] GetInteractor]
 
   hae_renderwidget ResetCamera
 
@@ -54,7 +52,6 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
 proc vtkKWHeaderAnnotationEditorFinalizePoint {} {
   hae_anno_editor Delete
   hae_reader Delete
-  hae_iren Delete
   hae_renderwidget Delete
   hae_viewer Delete
 }

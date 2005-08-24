@@ -22,7 +22,6 @@ protected:
   vtkKWRenderWidget *hae_renderwidget;
   vtkXMLImageDataReader *hae_reader;
   vtkImageViewer2 *hae_viewer;
-  vtkRenderWindowInteractor *hae_iren;
   vtkKWHeaderAnnotationEditor *hae_anno_editor;
 };
 
@@ -66,9 +65,8 @@ vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
   this->hae_viewer->SetRenderWindow(this->hae_renderwidget->GetRenderWindow());
   this->hae_viewer->SetRenderer(this->hae_renderwidget->GetRenderer());
   this->hae_viewer->SetInput(this->hae_reader->GetOutput());
-
-  this->hae_iren = vtkRenderWindowInteractor::New();
-  this->hae_viewer->SetupInteractor(this->hae_iren);
+  this->hae_viewer->SetupInteractor(
+    this->hae_renderwidget->GetRenderWindow()->GetInteractor());
 
   this->hae_renderwidget->ResetCamera();
 
@@ -90,7 +88,6 @@ vtkKWHeaderAnnotationEditorItem::~vtkKWHeaderAnnotationEditorItem()
 {
   this->hae_anno_editor->Delete();
   this->hae_reader->Delete();
-  this->hae_iren->Delete();
   this->hae_renderwidget->Delete();
   this->hae_viewer->Delete();
 }

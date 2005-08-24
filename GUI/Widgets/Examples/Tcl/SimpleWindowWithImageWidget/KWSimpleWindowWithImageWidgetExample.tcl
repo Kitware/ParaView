@@ -54,9 +54,7 @@ vtkImageViewer2 viewer
 viewer SetRenderWindow [rw GetRenderWindow]
 viewer SetRenderer [rw GetRenderer]
 viewer SetInput [reader GetOutput]
-
-vtkRenderWindowInteractor iren
-viewer SetupInteractor iren
+viewer SetupInteractor [[rw GetRenderWindow] GetInteractor]
 
 # Reset the window/level and the camera
 
@@ -106,7 +104,6 @@ win Close
 rw Delete
 reader Delete
 viewer Delete
-iren Delete
 slice_scale Delete
 win Delete
 app Delete

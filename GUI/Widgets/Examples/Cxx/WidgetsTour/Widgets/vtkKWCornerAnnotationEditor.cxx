@@ -23,7 +23,6 @@ protected:
   vtkKWRenderWidget *cae_renderwidget;
   vtkXMLImageDataReader *cae_reader;
   vtkImageViewer2 *cae_viewer;
-  vtkRenderWindowInteractor *cae_iren;
   vtkKWCornerAnnotationEditor *cae_anno_editor;
 };
 
@@ -65,9 +64,8 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   this->cae_viewer->SetRenderWindow(this->cae_renderwidget->GetRenderWindow());
   this->cae_viewer->SetRenderer(this->cae_renderwidget->GetRenderer());
   this->cae_viewer->SetInput(this->cae_reader->GetOutput());
-
-  this->cae_iren = vtkRenderWindowInteractor::New();
-  this->cae_viewer->SetupInteractor(this->cae_iren);
+  this->cae_viewer->SetupInteractor(
+    this->cae_renderwidget->GetRenderWindow()->GetInteractor());
 
   // Reset the window/level and the camera
 
@@ -111,7 +109,6 @@ vtkKWCornerAnnotationEditorItem::~vtkKWCornerAnnotationEditorItem()
 {
   this->cae_anno_editor->Delete();
   this->cae_reader->Delete();
-  this->cae_iren->Delete();
   this->cae_renderwidget->Delete();
   this->cae_viewer->Delete();
 }

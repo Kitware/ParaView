@@ -28,9 +28,7 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   cae_viewer SetRenderWindow [cae_renderwidget GetRenderWindow] 
   cae_viewer SetRenderer [cae_renderwidget GetRenderer] 
   cae_viewer SetInput [cae_reader GetOutput] 
-
-  vtkRenderWindowInteractor cae_iren
-  cae_viewer SetupInteractor cae_iren
+  cae_viewer SetupInteractor [[cae_renderwidget GetRenderWindow] GetInteractor]
 
   # Reset the window/level and the camera
 
@@ -74,7 +72,6 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
 proc vtkKWCornerAnnotationEditorFinalizePoint {} {
   cae_anno_editor Delete
   cae_reader Delete
-  cae_iren Delete
   cae_renderwidget Delete
   cae_viewer Delete
 }
