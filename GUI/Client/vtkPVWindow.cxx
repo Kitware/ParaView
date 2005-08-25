@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.761");
+vtkCxxRevisionMacro(vtkPVWindow, "1.762");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -335,10 +335,7 @@ vtkPVWindow::vtkPVWindow()
   // There is only one page in the secondary notebook, the "Animation" page
   // so do not show the tab to save some space
 
-  if (this->SecondaryNotebook)
-    {
-    this->SecondaryNotebook->AlwaysShowTabsOff();
-    }
+  this->GetSecondaryNotebook()->AlwaysShowTabsOff();
 }
 
 //-----------------------------------------------------------------------------
@@ -2182,10 +2179,10 @@ void vtkPVWindow::ShowMainUserInterface(vtkKWUserInterfacePanel *panel)
 
   // Forget current props and pack the notebook
   
-  this->MainNotebook->UnpackSiblings();
+  this->GetMainNotebook()->UnpackSiblings();
   
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
-               this->MainNotebook->GetWidgetName());
+               this->GetMainNotebook()->GetWidgetName());
 
   this->Superclass::ShowMainUserInterface(panel);
 }
