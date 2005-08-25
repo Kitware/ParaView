@@ -1,3 +1,5 @@
+#include "vtkCornerAnnotation.h"
+#include "vtkImageData.h"
 #include "vtkImageViewer2.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCornerAnnotationEditor.h"
@@ -8,7 +10,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
-#include "vtkCornerAnnotation.h"
 
 #include "KWWidgetsTourExampleTypes.h"
 
