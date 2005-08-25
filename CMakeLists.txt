@@ -430,7 +430,7 @@ IF (PARAVIEW_BUILD_GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
-# Import external projects, such as EXODUS and SAF
+# Import external projects, such as SAF
 
 SET(PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES)
 
@@ -506,7 +506,7 @@ ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external EXODUS SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external SAF SSLIB_SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})

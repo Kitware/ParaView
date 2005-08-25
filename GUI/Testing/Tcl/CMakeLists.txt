@@ -64,6 +64,7 @@ SET(PROJECT_TESTS
   ScalarsSphereClip
   SPCTH
   TestDemo
+  TestExodus
   TestPackage
   Threshold
   ThresholdAttrMode
@@ -85,13 +86,6 @@ SET(PROJECT_TESTS
   XdmfReadRectilinearGridCollection
 #  TestAnimationSaveLoad
   )
-
-IF(PARAVIEW_USE_EXODUS)
-  SET(PROJECT_TESTS
-    ${PROJECT_TESTS}
-    TestExodus
-    )
-ENDIF(PARAVIEW_USE_EXODUS)
 
 # some tests require MPI because the classes do not get built otherwise
 IF(VTK_USE_MPI)

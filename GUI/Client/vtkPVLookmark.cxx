@@ -57,9 +57,7 @@
 #include "vtkPVStringEntry.h"
 #include "vtkPVSelectWidget.h"
 #include "vtkPVMinMax.h"
-#ifdef PARAVIEW_USE_EXODUS
 #include "vtkPVBasicDSPFilterWidget.h"
-#endif
 #include "vtkKWFrameLabeled.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkKWText.h"
@@ -70,7 +68,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.3");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.8.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -575,10 +573,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
   vtkPVStringEntry *stringEntry;
   vtkPVSelectWidget *selectWidget;
   vtkPVMinMax *minMaxWidget;
-#ifdef PARAVIEW_USE_EXODUS
   vtkPVBasicDSPFilterWidget *dspWidget;
-#endif
-
   vtkPVSource *src;
   vtkPVWidget *pvWidget;
   char *ptr;
@@ -727,7 +722,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
             minMaxWidget->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
-#ifdef PARAVIEW_USE_EXODUS
           else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
@@ -738,7 +732,6 @@ void vtkPVLookmark::ParseAndExecuteStateScript(vtkPVSource *reader,char *script,
             dspWidget->SetFilterLength(atoi(this->GetStringValue(ptr)));
             ptr = strtok(NULL,"\r\n");
             }
-#endif
           else   //if we do not support this widget yet, advance and break loop
             {
             ptr = strtok(NULL,"\r\n");
