@@ -1,14 +1,19 @@
+#include "vtkCornerAnnotation.h"
+#include "vtkImageData.h"
 #include "vtkImageViewer2.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWMenuButtonWithSpinButtons.h"
+#include "vtkKWMenuButtonWithSpinButtonsWithLabel.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWindowBase.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
-#include "vtkCornerAnnotation.h"
 
 #include "vtkKWWidgetsConfigurePaths.h"
 #include "vtkToolkits.h"
@@ -58,14 +63,16 @@ int my_main(int argc, char *argv[])
   // Add a window
   // Set 'SupportHelp' to automatically add a menu entry for the help link
 
-  vtkKWWindowBase *win = vtkKWWindowBase::New();
+  vtkKWWindow *win = vtkKWWindow::New();
   win->SupportHelpOn();
   app->AddWindow(win);
   win->Create(app);
+  win->SecondaryPanelVisibilityOff();
 
   // Add a render widget, attach it to the view frame, and pack
   
   vtkKWRenderWidget *rw = vtkKWRenderWidget::New();
+
   rw->SetParent(win->GetViewFrame());
   rw->Create(app);
   rw->CornerAnnotationVisibilityOn();
@@ -118,28 +125,63 @@ int my_main(int argc, char *argv[])
   ca->SetText(2, "<slice>");
   ca->SetText(3, "<window>\n<level>");
 
-  // Create a scale to control the slice
-
-  vtkKWScale *slice_scale = vtkKWScale::New();
-  slice_scale->SetParent(win->GetViewFrame());
-  slice_scale->Create(app);
-  slice_scale->SetRange(viewer->GetWholeZMin(), viewer->GetWholeZMax());
-  slice_scale->SetValue(viewer->GetZSlice());
+  // The above code makes sense only if we can get the Tcl object 
+  // corresponding to the viewer. I.e., VTK_WRAP_TCL must be ON
 
 #ifdef VTK_WRAP_TCL
 
-  // This code makes sense only if we can get the Tcl object corresponding
-  // to the viewer. I.e., VTK_WRAP_TCL must be ON
-
-  char command[1024];
   vtksys_stl::string viewer_tclname(
     vtkKWTkUtilities::GetTclNameFromPointer(app, viewer));
-  sprintf(command, "%s SetZSlice [%s GetValue] ; %s Render", 
+
+  // Create a scale to control the slice
+
+  vtkKWScale *slice_scale = vtkKWScale::New();
+  slice_scale->SetParent(win->GetViewPanelFrame());
+  slice_scale->Create(app);
+  slice_scale->SetRange(viewer->GetSliceMin(), viewer->GetSliceMax());
+  slice_scale->SetValue(viewer->GetSlice());
+
+  char command[1024];
+  sprintf(command, "%s SetSlice [%s GetValue]", 
           viewer_tclname.c_str(), slice_scale->GetTclName(), rw->GetTclName());
   slice_scale->SetCommand(NULL, command);
 
   app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2", 
               slice_scale->GetWidgetName());
+
+  // Create a menu button to control the orientation
+
+  vtkKWMenuButtonWithSpinButtonsWithLabel *orientation_menubutton = 
+    vtkKWMenuButtonWithSpinButtonsWithLabel::New();
+
+  orientation_menubutton->SetParent(win->GetMainPanelFrame());
+  orientation_menubutton->Create(app);
+  orientation_menubutton->SetLabelText("Orientation:");
+  orientation_menubutton->SetPadX(2);
+  orientation_menubutton->SetPadY(2);
+  orientation_menubutton->SetBorderWidth(2);
+  orientation_menubutton->SetReliefToGroove();
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x",
+              orientation_menubutton->GetWidgetName());
+
+  // This is ugly, this is *not* the way it should be done in your application,
+  // you should have your class Tcl wrapped automatically and call
+  // the corresponding callbacks instead of creating Tk procs
+
+  app->Script("proc update_scale {} { %s SetRange [%s GetSliceMin] [%s GetSliceMax] ; %s SetValue [%s GetSlice] }",
+              slice_scale->GetTclName(), 
+              viewer_tclname.c_str(), 
+              viewer_tclname.c_str(), 
+              slice_scale->GetTclName(), 
+              viewer_tclname.c_str());
+              
+  vtkKWMenuButton *mb = orientation_menubutton->GetWidget()->GetWidget();
+  mb->AddRadioButton("X-Y", viewer, "SetSliceOrientationToXY ; update_scale");
+  mb->AddRadioButton("X-Z", viewer, "SetSliceOrientationToXZ ; update_scale");
+  mb->AddRadioButton("Y-Z", viewer, "SetSliceOrientationToYZ ; update_scale");
+  mb->SetValue("X-Y");
+
 #endif
 
   // Start the application
@@ -157,7 +199,10 @@ int my_main(int argc, char *argv[])
   // Deallocate and exit
 
   reader->Delete();
+#ifdef VTK_WRAP_TCL
   slice_scale->Delete();
+  orientation_menubutton->Delete();
+#endif
   viewer->Delete();
   rw->Delete();
   win->Delete();

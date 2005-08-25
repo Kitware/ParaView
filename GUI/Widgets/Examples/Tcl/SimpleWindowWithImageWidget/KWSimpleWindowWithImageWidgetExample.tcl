@@ -26,10 +26,11 @@ app SetHelpDialogStartingPage "http://public.kitware.com/KWWidgets"
 # Add a window
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
-vtkKWWindowBase win
+vtkKWWindow win
 win SupportHelpOn
 app AddWindow win
 win Create app
+win SecondaryPanelVisibilityOff
 
 # Add a render widget, attach it to the view frame, and pack
 
@@ -80,13 +81,38 @@ $ca SetText 3 "<window>\n<level>"
 # Create a scale to control the slice
 
 vtkKWScale slice_scale
-slice_scale SetParent [win GetViewFrame]
+slice_scale SetParent [win GetViewPanelFrame]
 slice_scale Create app
-slice_scale SetRange [viewer GetWholeZMin] [viewer GetWholeZMax]
-slice_scale SetValue [viewer GetZSlice]
-slice_scale SetCommand "" {viewer SetZSlice [slice_scale GetValue] ; rw Render}
+slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]
+slice_scale SetValue [viewer GetSlice]
+slice_scale SetCommand "" {viewer SetSlice [slice_scale GetValue]}
 
 pack [slice_scale GetWidgetName] -side top -expand n -fill x -padx 2 -pady 2
+
+# Create a menu button to control the orientation
+
+vtkKWMenuButtonWithSpinButtonsWithLabel orientation_menubutton
+
+orientation_menubutton SetParent [win GetMainPanelFrame]
+orientation_menubutton Create app
+orientation_menubutton SetLabelText "Orientation:"
+orientation_menubutton SetPadX 2
+orientation_menubutton SetPadY 2
+orientation_menubutton SetBorderWidth 2
+orientation_menubutton SetReliefToGroove
+
+pack [orientation_menubutton GetWidgetName] -side top -anchor nw -expand n -fill x
+             
+proc update_scale {} { 
+  slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]
+  slice_scale SetValue [viewer GetSlice] 
+}
+
+set mb [[orientation_menubutton GetWidget] GetWidget]
+$mb AddRadioButton "X-Y" viewer "SetSliceOrientationToXY ; update_scale" ""
+$mb AddRadioButton "X-Z" viewer "SetSliceOrientationToXZ ; update_scale" ""
+$mb AddRadioButton "Y-Z" viewer "SetSliceOrientationToYZ ; update_scale" ""
+$mb SetValue "X-Y"
 
 # Start the application
 # If --test was provided, do not enter the event loop
@@ -105,6 +131,7 @@ rw Delete
 reader Delete
 viewer Delete
 slice_scale Delete
+orientation_menubutton Delete
 win Delete
 app Delete
 
