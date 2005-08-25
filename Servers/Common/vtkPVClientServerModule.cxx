@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44");
 
 
 //----------------------------------------------------------------------------
@@ -591,7 +591,7 @@ void vtkPVClientServerModule::ConnectToRemote()
       if(!this->OpenConnectionDialog(&start))
         {
         // if the user canceled then just quit
-        vtkErrorMacro("Client error: Could not connect to the server.");
+        vtkErrorMacro("Client error: Could not connect to the server. If you were trying to connect a client to data and render servers, you must use the --client-render-server (-crs) argument.");
         comm->Delete();
         commRenderServer->Delete();
         if(this->GUIHelper)
