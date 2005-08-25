@@ -1,7 +1,7 @@
 #include "vtkActor.h"
 #include "vtkInteractorStyleSwitch.h"
 #include "vtkKWApplication.h"
-#include "vtkKWGenericRenderWindowInteractor.h"
+#include "vtkGenericRenderWindowInteractor.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWWindow.h"
 #include "vtkPolyDataMapper.h"

@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.102");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.103");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -306,7 +306,9 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app)
   this->Script("grid %s -row 0 -column 0 -sticky nsew", 
                this->VTKWidget->GetWidgetName());
   
-  this->RenderWindow->Render();
+  // When the render window is created by the Tk render widget, it
+  // is Render()'ed, which calls Initialize() on the interactor, which
+  // always reset its Enable state.
 
   // Make the corner annotation visibile
 

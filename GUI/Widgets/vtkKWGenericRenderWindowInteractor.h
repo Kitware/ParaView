@@ -38,16 +38,19 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the renderwidget associate to this interactor.
+  // Set the renderwidget associated to this interactor.
+  // It is used to override the Render() method and allow the interactor styles
+  // to communicate with the vtkKWRenderWidget (and subclasses) instance.
   virtual void SetRenderWidget(vtkKWRenderWidget *widget);
   vtkGetObjectMacro(RenderWidget, vtkKWRenderWidget);
   
   // Description:
-  // Manually set the last even position
-  vtkSetVector2Macro(LastEventPosition, int);
-  
-  // Description:
-  // Override Render to render through the widget
+  // Override Render to render through the widget. 
+  // The superclass would call vtkRenderWindow::Render(). We want the
+  // vtkKWRenderWidget::Render() method to be called instead. Depending
+  // on its RenderMode (interactive, still, print) and various flag it
+  // will perform some tests and ultimately called vtkRenderWindow::Render()
+  // if needed.
   virtual void Render();
   
 protected:
