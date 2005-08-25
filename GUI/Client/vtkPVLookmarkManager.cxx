@@ -55,7 +55,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.67");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.68");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -511,7 +511,7 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   vtkXMLDataParser *parser;
   vtkXMLDataElement *root;
   int retval;
-  char msg[500];
+  ostrstream msg;
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
     {
@@ -528,8 +528,9 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   ifstream infile(path);
   if ( infile.fail())
     {
-    sprintf(msg,"Error opening LookmarkMacros file in %s.",path);
-    this->GetPVWindow()->ErrorMessage(msg);
+    //msg << "Error opening LookmarkMacros file in " << path << ends;
+    //this->GetPVWindow()->ErrorMessage(msg.str());
+    //msg.rdbuf()->freeze(0);
     return;
     }
 
@@ -539,8 +540,9 @@ void vtkPVLookmarkManager::ImportMacroExamplesCallback()
   retval = parser->Parse();
   if(retval==0)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",path);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << path << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     return;
     } 
@@ -1124,16 +1126,14 @@ void vtkPVLookmarkManager::Import(const char *filename, int appendFlag)
   vtkXMLDataElement *root;
   vtkPVLookmark *lookmarkWidget;
   int retval;
-  char msg[500];
+  ostrstream msg;
 
   ifstream infile(filename);
   if ( infile.fail())
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
+    //msg << "Could not open lookmark file " << filename << ends;
+    //this->GetPVWindow()->ErrorMessage(msg.str());
+    //msg.rdbuf()->freeze(0);
 
     return;
     }
@@ -1153,8 +1153,9 @@ void vtkPVLookmarkManager::Import(const char *filename, int appendFlag)
   retval = parser->Parse();
   if(retval==0)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     return;
     }
@@ -1165,8 +1166,9 @@ void vtkPVLookmarkManager::Import(const char *filename, int appendFlag)
 
   if(!root)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     return;
     }
@@ -1571,6 +1573,8 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
         newLmkFolder->GetLabelFrame()->GetFrame());
       }
 
+    this->PackChildrenBasedOnLocation(newLmkFolder->GetLabelFrame()->GetFrame());
+
     // delete the source folder
     this->RemoveItemAsDragAndDropTarget(lmkFolder);
     this->Script("destroy %s", lmkFolder->GetWidgetName());
@@ -1739,7 +1743,7 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
  
   if(elem->GetAttribute("Name"))
     {
-    char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1]; 
+    char *lookmarkName = new char[strlen(elem->GetAttribute("Name"))+1];
     strcpy(lookmarkName,elem->GetAttribute("Name"));
     lmk->SetName(lookmarkName);
     delete [] lookmarkName;
@@ -1771,7 +1775,7 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
     lmk->CreateDatasetList();
     delete [] lookmarkDataset;
     }
- 
+
   if(elem->GetAttribute("ImageData"))
     {
     char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
@@ -2175,7 +2179,7 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
   vtkXMLLookmarkElement *root;
   vtkXMLDataParser *parser;
   int retval;
-  char msg[500];
+  ostrstream msg;
 
   if(this->GetPVApplication()->GetGUIClientOptions()->GetDisableRegistry())
     {
@@ -2186,21 +2190,17 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
   outfile = new ofstream(filename,ios::trunc);
   if ( !outfile )
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     delete outfile;
     return;
     }
   if ( outfile->fail())
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     delete outfile;
     return;
     }
@@ -2212,21 +2212,16 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
   infile = new ifstream(filename);
   if ( !infile )
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
-    delete infile;
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     return;
     }
   if ( infile->fail())
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     delete infile;
     return;
     }
@@ -2236,8 +2231,9 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
   retval = parser->Parse();
   if(retval==0)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     delete infile;
     return;
@@ -2247,8 +2243,9 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
 
   if(!root)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     delete infile;
     return;
@@ -2260,21 +2257,18 @@ void vtkPVLookmarkManager::SaveAll(const char *filename)
   outfile = new ofstream(filename,ios::trunc);
   if ( !outfile )
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
-    this->Focus();
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     delete infile;
     delete outfile;
     return;
     }
   if ( outfile->fail())
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetPVApplication(), this->GetPVWindow(), "Could Not Open Lookmark File", 
-      "File might have been moved, deleted, or its permissions changed.", 
-      vtkKWMessageDialog::ErrorIcon);
+    msg << "Could not open lookmark file " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     this->Focus();
     delete infile;
     delete outfile;
@@ -2297,7 +2291,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
   vtkXMLLookmarkElement *root;
   vtkXMLDataParser *parser;
   int retval;
-  char msg[500];
+  ostrstream msg;
   
   // write out an empty lookmark file so that the parser will not complain
   outfile = new ofstream(filename,ios::trunc);
@@ -2352,8 +2346,9 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
   retval = parser->Parse();
   if(retval==0)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     delete infile;
     delete outfile;
@@ -2364,8 +2359,9 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
 
   if(!root)
     {
-    sprintf(msg,"Error parsing lookmark file in %s.",filename);
-    this->GetPVWindow()->ErrorMessage(msg);
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
     parser->Delete();
     delete infile;
     delete outfile;

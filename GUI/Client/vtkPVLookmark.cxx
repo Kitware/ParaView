@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.59");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.60");
 
 
 //*****************************************************************************
@@ -231,7 +231,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
   vtkPVSource *pvs2 = NULL;
   vtkPVSource *source = NULL;
   int i = 0;
-  char mesg[400];
+  ostrstream mesg;
 
   // check if this lookmark has a single source of the same module type first
   while(this->DatasetList[i]){ i++; }
@@ -280,8 +280,9 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
     {
     menu->SetValue(pvs2->GetModuleName());
     }
-  sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
-  dialog->SetText( mesg );
+  mesg << "Multiple open sources match the data type of the file path \"" << name << "\" stored with this lookmark. Please select which source to use, then press OK." << ends;
+  dialog->SetText( mesg.str() );
+  mesg.rdbuf()->freeze(0);
   dialog->SetTitle( "Multiple Matching Sources" );
   dialog->SetIcon();
   dialog->BeepOn();
@@ -347,7 +348,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, ch
   vtkPVSource *pvs2;
   vtkPVSource *source = NULL;
   vtkPVReaderModule *mod = NULL;
-  char mesg[400];
+  ostrstream mesg;
   const char *defaultValue = NULL;
 
   // check if this lookmark has a single source first
@@ -410,8 +411,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, ch
     {
     menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
     }
-  sprintf(mesg,"Multiple open sources match the data type of the file path \"%s\" stored with this lookmark. Please select which source to use, then press OK.",name);
-  dialog->SetText( mesg );
+  mesg << "Multiple open sources match the data type of the file path \"" << name << "\" stored with this lookmark. Please select which source to use, then press OK." << ends;
+  dialog->SetText( mesg.str() );
+  mesg.rdbuf()->freeze(0);
   dialog->SetTitle( "Multiple Matching Sources" );
   dialog->SetIcon();
   dialog->BeepOn();
@@ -447,7 +449,7 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
   vtkPVSource *currentSource = win->GetCurrentPVSource();
   char *targetName;
   vtkPVReaderModule *mod = NULL;
-  char mesg[400];
+  ostrstream mesg;
   const char *defaultValue = NULL;
 
   // If there is an open dataset of the same type and path, use it
@@ -524,8 +526,9 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
         {
         menu->SetValue(mod->RemovePath(mod->GetFileEntry()->GetValue()));
         }
-      sprintf(mesg,"The dataset stored with this lookmark could not be located at %s. Either select an open one from the drop down menu or an unopen one by pressing \"Open\".",name);
-      dialog->SetText( mesg );
+      mesg << "The dataset stored with this lookmark could not be located at " << name << ". Either select an open one from the drop down menu or an unopen one by pressing \"Open\"." << ends;
+      dialog->SetText( mesg.str() );
+      mesg.rdbuf()->freeze(0);
       dialog->SetTitle( "Could Not Find Default Data Set" );
       dialog->SetIcon();
       dialog->BeepOn();
