@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.12");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
@@ -159,6 +159,7 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app)
     "<Return>", this, "SetGhostLevel 2");
 }
 
+//----------------------------------------------------------------------------
 int vtkPVGhostLevelDialog::Invoke()
 {
   this->SelButton1->Focus();
@@ -168,8 +169,6 @@ int vtkPVGhostLevelDialog::Invoke()
 //----------------------------------------------------------------------------
 void vtkPVGhostLevelDialog::SetGhostLevel(int level)
 {
-  this->Withdraw();
-  this->ReleaseGrab();
   this->GhostLevel = level;  
   this->Done = 2;  
 }
