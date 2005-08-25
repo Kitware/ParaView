@@ -39,7 +39,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.48");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -545,9 +545,12 @@ void vtkKWApplicationSettingsInterface::Update()
 
   // Interface customization : Drag & Drop : Enable
 
-  vtkKWUserInterfaceManagerNotebook *uim_nb = 
-    vtkKWUserInterfaceManagerNotebook::SafeDownCast(
+  vtkKWUserInterfaceManagerNotebook *uim_nb = NULL;
+  if (this->Window->HasMainUserInterfaceManager())
+    {
+    uim_nb = vtkKWUserInterfaceManagerNotebook::SafeDownCast(
       this->Window->GetMainUserInterfaceManager());
+    }
   if (!uim_nb)
     {
     this->ResetDragAndDropButton->SetEnabled(0);
@@ -680,12 +683,15 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
         "start this application.",
         vtkKWMessageDialog::WarningIcon);
 
-  vtkKWUserInterfaceManagerNotebook *uim_nb = 
-    vtkKWUserInterfaceManagerNotebook::SafeDownCast(
-      this->Window->GetMainUserInterfaceManager());
-  if (uim_nb)
+  if (this->Window->HasMainUserInterfaceManager())
     {
-    uim_nb->DeleteAllDragAndDropEntries();
+    vtkKWUserInterfaceManagerNotebook *uim_nb = 
+      vtkKWUserInterfaceManagerNotebook::SafeDownCast(
+        this->Window->GetMainUserInterfaceManager());
+    if (uim_nb)
+      {
+      uim_nb->DeleteAllDragAndDropEntries();
+      }
     }
 }
 

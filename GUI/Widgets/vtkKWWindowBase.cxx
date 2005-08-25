@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.34");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.35");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -526,7 +526,7 @@ void vtkKWWindowBase::Pack()
   // Take care of placing the progress gauge and the tray frame in
   // a toolbar, if this is how they have been set
 
-  if (this->GetMainToolbarSet())
+  if (this->MainToolbarSet)
     {
     int need_progress_in = 
       (this->ProgressGauge && 
@@ -552,7 +552,7 @@ void vtkKWWindowBase::Pack()
       if (!this->StatusToolbar->IsCreated() && this->IsCreated())
         {
         this->StatusToolbar->SetParent(
-          this->GetMainToolbarSet()->GetToolbarsFrame());
+          this->MainToolbarSet->GetToolbarsFrame());
         this->StatusToolbar->Create(this->GetApplication());
         }
       }
@@ -605,13 +605,13 @@ void vtkKWWindowBase::Pack()
       // too much with the regular ones
 
       int has_toolbar = 
-        this->GetMainToolbarSet()->HasToolbar(this->StatusToolbar);
+        this->MainToolbarSet->HasToolbar(this->StatusToolbar);
       if (this->StatusToolbar->GetNumberOfWidgets())
         {
         if (!has_toolbar)
           {
-          this->GetMainToolbarSet()->AddToolbar(this->StatusToolbar);
-          this->GetMainToolbarSet()->SetToolbarAnchorToEast(
+          this->MainToolbarSet->AddToolbar(this->StatusToolbar);
+          this->MainToolbarSet->SetToolbarAnchorToEast(
             this->StatusToolbar);
           }
         }
@@ -619,7 +619,7 @@ void vtkKWWindowBase::Pack()
         {
         if (has_toolbar)
           {
-          this->GetMainToolbarSet()->RemoveToolbar(this->StatusToolbar);
+          this->MainToolbarSet->RemoveToolbar(this->StatusToolbar);
           }
         }
       }
@@ -984,8 +984,11 @@ void vtkKWWindowBase::AddRecentFile(const char *name,
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
 {
-  this->MainToolbarSet->PopulateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
+  if (this->MainToolbarSet)
+    {
+    this->MainToolbarSet->PopulateToolbarsVisibilityMenu(
+      this->GetToolbarsVisibilityMenu());
+    }
 
   this->UpdateToolbarState();
 }
@@ -993,8 +996,11 @@ void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWWindowBase::ToolbarVisibilityChangedCallback()
 {
-  this->MainToolbarSet->UpdateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
+  if (this->MainToolbarSet)
+    {
+    this->MainToolbarSet->UpdateToolbarsVisibilityMenu(
+      this->GetToolbarsVisibilityMenu());
+    }
 
   this->UpdateToolbarState();
 }

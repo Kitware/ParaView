@@ -176,7 +176,8 @@ public:
   virtual int GetMainPanelVisibility();
   virtual void SetMainPanelVisibility(int);
   vtkBooleanMacro(MainPanelVisibility, int );
-  vtkGetObjectMacro(MainNotebook, vtkKWNotebook);
+  virtual vtkKWNotebook* GetMainNotebook();
+  virtual int HasMainUserInterfaceManager();
   virtual vtkKWUserInterfaceManager* GetMainUserInterfaceManager();
   virtual void ShowMainUserInterface(const char *name);
 
@@ -188,7 +189,8 @@ public:
   virtual int GetSecondaryPanelVisibility();
   virtual void SetSecondaryPanelVisibility(int);
   vtkBooleanMacro(SecondaryPanelVisibility, int );
-  vtkGetObjectMacro(SecondaryNotebook, vtkKWNotebook);
+  virtual vtkKWNotebook* GetSecondaryNotebook();
+  virtual int HasSecondaryUserInterfaceManager();
   virtual vtkKWUserInterfaceManager* GetSecondaryUserInterfaceManager();
   virtual void ShowSecondaryUserInterface(const char *name);
 
@@ -257,14 +259,15 @@ public:
   // GetViewFrame(). The GetViewPanelFrame() method returns the parent of
   // the notebook, if one really need to pack something out of the 
   // GetViewFrame().
-  vtkGetObjectMacro(ViewNotebook, vtkKWNotebook);
+  virtual vtkKWNotebook* GetViewNotebook();
+  virtual int HasViewUserInterfaceManager();
   virtual vtkKWUserInterfaceManager* GetViewUserInterfaceManager();
   virtual void ShowViewUserInterface(const char *name);
   virtual vtkKWFrame* GetViewPanelFrame();
 
   // Description:
   // Get the secondary toolbar set.
-  vtkGetObjectMacro(SecondaryToolbarSet, vtkKWToolbarSet);
+  virtual vtkKWToolbarSet* GetSecondaryToolbarSet();
 
   // Description:
   // Set the status frame position. The default position is at the
@@ -388,24 +391,25 @@ protected:
   int PanelLayout;
 
   vtkKWSplitFrame *MainSplitFrame;
-  vtkKWNotebook   *MainNotebook;
 
   vtkKWSplitFrame *SecondarySplitFrame;
-  vtkKWNotebook   *SecondaryNotebook;
-
-  vtkKWNotebook *ViewNotebook;
 
   vtkKWApplicationSettingsInterface *ApplicationSettingsInterface;
-
-  vtkKWToolbarSet *SecondaryToolbarSet;
 
   int             StatusFramePosition;
 
 private:
 
+  vtkKWNotebook   *MainNotebook;
+  vtkKWNotebook   *SecondaryNotebook;
+  vtkKWNotebook   *ViewNotebook;
+
+  vtkKWToolbarSet *SecondaryToolbarSet;
+
   vtkKWUserInterfaceManagerNotebook *MainUserInterfaceManager;
   vtkKWUserInterfaceManagerNotebook *SecondaryUserInterfaceManager;
   vtkKWUserInterfaceManagerNotebook *ViewUserInterfaceManager;
+
   vtkKWUserInterfaceManagerDialog *ApplicationSettingsUserInterfaceManager;
 
   vtkKWWindow(const vtkKWWindow&); // Not implemented
