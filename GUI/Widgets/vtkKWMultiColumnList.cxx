@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.21");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -127,10 +127,24 @@ int vtkKWMultiColumnList::AddColumn(const char *title)
 {
   if (this->IsCreated() && title)
     {
+    int nb_columns = this->GetNumberOfColumns();
     this->Script("%s insertcolumns end 0 {%s}", this->GetWidgetName(), title);
+    if (this->GetNumberOfColumns() != nb_columns)
+      {
+      this->NumberOfColumnsChanged();
+      }
     return this->GetNumberOfColumns() - 1;
     }
   return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::NumberOfColumnsChanged()
+{
+  // Changing the number of columns can potentially affect the selection
+  // Check for that
+
+  this->SelectionChangedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -161,8 +175,13 @@ void vtkKWMultiColumnList::DeleteColumn(int col_index)
 {
   if (this->IsCreated())
     {
+    int nb_columns = this->GetNumberOfColumns();
     this->Script("%s deletecolumns %d %d", 
                  this->GetWidgetName(), col_index, col_index);
+    if (this->GetNumberOfColumns() != nb_columns)
+      {
+      this->NumberOfColumnsChanged();
+      }
     }
 }
 
@@ -171,7 +190,12 @@ void vtkKWMultiColumnList::DeleteAllColumns()
 {
   if (this->IsCreated())
     {
+    int nb_columns = this->GetNumberOfColumns();
     this->Script("%s deletecolumns 0 end", this->GetWidgetName());
+    if (this->GetNumberOfColumns() != nb_columns)
+      {
+      this->NumberOfColumnsChanged();
+      }
     }
 }
 
@@ -885,10 +909,15 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::NumberOfRowsChanged()
 {
+  // Changing the number of columns can potentially affect the selection
+  // Check for that
+
+  this->SelectionChangedCallback();
+
   // Trigger this because inserting/removing rows can change the background
   // color of a row (given the stripes, or the specific row colors, etc.)
 
-    this->InvokePotentialCellBackgroundColorChangedCommand();
+  this->InvokePotentialCellBackgroundColorChangedCommand();
 }
 
 //----------------------------------------------------------------------------

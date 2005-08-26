@@ -859,8 +859,9 @@ protected:
   virtual void InvokePotentialCellBackgroundColorChangedCommand();
 
   // Description:
-  // Called when the number of rows changed
+  // Called when the number of rows/columns changed
   virtual void NumberOfRowsChanged();
+  virtual void NumberOfColumnsChanged();
 
   // Description:
   // Set/Get a column configuration option (ex: "-bg") 
