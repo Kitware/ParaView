@@ -32,15 +32,16 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkStdString.h"
+#include "vtkKWPushButton.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.32");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
 {
-  this->Icon= vtkKWLabel::New();
+  this->Icon= vtkKWPushButton::New();
   this->Checkbox= vtkKWCheckButton::New();
   this->LeftFrame= vtkKWFrame::New();
   this->RightFrame= vtkKWFrame::New();
@@ -187,9 +188,6 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->Checkbox->Create(app);
   this->Checkbox->SetSelectedState(0);
 
-  this->GetDragAndDropTargetSet()->SetSourceAnchor(
-    this->MainFrame->GetLabel());
-
   this->SeparatorFrame->SetParent(this);
   this->SeparatorFrame->Create(app);
 
@@ -198,12 +196,17 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->RightFrame->SetParent(this->MainFrame->GetFrame());
   this->RightFrame->Create(app);
-
+/*
   this->Icon->SetParent(this->LeftFrame);
   this->Icon->Create(app);
   this->Icon->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
                this->Icon->GetWidgetName());
+*/
+  this->Icon->SetParent(this->LeftFrame);
+  this->Icon->Create(app);
+
+  this->GetDragAndDropTargetSet()->SetSourceAnchor(this->Icon);
 
   int rw, rh, padx, pady, bd;
   this->Script("concat [winfo reqwidth %s] [winfo reqheight %s] "
@@ -288,63 +291,6 @@ void vtkKWLookmark::CommentsModifiedCallback()
   this->CommentsFrame->SetLabelText(str);
 }
 
-void vtkKWLookmark::UpdateWidgetValues()
-{
-  // Use variable values to initialize widgets
-
-  this->CommentsText->SetText(this->Comments);
-  this->MainFrame->SetLabelText(this->Name);
-
-  if(this->MainFrameCollapsedState)
-    {
-    this->MainFrame->CollapseFrame();
-    }
-  else
-    {
-    this->MainFrame->ExpandFrame();
-    }
-
-  if(this->CommentsFrameCollapsedState)
-    {
-    this->CommentsFrame->CollapseFrame();
-    }
-  else
-    {
-    this->CommentsFrame->ExpandFrame();
-    }
-
-  int i=0;
-  char *ptr;
-  vtkStdString datasetLabel = "Sources: ";
-  while(this->DatasetList[i])
-    {
-    if(strstr(this->DatasetList[i],"/") && !strstr(this->DatasetList[i],"\\"))
-      {
-      ptr = this->DatasetList[i];
-      ptr+=strlen(ptr)-1;
-      while(*ptr!='/' && *ptr!='\\')
-        ptr--;
-      ptr++;
-      datasetLabel.append(ptr);
-      datasetLabel.append(", ");
-      }
-    else
-      {
-      datasetLabel.append(this->DatasetList[i]);
-      datasetLabel.append(", ");
-      }
-    i++;
-    }
-  
-  vtkstd::string::size_type ret = datasetLabel.find_last_of(',',datasetLabel.size());
-  if(ret != vtkstd::string::npos)
-    {
-    datasetLabel.erase(ret);
-    }
-
-  this->DatasetLabel->SetText(datasetLabel.c_str());
-
-}
 
 void vtkKWLookmark::CreateDatasetList()
 {
@@ -391,6 +337,15 @@ void vtkKWLookmark::UpdateVariableValues()
   this->SetName(this->MainFrame->GetLabel()->GetText());
   this->SetMainFrameCollapsedState(this->MainFrame->IsFrameCollapsed());
   this->SetCommentsFrameCollapsedState(this->CommentsFrame->IsFrameCollapsed());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLookmark::SetIcon(vtkKWIcon *icon)
+{
+  if(this->Icon)
+    {
+    this->Icon->SetImageToIcon(icon);
+    }
 }
 
 

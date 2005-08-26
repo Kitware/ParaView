@@ -37,7 +37,7 @@ class vtkKWLabel;
 class vtkKWFrameWithLabel;
 class vtkKWCheckButton;
 class vtkKWText;
-
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkKWLookmark : public vtkKWCompositeWidget
 {
@@ -103,7 +103,6 @@ public:
   // Description:
   // Update the widget based on either its widget values or its variable values
   void UpdateVariableValues();
-  void UpdateWidgetValues();
 
   vtkSetMacro(MacroFlag,int);
   vtkGetMacro(MacroFlag,int);
@@ -120,6 +119,10 @@ public:
   vtkSetMacro(Height,int);
   vtkGetMacro(Height,int);
 
+  // Description:
+  // Uses the vtkKWIcon to initialize the lookmark's Icon
+  void SetIcon(vtkKWIcon *icon);
+
   virtual void UpdateEnableState();
 
 protected:
@@ -134,7 +137,7 @@ protected:
   vtkKWFrameWithLabel *CommentsFrame;
   vtkKWLabel *DatasetLabel;
   vtkKWFrame *DatasetFrame;
-  vtkKWLabel *Icon;
+  vtkKWPushButton *Icon;
   vtkKWText *CommentsText;
   vtkKWText *NameField;
   vtkKWFrame *SeparatorFrame;

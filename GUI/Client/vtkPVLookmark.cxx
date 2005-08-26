@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.60");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.61");
 
 
 //*****************************************************************************
@@ -128,6 +128,8 @@ vtkPVLookmark::vtkPVLookmark()
   this->Observer = vtkPVLookmarkObserver::New();
   this->Observer->SetLookmark(this);
   this->ErrorEventTag = 0;
+  this->ReleaseEventFlag = 0;
+  this->Version = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -193,6 +195,12 @@ void vtkPVLookmark::View()
 {
   vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
+
+  if(this->ReleaseEventFlag == 0)
+    {
+    // widget is being dragged so don't execute
+    return; 
+    }
 
   this->UnsetLookmarkIconCommand();
 
@@ -629,7 +637,7 @@ void vtkPVLookmark::CreateIconFromMainView()
     }
   this->GetPVRenderView()->ForceRender();
   this->GetPVLookmarkManager()->Display();
-  this->SetLookmarkImage(lmkIcon);
+  this->SetIcon(lmkIcon);
 
   this->SetImageData(this->GetEncodedImageData(lmkIcon));
   this->SetLookmarkIconCommand();
@@ -642,30 +650,6 @@ void vtkPVLookmark::CreateIconFromMainView()
   lmkIcon->Delete();
 }
 
-void vtkPVLookmark::CreateIconFromImageData()
-{
-  if(!this->ImageData)
-    {
-    return;
-    }
-  unsigned long imageSize = this->Width*this->Height*this->PixelSize;
-  unsigned char *decodedImageData = new unsigned char[imageSize];
-  vtkBase64Utilities *decoder = vtkBase64Utilities::New();
-  decoder->Decode((unsigned char*)this->ImageData,imageSize,decodedImageData);
-  vtkKWIcon *icon = vtkKWIcon::New();
-  icon->SetImage(decodedImageData,this->Width,this->Height,this->PixelSize,imageSize);
-  this->SetLookmarkImage(icon);
-  this->SetLookmarkIconCommand();
-
-  if(this->MacroFlag)
-    {
-    this->AddLookmarkToolbarButton(icon);
-    }
-
-  delete [] decodedImageData;
-  decoder->Delete();
-  icon->Delete();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
@@ -682,9 +666,96 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     os << this->GetName() << " -- " << this->CommentsText->GetText() << ends;
     this->ToolbarButton->SetBalloonHelpString(os.str());
     os.rdbuf()->freeze(0);
-    this->ToolbarButton->SetCommand(this, "ViewLookmarkWithCurrentDataset");
+    this->ToolbarButton->SetCommand(this, "ViewMacro");
     win->GetLookmarkToolbar()->AddWidget(this->ToolbarButton);
     }
+}
+
+
+void vtkPVLookmark::UpdateWidgetValues()
+{
+  int i=0;
+  char *ptr;
+  vtkStdString datasetLabel = "Sources: ";
+
+  // Comments:
+  this->CommentsText->SetText(this->Comments);
+  this->CommentsModifiedCallback();
+
+  // Name:
+  this->MainFrame->SetLabelText(this->Name);
+
+  // Collapsed state of main frame and comments frame:
+  if(this->MainFrameCollapsedState)
+    {
+    this->MainFrame->CollapseFrame();
+    }
+  else
+    {
+    this->MainFrame->ExpandFrame();
+    }
+
+  if(this->CommentsFrameCollapsedState)
+    {
+    this->CommentsFrame->CollapseFrame();
+    }
+  else
+    {
+    this->CommentsFrame->ExpandFrame();
+    }
+
+  // Dataset:
+  this->CreateDatasetList();
+  while(this->DatasetList[i])
+    {
+    if(strstr(this->DatasetList[i],"/") && !strstr(this->DatasetList[i],"\\"))
+      {
+      ptr = this->DatasetList[i];
+      ptr+=strlen(ptr)-1;
+      while(*ptr!='/' && *ptr!='\\')
+        ptr--;
+      ptr++;
+      datasetLabel.append(ptr);
+      datasetLabel.append(", ");
+      }
+    else
+      {
+      datasetLabel.append(this->DatasetList[i]);
+      datasetLabel.append(", ");
+      }
+    i++;
+    }
+  
+  vtkstd::string::size_type ret = datasetLabel.find_last_of(',',datasetLabel.size());
+  if(ret != vtkstd::string::npos)
+    {
+    datasetLabel.erase(ret);
+    }
+
+  this->DatasetLabel->SetText(datasetLabel.c_str());
+
+  // Icon:
+  if(!this->ImageData)
+    {
+    return;
+    }
+  unsigned long imageSize = this->Width*this->Height*this->PixelSize;
+  unsigned char *decodedImageData = new unsigned char[imageSize];
+  vtkBase64Utilities *decoder = vtkBase64Utilities::New();
+  decoder->Decode((unsigned char*)this->ImageData,imageSize,decodedImageData);
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(decodedImageData,this->Width,this->Height,this->PixelSize,imageSize);
+  this->SetIcon(icon);
+  this->SetLookmarkIconCommand();
+
+  if(this->MacroFlag)
+    {
+    this->AddLookmarkToolbarButton(icon);
+    }
+
+  delete [] decodedImageData;
+  decoder->Delete();
+  icon->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -758,9 +829,15 @@ void vtkPVLookmark::StoreStateScript()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
+void vtkPVLookmark::ViewMacro()
 {
   vtkPVWindow *win = this->GetPVWindow();
+
+  if(this->ReleaseEventFlag == 0)
+    {
+    // widget is being dragged so don't execute
+    return; 
+    }
 
   // if the pipeline is empty fail
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
@@ -782,7 +859,7 @@ void vtkPVLookmark::ViewLookmarkWithCurrentDataset()
   camera->SetPosition(cam->GetPosition());
   camera->SetViewUp(cam->GetViewUp());
 
-  this->GetTraceHelper()->AddEntry("$kw(%s) ViewLookmarkWithCurrentDataset",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ViewMacro",
                       this->GetTclName());
 
   if(!this->ErrorEventTag)
@@ -986,10 +1063,7 @@ void vtkPVLookmark::Update()
     }
   this->CreateIconFromMainView();
   this->UpdateWidgetValues();
-
 }
-
-
 
 //----------------------------------------------------------------------------
 vtkKWIcon *vtkPVLookmark::GetIconOfRenderWindow(vtkRenderWindow *renderWindow)
@@ -1085,32 +1159,71 @@ void vtkPVLookmark::SetLookmarkIconCommand()
 {
   if(this->MacroFlag)
     {
-    this->Icon->SetBinding(
-      "<Button-1>", this, "ViewLookmarkWithCurrentDataset");
-    this->Icon->SetBinding(
-      "<Double-1>", this, "ViewLookmarkWithCurrentDataset");
+    this->Icon->AddBinding("<Button-1>", this, "PreViewMacro");
+//    this->Icon->AddBinding("<Double-1>", this, "PreViewMacro");
     }
   else
     {
-    this->Icon->SetBinding("<Button-1>", this, "View");
-    this->Icon->SetBinding("<Double-1>", this, "View");
+    this->Icon->AddBinding("<Button-1>", this, "PreView");
+//    this->Icon->AddBinding("<Double-1>", this, "PreView");
     }
+
+  this->Icon->AddBinding("<ButtonRelease-1>", this, "ReleaseEvent");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::UnsetLookmarkIconCommand()
 {
   this->Icon->RemoveBinding("<Button-1>");
-  this->Icon->RemoveBinding("<Double-1>");
+//  this->Icon->RemoveBinding("<Double-1>");
+  this->Icon->RemoveBinding("<ButtonRelease-1>");
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmark::SetLookmarkImage(vtkKWIcon *icon)
+void vtkPVLookmark::PreView()
 {
-  if(this->Icon)
+  this->ReleaseEventFlag = 0;
+  this->Script("after 600 {catch {%s View}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::PreViewMacro()
+{
+  this->ReleaseEventFlag = 0;
+  this->Script("after 600 {catch {%s ViewMacro}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::ReleaseEvent()
+{
+  this->ReleaseEventFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmark::Clone(vtkPVLookmark *&clone)
+{
+  ostrstream s;
+  vtkPVLookmark *lmk = this->NewInstance();
+  lmk->SetMacroFlag(this->GetMacroFlag());
+  lmk->GetTraceHelper()->SetReferenceHelper(this->GetPVLookmarkManager()->GetTraceHelper());
+  lmk->SetName(this->GetName());
+  lmk->SetVersion(this->GetVersion());
+  if(lmk->GetName())
     {
-    this->Icon->SetImageToIcon(icon);
+    s << "GetPVLookmark \"" << lmk->GetName() << "\"" << ends;
+    lmk->GetTraceHelper()->SetReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
     }
+  lmk->SetDataset(this->GetDataset());
+    lmk->SetComments(this->GetComments());
+  lmk->SetMainFrameCollapsedState(this->GetMainFrameCollapsedState());
+  lmk->SetCommentsFrameCollapsedState(this->GetCommentsFrameCollapsedState());
+  lmk->SetImageData(this->GetImageData());
+  lmk->SetPixelSize(this->GetPixelSize());
+  lmk->SetStateScript(this->GetStateScript());
+  lmk->SetLocation(this->GetLocation());
+
+  clone = lmk;
 }
 
 //----------------------------------------------------------------------------

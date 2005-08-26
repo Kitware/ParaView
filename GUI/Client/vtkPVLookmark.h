@@ -62,12 +62,20 @@ public:
   // to them. The reader is initialized using the attributes in the lookmark's state script. The rest of the
   // script is then executed.
   void View();
+  void PreView();
 
   // Description: 
   // This is called when the user clicks on a macro's thumbnail. 
   // It uses the stored script to initialize the currently selected dataset, maintaining
   // the current camera view and timestep. 
-  void ViewLookmarkWithCurrentDataset();
+  void ViewMacro();
+  void PreViewMacro();
+
+  void ReleaseEvent();
+
+  // Description:
+  // Initialize this pvlookmark using the ivars of the the one being passed
+  void Clone(vtkPVLookmark*& lmk);
 
   // Description:
   // Updates the lookmark's icon and state while maintaining any existing name, comments, etc.
@@ -77,9 +85,9 @@ public:
   // Converts the image in the render window to a vtkKWIcon stored with the lookmark - called when lookmark is first being created or updated
   void CreateIconFromMainView();
 
-  // Description:
-  // Use the ImageData to set up the lookmark's icon - called when lookmark is being imported into manager
-  void CreateIconFromImageData();
+  // Description: 
+  // Use ivars to update widgets
+  void UpdateWidgetValues();
 
   // Description:
   // Called when lookmark is being created or updated. 
@@ -94,6 +102,11 @@ public:
   // for the vtkPVSources that 'contribute' to the view, meaning visible 'leaf' node filters and any visible or nonvisible sources between it and the reader.
   vtkGetStringMacro(StateScript);
   vtkSetStringMacro(StateScript);
+
+  // Description:
+  // Store the paraview application version with lookmark to support backwards compatability in the future
+  vtkGetStringMacro(Version);
+  vtkSetStringMacro(Version);
  
   // Description:
   // This is the raw base64 encoded image data that makes up the thumbnail
@@ -168,10 +181,6 @@ protected:
   // performs a base64 encoding on the raw image data of the kwicon
   char *GetEncodedImageData(vtkKWIcon *lmkIcon);
 
-  // Description:
-  // Assigns the vtkKWIcon to the lookmark's vtkKWLabel
-  void SetLookmarkImage(vtkKWIcon *icon);
-
   // Description: 
   // This is used to make sure the user cannot click on a lookmark at certain times
   void SetLookmarkIconCommand();
@@ -193,12 +202,14 @@ protected:
   vtkPVSource *GetSourceForLookmark(vtkPVSourceCollection *col,char *sourcename);
   vtkPVSource *GetSourceForMacro(vtkPVSourceCollection *col,char *sourcename);
 
+  char *Version;
   char* StateScript;
   char* ImageData;
   float* CenterOfRotation;
   vtkPVSourceCollection* Sources;
   int Location;
   unsigned long ErrorEventTag;
+  int ReleaseEventFlag;
 
   vtkPVTraceHelper* TraceHelper;
 
