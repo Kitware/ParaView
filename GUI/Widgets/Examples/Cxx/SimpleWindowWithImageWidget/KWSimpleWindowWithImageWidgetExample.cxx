@@ -182,6 +182,7 @@ int my_main(int argc, char *argv[])
   mb->AddRadioButton("Y-Z", viewer, "SetSliceOrientationToYZ ; update_scale");
   mb->SetValue("X-Y");
 
+  win->MainPanelVisibilityOn();
 #else
   win->MainPanelVisibilityOff();
 #endif
