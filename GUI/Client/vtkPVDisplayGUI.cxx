@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.48");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.49");
 
 //----------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ public:
     { 
       if (   !this->DisplayGUI
           || !this->DisplayGUI->VolumeRenderMode
-          || !this->DisplayGUI->PVSource->GetDisplayProxy() )
+          || !(this->DisplayGUI->PVSource && this->DisplayGUI->PVSource->GetDisplayProxy()))
         {
         return;
         }
