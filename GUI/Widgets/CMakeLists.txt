@@ -180,6 +180,7 @@ SET(KWWidgets_SRCS
   vtkKWWidgetWithSpinButtons.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
+  vtkKWWindowLevelPresetSelector.cxx 
 )
 
 SET(KWWidgets_Utils_SRCS
