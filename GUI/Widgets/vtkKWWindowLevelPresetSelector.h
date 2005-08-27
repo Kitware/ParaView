@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkKWWindowLevelPresetSelectorInternals;
 class vtkKWMultiColumnListWithScrollbars;
 class vtkKWPushButtonSet;
+class vtkImageData;
 
 class KWWIDGETS_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWCompositeWidget
 {
@@ -129,6 +130,26 @@ public:
   vtkBooleanMacro(ImageColumnVisibility, int);
 
   // Description:
+  // Assign an image to a preset in the pool.
+  // It will be used to generate both a thumbnail view of the
+  // preset and a popup mini-screenshot.
+  virtual int SetWindowLevelPresetImage(int id, vtkImageData *img);
+  virtual int HasWindowLevelPresetImage(int id);
+
+  // Description:
+  // Set/Get the thumbnail size.
+  // Changing the size will not resize the current thumbnails, but will
+  // affect the presets inserted later on.
+  vtkSetClampMacro(ThumbnailSize,int,8,512);
+  vtkGetMacro(ThumbnailSize,int);
+
+  // Description:
+  // Set/Get the screenshot size (i.e. the image that appears as
+  // a popup when the mouse is on top of the thumbnail).
+  vtkSetClampMacro(ScreenshotSize,int,8,2048);
+  vtkGetMacro(ScreenshotSize,int);
+
+  // Description:
   // Specifies a command to be invoked when the "add" button is pressed.
   // This is used by the application to actually check which window/level
   // is used on whichever dataset is loaded or selected, and call back
@@ -180,6 +201,9 @@ protected:
 
   vtkKWMultiColumnListWithScrollbars *PresetList;
   vtkKWPushButtonSet                 *PresetButtons;
+
+  int ThumbnailSize;
+  int ScreenshotSize;
 
   // Description:
   // Called when the number of presets has changed

@@ -612,13 +612,6 @@ public:
   virtual void CancelEditing();
 
   // Description:
-  // If invoked from within EditEndCommand, then this method prevents the
-  // termination of the interactive editing of the contents of a cell.  It
-  // enables you to reject the widget's text during the final validation of the
-  // string intended to become the new cell contents.
-  virtual void RejectInput();
-
-  // Description:
   // Set/Get the selection background and foreground colors.
   virtual void GetSelectionBackgroundColor(double *r, double *g, double *b);
   virtual double* GetSelectionBackgroundColor();
@@ -812,6 +805,13 @@ public:
   // after destroying the temporary embedded widget. The main purpose of this
   // script is to perform a final validation of the edit window's contents.
   virtual void SetEditEndCommand(vtkObject* object, const char *method);
+
+  // Description:
+  // If invoked from within EditEndCommand, then this method prevents the
+  // termination of the interactive editing of the contents of a cell.  It
+  // enables you to reject the widget's text during the final validation of the
+  // string intended to become the new cell contents.
+  virtual void RejectInput();
 
   // Description:
   // Specifies a command to be invoked when mouse button 1 is pressed over one

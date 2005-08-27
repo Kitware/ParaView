@@ -33,23 +33,24 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkImageData.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
+
+#include <time.h>
 
 #define VTK_KW_WLPS_ID_COL         0
 #define VTK_KW_WLPS_ICON_COL       1
 #define VTK_KW_WLPS_WINDOW_COL     2
 #define VTK_KW_WLPS_LEVEL_COL      3
 
-#define VTK_KW_WLPS_THUMBNAIL_SIZE 48
-
 #define VTK_KW_WLPS_BUTTON_ADD_ID    0
 #define VTK_KW_WLPS_BUTTON_REMOVE_ID 1
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -61,6 +62,7 @@ public:
     double Window;
     double Level;
     vtksys_stl::string Group;
+    clock_t CreationTime;
     vtkKWIcon *Thumbnail;
     vtkKWIcon *Screenshot;
 
@@ -125,11 +127,15 @@ vtkKWWindowLevelPresetSelector::vtkKWWindowLevelPresetSelector()
 {
   this->Internals = new vtkKWWindowLevelPresetSelectorInternals;
 
-  this->AddWindowLevelPresetCommand = NULL;
-  this->ApplyWindowLevelPresetCommand = NULL;
+  this->AddWindowLevelPresetCommand    = NULL;
+  this->ApplyWindowLevelPresetCommand  = NULL;
   this->RemoveWindowLevelPresetCommand = NULL;
+
   this->PresetList              = NULL;
   this->PresetButtons           = NULL;
+
+  this->ThumbnailSize = 40;
+  this->ScreenshotSize = 156;
 }
 
 //----------------------------------------------------------------------------
@@ -225,22 +231,26 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   col++;
 
   list->AddColumn("Image");
-  list->SetColumnWidth(col, -VTK_KW_WLPS_THUMBNAIL_SIZE);
+  list->SetColumnWidth(col, -this->ThumbnailSize);
   list->SetColumnResizable(col, 0);
   list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 0);
+  list->SetColumnSortModeToReal(col);
+  list->SetColumnFormatCommandToEmptyOutput(col);
   col++;
 
   list->AddColumn("Window");
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 1);
   list->SetColumnEditable(col, 1);
+  list->SetColumnSortModeToReal(col);
   col++;
 
   list->AddColumn("Level");
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 1);
   list->SetColumnEditable(col, 1);
+  list->SetColumnSortModeToReal(col);
   col++;
 
   // --------------------------------------------------------------
@@ -334,6 +344,7 @@ int vtkKWWindowLevelPresetSelector::AddWindowLevelPreset(
   node->Id = vtkKWWindowLevelPresetSelectorInternals::PoolNodeCounter++;;
   node->Window = window;
   node->Level = level;
+  node->CreationTime = clock();
 
   // Add it to the pool
 
@@ -678,6 +689,102 @@ void vtkKWWindowLevelPresetSelector::NumberOfWindowLevelPresetsHasChanged()
 {
 }
 
+//---------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
+  int id, vtkImageData *screenshot)
+{
+  if (!this->Internals || !screenshot)
+    {
+    return 0;
+    }
+
+  vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+    this->Internals->GetPoolNode(id);
+  if (it == this->Internals->Pool.end())
+    {
+    return 0;
+    }
+
+  double factor;
+  vtkImageData *output;
+
+  vtkImageResample *resample = vtkImageResample::New();
+  resample->SetInput(screenshot);
+  resample->SetInterpolationModeToCubic();
+  resample->SetDimensionality(2);
+
+  // Create the thumbnail
+
+  factor = (double)this->ThumbnailSize / 
+    (double)screenshot->GetDimensions()[0];
+  resample->SetAxisMagnificationFactor(0, factor);
+  resample->SetAxisMagnificationFactor(1, factor);
+  resample->Update();
+  output = resample->GetOutput();
+
+  if (!(*it)->Thumbnail)
+    {
+    (*it)->Thumbnail = vtkKWIcon::New();
+    }
+  (*it)->Thumbnail->SetImage(
+    (const unsigned char*)output->GetScalarPointer(),
+    output->GetDimensions()[0],
+    output->GetDimensions()[1],
+    3,
+    0,
+    vtkKWIcon::ImageOptionFlipVertical);
+
+  // Create the screenshot
+
+  factor = (double)this->ScreenshotSize / 
+    (double)screenshot->GetDimensions()[0];
+  resample->SetAxisMagnificationFactor(0, factor);
+  resample->SetAxisMagnificationFactor(1, factor);
+  resample->Update();
+  output = resample->GetOutput();
+
+  if (!(*it)->Screenshot)
+    {
+    (*it)->Screenshot = vtkKWIcon::New();
+    }
+  (*it)->Screenshot->SetImage(
+    (const unsigned char*)output->GetScalarPointer(),
+    output->GetDimensions()[0],
+    output->GetDimensions()[1],
+    3,
+    0,
+    vtkKWIcon::ImageOptionFlipVertical);
+
+  resample->Delete();
+
+  // Update the icon cell
+
+  this->UpdateRowInPresetList(*it);
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int row = list->FindCellTextAsIntInColumn(VTK_KW_WLPS_ID_COL, id);
+    if (row >= 0)
+      {
+      list->RefreshCellWithWindowCommand(row, VTK_KW_WLPS_ICON_COL);
+      }
+    }
+
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::HasWindowLevelPresetImage(int id)
+{
+  if (this->Internals)
+    {
+    vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+      this->Internals->GetPoolNode(id);
+    return (it != this->Internals->Pool.end() && (*it)->Thumbnail) ? 1 : 0;
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 {
@@ -705,11 +812,14 @@ void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
   sprintf(buffer, "%03d", node->Id);
   list->SetCellText(row, VTK_KW_WLPS_ID_COL, buffer);
 
-#if 0
-  list->SetCellWindowCommand(
-    row, VTK_KW_WLPS_ICON_COL, this, "PresetCellIconCallback");
-  list->SetCellWindowDestroyCommandToRemoveChild(row, VTK_KW_WLPS_ICON_COL);
-#endif
+  if (node->Thumbnail)
+    {
+    list->SetCellWindowCommand(
+      row, VTK_KW_WLPS_ICON_COL, this, "PresetCellIconCallback");
+    list->SetCellWindowDestroyCommandToRemoveChild(row, VTK_KW_WLPS_ICON_COL);
+    }
+  list->SetCellTextAsDouble(
+    row, VTK_KW_WLPS_ICON_COL, (double)node->CreationTime);
 
   list->SetCellTextAsDouble(row, VTK_KW_WLPS_WINDOW_COL, node->Window);
   list->SetCellTextAsDouble(row, VTK_KW_WLPS_LEVEL_COL, node->Level);
@@ -717,7 +827,7 @@ void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 
 //---------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
-  const char *list_widget, int row, int col, const char *widget)
+  const char *, int row, int col, const char *widget)
 {
   if (!this->Internals || !this->PresetList || !widget)
     {
@@ -762,7 +872,7 @@ void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
 
 //---------------------------------------------------------------------------
 const char* vtkKWWindowLevelPresetSelector::PresetCellEditStartCallback(
-  const char *list_widget, int row, int col, const char *text)
+  const char *, int row, int col, const char *text)
 {
   if (!this->Internals || !this->PresetList)
     {
