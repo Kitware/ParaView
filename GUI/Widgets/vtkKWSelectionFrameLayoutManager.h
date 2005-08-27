@@ -182,6 +182,7 @@ public:
   virtual int AppendAllWidgetsToImageData(vtkImageData *image);
   virtual int AppendAllWidgetsToImageDataFast(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageData(vtkImageData *image);
+  virtual int AppendSelectedWidgetToImageDataFast(vtkImageData *image);
 
   // Description:
   // Print all widgets or the selected one.

@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.42");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1928,7 +1928,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
 int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageData(
   vtkImageData *image)
 {
-  return this->AppendWidgetsToImageData(image, 0);
+  return this->AppendWidgetsToImageData(image, 0, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1942,7 +1942,14 @@ int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageDataFast(
 int vtkKWSelectionFrameLayoutManager::AppendSelectedWidgetToImageData(
   vtkImageData *image)
 {
-  return this->AppendWidgetsToImageData(image, 1);
+  return this->AppendWidgetsToImageData(image, 1, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::AppendSelectedWidgetToImageDataFast(
+  vtkImageData *image)
+{
+  return this->AppendWidgetsToImageData(image, 1, 1);
 }
 
 //---------------------------------------------------------------------------
