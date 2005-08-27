@@ -50,7 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.2");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -827,7 +827,7 @@ void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 
 //---------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
-  const char *, int row, int col, const char *widget)
+  const char *, int row, int, const char *widget)
 {
   if (!this->Internals || !this->PresetList || !widget)
     {
@@ -872,7 +872,7 @@ void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
 
 //---------------------------------------------------------------------------
 const char* vtkKWWindowLevelPresetSelector::PresetCellEditStartCallback(
-  const char *, int row, int col, const char *text)
+  const char *, int row, int, const char *text)
 {
   if (!this->Internals || !this->PresetList)
     {
