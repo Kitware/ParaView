@@ -19,7 +19,7 @@
 #include "vtkDistributedStreamTracer.h"
 #include "vtkLineSource.h"
 #include "vtkLookupTable.h"
-#include "vtkMultiProcessController.h"
+#include "vtkMPIController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPLOT3DReader.h"
 #include "vtkGeometryFilter.h"
@@ -218,7 +218,7 @@ void MyMain( vtkMultiProcessController *controller, void *arg )
 
 int main( int argc, char* argv[] )
 {
-  vtkMultiProcessController* contr = vtkMultiProcessController::New();
+  vtkMultiProcessController* contr = vtkMPIController::New();
   contr->Initialize(&argc, &argv);
   contr->CreateOutputWindow();
 
