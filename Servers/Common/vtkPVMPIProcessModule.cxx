@@ -35,6 +35,8 @@
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIGroup.h"
+#else
+#include "vtkDummyController.h"
 #endif
 
 #include "vtkProcessModuleGUIHelper.h"
@@ -46,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.6");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.7");
 
 
 // external global variable.
@@ -138,7 +140,11 @@ void vtkPVMPIProcessModule::Initialize()
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
 {
   // Initialize the MPI controller.
-  this->Controller = vtkMultiProcessController::New();
+#ifdef VTK_USE_MPI
+  this->Controller = vtkMPIController::New();
+#else
+  this->Controller = vtkDummyController::New();
+#endif
   this->Controller->Initialize(&argc, &argv, 1);
   vtkMultiProcessController::SetGlobalController(this->Controller);
 
