@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSpinButtons );
-vtkCxxRevisionMacro(vtkKWSpinButtons, "1.1");
+vtkCxxRevisionMacro(vtkKWSpinButtons, "1.2");
 
 /* 
  * Resource generated for file:
@@ -77,25 +77,29 @@ static const unsigned char image_spin_right[] =
 //----------------------------------------------------------------------------
 vtkKWSpinButtons::vtkKWSpinButtons()
 {
-  this->DecrementButton = vtkKWPushButton::New();
-  this->IncrementButton = vtkKWPushButton::New();
+  this->PreviousButton = vtkKWPushButton::New();
+  this->NextButton = vtkKWPushButton::New();
 
-  this->Orientation = vtkKWSpinButtons::OrientationVertical;
+  this->ArrowOrientation = vtkKWSpinButtons::ArrowOrientationVertical;
+  this->LayoutOrientation = vtkKWSpinButtons::LayoutOrientationVertical;
+
+  this->ButtonsPadX = 0;
+  this->ButtonsPadY = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWSpinButtons::~vtkKWSpinButtons()
 {
-  if (this->DecrementButton)
+  if (this->PreviousButton)
     {
-    this->DecrementButton->Delete();
-    this->DecrementButton = NULL;
+    this->PreviousButton->Delete();
+    this->PreviousButton = NULL;
     }
 
-  if (this->IncrementButton)
+  if (this->NextButton)
     {
-    this->IncrementButton->Delete();
-    this->IncrementButton = NULL;
+    this->NextButton->Delete();
+    this->NextButton = NULL;
     }
 }
 
@@ -114,16 +118,17 @@ void vtkKWSpinButtons::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
-  this->DecrementButton->SetParent(this);
-  this->DecrementButton->Create(app);
-  this->DecrementButton->SetPadX(0);
-  this->DecrementButton->SetPadY(this->DecrementButton->GetPadX());
+  this->PreviousButton->SetParent(this);
+  this->PreviousButton->Create(app);
+  this->PreviousButton->SetPadX(0);
+  this->PreviousButton->SetPadY(this->PreviousButton->GetPadX());
 
-  this->IncrementButton->SetParent(this);
-  this->IncrementButton->Create(app);
-  this->IncrementButton->SetPadX(this->DecrementButton->GetPadX());
-  this->IncrementButton->SetPadY(this->DecrementButton->GetPadY());
+  this->NextButton->SetParent(this);
+  this->NextButton->Create(app);
+  this->NextButton->SetPadX(this->PreviousButton->GetPadX());
+  this->NextButton->SetPadY(this->PreviousButton->GetPadY());
   
+  this->UpdateArrowOrientation();
   this->Pack();
 
   // Update enable state
@@ -132,46 +137,125 @@ void vtkKWSpinButtons::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinButtons::SetOrientation(int val)
+void vtkKWSpinButtons::SetArrowOrientation(int val)
 {
-  if (val < vtkKWSpinButtons::OrientationHorizontal)
+  if (val < vtkKWSpinButtons::ArrowOrientationHorizontal)
     {
-    val = vtkKWSpinButtons::OrientationHorizontal;
+    val = vtkKWSpinButtons::ArrowOrientationHorizontal;
     }
-  if (val > vtkKWSpinButtons::OrientationVertical)
+  if (val > vtkKWSpinButtons::ArrowOrientationVertical)
     {
-    val = vtkKWSpinButtons::OrientationVertical;
+    val = vtkKWSpinButtons::ArrowOrientationVertical;
     }
 
-  if (this->Orientation == val)
+  if (this->ArrowOrientation == val)
     {
     return;
     }
 
-  this->Orientation = val;
+  this->ArrowOrientation = val;
+  this->Modified();
+
+  this->UpdateArrowOrientation();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::UpdateArrowOrientation()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->ArrowOrientation == vtkKWSpinButtons::ArrowOrientationVertical)  
+    {
+    if (this->PreviousButton && this->PreviousButton->IsCreated())
+      {
+      this->PreviousButton->SetImageToPixels(
+        image_spin_up, 
+        image_spin_up_width, image_spin_up_height, 
+        image_spin_up_pixel_size,
+        image_spin_up_length);
+      }
+    if (this->NextButton && this->NextButton->IsCreated())
+      {
+      this->NextButton->SetImageToPixels(
+        image_spin_down, 
+        image_spin_down_width, image_spin_down_height, 
+        image_spin_down_pixel_size,
+        image_spin_down_length);
+      }
+    }
+  else
+    {
+    if (this->PreviousButton && this->PreviousButton->IsCreated())
+      {
+      this->PreviousButton->SetImageToPixels(
+        image_spin_left, 
+        image_spin_left_width, image_spin_left_height, 
+        image_spin_left_pixel_size,
+        image_spin_left_length);
+      }
+    if (this->NextButton && this->NextButton->IsCreated())
+      {
+      this->NextButton->SetImageToPixels(
+        image_spin_right, 
+        image_spin_right_width, image_spin_right_height, 
+        image_spin_right_pixel_size,
+        image_spin_right_length);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::SetLayoutOrientation(int val)
+{
+  if (val < vtkKWSpinButtons::LayoutOrientationHorizontal)
+    {
+    val = vtkKWSpinButtons::LayoutOrientationHorizontal;
+    }
+  if (val > vtkKWSpinButtons::LayoutOrientationVertical)
+    {
+    val = vtkKWSpinButtons::LayoutOrientationVertical;
+    }
+
+  if (this->LayoutOrientation == val)
+    {
+    return;
+    }
+
+  this->LayoutOrientation = val;
   this->Modified();
 
   this->Pack();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinButtons::SetDecrementCommand(
-  vtkObject *object, const char *method)
+void vtkKWSpinButtons::SetButtonsPadX(int arg)
 {
-  if (this->DecrementButton)
+  if (arg == this->ButtonsPadX)
     {
-    this->DecrementButton->SetCommand(object, method);
+    return;
     }
+
+  this->ButtonsPadX = arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinButtons::SetIncrementCommand(
-  vtkObject *object, const char *method)
+void vtkKWSpinButtons::SetButtonsPadY(int arg)
 {
-  if (this->IncrementButton)
+  if (arg == this->ButtonsPadY)
     {
-    this->IncrementButton->SetCommand(object, method);
+    return;
     }
+
+  this->ButtonsPadY = arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -182,51 +266,71 @@ void vtkKWSpinButtons::Pack()
     return;
     }
 
-  if (this->Orientation == vtkKWSpinButtons::OrientationVertical)  
+  const char *next, *prev;
+  if (this->LayoutOrientation == vtkKWSpinButtons::LayoutOrientationVertical)  
     {
-    if (this->IncrementButton && this->IncrementButton->IsCreated())
-      {
-      this->IncrementButton->SetImageToPixels(
-        image_spin_up, 
-        image_spin_up_width, image_spin_up_height, 
-        image_spin_up_pixel_size,
-        image_spin_up_length);
-      this->Script("pack %s -side top -expand y -fill y",
-                   this->IncrementButton->GetWidgetName());
-      }
-    if (this->DecrementButton && this->DecrementButton->IsCreated())
-      {
-      this->DecrementButton->SetImageToPixels(
-        image_spin_down, 
-        image_spin_down_width, image_spin_down_height, 
-        image_spin_down_pixel_size,
-        image_spin_down_length);
-      this->Script("pack %s -side bottom -expand y -fill y",
-                   this->DecrementButton->GetWidgetName());
-      }
+    prev = "top";
+    next = "bottom";
     }
   else
     {
-    if (this->DecrementButton && this->DecrementButton->IsCreated())
-      {
-      this->DecrementButton->SetImageToPixels(
-        image_spin_left, 
-        image_spin_left_width, image_spin_left_height, 
-        image_spin_left_pixel_size,
-        image_spin_left_length);
-      this->Script("pack %s -side left -expand y -fill y",
-                   this->DecrementButton->GetWidgetName());
-      }
-    if (this->IncrementButton && this->IncrementButton->IsCreated())
-      {
-      this->IncrementButton->SetImageToPixels(
-        image_spin_right, 
-        image_spin_right_width, image_spin_right_height, 
-        image_spin_right_pixel_size,
-        image_spin_right_length);
-      this->Script("pack %s -side right -expand y -fill y",
-                   this->IncrementButton->GetWidgetName());
-      }
+    prev = "left";
+    next = "right";
+    }
+  if (this->PreviousButton && this->PreviousButton->IsCreated())
+    {
+    this->Script(
+      "pack %s -side %s -expand y -fill both -padx %d -pady %d",
+      this->PreviousButton->GetWidgetName(), prev,
+      this->ButtonsPadX, this->ButtonsPadY);
+    }
+  if (this->NextButton && this->NextButton->IsCreated())
+    {
+    this->Script(
+      "pack %s -side %s -expand y -fill both -padx %d -pady %d",
+      this->NextButton->GetWidgetName(), next,
+      this->ButtonsPadX, this->ButtonsPadY);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::SetButtonsWidth(int w)
+{
+  if (this->PreviousButton)
+    {
+    this->PreviousButton->SetWidth(w);
+    }
+  if (this->NextButton)
+    {
+    this->NextButton->SetWidth(w);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinButtons::GetButtonsWidth()
+{
+  int d_w = this->PreviousButton ? this->PreviousButton->GetWidth() : 0;
+  int i_w = this->NextButton ? this->NextButton->GetWidth() : 0;
+  return d_w > i_w ? d_w : i_w;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::SetPreviousCommand(
+  vtkObject *object, const char *method)
+{
+  if (this->PreviousButton)
+    {
+    this->PreviousButton->SetCommand(object, method);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::SetNextCommand(
+  vtkObject *object, const char *method)
+{
+  if (this->NextButton)
+    {
+    this->NextButton->SetCommand(object, method);
     }
 }
 
@@ -235,23 +339,33 @@ void vtkKWSpinButtons::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->DecrementButton);
-  this->PropagateEnableState(this->IncrementButton);
+  this->PropagateEnableState(this->PreviousButton);
+  this->PropagateEnableState(this->NextButton);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSpinButtons::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "DecrementButton: " << this->DecrementButton << endl;
-  os << indent << "IncrementButton: " << this->IncrementButton << endl;
-  if (this->Orientation == vtkKWSpinButtons::OrientationHorizontal)
+  os << indent << "PreviousButton: " << this->PreviousButton << endl;
+  os << indent << "NextButton: " << this->NextButton << endl;
+  if (this->ArrowOrientation == vtkKWSpinButtons::ArrowOrientationHorizontal)
     {
-    os << indent << "Orientation: Horizontal\n";
+    os << indent << "ArrowOrientation: Horizontal\n";
     }
   else
     {
-    os << indent << "Orientation: Vertical\n";
+    os << indent << "ArrowOrientation: Vertical\n";
     }
+  if (this->LayoutOrientation == vtkKWSpinButtons::LayoutOrientationHorizontal)
+    {
+    os << indent << "LayoutOrientation: Horizontal\n";
+    }
+  else
+    {
+    os << indent << "LayoutOrientation: Vertical\n";
+    }
+  os << indent << "ButtonsPadX: " << this->ButtonsPadX << endl;
+  os << indent << "ButtonsPadY: " << this->ButtonsPadY << endl;
 }
 
