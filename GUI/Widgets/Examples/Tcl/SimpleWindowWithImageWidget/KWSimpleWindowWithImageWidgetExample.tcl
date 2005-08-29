@@ -83,9 +83,14 @@ $ca SetText 3 "<window>\n<level>"
 vtkKWScale slice_scale
 slice_scale SetParent [win GetViewPanelFrame]
 slice_scale Create app
-slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]
-slice_scale SetValue [viewer GetSlice]
 slice_scale SetCommand "" {viewer SetSlice [slice_scale GetValue]}
+
+proc update_slice_scale {} { 
+  slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]
+  slice_scale SetValue [viewer GetSlice] 
+}
+
+update_slice_scale
 
 pack [slice_scale GetWidgetName] -side top -expand n -fill x -padx 2 -pady 2
 
@@ -103,15 +108,10 @@ orientation_menubutton SetReliefToGroove
 
 pack [orientation_menubutton GetWidgetName] -side top -anchor nw -expand n -fill x
              
-proc update_scale {} { 
-  slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]
-  slice_scale SetValue [viewer GetSlice] 
-}
-
 set mb [[orientation_menubutton GetWidget] GetWidget]
-$mb AddRadioButton "X-Y" "" "viewer SetSliceOrientationToXY ; update_scale" ""
-$mb AddRadioButton "X-Z" "" "viewer SetSliceOrientationToXZ ; update_scale" ""
-$mb AddRadioButton "Y-Z" "" "viewer SetSliceOrientationToYZ ; update_scale" ""
+$mb AddRadioButton "X-Y" "" "viewer SetSliceOrientationToXY ; update_slice_scale" ""
+$mb AddRadioButton "X-Z" "" "viewer SetSliceOrientationToXZ ; update_slice_scale" ""
+$mb AddRadioButton "Y-Z" "" "viewer SetSliceOrientationToYZ ; update_slice_scale" ""
 $mb SetValue "X-Y"
 
 # Create a window/level preset selector
