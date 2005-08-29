@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.82");
+vtkCxxRevisionMacro(vtkKWMenu, "1.83");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -105,7 +105,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
     str << " -label {" << label << "}";
     }
 
-  if (Object && MethodAndArgString)
+  if (Object || MethodAndArgString)
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, Object, MethodAndArgString);
@@ -148,7 +148,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
     str << " -label {" << label << "}";
     }
 
-  if (Object && MethodAndArgString)
+  if (Object || MethodAndArgString)
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, Object, MethodAndArgString);
@@ -755,7 +755,7 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
 int vtkKWMenu::GetIndexOfCommand(
   vtkObject* Object, const char* MethodAndArgString)
 {
-  if (Object && MethodAndArgString)
+  if (Object || MethodAndArgString)
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, Object, MethodAndArgString);
