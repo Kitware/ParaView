@@ -19,9 +19,10 @@
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/list>
+#include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.11");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.12");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -31,6 +32,7 @@ public:
   struct WidgetSlot
   {
     int Id;
+    int Visibility;
     vtkKWWidget *Widget;
   };
 
@@ -47,6 +49,8 @@ vtkKWWidgetSet::vtkKWWidgetSet()
   this->MaximumNumberOfWidgetsInPackingDirection = 0;
   this->WidgetsPadX = 0;
   this->WidgetsPadY = 0;
+  this->WidgetsInternalPadX = 0;
+  this->WidgetsInternalPadY = 0;
   this->ExpandWidgets = 0;
 
   // Internal structs
@@ -195,6 +199,7 @@ vtkKWWidget* vtkKWWidgetSet::AddWidgetInternal(int id)
 
   vtkKWWidgetSetInternals::WidgetSlot widget_slot;
   widget_slot.Id = id;
+  widget_slot.Visibility = 1;
   widget_slot.Widget = this->AllocateAndCreateWidget();
   this->PropagateEnableState(widget_slot.Widget);
 
@@ -225,21 +230,45 @@ void vtkKWWidgetSet::Pack()
   vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
 
+  int nb_widgets = this->GetNumberOfWidgets();
+
   int col = 0;
   int row = 0;
+
   const char *sticky = 
     (this->ExpandWidgets ? "news" : (this->PackHorizontally ? "ews" : "nsw"));
 
+  vtksys_stl::vector<int> col_used;
+  col_used.assign(nb_widgets, 0);
+
+  vtksys_stl::vector<int> row_used;
+  row_used.assign(nb_widgets, 0);
+
   for (; it != end; ++it)
     {
-    tk_cmd 
-      << "grid " << it->Widget->GetWidgetName() 
-      << " -sticky " << sticky
-      << " -column " << (this->PackHorizontally ? col : row)
-      << " -row " << (this->PackHorizontally ? row : col)
-      << " -padx " << this->WidgetsPadX
-      << " -pady " << this->WidgetsPadY
-      << endl;
+    if (it->Visibility)
+      {
+      tk_cmd 
+        << "grid " << it->Widget->GetWidgetName() 
+        << " -sticky " << sticky
+        << " -column " << (this->PackHorizontally ? col : row)
+        << " -row " << (this->PackHorizontally ? row : col)
+        << " -padx " << this->WidgetsPadX
+        << " -pady " << this->WidgetsPadY
+        << " -ipadx " << this->WidgetsInternalPadX
+        << " -ipady " << this->WidgetsInternalPadY
+        << endl;
+      if (this->PackHorizontally)
+        {
+        col_used[col] = 1;
+        row_used[row] = 1;
+        }
+      else
+        {
+        col_used[row] = 1;
+        row_used[col] = 1;
+        }
+      }
     col++;
     if (this->MaximumNumberOfWidgetsInPackingDirection &&
         col >= this->MaximumNumberOfWidgetsInPackingDirection)
@@ -256,16 +285,23 @@ void vtkKWWidgetSet::Pack()
     (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection : col;
   for (i = 0; i < maxcol; i++)
     {
-    tk_cmd << "grid " << (this->PackHorizontally ? "column" : "row") 
-           << "configure " << this->GetWidgetName() << " " 
-           << i << " -weight 1" << endl;
+    tk_cmd 
+      << "grid " << (this->PackHorizontally ? "column" : "row") 
+      << "configure " << this->GetWidgetName() << " " << i 
+      << " -weight " << (this->PackHorizontally ? col_used[i] : row_used[i])
+      << endl;
     }
 
-  for (i = 0; i <= row; i++)
+  if (nb_widgets)
     {
-    tk_cmd << "grid " << (this->PackHorizontally ? "row" : "column") 
-           << "configure " << this->GetWidgetName() << " " 
-           << i << " -weight 1" << endl;
+    for (i = 0; i <= row; i++)
+      {
+      tk_cmd 
+        << "grid " << (this->PackHorizontally ? "row" : "column") 
+        << "configure " << this->GetWidgetName() << " " << i 
+        << " -weight " << (this->PackHorizontally ? row_used[i] : col_used[i])
+        << endl;
+      }
     }
 
   tk_cmd << ends;
@@ -327,6 +363,34 @@ void vtkKWWidgetSet::SetWidgetsPadY(int arg)
   this->Pack();
 }
 
+//----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetWidgetsInternalPadX(int arg)
+{
+  if (arg == this->WidgetsInternalPadX)
+    {
+    return;
+    }
+
+  this->WidgetsInternalPadX = arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidgetSet::SetWidgetsInternalPadY(int arg)
+{
+  if (arg == this->WidgetsInternalPadY)
+    {
+    return;
+    }
+
+  this->WidgetsInternalPadY = arg;
+  this->Modified();
+
+  this->Pack();
+}
+
 // ----------------------------------------------------------------------------
 void vtkKWWidgetSet::SetExpandWidgets(int _arg)
 {
@@ -357,20 +421,37 @@ void vtkKWWidgetSet::ShowWidget(int id)
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::GetWidgetVisibility(int id)
 {
-  vtkKWWidget *widget = this->GetWidgetInternal(id);
-  return (widget && 
-          widget->IsCreated() &&
-          !widget->GetApplication()->EvaluateBooleanExpression(
-            "catch {grid info %s}", widget->GetWidgetName()));
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
+    {
+    if (it->Id == id)
+      {
+      return it->Visibility;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidgetSet::SetWidgetVisibility(int id, int flag)
 {
-  vtkKWWidget *widget = this->GetWidgetInternal(id);
-  if (widget && widget->IsCreated())
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    this->Script("grid %s %s", (flag ? "" : "remove"),widget->GetWidgetName());
+    if (it->Id == id)
+      {
+      if (it->Visibility != flag)
+        {
+        it->Visibility = flag;
+        this->Pack();
+        }
+      }
     }
 }
 
@@ -391,6 +472,9 @@ void vtkKWWidgetSet::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "WidgetsPadX: " << this->WidgetsPadX << endl;
   os << indent << "WidgetsPadY: " << this->WidgetsPadY << endl;
+
+  os << indent << "WidgetsInternalPadX: " << this->WidgetsInternalPadX << endl;
+  os << indent << "WidgetsInternalPadY: " << this->WidgetsInternalPadY << endl;
 
   os << indent << "ExpandWidgets: " 
      << (this->ExpandWidgets ? "On" : "Off") << endl;

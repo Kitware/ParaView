@@ -90,6 +90,15 @@ public:
   vtkGetMacro(WidgetsPadY, int);
 
   // Description:
+  // Set/Get the internal padding that will be left around each widget.
+  // This space is added inside the widget border.
+  // (default to 0).
+  virtual void SetWidgetsInternalPadX(int);
+  vtkGetMacro(WidgetsInternalPadX, int);
+  virtual void SetWidgetsInternalPadY(int);
+  vtkGetMacro(WidgetsInternalPadY, int);
+
+  // Description:
   // Set the layout to allow the widgets to expand automatically 
   virtual void SetExpandWidgets(int);
   vtkBooleanMacro(ExpandWidgets, int);
@@ -112,6 +121,8 @@ protected:
   int MaximumNumberOfWidgetsInPackingDirection;
   int WidgetsPadX;
   int WidgetsPadY;
+  int WidgetsInternalPadX;
+  int WidgetsInternalPadY;
   int ExpandWidgets;
 
   
