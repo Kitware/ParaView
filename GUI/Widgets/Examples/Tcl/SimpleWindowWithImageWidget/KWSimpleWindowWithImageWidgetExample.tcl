@@ -109,10 +109,37 @@ proc update_scale {} {
 }
 
 set mb [[orientation_menubutton GetWidget] GetWidget]
-$mb AddRadioButton "X-Y" viewer "SetSliceOrientationToXY ; update_scale" ""
-$mb AddRadioButton "X-Z" viewer "SetSliceOrientationToXZ ; update_scale" ""
-$mb AddRadioButton "Y-Z" viewer "SetSliceOrientationToYZ ; update_scale" ""
+$mb AddRadioButton "X-Y" "" "viewer SetSliceOrientationToXY ; update_scale" ""
+$mb AddRadioButton "X-Z" "" "viewer SetSliceOrientationToXZ ; update_scale" ""
+$mb AddRadioButton "Y-Z" "" "viewer SetSliceOrientationToYZ ; update_scale" ""
 $mb SetValue "X-Y"
+
+# Create a window/level preset selector
+
+vtkKWWindowLevelPresetSelector wl_preset_selector
+
+wl_preset_selector SetParent [win GetMainPanelFrame]
+wl_preset_selector Create app
+wl_preset_selector SetPadX 2
+wl_preset_selector SetPadY 2
+wl_preset_selector SetBorderWidth 2
+wl_preset_selector SetReliefToGroove
+wl_preset_selector SetAddWindowLevelPresetCommand "" "add_wl_preset"
+wl_preset_selector SetApplyWindowLevelPresetCommand "" "apply_wl_preset"
+
+pack [wl_preset_selector GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
+
+proc add_wl_preset {} {
+  set id [wl_preset_selector AddWindowLevelPreset [viewer GetColorWindow] [viewer GetColorLevel]]
+  wl_preset_selector SetWindowLevelPresetImageFromRenderWindow $id [rw GetRenderWindow]
+}
+
+proc apply_wl_preset {id} {
+  set wl [wl_preset_selector GetWindowLevelPreset $id]
+  viewer SetColorWindow [lindex $wl 0]
+  viewer SetColorLevel [lindex $wl 1]
+  viewer Render
+}
 
 # Start the application
 # If --test was provided, do not enter the event loop
@@ -132,6 +159,7 @@ reader Delete
 viewer Delete
 slice_scale Delete
 orientation_menubutton Delete
+wl_preset_selector Delete
 win Delete
 app Delete
 
