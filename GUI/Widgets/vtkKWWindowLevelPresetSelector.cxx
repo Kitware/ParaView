@@ -52,7 +52,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.4");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -141,8 +141,8 @@ vtkKWWindowLevelPresetSelector::vtkKWWindowLevelPresetSelector()
 
   this->ApplyPresetOnSelectionChanged = 1;
 
-  this->ThumbnailSize = 40;
-  this->ScreenshotSize = 156;
+  this->ThumbnailSize = 32;
+  this->ScreenshotSize = 144;
 
   this->GroupFilter = NULL;
 }
