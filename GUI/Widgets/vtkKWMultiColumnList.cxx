@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.22");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2270,6 +2270,7 @@ void vtkKWMultiColumnList::SetSelectionMode(int relief)
 {
   this->SetConfigurationOption(
     "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
+  this->SelectionChangedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -2301,6 +2302,7 @@ void vtkKWMultiColumnList::SetSelectionType(int type)
       break;
     }
   this->SetConfigurationOption("-selecttype", type_opt);
+  this->SelectionChangedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -2339,6 +2341,7 @@ void vtkKWMultiColumnList::SelectRow(int row_index)
     {
     this->Script("%s selection set %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    this->SelectionChangedCallback();
     }
 }
 
@@ -2349,6 +2352,7 @@ void vtkKWMultiColumnList::DeselectRow(int row_index)
     {
     this->Script("%s selection clear %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    this->SelectionChangedCallback();
     }
 }
 
@@ -2429,6 +2433,7 @@ void vtkKWMultiColumnList::SelectCell(int row_index, int col_index)
     this->Script("%s cellselection set %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
+    this->SelectionChangedCallback();
     }
 }
 
@@ -2440,6 +2445,7 @@ void vtkKWMultiColumnList::DeselectCell(int row_index, int col_index)
     this->Script("%s cellselection clear %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
+    this->SelectionChangedCallback();
     }
 }
 
@@ -2501,6 +2507,7 @@ void vtkKWMultiColumnList::ClearSelection()
   if (this->IsCreated())
     {
     this->Script("%s selection clear 0 end", this->GetWidgetName());
+    this->SelectionChangedCallback();
     }
 }
 
