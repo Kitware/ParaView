@@ -39,10 +39,17 @@ public:
   virtual char *GetText();
 
   // Description:
-  // Convenience method to set/get the text width (in chars).
+  // Convenience method to set/get the text width (in chars if the button
+  // has a text contents, or pixels if it has an image contents).
   virtual void SetWidth(int width);
   virtual int GetWidth();
   
+  // Description:
+  // Convenience method to set/get the text height (in chars if the button
+  // has a text contents, or pixels if it has an image contents).
+  virtual void SetHeight(int height);
+  virtual int GetHeight();
+
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when mouse button 1 is released over the button.

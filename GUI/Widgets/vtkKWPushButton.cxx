@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.25");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -74,6 +74,18 @@ void vtkKWPushButton::SetWidth(int width)
 int vtkKWPushButton::GetWidth()
 {
   return this->GetConfigurationOptionAsInt("-width");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetHeight(int height)
+{
+  this->SetConfigurationOptionAsInt("-height", height);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetHeight()
+{
+  return this->GetConfigurationOptionAsInt("-height");
 }
 
 //----------------------------------------------------------------------------
