@@ -61,15 +61,17 @@ public:
   // It tries to find/open the lookmark's dataset(s) and/or source(s) and apply the pipeline
   // to them. The reader is initialized using the attributes in the lookmark's state script. The rest of the
   // script is then executed.
-  void View();
   void PreView();
+  void ViewCallback();
+  void View();
 
   // Description: 
   // This is called when the user clicks on a macro's thumbnail. 
   // It uses the stored script to initialize the currently selected dataset, maintaining
   // the current camera view and timestep. 
-  void ViewMacro();
   void PreViewMacro();
+  void ViewMacroCallback();
+  void ViewMacro();
 
   void ReleaseEvent();
 

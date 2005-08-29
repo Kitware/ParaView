@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.61");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.62");
 
 
 //*****************************************************************************
@@ -191,16 +191,19 @@ vtkPVWindow* vtkPVLookmark::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLookmark::ViewCallback()
+{
+  if(this->ReleaseEventFlag == 1)
+    {
+    this->View();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLookmark::View()
 {
   vtkPVWindow *win = this->GetPVWindow();
   vtkPVSource *pvs;
-
-  if(this->ReleaseEventFlag == 0)
-    {
-    // widget is being dragged so don't execute
-    return; 
-    }
 
   this->UnsetLookmarkIconCommand();
 
@@ -829,15 +832,18 @@ void vtkPVLookmark::StoreStateScript()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLookmark::ViewMacroCallback()
+{
+  if(this->ReleaseEventFlag == 1)
+    {
+    this->ViewMacro();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLookmark::ViewMacro()
 {
   vtkPVWindow *win = this->GetPVWindow();
-
-  if(this->ReleaseEventFlag == 0)
-    {
-    // widget is being dragged so don't execute
-    return; 
-    }
 
   // if the pipeline is empty fail
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
@@ -1183,14 +1189,14 @@ void vtkPVLookmark::UnsetLookmarkIconCommand()
 void vtkPVLookmark::PreView()
 {
   this->ReleaseEventFlag = 0;
-  this->Script("after 600 {catch {%s View}}", this->GetTclName());
+  this->Script("after 600 {catch {%s ViewCallback}}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmark::PreViewMacro()
 {
   this->ReleaseEventFlag = 0;
-  this->Script("after 600 {catch {%s ViewMacro}}", this->GetTclName());
+  this->Script("after 600 {catch {%s ViewMacroCallback}}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -2293,6 +2299,7 @@ void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "Version: " << this->GetVersion() << endl;
   os << indent << "StateScript: " << this->GetStateScript() << endl;
   os << indent << "ImageData: " << this->GetImageData() << endl;
   os << indent << "CenterOfRotation: " << this->GetCenterOfRotation() << endl;
