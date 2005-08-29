@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWSpinButtons.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkWindowToImageFilter.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
@@ -52,7 +54,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.5");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -459,40 +461,93 @@ int vtkKWWindowLevelPresetSelector::GetCommentColumnVisibility()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindowLevelPresetSelector::AddWindowLevelPreset(
-  double window, double level)
+int vtkKWWindowLevelPresetSelector::AddWindowLevelPresetWithGroup(
+  double window, double level, const char *group)
 {
-  // Create a new node
+  // Do we have that preset already ? If not, create a new node
 
-  vtkKWWindowLevelPresetSelectorInternals::PoolNode *node =
-    new vtkKWWindowLevelPresetSelectorInternals::PoolNode;
+  int id;
+  if (group && *group)
+    {
+    id = this->GetWindowLevelPresetIdWithGroup(window, level, group);
+    }
+  else
+    {
+    id = this->GetWindowLevelPresetId(window, level);
+    }
+  vtkKWWindowLevelPresetSelectorInternals::PoolNode *node = NULL;
+  if (id < 0)
+    {
+    id =  vtkKWWindowLevelPresetSelectorInternals::PoolNodeCounter++;
 
-  node->Id = vtkKWWindowLevelPresetSelectorInternals::PoolNodeCounter++;;
-  node->Window = window;
-  node->Level = level;
-  node->CreationTime = clock();
+    node = new vtkKWWindowLevelPresetSelectorInternals::PoolNode;
 
-  // Add it to the pool
+    node->Id = id;
+    node->Window = window;
+    node->Level = level;
+    node->CreationTime = clock();
+    if (group && *group)
+      {
+      node->Group = group;
+      }
 
-  this->Internals->Pool.push_back(node);
+    this->Internals->Pool.push_back(node);
 
-  this->UpdateRowInPresetList(node);
+    this->UpdateRowInPresetList(node);
+    }
 
   if (this->PresetList)
     {
     vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-    list->SeeRow(list->GetNumberOfRows() - 1);
+    int row = list->FindCellTextAsIntInColumn(VTK_KW_WLPS_ID_COL, id);
+    if (row >= 0)
+      {
+      list->SeeRow(row);
+      }
     }
 
-  this->NumberOfWindowLevelPresetsHasChanged();
+  if (node)
+    {
+    this->NumberOfWindowLevelPresetsHasChanged();
+    }
 
-  return node->Id;
+  return id;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::AddWindowLevelPreset(
+  double window, double level)
+{
+  return this->AddWindowLevelPresetWithGroup(window, level, NULL);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetGroup(
   int id, const char *group)
 {
+  // Check if there is already a preset corresponding to that group
+  // If there is, remove it first
+
+  double window, level;
+  if (this->GetWindowLevelPreset(id, &window, &level))
+    {
+    int existing_id = 
+      this->GetWindowLevelPresetIdWithGroup(window, level, group);
+    if (existing_id >= 0)
+      {
+      if (existing_id == id)
+        {
+        return 1;
+        }
+      else
+        {
+        this->RemoveWindowLevelPreset(existing_id);
+        }
+      }
+    }
+
+  // Update the group
+
   vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
     this->Internals->GetPoolNode(id);
   if (it != this->Internals->Pool.end())
@@ -593,16 +648,16 @@ int vtkKWWindowLevelPresetSelector::GetNumberOfVisibleWindowLevelPresets()
 int vtkKWWindowLevelPresetSelector::HasWindowLevelPreset(
   double window, double level)
 {
-  int id;
-  return this->GetWindowLevelPresetId(window, level, &id);
+  int id = this->GetWindowLevelPresetId(window, level);
+  return id >= 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::HasWindowLevelPresetWithGroup(
   double window, double level, const char *group)
 {
-  int id;
-  return this->GetWindowLevelPresetIdWithGroup(window, level, group, &id);
+  int id = this->GetWindowLevelPresetIdWithGroup(window, level, group);
+  return id >= 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -622,6 +677,17 @@ int vtkKWWindowLevelPresetSelector::GetWindowLevelPreset(
 }
 
 //----------------------------------------------------------------------------
+double* vtkKWWindowLevelPresetSelector::GetWindowLevelPreset(int id)
+{
+  static double wl[2];
+  if (this->GetWindowLevelPreset(id, wl, wl + 1))
+    {
+    return wl;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPreset(
   int index, double *window, double *level)
 {
@@ -636,20 +702,43 @@ int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPreset(
 }
 
 //----------------------------------------------------------------------------
+double* vtkKWWindowLevelPresetSelector::GetNthWindowLevelPreset(int index)
+{
+  static double wl[2];
+  if (this->GetNthWindowLevelPreset(index, wl, wl + 1))
+    {
+    return wl;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetWithGroup(
   int index, const char *group, double *window, double *level)
 {
-  int rank;
-  if (this->GetNthWindowLevelPresetRankWithGroup(index, group, &rank))
+  int rank = this->GetNthWindowLevelPresetRankWithGroup(index, group);
+  if (rank >= 0)
     {
     return this->GetNthWindowLevelPreset(rank, window, level);
     }
-  return 0;
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetWithGroup(
+  int index, const char *group)
+{
+  static double wl[2];
+  if (this->GetNthWindowLevelPresetWithGroup(index, group, wl, wl + 1))
+    {
+    return wl;
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetWindowLevelPresetId(
-  double window, double level, int *id)
+  double window, double level)
 {
   vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
     this->Internals->Pool.begin();
@@ -659,17 +748,16 @@ int vtkKWWindowLevelPresetSelector::GetWindowLevelPresetId(
     {
     if ((*it)->Window == window && (*it)->Level == level)
       {
-      *id = (*it)->Id;
-      return 1;
+      return (*it)->Id;
       }
     }
 
-  return 0;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetWindowLevelPresetIdWithGroup(
-  double window, double level, const char *group, int *id)
+  double window, double level, const char *group)
 {
   if (group && *group)
     {
@@ -682,59 +770,55 @@ int vtkKWWindowLevelPresetSelector::GetWindowLevelPresetIdWithGroup(
       if ((*it)->Window == window && (*it)->Level == level &&
           !(*it)->Group.compare(group))
         {
-        *id = (*it)->Id;
-        return 1;
+        return (*it)->Id;
         }
       }
     }
 
-  return 0;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetId(
-  int index, int *id)
+int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetId(int index)
 {
-  if (index < 0 || index >= this->GetNumberOfWindowLevelPresets())
+  if (index >= 0 && index < this->GetNumberOfWindowLevelPresets())
     {
-    return 0;
+    return this->Internals->Pool[index]->Id;
     }
 
-  *id = this->Internals->Pool[index]->Id;
-  return 1;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetIdWithGroup(
-  int index, const char *group, int *id)
+  int index, const char *group)
 {
-  int rank;
-  if (this->GetNthWindowLevelPresetRankWithGroup(index, group, &rank))
+  int rank = this->GetNthWindowLevelPresetRankWithGroup(index, group);
+  if (rank >= 0)
     {
-    return this->GetNthWindowLevelPresetId(rank, id);
+    return this->GetNthWindowLevelPresetId(rank);
     }
-  return 0;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetNthVisibleWindowLevelPresetId(
-  int row_index, int *id)
+  int row_index)
 {
   if (this->PresetList)
     {
     vtkKWMultiColumnList *list = this->PresetList->GetWidget();
     if (row_index >= 0 && row_index < list->GetNumberOfRows())
       {
-      *id = list->GetCellTextAsInt(row_index, VTK_KW_WLPS_ID_COL);
-      return 1;
+      return list->GetCellTextAsInt(row_index, VTK_KW_WLPS_ID_COL);
       }
     }
-  return 0;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetRankWithGroup(
-  int index, const char *group, int *rank)
+  int index, const char *group)
 {
   if (index >= 0 && group && *group)
     {
@@ -749,14 +833,13 @@ int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetRankWithGroup(
         index--;
         if (index < 0)
           {
-          *rank = nth;
-          return 1;
+          return nth;
           }
         }
       }
     }
 
-  return 0;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -956,6 +1039,23 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
     }
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImageFromRenderWindow(
+  int id, vtkRenderWindow *win)
+{
+  if (win)
+    {
+    vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
+    filter->ShouldRerenderOff();
+    filter->SetInput(win);
+    filter->Update();
+    int res = this->SetWindowLevelPresetImage(id, filter->GetOutput());
+    filter->Delete();
+    return res;
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------

@@ -34,6 +34,7 @@ class vtkKWMultiColumnListWithScrollbars;
 class vtkKWSpinButtons;
 class vtkKWPushButtonSet;
 class vtkImageData;
+class vtkRenderWindow;
 
 class KWWIDGETS_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWCompositeWidget
 {
@@ -48,14 +49,21 @@ public:
   
   // Description:
   // Add a new window/level preset.
-  // Return a unique Id for that preset.
+  // If a preset already exists for the given parameters (window/level and
+  // optionally group), no new preset is created and the Id of the existing 
+  // preset is returned.
+  // Return the unique Id of the preset
   virtual int AddWindowLevelPreset(double window, double level);
+  virtual int AddWindowLevelPresetWithGroup(
+    double window, double level, const char *group);
 
   // Description:
   // Assign a group to a preset in the pool.
   // This provide a way of grouping window/level presets (say, if you
   // have different dataset at the same time and want to store
   // different window/level presets for each dataset).
+  // If there is already a window/level preset for that group, it is removed
+  // first.
   // Return 1 on success, 0 on error
   virtual int SetWindowLevelPresetGroup(int id, const char *group);
   virtual const char* GetWindowLevelPresetGroup(int id);
@@ -87,13 +95,19 @@ public:
   // Retrieve a window/level preset given its unique Id, or its position in
   // the pool (i.e. nth-preset), or its position in the pool within a group
   // (i.e. nth-preset with a given group).
-  // Return 1 on success, 0 otherwise.
+  // Return 1 on success, 0 otherwise for methods that take a pointer
+  // to the window and level (return pointer to array of 2 elements
+  // on success, NULL otherwise for the other methods). 
   virtual int GetWindowLevelPreset(
     int id, double *window, double *level);
+  virtual double* GetWindowLevelPreset(int id);
   virtual int GetNthWindowLevelPreset(
     int index, double *window, double *level);
+  virtual double* GetNthWindowLevelPreset(int index);
   virtual int GetNthWindowLevelPresetWithGroup(
     int index, const char *group, double *window, double *level);
+  virtual double* GetNthWindowLevelPresetWithGroup(
+    int index, const char *group);
 
   // Description:
   // Retrieve the Id of the first preset with a given window/level,
@@ -101,24 +115,20 @@ public:
   // given its position in the pool within a group (i.e. nth-preset with
   // a given group), or given its row position as currently displayed in the
   // list.
-  // Return 1 on success, 0 otherwise
-  virtual int GetWindowLevelPresetId(
-    double window, double level, int *id);
+  // Return id on success, -1 otherwise
+  virtual int GetWindowLevelPresetId(double window, double level);
   virtual int GetWindowLevelPresetIdWithGroup(
-    double window, double level, const char *group, int *id);
-  virtual int GetNthWindowLevelPresetId(
-    int index, int *id);
-  virtual int GetNthWindowLevelPresetIdWithGroup(
-    int index, const char *group, int *id);
-  virtual int GetNthVisibleWindowLevelPresetId(
-    int row_index, int *id);
+    double window, double level, const char *group);
+  virtual int GetNthWindowLevelPresetId(int index);
+  virtual int GetNthWindowLevelPresetIdWithGroup(int index, const char *group);
+  virtual int GetNthVisibleWindowLevelPresetId(int row_index);
 
   // Description:
   // Retrieve the rank in the whole pool of the nth preset in the pool within
   // a group (i.e. nth-preset with a given group).
-  // Return 1 on success, 0 otherwise
+  // Return rank on success, -1 otherwise
   virtual int GetNthWindowLevelPresetRankWithGroup(
-    int index, const char *group, int *rank);
+    int index, const char *group);
 
   // Description:
   // Remove a window/level preset, or all of them, or all of the presets
@@ -159,7 +169,10 @@ public:
   // Assign an image to a preset in the pool.
   // It will be used to generate both a thumbnail view of the
   // preset and a popup mini-screenshot.
+  // If passed a vtkRenderWindow, grab an image of the window contents.
   virtual int SetWindowLevelPresetImage(int id, vtkImageData *img);
+  virtual int SetWindowLevelPresetImageFromRenderWindow(
+    int id, vtkRenderWindow *win);
   virtual int HasWindowLevelPresetImage(int id);
 
   // Description:

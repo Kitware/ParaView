@@ -25,3 +25,6 @@ vtkKWMultiColumnList GetSelectionForegroundColor       307 3
 vtkKWScale GetTroughColor                              307 3
 vtkKWScale GetRange                                    307 2
 vtkKWScaleWithEntry GetRange                           307 2
+vtkKWWindowLevelPresetSelector GetWindowLevelPreset    307 2
+vtkKWWindowLevelPresetSelector GetNthWindowLevelPreset 307 2
+vtkKWWindowLevelPresetSelector GetNthWindowLevelPresetWithGroup 307 2
