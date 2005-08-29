@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithSpinButtons);
-vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.1");
+vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.2");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithSpinButtons::@WidgetType@WithSpinButtons()
@@ -72,14 +72,6 @@ void @WidgetType@WithSpinButtons::Create(vtkKWApplication *app)
     return;
     }
 
-  // Connect the spin buttons to the widget
-
-  if (this->SpinButtons)
-    {
-    this->SpinButtons->SetIncrementCommand(this->Widget, "IncrementValue");
-    this->SpinButtons->SetDecrementCommand(this->Widget, "DecrementValue");
-    }
-
   // Pack
 
   this->Pack();
@@ -126,20 +118,20 @@ void @WidgetType@WithSpinButtons::Pack()
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@WithSpinButtons::IncrementValueCallback()
+void @WidgetType@WithSpinButtons::NextValueCallback()
 {
   if (this->Widget)
     {
-    this->Widget->IncrementValue();
+    this->Widget->NextValue();
     }
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@WithSpinButtons::DecrementValueCallback()
+void @WidgetType@WithSpinButtons::PreviousValueCallback()
 {
   if (this->Widget)
     {
-    this->Widget->DecrementValue();
+    this->Widget->PreviousValue();
     }
 }
 

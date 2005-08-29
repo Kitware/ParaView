@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithSpinButtons);
-vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithSpinButtons::vtkKWWidgetWithSpinButtons()
@@ -56,8 +56,8 @@ void vtkKWWidgetWithSpinButtons::Create(vtkKWApplication *app)
 
   this->SpinButtons->SetParent(this);
   this->SpinButtons->Create(app);
-  this->SpinButtons->SetIncrementCommand(this, "IncrementValueCallback");
-  this->SpinButtons->SetDecrementCommand(this, "DecrementValueCallback");
+  this->SpinButtons->SetNextCommand(this, "NextValueCallback");
+  this->SpinButtons->SetPreviousCommand(this, "PreviousValueCallback");
 
   // Subclasses will call this->Pack() here. Not now.
   // this->Pack();

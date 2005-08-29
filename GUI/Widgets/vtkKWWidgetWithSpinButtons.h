@@ -15,8 +15,8 @@
 // .SECTION Description
 // This class implements an abstract superclass for composite widgets
 // associating a widget to a set of spin buttons.
-// The only requirement is for the widget to implement the IncrementValue()
-// and DecrementValue() callbacks.
+// The only requirement is for the widget to implement the NextValue()
+// and PreviousValue() callbacks.
 
 #ifndef __vtkKWWidgetWithSpinButtons_h
 #define __vtkKWWidgetWithSpinButtons_h
@@ -57,8 +57,8 @@ public:
 
   // Description:
   // Callbacks
-  virtual void IncrementValueCallback() {};
-  virtual void DecrementValueCallback() {};
+  virtual void NextValueCallback() {};
+  virtual void PreviousValueCallback() {};
 
 protected:
   vtkKWWidgetWithSpinButtons();

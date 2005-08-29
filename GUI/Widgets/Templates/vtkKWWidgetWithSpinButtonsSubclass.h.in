@@ -18,7 +18,7 @@
 // As a subclass of vtkKWWidgetWithSpinButtons, it inherits a set of
 // spin buttons.
 // The only requirement is for the @WidgetType@ class to implement the
-// IncrementValue() and DecrementValue() callbacks.
+// NextValue() and PreviousValue() callbacks.
 // .SECTION See Also
 // vtkKWWidgetWithSpinButtons @WidgetType@
 
@@ -61,8 +61,8 @@ public:
 
   // Description:
   // Callbacks
-  virtual void IncrementValueCallback();
-  virtual void DecrementValueCallback();
+  virtual void NextValueCallback();
+  virtual void PreviousValueCallback();
 
 protected:
   @WidgetType@WithSpinButtons();

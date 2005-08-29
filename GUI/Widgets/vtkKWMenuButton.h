@@ -46,8 +46,8 @@ public:
   // Description:
   // Set/Get the current entry to the previous or next entry
   // and call the corresponding callback if any.
-  virtual void IncrementValue();
-  virtual void DecrementValue();
+  virtual void NextValue();
+  virtual void PreviousValue();
 
   // Description:
   // Get the menu object

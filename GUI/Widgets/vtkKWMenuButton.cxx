@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.30");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -88,7 +88,7 @@ void vtkKWMenuButton::SetValue(const char *s)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::IncrementValue()
+void vtkKWMenuButton::NextValue()
 {
   const char *value = this->GetValue();
   if (!this->Menu || !this->Menu->IsCreated())
@@ -112,7 +112,7 @@ void vtkKWMenuButton::IncrementValue()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::DecrementValue()
+void vtkKWMenuButton::PreviousValue()
 {
   const char *value = this->GetValue();
   if (!this->Menu || !this->Menu->IsCreated() || !this->Menu->HasItem(value))
