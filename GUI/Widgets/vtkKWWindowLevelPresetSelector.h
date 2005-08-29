@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkKWWindowLevelPresetSelectorInternals;
 class vtkKWMultiColumnListWithScrollbars;
+class vtkKWSpinButtons;
 class vtkKWPushButtonSet;
 class vtkImageData;
 
@@ -60,10 +61,18 @@ public:
   virtual const char* GetWindowLevelPresetGroup(int id);
 
   // Description:
-  // Get the number of presets in the pool (or the number of presets with
-  // the same group in the pool).
+  // Assign a comment to a preset in the pool.
+  // Return 1 on success, 0 on error
+  virtual int SetWindowLevelPresetComment(int id, const char *group);
+  virtual const char* GetWindowLevelPresetComment(int id);
+
+  // Description:
+  // Get the number of presets in the pool, or the number of presets with
+  // the same group in the pool, or the number of visible presets, i.e.
+  // the presets that are displayed despite the filters (see GroupFilter).
   virtual int GetNumberOfWindowLevelPresets();
   virtual int GetNumberOfWindowLevelPresetsWithGroup(const char *group);
+  virtual int GetNumberOfVisibleWindowLevelPresets();
 
   // Description:
   // Query if a preset is in the pool, given a window/level, and optionally
@@ -88,9 +97,10 @@ public:
 
   // Description:
   // Retrieve the Id of the first preset with a given window/level,
-  // or given a window/level and a group, or given its position in the pool, 
-  // given its position in the pool  within a group (i.e. nth-preset with
-  // a given group).
+  // or given a window/level and a group, or given its position in the pool, or
+  // given its position in the pool within a group (i.e. nth-preset with
+  // a given group), or given its row position as currently displayed in the
+  // list.
   // Return 1 on success, 0 otherwise
   virtual int GetWindowLevelPresetId(
     double window, double level, int *id);
@@ -100,6 +110,8 @@ public:
     int index, int *id);
   virtual int GetNthWindowLevelPresetIdWithGroup(
     int index, const char *group, int *id);
+  virtual int GetNthVisibleWindowLevelPresetId(
+    int row_index, int *id);
 
   // Description:
   // Retrieve the rank in the whole pool of the nth preset in the pool within
@@ -117,6 +129,13 @@ public:
   virtual int RemoveAllWindowLevelPresetsWithGroup(const char *group);
 
   // Description:
+  // Set/Get the group filter.
+  // If set to a non-empty value, only the presets have the same group
+  // as the filter will be displayed.
+  virtual void SetGroupFilter(const char *group);
+  vtkGetStringMacro(GroupFilter);
+
+  // Description:
   // Set/Get the list height (in number of items)
   // No effect if called before Create().
   virtual void SetListHeight(int);
@@ -128,6 +147,13 @@ public:
   virtual void SetImageColumnVisibility(int);
   virtual int GetImageColumnVisibility();
   vtkBooleanMacro(ImageColumnVisibility, int);
+
+  // Description:
+  // Set/Get the visibility of the comment column.
+  // No effect if called before Create().
+  virtual void SetCommentColumnVisibility(int);
+  virtual int GetCommentColumnVisibility();
+  vtkBooleanMacro(CommentColumnVisibility, int);
 
   // Description:
   // Assign an image to a preset in the pool.
@@ -167,6 +193,15 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
+  // Set/Get if a preset should be applied when it is selected (single-click),
+  // or only when it is double-clicked on.
+  // If set, only one preset can be selected at a time (if not, multiple
+  // preset can be selected, and removed for example).
+  virtual void SetApplyPresetOnSelectionChanged(int);
+  vtkGetMacro(ApplyPresetOnSelectionChanged,int);
+  vtkBooleanMacro(ApplyPresetOnSelectionChanged,int);
+
+  // Description:
   // Specifies a command to be invoked when the the user tries to
   // apply a window/level preset (by double-clicking on the preset for
   // example). The id of the preset is passed to the command.
@@ -193,17 +228,27 @@ public:
   virtual void PresetCellIconCallback(const char*, int, int, const char*);
   virtual const char* PresetCellEditStartCallback(
     const char*, int, int, const char*);
+  virtual const char* PresetCellEditEndCallback(
+    const char*, int, int, const char*);
   virtual void PresetSelectionChangedCallback();
+  virtual void PresetSelectAndApplyPreviousCallback();
+  virtual void PresetSelectAndApplyNextCallback();
 
 protected:
   vtkKWWindowLevelPresetSelector();
   ~vtkKWWindowLevelPresetSelector();
 
   vtkKWMultiColumnListWithScrollbars *PresetList;
+  vtkKWFrame                         *ControlFrame;
+  vtkKWSpinButtons                   *PresetSpinButtons;
   vtkKWPushButtonSet                 *PresetButtons;
+
+  int ApplyPresetOnSelectionChanged;
 
   int ThumbnailSize;
   int ScreenshotSize;
+
+  char* GroupFilter;
 
   // Description:
   // Called when the number of presets has changed
@@ -214,6 +259,9 @@ protected:
   vtkKWWindowLevelPresetSelectorInternals *Internals;
   //ETX
 
+  // Description:
+  // Update one or all rows in the list
+  virtual void UpdateRowsInPresetList();
   virtual void UpdateRowInPresetList(void*);
 
   char *AddWindowLevelPresetCommand;

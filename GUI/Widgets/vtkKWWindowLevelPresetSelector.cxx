@@ -23,17 +23,18 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindowLevelPresetSelector.h"
 
 #include "vtkImageData.h"
+#include "vtkImageData.h"
 #include "vtkImageResample.h"
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkKWIcon.h"
-#include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMultiColumnList.h"
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
+#include "vtkKWSpinButtons.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkImageData.h"
+#include "vtkObjectFactory.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
@@ -44,13 +45,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define VTK_KW_WLPS_ICON_COL       1
 #define VTK_KW_WLPS_WINDOW_COL     2
 #define VTK_KW_WLPS_LEVEL_COL      3
+#define VTK_KW_WLPS_COMMENT_COL    4
 
 #define VTK_KW_WLPS_BUTTON_ADD_ID    0
 #define VTK_KW_WLPS_BUTTON_REMOVE_ID 1
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.3");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -62,6 +64,7 @@ public:
     double Window;
     double Level;
     vtksys_stl::string Group;
+    vtksys_stl::string Comment;
     clock_t CreationTime;
     vtkKWIcon *Thumbnail;
     vtkKWIcon *Screenshot;
@@ -131,11 +134,17 @@ vtkKWWindowLevelPresetSelector::vtkKWWindowLevelPresetSelector()
   this->ApplyWindowLevelPresetCommand  = NULL;
   this->RemoveWindowLevelPresetCommand = NULL;
 
-  this->PresetList              = NULL;
-  this->PresetButtons           = NULL;
+  this->PresetList        = NULL;
+  this->ControlFrame      = NULL;
+  this->PresetSpinButtons = NULL;
+  this->PresetButtons     = NULL;
+
+  this->ApplyPresetOnSelectionChanged = 1;
 
   this->ThumbnailSize = 40;
   this->ScreenshotSize = 156;
+
+  this->GroupFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -145,6 +154,18 @@ vtkKWWindowLevelPresetSelector::~vtkKWWindowLevelPresetSelector()
     {
     this->PresetList->Delete();
     this->PresetList = NULL;
+    }
+
+  if (this->ControlFrame)
+    {
+    this->ControlFrame->Delete();
+    this->ControlFrame = NULL;
+    }
+
+  if (this->PresetSpinButtons)
+    {
+    this->PresetSpinButtons->Delete();
+    this->PresetSpinButtons = NULL;
     }
 
   if (this->PresetButtons)
@@ -178,6 +199,9 @@ vtkKWWindowLevelPresetSelector::~vtkKWWindowLevelPresetSelector()
   // Delete our pool
 
   delete this->Internals;
+  this->Internals = NULL;
+
+  this->SetGroupFilter(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -212,7 +236,14 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
     this->PresetList->GetWidgetName());
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-  list->SetSelectionModeToExtended();
+  if (this->ApplyPresetOnSelectionChanged)
+    {
+    list->SetSelectionModeToSingle();
+    }
+  else
+    {
+    list->SetSelectionModeToExtended();
+    }
   list->SetSelectionChangedCommand(
     this, "PresetSelectionChangedCallback");
   list->SetPotentialCellBackgroundColorChangedCommand(
@@ -221,6 +252,7 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   // list->ColumnLabelsVisibilityOff();
   list->ColumnSeparatorsVisibilityOn();
   list->SetEditStartCommand(this, "PresetCellEditStartCallback");
+  list->SetEditEndCommand(this, "PresetCellEditEndCallback");
 
   int col = 0;
 
@@ -240,18 +272,66 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   col++;
 
   list->AddColumn("Window");
+  list->SetColumnWidth(col, 8);
   list->SetColumnResizable(col, 1);
-  list->SetColumnStretchable(col, 1);
+  list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 1);
   list->SetColumnSortModeToReal(col);
   col++;
 
   list->AddColumn("Level");
+  list->SetColumnWidth(col, 8);
   list->SetColumnResizable(col, 1);
-  list->SetColumnStretchable(col, 1);
+  list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 1);
   list->SetColumnSortModeToReal(col);
   col++;
+
+  list->AddColumn("Comment");
+  list->SetColumnResizable(col, 1);
+  list->SetColumnStretchable(col, 1);
+  list->SetColumnEditable(col, 1);
+  col++;
+
+  // --------------------------------------------------------------
+  // Preset : control frame
+
+  if (!this->ControlFrame)
+    {
+    this->ControlFrame = vtkKWFrame::New();
+    }
+
+  this->ControlFrame->SetParent(this);
+  this->ControlFrame->Create(app);
+
+  this->Script("pack %s -side top -anchor nw -fill both -expand t",
+               this->ControlFrame->GetWidgetName());
+
+  // --------------------------------------------------------------
+  // Preset : spin buttons
+
+  if (!this->PresetSpinButtons)
+    {
+    this->PresetSpinButtons = vtkKWSpinButtons::New();
+    }
+
+  this->PresetSpinButtons->SetParent(this->ControlFrame);
+  this->PresetSpinButtons->Create(app);
+  this->PresetSpinButtons->SetLayoutOrientationToHorizontal();
+  this->PresetSpinButtons->SetArrowOrientationToVertical();
+  this->PresetSpinButtons->SetButtonsPadX(2);
+  this->PresetSpinButtons->SetButtonsPadY(2);
+  this->PresetSpinButtons->GetPreviousButton()->SetBalloonHelpString(
+    "Select and apply previous preset");
+  this->PresetSpinButtons->GetNextButton()->SetBalloonHelpString(
+    "Select and apply next preset");
+  this->PresetSpinButtons->SetPreviousCommand(
+    this, "PresetSelectAndApplyPreviousCallback");
+  this->PresetSpinButtons->SetNextCommand(
+    this, "PresetSelectAndApplyNextCallback");
+
+  this->Script("pack %s -side left -anchor nw -fill both -expand t",
+               this->PresetSpinButtons->GetWidgetName());
 
   // --------------------------------------------------------------
   // Preset : buttons
@@ -261,13 +341,14 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
     this->PresetButtons = vtkKWPushButtonSet::New();
     }
 
-  this->PresetButtons->SetParent(this);
+  this->PresetButtons->SetParent(this->ControlFrame);
   this->PresetButtons->PackHorizontallyOn();
   this->PresetButtons->SetWidgetsPadX(2);
   this->PresetButtons->SetWidgetsPadY(2);
+  this->PresetButtons->SetWidgetsInternalPadY(1);
   this->PresetButtons->Create(app);
 
-  this->Script("pack %s -side top -anchor nw -fill x -expand t",
+  this->Script("pack %s -side left -anchor nw -fill x -expand t",
                this->PresetButtons->GetWidgetName());
 
   vtkKWPushButton *pb = NULL;
@@ -277,7 +358,7 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_ADD_ID);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
   pb->SetCommand(this, "PresetAddCallback");
-  pb->SetBalloonHelpString("Take a window/level preset");
+  pb->SetBalloonHelpString("Add a window/level preset");
 
   // remove preset
 
@@ -289,7 +370,31 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
 
   // Update enable state
 
-  this->UpdateEnableState();
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::SetApplyPresetOnSelectionChanged(int arg)
+{
+  if (this->ApplyPresetOnSelectionChanged == arg)
+    {
+    return;
+    }
+
+  this->ApplyPresetOnSelectionChanged = arg;
+  this->Modified();
+
+  if (this->PresetList)
+    {
+    if (this->ApplyPresetOnSelectionChanged)
+      {
+      this->PresetList->GetWidget()->SetSelectionModeToSingle();
+      }
+    else
+      {
+      this->PresetList->GetWidget()->SetSelectionModeToExtended();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -328,6 +433,27 @@ int vtkKWWindowLevelPresetSelector::GetImageColumnVisibility()
     {
     return this->PresetList->GetWidget()->GetColumnVisibility(
       VTK_KW_WLPS_ICON_COL);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::SetCommentColumnVisibility(int arg)
+{
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->SetColumnVisibility(
+      VTK_KW_WLPS_COMMENT_COL, arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::GetCommentColumnVisibility()
+{
+  if (this->PresetList)
+    {
+    return this->PresetList->GetWidget()->GetColumnVisibility(
+      VTK_KW_WLPS_COMMENT_COL);
     }
   return 0;
 }
@@ -372,6 +498,8 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetGroup(
   if (it != this->Internals->Pool.end())
     {
     (*it)->Group = group ? group : "";
+    this->UpdateRowInPresetList(*it);
+    this->Update(); // the number of visible widgets may have changed
     return 1;
     }
 
@@ -387,6 +515,36 @@ const char* vtkKWWindowLevelPresetSelector::GetWindowLevelPresetGroup(
   if (it != this->Internals->Pool.end())
     {
     return (*it)->Group.c_str();
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetComment(
+  int id, const char *group)
+{
+  vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+    this->Internals->GetPoolNode(id);
+  if (it != this->Internals->Pool.end())
+    {
+    (*it)->Comment = group ? group : "";
+    this->UpdateRowInPresetList(*it);
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWindowLevelPresetSelector::GetWindowLevelPresetComment(
+  int id)
+{
+  vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+    this->Internals->GetPoolNode(id);
+  if (it != this->Internals->Pool.end())
+    {
+    return (*it)->Comment.c_str();
     }
 
   return NULL;
@@ -419,6 +577,16 @@ int vtkKWWindowLevelPresetSelector::GetNumberOfWindowLevelPresetsWithGroup(
     }
 
   return count;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::GetNumberOfVisibleWindowLevelPresets()
+{
+  if (this->GroupFilter && *this->GroupFilter)
+    {
+    return this->GetNumberOfWindowLevelPresetsWithGroup(this->GroupFilter);
+    }
+  return this->GetNumberOfWindowLevelPresets();
 }
 
 //----------------------------------------------------------------------------
@@ -544,6 +712,22 @@ int vtkKWWindowLevelPresetSelector::GetNthWindowLevelPresetIdWithGroup(
   if (this->GetNthWindowLevelPresetRankWithGroup(index, group, &rank))
     {
     return this->GetNthWindowLevelPresetId(rank, id);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::GetNthVisibleWindowLevelPresetId(
+  int row_index, int *id)
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    if (row_index >= 0 && row_index < list->GetNumberOfRows())
+      {
+      *id = list->GetCellTextAsInt(row_index, VTK_KW_WLPS_ID_COL);
+      return 1;
+      }
     }
   return 0;
 }
@@ -687,6 +871,7 @@ int vtkKWWindowLevelPresetSelector::RemoveAllWindowLevelPresetsWithGroup(
 //----------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::NumberOfWindowLevelPresetsHasChanged()
 {
+  this->Update(); // enable/disable some buttons valid only if we have presets
 }
 
 //---------------------------------------------------------------------------
@@ -786,6 +971,55 @@ int vtkKWWindowLevelPresetSelector::HasWindowLevelPresetImage(int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::SetGroupFilter(const char* _arg)
+{
+  if (this->GroupFilter == NULL && _arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->GroupFilter && _arg && (!strcmp(this->GroupFilter, _arg))) 
+    { 
+    return;
+    }
+
+  if (this->GroupFilter) 
+    { 
+    delete [] this->GroupFilter; 
+    }
+
+  if (_arg)
+    {
+    this->GroupFilter = new char[strlen(_arg)+1];
+    strcpy(this->GroupFilter,_arg);
+    }
+   else
+    {
+    this->GroupFilter = NULL;
+    }
+
+  this->Modified();
+
+  this->UpdateRowsInPresetList();
+} 
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::UpdateRowsInPresetList()
+{
+  if (this->Internals)
+    {
+    vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWWindowLevelPresetSelectorInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      this->UpdateRowInPresetList(*it);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 {
   if (!ptr || !this->PresetList)
@@ -798,11 +1032,35 @@ void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
 
+  // Look for this node in the list
+
   int row = list->FindCellTextAsIntInColumn(VTK_KW_WLPS_ID_COL, node->Id);
+
+  int group_filter_exclude =
+    this->GroupFilter && *this->GroupFilter && 
+    node->Group.compare(this->GroupFilter);
+
+  // Not found ? Insert it, or ignore it if the group filter does not match
+
   if (row < 0)
     {
+    if (group_filter_exclude)
+      {
+      return;
+      }
     list->AddRow();
     row = list->GetNumberOfRows() - 1;
+    }
+
+  // Found ? Remove it if the group filter does not match
+
+  else
+    {
+    if (group_filter_exclude)
+      {
+      list->DeleteRow(row);
+      return;
+      }
     }
 
   // Id (not shown, but useful to retrieve the id of a preset from
@@ -823,6 +1081,7 @@ void vtkKWWindowLevelPresetSelector::UpdateRowInPresetList(void *ptr)
 
   list->SetCellTextAsDouble(row, VTK_KW_WLPS_WINDOW_COL, node->Window);
   list->SetCellTextAsDouble(row, VTK_KW_WLPS_LEVEL_COL, node->Level);
+  list->SetCellText(row, VTK_KW_WLPS_COMMENT_COL, node->Comment.c_str());
 }
 
 //---------------------------------------------------------------------------
@@ -872,7 +1131,7 @@ void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
 
 //---------------------------------------------------------------------------
 const char* vtkKWWindowLevelPresetSelector::PresetCellEditStartCallback(
-  const char *, int row, int, const char *text)
+  const char *, int row, int col, const char *text)
 {
   if (!this->Internals || !this->PresetList)
     {
@@ -886,9 +1145,36 @@ const char* vtkKWWindowLevelPresetSelector::PresetCellEditStartCallback(
     this->Internals->GetPoolNode(id);
   if (it != this->Internals->Pool.end())
     {
-    this->InvokeApplyWindowLevelPresetCommand(id);
+    if (col != VTK_KW_WLPS_COMMENT_COL)
+      {
+      this->InvokeApplyWindowLevelPresetCommand(id);
+      list->CancelEditing();
+      }
     }
-  list->CancelEditing();
+  return text;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkKWWindowLevelPresetSelector::PresetCellEditEndCallback(
+  const char *, int row, int col, const char *text)
+{
+  if (!this->Internals || !this->PresetList)
+    {
+    return NULL;
+    }
+
+  vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+  int id = list->GetCellTextAsInt(row, VTK_KW_WLPS_ID_COL);
+
+  vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+    this->Internals->GetPoolNode(id);
+  if (it != this->Internals->Pool.end())
+    {
+    if (col == VTK_KW_WLPS_COMMENT_COL)
+      {
+      this->SetWindowLevelPresetComment(id, text);
+      }
+    }
   return text;
 }
 
@@ -933,7 +1219,74 @@ void vtkKWWindowLevelPresetSelector::PresetRemoveCallback()
 //---------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::PresetSelectionChangedCallback()
 {
-  this->Update();
+  this->Update(); // this enable/disable the remove button if no selection
+
+  if (this->ApplyPresetOnSelectionChanged)
+    {
+    if (this->PresetList)
+      {
+      vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+      if (list->GetNumberOfSelectedRows())
+        {
+        int id = list->GetCellTextAsInt(
+          list->GetIndexOfFirstSelectedRow(), VTK_KW_WLPS_ID_COL);
+        vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+          this->Internals->GetPoolNode(id);
+        if (it != this->Internals->Pool.end())
+          {
+          this->InvokeApplyWindowLevelPresetCommand(id);
+          }
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::PresetSelectAndApplyPreviousCallback()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int nb_rows = list->GetNumberOfRows();
+    if (nb_rows)
+      {
+      int prev_row; 
+      if (!list->GetNumberOfSelectedRows())
+        {
+        prev_row = nb_rows - 1;
+        }
+      else
+        {
+        int sel_row = list->GetIndexOfFirstSelectedRow();
+        prev_row = (nb_rows == 1 || sel_row == 0) ? nb_rows - 1 : sel_row - 1;
+        }
+      list->SelectSingleRow(prev_row);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::PresetSelectAndApplyNextCallback()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int nb_rows = list->GetNumberOfRows();
+    if (nb_rows)
+      {
+      int next_row; 
+      if (!list->GetNumberOfSelectedRows())
+        {
+        next_row = 0;
+        }
+      else
+        {
+        int sel_row = list->GetIndexOfFirstSelectedRow();
+        next_row = (nb_rows == 1 || sel_row == nb_rows - 1) ? 0 : sel_row + 1;
+        }
+      list->SelectSingleRow(next_row);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -942,6 +1295,7 @@ void vtkKWWindowLevelPresetSelector::SetAddWindowLevelPresetCommand(
 {
   this->SetObjectMethodCommand(
     &this->AddWindowLevelPresetCommand, object, method);
+  this->Update(); // this show/hide the add button
 }
 
 //----------------------------------------------------------------------------
@@ -998,6 +1352,8 @@ void vtkKWWindowLevelPresetSelector::InvokeRemoveWindowLevelPresetCommand(
 //---------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::Update()
 {
+  this->UpdateEnableState();
+
   if (this->PresetButtons)
     {
     this->PresetButtons->SetWidgetVisibility(
@@ -1012,7 +1368,15 @@ void vtkKWWindowLevelPresetSelector::Update()
     this->PresetButtons->GetWidget(
       VTK_KW_WLPS_BUTTON_REMOVE_ID)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
+    }
 
+
+  if (this->PresetSpinButtons)
+    {
+    if (!this->GetNumberOfVisibleWindowLevelPresets())
+      {
+      this->PresetSpinButtons->SetEnabled(0);
+      }
     }
 }
 
@@ -1024,6 +1388,16 @@ void vtkKWWindowLevelPresetSelector::UpdateEnableState()
   if (this->PresetList)
     {
     this->PresetList->SetEnabled(this->GetEnabled());
+    }
+
+  if (this->ControlFrame)
+    {
+    this->ControlFrame->SetEnabled(this->GetEnabled());
+    }
+
+  if (this->PresetSpinButtons)
+    {
+    this->PresetSpinButtons->SetEnabled(this->GetEnabled());
     }
 
   if (this->PresetButtons)
