@@ -148,7 +148,7 @@ proc apply_wl_preset {id} {
 
 vtkKWFrameWithLabel animation_frame
 animation_frame SetParent [win GetMainPanelFrame] 
-animation_frame Create $app
+animation_frame Create app
 animation_frame SetLabelText "Movie Creator"
 
 pack [animation_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
@@ -183,7 +183,10 @@ reader Delete
 viewer Delete
 slice_scale Delete
 orientation_menubutton Delete
+wl_frame Delete
 wl_preset_selector Delete
+animation_frame Delete
+animation_widget Delete
 win Delete
 app Delete
 
