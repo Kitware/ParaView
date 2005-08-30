@@ -66,7 +66,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -963,24 +963,6 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     this->RenderWidget->OffScreenRenderingOn();
     old_size[0] = this->RenderWidget->GetRenderWindow()->GetSize()[0];
     old_size[1] = this->RenderWidget->GetRenderWindow()->GetSize()[1];
-    int width = old_size[0];
-    int height = old_size[1];
-    if ((width % 32) > 0)
-      {
-      width -= width % 32;
-      }
-    if ((height % 8) > 0)
-      {
-      height -= height % 8;
-      }
-    if (width > 1920)
-      {
-      width = 1920;
-      }
-    if (height > 1080)
-      {
-      height = 1080;
-      }      
     this->RenderWidget->GetRenderWindow()->SetSize(width, height);
     if (win)
       {
