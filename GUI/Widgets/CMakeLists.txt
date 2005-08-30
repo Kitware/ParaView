@@ -150,6 +150,7 @@ SET(KWWidgets_SRCS
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
   vtkKWSeparator.cxx
+  vtkKWSimpleAnimationWidget.cxx
   vtkKWSimpleEntryDialog.cxx
   vtkKWSpinBox.cxx
   vtkKWSpinButtons.cxx

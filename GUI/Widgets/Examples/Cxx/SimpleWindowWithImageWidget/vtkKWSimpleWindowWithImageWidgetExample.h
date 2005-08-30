@@ -20,7 +20,11 @@ public:
 
   // Description:
   // Callbacks
-  virtual void SetSliceCallback();
+  virtual void SetSliceFromScaleCallback();
+  virtual void SetSliceCallback(int slice);
+  virtual int  GetSliceCallback();
+  virtual int  GetSliceMinCallback();
+  virtual int  GetSliceMaxCallback();
   virtual void SetSliceOrientationToXYCallback();
   virtual void SetSliceOrientationToXZCallback();
   virtual void SetSliceOrientationToYZCallback();

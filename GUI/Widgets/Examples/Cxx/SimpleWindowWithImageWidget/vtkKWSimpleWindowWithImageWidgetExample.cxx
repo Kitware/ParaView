@@ -1,6 +1,5 @@
 #include "vtkKWSimpleWindowWithImageWidgetExample.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkImageData.h"
 #include "vtkImageViewer2.h"
@@ -9,15 +8,17 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithSpinButtons.h"
 #include "vtkKWMenuButtonWithSpinButtonsWithLabel.h"
+#include "vtkKWNotebook.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
+#include "vtkKWSimpleAnimationWidget.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWNotebook.h"
 #include "vtkKWWindow.h"
+#include "vtkKWWindowLevelPresetSelector.h"
+#include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
-#include "vtkKWWindowLevelPresetSelector.h"
 
 #include "vtkKWWidgetsConfigurePaths.h"
 #include "vtkToolkits.h"
@@ -27,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.1");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.2");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -129,7 +130,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   this->SliceScale = vtkKWScale::New();
   this->SliceScale->SetParent(win->GetViewPanelFrame());
   this->SliceScale->Create(app);
-  this->SliceScale->SetCommand(this, "SetSliceCallback");
+  this->SliceScale->SetCommand(this, "SetSliceFromScaleCallback");
 
   this->UpdateSliceScale();
 
@@ -173,9 +174,29 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   this->WindowLevelPresetSelector->SetApplyWindowLevelPresetCommand(
     this, "ApplyWindowLevelPresetCallback");
   
-  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
+  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 1",
               this->WindowLevelPresetSelector->GetWidgetName());
-  
+
+  // Create a simple animation widget
+
+  vtkKWSimpleAnimationWidget *animation_widget = 
+    vtkKWSimpleAnimationWidget::New();
+  animation_widget->SetParent(win->GetMainPanelFrame());
+  animation_widget->Create(app);
+  animation_widget->SetPadX(2);
+  animation_widget->SetPadY(2);
+  animation_widget->SetBorderWidth(2);
+  animation_widget->SetReliefToGroove();
+  animation_widget->SetRenderWidget(this->RenderWidget);
+  animation_widget->SetAnimationTypeToSlice();
+  animation_widget->SetSliceSetCommand(this, "SetSliceCallback");
+  animation_widget->SetSliceGetCommand(this, "GetSliceCallback");
+  animation_widget->SetSliceGetMinCommand(this, "GetSliceMinCallback");
+  animation_widget->SetSliceGetMaxCommand(this, "GetSliceMaxCallback");
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 1",
+              animation_widget->GetWidgetName());
+
   // Start the application
   // If --test was provided, do not enter the event loop
 
@@ -196,15 +217,40 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   this->ImageViewer->Delete();
   this->RenderWidget->Delete();
   this->WindowLevelPresetSelector->Delete();
+  animation_widget->Delete();
   win->Delete();
   
   return ret;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceCallback()
+void vtkKWSimpleWindowWithImageWidgetExample::SetSliceFromScaleCallback()
 {
   this->ImageViewer->SetSlice(this->SliceScale->GetValue());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSimpleWindowWithImageWidgetExample::SetSliceCallback(int slice)
+{
+  this->ImageViewer->SetSlice(slice);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSimpleWindowWithImageWidgetExample::GetSliceCallback()
+{
+  return this->ImageViewer->GetSlice();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSimpleWindowWithImageWidgetExample::GetSliceMinCallback()
+{
+  return this->ImageViewer->GetSliceMin();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSimpleWindowWithImageWidgetExample::GetSliceMaxCallback()
+{
+  return this->ImageViewer->GetSliceMax();
 }
 
 //----------------------------------------------------------------------------

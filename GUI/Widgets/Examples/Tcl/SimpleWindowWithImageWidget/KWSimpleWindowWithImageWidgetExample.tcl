@@ -141,6 +141,24 @@ proc apply_wl_preset {id} {
   viewer Render
 }
 
+# Create a simple animation widget
+
+vtkKWSimpleAnimationWidget animation_widget
+animation_widget SetParent [win GetMainPanelFrame] 
+animation_widget Create app
+animation_widget SetPadX 2
+animation_widget SetPadY 2
+animation_widget SetBorderWidth 2
+animation_widget SetReliefToGroove
+animation_widget SetRenderWidget rw
+animation_widget SetAnimationTypeToSlice
+animation_widget SetSliceSetCommand viewer "SetSlice"
+animation_widget SetSliceGetCommand viewer "GetSlice"
+animation_widget SetSliceGetMinCommand viewer "GetSliceMin"
+animation_widget SetSliceGetMaxCommand viewer "GetSliceMax"
+
+pack [animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x -pady 1
+
 # Start the application
 # If --test was provided, do not enter the event loop
 
