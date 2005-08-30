@@ -116,18 +116,21 @@ $mb SetValue "X-Y"
 
 # Create a window/level preset selector
 
+vtkKWFrameWithLabel wl_frame
+wl_frame SetParent [win GetMainPanelFrame] 
+wl_frame Create app
+wl_frame SetLabelText "Window/Level Presets"
+
+pack [wl_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
+
 vtkKWWindowLevelPresetSelector wl_preset_selector
 
-wl_preset_selector SetParent [win GetMainPanelFrame]
+wl_preset_selector SetParent [wl_frame GetFrame] 
 wl_preset_selector Create app
-wl_preset_selector SetPadX 2
-wl_preset_selector SetPadY 2
-wl_preset_selector SetBorderWidth 2
-wl_preset_selector SetReliefToGroove
 wl_preset_selector SetAddWindowLevelPresetCommand "" "add_wl_preset"
 wl_preset_selector SetApplyWindowLevelPresetCommand "" "apply_wl_preset"
 
-pack [wl_preset_selector GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
+pack [wl_preset_selector GetWidgetName] -side top -anchor nw -expand n -fill x
 
 proc add_wl_preset {} {
   set id [wl_preset_selector AddWindowLevelPreset [viewer GetColorWindow] [viewer GetColorLevel]]
@@ -143,13 +146,16 @@ proc apply_wl_preset {id} {
 
 # Create a simple animation widget
 
+vtkKWFrameWithLabel animation_frame
+animation_frame SetParent [win GetMainPanelFrame] 
+animation_frame Create $app
+animation_frame SetLabelText "Movie Creator"
+
+pack [animation_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
+
 vtkKWSimpleAnimationWidget animation_widget
-animation_widget SetParent [win GetMainPanelFrame] 
+animation_widget SetParent [animation_frame GetFrame] 
 animation_widget Create app
-animation_widget SetPadX 2
-animation_widget SetPadY 2
-animation_widget SetBorderWidth 2
-animation_widget SetReliefToGroove
 animation_widget SetRenderWidget rw
 animation_widget SetAnimationTypeToSlice
 animation_widget SetSliceSetCommand viewer "SetSlice"
@@ -157,7 +163,7 @@ animation_widget SetSliceGetCommand viewer "GetSlice"
 animation_widget SetSliceGetMinCommand viewer "GetSliceMin"
 animation_widget SetSliceGetMaxCommand viewer "GetSliceMax"
 
-pack [animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x -pady 1
+pack [animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
 
 # Start the application
 # If --test was provided, do not enter the event loop

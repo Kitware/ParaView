@@ -5,6 +5,7 @@
 #include "vtkImageViewer2.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithSpinButtons.h"
 #include "vtkKWMenuButtonWithSpinButtonsWithLabel.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.2");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.3");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -161,32 +162,40 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   // Create a window/level preset selector
 
+  vtkKWFrameWithLabel *wl_frame = vtkKWFrameWithLabel::New();
+  wl_frame->SetParent(win->GetMainPanelFrame());
+  wl_frame->Create(app);
+  wl_frame->SetLabelText("Window/Level Presets");
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
+              wl_frame->GetWidgetName());
+
   this->WindowLevelPresetSelector = vtkKWWindowLevelPresetSelector::New();
 
-  this->WindowLevelPresetSelector->SetParent(win->GetMainPanelFrame());
+  this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create(app);
-  this->WindowLevelPresetSelector->SetPadX(2);
-  this->WindowLevelPresetSelector->SetPadY(2);
-  this->WindowLevelPresetSelector->SetBorderWidth(2);
-  this->WindowLevelPresetSelector->SetReliefToGroove();
   this->WindowLevelPresetSelector->SetAddWindowLevelPresetCommand(
     this, "AddWindowLevelPresetCallback");
   this->WindowLevelPresetSelector->SetApplyWindowLevelPresetCommand(
     this, "ApplyWindowLevelPresetCallback");
   
-  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 1",
+  app->Script("pack %s -side top -anchor nw -expand n -fill x",
               this->WindowLevelPresetSelector->GetWidgetName());
 
   // Create a simple animation widget
 
+  vtkKWFrameWithLabel *animation_frame = vtkKWFrameWithLabel::New();
+  animation_frame->SetParent(win->GetMainPanelFrame());
+  animation_frame->Create(app);
+  animation_frame->SetLabelText("Movie Creator");
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
+              animation_frame->GetWidgetName());
+
   vtkKWSimpleAnimationWidget *animation_widget = 
     vtkKWSimpleAnimationWidget::New();
-  animation_widget->SetParent(win->GetMainPanelFrame());
+  animation_widget->SetParent(animation_frame->GetFrame());
   animation_widget->Create(app);
-  animation_widget->SetPadX(2);
-  animation_widget->SetPadY(2);
-  animation_widget->SetBorderWidth(2);
-  animation_widget->SetReliefToGroove();
   animation_widget->SetRenderWidget(this->RenderWidget);
   animation_widget->SetAnimationTypeToSlice();
   animation_widget->SetSliceSetCommand(this, "SetSliceCallback");
@@ -194,7 +203,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   animation_widget->SetSliceGetMinCommand(this, "GetSliceMinCallback");
   animation_widget->SetSliceGetMaxCommand(this, "GetSliceMaxCallback");
 
-  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 1",
+  app->Script("pack %s -side top -anchor nw -expand n -fill x",
               animation_widget->GetWidgetName());
 
   // Start the application
@@ -216,10 +225,12 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   orientation_menubutton->Delete();
   this->ImageViewer->Delete();
   this->RenderWidget->Delete();
+  wl_frame->Delete();
   this->WindowLevelPresetSelector->Delete();
+  animation_frame->Delete();
   animation_widget->Delete();
   win->Delete();
-  
+
   return ret;
 }
 
