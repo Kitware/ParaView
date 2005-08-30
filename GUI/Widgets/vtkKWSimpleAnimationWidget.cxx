@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -530,7 +530,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->Create(this->GetApplication());
   save_dialog->SetTitle("Save Animation");
   save_dialog->SaveDialogOn();
-#ifdef _WIN32
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
   save_dialog->SetFileTypes("{{AVI} {.avi}} {{MPEG2 movie file} {.mp2}}");
   save_dialog->SetDefaultExtension(".avi");
 #else
@@ -726,16 +726,6 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
 
   vtkWindowToImageFilter *w2i = NULL;
   vtkGenericMovieWriter *awriter = NULL;
-  if (ext && !strcmp(ext, ".mp2"))
-    {
-    awriter = vtkMPEG2Writer::New();
-    }
-#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
-  else if (ext && !strcmp(ext, ".avi"))
-    {
-    awriter = vtkAVIWriter::New();
-    }
-#endif
 
   if (previewing)
     {
@@ -749,6 +739,25 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     }
   else
     {
+    if (ext)
+      {
+      if (!strcmp(ext, ".mp2"))
+        {
+        awriter = vtkMPEG2Writer::New();
+        }
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
+      else if (!strcmp(ext, ".avi"))
+        {
+        awriter = vtkAVIWriter::New();
+        }
+#endif
+      if (!awriter)
+        {
+        vtkErrorMacro("Failed to create a movie writer for extension: "<< ext);
+        return;
+        }
+      }
+
     this->RenderWidget->OffScreenRenderingOn();
     old_size[0] = this->RenderWidget->GetRenderWindow()->GetSize()[0];
     old_size[1] = this->RenderWidget->GetRenderWindow()->GetSize()[1];
