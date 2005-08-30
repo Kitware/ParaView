@@ -37,6 +37,12 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkKWWindowBase.h"
 
+// Temporary
+
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
+#undef VTK_USE_VIDEO_FOR_WINDOWS 
+#endif
+
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
 #include "vtkAVIWriter.h"
 #endif
@@ -60,7 +66,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
