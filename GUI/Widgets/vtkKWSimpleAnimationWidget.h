@@ -18,7 +18,7 @@
 // type. The first one, 'Camera' provides a user interface to rotate the
 // camera in the scene. The second one, 'Slice' provides a different user
 // interface to slice through a volume for example (say, display all the
-// slices along the saggital axis of a medical dataset). No explicit reference
+// slices along the sagittal axis of a medical dataset). No explicit reference
 // is made to the dataset, but callbacks must be set so that this widget
 // can set or get the slice value on the approriate external resource.
 
