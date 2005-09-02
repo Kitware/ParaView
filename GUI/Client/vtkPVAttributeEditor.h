@@ -26,7 +26,6 @@
 #include "vtkPVSource.h"
 
 class vtkSMPointLabelDisplay;
-
 class vtkCollection;
 class vtkKWFrame;
 class vtkKWLabel;
@@ -37,8 +36,6 @@ class vtkKWEntry;
 class vtkCallbackCommand;
 class vtkPVReaderModule;
 
-#include "vtkClientServerID.h"
-#include "vtkClientServerStream.h"
 
 class VTK_EXPORT vtkPVAttributeEditor : public vtkPVSource
 {
