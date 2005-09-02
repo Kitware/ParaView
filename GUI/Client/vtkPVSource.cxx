@@ -62,7 +62,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.453");
+vtkCxxRevisionMacro(vtkPVSource, "1.454");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2316,6 +2316,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
     }
   else
     {
+    *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] Update\n";
     *file << "[$kw(" << this->GetTclName()
           << ") GetPVOutput] ColorByProperty\n";
     }
