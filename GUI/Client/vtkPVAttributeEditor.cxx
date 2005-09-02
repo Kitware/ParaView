@@ -107,7 +107,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.1");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -168,8 +168,20 @@ void vtkPVAttributeEditor::CreateProperties()
   // Call the superclass to create the widget and set the appropriate flags
   this->Superclass::CreateProperties();
 
+  // listen for the following events
+  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::CharEvent, this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonPressEvent, this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonReleaseEvent, this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+  this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+
+  vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
+  select->SetModifiedCommand(this->GetTclName(),"PickMethodObserver");
+
   vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
-  if(strcmp(mod->GetModuleName(),"ExodusReader")!=0)
+  if(mod ==NULL || strcmp(mod->GetModuleName(),"ExodusReader")!=0)
     {
     return;
     }
@@ -229,21 +241,7 @@ void vtkPVAttributeEditor::CreateProperties()
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
 
-  vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
-  select->SetModifiedCommand(this->GetTclName(),"PickMethodObserver");
-
   this->GetNotebook()->SetAutoAccept(0);
-
-  // listen for the following events
-
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::CharEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonPressEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonReleaseEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-
 }
 
 //----------------------------------------------------------------------------
