@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.762");
+vtkCxxRevisionMacro(vtkPVWindow, "1.763");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -5077,6 +5077,19 @@ void vtkPVWindow::RestorePVWindowGeometry()
     {
     this->AnimationManager->RestoreWindowGeometryFromRegistry();
     }
+}
+
+vtkPVReaderModule *vtkPVWindow::GetCurrentPVReaderModule()
+{
+  vtkPVSource *src, *temp;
+
+  src = this->GetCurrentPVSource();
+  while((temp = src->GetPVInput(0)))
+    {
+    src = temp;
+    }
+
+  return vtkPVReaderModule::SafeDownCast(src);
 }
 
 //-----------------------------------------------------------------------------

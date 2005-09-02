@@ -128,6 +128,7 @@ public:
   void SetCurrentPVSourceCallback(vtkPVSource *comp);
   vtkPVSource *GetCurrentPVSource() {return this->CurrentPVSource;}
   vtkPVSource *GetPreviousPVSource(int idx = 1);
+  vtkPVReaderModule *GetCurrentPVReaderModule();
 
   // Description:
   // This adds a PVSource to the collection called "listname", and makes 

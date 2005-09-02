@@ -68,6 +68,7 @@ SET( ParaViewClient_SRCS
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx
   vtkPVAnimationManager.cxx
+  vtkPVAttributeEditor.cxx
   vtkPVRampKeyFrame.cxx
   vtkPVBooleanKeyFrame.cxx
   vtkPVCameraAnimationCue.cxx
@@ -148,6 +149,8 @@ SET( ParaViewClient_SRCS
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVPick.cxx
+  vtkPVPickBoxWidget.cxx
+  vtkPVPickSphereWidget.cxx
   vtkPVProbe.cxx
   vtkPVPropertyKeyFrame.cxx
   vtkPVProxyKeyFrame.cxx
@@ -199,6 +202,7 @@ SET( ParaViewClient_SRCS
   #  vtkPVRenderGroupDialog.cxx
   ${ExtraParaViewClient_SRCS}
   )
+
 
 
 INCLUDE_DIRECTORIES(

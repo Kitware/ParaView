@@ -57,6 +57,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
+
 // Some header file is defining CurrentTime so undef it
 #undef CurrentTime
 
@@ -71,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.55");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.56");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1014,6 +1015,9 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     vtkErrorMacro("Scene has not been created yet.");
     return;
     }
+
+  this->InvokeEvent(vtkKWEvent::TimeChangedEvent);
+
   //Firstly, if the time resolution is 1, we round the time the time value.
   if (this->TimeScale->GetResolution() == 1)
     {

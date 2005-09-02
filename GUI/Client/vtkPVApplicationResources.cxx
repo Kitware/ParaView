@@ -82,6 +82,8 @@
 #include "Resources/vtkPVRecordState.h"
 #include "Resources/vtkPVMovie.h"
 #include "Resources/vtkPVLookmarkButton.h"
+#include "Resources/vtkPVAttributeEditor.h"
+
 
 // Splash screen
 
@@ -467,6 +469,13 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVLookmarkButton_height,
     image_PVLookmarkButton_pixel_size,
     image_PVLookmarkButton_length);
+
+  this->CreatePhoto("PVAttributeEditor",
+    image_PVAttributeEditor,
+    image_PVAttributeEditor_width,
+    image_PVAttributeEditor_height,
+    image_PVAttributeEditor_pixel_size,
+    image_PVAttributeEditor_buffer_length);
 }
 
 //----------------------------------------------------------------------------
