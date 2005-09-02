@@ -3,6 +3,7 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 
 SET(Filters_SRCS
+  vtkAttributeEditor.cxx
   vtkCVGeometryCache.cxx
   vtkCaveRenderManager.cxx
   vtkCleanUnstructuredGrid.cxx
