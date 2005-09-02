@@ -292,6 +292,7 @@ void vtkSMPointLabelDisplayProxy::Update()
   vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
   p->Modified();
   this->UpdateSuppressorProxy->UpdateVTKObjects(); 
+  this->GeometryIsValid = 1;
 }
 
 //-----------------------------------------------------------------------------
