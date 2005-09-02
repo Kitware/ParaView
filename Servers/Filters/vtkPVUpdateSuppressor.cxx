@@ -26,7 +26,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.27");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.28");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -52,7 +52,6 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 void vtkPVUpdateSuppressor::ForceUpdate()
 {
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
-  vtkDataSet *output = this->GetOutput();
   if (input == 0)
     {
     vtkErrorMacro("No valid input.");
@@ -60,6 +59,10 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     }
   input->UpdateInformation();
   input =  vtkDataSet::SafeDownCast(this->GetInput());
+
+  // Make sure that output type matches input type
+  this->UpdateInformation();
+  vtkDataSet *output = this->GetOutput();
 
   // int fixme; // I do not like this hack.  How can we get rid of it?
   // Assume the input is the collection filter.
