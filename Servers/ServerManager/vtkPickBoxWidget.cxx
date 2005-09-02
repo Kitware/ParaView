@@ -47,7 +47,7 @@
 
 
 vtkStandardNewMacro(vtkPickBoxWidget);
-vtkCxxRevisionMacro(vtkPickBoxWidget, "1.1");
+vtkCxxRevisionMacro(vtkPickBoxWidget, "1.2");
 
 
 
@@ -123,10 +123,10 @@ void vtkPickBoxWidget::SetEnabled(int enabling)
 }
 
 //----------------------------------------------------------------------------
-void vtkPickBoxWidget::ProcessEvents(vtkObject* object, 
+void vtkPickBoxWidget::ProcessEvents(vtkObject* vtkNotUsed(object), 
                                        unsigned long event,
                                        void* clientdata, 
-                                       void* calldata)
+                                       void* vtkNotUsed(calldata))
 {
   vtkPickBoxWidget* self 
     = reinterpret_cast<vtkPickBoxWidget *>( clientdata );
