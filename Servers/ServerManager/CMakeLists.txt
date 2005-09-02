@@ -1,10 +1,13 @@
 PROJECT(ServerManager)
 
 SET( ServerManagerCS_SRCS
+  vtkPickBoxWidget.cxx
   vtkPickPointWidget.cxx
   vtkPickLineWidget.cxx
+  vtkPickSphereWidget.cxx
   )
  
+
 SET( ServerManagerCommon_SRCS
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
@@ -64,8 +67,10 @@ SET( ServerManagerCommon_SRCS
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
+  vtkSMPickBoxWidgetProxy.cxx
   vtkSMPickLineWidgetProxy.cxx
   vtkSMPickPointWidgetProxy.cxx
+  vtkSMPickSphereWidgetProxy.cxx
   vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
@@ -108,6 +113,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
   )
+
 
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx

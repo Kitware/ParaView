@@ -2955,4 +2955,77 @@ Tessellate a higher-order dataset.
     <Documentation>
     </Documentation>
   </Module>
+
+ <Module name="AttributeEditor"
+          root_name="AttributeEditor"
+          class="vtkPVAttributeEditor"
+          module_type="Filter"
+          button_image="PVAttributeEditor"
+          button_help="Select with a point or box widget the region to edit."
+          button_visibility="0"
+          long_help="Select with a point or box widget the region to edit.  This output data type of this filter is always an unstructured grid."
+          short_help="Select with a point or box widget the region to edit.">
+    <Filter class="vtkAttributeEditor">
+      <Input name="Input"
+             class="vtkDataSet" quantity="Multiple"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im1"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <InputMenu trace_name="Source" property="Source"
+               id="im2"
+               label="Source"
+               help="Set the source dataset to this filter."
+               input_name="Input"/>
+    <FieldMenu id="fm"
+               trace_name="FieldMenu"
+               input_menu="im1"
+               property="SelectInputScalars"
+               help="Choose cell or point field to edit." />
+    <ArrayMenu id="am" property="SelectInputScalars"
+               trace_name="Scalars"
+               label="Scalars"
+               input_menu="im1"
+               help="Choose the scalar array."/>
+    <SelectWidget label="Pick Method"
+                  trace_name="PickFunction"
+                  property="PickFunction">
+      <Item label="'e'dit within a box"
+            value="Box">
+        <PickBoxWidget use_label="0"
+                   trace_name="Box"
+                   input_menu="im1"
+                   help="Adjusts the parameters of the box to clip with."/>
+      </Item>
+      <Item label="'e'dit within a draggable sphere"
+            value="Sphere">
+        <PickSphereWidget use_label="0"
+                   trace_name="Sphere"
+                   input_menu="im1"
+                   help="Adjusts the parameters of the box to clip with."/>
+      </Item>
+      <Item label="'e'dit at a point" value="Point">
+        <PointWidget trace_name="Point" variable="WorldPoint" input_menu="im1"
+                     help="Pick the node closest to this world point. The 'p' key can be used to select a node under the cursor."/>
+      </Item>
+    </SelectWidget>
+
+    <VectorEntry label="Attribute Value"
+                        trace_name="AttributeValue"
+                        type="float"
+                        property="Value"
+                        help="Choose the scalar value to select with"/>
+
+    <LabeledToggle label="Source View"
+                   trace_name="UnfilteredDataset"
+                   property="UnfilteredDataset"
+                   help="Switches to view of unfiltered dataset."/>
+    <Documentation>
+The Attribute Editor filter selects a portion of the input data set using a box. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
+If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function.  The filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
+This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
+    </Documentation>
+  </Module>
 </ModuleInterfaces>
