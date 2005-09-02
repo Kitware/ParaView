@@ -55,7 +55,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.69");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.70");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1569,7 +1569,7 @@ void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vt
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType j,numLmks, numFolders;
   const char *nameAttribute;
-  int ival;
+  int ival = 0;
   char methodAndArg[200];
 
   if(strcmp("LmkFolder",lmkElement->GetName())==0)
