@@ -99,7 +99,7 @@ public:
 
   // Description:
   // The least common class name of composite dataset blocks
-  vtkGetStringMacro(BaseDataClassName);
+  vtkGetStringMacro(CompositeDataClassName);
 
 protected:
   vtkPVDataInformation();
@@ -126,8 +126,8 @@ protected:
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
 
-  char*          BaseDataClassName;
-  vtkSetStringMacro(BaseDataClassName);
+  char*          CompositeDataClassName;
+  vtkSetStringMacro(CompositeDataClassName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;

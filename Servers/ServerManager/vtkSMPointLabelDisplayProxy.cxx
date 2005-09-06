@@ -62,7 +62,7 @@ void vtkSMPointLabelDisplayProxy::AddInput(vtkSMSourceProxy* input,
 void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
 {
   vtkPVDataInformation *di=input->GetDataInformation();
-  if(!di->DataSetTypeIsA("vtkDataSet") || di->GetBaseDataClassName())
+  if(!di->DataSetTypeIsA("vtkDataSet") || di->GetCompositeDataClassName())
     {
     return;
     }

@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.10");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -62,7 +62,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   
   this->Name = 0;
   this->DataClassName = 0;
-  this->BaseDataClassName = 0;
+  this->CompositeDataClassName = 0;
   this->NumberOfDataSets = 0;
   this->NameSetToDefault = 0;
 }
@@ -79,7 +79,7 @@ vtkPVDataInformation::~vtkPVDataInformation()
   
   this->SetName(0);
   this->SetDataClassName(0);
-  this->SetBaseDataClassName(0);
+  this->SetCompositeDataClassName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -118,8 +118,8 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "DataClassName: " 
      << (this->DataClassName?this->DataClassName:"(none)") << endl;
-  os << indent << "BaseDataClassName: " 
-     << (this->BaseDataClassName?this->BaseDataClassName:"(none)") << endl;
+  os << indent << "CompositeDataClassName: " 
+     << (this->CompositeDataClassName?this->CompositeDataClassName:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void vtkPVDataInformation::Initialize()
   
   this->SetName(0);
   this->SetDataClassName(0);
-  this->SetBaseDataClassName(0);
+  this->SetCompositeDataClassName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -154,7 +154,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->DataSetType = dataInfo->GetDataSetType();
   this->BaseDataSetType = dataInfo->GetBaseDataSetType();
   this->SetDataClassName(dataInfo->GetDataClassName());
-  this->SetBaseDataClassName(dataInfo->GetBaseDataClassName());
+  this->SetCompositeDataClassName(dataInfo->GetCompositeDataClassName());
 
   this->NumberOfDataSets = dataInfo->NumberOfDataSets;
 
@@ -206,7 +206,7 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
     }
   iter->Delete();
 
-  this->SetBaseDataClassName(data->GetClassName());
+  this->SetCompositeDataClassName(data->GetClassName());
   this->BaseDataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = numDataSets;
 }
@@ -725,7 +725,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
 
-  *css << this->BaseDataClassName;
+  *css << this->CompositeDataClassName;
   *css << this->BaseDataSetType;
 
   dcss.Reset();
@@ -824,13 +824,13 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   dcss.SetData(&*data.begin(), length);
   this->CellDataInformation->CopyFromStream(&dcss);
 
-  const char* basedataclassname = 0;
-  if(!css->GetArgument(0, 11, &basedataclassname))
+  const char* compositedataclassname = 0;
+  if(!css->GetArgument(0, 11, &compositedataclassname))
     {
     vtkErrorMacro("Error parsing class name of data.");
     return;
     }
-  this->SetBaseDataClassName(basedataclassname);
+  this->SetCompositeDataClassName(compositedataclassname);
 
   if(!css->GetArgument(0, 12, &this->BaseDataSetType))
     {

@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.8");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -159,10 +159,10 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
       }
     }
 
-  if (info->GetBaseDataClassName())
+  if (info->GetCompositeDataClassName())
     {
     vtkDataObject* cDobj =  
-      pm->GetDataObjectOfType(info->GetBaseDataClassName());
+      pm->GetDataObjectOfType(info->GetCompositeDataClassName());
     for (unsigned int i=0; i<numTypes; i++)
       {
       if (cDobj->IsA(this->GetDataType(i)))

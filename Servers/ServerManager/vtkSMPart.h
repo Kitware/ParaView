@@ -37,27 +37,36 @@ public:
 
   //BTX
   // Description:
+  // Returns data information. If data information is marked
+  // invalid, calls GatherDataInformation.
   vtkPVDataInformation* GetDataInformation();
   //ETX
 
   //BTX
   // Description:
+  // Returns classname information.
   vtkPVClassNameInformation* GetClassNameInformation();
   //ETX
 
   // Description:
+  // Get the classname of the dataset from server.
   void GatherClassNameInformation();
 
   // Description:
-  void GatherDataInformation();
+  // Get information about dataset from server.
+  void GatherDataInformation(int doUpdate=1);
 
   // Description:
+  // Mark data information as invalid.
   void InvalidateDataInformation();
 
   // Description:
+  // Insert a filter to extract (and redistribute) unstructured
+  // pieces if the source cannot generate pieces.
   void InsertExtractPiecesIfNecessary();
 
   // Description:
+  // Replace the default extent translator with vtkPVExtentTranslator.
   void CreateTranslatorIfNecessary();
 
 //ETX

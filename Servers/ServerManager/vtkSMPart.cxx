@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.16");
+vtkCxxRevisionMacro(vtkSMPart, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ void vtkSMPart::InvalidateDataInformation()
 
 //----------------------------------------------------------------------------
 // vtkPVPart used to update before gathering this information ...
-void vtkSMPart::GatherDataInformation()
+void vtkSMPart::GatherDataInformation(int doUpdate)
 {
   if (this->GetNumberOfIDs() < 1)
     {
@@ -85,13 +85,19 @@ void vtkSMPart::GatherDataInformation()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  pm->SendPrepareProgress();
-  this->Update();
-  pm->SendCleanupPendingProgress();
+  if (doUpdate)
+    {
+    pm->SendPrepareProgress();
+    this->Update();
+    pm->SendCleanupPendingProgress();
+    }
 
   pm->GatherInformation(this->DataInformation, this->GetID(0));
 
-  this->DataInformationValid = 1;
+  if (doUpdate)
+    {
+    this->DataInformationValid = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -116,11 +122,6 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
-  // We are going to create the piece filter with a dummy tcl name,
-  // setup the pipeline, and remove tcl's reference to the objects.
-  // The vtkData object will be moved to the output of the piece filter.
-  // This must use class name information and not data information
-  // to avoid executing the filter early.
   const char* className = this->GetClassNameInformation()->GetVTKClassName();
   vtkClientServerStream stream;
   vtkClientServerID tempDataPiece = {0};
@@ -142,6 +143,11 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    this->GatherDataInformation(0);
+    if (this->DataInformation->GetCompositeDataClassName())
+      {
+      return;
+      }
     stream << vtkClientServerStream::Invoke 
                     << this->GetID(0) << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
@@ -195,6 +201,11 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    this->GatherDataInformation(0);
+    if (this->DataInformation->GetCompositeDataClassName())
+      {
+      return;
+      }
     stream << vtkClientServerStream::Invoke 
                     << this->GetID(0) << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
@@ -272,11 +283,6 @@ void vtkSMPart::CreateTranslatorIfNecessary()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
-  // We are going to create the piece filter with a dummy tcl name,
-  // setup the pipeline, and remove tcl's reference to the objects.
-  // The vtkData object will be moved to the output of the piece filter.
-  // This must use class name information and not data information
-  // to avoid executing the filter early.
   const char* className = this->GetClassNameInformation()->GetVTKClassName();
   if (className == NULL)
     {
