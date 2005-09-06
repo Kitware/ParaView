@@ -20,20 +20,21 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
+#include "vtkInstantiator.h"
+#include "vtkKWProcessStatistics.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
-#include "vtkInstantiator.h"
-#include "vtkToolkits.h"
-#include "vtkPVProgressHandler.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProgressHandler.h"
 #include "vtkProcessModuleGUIHelper.h"
-#include "vtkKWProcessStatistics.h"
+#include "vtkSmartPointer.h"
+#include "vtkStdString.h"
+#include "vtkToolkits.h"
 
 #include <vtkstd/map>
 
-#include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
@@ -46,7 +47,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.24");
+vtkCxxRevisionMacro(vtkProcessModule, "1.25");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -444,6 +445,8 @@ void vtkProcessModule::InitializeInterpreter()
     {
     return;
     }
+
+  vtkMultiThreader::SetGlobalMaximumNumberOfThreads(1);
 
   // Create the interpreter and supporting stream.
   this->Interpreter = vtkClientServerInterpreter::New();
