@@ -94,6 +94,7 @@ protected:
   int IsMovingFlag;
   int EditedFlag;
   int ForceEdit;
+  int ForceNoEdit;
   
   vtkKWFrame *Frame;
   vtkKWFrame *DataFrame;

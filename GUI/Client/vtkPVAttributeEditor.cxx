@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.3");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -77,6 +77,7 @@ vtkPVAttributeEditor::vtkPVAttributeEditor()
   this->WriterID.ID = 0;
 
   this->ForceEdit = 0;
+  this->ForceNoEdit = 0;
   this->IsScalingFlag = 0;
   this->IsMovingFlag = 0;
   this->EditedFlag = 0;
@@ -249,7 +250,9 @@ void vtkPVAttributeEditor::SaveCallback()
   // Send the source input to the output instead of the filter input so that the whole dataset gets written:
   vtkPVLabeledToggle *unfilteredFlag = vtkPVLabeledToggle::SafeDownCast(this->GetPVWidget("UnfilteredDataset"));
   unfilteredFlag->SetSelectedState(1);
+  this->ForceNoEdit = 1;
   this->AcceptCallback();
+  this->ForceNoEdit = 0;
 
   if(this->WriterID.ID==0)
     {
@@ -287,7 +290,9 @@ void vtkPVAttributeEditor::SaveCallback()
 
   // turn the filter view back on
   unfilteredFlag->SetSelectedState(0);
+  this->ForceNoEdit = 1;
   this->AcceptCallback();
+  this->ForceNoEdit = 0;
 
   this->EditedFlag = 0;
 }
@@ -472,6 +477,10 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
     {
     editFlag = 1;
     }
+  else if(this->ForceNoEdit)
+    {
+    editFlag = 0;
+    }
   
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProxy()->GetProperty("EditMode"));
@@ -527,7 +536,9 @@ void vtkPVAttributeEditor::Select()
   // when returning to this source
   filterInput->SetCurrentValue(input);
   sourceInput->SetCurrentValue(source);
+  this->ForceNoEdit = 1;
   this->AcceptCallback();
+  this->ForceNoEdit = 0;
 }
 
 //----------------------------------------------------------------------------
