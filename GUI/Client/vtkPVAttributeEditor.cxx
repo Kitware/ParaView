@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.4");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -452,6 +452,7 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
           if(widget->IsA("vtkPVInputMenu"))
             {
             inputModified = 1;
+            editFlag = 0;
             }
           else if(widget->IsA("vtkPVSelectWidget"))
             {
