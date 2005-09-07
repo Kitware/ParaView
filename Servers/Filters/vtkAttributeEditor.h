@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAttributeEditor - subclass of vtkClipDataSet
+// .NAME vtkAttributeEditor
 // .SECTION Description
-
-// .SECTION See Also
-// vtkClipDataSet
+//  This class edits an attribute value either within a region or at a point. 
+//  It takes two inputs, one from a filter and one from the original 
+//  source/reader (these could be the same). When these are different, the 
+//  points and cells in the filter are used to narrow the region to edit and 
+//  acts as a selector. The editable region is defined by an ImplicitFunction.
+//  This class was modeled after vtkClipDataSet.
 
 #ifndef __vtkAttributeEditor_h
 #define __vtkAttributeEditor_h
@@ -31,6 +34,7 @@ class vtkIntArray;
 class vtkPoints;
 class vtkDataSet;
 class vtkAppendFilter;
+class vtkFloatArray;
 
 #define VTK_ATTRIBUTE_MODE_DEFAULT         0
 #define VTK_ATTRIBUTE_MODE_USE_POINT_DATA  1
@@ -42,31 +46,29 @@ public:
   vtkTypeRevisionMacro(vtkAttributeEditor,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Construct with user-specified implicit function; InsideOut turned off;
-  // value set to 0.0; and generate clip scalars turned off.
   static vtkAttributeEditor *New();
 
   // Description:
-  // Get any input of this filter.
+  // Get either input of this filter.
 //BTX
   vtkDataSet *GetInput(int idx);
   vtkDataSet *GetInput() 
     {return this->GetInput( 0 );}
 //ETX
 
-  vtkSetMacro(UnfilteredDataset,int);
-  vtkGetMacro(UnfilteredDataset,int);
-  vtkBooleanMacro(UnfilteredDataset,int);
-
   // Description:
   // Remove a dataset from the list of data to append.
   void RemoveInput(vtkDataSet *in);
 
   // Description:
+  // Access to the flag that toggles between a source view and a filter view
+  vtkSetMacro(UnfilteredDataset,int);
+  vtkGetMacro(UnfilteredDataset,int);
+  vtkBooleanMacro(UnfilteredDataset,int);
+
+  // Description:
   // Set the clipping value of the implicit function (if clipping with
-  // implicit function) or scalar value (if clipping with
-  // scalars). The default value is 0.0. 
+  // implicit function) or point. The default value is 0.0. 
   vtkSetMacro(Value,double);
   vtkGetMacro(Value,double);
 
@@ -76,29 +78,6 @@ public:
   // then the selected input scalar data will be used for clipping.
   virtual void SetClipFunction(vtkImplicitFunction*);
   vtkGetObjectMacro(ClipFunction,vtkImplicitFunction);
-
-  // Description:
-  // Set the tolerance for merging clip intersection points that are near
-  // the vertices of cells. This tolerance is used to prevent the generation
-  // of degenerate primitives. Note that only 3D cells actually use this
-  // instance variable.
-  vtkSetClampMacro(MergeTolerance,double,0.0001,0.25);
-  vtkGetMacro(MergeTolerance,double);
-
-  // Description:
-  // Return the mtime also considering the locator and clip function.
-  unsigned long GetMTime();
-
-  // Description:
-  // Specify a spatial locator for merging points. By default, an
-  // instance of vtkMergePoints is used.
-  void SetLocator(vtkPointLocator *locator);
-  vtkGetObjectMacro(Locator,vtkPointLocator);
-
-  // Description:
-  // Create default locator. Used to create one when none is specified. The 
-  // locator is used to merge coincident points.
-  void CreateDefaultLocator();
 
   // Description:
   // Function could be a vtk3DWidget or vtkImplicitFunction
@@ -127,7 +106,31 @@ public:
   vtkGetMacro(EditMode,int);
   vtkBooleanMacro(EditMode,int);
 
-  // Point picking stuff
+
+  // Description:
+  // Set the tolerance for merging clip intersection points that are near
+  // the vertices of cells. This tolerance is used to prevent the generation
+  // of degenerate primitives. Note that only 3D cells actually use this
+  // instance variable.
+  vtkSetClampMacro(MergeTolerance,double,0.0001,0.25);
+  vtkGetMacro(MergeTolerance,double);
+
+  // Description:
+  // Return the mtime also considering the locator and clip function.
+  unsigned long GetMTime();
+
+  // Description:
+  // Specify a spatial locator for merging points. By default, an
+  // instance of vtkMergePoints is used.
+  void SetLocator(vtkPointLocator *locator);
+  vtkGetObjectMacro(Locator,vtkPointLocator);
+
+  // Description:
+  // Create default locator. Used to create one when none is specified. The 
+  // locator is used to merge coincident points.
+  void CreateDefaultLocator();
+
+  // Point picking stuff - borrowed from vtkPickFilter
 
   // Description:
   // Set your picking point here.
@@ -145,7 +148,6 @@ public:
   // This is set by default (if compiled with MPI).
   // User can override this default.
   void SetController(vtkMultiProcessController* controller);
-
   
 protected:
   vtkAttributeEditor(vtkImplicitFunction *cf=NULL);
@@ -171,7 +173,7 @@ protected:
 
   // Point picking stuff:
 
-  void BoxExecute(vtkDataSet *, vtkDataSet *);
+  //void RegionExecute(vtkDataSet *, vtkDataSet *);
   void PointExecute(vtkDataSet *, vtkDataSet *);
   void CellExecute(vtkDataSet *, vtkDataSet *);
 
@@ -202,8 +204,11 @@ protected:
   void DeletePointMap();
   int ListContainsId(vtkIdList* ids, vtkIdType id);
 
-  // Locator did no do what I wanted.
+  // Locator did not do what I wanted.
   vtkIdType FindPointId(double pt[3], vtkDataSet* input);
+
+  vtkFloatArray *FilterDataArray;
+  vtkFloatArray *ReaderDataArray;
 
 private:
   vtkAttributeEditor(const vtkAttributeEditor&);  // Not implemented.

@@ -47,7 +47,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.1");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.2");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -68,12 +68,17 @@ vtkAttributeEditor::vtkAttributeEditor(vtkImplicitFunction *cf)
   this->AttributeMode = -1;
   this->EditMode = 0;
   this->UnfilteredDataset = 0;
-/*
-  this->SetNumberOfOutputPorts(2);
-  vtkUnstructuredGrid *output2 = vtkUnstructuredGrid::New();
-  this->GetExecutive()->SetOutputData(1, output2);
-  output2->Delete();
-*/
+
+  // by default process active point scalars
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
+                               vtkDataSetAttributes::SCALARS);
+
+  vtkInformation* info = this->GetInputPortInformation(0);
+  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
+
+  this->FilterDataArray = 0;
+  this->ReaderDataArray = 0;
+
   // Point stuff:
 
   this->SetNumberOfInputPorts(1);
@@ -85,13 +90,6 @@ vtkAttributeEditor::vtkAttributeEditor(vtkImplicitFunction *cf)
   this->PointMap = 0;
   this->RegionPointIds = 0;
   this->BestInputIndex = -1;
-
-  // by default process active point scalars
-  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
-                               vtkDataSetAttributes::SCALARS);
-
-  vtkInformation* info = this->GetInputPortInformation(0);
-  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
 
 }
 
@@ -107,6 +105,17 @@ vtkAttributeEditor::~vtkAttributeEditor()
 
   this->SetController(0);
 
+  if(this->FilterDataArray)
+    {
+    this->FilterDataArray->Delete();
+    this->FilterDataArray = 0;
+    }
+
+  if(this->ReaderDataArray)
+    {
+    this->ReaderDataArray->Delete();
+    this->ReaderDataArray = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -146,110 +155,92 @@ int vtkAttributeEditor::RequestData(
 {
 
   vtkDataSet *readerInput;
-  vtkDataSet *filterInput;
   vtkUnstructuredGrid *readerOutput;
-  vtkUnstructuredGrid *filterOutput;
 
-  // get the info objects
+  // Get the filter input and output data sets:
+  vtkDataSet *filterInput;
+  vtkUnstructuredGrid *filterOutput;
   vtkInformation *filterInputInfo = inputVector[0]->GetInformationObject(0);
-  // get the input
   filterInput = vtkDataSet::SafeDownCast(
     filterInputInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (filterInput == NULL)
     {
     return 1;
     }
-
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   filterOutput = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  // for each point or cell in the clipped output we want to find its counterpart in the real output, and set the saliency field value according to AttributeValue (hardcode for now)
-  // can you access a point's field data directly?
-
-  vtkPointData *inPD=filterInput->GetPointData();
-  vtkCellData *inCD=filterInput->GetCellData();
-  vtkFieldData *inFD=filterInput->GetFieldData();
-
-  // filter must have been initialized for the second input to be valid
+  // Get the source input and output data sets:
   vtkInformation *readerInputInfo = inputVector[0]->GetInformationObject(1);
-  if(!readerInputInfo)
+  if(readerInputInfo == NULL)
     {
-    // either the two inputs are the same reader, or second input is invalid
+    // either the two inputs are the same, or second input is invalid
     readerInput = filterInput;
     readerOutput = filterOutput;
     }
   else
     {
+    // filter must have been initialized for the second input to be valid
     readerInput = vtkDataSet::SafeDownCast(
       readerInputInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if (readerInputInfo == NULL)
-      {
-      return 1;
-      }
-//    readerOutput = vtkUnstructuredGrid::SafeDownCast(this->GetExecutive()->GetOutputData(1));
-
     readerOutput = vtkUnstructuredGrid::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
     }
 
-  vtkPointData *myPD = vtkPointData::New();
-  myPD->ShallowCopy(readerInput->GetPointData());
-  vtkCellData *myCD = vtkCellData::New();
-  myCD->ShallowCopy(readerInput->GetCellData());
-//  vtkFloatArray *filterArray = vtkFloatArray::SafeDownCast(this->GetInputArrayToProcess(0,inputVector));
-//  vtkFloatArray *readerArray = vtkFloatArray::SafeDownCast(this->GetInputArrayToProcess(0,1,inputVector));
-
-/*
-  vtkInformation *info = this->GetInputArrayInformation(0);
-//  vtkFloatArray *farray = vtkFloatArray::SafeDownCast(inPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-//  vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(myPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-  vtkDataArray *farray = inPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME()));
-  vtkDataArray *rarray = myPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME()));
-
-  int type = info->Get(vtkDataObject::FIELD_ARRAY_TYPE());
-  switch( type )
-   {
-    vtkTemplateMacro10(vtkContourGridExecute, this, input, output, inScalars,
-                       (VTK_TT *)(scalarArrayPtr), numContours, values,
-                       computeScalars, useScalarTree, 
-                       scalarTree);
-    default:
-      vtkErrorMacro(<< "Execute: Unknown ScalarType");
-      return 1;
-    }
-*/
+  vtkPointData *filterPD=filterInput->GetPointData();
+  vtkCellData *filterCD=filterInput->GetCellData();
+  //vtkPointData *readerPD = readerInput->GetPointData();
+  //vtkCellData *readerCD = readerInput->GetCellData();
 
 
-  // when edit mode is off, either this is the first execution of filter, the source view has been modified, or source view is on
+  vtkPointData *readerPD = vtkPointData::New();
+  readerPD->DeepCopy(readerInput->GetPointData());
+  vtkCellData *readerCD = vtkCellData::New();
+  readerCD->DeepCopy(readerInput->GetCellData());
+
+
+  // when edit mode is off, either this is the first execution of filter, the source view or some other widget has been modified, or source view is on
   if(this->EditMode==0)
     {
     if(this->UnfilteredDataset)
       {
       readerOutput->CopyStructure(readerInput);
-      readerOutput->GetPointData()->PassData( myPD );
-      readerOutput->GetCellData()->PassData ( myCD );
-      readerOutput->GetFieldData()->PassData ( readerInput->GetFieldData() );
+      readerOutput->GetPointData()->PassData( readerPD );
+      readerOutput->GetCellData()->PassData ( readerCD );
+   //   if(this->ReaderDataArray)
+   //     {
+   //     readerOutput->GetPointData()->AddArray(this->ReaderDataArray);
+   //     }
       }
     else
       {
       filterOutput->CopyStructure(filterInput);
-      filterOutput->GetPointData()->PassData( inPD );
-      filterOutput->GetCellData()->PassData ( inCD );
-      filterOutput->GetFieldData()->PassData ( inFD );
+      filterOutput->GetPointData()->PassData( filterPD );
+      filterOutput->GetCellData()->PassData ( filterCD );
+   //   if(this->FilterDataArray)
+   //     {
+   //     filterOutput->GetPointData()->AddArray(this->FilterDataArray);
+   //     }
       }
 
-    myPD->Delete();
-    myCD->Delete();
+    readerPD->Delete();
+    readerCD->Delete();
 
     return 1;
     }
 
+  // Turn edit mode off - it must be set explicitly in order for an edit to take place
   this->EditMode = 0;
 
   if(this->IsPointPick)
     {
     this->BestInputIndex = -1;
+  
+    //vtkPickFilter *pickFilter = vtkPickFilter::New();
+    //pickFilter->SetWorldPoint(this->WorldPoint);
+    //pickFilter->SetPickCell(this->PickCell);
+    //pickFilter->Execute();
 
     if (this->PickCell)
       {
@@ -278,7 +269,7 @@ int vtkAttributeEditor::RequestData(
 
     this->BestInputIndex = 0;
 
-    //this->BoxExecute(readerInput,filterInput);
+    //this->RegionExecute(readerInput,filterInput);
 
     vtkDataSet *finput = filterInput;
     vtkDataSet *rinput = readerInput;
@@ -288,29 +279,17 @@ int vtkAttributeEditor::RequestData(
     double *coords;
     vtkIdType numPts = finput->GetNumberOfPoints();
     vtkIdType numCells = finput->GetNumberOfCells();
-    //vtkPointData *inPD=finput->GetPointData();
-    //vtkCellData *inCD=finput->GetCellData();
-    //vtkFieldData *inFD=finput->GetFieldData();
-    //vtkPointData *myPD = vtkPointData::New();
-    //myPD->ShallowCopy(rinput->GetPointData());
-    //vtkCellData *myCD = vtkCellData::New();
-    //myCD->ShallowCopy(rinput->GetCellData());
 
     vtkInformation *info = this->GetInputArrayInformation(0);
 
-    vtkDebugMacro(<< "Clipping dataset");
-    
-    // Initialize self; create output objects
-    //
     if ( numPts < 1 )
       {
-      //vtkErrorMacro(<<"No data to clip");
       return 0;
       }
 
     if ( !this->ClipFunction )
       {
-      vtkErrorMacro(<<"No clip function defined");
+      vtkErrorMacro(<<"No pick function defined");
       return 0;
       }
 
@@ -324,14 +303,41 @@ int vtkAttributeEditor::RequestData(
       }
     this->Locator->InitPointInsertion (newPoints, finput->GetBounds());
 
-    if ( this->ClipFunction )
-      {
-      vtkIdType readerId;
-      if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-        {
-        vtkFloatArray *farray = vtkFloatArray::SafeDownCast(inPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-        vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(myPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
 
+    vtkIdType readerId;
+    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      {
+      vtkFloatArray *farray = vtkFloatArray::SafeDownCast(filterPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+      vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(readerPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+/*
+      if( !this->FilterDataArray || strcmp(this->FilterDataArray->GetName(),info->Get(vtkDataObject::FIELD_NAME())) != 0)
+        {
+        if(this->FilterDataArray)
+          {
+          this->FilterDataArray->Delete();  
+          }
+        this->FilterDataArray = vtkFloatArray::New();
+        this->FilterDataArray->DeepCopy(filterPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+        this->FilterDataArray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
+        }
+      if( !this->ReaderDataArray || strcmp(this->ReaderDataArray->GetName(),info->Get(vtkDataObject::FIELD_NAME())) != 0)
+        {
+        if(this->ReaderDataArray)
+          {
+          this->ReaderDataArray->Delete();  
+          }
+        this->ReaderDataArray = vtkFloatArray::New();
+        this->ReaderDataArray->DeepCopy(filterPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+        this->ReaderDataArray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
+        }
+*/
+      //vtkFloatArray *farray = vtkFloatArray::New();
+      // farray->DeepCopy(filterPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+      // vtkFloatArray *rarray = vtkFloatArray::New();
+    //  rarray->DeepCopy(readerPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+    //  if(farray && rarray)
+      if(farray && rarray)
+        {
         for ( i=0; i < numPts; i++ )
           {
           coords = finput->GetPoint(i);
@@ -339,130 +345,35 @@ int vtkAttributeEditor::RequestData(
           readerId = rinput->FindPoint(coords);
           if(this->Value > s )
             {
-            farray->SetValue(i,this->AttributeValue);
             rarray->SetValue(readerId,this->AttributeValue);
+            if(farray != rarray)
+              {
+              farray->SetValue(i,this->AttributeValue);
+              }
             }
           }
-        }
-      else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-        {
-        vtkFloatArray *farray = vtkFloatArray::SafeDownCast(inCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-        vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(myCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-        vtkCell *cell;
-        int subId = 0;
-        double pcoords[3];
-        double *w = new double[finput->GetMaxCellSize()];
-
-        for ( i=0; i < numCells; i++ )
+/*
+        // This replaces the given array if it already exists
+        // rarray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
+        readerOutput->GetPointData()->AddArray(this->ReaderDataArray);
+    //    rarray->Delete();
+        if(this->ReaderDataArray != this->FilterDataArray)
           {
-          cell = finput->GetCell(i);
-          coords = finput->GetPoint(cell->GetPointId(0));
-          s = this->ClipFunction->FunctionValue(coords);
-          readerId = rinput->FindCell(coords,NULL,-1,0.0,subId,pcoords,w);
-          if(this->Value > s )
-            {
-            farray->SetValue(i,this->AttributeValue);
-            rarray->SetValue(readerId,this->AttributeValue);
-            }
+          this->FilterDataArray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
+          filterOutput->GetPointData()->AddArray(this->FilterDataArray);
+    //      this->FilterDataArray->Delete();
           }
-        }
-      }
-
-    newPoints->Delete();
-    this->Locator->Initialize();//release any extra memory
-  // output->Squeeze();
-
-    }
-
-  if(this->UnfilteredDataset)
-    {
-    readerOutput->CopyStructure(readerInput);
-    readerOutput->GetPointData()->PassData( myPD );
-    readerOutput->GetCellData()->PassData ( myCD );
-    readerOutput->GetFieldData()->PassData ( readerInput->GetFieldData() );
-    }
-  else
-    {
-    filterOutput->CopyStructure(filterInput);
-    filterOutput->GetPointData()->PassData( inPD );
-    filterOutput->GetCellData()->PassData ( inCD );
-    filterOutput->GetFieldData()->PassData ( inFD );
-    }
-
-  myPD->Delete();
-  myCD->Delete();
-
-  return 1;
-
-}
-
-void vtkAttributeEditor::BoxExecute(vtkDataSet *rinput,vtkDataSet *finput)
-{
-  vtkPoints *newPoints;
-  double s;
-  vtkIdType i;
-  double *coords;
-  vtkIdType numPts = finput->GetNumberOfPoints();
-  vtkIdType numCells = finput->GetNumberOfCells();
-  vtkPointData *inPD=finput->GetPointData();
-  vtkCellData *inCD=finput->GetCellData();
-  vtkPointData *myPD = vtkPointData::New();
-  myPD->ShallowCopy(rinput->GetPointData());
-  vtkCellData *myCD = vtkCellData::New();
-  myCD->ShallowCopy(rinput->GetCellData());
-
-  vtkInformation *info = this->GetInputArrayInformation(0);
-
-  vtkDebugMacro(<< "Clipping dataset");
-  
-  // Initialize self; create output objects
-  //
-  if ( numPts < 1 )
-    {
-    //vtkErrorMacro(<<"No data to clip");
-    return;
-    }
-
-  if ( !this->ClipFunction )
-    {
-    vtkErrorMacro(<<"No clip function defined");
-    return;
-    }
-
-  newPoints = vtkPoints::New();
-  newPoints->Allocate(numPts,numPts/2);
-  
-  // locator used to merge potentially duplicate points
-  if ( this->Locator == NULL )
-    {
-    this->CreateDefaultLocator();
-    }
-  this->Locator->InitPointInsertion (newPoints, finput->GetBounds());
-
-  if ( this->ClipFunction )
-    {
-    vtkIdType readerId;
-    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-      vtkFloatArray *farray = vtkFloatArray::SafeDownCast(inPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-      vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(myPD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-
-      for ( i=0; i < numPts; i++ )
-        {
-        coords = finput->GetPoint(i);
-        s = this->ClipFunction->FunctionValue(coords);
-        readerId = rinput->FindPoint(coords);
-        if(this->Value > s )
+        else
           {
-          farray->SetValue(i,this->AttributeValue);
-          rarray->SetValue(readerId,this->AttributeValue);
-          }
+          filterOutput->GetPointData()->AddArray(this->ReaderDataArray);
+          
+*/
         }
       }
     else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
       {
-      vtkFloatArray *farray = vtkFloatArray::SafeDownCast(inCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
-      vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(myCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+      vtkFloatArray *farray = vtkFloatArray::SafeDownCast(filterCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+      vtkFloatArray *rarray = vtkFloatArray::SafeDownCast(readerCD->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
       vtkCell *cell;
       int subId = 0;
       double pcoords[3];
@@ -481,14 +392,31 @@ void vtkAttributeEditor::BoxExecute(vtkDataSet *rinput,vtkDataSet *finput)
           }
         }
       }
+
+    newPoints->Delete();
+    this->Locator->Initialize();//release any extra memory
     }
 
-  newPoints->Delete();
-  this->Locator->Initialize();//release any extra memory
- // output->Squeeze();
+
+  if(this->UnfilteredDataset)
+    {
+    readerOutput->CopyStructure(readerInput);
+    readerOutput->GetPointData()->PassData( readerPD );
+    readerOutput->GetCellData()->PassData ( readerCD );
+    }
+  else
+    {
+    filterOutput->CopyStructure(filterInput);
+    filterOutput->GetPointData()->PassData( filterPD );
+    filterOutput->GetCellData()->PassData ( filterCD );
+    }
+
+  readerPD->Delete();
+  readerCD->Delete();
+
+  return 1;
 
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkAttributeEditor::PointExecute(vtkDataSet *rinput,vtkDataSet *finput)
@@ -503,9 +431,6 @@ void vtkAttributeEditor::PointExecute(vtkDataSet *rinput,vtkDataSet *finput)
   int inputIdx;
   vtkIdType numPts = 0, ptId;
   double *coords;
-
-// for each point or cell in the clipped output we want to find its counterpart in the real output, and set the saliency field value according to AttributeValue (hardcode for now)
-// can you access a point's field data directly?
 
   numPts = finput->GetNumberOfPoints();
   vtkPointData *inPD=finput->GetPointData();
