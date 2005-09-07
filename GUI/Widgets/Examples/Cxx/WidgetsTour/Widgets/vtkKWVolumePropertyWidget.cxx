@@ -37,7 +37,7 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   vtkKWVolumePropertyWidget *vpw = vtkKWVolumePropertyWidget::New();
   vpw->SetParent(vpw_frame->GetFrame());
   vpw->Create(app);
- 
+
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               vpw->GetWidgetName());
 
@@ -48,6 +48,7 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   vpw_vp->SetIndependentComponents(1);
 
   vtkColorTransferFunction *vpw_cfun = vtkColorTransferFunction::New();
+  vpw_cfun->SetColorSpaceToHSV();
   vpw_cfun->AddHSVSegment(0.0, 0.2, 1.0, 1.0, 255.0, 0.8, 1.0, 1.0);
   vpw_cfun->AddHSVSegment(80, 0.8, 1.0, 1.0, 130.0, 0.1, 1.0, 1.0);
 

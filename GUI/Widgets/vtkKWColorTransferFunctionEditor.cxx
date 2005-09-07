@@ -20,6 +20,7 @@
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntryWithLabel.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWRange.h"
 #include "vtkKWCanvas.h"
@@ -30,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.41");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.42");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -115,13 +116,6 @@ void vtkKWColorTransferFunctionEditor::SetColorTransferFunction(
     
   this->ColorTransferFunction = arg;
 
-  if (this->ColorTransferFunction)
-    {
-    this->ColorTransferFunction->Register(this);
-    }
-
-  this->Modified();
-
   this->LastRedrawFunctionTime = 0;
 
   // If we are using this function to color the ramp, then reset that time
@@ -131,6 +125,14 @@ void vtkKWColorTransferFunctionEditor::SetColorTransferFunction(
     {
     this->LastRedrawColorRampTime = 0;
     }
+
+  if (this->ColorTransferFunction)
+    {
+    this->ColorTransferFunction->Register(this);
+    this->SetWholeParameterRangeToFunctionRange();
+    }
+
+  this->Modified();
 
   this->Update();
 }
@@ -192,8 +194,9 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointParameter(
     return 0;
     }
 
-  *parameter = this->ColorTransferFunction->GetDataPointer()[
-    id * (1 + this->GetFunctionPointDimensionality())];
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  *parameter = node_value[0];
   
   return 1;
 }
@@ -214,10 +217,11 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointValues(
     return 0;
     }
   
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+
   int dim = this->GetFunctionPointDimensionality();
-  memcpy(values, 
-         (this->ColorTransferFunction->GetDataPointer() + id * (1 + dim) + 1), 
-         dim * sizeof(double));
+  memcpy(values, node_value + 1, dim * sizeof(double));
   
   return 1;
 }
@@ -232,13 +236,20 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPointValues(
     return 0;
     }
   
+  // Clamp
+
   double clamped_values[
     vtkKWParameterValueFunctionEditor::MaxFunctionPointDimensionality];
   vtkMath::ClampValues(values, this->GetFunctionPointDimensionality(), 
                        this->GetWholeValueRange(), clamped_values);
 
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+
   this->ColorTransferFunction->AddRGBPoint(
-    parameter, clamped_values[0], clamped_values[1], clamped_values[2]);
+    parameter, 
+    clamped_values[0], clamped_values[1], clamped_values[2], 
+    node_value[4], node_value[5]);
   
   return 1;
 }
@@ -277,8 +288,20 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPoint(
   // Add the point
  
   int old_size = this->GetFunctionSize();
-  *id = this->ColorTransferFunction->AddRGBPoint(
-    parameter, clamped_values[0], clamped_values[1], clamped_values[2]);
+  if (this->GetFunctionPointId(parameter, id))
+    {
+    double node_value[6];
+    this->ColorTransferFunction->GetNodeValue(*id, node_value);
+    *id = this->ColorTransferFunction->AddRGBPoint(
+      parameter, 
+      clamped_values[0], clamped_values[1], clamped_values[2],
+      node_value[4], node_value[5]);
+    }
+  else
+    {
+    *id = this->ColorTransferFunction->AddRGBPoint(
+      parameter, clamped_values[0], clamped_values[1], clamped_values[2]);
+    }
   return (old_size != this->GetFunctionSize());
 }
 
@@ -297,6 +320,9 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPoint(
     return 0;
     }
 
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+
   // Clamp
 
   vtkMath::ClampValue(&parameter, this->GetWholeParameterRange());
@@ -310,7 +336,9 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPoint(
     this->ColorTransferFunction->RemovePoint(old_parameter);
     }
   int new_id = this->ColorTransferFunction->AddRGBPoint(
-    parameter, clamped_values[0], clamped_values[1], clamped_values[2]);
+    parameter, 
+    clamped_values[0], clamped_values[1], clamped_values[2],
+    node_value[4], node_value[5]);
   
   if (new_id != id)
     {
@@ -331,12 +359,101 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 
   // Remove the point
 
-  double parameter = this->ColorTransferFunction->GetDataPointer()[
-    id * (1 + this->GetFunctionPointDimensionality())];
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  double parameter = node_value[0];
 
   int old_size = this->GetFunctionSize();
   this->ColorTransferFunction->RemovePoint(parameter);
   return (old_size != this->GetFunctionSize());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::GetFunctionMidPoint(
+  int id, double *pos)
+{
+  if (id < 0 || id >= this->GetFunctionSize() || !pos)
+    {
+    return 0;
+    }
+
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  *pos = node_value[4];
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::SetFunctionMidPoint(
+  int id, double pos)
+{
+  if (id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  if (pos < 0.0)
+    {
+    pos = 0.0;
+    }
+  else if (pos > 1.0)
+    {
+    pos = 1.0;
+    }
+
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  this->ColorTransferFunction->AddRGBPoint(
+    node_value[0], 
+    node_value[1], node_value[2], node_value[3], 
+    pos, node_value[5]);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::GetFunctionSharpness(
+  int id, double *sharpness)
+{
+  if (id < 0 || id >= this->GetFunctionSize() || !sharpness)
+    {
+    return 0;
+    }
+
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  *sharpness = node_value[5];
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::SetFunctionSharpness(
+  int id, double sharpness)
+{
+  if (id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  if (sharpness < 0.0)
+    {
+    sharpness = 0.0;
+    }
+  else if (sharpness > 1.0)
+    {
+    sharpness = 1.0;
+    }
+
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
+  this->ColorTransferFunction->AddRGBPoint(
+    node_value[0], 
+    node_value[1], node_value[2], node_value[3], 
+    node_value[4], sharpness);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -418,9 +535,10 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
 
   // Get the values in the right color space
 
-  double *point = this->ColorTransferFunction->GetDataPointer() + id * 4;
+  double node_value[6];
+  this->ColorTransferFunction->GetNodeValue(id, node_value);
 
-  double *values = point + 1, hsv[3];
+  double *values = node_value + 1, hsv[3];
   if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
     {
     vtkMath::RGBToHSV(values, hsv);
@@ -537,7 +655,7 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the value entries
 
-  if (this->ValueEntriesVisibility)
+  if (this->ValueEntriesVisibility && this->PointEntriesVisibility)
     {
     this->CreateValueEntries(app);
     }
@@ -610,11 +728,11 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
 {
   if (this->ValueEntries[0] && !this->ValueEntries[0]->IsCreated())
     {
-    this->CreateTopRightFrame(app);
+    this->CreatePointEntriesFrame(app);
     int i;
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->SetParent(this->TopRightFrame);
+      this->ValueEntries[i]->SetParent(this->PointEntriesFrame);
       this->ValueEntries[i]->Create(app);
       this->ValueEntries[i]->GetWidget()->SetWidth(4);
       this->ValueEntries[i]->GetWidget()->SetCommand(
@@ -622,7 +740,7 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
       }
 
     this->UpdatePointEntriesLabel();
-    this->UpdatePointEntries(this->SelectedPoint);
+    this->UpdatePointEntries(this->GetSelectedPoint());
     }
 }
 
@@ -634,10 +752,10 @@ int vtkKWColorTransferFunctionEditor::IsTopLeftFrameUsed()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::IsTopRightFrameUsed()
+int vtkKWColorTransferFunctionEditor::IsPointEntriesFrameUsed()
 {
-  return (this->Superclass::IsTopRightFrameUsed() || 
-          this->ValueEntriesVisibility);
+  return (this->Superclass::IsPointEntriesFrameUsed() || 
+          (this->PointEntriesVisibility && this->ValueEntriesVisibility));
 }
 
 //----------------------------------------------------------------------------
@@ -665,15 +783,22 @@ void vtkKWColorTransferFunctionEditor::Pack()
 
   // Value entries (in top right frame)
 
-  if (this->ValueEntriesVisibility)
+  if (this->ValueEntriesVisibility && this->PointEntriesVisibility)
     {
+    vtksys_stl::string before;
+    if (this->MidPointEntry && this->MidPointEntry->IsCreated() && 
+        this->MidPointEntryVisibility)
+      {
+      before = " -before ";
+      before += this->MidPointEntry->GetWidgetName();
+      }
     int i;
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
       if (this->ValueEntries[i] && this->ValueEntries[i]->IsCreated())
         {
         tk_cmd << "pack " << this->ValueEntries[i]->GetWidgetName() 
-               << " -side left -pady 0" << endl;
+               << " -side left -pady 0" << before.c_str() << endl;
         }
       }
     }
@@ -717,7 +842,8 @@ void vtkKWColorTransferFunctionEditor::Pack()
         }
       }
     tk_cmd << "grid " << this->ColorRamp->GetWidgetName() 
-           << " -columnspan 2 -sticky w -pady 2 -padx 0 "
+           << " -columnspan 2 -sticky w -padx 0 "
+           << " -pady " << (this->CanvasVisibility ? 2 : 0)
            << " -column " << col << " -row " << row << endl;
     }
   
@@ -786,7 +912,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
         this->Update();
         if (this->HasSelection())
           {
-          this->UpdatePointEntries(this->SelectedPoint);
+          this->UpdatePointEntries(this->GetSelectedPoint());
           }
         this->InvokeFunctionChangedCommand();
         }
@@ -801,7 +927,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
         this->Update();
         if (this->HasSelection())
           {
-          this->UpdatePointEntries(this->SelectedPoint);
+          this->UpdatePointEntries(this->GetSelectedPoint());
           }
         this->InvokeFunctionChangedCommand();
         }
@@ -816,7 +942,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
         this->Update();
         if (this->HasSelection())
           {
-          this->UpdatePointEntries(this->SelectedPoint);
+          this->UpdatePointEntries(this->GetSelectedPoint());
           }
         this->InvokeFunctionChangedCommand();
         }
@@ -862,7 +988,7 @@ void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
   
   if (this->GetFunctionMTime() > mtime)
     {
-    this->InvokePointMovedCommand(this->SelectedPoint);
+    this->InvokePointChangedCommand(this->GetSelectedPoint());
     this->InvokeFunctionChangedCommand();
     }
 }
@@ -871,6 +997,8 @@ void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
 void vtkKWColorTransferFunctionEditor::DoubleClickOnPointCallback(
   int x, int y)
 {
+  this->Superclass::DoubleClickOnPointCallback(x, y);
+
   int id, c_x, c_y;
 
   // No point found
@@ -1047,13 +1175,15 @@ void vtkKWColorTransferFunctionEditor::SetValueEntriesVisibility(int arg)
   // Make sure that if the entries have to be shown, we create it on the fly if
   // needed
 
-  if (this->ValueEntriesVisibility && this->IsCreated())
+  if (this->ValueEntriesVisibility && 
+      this->PointEntriesVisibility && 
+      this->IsCreated())
     {
     this->CreateValueEntries(this->GetApplication());
     }
 
   this->UpdatePointEntriesLabel();
-  this->UpdatePointEntries(this->SelectedPoint);
+  this->UpdatePointEntries(this->GetSelectedPoint());
 
   this->Modified();
 
@@ -1179,7 +1309,7 @@ void vtkKWColorTransferFunctionEditor::RedrawFunctionDependentElements()
 
   // This method is called each time the color tfunc has changed
   // but since the histogram depends on the point too if we color by values
-  // the update the histogram
+  // then update the histogram
 
   if (this->Histogram && this->ComputeHistogramColorFromValue)
     {
@@ -1188,7 +1318,26 @@ void vtkKWColorTransferFunctionEditor::RedrawFunctionDependentElements()
 
   // The color ramp may (or may not) have to be redrawn, depending on which
   // color tfunc is used in the ramp, so it is also catched by Redraw()
-  // and in this method (which can be called independently.
+  // and in this method (which can be called independently).
+
+  if (!this->IsColorRampUpToDate())
+    {
+    this->RedrawColorRamp();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::RedrawSinglePointDependentElements(
+  int id)
+{
+  this->Superclass::RedrawSinglePointDependentElements(id);
+
+  // The histogram depends on the point too if we color by values
+
+  if (this->Histogram && this->ComputeHistogramColorFromValue)
+    {
+    this->RedrawHistogram();
+    }
 
   if (!this->IsColorRampUpToDate())
     {
@@ -1535,6 +1684,7 @@ void vtkKWColorTransferFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "None" << endl;
     }
+
   os << indent << "ColorRampTransferFunction: ";
   if (this->ColorRampTransferFunction)
     {
@@ -1545,6 +1695,7 @@ void vtkKWColorTransferFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "None" << endl;
     }
+
   os << indent << "ColorSpaceOptionMenu: ";
   if (this->ColorSpaceOptionMenu)
     {

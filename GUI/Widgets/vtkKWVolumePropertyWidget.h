@@ -139,6 +139,25 @@ public:
   vtkBooleanMacro(DisableCommands, int);
 
   // Description:
+  // Set/Get if the scalar color transfer function should be used to color
+  // each point in the scalar opacity editor. This also makes sure that
+  // any changes made to one or the other will be propagated accordingly. 
+  // This alszo enables the user to pick a color by double-clicking on
+  // the scalar opacity points.
+  vtkBooleanMacro(UseScalarColorFunctionInScalarOpacityEditor, int);
+  virtual void SetUseScalarColorFunctionInScalarOpacityEditor(int);
+  vtkGetMacro(UseScalarColorFunctionInScalarOpacityEditor, int);
+
+  // Description:
+  // Convenience method to merge both scalar opacity and color editors.
+  // This will put both editors in synchronized/locked mode, the scalar
+  // color function in the editor will be hidden (only the color ramp will
+  // remain), and the opacity editor will use the scalar color function
+  // to color its points. Double clicking on a point will popup a color
+  // selector. 
+  virtual void MergeScalarOpacityAndColorEditors();
+
+  // Description:
   // Set commands.
   virtual void SetVolumePropertyChangedCommand(
     vtkObject* object,const char *method);
@@ -156,6 +175,7 @@ public:
   virtual void MaterialPropertyChangingCallback();
   virtual void ScalarOpacityFunctionChangedCallback();
   virtual void ScalarOpacityFunctionChangingCallback();
+  virtual void DoubleClickOnScalarOpacityPointCallback(int id);
   virtual void WindowLevelModeCallback();
   virtual void LockOpacityAndColorCallback();
   virtual void ScalarOpacityUnitDistanceChangedCallback();
@@ -210,6 +230,7 @@ protected:
   int   MaterialPropertyVisibility;
   int   GradientOpacityFunctionVisibility;
   int   ComponentWeightsVisibility;
+  int   UseScalarColorFunctionInScalarOpacityEditor;
 
   // Commands
 

@@ -31,8 +31,9 @@
 #include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
+#include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.61");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.62");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -62,9 +63,9 @@ vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.61");
 const char *vtkKWParameterValueFunctionEditor::FunctionTag = "function_tag";
 const char *vtkKWParameterValueFunctionEditor::SelectedTag = "selected_tag";
 const char *vtkKWParameterValueFunctionEditor::PointTag = "point_tag";
-const char *vtkKWParameterValueFunctionEditor::GuidelineTag = "point_guideline_tag";
+const char *vtkKWParameterValueFunctionEditor::PointGuidelineTag = "point_guideline_tag";
 const char *vtkKWParameterValueFunctionEditor::LineTag = "line_tag";
-const char *vtkKWParameterValueFunctionEditor::TextTag = "text_tag";
+const char *vtkKWParameterValueFunctionEditor::PointTextTag = "point_text_tag";
 const char *vtkKWParameterValueFunctionEditor::HistogramTag = "histogram_tag";
 const char *vtkKWParameterValueFunctionEditor::FrameForegroundTag = "framefg_tag";
 const char *vtkKWParameterValueFunctionEditor::FrameBackgroundTag = "framebg_tag";
@@ -107,13 +108,16 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ComputeValueTicksFromHistogram = 0;
   this->CanvasBackgroundVisibility        = 1;
   this->FunctionLineVisibility            = 1;
+  this->CanvasVisibility            = 1;
   this->PointIndexVisibility              = 0;
   this->PointGuidelineVisibility          = 0;
+  this->PointVisibility          = 1;
   this->SelectedPointIndexVisibility      = 1;
   this->RangeLabelVisibility              = 1;
   this->RangeLabelPosition          = vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault;
-  this->ParameterEntryPosition      = vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault;
+  this->PointEntriesPosition      = vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault;
   this->ParameterEntryVisibility          = 1;
+  this->PointEntriesVisibility          = 1;
   this->UserFrameVisibility               = 0;
   this->PointMarginToCanvas         = vtkKWParameterValueFunctionEditor::PointMarginAllSides;
   this->TicksLength                 = 5;
@@ -177,8 +181,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ComputePointColorFromValue     = 0;
 
   this->PointAddedCommand           = NULL;
-  this->PointMovingCommand          = NULL;
-  this->PointMovedCommand           = NULL;
+  this->PointChangingCommand          = NULL;
+  this->PointChangedCommand           = NULL;
   this->PointRemovedCommand         = NULL;
   this->SelectionChangedCommand     = NULL;
   this->FunctionChangedCommand      = NULL;
@@ -187,6 +191,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->VisibleRangeChangingCommand = NULL;
   this->ParameterCursorMovingCommand          = NULL;
   this->ParameterCursorMovedCommand           = NULL;
+  this->DoubleClickOnPointCommand  = NULL;
 
   this->Canvas                      = vtkKWCanvas::New();
   this->ParameterRange              = vtkKWRange::New();
@@ -194,9 +199,9 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->TopLeftContainer            = vtkKWFrame::New();
   this->TopLeftFrame                = vtkKWFrame::New();
   this->UserFrame                   = vtkKWFrame::New();
-  this->TopRightFrame               = vtkKWFrame::New();
+  this->PointEntriesFrame           = vtkKWFrame::New();
   this->RangeLabel                  = vtkKWLabel::New();
-  this->ParameterEntry              = vtkKWEntryWithLabel::New();
+  this->ParameterEntry              = NULL;
   this->ValueTicksCanvas            = vtkKWCanvas::New();
   this->ParameterTicksCanvas        = vtkKWCanvas::New();
 
@@ -246,16 +251,16 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     this->PointAddedCommand = NULL;
     }
 
-  if (this->PointMovingCommand)
+  if (this->PointChangingCommand)
     {
-    delete [] this->PointMovingCommand;
-    this->PointMovingCommand = NULL;
+    delete [] this->PointChangingCommand;
+    this->PointChangingCommand = NULL;
     }
 
-  if (this->PointMovedCommand)
+  if (this->PointChangedCommand)
     {
-    delete [] this->PointMovedCommand;
-    this->PointMovedCommand = NULL;
+    delete [] this->PointChangedCommand;
+    this->PointChangedCommand = NULL;
     }
 
   if (this->PointRemovedCommand)
@@ -305,6 +310,11 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     delete [] this->ParameterCursorMovedCommand;
     this->ParameterCursorMovedCommand = NULL;
     }
+  if (this->DoubleClickOnPointCommand)
+    {
+    delete [] this->DoubleClickOnPointCommand;
+    this->DoubleClickOnPointCommand = NULL;
+    }
 
   // GUI
 
@@ -344,10 +354,10 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     this->UserFrame = NULL;
     }
 
-  if (this->TopRightFrame)
+  if (this->PointEntriesFrame)
     {
-    this->TopRightFrame->Delete();
-    this->TopRightFrame = NULL;
+    this->PointEntriesFrame->Delete();
+    this->PointEntriesFrame = NULL;
     }
 
   if (this->ParameterEntry)
@@ -606,7 +616,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointColorInCanvas(
 
   if (!this->ComputePointColorFromValue)
     {
-    if (id == this->SelectedPoint)
+    if (id == this->GetSelectedPoint())
       {
       rgb[0] = this->SelectedPointColor[0];
       rgb[1] = this->SelectedPointColor[1];
@@ -662,7 +672,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointTextColorInCanvas(
 
   if (!this->ComputePointColorFromValue)
     {
-    if (id == this->SelectedPoint)
+    if (id == this->GetSelectedPoint())
       {
       rgb[0] = this->SelectedPointTextColor[0];
       rgb[1] = this->SelectedPointTextColor[1];
@@ -685,7 +695,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointTextColorInCanvas(
     return 0;
     }
 
-  double l = (rgb[0] + rgb[1] + rgb[2]) / 3.0;
+  double l = (prgb[0] + prgb[1] + prgb[2]) / 3.0;
   if (l > 0.5)
     {
     rgb[0] = rgb[1] = rgb[2] = 0.0;
@@ -699,17 +709,9 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointTextColorInCanvas(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
-  int id, int &x, int &y)
+int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParameter(double parameter, int &x, int &y)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
-    {
-    return 0;
-    }
-
-  double parameter;
-  if (!this->GetFunctionPointParameter(id, &parameter))
+  if (!this->IsCreated() || !this->HasFunction())
     {
     return 0;
     }
@@ -755,7 +757,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
     {
     double values[
       vtkKWParameterValueFunctionEditor::MaxFunctionPointDimensionality];
-    if (!this->GetFunctionPointValues(id, values))
+    if (!this->InterpolateFunctionPointValues(parameter, values))
       {
       return 0;
       }
@@ -763,6 +765,25 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
     }
     
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
+  int id, int &x, int &y)
+{
+  if (!this->IsCreated() || 
+      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  double parameter;
+  if (!this->GetFunctionPointParameter(id, &parameter))
+    {
+    return 0;
+    }
+
+  return this->GetFunctionPointCanvasCoordinatesAtParameter(parameter, x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -978,23 +999,17 @@ int vtkKWParameterValueFunctionEditor::MoveFunctionPoint(
   // Redraw the point
   // the point we just moved will be redrawn by
   // the call to RedrawFunctionDependentElements
-  /*
-  this->RedrawPoint(id); 
-  if (id == this->SelectedPoint)
-    {
-    this->UpdatePointEntries(id);
-    }
-  */
+
+  this->RedrawSinglePointDependentElements(id);
 
   // If we are moving the end points and we should rescale
 
-  if (this->RescaleBetweenEndPoints &&
+  if (this->RescaleBetweenEndPoints && 
       (id == 0 || id == this->GetFunctionSize() - 1))
     {
     this->RescaleFunctionBetweenEndPoints(id, old_parameter);
+    this->RedrawFunctionDependentElements();
     }
-
-  this->RedrawFunctionDependentElements();
 
   return 1;
 }
@@ -1130,6 +1145,12 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
   this->Canvas->SetBorderWidth(0);
   this->Canvas->SetHeight(this->CanvasHeight);
   this->Canvas->SetWidth(this->ExpandCanvasWidth ? 0 : this->CanvasWidth);
+
+  // Both are needed, the first one in case the canvas is not visible, the
+  // second because if it is visible, we want it to notify us precisely
+  // when it needs re-configuration
+
+  this->SetBinding("<Configure>", this, "ConfigureCallback");
   this->Canvas->SetBinding("<Configure>", this, "ConfigureCallback");
 
   // Create the ranges
@@ -1204,9 +1225,9 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
     this->CreateTopLeftFrame(app);
     }
 
-  if (this->IsTopRightFrameUsed())
+  if (this->IsPointEntriesFrameUsed())
     {
-    this->CreateTopRightFrame(app);
+    this->CreatePointEntriesFrame(app);
     }
 
   // Create the user frame
@@ -1230,13 +1251,13 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
     this->CreateRangeLabel(app);
     }
 
-  // Create the top right frame
+  // Do not create the point entries frame
   // It will be created automatically when sub-elements will be created
   // (for ex: ParameterEntry)
 
   // Create the parameter entry
 
-  if (this->ParameterEntryVisibility)
+  if (this->ParameterEntryVisibility && this->PointEntriesVisibility)
     {
     this->CreateParameterEntry(app);
     }
@@ -1276,17 +1297,18 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
 {
-  if (this->HasLabel() && this->GetLabel()->IsCreated())
-    {
-    return;
-    }
-
   // If we are displaying the label in the top left frame, make sure it has
   // been created. 
 
-  if (this->IsTopLeftFrameUsed() && this->IsCreated())
+  if (this->GetLabelVisibility() && 
+      this->LabelPosition == vtkKWWidgetWithLabel::LabelPositionDefault)
     {
-    this->CreateTopLeftFrame(this->GetApplication());
+    this->CreateTopLeftFrame(app);
+    }
+
+  if (this->HasLabel() && this->GetLabel()->IsCreated())
+    {
+    return;
     }
 
   this->Superclass::CreateLabel(app);
@@ -1319,6 +1341,13 @@ void vtkKWParameterValueFunctionEditor::CreateValueRange(
 void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
   vtkKWApplication *app)
 {
+  if (this->RangeLabelVisibility && 
+      (this->RangeLabelPosition == 
+       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault))
+    {
+    this->CreateTopLeftFrame(app);
+    }
+
   if (this->RangeLabel && !this->RangeLabel->IsCreated())
     {
     this->RangeLabel->SetParent(this);
@@ -1330,28 +1359,49 @@ void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateTopRightFrame(
+void vtkKWParameterValueFunctionEditor::CreatePointEntriesFrame(
   vtkKWApplication *app)
 {
-  if (this->TopRightFrame && !this->TopRightFrame->IsCreated())
+  if (this->PointEntriesFrame && !this->PointEntriesFrame->IsCreated())
     {
-    this->TopRightFrame->SetParent(this);
-    this->TopRightFrame->Create(app);
+    this->PointEntriesFrame->SetParent(this);
+    this->PointEntriesFrame->Create(app);
     }
+}
+
+//----------------------------------------------------------------------------
+vtkKWEntryWithLabel* vtkKWParameterValueFunctionEditor::GetParameterEntry()
+{
+  if (!this->ParameterEntry)
+    {
+    this->ParameterEntry = vtkKWEntryWithLabel::New();
+    if (this->ParameterEntryVisibility &&  
+        this->PointEntriesVisibility && 
+        this->IsCreated())
+      {
+      this->CreateParameterEntry(this->GetApplication());
+      }
+    }
+  return this->ParameterEntry;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
   vtkKWApplication *app)
 {
-  if (this->ParameterEntry && !this->ParameterEntry->IsCreated())
+  if (this->GetParameterEntry() && !this->ParameterEntry->IsCreated())
     {
-    this->ParameterEntry->SetParent(this);
+    this->CreatePointEntriesFrame(app);
+
+    // If we are displaying the entry in the top right frame, make sure it
+    // has been created. 
+
+    this->ParameterEntry->SetParent(this->PointEntriesFrame);
     this->ParameterEntry->Create(app);
-    this->ParameterEntry->GetWidget()->SetWidth(9);
+    this->ParameterEntry->GetWidget()->SetWidth(7);
     this->ParameterEntry->GetLabel()->SetText("P:");
 
-    this->UpdateParameterEntry(this->SelectedPoint);
+    this->UpdateParameterEntry(this->GetSelectedPoint());
 
     this->ParameterEntry->GetWidget()->SetCommand(
       this, "ParameterEntryCallback");
@@ -1434,12 +1484,9 @@ int vtkKWParameterValueFunctionEditor::IsTopLeftFrameUsed()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::IsTopRightFrameUsed()
+int vtkKWParameterValueFunctionEditor::IsPointEntriesFrameUsed()
 {
-  return 
-    (this->ParameterEntryVisibility && 
-     (this->ParameterEntryPosition == 
-      vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault));
+  return this->ParameterEntryVisibility && this->PointEntriesVisibility;
 }
 
 //----------------------------------------------------------------------------
@@ -1505,12 +1552,9 @@ void vtkKWParameterValueFunctionEditor::Update()
 
   this->UpdateRangeLabel();
 
-  this->Redraw();
+  this->UpdatePointEntries(this->GetSelectedPoint());
 
-  if (!this->HasSelection())
-    {
-    this->ParameterEntry->SetEnabled(0);
-    }
+  this->Redraw();
 
   this->UpdateHistogramLogModeOptionMenu();
 }
@@ -1537,19 +1581,20 @@ void vtkKWParameterValueFunctionEditor::Pack()
   /*
     TLC: TopLeftContainer, contains the TopLeftFrame (TLF) and UserFrame (UF)
     TLF: TopLeftFrame, may contain the Label (L) and/or the RangeLabel (RL)...
-    L: Label, usually the title of the whole dialog
-    RL: RangeLabel, displays the current visible parameter range
-    TRF: TopRightFrame, contains the ParameterEntry (PE) and subclasses entries
-    PE: Parameter Entry
-    PR: Parameter Range
-    VR: Value Range
-    VT: Value Ticks
-    PT: Parameter Ticks
+    L:   Label, usually the title of the whole dialog
+    RL:  RangeLabel, displays the current visible parameter range
+    PEF: PointEntriesFrame, has the ParameterEntry (PE)
+         and subclasses entries
+    PE:  Parameter Entry
+    PR:  Parameter Range
+    VR:  Value Range
+    VT:  Value Ticks
+    PT:  Parameter Ticks
     [---]: Canvas
 
             a b  c              d   e  f
          +------------------------------
-        0|       TLC            TRF             ShowLabel: On
+        0|       TLC            PEF             ShowLabel: On
         1|    VT [--------------]   VR          LabelPosition: Default
         2|       PT                             RangeLabelPosition: Default
         3|       PR                   
@@ -1557,23 +1602,23 @@ void vtkKWParameterValueFunctionEditor::Pack()
             a b  c              d   e  f
          +------------------------------
         0|       L            RL                ShowLabel: On
-        1|       TLC            TRF             LabelPosition: Top
+        1|       TLC            PEF             LabelPosition: Top
         2|    VT [--------------]   VR          RangeLabelPosition: Top
         3|       PT 
         4|       PR
 
             a b  c              d   e  f
          +------------------------------
-        0|       TLC            TRF            ShowLabel: On
-        1|  L VT [--------------]   VR PE      LabelPosition: Left
+        0|       TLC                           ShowLabel: On
+        1|  L VT [--------------]   VR PEF     LabelPosition: Left
         2|       PT                            RangeLabelPosition: Default
-        3|       PR                            ParameterEntryPosition: Right
+        3|       PR                            PointEntriesPosition: Right
 
             a b  c              d   e  f
          +------------------------------
-        0|       TLC            TRF            ShowLabel: On
-        1|       PR                            ParameterEntryPosition: Right
-        2|  L VT [--------------]   VR PE      LabelPosition: Left
+        0|       TLC                           ShowLabel: On
+        1|       PR                            PointEntriesPosition: Right
+        2|  L VT [--------------]   VR PEF     LabelPosition: Left
         3|       PT                            RangeLabelPosition: Default
                                                ParameterRangePosition: Top
   */
@@ -1685,30 +1730,17 @@ void vtkKWParameterValueFunctionEditor::Pack()
            << this->TopLeftFrame->GetWidgetName() << endl;
     }
   
-  // TopRightFrame (TRF)
+  // PointEntriesFrame (PEF) if at default position, i.e. top right
 
-  if (this->TopRightFrame && this->TopRightFrame->IsCreated())
+  if (this->PointEntriesFrame && this->PointEntriesFrame->IsCreated() &&
+      this->PointEntriesPosition == 
+      vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault &&
+      this->IsPointEntriesFrameUsed())
     {
-    this->TopRightFrame->UnpackChildren();
-    if (this->IsTopRightFrameUsed())
-      {
-      tk_cmd << "grid " << this->TopRightFrame->GetWidgetName() 
-             << " -stick ens -pady 1"
-             << " -column " << col_d << " -row " << row << endl;
-      }
-    }
-  
-  // ParameterEntry (PE) if at default position inside top right frame (TRF)
-  
-  if (this->ParameterEntryVisibility && 
-      (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
-      this->ParameterEntry && this->ParameterEntry->IsCreated() &&
-      this->TopRightFrame && this->TopRightFrame->IsCreated())
-    {
-    tk_cmd << "pack " << this->ParameterEntry->GetWidgetName() 
-           << " -side left -padx 2 -in "
-           << this->TopRightFrame->GetWidgetName() << endl;
+    this->PointEntriesFrame->UnpackChildren();
+    tk_cmd << "grid " << this->PointEntriesFrame->GetWidgetName() 
+           << " -stick ens -pady 1"
+           << " -column " << col_d << " -row " << row << endl;
     }
   
   row++;
@@ -1751,7 +1783,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Canvas ([------])
   
-  if (this->Canvas && this->Canvas->IsCreated())
+  if (this->CanvasVisibility && 
+      this->Canvas && this->Canvas->IsCreated())
     {
     tk_cmd << "grid " << this->Canvas->GetWidgetName() 
            << " -sticky news -padx 0 -pady 0 "
@@ -1768,19 +1801,19 @@ void vtkKWParameterValueFunctionEditor::Pack()
            << " -column " << col_e << " -row " << row << endl;
     }
   
-  // ParameterEntry (PE) if at right
-  
-  if (this->ParameterEntryVisibility && 
-      (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight) &&
-      this->ParameterEntry && this->ParameterEntry->IsCreated())
-    {
-    tk_cmd << "grid " << this->ParameterEntry->GetWidgetName() 
-           << " -sticky wns -padx 2 -pady 0 -in "
-           << this->GetWidgetName() 
-           << " -column " << col_f << " -row " << row << endl;
-    }
+  // PointEntriesFrame (PEF) if at right of canvas
 
+  if (this->PointEntriesFrame && this->PointEntriesFrame->IsCreated() &&
+      this->PointEntriesPosition == 
+      vtkKWParameterValueFunctionEditor::PointEntriesPositionRight &&
+      this->IsPointEntriesFrameUsed())
+    {
+    this->PointEntriesFrame->UnpackChildren();
+    tk_cmd << "grid " << this->PointEntriesFrame->GetWidgetName() 
+           << " -sticky wns -padx 2 -pady 0 -column " << col_f 
+           << " -row " << row << endl;
+    }
+  
   tk_cmd << "grid rowconfigure " 
          << this->GetWidgetName() << " " << row << " -weight 1" << endl;
   
@@ -1807,6 +1840,16 @@ void vtkKWParameterValueFunctionEditor::Pack()
     tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
            << " -sticky ew -padx 0 -pady 2"
            << " -columnspan 2 -column " << col_c << " -row " << row << endl;
+    }
+  
+  // ParameterEntry (PE)
+  
+  if (this->ParameterEntryVisibility && 
+      this->PointEntriesVisibility &&
+      this->ParameterEntry && this->ParameterEntry->IsCreated())
+    {
+    tk_cmd << "pack " << this->ParameterEntry->GetWidgetName() 
+           << " -side left -padx 2 " << endl;
     }
   
   // Make sure it will resize properly
@@ -1848,7 +1891,7 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
@@ -1856,7 +1899,7 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
@@ -1864,7 +1907,7 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
@@ -1874,7 +1917,7 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <Double-1> {" << this->GetTclName() 
            << " DoubleClickOnPointCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <Double-1> {" << this->GetTclName() 
            << " DoubleClickOnPointCallback %%x %%y}" << endl;
 
@@ -2000,19 +2043,19 @@ void vtkKWParameterValueFunctionEditor::UnBind()
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <B1-Motion> {}" << endl;
 
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <Shift-B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <Shift-B1-Motion> {}" << endl;
 
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
            << " <ButtonRelease-1> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::TextTag 
+    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <ButtonRelease-1> {}" << endl;
 
     // Paameter Cursor
@@ -2083,10 +2126,41 @@ double* vtkKWParameterValueFunctionEditor::GetWholeParameterRange()
 void vtkKWParameterValueFunctionEditor::SetWholeParameterRange(
   double r0, double r1)
 {
+  // First get the current relative visible range
+
+  double range[2];
+  this->GetRelativeVisibleParameterRange(range);
+  if (range[0] == range[1]) // avoid getting stuck
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
+
+  // Then set the whole range
+
   this->ParameterRange->SetWholeRange(r0, r1);
 
+  // We update the label, but we do not redraw yet as the visible range
+  // might just be several order of magnitude smaller or bigger than
+  // the new whole parameter range, and extreme zoom could be
+  // problematic for function that need sampling...
+  // Instead, check the last redraw time, and if setting the
+  // visible range below did not trigger a redraw, let's do it ourself.
+
   this->UpdateRangeLabel();
-  this->Redraw();
+
+  //this->Redraw();
+  unsigned long old_time = this->LastRedrawFunctionTime;
+
+  // Reset the visible range but keep the same relative range compared
+  // to the whole range
+
+  this->SetRelativeVisibleParameterRange(range);
+
+  if (old_time == this->LastRedrawFunctionTime)
+    {
+    this->Redraw();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2120,20 +2194,6 @@ void vtkKWParameterValueFunctionEditor::SetVisibleParameterRange(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetVisibleParameterRangeToFunctionRange()
-{
-  double start, end;
-  if (this->GetFunctionSize() >= 2)
-    {
-    if (this->GetFunctionPointParameter(0, &start) &&
-        this->GetFunctionPointParameter(this->GetFunctionSize() - 1, &end))
-      {
-      this->SetVisibleParameterRange(start, end);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetVisibleParameterRangeToWholeParameterRange()
 {
   this->SetVisibleParameterRange(this->GetWholeParameterRange());
@@ -2154,23 +2214,6 @@ void vtkKWParameterValueFunctionEditor::SetRelativeVisibleParameterRange(
 
   // VisibleParameterRangeChangingCallback is invoked automatically 
   // by the line above
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetWholeParameterRangeAndMaintainVisible(
-  double r0, double r1)
-{
-  double range[2];
-  this->GetRelativeVisibleParameterRange(range);
-
-  this->SetWholeParameterRange(r0, r1);
-
-  if (range[0] == range[1]) // avoid getting stuck
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }
-  this->SetRelativeVisibleParameterRange(range);
 }
 
 //----------------------------------------------------------------------------
@@ -2231,10 +2274,41 @@ double* vtkKWParameterValueFunctionEditor::GetWholeValueRange()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetWholeValueRange(double r0, double r1)
 {
+  // First get the current relative visible range
+
+  double range[2];
+  this->GetRelativeVisibleValueRange(range);
+  if (range[0] == range[1]) // avoid getting stuck
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
+
+  // Then set the whole range
+
   this->ValueRange->SetWholeRange(r0, r1);
 
+  // We update the label, but we do not redraw yet as the visible range
+  // might just be several order of magnitude smaller or bigger than
+  // the new whole value range, and extreme zoom could be
+  // problematic for function that need sampling...
+  // Instead, check the last redraw time, and if setting the
+  // visible range below did not trigger a redraw, let's do it ourself.
+
   this->UpdateRangeLabel();
-  this->Redraw();
+
+  //this->Redraw();
+  unsigned long old_time = this->LastRedrawFunctionTime;
+
+  // Reset the visible range but keep the same relative range compared
+  // to the whole range
+
+  this->SetRelativeVisibleValueRange(range);
+
+  if (old_time == this->LastRedrawFunctionTime)
+    {
+    this->Redraw();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2268,23 +2342,6 @@ void vtkKWParameterValueFunctionEditor::SetRelativeVisibleValueRange(
 
   // VisibleValueRangeChangingCallback is invoked automatically 
   // by the line above
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetWholeValueRangeAndMaintainVisible(
-  double r0, double r1)
-{
-  double range[2];
-  this->GetRelativeVisibleValueRange(range);
-
-  this->SetWholeValueRange(r0, r1);
-
-  if (range[0] == range[1]) // avoid getting stuck
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }
-  this->SetRelativeVisibleValueRange(range);
 }
 
 //----------------------------------------------------------------------------
@@ -2336,24 +2393,6 @@ void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRange(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetLabelVisibility(int arg)
-{
-  // If we are displaying the label in the top left frame, make sure it has
-  // been created before we call the superclass (which will call our 
-  // overriden CreateLabel()).
-
-  if (arg && 
-      (this->LabelPosition == 
-       vtkKWWidgetWithLabel::LabelPositionDefault) &&
-      this->IsCreated())
-    {
-    this->CreateTopLeftFrame(this->GetApplication());
-    }
-
-  this->Superclass::SetLabelVisibility(arg);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 {
   if (arg != vtkKWParameterValueFunctionEditor::LabelPositionDefault &&
@@ -2370,12 +2409,9 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 
   this->LabelPosition = arg;
 
-  // If we are displaying the label in the top left frame, make sure it has
-  // been created. 
-
-  if (this->IsTopLeftFrameUsed() && this->IsCreated())
+  if (this->GetLabelVisibility() && this->IsCreated())
     {
-    this->CreateTopLeftFrame(this->GetApplication());
+    this->CreateLabel(this->GetApplication());
     }
 
   this->Modified();
@@ -2392,17 +2428,6 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelVisibility(int arg)
     }
 
   this->RangeLabelVisibility = arg;
-
-  // If we are displaying the range label in the top left frame, make sure it
-  // has been created. 
-
-  if (this->RangeLabelVisibility && 
-      (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
-      this->IsCreated())
-    {
-    this->CreateTopLeftFrame(this->GetApplication());
-    }
 
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
@@ -2439,15 +2464,12 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
 
   this->RangeLabelPosition = arg;
 
-  // If we are displaying the range label in the top left frame, make sure it
-  // has been created. 
+  // Make sure that if the range has to be shown, we create it on the fly if
+  // needed
 
-  if (this->RangeLabelVisibility && 
-      (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
-      this->IsCreated())
+  if (this->RangeLabelVisibility && this->IsCreated())
     {
-    this->CreateTopLeftFrame(this->GetApplication());
+    this->CreateRangeLabel(this->GetApplication());
     }
 
   this->UpdateRangeLabel();
@@ -2455,6 +2477,47 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
   this->Modified();
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointEntriesPosition(int arg)
+{
+  if (arg < vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault)
+    {
+    arg = vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault;
+    }
+  else if (arg > 
+           vtkKWParameterValueFunctionEditor::PointEntriesPositionRight)
+    {
+    arg = vtkKWParameterValueFunctionEditor::PointEntriesPositionRight;
+    }
+
+  if (this->PointEntriesPosition == arg)
+    {
+    return;
+    }
+
+  this->PointEntriesPosition = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointEntriesVisibility(int arg)
+{
+  if (this->PointEntriesVisibility == arg)
+    {
+    return;
+    }
+
+  this->PointEntriesVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -2467,62 +2530,17 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryVisibility(int arg)
 
   this->ParameterEntryVisibility = arg;
 
-  // If we are displaying the entry in the top right frame, make sure it
-  // has been created. 
-
-  if (this->ParameterEntryVisibility && 
-      (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
-      this->IsCreated())
-    {
-    this->CreateTopRightFrame(this->GetApplication());
-    }
-
   // Make sure that if the entry has to be shown, we create it on the fly if
-  // needed
+  // needed, including all dependents widgets (like its container)
 
-  if (this->ParameterEntryVisibility && this->IsCreated())
+  if (this->ParameterEntryVisibility  && 
+      this->PointEntriesVisibility && 
+      this->IsCreated())
     {
     this->CreateParameterEntry(this->GetApplication());
     }
 
-  this->UpdateParameterEntry(this->SelectedPoint);
-
-  this->Modified();
-
-  this->Pack();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetParameterEntryPosition(int arg)
-{
-  if (arg < vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault)
-    {
-    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault;
-    }
-  else if (arg > 
-           vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight)
-    {
-    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight;
-    }
-
-  if (this->ParameterEntryPosition == arg)
-    {
-    return;
-    }
-
-  this->ParameterEntryPosition = arg;
-
-  // If we are displaying the entry in the top right frame, make sure it
-  // has been created. 
-
-  if (this->ParameterEntryVisibility && 
-      (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
-      this->IsCreated())
-    {
-    this->CreateTopRightFrame(this->GetApplication());
-    }
+  this->UpdateParameterEntry(this->GetSelectedPoint());
 
   this->Modified();
 
@@ -2560,7 +2578,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryFormat(const char *arg)
 
   this->Modified();
   
-  this->UpdateParameterEntry(this->SelectedPoint);
+  this->UpdateParameterEntry(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -2632,6 +2650,22 @@ void vtkKWParameterValueFunctionEditor::SetExpandCanvasWidth(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetCanvasVisibility(int arg)
+{
+  if (this->CanvasVisibility == arg)
+    {
+    return;
+    }
+
+  this->CanvasVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetFunctionLineVisibility(int arg)
 {
   if (this->FunctionLineVisibility == arg)
@@ -2642,15 +2676,6 @@ void vtkKWParameterValueFunctionEditor::SetFunctionLineVisibility(int arg)
   this->FunctionLineVisibility = arg;
 
   this->Modified();
-
-  // Remove the polyline in the canvas. RedrawFunction only changes items
-  // coordinates if they already exist. To make sure the line is hidden,
-  // we have to remove the item.
-
-  if (!this->FunctionLineVisibility)
-    {
-    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::LineTag);
-    }
 
   this->RedrawFunction();
 }
@@ -3024,7 +3049,7 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointRadius(double arg)
     }
   else
     {
-    this->RedrawPoint(this->SelectedPoint);
+    this->RedrawPoint(this->GetSelectedPoint());
     }
 }
 
@@ -3353,7 +3378,7 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointColor(
 
   this->Modified();
 
-  this->RedrawPoint(this->SelectedPoint);
+  this->RedrawPoint(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -3399,7 +3424,7 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointTextColor(
 
   this->Modified();
 
-  this->RedrawPoint(this->SelectedPoint);
+  this->RedrawPoint(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -3466,6 +3491,21 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyle(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointVisibility(int arg)
+{
+  if (this->PointVisibility == arg)
+    {
+    return;
+    }
+
+  this->PointVisibility = arg;
+
+  this->Modified();
+
+  this->RedrawFunction();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointIndexVisibility(int arg)
 {
   if (this->PointIndexVisibility == arg)
@@ -3481,10 +3521,26 @@ void vtkKWParameterValueFunctionEditor::SetPointIndexVisibility(int arg)
 
   // Since the point label can show the point index, update it too
 
-  if (this->HasSelection())
+  this->UpdatePointEntries(this->GetSelectedPoint());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSelectedPointIndexVisibility(int arg)
+{
+  if (this->SelectedPointIndexVisibility == arg)
     {
-    this->UpdatePointEntries(this->SelectedPoint);
+    return;
     }
+
+  this->SelectedPointIndexVisibility = arg;
+
+  this->Modified();
+
+  this->RedrawPoint(this->GetSelectedPoint());
+
+  // Since the point label can show the point index, update it too
+
+  this->UpdatePointEntries(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -3498,15 +3554,6 @@ void vtkKWParameterValueFunctionEditor::SetPointGuidelineVisibility(int arg)
   this->PointGuidelineVisibility = arg;
 
   this->Modified();
-
-  // Remove the polyline in the canvas. RedrawFunction only changes items
-  // coordinates if they already exist. To make sure the line is hidden,
-  // we have to remove the item.
-
-  if (!this->PointGuidelineVisibility)
-    {
-    this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::GuidelineTag);
-    }
 
   this->RedrawFunction();
 }
@@ -3533,28 +3580,6 @@ void vtkKWParameterValueFunctionEditor::SetPointGuidelineStyle(int arg)
   this->Modified();
 
   this->RedrawFunction();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetSelectedPointIndexVisibility(int arg)
-{
-  if (this->SelectedPointIndexVisibility == arg)
-    {
-    return;
-    }
-
-  this->SelectedPointIndexVisibility = arg;
-
-  this->Modified();
-
-  this->RedrawPoint(this->SelectedPoint);
-
-  // Since the point label can show the point index, update it too
-
-  if (this->HasSelection())
-    {
-    this->UpdatePointEntries(this->SelectedPoint);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -3609,19 +3634,19 @@ void vtkKWParameterValueFunctionEditor::InvokePointAddedCommand(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::InvokePointMovingCommand(int id)
+void vtkKWParameterValueFunctionEditor::InvokePointChangingCommand(int id)
 {
-  this->InvokePointCommand(this->PointMovingCommand, id);
+  this->InvokePointCommand(this->PointChangingCommand, id);
 
-  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointMovingEvent, &id);
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointChangingEvent, &id);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::InvokePointMovedCommand(int id)
+void vtkKWParameterValueFunctionEditor::InvokePointChangedCommand(int id)
 {
-  this->InvokePointCommand(this->PointMovedCommand, id);
+  this->InvokePointCommand(this->PointChangedCommand, id);
 
-  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointMovedEvent, &id);
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointChangedEvent, &id);
 }
 
 //----------------------------------------------------------------------------
@@ -3723,17 +3748,17 @@ void vtkKWParameterValueFunctionEditor::SetPointAddedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetPointMovingCommand(
+void vtkKWParameterValueFunctionEditor::SetPointChangingCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(&this->PointMovingCommand, object, method);
+  this->SetObjectMethodCommand(&this->PointChangingCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetPointMovedCommand(
+void vtkKWParameterValueFunctionEditor::SetPointChangedCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(&this->PointMovedCommand, object, method);
+  this->SetObjectMethodCommand(&this->PointChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -3795,6 +3820,23 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorMovedCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::InvokeDoubleClickOnPointCommand(int id)
+{
+  this->InvokePointCommand(this->DoubleClickOnPointCommand, id);
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::DoubleClickOnPointEvent, &id);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetDoubleClickOnPointCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->DoubleClickOnPointCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -3805,7 +3847,7 @@ void vtkKWParameterValueFunctionEditor::UpdateEnableState()
   this->PropagateEnableState(this->TopLeftContainer);
   this->PropagateEnableState(this->TopLeftFrame);
   this->PropagateEnableState(this->UserFrame);
-  this->PropagateEnableState(this->TopRightFrame);
+  this->PropagateEnableState(this->PointEntriesFrame);
   this->PropagateEnableState(this->RangeLabel);
   this->PropagateEnableState(this->ParameterEntry);
   this->PropagateEnableState(this->HistogramLogModeOptionMenu);
@@ -3844,11 +3886,6 @@ void vtkKWParameterValueFunctionEditor::SetBalloonHelpString(
   if (this->RangeLabel)
     {
     this->RangeLabel->SetBalloonHelpString(string);
-    }
-
-  if (this->ParameterEntry)
-    {
-    this->ParameterEntry->SetBalloonHelpString(string);
     }
 }
 
@@ -4119,6 +4156,12 @@ void vtkKWParameterValueFunctionEditor::GetCanvasHorizontalSlidingBounds(
 }
 
 //----------------------------------------------------------------------------
+unsigned long vtkKWParameterValueFunctionEditor::GetRedrawFunctionTime()
+{
+  return this->GetFunctionMTime();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::Redraw()
 {
   if (!this->IsCreated() || 
@@ -4138,7 +4181,16 @@ void vtkKWParameterValueFunctionEditor::Redraw()
 
   if (this->ExpandCanvasWidth)
     {
-    this->CanvasWidth = atoi(this->Script("winfo width %s", canv));
+    if (this->CanvasVisibility)
+      {
+      this->CanvasWidth = atoi(this->Script("winfo width %s", canv));
+      }
+    else
+      {
+      this->CanvasWidth = atoi(
+        this->Script("winfo width %s", this->GetWidgetName()));
+      this->CanvasWidth -= (this->GetBorderWidth() + this->GetPadX())* 2;
+      }
     if (this->CanvasWidth < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
       {
       this->CanvasWidth = VTK_KW_PVFE_CANVAS_WIDTH_MIN;
@@ -4204,7 +4256,7 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     }
 
   if (!this->HasFunction() ||
-      this->GetFunctionMTime() > this->LastRedrawFunctionTime)
+      this->GetRedrawFunctionTime() > this->LastRedrawFunctionTime)
     {
     this->RedrawFunctionDependentElements();
     }
@@ -4228,11 +4280,13 @@ void vtkKWParameterValueFunctionEditor::RedrawPanOnlyDependentElements()
   this->RedrawHistogram();
   this->RedrawRangeTicks();
 
-  if (this->PointPositionInValueRange != 
-      vtkKWParameterValueFunctionEditor::PointPositionValue)
-    {
-    this->RedrawFunction();
-    }
+  // We used to draw the entire function for the whole canvas, even if
+  // a small portion of it was displayed (in zoom mode). This would
+  // use a lot of resources of lines were to be sampled betweem each points
+  // every n-pixel. Now we only redraw the points and line that are
+  // indeed visible. So if we pan, we need to redraw.
+
+  this->RedrawFunction();
 }
 
 //----------------------------------------------------------------------------
@@ -4241,9 +4295,33 @@ void vtkKWParameterValueFunctionEditor::RedrawFunctionDependentElements()
   this->RedrawFunction();
   this->RedrawRangeFrame();
 
-  if (this->HasSelection())
+  this->UpdatePointEntries(this->GetSelectedPoint());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::RedrawSinglePointDependentElements(
+  int id)
+{
+  if (id < 0 || id >= this->GetFunctionSize())
     {
-    this->UpdatePointEntries(this->SelectedPoint);
+    return;
+    }
+
+  this->RedrawPoint(id);
+
+  this->RedrawLine(id - 1, id);
+  this->RedrawLine(id, id + 1);
+
+  if (id == this->GetSelectedPoint())
+    {
+    this->UpdatePointEntries(id);
+    }
+
+  // The range frame uses the two extreme points
+  
+  if ((id == 0 || id == this->GetFunctionSize() - 1))
+    {
+    this->RedrawRangeFrame(); 
     }
 }
 
@@ -4267,65 +4345,82 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
   // solid background. Then we can insert objects between those two
   // frames (histogram for example)
 
-  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameForegroundTag);
+  int has_tag = this->CanvasHasTag(
+    vtkKWParameterValueFunctionEditor::FrameForegroundTag);
   if (!has_tag)
     {
-    if (this->CanvasOutlineVisibility)
+    if (this->CanvasOutlineVisibility && this->CanvasVisibility)
       {
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_l " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
+               << "-tags {framefg_l " 
+               << vtkKWParameterValueFunctionEditor::FrameForegroundTag 
+               << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_r " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
+               << "-tags {framefg_r " 
+               << vtkKWParameterValueFunctionEditor::FrameForegroundTag 
+               << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_t " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
+               << "-tags {framefg_t " 
+               << vtkKWParameterValueFunctionEditor::FrameForegroundTag 
+               << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
         {
         tk_cmd << canv << " create line 0 0 0 0 "
-               << "-tags {framefg_b " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << "}\n";
+               << "-tags {framefg_b " 
+               << vtkKWParameterValueFunctionEditor::FrameForegroundTag 
+               << "}\n";
         }
-      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::FrameForegroundTag
-             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" << endl;
+      tk_cmd << canv << " lower " 
+             << vtkKWParameterValueFunctionEditor::FrameForegroundTag
+             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" 
+             << endl;
       }
     }
   else 
     {
-    if (!this->CanvasOutlineVisibility)
+    if (!this->CanvasOutlineVisibility || !this->CanvasVisibility)
       {
-      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameForegroundTag << endl;
+      tk_cmd << canv << " delete " 
+             << vtkKWParameterValueFunctionEditor::FrameForegroundTag << endl;
       }
     }
 
   // The background
 
-  has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::FrameBackgroundTag);
+  has_tag = this->CanvasHasTag(
+    vtkKWParameterValueFunctionEditor::FrameBackgroundTag);
   if (!has_tag)
     {
-    if (this->CanvasBackgroundVisibility)
+    if (this->CanvasBackgroundVisibility && this->CanvasVisibility)
       {
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << " -tags {" << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << "}" << endl;
-      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
+             << " -tags {" 
+             << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << "}" 
+             << endl;
+      tk_cmd << canv << " lower " 
+             << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
              << " all" << endl;
       }
     }
   else 
     {
-    if (!this->CanvasBackgroundVisibility)
+    if (!this->CanvasBackgroundVisibility || !this->CanvasVisibility)
       {
-      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << endl;
+      tk_cmd << canv << " delete " 
+             << vtkKWParameterValueFunctionEditor::FrameBackgroundTag << endl;
       }
     }
 
@@ -4364,7 +4459,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
 
   // Update coordinates and colors
 
-  if (this->CanvasOutlineVisibility)
+  if (this->CanvasOutlineVisibility && this->CanvasVisibility)
     {
     double c1_x = p_w_range[0] * factors[0];
     double c1_y = v_w_range[0] * factors[1];
@@ -4401,7 +4496,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
       }
     }
 
-  if (this->CanvasBackgroundVisibility)
+  if (this->CanvasBackgroundVisibility && this->CanvasVisibility)
     {
     tk_cmd << canv << " coords " 
            << vtkKWParameterValueFunctionEditor::FrameBackgroundTag 
@@ -4453,7 +4548,8 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
 
   // Create the ticks if not created already
 
-  int has_p_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag);
+  int has_p_tag = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterTicksTag);
   if (!has_p_tag)
     {
     if (this->ParameterTicksVisibility)
@@ -4462,14 +4558,17 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
         {
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {p_tick_t" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" 
+               << endl;
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {p_tick_b" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" 
+               << endl;
         tk_cmd << p_t_canv << " create text 0 0 -text {} -anchor n " 
                << "-font {{fixed} " << VTK_KW_PVFE_TICKS_TEXT_SIZE << "} "
                << "-tags {p_tick_b_t" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ParameterTicksTag << "}" 
+               << endl;
         }
       }
     }
@@ -4484,7 +4583,8 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
       }
     }
 
-  int has_v_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ValueTicksTag);
+  int has_v_tag = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ValueTicksTag);
   if (!has_v_tag)
     {
     if (this->ValueTicksVisibility)
@@ -4493,14 +4593,17 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
         {
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {v_tick_l" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" 
+               << endl;
         tk_cmd << canv << " create line 0 0 0 0 "
                << " -tags {v_tick_r" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" 
+               << endl;
         tk_cmd << v_t_canv << " create text 0 0 -text {} -anchor e " 
                << "-font {{fixed} " << VTK_KW_PVFE_TICKS_TEXT_SIZE << "} "
                << "-tags {v_tick_l_t" << i << " " 
-               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" << endl;
+               << vtkKWParameterValueFunctionEditor::ValueTicksTag << "}" 
+               << endl;
         }
       }
     }
@@ -4636,28 +4739,34 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
 
   // Create the cursor if not created already
 
-  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterCursorTag);
+  int has_tag = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::ParameterCursorTag);
   if (!has_tag)
     {
-    if (this->ParameterCursorVisibility)
+    if (this->ParameterCursorVisibility && this->CanvasVisibility)
       {
       tk_cmd << canv << " create line 0 0 0 0 "
-             << " -tags {" << vtkKWParameterValueFunctionEditor::ParameterCursorTag << "}" << endl;
-      tk_cmd << canv << " lower " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
-             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" << endl;
+             << " -tags {" 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag << "}" 
+             << endl;
+      tk_cmd << canv << " lower " 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+             << " {" << vtkKWParameterValueFunctionEditor::FunctionTag << "}" 
+             << endl;
       }
     }
   else 
     {
-    if (!this->ParameterCursorVisibility)
+    if (!this->ParameterCursorVisibility || !this->CanvasVisibility)
       {
-      tk_cmd << canv << " delete " << vtkKWParameterValueFunctionEditor::ParameterCursorTag<< endl;
+      tk_cmd << canv << " delete " 
+             << vtkKWParameterValueFunctionEditor::ParameterCursorTag<< endl;
       }
     }
 
   // Update the cursor position and style
   
-  if (this->ParameterCursorVisibility)
+  if (this->ParameterCursorVisibility && this->CanvasVisibility)
     {
     double v_v_range[2];
     this->GetWholeValueRange(v_v_range);
@@ -4665,7 +4774,8 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
     double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
 
-    tk_cmd << canv << " coords " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+    tk_cmd << canv << " coords " 
+           << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " " << this->ParameterCursorPosition * factors[0]
            << " " << v_v_range[0] * factors[1]
            << " " << this->ParameterCursorPosition * factors[0]
@@ -4678,7 +4788,8 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
             (int)(this->ParameterCursorColor[1] * 255.0),
             (int)(this->ParameterCursorColor[2] * 255.0));
     
-    tk_cmd << canv << " itemconfigure " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+    tk_cmd << canv << " itemconfigure " 
+           << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " -fill " << color << endl;
     }
 
@@ -4691,11 +4802,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
 void vtkKWParameterValueFunctionEditor::RedrawPoint(int id, 
                                                     ostrstream *tk_cmd)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || 
-      id < 0 || 
-      id >= this->GetFunctionSize() ||
-      this->DisableRedraw)
+  if (!this->IsCreated() || !this->HasFunction() || this->DisableRedraw)
     {
     return;
     }
@@ -4712,250 +4819,309 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   const char *canv = this->Canvas->GetWidgetName();
 
-  // Get the point coords, color, radius (different size if point is selected)
+  int x, y, r;
+  int is_not_visible = 0;
+  int is_not_valid = (id < 0 || id >= this->GetFunctionSize());
 
-  int x, y;
-  this->GetFunctionPointCanvasCoordinates(id, x, y);
+  // Get the point coords, radius, check if the point is visible
 
-  int r = this->PointRadius;
-  if (id == this->SelectedPoint)
+  if (!is_not_valid)
     {
-    r = (int)ceil((double)r * this->SelectedPointRadius);
+    this->GetFunctionPointCanvasCoordinates(id, x, y);
+
+    r = this->PointRadius;
+    if (id == this->GetSelectedPoint())
+      {
+      r = (int)ceil((double)r * this->SelectedPointRadius);
+      }
+
+    // If the point is not in the visible range, hide it
+
+    double c_x, c_y, c_x2, c_y2;
+    this->GetCanvasScrollRegion(&c_x, &c_y, &c_x2, &c_y2);
+
+    int visible_margin = r + this->PointOutlineWidth + 5;
+
+    if ((x + visible_margin < c_x || c_x2 < x - visible_margin ||
+         y + visible_margin < c_y || c_y2 < y - visible_margin))
+      {
+      is_not_visible = 1;
+      }
     }
+
+
+  double rgb[3];
+  char color[10];
 
   // Create the text item (index at each point)
-
-  if (!this->CanvasHasTag("t", &id))
-    {
-    *tk_cmd << canv << " create text 0 0 -text {} " 
-            << "-tags {t" << id 
-            << " " << vtkKWParameterValueFunctionEditor::TextTag
-            << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
-    }
-
-  // Get the style
-
-  // Points are reused. Since each point is of a specific type, it is OK
-  // as long as the point styles are not mixed. If they are (i.e., a special
-  // style for the first or last point for example), we have to check
-  // for the point type. If it is not the right type, the point can not be
-  // reused as the coordinates spec would not match. In that case, delete
-  // the point right now.
-
-  int func_size = this->GetFunctionSize();
-
-  int style = this->PointStyle;
-  int must_check_for_type = 0;
-
-  if (this->FirstPointStyle != 
-      vtkKWParameterValueFunctionEditor::PointStyleDefault)
-    {
-    must_check_for_type = 1;
-    if (id == 0)
-      {
-      style = this->FirstPointStyle;
-      }
-    }
-  if (this->LastPointStyle != 
-      vtkKWParameterValueFunctionEditor::PointStyleDefault)
-    {
-    must_check_for_type = 1;
-    if (id == func_size - 1)
-      {
-      style = this->LastPointStyle;
-      }
-    }
-
-  int point_exists = this->CanvasHasTag("p", &id);
-  if (point_exists && must_check_for_type)
-    {
-    int must_delete_point = 0;
-    switch (style)
-      {
-      case vtkKWParameterValueFunctionEditor::PointStyleDefault:
-      case vtkKWParameterValueFunctionEditor::PointStyleDisc:
-        must_delete_point = !this->CanvasCheckTagType("p", id, "oval");
-        break;
-
-      case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
-        must_delete_point = !this->CanvasCheckTagType("p", id, "rectange");
-        break;
-
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
-        must_delete_point = !this->CanvasCheckTagType("p", id, "polygon");
-        break;
-      }
-    if (must_delete_point)
-      {
-      *tk_cmd << canv << " delete p" << id << endl;
-      point_exists = 0;
-      }
-    }
-
-  // Create the point item
-
-  if (!point_exists)
-    {
-    switch (style)
-      {
-      case vtkKWParameterValueFunctionEditor::PointStyleDefault:
-      case vtkKWParameterValueFunctionEditor::PointStyleDisc:
-        *tk_cmd << canv << " create oval";
-        break;
-
-      case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
-        *tk_cmd << canv << " create rectangle";
-        break;
-
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
-      case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
-        *tk_cmd << canv << " create polygon 0 0 0 0 0 0";
-        break;
-      }
-    *tk_cmd << " 0 0 0 0 -tags {p" << id 
-            << " " << vtkKWParameterValueFunctionEditor::PointTag 
-            << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
-    *tk_cmd << canv << " lower p" << id << " t" << id << endl;
-    }
-
-  // Create the point guideline
-
-  if (this->PointGuidelineVisibility)
-    {
-    if (!this->CanvasHasTag("g", &id))
-      {
-      *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 1 " 
-              << " -tags {g" << id << " " << vtkKWParameterValueFunctionEditor::GuidelineTag 
-              << " " << vtkKWParameterValueFunctionEditor::FunctionTag
-              << "}" << endl;
-      *tk_cmd << canv << " lower g" << id << " p" << id << endl;
-      }
-    }
   
-  // Create the line between a point and its predecessor
-
-  if (this->FunctionLineVisibility)
+  if (is_not_valid)
     {
-    if (id > 0)
-      {
-      if (!this->CanvasHasTag("l", &id))
-        {
-        *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 2 " 
-                << " -tags {l" << id 
-                << " " << vtkKWParameterValueFunctionEditor::LineTag
-                << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}\n";
-        *tk_cmd << canv << " lower l" << id << " p" << id - 1 << endl;
-        }
-      }
+    *tk_cmd << canv << " delete t" << id << endl;
     }
-  
-  // Update the point coordinates and style
-
-  switch (style)
+  else
     {
-    case vtkKWParameterValueFunctionEditor::PointStyleDefault:
-    case vtkKWParameterValueFunctionEditor::PointStyleDisc:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x - r << " " << y - r 
-              << " " << x + r << " " << y + r << endl;
-      break;
-      
-    case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x - r << " " << y - r 
-              << " " << x + r + LSTRANGE << " " << y + r + LSTRANGE << endl;
-      break;
-      
-    case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x - r << " " << y 
-              << " " << x     << " " << y + r
-              << " " << x + r << " " << y 
-              << " " << x + r << " " << y - r + 1 
-              << " " << x - r << " " << y - r + 1 
-              << endl;
-      break;
-
-    case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x - r << " " << y 
-              << " " << x     << " " << y - r
-              << " " << x + r << " " << y 
-              << " " << x + r << " " << y + r - 1 
-              << " " << x - r << " " << y + r - 1 
-              << endl;
-      break;
-
-    case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x         << " " << y + r
-              << " " << x - r     << " " << y
-              << " " << x         << " " << y - r
-              << " " << x + r - 1 << " " << y - r 
-              << " " << x + r - 1 << " " << y + r
-              << endl;
-      break;
-
-    case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
-      *tk_cmd << canv << " coords p" << id 
-              << " " << x         << " " << y + r
-              << " " << x + r     << " " << y
-              << " " << x         << " " << y - r
-              << " " << x - r + 1 << " " << y - r 
-              << " " << x - r + 1 << " " << y + r
-              << endl;
-      break;
-    }
-
-  *tk_cmd << canv << " itemconfigure p" << id 
-          << " -width " << this->PointOutlineWidth << endl;
-
-  // Update the text coordinates
-
-  *tk_cmd << canv << " coords t" << id << " " << x << " " << y << endl;
-
-  // Update the guideline coordinates and style
-
-  if (this->PointGuidelineVisibility)
-    {
-    double factors[2] = {0.0, 0.0};
-    this->GetCanvasScalingFactors(factors);
-    double *v_w_range = this->GetWholeValueRange();
-    int y1 = vtkMath::Round(v_w_range[0] * factors[1]);
-    int y2 = vtkMath::Round(v_w_range[1] * factors[1]);
-    *tk_cmd << canv << " coords g" << id << " "
-            << x << " " << y1 << " " << x << " " << y2 << endl;
-    *tk_cmd << canv << " itemconfigure g" << id;
-    if (this->PointGuidelineStyle == 
-        vtkKWParameterValueFunctionEditor::LineStyleDash)
+    if (is_not_visible  ||
+        !this->CanvasVisibility ||
+        !this->PointVisibility || 
+        !(this->PointIndexVisibility ||
+          (this->SelectedPointIndexVisibility && id == this->GetSelectedPoint())))
       {
-      *tk_cmd << " -dash {.}";
+      *tk_cmd << canv << " itemconfigure t" << id << " -state hidden" << endl;
       }
     else
       {
-      *tk_cmd << " -dash {}";
+      if (!this->CanvasHasTag("t", &id))
+        {
+        *tk_cmd << canv << " create text 0 0 -text {} " 
+                << "-tags {t" << id 
+                << " " << vtkKWParameterValueFunctionEditor::PointTextTag
+                << " " << vtkKWParameterValueFunctionEditor::FunctionTag << "}"
+                << endl;
+        }
+    
+      // Update the text coordinates
+      
+      *tk_cmd << canv << " coords t" << id << " " << x << " " << y << endl;
+
+      // Update the text color and contents
+      
+      if (this->GetFunctionPointTextColorInCanvas(id, rgb))
+        {
+        int text_size = 7 - (id > 8 ? 1 : 0);
+        sprintf(color, "#%02x%02x%02x", 
+                (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
+        *tk_cmd << canv << " itemconfigure t" << id
+                << " -state normal -font {{fixed} " << text_size << "} -text " 
+                << id + 1 << " -fill " << color << endl;
+        }
       }
-    *tk_cmd << endl;
     }
 
-  // Update the line coordinates and style
+  // Create the point
 
-  if (this->FunctionLineVisibility)
+  if (is_not_valid)
     {
-    if (id > 0)
+    *tk_cmd << canv << " delete p" << id << endl;
+    }
+  else
+    {
+    if (is_not_visible || 
+        !this->PointVisibility || 
+        !this->CanvasVisibility)
       {
-      int prev_x, prev_y;
-      this->GetFunctionPointCanvasCoordinates(id - 1, prev_x, prev_y);
-      *tk_cmd << canv << " coords l" << id << " "
-              << prev_x << " " << prev_y << " " << x << " " << y << endl;
-      *tk_cmd << canv << " itemconfigure l" << id 
-              << " -width " << this->FunctionLineWidth;
-      if (this->FunctionLineStyle == 
+      *tk_cmd << canv << " itemconfigure p" << id << " -state hidden" << endl;
+      }
+    else
+      {
+      // Get the point style
+      // Points are reused. Since each point is of a specific type, it is OK
+      // as long as the point styles are not mixed. If they are (i.e., a 
+      // special style for the first or last point for example), we have to
+      // check for the point type. If it is not the right type, the point can
+      // not be reused as the coordinates spec would not match. In that case,
+      // delete the point right now.
+
+      int func_size = this->GetFunctionSize();
+
+      int style = this->PointStyle;
+      int must_check_for_type = 0;
+
+      if (this->FirstPointStyle != 
+          vtkKWParameterValueFunctionEditor::PointStyleDefault)
+        {
+        must_check_for_type = 1;
+        if (id == 0)
+          {
+          style = this->FirstPointStyle;
+          }
+        }
+      if (this->LastPointStyle != 
+          vtkKWParameterValueFunctionEditor::PointStyleDefault)
+        {
+        must_check_for_type = 1;
+        if (id == func_size - 1)
+          {
+          style = this->LastPointStyle;
+          }
+        }
+
+      // Check if we need to recreate it
+
+      int point_exists = this->CanvasHasTag("p", &id);
+      if (point_exists && must_check_for_type)
+        {
+        int must_delete_point = 0;
+        switch (style)
+          {
+          case vtkKWParameterValueFunctionEditor::PointStyleDefault:
+          case vtkKWParameterValueFunctionEditor::PointStyleDisc:
+            must_delete_point = !this->CanvasCheckTagType("p", id, "oval");
+            break;
+
+          case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
+            must_delete_point = !this->CanvasCheckTagType("p", id, "rectange");
+            break;
+
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
+            must_delete_point = !this->CanvasCheckTagType("p", id, "polygon");
+            break;
+          }
+        if (must_delete_point)
+          {
+          *tk_cmd << canv << " delete p" << id << endl;
+          point_exists = 0;
+          }
+        }
+
+      // Create the point item
+
+      if (!point_exists)
+        {
+        switch (style)
+          {
+          case vtkKWParameterValueFunctionEditor::PointStyleDefault:
+          case vtkKWParameterValueFunctionEditor::PointStyleDisc:
+            *tk_cmd << canv << " create oval";
+            break;
+
+          case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
+            *tk_cmd << canv << " create rectangle";
+            break;
+
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
+          case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
+            *tk_cmd << canv << " create polygon 0 0 0 0 0 0";
+            break;
+          }
+        *tk_cmd << " 0 0 0 0 -tags {p" << id 
+                << " " << vtkKWParameterValueFunctionEditor::PointTag 
+                << " " << vtkKWParameterValueFunctionEditor::FunctionTag 
+                << "}" << endl;
+        *tk_cmd << canv << " lower p" << id << " t" << id << endl;
+        }
+
+      // Update the point coordinates and style
+
+      switch (style)
+        {
+        case vtkKWParameterValueFunctionEditor::PointStyleDefault:
+        case vtkKWParameterValueFunctionEditor::PointStyleDisc:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x - r << " " << y - r 
+                  << " " << x + r << " " << y + r << endl;
+          break;
+      
+        case vtkKWParameterValueFunctionEditor::PointStyleRectangle:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x - r << " " << y - r 
+                  << " " << x + r + LSTRANGE << " " << y + r + LSTRANGE 
+                  << endl;
+          break;
+      
+        case vtkKWParameterValueFunctionEditor::PointStyleCursorDown:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x - r << " " << y 
+                  << " " << x     << " " << y + r
+                  << " " << x + r << " " << y 
+                  << " " << x + r << " " << y - r + 1 
+                  << " " << x - r << " " << y - r + 1 
+                  << endl;
+          break;
+
+        case vtkKWParameterValueFunctionEditor::PointStyleCursorUp:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x - r << " " << y 
+                  << " " << x     << " " << y - r
+                  << " " << x + r << " " << y 
+                  << " " << x + r << " " << y + r - 1 
+                  << " " << x - r << " " << y + r - 1 
+                  << endl;
+          break;
+
+        case vtkKWParameterValueFunctionEditor::PointStyleCursorLeft:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x         << " " << y + r
+                  << " " << x - r     << " " << y
+                  << " " << x         << " " << y - r
+                  << " " << x + r - 1 << " " << y - r 
+                  << " " << x + r - 1 << " " << y + r
+                  << endl;
+          break;
+
+        case vtkKWParameterValueFunctionEditor::PointStyleCursorRight:
+          *tk_cmd << canv << " coords p" << id 
+                  << " " << x         << " " << y + r
+                  << " " << x + r     << " " << y
+                  << " " << x         << " " << y - r
+                  << " " << x - r + 1 << " " << y - r 
+                  << " " << x - r + 1 << " " << y + r
+                  << endl;
+          break;
+        }
+
+      *tk_cmd << canv << " itemconfigure p" << id 
+              << " -state normal  -width " << this->PointOutlineWidth << endl;
+
+      // Update the point color
+
+      if (this->GetFunctionPointColorInCanvas(id, rgb))
+        {
+        sprintf(color, "#%02x%02x%02x", 
+                (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
+        *tk_cmd << canv << " itemconfigure p" << id;
+        if (style != vtkKWParameterValueFunctionEditor::PointStyleRectangle)
+          {
+          *tk_cmd << " -outline black -fill " << color << endl;
+          }
+        else
+          {
+          *tk_cmd << " -fill {} -outline " << color << endl;
+          }
+        }
+      }
+    }
+
+  // Create and/or update the point guideline
+
+  if (is_not_valid)
+    {
+    *tk_cmd << canv << " delete g" << id << endl;
+    }
+  else
+    {
+    if (is_not_visible || 
+        !this->PointGuidelineVisibility || 
+        !this->CanvasVisibility)
+      {
+      *tk_cmd << canv << " itemconfigure g" << id << " -state hidden" << endl;
+      }
+    else
+      {
+      if (!this->CanvasHasTag("g", &id))
+        {
+        *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 1 " 
+                << " -tags {g" << id << " " 
+                << vtkKWParameterValueFunctionEditor::PointGuidelineTag 
+                << " " << vtkKWParameterValueFunctionEditor::FunctionTag
+                << "}" << endl;
+        *tk_cmd << canv << " lower g" << id << " p" << id << endl;
+        }
+  
+      double factors[2] = {0.0, 0.0};
+      this->GetCanvasScalingFactors(factors);
+      double *v_w_range = this->GetWholeValueRange();
+      int y1 = vtkMath::Round(v_w_range[0] * factors[1]);
+      int y2 = vtkMath::Round(v_w_range[1] * factors[1]);
+      *tk_cmd << canv << " coords g" << id << " "
+              << x << " " << y1 << " " << x << " " << y2 << endl;
+      *tk_cmd << canv << " itemconfigure g" << id;
+      if (this->PointGuidelineStyle == 
           vtkKWParameterValueFunctionEditor::LineStyleDash)
         {
         *tk_cmd << " -dash {.}";
@@ -4964,54 +5130,8 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         {
         *tk_cmd << " -dash {}";
         }
-      *tk_cmd << endl;
+      *tk_cmd << " -state normal" << endl;
       }
-    if (id < func_size - 1)
-      {
-      int next_x, next_y;
-      this->GetFunctionPointCanvasCoordinates(id + 1, next_x, next_y);
-      *tk_cmd << canv << " coords l" << id + 1 << " "
-              << x << " " << y << " " << next_x << " " << next_y << endl;
-      }
-    }
-
-  // Update the point color
-
-  double rgb[3];
-  char color[10];
-
-  if (this->GetFunctionPointColorInCanvas(id, rgb))
-    {
-    sprintf(color, "#%02x%02x%02x", 
-            (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
-    *tk_cmd << canv << " itemconfigure p" << id;
-    if (style != vtkKWParameterValueFunctionEditor::PointStyleRectangle)
-      {
-      *tk_cmd << " -outline black -fill " << color << endl;
-      }
-    else
-      {
-      *tk_cmd << " -fill {} -outline " << color << endl;
-      }
-    }
-
-  // Update the text color
-
-  if (this->PointIndexVisibility ||
-      (this->SelectedPointIndexVisibility && id == this->SelectedPoint))
-    {
-    if (this->GetFunctionPointTextColorInCanvas(id, rgb))
-      {
-      sprintf(color, "#%02x%02x%02x", 
-              (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
-      *tk_cmd << canv << " itemconfigure t" << id
-              << " -font {{fixed} " << 7 - (id > 8 ? 1 : 0) << "} -text " 
-              << id + 1 << " -fill " << color << endl;
-      }
-    }
-  else
-    {
-    *tk_cmd << canv << " itemconfigure t" << id << " -text {}" << endl;
     }
 
   // Execute the command, free the stream
@@ -5023,6 +5143,203 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
     tk_cmd->rdbuf()->freeze(0);
     delete tk_cmd;
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::FunctionLineIsInVisibleRangeBetweenPoints(
+  int id1, int id2)
+{
+  if (id1 < 0 || id1 >= this->GetFunctionSize() ||
+      id2 < 0 || id2 >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  // Get the line coordinates
+
+  int x1, y1, x2, y2;
+  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
+  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+
+  // Reorder so that it matches the canvas coords
+
+  if (x1 > x2)
+    {
+    int temp = x1;
+    x1 = x2;
+    x2 = temp;
+    }
+  if (y1 > y2)
+    {
+    int temp = y1;
+    y1 = y2;
+    y2 = temp;
+    }
+
+  // Get the current canvas visible coords
+
+  double c_x1, c_y1, c_x2, c_y2;
+  this->GetCanvasScrollRegion(&c_x1, &c_y1, &c_x2, &c_y2);
+
+  int margin = this->FunctionLineWidth + 5;
+
+  // Check
+
+  return (x2 < c_x1 || c_x2 < x1 || y2 < c_y1 || c_y2 < y1) ? 0 : 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::RedrawLine(
+  int id1, int id2, ostrstream *tk_cmd)
+{
+  if (!this->IsCreated() || !this->HasFunction() || this->DisableRedraw)
+    {
+    return;
+    }
+
+  // If there is no stream, then it means we want to execute that command
+  // right now (so create a stream)
+
+  int stream_was_created = 0;
+  if (!tk_cmd)
+    {
+    tk_cmd = new ostrstream;
+    stream_was_created = 1;
+    }
+
+  const char *canv = this->Canvas->GetWidgetName();
+
+  int is_not_valid = (id1 == id2 ||
+                      id1 < 0 || id1 >= this->GetFunctionSize() ||
+                      id2 < 0 || id2 >= this->GetFunctionSize());
+
+  // Switch boths id's if they were not specified in order
+  
+  if (id1 > id2)
+    {
+    int temp = id1;
+    id1 = id2;
+    id2 = temp;
+    }
+  
+  // Create the line item
+  
+  if (is_not_valid)
+    {
+    *tk_cmd << canv << " delete l" << id2 << endl;
+    }
+  else
+    {
+    // Hide the line if not visible
+    // Actually let's just destroy it to keep memory low in case
+    // many segments were generated for a sampled line
+
+    if (!this->FunctionLineVisibility || 
+        !this->CanvasVisibility ||
+        !this->FunctionLineIsInVisibleRangeBetweenPoints(id1, id2))
+      {
+      //*tk_cmd << canv << " itemconfigure l" << id2 << " -state hidden"<<endl;
+      *tk_cmd << canv << " delete l" << id2 << endl;
+      }
+    else
+      {
+      // Create the poly-line between the points
+      // The line id is the id of the second end-point (id2)
+  
+      if (!this->CanvasHasTag("l", &id2))
+        {
+        *tk_cmd << canv << " create line 0 0 0 0 -fill black " 
+                << " -tags {l" << id2 
+                << " " << vtkKWParameterValueFunctionEditor::LineTag
+                << " " << vtkKWParameterValueFunctionEditor::FunctionTag 
+                << "}" << endl;
+        *tk_cmd << canv << " lower l" << id2 << " {p" << id1 << "||p" << id2 
+                << "}" << endl;
+        }
+  
+      // Get the point coords
+      // Use either a straight line, or sample points
+
+      *tk_cmd << canv << " coords l" << id2;
+      this->GetLineCoordinates(id1, id2, tk_cmd);
+      *tk_cmd << endl;
+
+      // Configure style
+      
+      *tk_cmd << canv << " itemconfigure l" << id2 
+              << " -state normal -width " << this->FunctionLineWidth;
+      if (this->FunctionLineStyle == 
+          vtkKWParameterValueFunctionEditor::LineStyleDash)
+        {
+        *tk_cmd << " -dash {.}";
+        }
+      else
+        {
+        *tk_cmd << " -dash {}";
+        }
+      *tk_cmd << endl;
+      }
+    }
+  
+  // Execute the command, free the stream
+
+  if (stream_was_created)
+    {
+    *tk_cmd << ends;
+    this->Script(tk_cmd->str());
+    tk_cmd->rdbuf()->freeze(0);
+    delete tk_cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetLineCoordinates(
+  int id1, int id2, ostrstream *tk_cmd)
+{
+  // We assume all parameters are OK, they were checked by RedrawLine
+
+  // Use either a straight line, or sample points
+
+  int x1, y1, x2, y2;
+  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
+  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+
+  *tk_cmd << " " << x1 << " " << y1;
+
+  if (this->FunctionLineIsSampledBetweenPoints(id1, id2))
+    {
+    double id1_p, id2_p;
+    if (this->GetFunctionPointParameter(id1, &id1_p) &&
+        this->GetFunctionPointParameter(id2, &id2_p))
+      {
+      // we want segments no longer than 2 pixels
+      // Also, check that we do not exceed, say 2000 pixels total, that
+      // would be a flag that something not reasonable is happenin, i.e.
+      // a function has just been set but the visible does not match
+      // at all and extreme zooming is happening before the user had the
+      // time to reset the range.
+
+      int max_segment_length = 2;
+          
+      int x, y;
+      int nb_steps = 
+        (int)ceil((double)(x2 - x1) / (double)max_segment_length);
+      if (nb_steps > 1000)
+        {
+        nb_steps = 1000;
+        }
+      for (int i = 1; i < nb_steps; i++)
+        {
+        double p = id1_p + (id2_p - id1_p)*((double)i / (double)nb_steps);
+        if (this->GetFunctionPointCanvasCoordinatesAtParameter(p, x, y))
+          {
+          *tk_cmd << " " << x << " " << y;
+          }
+        }
+      }
+    }
+
+  *tk_cmd << " " << x2 << " " << y2;
 }
 
 //----------------------------------------------------------------------------
@@ -5048,7 +5365,8 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
 
   // Are we going to create or delete points ?
 
-  int c_nb_points = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
+  int c_nb_points = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
   int nb_points_changed = (c_nb_points != this->GetFunctionSize());
 
   // Try to save the selection before (eventually) creating new points
@@ -5063,21 +5381,26 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
     }
 
   // Create the points 
-
+  
   ostrstream tk_cmd;
 
   int i, nb_points = this->GetFunctionSize();
-  for (i = 0; i < nb_points; i++)
+  if (nb_points < c_nb_points)
     {
-    this->RedrawPoint(i, &tk_cmd);
+    nb_points = c_nb_points;
     }
 
-  // Delete the extra points
+  // Note that we redraw the points that are out of the function id range
+  // this is OK since this will delete them automatically
 
-  c_nb_points = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
-  for (i = nb_points; i < c_nb_points; i++)
+  if (nb_points)
     {
-    tk_cmd << canv << " delete p" << i << " l" << i << " t" << i << endl;
+    this->RedrawPoint(0, &tk_cmd);
+    for (i = 1; i < nb_points; i++)
+      {
+      this->RedrawPoint(i, &tk_cmd);
+      this->RedrawLine(i - 1, i, &tk_cmd);
+      }
     }
 
   // Execute all of this
@@ -5140,9 +5463,11 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
   const char *canv = this->Canvas->GetWidgetName();
 
   ostrstream img_name;
-  img_name << canv << "." << vtkKWParameterValueFunctionEditor::HistogramTag << ends;
+  img_name << canv << "." 
+           << vtkKWParameterValueFunctionEditor::HistogramTag << ends;
 
-  int has_tag = this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag);
+  int has_tag = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag);
 
   // Create the image if not created already
 
@@ -5264,7 +5589,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
              << " -image " << img_name.str()
              << " -tags {" << vtkKWParameterValueFunctionEditor::HistogramTag << "}"
              << endl;
-      if (this->CanvasBackgroundVisibility)
+      if (this->CanvasBackgroundVisibility && this->CanvasVisibility)
         {
         tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::HistogramTag 
                << " " << vtkKWParameterValueFunctionEditor::FrameBackgroundTag
@@ -5302,14 +5627,14 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::HasSelection()
 {
-  return (this->SelectedPoint >= 0);
+  return (this->GetSelectedPoint() >= 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 {
   if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
-      this->SelectedPoint == id)
+      this->GetSelectedPoint() == id)
     {
     return;
     }
@@ -5331,9 +5656,9 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
     ostrstream tk_cmd;
 
     tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
-           << " withtag p" <<  this->SelectedPoint << endl;
+           << " withtag p" <<  this->GetSelectedPoint() << endl;
     tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
-           << " withtag t" <<  this->SelectedPoint << endl;
+           << " withtag t" <<  this->GetSelectedPoint() << endl;
     tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::SelectedTag << " all" << endl;
 
     tk_cmd << ends;
@@ -5343,11 +5668,11 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 
   // Draw the selected point accordingly and update its aspect
   
-  this->RedrawPoint(this->SelectedPoint);
+  this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
 
   // Show the selected point description in the point label
 
-  this->UpdatePointEntries(this->SelectedPoint);
+  this->UpdatePointEntries(this->GetSelectedPoint());
 
   this->InvokeSelectionChangedCommand();
 }
@@ -5368,9 +5693,9 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
 
     ostrstream tk_cmd;
 
-    tk_cmd << canv << " dtag p" <<  this->SelectedPoint
+    tk_cmd << canv << " dtag p" <<  this->GetSelectedPoint()
            << " " << vtkKWParameterValueFunctionEditor::SelectedTag << endl;
-    tk_cmd << canv << " dtag t" <<  this->SelectedPoint
+    tk_cmd << canv << " dtag t" <<  this->GetSelectedPoint()
            << " " << vtkKWParameterValueFunctionEditor::SelectedTag << endl;
 
     tk_cmd << ends;
@@ -5380,18 +5705,18 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
 
   // Deselect
 
-  int old_selection = this->SelectedPoint;
+  int old_selection = this->GetSelectedPoint();
   this->SelectedPoint = -1;
 
   // Redraw the point that used to be selected and update its aspect
 
-  this->RedrawPoint(old_selection);
+  this->RedrawSinglePointDependentElements(old_selection);
 
   // Show the selected point description in the point label
   // Since nothing is selected, the expect side effect is to clear the
   // point label
 
-  this->UpdatePointEntries(this->SelectedPoint);
+  this->UpdatePointEntries(this->GetSelectedPoint());
 
   this->InvokeSelectionChangedCommand();
 }
@@ -5401,8 +5726,8 @@ void vtkKWParameterValueFunctionEditor::SelectNextPoint()
 {
   if (this->HasSelection())
     {
-    this->SelectPoint(this->SelectedPoint == this->GetFunctionSize() - 1 
-                      ? 0 : this->SelectedPoint + 1);
+    this->SelectPoint(this->GetSelectedPoint() == this->GetFunctionSize() - 1 
+                      ? 0 : this->GetSelectedPoint() + 1);
     }
 }
 
@@ -5411,8 +5736,8 @@ void vtkKWParameterValueFunctionEditor::SelectPreviousPoint()
 {
   if (this->HasSelection())
     {
-    this->SelectPoint(this->SelectedPoint == 0  
-                      ? this->GetFunctionSize() - 1 : this->SelectedPoint - 1);
+    this->SelectPoint(this->GetSelectedPoint() == 0  
+                      ? this->GetFunctionSize() - 1 : this->GetSelectedPoint() - 1);
     }
 }
 
@@ -5436,7 +5761,7 @@ int vtkKWParameterValueFunctionEditor::RemoveSelectedPoint()
     return 0;
     }
 
-  return this->RemovePoint(this->SelectedPoint);
+  return this->RemovePoint(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -5464,11 +5789,11 @@ int vtkKWParameterValueFunctionEditor::RemovePoint(int id)
       {
       this->ClearSelection();
       }
-    else if (id < this->SelectedPoint)
+    else if (id < this->GetSelectedPoint())
       {
-      this->SelectPoint(this->SelectedPoint - 1);
+      this->SelectPoint(this->GetSelectedPoint() - 1);
       }
-    else if (this->SelectedPoint >= this->GetFunctionSize())
+    else if (this->GetSelectedPoint() >= this->GetFunctionSize())
       {
       this->SelectLastPoint();
       }
@@ -5512,9 +5837,9 @@ int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
 
   // If the point was inserted before the selection, shift the selection
 
-  if (this->HasSelection() && id <= this->SelectedPoint)
+  if (this->HasSelection() && id <= this->GetSelectedPoint())
     {
-    this->SelectPoint(this->SelectedPoint + 1);
+    this->SelectPoint(this->GetSelectedPoint() + 1);
     }
 
   this->InvokePointAddedCommand(id);
@@ -5538,9 +5863,9 @@ int vtkKWParameterValueFunctionEditor::AddPointAtParameter(
 
   // If we the point was inserted before the selection, shift the selection
 
-  if (this->HasSelection() && id <= this->SelectedPoint)
+  if (this->HasSelection() && id <= this->GetSelectedPoint())
     {
-    this->SelectPoint(this->SelectedPoint + 1);
+    this->SelectPoint(this->GetSelectedPoint() + 1);
     }
 
   this->InvokePointAddedCommand(id);
@@ -5561,20 +5886,13 @@ int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
   int old_size = this->GetFunctionSize();
   int editor_size = editor->GetFunctionSize();
 
-  double parameter, editor_parameter;
-  int new_id;
-
   // Browse all editor's point, get their parameters, add them to our own
   // function (the values will be interpolated automatically)
 
-  for (int id = 0; id < editor_size; id++)
+  int new_id;
+  for (int editor_id = 0; editor_id < editor_size; editor_id++)
     {
-    if (editor->GetFunctionPointParameter(id, &editor_parameter) &&
-        (!this->GetFunctionPointParameter(id, &parameter) ||
-         editor_parameter != parameter))
-      {
-      this->AddPointAtParameter(editor_parameter, new_id);
-      }
+    this->MergePointFromEditor(editor, editor_id, new_id);
     }
 
   // Do we have new points as the result of the merging ?
@@ -5586,6 +5904,38 @@ int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
     }
 
   return nb_merged;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::MergePointFromEditor(
+  vtkKWParameterValueFunctionEditor *editor, int editor_id, int &new_id)
+{
+  double parameter, editor_parameter;
+  if (editor && 
+      editor->GetFunctionPointParameter(editor_id, &editor_parameter) &&
+      (!this->GetFunctionPointParameter(editor_id, &parameter) ||
+       editor_parameter != parameter))
+    {
+    return this->AddPointAtParameter(editor_parameter, new_id);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::CopyPointFromEditor(
+  vtkKWParameterValueFunctionEditor *editor, int id)
+{
+  double parameter, editor_parameter;
+  if (editor && editor->GetFunctionPointParameter(id, &editor_parameter) &&
+      this->GetFunctionPointParameter(id, &parameter))
+    {
+    if (editor_parameter != parameter)
+      {
+      this->MoveFunctionPointToParameter(id, editor_parameter);
+      }
+    return 1;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -5672,7 +6022,7 @@ void vtkKWParameterValueFunctionEditor::SetDisplayedWholeParameterRange(
   this->DisplayedWholeParameterRange[1] = r1;
 
   this->UpdateRangeLabel();
-  this->UpdateParameterEntry(this->SelectedPoint);
+  this->UpdateParameterEntry(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -5743,23 +6093,20 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::UpdateParameterEntry(int id)
 {
-  if (!this->IsCreated())
+  if (!this->ParameterEntry || !this->HasFunction())
     {
     return;
     }
-  
-  // Update the parameter entry
 
   double parameter;
-  if (!this->GetFunctionPointParameter(id, &parameter))
+
+  if (id < 0 || id >= this->GetFunctionSize() ||
+      !this->GetFunctionPointParameter(id, &parameter))
     {
-    if (this->ParameterEntry)
+    this->ParameterEntry->SetEnabled(0);
+    if (this->ParameterEntry->GetWidget())
       {
-      if (this->ParameterEntry->GetWidget())
-        {
-        this->ParameterEntry->GetWidget()->SetValue("");
-        }
-      this->ParameterEntry->SetEnabled(0);
+      this->ParameterEntry->GetWidget()->SetValue("");
       }
     return;
     }
@@ -5828,7 +6175,7 @@ void vtkKWParameterValueFunctionEditor::ParameterEntryCallback()
 
   if (this->GetFunctionMTime() > mtime)
     {
-    this->InvokePointMovedCommand(this->SelectedPoint);
+    this->InvokePointChangedCommand(this->GetSelectedPoint());
     this->InvokeFunctionChangedCommand();
     }
 }
@@ -5978,7 +6325,8 @@ int vtkKWParameterValueFunctionEditor::SynchronizePoints(
 
   int events[] = 
     {
-      vtkKWParameterValueFunctionEditor::PointMovingEvent,
+      vtkKWParameterValueFunctionEditor::PointChangingEvent,
+      vtkKWParameterValueFunctionEditor::PointChangedEvent,
       vtkKWParameterValueFunctionEditor::PointRemovedEvent,
       vtkKWParameterValueFunctionEditor::FunctionChangedEvent
     };
@@ -6006,7 +6354,8 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
 
   int events[] = 
     {
-      vtkKWParameterValueFunctionEditor::PointMovingEvent,
+      vtkKWParameterValueFunctionEditor::PointChangingEvent,
+      vtkKWParameterValueFunctionEditor::PointChangedEvent,
       vtkKWParameterValueFunctionEditor::PointRemovedEvent,
       vtkKWParameterValueFunctionEditor::FunctionChangedEvent
     };
@@ -6159,7 +6508,6 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
   vtkKWParameterValueFunctionEditor *self =
     reinterpret_cast<vtkKWParameterValueFunctionEditor *>(clientdata);
   
-  double parameter;
   int *point_id = reinterpret_cast<int *>(calldata);
   double *dargs = reinterpret_cast<double *>(calldata);
   double range[2];
@@ -6176,11 +6524,9 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
       
     // Synchronize points
       
-    case vtkKWParameterValueFunctionEditor::PointMovingEvent:
-      if (pvfe->GetFunctionPointParameter(*point_id, &parameter))
-        {
-        self->MoveFunctionPointToParameter(*point_id, parameter);
-        }
+    case vtkKWParameterValueFunctionEditor::PointChangingEvent:
+    case vtkKWParameterValueFunctionEditor::PointChangedEvent:
+      self->CopyPointFromEditor(pvfe, *point_id);
       break;
 
     case vtkKWParameterValueFunctionEditor::PointRemovedEvent:
@@ -6235,7 +6581,18 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::ConfigureCallback()
 {
+  static int in_configure_callback = 0;
+
+  if (in_configure_callback)
+    {
+    return;
+    }
+
+  in_configure_callback = 1;
+
   this->Redraw();
+
+  in_configure_callback = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -6362,6 +6719,8 @@ void vtkKWParameterValueFunctionEditor::DoubleClickOnPointCallback(
   // Select the point
 
   this->SelectPoint(id);
+
+  this->InvokeDoubleClickOnPointCommand(id);
 }
 
 //----------------------------------------------------------------------------
@@ -6382,7 +6741,7 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   // Select the point (that was found or just added)
 
   this->SelectPoint(id);
-  this->GetFunctionPointCanvasCoordinates(this->SelectedPoint, c_x, c_y);
+  this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint(), c_x, c_y);
   this->LastSelectCanvasCoordinates[0] = c_x;
   this->LastSelectCanvasCoordinates[1] = c_y;
 }
@@ -6403,7 +6762,7 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
   // the user a chance to recover)
 
   int warn_delete = 
-    (this->FunctionPointCanBeRemoved(this->SelectedPoint) &&
+    (this->FunctionPointCanBeRemoved(this->GetSelectedPoint()) &&
      (x < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
       x > this->CanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
       y < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
@@ -6436,10 +6795,10 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 
   // We assume we can not go before or beyond the previous or next point
 
-  if (this->SelectedPoint > 0)
+  if (this->GetSelectedPoint() > 0)
     {
     int prev_x, prev_y;
-    this->GetFunctionPointCanvasCoordinates(this->SelectedPoint - 1, 
+    this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint() - 1, 
                                             prev_x, prev_y);
     if (c_x <= prev_x)
       {
@@ -6447,10 +6806,10 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
       }
     }
 
-  if (this->SelectedPoint < this->GetFunctionSize() - 1)
+  if (this->GetSelectedPoint() < this->GetFunctionSize() - 1)
     {
     int next_x, next_y;
-    this->GetFunctionPointCanvasCoordinates(this->SelectedPoint + 1,
+    this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint() + 1,
                                             next_x, next_y);
     if (c_x >= next_x)
       {
@@ -6460,8 +6819,8 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 
   // Are we constrained vertically or horizontally ?
 
-  int move_h_only = this->FunctionPointValueIsLocked(this->SelectedPoint);
-  int move_v_only = this->FunctionPointParameterIsLocked(this->SelectedPoint);
+  int move_h_only = this->FunctionPointValueIsLocked(this->GetSelectedPoint());
+  int move_v_only = this->FunctionPointParameterIsLocked(this->GetSelectedPoint());
 
   if (shift)
     {
@@ -6533,11 +6892,11 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
   // Now update the point given those coords, and update the info label
 
   this->MoveFunctionPointToCanvasCoordinates(
-    this->SelectedPoint, c_x, c_y);
+    this->GetSelectedPoint(), c_x, c_y);
 
   // Invoke the commands/callbacks
 
-  this->InvokePointMovingCommand(this->SelectedPoint);
+  this->InvokePointChangingCommand(this->GetSelectedPoint());
   this->InvokeFunctionChangingCommand();
 }
 
@@ -6552,17 +6911,17 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
   // Invoke the commands/callbacks
   // If we are out of the canvas by a given margin, delete the point
 
-  if (this->FunctionPointCanBeRemoved(this->SelectedPoint) &&
+  if (this->FunctionPointCanBeRemoved(this->GetSelectedPoint()) &&
       (x < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
        x > this->CanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
        y < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
        y > this->CanvasHeight - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN))
     {
-    this->RemovePoint(this->SelectedPoint);
+    this->RemovePoint(this->GetSelectedPoint());
     }
   else
     {
-    this->InvokePointMovedCommand(this->SelectedPoint);
+    this->InvokePointChangedCommand(this->GetSelectedPoint());
     this->InvokeFunctionChangedCommand();
     }
 
@@ -6668,9 +7027,11 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "RangeLabelVisibility: "
      << (this->RangeLabelVisibility ? "On" : "Off") << endl;
   os << indent << "RangeLabelPosition: " << this->RangeLabelPosition << endl;
-  os << indent << "ParameterEntryPosition: " << this->ParameterEntryPosition << endl;
+  os << indent << "PointEntriesPosition: " << this->PointEntriesPosition << endl;
   os << indent << "ParameterEntryVisibility: "
      << (this->ParameterEntryVisibility ? "On" : "Off") << endl;
+  os << indent << "PointEntriesVisibility: "
+     << (this->PointEntriesVisibility ? "On" : "Off") << endl;
   os << indent << "UserFrameVisibility: "
      << (this->UserFrameVisibility ? "On" : "Off") << endl;
   os << indent << "CanvasHeight: "<< this->CanvasHeight << endl;
@@ -6710,7 +7071,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->DisableAddAndRemove ? "On" : "Off") << endl;
   os << indent << "ChangeMouseCursor: "
      << (this->ChangeMouseCursor ? "On" : "Off") << endl;
-  os << indent << "SelectedPoint: "<< this->SelectedPoint << endl;
+  os << indent << "SelectedPoint: "<< this->GetSelectedPoint() << endl;
   os << indent << "FrameBackgroundColor: ("
      << this->FrameBackgroundColor[0] << ", " 
      << this->FrameBackgroundColor[1] << ", " 
@@ -6751,8 +7112,12 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "SecondaryHistogramStyle: "<< this->SecondaryHistogramStyle << endl;
   os << indent << "FunctionLineVisibility: "
      << (this->FunctionLineVisibility ? "On" : "Off") << endl;
+  os << indent << "CanvasVisibility: "
+     << (this->CanvasVisibility ? "On" : "Off") << endl;
   os << indent << "PointIndexVisibility: "
      << (this->PointIndexVisibility ? "On" : "Off") << endl;
+  os << indent << "PointVisibility: "
+     << (this->PointVisibility ? "On" : "Off") << endl;
   os << indent << "PointGuidelineVisibility: "
      << (this->PointGuidelineVisibility ? "On" : "Off") << endl;
   os << indent << "SelectedPointIndexVisibility: "

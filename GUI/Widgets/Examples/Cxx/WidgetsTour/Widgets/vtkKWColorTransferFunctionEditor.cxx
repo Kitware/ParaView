@@ -97,10 +97,9 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc2_editor->SetPadX(2);
   cpsel_tfunc2_editor->SetPadY(2);
   cpsel_tfunc2_editor->ExpandCanvasWidthOff();
-  cpsel_tfunc2_editor->SetCanvasWidth(350);
-  cpsel_tfunc2_editor->SetCanvasHeight(90);
+  cpsel_tfunc2_editor->SetCanvasWidth(450);
+  cpsel_tfunc2_editor->SetCanvasHeight(150);
   cpsel_tfunc2_editor->SetLabelText("Transfer Function Editor");
-  cpsel_tfunc2_editor->SetLabelPositionToTop();
   cpsel_tfunc2_editor->SetRangeLabelPositionToTop();
   cpsel_tfunc2_editor->SetBalloonHelpString(
     "Another color transfer function editor. The point position is now on "
@@ -119,7 +118,10 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc2_editor->FunctionLineVisibilityOff();
   cpsel_tfunc2_editor->PointGuidelineVisibilityOn();
   cpsel_tfunc2_editor->PointIndexVisibilityOff();
-  cpsel_tfunc2_editor->SelectedPointIndexVisibilityOff();
+  cpsel_tfunc2_editor->SelectedPointIndexVisibilityOn();
+  cpsel_tfunc2_editor->MidPointEntryVisibilityOn();
+  cpsel_tfunc2_editor->SharpnessEntryVisibilityOn();
+  cpsel_tfunc2_editor->SetLabelPositionToTop();
 
   cpsel_tfunc2_editor->SetHistogram(cpsel_hist);
 

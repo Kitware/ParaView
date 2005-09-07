@@ -57,11 +57,17 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   # Create the transfer function that will be modified by the 2nd editor
   # This one shows a different look & feel
 
+  set r0 [lindex $range 0]
+  set r1 [lindex $range 1]
+
   vtkPiecewiseFunction pfed_tfunc2
-  pfed_tfunc2 AddPoint [lindex $range 0] 0.66
-  pfed_tfunc2 AddPoint [expr ([lindex $range 0] + [lindex $range 1]) * 0.5] 0.2
-  pfed_tfunc2 AddPoint [expr ([lindex $range 0] + [lindex $range 1]) * 0.75] 0.9
-  pfed_tfunc2 AddPoint [lindex $range 1] 0.33
+  pfed_tfunc2 AddPoint $r0                       0.1 0.5 0.00
+  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.15] 0.9 0.5 0.25
+  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.30] 0.1 0.5 0.50
+  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.45] 0.9 0.5 0.75
+  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.60] 0.1 0.5 1.00
+  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.75] 0.9 0.2 0.00
+  pfed_tfunc2 AddPoint $r1                       0.1
 
   # Create a transfer function editor
   # Assign our tfunc to the editor
@@ -77,7 +83,7 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   pfed_tfunc2_editor SetPadY 2
   pfed_tfunc2_editor ExpandCanvasWidthOff
   pfed_tfunc2_editor SetCanvasWidth 450
-  pfed_tfunc2_editor SetCanvasHeight 90
+  pfed_tfunc2_editor SetCanvasHeight 150
   pfed_tfunc2_editor SetLabelText "Transfer Function Editor"
   pfed_tfunc2_editor SetBalloonHelpString \
     "Another transfer function editor. The point position is now on\
@@ -87,12 +93,14 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
     The range and histogram are based on a real image data."
 
   pfed_tfunc2_editor SetPiecewiseFunction pfed_tfunc2
-  pfed_tfunc2_editor SetWholeParameterRangeToFunctionRange
-  pfed_tfunc2_editor SetVisibleParameterRangeToWholeParameterRange
 
-  pfed_tfunc2_editor PointGuidelineVisibilityOn
   pfed_tfunc2_editor PointIndexVisibilityOff
-  pfed_tfunc2_editor SelectedPointIndexVisibilityOff
+  pfed_tfunc2_editor SelectedPointIndexVisibilityOn
+  pfed_tfunc2_editor MidPointVisibilityOn
+  pfed_tfunc2_editor MidPointGuidelineVisibilityOn
+  pfed_tfunc2_editor MidPointEntryVisibilityOn
+  pfed_tfunc2_editor SharpnessEntryVisibilityOn
+  pfed_tfunc2_editor SetLabelPositionToTop
 
   pfed_tfunc2_editor SetHistogram pfed_hist
 

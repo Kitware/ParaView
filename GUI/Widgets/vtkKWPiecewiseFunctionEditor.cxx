@@ -15,28 +15,33 @@
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWEntryWithLabel.h"
 #include "vtkKWRange.h"
+#include "vtkKWScaleWithEntry.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkColorTransferFunction.h"
+
+#include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.34");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 {
   this->PiecewiseFunction                = NULL;
+  this->PointColorTransferFunction       = NULL;
 
   this->WindowLevelMode                  = 0;
   this->WindowLevelModeLockEndPointValue = 0;
-  this->WindowLevelModeButtonVisibility        = 0;
-  this->ValueEntryVisibility                   = 1;
+  this->WindowLevelModeButtonVisibility  = 0;
+  this->ValueEntryVisibility             = 1;
 
   this->Window                           = 1.0;
   this->Level                            = 1.0;
@@ -70,6 +75,7 @@ vtkKWPiecewiseFunctionEditor::~vtkKWPiecewiseFunctionEditor()
     }
 
   this->SetPiecewiseFunction(NULL);
+  this->SetPointColorTransferFunction(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +97,15 @@ void vtkKWPiecewiseFunctionEditor::SetPiecewiseFunction(
   if (this->PiecewiseFunction)
     {
     this->PiecewiseFunction->Register(this);
+
+    // Reset the whole parameter range to the function range.
+    // This is done to avoid extreme case where the current parameter range
+    // would be several order of magnitudes smaller than the function range:
+    // the next Update() would redraw the function at a very high zoom level
+    // which could produce a very unreasonable number of segments if the
+    // function was to be sampled at regular pixels interval.
+
+    this->SetWholeParameterRangeToFunctionRange();
     }
 
   this->Modified();
@@ -98,6 +113,32 @@ void vtkKWPiecewiseFunctionEditor::SetPiecewiseFunction(
   this->LastRedrawFunctionTime = 0;
 
   this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::SetPointColorTransferFunction(
+  vtkColorTransferFunction *arg)
+{
+  if (this->PointColorTransferFunction == arg)
+    {
+    return;
+    }
+
+  if (this->PointColorTransferFunction)
+    {
+    this->PointColorTransferFunction->UnRegister(this);
+    }
+    
+  this->PointColorTransferFunction = arg;
+
+  if (this->PointColorTransferFunction)
+    {
+    this->PointColorTransferFunction->Register(this);
+    }
+
+  this->Modified();
+
+  this->RedrawFunction();
 }
 
 //----------------------------------------------------------------------------
@@ -163,8 +204,9 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointParameter(
     return 0;
     }
 
-  *parameter = this->PiecewiseFunction->GetDataPointer()[
-    id * (1 + this->GetFunctionPointDimensionality())];
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  *parameter = node_value[0];
   
   return 1;
 }
@@ -185,8 +227,9 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointValues(
     return 0;
     }
 
-  values[0] = this->PiecewiseFunction->GetDataPointer()[
-    id * (1 + this->GetFunctionPointDimensionality()) + 1];
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  values[0] = node_value[1];
   
   return 1;
 }
@@ -206,7 +249,11 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPointValues(
   double value;
   vtkMath::ClampValue(values[0], this->GetWholeValueRange(), &value);
 
-  this->PiecewiseFunction->AddPoint(parameter, value);
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+
+  this->PiecewiseFunction->AddPoint(
+    parameter, value, node_value[2], node_value[3]);
   
   return 1;
 }
@@ -243,7 +290,17 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPoint(
   // Add the point
 
   int old_size = this->GetFunctionSize();
-  *id = this->PiecewiseFunction->AddPoint(parameter, value);
+  if (this->GetFunctionPointId(parameter, id))
+    {
+    double node_value[4];
+    this->PiecewiseFunction->GetNodeValue(*id, node_value);
+    *id = this->PiecewiseFunction->AddPoint(
+      parameter, value, node_value[2], node_value[3]);
+    }
+  else
+    {
+    *id = this->PiecewiseFunction->AddPoint(parameter, value);
+    }
   return (old_size != this->GetFunctionSize());
 }
 
@@ -262,6 +319,9 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
     return 0;
     }
 
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+
   // Clamp
 
   vtkMath::ClampValue(&parameter, this->GetWholeParameterRange());
@@ -272,7 +332,8 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
     {
     this->PiecewiseFunction->RemovePoint(old_parameter);
     }
-  int new_id = this->PiecewiseFunction->AddPoint(parameter, value);
+  int new_id = this->PiecewiseFunction->AddPoint(
+    parameter, value, node_value[2], node_value[3]);
 
   if (new_id != id)
     {
@@ -293,9 +354,10 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 
   // Remove the point
 
-  double parameter = this->PiecewiseFunction->GetDataPointer()[
-    id * (1 + this->GetFunctionPointDimensionality())];
-  
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  double parameter = node_value[0];
+
   int old_size = this->GetFunctionSize();
   this->PiecewiseFunction->RemovePoint(parameter);
   return (old_size != this->GetFunctionSize());
@@ -345,18 +407,188 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPoint(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::GetFunctionPointColorInCanvas(
+  int id, double rgb[3])
+{
+  double parameter;
+  if (this->PointColorTransferFunction && 
+      this->GetFunctionPointParameter(id, &parameter))
+    {
+    this->PointColorTransferFunction->GetColor(parameter, rgb);
+    return 1;
+    }
+
+  return this->Superclass::GetFunctionPointColorInCanvas(id, rgb);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
+  int id1, int id2)
+{
+  if (!this->HasFunction() || id1 < 0 || id1 >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  // If sharpness == 0.0 and mid-point = 0.5, then it's the good 
+  // old piecewise linear and we do not need to sample, the default
+  // superclass implementation (staight line between id1 and id2) is fine
+
+  double midpoint, sharpness;
+  if (this->GetFunctionMidPoint(id1, &midpoint) &&
+      this->GetFunctionSharpness(id1, &sharpness))
+    {
+    return (sharpness == 0.0 && midpoint == 0.5) ? 0 : 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::GetFunctionMidPoint(
+  int id, double *pos)
+{
+  if (id < 0 || id >= this->GetFunctionSize() || !pos)
+    {
+    return 0;
+    }
+
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  *pos = node_value[2];
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::SetFunctionMidPoint(
+  int id, double pos)
+{
+  if (id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  if (pos < 0.0)
+    {
+    pos = 0.0;
+    }
+  else if (pos > 1.0)
+    {
+    pos = 1.0;
+    }
+
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  this->PiecewiseFunction->AddPoint(
+    node_value[0], node_value[1], pos, node_value[3]);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::GetFunctionSharpness(
+  int id, double *sharpness)
+{
+  if (id < 0 || id >= this->GetFunctionSize() || !sharpness)
+    {
+    return 0;
+    }
+
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  *sharpness = node_value[3];
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::SetFunctionSharpness(
+  int id, double sharpness)
+{
+  if (id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  if (sharpness < 0.0)
+    {
+    sharpness = 0.0;
+    }
+  else if (sharpness > 1.0)
+    {
+    sharpness = 1.0;
+    }
+
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
+  this->PiecewiseFunction->AddPoint(
+    node_value[0], node_value[1], node_value[2], sharpness);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
+  int id1, int id2, ostrstream *tk_cmd)
+{
+  // We want to intercept specific case like
+  // sharpness = 1.0: step (3 segments), could not be done using sampling
+  // sharpness = 0.0 and mid-point != 0.5: two segments, for efficiency
+
+  // We assume all parameters are OK, they were checked by RedrawLine
+
+  double midpoint, sharpness;
+  this->GetFunctionMidPoint(id1, &midpoint);
+  this->GetFunctionSharpness(id1, &sharpness);
+
+  int sharp_1 = sharpness == 1.0;
+  int sharp_0 = (sharpness == 0.0 && midpoint != 0.5);
+  if (!sharp_1 && !sharp_0)
+    {
+    this->Superclass::GetLineCoordinates(id1, id2, tk_cmd);
+    return;
+    }
+
+  // Get end-point coordinates
+
+  int x1, y1, x2, y2, xp, yp;
+  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
+  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+
+  // Get mid-point coordinates
+
+  double p1, p2, p;
+  this->GetFunctionPointParameter(id1, &p1);
+  this->GetFunctionPointParameter(id2, &p2);
+  p = p1 + (p2 - p1) * midpoint;
+  this->GetFunctionPointCanvasCoordinatesAtParameter(p, xp, yp);
+
+  *tk_cmd << " " << x1 << " " << y1;
+  if (sharp_1)
+    {
+    *tk_cmd << " " << xp << " " << y1 
+            << " " << xp << " " << y2;
+    }
+  else
+    {
+    *tk_cmd << " " << xp << " " << yp; 
+    }
+  *tk_cmd << " " << x2 << " " << y2;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 {
   this->Superclass::UpdatePointEntries(id);
 
-  if (!this->IsCreated() || !this->ValueEntry)
+  if (!this->ValueEntry || !this->HasFunction())
     {
     return;
     }
-  
+
   // No point ? Empty the entry and disable
 
-  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+  if (id < 0 || id >= this->GetFunctionSize())
     {
     this->ValueEntry->GetWidget()->SetValue("");
     this->ValueEntry->SetEnabled(0);
@@ -370,9 +602,10 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 
   // Get the value
 
-  double *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
+  double node_value[4];
+  this->PiecewiseFunction->GetNodeValue(id, node_value);
 
-  this->ValueEntry->GetWidget()->SetValueAsFormattedDouble(point[1], 3);
+  this->ValueEntry->GetWidget()->SetValueAsFormattedDouble(node_value[1], 3);
 }
 
 //----------------------------------------------------------------------------
@@ -392,7 +625,7 @@ void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the value entry
 
-  if (this->ValueEntryVisibility)
+  if (this->ValueEntryVisibility && this->PointEntriesVisibility)
     {
     this->CreateValueEntry(app);
     }
@@ -442,13 +675,13 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
 {
   if (this->ValueEntry && !this->ValueEntry->IsCreated())
     {
-    this->CreateTopRightFrame(app);
-    this->ValueEntry->SetParent(this->TopRightFrame);
+    this->CreatePointEntriesFrame(app);
+    this->ValueEntry->SetParent(this->PointEntriesFrame);
     this->ValueEntry->Create(app);
     this->ValueEntry->GetWidget()->SetWidth(6);
     this->ValueEntry->GetLabel()->SetText("V:");
 
-    this->UpdatePointEntries(this->SelectedPoint);
+    this->UpdatePointEntries(this->GetSelectedPoint());
 
     this->ValueEntry->GetWidget()->SetCommand(
       this, "ValueEntryCallback");
@@ -463,10 +696,9 @@ int vtkKWPiecewiseFunctionEditor::IsTopLeftFrameUsed()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::IsTopRightFrameUsed()
+int vtkKWPiecewiseFunctionEditor::IsPointEntriesFrameUsed()
 {
-  return (this->Superclass::IsTopRightFrameUsed() || 
-          this->ValueEntryVisibility);
+  return (this->Superclass::IsPointEntriesFrameUsed());
 }
 
 //----------------------------------------------------------------------------
@@ -485,11 +717,20 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 
   // Value entry (in top right frame)
 
-  if (this->ValueEntryVisibility && 
+  if (this->ValueEntryVisibility  && 
+      this->PointEntriesVisibility && 
       this->ValueEntry && this->ValueEntry->IsCreated())
     {
+    vtksys_stl::string before;
+    if (this->MidPointEntry && this->MidPointEntry->IsCreated() && 
+        this->MidPointEntryVisibility)
+      {
+      before = " -before ";
+      before += this->MidPointEntry->GetWidgetName();
+      }
+    
     tk_cmd << "pack " << this->ValueEntry->GetWidgetName() 
-           << " -side left" << endl;
+           << " -side left" << before.c_str() << endl;
     }
 
   // Window/Level mode (in top left frame)
@@ -511,13 +752,6 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 void vtkKWPiecewiseFunctionEditor::Update()
 {
   this->Superclass::Update();
-
-  // No selection, disable value entry
-
-  if (this->ValueEntry && !this->HasSelection())
-    {
-    this->ValueEntry->SetEnabled(0);
-    }
 
   // Window/Level mode
 
@@ -583,16 +817,22 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
 
     double parameter;
     double *v_w_range = this->GetWholeValueRange();
+    double node_value[4];
 
     if (this->GetFunctionSize() > 0 && 
         this->GetFunctionPointParameter(0, &parameter))
       {
-      this->PiecewiseFunction->AddPoint(parameter, v_w_range[0]);
+      this->PiecewiseFunction->GetNodeValue(0, node_value);
+      this->PiecewiseFunction->AddPoint(
+        parameter, v_w_range[0], node_value[2], node_value[3]);
       }
     if (this->GetFunctionSize() > 1 &&
         this->GetFunctionPointParameter(this->GetFunctionSize()-1, &parameter))
       {
-      this->PiecewiseFunction->AddPoint(parameter, v_w_range[1]);
+      this->PiecewiseFunction->GetNodeValue(
+        this->GetFunctionSize() - 1, node_value);
+      this->PiecewiseFunction->AddPoint(
+        parameter, v_w_range[1], node_value[2], node_value[3]);
       }
     }
 
@@ -615,12 +855,14 @@ void vtkKWPiecewiseFunctionEditor::SetValueEntryVisibility(int arg)
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->ValueEntryVisibility && this->IsCreated())
+  if (this->ValueEntryVisibility && 
+      this->PointEntriesVisibility && 
+      this->IsCreated())
     {
     this->CreateValueEntry(this->GetApplication());
     }
 
-  this->UpdatePointEntries(this->SelectedPoint);
+  this->UpdatePointEntries(this->GetSelectedPoint());
 
   this->Modified();
 
@@ -718,6 +960,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 
   double parameter;
   int id;
+  double node_value[4];
 
   // We are in not WindowLevel mode, make sure our points are within the
   // range (while in W/L mode, those points can be out of the parameter range)
@@ -733,10 +976,12 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
         if (this->GetFunctionPointParameter(id, &parameter) &&
             (parameter < p_w_range[0] || parameter > p_w_range[1]))
           {
+          this->PiecewiseFunction->GetNodeValue(id, node_value);
           double value = this->PiecewiseFunction->GetValue(parameter);
           this->PiecewiseFunction->RemovePoint(parameter);
           this->PiecewiseFunction->AddPoint(
-            (parameter < p_w_range[0] ? p_w_range[0] : p_w_range[1]), value);
+            (parameter < p_w_range[0] ? p_w_range[0] : p_w_range[1]), value,
+            node_value[2], node_value[3]);
           done = 0;
           break;
           }
@@ -817,10 +1062,20 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
       }
 
     // Set the points
-  
+    int size = this->GetFunctionSize();
     for (id = 0; id < 4; id++)
       {
-      this->PiecewiseFunction->AddPoint(points[id], id < 2 ? start_v : end_v);
+      if (id < size)
+        {
+        this->PiecewiseFunction->GetNodeValue(id, node_value);
+        this->PiecewiseFunction->AddPoint(
+          points[id], id < 2 ? start_v : end_v, node_value[2], node_value[3]);
+        }
+      else
+        {
+        this->PiecewiseFunction->AddPoint(
+          points[id], id < 2 ? start_v : end_v);
+        }
       }
     }
 
@@ -868,7 +1123,7 @@ void vtkKWPiecewiseFunctionEditor::ValueEntryCallback()
 
   if (this->GetFunctionMTime() > mtime)
     {
-    this->InvokePointMovedCommand(this->SelectedPoint);
+    this->InvokePointChangedCommand(this->GetSelectedPoint());
     this->InvokeFunctionChangedCommand();
     }
 }
@@ -896,6 +1151,19 @@ void vtkKWPiecewiseFunctionEditor::WindowLevelModeCallback()
     }
 
   this->SetWindowLevelMode(this->WindowLevelModeCheckButton->GetSelectedState());
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkKWPiecewiseFunctionEditor::GetRedrawFunctionTime()
+{
+  unsigned long t = this->Superclass::GetRedrawFunctionTime();
+  if (this->PointColorTransferFunction &&
+      this->PointColorTransferFunction->GetMTime() > t)
+    {
+    return this->PointColorTransferFunction->GetMTime();
+    }
+
+  return t;
 }
 
 //----------------------------------------------------------------------------
@@ -934,6 +1202,17 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << endl;
     this->ValueEntry->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+
+  os << indent << "PointColorTransferFunction: ";
+  if (this->PointColorTransferFunction)
+    {
+    os << endl;
+    this->PointColorTransferFunction->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {

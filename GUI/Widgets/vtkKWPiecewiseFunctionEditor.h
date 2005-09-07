@@ -18,20 +18,24 @@
 #ifndef __vtkKWPiecewiseFunctionEditor_h
 #define __vtkKWPiecewiseFunctionEditor_h
 
-#include "vtkKWParameterValueFunctionEditor.h"
+#include "vtkKWParameterValueHermiteFunctionEditor.h"
 
 class vtkKWCheckButton;
 class vtkPiecewiseFunction;
+class vtkKWScaleWithEntry;
+class vtkColorTransferFunction;
 
-class KWWIDGETS_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueFunctionEditor
+class KWWIDGETS_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
 {
 public:
   static vtkKWPiecewiseFunctionEditor* New();
-  vtkTypeRevisionMacro(vtkKWPiecewiseFunctionEditor,vtkKWParameterValueFunctionEditor);
+  vtkTypeRevisionMacro(vtkKWPiecewiseFunctionEditor,vtkKWParameterValueHermiteFunctionEditor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get/Set the function
+  // Note that the whole parameter range is automatically reset to the
+  // function range.
   vtkGetObjectMacro(PiecewiseFunction, vtkPiecewiseFunction);
   virtual void SetPiecewiseFunction(vtkPiecewiseFunction*);
 
@@ -46,6 +50,12 @@ public:
   // Description:
   // Pack the widget
   virtual void Pack();
+
+  // Description:
+  // Get/Set a specific function to display in the color ramp. If not
+  // specified, the ColorTransferFunction will be used.
+  vtkGetObjectMacro(PointColorTransferFunction, vtkColorTransferFunction);
+  virtual void SetPointColorTransferFunction(vtkColorTransferFunction*);
 
   // Description:
   // Set/Get the window/level mode. In that mode:
@@ -91,12 +101,8 @@ public:
   virtual void InvokeFunctionChangingCommand();
 
   // Description:
-  // Callbacks
-  virtual void ValueEntryCallback();
-  virtual void WindowLevelModeCallback();
-
-  // Description:
   // Set/Get the value entry UI visibility.
+  // Not shown if superclass PointEntriesVisibility is set to Off
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
   vtkBooleanMacro(ValueEntryVisibility, int);
@@ -119,23 +125,33 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
+  // Callbacks
+  virtual void ValueEntryCallback();
+  virtual void WindowLevelModeCallback();
+
+  // Description:
   // Proxy to the function. 
-  // IMPLEMENT those functions in the subclasses.
   // See protected: section too.
   virtual int HasFunction();
   virtual int GetFunctionSize();
-
-protected:
-  vtkKWPiecewiseFunctionEditor();
-  ~vtkKWPiecewiseFunctionEditor();
+  virtual unsigned long GetFunctionMTime();
+  virtual int GetFunctionPointParameter(int id, double *parameter);
+  virtual int GetFunctionPointDimensionality();
 
   // Description:
   // Is point locked, protected, removable ?
-  // Likely to be overriden in subclasses.
   virtual int FunctionPointCanBeAdded();
   virtual int FunctionPointCanBeRemoved(int id);
   virtual int FunctionPointParameterIsLocked(int id);
   virtual int FunctionPointValueIsLocked(int id);
+
+  // Description:
+  // Higher-level methods to manipulate the function. 
+  virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
+
+protected:
+  vtkKWPiecewiseFunctionEditor();
+  ~vtkKWPiecewiseFunctionEditor();
 
   // Description:
   // Proxy to the function. 
@@ -143,28 +159,36 @@ protected:
   // be added/removed/locked, it is up to the higer-level methods to do it.
   // IMPLEMENT those functions in the subclasses.
   // See public: section too.
-  virtual unsigned long GetFunctionMTime();
-  virtual int GetFunctionPointParameter(int id, double *parameter);
-  virtual int GetFunctionPointDimensionality();
   virtual int GetFunctionPointValues(int id, double *values);
   virtual int SetFunctionPointValues(int id, const double *values);
   virtual int InterpolateFunctionPointValues(double parameter, double *values);
-  virtual int AddFunctionPoint(double parameter, const double *values, int *id);
+  virtual int AddFunctionPoint(double parameter, const double *values,int *id);
   virtual int SetFunctionPoint(int id, double parameter, const double *values);
   virtual int RemoveFunctionPoint(int id);
+  virtual int FunctionLineIsSampledBetweenPoints(int id1, int id2);
+  virtual int GetFunctionMidPoint(int id, double *pos);
+  virtual int SetFunctionMidPoint(int id, double pos);
+  virtual int GetFunctionSharpness(int id, double *sharpness);
+  virtual int SetFunctionSharpness(int id, double sharpness);
 
   // Description:
   // Higher-level methods to manipulate the function. 
-  virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
+  virtual int  GetFunctionPointColorInCanvas(int id, double rgb[3]);
 
   virtual void UpdatePointEntries(int id);
 
+  //BTX
+  virtual void GetLineCoordinates(int id1, int id2, ostrstream *tk_cmd);
+  //ETX
+
   vtkPiecewiseFunction *PiecewiseFunction;
+  vtkColorTransferFunction *PointColorTransferFunction;
 
   int WindowLevelMode;
   int ValueEntryVisibility;
   int WindowLevelModeButtonVisibility;
   int WindowLevelModeLockEndPointValue;
+
   double Window;
   double Level;
 
@@ -178,7 +202,7 @@ protected:
   // GUI
 
   vtkKWEntryWithLabel *ValueEntry;
-  vtkKWCheckButton  *WindowLevelModeCheckButton;
+  vtkKWCheckButton    *WindowLevelModeCheckButton;
 
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
@@ -186,7 +210,9 @@ protected:
   virtual void CreateWindowLevelModeCheckButton(vtkKWApplication *app);
   virtual void CreateValueEntry(vtkKWApplication *app);
   virtual int IsTopLeftFrameUsed();
-  virtual int IsTopRightFrameUsed();
+  virtual int IsPointEntriesFrameUsed();
+
+  virtual unsigned long GetRedrawFunctionTime();
 
 private:
   vtkKWPiecewiseFunctionEditor(const vtkKWPiecewiseFunctionEditor&); // Not implemented

@@ -29,6 +29,7 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
   vpw_vp SetIndependentComponents 1
 
   vtkColorTransferFunction vpw_cfun
+  vpw_cfun SetColorSpaceToHSV
   vpw_cfun AddHSVSegment 0.0 0.2 1.0 1.0 255.0 0.8 1.0 1.0
   vpw_cfun AddHSVSegment 80 0.8 1.0 1.0 130.0 0.1 1.0 1.0
 

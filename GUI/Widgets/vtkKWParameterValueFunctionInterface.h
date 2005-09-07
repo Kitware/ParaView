@@ -67,10 +67,6 @@ public:
   // Return the number of points/elements in the function
   virtual int GetFunctionSize() = 0;
 
-protected:
-  vtkKWParameterValueFunctionInterface() {};
-  ~vtkKWParameterValueFunctionInterface() {};
-
   // Description:
   // This probably should not be hard-coded, but will make our life easier.
   // It specificies the maximum dimensionality of a point (not the *number*
@@ -110,6 +106,18 @@ protected:
   // (Ex: 3 for a RGB point, 1 for a boolean value or an opacity value)
   virtual int GetFunctionPointDimensionality() = 0;
 
+protected:
+  // Description:
+  // Interpolate and get the 'n-tuple' value at a given 'parameter' (where 
+  // 'n' is the dimensionality of the point). In other words, compute the 
+  // value of a point as if it was located at a given parameter over the
+  // parameter range of the function). Note that 'values' has to be allocated
+  // with enough room. The interpolation method is function dependent
+  // (linear in the vtkKWPiecewiseFunctionEditor class for example).
+  // Return 1 on success, 0 otherwise
+
+  virtual int InterpolateFunctionPointValues(double parameter,double *values)=0;
+  // Description:
   // Description:
   // Get the 'n-tuple' value at point 'id' (where 'n' is the dimensionality of
   // the point). Note that 'values' has to be allocated with enough room.
@@ -122,16 +130,6 @@ protected:
   // Return 1 on success, 0 otherwise
   virtual int SetFunctionPointValues(int id, const double *values) = 0;
 
-  // Description:
-  // Interpolate and get the 'n-tuple' value at a given 'parameter' (where 
-  // 'n' is the dimensionality of the point). In other words, compute the 
-  // value of a point as if it was located at a given parameter over the
-  // parameter range of the function). Note that 'values' has to be allocated
-  // with enough room. The interpolation method is function dependent
-  // (linear in the vtkKWPiecewiseFunctionEditor class for example).
-  // Return 1 on success, 0 otherwise
-  virtual int InterpolateFunctionPointValues(double parameter,double *values)=0;
-  // Description:
   // Add a 'n-tuple' value at a given 'parameter' over the parameter range 
   // (where 'n' is the dimensionality of the point), and return the 
   // corresponding point 'id' (the rank of the newly added point in the
@@ -160,15 +158,26 @@ protected:
 
   // *******************************************************************
   // The following low-level methods can be reimplemented, but a default 
-  // implementation is provided by vtkKWParameterValueFunctionEditor and
-  // is working just fine. If you have to reimplement them, make sure to
-  // call the corresponding superclass method too (or have a good reason
-  // not to). Those methods are used by high-level methods, and should 
+  // implementation is provided either by this class or by 
+  // vtkKWParameterValueFunctionEditor and is working just fine.
+  // If you have to reimplement them (for efficiency reasons for example), 
+  // make sure to call the corresponding superclass method too
+  // (or have a good reason not to :). 
+  // Those methods are used by high-level methods, and should 
   // not be called from the other low-level methods described above 
   // (see vtkKWParameterValueFunctionEditor for example, the high-level
   // AddFunctionPointAtParameter() method will use the low-level
   // below FunctionPointCanBeRemoved() and above RemoveFunctionPoint()).
   // *******************************************************************
+
+public:
+  // Description:
+  // Get the 'id' of the point at parameter 'parameter', if *any*.
+  // The current implementation is probably not too efficient as it
+  // loops over all points, call GetFunctionPointParameter and return
+  // the corresponding id if the parameter that was retrieved matches.
+  // Return 1 on success, 0 otherwise
+  virtual int GetFunctionPointId(double parameter, int *id);
 
   // Description:
   // Return 1 if a point can be added to the function, 0 otherwise.
@@ -202,6 +211,22 @@ protected:
   // if the parameter is locked, or if it is passing over or before its
   // neighbors.
   virtual int FunctionPointCanBeMovedToParameter(int id, double parameter) = 0;
+
+protected:
+  // Description:
+  // Return 1 if the function line joining point 'id1' and point 'id2'
+  // needs to be sampled at regular interval (instead of a straight line). 
+  // If the interpolation function InterpolateFunctionPointValues is not
+  // linear, it is likely that this function should return 1 so that the
+  // line that is drawn between the two points is not a straight line but a
+  // set of segments computed by sampling between each end-points. Yet, 
+  // it does not have to be *always* resampled, given the property of the
+  // interpolant, some cases may end up requiring just a straight line,
+  // which can be drawn much more efficiently.
+  virtual int FunctionLineIsSampledBetweenPoints(int id1, int id2);
+
+  vtkKWParameterValueFunctionInterface() {};
+  ~vtkKWParameterValueFunctionInterface() {};
 
 private:
   vtkKWParameterValueFunctionInterface(const vtkKWParameterValueFunctionInterface&); // Not implemented

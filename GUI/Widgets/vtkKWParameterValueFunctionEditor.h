@@ -48,6 +48,8 @@ public:
 
   // Description:
   // Set/Get the whole parameter range.
+  // Note that the visible parameter range is changed automatically to maintain
+  // the same relative visible range within the whole range.
   virtual double* GetWholeParameterRange();
   virtual void SetWholeParameterRange(double r0, double r1);
   virtual void GetWholeParameterRange(double &r0, double &r1)
@@ -60,7 +62,8 @@ public:
 
   // Description:
   // Convenience method to set the whole parameter range to the
-  // function parameter range
+  // function parameter range. Note that for safety reasons it will maintain
+  // the same relative visible parameter range.
   virtual void SetWholeParameterRangeToFunctionRange();
 
   // Description:
@@ -79,11 +82,6 @@ public:
 
   // Description:
   // Convenience method to set the visible parameter range to the
-  // function parameter range
-  virtual void SetVisibleParameterRangeToFunctionRange();
-
-  // Description:
-  // Convenience method to set the visible parameter range to the
   // whole parameter range
   virtual void SetVisibleParameterRangeToWholeParameterRange();
 
@@ -98,14 +96,9 @@ public:
     { this->SetRelativeVisibleParameterRange(range[0], range[1]); };
 
   // Description:
-  // Convenience method to set the whole parameter range while maintaining
-  // the same relative visible parameter range.
-  virtual void SetWholeParameterRangeAndMaintainVisible(double r0, double r1);
-  virtual void SetWholeParameterRangeAndMaintainVisible(double range[2]) 
-    { this->SetWholeParameterRangeAndMaintainVisible(range[0], range[1]); };
-
-  // Description:
   // Set/Get the whole value range.
+  // Note that the visible value range is changed automatically to maintain
+  // the same relative visible range within the whole range.
   virtual double* GetWholeValueRange();
   virtual void SetWholeValueRange(double r0, double r1);
   virtual void GetWholeValueRange(double &r0, double &r1)
@@ -139,17 +132,6 @@ public:
     { this->GetRelativeVisibleValueRange(range[0], range[1]); };
   virtual void SetRelativeVisibleValueRange(double range[2]) 
     { this->SetRelativeVisibleValueRange(range[0], range[1]); };
-
-  // Description:
-  // Convenience method to set the whole value range while maintaining
-  // the same relative visible value range.
-  virtual void SetWholeValueRangeAndMaintainVisible(double r0, double r1);
-  virtual void SetWholeValueRangeAndMaintainVisible(double range[2]) 
-    { this->SetWholeValueRangeAndMaintainVisible(range[0], range[1]); };
-
-  // Description:
-  // Set/Get the internal label visibility (override the super).
-  virtual void SetLabelVisibility(int);
 
   // Description:
   // If supported, set the label position in regards to the rest of
@@ -285,33 +267,44 @@ public:
       vtkKWParameterValueFunctionEditor::RangeLabelPositionTop); };
 
   // Description:
+  // Display the points entries (i.e. the parameter entry, 
+  // and any other entries the subclass will introduce) at
+  // the default position (on the same line as all other elements), or on
+  // the right of the canvas.
+  //BTX
+  enum
+  {
+    PointEntriesPositionDefault = 10,
+    PointEntriesPositionRight
+  };
+  //ETX
+  virtual void SetPointEntriesPosition(int);
+  vtkGetMacro(PointEntriesPosition, int);
+  virtual void SetPointEntriesPositionToDefault()
+    { this->SetPointEntriesPosition(
+      vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault); };
+  virtual void SetPointEntriesPositionToRight()
+    { this->SetPointEntriesPosition(
+      vtkKWParameterValueFunctionEditor::PointEntriesPositionRight); };
+
+  // Description:
+  // Set/Get the point entries UI visibility.
+  // This will hide all text entries for this class, i.e. the parameter
+  // entry and all values entries (say, RGB, or opacitry, or sharpness, etc).
+  // Note: set this parameter to the proper value before calling Create() in
+  // order to minimize the footprint of the object.
+  vtkBooleanMacro(PointEntriesVisibility, int);
+  virtual void SetPointEntriesVisibility(int);
+  vtkGetMacro(PointEntriesVisibility, int);
+
+  // Description:
   // Set/Get the parameter entry UI visibility.
+  // Not shown if PointEntriesVisibility is set to Off
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
   vtkBooleanMacro(ParameterEntryVisibility, int);
   virtual void SetParameterEntryVisibility(int);
   vtkGetMacro(ParameterEntryVisibility, int);
-
-  // Description:
-  // Display the parameter entry at the default position (on the same line
-  // as all other elements), or on the right of the canvas.
-  // The ParameterEntryVisibility parameter still has to be On for the entry
-  // to be displayed.
-  //BTX
-  enum
-  {
-    ParameterEntryPositionDefault = 10,
-    ParameterEntryPositionRight
-  };
-  //ETX
-  virtual void SetParameterEntryPosition(int);
-  vtkGetMacro(ParameterEntryPosition, int);
-  virtual void SetParameterEntryPositionToDefault()
-    { this->SetParameterEntryPosition(
-      vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault); };
-  virtual void SetParameterEntryPositionToRight()
-    { this->SetParameterEntryPosition(
-      vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight); };
 
   // Description:
   // Set/Get the parameter entry printf format. If not NULL, it is
@@ -321,10 +314,8 @@ public:
   vtkGetStringMacro(ParameterEntryFormat);
 
   // Description:
-  // Access the entry
-  // If you need to customize this object, make sure you first set 
-  // ParameterEntryVisibility to On and call Create().
-  vtkGetObjectMacro(ParameterEntry, vtkKWEntryWithLabel);
+  // Access the parameter entry.
+  virtual vtkKWEntryWithLabel* GetParameterEntry();
 
   // Description:
   // Set/Get the user frame UI visibility.
@@ -354,6 +345,13 @@ public:
   virtual void SetExpandCanvasWidth(int);
   vtkGetMacro(ExpandCanvasWidth, int);
   
+  // Description:
+  // Set/Get the canvas visibility, i.e. the whole area where the function
+  // line, points, canvas outline, background and histogram are displayed
+  vtkBooleanMacro(CanvasVisibility, int);
+  virtual void SetCanvasVisibility(int);
+  vtkGetMacro(CanvasVisibility, int);
+
   // Description:
   // Set/Get the function line visibility 
   // (i.e, if set to Off, only the points are displayed).
@@ -658,8 +656,7 @@ public:
   // Description:
   // Merge all the points from another function editor.
   // Return the number of points merged.
-  virtual int MergePointsFromEditor(
-    vtkKWParameterValueFunctionEditor *editor);
+  virtual int MergePointsFromEditor(vtkKWParameterValueFunctionEditor *editor);
 
   // Description:
   // Set/Get the background color of the main frame, where the function
@@ -715,10 +712,25 @@ public:
   vtkGetMacro(ComputePointColorFromValue, int);
   
   // Description:
+  // Set/Get the point visibility in the canvas.
+  // This actually hides both the point and the index inside.
+  // If set to on, the index can still be hidden using PointIndexVisibility
+  // and SelectedPointIndexVisibility. Guidelines are not affected.
+  vtkBooleanMacro(PointVisibility, int);
+  virtual void SetPointVisibility(int);
+  vtkGetMacro(PointVisibility, int);
+
+  // Description:
   // Set/Get the point index visibility for each point in the canvas.
   vtkBooleanMacro(PointIndexVisibility, int);
   virtual void SetPointIndexVisibility(int);
   vtkGetMacro(PointIndexVisibility, int);
+
+  // Description:
+  // Set/Get the selected point index visibility in the canvas.
+  vtkBooleanMacro(SelectedPointIndexVisibility, int);
+  virtual void SetSelectedPointIndexVisibility(int);
+  vtkGetMacro(SelectedPointIndexVisibility, int);
 
   // Description:
   // Set/Get the point guideline visibility in the canvas 
@@ -732,12 +744,6 @@ public:
   // See FunctionLineStyle for enumeration of style values.
   virtual void SetPointGuidelineStyle(int);
   vtkGetMacro(PointGuidelineStyle, int);
-
-  // Description:
-  // Set/Get the selected point index visibility in the canvas.
-  vtkBooleanMacro(SelectedPointIndexVisibility, int);
-  virtual void SetSelectedPointIndexVisibility(int);
-  vtkGetMacro(SelectedPointIndexVisibility, int);
 
   // Description:
   // Set/Get the histogram and secondary histogram over the parameter range.
@@ -797,8 +803,9 @@ public:
   // Set commands.
   // Point... commands are passed the index of the point that is/was modified.
   // PointAddedCommand is called when a point was added.
-  // PointMovingCommand/PointMovedCommand is called when a point is moving or
-  // was moved (at the end of the interaction).
+  // PointChangingCommand/PointChangedCommand is called when a point is
+  // changing or has changed (at the end of the interaction). Moving the point
+  // for example, qualify as a change.
   // PointRemovedCommand is called when a point was removed, it takes an
   // additional arg which is the value of the parameter of the point that
   // was removed.
@@ -815,9 +822,9 @@ public:
   // interaction).
   virtual void SetPointAddedCommand(
     vtkObject* object,const char *method);
-  virtual void SetPointMovingCommand(
+  virtual void SetPointChangingCommand(
     vtkObject* object, const char *method);
-  virtual void SetPointMovedCommand(
+  virtual void SetPointChangedCommand(
     vtkObject* object, const char *method);
   virtual void SetPointRemovedCommand(
     vtkObject* object, const char *method);
@@ -837,6 +844,12 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
+  // Set the command that is invoked when double/clicking on a point.
+  // The id of the node is passed to the function.
+  virtual void SetDoubleClickOnPointCommand(
+    vtkObject* object,const char *method);
+
+  // Description:
   // Events. Even though it is highly recommended to use the commands
   // framework defined above to specify the callback methods you want to be 
   // invoked when specific event occur, you can also use the observer
@@ -847,8 +860,8 @@ public:
     FunctionChangedEvent = 10000,
     FunctionChangingEvent,
     PointAddedEvent,
-    PointMovedEvent,
-    PointMovingEvent,
+    PointChangedEvent,
+    PointChangingEvent,
     PointRemovedEvent,
     SelectionChangedEvent,
     VisibleParameterRangeChangedEvent,
@@ -856,7 +869,8 @@ public:
     VisibleRangeChangedEvent,
     VisibleRangeChangingEvent,
     ParameterCursorMovedEvent,
-    ParameterCursorMovingEvent
+    ParameterCursorMovingEvent,
+    DoubleClickOnPointEvent
   };
   //ETX
 
@@ -872,6 +886,7 @@ public:
   // Synchronize the visible parameter range between two editors A and B.
   // Each time the visible range of A is changed, the same visible range
   // is assigned to the synchronized editor B, and vice-versa.
+
   // Note that a call with (A, B) is the same as a call with (B, A), 
   // i.e. this is a double-link, only one call is needed to set the sync.
   // Return 1 on success, 0 otherwise.
@@ -960,9 +975,9 @@ public:
   static const char *FunctionTag;
   static const char *SelectedTag;
   static const char *PointTag;
-  static const char *GuidelineTag;
+  static const char *PointGuidelineTag;
+  static const char *PointTextTag;
   static const char *LineTag;
-  static const char *TextTag;
   static const char *HistogramTag;
   static const char *FrameForegroundTag;
   static const char *FrameBackgroundTag;
@@ -970,10 +985,6 @@ public:
   static const char *ParameterTicksTag;
   static const char *ValueTicksTag;
   //ETX
-
-protected:
-  vtkKWParameterValueFunctionEditor();
-  ~vtkKWParameterValueFunctionEditor();
 
   // Description:
   // Is point locked, protected, removable ?
@@ -985,14 +996,33 @@ protected:
 
   // Description:
   // Higher-level methods to manipulate the function. 
+  virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
+
+protected:
+  vtkKWParameterValueFunctionEditor();
+  ~vtkKWParameterValueFunctionEditor();
+
+  // Description:
+  // Return 1 if the function line joining point 'id1' and point 'id2'
+  // is visible given the current visible parameter and value range . 
+  // This implementation assuming that if the line is actually made of
+  // segments sampled between the two end-points, the segments are still
+  // bound by the box which diagonal is the line between id1 and id2. If
+  // this is not the case, you can still override that small function in
+  // subclasses.
+  virtual int FunctionLineIsInVisibleRangeBetweenPoints(int id1, int id2);
+
+  // Description:
+  // Higher-level methods to manipulate the function. 
   virtual int  GetFunctionPointColorInCanvas(int id, double rgb[3]);
   virtual int  GetFunctionPointTextColorInCanvas(int id, double rgb[3]);
   virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y);
+  virtual int  GetFunctionPointCanvasCoordinatesAtParameter(
+    double parameter, int &x, int &y);
   virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id);
   virtual int  AddFunctionPointAtParameter(double parameter, int &id);
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y);
   virtual int  MoveFunctionPointToParameter(int id,double parameter,int i=0);
-  virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
   virtual int  EqualFunctionPointValues(const double *values1, const double *values2);
   virtual int  FindFunctionPointAtCanvasCoordinates(
     int x, int y, int &id, int &c_x, int &c_y);
@@ -1012,6 +1042,22 @@ protected:
   vtkSetMacro(DisableRedraw, int);
   vtkBooleanMacro(DisableRedraw, int);
   vtkGetMacro(DisableRedraw, int);
+
+  // Description:
+  // Merge the point 'editor_id' from another function editor 'editor' into
+  // the instance. This only happens if no other point already exists at the 
+  // same parameter location, thus resulting in the creation of a new point.
+  // Return 1 if a point was added (and set its id in 'new_id'), 0 otherwise
+  virtual int MergePointFromEditor(
+    vtkKWParameterValueFunctionEditor *editor, int editor_id, int &new_id);
+
+  // Description:
+  // Copy the point 'id' parameter and values from another function editor
+  // 'editor' into the point 'id' in the instance. Both points have to exist
+  // in both editors.
+  // Return 1 if copy succeeded, 0 otherwise
+  virtual int CopyPointFromEditor(
+    vtkKWParameterValueFunctionEditor *editor, int id);
 
   int   ParameterRangeVisibility;
   int   ValueRangeVisibility;
@@ -1043,13 +1089,16 @@ protected:
   int   CanvasBackgroundVisibility;
   int   ParameterCursorVisibility;
   int   FunctionLineVisibility;
+  int   CanvasVisibility;
+  int   PointVisibility;
   int   PointIndexVisibility;
   int   PointGuidelineVisibility;
   int   SelectedPointIndexVisibility;
   int   RangeLabelVisibility;
   int   RangeLabelPosition;
-  int   ParameterEntryPosition;
+  int   PointEntriesPosition;
   int   ParameterEntryVisibility;
+  int   PointEntriesVisibility;
   int   UserFrameVisibility;
   int   ParameterTicksVisibility;
   int   ValueTicksVisibility;
@@ -1076,8 +1125,8 @@ protected:
   // Commands
 
   char  *PointAddedCommand;
-  char  *PointMovingCommand;
-  char  *PointMovedCommand;
+  char  *PointChangingCommand;
+  char  *PointChangedCommand;
   char  *PointRemovedCommand;
   char  *SelectionChangedCommand;
   char  *FunctionChangedCommand;
@@ -1086,14 +1135,15 @@ protected:
   char  *VisibleRangeChangingCommand;
   char  *ParameterCursorMovingCommand;
   char  *ParameterCursorMovedCommand;
+  char  *DoubleClickOnPointCommand;
 
   virtual void InvokeCommand(const char *command);
   virtual void InvokePointCommand(
     const char *command, int id, const char *extra = 0);
 
   virtual void InvokePointAddedCommand(int id);
-  virtual void InvokePointMovingCommand(int id);
-  virtual void InvokePointMovedCommand(int id);
+  virtual void InvokePointChangingCommand(int id);
+  virtual void InvokePointChangedCommand(int id);
   virtual void InvokePointRemovedCommand(int id, double parameter);
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeFunctionChangedCommand();
@@ -1102,20 +1152,21 @@ protected:
   virtual void InvokeVisibleRangeChangingCommand();
   virtual void InvokeParameterCursorMovingCommand();
   virtual void InvokeParameterCursorMovedCommand();
+  virtual void InvokeDoubleClickOnPointCommand(int id);
 
   // GUI
 
-  vtkKWCanvas       *Canvas;
-  vtkKWRange        *ParameterRange;
-  vtkKWRange        *ValueRange;
-  vtkKWFrame        *TopLeftContainer;
-  vtkKWFrame        *TopLeftFrame;
-  vtkKWFrame        *UserFrame;
-  vtkKWFrame        *TopRightFrame;
-  vtkKWLabel        *RangeLabel;
+  vtkKWCanvas         *Canvas;
+  vtkKWRange          *ParameterRange;
+  vtkKWRange          *ValueRange;
+  vtkKWFrame          *TopLeftContainer;
+  vtkKWFrame          *TopLeftFrame;
+  vtkKWFrame          *UserFrame;
+  vtkKWFrame          *PointEntriesFrame;
+  vtkKWLabel          *RangeLabel;
   vtkKWEntryWithLabel *ParameterEntry;
-  vtkKWCanvas       *ValueTicksCanvas;
-  vtkKWCanvas       *ParameterTicksCanvas;
+  vtkKWCanvas         *ValueTicksCanvas;
+  vtkKWCanvas         *ParameterTicksCanvas;
 
   // Histogram
 
@@ -1150,7 +1201,7 @@ protected:
   virtual void CreateParameterRange(vtkKWApplication *app);
   virtual void CreateValueRange(vtkKWApplication *app);
   virtual void CreateRangeLabel(vtkKWApplication *app);
-  virtual void CreateTopRightFrame(vtkKWApplication *app);
+  virtual void CreatePointEntriesFrame(vtkKWApplication *app);
   virtual void CreateParameterEntry(vtkKWApplication *app);
   virtual void CreateTopLeftContainer(vtkKWApplication *app);
   virtual void CreateTopLeftFrame(vtkKWApplication *app);
@@ -1158,7 +1209,7 @@ protected:
   virtual void CreateValueTicksCanvas(vtkKWApplication *app);
   virtual void CreateParameterTicksCanvas(vtkKWApplication *app);
   virtual int IsTopLeftFrameUsed();
-  virtual int IsTopRightFrameUsed();
+  virtual int IsPointEntriesFrameUsed();
 
   // Description:
   // Pack the widget
@@ -1184,17 +1235,26 @@ protected:
   //                              ranges have changed
   // RedrawPanDependentElements:  the visible ranges are panned while their
   //                              extents are unchanged
-  // RedrawFunctionDependentElements: the function has changed
+  // RedrawFunctionDependentElements: the function has changed (as triggered
+  // if GetRedrawFunctionTime(), a monotonically increasing value, has changed.
+  // in this implementation, it just calls GetFunctionMTime(), but can be
+  // overriden in subclasses to take into account other objects modification
+  // time)
+  virtual unsigned long GetRedrawFunctionTime();
   virtual void Redraw();
   virtual void RedrawSizeDependentElements();
   virtual void RedrawPanOnlyDependentElements();
   virtual void RedrawFunctionDependentElements();
+  virtual void RedrawSinglePointDependentElements(int id);
 
   // Description:
-  // Redraw the whole function or a specific point
+  // Redraw the whole function or a specific point, or 
+  // the line between two points
   //BTX
   virtual void RedrawFunction();
   virtual void RedrawPoint(int id, ostrstream *tk_cmd = 0);
+  virtual void RedrawLine(int id1, int id2, ostrstream *tk_cmd = 0);
+  virtual void GetLineCoordinates(int id1, int id2, ostrstream *tk_cmd);
   //ETX
 
   // Description:

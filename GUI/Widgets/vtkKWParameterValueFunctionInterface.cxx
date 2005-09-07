@@ -17,12 +17,36 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.4");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionInterface::Create(vtkKWApplication *app)
 {
   this->Superclass::Create(app);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionInterface::FunctionLineIsSampledBetweenPoints(
+  int vtkNotUsed(id1), int vtkNotUsed(id2))
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionInterface::GetFunctionPointId(
+  double parameter, int *id)
+{
+  int size = this->GetFunctionSize();
+  double p;
+  for (int i = 0; i < size; i++)
+    {
+    if (this->GetFunctionPointParameter(i, &p) && p == parameter)
+      {
+      *id = i;
+      return 1;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

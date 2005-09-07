@@ -41,6 +41,7 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkVolumeProperty.h"
+#include "vtkKWTkUtilities.h"
 
 #include <vtksys/stl/string>
 
@@ -50,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.24");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.25");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -66,12 +67,14 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->DisableCommands               = 0;
   this->EnableShadingForAllComponents = 0;
 
-  this->HSVColorSelectorVisibility = 1;
-  this->ComponentSelectionVisibility = 1;
-  this->InterpolationTypeVisibility = 1;
-  this->MaterialPropertyVisibility = 1;
+  this->HSVColorSelectorVisibility        = 1;
+  this->ComponentSelectionVisibility      = 1;
+  this->InterpolationTypeVisibility       = 1;
+  this->MaterialPropertyVisibility        = 1;
   this->GradientOpacityFunctionVisibility = 1;
-  this->ComponentWeightsVisibility = 1;
+  this->ComponentWeightsVisibility        = 1;
+
+  this->UseScalarColorFunctionInScalarOpacityEditor        = 0;
 
   this->VolumePropertyChangedCommand  = NULL;
   this->VolumePropertyChangingCommand = NULL;
@@ -294,7 +297,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->InterpolationTypeOptionMenu->SetParent(this->InnerLeftFrame);
   this->InterpolationTypeOptionMenu->Create(app);
   this->InterpolationTypeOptionMenu->ExpandWidgetOff();
-  this->InterpolationTypeOptionMenu->GetLabel()->SetText("Interpolation:");
+  this->InterpolationTypeOptionMenu->SetLabelText("Interpolation:");
   this->InterpolationTypeOptionMenu->SetLabelWidth(label_width);
   this->InterpolationTypeOptionMenu->GetWidget()->SetWidth(menu_width);
   this->InterpolationTypeOptionMenu->SetBalloonHelpString(
@@ -353,7 +356,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     {
     this->ScalarOpacityFunctionEditor->SetParent(frame);
     }
-  this->ScalarOpacityFunctionEditor->GetLabel()->SetText("Scalar Opacity Mapping:");
+  this->ScalarOpacityFunctionEditor->SetLabelText("Scalar Opacity Mapping:");
   this->ScalarOpacityFunctionEditor->ComputePointColorFromValueOff();
   this->ScalarOpacityFunctionEditor->LockEndPointsParameterOn();
   this->ScalarOpacityFunctionEditor->SetLabelPosition(
@@ -364,13 +367,16 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ScalarOpacityFunctionEditor->WindowLevelModeButtonVisibilityOn();
   this->ScalarOpacityFunctionEditor->Create(app);
 
-  this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()->SetText("S:");
-  this->ScalarOpacityFunctionEditor->GetValueEntry()->GetLabel()->SetText("O:");
+  this->ScalarOpacityFunctionEditor->GetParameterEntry()->SetLabelText("S:");
+  this->ScalarOpacityFunctionEditor->GetValueEntry()->SetLabelText("O:");
 
   this->ScalarOpacityFunctionEditor->SetFunctionChangedCommand(
     this, "ScalarOpacityFunctionChangedCallback");
   this->ScalarOpacityFunctionEditor->SetFunctionChangingCommand(
     this, "ScalarOpacityFunctionChangingCallback");
+  this->ScalarOpacityFunctionEditor->SetDoubleClickOnPointCommand(
+    this, "DoubleClickOnScalarOpacityPointCallback");
+
   this->ScalarOpacityFunctionEditor->SetWindowLevelModeChangedCommand(
     this, "WindowLevelModeCallback");
 
@@ -406,7 +412,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     {
     this->ScalarColorFunctionEditor->SetParent(frame);
     }
-  this->ScalarColorFunctionEditor->GetLabel()->SetText("Scalar Color Mapping:");
+  this->ScalarColorFunctionEditor->SetLabelText("Scalar Color Mapping:");
   this->ScalarColorFunctionEditor->SetCanvasHeight(
     this->ScalarOpacityFunctionEditor->GetCanvasHeight());
   this->ScalarColorFunctionEditor->LockEndPointsParameterOn();
@@ -420,7 +426,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->ScalarOpacityFunctionEditor->GetRangeLabelPosition());
   this->ScalarColorFunctionEditor->Create(app);
 
-  this->ScalarColorFunctionEditor->GetParameterEntry()->GetLabel()->SetText(
+  this->ScalarColorFunctionEditor->GetParameterEntry()->SetLabelText(
     this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()
     ->GetText());
 
@@ -461,7 +467,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     {
     this->GradientOpacityFunctionEditor->SetParent(frame);
     }
-  this->GradientOpacityFunctionEditor->GetLabel()->SetText("Gradient Opacity Mapping:");
+  this->GradientOpacityFunctionEditor->SetLabelText("Gradient Opacity Mapping:");
   this->GradientOpacityFunctionEditor->ComputePointColorFromValueOn();
   this->GradientOpacityFunctionEditor->LockEndPointsParameterOn();
   this->GradientOpacityFunctionEditor->SetPointMarginToCanvas(
@@ -476,10 +482,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->ScalarOpacityFunctionEditor->GetRangeLabelPosition());
   this->GradientOpacityFunctionEditor->Create(app);
 
-  this->GradientOpacityFunctionEditor->GetParameterEntry()->GetLabel()->SetText(
+  this->GradientOpacityFunctionEditor->GetParameterEntry()->SetLabelText(
     this->ScalarOpacityFunctionEditor->GetParameterEntry()->GetLabel()
     ->GetText());
-  this->GradientOpacityFunctionEditor->GetValueEntry()->GetLabel()->SetText("O:");
+  this->GradientOpacityFunctionEditor->GetValueEntry()->SetLabelText("O:");
 
   this->GradientOpacityFunctionEditor->SetFunctionChangedCommand(
     this, "GradientOpacityFunctionChangedCallback");
@@ -512,7 +518,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
 
   this->ComponentWeightScaleSet->SetParent(frame);
   this->ComponentWeightScaleSet->Create(app);
-  this->ComponentWeightScaleSet->GetLabel()->SetText("Component Weights:");
+  this->ComponentWeightScaleSet->SetLabelText("Component Weights:");
 
   vtkKWScaleWithEntrySet *scaleset = 
     this->ComponentWeightScaleSet->GetWidget();
@@ -688,14 +694,24 @@ void vtkKWVolumePropertyWidget::Pack()
 
   tk_cmd << "grid " << this->ScalarOpacityFunctionEditor->GetWidgetName()
          << " -sticky ew -column 0 -row " << row << colspan << pad_ed 
-         << in_frame.c_str() << endl;
+         << in_frame.c_str();
+  if (!this->ScalarColorFunctionEditor->GetCanvasVisibility())
+    {
+    tk_cmd << " -pady 0";
+    }
+  tk_cmd << endl;
   row++;
 
   // Color Transfer Function (CTF)
 
   tk_cmd << "grid " << this->ScalarColorFunctionEditor->GetWidgetName()
          << " -sticky ew -column 0 -row " << row << colspan << pad_ed
-         << in_frame.c_str() << endl;
+         << in_frame.c_str();
+  if (!this->ScalarColorFunctionEditor->GetCanvasVisibility())
+    {
+    tk_cmd << " -pady 0";
+    }
+  tk_cmd << endl;
   row++;
 
   // Gradient Opacity Function (GOF)
@@ -881,17 +897,15 @@ void vtkKWVolumePropertyWidget::Update()
 
       if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
         {
-        this->ScalarOpacityFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(p_range);
+        this->ScalarOpacityFunctionEditor->SetWholeParameterRange(p_range);
         }
       else
         {
-        this->ScalarOpacityFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(ofun->GetRange());
+        this->ScalarOpacityFunctionEditor->SetWholeParameterRange(
+          ofun->GetRange());
         }
 
-      this->ScalarOpacityFunctionEditor
-        ->SetWholeValueRangeAndMaintainVisible(0.0, 1.0);
+      this->ScalarOpacityFunctionEditor->SetWholeValueRange(0.0, 1.0);
       this->ScalarOpacityFunctionEditor->SetWindowLevelMode(
         this->WindowLevelMode[this->SelectedComponent]);
       }
@@ -957,15 +971,24 @@ void vtkKWVolumePropertyWidget::Update()
         this->VolumeProperty->GetRGBTransferFunction(this->SelectedComponent);
       this->ScalarColorFunctionEditor->SetColorTransferFunction(cfun);
 
-      if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
+      if (this->UseScalarColorFunctionInScalarOpacityEditor && 
+          this->ScalarOpacityFunctionEditor)
         {
-        this->ScalarColorFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(p_range);
+        this->ScalarOpacityFunctionEditor->SetPointColorTransferFunction(cfun);
         }
       else
         {
-        this->ScalarColorFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(cfun->GetRange());
+        this->ScalarOpacityFunctionEditor->SetPointColorTransferFunction(NULL);
+        }
+
+      if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
+        {
+        this->ScalarColorFunctionEditor->SetWholeParameterRange(p_range);
+        }
+      else
+        {
+        this->ScalarColorFunctionEditor->SetWholeParameterRange(
+          cfun->GetRange());
         }
       }
     else
@@ -1091,16 +1114,14 @@ void vtkKWVolumePropertyWidget::Update()
 
         p_range[1] = (float)(0.25 * ((double)p_range[1] - (double)p_range[0]));
         p_range[0] = 0.0;
-        this->GradientOpacityFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(p_range);
+        this->GradientOpacityFunctionEditor->SetWholeParameterRange(p_range);
         }
       else
         {
-        this->GradientOpacityFunctionEditor
-          ->SetWholeParameterRangeAndMaintainVisible(gfun->GetRange());
+        this->GradientOpacityFunctionEditor->SetWholeParameterRange(
+          gfun->GetRange());
         }
-      this->GradientOpacityFunctionEditor
-        ->SetWholeValueRangeAndMaintainVisible(0.0, 1.0);
+      this->GradientOpacityFunctionEditor->SetWholeValueRange(0.0, 1.0);
       }
     else
       {
@@ -1534,6 +1555,54 @@ int vtkKWVolumePropertyWidget::IsInWindowLevelMode()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetUseScalarColorFunctionInScalarOpacityEditor(int arg)
+{
+  if (this->UseScalarColorFunctionInScalarOpacityEditor == arg)
+    {
+    return;
+    }
+
+  this->UseScalarColorFunctionInScalarOpacityEditor = arg;
+
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
+{
+  for (int i = 0; i < VTK_MAX_VRCOMP; i++)
+    {
+    this->LockOpacityAndColor[i] = 1;
+    }
+
+  this->UseScalarColorFunctionInScalarOpacityEditor = 1;
+
+  if (this->ScalarOpacityFunctionEditor)
+    {
+    this->ScalarOpacityFunctionEditor->SetLabelText(
+      "Scalar Opacity And Color Mapping:");
+    this->ScalarOpacityFunctionEditor->WindowLevelModeButtonVisibilityOff();
+    this->ScalarOpacityFunctionEditor->ParameterRangeVisibilityOff();
+    }
+
+  if (this->ScalarColorFunctionEditor)
+    {
+    this->ScalarColorFunctionEditor->LabelVisibilityOff();
+    this->ScalarColorFunctionEditor->RangeLabelVisibilityOff();
+    this->ScalarColorFunctionEditor->PointEntriesVisibilityOff();
+    this->ScalarColorFunctionEditor->CanvasVisibilityOff();
+    this->ScalarColorFunctionEditor->HistogramLogModeOptionMenuVisibilityOff();
+    this->ScalarColorFunctionEditor->ColorSpaceOptionMenuVisibilityOff();
+    this->ScalarColorFunctionEditor->UserFrameVisibilityOff();
+    }
+
+  this->Pack();
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::InvokeCommand(const char *command)
 {
   if (command && *command && !this->DisableCommands)
@@ -1703,6 +1772,57 @@ void vtkKWVolumePropertyWidget::ScalarOpacityFunctionChangingCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::DoubleClickOnScalarOpacityPointCallback(int id)
+{
+  // If we are using the color tfunc in the scalar opacity function editor,
+  // try to modify the color
+
+  if (!this->UseScalarColorFunctionInScalarOpacityEditor ||
+      !this->ScalarOpacityFunctionEditor ||
+      !this->ScalarColorFunctionEditor ||
+      (this->ScalarOpacityFunctionEditor->GetPointColorTransferFunction() !=
+       this->ScalarColorFunctionEditor->GetColorTransferFunction()))
+    {
+    return;
+    }
+
+  // Query the parameter of the point in the scalar opacity editor, and
+  // find the corresponding point in the color transfer function editor
+
+  double soe_parameter;
+  int sce_id;
+  if (!this->ScalarOpacityFunctionEditor->GetFunctionPointParameter(
+        id, &soe_parameter) ||
+      !this->ScalarColorFunctionEditor->GetFunctionPointId(
+        soe_parameter, &sce_id))
+    {
+    return;
+    }
+      
+  // Change the point color
+
+  double rgb[3];
+  if (!this->ScalarColorFunctionEditor->FunctionPointValueIsLocked(sce_id) &&
+      this->ScalarColorFunctionEditor->GetPointColorAsRGB(sce_id, rgb) &&
+      vtkKWTkUtilities::QueryUserForColor(
+        this->GetApplication(),
+        this->GetWidgetName(),
+        NULL,
+        rgb[0], rgb[1], rgb[2],
+        &rgb[0], &rgb[1], &rgb[2]))
+    {
+    unsigned long mtime = this->ScalarColorFunctionEditor->GetFunctionMTime();
+
+    this->ScalarColorFunctionEditor->SetPointColorAsRGB(sce_id, rgb);
+
+    if (this->ScalarColorFunctionEditor->GetFunctionMTime() > mtime)
+      {
+      this->RGBTransferFunctionChangedCallback();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangedCallback()
 {
   if (!this->IsCreated() || !this->VolumeProperty)
@@ -1751,6 +1871,12 @@ void vtkKWVolumePropertyWidget::RGBTransferFunctionChangedCallback()
 {
   this->UpdateHSVColorSelectorFromScalarColorFunctionEditor();
 
+  if (this->UseScalarColorFunctionInScalarOpacityEditor &&
+      this->ScalarOpacityFunctionEditor)
+    {
+    this->ScalarOpacityFunctionEditor->Update();
+    }
+
   this->InvokeVolumePropertyChangedCommand();
 }
 
@@ -1758,6 +1884,12 @@ void vtkKWVolumePropertyWidget::RGBTransferFunctionChangedCallback()
 void vtkKWVolumePropertyWidget::RGBTransferFunctionChangingCallback()
 {
   this->UpdateHSVColorSelectorFromScalarColorFunctionEditor();
+
+  if (this->UseScalarColorFunctionInScalarOpacityEditor &&
+      this->ScalarOpacityFunctionEditor)
+    {
+    this->ScalarOpacityFunctionEditor->Update();
+    }
 
   if (this->InteractiveApplyCheckButton && 
       this->InteractiveApplyCheckButton->GetSelectedState())
@@ -1876,6 +2008,12 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangedCallback(
   this->ScalarColorFunctionEditor->SetPointColorAsHSV(
     this->ScalarColorFunctionEditor->GetSelectedPoint(), h, s, v);
 
+  if (this->UseScalarColorFunctionInScalarOpacityEditor &&
+      this->ScalarOpacityFunctionEditor)
+    {
+    this->ScalarOpacityFunctionEditor->Update();
+    }
+
   this->InvokeVolumePropertyChangedCommand();
 }
 
@@ -1897,11 +2035,18 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback(
     this->ScalarColorFunctionEditor->GetSelectedPoint(), h, s, v);
 
   if (this->ScalarColorFunctionEditor->GetColorTransferFunction()->GetMTime() >
-      mtime &&
-      this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+      mtime)
     {
-    this->InvokeVolumePropertyChangingCommand();
+    if (this->UseScalarColorFunctionInScalarOpacityEditor &&
+        this->ScalarOpacityFunctionEditor)
+      {
+      this->ScalarOpacityFunctionEditor->Update();
+      }
+    if (this->InteractiveApplyCheckButton && 
+        this->InteractiveApplyCheckButton->GetSelectedState())
+      {
+      this->InvokeVolumePropertyChangingCommand();
+      }
     }
 }
 
@@ -1985,6 +2130,9 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ComponentWeightsVisibility: "
      << (this->ComponentWeightsVisibility ? "On" : "Off") << endl;
   os << indent << "ScalarOpacityFunctionEditor: ";
+  os << indent << "UseScalarColorFunctionInScalarOpacityEditor: "
+     << (this->UseScalarColorFunctionInScalarOpacityEditor ? "On" : "Off") << endl;
+
   if (this->ScalarOpacityFunctionEditor)
     {
     os << endl;

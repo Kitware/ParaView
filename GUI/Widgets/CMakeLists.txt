@@ -91,6 +91,7 @@ SET(KWWidgets_SRCS
   vtkKWCheckButton.cxx 
   vtkKWCheckButtonWithChangeColorButton.cxx
   vtkKWCheckButtonWithPopupFrame.cxx 
+# vtkKWColorPicker.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWComboBox.cxx
@@ -128,6 +129,7 @@ SET(KWWidgets_SRCS
   vtkKWObject.cxx 
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
+  vtkKWParameterValueHermiteFunctionEditor.cxx
   vtkKWPiecewiseFunctionEditor.cxx
   vtkKWPopupButton.cxx 
   vtkKWPopupFrame.cxx 
@@ -198,6 +200,7 @@ SET(KWWidgets_SRCS ${KWWidgets_SRCS} ${KWWidgets_Utils_SRCS})
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
+  vtkKWParameterValueHermiteFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx

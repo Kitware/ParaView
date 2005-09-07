@@ -22,21 +22,23 @@
 #ifndef __vtkKWColorTransferFunctionEditor_h
 #define __vtkKWColorTransferFunctionEditor_h
 
-#include "vtkKWParameterValueFunctionEditor.h"
+#include "vtkKWParameterValueHermiteFunctionEditor.h"
 
 class vtkColorTransferFunction;
 class vtkKWEntryWithLabel;
 class vtkKWMenuButton;
 
-class KWWIDGETS_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
+class KWWIDGETS_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
 {
 public:
   static vtkKWColorTransferFunctionEditor* New();
-  vtkTypeRevisionMacro(vtkKWColorTransferFunctionEditor,vtkKWParameterValueFunctionEditor);
+  vtkTypeRevisionMacro(vtkKWColorTransferFunctionEditor,vtkKWParameterValueHermiteFunctionEditor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get/Set the function
+  // Note that the whole parameter range is automatically reset to the
+  // function range.
   vtkGetObjectMacro(ColorTransferFunction, vtkColorTransferFunction);
   virtual void SetColorTransferFunction(vtkColorTransferFunction*);
 
@@ -120,6 +122,7 @@ public:
 
   // Description:
   // Set/Get the value entries UI visibility.
+  // Not shown if superclass PointEntriesVisibility is set to Off
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
   vtkBooleanMacro(ValueEntriesVisibility, int);
@@ -159,6 +162,9 @@ public:
   // See protected: section too.
   virtual int HasFunction();
   virtual int GetFunctionSize();
+  virtual unsigned long GetFunctionMTime();
+  virtual int GetFunctionPointParameter(int id, double *parameter);
+  virtual int GetFunctionPointDimensionality();
 
 protected:
   vtkKWColorTransferFunctionEditor();
@@ -170,9 +176,6 @@ protected:
   // be added/removed/locked, it is up to the higer-level methods to do it.
   // IMPLEMENT those functions in the subclasses.
   // See public: section too.
-  virtual unsigned long GetFunctionMTime();
-  virtual int GetFunctionPointParameter(int id, double *parameter);
-  virtual int GetFunctionPointDimensionality();
   virtual int GetFunctionPointValues(int id, double *values);
   virtual int SetFunctionPointValues(int id, const double *values);
   virtual int InterpolateFunctionPointValues(double parameter, double *values);
@@ -180,6 +183,10 @@ protected:
     double parameter, const double *values, int *id);
   virtual int SetFunctionPoint(int id, double parameter, const double *values);
   virtual int RemoveFunctionPoint(int id);
+  virtual int GetFunctionMidPoint(int id, double *pos);
+  virtual int SetFunctionMidPoint(int id, double pos);
+  virtual int GetFunctionSharpness(int id, double *sharpness);
+  virtual int SetFunctionSharpness(int id, double sharpness);
 
   // Description:
   // Higher-level methods to manipulate the function. 
@@ -211,6 +218,7 @@ protected:
   virtual void RedrawSizeDependentElements();
   virtual void RedrawPanOnlyDependentElements();
   virtual void RedrawFunctionDependentElements();
+  virtual void RedrawSinglePointDependentElements(int id);
 
   // Description:
   // Redraw the histogram
@@ -239,7 +247,7 @@ protected:
   virtual void CreateColorRamp(vtkKWApplication *app);
   virtual void CreateValueEntries(vtkKWApplication *app);
   virtual int IsTopLeftFrameUsed();
-  virtual int IsTopRightFrameUsed();
+  virtual int IsPointEntriesFrameUsed();
 
 private:
   vtkKWColorTransferFunctionEditor(const vtkKWColorTransferFunctionEditor&); // Not implemented
