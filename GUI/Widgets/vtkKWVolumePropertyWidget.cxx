@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.25");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.26");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -816,7 +816,7 @@ void vtkKWVolumePropertyWidget::Update()
     // If dependents or W/L, we can not lock
 
     if (this->WindowLevelMode[this->SelectedComponent] ||
-        !this->GetIndependentComponents())
+        (has_prop && !this->GetIndependentComponents()))
       {
       this->LockOpacityAndColor[this->SelectedComponent] = 0;
       this->LockOpacityAndColorCheckButton->SetEnabled(0);
@@ -1572,11 +1572,6 @@ void vtkKWVolumePropertyWidget::SetUseScalarColorFunctionInScalarOpacityEditor(i
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
 {
-  for (int i = 0; i < VTK_MAX_VRCOMP; i++)
-    {
-    this->LockOpacityAndColor[i] = 1;
-    }
-
   this->UseScalarColorFunctionInScalarOpacityEditor = 1;
 
   if (this->ScalarOpacityFunctionEditor)
@@ -1596,6 +1591,11 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
     this->ScalarColorFunctionEditor->HistogramLogModeOptionMenuVisibilityOff();
     this->ScalarColorFunctionEditor->ColorSpaceOptionMenuVisibilityOff();
     this->ScalarColorFunctionEditor->UserFrameVisibilityOff();
+    }
+
+  for (int i = 0; i < VTK_MAX_VRCOMP; i++)
+    {
+    this->LockOpacityAndColor[i] = 1;
     }
 
   this->Pack();

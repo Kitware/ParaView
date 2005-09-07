@@ -66,6 +66,8 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   vpw->SetVolumeProperty(vpw_vp);
   vpw->SetWindowLevel(128, 128);
 
+  //vpw->MergeScalarOpacityAndColorEditors();
+  
   vpw_frame->Delete();
   vpw->Delete();
   vpw_cfun->Delete();
