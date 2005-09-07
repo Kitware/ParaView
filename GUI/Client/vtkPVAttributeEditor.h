@@ -14,27 +14,18 @@
 =========================================================================*/
 // .NAME vtkPVAttributeEditor - A special PVSource.
 // .SECTION Description
-// This class will set up defaults for thePVData.
-// It will also create a special PointLabelDisplay.
-// Both of these features should be specified in XML so we
-// can get rid of this special case.
-
+// This class controls interaction with the vtkAttributeEditor
 
 #ifndef __vtkPVAttributeEditor_h
 #define __vtkPVAttributeEditor_h
 
 #include "vtkPVSource.h"
 
-class vtkSMPointLabelDisplay;
-class vtkCollection;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkDataSetAttributes;
-class vtkPVFileEntry;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkCallbackCommand;
-class vtkPVReaderModule;
 
 
 class VTK_EXPORT vtkPVAttributeEditor : public vtkPVSource
@@ -46,30 +37,38 @@ public:
     
   // Description:
   // Set up the UI for this source
+  // In the case of exodus data, widgets that allow the user to save their
+  // edits are packed.
   virtual void CreateProperties();
 
-  void SetPVInput(const char* name, int idx, vtkPVSource *input);
-
-
-  // Description:
-  // Control the visibility of the pick display as well.
-  virtual void SetVisibilityNoTrace(int val);
-
+  // Description: 
+  // Called when the vtkPVSelectWidget is modified that contains options to
+  // pick by a box, sphere, or point widget.
+  // When the sphere widget is active, we want auto-accept to be turned on so
+  // it can be dragged.
   void PickMethodObserver();
 
   // Description:
   // Called when the browse button is pressed.
   void BrowseCallback();
 
+  // Description:
+  // Called when the save button is pressed.
+  // Sends commands to writer via clientserverstream.
+  // Currently only exodus data can be saved.
   void SaveCallback();
-
+ 
+  // Description:
+  // These must be made available to the ProcessEvents function so that 
+  // it can make decisions on what action to take when events occur.
+  void OnChar();
+  void OnTimestepChange();
   vtkGetMacro(EditedFlag,int);
   vtkSetMacro(EditedFlag,int);
   vtkSetMacro(IsScalingFlag,int);
   vtkSetMacro(IsMovingFlag,int);
 
-  void OnChar();
-
+  // Description:
   // Handles the events
   static void ProcessEvents(vtkObject* object, 
                             unsigned long event,
@@ -80,37 +79,28 @@ protected:
   vtkPVAttributeEditor();
   ~vtkPVAttributeEditor();
 
+  // The real AcceptCallback method.
+  virtual void AcceptCallbackInternal();  
+
+  virtual void Select();
+  void UpdateGUI();
+
   vtkClientServerID WriterID;
 
-  vtkCallbackCommand* EventCallbackCommand; //subclasses use one
+  // Listens for keyboard and mouse events
+  vtkCallbackCommand* EventCallbackCommand; 
 
   int IsScalingFlag;
   int IsMovingFlag;
   int EditedFlag;
   int ForceEdit;
-
-  // I am putting this here so that the display is added to the render module
-  // only once.  There may be a better check using the Proxy.
-  int DisplayHasBeenAddedToTheRenderModule;
   
-  vtkSMPointLabelDisplay* PointLabelDisplay;
   vtkKWFrame *Frame;
   vtkKWFrame *DataFrame;
-  vtkKWLabel *LabelWidget;
+  vtkKWLabel *Label;
   vtkKWPushButton *BrowseButton;
   vtkKWPushButton *SaveButton;
   vtkKWEntry *Entry;
-
-  vtkCollection* LabelCollection;
-  virtual void Select();
-  void UpdateGUI();
-  void ClearDataLabels();
-  void InsertDataLabel(const char* label, vtkIdType idx,
-                       vtkDataSetAttributes* attr, double* x=0);
-  int LabelRow;
-
-  // The real AcceptCallback method.
-  virtual void AcceptCallbackInternal();  
 
   vtkPVAttributeEditor(const vtkPVAttributeEditor&); // Not implemented
   void operator=(const vtkPVAttributeEditor&); // Not implemented

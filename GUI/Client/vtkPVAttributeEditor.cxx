@@ -12,27 +12,39 @@ Wylie, Brian
 
 =========================================================================*/
 #include "vtkPVAttributeEditor.h"
+
 #include "vtkObjectFactory.h"
-#include "vtkPVDisplayGUI.h"
-//#include "vtkSMPointLabelDisplay.h"
-#include "vtkPVApplication.h"
+#include "vtkCollectionIterator.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCommand.h"
+#include "vtkClientServerID.h"
+#include "vtkClientServerStream.h"
+
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
-#include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
+
+#include "vtkPVDisplayGUI.h"
+#include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSourceNotebook.h"
 #include "vtkPVWindow.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVSelectWidget.h"
-#include "vtkCallbackCommand.h"
-#include "vtkPVSourceNotebook.h"
-
-
-#include "vtkArrayMap.txx"
+#include "vtkPVReaderModule.h"
+#include "vtkPVLabeledToggle.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVColorMap.h"
+#include "vtkPVWidgetCollection.h"
+#include "vtkPVPickSphereWidget.h"
+#include "vtkPVPickBoxWidget.h"
+#include "vtkPVAnimationManager.h"
+#include "vtkPVAnimationScene.h"
+#include "vtkPVPointWidget.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 
 #include "vtkKWPushButton.h"
 #include "vtkKWEntry.h"
@@ -40,74 +52,16 @@ Wylie, Brian
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
-#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWEvent.h"
-
-#include "vtkObjectFactory.h"
-//#include "vtkPVAnimationInterfaceEntry.h"
-//#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVReaderModule.h"
-#include "vtkPVWindow.h"
-#include "vtkPVXMLElement.h"
-#include "vtkStringList.h"
-#include "vtkCommand.h"
-
-#include "vtkSMStringListDomain.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkPVScale.h"
-//#include "vtkSMPartDisplay.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkPVFieldMenu.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVVectorEntry.h"
-#include "vtkPVColorMap.h"
-#include "vtkClientServerID.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkPVPointWidget.h"
-#include "vtkPVBoxWidget.h"
-#include "vtkPVWidgetCollection.h"
-
-#include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVAdvancedReaderModule.h"
-//#include "vtkPVPointAttributeEditor.h"
-#include "vtkPVPick.h"
-//#include <kwsys/SystemTools.hxx>
-
-#include "vtkPVRenderView.h"
-#include "vtkKWEntry.h"
-#include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
-#include <vtkstd/string>
-
-#include "vtkPVFileEntry.h"
-#include "vtkClientServerStream.h"
-#include "vtkClientServerID.h"
-#include "vtkPVLabeledToggle.h"
-//#include "vtkPVArraySelection.h"
-//#include "vtkPVScale.h"
-#include "vtkCommand.h"
-#include "vtkCallbackCommand.h"
-//#include "vtkKWEvent.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPickSphereWidget.h"
-#include "vtkPVPickBoxWidget.h"
-#include "vtkKWFrameWithScrollbar.h"
-#include "vtkSMDisplayProxy.h"
 #include "vtkKWCheckButton.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkPVAnimationManager.h"
-#include "vtkPVAnimationScene.h"
+#include "vtkKWFrameWithScrollbar.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.2");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -115,7 +69,7 @@ vtkPVAttributeEditor::vtkPVAttributeEditor()
 {
   this->Frame = vtkKWFrame::New();
   this->DataFrame = vtkKWFrame::New();
-  this->LabelWidget = vtkKWLabel::New();
+  this->Label = vtkKWLabel::New();
   this->Entry = vtkKWEntry::New();
   this->BrowseButton = vtkKWPushButton::New();
   this->SaveButton = vtkKWPushButton::New();
@@ -142,8 +96,8 @@ vtkPVAttributeEditor::~vtkPVAttributeEditor()
   this->SaveButton = NULL;
   this->Entry->Delete();
   this->Entry = NULL;
-  this->LabelWidget->Delete();
-  this->LabelWidget = NULL;
+  this->Label->Delete();
+  this->Label = NULL;
   this->Frame->Delete();
   this->Frame = NULL;
 
@@ -151,12 +105,6 @@ vtkPVAttributeEditor::~vtkPVAttributeEditor()
   this->EventCallbackCommand->SetCallback(0);
   this->EventCallbackCommand->Delete();
   this->EventCallbackCommand = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAttributeEditor::SetVisibilityNoTrace(int val)
-{
-  this->Superclass::SetVisibilityNoTrace(val);
 }
 
 
@@ -169,17 +117,23 @@ void vtkPVAttributeEditor::CreateProperties()
   this->Superclass::CreateProperties();
 
   // listen for the following events
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::CharEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonPressEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::RightButtonReleaseEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetInteractor()->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-  this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+  vtkPVGenericRenderWindowInteractor *interactor = this->GetPVWindow()->GetInteractor();
+  if(interactor)
+    {
+    interactor->AddObserver(vtkCommand::CharEvent, this->EventCallbackCommand, 1);
+    interactor->AddObserver(vtkCommand::RightButtonPressEvent, this->EventCallbackCommand, 1);
+    interactor->AddObserver(vtkCommand::RightButtonReleaseEvent, this->EventCallbackCommand, 1);
+    interactor->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, 1);
+    interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
+    // Currently only a timestep change from the animation manager will prompt the user to save changes:
+    this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+    this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+    }
 
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
   select->SetModifiedCommand(this->GetTclName(),"PickMethodObserver");
 
+  // If this is not exodus data, do not pack the saving widgets
   vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
   if(mod ==NULL || strcmp(mod->GetModuleName(),"ExodusReader")!=0)
     {
@@ -189,28 +143,21 @@ void vtkPVAttributeEditor::CreateProperties()
   this->Frame->SetParent(this->ParameterFrame->GetFrame());
   this->Frame->Create(pvApp);
 
-  this->LabelWidget->SetParent(this->Frame);
+  this->Label->SetParent(this->Frame);
   this->Entry->SetParent(this->Frame);
   this->BrowseButton->SetParent(this->Frame);
   this->SaveButton->SetParent(this->Frame);
   
   // Now a label
-  this->LabelWidget->Create(pvApp);
-  this->LabelWidget->SetText("Filename");
-  this->LabelWidget->SetJustificationToRight();
-  this->LabelWidget->SetWidth(18);
-  this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
+  this->Label->Create(pvApp);
+  this->Label->SetText("Filename");
+  this->Label->SetJustificationToRight();
+  this->Label->SetWidth(18);
+  this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the entry
   this->Entry->Create(pvApp);
   this->Entry->SetValue(this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetValue());
-//  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-//               this->Entry->GetWidgetName(), this->GetTclName());
-//  this->Entry->BindCommand(this, "EntryChangedCallback");
-  // Change the order of the bindings so that the
-  // modified command gets called after the entry changes.
-//  this->Script("bindtags %s [concat Entry [lreplace [bindtags %s] 1 1]]", 
-//               this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
   
@@ -223,18 +170,11 @@ void vtkPVAttributeEditor::CreateProperties()
   this->SaveButton->Create(pvApp);
   this->SaveButton->SetText("Save");
   this->SaveButton->SetCommand(this, "SaveCallback");
-//  this->SaveButton->SetStateOption(0);
 
-  if (this->BalloonHelpString)
-    {
-    this->SetBalloonHelpString(this->BalloonHelpString);
-    }
   this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
   this->Script("pack %s -side left", this->SaveButton->GetWidgetName());
-//  this->Script("pack %s -fill both -expand 1", frame->GetWidgetName());
   this->Script("pack %s -pady 10 -side top -fill x -expand t", 
                 this->Frame->GetWidgetName());
-
 
   this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
   this->DataFrame->Create(pvApp);
@@ -247,20 +187,21 @@ void vtkPVAttributeEditor::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::BrowseCallback()
 {
-
   ostrstream str;
-  vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* saveDialog;
   const char* fname = this->Entry->GetValue();
 
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVWindow* win = 0;
-  if (pvApp)
+  if (!pvApp)
     {
-    win = pvApp->GetMainWindow();
+    return;
     }
 
-    saveDialog->SetLastPath(fname);
+  saveDialog = pvApp->NewLoadSaveDialog();
+  win = pvApp->GetMainWindow();
 
+  saveDialog->SetLastPath(fname);
   saveDialog->Create(this->GetPVApplication());
   if (win) 
     { 
@@ -268,10 +209,11 @@ void vtkPVAttributeEditor::BrowseCallback()
     }
   saveDialog->SaveDialogOn();
   saveDialog->SetTitle("Select File");
-  if(this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetExtension())
+  char *ext = this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetExtension();
+  if(ext)
     {
-    saveDialog->SetDefaultExtension(this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetExtension());
-    str << "{{} {." << this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetExtension() << "}} ";
+    saveDialog->SetDefaultExtension(ext);
+    str << "{{} {." << ext << "}} ";
     }
   str << "{{All files} {*}}" << ends;  
   saveDialog->SetFileTypes(str.str());
@@ -281,37 +223,43 @@ void vtkPVAttributeEditor::BrowseCallback()
     this->Script("%s SetValue {%s}", this->Entry->GetTclName(),
                  saveDialog->GetFileName());
     }
-  saveDialog->Delete();
 
+  saveDialog->Delete();
 }
 
 
 void vtkPVAttributeEditor::SaveCallback()
 {
-  char *srcName = new char[250];
+  vtkClientServerStream stream;
+  int ghostLevel = 1;
+  int editorFlag = 1;
 
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  if(!pm)
+    {
+    return;
+    }
+
+  vtkPVArrayMenu *array = vtkPVArrayMenu::SafeDownCast(this->GetPVWidget("Scalars"));
+  if(!array)
+    {
+    return;
+    }
+
+  // Send the source input to the output instead of the filter input so that the whole dataset gets written:
   vtkPVLabeledToggle *unfilteredFlag = vtkPVLabeledToggle::SafeDownCast(this->GetPVWidget("UnfilteredDataset"));
   unfilteredFlag->SetSelectedState(1);
   this->AcceptCallback();
-  
-  sprintf(srcName,"%s",this->Entry->GetValue());
-
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkPVArrayMenu *array = vtkPVArrayMenu::SafeDownCast(this->GetPVWidget("Scalars"));
-
-  int ghostLevel = 1;
 
   if(this->WriterID.ID==0)
     {
     this->WriterID = pm->NewStreamObject("vtkExodusIIWriter",stream);
     }
 
-//  vtkClientServerID dataID = this->GetPart(1)->GetID(0);
   vtkClientServerID dataID = this->GetPart()->GetID(0);
+
   stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetFileName" << srcName
+                  << this->WriterID << "SetFileName" << this->Entry->GetValue()
                   << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
                   << this->WriterID << "SetInput" << dataID
@@ -320,7 +268,7 @@ void vtkPVAttributeEditor::SaveCallback()
                   << this->WriterID << "SetGhostLevel" << ghostLevel
                   << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetEditorFlag" << 1
+                  << this->WriterID << "SetEditorFlag" << editorFlag
                   << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
                   << this->WriterID << "SetEditedVariableName" << array->GetValue()
@@ -333,18 +281,15 @@ void vtkPVAttributeEditor::SaveCallback()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
-
   pm->DeleteStreamObject(this->WriterID, stream);
   pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   this->WriterID.ID = 0;
 
+  // turn the filter view back on
   unfilteredFlag->SetSelectedState(0);
   this->AcceptCallback();
 
   this->EditedFlag = 0;
-
-  delete [] srcName;
-
 }
 
 
@@ -394,25 +339,7 @@ void vtkPVAttributeEditor::ProcessEvents(vtkObject* vtkNotUsed(object),
       leftup = 1;
       break;
     case vtkKWEvent::TimeChangedEvent:
-      if(self->GetEditedFlag())
-        {
-        if ( vtkKWMessageDialog::PopupYesNo(
-              self->GetPVApplication(), self->GetPVWindow(), "UnsavedChanges",
-              "Save Changes?", 
-              "Would you like to save the changes you have made to the current time step in the Attribute Editor filter before continuing?", 
-              vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
-              vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
-          {
-          self->SaveCallback();  
-          }
-        self->SetEditedFlag(0);
-        }
-
-      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-        self->GetProxy()->GetProperty("EditMode"));
-      ivp->SetElements1(0);
-      self->GetProxy()->UpdateVTKObjects();
-
+      self->OnTimestepChange();
       break;
     }
 
@@ -431,13 +358,40 @@ void vtkPVAttributeEditor::ProcessEvents(vtkObject* vtkNotUsed(object),
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVAttributeEditor::OnTimestepChange()
+{
+  if(this->GetEditedFlag())
+    {
+    if ( vtkKWMessageDialog::PopupYesNo(
+          this->GetPVApplication(), this->GetPVWindow(), "UnsavedChanges",
+          "Save Changes?", 
+          "Would you like to save the changes you have made to the current time step in the Attribute Editor filter before continuing?", 
+          vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
+          vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
+      {
+      this->SaveCallback();  
+      }
+    this->SetEditedFlag(0);
+    }
+
+  // This ensures the currently selected region won't be edited in the new timestep:
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProxy()->GetProperty("EditMode"));
+  ivp->SetElements1(0);
+  this->GetProxy()->UpdateVTKObjects();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::OnChar()
 {
   if (this->GetPVWindow()->GetInteractor()->GetKeyCode() == 'e' ||
       this->GetPVWindow()->GetInteractor()->GetKeyCode() == 'E' )
     {
+    // This is a hack to make accept think its been modified:
     this->Notebook->SetAcceptButtonColorToModified();
+    // We want filter to edit no matter what (i.e. even if some pvwidget's state has changed)
     this->ForceEdit = 1;
     this->AcceptCallback();
     this->ForceEdit = 0;
@@ -447,7 +401,6 @@ void vtkPVAttributeEditor::OnChar()
   else if (this->GetPVWindow()->GetInteractor()->GetKeyCode() == 't' ||
       this->GetPVWindow()->GetInteractor()->GetKeyCode() == 'T' )
     {
-    // should be a child of current reader module
     vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
     vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
     vtkPVPickSphereWidget *sphere = vtkPVPickSphereWidget::SafeDownCast(select->GetPVWidget("'e'dit within a draggable sphere"));
@@ -466,11 +419,6 @@ void vtkPVAttributeEditor::OnChar()
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVAttributeEditor::SetPVInput(const char* vtkNotUsed(name), int vtkNotUsed(idx), vtkPVSource *pvs)
-{
-  this->AddPVInput(pvs);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::AcceptCallbackInternal()
@@ -478,12 +426,14 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
   int editFlag = 1;
   int inputModified = 0;
 
+  // If this is the first time accept has been called on this source, make sure not to edit
   if(!this->GetInitialized())
     {
     editFlag = 0;
     }
   else
     {
+    // If any of the pvwidgets except the box/point/sphere have been modified, don't edit
     vtkPVWidgetCollection *col = this->GetWidgets();
     if(col)
       {
@@ -522,12 +472,13 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
     {
     editFlag = 1;
     }
-
+  
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProxy()->GetProperty("EditMode"));
   ivp->SetElements1(editFlag);
   this->GetProxy()->UpdateVTKObjects();
 
+  // Has this source been edited yet?
   if(this->EditedFlag==0)
     {
     this->EditedFlag = editFlag;
@@ -550,7 +501,11 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
       box->ActualPlaceWidget();
       }
 
-    this->Entry->SetValue(this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetValue());
+    vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
+    if(mod)
+      {
+      this->Entry->SetValue(mod->GetFileEntry()->GetValue());
+      }
     }
 }
 
@@ -560,15 +515,18 @@ void vtkPVAttributeEditor::Select()
 {
   vtkPVSource *input, *source;
 
-  vtkPVInputMenu *inputMenu1 = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Input"));
-  input = inputMenu1->GetCurrentValue();
-  vtkPVInputMenu *inputMenu2 = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Source"));
-  source = inputMenu2->GetCurrentValue();
+  vtkPVInputMenu *filterInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Input"));
+  input = filterInput->GetCurrentValue();
+  vtkPVInputMenu *sourceInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Source"));
+  source = sourceInput->GetCurrentValue();
 
   this->Superclass::Select();
 
-  inputMenu1->SetCurrentValue(input);
-  inputMenu2->SetCurrentValue(source);
+  // Initialize the inputs when the source is selected in the selection window. 
+  // This is kindof a hack because the state of the input menus was not being maintained
+  // when returning to this source
+  filterInput->SetCurrentValue(input);
+  sourceInput->SetCurrentValue(source);
   this->AcceptCallback();
 }
 
