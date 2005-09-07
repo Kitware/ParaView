@@ -160,8 +160,7 @@ animation_widget SetRenderWidget rw
 animation_widget SetAnimationTypeToSlice
 animation_widget SetSliceSetCommand viewer "SetSlice"
 animation_widget SetSliceGetCommand viewer "GetSlice"
-animation_widget SetSliceGetMinCommand viewer "GetSliceMin"
-animation_widget SetSliceGetMaxCommand viewer "GetSliceMax"
+animation_widget SetSliceGetMinAndMaxCommands viewer "GetSliceMin" "GetSliceMax"
 
 pack [animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
 

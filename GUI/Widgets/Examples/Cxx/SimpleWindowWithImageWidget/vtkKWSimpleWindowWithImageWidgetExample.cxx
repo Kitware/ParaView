@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.4");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.5");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -200,8 +200,8 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   animation_widget->SetAnimationTypeToSlice();
   animation_widget->SetSliceSetCommand(this, "SetSliceCallback");
   animation_widget->SetSliceGetCommand(this, "GetSliceCallback");
-  animation_widget->SetSliceGetMinCommand(this, "GetSliceMinCallback");
-  animation_widget->SetSliceGetMaxCommand(this, "GetSliceMaxCallback");
+  animation_widget->SetSliceGetMinAndMaxCommands(
+    this, "GetSliceMinCallback", "GetSliceMaxCallback");
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x",
               animation_widget->GetWidgetName());

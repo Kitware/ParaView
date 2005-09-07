@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -1155,10 +1155,17 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetCommand()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::SetSliceGetMinCommand(
-  vtkObject *object, const char *method)
+void vtkKWSimpleAnimationWidget::SetSliceGetMinAndMaxCommands(
+  vtkObject *object, const char *get_min_method, const char *get_max_method)
 {
-  this->SetObjectMethodCommand(&this->SliceGetMinCommand, object, method);
+  // They have to be set at the same time, otherwise Update() will try to
+  // call get_min while get_max is still referring to a potentially non-
+  // existing object.
+
+  this->SetObjectMethodCommand(
+    &this->SliceGetMinCommand, object, get_min_method);
+  this->SetObjectMethodCommand(
+    &this->SliceGetMaxCommand, object, get_max_method);
   this->Update();
 }
 
@@ -1171,14 +1178,6 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetMinCommand()
     return atoi(this->Script("eval %s", this->SliceGetMinCommand));
     }
   return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::SetSliceGetMaxCommand(
-  vtkObject *object, const char *method)
-{
-  this->SetObjectMethodCommand(&this->SliceGetMaxCommand, object, method);
-  this->Update();
 }
 
 //----------------------------------------------------------------------------

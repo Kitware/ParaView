@@ -90,13 +90,13 @@ public:
   virtual int InvokeSliceGetCommand();
 
   // Description:
-  // Set the command to invoke to get the minimum and maximum value of the
+  // Set the commands to invoke to get the minimum and maximum value of the
   // slice range from an external object when the animation is in 'slice' mode.
   // These commands should return an int (the min and max).
   // These commands are mandatory for the slice animation to work.
-  virtual void SetSliceGetMinCommand(vtkObject *object, const char *method);
+  virtual void SetSliceGetMinAndMaxCommands(
+    vtkObject *object, const char *get_min_method, const char *get_max_method);
   virtual int InvokeSliceGetMinCommand();
-  virtual void SetSliceGetMaxCommand(vtkObject *object, const char *method);
   virtual int InvokeSliceGetMaxCommand();
 
   // Description:
