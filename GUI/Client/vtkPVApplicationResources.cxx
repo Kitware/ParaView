@@ -475,7 +475,7 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVAttributeEditor_width,
     image_PVAttributeEditor_height,
     image_PVAttributeEditor_pixel_size,
-    image_PVAttributeEditor_buffer_length);
+    image_PVAttributeEditor_length);
 }
 
 //----------------------------------------------------------------------------
