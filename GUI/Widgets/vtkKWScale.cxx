@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.105");
+vtkCxxRevisionMacro(vtkKWScale, "1.106");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -269,8 +269,11 @@ void vtkKWScale::SetRange(double min, double max)
 //----------------------------------------------------------------------------
 void vtkKWScale::UpdateRange()
 {
-  this->SetConfigurationOptionAsDouble("-from", this->Range[0]);
-  this->SetConfigurationOptionAsDouble("-to", this->Range[1]);
+  if (this->IsCreated())
+    {
+    this->SetConfigurationOptionAsDouble("-from", this->Range[0]);
+    this->SetConfigurationOptionAsDouble("-to", this->Range[1]);
+    }
 }
 
 //----------------------------------------------------------------------------
