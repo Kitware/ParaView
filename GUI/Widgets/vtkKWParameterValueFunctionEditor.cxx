@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.62");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.63");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -5185,7 +5185,10 @@ int vtkKWParameterValueFunctionEditor::FunctionLineIsInVisibleRangeBetweenPoints
 
   // Check
 
-  return (x2 < c_x1 || c_x2 < x1 || y2 < c_y1 || c_y2 < y1) ? 0 : 1;
+  return (x2 + margin < c_x1 || 
+          c_x2 < x1 - margin || 
+          y2 + margin < c_y1 || 
+          c_y2 < y1 - margin) ? 0 : 1;
 }
 
 //----------------------------------------------------------------------------

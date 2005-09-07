@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.36");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -507,7 +507,7 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionSharpness(
 
 //----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
-  int id1, int id2)
+  int id1, int vtkNotUsed(id2))
 {
   if (!this->HasFunction() || id1 < 0 || id1 >= this->GetFunctionSize())
     {

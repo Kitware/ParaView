@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.2");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -592,7 +592,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     p = p1 + (p2 - p1) * midpoint;
     this->GetFunctionPointCanvasCoordinatesAtParameter(p, x, y);
 
-    r = this->PointRadius * 0.75;
+    r = (int)((double)this->PointRadius * 0.75);
 
     // If the midpoint is not in the visible range, hide it
 
