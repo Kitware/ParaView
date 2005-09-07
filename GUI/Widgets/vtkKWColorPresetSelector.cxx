@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.17");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.18");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -649,7 +649,9 @@ void vtkKWColorPresetSelector::PresetSelectedCallback(const char *name)
   if (this->ApplyPresetBetweenEndPoints &&
       this->ColorTransferFunction->GetSize() >= 2)
     {
-    this->ColorTransferFunction->GetRange(scalar_range);
+    double *ctfun_range = this->ColorTransferFunction->GetRange();
+    scalar_range[0] = ctfun_range[0];
+    scalar_range[1] = ctfun_range[1];
     }
   else
     {
