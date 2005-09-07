@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.38");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.39");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -322,8 +322,8 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::InitializeObservers(vtkObject* object)
 {
-  this->Observe(object, vtkKWParameterValueFunctionEditor::PointMovedEvent);
-  this->Observe(object, vtkKWParameterValueFunctionEditor::PointMovingEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::PointChangedEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::PointChangingEvent);
   this->Observe(object, vtkKWParameterValueFunctionEditor::SelectionChangedEvent);
   this->Observe(object, vtkKWEvent::FocusInEvent);
   this->Observe(object, vtkKWEvent::FocusOutEvent);

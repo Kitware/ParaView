@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.17");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.18");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -349,8 +349,8 @@ void vtkPVAnimationCueTree::ExecuteEvent(vtkObject* wdg, unsigned long event, vo
     }
   else if (this->ScaleChildrenOnEndPointsChange && 
     vtkPVTimeLine::SafeDownCast(wdg) && (
-      event == vtkKWParameterValueFunctionEditor::PointMovedEvent ||
-      event == vtkKWParameterValueFunctionEditor::PointMovingEvent ))
+      event == vtkKWParameterValueFunctionEditor::PointChangedEvent ||
+      event == vtkKWParameterValueFunctionEditor::PointChangingEvent ))
     {
     // scale all the children.
     double new_bounds[2];
