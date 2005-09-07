@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.35");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -422,28 +422,6 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointColorInCanvas(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
-  int id1, int id2)
-{
-  if (!this->HasFunction() || id1 < 0 || id1 >= this->GetFunctionSize())
-    {
-    return 0;
-    }
-
-  // If sharpness == 0.0 and mid-point = 0.5, then it's the good 
-  // old piecewise linear and we do not need to sample, the default
-  // superclass implementation (staight line between id1 and id2) is fine
-
-  double midpoint, sharpness;
-  if (this->GetFunctionMidPoint(id1, &midpoint) &&
-      this->GetFunctionSharpness(id1, &sharpness))
-    {
-    return (sharpness == 0.0 && midpoint == 0.5) ? 0 : 1;
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::GetFunctionMidPoint(
   int id, double *pos)
 {
@@ -525,6 +503,28 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionSharpness(
     node_value[0], node_value[1], node_value[2], sharpness);
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
+  int id1, int id2)
+{
+  if (!this->HasFunction() || id1 < 0 || id1 >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  // If sharpness == 0.0 and mid-point = 0.5, then it's the good 
+  // old piecewise linear and we do not need to sample, the default
+  // superclass implementation (staight line between id1 and id2) is fine
+
+  double midpoint, sharpness;
+  if (this->GetFunctionMidPoint(id1, &midpoint) &&
+      this->GetFunctionSharpness(id1, &sharpness))
+    {
+    return (sharpness == 0.0 && midpoint == 0.5) ? 0 : 1;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
