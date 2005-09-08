@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -57,9 +57,7 @@ vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::~vtkKWVolumeMaterialPropertyWidget()
 {
-  this->SetVolumeProperty(NULL);
-
-  if (this->ComponentSelectionWidget)
+   if (this->ComponentSelectionWidget)
     {
     this->ComponentSelectionWidget->Delete();
     this->ComponentSelectionWidget = NULL;
@@ -70,6 +68,8 @@ vtkKWVolumeMaterialPropertyWidget::~vtkKWVolumeMaterialPropertyWidget()
     this->EnableShadingCheckButton->Delete();
     this->EnableShadingCheckButton = NULL;
     }
+
+  this->SetVolumeProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -213,8 +213,10 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
       this->EnableShadingCheckButton->GetWidget()->SetSelectedState(
         this->VolumeProperty->GetShade(this->SelectedComponent));
       }
-    this->EnableShadingCheckButton->SetEnabled(
-      this->VolumeProperty ? 0 : this->GetEnabled());
+    else
+      {
+      this->EnableShadingCheckButton->SetEnabled(0);
+      }
     }
 
   // Parameters
@@ -288,6 +290,7 @@ void vtkKWVolumeMaterialPropertyWidget::SetAllowEnableShading(int arg)
   this->Modified();
 
   this->Pack();
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
