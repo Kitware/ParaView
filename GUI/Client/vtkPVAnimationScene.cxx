@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.57");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.58");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1196,22 +1196,27 @@ void vtkPVAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 // Define possible mangled names.
 int vtkPVAnimationScene::GetTickCount()
 {
-  return this->GetCurrentTime();
+  VTK_LEGACY_REPLACED_BODY(vtkPVAnimationScene::GetCurrentTime, "ParaView 2.4",
+                           vtkPVAnimationScene::GetAnimationTime);
+  return this->GetAnimationTime();
 }
 # endif
 double vtkPVAnimationScene::GetCurrentTime()
 {
-  vtkGenericWarningMacro("vtkPVAnimationScene::GetCurrentTime was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::GetAnimationTime instead.");
+  VTK_LEGACY_REPLACED_BODY(vtkPVAnimationScene::GetCurrentTime, "ParaView 2.4",
+                           vtkPVAnimationScene::GetAnimationTime);
   return this->GetAnimationTime();
 }
 void vtkPVAnimationScene::SetCurrentTime(double time)
 {
-  vtkGenericWarningMacro("vtkPVAnimationScene::SetCurrentTime was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::SetAnimationTime instead.");
+  VTK_LEGACY_REPLACED_BODY(vtkPVAnimationScene::SetCurrentTime, "ParaView 2.4",
+                           vtkPVAnimationScene::SetAnimationTime);
   this->SetAnimationTime(time);
 }
 void vtkPVAnimationScene::SetCurrentTimeWithTrace(double time)
 {
-  vtkGenericWarningMacro("vtkPVAnimationScene::SetCurrentTimeWithTrace was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::SetAnimationTimeWithTrace instead.");
+  VTK_LEGACY_REPLACED_BODY(vtkPVAnimationScene::SetCurrentTimeWithTrace, "ParaView 2.4",
+                           vtkPVAnimationScene::SetAnimationTimeWithTrace);
   this->SetAnimationTimeWithTrace(time);
 }
 #endif
