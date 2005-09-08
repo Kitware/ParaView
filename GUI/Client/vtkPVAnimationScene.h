@@ -98,34 +98,24 @@ public:
   void SetLoop(int loop);
   void SetLoopWithTrace(int loop);
   int GetLoop();
-  
+
   // Description:
   // Sets the current time for the animation state.
   // Note that this time is not normalized time. It extends from
   // [0, Duration].
-  void SetCurrentTime( double time);
-  void SetCurrentTimeWithTrace(double time);
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-  // Avoid windows name mangling.
-#define GetTickCount() GetCurrentTime()
-#endif
-  // Description:
-  // Get the current animation time step.
-  double GetCurrentTime();
-  
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-# undef GetTickCount
-  //BTX
-  int GetTickCount();
-  //ETX
-#endif
+  void SetAnimationTime( double time);
+  void SetAnimationTimeWithTrace(double time);
 
   // Description:
-  // Sets the current time for the animation state. 
-  // This is normalized time [0,1], normalized to the duration 
+  // Get the current animation time step.
+  double GetAnimationTime();
+
+  // Description:
+  // Sets the current time for the animation state.
+  // This is normalized time [0,1], normalized to the duration
   // of the scene.
-  void SetNormalizedCurrentTime(double ntime);
-  double GetNormalizedCurrentTime();
+  void SetNormalizedAnimationTime(double ntime);
+  double GetNormalizedAnimationTime();
 
   // Description:
   // Add/Remove animation cues from the scene. PVAnimationCues are not
@@ -189,6 +179,33 @@ public:
   // to reflect the playing state.
   void OnBeginPlay();
   void OnEndPlay();
+
+  // -------------------------------------------------------------------------
+
+  // Description:
+  // @deprecated Replaced by vtkPVAnimationScene::SetAnimationTime().
+  VTK_LEGACY(void SetCurrentTime( double time));
+
+  // Description:
+  // @deprecated Replaced by vtkPVAnimationScene::SetAnimationTimeWithTrace().
+  VTK_LEGACY(void SetCurrentTimeWithTrace(double time));
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+#define GetTickCount() GetCurrentTime()
+#endif
+  // Description:
+  // @deprecated Replaced by vtkPVAnimationScene::GetAnimationTime().
+  VTK_LEGACY(double GetCurrentTime());
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetTickCount
+  //BTX
+  int GetTickCount();
+  //ETX
+#endif
+
+  // -------------------------------------------------------------------------
+
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();

@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.18");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.19");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -790,7 +790,7 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
     {
     // Don't do this since it disturbs the entire system.
     // Issues with domain sync are as such not addressed fully by doing this.
-    // pvAM->SetCurrentTime(time);
+    // pvAM->SetAnimationTime(time);
     }
   
   vtkPVKeyFrame* keyframe = this->CreateNewKeyFrameAndInit(type);

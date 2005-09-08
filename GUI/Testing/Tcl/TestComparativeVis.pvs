@@ -166,7 +166,7 @@ $kw(vtkTemp555) SetDuration 10
 $kw(vtkTemp555) SetPlayMode 0
 $kw(vtkTemp555) SetFrameRate 1
 $kw(vtkTemp555) SetLoop 0
-$kw(vtkTemp555) SetCurrentTime 0
+$kw(vtkTemp555) SetAnimationTime 0
 $kw(vtkTemp1) SetCenterOfRotation 0 0 0
 
 # Comparative visualizations

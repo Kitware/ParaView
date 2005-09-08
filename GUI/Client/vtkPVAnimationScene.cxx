@@ -57,10 +57,6 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-
-// Some header file is defining CurrentTime so undef it
-#undef CurrentTime
-
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
 #endif
@@ -72,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.56");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.57");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -527,9 +523,9 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
       double etime = this->AnimationSceneProxy->GetEndTime();
       double stime = this->AnimationSceneProxy->GetStartTime();
       double ntime = 
-        (etime==stime)?  0 : (cueInfo->CurrentTime - stime) / (etime - stime);
+        (etime==stime)?  0 : (cueInfo->AnimationTime - stime) / (etime - stime);
       this->AnimationManager->SetTimeMarker(ntime);
-      this->TimeScale->SetValue(cueInfo->CurrentTime);
+      this->TimeScale->SetValue(cueInfo->AnimationTime);
       if (this->RenderView)
         {
         this->RenderView->GetCornerAnnotation()->UpdateCornerText();
@@ -604,7 +600,7 @@ void vtkPVAnimationScene::SetDuration(double duration)
     {
     duration = this->GetDuration();
     }
-  double ntime = this->GetNormalizedCurrentTime();
+  double ntime = this->GetNormalizedAnimationTime();
 
   double end_time = (this->InterpretDurationAsFrameMax)? (duration -1) : duration;
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", end_time);
@@ -705,7 +701,7 @@ void vtkPVAnimationScene::Stop()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::GoToBeginning()
 {
-  this->SetCurrentTimeWithTrace(0);
+  this->SetAnimationTimeWithTrace(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -715,7 +711,7 @@ void vtkPVAnimationScene::GoToEnd()
     {
     return;
     }
-  this->SetCurrentTimeWithTrace(this->AnimationSceneProxy->GetEndTime());
+  this->SetAnimationTimeWithTrace(this->AnimationSceneProxy->GetEndTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -731,7 +727,7 @@ void vtkPVAnimationScene::GoToNext()
   newtime = (newtime > duration) ? duration : newtime;
   if (newtime != time)
     {
-    this->SetCurrentTimeWithTrace(newtime);
+    this->SetAnimationTimeWithTrace(newtime);
     }
 }
 
@@ -747,7 +743,7 @@ void vtkPVAnimationScene::GoToPrevious()
   newtime = (newtime < 0) ? 0 : newtime;
   if (newtime != time)
     {
-    this->SetCurrentTimeWithTrace(newtime); 
+    this->SetAnimationTimeWithTrace(newtime); 
     }
 }
 
@@ -1000,15 +996,15 @@ int vtkPVAnimationScene::GetLoop()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::SetCurrentTimeWithTrace(double time)
+void vtkPVAnimationScene::SetAnimationTimeWithTrace(double time)
 {
-  this->SetCurrentTime(time);
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTimeWithTrace %f", 
+  this->SetAnimationTime(time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetAnimationTimeWithTrace %f", 
     this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::SetCurrentTime(double time)
+void vtkPVAnimationScene::SetAnimationTime(double time)
 {
   if (!this->IsCreated())
     {
@@ -1033,42 +1029,32 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
 }
 
 //-----------------------------------------------------------------------------
-#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
-# undef GetCurrentTime
-// Define possible mangled names.
-int vtkPVAnimationScene::GetTickCount()
-{
-  return this->GetCurrentTime();
-}
-#endif
-
-//-----------------------------------------------------------------------------
-double vtkPVAnimationScene::GetCurrentTime()
+double vtkPVAnimationScene::GetAnimationTime()
 {
   return this->TimeScale->GetValue();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::SetNormalizedCurrentTime(double ntime)
+void vtkPVAnimationScene::SetNormalizedAnimationTime(double ntime)
 {
   if (!this->IsCreated())
     {
     vtkErrorMacro("Scene has not been created yet.");
     return;
-    } 
-  this->SetCurrentTime(ntime * this->GetDuration());
+    }
+  this->SetAnimationTime(ntime * this->GetDuration());
 }
 
 //-----------------------------------------------------------------------------
-double vtkPVAnimationScene::GetNormalizedCurrentTime()
+double vtkPVAnimationScene::GetNormalizedAnimationTime()
 {
-  return (this->GetCurrentTime() / this->GetDuration());
+  return (this->GetAnimationTime() / this->GetDuration());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::TimeScaleCallback()
 {
-  this->SetCurrentTimeWithTrace(this->TimeScale->GetValue());
+  this->SetAnimationTimeWithTrace(this->TimeScale->GetValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -1172,7 +1158,7 @@ void vtkPVAnimationScene::SaveState(ofstream* file)
 
   // NOTE: scene doesn't bother adding the cues, the cue add themselves 
   // to the scene.
-  *file << "$kw(" << this->GetTclName() << ") SetCurrentTime " << 
+  *file << "$kw(" << this->GetTclName() << ") SetAnimationTime " << 
     this->TimeScale->GetValue() << endl;
   
   //TODO: add all the addded cues and then set the current time.
@@ -1202,3 +1188,30 @@ void vtkPVAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Window: " << this->Window << endl;
   os << indent << "AnimationManager: " << this->AnimationManager << endl;
 }
+
+//-----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
+# ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+#  undef GetCurrentTime
+// Define possible mangled names.
+int vtkPVAnimationScene::GetTickCount()
+{
+  return this->GetCurrentTime();
+}
+# endif
+double vtkPVAnimationScene::GetCurrentTime()
+{
+  vtkGenericWarningMacro("vtkPVAnimationScene::GetCurrentTime was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::GetAnimationTime instead.");
+  return this->GetAnimationTime();
+}
+void vtkPVAnimationScene::SetCurrentTime(double time)
+{
+  vtkGenericWarningMacro("vtkPVAnimationScene::SetCurrentTime was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::SetAnimationTime instead.");
+  this->SetAnimationTime(time);
+}
+void vtkPVAnimationScene::SetCurrentTimeWithTrace(double time)
+{
+  vtkGenericWarningMacro("vtkPVAnimationScene::SetCurrentTimeWithTrace was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationScene::SetAnimationTimeWithTrace instead.");
+  this->SetAnimationTimeWithTrace(time);
+}
+#endif

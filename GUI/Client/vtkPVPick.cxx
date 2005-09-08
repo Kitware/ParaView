@@ -57,8 +57,6 @@
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkSMIntVectorProperty.h"
-// Some header file is defining CurrentTime so undef it
-#undef CurrentTime
 #include "vtkAnimationCue.h"
 
 #include <vtkstd/string>
@@ -66,7 +64,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.24");
+vtkCxxRevisionMacro(vtkPVPick, "1.25");
 
 
 //*****************************************************************************
@@ -104,7 +102,7 @@ public:
             vtkAnimationCue::AnimationCueInfo*>(calldata);
           vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateTick"));
-          if (prop) prop->SetElement(0, cueInfo->CurrentTime);
+          if (prop) prop->SetElement(0, cueInfo->AnimationTime);
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -505,7 +503,7 @@ void vtkPVPick::AcceptCallbackInternal()
 
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
-    double currTime = animScene->GetCurrentTime();
+    double currTime = animScene->GetAnimationTime();
 
     vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateTick"));

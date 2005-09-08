@@ -1232,7 +1232,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetPlayMode 0
   $extract(vtkTemp480) SetFrameRate 1
   $extract(vtkTemp480) SetLoop 0
-  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) SetAnimationTime 0
   $extract(vtkTemp480) Play
   
   $extract(vtkTemp826) RemoveAllKeyFrames
@@ -1265,7 +1265,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetPlayMode 0
   $extract(vtkTemp480) SetFrameRate 1
   $extract(vtkTemp480) SetLoop 0
-  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) SetAnimationTime 0
    $extract(vtkTemp480) Play
   
   $extract(vtkTemp830) RemoveAllKeyFrames
@@ -1299,7 +1299,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetPlayMode 0
   $extract(vtkTemp480) SetFrameRate 1
   $extract(vtkTemp480) SetLoop 0
-  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) SetAnimationTime 0
    $extract(vtkTemp480) Play
   
   $extract(vtkTemp830) RemoveAllKeyFrames
@@ -1339,7 +1339,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetPlayMode 0
   $extract(vtkTemp480) SetFrameRate 1
   $extract(vtkTemp480) SetLoop 0
-  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) SetAnimationTime 0
   $extract(vtkTemp480) Play
 
 
@@ -1359,7 +1359,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetPlayMode 0
   $extract(vtkTemp480) SetFrameRate 1
   $extract(vtkTemp480) SetLoop 0
-  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) SetAnimationTime 0
   $extract(vtkTemp480) Play
 
   $extract(vtkTemp780) SetVisibility 0
@@ -1532,7 +1532,7 @@ proc iso_run {} {
   $iso(vtkTemp480) SetFrameRate 1
   $iso(vtkTemp480) SetLoop 0
   for {set i 0} {$i <= [expr 60 / $speed]} {incr i} {
-    $iso(vtkTemp480) SetCurrentTime $i
+    $iso(vtkTemp480) SetAnimationTime $i
     DemoAfter 50
     if $pvDemoShouldStop {
       return

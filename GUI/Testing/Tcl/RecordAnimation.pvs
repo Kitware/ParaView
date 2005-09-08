@@ -45,7 +45,7 @@ $kw(vtkTemp539) StopRecording
 $kw(vtkTemp4) ShowAnimationPanes
 $kw(vtkTemp539) SetDurationWithTrace 21
 $kw(vtkTemp539) Play
-$kw(vtkTemp539) SetCurrentTimeWithTrace 17
+$kw(vtkTemp539) SetAnimationTimeWithTrace 17
 
 #update
 source [file join [file dirname [info script]] Compare.tcl]

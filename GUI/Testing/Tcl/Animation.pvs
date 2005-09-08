@@ -46,8 +46,8 @@ set kw(vtkTemp457) [$kw(vtkTemp454) GetParentTree]
 set kw(vtkTemp683) [$kw(vtkTemp457) GetChild "_Scene_.Sources;Sphere1"]
 $kw(vtkTemp683) SetExpanded 1
 set kw(vtkTemp478) [$kw(vtkTemp778) GetAnimationScene]
-$kw(vtkTemp478) SetCurrentTime 1.096224
-$kw(vtkTemp778) SetCurrentTime 0.018270
+$kw(vtkTemp478) SetAnimationTime 1.096224
+$kw(vtkTemp778) SetAnimationTime 0.018270
 set kw(vtkTemp699) [$kw(vtkTemp683) GetChild "_Scene_.Sources;Sphere1.Radius.0"]
 $kw(vtkTemp699) CreateAndAddKeyFrame 0.018270 0
 set kw(vtkTemp780) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_0"]
@@ -59,8 +59,8 @@ $kw(vtkTemp780) SetKeyValue 0.500000
 $kw(vtkTemp699) GetFocus
 set kw(vtkTemp464) [$kw(vtkTemp778) GetVAnimationInterface]
 $kw(vtkTemp464) SetKeyFrameIndex 0
-$kw(vtkTemp478) SetCurrentTime 28.574909
-$kw(vtkTemp778) SetCurrentTime 0.476248
+$kw(vtkTemp478) SetAnimationTime 28.574909
+$kw(vtkTemp778) SetAnimationTime 0.476248
 $kw(vtkTemp699) CreateAndAddKeyFrame 0.476248 0
 set kw(vtkTemp783) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_1"]
 $kw(vtkTemp783) SetKeyTime 0.476248
@@ -70,8 +70,8 @@ $kw(vtkTemp683) RemoveKeyFrame 0
 $kw(vtkTemp457) RemoveKeyFrame 0
 $kw(vtkTemp783) SetKeyValue 0.500000
 $kw(vtkTemp464) SetKeyFrameIndex 1
-$kw(vtkTemp478) SetCurrentTime 55.688185
-$kw(vtkTemp778) SetCurrentTime 0.928136
+$kw(vtkTemp478) SetAnimationTime 55.688185
+$kw(vtkTemp778) SetAnimationTime 0.928136
 $kw(vtkTemp699) CreateAndAddKeyFrame 0.928136 0
 set kw(vtkTemp786) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_2"]
 $kw(vtkTemp786) SetKeyTime 0.928136
@@ -148,8 +148,8 @@ $kw(vtkTemp464) SetKeyFrameIndex 2
 $kw(vtkTemp683) SetExpanded 0
 set kw(vtkTemp751) [$kw(vtkTemp457) GetChild "_Scene_.Sources;Sphere2"]
 $kw(vtkTemp751) SetExpanded 1
-$kw(vtkTemp478) SetCurrentTime 0.243605
-$kw(vtkTemp778) SetCurrentTime 0.012180
+$kw(vtkTemp478) SetAnimationTime 0.243605
+$kw(vtkTemp778) SetAnimationTime 0.012180
 set kw(vtkTemp767) [$kw(vtkTemp751) GetChild "_Scene_.Sources;Sphere2.Radius.0"]
 $kw(vtkTemp767) CreateAndAddKeyFrame 0.012180 0
 set kw(vtkTemp813) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_3"]
@@ -159,8 +159,8 @@ $kw(vtkTemp751) RemoveKeyFrame 0
 $kw(vtkTemp813) SetKeyValue 0.500000
 $kw(vtkTemp767) GetFocus
 $kw(vtkTemp464) SetKeyFrameIndex 0
-$kw(vtkTemp478) SetCurrentTime 9.890378
-$kw(vtkTemp778) SetCurrentTime 0.494519
+$kw(vtkTemp478) SetAnimationTime 9.890378
+$kw(vtkTemp778) SetAnimationTime 0.494519
 $kw(vtkTemp767) CreateAndAddKeyFrame 0.494519 0
 set kw(vtkTemp816) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_4"]
 $kw(vtkTemp816) SetKeyTime 0.494519
@@ -168,8 +168,8 @@ $kw(vtkTemp816) SetKeyValue 0.000000
 $kw(vtkTemp751) RemoveKeyFrame 0
 $kw(vtkTemp816) SetKeyValue 0.500000
 $kw(vtkTemp464) SetKeyFrameIndex 1
-$kw(vtkTemp478) SetCurrentTime 19.512789
-$kw(vtkTemp778) SetCurrentTime 0.975639
+$kw(vtkTemp478) SetAnimationTime 19.512789
+$kw(vtkTemp778) SetAnimationTime 0.975639
 $kw(vtkTemp767) CreateAndAddKeyFrame 0.975639 0
 set kw(vtkTemp819) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_5"]
 $kw(vtkTemp819) SetKeyTime 0.975639
@@ -214,13 +214,13 @@ $kw(vtkTemp819) SetKeyTime 1.000000
 $kw(vtkTemp464) SetKeyFrameIndex 1
 $kw(vtkTemp464) SetKeyFrameIndex 1
 $kw(vtkTemp837) SetKeyTime 0.425000
-$kw(vtkTemp478) SetCurrentTime 0.000000
+$kw(vtkTemp478) SetAnimationTime 0.000000
 update
 $kw(vtkTemp464) SetCacheGeometry 0
 $kw(vtkTemp478) Play
 update
-$kw(vtkTemp478) SetCurrentTime 0.000000
-$kw(vtkTemp478) SetCurrentTime 9.000000
+$kw(vtkTemp478) SetAnimationTime 0.000000
+$kw(vtkTemp478) SetAnimationTime 9.000000
 update
 
 source [file join [file dirname [info script]] Compare.tcl]

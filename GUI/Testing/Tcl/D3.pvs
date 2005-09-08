@@ -198,7 +198,7 @@ $kw(vtkTemp237) SetCurrentManipulator 2 1 {Pan}
 $kw(vtkTemp237) SetCurrentManipulator 2 0 {Zoom}
 set kw(vtkTemp237) [$kw(vtkTemp24) GetManipulatorControl3D]
 # $kw(vtkTemp183) SetNumberOfFrames 100
-# $kw(vtkTemp183) SetCurrentTime 0
+# $kw(vtkTemp183) SetAnimationTime 0
 # $kw(vtkTemp183) SetCacheGeometry 1
 $kw(vtkTemp1) SetCenterOfRotation 0 0 0
 

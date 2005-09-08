@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.14");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, const char* ext,
     vtkErrorMacro("Incosistent state. Save aborted.");
     return 1;
     }
-  this->SetCurrentTime(0);
+  this->SetAnimationTime(0);
 
   this->RenderModuleProxy->UpdateInformation();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -317,7 +317,7 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
     }
   
   this->SaveFailed = 0;
-  this->SetCurrentTime(0);
+  this->SetAnimationTime(0);
   this->GeometryWriter = animWriter;
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
@@ -577,7 +577,7 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
   this->SaveImages();
   vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
     vtkAnimationCue::AnimationCueInfo*>(info);
-  this->SaveGeometry(cueInfo->CurrentTime);
+  this->SaveGeometry(cueInfo->AnimationTime);
 }
 
 //----------------------------------------------------------------------------
@@ -606,7 +606,7 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
   double stime = this->GetStartTime();
 
   int index = 
-    static_cast<int>((cueInfo->CurrentTime - stime) * this->GetFrameRate());
+    static_cast<int>((cueInfo->AnimationTime - stime) * this->GetFrameRate());
 
   int maxindex = 
     static_cast<int>((etime - stime) * this->GetFrameRate()) + 1; 
@@ -628,7 +628,7 @@ void vtkSMAnimationSceneProxy::CleanCache()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SetCurrentTime(double time)
+void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
 {
   this->AnimationCue->Initialize();
   this->AnimationCue->Tick(time,0);

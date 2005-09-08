@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.61");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -941,13 +941,13 @@ int vtkPVAnimationManager::GetInPlay()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::SetCurrentTime(double ntime)
+void vtkPVAnimationManager::SetAnimationTime(double ntime)
 {
   if (this->AnimationScene)
     {
-    this->AnimationScene->SetNormalizedCurrentTime(ntime);
+    this->AnimationScene->SetNormalizedAnimationTime(ntime);
     }
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTime %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetAnimationTime %f",
     this->GetTclName(), ntime);
 }
 
@@ -1378,3 +1378,12 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
 }
+
+//-----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
+void vtkPVAnimationManager::SetCurrentTime(double ntime)
+{
+  vtkGenericWarningMacro("vtkPVAnimationManager::SetCurrentTime was deprecated for ParaView 2.4 and will be removed in a future version.  Use vtkPVAnimationManager::SetAnimationTime instead.");
+  this->SetAnimationTime(ntime);
+}
+#endif

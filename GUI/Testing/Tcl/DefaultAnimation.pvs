@@ -36,7 +36,7 @@ $kw(vtkTemp821) SetScalarRange 0.21 0.7
 $kw(vtkTemp821) SetScalarRange 0.21 0.72
 set kw(vtkTemp995) [$kw(vtkTemp4) GetAnimationManager]
 set kw(vtkTemp539) [$kw(vtkTemp995) GetAnimationScene]
-$kw(vtkTemp539) SetCurrentTimeWithTrace 1.000000
+$kw(vtkTemp539) SetAnimationTimeWithTrace 1.000000
 
 
 update

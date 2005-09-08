@@ -24,7 +24,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.11");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -261,7 +261,7 @@ void vtkSMAnimationCueProxy::TickInternal(
   double ctime = 0.0;
   if (cueInfo->StartTime != cueInfo->EndTime)
     {
-    ctime = (cueInfo->CurrentTime - cueInfo->StartTime) /
+    ctime = (cueInfo->AnimationTime - cueInfo->StartTime) /
       (cueInfo->EndTime - cueInfo->StartTime);
     }
 

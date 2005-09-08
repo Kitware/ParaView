@@ -910,7 +910,7 @@
 
       <DoubleVectorProperty
         name="CurrentTime"
-        command="SetCurrentTime"
+        command="SetAnimationTime"
         number_of_elements="1"
         update_self="1"
         default_values="0"

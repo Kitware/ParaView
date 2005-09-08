@@ -81,7 +81,7 @@ public:
   void SetRenderModuleProxy(vtkSMRenderModuleProxy* ren)
     { this->RenderModuleProxy = ren; } 
   
-  void SetCurrentTime(double time);
+  void SetAnimationTime(double time);
 
   // Description:
   // Saves the animation as a sequence of images or a movie file.

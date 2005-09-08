@@ -174,7 +174,7 @@ public:
   // Description:
   // Sets the animation time. Changes the system state to reflect the one
   // at the point in time. Time is normalized Scene time.
-  void SetCurrentTime(double ntime);
+  void SetAnimationTime(double ntime);
 
   // Description:
   // Invalidates all geometry.
@@ -233,7 +233,10 @@ public:
   // Returns the active track selector widget
   vtkGetObjectMacro(ActiveTrackSelector, vtkPVActiveTrackSelector);
 
-  
+  // Description:
+  // @deprecated Replaced by vtkPVAnimationManager::SetAnimationTime().
+  VTK_LEGACY(void SetCurrentTime(double ntime));
+
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();

@@ -242,7 +242,7 @@ $kw(vtkTemp595) SetDuration 10
 $kw(vtkTemp595) SetPlayMode 0
 $kw(vtkTemp595) SetFrameRate 1
 $kw(vtkTemp595) SetLoop 0
-$kw(vtkTemp595) SetCurrentTime 0
+$kw(vtkTemp595) SetAnimationTime 0
 
 set kw(vtkTemp881) [$kw(vtkTemp2) GetAnimationManager]
 set kw(vtkTemp556) [$kw(vtkTemp881) GetAnimationScene]

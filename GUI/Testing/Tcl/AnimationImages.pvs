@@ -39,7 +39,7 @@ $kw(vtkTemp187) SetTimeEnd 200.000000
 
 # Save animation images
 $kw(vtkTemp164) SaveImages "$TempDir/AnimationImages" {png} 300 300
-$kw(vtkTemp164) SetCurrentTime 1
+$kw(vtkTemp164) SetAnimationTime 1
 
 set didRegression 0
 

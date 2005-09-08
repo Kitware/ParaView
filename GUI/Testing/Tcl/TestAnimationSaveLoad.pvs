@@ -73,7 +73,7 @@ $kw(vtkTemp1196) AnimationMenuCallback $kw(vtkTemp1160)
 set timesteps [$kw(vtkTemp1186) GetNumberOfTimeSteps]
 $kw(vtkTemp1160) SetTimeEnd [expr $timesteps - 1]
 for {set i 0} {$i < $timesteps} {incr i} {
-  $kw(vtkTemp178) SetCurrentTime $i 1
+  $kw(vtkTemp178) SetAnimationTime $i 1
 }
 
 # Check the results.
