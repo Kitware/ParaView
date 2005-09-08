@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.26");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.27");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -67,6 +67,8 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->DisableCommands               = 0;
   this->EnableShadingForAllComponents = 0;
 
+  this->InteractiveApplyMode              = 0;
+  this->InteractiveApplyButtonVisibility  = 1;
   this->HSVColorSelectorVisibility        = 1;
   this->ComponentSelectionVisibility      = 1;
   this->InterpolationTypeVisibility       = 1;
@@ -344,6 +346,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->InteractiveApplyCheckButton->SetParent(this->InnerLeftFrame);
   this->InteractiveApplyCheckButton->Create(app);
   this->InteractiveApplyCheckButton->SetText("Interactive Apply");
+  this->InteractiveApplyCheckButton->SetCommand(
+    this, "InteractiveApplyCallback");
   this->InteractiveApplyCheckButton->SetBalloonHelpString(
     "Toggle whether changes are applied to the volume window and image "
     "windows as nodes in the transfer functions are modified, or only after "
@@ -683,8 +687,11 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Interactive Apply (IA)
 
-  tk_cmd << "pack " << this->InteractiveApplyCheckButton->GetWidgetName()
-         << " -side top -anchor nw " << pad << endl;
+  if (this->InteractiveApplyButtonVisibility)
+    {
+    tk_cmd << "pack " << this->InteractiveApplyCheckButton->GetWidgetName()
+           << " -side top -anchor nw " << pad << endl;
+    }
 
   row++;
 
@@ -841,8 +848,7 @@ void vtkKWVolumePropertyWidget::Update()
       }
     if (EnableShadingCheckButton->IsCreated())
       {
-      if (this->EnableShadingForAllComponents &&
-          this->MaterialPropertyVisibility)
+      if (this->EnableShadingForAllComponents)
         {
         tk_cmd << "pack "
                << this->EnableShadingCheckButton->GetWidgetName() 
@@ -862,6 +868,14 @@ void vtkKWVolumePropertyWidget::Update()
       {
       this->VolumeProperty->SetShade(i, this->VolumeProperty->GetShade(0));
       }
+    }
+
+  // Interactive Apply
+
+  if (this->InteractiveApplyCheckButton)
+    {
+    this->InteractiveApplyCheckButton->SetSelectedState(
+      this->InteractiveApplyMode);
     }
 
   // Material Property
@@ -1446,6 +1460,21 @@ void vtkKWVolumePropertyWidget::SetHSVColorSelectorVisibility(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetInteractiveApplyButtonVisibility(int arg)
+{
+  if (this->InteractiveApplyButtonVisibility == arg)
+    {
+    return;
+    }
+
+  this->InteractiveApplyButtonVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetInterpolationTypeVisibility(int arg)
 {
   if (this->InterpolationTypeVisibility == arg)
@@ -1730,10 +1759,19 @@ void vtkKWVolumePropertyWidget::MaterialPropertyChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::MaterialPropertyChangingCallback()
 {
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     this->InvokeVolumePropertyChangingCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::InteractiveApplyCallback()
+{
+  if (this->InteractiveApplyCheckButton)
+    {
+    this->SetInteractiveApplyMode(
+      this->InteractiveApplyCheckButton->GetSelectedState() ? 1 : 0);
     }
 }
 
@@ -1764,8 +1802,7 @@ void vtkKWVolumePropertyWidget::ScalarOpacityFunctionChangingCallback()
     this->InvokeEvent(vtkKWEvent::WindowLevelChangingEvent, fargs);
     }
 
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1845,8 +1882,7 @@ void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangingCallback()
     return;
     }
 
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     float d = this->ScalarOpacityUnitDistanceScale->GetValue();
     this->VolumeProperty->SetScalarOpacityUnitDistance(
@@ -1891,8 +1927,7 @@ void vtkKWVolumePropertyWidget::RGBTransferFunctionChangingCallback()
     this->ScalarOpacityFunctionEditor->Update();
     }
 
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -1987,8 +2022,7 @@ void vtkKWVolumePropertyWidget::GradientOpacityFunctionChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::GradientOpacityFunctionChangingCallback()
 {
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -2042,8 +2076,7 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback(
       {
       this->ScalarOpacityFunctionEditor->Update();
       }
-    if (this->InteractiveApplyCheckButton && 
-        this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
       {
       this->InvokeVolumePropertyChangingCommand();
       }
@@ -2099,8 +2132,7 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(int index)
   fargs[1] = weight;
   this->InvokeEvent(vtkKWEvent::ScalarComponentWeightChangingEvent, fargs);
 
-  if (this->InteractiveApplyCheckButton && 
-      this->InteractiveApplyCheckButton->GetSelectedState())
+  if (this->InteractiveApplyMode)
     {
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -2119,6 +2151,10 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->EnableShadingForAllComponents ? "On" : "Off") << endl;
   os << indent << "ComponentSelectionVisibility: "
      << (this->ComponentSelectionVisibility ? "On" : "Off") << endl;
+  os << indent << "InteractiveApplyMode: "
+     << (this->InteractiveApplyMode ? "On" : "Off") << endl;
+  os << indent << "InteractiveApplyButtonVisibility: "
+     << (this->InteractiveApplyButtonVisibility ? "On" : "Off") << endl;
   os << indent << "HSVColorSelectorVisibility: "
      << (this->HSVColorSelectorVisibility ? "On" : "Off") << endl;
   os << indent << "InterpolationTypeVisibility: "

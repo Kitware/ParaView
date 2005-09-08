@@ -84,6 +84,20 @@ public:
   virtual int IsInWindowLevelMode();
 
   // Description:
+  // Set/Get if the widget is in "Interactive Apply" mode, i.e.
+  // changes will be propagated during most/all interactions, not just
+  // at the end of them.
+  vtkBooleanMacro(InteractiveApplyMode, int);
+  vtkSetMacro(InteractiveApplyMode, int);
+  vtkGetMacro(InteractiveApplyMode, int);
+
+  // Description:
+  // Set/Get the 'Interactive Apply' button visibility
+  vtkBooleanMacro(InteractiveApplyButtonVisibility, int);
+  virtual void SetInteractiveApplyButtonVisibility(int);
+  vtkGetMacro(InteractiveApplyButtonVisibility, int);
+
+  // Description:
   // Set/Get the HSV color selector visibility
   vtkBooleanMacro(HSVColorSelectorVisibility, int);
   virtual void SetHSVColorSelectorVisibility(int);
@@ -173,6 +187,7 @@ public:
   virtual void EnableShadingCallback();
   virtual void MaterialPropertyChangedCallback();
   virtual void MaterialPropertyChangingCallback();
+  virtual void InteractiveApplyCallback();
   virtual void ScalarOpacityFunctionChangedCallback();
   virtual void ScalarOpacityFunctionChangingCallback();
   virtual void DoubleClickOnScalarOpacityPointCallback(int id);
@@ -224,6 +239,8 @@ protected:
   int   DisableCommands;
   int   EnableShadingForAllComponents;
 
+  int   InteractiveApplyMode;
+  int   InteractiveApplyButtonVisibility;
   int   HSVColorSelectorVisibility;
   int   ComponentSelectionVisibility;
   int   InterpolationTypeVisibility;
