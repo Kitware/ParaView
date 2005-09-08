@@ -95,6 +95,20 @@ static const unsigned char image_expand[] =
 
 /* 
  * Resource generated for file:
+ *    file_open.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_file_open_width          = 16;
+static const unsigned int  image_file_open_height         = 13;
+static const unsigned int  image_file_open_pixel_size     = 4;
+static const unsigned long image_file_open_length         = 116;
+static const unsigned long image_file_open_decoded_length = 832;
+
+static const unsigned char image_file_open[] = 
+  "eNqdUoEJACAM6vj9bVEEJrGWgbgo3dYC0FDAWNhAUcPa297x0nqc+vTu4hlP5nNF0t/hce"
+  "Nc//b4yZ/1UOk/4g2Zo6Xl/I6W5+lo9T9U3ovRAZBf4XI=";
+
+/* 
+ * Resource generated for file:
  *    floppy.png (zlib, base64) (image file)
  */
 static const unsigned int  image_floppy_width          = 16;

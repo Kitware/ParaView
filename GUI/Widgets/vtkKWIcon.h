@@ -47,6 +47,7 @@ public:
     IconErrorMini                 = 3,
     IconErrorRedMini              = 4,
     IconExpand                    = 5,
+    IconFileOpen                  = 8,
     IconFloppy                    = 7,
     IconFolder                    = 20,
     IconFolderOpen                = 21,
