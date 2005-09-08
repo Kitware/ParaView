@@ -22,13 +22,13 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.10");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
 {
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
 
   this->OldSelection = 0;
   this->ActiveColor[0] = 0.83;

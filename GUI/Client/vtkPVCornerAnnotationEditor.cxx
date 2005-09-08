@@ -31,13 +31,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.11");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()
 {
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
 
   this->InternalCornerAnnotation = NULL;
 

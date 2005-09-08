@@ -33,8 +33,8 @@ public:
   // Description:
   // Set/Get the object (Object) being traced.
   // Note: Object is not reference-counted at the moment.
-  virtual void SetObject(vtkKWObject *);
-  vtkGetObjectMacro(Object, vtkKWObject);
+  virtual void SetTraceObject(vtkKWObject *);
+  vtkGetObjectMacro(TraceObject, vtkKWObject);
   
   // Description:
   // If needed, a unique name for Object in the trace context.
@@ -132,7 +132,7 @@ protected:
 
   // Description:
   // The object being traced
-  vtkKWObject *Object;
+  vtkKWObject *TraceObject;
 
   // Description:
   // The object being traced can be obtained from the reference helper

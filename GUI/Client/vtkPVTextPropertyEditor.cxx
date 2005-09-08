@@ -18,13 +18,13 @@
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTextPropertyEditor);
-vtkCxxRevisionMacro(vtkPVTextPropertyEditor, "1.2");
+vtkCxxRevisionMacro(vtkPVTextPropertyEditor, "1.3");
 
 // ----------------------------------------------------------------------------
 vtkPVTextPropertyEditor::vtkPVTextPropertyEditor()
 {
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
 }
 
 // ----------------------------------------------------------------------------

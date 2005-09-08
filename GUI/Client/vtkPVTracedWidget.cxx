@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTracedWidget );
-vtkCxxRevisionMacro(vtkPVTracedWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVTracedWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVTracedWidget::vtkPVTracedWidget()
@@ -53,7 +53,7 @@ vtkPVTraceHelper* vtkPVTracedWidget::GetTraceHelper()
   if (!this->TraceHelper)
     {
     this->TraceHelper = vtkPVTraceHelper::New();
-    this->TraceHelper->SetObject(this);
+    this->TraceHelper->SetTraceObject(this);
     }
 
   return this->TraceHelper;

@@ -55,7 +55,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.70");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.71");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -82,7 +82,7 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->UsersTutorialTxt = 0;
 
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
 
   this->SetTitle("Lookmark Manager");
 }

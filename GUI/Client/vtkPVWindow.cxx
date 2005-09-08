@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.763");
+vtkCxxRevisionMacro(vtkPVWindow, "1.764");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -166,7 +166,7 @@ vtkPVWindow::vtkPVWindow()
   this->ModifiedEnableState = 0;
 
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
 
   // ParaView specific menus:
   // SelectMenu   -> used to select existing data objects

@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.62");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.63");
 
 
 //*****************************************************************************
@@ -123,7 +123,7 @@ vtkPVLookmark::vtkPVLookmark()
   this->CenterOfRotation[0] = this->CenterOfRotation[1] = this->CenterOfRotation[2] = 0;
   this->Sources = vtkPVSourceCollection::New();
   this->TraceHelper = vtkPVTraceHelper::New();
-  this->TraceHelper->SetObject(this);
+  this->TraceHelper->SetTraceObject(this);
   this->ToolbarButton = 0;
   this->Observer = vtkPVLookmarkObserver::New();
   this->Observer->SetLookmark(this);

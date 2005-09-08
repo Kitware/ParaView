@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.3");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.4");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -34,7 +34,7 @@ vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
 vtkPVTraceHelper::vtkPVTraceHelper()
 {
   this->Initialized      = 0;
-  this->Object           = NULL;
+  this->TraceObject      = NULL;
   this->ReferenceHelper  = NULL;
   this->ReferenceCommand = NULL;
   this->ObjectName       = NULL;
@@ -44,21 +44,21 @@ vtkPVTraceHelper::vtkPVTraceHelper()
 //----------------------------------------------------------------------------
 vtkPVTraceHelper::~vtkPVTraceHelper()
 {
-  this->SetObject(NULL);
+  this->SetTraceObject(NULL);
   this->SetReferenceHelper(NULL);
   this->SetReferenceCommand(NULL);
   this->SetObjectName(NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTraceHelper::SetObject(vtkKWObject* _arg)
+void vtkPVTraceHelper::SetTraceObject(vtkKWObject* _arg)
 {
-  if (this->Object == _arg) 
+  if (this->TraceObject == _arg) 
     { 
     return;
     }
 
-  this->Object = _arg;
+  this->TraceObject = _arg;
   this->Modified();
 } 
 
@@ -79,10 +79,10 @@ void vtkPVTraceHelper::SetReferenceHelper(vtkPVTraceHelper* _arg)
 //----------------------------------------------------------------------------
 ofstream* vtkPVTraceHelper::GetFile()
 {
-  if (this->Object)
+  if (this->TraceObject)
     {
     vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(
-      this->Object->GetApplication());
+      this->TraceObject->GetApplication());
     if (pvapp)
       {
       return pvapp->GetTraceFile();
@@ -104,7 +104,7 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
   int dummy_init = 0;
   int *init;
 
-  if (!this->Object)
+  if (!this->TraceObject)
     {
     return 0;
     }
@@ -145,11 +145,11 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
 
   if (this->ReferenceHelper && this->ReferenceCommand)
     {
-    if (this->ReferenceHelper->GetObject() && 
+    if (this->ReferenceHelper->GetTraceObject() && 
         this->ReferenceHelper->Initialize(file))
       {
-      *file << "set kw(" << this->Object->GetTclName() << ") [$kw(" 
-            << this->ReferenceHelper->GetObject()->GetTclName() << ") "
+      *file << "set kw(" << this->TraceObject->GetTclName() << ") [$kw(" 
+            << this->ReferenceHelper->GetTraceObject()->GetTclName() << ") "
             << this->ReferenceCommand << "]" << endl;
       *init = 1;
       return 1;
@@ -250,7 +250,7 @@ void vtkPVTraceHelper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Initialized: " << this->GetInitialized() << endl;
-  os << indent << "Object: " << this->GetObject() << endl;
+  os << indent << "TraceObject: " << this->GetTraceObject() << endl;
   os << indent << "ReferenceHelper: " 
      << this->GetReferenceHelper() << endl;
   os << indent << "ReferenceCommand: " 

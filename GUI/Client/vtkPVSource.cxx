@@ -62,7 +62,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.454");
+vtkCxxRevisionMacro(vtkPVSource, "1.455");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2335,7 +2335,7 @@ void vtkPVSource::SaveState(ofstream *file)
   if (this->GetTraceHelper()->GetReferenceCommand())
     {
     *file << "set kw(" << this->GetTclName() << ") [$kw(" 
-          << this->GetTraceHelper()->GetReferenceHelper()->GetObject()->GetTclName() << ") " 
+          << this->GetTraceHelper()->GetReferenceHelper()->GetTraceObject()->GetTclName() << ") " 
           << this->GetTraceHelper()->GetReferenceCommand() << "]\n";
     return;
     }
