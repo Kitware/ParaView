@@ -106,12 +106,13 @@
 #include <sys/stat.h>
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.370");
+vtkCxxRevisionMacro(vtkPVApplication, "1.371");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -233,41 +234,60 @@ public:
       {
       vtkKWWindowBase *win = this->Application->GetNthWindow(
         this->Application->GetNumberOfWindows() - 1);
-      const char *message = strstr(t, "): ");
-      char type[1024], file[1024];
+
+      // Try to parse the message from standard VTK formats to
+      // reformat it a bit.  The standard format of a VTK message
+      // is
+      //
+      //   <message-type>: In <file>, line <line>\n
+      //   <message>
+      //
+      // Try to parse the message by looking for the newline and then
+      // using sscanf to get the three components from the first line.
+      vtkstd::string msg;
+      const char* eol = strstr(t, "\n");
+      char type[1024];
+      char file[1024];
       int line;
-      sscanf(t, "%[^:]: In %[^,], line %d", type, file, &line);
-      if ( message )
+      if(eol && sscanf(t, "%[^:]: In %[^,], line %d", type, file, &line) == 3)
         {
-        message += 3;
-        char *rmessage = vtksys::SystemTools::DuplicateString(message);
-        int last = strlen(rmessage) - 1;
-        while ( last > 0 && 
-                (rmessage[last] == ' ' || rmessage[last] == '\n' || 
-                 rmessage[last] == '\r' || rmessage[last] == '\t') )
+        // The message is in a standard VTK format.  Construct the
+        // reformatted message.
+        vtksys_ios::ostringstream buf;
+        buf << "There was a VTK " << (error ? "Error" : "Warning")
+            << " in file: " << file << " (" << line << ")\n " << (eol+1);
+        msg = buf.str();
+        }
+      else
+        {
+        // The message is not in a standard VTK format.  Do not try to
+        // reformat it.
+        msg = t;
+        }
+
+      // Remove trailing whitespace.
+      vtkstd::string::size_type pos = msg.find_last_not_of(" \n\r\t");
+      if(pos != vtkstd::string::npos)
+        {
+        msg = msg.substr(0, pos+1);
+        }
+      else
+        {
+        msg = msg.substr(0, vtkstd::string::npos);
+        }
+
+      // Send the possibly reformatted message to the window.
+      if ( error )
+        {
+        win->ErrorMessage(msg.c_str());
+        if ( this->TestErrors )
           {
-          rmessage[last] = 0;
-          last--;
+          this->ErrorOccurred = 1;
           }
-        char *buffer = new char[strlen(file) + strlen(rmessage) + 256];
-        sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
-                (error ? "Error" : "Warning"),
-                file, line,
-                rmessage);
-        if ( error )
-          {
-          win->ErrorMessage(buffer);
-          if ( this->TestErrors )
-            {
-            this->ErrorOccurred = 1;
-            }
-          }
-        else 
-          {
-          win->WarningMessage(buffer);
-          }
-        delete [] rmessage;
-        delete [] buffer;
+        }
+      else
+        {
+        win->WarningMessage(msg.c_str());
         }
       }
     else
