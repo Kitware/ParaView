@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.37");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -534,6 +534,9 @@ void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
   // We want to intercept specific case like
   // sharpness = 1.0: step (3 segments), could not be done using sampling
   // sharpness = 0.0 and mid-point != 0.5: two segments, for efficiency
+  //      (also mid_point should be != 0.0 or 1.0 otherwise the midpoint
+  //       parameter is the same as one of the end-point, and its value
+  //       (vertical position) is wrong).
 
   // We assume all parameters are OK, they were checked by RedrawLine
 
@@ -541,8 +544,11 @@ void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
   this->GetFunctionMidPoint(id1, &midpoint);
   this->GetFunctionSharpness(id1, &sharpness);
 
-  int sharp_1 = sharpness == 1.0;
-  int sharp_0 = (sharpness == 0.0 && midpoint != 0.5);
+  int sharp_1 = (sharpness == 1.0) ? 1 : 0;
+  int sharp_0 = (sharpness == 0.0 && 
+                 midpoint != 0.5 && 
+                 midpoint != 0.0 && 
+                 midpoint != 1.0) ? 1 : 0;
   if (!sharp_1 && !sharp_0)
     {
     this->Superclass::GetLineCoordinates(id1, id2, tk_cmd);
