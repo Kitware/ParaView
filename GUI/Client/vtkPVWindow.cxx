@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.765");
+vtkCxxRevisionMacro(vtkPVWindow, "1.766");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3207,7 +3207,7 @@ void vtkPVWindow::SaveState(const char* filename)
     vtkPVSourceCollection* col = 0;
     if (it->GetData(col) == VTK_OK && col)
       {
-      vtkCollectionIterator *cit = col->NewIterator();
+      cit = col->NewIterator();
       cit->InitTraversal();
       while ( !cit->IsDoneWithTraversal() )
         {
