@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.3");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.4");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -254,6 +254,35 @@ int vtkAttributeEditor::RequestData(
 
     return 1;
     }
+/*
+  if(this->EditMode==0)
+    {
+    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      {
+      readerfield = readerOutput->GetPointData();
+      filterfield = filterOutput->GetPointData();
+      }
+    else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+      {
+      readerfield = readerOutput->GetCellData();
+      filterfield = filterOutput->GetCellData();
+      }
+
+    if(this->ReaderDataArray)
+      {
+      readerfield->AddArray(this->ReaderDataArray);
+      readerfield->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME());
+      }
+
+    if(this->FilterDataArray)
+      {
+      filterfield->AddArray(this->FilterDataArray);
+      filterfield->GetPointData()->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME());
+      }
+
+    return 1;
+    }
+*/
 
   // Turn edit mode off - it must be set explicitly in order for an edit to take place
   this->EditMode = 0;
@@ -346,11 +375,6 @@ void vtkAttributeEditor::RegionExecute(vtkDataSet *rinput,vtkDataSet *finput, vt
   vtkIdType numPts = finput->GetNumberOfPoints();
   vtkIdType numCells = finput->GetNumberOfCells();
   vtkIdType readerId;
-
-  vtkPointData *filterPD = finput->GetPointData();
-  vtkPointData *readerPD = rinput->GetPointData();
-  vtkCellData *filterCD = finput->GetCellData();
-  vtkCellData *readerCD = rinput->GetCellData();
 
   vtkInformation *info = this->GetInputArrayInformation(0);
 
@@ -452,10 +476,6 @@ void vtkAttributeEditor::PointExecute(vtkDataSet *rinput,vtkDataSet *finput, vtk
   double *coords;
 
   numPts = finput->GetNumberOfPoints();
-  vtkPointData *filterPD = finput->GetPointData();
-  vtkPointData *readerPD = rinput->GetPointData();
-
-  vtkInformation *info = this->GetInputArrayInformation(0);
 
   // Find the nearest point in the input.
   bestDistance2 = VTK_LARGE_FLOAT;
@@ -530,11 +550,6 @@ void vtkAttributeEditor::CellExecute(vtkDataSet *rinput,vtkDataSet *finput, vtkD
   double* weights;
   vtkIdType numCells;
   vtkIdType bestId = -1;
-
-  vtkCellData *filterCD = finput->GetCellData();
-  vtkCellData *readerCD = rinput->GetCellData();
-
-  vtkInformation *info = this->GetInputArrayInformation(0);
 
   numInputs = this->GetExecutive()->GetNumberOfInputPorts();
 
