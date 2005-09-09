@@ -24,7 +24,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
   cpsel_tfunc_editor SetPadY 2
   cpsel_tfunc_editor ParameterRangeVisibilityOff
   cpsel_tfunc_editor ParameterEntryVisibilityOff
-  cpsel_tfunc_editor RangeLabelVisibilityOff
+  cpsel_tfunc_editor ParameterRangeLabelVisibilityOff
   cpsel_tfunc_editor ColorSpaceOptionMenuVisibilityOff
   cpsel_tfunc_editor ReadOnlyOn
   cpsel_tfunc_editor SetColorTransferFunction cpsel_func
