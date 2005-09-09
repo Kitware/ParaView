@@ -54,7 +54,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.6");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -141,7 +141,7 @@ vtkKWWindowLevelPresetSelector::vtkKWWindowLevelPresetSelector()
   this->PresetSpinButtons = NULL;
   this->PresetButtons     = NULL;
 
-  this->ApplyPresetOnSelectionChanged = 1;
+  this->ApplyPresetOnSingleClick = 1;
 
   this->ThumbnailSize = 32;
   this->ScreenshotSize = 144;
@@ -238,7 +238,7 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
     this->PresetList->GetWidgetName());
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-  if (this->ApplyPresetOnSelectionChanged)
+  if (this->ApplyPresetOnSingleClick)
     {
     list->SetSelectionModeToSingle();
     }
@@ -246,8 +246,8 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
     {
     list->SetSelectionModeToExtended();
     }
-  list->SetSelectionChangedCommand(
-    this, "PresetSelectionChangedCallback");
+  list->SetSelectionCommand(
+    this, "PresetSelectionCallback");
   list->SetPotentialCellBackgroundColorChangedCommand(
     list, "RefreshBackgroundColorOfAllCellsWithWindowCommand");
   // list->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
@@ -376,19 +376,19 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindowLevelPresetSelector::SetApplyPresetOnSelectionChanged(int arg)
+void vtkKWWindowLevelPresetSelector::SetApplyPresetOnSingleClick(int arg)
 {
-  if (this->ApplyPresetOnSelectionChanged == arg)
+  if (this->ApplyPresetOnSingleClick == arg)
     {
     return;
     }
 
-  this->ApplyPresetOnSelectionChanged = arg;
+  this->ApplyPresetOnSingleClick = arg;
   this->Modified();
 
   if (this->PresetList)
     {
-    if (this->ApplyPresetOnSelectionChanged)
+    if (this->ApplyPresetOnSingleClick)
       {
       this->PresetList->GetWidget()->SetSelectionModeToSingle();
       }
@@ -1317,11 +1317,11 @@ void vtkKWWindowLevelPresetSelector::PresetRemoveCallback()
 }
 
 //---------------------------------------------------------------------------
-void vtkKWWindowLevelPresetSelector::PresetSelectionChangedCallback()
+void vtkKWWindowLevelPresetSelector::PresetSelectionCallback()
 {
   this->Update(); // this enable/disable the remove button if no selection
 
-  if (this->ApplyPresetOnSelectionChanged)
+  if (this->ApplyPresetOnSingleClick)
     {
     if (this->PresetList)
       {
@@ -1469,7 +1469,6 @@ void vtkKWWindowLevelPresetSelector::Update()
       VTK_KW_WLPS_BUTTON_REMOVE_ID)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
     }
-
 
   if (this->PresetSpinButtons)
     {

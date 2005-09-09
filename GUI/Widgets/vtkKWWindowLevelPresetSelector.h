@@ -210,9 +210,9 @@ public:
   // or only when it is double-clicked on.
   // If set, only one preset can be selected at a time (if not, multiple
   // preset can be selected, and removed for example).
-  virtual void SetApplyPresetOnSelectionChanged(int);
-  vtkGetMacro(ApplyPresetOnSelectionChanged,int);
-  vtkBooleanMacro(ApplyPresetOnSelectionChanged,int);
+  virtual void SetApplyPresetOnSingleClick(int);
+  vtkGetMacro(ApplyPresetOnSingleClick,int);
+  vtkBooleanMacro(ApplyPresetOnSingleClick,int);
 
   // Description:
   // Specifies a command to be invoked when the the user tries to
@@ -243,7 +243,7 @@ public:
     const char*, int, int, const char*);
   virtual const char* PresetCellEditEndCallback(
     const char*, int, int, const char*);
-  virtual void PresetSelectionChangedCallback();
+  virtual void PresetSelectionCallback();
   virtual void PresetSelectAndApplyPreviousCallback();
   virtual void PresetSelectAndApplyNextCallback();
 
@@ -256,7 +256,7 @@ protected:
   vtkKWSpinButtons                   *PresetSpinButtons;
   vtkKWPushButtonSet                 *PresetButtons;
 
-  int ApplyPresetOnSelectionChanged;
+  int ApplyPresetOnSingleClick;
 
   int ThumbnailSize;
   int ScreenshotSize;
