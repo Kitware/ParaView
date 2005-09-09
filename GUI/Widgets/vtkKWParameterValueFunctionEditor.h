@@ -238,18 +238,26 @@ public:
       vtkKWParameterValueFunctionEditor::PointPositionCenter); };
 
   // Description:
-  // Set/Get the range label UI visibility.
+  // Set/Get the parameter range label UI visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
-  vtkBooleanMacro(RangeLabelVisibility, int);
-  virtual void SetRangeLabelVisibility(int);
-  vtkGetMacro(RangeLabelVisibility, int);
+  vtkBooleanMacro(ParameterRangeLabelVisibility, int);
+  virtual void SetParameterRangeLabelVisibility(int);
+  vtkGetMacro(ParameterRangeLabelVisibility, int);
+
+  // Description:
+  // Set/Get the value range label UI visibility.
+  // Note: set this parameter to the proper value before calling Create() in
+  // order to minimize the footprint of the object.
+  vtkBooleanMacro(ValueRangeLabelVisibility, int);
+  virtual void SetValueRangeLabelVisibility(int);
+  vtkGetMacro(ValueRangeLabelVisibility, int);
 
   // Description:
   // Display the range label at the default position (on the same line as all
   // other elements), or on top on its own line.
-  // The RangeLabelVisibility parameter still has to be On for the label to be
-  // displayed.
+  // The ParameterRangeLabelVisibility or ValueRangeLabelVisibility 
+  // parameter still has to be On for the label to be displayed.
   //BTX
   enum
   {
@@ -1094,7 +1102,8 @@ protected:
   int   PointIndexVisibility;
   int   PointGuidelineVisibility;
   int   SelectedPointIndexVisibility;
-  int   RangeLabelVisibility;
+  int   ParameterRangeLabelVisibility;
+  int   ValueRangeLabelVisibility;
   int   RangeLabelPosition;
   int   PointEntriesPosition;
   int   ParameterEntryVisibility;

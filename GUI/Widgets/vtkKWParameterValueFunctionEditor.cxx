@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.63");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.64");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -113,7 +113,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->PointGuidelineVisibility          = 0;
   this->PointVisibility          = 1;
   this->SelectedPointIndexVisibility      = 1;
-  this->RangeLabelVisibility              = 1;
+  this->ParameterRangeLabelVisibility              = 1;
+  this->ValueRangeLabelVisibility              = 1;
   this->RangeLabelPosition          = vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault;
   this->PointEntriesPosition      = vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault;
   this->ParameterEntryVisibility          = 1;
@@ -1246,7 +1247,8 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   // Create the range label
 
-  if (this->RangeLabelVisibility)
+  if (this->ParameterRangeLabelVisibility || 
+      this->ValueRangeLabelVisibility)
     {
     this->CreateRangeLabel(app);
     }
@@ -1341,7 +1343,8 @@ void vtkKWParameterValueFunctionEditor::CreateValueRange(
 void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
   vtkKWApplication *app)
 {
-  if (this->RangeLabelVisibility && 
+  if ((this->ParameterRangeLabelVisibility || 
+       this->ValueRangeLabelVisibility) && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault))
     {
@@ -1477,7 +1480,8 @@ int vtkKWParameterValueFunctionEditor::IsTopLeftFrameUsed()
   return ((this->LabelVisibility && 
            (this->LabelPosition == 
             vtkKWWidgetWithLabel::LabelPositionDefault)) ||
-          (this->RangeLabelVisibility && 
+          ((this->ParameterRangeLabelVisibility || 
+            this->ValueRangeLabelVisibility) && 
            (this->RangeLabelPosition == 
             vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault)) ||
           this->HistogramLogModeOptionMenuVisibility);
@@ -1648,7 +1652,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Note that we span column col_c and col_d because (L) can get quite large
   // whereas TLC is usually small, so we would end up with a too large col_c
   
-  if (this->RangeLabelVisibility && 
+  if ((this->ParameterRangeLabelVisibility ||
+       this->ValueRangeLabelVisibility) && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionTop) &&
       this->RangeLabel && this->RangeLabel->IsCreated())
@@ -1719,7 +1724,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // RangeLabel (RL) at default position, i.e. inside top left frame (TLF)
 
-  if (this->RangeLabelVisibility && 
+  if ((this->ParameterRangeLabelVisibility ||
+       this->ValueRangeLabelVisibility) && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->RangeLabel && this->RangeLabel->IsCreated() &&
@@ -2420,19 +2426,44 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetRangeLabelVisibility(int arg)
+void vtkKWParameterValueFunctionEditor::SetParameterRangeLabelVisibility(int arg)
 {
-  if (this->RangeLabelVisibility == arg)
+  if (this->ParameterRangeLabelVisibility == arg)
     {
     return;
     }
 
-  this->RangeLabelVisibility = arg;
+  this->ParameterRangeLabelVisibility = arg;
 
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->RangeLabelVisibility && this->IsCreated())
+  if (this->ParameterRangeLabelVisibility && this->IsCreated())
+    {
+    this->CreateRangeLabel(this->GetApplication());
+    }
+
+  this->UpdateRangeLabel();
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetValueRangeLabelVisibility(int arg)
+{
+  if (this->ValueRangeLabelVisibility == arg)
+    {
+    return;
+    }
+
+  this->ValueRangeLabelVisibility = arg;
+
+  // Make sure that if the range has to be shown, we create it on the fly if
+  // needed
+
+  if (this->ValueRangeLabelVisibility && this->IsCreated())
     {
     this->CreateRangeLabel(this->GetApplication());
     }
@@ -2467,7 +2498,8 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
   // Make sure that if the range has to be shown, we create it on the fly if
   // needed
 
-  if (this->RangeLabelVisibility && this->IsCreated())
+  if ((this->ParameterRangeLabelVisibility ||
+       this->ValueRangeLabelVisibility) && this->IsCreated())
     {
     this->CreateRangeLabel(this->GetApplication());
     }
@@ -6057,7 +6089,8 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
   if (!this->IsCreated() || 
       !this->RangeLabel || 
       !this->RangeLabel->IsAlive() ||
-      !this->RangeLabelVisibility)
+      !(this->ParameterRangeLabelVisibility || 
+        this->ValueRangeLabelVisibility))
     {
     return;
     }
@@ -6065,7 +6098,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
   ostrstream ranges;
   int nb_ranges = 0;
 
-  if (this->ParameterRangeVisibility)
+  if (this->ParameterRangeLabelVisibility)
     {
     double param[2];
     this->GetDisplayedVisibleParameterRange(param[0], param[1]);
@@ -6076,7 +6109,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
     }
 
   double *value = GetVisibleValueRange();
-  if (value && this->ValueRangeVisibility)
+  if (value && this->ValueRangeLabelVisibility)
     {
     char buffer[1024];
     sprintf(buffer, "[%g, %g]", value[0], value[1]);
@@ -7027,8 +7060,10 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->ParameterRangeVisibility ? "On" : "Off") << endl;
   os << indent << "ValueRangeVisibility: "
      << (this->ValueRangeVisibility ? "On" : "Off") << endl;
-  os << indent << "RangeLabelVisibility: "
-     << (this->RangeLabelVisibility ? "On" : "Off") << endl;
+  os << indent << "ParameterRangeLabelVisibility: "
+     << (this->ParameterRangeLabelVisibility ? "On" : "Off") << endl;
+  os << indent << "ValueRangeLabelVisibility: "
+     << (this->ValueRangeLabelVisibility ? "On" : "Off") << endl;
   os << indent << "RangeLabelPosition: " << this->RangeLabelPosition << endl;
   os << indent << "PointEntriesPosition: " << this->PointEntriesPosition << endl;
   os << indent << "ParameterEntryVisibility: "
