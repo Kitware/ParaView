@@ -62,7 +62,7 @@ actor SetMapper mapper
 
 # Add the actor to the scene
 
-rw AddProp actor
+rw AddViewProp actor
 rw ResetCamera
 
 # Start the application
