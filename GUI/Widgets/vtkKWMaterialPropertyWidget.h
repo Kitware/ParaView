@@ -79,6 +79,14 @@ public:
     { this->SetMaterialColor(color[0], color[1], color[2]); }
 
   // Description:
+  // Set/Get the lighting parameters visibility.
+  // If set to Off, none of the ambient, diffuse, specular (etc.) scales
+  // will be displayed.
+  virtual void SetLightingParametersVisibility(int);
+  vtkBooleanMacro(LightingParametersVisibility, int);
+  vtkGetMacro(LightingParametersVisibility, int);
+
+  // Description:
   // Set/Get the event invoked when the property is changed/changing.
   // Defaults to vtkKWEvent::MaterialPropertyChanged/ingEvent, this default
   // is likely to change in subclasses to reflect what kind of property
@@ -122,6 +130,7 @@ protected:
   int   PresetSize;
   int   PopupPreviewSize;
   double GridOpacity;
+  int LightingParametersVisibility;
 
   double MaterialColor[3];
 
@@ -162,6 +171,7 @@ protected:
 
   vtkKWPopupButtonWithLabel   *PopupButton;
   vtkKWFrameWithLabel         *MaterialPropertiesFrame;
+  vtkKWFrame                  *ControlFrame;
   vtkKWFrame                  *LightingFrame;
   vtkKWScaleWithEntry         *AmbientScale;
   vtkKWScaleWithEntry         *DiffuseScale;
@@ -170,6 +180,10 @@ protected:
   vtkKWFrame                  *PresetsFrame;
   vtkKWLabelWithLabel         *PreviewLabel;
   vtkKWPushButtonSetWithLabel *PresetPushButtonSet;
+
+  // Description:
+  // Pack
+  virtual void Pack();
 
   // Description:
   // Create a preview image given some material properties
@@ -209,6 +223,10 @@ protected:
                             double diffuse,
                             double specular, 
                             double specular_power);
+
+  // Description:
+  // Return 1 if the controls should be enabled.
+  virtual int AreControlsEnabled() { return 1; };
 
 private:
   vtkKWMaterialPropertyWidget(const vtkKWMaterialPropertyWidget&);  //Not implemented

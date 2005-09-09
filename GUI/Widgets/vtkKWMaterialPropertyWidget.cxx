@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -54,6 +54,7 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
   this->PresetSize       = 48;
   this->PopupPreviewSize = 24;
   this->GridOpacity      = 0.3;
+  this->LightingParametersVisibility  = 1;
 
   this->MaterialColor[0] = 1.0;
   this->MaterialColor[1] = 1.0;
@@ -77,6 +78,8 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
   this->PopupButton = NULL;
 
   this->MaterialPropertiesFrame = vtkKWFrameWithLabel::New();
+
+  this->ControlFrame = vtkKWFrame::New();
 
   this->LightingFrame = vtkKWFrame::New();
 
@@ -146,6 +149,12 @@ vtkKWMaterialPropertyWidget::~vtkKWMaterialPropertyWidget()
     {
     this->MaterialPropertiesFrame->Delete();
     this->MaterialPropertiesFrame = NULL;
+    }
+
+  if (this->ControlFrame)
+    {
+    this->ControlFrame->Delete();
+    this->ControlFrame = NULL;
     }
 
   if (this->LightingFrame)
@@ -312,14 +321,17 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
   frame = this->MaterialPropertiesFrame->GetFrame();
 
   // --------------------------------------------------------------
+  // Control frame
+
+  this->ControlFrame->SetParent(frame);
+  this->ControlFrame->Create(app);
+
+  // --------------------------------------------------------------
   // Lighting frame
 
   this->LightingFrame->SetParent(frame);
   this->LightingFrame->Create(app);
 
-  this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
-               this->LightingFrame->GetWidgetName());
-  
   // --------------------------------------------------------------
   // Ambient
 
@@ -405,9 +417,6 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
   this->PresetsFrame->SetParent(frame);
   this->PresetsFrame->Create(app);
   
-  this->Script("pack %s -anchor w -fill x -expand y",
-               this->PresetsFrame->GetWidgetName());
-  
   // --------------------------------------------------------------
   // Preview
 
@@ -448,6 +457,38 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMaterialPropertyWidget::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->MaterialPropertiesFrame)
+    {
+    this->MaterialPropertiesFrame->GetFrame()->UnpackChildren();
+    }
+
+  if (this->ControlFrame)
+    {
+    this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
+                 this->ControlFrame->GetWidgetName());
+    }
+  
+  if (this->LightingFrame && this->LightingParametersVisibility)
+    {
+    this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
+                 this->LightingFrame->GetWidgetName());
+    }
+
+  if (this->PresetsFrame)
+    {
+    this->Script("pack %s -anchor w -fill x -expand y",
+                 this->PresetsFrame->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::Update()
 {
   // Update enable state
@@ -458,6 +499,21 @@ void vtkKWMaterialPropertyWidget::Update()
     {
     return;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMaterialPropertyWidget::SetLightingParametersVisibility(int arg)
+{
+  if (this->LightingParametersVisibility == arg)
+    {
+    return;
+    }
+
+  this->LightingParametersVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -722,13 +778,40 @@ void vtkKWMaterialPropertyWidget::UpdateEnableState()
 
   this->PropagateEnableState(this->PopupButton);
   this->PropagateEnableState(this->MaterialPropertiesFrame);
+  this->PropagateEnableState(this->ControlFrame);
   this->PropagateEnableState(this->LightingFrame);
-  this->PropagateEnableState(this->AmbientScale);
-  this->PropagateEnableState(this->DiffuseScale);
-  this->PropagateEnableState(this->SpecularScale);
-  this->PropagateEnableState(this->SpecularPowerScale);
-  this->PropagateEnableState(this->PreviewLabel);
-  this->PropagateEnableState(this->PresetPushButtonSet);
+
+  int enabled = this->AreControlsEnabled() ? this->GetEnabled() : 0;
+
+  if (this->AmbientScale)
+    {
+    this->AmbientScale->SetEnabled(enabled);
+    }
+
+  if (this->DiffuseScale)
+    {
+    this->DiffuseScale->SetEnabled(enabled);
+    }
+
+  if (this->SpecularScale)
+    {
+    this->SpecularScale->SetEnabled(enabled);
+    }
+
+  if (this->SpecularPowerScale)
+    {
+    this->SpecularPowerScale->SetEnabled(enabled);
+    }
+
+  if (this->PreviewLabel)
+    {
+    this->PreviewLabel->SetEnabled(enabled);
+    }
+
+  if (this->PresetPushButtonSet)
+    {
+    this->PresetPushButtonSet->SetEnabled(enabled);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -814,16 +897,17 @@ void vtkKWMaterialPropertyWidget::CreateImage(unsigned char *data,
 
   int pixel_size = 3 + (this->GridOpacity == 1.0 ? 0 : 1);
   int r, g, b, a;
+  double size2 = (double)size * 0.5;
 
   for (i = 0; i < size; i++)
     {
     for (j = 0; j < size; j++)
       {
-      dist = sqrt((double)((i-size/2)*(i-size/2) + (j-size/2)*(j-size/2)));
-      if (dist <= size/2 - 1)
+      dist = sqrt((double)((i-size2)*(i-size2) + (j-size2)*(j-size2)));
+      if (dist <= size2 - 1)
         {
-        normal[0] = pt[0] = (i-size/2) / (size/2.0-1);
-        normal[1] = pt[1] = (j-size/2) / (size/2.0-1);
+        normal[0] = pt[0] = (i-size2) / (size2-1);
+        normal[1] = pt[1] = (j-size2) / (size2-1);
         normal[2] = pt[2] = sqrt(1 - pt[0]*pt[0] - pt[1]*pt[1]);
         vtkMath::Normalize(normal);
 
@@ -962,6 +1046,9 @@ void vtkKWMaterialPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << this->MaterialColor[0] << " "
      << this->MaterialColor[1] << " "
      << this->MaterialColor[2] << endl;
+  os << indent << "LightingParametersVisibility: "
+     << (this->LightingParametersVisibility ? "On" : "Off") << endl;
+
   os << indent << "PopupButton: ";
   if (this->PopupButton)
     {
