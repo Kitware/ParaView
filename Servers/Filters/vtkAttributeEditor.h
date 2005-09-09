@@ -106,6 +106,11 @@ public:
   vtkGetMacro(EditMode,int);
   vtkBooleanMacro(EditMode,int);
 
+  // When this flag is set, the next time the filter is executed, the arrays of edits will be deleted.
+  // This is meant to be called just before a timestep change is about to occur.
+  vtkSetMacro(ClearEdits,int);
+  vtkGetMacro(ClearEdits,int);
+  vtkBooleanMacro(ClearEdits,int);
 
   // Description:
   // Set the tolerance for merging clip intersection points that are near
@@ -170,12 +175,13 @@ protected:
   int EditMode;
   int IsPointPick;
   int UnfilteredDataset;
+  int ClearEdits;
 
   // Point picking stuff:
 
-  //void RegionExecute(vtkDataSet *, vtkDataSet *);
-  void PointExecute(vtkDataSet *, vtkDataSet *);
-  void CellExecute(vtkDataSet *, vtkDataSet *);
+  void RegionExecute(vtkDataSet *readerInput, vtkDataSet *filterInput, vtkDataSet *readerOutput, vtkDataSet *filterOutput);
+  void PointExecute(vtkDataSet *readerInput, vtkDataSet *filterInput, vtkDataSet *readerOutput, vtkDataSet *filterOutput);
+  void CellExecute(vtkDataSet *readerInput, vtkDataSet *filterInput, vtkDataSet *readerOutput, vtkDataSet *filterOutput);
 
   void CreateOutput(vtkIdList* regionCellIds);
   int CompareProcesses(double bestDist2);
