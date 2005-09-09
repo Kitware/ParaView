@@ -106,6 +106,10 @@ protected:
   // Send an event representing the state of the widget
   virtual void SendStateEvent(int event);
 
+  // Description:
+  // Return 1 if the controls should be enabled.
+  virtual int AreControlsEnabled();
+
 private:
   vtkKWVolumeMaterialPropertyWidget(const vtkKWVolumeMaterialPropertyWidget&);  //Not implemented
   void operator=(const vtkKWVolumeMaterialPropertyWidget&);  //Not implemented
