@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.23");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.24");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -40,6 +40,7 @@ public:
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
 {
+  this->SelectionCommand = NULL;
   this->SelectionChangedCommand = NULL;
   this->PotentialCellBackgroundColorChangedCommand = NULL;
 
@@ -49,6 +50,11 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::~vtkKWMultiColumnList()
 {
+  if (this->SelectionCommand)
+    {
+    delete [] this->SelectionCommand;
+    this->SelectionCommand = NULL;
+    }
   if (this->SelectionChangedCommand)
     {
     delete [] this->SelectionChangedCommand;
@@ -91,7 +97,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 
   this->SetConfigurationOption("-activestyle", "none");
 
-  this->AddBinding("<<TablelistSelect>>", this, "SelectionChangedCallback");
+  this->AddBinding("<<TablelistSelect>>", this, "SelectionCallback");
   
   // Update enable state
 
@@ -144,7 +150,7 @@ void vtkKWMultiColumnList::NumberOfColumnsChanged()
   // Changing the number of columns can potentially affect the selection
   // Check for that
 
-  this->SelectionChangedCallback();
+  this->HasSelectionChanged();
 }
 
 //----------------------------------------------------------------------------
@@ -912,7 +918,7 @@ void vtkKWMultiColumnList::NumberOfRowsChanged()
   // Changing the number of columns can potentially affect the selection
   // Check for that
 
-  this->SelectionChangedCallback();
+  this->HasSelectionChanged();
 
   // Trigger this because inserting/removing rows can change the background
   // color of a row (given the stripes, or the specific row colors, etc.)
@@ -2270,7 +2276,7 @@ void vtkKWMultiColumnList::SetSelectionMode(int relief)
 {
   this->SetConfigurationOption(
     "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
-  this->SelectionChangedCallback();
+  this->HasSelectionChanged();
 }
 
 //----------------------------------------------------------------------------
@@ -2302,7 +2308,7 @@ void vtkKWMultiColumnList::SetSelectionType(int type)
       break;
     }
   this->SetConfigurationOption("-selecttype", type_opt);
-  this->SelectionChangedCallback();
+  this->HasSelectionChanged();
 }
 
 //----------------------------------------------------------------------------
@@ -2341,7 +2347,7 @@ void vtkKWMultiColumnList::SelectRow(int row_index)
     {
     this->Script("%s selection set %d %d", 
                  this->GetWidgetName(), row_index, row_index);
-    this->SelectionChangedCallback();
+    this->SelectionCallback();
     }
 }
 
@@ -2352,7 +2358,7 @@ void vtkKWMultiColumnList::DeselectRow(int row_index)
     {
     this->Script("%s selection clear %d %d", 
                  this->GetWidgetName(), row_index, row_index);
-    this->SelectionChangedCallback();
+    this->SelectionCallback();
     }
 }
 
@@ -2433,7 +2439,7 @@ void vtkKWMultiColumnList::SelectCell(int row_index, int col_index)
     this->Script("%s cellselection set %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
-    this->SelectionChangedCallback();
+    this->SelectionCallback();
     }
 }
 
@@ -2445,7 +2451,7 @@ void vtkKWMultiColumnList::DeselectCell(int row_index, int col_index)
     this->Script("%s cellselection clear %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
-    this->SelectionChangedCallback();
+    this->SelectionCallback();
     }
 }
 
@@ -2507,7 +2513,25 @@ void vtkKWMultiColumnList::ClearSelection()
   if (this->IsCreated())
     {
     this->Script("%s selection clear 0 end", this->GetWidgetName());
-    this->SelectionChangedCallback();
+    this->SelectionCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetSelectionCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->SelectionCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeSelectionCommand()
+{
+  if (this->SelectionCommand && 
+      *this->SelectionCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval %s", this->SelectionCommand);
     }
 }
 
@@ -2549,7 +2573,14 @@ void vtkKWMultiColumnList::InvokePotentialCellBackgroundColorChangedCommand()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SelectionChangedCallback()
+void vtkKWMultiColumnList::SelectionCallback()
+{
+  this->InvokeSelectionCommand();
+  this->HasSelectionChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::HasSelectionChanged()
 {
   // Retrieve the selected cells
 

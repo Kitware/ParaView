@@ -771,7 +771,19 @@ public:
   virtual void ClearSelection();
 
   // Description:
-  // Specifies a command to be invoked when the selection has changed
+  // Specifies a command to be invoked when an element is selected/deselected
+  // in the widget. Re-selecting an element will trigger this command too.
+  // If one want to be notified only when the selection has *changed* (the
+  // number of selected/deselected items has changed), use the
+  // SelectionChangedCommand command instead.
+  virtual void SetSelectionCommand(
+    vtkObject* object, const char *method);
+
+  // Description:
+  // Specifies a command to be invoked when the selection has *changed*. This
+  // command will *not* be invoked when an item is re-selected (i.e. it
+  // was already selected when the user clicked on it again). To be notified
+  // when any selection event occurs, use SelectionCommand instead.
   virtual void SetSelectionChangedCommand(
     vtkObject* object, const char *method);
 
@@ -835,7 +847,7 @@ public:
 
   // Description:
   // Callbacks
-  virtual void SelectionChangedCallback();
+  virtual void SelectionCallback();
   virtual void CellWindowDestroyRemoveChildCallback(
     const char*, int, int, const char*);
 
@@ -851,6 +863,9 @@ public:
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
+
+  char *SelectionCommand;
+  virtual void InvokeSelectionCommand();
 
   char *SelectionChangedCommand;
   virtual void InvokeSelectionChangedCommand();
@@ -914,6 +929,10 @@ protected:
   //BTX
   vtkKWMultiColumnListInternals *Internals;
   //ETX
+
+  // Description:
+  // Check if the selection has changed and invoke the corresponding command
+  virtual void HasSelectionChanged();
 
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented
