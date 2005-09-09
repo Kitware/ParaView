@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.5");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -382,9 +382,15 @@ void vtkPVAttributeEditor::OnTimestepChange()
     }
 
   // This ensures the currently selected region won't be edited in the new timestep:
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProxy()->GetProperty("EditMode"));
   ivp->SetElements1(0);
+
+  vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProxy()->GetProperty("ClearEdits"));
+  vp->SetElements1(1);
+
   this->GetProxy()->UpdateVTKObjects();
 }
 

@@ -67,6 +67,8 @@ public:
   vtkSetMacro(EditedFlag,int);
   vtkSetMacro(IsScalingFlag,int);
   vtkSetMacro(IsMovingFlag,int);
+  vtkSetMacro(ForceEdit,int);
+  vtkSetMacro(ForceNoEdit,int);
 
   // Description:
   // Handles the events
