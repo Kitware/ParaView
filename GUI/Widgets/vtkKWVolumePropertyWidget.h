@@ -98,6 +98,12 @@ public:
   vtkGetMacro(InteractiveApplyButtonVisibility, int);
 
   // Description:
+  // Set/Get the scalar opacity unit distance visibility
+  vtkBooleanMacro(ScalarOpacityUnitDistanceVisibility, int);
+  virtual void SetScalarOpacityUnitDistanceVisibility(int);
+  vtkGetMacro(ScalarOpacityUnitDistanceVisibility, int);
+
+  // Description:
   // Set/Get the HSV color selector visibility
   vtkBooleanMacro(HSVColorSelectorVisibility, int);
   virtual void SetHSVColorSelectorVisibility(int);
@@ -121,6 +127,29 @@ public:
   virtual void SetMaterialPropertyVisibility(int);
   vtkGetMacro(MaterialPropertyVisibility, int);
 
+  // Description:
+  // Set the material property button position to the top frame (default)
+  // or to the scalar opacity or color user frame.
+  //BTX
+  enum
+  {
+    MaterialPropertyPositionTopFrame,
+    MaterialPropertyPositionScalarOpacityUserFrame,
+    MaterialPropertyPositionScalarColorUserFrame
+  };
+  //ETX
+  virtual void SetMaterialPropertyPosition(int);
+  vtkGetMacro(MaterialPropertyPosition, int);
+  virtual void SetMaterialPropertyPositionToTopFrame()
+    { this->SetMaterialPropertyPosition(
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame); };
+  virtual void SetMaterialPropertyPositionToScalarOpacityUserFrame()
+    { this->SetMaterialPropertyPosition(
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarOpacityUserFrame); };
+  virtual void SetMaterialPropertyPositionToScalarColorUserFrame()
+    { this->SetMaterialPropertyPosition(
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame); };
+  
   // Description:
   // Set/Get the gradient opacity function visibility
   vtkBooleanMacro(GradientOpacityFunctionVisibility, int);
@@ -213,6 +242,7 @@ public:
   vtkGetObjectMacro(GradientOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
   vtkGetObjectMacro(ScalarOpacityUnitDistanceScale, vtkKWScaleWithEntry);
   vtkGetObjectMacro(HSVColorSelector, vtkKWHSVColorSelector);
+  vtkGetObjectMacro(MaterialPropertyWidget, vtkKWVolumeMaterialPropertyWidget);
  
   // Description:
   // Pack or repack the UI
@@ -238,9 +268,10 @@ protected:
   int   SelectedComponent;
   int   DisableCommands;
   int   EnableShadingForAllComponents;
-
+  int   MaterialPropertyPosition;
   int   InteractiveApplyMode;
   int   InteractiveApplyButtonVisibility;
+  int   ScalarOpacityUnitDistanceVisibility;
   int   HSVColorSelectorVisibility;
   int   ComponentSelectionVisibility;
   int   InterpolationTypeVisibility;

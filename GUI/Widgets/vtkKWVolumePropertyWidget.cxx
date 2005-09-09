@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.27");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.28");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -69,12 +69,14 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->InteractiveApplyMode              = 0;
   this->InteractiveApplyButtonVisibility  = 1;
+  this->ScalarOpacityUnitDistanceVisibility  = 1;
   this->HSVColorSelectorVisibility        = 1;
   this->ComponentSelectionVisibility      = 1;
   this->InterpolationTypeVisibility       = 1;
   this->MaterialPropertyVisibility        = 1;
   this->GradientOpacityFunctionVisibility = 1;
   this->ComponentWeightsVisibility        = 1;
+  this->MaterialPropertyPosition   = vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame;
 
   this->UseScalarColorFunctionInScalarOpacityEditor        = 0;
 
@@ -329,7 +331,7 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Material properties : widget
 
-  this->MaterialPropertyWidget->SetParent(this->InnerLeftFrame);
+  this->MaterialPropertyWidget->SetParent(this);
   this->MaterialPropertyWidget->PopupModeOn();
   this->MaterialPropertyWidget->Create(app);
   this->MaterialPropertyWidget->GetPopupButton()->SetLabelWidth(label_width);
@@ -368,6 +370,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   this->ScalarOpacityFunctionEditor->SetRangeLabelPosition(
     vtkKWParameterValueFunctionEditor::RangeLabelPositionTop);
   this->ScalarOpacityFunctionEditor->ValueRangeVisibilityOff();
+  this->ScalarOpacityFunctionEditor->SetValueRangeLabelVisibility(
+    this->ScalarOpacityFunctionEditor->GetValueRangeVisibility());
   this->ScalarOpacityFunctionEditor->WindowLevelModeButtonVisibilityOn();
   this->ScalarOpacityFunctionEditor->Create(app);
 
@@ -406,9 +410,6 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     "Set the unit distance on which the scalar opacity transfer function "
     "is defined.");
 
-  tk_cmd << "pack " << this->ScalarOpacityUnitDistanceScale->GetWidgetName() 
-         << " -side right -fill both -padx 2 -pady 0" << endl;
-
   // --------------------------------------------------------------
   // Color transfer function editor
 
@@ -424,6 +425,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->ScalarOpacityFunctionEditor->GetPointMarginToCanvas());
   this->ScalarColorFunctionEditor->SetValueRangeVisibility(
     this->ScalarOpacityFunctionEditor->GetValueRangeVisibility());
+  this->ScalarColorFunctionEditor->SetValueRangeLabelVisibility(
+    this->ScalarColorFunctionEditor->GetValueRangeVisibility());
   this->ScalarColorFunctionEditor->SetLabelPosition(
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->ScalarColorFunctionEditor->SetRangeLabelPosition(
@@ -480,6 +483,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
     this->ScalarColorFunctionEditor->GetCanvasHeight());
   this->GradientOpacityFunctionEditor->SetValueRangeVisibility(
     this->ScalarOpacityFunctionEditor->GetValueRangeVisibility());
+  this->GradientOpacityFunctionEditor->SetValueRangeLabelVisibility(
+    this->GradientOpacityFunctionEditor->GetValueRangeVisibility());
   this->GradientOpacityFunctionEditor->SetLabelPosition(
     this->ScalarOpacityFunctionEditor->GetLabelPosition());
   this->GradientOpacityFunctionEditor->SetRangeLabelPosition(
@@ -671,12 +676,45 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Material Property (MP)
 
-  if (this->MaterialPropertyVisibility)
+  if (this->MaterialPropertyPosition == 
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame)
     {
-    tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
-           << " -side top -anchor nw " << pad << endl;
+    if (this->MaterialPropertyVisibility)
+      {
+      tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
+             << " -side top -anchor nw " << pad << " -in " 
+             << this->InnerLeftFrame->GetWidgetName() << endl;
+      }
+    this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOn();
     }
-
+  else
+    {
+    this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOff();
+    if (this->MaterialPropertyVisibility)
+      {
+      tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
+             << " -side right -fill both -padx 2 -pady 0 -in ";
+      if (this->MaterialPropertyPosition == 
+          vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarOpacityUserFrame)
+        {
+        tk_cmd << 
+          this->ScalarOpacityFunctionEditor->GetUserFrame()->GetWidgetName();
+        }
+      else if (this->MaterialPropertyPosition == 
+         vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame)
+        {
+        tk_cmd << 
+          this->ScalarColorFunctionEditor->GetUserFrame()->GetWidgetName();
+        }
+      tk_cmd << endl;
+      }
+    else
+      {
+      tk_cmd << "pack forget " << this->MaterialPropertyWidget->GetWidgetName()
+             << endl;
+      }
+    }
+  
   // Enable Shading (ES)
 
   if (this->MaterialPropertyVisibility)
@@ -708,6 +746,17 @@ void vtkKWVolumePropertyWidget::Pack()
     }
   tk_cmd << endl;
   row++;
+
+  if (this->ScalarOpacityUnitDistanceVisibility)
+    {
+    tk_cmd << "pack " << this->ScalarOpacityUnitDistanceScale->GetWidgetName() 
+           << " -side right -fill both -padx 2 -pady 0" << endl;
+    }
+  else
+    {
+    tk_cmd << "pack forget " 
+           << this->ScalarOpacityUnitDistanceScale->GetWidgetName() << endl;
+    }
 
   // Color Transfer Function (CTF)
 
@@ -1475,6 +1524,21 @@ void vtkKWVolumePropertyWidget::SetInteractiveApplyButtonVisibility(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetScalarOpacityUnitDistanceVisibility(int arg)
+{
+  if (this->ScalarOpacityUnitDistanceVisibility == arg)
+    {
+    return;
+    }
+
+  this->ScalarOpacityUnitDistanceVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetInterpolationTypeVisibility(int arg)
 {
   if (this->InterpolationTypeVisibility == arg)
@@ -1498,6 +1562,31 @@ void vtkKWVolumePropertyWidget::SetMaterialPropertyVisibility(int arg)
     }
 
   this->MaterialPropertyVisibility = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetMaterialPropertyPosition(int arg)
+{
+  if (arg < vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame)
+    {
+    arg = vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame;
+    }
+  else if (arg > 
+     vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame)
+    {
+    arg = vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame;
+    }
+
+  if (this->MaterialPropertyPosition == arg)
+    {
+    return;
+    }
+
+  this->MaterialPropertyPosition = arg;
 
   this->Modified();
 
@@ -1614,7 +1703,7 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
   if (this->ScalarColorFunctionEditor)
     {
     this->ScalarColorFunctionEditor->LabelVisibilityOff();
-    this->ScalarColorFunctionEditor->RangeLabelVisibilityOff();
+    this->ScalarColorFunctionEditor->ParameterRangeLabelVisibilityOff();
     this->ScalarColorFunctionEditor->PointEntriesVisibilityOff();
     this->ScalarColorFunctionEditor->CanvasVisibilityOff();
     this->ScalarColorFunctionEditor->HistogramLogModeOptionMenuVisibilityOff();
@@ -2155,10 +2244,13 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->InteractiveApplyMode ? "On" : "Off") << endl;
   os << indent << "InteractiveApplyButtonVisibility: "
      << (this->InteractiveApplyButtonVisibility ? "On" : "Off") << endl;
+  os << indent << "ScalarOpacityUnitDistanceVisibility: "
+     << (this->ScalarOpacityUnitDistanceVisibility ? "On" : "Off") << endl;
   os << indent << "HSVColorSelectorVisibility: "
      << (this->HSVColorSelectorVisibility ? "On" : "Off") << endl;
   os << indent << "InterpolationTypeVisibility: "
      << (this->InterpolationTypeVisibility ? "On" : "Off") << endl;
+  os << indent << "MaterialPropertyPosition: " << this->MaterialPropertyPosition << endl;
   os << indent << "MaterialPropertyVisibility: "
      << (this->MaterialPropertyVisibility ? "On" : "Off") << endl;
   os << indent << "GradientOpacityFunctionVisibility: "
