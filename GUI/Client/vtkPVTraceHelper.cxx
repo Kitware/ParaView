@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.4");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.5");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -34,6 +34,7 @@ vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
 vtkPVTraceHelper::vtkPVTraceHelper()
 {
   this->Initialized      = 0;
+  this->StateInitialized = 0;
   this->TraceObject      = NULL;
   this->ReferenceHelper  = NULL;
   this->ReferenceCommand = NULL;
@@ -101,7 +102,6 @@ int vtkPVTraceHelper::Initialize()
 int vtkPVTraceHelper::Initialize(ofstream* file)
 {
   int state_flag = 0;
-  int dummy_init = 0;
   int *init;
 
   if (!this->TraceObject)
@@ -122,9 +122,10 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
     }
   else
     { 
-    // Saving state: Ignore trace initialization.
+    // Saving state: Ignore trace initialization; keep track of state
+    // initialization.
     state_flag = 1;
-    init = &(dummy_init);
+    init = &(this->StateInitialized);
     }
 
   // There is no need to do anything if there is no trace file.
@@ -250,6 +251,7 @@ void vtkPVTraceHelper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Initialized: " << this->GetInitialized() << endl;
+  os << indent << "StateInitialized: " << this->GetStateInitialized() << endl;
   os << indent << "TraceObject: " << this->GetTraceObject() << endl;
   os << indent << "ReferenceHelper: " 
      << this->GetReferenceHelper() << endl;

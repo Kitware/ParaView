@@ -62,7 +62,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.455");
+vtkCxxRevisionMacro(vtkPVSource, "1.456");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2330,14 +2330,12 @@ void vtkPVSource::SaveState(ofstream *file)
 {
   int i, numWidgets;
   vtkPVWidget *pvw;
+  int glyphSource = 0;
 
   // Detect if this source is in Glyph sourcesm and already exists.
   if (this->GetTraceHelper()->GetReferenceCommand())
     {
-    *file << "set kw(" << this->GetTclName() << ") [$kw(" 
-          << this->GetTraceHelper()->GetReferenceHelper()->GetTraceObject()->GetTclName() << ") " 
-          << this->GetTraceHelper()->GetReferenceCommand() << "]\n";
-    return;
+    glyphSource = 1;
     }
 
   // This should not be needed, but We can check anyway.
@@ -2346,34 +2344,37 @@ void vtkPVSource::SaveState(ofstream *file)
     return;
     }
 
-  // This is the recursive part.
-  this->VisitedFlag = 1;
-  // Loop through all of the inputs
-  for (i = 0; i < this->NumberOfPVInputs; ++i)
+  if (!glyphSource)
     {
-    if (this->PVInputs[i] && this->PVInputs[i]->GetVisitedFlag() != 2)
+    // This is the recursive part.
+    this->VisitedFlag = 1;
+    // Loop through all of the inputs
+    for (i = 0; i < this->NumberOfPVInputs; ++i)
       {
-      this->PVInputs[i]->SaveState(file);
+      if (this->PVInputs[i] && this->PVInputs[i]->GetVisitedFlag() != 2)
+        {
+        this->PVInputs[i]->SaveState(file);
+        }
       }
-    }
-  
-  // We have to set the first input as the current source,
-  // because CreatePVSource uses it as default input.
-  // We may not have a input menu to set it for us.
-  if (this->GetPVInput(0))
-    {
-    *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
-          << "SetCurrentPVSourceCallback $kw("
-          << this->GetPVInput(0)->GetTclName() << ")\n";
-    }
 
-  // Save the object in the script.
-  *file << "set kw(" << this->GetTclName() << ") "
-        << "[$kw(" << this->GetPVWindow()->GetTclName() << ") "
-        << "CreatePVSource " << this->GetModuleName() << "]" << endl;
+    // We have to set the first input as the current source,
+    // because CreatePVSource uses it as default input.
+    // We may not have a input menu to set it for us.
+    if (this->GetPVInput(0))
+      {
+      *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+            << "SetCurrentPVSourceCallback $kw("
+            << this->GetPVInput(0)->GetTclName() << ")\n";
+      }
 
-  *file << "$kw(" << this->GetTclName() << ") SetLabel {" 
-        << this->GetLabel() << "}" << endl;
+    // Save the object in the script.
+    *file << "set kw(" << this->GetTclName() << ") "
+          << "[$kw(" << this->GetPVWindow()->GetTclName() << ") "
+          << "CreatePVSource " << this->GetModuleName() << "]" << endl;
+
+    *file << "$kw(" << this->GetTclName() << ") SetLabel {" 
+          << this->GetLabel() << "}" << endl;
+    }
 
   // Let the PVWidgets set up the object.
   numWidgets = this->Widgets->GetNumberOfItems();
@@ -2390,7 +2391,10 @@ void vtkPVSource::SaveState(ofstream *file)
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
-  this->SaveStateDisplay(file);
+  if (!glyphSource)
+    {
+    this->SaveStateDisplay(file);
+    }
 }
 
 //----------------------------------------------------------------------------

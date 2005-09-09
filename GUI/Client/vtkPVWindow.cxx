@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.764");
+vtkCxxRevisionMacro(vtkPVWindow, "1.765");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3180,6 +3180,24 @@ void vtkPVWindow::SaveState(const char* filename)
     *file << endl;
     }
 
+  // Save the state of the glyph sources
+  vtkPVSourceCollection *glyphSources = this->GetSourceList("GlyphSources");
+  vtkCollectionIterator* cit;
+  cit = glyphSources->NewIterator();
+  cit->InitTraversal();
+  if (glyphSources->GetNumberOfItems() > 0)
+    {
+    *file << "\n# Glyph Sources" << endl;
+    while (!cit->IsDoneWithTraversal())
+      {
+      pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject());
+      pvs->SaveState(file);
+      cit->GoToNextItem();
+      }
+    *file << endl;
+    }
+  cit->Delete();
+  
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
 
@@ -3205,7 +3223,6 @@ void vtkPVWindow::SaveState(const char* filename)
 
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
-  vtkCollectionIterator* cit;
   cit = modules->NewIterator();
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )

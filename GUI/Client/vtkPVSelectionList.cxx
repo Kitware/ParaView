@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.60");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -312,12 +312,16 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     return;
     }
 
-  this->CurrentValue = value;
   name = this->Names->GetString(value);
   if (name)
     {
+    // CurrentValue is set in SelectCallback
     this->Menu->SetValue(name);
     this->SelectCallback(name, value);
+    }
+  else
+    {
+    this->CurrentValue = value;
     }
 }
 

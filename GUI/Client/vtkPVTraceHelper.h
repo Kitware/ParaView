@@ -90,6 +90,13 @@ public:
   vtkBooleanMacro(Initialized, int);
 
   // Description:
+  // If a callback initializes Object in a state file, it can indicate so by
+  // setting this flag.
+  vtkSetMacro(StateInitialized, int);
+  vtkGetMacro(StateInitialized, int);
+  vtkBooleanMacro(StateInitialized, int);
+
+  // Description:
   // Convenience method to get the trace file associated to the Object's
   // application, if any. Return NULL if Object's is not defined, has
   // no application, or no trace file.
@@ -124,6 +131,11 @@ protected:
   // This flag indicates that a variable has been defined in the 
   // trace file for the object being traced.
   int Initialized;
+
+  // Description:
+  // This flag indicates that a variable has been defined in the 
+  // state file for the object being saved.
+  int StateInitialized;
 
   // Description:
   // Unique trace name
