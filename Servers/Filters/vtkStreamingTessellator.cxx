@@ -31,7 +31,7 @@
 #  define VTK_TESSELLATOR_INCR_SUBCASE_COUNT(cs,sc)
 #endif // PARAVIEW_DEBUG_TESSELLATOR
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.10");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.11");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )
@@ -243,8 +243,10 @@ bool compareHopfCrossStringDist( const double* a0, const double* a1, const doubl
   for (int i=0; i<3; i++)
     {
     double tmp;
-    SqMagA += (tmp=(a0[i]-a1[i]))*tmp;
-    SqMagB += (tmp=(b0[i]-b1[i]))*tmp;
+    tmp = a0[i] - a1[i];
+    SqMagA += tmp * tmp;
+    tmp = b0[i] - b1[i];
+    SqMagB += tmp * tmp;
     }
   return SqMagA < SqMagB;
 }

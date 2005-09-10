@@ -19,7 +19,7 @@
 #include "vtkCell.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.2");
+vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.3");
 vtkStandardNewMacro(vtkDataSetSubdivisionAlgorithm);
 
 vtkDataSetSubdivisionAlgorithm::vtkDataSetSubdivisionAlgorithm()
@@ -143,7 +143,10 @@ bool vtkDataSetSubdivisionAlgorithm::EvaluateEdge( const double* p0, double* mid
   double tmp;
   int c;
   for ( c = 0; c < 3; ++c )
-    chord2 += ( tmp = midpt[c] - realMidPt[c] )*tmp;
+    {
+    tmp = midpt[c] - realMidPt[c];
+    chord2 += tmp * tmp;
+    }
 
   bool rval = chord2 > this->ChordError2;
   if ( rval )
