@@ -68,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.250");
+vtkCxxRevisionMacro(vtkKWApplication, "1.251");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1690,7 +1690,7 @@ void vtkKWApplication::CheckForUpdates()
   if (this->GetCheckForUpdatesPath(upd))
     {
     upd << ends;
-#if defined (__BORLAND_C__)
+#if defined (__BORLANDC__)
     spawnl(P_NOWAIT, upd.str(), upd.str(), NULL);
 #else
    _spawnl(_P_NOWAIT, upd.str(), upd.str(), NULL);
