@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -114,8 +114,6 @@ void vtkKWVolumeMaterialPropertyWidget::Create(vtkKWApplication *app)
 
   // --------------------------------------------------------------
   // Material frame
-
-  vtkKWFrame *frame = this->MaterialPropertiesFrame->GetFrame();
 
   int label_width = this->AmbientScale->GetLabel()->GetWidth();
 

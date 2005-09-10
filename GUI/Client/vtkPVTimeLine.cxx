@@ -22,7 +22,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.11");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -42,8 +42,10 @@ vtkPVTimeLine::vtkPVTimeLine()
   this->AnimationCue = 0;
 
   this->ValueRangeVisibilityOff();
+  this->ValueRangeLabelVisibilityOff();
   this->ParameterRangeVisibilityOff();
   this->ParameterEntryVisibilityOff();
+  this->ParameterRangeLabelVisibilityOff();
   this->LabelVisibilityOff();
   this->CanvasOutlineVisibilityOn();
   this->FunctionLineVisibilityOn();
@@ -51,7 +53,6 @@ vtkPVTimeLine::vtkPVTimeLine()
   this->ParameterCursorVisibilityOn();
   this->SetParameterCursorPosition(0.0);
   this->LockEndPointsParameterOff();
-  this->RangeLabelVisibilityOff();
 }
 
 //----------------------------------------------------------------------------
