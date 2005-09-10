@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.6");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -556,5 +556,7 @@ void vtkPVAttributeEditor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SetEditedFlag" << this->GetEditedFlag() << endl;
   os << indent << "SetIsScalingFlag" << this->IsScalingFlag << endl;
   os << indent << "SetIsMovingFlag" << this->IsMovingFlag << endl;
+  os << indent << "SetForceEdit" << this->ForceEdit << endl;
+  os << indent << "SetForceNoEdit" << this->ForceNoEdit << endl;
   
 }

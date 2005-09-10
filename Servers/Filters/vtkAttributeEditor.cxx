@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.4");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.5");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -160,7 +160,10 @@ int vtkAttributeEditor::RequestData(
   vtkDataSet *readerInput;
   vtkUnstructuredGrid *readerOutput;
   vtkDataSetAttributes *field;
-  vtkInformation *info = this->GetInputArrayInformation(0);
+  vtkDataSetAttributes *readerfield;
+  vtkDataSetAttributes *filterfield;
+  vtkInformation *info;
+  //vtkInformation *info = this->GetInputArrayInformation(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE());
   vtkDataSet *filterInput;
   vtkUnstructuredGrid *filterOutput;
   vtkInformation *filterInputInfo;
@@ -239,7 +242,7 @@ int vtkAttributeEditor::RequestData(
     filterOutput->GetCellData()->PassData ( filterCD );
     filterOutput->GetFieldData()->PassData ( filterInput->GetFieldData() );
     }
-
+/*
   if(this->EditMode==0)
     {
     if(this->ReaderDataArray)
@@ -254,7 +257,10 @@ int vtkAttributeEditor::RequestData(
 
     return 1;
     }
-/*
+*/
+
+  info = this->GetInputArrayInformation(filterInputInfo->Get(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE()));
+
   if(this->EditMode==0)
     {
     if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
@@ -271,18 +277,18 @@ int vtkAttributeEditor::RequestData(
     if(this->ReaderDataArray)
       {
       readerfield->AddArray(this->ReaderDataArray);
-      readerfield->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME());
+      readerfield->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME()));
       }
 
     if(this->FilterDataArray)
       {
       filterfield->AddArray(this->FilterDataArray);
-      filterfield->GetPointData()->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME());
+      filterfield->SetActiveScalars(info->Get(vtkDataObject::FIELD_NAME()));
       }
 
     return 1;
     }
-*/
+
 
   // Turn edit mode off - it must be set explicitly in order for an edit to take place
   this->EditMode = 0;
@@ -1033,6 +1039,7 @@ void vtkAttributeEditor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SetAttributeMode" << this->GetAttributeMode() << endl;
   os << indent << "SetAttributeValue" << this->GetAttributeValue() << endl;
   os << indent << "SetEditMode" << this->GetEditMode() << endl;
+  os << indent << "SetClearEdits" << this->GetClearEdits() << endl;
 
 
 }
