@@ -47,7 +47,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.25");
+vtkCxxRevisionMacro(vtkProcessModule, "1.26");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -395,6 +395,10 @@ vtkDataObject* vtkProcessModule::GetDataObjectOfType(const char* classname)
   else if (strcmp(classname, "vtkPointSet") == 0)
     {
     classname = "vtkPolyData";
+    }
+  else if (strcmp(classname, "vtkCompositeDataSet") == 0)
+    {
+    classname = "vtkHierarchicalDataSet";
     }
 
   vtkProcessModuleInternals::DataTypesType::iterator it =
