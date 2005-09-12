@@ -1,0 +1,6 @@
+#ifndef __vtkPVProcessModuleBatchHelperConfig_h
+#define __vtkPVProcessModuleBatchHelperConfig_h
+
+#define VTK_PV_TclTk_INSTALL_DIR "@TclTk_INSTALL_LIB_DIR@"
+
+#endif
