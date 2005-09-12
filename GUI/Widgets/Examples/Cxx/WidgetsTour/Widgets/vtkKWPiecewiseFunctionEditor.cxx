@@ -118,7 +118,9 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc2_editor->PointIndexVisibilityOff();
   pfed_tfunc2_editor->SelectedPointIndexVisibilityOn();
   pfed_tfunc2_editor->MidPointVisibilityOn();
+  pfed_tfunc2_editor->PointGuidelineVisibilityOn();
   pfed_tfunc2_editor->MidPointGuidelineVisibilityOn();
+  pfed_tfunc2_editor->MidPointGuidelineValueVisibilityOn();
   pfed_tfunc2_editor->MidPointEntryVisibilityOn();
   pfed_tfunc2_editor->SharpnessEntryVisibilityOn();
   pfed_tfunc2_editor->SetLabelPositionToTop();
@@ -128,6 +130,8 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc2_editor->ParameterTicksVisibilityOn();
   pfed_tfunc2_editor->ComputeValueTicksFromHistogramOn();
   pfed_tfunc2_editor->SetParameterTicksFormat("%-#6.0f");
+
+  cout << pfed_tfunc2_editor->GetTclName() << endl;
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 20", 

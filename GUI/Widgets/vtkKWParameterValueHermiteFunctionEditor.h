@@ -91,6 +91,13 @@ public:
   vtkGetMacro(MidPointGuidelineVisibility, int);
 
   // Description:
+  // Set/Get the midpoint guideline value visibility in the canvas 
+  // (i.e., a value on top of the guideline).
+  vtkBooleanMacro(MidPointGuidelineValueVisibility, int);
+  virtual void SetMidPointGuidelineValueVisibility(int);
+  vtkGetMacro(MidPointGuidelineValueVisibility, int);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -155,6 +162,7 @@ protected:
 
   int   MidPointVisibility;
   int   MidPointGuidelineVisibility;
+  int   MidPointGuidelineValueVisibility;
   double MidPointColor[3];
 
   // GUI

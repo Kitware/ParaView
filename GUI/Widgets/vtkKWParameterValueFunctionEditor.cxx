@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.64");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.65");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4852,7 +4852,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
   const char *canv = this->Canvas->GetWidgetName();
 
   int x, y, r;
-  int is_not_visible = 0;
+  int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= this->GetFunctionSize());
 
   // Get the point coords, radius, check if the point is visible
@@ -4874,8 +4874,13 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
     int visible_margin = r + this->PointOutlineWidth + 5;
 
-    if ((x + visible_margin < c_x || c_x2 < x - visible_margin ||
-         y + visible_margin < c_y || c_y2 < y - visible_margin))
+    if (x + visible_margin < c_x || c_x2 < x - visible_margin)
+      {
+      is_not_visible_h = 1;
+      }
+    
+    if (is_not_visible_h || 
+        y + visible_margin < c_y || c_y2 < y - visible_margin)
       {
       is_not_visible = 1;
       }
@@ -5127,7 +5132,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
     }
   else
     {
-    if (is_not_visible || 
+    if (is_not_visible_h || 
         !this->PointGuidelineVisibility || 
         !this->CanvasVisibility)
       {

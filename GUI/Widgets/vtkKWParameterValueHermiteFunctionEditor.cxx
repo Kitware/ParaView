@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.3");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -44,6 +44,7 @@ vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEdit
 
   this->MidPointVisibility          = 1;
   this->MidPointGuidelineVisibility = 0;
+  this->MidPointGuidelineValueVisibility = 0;
 
   this->MidPointColor[0]     = 0.2;
   this->MidPointColor[1]     = 0.2;
@@ -518,6 +519,21 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointGuidelineVisibility(in
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SetMidPointGuidelineValueVisibility(int arg)
+{
+  if (this->MidPointGuidelineValueVisibility == arg)
+    {
+    return;
+    }
+
+  this->MidPointGuidelineValueVisibility = arg;
+
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::SetMidPointColor(
   double r, double g, double b)
 {
@@ -578,7 +594,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   // Is visible ? Is valid (not that there is no midpoint for the last point)
 
   int x, y, r;
-  int is_not_visible = 0;
+  int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= (this->GetFunctionSize() - 1));
 
   // Get the midpoint coords, radius, check if the midpoint is visible
@@ -601,8 +617,13 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
     int visible_margin = r + this->PointOutlineWidth + 5;
 
-    if ((x + visible_margin < c_x || c_x2 < x - visible_margin ||
-         y + visible_margin < c_y || c_y2 < y - visible_margin))
+    if (x + visible_margin < c_x || c_x2 < x - visible_margin)
+      {
+      is_not_visible_h = 1;
+      }
+    
+    if (is_not_visible_h || 
+        y + visible_margin < c_y || c_y2 < y - visible_margin)
       {
       is_not_visible = 1;
       }
@@ -656,7 +677,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     }
   else
     {
-    if (is_not_visible || 
+    if (is_not_visible_h || 
         !this->MidPointGuidelineVisibility || 
         !this->CanvasVisibility)
       {
@@ -723,6 +744,9 @@ void vtkKWParameterValueHermiteFunctionEditor::PrintSelf(ostream& os, vtkIndent 
 
   os << indent << "MidPointGuidelineVisibility: "
      << (this->MidPointGuidelineVisibility ? "On" : "Off") << endl;
+
+  os << indent << "MidPointGuidelineValueVisibility: "
+     << (this->MidPointGuidelineValueVisibility ? "On" : "Off") << endl;
 
   os << indent << "MidPointColor: ("
      << this->MidPointColor[0] << ", " 
