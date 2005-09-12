@@ -152,6 +152,22 @@
                     property="CellArrayStatus"
                     trace_name="CellSelection"/>
   </Module>
+  <Module name="XMLHierarchicalDataReader"
+          root_name="XMLHierarchicalDataReader"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions=".vth"
+          file_description="VTK Hierarchical Data Files">
+    <Source class="vtkXMLHierarchicalDataReader"/>
+  </Module>
+  <Module name="XMLHierarchicalBoxDataReader"
+          root_name="XMLHierarchicalBoxDataReader"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions=".vth"
+          file_description="VTK Hierarchical Box Data Files">
+    <Source class="vtkXMLHierarchicalBoxDataReader"/>
+  </Module>
   <Module name="legacyreader"
           class="vtkPVReaderModule" root_name="LegaVTK"
           module_type="Reader"

@@ -14,6 +14,28 @@
    <!-- End DEMReader -->
    </SourceProxy>
 
+   <SourceProxy name="XMLHierarchicalDataReader" 
+                class="vtkXMLHierarchicalDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End HierarchicalDataReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLHierarchicalBoxDataReader" 
+                class="vtkXMLHierarchicalBoxDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End HierarchicalBoxDataReader -->
+   </SourceProxy>
+
    <SourceProxy name="PVDReader" 
                 class="vtkPVDReader">
      <StringVectorProperty
