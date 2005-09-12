@@ -134,7 +134,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.766");
+vtkCxxRevisionMacro(vtkPVWindow, "1.767");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2533,8 +2533,19 @@ void vtkPVWindow::WriteData()
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVDataInformation* info = part->GetDataInformation();
 
-  // Instantiator does not work for static builds and VTK objects.
-  vtkDataObject* data = pm->GetDataObjectOfType(info->GetDataClassName());
+  // We need to ass an object of the same type to the writer (the actual
+  // data cannot be accessed)
+  const char* classname;
+  if (info->GetCompositeDataClassName())
+    {
+    classname = info->GetCompositeDataClassName();
+    }
+  else
+    {
+    classname = info->GetDataClassName();
+    }
+
+  vtkDataObject* data = pm->GetDataObjectOfType(classname);
 
   // Check the number of processes.
   int parallel = (pm->GetNumberOfPartitions() > 1);
@@ -2549,8 +2560,7 @@ void vtkPVWindow::WriteData()
   while(!it->IsDoneWithTraversal())
     {
     vtkPVWriter* wm = 0;
-    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
-                                                       numParts))
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,numParts))
       {
       const char* desc = wm->GetDescription();
       const char* ext = wm->GetExtension();
@@ -2580,7 +2590,7 @@ void vtkPVWindow::WriteData()
       msg << " serial writing of ";
       }
     
-    msg << this->GetCurrentPVSource()->GetDataInformation()->GetDataSetTypeAsString()
+    msg << (data?data->GetClassName():info->GetDataSetTypeAsString())
         << "." << ends;
 
     vtkKWMessageDialog::PopupMessage(
@@ -2660,33 +2670,25 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
 {
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
-  vtkDataSet* data = NULL;
+
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVDataInformation* info = part->GetDataInformation();
-  if (info->DataSetTypeIsA("vtkImageData"))
+
+  // We need to ass an object of the same type to the writer (the actual
+  // data cannot be accessed)
+  const char* classname;
+  if (info->GetCompositeDataClassName())
     {
-    data = vtkImageData::New();
+    classname = info->GetCompositeDataClassName();
     }
-  else if (info->DataSetTypeIsA("vtkStructuredPoints"))
+  else
     {
-    data = vtkStructuredPoints::New();
+    classname = info->GetDataClassName();
     }
-  else if (info->DataSetTypeIsA("vtkStructuredGrid"))
-    {
-    data = vtkStructuredGrid::New();
-    }
-  else if (info->DataSetTypeIsA("vtkRectilinearGrid"))
-    {
-    data = vtkRectilinearGrid::New();
-    }
-  else if (info->DataSetTypeIsA("vtkPolyData"))
-    {
-    data = vtkPolyData::New();
-    }
-  else if (info->DataSetTypeIsA("vtkUnstructuredGrid"))
-    {
-    data = vtkUnstructuredGrid::New();
-    }
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
+  vtkDataObject* data = pm->GetDataObjectOfType(classname);
 
   vtkLinkedListIterator<vtkPVWriter*>* it =
     this->FileWriterList->NewIterator();
@@ -2705,7 +2707,6 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
     it->GoToNextItem();
     }
   it->Delete();
-  data->Delete();
   return writer;
 }
 

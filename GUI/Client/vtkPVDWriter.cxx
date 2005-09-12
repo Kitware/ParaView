@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.11");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -50,7 +50,7 @@ int vtkPVDWriter::CanWriteData(vtkDataObject* data, int, int)
 {
   // We support all dataset types in both parallel and serial mode, and
   // with any number of parts.
-  if (!data || !data->IsA("vtkDataSet"))
+  if (!data || !(data->IsA("vtkDataSet") || data->IsA(this->InputClassName)))
     {
     return 0;
     }
@@ -69,10 +69,25 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     timeSeries = 0;
     }
 
+  const char* classname;
+  if (this->WriterClassName)
+    {
+    classname = this->WriterClassName;
+    }
+  else
+    {
+    if (timeSeries)
+      {
+      classname = "vtkXMLPVAnimationWriter";
+      }
+    else
+      {
+      classname = "vtkXMLPVDWriter";
+      }
+    }
   // Create the writer.
   vtkClientServerStream stream;
-  vtkClientServerID writerID = pm->NewStreamObject(
-    timeSeries ?  "vtkXMLPVAnimationWriter" : "vtkXMLPVDWriter", stream);
+  vtkClientServerID writerID = pm->NewStreamObject(classname, stream);
   stream << vtkClientServerStream::Invoke
          << writerID << "SetNumberOfPieces" << numProcs
          << vtkClientServerStream::End;
@@ -150,12 +165,21 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
   else
     {
     // Plug the inputs into the writer.
-    int i;
-    for(i=0; i < pvs->GetNumberOfParts(); ++i)
+    if (pvs->GetNumberOfParts() == 1)
       {
       stream << vtkClientServerStream::Invoke
-             << writerID << "AddInput" << pvs->GetPart(i)->GetID(0)
+             << writerID << "SetInput" << pvs->GetPart()->GetID(0)
              << vtkClientServerStream::End;
+      }
+    else
+      {
+      int i;
+      for(i=0; i < pvs->GetNumberOfParts(); ++i)
+        {
+        stream << vtkClientServerStream::Invoke
+               << writerID << "AddInput" << pvs->GetPart(i)->GetID(0)
+               << vtkClientServerStream::End;
+        }
       }
 
     // Just write the current data.
