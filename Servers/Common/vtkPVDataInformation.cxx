@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.11");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -199,7 +199,7 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
     dinf->CopyFromObject(dobj);
     dinf->SetDataClassName(dobj->GetClassName());
     dinf->DataSetType = dobj->GetDataObjectType();
-    this->AddInformation(dinf);
+    this->AddInformation(dinf, 1);
     dinf->Delete();
     numDataSets++;
     iter->GoToNextItem();
@@ -382,9 +382,15 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
   vtkErrorMacro("Could not cast object to a known data set: " << object);
 }
-
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
+{
+  this->AddInformation(pvi, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::AddInformation(
+  vtkPVInformation* pvi, int addingParts)
 {
   vtkPVDataInformation *info;
   int             i,j;
@@ -453,7 +459,31 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
-  this->NumberOfDataSets += info->GetNumberOfDataSets();
+  if (addingParts)
+    {
+    // Adding data information of parts
+    this->NumberOfDataSets += info->GetNumberOfDataSets();
+    }
+  else 
+    {
+    // Adding data information of 1 part across processors
+    if (this->GetCompositeDataClassName())
+      {
+      // Composite data blocks are not distributed across processors.
+      // Simply add their number.
+      this->NumberOfDataSets += info->GetNumberOfDataSets();
+      }
+    else
+      {
+      // Simple data blocks are distributed across processors, use
+      // the largest number (actually, NumberOfDataSets should always
+      // be 1 since the data information is for a part)
+      if (this->NumberOfDataSets < info->GetNumberOfDataSets())
+        {
+        this->NumberOfDataSets = info->GetNumberOfDataSets();
+        }
+      }
+    }
 
   // Bounds are only a little harder.
   bounds = info->GetBounds();

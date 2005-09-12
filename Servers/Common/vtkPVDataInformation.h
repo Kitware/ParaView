@@ -44,8 +44,14 @@ public:
   virtual void CopyFromObject(vtkObject*);
 
   // Description:
-  // Merge another information object.
-  virtual void AddInformation(vtkPVInformation*);
+  // Merge another information object. Calls AddInformation(info, 0).
+  virtual void AddInformation(vtkPVInformation* info);
+
+  // Description:
+  // Merge another information object. If adding information of
+  // 1 part across processors, set addingParts to false. If
+  // adding information of parts, set addingParts to true.
+  virtual void AddInformation(vtkPVInformation*, int addingParts);
 
   // Description:
   // Manage a serialized version of the information.
@@ -110,7 +116,7 @@ protected:
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
   void CopyFromDataSet(vtkDataSet* data);
   void CopyFromGenericDataSet(vtkGenericDataSet *data);
-  
+
   // Data information collected from remote processes.
   int            DataSetType;
   int            BaseDataSetType;
