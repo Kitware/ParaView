@@ -59,6 +59,11 @@
          parallel="1"
          extension=".pvti"
          file_description="PVTK ImageData Files"/>
+ <Writer input="vtkHierarchicalDataSet"
+         class="vtkPVDWriter"
+         writer="vtkXMLPHierarchicalDataWriter"
+         extension=".vth"
+         file_description="VTK HierarchicalData Files"/>
   <Writer input="vtkDataSet"
           class="vtkPVWriter"
           writer="vtkDataSetWriter"
