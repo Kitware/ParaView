@@ -64,7 +64,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.25");
+vtkCxxRevisionMacro(vtkPVPick, "1.26");
 
 
 //*****************************************************************************
@@ -364,6 +364,8 @@ void vtkPVPick::CreateProperties()
   this->DataFrame->Create(pvApp);
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
+
+  this->UpdateProperties();
 }
 
 

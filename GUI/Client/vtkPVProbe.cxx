@@ -58,7 +58,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.157");
+vtkCxxRevisionMacro(vtkPVProbe, "1.158");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -322,6 +322,8 @@ void vtkPVProbe::CreateProperties()
   dlg->SaveDialogOn();
   this->Script("pack %s",
                this->SaveButton->GetWidgetName());
+
+  this->UpdateProperties();
 }
 
 //----------------------------------------------------------------------------
