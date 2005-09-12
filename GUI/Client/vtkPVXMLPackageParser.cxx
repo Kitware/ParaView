@@ -38,7 +38,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.50");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.51");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -816,12 +816,10 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
 
   // Setup the writer's type.
   const char* writer = we->GetAttribute("writer");
-  if(!writer)
+  if(writer)
     {
-    vtkErrorMacro("Writer missing writer attribute.");
-    return;
+    pwm->SetWriterClassName(writer);
     }
-  pwm->SetWriterClassName(writer);
 
   // Setup the writer's file extension.
   const char* extension = we->GetAttribute("extension");
