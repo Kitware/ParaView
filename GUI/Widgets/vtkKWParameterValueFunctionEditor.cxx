@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.66");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.67");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -181,6 +181,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->SelectedPointTextColor[2]   = 0.0;
 
   this->ComputePointColorFromValue     = 0;
+
+  this->InUserInteraction           = 0;
 
   this->PointAddedCommand           = NULL;
   this->PointChangingCommand          = NULL;
@@ -6830,6 +6832,19 @@ void vtkKWParameterValueFunctionEditor::DoubleClickOnPointCallback(
 
   this->SelectPoint(id);
 
+  // The first click in that double-click will trigger
+  // StartInteractionCallback. At this point, weird behaviours have been
+  // noticed. For example, if the DoubleClickOnPointCommand below
+  // popups up a Color Chooser dialog, even if that dialog is modal, selecting
+  // a color will trigger the MovePointCallback just as if the user was
+  // still dragging the point it double-clicked on. To avoid that,
+  // StartInteractionCallback sets InUserInteraction to 1 and
+  // MovePointCallback does not anything if it is not set to 1. Therefore
+  // set it to 0 right now to avoid triggering any user interaction involving
+  // moving the point.
+
+  this->InUserInteraction = 0;
+
   this->InvokeDoubleClickOnPointCommand(id);
 }
 
@@ -6854,13 +6869,15 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint(), c_x, c_y);
   this->LastSelectCanvasCoordinates[0] = c_x;
   this->LastSelectCanvasCoordinates[1] = c_y;
+
+  this->InUserInteraction = 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::MovePointCallback(
   int x, int y, int shift)
 {
-  if (!this->IsCreated() || !this->HasSelection())
+  if (!this->IsCreated() || !this->HasSelection() || !this->InUserInteraction)
     {
     return;
     }
@@ -7013,6 +7030,8 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 {
+  this->InUserInteraction = 0;
+
   if (!this->HasSelection())
     {
     return;

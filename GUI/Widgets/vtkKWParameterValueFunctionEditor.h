@@ -1130,6 +1130,7 @@ protected:
   double PointTextColor[3];
   double SelectedPointTextColor[3];
   int    ComputePointColorFromValue;
+  int    InUserInteraction;
 
   // Commands
 
