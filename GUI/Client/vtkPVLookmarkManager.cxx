@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.72");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.73");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1105,11 +1105,12 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
   vtkIdType i,numberOfLookmarkWidgets;
   vtkPVLookmark *lookmarkWidget;
   vtkPVLookmark *macro = NULL;
+  char ext[] = "bb";
 
   this->SetButtonFrameState(0);
 
   // Ask user for path to bb file
-  if( !(filename = this->PromptForFile("bb",0)) )
+  if( !(filename = this->PromptForFile(ext,0)) )
     {
     vtkErrorMacro(<< this->GetClassName() << ": Cannot open bounding box file");
     this->SetButtonFrameState(1);
@@ -1261,10 +1262,11 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
 void vtkPVLookmarkManager::ImportLookmarkFileCallback()
 {
   char *filename;
+  char ext[] = "lmk";
 
   this->SetButtonFrameState(0);
 
-  if(!(filename = this->PromptForFile("lmk",0)))
+  if(!(filename = this->PromptForFile(ext,0)))
     {
     this->Script("pack %s -anchor w -fill both -side top",
                   this->ScrollFrame->GetWidgetName());
@@ -2162,10 +2164,11 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 void vtkPVLookmarkManager::SaveAllCallback()
 {
   char *filename;
+  char ext[] = "lmk";
 
   this->SetButtonFrameState(0);
 
-  if(!(filename = this->PromptForFile("lmk",1)))
+  if(!(filename = this->PromptForFile(ext,1)))
     {
     this->SetButtonFrameState(1);
     return;
@@ -2204,6 +2207,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
   vtkKWLookmarkFolder *rootFolder = NULL;
   int errorFlag = 0;
   vtkIdType numberOfLookmarkWidgets, numberOfLookmarkFolders;
+  char ext[] = "lmk";
 
   vtkIdType numLmkFolders = this->Folders->GetNumberOfItems();
   for(i=numLmkFolders-1;i>=0;i--)
@@ -2226,7 +2230,7 @@ void vtkPVLookmarkManager::ExportFolderCallback()
 
   this->SetButtonFrameState(0);
 
-  if(!(filename = this->PromptForFile("lmk",1)))
+  if(!(filename = this->PromptForFile(ext,1)))
     {
     this->SetButtonFrameState(1);
     return;
