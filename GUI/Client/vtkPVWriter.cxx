@@ -24,12 +24,13 @@
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
-
 #include <vtkstd/string>
+#include "vtkVector.txx"
+#include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.22");
+vtkCxxRevisionMacro(vtkPVWriter, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -37,9 +38,10 @@ vtkPVWriter::vtkPVWriter()
   this->InputClassName = 0;
   this->WriterClassName = 0;
   this->Description = 0;
-  this->Extension = 0;
   this->Parallel = 0;
   this->DataModeMethod = 0;
+  this->Extensions = vtkVector<const char*>::New();
+  this->Iterator = this->Extensions->NewIterator();
 }
 
 //----------------------------------------------------------------------------
@@ -48,8 +50,9 @@ vtkPVWriter::~vtkPVWriter()
   this->SetInputClassName(0);
   this->SetWriterClassName(0);
   this->SetDescription(0);
-  this->SetExtension(0);
   this->SetDataModeMethod(0);
+  this->Extensions->Delete();
+  this->Iterator->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -62,8 +65,6 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
      << (this->WriterClassName?this->WriterClassName:"(none)") << endl;
   os << indent << "Description: " 
      << (this->Description?this->Description:"(none)") << endl;
-  os << indent << "Extension: " 
-     << (this->Extension?this->Extension:"(none)") << endl;
   os << indent << "Parallel: " << this->Parallel << endl;
   os << indent << "DataModeMethod: " 
      << (this->DataModeMethod?this->DataModeMethod:"(none)") << endl;
@@ -84,6 +85,31 @@ int vtkPVWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVWriter::CanWriteFile(const char* fname)
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  const char* ext = this->ExtractExtension(fname);
+  int matches = 0;
+  int canRead = 0;
+
+  // Check if the file name matches any of our extensions.
+  for(this->Iterator->GoToFirstItem();
+      !this->Iterator->IsDoneWithTraversal() && !matches;
+      this->Iterator->GoToNextItem())
+    {
+    const char* val = 0;
+    this->Iterator->GetData(val);
+    if(ext && strcmp(ext, val) == 0)
+      {
+      matches = 1;
+      }
+    }
+
+  return matches;
+}
+
+
+//----------------------------------------------------------------------------
 vtkPVApplication* vtkPVWriter::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->GetApplication());
@@ -94,7 +120,8 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
                         int numProcs, int ghostLevel, int timeSeries)
 {
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(pvs);
-  if(rm && timeSeries)
+
+  if( rm && timeSeries )
     {
     vtkstd::string name = fileName;
     vtkstd::string::size_type pos = name.find_last_of(".");
@@ -215,4 +242,30 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
   pm->DeleteStreamObject(writerID, stream);
   pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   return success;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWriter::AddExtension(const char* ext)
+{
+  this->Extensions->AppendItem(ext);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkPVWriter::GetNumberOfExtensions()
+{
+  return this->Extensions->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVWriter::GetExtension(vtkIdType i)
+{
+  const char* result = 0;
+  if(this->Extensions->GetItem(i, result) != VTK_OK) { result = 0; }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVWriter::ExtractExtension(const char* fname)
+{
+  return strrchr(fname, '.');
 }

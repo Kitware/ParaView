@@ -27,6 +27,12 @@
 class vtkDataObject;
 class vtkPVApplication;
 class vtkPVSource;
+//BTX
+template <class value>
+class vtkVector;
+template <class value>
+class vtkVectorIterator;
+//ETX
 
 class VTK_EXPORT vtkPVWriter : public vtkKWObject
 {
@@ -50,11 +56,19 @@ public:
   // writer.
   vtkSetStringMacro(Description);
   vtkGetStringMacro(Description);
+
+  // Description:
+  // Add extension recognized by the writer. This is displayed in the
+  // selection dialog 
+  void AddExtension(const char*);
   
   // Description:
-  // Get/Set the file extension supported by this writer.
-  vtkSetStringMacro(Extension);
-  vtkGetStringMacro(Extension);
+  // Get the number of registered file extensions.
+  vtkIdType GetNumberOfExtensions();
+
+  // Description:
+  // Get the ith file extension.
+  const char* GetExtension(vtkIdType i);
   
   // Description:
   // Get/Set whether the file writer is for parallel file formats.
@@ -73,6 +87,13 @@ public:
   virtual int CanWriteData(vtkDataObject* data, int parallel, int numParts);
   
   // Description:
+  // Returns true (1) if the current writer can write to the specified file,
+  // false (0) otherwise. In the default implementation, this is done by
+  // comparing the extension of the file to a list of extensions specified
+  // by the configuration (XML) file -see AddExtension-.
+  virtual int CanWriteFile(const char* fname);
+
+  // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();
   
@@ -87,11 +108,16 @@ protected:
   
   int WriteOneFile(const char* fileName, vtkPVSource* pvs,
                    int numProcs, int ghostLevel);
+
+  const char* ExtractExtension(const char* fname);
   
   char* InputClassName;
   char* WriterClassName;
   char* Description;
-  char* Extension;
+//BTX
+  vtkVector<const char*>* Extensions;
+  vtkVectorIterator<const char*>* Iterator;
+//ETX
   int Parallel;
   char* DataModeMethod;
   

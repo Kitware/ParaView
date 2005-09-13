@@ -96,6 +96,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkPVFileEntry.h"
 
 #include "vtkPVLookmarkManager.h"
 
@@ -134,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.767");
+vtkCxxRevisionMacro(vtkPVWindow, "1.768");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2560,12 +2561,19 @@ void vtkPVWindow::WriteData()
   while(!it->IsDoneWithTraversal())
     {
     vtkPVWriter* wm = 0;
+
     if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,numParts))
       {
       const char* desc = wm->GetDescription();
-      const char* ext = wm->GetExtension();
+ 
+      typesStr << " {{" << desc << "} {"; 
 
-      typesStr << " {{" << desc << "} {" << ext << "}}";
+      for(vtkIdType idx=0; idx<wm->GetNumberOfExtensions(); idx++)
+        {
+        typesStr << wm->GetExtension(idx) << " ";
+        }
+      typesStr << "}}";
+
       if(!writerFound)
         {
         writerFound = 1;
@@ -2574,7 +2582,7 @@ void vtkPVWindow::WriteData()
     it->GoToNextItem();
     }
   it->Delete();
-  
+
   // Make sure we have at least one writer.
   if(!writerFound)
     {
@@ -2603,7 +2611,7 @@ void vtkPVWindow::WriteData()
   
   typesStr << ends;
   char* types = typesStr.str();
-  
+
   vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveDataFile");
@@ -2695,14 +2703,10 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   while(!it->IsDoneWithTraversal())
     {
     vtkPVWriter* wm = 0;
-    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
-                                                       numParts))
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,numParts) && wm->CanWriteFile(fileName) )
       {
-      if(vtksys::SystemTools::StringEndsWith(fileName, wm->GetExtension()))
-        {
-        writer = wm;
-        break;
-        }
+      writer = wm;
+      break;
       }
     it->GoToNextItem();
     }

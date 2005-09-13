@@ -38,7 +38,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.51");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.52");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -822,13 +822,37 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     }
 
   // Setup the writer's file extension.
-  const char* extension = we->GetAttribute("extension");
-  if(!extension)
+  const char* extensions = we->GetAttribute("extensions");
+  if(extensions)
     {
-    vtkErrorMacro("Writer missing extension attribute.");
+    const char* start = extensions;
+    const char* end = 0;
+
+    // Parse the space-separated list.
+    while(*start)
+      {
+      while(*start && vtkPVXMLPackageParserIsSpace(*start)) { ++start; }
+      end = start;
+      while(*end && !vtkPVXMLPackageParserIsSpace(*end)) { ++end; }
+      int length = end-start;
+      if(length)
+        {
+        char* entry = new char[length+1];
+        strncpy(entry, start, length);
+        entry[length] = '\0';
+        pwm->AddExtension(entry);
+        delete [] entry;
+        }
+      start = end;
+      }
+    }
+  else
+    {
+    vtkErrorMacro("Writer has no extensions attribute.");
+    pwm->Delete();
     return;
     }
-  pwm->SetExtension(extension);
+
 
   // Setup the writer's file description.
   const char* file_description = we->GetAttribute("file_description");
