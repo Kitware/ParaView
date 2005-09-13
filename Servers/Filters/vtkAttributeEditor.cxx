@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.5");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.6");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -169,6 +169,7 @@ int vtkAttributeEditor::RequestData(
   vtkInformation *filterInputInfo;
   vtkInformation *outInfo;
   vtkInformation *readerInputInfo;
+//  int usePointScalars;
 
   // Get the filter input and output data sets:
   filterInputInfo = inputVector[0]->GetInformationObject(0);
@@ -258,11 +259,22 @@ int vtkAttributeEditor::RequestData(
     return 1;
     }
 */
-
-  info = this->GetInputArrayInformation(filterInputInfo->Get(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE()));
+/*
+  vtkDataArray *inScalars = this->GetInputArrayToProcess(0,inputVector);
+  if (!inScalars)
+    {
+    vtkDebugMacro(<<"No scalar data to threshold");
+    return 1;
+    }
+  // are we using pointScalars?
+  usePointScalars = (inScalars->GetNumberOfTuples() == filterInput->GetNumberOfPoints());
+*/
+  info = this->GetInputArrayInformation(0);
 
   if(this->EditMode==0)
     {
+//    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+//    else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
       {
       readerfield = readerOutput->GetPointData();
@@ -408,7 +420,6 @@ void vtkAttributeEditor::RegionExecute(vtkDataSet *rinput,vtkDataSet *finput, vt
 
   if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-
     if(this->FilterDataArray && this->ReaderDataArray)
       {
       for ( i=0; i < numPts; i++ )
@@ -541,7 +552,7 @@ void vtkAttributeEditor::PointExecute(vtkDataSet *rinput,vtkDataSet *finput, vtk
 }
 
 //-----------------------------------------------------------------------------
-void vtkAttributeEditor::CellExecute(vtkDataSet *rinput,vtkDataSet *finput, vtkDataSet *routput,vtkDataSet *foutput)
+void vtkAttributeEditor::CellExecute(vtkDataSet*,vtkDataSet *finput, vtkDataSet *routput,vtkDataSet *foutput)
 {
   // Loop over all of the cells.
   int numInputs, inputIdx;
