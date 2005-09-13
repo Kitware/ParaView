@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.23");
+vtkCxxRevisionMacro(vtkPVWriter, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -87,10 +87,8 @@ int vtkPVWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
 //----------------------------------------------------------------------------
 int vtkPVWriter::CanWriteFile(const char* fname)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   const char* ext = this->ExtractExtension(fname);
   int matches = 0;
-  int canRead = 0;
 
   // Check if the file name matches any of our extensions.
   for(this->Iterator->GoToFirstItem();
