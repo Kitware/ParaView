@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.3");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.4");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -32,6 +32,8 @@ const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "mi
 #define LSTRANGE 1
 #endif
 #define RSTRANGE 1
+
+#define VTK_KW_PVHFE_GUIDELINE_VALUE_TEXT_SIZE          7
 
 //----------------------------------------------------------------------------
 vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEditor()
@@ -49,6 +51,9 @@ vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEdit
   this->MidPointColor[0]     = 0.2;
   this->MidPointColor[1]     = 0.2;
   this->MidPointColor[2]     = 0.2;
+
+  this->MidPointGuidelineValueFormat        = NULL;
+  this->SetMidPointGuidelineValueFormat("%-#6.3g");
 }
 
 //----------------------------------------------------------------------------
@@ -64,6 +69,12 @@ vtkKWParameterValueHermiteFunctionEditor::~vtkKWParameterValueHermiteFunctionEdi
     {
     this->SharpnessEntry->Delete();
     this->SharpnessEntry = NULL;
+    }
+
+  if (this->MidPointGuidelineValueFormat)
+    {
+    delete [] this->MidPointGuidelineValueFormat;
+    this->MidPointGuidelineValueFormat = NULL;
     }
 }
 
@@ -530,7 +541,57 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointGuidelineValueVisibili
 
   this->Modified();
 
+  if (this->MidPointGuidelineValueVisibility && this->IsCreated())
+    {
+    this->CreateGuidelineValueCanvas(this->GetApplication());
+    }
+
   this->Redraw();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SetMidPointGuidelineValueFormat(const char *arg)
+{
+  if (this->MidPointGuidelineValueFormat == NULL && arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->MidPointGuidelineValueFormat && arg && 
+      (!strcmp(this->MidPointGuidelineValueFormat, arg))) 
+    {
+    return;
+    }
+
+  if (this->MidPointGuidelineValueFormat) 
+    { 
+    delete [] this->MidPointGuidelineValueFormat; 
+    }
+
+  if (arg)
+    {
+    this->MidPointGuidelineValueFormat = new char[strlen(arg) + 1];
+    strcpy(this->MidPointGuidelineValueFormat, arg);
+    }
+  else
+    {
+    this->MidPointGuidelineValueFormat = NULL;
+    }
+
+  this->Modified();
+  
+  if (this->MidPointGuidelineValueVisibility)
+    {
+    this->RedrawFunction();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::IsGuidelineValueCanvasUsed()
+{
+  return this->Superclass::IsGuidelineValueCanvasUsed() || 
+    this->MidPointGuidelineValueVisibility;
 }
 
 //----------------------------------------------------------------------------
@@ -593,6 +654,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   // Is visible ? Is valid (not that there is no midpoint for the last point)
 
+  double p;
   int x, y, r;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= (this->GetFunctionSize() - 1));
@@ -602,7 +664,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   if (!is_not_valid)
     {
-    double p1, p2, p;
+    double p1, p2;
     this->GetFunctionPointParameter(id, &p1);
     this->GetFunctionPointParameter(id + 1, &p2);
     p = p1 + (p2 - p1) * midpoint;
@@ -629,7 +691,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
       }
     }
 
-  // Create the point
+  // Create/update the midpoint
 
   if (is_not_valid)
     {
@@ -669,7 +731,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
       }
     }
 
-  // Create and/or update the point guideline
+  // Create/update the midpoint guideline
 
   if (is_not_valid)
     {
@@ -717,6 +779,55 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
       }
     }
 
+  // Create/update the midpoint guideline value
+
+  if (this->IsGuidelineValueCanvasUsed() && 
+      this->GuidelineValueCanvas &&
+      this->GuidelineValueCanvas->IsCreated())
+    {
+    const char *gv_canv = this->GuidelineValueCanvas->GetWidgetName();
+  
+    if (is_not_valid)
+      {
+      *tk_cmd << gv_canv << " delete m_g" << id << endl;
+      }
+    else
+      {
+      if (is_not_visible_h || 
+          !this->MidPointGuidelineVisibility || 
+          !this->MidPointGuidelineValueVisibility)
+        {
+        *tk_cmd << gv_canv << " itemconfigure m_g" << id << " -state hidden" 
+                << endl;
+        }
+      else
+        {
+        if (!this->CanvasHasTag("m_g", &id, this->GuidelineValueCanvas))
+          {
+          *tk_cmd 
+            << gv_canv << " create text 0 0 -text {} -anchor s " 
+            << "-font {{fixed} " << VTK_KW_PVHFE_GUIDELINE_VALUE_TEXT_SIZE 
+            << "} -tags {m_g" << id << " " 
+            << vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag 
+            << " " << vtkKWParameterValueFunctionEditor::FunctionTag
+            << "}" << endl;
+          }
+        
+        *tk_cmd << gv_canv << " coords m_g" << id << " " << x 
+                << " " << this->GuidelineValueCanvas->GetHeight() + 1 << endl
+                << gv_canv << " itemconfigure m_g" << id << " -state normal" 
+                << endl;
+        if (this->MidPointGuidelineValueFormat)
+          {
+          char buffer[256];
+          sprintf(buffer, this->MidPointGuidelineValueFormat, p);
+          *tk_cmd << gv_canv << " itemconfigure m_g" << id 
+                  << " -text {" << buffer << "}" << endl;
+          }
+        }
+      }
+    }
+
   // Execute the command, free the stream
 
   if (stream_was_created)
@@ -752,6 +863,9 @@ void vtkKWParameterValueHermiteFunctionEditor::PrintSelf(ostream& os, vtkIndent 
      << this->MidPointColor[0] << ", " 
      << this->MidPointColor[1] << ", " 
      << this->MidPointColor[2] << ")" << endl;
+
+  os << indent << "MidPointGuidelineValueFormat: "
+     << (this->MidPointGuidelineValueFormat ? this->MidPointGuidelineValueFormat : "(None)") << endl;
 
   os << indent << "MidPointEntry: ";
   if (this->MidPointEntry)

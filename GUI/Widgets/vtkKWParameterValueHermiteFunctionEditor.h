@@ -93,9 +93,17 @@ public:
   // Description:
   // Set/Get the midpoint guideline value visibility in the canvas 
   // (i.e., a value on top of the guideline).
+  // Note that the value is not displayed if MidPointGuidelineVisibility is
+  // set to Off (i.e. if we do not display the guideline itself, why displaying
+  // the value ?).
   vtkBooleanMacro(MidPointGuidelineValueVisibility, int);
   virtual void SetMidPointGuidelineValueVisibility(int);
   vtkGetMacro(MidPointGuidelineValueVisibility, int);
+
+  // Description:
+  // Set/Get the midpoint guideline value printf format.
+  virtual void SetMidPointGuidelineValueFormat(const char *);
+  vtkGetStringMacro(MidPointGuidelineValueFormat);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -157,13 +165,14 @@ protected:
   // Update point entries
   virtual void UpdatePointEntries(int id);
 
-  int MidPointEntryVisibility;
-  int SharpnessEntryVisibility;
-
-  int   MidPointVisibility;
-  int   MidPointGuidelineVisibility;
-  int   MidPointGuidelineValueVisibility;
+  int    MidPointEntryVisibility;
+  int    SharpnessEntryVisibility;
+  int    MidPointVisibility;
+  int    MidPointGuidelineVisibility;
+  int    MidPointGuidelineValueVisibility;
   double MidPointColor[3];
+
+  char* MidPointGuidelineValueFormat;
 
   // GUI
 
@@ -176,6 +185,7 @@ protected:
   virtual void CreateMidPointEntry(vtkKWApplication *app);
   virtual void CreateSharpnessEntry(vtkKWApplication *app);
   virtual int IsPointEntriesFrameUsed();
+  virtual int IsGuidelineValueCanvasUsed();
 
   // Description:
   // Update the mid-point entry according to the mid-point of a point

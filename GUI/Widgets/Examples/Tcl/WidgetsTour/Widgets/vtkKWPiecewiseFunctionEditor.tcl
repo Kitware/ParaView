@@ -86,18 +86,20 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   pfed_tfunc2_editor SetCanvasHeight 150
   pfed_tfunc2_editor SetLabelText "Transfer Function Editor"
   pfed_tfunc2_editor SetBalloonHelpString \
-    "Another transfer function editor. The point position is now on\
-    top guidelines are shown for each point useful when combined with\
-    an histogram point indices are hidden ticks are displayed in the\
-    parameter space the width is set explicitly.\
+    "Another transfer function editor. Guidelines are dispayed\
+    for each midpoint, ticks are displayed in the\
+    parameter space at the bottom, the width is set explicitly.\
     The range and histogram are based on a real image data."
 
   pfed_tfunc2_editor SetPiecewiseFunction pfed_tfunc2
 
   pfed_tfunc2_editor PointIndexVisibilityOff
   pfed_tfunc2_editor SelectedPointIndexVisibilityOn
+  pfed_tfunc2_editor PointGuidelineVisibilityOff
   pfed_tfunc2_editor MidPointVisibilityOn
   pfed_tfunc2_editor MidPointGuidelineVisibilityOn
+  pfed_tfunc2_editor MidPointGuidelineValueVisibilityOn
+  pfed_tfunc2_editor SetMidPointGuidelineValueFormat "%-#6.0f"
   pfed_tfunc2_editor MidPointEntryVisibilityOn
   pfed_tfunc2_editor SharpnessEntryVisibilityOn
   pfed_tfunc2_editor SetLabelPositionToTop
@@ -106,7 +108,8 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
 
   pfed_tfunc2_editor ParameterTicksVisibilityOn
   pfed_tfunc2_editor ComputeValueTicksFromHistogramOn
-  pfed_tfunc2_editor SetParameterTicksFormat "%-#6.0f"
+  pfed_tfunc2_editor SetParameterTicksFormat \
+      [pfed_tfunc2_editor GetMidPointGuidelineValueFormat]
 
   pack [pfed_tfunc2_editor GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 20
 

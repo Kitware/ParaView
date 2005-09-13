@@ -1176,6 +1176,7 @@ protected:
   vtkKWEntryWithLabel *ParameterEntry;
   vtkKWCanvas         *ValueTicksCanvas;
   vtkKWCanvas         *ParameterTicksCanvas;
+  vtkKWCanvas         *GuidelineValueCanvas;
 
   // Histogram
 
@@ -1217,8 +1218,10 @@ protected:
   virtual void CreateUserFrame(vtkKWApplication *app);
   virtual void CreateValueTicksCanvas(vtkKWApplication *app);
   virtual void CreateParameterTicksCanvas(vtkKWApplication *app);
+  virtual void CreateGuidelineValueCanvas(vtkKWApplication *app);
   virtual int IsTopLeftFrameUsed();
   virtual int IsPointEntriesFrameUsed();
+  virtual int IsGuidelineValueCanvasUsed();
 
   // Description:
   // Pack the widget
@@ -1331,8 +1334,10 @@ protected:
 
   // Description:
   // Convenience method to look for a tag in the Canvas. 
-  // Return the number of elements matching tag+suffix.
-  virtual int CanvasHasTag(const char *tag, int *suffix = 0);
+  // Return the number of elements matching tag+suffix, in default
+  // canvas or specified one.
+  virtual int CanvasHasTag(
+    const char *tag, int *suffix = 0, vtkKWCanvas *canv = NULL);
 
   // Description:
   // Convenience method to remove everything with a given tag.

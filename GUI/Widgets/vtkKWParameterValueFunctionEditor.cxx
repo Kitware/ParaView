@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.65");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.66");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -47,6 +47,7 @@ vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.65");
 #define VTK_KW_PVFE_TICKS_SEP                2
 #define VTK_KW_PVFE_TICKS_VALUE_CANVAS_WIDTH ((int)ceil((double)VTK_KW_PVFE_TICKS_TEXT_SIZE * 6.2))
 #define VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT ((int)ceil((double)VTK_KW_PVFE_TICKS_TEXT_SIZE * 1.45))
+#define VTK_KW_PVFE_GUIDELINE_VALUE_CANVAS_HEIGHT VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT
 
 // For some reasons, the end-point of a line/rectangle is not drawn on Win32. 
 // Comply with that.
@@ -205,6 +206,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ParameterEntry              = NULL;
   this->ValueTicksCanvas            = vtkKWCanvas::New();
   this->ParameterTicksCanvas        = vtkKWCanvas::New();
+  this->GuidelineValueCanvas               = vtkKWCanvas::New();
 
   this->DisplayedWholeParameterRange[0] = 0.0;
   this->DisplayedWholeParameterRange[1] = 
@@ -395,6 +397,12 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     {
     this->ParameterTicksCanvas->Delete();
     this->ParameterTicksCanvas = NULL;
+    }
+
+  if (this->GuidelineValueCanvas)
+    {
+    this->GuidelineValueCanvas->Delete();
+    this->GuidelineValueCanvas = NULL;
     }
 
   // Histogram
@@ -1276,6 +1284,13 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
     this->CreateParameterTicksCanvas(app);
     }
 
+  // Create the guideline value canvas
+
+  if (this->IsGuidelineValueCanvasUsed())
+    {
+    this->CreateGuidelineValueCanvas(app);
+    }
+
   // Histogram log mode
 
   if (this->HistogramLogModeOptionMenuVisibility)
@@ -1550,6 +1565,23 @@ void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::CreateGuidelineValueCanvas(
+  vtkKWApplication *app)
+{
+  if (this->GuidelineValueCanvas && !this->GuidelineValueCanvas->IsCreated())
+    {
+    this->GuidelineValueCanvas->SetParent(this);
+    this->GuidelineValueCanvas->Create(app);
+    this->GuidelineValueCanvas->SetHighlightThickness(0);
+    this->GuidelineValueCanvas->SetReliefToSolid();
+    this->GuidelineValueCanvas->SetWidth(0);
+    this->GuidelineValueCanvas->SetBorderWidth(0);
+    this->GuidelineValueCanvas->SetHeight(
+      VTK_KW_PVFE_GUIDELINE_VALUE_CANVAS_HEIGHT);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::Update()
 {
   this->UpdateEnableState();
@@ -1594,6 +1626,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
     VR:  Value Range
     VT:  Value Ticks
     PT:  Parameter Ticks
+    GVC:  Guideline Value Canvas
     [---]: Canvas
 
             a b  c              d   e  f
@@ -1614,9 +1647,10 @@ void vtkKWParameterValueFunctionEditor::Pack()
             a b  c              d   e  f
          +------------------------------
         0|       TLC                           ShowLabel: On
-        1|  L VT [--------------]   VR PEF     LabelPosition: Left
-        2|       PT                            RangeLabelPosition: Default
-        3|       PR                            PointEntriesPosition: Right
+        1|       GVC                           if guideline values displayed
+        2|  L VT [--------------]   VR PEF     LabelPosition: Left
+        3|       PT                            RangeLabelPosition: Default
+        4|       PR                            PointEntriesPosition: Right
 
             a b  c              d   e  f
          +------------------------------
@@ -1764,6 +1798,17 @@ void vtkKWParameterValueFunctionEditor::Pack()
     row++;
     }
 
+  // Guideline Value Canvas (GVC)
+  
+  if (this->IsGuidelineValueCanvasUsed() && 
+      this->GuidelineValueCanvas && this->GuidelineValueCanvas->IsCreated())
+    {
+    tk_cmd << "grid " << this->GuidelineValueCanvas->GetWidgetName() 
+           << " -sticky ew -padx 0 -pady 0"
+           << " -columnspan 2 -column " << col_c << " -row " << row << endl;
+    row++;
+    }
+  
   // Label (L) if at left
 
   if (this->LabelVisibility && 
@@ -2980,6 +3025,12 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorInteractionStyle(
     {
     this->Bind();
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::IsGuidelineValueCanvasUsed()
+{
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -4242,6 +4293,11 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     this->ParameterTicksCanvas->SetWidth(this->CanvasWidth);
     }
 
+  if (this->IsGuidelineValueCanvasUsed())
+    {
+    this->GuidelineValueCanvas->SetWidth(this->CanvasWidth);
+    }
+
   // In that visible area, we must fit the visible parameter in the
   // width dimension, and the visible value range in the height dimension.
   // Get the corresponding scaling factors.
@@ -4265,6 +4321,13 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     sprintf(buffer, "%lf 0 %lf %d", 
             c_x, c_x2, VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
     this->ParameterTicksCanvas->SetConfigurationOption("-scrollregion",buffer);
+    }
+
+  if (this->IsGuidelineValueCanvasUsed())
+    {
+    sprintf(buffer, "%lf 0 %lf %d", 
+            c_x, c_x2, VTK_KW_PVFE_GUIDELINE_VALUE_CANVAS_HEIGHT);
+    this->GuidelineValueCanvas->SetConfigurationOption("-scrollregion",buffer);
     }
 
   // If the canvas has been resized,
@@ -5980,23 +6043,29 @@ int vtkKWParameterValueFunctionEditor::CopyPointFromEditor(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::CanvasHasTag(const char *tag, 
-                                                    int *suffix)
+                                                    int *suffix,
+                                                    vtkKWCanvas *canv)
 {
-  if (!this->IsCreated())
+  if (!canv)
+    {
+    canv = this->Canvas;
+    }
+
+  if (!canv->IsCreated())
     {
     return 0;
     }
 
   if (suffix)
     {
-    return atoi(this->Script(
+    return atoi(canv->Script(
                   "llength [%s find withtag %s%d]",
-                  this->Canvas->GetWidgetName(), tag, *suffix));
+                  canv->GetWidgetName(), tag, *suffix));
     }
 
-  return atoi(this->Script(
+  return atoi(canv->Script(
                 "llength [%s find withtag %s]",
-                this->Canvas->GetWidgetName(), tag));
+                canv->GetWidgetName(), tag));
 }
 
 //----------------------------------------------------------------------------
