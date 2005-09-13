@@ -49,6 +49,7 @@ class vtkKWMessageDialog;
 class vtkKWTextWithScrollbars;
 class vtkPVTraceHelper;
 class vtkPVWindow;
+class vtkPVReaderModule;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -86,8 +87,9 @@ public:
   // Description:
   // Called from File --> Import --> Replace/Append
   // Takes the user specified .lmk file and parses it to populate the panel with its contents
-  void ImportCallback();
-  void Import(const char *path, int appendFlag);
+  void ImportLookmarkFileCallback();
+  void ImportBoundingBoxFileCallback();
+  void ImportLookmarkFile(const char *path, int appendFlag);
 
   // Description:
   // Create either a Lookmark or a Lookmark Macro.
@@ -120,6 +122,7 @@ public:
   // Add an empty folder to the bottom of the lookmark manager named "New Folder"
   // You can then drag items into it
   void CreateFolderCallback();
+  vtkKWLookmarkFolder* CreateFolder(const char *name, int macroFlag);
 
   // Description:
   // Check/Uncheck the boxes of all lookmarks and folders
@@ -233,16 +236,20 @@ protected:
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkPVLookmarks and vtkKWLookmarkFolders as appropriate
-  void ImportInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
+  void ImportLookmarkFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creatings entries in the "Add Macro Examples" menu
   void ImportMacroExamplesInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWMenu *parentMenu);
 
   // Description:
+  //
+  void ImportBoundingBoxFileInternal(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName);
+
+  // Description:
   // Convenience method for creating a Load/Save dialog box and returning the filename chosen by the user
   // 0 for load, 1 for save
-  char* PromptForLookmarkFile(int save_flag);
+  char* PromptForFile(char *extension, int save_flag);
 
   // Description:
   // Takes a vtkKWLookmarkElement and uses its attributes to initialize and return a new vtkPVLookmark
@@ -307,6 +314,8 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWMenu *MenuFile;
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuImport;
+  vtkKWMenu *MenuImportLmkFile;
+  vtkKWMenu *MenuImportBoundingBoxFile;
   vtkKWMenu *MenuHelp;
   vtkKWMenu *MenuExamples;
 
