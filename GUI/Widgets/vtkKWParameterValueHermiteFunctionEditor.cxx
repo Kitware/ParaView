@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.5");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -632,14 +632,6 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     return;
     }
 
-  // Do we have a midpoint for this segment ?
-
-  double midpoint;
-  if (!this->GetFunctionMidPoint(id, &midpoint))
-    {
-    return;
-    }
-
   // If there is no stream, then it means we want to execute that command
   // right now (so create a stream)
 
@@ -658,6 +650,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   int x, y, r;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= (this->GetFunctionSize() - 1));
+
+  // Do we have a midpoint for this segment ?
+
+  double midpoint;
+  if (!this->GetFunctionMidPoint(id, &midpoint))
+    {
+    is_not_valid = 1;
+    }
 
   // Get the midpoint coords, radius, check if the midpoint is visible
   // The radius is 80% of the point radius
