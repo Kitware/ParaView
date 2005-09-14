@@ -14,21 +14,24 @@
 =========================================================================*/
 #include "vtkPVEnSightMasterServerReader.h"
 
+#include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayCollection.h"
+#include "vtkHierarchicalDataSet.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVEnSightMasterServerTranslator.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkPVEnSightMasterServerTranslator.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkToolkits.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkMultiProcessController.h"
 #include "vtkTransmitPolyDataPiece.h"
 #include "vtkTransmitUnstructuredGridPiece.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
+#include "vtkUnstructuredGrid.h"
 
 #ifdef VTK_USE_MPI
 # include "vtkMPICommunicator.h"
@@ -41,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.25");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -60,7 +63,6 @@ public:
   int NumberOfOutputs;
   vtkstd::vector<int> CumulativeTimeSetSizes;
   vtkstd::vector<float> TimeSetValues;
-  vtkstd::vector<int> OutputTypes;
 };
 
 //----------------------------------------------------------------------------
@@ -169,7 +171,10 @@ int vtkPVEnSightMasterServerReaderSyncValues(T*,
 #endif
 
 //----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::ExecuteInformation()
+int vtkPVEnSightMasterServerReader::RequestInformation(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   int i;
   
@@ -181,7 +186,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("ExecuteInformation requires a Controller.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
   
   // Parse the input file.  This will set NumberOfPieces.
@@ -198,7 +203,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("Error parsing the master server file.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
   
   // Compare case file versions.
@@ -207,7 +212,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
   if(piece < this->NumberOfPieces)
     {
     // Let the superclass read the file information on this node.
-    this->SuperclassExecuteInformation();
+    this->SuperclassExecuteInformation(request, inputVector, outputVector);
     this->Internal->EnSightVersion = this->EnSightVersion;
     }  
   if(vtkPVEnSightMasterServerReaderSyncValues(&this->Internal->EnSightVersion,
@@ -216,7 +221,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("EnSight version mismatch across nodes.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
   
   // Make sure all nodes could read their files.
@@ -224,7 +229,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("Error reading case file on at least one node.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
   
   // Compare number of time sets.
@@ -236,7 +241,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("Number of time sets not equal on all nodes.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
   
   // Compare the time sets' sizes.
@@ -259,7 +264,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("Time set sizes not equal on all nodes.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
 
   // All time sets have the correct size.  Now compare the values.
@@ -294,281 +299,69 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     {
     vtkErrorMacro("Time set values do not match on all nodes.");
     this->InformationError = 1;
-    return;
+    return 0;
     }
 
-  // This reader can produce any number of pieces.
-  for (i=0; i < this->NumberOfOutputs; ++i)
-    {
-    this->Outputs[i]->SetMaximumNumberOfPieces(-1);
-    }
+  return 1;
 }
 
-
 //----------------------------------------------------------------------------
-// We need this method because we cannot get the output until we execute.
-void vtkPVEnSightMasterServerReader::Update()
-{
-  int i;
-  int myId = 0;
-  int numProcs = 1;
-  
-  if (this->Controller)
-    {
-    myId = this->Controller->GetLocalProcessId();
-    numProcs = this->Controller->GetNumberOfProcesses();
-    }
-  
-  this->UpdateInformation();
-  this->Execute();
-
-  // The superclass thinks it is reading the whole data set.
-  // This subclass tells the output that it is only a piece.
-  for (i = 0; i < this->NumberOfOutputs; ++i)
-    {
-    if (this->Outputs[i])
-      {
-      // This gets transfered to the Piece/NumberOfPieces
-      // when 'DataHasBeenGenerated' is called.
-      this->Outputs[i]->SetUpdatePiece(myId);
-      this->Outputs[i]->SetUpdateNumberOfPieces(numProcs);
-      }
-    }
-
-  // Set the extent translator on the outputs.
-  this->ExtentTranslator->SetProcessId(myId);
-  for(i=0; i < this->Internal->NumberOfOutputs; ++i)
-    {
-    if( this->GetOutput(i) )
-      {
-      this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
-      }
-    }
-  
-  for (i = 0; i < this->GetNumberOfOutputs(); i++)
-    {
-    if ( this->GetOutput(i) )
-      {
-      this->GetOutput(i)->DataHasBeenGenerated();
-      }
-    }
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::Execute()
+int vtkPVEnSightMasterServerReader::RequestData(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   int i;
   
   // Do not execute if ExecuteInformation failed.
   if(this->InformationError)
     {
-    this->ExecuteError();
-    return;
+    return 0;
     }
   
-  //cout << "In execute " << endl;
-
   // Compare the number of outputs.
   int piece = this->Controller->GetLocalProcessId();
   if(piece < this->NumberOfPieces)
     {
     // Let the superclass read the data and setup the outputs.
-    this->SuperclassExecuteData();
-    this->Internal->NumberOfOutputs = this->GetNumberOfOutputs();
+    this->SuperclassExecuteData(request, inputVector, outputVector);
     }
   if(vtkPVEnSightMasterServerReaderSyncValues(
        &this->Internal->NumberOfOutputs, 1, this->NumberOfPieces,
        this->Controller) != VTK_OK)
     {
     vtkErrorMacro("Number of outputs does not match on all nodes.");
-    this->ExecuteError();
-    return;
+    return 0;
     }
   
-  // Compare the output types.
-  this->Internal->OutputTypes.resize(this->Internal->NumberOfOutputs);
-  if(piece < this->NumberOfPieces)
-    {
-    for(i=0; i < this->Internal->NumberOfOutputs; ++i)
-      {
-      if(vtkDataSet* output = this->GetOutput(i))
-        {
-        this->Internal->OutputTypes[i] = output->GetDataObjectType();
-        }
-      else
-        {
-        this->Internal->OutputTypes[i] = -1;
-        }
-      }
-    }
-  if(vtkPVEnSightMasterServerReaderSyncValues(
-       &*this->Internal->OutputTypes.begin(),
-       this->Internal->NumberOfOutputs, this->NumberOfPieces,
-       this->Controller) != VTK_OK)
-    {
-    vtkErrorMacro("Output types do not match on all nodes.");
-    this->ExecuteError();
-    return;
-    }  
-  
-  // If we are on a node that did not read real data, create empty
-  // outputs of the right type.
-  if(piece >= this->NumberOfPieces)
-    {
-    for(i=0; i < this->Internal->NumberOfOutputs; ++i)
-      {
-      vtkDataObject* output = 0;
-      switch (this->Internal->OutputTypes[i])
-        {
-        case VTK_IMAGE_DATA:
-        case VTK_STRUCTURED_POINTS:
-          if(!(this->GetOutput(i) && this->GetOutput(i)->IsA("vtkImageData")))
-            {
-            output = vtkImageData::New();
-            }
-          break;
-        case VTK_STRUCTURED_GRID:
-          if(!(this->GetOutput(i) && this->GetOutput(i)->IsA("vtkStructuredGrid")))
-            {
-            output = vtkStructuredGrid::New();
-            }
-          break;
-        case VTK_RECTILINEAR_GRID:
-          if(!(this->GetOutput(i) && this->GetOutput(i)->IsA("vtkRectilinearGrid")))
-            {
-            output = vtkRectilinearGrid::New();
-            }
-          break;
-        case VTK_UNSTRUCTURED_GRID:
-          if(!(this->GetOutput(i) && this->GetOutput(i)->IsA("vtkUnstructuredGrid")))
-            {
-            output = vtkUnstructuredGrid::New();
-            }
-          break;
-        case VTK_POLY_DATA:
-          if(!(this->GetOutput(i) && this->GetOutput(i)->IsA("vtkPolyData")))
-            {
-            output = vtkPolyData::New();
-            }
-          break;
-        }
-      if(output)
-        {
-        this->SetNthOutput(i, output);
-        output->Initialize();
-        output->Delete();
-        }
-      }
-    }
-  
-  // Load balance non SOS files.
-  if (this->Controller && this->NumberOfPieces == 1 &&
-      this->Controller->GetNumberOfProcesses() > 1)
-    {
-    this->Balance();
-    }
-  // This reader can produce any number of pieces.  The superclass
-  // sets the output max pieces to 1 during Execute so we must change
-  // it back to -1 here.
-  for (i=0; i < this->NumberOfOutputs; ++i)
-    {
-    if( this->Outputs[i] )
-      {
-      this->Outputs[i]->SetMaximumNumberOfPieces(-1);
-      }
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::Balance()
-{
-  int i;
-  vtkDataSet* out;
-
-  for (i = 0; i < this->GetNumberOfOutputs(); i++)
-    {
-    out = this->GetOutput(i);
-    vtkPolyData* pdOut = vtkPolyData::SafeDownCast(out);
-    vtkUnstructuredGrid* ugOut = vtkUnstructuredGrid::SafeDownCast(out);
-    if (pdOut)
-      {
-      vtkTransmitPolyDataPiece* extract= vtkTransmitPolyDataPiece::New();
-      vtkPolyData* tmp = vtkPolyData::New();
-      tmp->CopyStructure(ugOut);
-      tmp->GetPointData()->ShallowCopy(ugOut->GetPointData());
-      tmp->GetCellData()->ShallowCopy(ugOut->GetCellData());
-      extract->SetInput(tmp);
-      tmp->Delete();
-      tmp = extract->GetOutput();
-      tmp->SetUpdateNumberOfPieces(this->Controller->GetNumberOfProcesses());
-      tmp->SetUpdatePiece(this->Controller->GetLocalProcessId());
-      tmp->Update();
-      pdOut->CopyStructure(tmp);
-      pdOut->GetPointData()->ShallowCopy(tmp->GetPointData());
-      pdOut->GetCellData()->ShallowCopy(tmp->GetCellData());
-      extract->Delete();
-      }
-    else if (ugOut)
-      {
-      vtkTransmitUnstructuredGridPiece* extract= vtkTransmitUnstructuredGridPiece::New();
-      vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
-      tmp->CopyStructure(ugOut);
-      tmp->GetPointData()->ShallowCopy(ugOut->GetPointData());
-      tmp->GetCellData()->ShallowCopy(ugOut->GetCellData());
-      extract->SetInput(tmp);
-      tmp->Delete();
-      tmp = extract->GetOutput();
-      tmp->SetUpdateNumberOfPieces(this->Controller->GetNumberOfProcesses());
-      tmp->SetUpdatePiece(this->Controller->GetLocalProcessId());
-      tmp->Update();
-      ugOut->CopyStructure(tmp);
-      ugOut->GetPointData()->ShallowCopy(tmp->GetPointData());
-      ugOut->GetCellData()->ShallowCopy(tmp->GetCellData());
-      extract->Delete();
-      }
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::ExecuteError()
-{
-  // An error has occurred reading the file.  Just produce empty
-  // output.
-  this->SetNumberOfOutputs(1);
-  if(!(this->GetOutput(0) && this->GetOutput(0)->IsA("vtkPolyData")))
-    {
-    vtkPolyData* output = vtkPolyData::New();
-    this->SetNthOutput(0, output);
-    output->Delete();
-    }
-  this->GetOutput(0)->Initialize();
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
+void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation(
+  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   // Fake the filename when the superclass uses it.
   int piece = this->Controller->GetLocalProcessId();
   char* temp = this->CaseFileName;
   this->CaseFileName =
     const_cast<char*>(this->Internal->PieceFileNames[piece].c_str());
-  this->Superclass::ExecuteInformation();
+  this->Superclass::RequestInformation(request, inputVector, outputVector);
   this->CaseFileName = temp;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
+void vtkPVEnSightMasterServerReader::SuperclassExecuteData(
+  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   // Fake the filename when the superclass uses it.
   int piece = this->Controller->GetLocalProcessId();
   char* temp = this->CaseFileName;
   this->CaseFileName =
     const_cast<char*>(this->Internal->PieceFileNames[piece].c_str());
-  this->Superclass::Execute();
+  this->Superclass::RequestData(request, inputVector, outputVector);
   this->CaseFileName = temp;
 }
 
@@ -794,13 +587,6 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
     }
   
   this->NumberOfPieces = (numServers < numProcs)? numServers:numProcs;
-
-  for (int i = 0; i < this->GetNumberOfOutputs(); i++)
-    {
-    vtkDataObject* output = this->GetOutput(i);
-
-    output->SetMaximumNumberOfPieces(-1);
-    }
   
   return VTK_OK;
 }

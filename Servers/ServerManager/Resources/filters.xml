@@ -100,7 +100,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
@@ -174,7 +174,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
@@ -209,7 +209,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
@@ -958,7 +958,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
@@ -1444,7 +1444,7 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
      </InputProperty>
@@ -1743,7 +1743,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkPolyData"/>
              <DataType value="vtkDataSet"/>
              <DataType value="vtkUnstructuredGrid"/>
@@ -2444,7 +2444,7 @@
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_group" multiplicity="single"/>
@@ -2512,7 +2512,7 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
@@ -2705,7 +2705,7 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
+           <DataTypeDomain name="input_type" composite_data_supported="0">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>

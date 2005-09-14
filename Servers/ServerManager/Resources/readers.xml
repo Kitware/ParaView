@@ -631,7 +631,7 @@
    </SourceProxy>
 
    <SourceProxy name="ensight" 
-                class="vtkPVEnSightMasterServerReader">
+                class="vtkGenericEnSightReader">
      <StringVectorProperty
         name="CaseFileName"
         command="SetCaseFileName"

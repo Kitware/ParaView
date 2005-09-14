@@ -37,11 +37,6 @@ set pv(vtkTemp176) [$pv(vtkTemp159) GetPVWidget {Compute Normals}]
 $pv(vtkTemp176) SetSelectedState 0
 $pv(vtkTemp159) AcceptCallback
 
-$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp574)
-
-set pv(vtkTemp1254) [$pv(vtkTemp1) CreatePVSource PartScalars]
-$pv(vtkTemp1254) AcceptCallback
-
 #set pv(vtkTemp832) [$pv(vtkTemp1) GetPVLookmarkManager]
 #$pv(vtkTemp832) CreateLookmark "Lookmark Test" 0
 #$pv(vtkTemp1) SetCurrentPVSourceCallback {}

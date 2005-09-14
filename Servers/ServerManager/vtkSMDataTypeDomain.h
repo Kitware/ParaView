@@ -75,6 +75,10 @@ protected:
 
   vtkSMDataTypeDomainInternals* DTInternals;
 
+  int CompositeDataSupported;
+  vtkSetMacro(CompositeDataSupported, int);
+  vtkGetMacro(CompositeDataSupported, int);
+
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
   void operator=(const vtkSMDataTypeDomain&); // Not implemented

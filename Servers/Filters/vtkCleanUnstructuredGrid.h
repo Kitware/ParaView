@@ -29,18 +29,16 @@
 #ifndef __vtkCleanUnstructuredGrid_h
 #define __vtkCleanUnstructuredGrid_h
 
-#include "vtkDataSetToUnstructuredGridFilter.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
-class vtkUnstructuredGrid;
 class vtkPointLocator;
 
-class VTK_EXPORT vtkCleanUnstructuredGrid: public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkCleanUnstructuredGrid: public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCleanUnstructuredGrid *New();
 
-  vtkTypeRevisionMacro(vtkCleanUnstructuredGrid, 
-    vtkDataSetToUnstructuredGridFilter);
+  vtkTypeRevisionMacro(vtkCleanUnstructuredGrid, vtkUnstructuredGridAlgorithm);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -51,7 +49,9 @@ protected:
 
   vtkPointLocator *Locator;
 
-  void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **,
+                          vtkInformationVector *);
+  virtual int FillInputPortInformation(int port, vtkInformation *info);
 
 private:
 

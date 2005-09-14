@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.9");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -38,6 +38,7 @@ struct vtkSMDataTypeDomainInternals
 vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
   this->DTInternals = new vtkSMDataTypeDomainInternals;
+  this->CompositeDataSupported = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -107,6 +108,11 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
   proxy->CreateParts();
   vtkPVDataInformation* info = proxy->GetDataInformation();
   if (!info)
+    {
+    return 0;
+    }
+
+  if (info->GetCompositeDataClassName() && !this->CompositeDataSupported)
     {
     return 0;
     }
@@ -198,6 +204,13 @@ void vtkSMDataTypeDomain::SaveState(
 int vtkSMDataTypeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
+
+  int compositeDataSupported;
+  if (element->GetScalarAttribute("composite_data_supported",
+                                  &compositeDataSupported))
+    {
+    this->SetCompositeDataSupported(compositeDataSupported);
+    }
 
   // Loop over the top-level elements.
   unsigned int i;

@@ -51,25 +51,20 @@ public:
   // UpdateInformation.
   vtkGetMacro(NumberOfPieces, int);
 
-  // Description:
-  // This is necessary because the outputs do not exist until after execute.
-  virtual void Update();
-
 protected:
   vtkPVEnSightMasterServerReader();
   ~vtkPVEnSightMasterServerReader();
   
-  virtual void ExecuteInformation();
-  virtual void Execute();
+  virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
+                                 vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **,
+                          vtkInformationVector *);
   int ParseMasterServerFile();
-  void Balance();
   
-  void SuperclassExecuteInformation();
-  void SuperclassExecuteData();
-  
-  // Special execute method called by Execute when an error has
-  // occurred.  It produces an empty output.
-  virtual void ExecuteError();
+  void SuperclassExecuteInformation(vtkInformation *, vtkInformationVector **,
+                                    vtkInformationVector *);
+  void SuperclassExecuteData(vtkInformation *, vtkInformationVector **,
+                             vtkInformationVector *);
   
   // The MPI controller used to communicate with the instances in
   // other processes.

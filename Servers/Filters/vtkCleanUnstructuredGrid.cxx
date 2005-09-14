@@ -23,8 +23,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkIntArray.h"
 #include "vtkCollection.h"
 #include "vtkMergePoints.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.7");
+vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.8");
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 
 //----------------------------------------------------------------------------
@@ -47,10 +49,18 @@ void vtkCleanUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkCleanUnstructuredGrid::Execute()
+int vtkCleanUnstructuredGrid::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
-  vtkDataSet *input = this->GetInput();
-  vtkUnstructuredGrid *output= this->GetOutput();
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid *output= vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   if (input->GetNumberOfCells() == 0)
     {
@@ -63,9 +73,8 @@ void vtkCleanUnstructuredGrid::Execute()
     pts->SetNumberOfPoints(VTK_CELL_SIZE);
     output->SetPoints(pts);
     pts->Delete();
-    return;
+    return 1;
     }
-
 
   output->GetPointData()->CopyAllocate(input->GetPointData());
   output->GetCellData()->PassData(input->GetCellData());
@@ -125,4 +134,13 @@ void vtkCleanUnstructuredGrid::Execute()
   delete [] ptMap;
   cellPoints->Delete();
   output->Squeeze();
+
+  return 1;
+}
+
+int vtkCleanUnstructuredGrid::FillInputPortInformation(int vtkNotUsed(port),
+                                                       vtkInformation *info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
 }
