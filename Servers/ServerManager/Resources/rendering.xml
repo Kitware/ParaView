@@ -803,7 +803,7 @@
         command="SetOrientation"
         number_of_elements="3"
         default_values="0 0 0"
-        animateable="0">
+        animateable="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
