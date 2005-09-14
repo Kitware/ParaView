@@ -44,8 +44,6 @@
 
 #include "vtkPVDemoPaths.h"
 
-#include <sys/stat.h>
-
 #include <vtksys/SystemTools.hxx>
 
 // initialze the class variables
@@ -54,7 +52,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.37");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -399,7 +397,6 @@ const char* vtkPVProcessModule::GetDemoPath()
 {
   int found=0;
   char temp1[1024];
-  struct stat fs;
 
   this->SetDemoPath(NULL);
 
@@ -409,6 +406,7 @@ const char* vtkPVProcessModule::GetDemoPath()
     if (vtksys::SystemTools::FindProgramPath(
           this->Options->GetArgv0(), selfPath, errorMsg))
       {
+      selfPath = vtksys::SystemTools::GetFilenamePath(selfPath);
       const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
       char* newPath = new char[selfPath.size()+strlen(relPath)+2];
       sprintf(newPath, "%s/%s", selfPath.c_str(), relPath);
@@ -416,7 +414,7 @@ const char* vtkPVProcessModule::GetDemoPath()
       char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
       sprintf(demoFile, "%s/Demo1.pvs", newPath);
 
-      if (stat(demoFile, &fs) == 0)
+      if(vtksys::SystemTools::FileExists(demoFile))
         {
         this->SetDemoPath(newPath);
         found = 1;
@@ -433,7 +431,7 @@ const char* vtkPVProcessModule::GetDemoPath()
     for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
       {
       sprintf(temp1, "%s/Demo1.pvs", *dir);
-      if (stat(temp1, &fs) == 0) 
+      if(vtksys::SystemTools::FileExists(temp1))
         {
         this->SetDemoPath(*dir);
         found = 1;
