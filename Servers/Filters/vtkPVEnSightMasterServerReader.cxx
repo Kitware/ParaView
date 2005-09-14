@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.26");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -311,8 +311,6 @@ int vtkPVEnSightMasterServerReader::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
-  int i;
-  
   // Do not execute if ExecuteInformation failed.
   if(this->InformationError)
     {
