@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -47,7 +47,6 @@ vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackE
 vtkPVComparativeVisPropertyWidget::vtkPVComparativeVisPropertyWidget()
 {
   this->TrackSelector = vtkPVActiveTrackSelector::New();
-  this->TrackSelector->SetDisplayOnlyPVSourceProperties(1);
 
   this->NumberOfFramesEntry = vtkKWEntryWithLabel::New();
 

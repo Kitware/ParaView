@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.12");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.13");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -56,7 +56,6 @@ vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
   this->CurrentCue = 0;
   this->PackHorizontally = 0;
   this->FocusCurrentCue = 1;
-  this->DisplayOnlyPVSourceProperties = 0;
 }
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
@@ -345,26 +344,14 @@ void vtkPVActiveTrackSelector::BuildPropertiesMenu(const char* pretext,
       }
     else if (child_cue)
       {
-      int addProperty = 1;
-      if (this->DisplayOnlyPVSourceProperties)
-        {
-        if (child_cue->GetPVSource() &&
-            child_cue->GetPVSource()->GetProxy()!=child_cue->GetAnimatedProxy())
-          {
-          addProperty = 0;
-          }
-        }
-      if (addProperty)
-        {
-        int index = this->Internals->PropertyCues.size();
-        this->Internals->PropertyCues.push_back(child_cue);
-        
-        ostrstream command;
-        command << "SelectPropertyCallback " << index << ends;
-        this->PropertyMenuButton->GetMenu()->AddCommand(
-          label.str(), this, command.str());
-        command.rdbuf()->freeze(0);
-        }
+      int index = this->Internals->PropertyCues.size();
+      this->Internals->PropertyCues.push_back(child_cue);
+      
+      ostrstream command;
+      command << "SelectPropertyCallback " << index << ends;
+      this->PropertyMenuButton->GetMenu()->AddCommand(
+        label.str(), this, command.str());
+      command.rdbuf()->freeze(0);
       }
     label.rdbuf()->freeze(0);
     }
@@ -452,6 +439,4 @@ void vtkPVActiveTrackSelector::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "PackHorizontally: " << this->PackHorizontally << endl;
   os << indent << "FocusCurrentCue: " << this->FocusCurrentCue << endl;
-  os << indent << "DisplayOnlyPVSourceProperties: " 
-     << this->DisplayOnlyPVSourceProperties << endl;
 }

@@ -91,13 +91,6 @@ public:
                    int onlyCopySources=0);
 
   // Description:
-  // If true, only properties belonging to the proxy of the 
-  // point PVSource are shown in the properties dialog. False
-  // by default.
-  vtkSetMacro(DisplayOnlyPVSourceProperties, int);
-  vtkGetMacro(DisplayOnlyPVSourceProperties, int);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's Limited
   // Edition Mode, etc.), the "enable" state of the object is updated and
@@ -125,8 +118,6 @@ protected:
 
   int PackHorizontally;
   int FocusCurrentCue;
-
-  int DisplayOnlyPVSourceProperties;
 
 private:
   vtkPVActiveTrackSelector(const vtkPVActiveTrackSelector&); // Not implemented.
