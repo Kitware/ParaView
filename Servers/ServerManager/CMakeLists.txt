@@ -207,6 +207,10 @@ IF (PARAVIEW_BUILD_GUI)
     SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
     ADD_DEFINITIONS(-D_HPUX_SOURCE)
   ENDIF(NOT WIN32)
+  CONFIGURE_FILE(
+    "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVProcessModuleBatchHelperConfig.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/vtkPVProcessModuleBatchHelperConfig.h"
+  @ONLY IMMEDIATE)
   ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
     vtkPVProcessModuleBatchHelper.cxx)
   TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL 

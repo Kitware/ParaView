@@ -15,6 +15,7 @@
 #include "vtkPVProcessModuleBatchHelper.h"
 
 #include "vtkPVProcessModule.h"
+#include "vtkPVProcessModuleBatchHelperConfig.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVBatchOptions.h"
 #include "vtkSMApplication.h"
@@ -23,9 +24,10 @@
 #include "vtkTclUtil.h"
 #include "vtkWindows.h"
 
+#include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.10");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.10.2.1");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -70,66 +72,43 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
 #ifdef VTK_TCL_TK_COPY_SUPPORT_LIBRARY
 
   int has_tcllibpath_env = getenv("TCL_LIBRARY") ? 1 : 0;
-  int has_tklibpath_env = getenv("TK_LIBRARY") ? 1 : 0;
-  if (!has_tcllibpath_env || !has_tklibpath_env)
+  if (!has_tcllibpath_env)
     {
     const char *nameofexec = Tcl_GetNameOfExecutable();
     if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
       {
-      char dir_unix[1024], buffer[1024];
+      char dir_unix[1024];
       vtksys_stl::string dir = vtksys::SystemTools::GetFilenamePath(nameofexec);
       vtksys::SystemTools::ConvertToUnixSlashes(dir);
       strcpy(dir_unix, dir.c_str());
 
-      // Installed KW application, otherwise build tree/windows
-      sprintf(buffer, "%s/../lib/TclTk", dir_unix);
-      int exists = vtksys::SystemTools::FileExists(buffer);
-      if (!exists)
+      // Search possible paths for the tcl libraries.
+      const char* const relative_dirs[] =
         {
-        sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = vtksys::SystemTools::FileExists(buffer);
-        }
-      vtksys_stl::string collapsed = 
-        vtksys::SystemTools::CollapseFullPath(buffer);
-      sprintf(buffer, collapsed.c_str());
-      if (exists)
+          "../lib/TclTk/lib",
+          "TclTk/lib",
+          ".." VTK_PV_TclTk_INSTALL_DIR,     // for exe in PREFIX/bin
+          "../.." VTK_PV_TclTk_INSTALL_DIR,  // for exe in PREFIX/lib/paraview-V.v
+          0
+        };
+      vtkstd::string tdir;
+      for(const char* const* p = relative_dirs; *p; ++p)
         {
-        // Also prepend our Tcl Tk lib path to the library paths
-        // This *is* mandatory if we want encodings files to be found, as they
-        // are searched by browsing TclGetLibraryPath().
-        // (nope, updating the Tcl tcl_libPath var won't do the trick)
-        
-        Tcl_Obj *new_libpath = Tcl_NewObj();
-        
-        // Tcl lib path
-        
-        if (!has_tcllibpath_env)
-        {
-        char tcl_library[1024] = "";
-        sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (vtksys::SystemTools::FileExists(tcl_library))
+        tdir = dir_unix;
+        tdir += "/";
+        tdir += *p;
+        tdir += "/tcl" TCL_VERSION;
+        tdir = vtksys::SystemTools::CollapseFullPath(tdir.c_str());
+        if(vtksys::SystemTools::FileExists(tdir.c_str()) &&
+           vtksys::SystemTools::FileIsDirectory(tdir.c_str()))
           {
-          if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
-                          TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
-            {
-            if (err)
-              {
-              *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) 
-                   << endl;
-              }
-            return NULL;
-            }
-          Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
-          if (obj && 
-              !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK &&
-              err)
-            {
-            *err << "Tcl_ListObjAppendElement error: " 
-                 << Tcl_GetStringResult(interp) << endl;
-            }
+          // Set the tcl_library Tcl variable.
+          char tcl_library[1024];
+          strcpy(tcl_library, tdir.c_str());
+          Tcl_SetVar(interp, "tcl_library", tcl_library,
+                     TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
+          break;
           }
-        }
-        TclSetLibraryPath(new_libpath);
         }
       }
     }
