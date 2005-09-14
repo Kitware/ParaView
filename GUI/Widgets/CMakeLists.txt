@@ -83,6 +83,7 @@ SET (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 # Sources
 
 SET(KWWidgets_SRCS
+  vtkKWAbstractPresetSelector.cxx
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBalloonHelpManager.cxx
@@ -198,6 +199,7 @@ SET(KWWidgets_SRCS ${KWWidgets_SRCS} ${KWWidgets_Utils_SRCS})
 # Abstract/pure virtual classes
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkKWAbstractPresetSelector.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueHermiteFunctionEditor.cxx
