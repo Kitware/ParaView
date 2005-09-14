@@ -34,6 +34,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
@@ -41,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.17");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.18");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -407,6 +408,8 @@ vtkPVApplication* vtkPVComparativeVisManager::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::SaveState(ofstream *file)
 {
+  vtkPVWindow* window = this->GetPVApplication()->GetMainWindow();
+
   *file << endl;
   *file << "vtkSMObject foo" << endl;
   *file << "set proxyManager [foo GetProxyManager]" << endl;
@@ -443,8 +446,20 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
           {
           *file << endl;
           ostrstream proxyName;
-          proxyName << "[$kw(" << iter->GetPointer()->GetSourceTclName(i)
-                    << ") GetProxy]" << ends;
+          vtkPVSource* source = 
+            window->GetPVSource("Sources", 
+                                iter->GetPointer()->GetSourceName(i));
+          if (vtkSMSourceProxy::SafeDownCast(animCue->GetAnimatedProxy()) == 
+              source->GetProxy())
+            {
+            proxyName << "[$kw(" << iter->GetPointer()->GetSourceTclName(i)
+                      << ") GetProxy]" << ends;
+            }
+          else if (animCue->GetAnimatedProxy() == source->GetDisplayProxy())
+            {
+            proxyName << "[$kw(" << iter->GetPointer()->GetSourceTclName(i)
+                      << ") GetDisplayProxy]" << ends;
+            }
           animCue->SaveInBatchScript(file, proxyName.str(), 0);
           delete[] proxyName.str();
           *file << "$comparativeVis(" << idx << ") AddCue $pvTemp" 
