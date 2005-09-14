@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.73");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.74");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1173,7 +1173,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
   //    create lmk, pack lmk inside folder
 
   int iter=0;
-  int tstep;
+  int tstep, j, numberOfItems;
   float center[3];
   double bds[6];
   ifstream *infile;
@@ -1181,6 +1181,9 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
   vtkPVSource *pvs;
   vtkstd::string filename;
   vtkstd::string::size_type idx;
+  vtkIdType k;
+  char name[200];
+  vtkKWLookmarkFolder *lmkFolderWidget;
 
   vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
   if (col == NULL)
@@ -1194,16 +1197,16 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
   filename = reader->RemovePath(boundingBoxFileName);
   idx = filename.find_last_of('.',filename.size());
   filename.erase(idx,filename.size()-idx);
-/*
+
   j = 0;
   numberOfItems = this->Folders->GetNumberOfItems();
   while(j<=numberOfItems)
     {
     sprintf(name,"%s-%d",filename.c_str(),j);
+    name[0] = toupper(name[0]);
     k=0;
     this->Folders->GetItem(k,lmkFolderWidget);
-    ptr = name;
-    while(k<numberOfItems && strstr(lmkFolderWidget->GetFolderName(),++ptr)!=0)
+    while(k<numberOfItems && strcmp(lmkFolderWidget->GetFolderName(),name)!=0)
       {
       this->Folders->GetItem(++k,lmkFolderWidget);
       }
@@ -1213,8 +1216,8 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
       }
     j++;
     }
-*/
-  vtkKWLookmarkFolder *bboxFolder = this->CreateFolder(filename.c_str(),0);
+
+  vtkKWLookmarkFolder *bboxFolder = this->CreateFolder(name,0);
 
   while(*infile >> tstep >> bds[0] >> bds[2] >> bds[4] >> bds[1] >> bds[3] >> bds[5])
     {
