@@ -61,19 +61,12 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.7");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.8");
 
 
 //----------------------------------------------------------------------------
 vtkPVAttributeEditor::vtkPVAttributeEditor()
 {
-  this->Frame = vtkKWFrame::New();
-  this->DataFrame = vtkKWFrame::New();
-  this->Label = vtkKWLabel::New();
-  this->Entry = vtkKWEntry::New();
-  this->BrowseButton = vtkKWPushButton::New();
-  this->SaveButton = vtkKWPushButton::New();
-
   this->WriterID.ID = 0;
 
   this->ForceEdit = 0;
@@ -81,6 +74,8 @@ vtkPVAttributeEditor::vtkPVAttributeEditor()
   this->IsScalingFlag = 0;
   this->IsMovingFlag = 0;
   this->EditedFlag = 0;
+  this->PassSourceInput = 0;
+  this->SaveButton = vtkKWPushButton::New();
 
   this->EventCallbackCommand = vtkCallbackCommand::New();
   this->EventCallbackCommand->SetClientData(this); 
@@ -88,26 +83,13 @@ vtkPVAttributeEditor::vtkPVAttributeEditor()
 }
 
 vtkPVAttributeEditor::~vtkPVAttributeEditor()
-{  
-  this->DataFrame->Delete();
-  this->DataFrame = NULL;
-  this->BrowseButton->Delete();
-  this->BrowseButton = NULL;
-  this->SaveButton->Delete();
-  this->SaveButton = NULL;
-  this->Entry->Delete();
-  this->Entry = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
-  this->Frame->Delete();
-  this->Frame = NULL;
-
+{
   this->EventCallbackCommand->SetClientData(0);
   this->EventCallbackCommand->SetCallback(0);
   this->EventCallbackCommand->Delete();
   this->EventCallbackCommand = 0;
+  this->SaveButton->Delete();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::CreateProperties()
@@ -128,173 +110,26 @@ void vtkPVAttributeEditor::CreateProperties()
     interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
     // Currently only a timestep change from the animation manager will prompt the user to save changes:
     this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-    this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+    //this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
     }
 
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
   select->SetModifiedCommand(this->GetTclName(),"PickMethodObserver");
 
   // If this is not exodus data, do not pack the saving widgets
-  vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
-  if(mod ==NULL || strcmp(mod->GetModuleName(),"ExodusReader")!=0)
-    {
-    return;
-    }
+  //vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
+  //if(mod ==NULL || strcmp(mod->GetModuleName(),"ExodusReader")!=0)
+  //  {
+  //  return;
+  //  }
 
-  this->Frame->SetParent(this->ParameterFrame->GetFrame());
-  this->Frame->Create(pvApp);
-
-  this->Label->SetParent(this->Frame);
-  this->Entry->SetParent(this->Frame);
-  this->BrowseButton->SetParent(this->Frame);
-  this->SaveButton->SetParent(this->Frame);
-  
-  // Now a label
-  this->Label->Create(pvApp);
-  this->Label->SetText("Filename");
-  this->Label->SetJustificationToRight();
-  this->Label->SetWidth(18);
-  this->Script("pack %s -side left", this->Label->GetWidgetName());
-  
-  // Now the entry
-  this->Entry->Create(pvApp);
-  this->Entry->SetValue(this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetValue());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->Entry->GetWidgetName());
-  
-  // Now the push button
-  this->BrowseButton->Create(pvApp);
-  this->BrowseButton->SetText("Browse");
-  this->BrowseButton->SetCommand(this, "BrowseCallback");
-
-  // Now the push button
+  this->SaveButton->SetParent(this->ParameterFrame->GetFrame());
   this->SaveButton->Create(pvApp);
   this->SaveButton->SetText("Save");
-  this->SaveButton->SetCommand(this, "SaveCallback");
-
-  this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
-  this->Script("pack %s -side left", this->SaveButton->GetWidgetName());
-  this->Script("pack %s -pady 10 -side top -fill x -expand t", 
-                this->Frame->GetWidgetName());
-
-  this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->DataFrame->Create(pvApp);
-  this->Script("pack %s",
-               this->DataFrame->GetWidgetName());
+  this->SaveButton->SetCommand(this->GetPVWindow(), "WriteData");
+  this->Script("pack %s -padx 2 -pady 4 -expand t", this->SaveButton->GetWidgetName());
 
   this->GetNotebook()->SetAutoAccept(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAttributeEditor::BrowseCallback()
-{
-  ostrstream str;
-  vtkKWLoadSaveDialog* saveDialog;
-  const char* fname = this->Entry->GetValue();
-
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVWindow* win = 0;
-  if (!pvApp)
-    {
-    return;
-    }
-
-  saveDialog = pvApp->NewLoadSaveDialog();
-  win = pvApp->GetMainWindow();
-
-  saveDialog->SetLastPath(fname);
-  saveDialog->Create(this->GetPVApplication());
-  if (win) 
-    { 
-    saveDialog->SetParent(this); 
-    }
-  saveDialog->SaveDialogOn();
-  saveDialog->SetTitle("Select File");
-  char *ext = this->GetPVWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetExtension();
-  if(ext)
-    {
-    saveDialog->SetDefaultExtension(ext);
-    str << "{{} {." << ext << "}} ";
-    }
-  str << "{{All files} {*}}" << ends;  
-  saveDialog->SetFileTypes(str.str());
-  str.rdbuf()->freeze(0);  
-  if(saveDialog->Invoke())
-    {
-    this->Script("%s SetValue {%s}", this->Entry->GetTclName(),
-                 saveDialog->GetFileName());
-    }
-
-  saveDialog->Delete();
-}
-
-
-void vtkPVAttributeEditor::SaveCallback()
-{
-  vtkClientServerStream stream;
-  int ghostLevel = 1;
-  int editorFlag = 1;
-
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  if(!pm)
-    {
-    return;
-    }
-
-  vtkPVArrayMenu *array = vtkPVArrayMenu::SafeDownCast(this->GetPVWidget("Scalars"));
-  if(!array)
-    {
-    return;
-    }
-
-  // Send the source input to the output instead of the filter input so that the whole dataset gets written:
-  vtkPVLabeledToggle *unfilteredFlag = vtkPVLabeledToggle::SafeDownCast(this->GetPVWidget("UnfilteredDataset"));
-  unfilteredFlag->SetSelectedState(1);
-  this->ForceNoEdit = 1;
-  this->AcceptCallback();
-  this->ForceNoEdit = 0;
-
-  if(this->WriterID.ID==0)
-    {
-    this->WriterID = pm->NewStreamObject("vtkExodusIIWriter",stream);
-    }
-
-  vtkClientServerID dataID = this->GetPart()->GetID(0);
-
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetFileName" << this->Entry->GetValue()
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetInput" << dataID
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetGhostLevel" << ghostLevel
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetEditorFlag" << editorFlag
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "SetEditedVariableName" << array->GetValue()
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "Write"
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-                  << this->WriterID << "GetErrorCode"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-
-  pm->DeleteStreamObject(this->WriterID, stream);
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-  this->WriterID.ID = 0;
-
-  // turn the filter view back on
-  unfilteredFlag->SetSelectedState(0);
-  this->ForceNoEdit = 1;
-  this->AcceptCallback();
-  this->ForceNoEdit = 0;
-
-  this->EditedFlag = 0;
 }
 
 
@@ -376,7 +211,7 @@ void vtkPVAttributeEditor::OnTimestepChange()
           vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
           vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
       {
-      this->SaveCallback();  
+      this->GetPVWindow()->WriteData();
       }
     this->SetEditedFlag(0);
     }
@@ -469,6 +304,14 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
               editFlag = 0;
               }
             }
+          else if(widget->IsA("vtkPVArrayMenu"))
+            {
+            // if the attribute array has changed, tell filter to clear its stored arrays
+            vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
+              this->GetProxy()->GetProperty("ClearEdits"));
+            vp->SetElements1(1);
+            this->GetProxy()->UpdateVTKObjects();
+            }
           else
             {
             editFlag = 0;
@@ -487,6 +330,13 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
   else if(this->ForceNoEdit)
     {
     editFlag = 0;
+    }
+
+  if(this->PassSourceInput)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProxy()->GetProperty("UnfilteredDataset"));
+    ivp->SetElements1(1);
     }
   
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -515,12 +365,6 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
     if(box)
       {
       box->ActualPlaceWidget();
-      }
-
-    vtkPVReaderModule *mod = this->GetPVWindow()->GetCurrentPVReaderModule();
-    if(mod)
-      {
-      this->Entry->SetValue(mod->GetFileEntry()->GetValue());
       }
     }
 }

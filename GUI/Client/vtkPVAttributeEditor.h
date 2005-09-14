@@ -21,12 +21,8 @@
 
 #include "vtkPVSource.h"
 
-class vtkKWFrame;
-class vtkKWLabel;
-class vtkKWPushButton;
-class vtkKWEntry;
 class vtkCallbackCommand;
-
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVAttributeEditor : public vtkPVSource
 {
@@ -47,16 +43,6 @@ public:
   // When the sphere widget is active, we want auto-accept to be turned on so
   // it can be dragged.
   void PickMethodObserver();
-
-  // Description:
-  // Called when the browse button is pressed.
-  void BrowseCallback();
-
-  // Description:
-  // Called when the save button is pressed.
-  // Sends commands to writer via clientserverstream.
-  // Currently only exodus data can be saved.
-  void SaveCallback();
  
   // Description:
   // These must be made available to the ProcessEvents function so that 
@@ -69,6 +55,7 @@ public:
   vtkSetMacro(IsMovingFlag,int);
   vtkSetMacro(ForceEdit,int);
   vtkSetMacro(ForceNoEdit,int);
+  vtkSetMacro(PassSourceInput,int);
 
   // Description:
   // Handles the events
@@ -97,13 +84,9 @@ protected:
   int EditedFlag;
   int ForceEdit;
   int ForceNoEdit;
-  
-  vtkKWFrame *Frame;
-  vtkKWFrame *DataFrame;
-  vtkKWLabel *Label;
-  vtkKWPushButton *BrowseButton;
+  int PassSourceInput;
+
   vtkKWPushButton *SaveButton;
-  vtkKWEntry *Entry;
 
   vtkPVAttributeEditor(const vtkPVAttributeEditor&); // Not implemented
   void operator=(const vtkPVAttributeEditor&); // Not implemented
