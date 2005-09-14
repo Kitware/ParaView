@@ -25,6 +25,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_SOURCE_DIR}/Wrapping
   ${VTK_SOURCE_DIR}
   ${VTK_BINARY_DIR}
+  ${VTK_BINARY_DIR}/Utilities
   ${VTK_SOURCE_DIR}/Common
   ${VTK_SOURCE_DIR}/Filtering
   ${VTK_BINARY_DIR}/Rendering
