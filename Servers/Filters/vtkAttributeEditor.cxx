@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.6");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.7");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -73,8 +73,10 @@ vtkAttributeEditor::vtkAttributeEditor(vtkImplicitFunction *cf)
   this->ClearEdits = 0;
 
   // by default process active point scalars
-  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
-                               vtkDataSetAttributes::SCALARS);
+  //this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
+  //                             vtkDataSetAttributes::SCALARS);
+  //this->SetInputArrayToProcess(0,1,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
+  //                             vtkDataSetAttributes::SCALARS);
 
   vtkInformation* info = this->GetInputPortInformation(0);
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
@@ -163,13 +165,12 @@ int vtkAttributeEditor::RequestData(
   vtkDataSetAttributes *readerfield;
   vtkDataSetAttributes *filterfield;
   vtkInformation *info;
-  //vtkInformation *info = this->GetInputArrayInformation(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE());
   vtkDataSet *filterInput;
   vtkUnstructuredGrid *filterOutput;
   vtkInformation *filterInputInfo;
   vtkInformation *outInfo;
   vtkInformation *readerInputInfo;
-//  int usePointScalars;
+  int usePointScalars;
 
   // Get the filter input and output data sets:
   filterInputInfo = inputVector[0]->GetInformationObject(0);
@@ -220,13 +221,6 @@ int vtkAttributeEditor::RequestData(
     this->ClearEdits = 0;
     }
 
-/*
-  vtkPointData *readerPD = vtkPointData::New();
-  readerPD->DeepCopy(readerInput->GetPointData());
-  vtkCellData *readerCD = vtkCellData::New();
-  readerCD->DeepCopy(readerInput->GetCellData());
-*/
-
   // when edit mode is off, either this is the first execution of filter, the source view or some other widget has been modified, or source view is on
 
   if(this->UnfilteredDataset)
@@ -243,44 +237,29 @@ int vtkAttributeEditor::RequestData(
     filterOutput->GetCellData()->PassData ( filterCD );
     filterOutput->GetFieldData()->PassData ( filterInput->GetFieldData() );
     }
-/*
-  if(this->EditMode==0)
-    {
-    if(this->ReaderDataArray)
-      {
-      readerOutput->GetPointData()->AddArray(this->ReaderDataArray);
-      }
 
-    if(this->FilterDataArray)
-      {
-      filterOutput->GetPointData()->AddArray(this->FilterDataArray);
-      }
 
-    return 1;
-    }
-*/
-/*
   vtkDataArray *inScalars = this->GetInputArrayToProcess(0,inputVector);
   if (!inScalars)
     {
-    vtkDebugMacro(<<"No scalar data to threshold");
+    vtkDebugMacro(<<"No scalar data");
     return 1;
     }
   // are we using pointScalars?
   usePointScalars = (inScalars->GetNumberOfTuples() == filterInput->GetNumberOfPoints());
-*/
+
   info = this->GetInputArrayInformation(0);
 
   if(this->EditMode==0)
     {
 //    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
 //    else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    if(filterPD->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
       {
       readerfield = readerOutput->GetPointData();
       filterfield = filterOutput->GetPointData();
       }
-    else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    else if(filterCD->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
       {
       readerfield = readerOutput->GetCellData();
       filterfield = filterOutput->GetCellData();
@@ -307,13 +286,20 @@ int vtkAttributeEditor::RequestData(
 
   // Create stored arrays if needed
 
-  if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  if(filterPD->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
     {
     field = filterPD;
     }
-  else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  else if(filterCD->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
     {
     field = filterCD;
+    }
+
+  vtkDataArray *scalarArray = field->GetArray(info->Get(vtkDataObject::FIELD_NAME()));
+  if(!scalarArray)
+    {
+    vtkErrorMacro(<<"Could not find array to edit");
+    return 0;
     }
 
   if( !this->FilterDataArray || strcmp(this->FilterDataArray->GetName(),info->Get(vtkDataObject::FIELD_NAME())) != 0)
@@ -323,7 +309,7 @@ int vtkAttributeEditor::RequestData(
       this->FilterDataArray->Delete();  
       }
     this->FilterDataArray = vtkFloatArray::New();
-    this->FilterDataArray->DeepCopy(field->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+    this->FilterDataArray->DeepCopy(scalarArray);
     this->FilterDataArray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
     }
 
@@ -331,10 +317,10 @@ int vtkAttributeEditor::RequestData(
     {
     if(this->ReaderDataArray)
       {
-      this->ReaderDataArray->Delete();  
+      this->ReaderDataArray->Delete();
       }
     this->ReaderDataArray = vtkFloatArray::New();
-    this->ReaderDataArray->DeepCopy(field->GetScalars(info->Get(vtkDataObject::FIELD_NAME())));
+    this->ReaderDataArray->DeepCopy(scalarArray);
     this->ReaderDataArray->SetName(info->Get(vtkDataObject::FIELD_NAME()));
     }
 
@@ -418,7 +404,7 @@ void vtkAttributeEditor::RegionExecute(vtkDataSet *rinput,vtkDataSet *finput, vt
   this->Locator->InitPointInsertion (newPoints, finput->GetBounds());
 
 
-  if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  if(finput->GetPointData()->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
     {
     if(this->FilterDataArray && this->ReaderDataArray)
       {
@@ -440,10 +426,9 @@ void vtkAttributeEditor::RegionExecute(vtkDataSet *rinput,vtkDataSet *finput, vt
       // This replaces the given array if it already exists
       routput->GetPointData()->AddArray(this->ReaderDataArray);
       foutput->GetPointData()->AddArray(this->FilterDataArray);
-
       }
     }
-  else if(info->Get(vtkDataObject::FIELD_ASSOCIATION()) == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  else if(finput->GetCellData()->HasArray(info->Get(vtkDataObject::FIELD_NAME())))
     {
     vtkCell *cell;
     int subId = 0;
