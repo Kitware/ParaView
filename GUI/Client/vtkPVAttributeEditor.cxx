@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.9");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -403,5 +403,6 @@ void vtkPVAttributeEditor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SetIsMovingFlag" << this->IsMovingFlag << endl;
   os << indent << "SetForceEdit" << this->ForceEdit << endl;
   os << indent << "SetForceNoEdit" << this->ForceNoEdit << endl;
+  os << indent << "PassSourceInput" << this->PassSourceInput << endl;
   
 }
