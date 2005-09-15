@@ -61,7 +61,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.8");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void vtkPVAttributeEditor::CreateProperties()
     interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
     // Currently only a timestep change from the animation manager will prompt the user to save changes:
     this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-    //this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+    this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
     }
 
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
@@ -211,9 +211,10 @@ void vtkPVAttributeEditor::OnTimestepChange()
           vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
           vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
       {
+      this->Select();
+      this->GetPVWindow()->SetCurrentPVSource(this);
       this->GetPVWindow()->WriteData();
       }
-    this->SetEditedFlag(0);
     }
 
   // This ensures the currently selected region won't be edited in the new timestep:

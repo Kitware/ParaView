@@ -32,12 +32,13 @@
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkKWEvent.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.70");
+vtkCxxRevisionMacro(vtkPVScale, "1.71");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -279,6 +280,11 @@ void vtkPVScale::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVScale::Accept()
 {
+  if(this->GetKeepsTimeStep() && this->ModifiedFlag)
+    {
+    this->InvokeEvent(vtkKWEvent::TimeChangedEvent);
+    }
+
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
