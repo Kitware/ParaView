@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.74");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.75");
 
 //===========================================================================
 //***************************************************************************
@@ -278,6 +278,11 @@ void vtkPV3DWidget::SetVisibility()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibility(int visibility)
 {
+  if (visibility == this->Visible)
+    {
+    return;
+    }
+
   if ( visibility )
     {
     this->PlaceWidget();
