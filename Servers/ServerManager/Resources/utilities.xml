@@ -1485,6 +1485,24 @@
         <IntRangeDomain name="range"/>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="NumberOfXFrames"
+        command="SetNumberOfXFrames"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfYFrames"
+        command="SetNumberOfYFrames"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
       <StringVectorProperty
         name="SourceNames"
         command="SetSourceName"

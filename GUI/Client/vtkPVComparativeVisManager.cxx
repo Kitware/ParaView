@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.18");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.19");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -425,6 +425,12 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
           << "ComparativeVis]" << endl;
     *file << "$comparativeVis(" << idx << ") SetName {" 
           << iter->GetPointer()->GetName() << "}" << endl;
+    *file << "$comparativeVis(" << idx << ") SetNumberOfXFrames " 
+          <<  iter->GetPointer()->GetNumberOfXFrames()
+          << endl;
+    *file << "$comparativeVis(" << idx << ") SetNumberOfYFrames " 
+          <<  iter->GetPointer()->GetNumberOfYFrames()
+          << endl;
     unsigned int numCues = iter->GetPointer()->GetNumberOfCues();
     for (unsigned int i=0; i<numCues; i++)
       {

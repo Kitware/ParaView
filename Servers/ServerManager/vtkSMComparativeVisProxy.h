@@ -153,6 +153,16 @@ public:
   void SetSourceTclName(unsigned int idx, const char* sourceName);
   const char* GetSourceTclName(unsigned int idx);
 
+  // Description:
+  // Set the number of frames in X
+  vtkSetMacro(NumberOfXFrames, unsigned int);
+  vtkGetMacro(NumberOfXFrames, unsigned int);
+
+  // Description:
+  // Set the number of frames in Y
+  vtkSetMacro(NumberOfYFrames, unsigned int);
+  vtkGetMacro(NumberOfYFrames, unsigned int);
+
 protected:
   vtkSMComparativeVisProxy();
   ~vtkSMComparativeVisProxy();
@@ -189,6 +199,9 @@ protected:
   int InFirstShow;
 
   int IsGenerated;
+
+  unsigned int NumberOfXFrames;
+  unsigned int NumberOfYFrames;
 
   void UpdateProgress(double progress);
 

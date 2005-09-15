@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.11");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.12");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -115,6 +115,10 @@ vtkPVComparativeVisDialog::vtkPVComparativeVisDialog()
     vtkPVTrackEditor::LAST_KEYFRAME_TIME_NOTCHANGABLE);
   this->NameEntry = vtkKWEntryWithLabel::New();
   this->VisualizationListFrame = vtkKWFrameWithLabel::New();
+  
+  this->NumberOfFramesFrame = vtkKWFrame::New();
+  this->NumberOfXFramesEntry = vtkKWEntryWithLabel::New();
+  this->NumberOfYFramesEntry = vtkKWEntryWithLabel::New();
 
   this->ButtonFrame = vtkKWFrame::New();
   this->OKButton = vtkKWPushButton::New();
@@ -142,6 +146,9 @@ vtkPVComparativeVisDialog::~vtkPVComparativeVisDialog()
   this->TrackEditor->Delete();
   this->NameEntry->Delete();
   this->VisualizationListFrame->Delete();
+  this->NumberOfFramesFrame->Delete();
+  this->NumberOfXFramesEntry->Delete();
+  this->NumberOfYFramesEntry->Delete();
   this->ButtonFrame->Delete();
   this->OKButton->Delete();
   this->CancelButton->Delete();
@@ -243,6 +250,9 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
   this->Internal->RadioButtons.clear();
   this->Internal->Widgets.clear();
 
+  this->NumberOfXFramesEntry->GetWidget()->SetValueAsInt(5);
+  this->NumberOfYFramesEntry->GetWidget()->SetValueAsInt(5);
+
   // Create two property widgets by default
   this->NewPropertyWidget();
   this->NewPropertyWidget();
@@ -277,6 +287,31 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
   vtkKWTkUtilities::ChangeFontWeightToBold(this->NameEntry->GetLabel());
   this->Script("pack %s -side top -fill x -anchor n -pady 5", 
                this->NameEntry->GetWidgetName());
+
+  this->NumberOfFramesFrame->SetParent(this->MainFrame);
+  this->NumberOfFramesFrame->Create(app);
+  this->Script(
+    "pack %s -side top -fill x -anchor n -pady 5", 
+    this->NumberOfFramesFrame->GetWidgetName());
+
+  this->NumberOfXFramesEntry->SetParent(this->NumberOfFramesFrame);
+  this->NumberOfXFramesEntry->Create(app);
+  this->NumberOfXFramesEntry->SetLabelText("Number of X Frames:");
+  vtkKWTkUtilities::ChangeFontWeightToBold(
+    this->NumberOfXFramesEntry->GetLabel());
+
+  this->NumberOfYFramesEntry->SetParent(this->NumberOfFramesFrame);
+  this->NumberOfYFramesEntry->Create(app);
+  this->NumberOfYFramesEntry->SetLabelText("Number of Y Frames:");
+  vtkKWTkUtilities::ChangeFontWeightToBold(
+    this->NumberOfYFramesEntry->GetLabel());
+
+  this->Script(
+    "pack %s -side left", 
+    this->NumberOfXFramesEntry->GetWidgetName());
+  this->Script(
+    "pack %s -side left -padx 5", 
+    this->NumberOfYFramesEntry->GetWidgetName());
 
   this->VisualizationListFrame->SetParent(this->MainFrame);
   this->VisualizationListFrame->Create(app);
@@ -335,6 +370,13 @@ void vtkPVComparativeVisDialog::CopyToVisualization(
     cv->GetProperty("SourceTclNames"))->SetNumberOfElements(0);
   cv->UpdateVTKObjects();
 
+  vtkSMIntVectorProperty::SafeDownCast(
+    cv->GetProperty("NumberOfXFrames"))->SetElement(
+      0, this->NumberOfXFramesEntry->GetWidget()->GetValueAsInt());
+  vtkSMIntVectorProperty::SafeDownCast(
+    cv->GetProperty("NumberOfYFrames"))->SetElement(
+      0, this->NumberOfYFramesEntry->GetWidget()->GetValueAsInt());
+
   vtkPVComparativeVisDialogInternals::WidgetsType::iterator iter =
     this->Internal->Widgets.begin();
   for (; iter != this->Internal->Widgets.end(); iter++)
@@ -375,6 +417,11 @@ void vtkPVComparativeVisDialog::CopyFromVisualization(
       this->NewPropertyWidget();
       }
     }
+
+  this->NumberOfXFramesEntry->GetWidget()->SetValueAsInt(
+    cv->GetNumberOfXFrames());
+  this->NumberOfYFramesEntry->GetWidget()->SetValueAsInt(
+    cv->GetNumberOfYFrames());
     
   this->NameEntry->GetWidget()->SetValue(cv->GetName());
   // Choose the first widget by default

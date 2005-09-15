@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.10");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -131,6 +131,9 @@ vtkSMComparativeVisProxy::vtkSMComparativeVisProxy()
   this->PropertyIndex = 0;
 
   this->Adaptor = vtkSMPropertyAdaptor::New();
+
+  this->NumberOfXFrames = 1;
+  this->NumberOfYFrames = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -654,12 +657,14 @@ int vtkSMComparativeVisProxy::Show()
     double* bounds = &this->Internal->Bounds[i][0];
     this->AddBounds(bounds, biggestBounds);
     }
-  int nx = this->Internal->NumberOfFramesInCue[0];
-  int ny = 1;
-  if (numProps > 1)
-    {
-    ny = this->Internal->NumberOfFramesInCue[1];
-    }
+  int nx = this->NumberOfXFrames;
+  int ny = this->NumberOfYFrames;
+//   int nx = this->Internal->NumberOfFramesInCue[0];
+//   int ny = 1;
+//   if (numProps > 1)
+//     {
+//     ny = this->Internal->NumberOfFramesInCue[1];
+//     }
   // Compute a proper cell (frame) spacing based on the data
   // bounds aspect ratio and window aspect ratio.
   double dataWidth = biggestBounds[1] - biggestBounds[0];
@@ -694,18 +699,22 @@ int vtkSMComparativeVisProxy::Show()
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->RenderModule->GetProperty("Displays"));
 
-  for(i=0; i<numEntries; i++)
+  unsigned int ix=0, iy=0;
+  for(i=0; i<numEntries && ix<this->NumberOfXFrames; i++)
     {
     this->ComputeIndices(i);
     vtkSMComparativeVisProxyInternals::ProxiesType::iterator iter2 = 
       this->Internal->Displays[i].begin();
-    double xPos = cellSpacing[0]*this->Internal->Indices[0];
-    double yPos = 0;
-    if (numProps > 1)
-      {
-      yPos = cellSpacing[1]*this->Internal->Indices[1];
-      }
-
+//     double xPos = cellSpacing[0]*this->Internal->Indices[0];
+//     double yPos = 0;
+//     if (numProps > 1)
+//       {
+//       yPos = cellSpacing[1]*this->Internal->Indices[1];
+//       }
+    cout << this->Internal->Indices[0] << " " << ix << endl;
+    cout << this->Internal->Indices[1] << " " << iy << endl;
+    double xPos = cellSpacing[0]*ix;
+    double yPos = cellSpacing[1]*iy;
     vtkSMDisplayProxy* label = vtkSMDisplayProxy::SafeDownCast(
       this->Internal->Labels[i]);
     pp->AddProxy(label);
@@ -813,15 +822,17 @@ int vtkSMComparativeVisProxy::Show()
             label->GetProperty("Position"));
         int delx = winSize[0] / nx;
         int dely = winSize[1] / ny;
-        pos->SetElement(0, this->Internal->Indices[0]*delx);
-        if (numProps > 1)
-          {
-          pos->SetElement(1, this->Internal->Indices[1]*dely);
-          }
-        else
-          {
-          pos->SetElement(1, 0);
-          }
+        //pos->SetElement(0, this->Internal->Indices[0]*delx);
+        pos->SetElement(0, ix*delx);
+//         if (numProps > 1)
+//           {
+//           pos->SetElement(1, this->Internal->Indices[1]*dely);
+//           }
+//         else
+//           {
+//           pos->SetElement(1, 0);
+//           }
+        pos->SetElement(1, iy*dely);
         label->UpdateVTKObjects();
         }
       else
@@ -833,6 +844,12 @@ int vtkSMComparativeVisProxy::Show()
         //display->GetProperty("Position"));
         //position->SetElements3(xPos, yPos, 0);
         }
+      }
+    iy++;
+    if (iy == this->NumberOfYFrames)
+      {
+      iy = 0;
+      ix++;
       }
     }
   

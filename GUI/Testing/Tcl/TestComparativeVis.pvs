@@ -179,6 +179,8 @@ foo Delete
 
 set comparativeVis(0) [$proxyManager NewProxy ComparativeVisHelpers ComparativeVis]
 $comparativeVis(0) SetName {Comparative Vis 1}
+$comparativeVis(0) SetNumberOfXFrames 6
+$comparativeVis(0) SetNumberOfYFrames 4
 $comparativeVis(0) SetNumberOfFramesInCue 0 6
 $comparativeVis(0) SetSourceName 0 [$kw(vtkTemp847) GetName]
 $comparativeVis(0) SetSourceTclName 0 $kw(vtkTemp847)
