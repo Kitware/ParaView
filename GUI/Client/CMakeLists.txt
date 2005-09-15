@@ -111,6 +111,7 @@ SET( ParaViewClient_SRCS
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
+  vtkPVEWriter.cxx
   vtkPVExtentEntry.cxx
   vtkPVExtractDataSetsWidget.cxx
   vtkPVExtractPartsWidget.cxx

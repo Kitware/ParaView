@@ -106,7 +106,7 @@ protected:
   vtkPVWriter();
   ~vtkPVWriter();
   
-  int WriteOneFile(const char* fileName, vtkPVSource* pvs,
+  virtual int WriteOneFile(const char* fileName, vtkPVSource* pvs,
                    int numProcs, int ghostLevel);
 
   const char* ExtractExtension(const char* fname);
