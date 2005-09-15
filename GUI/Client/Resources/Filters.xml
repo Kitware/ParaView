@@ -2997,11 +2997,6 @@ Tessellate a higher-order dataset.
                label="Source"
                help="Set the source dataset to this filter."
                input_name="Input"/>
-    <FieldMenu id="fm"
-               trace_name="FieldMenu"
-               input_menu="im1"
-               property="SelectInputScalars"
-               help="Choose cell or point field to edit." />
     <ArrayMenu id="am" property="SelectInputScalars"
                trace_name="Scalars"
                label="Scalars"
@@ -3035,11 +3030,6 @@ Tessellate a higher-order dataset.
                         type="float"
                         property="Value"
                         help="Choose the scalar value to select with"/>
-
-    <LabeledToggle label="Source View"
-                   trace_name="UnfilteredDataset"
-                   property="UnfilteredDataset"
-                   help="Switches to view of unfiltered dataset."/>
     <Documentation>
 The Attribute Editor filter selects a portion of the input data set using a box. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
 If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function.  The filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.

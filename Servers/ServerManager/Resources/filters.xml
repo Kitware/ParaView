@@ -3337,9 +3337,6 @@
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
           <InputArrayDomain name="input_array" number_of_components="1">
-             <RequiredProperties>
-                <Property name="AttributeMode" function="FieldDataSelection"/>
-             </RequiredProperties>
           </InputArrayDomain>
       </InputProperty>
 
@@ -3364,14 +3361,8 @@
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
-                <Property name="AttributeMode" function="FieldDataSelection"/>
              </RequiredProperties>
            </ArrayListDomain>
-           <FieldDataDomain name="field_list">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </FieldDataDomain>
      </StringVectorProperty> 
 
      <ProxyProperty name="PickFunction" command="SetPickFunction">
@@ -3404,6 +3395,14 @@
      <IntVectorProperty 
         name="EditMode" 
         command="SetEditMode" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ClearEdits" 
+        command="SetClearEdits" 
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
