@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.17");
+vtkCxxRevisionMacro(vtkSMPart, "1.18");
 
 
 //----------------------------------------------------------------------------
@@ -345,14 +345,29 @@ void vtkSMPart::Update()
     stream << vtkClientServerStream::Invoke 
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetPartitionId"
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << this->GetID(0) << "SetUpdateExtent"
-           << vtkClientServerStream::LastResult 
-           << pm->GetNumberOfPartitions() << 0
-           << vtkClientServerStream::End;    
+    // When getting rid of streaming, though away the conditional and keep the else.
+    if (vtkPVProcessModule::GetGlobalStreamBlock())
+      {
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "GetPartitionId"
+             << vtkClientServerStream::End
+             << vtkClientServerStream::Invoke
+             << this->GetID(0) << "SetUpdateExtent"
+             << vtkClientServerStream::LastResult 
+             << pm->GetNumberOfPartitions() * 200 << 0
+             << vtkClientServerStream::End; 
+      }
+    else
+      {
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "GetPartitionId"
+             << vtkClientServerStream::End
+             << vtkClientServerStream::Invoke
+             << this->GetID(0) << "SetUpdateExtent"
+             << vtkClientServerStream::LastResult 
+             << pm->GetNumberOfPartitions() << 0
+             << vtkClientServerStream::End; 
+       }   
     stream << vtkClientServerStream::Invoke 
            << this->GetID(0) << "Update"
            << vtkClientServerStream::End;
