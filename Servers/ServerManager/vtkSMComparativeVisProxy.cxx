@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.12");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -629,11 +629,11 @@ int vtkSMComparativeVisProxy::Show()
     return 0;
     }
 
-  unsigned int numProps = this->Internal->NumberOfFramesInCue.size();
+  //unsigned int numProps = this->Internal->NumberOfFramesInCue.size();
   if (this->Internal->NumberOfFramesInCue.size() < 1 ||
       this->Internal->NumberOfFramesInCue.size() > 2)
     {
-    vtkErrorMacro("This visualization only works with two properties. "
+    vtkErrorMacro("This visualization only works with <= 2 properties. "
                   "Cannot display");
     return 0;
     }
@@ -950,4 +950,6 @@ void vtkSMComparativeVisProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MultiActorHelper: " << this->MultiActorHelper << endl;
   os << indent << "ShouldAbort: " << this->ShouldAbort << endl;
   os << indent << "RenderModule: " << this->RenderModule << endl;
+  os << indent << "NumberOfXFrames: " << this->NumberOfXFrames << endl;
+  os << indent << "NumberOfYFrames: " << this->NumberOfYFrames << endl;
 }
