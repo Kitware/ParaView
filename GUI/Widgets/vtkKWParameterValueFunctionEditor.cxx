@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.67");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.68");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -7030,12 +7030,12 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 {
-  this->InUserInteraction = 0;
-
-  if (!this->HasSelection())
+  if (!this->HasSelection() || !this->InUserInteraction)
     {
     return;
     }
+
+  this->InUserInteraction = 0;
 
   // Invoke the commands/callbacks
   // If we are out of the canvas by a given margin, delete the point
