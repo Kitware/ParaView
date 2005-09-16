@@ -155,7 +155,15 @@ public:
   void SetGlobalLODFlag(int val);
   static int GetGlobalLODFlag();
   static void SetGlobalLODFlagInternal(int val);
-  
+
+  // Description:
+  // I am experimenting with streaming. This turns streaming on and off.
+  // When this value is zero, pipelines do not update.
+  // When the flag is turned on, then the pipeline streams.
+  void SetGlobalStreamBlock(int val);
+  static int GetGlobalStreamBlock();
+  static void SetGlobalStreamBlockInternal(int val);
+
   // Description:  
   // This method leaks memory.  It is a quick and dirty way to set different 
   // DISPLAY environment variables on the render server.  I think the string 
@@ -194,6 +202,9 @@ protected:
   // All process must be consistent in choosing LODs because
   // of the vtkCollectPolydata filter.
   static int GlobalLODFlag;
+
+  // Testing streamoing.
+  static int GlobalStreamBlock;
   
   float LogThreshold;
   char* DemoPath;

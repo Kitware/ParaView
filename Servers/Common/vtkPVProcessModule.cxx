@@ -48,11 +48,12 @@
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
+int vtkPVProcessModule::GlobalStreamBlock = 0;
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.38");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -373,20 +374,42 @@ void vtkPVProcessModule::SetGlobalLODFlag(int val)
   this->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 }
-
- 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SetGlobalLODFlagInternal(int val)
 {
   vtkPVProcessModule::GlobalLODFlag = val;
 }
-
-
-
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetGlobalLODFlag()
 {
   return vtkPVProcessModule::GlobalLODFlag;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetGlobalStreamBlock(int val)
+{
+  if (vtkPVProcessModule::GlobalStreamBlock == val)
+    {
+    return;
+    }
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "SetGlobalStreamBlockInternal"
+         << val
+         << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+}
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetGlobalStreamBlockInternal(int val)
+{
+  vtkPVProcessModule::GlobalStreamBlock = val;
+}
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::GetGlobalStreamBlock()
+{
+  return vtkPVProcessModule::GlobalStreamBlock;
 }
 
 //============================================================================

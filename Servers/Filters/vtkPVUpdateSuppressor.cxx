@@ -25,8 +25,12 @@
 #include "vtkSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
+#include "vtkPVProcessModule.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.28");
+// Only required for the prototype streaming feature.
+#include "vtkPolyDataStreamer.h"
+
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.29");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -39,6 +43,7 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
   this->CachedGeometryLength = 0;
 
   this->OutputType = 0;
+  this->PreviousUpdateWasBlockedByStreaming = 0;  
 }
 
 //----------------------------------------------------------------------------
@@ -50,7 +55,7 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::ForceUpdate()
-{
+{  
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   if (input == 0)
     {
@@ -83,7 +88,31 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdatePiece(this->UpdatePiece);
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
   input->SetUpdateGhostLevel(0);
-  input->Update();
+
+  // This conditional is only used for the temporary streaming feature.
+  // It can be removed when the streaming feature is removed.
+  vtkPolyData *pInput = vtkPolyData::SafeDownCast(input);
+  if (vtkPVProcessModule::GetGlobalStreamBlock())
+    {
+    this->PreviousUpdateWasBlockedByStreaming = 1;  
+    input->SetUpdatePiece(this->UpdatePiece*200);
+    input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces*200);
+    input->Update();
+    }
+  else if (this->PreviousUpdateWasBlockedByStreaming  && pInput)
+    { // stream
+    vtkPolyDataStreamer* streamer = vtkPolyDataStreamer::New();
+    streamer->SetInput(pInput);
+    streamer->SetNumberOfStreamDivisions(200);
+    streamer->Update();
+    pInput->ShallowCopy(streamer->GetOutput());
+    streamer->Delete();
+    }
+  else
+    { // This would stay when removing streaming.
+    input->Update();
+    this->PreviousUpdateWasBlockedByStreaming = 0;
+    }
 
   unsigned long t2 = 0;
   vtkDemandDrivenPipeline *ddp = 0;

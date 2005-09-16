@@ -76,6 +76,9 @@ protected:
                                 vtkInformationVector**, 
                                 vtkInformationVector*);
   char* OutputType;
+  
+  // This can be removed when streaming is removed.
+  int PreviousUpdateWasBlockedByStreaming;  
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.

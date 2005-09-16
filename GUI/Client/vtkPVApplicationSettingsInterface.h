@@ -57,6 +57,7 @@ public:
   virtual void ShowSourcesNameCallback();
   virtual void ShowTraceFilesCallback();
   virtual void CreateLogFilesCallback();
+  virtual void StreamBlockCallback();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -80,6 +81,7 @@ protected:
   vtkKWCheckButton *ShowTraceFilesCheckButton;
   vtkKWCheckButton *AutoAcceptCheckButton;
   vtkKWCheckButton *CreateLogFilesCheckButton;
+  vtkKWCheckButton *StreamBlockCheckButton;
 
   int AutoAccept;
 
