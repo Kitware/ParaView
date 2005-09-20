@@ -114,7 +114,8 @@ public:
 
 //BTX
   enum ComposeOperationType {
-    ComposeOperationClosest, ComposeOperationOver
+    ComposeOperationClosest = 0,
+    ComposeOperationOver = 1
   };
 //ETX
 
