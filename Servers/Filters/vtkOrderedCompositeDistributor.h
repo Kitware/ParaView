@@ -69,6 +69,18 @@ public:
   vtkGetMacro(PassThrough, int);
   vtkBooleanMacro(PassThrough, int);
 
+  // Description:
+  // When non-null, the output will be converted to the given type.
+  vtkSetStringMacro(OutputType);
+  vtkGetStringMacro(OutputType);
+
+  // Description:
+  // Set/get some internal filters.
+  vtkGetObjectMacro(D3, vtkDistributedDataFilter);
+  virtual void SetD3(vtkDistributedDataFilter *);
+  vtkGetObjectMacro(ToPolyData, vtkDataSetSurfaceFilter);
+  virtual void SetToPolyData(vtkDataSetSurfaceFilter *);
+
 protected:
   vtkOrderedCompositeDistributor();
   ~vtkOrderedCompositeDistributor();
@@ -81,10 +93,16 @@ protected:
 
   int PassThrough;
 
+  int FillInputPortInformation(int port, vtkInformation *info);
+
+  int RequestDataObject(vtkInformation *,
+                        vtkInformationVector **, vtkInformationVector *);
   int RequestData(vtkInformation *,
                   vtkInformationVector **, vtkInformationVector *);
 
   virtual void ReportReferences(vtkGarbageCollector *collector);
+
+  char *OutputType;
 
 private:
   vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &);  // Not implemented.

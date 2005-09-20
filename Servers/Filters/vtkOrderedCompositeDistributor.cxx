@@ -26,6 +26,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
@@ -36,12 +37,16 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.2");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.3");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, Controller,
                      vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, D3,
+                     vtkDistributedDataFilter);
+vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, ToPolyData,
+                     vtkDataSetSurfaceFilter);
 
 //-----------------------------------------------------------------------------
 
@@ -54,6 +59,8 @@ vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
   this->ToPolyData = NULL;
 
   this->PassThrough = 0;
+
+  this->OutputType = NULL;
 }
 
 vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
@@ -61,8 +68,10 @@ vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
   this->SetPKdTree(NULL);
   this->SetController(NULL);
 
-  if (this->D3) this->D3->Delete();
-  if (this->ToPolyData) this->ToPolyData->Delete();
+  this->SetD3(NULL);
+  this->SetToPolyData(NULL);
+
+  this->SetOutputType(NULL);
 }
 
 void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
@@ -72,6 +81,10 @@ void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
   os << "PKdTree: " << this->PKdTree << endl;
   os << "Controller: " << this->Controller << endl;
   os << "PassThrough: " << this->PassThrough << endl;
+  os << "OutputType: " << this->OutputType << endl;
+
+  os << "D3: " << this->D3 << endl;
+  os << "ToPolyData" << this->ToPolyData << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,6 +102,55 @@ void vtkOrderedCompositeDistributor::ReportReferences(
 
 //-----------------------------------------------------------------------------
 
+int vtkOrderedCompositeDistributor::FillInputPortInformation(
+                                                 int port, vtkInformation *info)
+{
+  if (!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+
+int vtkOrderedCompositeDistributor::RequestDataObject(
+                                             vtkInformation* request,
+                                             vtkInformationVector** inputVector,
+                                             vtkInformationVector* outputVector)
+{
+  if (!this->OutputType)
+    {
+    return this->Superclass::RequestDataObject(request,
+                                               inputVector, outputVector);
+    }
+
+
+  // for each output
+  for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+    {
+    vtkInformation* info = outputVector->GetInformationObject(i);
+    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+
+    if (!output || !output->IsA(this->OutputType)) 
+      {
+      output = vtkDemandDrivenPipeline::NewDataObject(this->OutputType);
+      if (!output)
+        {
+        return 0;
+        }
+      output->SetPipelineInformation(info);
+      output->Delete();
+      this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
+                                             output->GetExtentType());
+      }
+    }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+
 int vtkOrderedCompositeDistributor::RequestData(
                                             vtkInformation *vtkNotUsed(request),
                                             vtkInformationVector **inputVector,
@@ -98,11 +160,23 @@ int vtkOrderedCompositeDistributor::RequestData(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
+  if (!inInfo || !outInfo)
+    {
+    // Ignore request.
+    return 1;
+    }
+
   // Get the input and output.
   vtkDataSet *input = vtkDataSet::SafeDownCast(
                                      inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkDataSet *output = vtkDataSet::SafeDownCast(
                                     outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (!output || !input)
+    {
+    // Ignore request.
+    return 1;
+    }
 
   if (this->PassThrough)
     {
@@ -122,11 +196,11 @@ int vtkOrderedCompositeDistributor::RequestData(
   this->D3->SetController(this->Controller);
   this->D3->Update();
 
-  if (input->IsA("vtkUnstructuredGrid"))
+  if (output->IsA("vtkUnstructuredGrid"))
     {
     output->ShallowCopy(this->D3->GetOutput());
     }
-  else if (input->IsA("vtkPolyData"))
+  else if (output->IsA("vtkPolyData"))
     {
     if (this->ToPolyData == NULL)
       {
