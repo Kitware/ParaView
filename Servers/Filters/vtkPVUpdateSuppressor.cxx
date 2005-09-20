@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkPVUpdateSuppressor.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkDataSet.h"
@@ -30,7 +32,7 @@
 // Only required for the prototype streaming feature.
 #include "vtkPolyDataStreamer.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.29");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.30");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -73,16 +75,18 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   // Assume the input is the collection filter.
   // Client needs to modify the collection filter because it is not
   // connected to a pipeline.
-  if (input->GetSource() && 
-      (input->GetSource()->IsA("vtkMPIMoveData") ||
-       input->GetSource()->IsA("vtkCollectPolyData") ||
-       input->GetSource()->IsA("vtkMPIDuplicatePolyData") ||
-       input->GetSource()->IsA("vtkM2NDuplicate") ||
-       input->GetSource()->IsA("vtkM2NCollect") ||
-       input->GetSource()->IsA("vtkMPIDuplicateUnstructuredGrid") ||
-       input->GetSource()->IsA("vtkPVDuplicatePolyData")))
+  vtkAlgorithm *source = input->GetProducerPort()->GetProducer();
+  if (source &&
+      (source->IsA("vtkMPIMoveData") ||
+       source->IsA("vtkCollectPolyData") ||
+       source->IsA("vtkMPIDuplicatePolyData") ||
+       source->IsA("vtkM2NDuplicate") ||
+       source->IsA("vtkM2NCollect") ||
+       source->IsA("vtkMPIDuplicateUnstructuredGrid") ||
+       source->IsA("vtkPVDuplicatePolyData") ||
+       source->IsA("vtkOrderedCompositeDistributor")))
     {
-    input->GetSource()->Modified();
+    source->Modified();
     }
 
   input->SetUpdatePiece(this->UpdatePiece);
@@ -116,16 +120,13 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 
   unsigned long t2 = 0;
   vtkDemandDrivenPipeline *ddp = 0;
-  if (input->GetSource())
+  if (source)
     {
-    ddp = 
-      vtkDemandDrivenPipeline::SafeDownCast(
-        input->GetSource()->GetExecutive());
+    ddp = vtkDemandDrivenPipeline::SafeDownCast(source->GetExecutive());
     }
   else
     {
-    vtkInformation* pipInf =
-      input->GetPipelineInformation();
+    vtkInformation* pipInf = input->GetPipelineInformation();
     ddp = vtkDemandDrivenPipeline::SafeDownCast(
       pipInf->GetExecutive(vtkExecutive::PRODUCER()));
     }
@@ -243,6 +244,7 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
   else
     { // Output generated previously.
     output->ShallowCopy(pd);
+    this->Modified();
     }
 }
 
