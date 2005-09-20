@@ -58,7 +58,7 @@ public:
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.25");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.26");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -80,7 +80,7 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->Strategy = DEFAULT;
   this->StrategyDirty = 1;
 
-  this->ComposeOperation = CLOSEST;
+  this->ComposeOperation = ComposeOperationClosest;
   this->ComposeOperationDirty = 1;
 
   this->SortingKdTree = NULL;
@@ -238,11 +238,11 @@ void vtkIceTRenderManager::UpdateIceTContext()
     {
     switch (this->ComposeOperation)
       {
-      case CLOSEST:
+      case ComposeOperationClosest:
         icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT,
                                ICET_COLOR_BUFFER_BIT);
         break;
-      case OVER:
+      case ComposeOperationOver:
         icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT, ICET_COLOR_BUFFER_BIT);
         break;
       default:
@@ -494,7 +494,7 @@ void vtkIceTRenderManager::SetStrategy(const char *strategy)
 
 //-----------------------------------------------------------------------------
 
-void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
+void vtkIceTRenderManager::SetComposeOperation(int operation)
 {
   vtkDebugMacro("SetComposeOperation to " << operation);
 
@@ -753,7 +753,7 @@ void vtkIceTRenderManager::PreRenderProcessing()
   else
     {
     icetRen->SetComposeNextFrame(1);
-    if (this->SortingKdTree)
+    if (this->SortingKdTree && (this->ComposeOperation == ComposeOperationOver))
       {
       // Setup ICE-T context for correct sorting.
       icetEnable(ICET_ORDERED_COMPOSITE);
@@ -941,8 +941,8 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "Compose Operation: ";
   switch (this->ComposeOperation)
     {
-    case CLOSEST: os << "closest to camera"; break;
-    case OVER:    os << "Porter and Duff OVER operator"; break;
+    case ComposeOperationClosest: os << "closest to camera"; break;
+    case ComposeOperationOver:    os << "Porter and Duff OVER operator"; break;
     }
   os << endl;
 

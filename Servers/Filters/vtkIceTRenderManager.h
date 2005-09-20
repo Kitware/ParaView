@@ -114,7 +114,7 @@ public:
 
 //BTX
   enum ComposeOperationType {
-    CLOSEST, OVER
+    ComposeOperationClosest, ComposeOperationOver
   };
 //ETX
 
@@ -122,21 +122,21 @@ public:
   // Get/Set to operation to use when composing pixels together.  Note that
   // not all operations are commutative.  That is, for some operations, the
   // order of composition matters.
-  vtkGetMacro(ComposeOperation, ComposeOperationType);
-  virtual void SetComposeOperation(ComposeOperationType operation);
+  vtkGetMacro(ComposeOperation, int);
+  virtual void SetComposeOperation(int operation);
   // Description:
   // Sets the compose operation to pick the pixel color that is closest to
   // the camera (determined by the z-buffer).  This operation is
   // commutative.  This is the default operation.
   void SetComposeOperationToClosest() {
-    this->SetComposeOperation(CLOSEST);
+    this->SetComposeOperation(ComposeOperationClosest);
   }
   // Description:
   // Sets the compose operation to blend colors using the Porter and Duff
   // OVER operator.  This operation is not commutative (order of
   // composition matters).
   void SetComposeOperationToOver() {
-    this->SetComposeOperation(OVER);
+    this->SetComposeOperation(ComposeOperationOver);
   }
 
   // Description:
@@ -201,7 +201,7 @@ protected:
   StrategyType Strategy;
   int StrategyDirty;
 
-  ComposeOperationType ComposeOperation;
+  int ComposeOperation;
   int ComposeOperationDirty;
 
   vtkPKdTree *SortingKdTree;
