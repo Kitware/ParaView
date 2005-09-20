@@ -3195,6 +3195,34 @@
       </IntVectorProperty>
     </SourceProxy>
 
+    <SourceProxy name="OrderedCompositeDistributor"
+                 class="vtkOrderedCompositeDistributor">
+      <InputProperty name="Input" command="SetInput">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+      <IntVectorProperty name="PassThrough"
+                         command="SetPassThrough"
+                         number_of_elements="1"
+                         default_values="0"
+                         animateable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="PKdTree" command="SetPKdTree">
+        <ProxyGroupDomain name="groups">
+          <Group name="locators"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty name="PKdTreeInfo" command="GetPKdTree"
+                     information_only="1"/>
+      <StringVectorProperty name="OutputType"
+                            command="SetOutputType"
+                            number_of_elements="1">
+      </StringVectorProperty>
+    </SourceProxy>
+
     <SourceProxy name="UpdateSuppressor" class="vtkPVUpdateSuppressor"
       executive="vtkUpdateSuppressorPipeline">
       <InputProperty

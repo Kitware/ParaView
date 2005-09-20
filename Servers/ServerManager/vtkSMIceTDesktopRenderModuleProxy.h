@@ -27,6 +27,17 @@ public:
   vtkTypeRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, vtkSMCompositeRenderModuleProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Set whether or not to order compositing.  If compositing is not ordered,
+  // then the z buffer is used to composite.
+  vtkGetMacro(OrderedCompositing, int);
+  virtual void SetOrderedCompositing(int);
+  vtkBooleanMacro(OrderedCompositing, int);
+
+  virtual void AddDisplay(vtkSMDisplayProxy* disp);
+
+  virtual void StillRender();
+
 protected:
   vtkSMIceTDesktopRenderModuleProxy();
   ~vtkSMIceTDesktopRenderModuleProxy();
@@ -51,7 +62,10 @@ protected:
   // Control the RemoteDisplay property on vtkDesktopDeliveryServer.
   int RemoteDisplay;
  
+  int OrderedCompositing;
+
   vtkSMProxy* DisplayManagerProxy;
+  vtkSMProxy* PKdTreeProxy;
 private:
   vtkSMIceTDesktopRenderModuleProxy(const vtkSMIceTDesktopRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMIceTDesktopRenderModuleProxy&); // Not implemented.

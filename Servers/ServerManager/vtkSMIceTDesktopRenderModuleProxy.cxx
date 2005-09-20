@@ -13,23 +13,31 @@
 
 =========================================================================*/
 #include "vtkSMIceTDesktopRenderModuleProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
+#include "vtkCollection.h"
+#include "vtkIceTRenderManager.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
+#include "vtkPVProcessModule.h"
+#include "vtkRenderWindow.h"
+#include "vtkSMDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkPVOptions.h"
-#include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
 {
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
   this->RemoteDisplay = 1;
+  this->OrderedCompositing = 0;
+
+  this->DisplayManagerProxy = NULL;
+  this->PKdTreeProxy = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -47,6 +55,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     }
   this->RendererProxy = this->GetSubProxy("Renderer");
   this->DisplayManagerProxy = this->GetSubProxy("DisplayManager");
+  this->PKdTreeProxy = this->GetSubProxy("PKdTree");
 
   if (!this->RendererProxy)
     {
@@ -60,9 +69,23 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
 
+  if (!this->PKdTreeProxy)
+    {
+    vtkErrorMacro("PKdTree subproxy must be defined.");
+    return;
+    }
+
 
   this->DisplayManagerProxy->SetServers(vtkProcessModule::RENDER_SERVER);
   this->DisplayManagerProxy->UpdateVTKObjects();
+
+  this->PKdTreeProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+
+  // Allow a minimum number of cells in case we break up small data.
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                                   this->PKdTreeProxy->GetProperty("MinCells"));
+  ivp->SetElements1(0);
+  this->PKdTreeProxy->UpdateVTKObjects();
 
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
@@ -92,6 +115,13 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
+
+  // Ordered compositing requires alpha bit planes.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+                        this->RenderWindowProxy->GetProperty("AlphaBitPlanes"));
+  ivp->SetElements1(1);
+
+  this->RenderWindowProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +160,16 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
+
+  pp = vtkSMProxyProperty::SafeDownCast(
+                       this->DisplayManagerProxy->GetProperty("SortingKdTree"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property SortingKdTree on DisplayManagerProxy.");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->PKdTreeProxy);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->DisplayManagerProxy->GetProperty("TileDimensions"));
@@ -175,6 +215,29 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
+
+  for (i = 0; i < this->PKdTreeProxy->GetNumberOfIDs(); i++)
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->PKdTreeProxy->GetID(i) << "SetController"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->PKdTreeProxy->GetID(i) << "SetNumberOfRegionsOrMore"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+    }
+
   //************************************************************
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
@@ -210,8 +273,100 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
+{
+  if (this->OrderedCompositing == flag) return;
+
+  this->OrderedCompositing = flag;
+
+  vtkObject *obj;
+  this->Displays->InitTraversal();
+  for (obj = this->Displays->GetNextItemAsObject(); obj != NULL;
+       obj = this->Displays->GetNextItemAsObject())
+    {
+    vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                                       disp->GetProperty("OrderedCompositing"));
+    if (ivp)
+      {
+      ivp->SetElements1(this->OrderedCompositing);
+      disp->UpdateVTKObjects();
+      }
+    }
+}
+
 //-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(vtkSMDisplayProxy *disp)
+{
+  this->Superclass::AddDisplay(disp);
+
+  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+                                   disp->GetProperty("OrderedCompositingTree"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->PKdTreeProxy);
+    }
+
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                                       disp->GetProperty("OrderedCompositing"));
+  if (ivp)
+    {
+    ivp->SetElements1(this->OrderedCompositing);
+    }
+
+  disp->UpdateVTKObjects();
+}
+
 //-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::StillRender()
+{
+  if (this->OrderedCompositing)
+    {
+    // Update the PKdTree, but only if there is something divide.
+    int doBuildLocator = 0;
+    vtkObject *obj;
+    this->Displays->InitTraversal();
+    for (obj = this->Displays->GetNextItemAsObject(); obj != NULL;
+         obj = this->Displays->GetNextItemAsObject())
+      {
+      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+      if (   disp && disp->GetVisibilityCM()
+          && disp->GetProperty("OrderedCompositingTree") )
+        {
+        doBuildLocator = 1;
+        vtkSMProperty *p = disp->GetProperty("UpdateDataToDistribute");
+        if (p)
+          {
+          p->Modified();
+          disp->UpdateVTKObjects();
+          }
+        }
+      }
+
+    if (doBuildLocator)
+      {
+      vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
+      p->Modified();
+      this->PKdTreeProxy->UpdateVTKObjects();
+
+      vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                    this->DisplayManagerProxy->GetProperty("ComposeOperation"));
+      ivp->SetElements1(vtkIceTRenderManager::ComposeOperationOver);
+      this->DisplayManagerProxy->UpdateVTKObjects();
+      }
+    }
+  else
+    {
+    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                    this->DisplayManagerProxy->GetProperty("ComposeOperation"));
+    ivp->SetElements1(vtkIceTRenderManager::ComposeOperationClosest);
+    this->DisplayManagerProxy->UpdateVTKObjects();
+    }
+
+  this->Superclass::StillRender();
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -224,7 +379,9 @@ void vtkSMIceTDesktopRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
     << ", " << this->TileDimensions[1] << endl;
   os << indent << "RemoteDisplay: " << this->RemoteDisplay 
     << endl;
+  os << indent << "OrderedCompositing: " << this->OrderedCompositing << endl;
   os << indent << "DisplayManagerProxy: " << this->DisplayManagerProxy
     <<endl;
+  os << indent << "PKdTreeProxy: " << this->PKdTreeProxy << endl;
 }
 

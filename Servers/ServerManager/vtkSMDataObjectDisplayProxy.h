@@ -328,7 +328,7 @@ protected:
   int GeometryInformationIsValid;
   vtkPVGeometryInformation* GeometryInformation;
 
-  void InvalidateGeometryInternal();
+  virtual void InvalidateGeometryInternal();
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.

@@ -430,6 +430,13 @@
          <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="AlphaBitPlanes"
+                         command="SetAlphaBitPlanes"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
     </Proxy>
   </ProxyGroup>
 
@@ -1323,6 +1330,16 @@
 
     <IceTDesktopRenderModuleProxy name="IceTDesktopRenderModule" 
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
+
+      <IntVectorProperty
+        name="OrderedCompositing"
+        command="SetOrderedCompositing"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="DisplayManager" proxygroup="composite_managers"
           proxyname="IceTRenderManager">
@@ -1335,6 +1352,10 @@
         <ExposedProperties>
           <Property name="InitializeOffScreen" />
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PKdTree" proxygroup="locators" proxyname="PKdTree" />
       </SubProxy>
     </IceTDesktopRenderModuleProxy>
 
@@ -1436,6 +1457,20 @@
         number_of_elements="2"
         default_values="0 0">
         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+      <ProxyProperty name="SortingKdTree" command="SetSortingKdTree">
+        <ProxyGroupDomain name="groups">
+          <Group name="locators"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty name="ComposeOperation"
+                         command="SetComposeOperation"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Closest"/>
+          <Entry value="1" text="Over"/>
+        </EnumerationDomain>
       </IntVectorProperty>
     </Proxy>
 
@@ -2131,7 +2166,25 @@
         saveable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-     
+      <IntVectorProperty name="OrderedCompositing"
+                         command="SetOrderedCompositing"
+                         number_of_elements="1"
+                         default_values="0"
+                         update_self="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="OrderedCompositingTree"
+                     command="SetOrderedCompositingTree"
+                     update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="locators"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property name="UpdateDataToDistribute"
+                command="UpdateDataToDistribute"
+                update_self="1" />
+
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
@@ -2150,6 +2203,64 @@
           <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Distributor"
+               proxygroup="filters"
+               proxyname="OrderedCompositeDistributor">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="LODDistributor"
+               proxygroup="filters"
+               proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ShareProperties subproxy="Distributor">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeDistributor"
+               proxygroup="filters"
+               proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ShareProperties subproxy="Distributor">
+          <Exception name="Input"/>
+          <Exception name="OutputType"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="DistributorSuppressor"
+               proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="UpdateSuppressor">
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="LODDistributorSuppressor"
+               proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="DistributorSuppressor">
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="VolumeDistributorSuppressor"
+               proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="DistributorSuppressor">
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="OutputType" />
+        </ShareProperties>
+      </SubProxy>
+
     </CompositeDisplayProxy>
 
     <MultiDisplayProxy name="MultiDisplay"

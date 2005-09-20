@@ -38,6 +38,12 @@ public:
   enum Server { CLIENT=0, DATA_SERVER, RENDER_SERVER};
   //ETX
 
+  virtual void SetOrderedCompositing(int val);
+  vtkGetMacro(OrderedCompositing, int);
+
+  virtual void SetOrderedCompositingTree(vtkSMProxy *tree);
+  vtkGetObjectMacro(OrderedCompositingTree, vtkSMProxy);
+
   //BTX
   // Description:
   // This is a little different than superclass 
@@ -45,6 +51,16 @@ public:
   //  Collection flag gets turned off if it needs to update.
   virtual vtkPVLODPartDisplayInformation* GetLODInformation();
   //ETX
+
+  // Description:
+  // Overridden to set up ordered compositing correctly.
+  virtual void SetVisibility(int visible);
+
+  virtual void Update();
+  virtual void UpdateDataToDistribute();
+
+  virtual void CacheUpdate(int idx, int total);
+
 protected:
   vtkSMCompositeDisplayProxy();
   ~vtkSMCompositeDisplayProxy();
@@ -63,8 +79,29 @@ protected:
   vtkSMProxy* LODCollectProxy;
   vtkSMProxy* VolumeCollectProxy;
 
+  vtkSMProxy* DistributorProxy;
+  vtkSMProxy* LODDistributorProxy;
+  vtkSMProxy* VolumeDistributorProxy;
+
+  vtkSMProxy* DistributorSuppressorProxy;
+  vtkSMProxy* LODDistributorSuppressorProxy;
+  vtkSMProxy* VolumeDistributorSuppressorProxy;
+
   int CollectionDecision;
   int LODCollectionDecision;
+
+  int DistributedGeometryIsValid;
+  int DistributedLODGeometryIsValid;
+  int DistributedVolumeGeometryIsValid;
+
+  int OrderedCompositing;
+
+  vtkSMProxy* OrderedCompositingTree;
+
+  virtual void RemoveGeometryFromCompositingTree();
+  virtual void AddGeometryToCompositingTree();
+
+  virtual void InvalidateGeometryInternal();
 
 private:
   vtkSMCompositeDisplayProxy(const vtkSMCompositeDisplayProxy&); // Not implemented.
