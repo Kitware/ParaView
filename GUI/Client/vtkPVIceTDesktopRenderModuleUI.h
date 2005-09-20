@@ -39,11 +39,19 @@ public:
   // Create the widget.
   void Create(vtkKWApplication *app);
 
+  // Description:
+  // Callback for the ordered composite check button.
+  virtual void OrderedCompositingCheckCallback();
+  virtual void SetOrderedCompositingFlag(int state);
+
   void EnableRenductionFactor();
 
 protected:
   vtkPVIceTDesktopRenderModuleUI();
   ~vtkPVIceTDesktopRenderModuleUI();
+
+  vtkKWCheckButton *OrderedCompositingCheck;
+  int               OrderedCompositingFlag;
 
   vtkPVIceTDesktopRenderModuleUI(const vtkPVIceTDesktopRenderModuleUI&); // Not implemented
   void operator=(const vtkPVIceTDesktopRenderModuleUI&); // Not implemented

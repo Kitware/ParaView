@@ -19,21 +19,35 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
+#include "vtkPVTraceHelper.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
 {
+  this->OrderedCompositingCheck = vtkKWCheckButton::New();
+  this->OrderedCompositingFlag = 0;
 }
 
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::~vtkPVIceTDesktopRenderModuleUI()
 {
+  // Save UI values in regisitry
+  vtkPVApplication *pvapp = this->GetPVApplication();
+  if (pvapp)
+    {
+    pvapp->SetRegistryValue(2, "RunTime", "OrderedCompositing", "%d",
+                            this->OrderedCompositingFlag);
+    }
+
+  this->OrderedCompositingCheck->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -49,19 +63,69 @@ void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
 
   this->Superclass::Create(app);
 
+  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+
   this->Script("pack forget %s",
                this->ParallelRenderParametersFrame->GetWidgetName());
-  //this->CompositeCompressionCheck->EnabledOff();
 
-  //this->SquirtCheck->SetSelectedState(0);
-  //this->SquirtLabel->EnabledOff();
-  //this->SquirtCheck->EnabledOff();
-  //this->SquirtLevelScale->EnabledOff();
-  //this->SquirtLevelLabel->EnabledOff();
+  this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
+  this->OrderedCompositingCheck->Create(app);
+  this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
+  this->OrderedCompositingCheck->SetCommand(this,
+                                            "OrderedCompositingCheckCallback");
 
-  //this->SetReductionFactor(1);
-  //this->ReductionCheck->EnabledOff();
-  //this->ReductionLabel->EnabledOff();
+  if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
+    {
+    this->OrderedCompositingFlag
+      = pvapp->GetIntRegistryValue(2, "RunTime", "OrderedCompositing");
+    }
+  this->OrderedCompositingCheck->SetSelectedState(this->OrderedCompositingFlag);
+  // This call just forwards the value to the render module.
+  this->OrderedCompositingCheckCallback();
+
+  this->OrderedCompositingCheck->SetBalloonHelpString(
+    "Toggle the use of ordered compositing.  Ordered compositing makes updates "
+    "and animations slower, but make volume rendering correct and may speed "
+    "up compositing in general.");
+
+  this->Script("pack %s -side top -anchor w",
+               this->OrderedCompositingCheck->GetWidgetName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVIceTDesktopRenderModuleUI::OrderedCompositingCheckCallback()
+{
+  this->SetOrderedCompositingFlag(
+                             this->OrderedCompositingCheck->GetSelectedState());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVIceTDesktopRenderModuleUI::SetOrderedCompositingFlag(int state)
+{
+  if (this->OrderedCompositingCheck->GetSelectedState() != state)
+    {
+    this->OrderedCompositingCheck->SetSelectedState(state);
+    }
+
+  this->OrderedCompositingFlag = state;
+
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                    this->RenderModuleProxy->GetProperty("OrderedCompositing"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property OrderedCompositing on "
+                  "RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElements1(this->OrderedCompositingFlag);
+  this->RenderModuleProxy->UpdateVTKObjects();
+
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->GetTraceHelper()->AddEntry(
+                                 "catch {$kw(%s) SetOrderedCompositingFlag %d}",
+                                 this->GetTclName(),
+                                 this->OrderedCompositingFlag);
 }
 
 //----------------------------------------------------------------------------
