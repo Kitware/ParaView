@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.10");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -127,10 +127,11 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
 
   // Put the data type as the label of the top frame.
   int dataType = dataInfo->GetDataSetType();
-  if (dataInfo->GetBaseDataSetType() >= 0)
+  if (dataInfo->GetCompositeDataSetType() >= 0)
     {
-    dataType = dataInfo->GetBaseDataSetType();
+    dataType = dataInfo->GetCompositeDataSetType();
     }
+
   if (dataType == VTK_POLY_DATA)
     {
     type << "Polygonal";

@@ -66,7 +66,7 @@ public:
   // Description:
   // Access to information.
   vtkGetMacro(DataSetType, int);
-  vtkGetMacro(BaseDataSetType, int);
+  vtkGetMacro(CompositeDataSetType, int);
   const char *GetDataSetTypeAsString();
   int DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
@@ -119,7 +119,7 @@ protected:
 
   // Data information collected from remote processes.
   int            DataSetType;
-  int            BaseDataSetType;
+  int            CompositeDataSetType;
   int            NumberOfDataSets;
   vtkTypeInt64   NumberOfPoints;
   vtkTypeInt64   NumberOfCells;
