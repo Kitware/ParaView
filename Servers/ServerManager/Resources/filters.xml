@@ -3152,6 +3152,23 @@
    <!-- End BlockScalars -->
    </SourceProxy>
 
+   <SourceProxy name="GroupDataSets" class="vtkHierarchicalDataGroupFilter">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+     </InputProperty>
+   <!-- End BlockScalars -->
+   </SourceProxy>
+
    <SourceProxy name="LevelScalars" class="vtkHierarchicalDataLevelFilter">
      <InputProperty
         name="Input"
