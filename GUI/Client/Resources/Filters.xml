@@ -2905,6 +2905,28 @@ Tessellate a higher-order dataset.
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
+This filter uses colors to show levels of a hiearchical dataset.
+    </Documentation>
+  </Module>
+
+  <Module name="GroupDataSets"
+          menu_name="Group Datasets"
+          root_name="GroupDataSets"
+          module_type="Filter"
+          replace_input="1"
+          long_help="Group data sets."
+          short_help="Group multiple inputs into one collection."
+          button_image="PVGroupButton"
+          button_help="Group multiple modules into one."
+          button_visibility="0">
+    <Filter class="vtkHierarchicalDataGroupFilter">
+      <Input name="Input"
+             class="vtkDataSet" quantity="Multiple"/>
+    </Filter>
+    <GroupInputsWidget trace_name="inputs" property="Input"
+                       help="Choose inputs to group."/>
+    <Documentation>
+Groups multiple datasets to create a multi-block hierarchical dataset
     </Documentation>
   </Module>
 
@@ -2923,7 +2945,7 @@ Tessellate a higher-order dataset.
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-    </Documentation>
+This filter uses colors to show levels of a hiearchical dataset.    </Documentation>
   </Module>
 
   <Module name="ExtractLevel"
@@ -2949,7 +2971,7 @@ Tessellate a higher-order dataset.
             max_help="Choose the level range to extract"/>
 
     <Documentation>
-    </Documentation>
+This filter extracts a range of levels from a hierarchical dataset    </Documentation>
   </Module>
 
   <Module name="ExtractDataSets"
@@ -2971,6 +2993,7 @@ Tessellate a higher-order dataset.
                            help="Choose the datasets to extract."/>
 
     <Documentation>
+This filter extracts a list of datasets from hierarchical datasets.
     </Documentation>
   </Module>
 
