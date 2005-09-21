@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.36");
 
 class vtkPVSourceVectorInternals
 {
@@ -245,6 +245,8 @@ void vtkPVGroupInputsWidget::Accept()
 
   this->Superclass::Accept();
   this->ModifiedFlag = 0;
+
+  this->Inactivate();
 }
 
 //---------------------------------------------------------------------------
