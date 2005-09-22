@@ -190,7 +190,7 @@
           module_type="Reader"
           extensions=".case .CASE .Case"
           file_description="EnSight Files">
-    <Source class="vtkEnSightMasterServerReader"/>
+    <Source class="vtkGenericEnSightReader"/>
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
                    property="ByteOrder"
