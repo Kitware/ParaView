@@ -58,7 +58,7 @@ public:
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.26");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.27");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -760,9 +760,20 @@ void vtkIceTRenderManager::PreRenderProcessing()
       vtkIntArray *orderedProcessIds = vtkIntArray::New();
 
       // Order all the regions.
-      this->SortingKdTree->DepthOrderAllProcesses(
-                         icetRen->GetActiveCamera()->GetDirectionOfProjection(),
-                         orderedProcessIds);
+      vtkCamera *camera = icetRen->GetActiveCamera();
+      if (camera->GetParallelProjection())
+        {
+        this->SortingKdTree->ViewOrderAllProcessesInDirection(
+                                             camera->GetDirectionOfProjection(),
+                                             orderedProcessIds);
+        }
+      else
+        {
+        this->SortingKdTree->ViewOrderAllProcessesFromPosition(
+                                                          camera->GetPosition(),
+                                                          orderedProcessIds);
+        }
+
       // Compiler, optimize away.
       if (sizeof(int) == sizeof(GLint))
         {
