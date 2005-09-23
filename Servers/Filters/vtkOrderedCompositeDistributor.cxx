@@ -24,6 +24,7 @@
 
 #include "vtkOrderedCompositeDistributor.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDemandDrivenPipeline.h"
@@ -37,7 +38,23 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.3");
+//-----------------------------------------------------------------------------
+
+static void D3UpdateProgress(vtkObject *_D3, unsigned long,
+                             void *_distributor, void *)
+{
+  vtkDistributedDataFilter *D3
+    = reinterpret_cast<vtkDistributedDataFilter *>(_D3);
+  vtkOrderedCompositeDistributor *distributor
+    = reinterpret_cast<vtkOrderedCompositeDistributor *>(_distributor);
+
+  distributor->SetProgressText(D3->GetProgressText());
+  distributor->UpdateProgress(D3->GetProgress() * 0.9);
+}
+
+//-----------------------------------------------------------------------------
+
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.4");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -185,16 +202,26 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
+  this->UpdateProgress(0.01);
+
   if (this->D3 == NULL)
     {
     this->D3 = vtkDistributedDataFilter::New();
     }
+
+  vtkCallbackCommand *cbc = vtkCallbackCommand::New();
+  cbc->SetClientData(this);
+  cbc->SetCallback(D3UpdateProgress);
+  this->D3->AddObserver(vtkCommand::ProgressEvent, cbc);
 
   this->D3->SetBoundaryModeToSplitBoundaryCells();
   this->D3->SetInput(input);
   this->D3->GetKdtree()->SetCuts(this->PKdTree->GetCuts());
   this->D3->SetController(this->Controller);
   this->D3->Update();
+
+  this->D3->RemoveObserver(cbc);
+  cbc->Delete();
 
   if (output->IsA("vtkUnstructuredGrid"))
     {
