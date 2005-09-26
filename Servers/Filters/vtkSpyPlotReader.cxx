@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.22");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.23");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -213,7 +213,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.22");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.23");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -319,7 +319,7 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
 static int spcthReadString(istream &ifs, char* str, size_t len)
 {
   ifs.read(str, len);
-  if ( len != ifs.gcount() )
+  if ( len != static_cast<size_t>(ifs.gcount()) )
     {
     return 0;
     }
@@ -1140,23 +1140,22 @@ void vtkSpyPlotUniReader::PrintInformation()
         }
       }
 
-    int fieldCnt;
     for ( fieldCnt = 0; fieldCnt < dp->NumVars; ++ fieldCnt )
       {
-      vtkSpyPlotUniReader::Variable* var = dp->Variables + fieldCnt;
-      cout << "   Variable: " << fieldCnt << " - \"" << var->Name << "\" Material: " << var->Material << endl;
-      if ( var->DataBlocks )
+      vtkSpyPlotUniReader::Variable* currentVar = dp->Variables + fieldCnt;
+      cout << "   Variable: " << fieldCnt << " - \"" << currentVar->Name << "\" Material: " << currentVar->Material << endl;
+      if ( currentVar->DataBlocks )
         {
         int dataBlock;
         for ( dataBlock = 0; dataBlock < dp->ActualNumberOfBlocks; ++ dataBlock)
           {
           cout << "      DataBlock: " << dataBlock << endl;
-          if ( var->DataBlocks[dataBlock] )
+          if ( currentVar->DataBlocks[dataBlock] )
             {
             vtkIndent indent;
-            var->DataBlocks[dataBlock]->PrintHeader(cout, indent.GetNextIndent().GetNextIndent());
-            var->DataBlocks[dataBlock]->PrintSelf(cout, indent.GetNextIndent().GetNextIndent().GetNextIndent());
-            var->DataBlocks[dataBlock]->PrintTrailer(cout, indent.GetNextIndent().GetNextIndent());
+            currentVar->DataBlocks[dataBlock]->PrintHeader(cout, indent.GetNextIndent().GetNextIndent());
+            currentVar->DataBlocks[dataBlock]->PrintSelf(cout, indent.GetNextIndent().GetNextIndent().GetNextIndent());
+            currentVar->DataBlocks[dataBlock]->PrintTrailer(cout, indent.GetNextIndent().GetNextIndent());
             }
           }
         }
@@ -1622,6 +1621,8 @@ public:
       return this->UniReader;
     }
   
+  virtual ~vtkSpyPlotBlockIterator() {}
+
 protected:
   vtkSpyPlotBlockIterator()
     {
