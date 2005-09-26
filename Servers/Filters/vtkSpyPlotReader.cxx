@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.21");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.22");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -99,6 +99,45 @@ public:
 
   vtkSetVector6Macro(Bounds, double);
 
+  struct CellMaterialField
+    {
+    char Id[30];
+    char Comment[80];
+    int Index;
+    };
+
+  struct Variable
+    {
+    char* Name;
+    int Material;
+    int Index;
+    CellMaterialField* MaterialField;
+    vtkDataArray** DataBlocks;
+    };
+  struct Block
+    {
+    int Nx;
+    int Ny;
+    int Nz;
+    int Allocated;
+    int Active;
+    int Level;
+
+    vtkFloatArray* XArray;
+    vtkFloatArray* YArray;
+    vtkFloatArray* ZArray;
+    };
+  struct DataDump
+    {
+    int NumVars;
+    int* SavedVariables;
+    vtkTypeInt64* SavedVariableOffsets;
+    Variable *Variables;
+    int NumberOfBlocks;
+    int ActualNumberOfBlocks;
+    Block* Blocks;
+    };
+
 protected:
   vtkSpyPlotUniReader();
   ~vtkSpyPlotUniReader();
@@ -134,13 +173,6 @@ private:
   int MaximumNumberOfLevels;
 
   // For storing possible cell/material fields meta data
-  struct CellMaterialField
-    {
-    char Id[30];
-    char Comment[80];
-    int Index;
-    };
-
   int NumberOfPossibleCellFields;
   CellMaterialField* CellFields;
   int NumberOfPossibleMaterialFields;
@@ -152,37 +184,6 @@ private:
   double *DumpTime;
   vtkTypeInt64 *DumpOffset;
 
-  struct Variable
-    {
-    char* Name;
-    int Material;
-    int Index;
-    CellMaterialField* MaterialField;
-    vtkDataArray** DataBlocks;
-    };
-  struct Block
-    {
-    int Nx;
-    int Ny;
-    int Nz;
-    int Allocated;
-    int Active;
-    int Level;
-
-    vtkFloatArray* XArray;
-    vtkFloatArray* YArray;
-    vtkFloatArray* ZArray;
-    };
-  struct DataDump
-    {
-    int NumVars;
-    int* SavedVariables;
-    vtkTypeInt64* SavedVariableOffsets;
-    Variable *Variables;
-    int NumberOfBlocks;
-    int ActualNumberOfBlocks;
-    Block* Blocks;
-    };
   DataDump* DataDumps;
 
 
@@ -212,7 +213,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.21");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.22");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
