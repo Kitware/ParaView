@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.18");
+vtkCxxRevisionMacro(vtkSMPart, "1.19");
 
 
 //----------------------------------------------------------------------------
@@ -249,6 +249,33 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 //                       << vtkClientServerStream::End;
       }
     }
+  else if (!strcmp(className, "vtkHierarchicalDataSet"))
+    {
+    if (pm->GetNumberOfPartitions() == 1)
+      {
+      // We're only operating with one processor, so it should have
+      // all the data.
+      return;
+      }
+    stream << vtkClientServerStream::Invoke 
+           << this->GetID(0) << "UpdateInformation"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    this->GatherDataInformation(0);
+    stream << vtkClientServerStream::Invoke
+           << this->GetID(0) << "GetMaximumNumberOfPieces"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    int num = 0;
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
+    if (num != 1)
+      { // The source can already produce pieces.
+      return;
+      }
+
+    tempDataPiece = pm->NewStreamObject(
+      "vtkExtractHierarchicalDataPiece", stream);
+    }
 
   // If no filter is to be inserted, just return.
   if(tempDataPiece.ID == 0)
@@ -257,10 +284,36 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     }
 
   // Connect the filter to the pipeline.  
-  stream << vtkClientServerStream::Invoke << tempDataPiece 
-                  << "SetInput"
-                  << this->GetID(0)
-                  << vtkClientServerStream::End;
+  if (!this->DataInformation->GetCompositeDataClassName())
+    {
+    stream << vtkClientServerStream::Invoke << tempDataPiece 
+           << "SetInput"
+           << this->GetID(0)
+           << vtkClientServerStream::End;
+    }
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->GetID(0)
+           << "GetProducerPort"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult
+           << "GetProducer"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult
+           << "GetExecutive"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult
+           << "GetCompositeOutputData" << 0
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << tempDataPiece
+           << "SetInput" << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    }
   stream << vtkClientServerStream::Invoke << tempDataPiece 
                   << "GetOutput"
                   << vtkClientServerStream::End;
