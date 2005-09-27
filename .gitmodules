@@ -1,15 +1,15 @@
 [submodule "IceT"]
-	path = Utilities/IceT
+	path = ParaView/Utilities/IceT
 	url = git://paraview.org/IceT.git
 [submodule "ParaViewData"]
-	path = Data
+	path = ParaView/Data
 	url = git://paraview.org/ParaViewData.git
 [submodule "TclTk-8-4-5"]
-	path = Utilities/TclTk/TclTk8.4.5Win
+	path = ParaView/Utilities/TclTk/TclTk8.4.5Win
 	url = git://paraview.org/ParaViewTclTk.git
 [submodule "VTK"]
-	path = VTK
+	path = ParaView/VTK
 	url = git://vtk.org/VTK.git
 [submodule "Xdmf1"]
-	path = Utilities/Xdmf
+	path = ParaView/Utilities/Xdmf
 	url = git://paraview.org/Xdmf.git
