@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.26");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.27");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -210,7 +210,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.26");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.27");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -308,7 +308,7 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
 }
 
 //-----------------------------------------------------------------------------
-static int spcthReadString(istream &ifs, char* str, size_t len)
+int vtkSpyPlotReadString(istream &ifs, char* str, size_t len)
 {
   ifs.read(str, len);
   if ( len != static_cast<size_t>(ifs.gcount()) )
@@ -320,10 +320,10 @@ static int spcthReadString(istream &ifs, char* str, size_t len)
 
 //-----------------------------------------------------------------------------
   template<class TypeName>
-static int spcthReadSpecialType(istream &ifs, TypeName* val, int num)
+int vtkSpyPlotReadSpecialType(istream &ifs, TypeName* val, int num)
 {
   void* vval = val;
-  int ret = ::spcthReadString(ifs, static_cast<char*>(vval), sizeof(TypeName)*num);
+  int ret = ::vtkSpyPlotReadString(ifs, static_cast<char*>(vval), sizeof(TypeName)*num);
   if ( !ret )
     {
     return 0;
@@ -344,24 +344,24 @@ static int spcthReadSpecialType(istream &ifs, TypeName* val, int num)
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadString(istream &ifs, char* str, size_t len)
 {
-  return ::spcthReadString(ifs, str, len);
+  return ::vtkSpyPlotReadString(ifs, str, len);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadString(istream &ifs, unsigned char* str, size_t len)
 {
-  return ::spcthReadString(ifs, reinterpret_cast<char*>(str), len);
+  return ::vtkSpyPlotReadString(ifs, reinterpret_cast<char*>(str), len);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadInt(istream &ifs, int* val, int num)
 {
-  return ::spcthReadSpecialType(ifs, val, num);
+  return ::vtkSpyPlotReadSpecialType(ifs, val, num);
 }
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadDouble(istream &ifs, double* val, int num)
 {
-  return ::spcthReadSpecialType(ifs, val, num);
+  return ::vtkSpyPlotReadSpecialType(ifs, val, num);
 }
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadFileOffset(istream &ifs, vtkTypeInt64* val, int num)
@@ -2369,7 +2369,7 @@ int vtkSpyPlotReader::RequestData(
   hb->Initialize(); // remove all previous blocks
   hb->SetHierarchicalDataInformation(compInfo);
   
-  int numFiles = this->Map->Files.size();
+  //int numFiles = this->Map->Files.size();
 
   // By setting SetMaximumNumberOfPieces(-1) 
   // then GetUpdateNumberOfPieces() should always return the number
@@ -3877,7 +3877,7 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
     return 0;
     }
   char magic[8];
-  if ( !spcthReadString(ifs, magic, 8) )
+  if ( !::vtkSpyPlotReadString(ifs, magic, 8) )
     {
     cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read magic" << endl;
     return 0;
