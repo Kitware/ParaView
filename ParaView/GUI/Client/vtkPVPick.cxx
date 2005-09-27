@@ -64,7 +64,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.26");
+vtkCxxRevisionMacro(vtkPVPick, "1.27");
 
 
 //*****************************************************************************
@@ -91,7 +91,9 @@ public:
           //Tell the proxy, to tell the TemporalProbe, to get ready to make a set of samples.
           vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateInit"));
-          if (prop) prop->Modified();
+          if (prop) {
+            prop->Modified();
+            }
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -102,7 +104,10 @@ public:
             vtkAnimationCue::AnimationCueInfo*>(calldata);
           vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateTick"));
-          if (prop) prop->SetElement(0, cueInfo->AnimationTime);
+          if (prop) 
+            {
+            prop->SetElement(0, cueInfo->AnimationTime);
+            }
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -419,7 +424,10 @@ void vtkPVPick::AcceptCallbackInternal()
   int PorC = (PorCIprop)?PorCIprop->GetElement(0):0;
   vtkSMIntVectorProperty *PorCOprop = vtkSMIntVectorProperty::SafeDownCast(
     this->TemporalProbeProxy->GetProperty("PointOrCell"));
-  if (PorCOprop) PorCOprop->SetElement(0, PorC);
+  if (PorCOprop) 
+    {
+    PorCOprop->SetElement(0, PorC);
+    }
   this->TemporalProbeProxy->UpdateVTKObjects();
 
   //pick by Id changes arrays too (by Id doesn't pass Id)
@@ -501,7 +509,10 @@ void vtkPVPick::AcceptCallbackInternal()
     //get correct value for plot
     vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateInit"));
-    if (prop) prop->Modified();
+    if (prop) 
+      {
+      prop->Modified();
+      }
 
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
@@ -509,7 +520,10 @@ void vtkPVPick::AcceptCallbackInternal()
 
     vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateTick"));
-    if (prop2) prop2->SetElement(0, currTime);
+    if (prop2) 
+      {
+      prop2->SetElement(0, currTime);
+      }
     this->TemporalProbeProxy->UpdateVTKObjects();
     }
 

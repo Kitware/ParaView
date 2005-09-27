@@ -58,7 +58,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.158");
+vtkCxxRevisionMacro(vtkPVProbe, "1.159");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -86,7 +86,10 @@ public:
           //Tell the proxy, to tell the TemporalProbe, to get ready to make a set of samples.
           vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateInit"));
-          if (prop) prop->Modified();
+          if (prop) 
+            {
+            prop->Modified();
+            }
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -97,7 +100,10 @@ public:
             vtkAnimationCue::AnimationCueInfo*>(calldata);
           vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateTick"));
-          if (prop) prop->SetElement(0, cueInfo->AnimationTime);
+          if (prop) 
+            {
+            prop->SetElement(0, cueInfo->AnimationTime);
+            }
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -371,13 +377,19 @@ void vtkPVProbe::AcceptCallbackInternal()
     //get correct value for plot
     vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateInit"));
-    if (prop) prop->Modified();
+    if (prop) 
+      {
+      prop->Modified();
+      }
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
     double currTime = animScene->GetAnimationTime();
     vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateTick"));
-    if (prop2) prop2->SetElement(0, currTime);
+    if (prop2) 
+      {
+      prop2->SetElement(0, currTime);
+      }
     this->TemporalProbeProxy->UpdateVTKObjects();
     }
 
@@ -468,7 +480,9 @@ void vtkPVProbe::AcceptCallbackInternal()
 
     //make sure placement of pt info and array widgets stay consistant
     if (initialized)
+      {
       this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
+      }
 
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
 
