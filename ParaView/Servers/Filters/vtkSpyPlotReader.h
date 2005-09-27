@@ -127,6 +127,10 @@ public:
   // it is the global controller.
   vtkGetObjectMacro(Controller,vtkMultiProcessController);
 
+  // Description:
+  // Determine if the file can be readed with this reader.
+  virtual int CanReadFile(const char* fname);
+
 protected:
   vtkSpyPlotReader();
   ~vtkSpyPlotReader();

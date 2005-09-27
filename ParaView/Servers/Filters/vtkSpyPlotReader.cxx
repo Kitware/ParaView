@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.25");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.26");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -210,7 +210,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.25");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.26");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -3866,6 +3866,29 @@ int vtkSpyPlotReader::GetParentProcessor(int proc)
 int vtkSpyPlotReader::GetLeftChildProcessor(int proc)
 {
   return (proc<<1)+1; // *2+1
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::CanReadFile(const char* fname)
+{
+  ifstream ifs(fname, ios::binary|ios::in);
+  if ( !ifs )
+    {
+    return 0;
+    }
+  char magic[8];
+  if ( !spcthReadString(ifs, magic, 8) )
+    {
+    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read magic" << endl;
+    return 0;
+    }
+  if ( strncmp(magic, "spydata", 7) != 0 &&
+    strncmp(magic, "spycase", 7) != 0 )
+    {
+    return 0;
+    }
+
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
