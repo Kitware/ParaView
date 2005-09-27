@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.24");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.25");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -210,7 +210,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.24");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.25");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -2256,7 +2256,7 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
 
   // AMR (hierarchy of uniform grids) or flat mesh (set of rectilinear grids)
   this->IsAMR=uniReader->IsAMR();
-  
+
   // Fields
   int fieldsCount = uniReader->GetNumberOfCellFields();
   vtkDebugMacro("Number of fields: " << fieldsCount);
@@ -2386,12 +2386,12 @@ int vtkSpyPlotReader::RequestData(
   vtkSpyPlotBlockIterator *blockIterator;
   if(this->DistributeFiles)
     {
-    cout<<"Distribute files"<<endl;
+    cout <<"Distribute files"<<endl;
     blockIterator=new vtkSpyPlotFileDistributionBlockIterator;
     }
   else
     {
-    cout<<"Distribute blocks"<<endl;
+    cout <<"Distribute blocks"<<endl;
     blockIterator=new vtkSpyPlotBlockDistributionBlockIterator;
     }
   
@@ -2409,7 +2409,8 @@ int vtkSpyPlotReader::RequestData(
     uniReader=blockIterator->GetUniReader();
     int dims[3];
     uniReader->GetDataBlockDimensions(block, dims);
-    //uniReader->PrintInformation();
+
+    //cout  << "Dims: " << dims[0] << " " << dims[1] << " " << dims[2] << endl;
     double realBounds[6];
     
     // Compute real bounds for the current block
@@ -2417,7 +2418,8 @@ int vtkSpyPlotReader::RequestData(
       {
       double bounds[6];
       uniReader->GetDataBlockBounds(block, bounds);
-      //cout << "Bounds: " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << bounds[4] << " " << bounds[5] << endl;
+
+      //cout  << "Bounds " << block << ": " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << bounds[4] << " " << bounds[5] << endl;
       double spacing;
       int cc=0;
       while(cc<3)
@@ -2444,22 +2446,25 @@ int vtkSpyPlotReader::RequestData(
       vtkDataArray *coordinates[3];
       uniReader->GetDataBlockVectors(block,coordinates);
       int cc;
-      for ( cc = 0; cc < 3; ++ cc )
-        {
-        cout << "CO[" << cc << "] =";
-        vtkIdType kk;
-        for ( kk = 0; kk < coordinates[cc]->GetNumberOfTuples(); ++ kk )
-          {
-          cout << " " << coordinates[cc]->GetTuple1(kk);
-          }
-        cout << endl;
-        }
+      //for ( cc = 0; cc < 3; ++ cc )
+      //  {
+      //  cout  << "CO[" << cc << "] =";
+      //  vtkIdType kk;
+      //  for ( kk = 0; kk < coordinates[cc]->GetNumberOfTuples(); ++ kk )
+      //    {
+      //    cout << " " << coordinates[cc]->GetTuple1(kk);
+      //    }
+      //  cout << endl;
+      //  }
       for ( cc = 0; cc < 3; ++ cc )
         {
         if(dims[cc]>1)
           {
           realBounds[2*cc]=coordinates[cc]->GetTuple1(1);
           realBounds[2*cc+1]=coordinates[cc]->GetTuple1(dims[cc]-1);
+
+          //cout  << "Real bounds[" << (2*cc) << "] = " << realBounds[2*cc] << endl;
+          //cout  << "Real bounds[" << (2*cc+1) << "] = " << realBounds[2*cc+1] << endl;
           }
         else
           {
@@ -2638,12 +2643,11 @@ int vtkSpyPlotReader::RequestData(
   // At this point, the global bounds is set in each processor.
   info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
   
-  cout<<processNumber<<" bounds="<<this->Bounds[0]<<"; "<<this->Bounds[1]<<"; "<<this->Bounds[2]<<"; "<<this->Bounds[3]<<"; "<<this->Bounds[4]<<"; "<<this->Bounds[5]<<endl;
-  cout<<"Should be: 0; 9.6; 0; 9.6; -10; 9.2" << endl;
+  //cout <<processNumber<<" bounds="<<this->Bounds[0]<<"; "<<this->Bounds[1]<<"; "<<this->Bounds[2]<<"; "<<this->Bounds[3]<<"; "<<this->Bounds[4]<<"; "<<this->Bounds[5]<<endl;
   
   // Read all files
   
-  cout<<"there is (are) "<<numFiles<<" file(s)"<<endl;
+  //cout <<"there is (are) "<<numFiles<<" file(s)"<<endl;
     // Read only the part of the file for this processNumber.
 //    for ( block = startBlock; block <= endBlock; ++ block )
   
@@ -2657,6 +2661,8 @@ int vtkSpyPlotReader::RequestData(
     int cc;
     int dims[3];
     uniReader->GetDataBlockDimensions(block, dims);
+
+    //cout  << "Dims: " << dims[0] << " " << dims[1] << " " << dims[2] << endl;
     
     int extents[6];
     cc=0;
@@ -2677,6 +2683,7 @@ int vtkSpyPlotReader::RequestData(
     double bounds[6];
       
     int hasBadGhostCells;
+    int badGhostCell[6] = { 0, 0, 0, 0, 0, 0 };
     int realExtents[6];
     int realDims[3];
       
@@ -2685,6 +2692,8 @@ int vtkSpyPlotReader::RequestData(
       {
       level = uniReader->GetDataBlockLevel(block);
       uniReader->GetDataBlockBounds(block, bounds);
+
+      //cout  << "Bounds " << block << ": " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << bounds[4] << " " << bounds[5] << endl;
       
       // add at the end of the level list.
       vtkUniformGrid* ug = vtkUniformGrid::New();
@@ -2720,6 +2729,7 @@ int vtkSpyPlotReader::RequestData(
             --extents[2*cc+1];
             origin[cc]+=spacing[cc];
             hasBadGhostCells=1;
+            badGhostCell[2*cc] = 1;
             }
           else
             {
@@ -2730,6 +2740,7 @@ int vtkSpyPlotReader::RequestData(
             realExtents[2*cc+1]=dims[cc]-1;
             --extents[2*cc+1];
             hasBadGhostCells=1;
+            badGhostCell[2*cc+1] = 1;
             }
           else
             {
@@ -2772,6 +2783,9 @@ int vtkSpyPlotReader::RequestData(
           {
           bounds[2*cc]=coordinates[cc]->GetTuple1(0); // coordinates[cc]->GetValue(0);
           bounds[2*cc+1]=coordinates[cc]->GetTuple1(dims[cc]); // coordinates[cc]->GetValue(dims[cc]);
+
+          //cout  << "Bounds[" << (2*cc) << "] = " << bounds[2*cc] << endl;
+          //cout  << "Bounds[" << (2*cc+1) << "] = " << bounds[2*cc+1] << endl;
           }
         else
           {
@@ -2792,6 +2806,7 @@ int vtkSpyPlotReader::RequestData(
             realExtents[2*cc]=1;
             --extents[2*cc+1];
             hasBadGhostCells=1;
+            badGhostCell[2*cc] = 1;
             }
           else
             {
@@ -2802,6 +2817,7 @@ int vtkSpyPlotReader::RequestData(
             realExtents[2*cc+1]=dims[cc]-1;
             --extents[2*cc+1];
             hasBadGhostCells=1;
+            badGhostCell[2*cc+1] = 1;
             }
           else
             {
@@ -2833,8 +2849,32 @@ int vtkSpyPlotReader::RequestData(
           }
         else
           {
+          //cout << "Has bad ghost cells: " << hasBadGhostCells << endl;
+          //cout << "BGC: " << badGhostCell[0] << " " << badGhostCell[1] << " " << badGhostCell[2] << " " << badGhostCell[3] << " " << badGhostCell[4] << " " << badGhostCell[5] << endl;
           //uniReader->GetDataBlockVectors(block, coordinates);
-          cout << "--- Size: " << coordinates[cc]->GetNumberOfTuples() << " should be: " << realDims[cc]+1 << endl;
+          //cout  << "--- Size: " << coordinates[cc]->GetNumberOfTuples() << " should be: " << realDims[cc]+1 << endl;
+          //cout  << "CO[" << cc << "] =";
+          //vtkIdType kk;
+          //for ( kk = 0; kk < coordinates[cc]->GetNumberOfTuples(); ++ kk )
+          //  {
+          //  cout << " " << coordinates[cc]->GetTuple1(kk);
+          //  }
+          //cout << endl;
+          if ( badGhostCell[cc*2] )
+            {
+            coordinates[cc]->RemoveFirstTuple();
+            }
+          if ( badGhostCell[cc*2+1] )
+            {
+            coordinates[cc]->RemoveLastTuple();
+            }
+          //cout  << "--- Size: " << coordinates[cc]->GetNumberOfTuples() << " should be: " << realDims[cc]+1 << endl;
+          //cout  << "CO[" << cc << "] =";
+          //for ( kk = 0; kk < coordinates[cc]->GetNumberOfTuples(); ++ kk )
+          //  {
+          //  cout << " " << coordinates[cc]->GetTuple1(kk);
+          //  }
+          //cout << endl;
           }
         ++cc;
         }
@@ -2873,7 +2913,7 @@ int vtkSpyPlotReader::RequestData(
             }
           
           array = uniReader->GetCellFieldData(block, field);
-          cout << __LINE__ << " Read data block: " << block << " " << field << "  [" << array->GetName() << "]" << endl;
+          //cout << __LINE__ << " Read data block: " << block << " " << field << "  [" << array->GetName() << "]" << endl;
           cd->AddArray(array);
           }
         }
