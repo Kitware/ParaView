@@ -22,7 +22,7 @@
 #include "vtkPoints.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.3");
+vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.4");
 vtkStandardNewMacro(vtkTemporalProbeFilter);
 
 
@@ -55,19 +55,28 @@ void vtkTemporalProbeFilter::AnimateInit()
   }
 
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
-  if (!input) return;
+  if (!input) 
+    {
+    return;
+    }
 
   vtkCellData *icd;
   vtkPointData *ipd;
   if (this->PointOrCell)
     {
     icd = input->GetCellData();
-    if (!icd) return;
+    if (!icd) 
+      {
+      return;
+      }
     }
   else
     {
     ipd = input->GetPointData();
-    if (!ipd) return;
+    if (!ipd) 
+      {
+      return;
+      }
     }
 
   this->History = vtkUnstructuredGrid::New();
@@ -91,19 +100,28 @@ void vtkTemporalProbeFilter::AnimateInit()
 void vtkTemporalProbeFilter::AnimateTick(double TheTime)
 {
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
-  if (!input) return;
+  if (!input) 
+    {
+    return;
+    }
 
   vtkCellData *icd;
   vtkPointData *ipd;
   if (this->PointOrCell)
     {
     icd = input->GetCellData();
-    if (!icd) return;
+    if (!icd) 
+      {
+      return;
+      }
     }
   else
     {
     ipd = input->GetPointData();
-    if (!ipd) return;
+    if (!ipd) 
+      {
+      return;
+      }
     }
 
   //Want to run silently even when input is the line probe, so do not warn.
