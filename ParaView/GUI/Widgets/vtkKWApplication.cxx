@@ -68,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.251");
+vtkCxxRevisionMacro(vtkKWApplication, "1.252");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -128,6 +128,7 @@ vtkKWApplication::vtkKWApplication()
   this->LimitedEditionModeName = NULL;
   this->HelpDialogStartingPage = NULL;
   this->InstallationDirectory = NULL;
+  this->UserDataDirectory = NULL;
   this->EmailFeedbackAddress  = NULL;
   this->InExit     = 0;
   this->ExitStatus = 0;
@@ -224,6 +225,7 @@ vtkKWApplication::~vtkKWApplication()
   this->SetReleaseName(NULL);
   this->SetPrettyName(NULL);
   this->SetInstallationDirectory(NULL);
+  this->SetUserDataDirectory(NULL);
   this->SetEmailFeedbackAddress(NULL);
   this->SetHelpDialogStartingPage(NULL);
 
@@ -1909,6 +1911,46 @@ void vtkKWApplication::FindInstallationDirectory()
 }
 
 //----------------------------------------------------------------------------
+char* vtkKWApplication::GetUserDataDirectory()
+{
+  if (!this->UserDataDirectory)
+    {
+    vtksys_stl::string dir;
+
+#ifdef _WIN32
+    vtksys_stl::string personal;
+    if (vtksys::SystemTools::ReadRegistryValue(
+          "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders;Personal", // or ;AppData
+          personal)) 
+      {
+      dir = personal;
+      dir += "/";
+      }
+#else
+    dir = vtksys::SystemTools::GetEnv("HOME");
+    dir += "/.";
+#endif
+
+    dir += this->GetVersionName();
+    vtksys::SystemTools::ConvertToUnixSlashes(dir);
+
+    // We assume that if the user data dir is being requested, we should
+    // create it now in case it does not exist, so that it can be used right
+    // away.
+
+    if (!vtksys::SystemTools::FileExists(dir.c_str()))
+      {
+      vtksys::SystemTools::MakeDirectory(dir.c_str());
+      }
+
+    this->UserDataDirectory = new char [dir.size() + 1];
+    strcpy(this->UserDataDirectory, dir.c_str());
+    }
+
+  return this->UserDataDirectory;
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWApplication::Script(const char* format, ...)
 {
   va_list var_args1, var_args2;
@@ -1981,6 +2023,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PromptBeforeExit: " << (this->GetPromptBeforeExit() ? "on":"off") << endl;
   os << indent << "InstallationDirectory: " 
      << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;
+  os << indent << "UserDataDirectory: " 
+     << (this->UserDataDirectory ? UserDataDirectory : "None") << endl;
   os << indent << "SaveUserInterfaceGeometry: " 
      << (this->SaveUserInterfaceGeometry ? "On" : "Off") << endl;
   os << indent << "LimitedEditionMode: " 
