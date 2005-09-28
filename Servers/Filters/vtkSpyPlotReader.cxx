@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.27");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.28");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -210,7 +210,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.27");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.28");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1144,10 +1144,7 @@ void vtkSpyPlotUniReader::PrintInformation()
           cout << "      DataBlock: " << dataBlock << endl;
           if ( currentVar->DataBlocks[dataBlock] )
             {
-            vtkIndent indent;
-            currentVar->DataBlocks[dataBlock]->PrintHeader(cout, indent.GetNextIndent().GetNextIndent());
-            currentVar->DataBlocks[dataBlock]->PrintSelf(cout, indent.GetNextIndent().GetNextIndent().GetNextIndent());
-            currentVar->DataBlocks[dataBlock]->PrintTrailer(cout, indent.GetNextIndent().GetNextIndent());
+            currentVar->DataBlocks[dataBlock]->Print(cout);
             }
           }
         }
