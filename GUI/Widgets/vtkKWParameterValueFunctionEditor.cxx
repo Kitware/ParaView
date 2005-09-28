@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.68");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.69");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -5760,11 +5760,15 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 
     ostrstream tk_cmd;
 
-    tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
+    tk_cmd << canv << " addtag " 
+           << vtkKWParameterValueFunctionEditor::SelectedTag 
            << " withtag p" <<  this->GetSelectedPoint() << endl;
-    tk_cmd << canv << " addtag " << vtkKWParameterValueFunctionEditor::SelectedTag 
+    tk_cmd << canv << " addtag " 
+           << vtkKWParameterValueFunctionEditor::SelectedTag 
            << " withtag t" <<  this->GetSelectedPoint() << endl;
-    tk_cmd << canv << " raise " << vtkKWParameterValueFunctionEditor::SelectedTag << " all" << endl;
+    tk_cmd << "catch {" << canv << " raise " 
+           << vtkKWParameterValueFunctionEditor::SelectedTag << " all}" 
+           << endl;
 
     tk_cmd << ends;
     this->Script(tk_cmd.str());
