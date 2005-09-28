@@ -163,6 +163,12 @@ public:
   vtkSetStringMacro(InstallationDirectory);
   
   // Description:
+  // Set/Get the directory in which the current application can store
+  // user data. 
+  virtual char* GetUserDataDirectory();
+  vtkSetStringMacro(UserDataDirectory);
+  
+  // Description:
   // Load and evaluate a Tcl script from a file. 
   // Return 1 if successful, 0 otherwise
   virtual int LoadScript(const char* filename);
@@ -407,6 +413,10 @@ protected:
   // Application installation directory
   char *InstallationDirectory;
   virtual void FindInstallationDirectory();
+
+  // Description:
+  // User data directory
+  char *UserDataDirectory;
 
   // Description:
   // Add email feedback body and subject to output stream.
