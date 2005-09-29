@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSMNumberOfPartsDomain - restricts the number of parts of input
 // .SECTION Description
-// vtkSMInputArrayDomain requires that the source proxy pointed by the
+// vtkSMNumberOfPartsDomain requires that the source proxy pointed by the
 // property has an output with the specified multiplicity of parts:
 // SINGLE or MULTIPLE.  Valid XML attributes are:
 // @verbatim
