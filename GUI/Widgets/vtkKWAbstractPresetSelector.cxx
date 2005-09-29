@@ -51,7 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWAbstractPresetSelector);
-vtkCxxRevisionMacro(vtkKWAbstractPresetSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWAbstractPresetSelector, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWAbstractPresetSelectorInternals
@@ -339,14 +339,14 @@ void vtkKWAbstractPresetSelector::Create(vtkKWApplication *app)
   // add preset
 
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_ADD_ID);
-  pb->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconDocument);
   pb->SetCommand(this, "PresetAddCallback");
   pb->SetBalloonHelpString("Add a preset");
 
   // remove preset
 
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_REMOVE_ID);
-  pb->SetImageToPredefinedIcon(vtkKWIcon::IconMinus);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconTrashcan);
   pb->SetCommand(this, "PresetRemoveCallback");
   pb->SetBalloonHelpString(
     "Remove the selected preset(s) from the list of presets");

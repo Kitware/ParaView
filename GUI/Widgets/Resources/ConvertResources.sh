@@ -16,6 +16,7 @@ KWConvertImageToHeader --zlib --base64 \
 KWConvertImageToHeader --zlib --base64 \
     vtkKWIconResources.h \
     connection.png \
+    document.png \
     empty_16x16.png \
     error.png \
     error_mini.png \
@@ -36,6 +37,7 @@ KWConvertImageToHeader --zlib --base64 \
     move_h.png \
     move_v.png \
     plus.png \
+    point_finger.png \
     question.png \
     reload.png \
     shrink.png \

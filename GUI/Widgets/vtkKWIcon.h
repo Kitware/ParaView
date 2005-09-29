@@ -42,6 +42,7 @@ public:
   enum { 
     IconNoIcon                    = 0,
     IconConnection                = 1,
+    IconDocument                  = 9,
     IconEmpty16x16                = 6,
     IconError                     = 2, 
     IconErrorMini                 = 3,
@@ -61,6 +62,7 @@ public:
     IconMove                      = 80,
     IconMoveH                     = 81,
     IconMoveV                     = 82,
+    IconPointFinger               = 90,
     IconPlus                      = 100,
     IconQuestion                  = 101,
     IconReload                    = 102,
