@@ -15,6 +15,20 @@ static const unsigned char image_connection[] =
 
 /* 
  * Resource generated for file:
+ *    document.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_document_width          = 12;
+static const unsigned int  image_document_height         = 14;
+static const unsigned int  image_document_pixel_size     = 4;
+static const unsigned long image_document_length         = 80;
+static const unsigned long image_document_decoded_length = 672;
+
+static const unsigned char image_document[] = 
+  "eNpjYGD4z4ADAwEDOoaKYwBcevCpR6KJVo+uh5B70P2DSz02/Q0NDf9H1RNWTywGqQdpBd"
+  "HEYgDlAeTG";
+
+/* 
+ * Resource generated for file:
  *    empty_16x16.png (zlib, base64) (image file)
  */
 static const unsigned int  image_empty_16x16_width          = 16;
@@ -303,6 +317,20 @@ static const unsigned char image_plus[] =
   "eNqVktEJwDAIRLtEPjNINvAvq3QTV+lfduoS1wtcQPyqgRdQj0NNAFwgPJ3cZJFXLOU6pJ"
   "N2kIc4MdKEKbdrI/jueEaP5DelOT14qu8LKeehX/uhtzBbi7qMai3soaKv9lOdt7TP6nuh"
   "+B8+Lv7PwQ==";
+
+/* 
+ * Resource generated for file:
+ *    point_finger.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_point_finger_width          = 14;
+static const unsigned int  image_point_finger_height         = 8;
+static const unsigned int  image_point_finger_pixel_size     = 4;
+static const unsigned long image_point_finger_length         = 96;
+static const unsigned long image_point_finger_decoded_length = 448;
+
+static const unsigned char image_point_finger[] = 
+  "eNp90FEKACAIA1CP7s1XEcFaW8J+tBcigIJkFlz2rLHiTKrtX3fM395OTbLsklHLe8ob+4"
+  "e7C/fCzubebftkK2UAQlwdeA==";
 
 /* 
  * Resource generated for file:
