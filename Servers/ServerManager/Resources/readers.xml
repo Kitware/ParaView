@@ -14,6 +14,28 @@
    <!-- End DEMReader -->
    </SourceProxy>
 
+   <SourceProxy name="XMLMultiBlockDataReader" 
+                class="vtkXMLMultiBlockDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End MultiBlockDataReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLMultiGroupDataReader" 
+                class="vtkXMLMultiGroupDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End MultiGroupDataReader -->
+   </SourceProxy>
+
    <SourceProxy name="XMLHierarchicalDataReader" 
                 class="vtkXMLHierarchicalDataReader">
      <StringVectorProperty

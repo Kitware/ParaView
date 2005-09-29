@@ -19,8 +19,8 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkGarbageCollector.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkHierarchicalDataInformation.h"
-#include "vtkHierarchicalDataSet.h"
+#include "vtkMultiGroupDataInformation.h"
+#include "vtkMultiGroupDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMaskPoints.h"
@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.22");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.23");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -265,10 +265,10 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
-  vtkHierarchicalDataSet *hdInput = vtkHierarchicalDataSet::SafeDownCast(
+  vtkMultiGroupDataSet *hdInput = vtkMultiGroupDataSet::SafeDownCast(
     inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
-  vtkHierarchicalDataInformation* hdInfo = 
-    hdInput->GetHierarchicalDataInformation();
+  vtkMultiGroupDataInformation* hdInfo = 
+    hdInput->GetMultiGroupDataInformation();
 
   vtkInformation* info = outputVector->GetInformationObject(0);
   vtkPolyData *output = vtkPolyData::SafeDownCast(
@@ -296,9 +296,9 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
   int retVal = 1;
   this->InputIsUniformGrid = 0;
 
-  unsigned int numLevels = hdInput->GetNumberOfLevels();
+  unsigned int numGroups = hdInput->GetNumberOfGroups();
 
-  for (unsigned int level=0; level<numLevels; level++)
+  for (unsigned int level=0; level<numGroups; level++)
     {
     unsigned int numDataSets = hdInput->GetNumberOfDataSets(level);
     for (unsigned int dataIdx=0; dataIdx<numDataSets; dataIdx++)

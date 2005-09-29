@@ -13,24 +13,28 @@
 
 =========================================================================*/
 #include "vtkPVInformationGUI.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVSource.h"
+
+#include "vtkKWBoundsDisplay.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
-#include "vtkKWBoundsDisplay.h"
 #include "vtkKWNotebook.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.11");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
 {
   this->StatsFrame = vtkKWFrameWithLabel::New();
   this->TypeLabel = vtkKWLabel::New();
+  this->CompositeDataFrame = vtkKWFrame::New();
+  this->NumBlocksLabel = vtkKWLabel::New();
   this->NumDataSetsLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
@@ -48,6 +52,12 @@ vtkPVInformationGUI::~vtkPVInformationGUI()
   this->TypeLabel->Delete();
   this->TypeLabel = NULL;
   
+  this->CompositeDataFrame->Delete();
+  this->CompositeDataFrame = NULL;
+
+  this->NumBlocksLabel->Delete();
+  this->NumBlocksLabel = NULL;
+
   this->NumDataSetsLabel->Delete();
   this->NumDataSetsLabel = NULL;
 
@@ -85,7 +95,13 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
   this->TypeLabel->Create(this->GetApplication());
 
-  this->NumDataSetsLabel->SetParent(this->StatsFrame->GetFrame());
+  this->CompositeDataFrame->SetParent(this->StatsFrame->GetFrame());
+  this->CompositeDataFrame->Create(this->GetApplication());
+
+  this->NumBlocksLabel->SetParent(this->CompositeDataFrame);
+  this->NumBlocksLabel->Create(this->GetApplication());
+
+  this->NumDataSetsLabel->SetParent(this->CompositeDataFrame);
   this->NumDataSetsLabel->Create(this->GetApplication());
 
   this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
@@ -104,9 +120,9 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
   this->ExtentDisplay->Create(this->GetApplication());
   this->ExtentDisplay->SetLabelText("Extents");
   
-  this->Script("pack %s %s %s %s %s -side top -anchor nw",
+  this->Script("pack %s %s % s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
-               this->NumDataSetsLabel->GetWidgetName(),
+               this->CompositeDataFrame->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName(),
                this->MemorySizeLabel->GetWidgetName());
@@ -173,9 +189,21 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     this->Script("pack %s -fill x -expand t -pady 2", 
                  this->ExtentDisplay->GetWidgetName());
     }
+  else if (dataType == VTK_MULTIGROUP_DATA_SET)
+    {
+    type << "Multi-group";
+    this->Script("pack forget %s", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_MULTIBLOCK_DATA_SET)
+    {
+    type << "Multi-block";
+    this->Script("pack forget %s", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
   else if (dataType == VTK_HIERARCHICAL_DATA_SET)
     {
-    type << "Multi-block composite";
+    type << "Hierarchical AMR";
     this->Script("pack forget %s", 
                  this->ExtentDisplay->GetWidgetName());
     }
@@ -195,9 +223,59 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   
   ostrstream numcells;
 
+  int packNumBlocks = 0;
+  vtkPVCompositeDataInformation* cdi = 
+    dataInfo->GetCompositeDataInformation();
+  if (dataType == VTK_MULTIGROUP_DATA_SET && cdi)
+    {
+    ostrstream numBlocks;
+    numBlocks << "Number of groups: " 
+          << cdi->GetNumberOfGroups() 
+          << ends;
+    this->NumBlocksLabel->SetText(numBlocks.str());
+    delete[] numBlocks.str();
+    packNumBlocks = 1;
+    }
+
+  if (dataType == VTK_MULTIBLOCK_DATA_SET && cdi)
+    {
+    ostrstream numBlocks;
+    numBlocks << "Number of blocks: " 
+          << cdi->GetNumberOfGroups() 
+          << ends;
+    this->NumBlocksLabel->SetText(numBlocks.str());
+    delete[] numBlocks.str();
+    packNumBlocks = 1;
+    }
+  
   if (dataType == VTK_HIERARCHICAL_DATA_SET ||
+      dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
+    {
+    ostrstream numBlocks;
+    numBlocks << "Number of levels: " 
+          << cdi->GetNumberOfGroups() 
+          << ends;
+    this->NumBlocksLabel->SetText(numBlocks.str());
+    delete[] numBlocks.str();
+    packNumBlocks = 1;
+    }
+
+  if (packNumBlocks)
+    {
+    this->Script("pack %s -side top -anchor nw ", 
+                 this->NumBlocksLabel->GetWidgetName());
+    }
+  else
+    {
+    this->Script("pack forget %s", 
+                 this->NumBlocksLabel->GetWidgetName());
+    }
+
+  if (dataType == VTK_MULTIGROUP_DATA_SET ||
+      dataType == VTK_MULTIBLOCK_DATA_SET ||
+      dataType == VTK_HIERARCHICAL_DATA_SET ||
       dataType == VTK_HIERARCHICAL_BOX_DATA_SET ||
-      dataInfo->GetNumberOfDataSets() > 1 || 1)
+      dataInfo->GetNumberOfDataSets() > 1)
     {
     ostrstream numds;
     numds << "Number of datasets: " 
@@ -205,11 +283,19 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
           << ends;
     this->NumDataSetsLabel->SetText(numds.str());
     delete[] numds.str();
+    this->Script("pack %s -side top -anchor nw ", 
+                 this->NumDataSetsLabel->GetWidgetName());
     }
   else
     {
-    //this->Script("pack forget %s", 
-    //this->NumDataSetsLabel->GetWidgetName());
+    this->Script("pack forget %s", 
+                 this->NumDataSetsLabel->GetWidgetName());
+    if (!packNumBlocks)
+      {
+      // If it is empty, the fame should not occupy any vertical
+      // space.
+      this->CompositeDataFrame->SetHeight(1);
+      }
     }
 
   numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
@@ -236,6 +322,7 @@ void vtkPVInformationGUI::UpdateEnableState()
   this->Superclass::UpdateEnableState();
   this->PropagateEnableState(this->TypeLabel);
   this->PropagateEnableState(this->StatsFrame);
+  this->PropagateEnableState(this->NumBlocksLabel);
   this->PropagateEnableState(this->NumDataSetsLabel);
   this->PropagateEnableState(this->NumCellsLabel);
   this->PropagateEnableState(this->NumPointsLabel);

@@ -152,11 +152,27 @@
                     property="CellArrayStatus"
                     trace_name="CellSelection"/>
   </Module>
+  <Module name="XMLMultiBlockDataReader"
+          root_name="XMLMultiBlockDataReader"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions=".vtm"
+          file_description="VTK MultiBlock Data Files">
+    <Source class="vtkXMLMultiBlockDataReader"/>
+  </Module>
+  <Module name="XMLMultiGroupDataReader"
+          root_name="XMLMultiGroupDataReader"
+          class="vtkPVAdvancedReaderModule"
+          module_type="Reader"
+          extensions=".vtm"
+          file_description="VTK MultiGroup Data Files">
+    <Source class="vtkXMLMultiGroupDataReader"/>
+  </Module>
   <Module name="XMLHierarchicalDataReader"
           root_name="XMLHierarchicalDataReader"
           class="vtkPVAdvancedReaderModule"
           module_type="Reader"
-          extensions=".vth"
+          extensions=".vtm"
           file_description="VTK Hierarchical Data Files">
     <Source class="vtkXMLHierarchicalDataReader"/>
   </Module>
@@ -164,7 +180,7 @@
           root_name="XMLHierarchicalBoxDataReader"
           class="vtkPVAdvancedReaderModule"
           module_type="Reader"
-          extensions=".vth"
+          extensions=".vtm"
           file_description="VTK Hierarchical Box Data Files">
     <Source class="vtkXMLHierarchicalBoxDataReader"/>
   </Module>

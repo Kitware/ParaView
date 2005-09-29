@@ -62,7 +62,7 @@ public:
 
   // Description:
   // Returns the number of levels.
-  unsigned int GetNumberOfLevels();
+  unsigned int GetNumberOfGroups();
 
   // Description:
   // Given a level, returns the number of datasets.

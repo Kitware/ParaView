@@ -25,6 +25,7 @@
 #include "vtkKWFrameWithScrollbar.h"
 
 class vtkPVSource;
+class vtkKWFrame;
 class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWBoundsDisplay;
@@ -62,7 +63,9 @@ protected:
   
   vtkKWFrameWithLabel *StatsFrame;
 
+  vtkKWFrame *CompositeDataFrame;
   vtkKWLabel *TypeLabel;
+  vtkKWLabel *NumBlocksLabel;
   vtkKWLabel *NumDataSetsLabel;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
