@@ -3295,23 +3295,24 @@
            <DataTypeDomain name="input_type">
              <DataType value="vtkMultiGroupDataSet"/>
            </DataTypeDomain>
+           <NumberOfGroupsDomain name="multi_group" multiplicity="multiple"/>
      </InputProperty>
 
      <IntVectorProperty 
-        name="LevelRange" 
-        command="SetLevelRange" 
+        name="GroupRange" 
+        command="SetGroupRange" 
         number_of_elements="2"
         default_values="0 0" > 
        <IntRangeDomain name="range">
           <RequiredProperties>
-             <Property name="InputLevels" function="Range"/>
+             <Property name="InputGroups" function="Range"/>
           </RequiredProperties>
        </IntRangeDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
-        name="InputLevels"
-        command="GetInputLevels"
+        name="InputGroups"
+        command="GetInputGroups"
         information_only="1">
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
