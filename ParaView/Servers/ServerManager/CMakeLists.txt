@@ -63,6 +63,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMLODRenderModuleProxy.cxx
   vtkSMMultiDisplayProxy.cxx
   vtkSMMultiDisplayRenderModuleProxy.cxx
+  vtkSMNumberOfGroupsDomain.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
