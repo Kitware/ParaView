@@ -2930,8 +2930,8 @@ This filter uses colors to show levels of a hiearchical dataset.    </Documentat
   </Module>
 
   <Module name="ExtractLevel"
-          menu_name="Extract Level"
-          root_name="ExtLevel"
+          menu_name="Extract Group"
+          root_name="ExtGroup"
           module_type="Filter"
           long_help="This filter extracts a range of groups from a multigroup dataset."
           short_help="Extract level.">
@@ -2945,11 +2945,11 @@ This filter uses colors to show levels of a hiearchical dataset.    </Documentat
                input_name="Input"/>
 
     <MinMax trace_name="MinMax"
-            property="LevelRange"
-            min_label="Min Level"
-            max_label="Max Level"
-            min_help="Choose the level range to extract"
-            max_help="Choose the level range to extract"/>
+            property="GroupRange"
+            min_label="Min Group"
+            max_label="Max Group"
+            min_help="Choose the group range to extract"
+            max_help="Choose the group range to extract"/>
 
     <Documentation>
 This filter extracts a range of groups from a multigroup dataset    
