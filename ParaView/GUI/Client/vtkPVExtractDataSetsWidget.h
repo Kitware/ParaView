@@ -17,7 +17,7 @@
 // vtkPVExtractDataSetsWidget is basically a vtkKWListBox that lists
 // all blocks in a vtkHierarchicalDataSet (through vtkPVDataInformation).
 // It allows the user to select zero or more blocks and assigns them
-// in a SM property in pairs: (level, id), (level, id) ...
+// in a SM property in pairs: (group, id), (group, id) ...
 // The property should look like:
 // @verbatim
 //     <IntVectorProperty 
@@ -93,7 +93,7 @@ public:
  
   // Description:
   // Called when an item is selected. This checks if the user clicked
-  // on a level item and selects/unselects the whole level.
+  // on a group item and selects/unselects the whole group.
   void PartSelectionCallback();
 
 protected:

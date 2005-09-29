@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.768");
+vtkCxxRevisionMacro(vtkPVWindow, "1.769");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2555,12 +2555,13 @@ void vtkPVWindow::WriteData()
   
   ostrstream typesStr;
   
+  vtkPVWriter* wm = 0;
+
   // Build list of file types supporting this data type.
   vtkLinkedListIterator<vtkPVWriter*>* it =
     this->FileWriterList->NewIterator();
   while(!it->IsDoneWithTraversal())
     {
-    vtkPVWriter* wm = 0;
 
     if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,numParts))
       {

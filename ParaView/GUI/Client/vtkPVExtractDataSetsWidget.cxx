@@ -34,12 +34,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.7");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {
-  vtkstd::vector<int> LevelIndices;
-  vtkstd::vector<int> LevelSelected;
+  vtkstd::vector<int> GroupIndices;
+  vtkstd::vector<int> GroupSelected;
 };
 
 //----------------------------------------------------------------------------
@@ -122,25 +122,25 @@ void vtkPVExtractDataSetsWidget::Create(vtkKWApplication *app)
 void vtkPVExtractDataSetsWidget::PartSelectionCallback()
 {
   int selIdx = this->PartSelectionList->GetSelectionIndex();
-  unsigned int numLevels = this->Internal->LevelIndices.size();
-  for (unsigned int i=0; i<numLevels; i++)
+  unsigned int numGroups = this->Internal->GroupIndices.size();
+  for (unsigned int i=0; i<numGroups; i++)
     {
-    if (selIdx == static_cast<int>(this->Internal->LevelIndices[i]))
+    if (selIdx == static_cast<int>(this->Internal->GroupIndices[i]))
       {
-      // Level entries should never be selected
+      // Group entries should never be selected
       this->PartSelectionList->SetSelectState(selIdx, 0);
 
-      // Select or unselect all entries belonging to this level
-      unsigned int begin = this->Internal->LevelIndices[i] + 1;
+      // Select or unselect all entries belonging to this group
+      unsigned int begin = this->Internal->GroupIndices[i] + 1;
       unsigned int end = this->PartSelectionList->GetNumberOfItems();
-      if (i < this->Internal->LevelIndices.size() - 1)
+      if (i < this->Internal->GroupIndices.size() - 1)
         {
-        end = this->Internal->LevelIndices[i+1];
+        end = this->Internal->GroupIndices[i+1];
         }
 
-      if (this->Internal->LevelSelected[i])
+      if (this->Internal->GroupSelected[i])
         {
-        this->Internal->LevelSelected[i] = 0;
+        this->Internal->GroupSelected[i] = 0;
         for (unsigned int j=begin; j<end; j++)
           {
           this->PartSelectionList->SetSelectState(j, 0);
@@ -148,7 +148,7 @@ void vtkPVExtractDataSetsWidget::PartSelectionCallback()
         }
       else
         {
-        this->Internal->LevelSelected[i] = 1;
+        this->Internal->GroupSelected[i] = 1;
         for (unsigned int j=begin; j<end; j++)
           {
           this->PartSelectionList->SetSelectState(j, 1);
@@ -178,16 +178,16 @@ void vtkPVExtractDataSetsWidget::Accept()
   ivp->SetNumberOfElements(0);
 
   unsigned int idx=0;
-  unsigned int numLevels = this->Internal->LevelIndices.size();
-  // For each level, add the selected datasets
-  for (unsigned int i=0; i<numLevels; i++)
+  unsigned int numGroups = this->Internal->GroupIndices.size();
+  // For each group, add the selected datasets
+  for (unsigned int i=0; i<numGroups; i++)
     {
-    // All items between this level and the next
-    unsigned int begin = this->Internal->LevelIndices[i]+1;
+    // All items between this group and the next
+    unsigned int begin = this->Internal->GroupIndices[i]+1;
     unsigned int end = this->PartSelectionList->GetNumberOfItems();
-    if (i < numLevels - 1)
+    if (i < numGroups - 1)
       {
-      end = this->Internal->LevelIndices[i+1];
+      end = this->Internal->GroupIndices[i+1];
       }
     for (unsigned int j=begin; j<end; j++)
       {
@@ -215,8 +215,8 @@ void vtkPVExtractDataSetsWidget::CommonInit()
 {
   int idx=0;
 
-  this->Internal->LevelIndices.clear();
-  this->Internal->LevelSelected.clear();
+  this->Internal->GroupIndices.clear();
+  this->Internal->GroupSelected.clear();
   this->PartSelectionList->DeleteAll();
 
   // Loop through all of the datasets of the input adding to the list.
@@ -224,26 +224,26 @@ void vtkPVExtractDataSetsWidget::CommonInit()
   vtkPVCompositeDataInformation* cdi =
     input->GetDataInformation()->GetCompositeDataInformation();
 
-  unsigned int numLevels = cdi->GetNumberOfLevels();
+  unsigned int numGroups = cdi->GetNumberOfGroups();
 
   unsigned int i;
   int firstTime = 1;
-  for (i=0; i<numLevels; i++)
+  for (i=0; i<numGroups; i++)
     {
-    // If there are more than one level, add a label showing
-    // the level number before listing the blocks for that
-    // level. Store the index of this item to be used later.
-    if (numLevels > 1)
+    // If there are more than one group, add a label showing
+    // the group number before listing the blocks for that
+    // group. Store the index of this item to be used later.
+    if (numGroups > 1)
       {
-      this->Internal->LevelIndices.push_back(idx);
-      ostrstream levelStr;
-      levelStr << "Level " << i << ":" << ends;
-      this->PartSelectionList->InsertEntry(idx++, levelStr.str());
-      delete[] levelStr.str();
+      this->Internal->GroupIndices.push_back(idx);
+      ostrstream groupStr;
+      groupStr << "Group " << i << ":" << ends;
+      this->PartSelectionList->InsertEntry(idx++, groupStr.str());
+      delete[] groupStr.str();
       }
     else
       {
-      this->Internal->LevelIndices.push_back(-1);
+      this->Internal->GroupIndices.push_back(-1);
       }
     unsigned int numDataSets = cdi->GetNumberOfDataSets(i);
     for (unsigned int j=0; j<numDataSets; j++)
@@ -266,12 +266,12 @@ void vtkPVExtractDataSetsWidget::CommonInit()
       }
     }
 
-  // Initially, no levels are selected
-  numLevels = this->Internal->LevelIndices.size();
-  this->Internal->LevelSelected.resize(numLevels);
-  for (i=0; i<numLevels; i++)
+  // Initially, no groups are selected
+  numGroups = this->Internal->GroupIndices.size();
+  this->Internal->GroupSelected.resize(numGroups);
+  for (i=0; i<numGroups; i++)
     {
-    this->Internal->LevelSelected[i] = 0;
+    this->Internal->GroupSelected[i] = 0;
     }
 }
 
@@ -302,9 +302,9 @@ void vtkPVExtractDataSetsWidget::ResetInternal()
   unsigned int numDataSets = numElems / 2;
   for (unsigned int i=0; i<numDataSets; i++)
     {
-    int level = ivp->GetElement(2*i  );
+    int group = ivp->GetElement(2*i  );
     int didx  = ivp->GetElement(2*i+1);
-    int entryIdx = this->Internal->LevelIndices[level] + didx + 1;
+    int entryIdx = this->Internal->GroupIndices[group] + didx + 1;
     this->PartSelectionList->SetSelectState(entryIdx, 1);
     }
 
@@ -316,22 +316,22 @@ void vtkPVExtractDataSetsWidget::AllOnCallback()
 {
   int num, idx;
 
-  unsigned int numLevels = this->Internal->LevelIndices.size();
+  unsigned int numGroups = this->Internal->GroupIndices.size();
 
-  // Select all but level labels
+  // Select all but group labels
   num = this->PartSelectionList->GetNumberOfItems();
   for (idx = 0; idx < num; ++idx)
     {
-    int isLevelEntry = 0;
-    for (unsigned int i=0; i<numLevels; i++)
+    int isGroupEntry = 0;
+    for (unsigned int i=0; i<numGroups; i++)
       {
-      if (idx == this->Internal->LevelIndices[i])
+      if (idx == this->Internal->GroupIndices[i])
         {
-        isLevelEntry = 1;
+        isGroupEntry = 1;
         break;
         }
       }
-    if (!isLevelEntry)
+    if (!isGroupEntry)
       {
       this->PartSelectionList->SetSelectState(idx, 1);
       }
@@ -371,9 +371,9 @@ void vtkPVExtractDataSetsWidget::Trace(ofstream *file)
   unsigned int numDataSets = numElems / 2;
   for (unsigned int i=0; i<numDataSets; i++)
     {
-    int level = ivp->GetElement(2*i  );
+    int group = ivp->GetElement(2*i  );
     int didx  = ivp->GetElement(2*i+1);
-    int entryIdx = this->Internal->LevelIndices[level] + didx + 1;
+    int entryIdx = this->Internal->GroupIndices[group] + didx + 1;
     *file << "$kw(" << this->GetTclName() << ") SetSelectState "
           << entryIdx << " 1" << endl;
     }

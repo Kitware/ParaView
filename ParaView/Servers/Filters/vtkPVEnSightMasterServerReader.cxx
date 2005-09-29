@@ -17,7 +17,6 @@
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayCollection.h"
-#include "vtkHierarchicalDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -44,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.27");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);

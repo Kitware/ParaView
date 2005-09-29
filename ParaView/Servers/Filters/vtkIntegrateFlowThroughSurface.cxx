@@ -20,7 +20,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkHierarchicalDataSet.h"
+#include "vtkMultiGroupDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntegrateAttributes.h"
@@ -30,7 +30,7 @@
 #include "vtkSurfaceVectors.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.3");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.4");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
@@ -115,7 +115,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *request,
     inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
   if (hdInput) 
     {
-    vtkHierarchicalDataSet* hds = vtkHierarchicalDataSet::New();
+    vtkMultiGroupDataSet* hds = vtkMultiGroupDataSet::New();
     vtkCompositeDataIterator* iter = hdInput->NewIterator();
     iter->GoToFirstItem();
     while (!iter->IsDoneWithTraversal())

@@ -15,7 +15,7 @@
 #include "vtkPVCompositeDataInformation.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkHierarchicalDataSet.h"
+#include "vtkMultiGroupDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkTimerLog.h"
@@ -24,16 +24,16 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.4");
 
 struct vtkPVCompositeDataInformationInternals
 {
   typedef 
   vtkstd::vector<vtkSmartPointer<vtkPVDataInformation> > 
-  LevelDataInformationType;
+  GroupDataInformationType;
 
   typedef 
-  vtkstd::vector<LevelDataInformationType> DataInformationType;
+  vtkstd::vector<GroupDataInformationType> DataInformationType;
 
   DataInformationType DataInformation;
 };
@@ -66,7 +66,7 @@ void vtkPVCompositeDataInformation::Initialize()
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVCompositeDataInformation::GetNumberOfLevels()
+unsigned int vtkPVCompositeDataInformation::GetNumberOfGroups()
 {
   return this->Internal->DataInformation.size();
 }
@@ -75,12 +75,12 @@ unsigned int vtkPVCompositeDataInformation::GetNumberOfLevels()
 unsigned int vtkPVCompositeDataInformation::GetNumberOfDataSets(
   unsigned int level)
 {
-  if (level >= this->GetNumberOfLevels())
+  if (level >= this->GetNumberOfGroups())
     {
     return 0;
     }
 
-  vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+  vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
     this->Internal->DataInformation[level];
 
   return ldata.size();
@@ -90,12 +90,12 @@ unsigned int vtkPVCompositeDataInformation::GetNumberOfDataSets(
 vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformation(
   unsigned int level, unsigned int idx)
 {
-  if (level >= this->GetNumberOfLevels())
+  if (level >= this->GetNumberOfGroups())
     {
     return 0;
     }
 
-  vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+  vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
     this->Internal->DataInformation[level];
 
   if (idx >= ldata.size())
@@ -111,8 +111,8 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
 {
   this->Initialize();
 
-  vtkHierarchicalDataSet* hds = 
-    vtkHierarchicalDataSet::SafeDownCast(object);
+  vtkMultiGroupDataSet* hds = 
+    vtkMultiGroupDataSet::SafeDownCast(object);
   if (!hds)
     {
     return;
@@ -122,11 +122,11 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
 
   this->DataIsComposite = 1;
 
-  unsigned int numLevels = hds->GetNumberOfLevels();
-  this->Internal->DataInformation.resize(numLevels);
-  for (unsigned int i=0; i<numLevels; i++)
+  unsigned int numGroups = hds->GetNumberOfGroups();
+  this->Internal->DataInformation.resize(numGroups);
+  for (unsigned int i=0; i<numGroups; i++)
     {
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     unsigned int numDataSets = hds->GetNumberOfDataSets(i);
     ldata.resize(numDataSets);
@@ -158,19 +158,19 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
     return;
     }
 
-  unsigned int otherNumLevels = info->Internal->DataInformation.size();
-  unsigned int numLevels = this->Internal->DataInformation.size();
-  if ( otherNumLevels > numLevels )
+  unsigned int otherNumGroups = info->Internal->DataInformation.size();
+  unsigned int numGroups = this->Internal->DataInformation.size();
+  if ( otherNumGroups > numGroups )
     {
-    numLevels = otherNumLevels;
-    this->Internal->DataInformation.resize(numLevels);
+    numGroups = otherNumGroups;
+    this->Internal->DataInformation.resize(numGroups);
     }
 
-  for (unsigned int i=0; i < otherNumLevels; i++)
+  for (unsigned int i=0; i < otherNumGroups; i++)
     {
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& 
       otherldata = info->Internal->DataInformation[i];
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     unsigned otherNumDataSets = otherldata.size();
     unsigned numDataSets = ldata.size();
@@ -218,11 +218,11 @@ void vtkPVCompositeDataInformation::CopyToStream(
     *css << vtkClientServerStream::End;
     return;
     }
-  unsigned int numLevels = this->Internal->DataInformation.size();
-  *css << numLevels;
-  for(i=0; i<numLevels; i++)
+  unsigned int numGroups = this->Internal->DataInformation.size();
+  *css << numGroups;
+  for(i=0; i<numGroups; i++)
     {
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     *css << ldata.size();
     }
@@ -231,9 +231,9 @@ void vtkPVCompositeDataInformation::CopyToStream(
   size_t length;
   const unsigned char* data;
 
-  for(i=0; i<numLevels; i++)
+  for(i=0; i<numGroups; i++)
     {
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     unsigned int numDataSets = ldata.size();
     for(j=0; j<numDataSets; j++)
@@ -250,7 +250,7 @@ void vtkPVCompositeDataInformation::CopyToStream(
         }
       }
     }
-  *css << numLevels;
+  *css << numGroups;
   *css << vtkClientServerStream::End;
   vtkTimerLog::MarkEndEvent("Copying composite information to stream");
 }
@@ -268,15 +268,15 @@ void vtkPVCompositeDataInformation::CopyFromStream(
     {
     return;
     }
-  unsigned int numLevels;
-  if(!css->GetArgument(0, 1, &numLevels))
+  unsigned int numGroups;
+  if(!css->GetArgument(0, 1, &numGroups))
     {
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
   int msgIdx = 1;
-  this->Internal->DataInformation.resize(numLevels);
-  for (unsigned int i=0; i<numLevels; i++)
+  this->Internal->DataInformation.resize(numGroups);
+  for (unsigned int i=0; i<numGroups; i++)
     {
     unsigned int numDataSets;
     msgIdx++;
@@ -285,7 +285,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       vtkErrorMacro("Error parsing data set type.");
       return;
       }
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[i];
     ldata.resize(numDataSets);
     }
@@ -299,7 +299,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       vtkErrorMacro("Error parsing data set type.");
       return;
       }
-    if (levelIdx >= numLevels)
+    if (levelIdx >= numGroups)
       {
       break;
       }
@@ -332,7 +332,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       }
     dcss.SetData(&*data.begin(), length);
     dataInf->CopyFromStream(&dcss);
-    vtkPVCompositeDataInformationInternals::LevelDataInformationType& ldata = 
+    vtkPVCompositeDataInformationInternals::GroupDataInformationType& ldata = 
       this->Internal->DataInformation[levelIdx];
     ldata[dataSetIdx] = dataInf;
     dataInf->Delete();

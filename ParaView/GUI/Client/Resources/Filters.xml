@@ -2890,25 +2890,6 @@ Tessellate a higher-order dataset.
   </Documentation>
  </Module>
 
-  <Module name="BlockScalars"
-          menu_name="Block Scalars"
-          root_name="LScalars"
-          module_type="Filter"
-          long_help="This filter uses colors to show levels of a hiearchical dataset."
-          short_help="Generate point scalars from level.">
-    <Filter class="vtkHierarchicalDataBlockFilter">
-      <Input name="Input"
-             class="vtkHierarchicalDataSet"/>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <Documentation>
-This filter uses colors to show levels of a hiearchical dataset.
-    </Documentation>
-  </Module>
-
   <Module name="GroupDataSets"
           menu_name="Group Datasets"
           root_name="GroupDataSets"
@@ -2919,26 +2900,26 @@ This filter uses colors to show levels of a hiearchical dataset.
           button_image="PVGroupButton"
           button_help="Group multiple modules into one."
           button_visibility="0">
-    <Filter class="vtkHierarchicalDataGroupFilter">
+    <Filter class="vtkMultiGroupDataGroupFilter">
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple"/>
     </Filter>
     <GroupInputsWidget trace_name="inputs" property="Input"
                        help="Choose inputs to group."/>
     <Documentation>
-Groups multiple datasets to create a multi-block hierarchical dataset
+Groups multiple datasets to create a multigroup dataset
     </Documentation>
   </Module>
 
-  <Module name="LevelScalars"
+  <Module name="GroupIdScalars"
           menu_name="Level Scalars"
           root_name="LScalars"
           module_type="Filter"
           long_help="This filter uses colors to show levels of a hiearchical dataset."
           short_help="Generate point scalars from level.">
-    <Filter class="vtkHierarchicalDataLevelFilter">
+    <Filter class="vtkMultiGroupDataGroupIdScalars">
       <Input name="Input"
-             class="vtkHierarchicalDataSet"/>
+             class="vtkMultiGroupDataSet"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
                label="Input"
@@ -2952,11 +2933,11 @@ This filter uses colors to show levels of a hiearchical dataset.    </Documentat
           menu_name="Extract Level"
           root_name="ExtLevel"
           module_type="Filter"
-          long_help="This filter extracts a range of levels from a hierarchical dataset."
+          long_help="This filter extracts a range of groups from a multigroup dataset."
           short_help="Extract level.">
-    <Filter class="vtkHierarchicalDataExtractLevel">
+    <Filter class="vtkMultiGroupDataExtractGroup">
       <Input name="Input"
-             class="vtkHierarchicalDataSet"/>
+             class="vtkMultiGroupDataExtractGroup"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
                label="Input"
@@ -2971,18 +2952,19 @@ This filter uses colors to show levels of a hiearchical dataset.    </Documentat
             max_help="Choose the level range to extract"/>
 
     <Documentation>
-This filter extracts a range of levels from a hierarchical dataset    </Documentation>
+This filter extracts a range of groups from a multigroup dataset    
+    </Documentation>
   </Module>
 
   <Module name="ExtractDataSets"
           menu_name="Extract Datasets"
           root_name="ExtDS"
           module_type="Filter"
-          long_help="This filter extracts a list of datasets from hierarchical datasets."
+          long_help="This filter extracts a list of datasets from multigroup datasets."
           short_help="Extract datasets.">
-    <Filter class="vtkHierarchicalDataExtractDataSets">
+    <Filter class="vtkMultiGroupDataExtractDataSets">
       <Input name="Input"
-             class="vtkHierarchicalDataSet"/>
+             class="vtkMultiGroupDataSet"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
                label="Input"
@@ -2993,7 +2975,7 @@ This filter extracts a range of levels from a hierarchical dataset    </Document
                            help="Choose the datasets to extract."/>
 
     <Documentation>
-This filter extracts a list of datasets from hierarchical datasets.
+This filter extracts a list of datasets from multigroup datasets.
     </Documentation>
   </Module>
 
