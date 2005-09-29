@@ -36,6 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkKWCanvas - canvas widget
 // .SECTION Description
 // A simple widget that represents a canvas. 
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWCanvas_h
 #define __vtkKWCanvas_h

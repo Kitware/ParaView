@@ -18,6 +18,12 @@
 // describes each control point of the curve, several pure virtual functions
 // are provided for subclasses to specify the midpoint and sharpness at each
 // control point.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWParameterValueHermiteFunctionEditor_h
 #define __vtkKWParameterValueHermiteFunctionEditor_h

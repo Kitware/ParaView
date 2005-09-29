@@ -21,6 +21,12 @@
 // slices along the sagittal axis of a medical dataset). No explicit reference
 // is made to the dataset, but callbacks must be set so that this widget
 // can set or get the slice value on the approriate external resource.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWSimpleAnimationWidget_h
 #define __vtkKWSimpleAnimationWidget_h
