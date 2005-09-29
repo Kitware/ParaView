@@ -55,13 +55,8 @@ public:
   
   // Description:
   // Add a new window/level preset.
-  // If a preset already exists for the given parameters (window/level and
-  // optionally group), no new preset is created and the Id of the existing 
-  // preset is returned.
   // Return the unique Id of the preset
   virtual int AddWindowLevelPreset(double window, double level);
-  virtual int AddWindowLevelPresetWithGroup(
-    double window, double level, const char *group);
 
   // Description:
   // Assign a group to a preset in the pool.
@@ -98,7 +93,7 @@ public:
     double window, double level, const char *group);
 
   // Description:
-  // Retrieve a window/level preset given its unique Id, or its position in
+  // Set/Get a window/level preset given its unique Id, or its position in
   // the pool (i.e. nth-preset), or its position in the pool within a group
   // (i.e. nth-preset with a given group).
   // Return 1 on success, 0 otherwise for methods that take a pointer
@@ -114,6 +109,7 @@ public:
     int index, const char *group, double *window, double *level);
   virtual double* GetNthWindowLevelPresetWithGroup(
     int index, const char *group);
+  virtual int SetWindowLevelPreset(int id, double window, double level);
 
   // Description:
   // Retrieve the Id of the first preset with a given window/level,
@@ -205,6 +201,16 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
+  // Specifies a command to be invoked when the "update" button is pressed.
+  // This is used by the application to actually check which window/level
+  // is used on whichever dataset is loaded or selected, and call back
+  // this object to update the window/level of the preset to update.
+  // The id of the preset to update is passed to the command.
+  // If it is not set, the 'update' button is not visible.
+  virtual void SetUpdateWindowLevelPresetCommand(
+    vtkObject* object, const char *method);
+
+  // Description:
   // Specifies a command to be invoked when the the user tries to
   // apply a window/level preset (by double-clicking on the preset for
   // example). The id of the preset is passed to the command.
@@ -243,6 +249,7 @@ public:
   // Description:
   // Callbacks
   virtual void PresetAddCallback();
+  virtual void PresetUpdateCallback();
   virtual void PresetRemoveCallback();
   virtual void PresetCellIconCallback(const char*, int, int, const char*);
   virtual const char* PresetCellEditStartCallback(
@@ -285,6 +292,9 @@ protected:
 
   char *AddWindowLevelPresetCommand;
   virtual void InvokeAddWindowLevelPresetCommand();
+
+  char *UpdateWindowLevelPresetCommand;
+  virtual void InvokeUpdateWindowLevelPresetCommand(int id);
 
   char *ApplyWindowLevelPresetCommand;
   virtual void InvokeApplyWindowLevelPresetCommand(int id);
