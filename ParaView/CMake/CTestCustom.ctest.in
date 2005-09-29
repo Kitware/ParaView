@@ -19,7 +19,8 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   HeaderTesting-PVServer-ServerManager
   HeaderTesting-KWCommon
   HeaderTesting-KWWidgets       
-  HeaderTesting-PVGUI-Client    
+  HeaderTesting-PVGUI-Client
+  HeaderTesting-Widgets
   
   PrintSelf-KWWidgets	
   PrintSelf-PVGUI-Client
