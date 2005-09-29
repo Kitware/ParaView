@@ -16,6 +16,12 @@
 // A widget with up and down arrow controls and direct text editing.
 // Typically used with integer fields that users increment by 1 (or
 // decrement) by clicking on the arrows.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWSpinBox_h
 #define __vtkKWSpinBox_h

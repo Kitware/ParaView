@@ -23,6 +23,12 @@
 // the column titles. The labels can be used, among others, for interactive
 // column resizing and column-based sorting of the items.
 // Use vtkKWMultiColumnListWithScrollbars if you need scrollbars.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 // .SECTION See Also
 // vtkKWMultiColumnListWithScrollbars
 

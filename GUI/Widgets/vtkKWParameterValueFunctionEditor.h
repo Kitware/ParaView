@@ -15,6 +15,12 @@
 // .SECTION Description
 // A widget that allows the user to edit a parameter/value function.
 // Keybindings: Delete or x, Home, End, PageUp or p, PageDown or n, 
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 // .SECTION See Also
 // vtkKWWidgetWithLabel
 

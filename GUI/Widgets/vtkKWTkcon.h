@@ -14,6 +14,12 @@
 // .NAME vtkKWTkcon - a wrapper around a tkcon console.
 // .SECTION Description
 // A widget to interactively execute Tcl commands using a tkcon console.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWTkcon_h
 #define __vtkKWTkcon_h

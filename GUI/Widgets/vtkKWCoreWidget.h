@@ -15,6 +15,12 @@
 // .SECTION Description
 // A superclass for all core widgets, i.e. C++ wrappers around simple
 // Tk widgets.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWCoreWidget_h
 #define __vtkKWCoreWidget_h

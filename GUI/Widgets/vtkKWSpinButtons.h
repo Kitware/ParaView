@@ -20,6 +20,12 @@
 // out vertically or horizontally.
 // The 'previous' button is mapped to the up/left arrow, the 'next' button
 // is mapped to the 'down/right' arrow.
+// .SECTION Thanks
+// This work is part of the National Alliance for Medical Image
+// Computing (NAMIC), funded by the National Institutes of Health
+// through the NIH Roadmap for Medical Research, Grant U54 EB005149.
+// Information on the National Centers for Biomedical Computing
+// can be obtained from http://nihroadmap.nih.gov/bioinformatics.
 
 #ifndef __vtkKWSpinButtons_h
 #define __vtkKWSpinButtons_h
