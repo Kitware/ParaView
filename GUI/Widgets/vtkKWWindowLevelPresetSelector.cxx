@@ -51,10 +51,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #define VTK_KW_WLPS_BUTTON_ADD_ID    0
 #define VTK_KW_WLPS_BUTTON_REMOVE_ID 1
+#define VTK_KW_WLPS_BUTTON_UPDATE_ID 2
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.7");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -133,6 +134,7 @@ vtkKWWindowLevelPresetSelector::vtkKWWindowLevelPresetSelector()
   this->Internals = new vtkKWWindowLevelPresetSelectorInternals;
 
   this->AddWindowLevelPresetCommand    = NULL;
+  this->UpdateWindowLevelPresetCommand    = NULL;
   this->ApplyWindowLevelPresetCommand  = NULL;
   this->RemoveWindowLevelPresetCommand = NULL;
 
@@ -180,6 +182,12 @@ vtkKWWindowLevelPresetSelector::~vtkKWWindowLevelPresetSelector()
     {
     delete [] this->AddWindowLevelPresetCommand;
     this->AddWindowLevelPresetCommand = NULL;
+    }
+
+  if (this->UpdateWindowLevelPresetCommand)
+    {
+    delete [] this->UpdateWindowLevelPresetCommand;
+    this->UpdateWindowLevelPresetCommand = NULL;
     }
 
   if (this->ApplyWindowLevelPresetCommand)
@@ -348,6 +356,7 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   this->PresetButtons->SetWidgetsPadX(2);
   this->PresetButtons->SetWidgetsPadY(2);
   this->PresetButtons->SetWidgetsInternalPadY(1);
+  this->PresetButtons->ExpandWidgetsOn();
   this->PresetButtons->Create(app);
 
   this->Script("pack %s -side left -anchor nw -fill x -expand t",
@@ -358,14 +367,21 @@ void vtkKWWindowLevelPresetSelector::Create(vtkKWApplication *app)
   // add preset
 
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_ADD_ID);
-  pb->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconDocument);
   pb->SetCommand(this, "PresetAddCallback");
   pb->SetBalloonHelpString("Add a window/level preset");
+
+  // update preset
+
+  pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_UPDATE_ID);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconPointFinger);
+  pb->SetCommand(this, "PresetUpdateCallback");
+  pb->SetBalloonHelpString("Update a preset");
 
   // remove preset
 
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_REMOVE_ID);
-  pb->SetImageToPredefinedIcon(vtkKWIcon::IconMinus);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconTrashcan);
   pb->SetCommand(this, "PresetRemoveCallback");
   pb->SetBalloonHelpString(
     "Remove the selected preset(s) from the list of presets");
@@ -461,40 +477,22 @@ int vtkKWWindowLevelPresetSelector::GetCommentColumnVisibility()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindowLevelPresetSelector::AddWindowLevelPresetWithGroup(
-  double window, double level, const char *group)
+int vtkKWWindowLevelPresetSelector::AddWindowLevelPreset(
+  double window, double level)
 {
-  // Do we have that preset already ? If not, create a new node
+  int id = vtkKWWindowLevelPresetSelectorInternals::PoolNodeCounter++;
 
-  int id;
-  if (group && *group)
-    {
-    id = this->GetWindowLevelPresetIdWithGroup(window, level, group);
-    }
-  else
-    {
-    id = this->GetWindowLevelPresetId(window, level);
-    }
-  vtkKWWindowLevelPresetSelectorInternals::PoolNode *node = NULL;
-  if (id < 0)
-    {
-    id =  vtkKWWindowLevelPresetSelectorInternals::PoolNodeCounter++;
+  vtkKWWindowLevelPresetSelectorInternals::PoolNode *node = 
+    new vtkKWWindowLevelPresetSelectorInternals::PoolNode;
 
-    node = new vtkKWWindowLevelPresetSelectorInternals::PoolNode;
-
-    node->Id = id;
-    node->Window = window;
-    node->Level = level;
-    node->CreationTime = clock();
-    if (group && *group)
-      {
-      node->Group = group;
-      }
-
-    this->Internals->Pool.push_back(node);
-
-    this->UpdateRowInPresetList(node);
-    }
+  node->Id = id;
+  node->Window = window;
+  node->Level = level;
+  node->CreationTime = clock();
+  
+  this->Internals->Pool.push_back(node);
+  
+  this->UpdateRowInPresetList(node);
 
   if (this->PresetList)
     {
@@ -505,49 +503,16 @@ int vtkKWWindowLevelPresetSelector::AddWindowLevelPresetWithGroup(
       list->SeeRow(row);
       }
     }
-
-  if (node)
-    {
-    this->NumberOfWindowLevelPresetsHasChanged();
-    }
+  
+  this->NumberOfWindowLevelPresetsHasChanged();
 
   return id;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindowLevelPresetSelector::AddWindowLevelPreset(
-  double window, double level)
-{
-  return this->AddWindowLevelPresetWithGroup(window, level, NULL);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetGroup(
   int id, const char *group)
 {
-  // Check if there is already a preset corresponding to that group
-  // If there is, remove it first
-
-  double window, level;
-  if (this->GetWindowLevelPreset(id, &window, &level))
-    {
-    int existing_id = 
-      this->GetWindowLevelPresetIdWithGroup(window, level, group);
-    if (existing_id >= 0)
-      {
-      if (existing_id == id)
-        {
-        return 1;
-        }
-      else
-        {
-        this->RemoveWindowLevelPreset(existing_id);
-        }
-      }
-    }
-
-  // Update the group
-
   vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
     this->Internals->GetPoolNode(id);
   if (it != this->Internals->Pool.end())
@@ -658,6 +623,23 @@ int vtkKWWindowLevelPresetSelector::HasWindowLevelPresetWithGroup(
 {
   int id = this->GetWindowLevelPresetIdWithGroup(window, level, group);
   return id >= 0 ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::SetWindowLevelPreset(
+  int id, double window, double level)
+{
+  vtkKWWindowLevelPresetSelectorInternals::PoolIterator it = 
+    this->Internals->GetPoolNode(id);
+  if (it != this->Internals->Pool.end())
+    {
+    (*it)->Window = window;
+    (*it)->Level = level;
+    this->UpdateRowInPresetList(*it);
+    return 1;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1285,6 +1267,35 @@ void vtkKWWindowLevelPresetSelector::PresetAddCallback()
 }
 
 //---------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::PresetUpdateCallback()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+
+    // First collect the indices of the presets to update
+    // Then update them
+
+    int *indices = new int [list->GetNumberOfRows()];
+    int *ids = new int [list->GetNumberOfRows()];
+
+    int i, nb_selected_rows = list->GetSelectedRows(indices);
+    for (i = 0; i < nb_selected_rows; i++)
+      {
+      ids[i] = list->GetCellTextAsInt(indices[i], VTK_KW_WLPS_ID_COL);
+      }
+
+    for (i = 0; i < nb_selected_rows; i++)
+      {
+      this->InvokeUpdateWindowLevelPresetCommand(ids[i]);
+      }
+
+    delete [] indices;
+    delete [] ids;
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::PresetRemoveCallback()
 {
   if (this->PresetList)
@@ -1296,8 +1307,7 @@ void vtkKWWindowLevelPresetSelector::PresetRemoveCallback()
     int *indices = new int [list->GetNumberOfRows()];
     int *ids = new int [list->GetNumberOfRows()];
 
-    int nb_selected_rows = list->GetSelectedRows(indices);
-    int i;
+    int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
       ids[i] = list->GetCellTextAsInt(indices[i], VTK_KW_WLPS_ID_COL);
@@ -1410,6 +1420,28 @@ void vtkKWWindowLevelPresetSelector::InvokeAddWindowLevelPresetCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::SetUpdateWindowLevelPresetCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->UpdateWindowLevelPresetCommand, object, method);
+  this->Update(); // this show/hide the add button
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWWindowLevelPresetSelector::InvokeUpdateWindowLevelPresetCommand(
+  int id)
+{
+  if (this->UpdateWindowLevelPresetCommand && 
+      *this->UpdateWindowLevelPresetCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval %s %d", this->UpdateWindowLevelPresetCommand, id);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::SetApplyWindowLevelPresetCommand(
   vtkObject *object, const char *method)
 {
@@ -1461,12 +1493,22 @@ void vtkKWWindowLevelPresetSelector::Update()
       (this->AddWindowLevelPresetCommand && *this->AddWindowLevelPresetCommand)
       ? 1 : 0);
 
+    this->PresetButtons->SetWidgetVisibility(
+      VTK_KW_WLPS_BUTTON_UPDATE_ID, 
+      (this->UpdateWindowLevelPresetCommand && 
+       *this->UpdateWindowLevelPresetCommand)
+      ? 1 : 0);
+
     int has_selection = 
       (this->PresetList && 
        this->PresetList->GetWidget()->GetNumberOfSelectedCells());
     
     this->PresetButtons->GetWidget(
       VTK_KW_WLPS_BUTTON_REMOVE_ID)->SetEnabled(
+        has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+    this->PresetButtons->GetWidget(
+      VTK_KW_WLPS_BUTTON_UPDATE_ID)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
     }
 
