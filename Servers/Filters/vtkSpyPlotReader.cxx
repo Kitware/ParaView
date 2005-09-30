@@ -26,7 +26,7 @@
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkHierarchicalDataInformation.h"
+#include "vtkMultiGroupDataInformation.h"
 #include "vtkUniformGrid.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
@@ -49,7 +49,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.28");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.29");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -210,7 +210,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.28");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.29");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -2068,8 +2068,8 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
   
-  vtkHierarchicalDataInformation *compInfo
-    =vtkHierarchicalDataInformation::New();
+  vtkMultiGroupDataInformation *compInfo
+    =vtkMultiGroupDataInformation::New();
 
   vtkInformation *info=outputVector->GetInformationObject(0);
   info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION(),compInfo);
@@ -2359,12 +2359,12 @@ int vtkSpyPlotReader::RequestData(
     }
 
 
-  vtkHierarchicalDataInformation *compInfo=
-    vtkHierarchicalDataInformation::SafeDownCast(
+  vtkMultiGroupDataInformation *compInfo=
+    vtkMultiGroupDataInformation::SafeDownCast(
       info->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION()));
 
   hb->Initialize(); // remove all previous blocks
-  hb->SetHierarchicalDataInformation(compInfo);
+  hb->SetMultiGroupDataInformation(compInfo);
   
   //int numFiles = this->Map->Files.size();
 
@@ -3402,69 +3402,6 @@ int vtkSpyPlotReader::RequestData(
     ++level;
     }
 #endif
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotReader::SetUpdateBlocks(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
-{
-  // See vtkCompositeDataPipeline class doc for explanations.
-  
-  vtkInformation *info=outputVector->GetInformationObject(0);
-  vtkHierarchicalDataInformation *compositeInfo=
-    vtkHierarchicalDataInformation::SafeDownCast(info->Get(
-      vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION()));
-  
-  if (!compositeInfo)
-    {
-    vtkErrorMacro("Composite information not found. ");
-    return 0;
-    }
-
-  vtkHierarchicalDataInformation *updateInfo=
-    vtkHierarchicalDataInformation::New();
-  info->Set(vtkCompositeDataPipeline::UPDATE_BLOCKS(), updateInfo);
-  updateInfo->Delete();
-  
-  int numLevels=compositeInfo->GetNumberOfLevels();
-  
-  vtkDataObject *doOutput=info->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET());
-  vtkHierarchicalDataSet *hb=vtkHierarchicalDataSet::SafeDownCast(doOutput); 
-  
-  updateInfo->SetNumberOfLevels(numLevels);
-  int level=0;
-  while(level<numLevels)
-    {
-    int numBlocks=compositeInfo->GetNumberOfDataSets(level);
-    updateInfo->SetNumberOfDataSets(level,numBlocks);
-    
-    // find the first index
-    int i=0;
-    int found=0;
-    while(!found && i<numBlocks)
-      {
-      found=hb->GetDataSet(level,i)!=0;
-      ++i;
-      }
-    if(found)
-      {
-      --i;
-      int done=0;
-      while(!done && i<numBlocks)
-        {
-        done=hb->GetDataSet(level,i)==0;
-        if(!done)
-          {
-          updateInfo->GetInformation(level,i)->Set(vtkCompositeDataPipeline::MARKED_FOR_UPDATE(),1);
-          }
-        ++i;
-        }
-      }
-    ++level;
-    }
   return 1;
 }
 
