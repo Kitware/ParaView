@@ -150,10 +150,6 @@ protected:
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);
 
-  virtual int SetUpdateBlocks(vtkInformation *request,
-                              vtkInformationVector **inputVector,
-                              vtkInformationVector *outputVector);
-
   // Callback registered with the SelectionObserver.
   static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
                                         void *clientdata, void *calldata);
