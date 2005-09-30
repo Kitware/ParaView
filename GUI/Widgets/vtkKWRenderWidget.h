@@ -119,6 +119,7 @@ public:
   // Description:
   // Event handlers and useful interactions
   virtual void MouseMove(int num, int x, int y);
+  virtual void MouseWheel(int delta);
   virtual void AButtonPress(int num, int x, int y, int ctrl, int shift);
   virtual void AButtonRelease(int num, int x, int y);
   virtual void AKeyPress(char key, int x, int y, int ctrl, int shift, char *keysym);

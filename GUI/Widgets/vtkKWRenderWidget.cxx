@@ -35,7 +35,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.103");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.104");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -463,6 +463,9 @@ void vtkKWRenderWidget::AddInteractionBindings()
   
     this->VTKWidget->SetBinding(
       "<Motion>", this, "MouseMove 0 %x %y");
+
+    this->VTKWidget->SetBinding(
+      "<MouseWheel>", this, "MouseWheel %D");
     }
 }
 
@@ -500,6 +503,7 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
     this->VTKWidget->RemoveBinding("<Control-KeyPress>");
 
     this->VTKWidget->RemoveBinding("<Motion>");
+    this->VTKWidget->RemoveBinding("<MouseWheel>");
     }
 }
 
@@ -508,6 +512,19 @@ void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
 {
   this->Interactor->SetEventPositionFlipY(x, y);
   this->Interactor->MouseMoveEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::MouseWheel(int delta)
+{
+  if (delta < 0)
+    {
+    this->Interactor->MouseWheelBackwardEvent();
+    }
+  else
+    {
+    this->Interactor->MouseWheelForwardEvent();
+    }
 }
 
 //----------------------------------------------------------------------------
