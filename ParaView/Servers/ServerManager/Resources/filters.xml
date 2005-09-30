@@ -2444,10 +2444,12 @@
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
+            <DataType value="vtkMultiGroupDataSet"/>
           </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_group" multiplicity="single"/>
+          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
+          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
           <InputArrayDomain name="input_array" attribute_type="point"/>
      </InputProperty>
 
