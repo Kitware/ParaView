@@ -122,6 +122,11 @@ public:
   vtkGetMacro(InterpolationTypeVisibility, int);
 
   // Description:
+  // Get the bottom frame, a frame that is always packed at the bottom of
+  // the whole widget, and can be used to add more user-defined widgets
+  vtkGetObjectMacro(BottomFrame, vtkKWFrame);
+
+  // Description:
   // Set/Get the material widget + enable shading visibility
   vtkBooleanMacro(MaterialPropertyVisibility, int);
   virtual void SetMaterialPropertyVisibility(int);
@@ -129,20 +134,24 @@ public:
 
   // Description:
   // Set the material property button position to the top frame (default)
-  // or to the scalar opacity or color user frame.
+  // or to the scalar opacity user frame, or color user frame.
   //BTX
   enum
   {
-    MaterialPropertyPositionTopFrame,
+    MaterialPropertyPositionTop,
+    MaterialPropertyPositionBottomFrame,
     MaterialPropertyPositionScalarOpacityUserFrame,
     MaterialPropertyPositionScalarColorUserFrame
   };
   //ETX
   virtual void SetMaterialPropertyPosition(int);
   vtkGetMacro(MaterialPropertyPosition, int);
-  virtual void SetMaterialPropertyPositionToTopFrame()
+  virtual void SetMaterialPropertyPositionToTop()
     { this->SetMaterialPropertyPosition(
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame); };
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionTop); };
+  virtual void SetMaterialPropertyPositionToBottomFrame()
+    { this->SetMaterialPropertyPosition(
+      vtkKWVolumePropertyWidget::MaterialPropertyPositionBottomFrame); };
   virtual void SetMaterialPropertyPositionToScalarOpacityUserFrame()
     { this->SetMaterialPropertyPosition(
       vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarOpacityUserFrame); };
@@ -236,7 +245,7 @@ public:
   virtual void ComponentWeightChangingCallback(int index);
 
   // Description:
-  // Access to the editors
+  // Access the objects
   vtkGetObjectMacro(ScalarOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
   vtkGetObjectMacro(ScalarColorFunctionEditor, vtkKWColorTransferFunctionEditor);
   vtkGetObjectMacro(GradientOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
@@ -304,6 +313,7 @@ protected:
   vtkKWPiecewiseFunctionEditor        *GradientOpacityFunctionEditor;
   vtkKWMenuButton                     *EnableGradientOpacityOptionMenu;
   vtkKWScaleWithEntrySetWithLabel     *ComponentWeightScaleSet;
+  vtkKWFrame                          *BottomFrame;
 
   int                                 LockOpacityAndColor[VTK_MAX_VRCOMP];
   int                                 WindowLevelMode[VTK_MAX_VRCOMP];

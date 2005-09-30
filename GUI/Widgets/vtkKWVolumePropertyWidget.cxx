@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.28");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.29");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->MaterialPropertyVisibility        = 1;
   this->GradientOpacityFunctionVisibility = 1;
   this->ComponentWeightsVisibility        = 1;
-  this->MaterialPropertyPosition   = vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame;
+  this->MaterialPropertyPosition   = vtkKWVolumePropertyWidget::MaterialPropertyPositionTop;
 
   this->UseScalarColorFunctionInScalarOpacityEditor        = 0;
 
@@ -117,6 +117,8 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->ScalarColorFunctionEditor = 
     vtkKWColorTransferFunctionEditor::New();
+
+  this->BottomFrame                  = vtkKWFrame::New();
 
   for (i = 0; i < VTK_MAX_VRCOMP; i++)
     {
@@ -236,6 +238,12 @@ vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
     this->HSVColorSelector = NULL;
     }
 
+  if (this->BottomFrame)
+    {
+    this->BottomFrame->Delete();
+    this->BottomFrame = NULL;
+    }
+
   this->SetHistogramSet(NULL);
   this->SetVolumeProperty(NULL);
   this->SetDataSet(NULL);
@@ -331,7 +339,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Material properties : widget
 
-  this->MaterialPropertyWidget->SetParent(this);
+  if (!this->MaterialPropertyWidget->GetParent())
+    {
+    this->MaterialPropertyWidget->SetParent(this);
+    }
   this->MaterialPropertyWidget->PopupModeOn();
   this->MaterialPropertyWidget->Create(app);
   this->MaterialPropertyWidget->GetPopupButton()->SetLabelWidth(label_width);
@@ -577,6 +588,12 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
   cout << "lock: " << this->LockOpacityAndColorCheckButton->GetTclName() << endl;
 #endif
 
+  // --------------------------------------------------------------
+  // Bottom frame
+
+  this->BottomFrame->SetParent(frame);
+  this->BottomFrame->Create(app);
+
   // Sync
 
   vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
@@ -624,6 +641,7 @@ void vtkKWVolumePropertyWidget::Pack()
   const char *colspan = " -columnspan 2 ";
   const char *col0 = " -column 0 ";
   const char *col1 = " -column 1 ";
+  const char *padx = " -padx 2";
   const char *pad = " -padx 2 -pady 2";
   const char *pad_ed = " -padx 2 -pady 3";
   
@@ -642,6 +660,7 @@ void vtkKWVolumePropertyWidget::Pack()
          |     CTF ------->
          |     GOF ------->
          |     CW  ------->
+         |     BF  ------->
   */
 
   // Inner Frame
@@ -676,22 +695,34 @@ void vtkKWVolumePropertyWidget::Pack()
 
   // Material Property (MP)
 
-  if (this->MaterialPropertyPosition == 
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame)
+  if (!this->MaterialPropertyVisibility)
     {
-    if (this->MaterialPropertyVisibility)
-      {
-      tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
-             << " -side top -anchor nw " << pad << " -in " 
-             << this->InnerLeftFrame->GetWidgetName() << endl;
-      }
-    this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOn();
+    tk_cmd << "pack forget " << this->MaterialPropertyWidget->GetWidgetName()
+           << endl;
     }
-  else
+  else 
     {
-    this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOff();
-    if (this->MaterialPropertyVisibility)
+    if (this->MaterialPropertyPosition == 
+        vtkKWVolumePropertyWidget::MaterialPropertyPositionTop ||
+      this->MaterialPropertyPosition == 
+        vtkKWVolumePropertyWidget::MaterialPropertyPositionBottomFrame)
       {
+      this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOn();
+      tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
+             << " -side top -anchor nw " << pad << " -in ";
+      if (this->MaterialPropertyPosition == 
+          vtkKWVolumePropertyWidget::MaterialPropertyPositionTop)
+        {
+        tk_cmd << this->InnerLeftFrame->GetWidgetName() << endl;
+        }
+      else
+        {
+        tk_cmd << this->BottomFrame->GetWidgetName() << endl;
+        }
+      }
+    else
+      {
+      this->MaterialPropertyWidget->GetPopupButton()->LabelVisibilityOff();
       tk_cmd << "pack " << this->MaterialPropertyWidget->GetWidgetName()
              << " -side right -fill both -padx 2 -pady 0 -in ";
       if (this->MaterialPropertyPosition == 
@@ -700,18 +731,12 @@ void vtkKWVolumePropertyWidget::Pack()
         tk_cmd << 
           this->ScalarOpacityFunctionEditor->GetUserFrame()->GetWidgetName();
         }
-      else if (this->MaterialPropertyPosition == 
-         vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame)
+      else
         {
         tk_cmd << 
           this->ScalarColorFunctionEditor->GetUserFrame()->GetWidgetName();
         }
       tk_cmd << endl;
-      }
-    else
-      {
-      tk_cmd << "pack forget " << this->MaterialPropertyWidget->GetWidgetName()
-             << endl;
       }
     }
   
@@ -789,6 +814,11 @@ void vtkKWVolumePropertyWidget::Pack()
 
     row++;
     }
+
+  tk_cmd << "grid " << this->BottomFrame->GetWidgetName()
+         << " -sticky ew -column 0 -row " << row << colspan << endl;
+
+  row++;
 
   // Make sure it can resize
 
@@ -1298,6 +1328,7 @@ void vtkKWVolumePropertyWidget::UpdateEnableState()
   this->PropagateEnableState(this->GradientOpacityFunctionEditor);
   this->PropagateEnableState(this->ComponentWeightScaleSet);
   this->PropagateEnableState(this->HSVColorSelector);
+  this->PropagateEnableState(this->BottomFrame);
 }
 
 //----------------------------------------------------------------------------
@@ -1571,9 +1602,9 @@ void vtkKWVolumePropertyWidget::SetMaterialPropertyVisibility(int arg)
 //----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetMaterialPropertyPosition(int arg)
 {
-  if (arg < vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame)
+  if (arg < vtkKWVolumePropertyWidget::MaterialPropertyPositionTop)
     {
-    arg = vtkKWVolumePropertyWidget::MaterialPropertyPositionTopFrame;
+    arg = vtkKWVolumePropertyWidget::MaterialPropertyPositionTop;
     }
   else if (arg > 
      vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame)
