@@ -7,20 +7,12 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _pqTests_h
-#define _pqTests_h
+#ifndef _pqTestCases_h
+#define _pqTestCases_h
+
+#include <QObject>
 
 class QWidget;
-
-/// Given a root widget, returns a child widget by name (treating the input string as a hierarchical "path")
-QWidget* pqLookupWidget(QWidget& Widget, const char* Name);
-
-/// Runs regression tests that do not require a UI
-void pqRunRegressionTests();
-/// Runs regression tests that require a UI
-void pqRunRegressionTests(QWidget& RootWidget);
-
-#include <QtCore/QObject>
 
 class pqTestTestingFramework :
   public QObject
@@ -38,10 +30,7 @@ class pqTestFileMenu :
   Q_OBJECT
   
 public:
-  pqTestFileMenu(QWidget& RootWidget) :
-    rootWidget(RootWidget)
-  {
-  }
+  pqTestFileMenu(QWidget& RootWidget);
 
 private:
   QWidget& rootWidget;
@@ -51,5 +40,5 @@ private slots:
   void testFileOpen();
 };
 
-#endif // !_pqTests_h
+#endif // !_pqTestCases_h
 

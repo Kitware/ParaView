@@ -38,13 +38,18 @@ INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/ParaView/Servers/ServerManager
   ${ParaQ_SOURCE_DIR}/ParaView/Utilities/VTKClientServer
   ${QT_TEST_INCLUDE_DIR}
+  ${QT_TEST_INCLUDE_DIR}/..
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMainWindow.h
   pqServerFileBrowser.h
   pqServerFileBrowserList.h
-  pqTests.h
+  pqTestCases.h
+)
+
+ADD_DEFINITIONS(
+  -DQT3_SUPPORT
 )
 
 ADD_EXECUTABLE(pqClient
@@ -63,8 +68,10 @@ ADD_EXECUTABLE(pqClient
   pqServerFileBrowser.h
   pqServerFileBrowserList.cxx
   pqServerFileBrowserList.h
-  pqTests.cxx
-  pqTests.h
+  pqTestCases.cxx
+  pqTestCases.h
+  pqTesting.cxx
+  pqTesting.h
   ${MOC_BUILT_SOURCES}
 )
 

@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*
  * Copyright 2004 Sandia Corporation.
  * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
@@ -9,12 +7,15 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _pqCamera_h
-#define _pqCamera_h
+#ifndef _pqTesting_h
+#define _pqTesting_h
 
-class vtkSMRenderModuleProxy;
+class QWidget;
 
-void pqResetCamera(vtkSMRenderModuleProxy* RenderModule);
-void pqRedrawCamera(vtkSMRenderModuleProxy* RenderModule);
+/// Runs regression tests that do not require a UI
+void pqRunRegressionTests();
+/// Runs regression tests that require a UI
+void pqRunRegressionTests(QWidget& RootWidget);
 
-#endif //_pqCamera_h
+#endif // !_pqTesting_h
+

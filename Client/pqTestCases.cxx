@@ -7,7 +7,7 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqTests.h"
+#include "pqTestCases.h"
 
 #include <vtkstd/string>
 
@@ -21,6 +21,7 @@
 namespace
 {
 
+/// Given a Qt object, lookup a child object by name, treating the name as a hierarchical "path"
 template<typename T>
 T* pqLookupObject(QObject& Object, const char* Name)
 {
@@ -60,55 +61,40 @@ bool pqActivate(QAbstractButton* Button)
   return Button ? true : false;
 }
 
-
-template<typename TestT>
-void pqRunRegressionTest()
-{
-  TestT test;
-  QtTest::exec(&test);
-}
-
-template<typename TestT>
-void pqRunRegressionTest(QWidget& RootWidget)
-{
-  TestT test(RootWidget);
-  QtTest::exec(&test);
-}
-
 } // namespace
 
 
+/////////////////////////////////////////////////////////////////////////
+// pqTestTestingFramework
 
 void pqTestTestingFramework::testSuccess()
 {
   COMPARE(true, true);
 }
-  
+
 void pqTestTestingFramework::testFailure()
 {
   EXPECT_FAIL("", "Deliberate failure", Continue);
   COMPARE(true, false);
 }
 
+//////////////////////////////////////////////////////////////////////////
+// pqTestFileMenu
+
+pqTestFileMenu::pqTestFileMenu(QWidget& RootWidget) :
+  rootWidget(RootWidget)
+{
+}
+
 void pqTestFileMenu::testFileMenu()
 {
   VERIFY(pqLookupObject<QWidget>(rootWidget, "menuBar/fileMenu"));
 }
-  
+
 void pqTestFileMenu::testFileOpen()
 {
   VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "fileOpenAction")));
   VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenBrowser"));
   VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenBrowser/buttonCancel")));
-}
-
-void pqRunRegressionTests()
-{
-  pqRunRegressionTest<pqTestTestingFramework>();
-}
-
-void pqRunRegressionTests(QWidget& RootWidget)
-{
-  pqRunRegressionTest<pqTestFileMenu>(RootWidget);
 }
 

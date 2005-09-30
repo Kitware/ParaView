@@ -12,7 +12,7 @@
 #include "pqParts.h"
 #include "pqServer.h"
 #include "pqServerFileBrowser.h"
-#include "pqTests.h"
+#include "pqTesting.h"
 
 #include <QApplication>
 #include <QMenu>
@@ -27,6 +27,7 @@
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMStringVectorProperty.h>
 
 namespace
 {
@@ -95,64 +96,26 @@ void pqMainWindow::onFileOpen()
 
 void pqMainWindow::onFileOpen(const QString& File)
 {
-  vtkSMProxyManager* proxyM = this->Server->GetProxyManager();
-  
-  // Here we create a simple pipeline
-
-  // vector text source (see
-  // ParaView/Servers/ServerManager/Resources/sources.xml and filters.xml)
-  vtkSMProxy *source = proxyM->NewProxy("sources", "CylinderSource");
-  proxyM->RegisterProxy("my proxies", "source1", source);
+  // Create a source ... see ParaView/Servers/ServerManager/Resources/sources.xml
+  vtkSMProxy* const source = this->Server->GetProxyManager()->NewProxy("sources", "ExodusReader");
+  this->Server->GetProxyManager()->RegisterProxy("paraq", "source1", source);
   source->Delete();
-  // Set the value of the Resolution property.  It just so happens that
-  // both ConeSource and CylinderSource have a Resolution property.
-  vtkSMIntVectorProperty::SafeDownCast(source->GetProperty("Resolution"))->SetElement(0, 64);
+  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FileName"))->SetElement(0, File.ascii());
+  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePrefix"))->SetElement(0, File.ascii());
+  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePattern"))->SetElement(0, "%s");
   source->UpdateVTKObjects();
-
-  // apply a normals filter
-  vtkSMProxy *normals = proxyM->NewProxy("filters", "PolyDataNormals");
-  proxyM->RegisterProxy("my proxies", "normals1", normals);
-  normals->Delete();
-  // connect the filter
-  vtkSMProxyProperty *input
-    = vtkSMProxyProperty::SafeDownCast(normals->GetProperty("Input"));
-  input->AddProxy(source);
-  normals->UpdateVTKObjects();
-
-  // Get a render module.  This sets up the parallel rendering process.
-  // If you want to specify a render module, call SetRenderModule in
-  // options to the name of the render module class minus the vtkPV prefix
-  // before calling pqApplication::Initialize.
-  vtkSMRenderModuleProxy *rm = this->Server->GetRenderModule();
-
-  // Turn on compositing for all data for demonstration.  This is controlled
-  // by a CompositeThreshold property on compositing render modules.  If the
-  // property is not there, it must not be a compositing render module.
-  vtkSMDoubleVectorProperty *ctprop
-    = vtkSMDoubleVectorProperty
-      ::SafeDownCast(rm->GetProperty("CompositeThreshold"));
-  if (ctprop)
-    {
-    ctprop->SetElement(0, 0.0);
-    }
-  // Also bump up the reduction factor on compositing modules.
-  vtkSMIntVectorProperty *rfprop
-    = vtkSMIntVectorProperty::SafeDownCast(rm->GetProperty("ReductionFactor"));
-  if (rfprop)
-    {
-    rfprop->SetElement(0, 4);
-    }
-
-  // Add the end of our pipeline as a part in the display.
-  pqAddPart(Server, vtkSMSourceProxy::SafeDownCast(normals));
+  
+  pqAddPart(Server, vtkSMSourceProxy::SafeDownCast(source));
 
   // Create a render window ...  
   vtkRenderWindow* const render_window = this->Server->GetRenderModule()->GetRenderWindow();
-  render_window->SetWindowName("ParaQ");
+  render_window->SetWindowName("ParaQ Client");
   render_window->SetPosition(500, 500);
+  render_window->SetSize(640, 480);
   render_window->Render();  
 
-  pqResetCamera(*Server);
+  pqResetCamera(Server->GetRenderModule());
+  pqRedrawCamera(Server->GetRenderModule());
 }
 
 void pqMainWindow::onDebugHierarchy()

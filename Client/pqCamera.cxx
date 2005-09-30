@@ -14,15 +14,21 @@
 
 #include <vtkSMRenderModuleProxy.h>
 
-void pqResetCamera(pqServer& Server)
+void pqResetCamera(vtkSMRenderModuleProxy* RenderModule)
 {
   double bounds[6];
-  Server.GetRenderModule()->ComputeVisiblePropBounds(bounds);
+  RenderModule->ComputeVisiblePropBounds(bounds);
   
   if (   (bounds[0] <= bounds[1])
       && (bounds[2] <= bounds[3])
       && (bounds[4] <= bounds[5]) )
     {
-    Server.GetRenderModule()->ResetCamera(bounds);
+    RenderModule->ResetCamera(bounds);
     }
 }
+
+void pqRedrawCamera(vtkSMRenderModuleProxy* RenderModule)
+{
+  RenderModule->StillRender();
+}
+
