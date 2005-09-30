@@ -2184,6 +2184,11 @@ The Pick filter operates on any type of data and produces unstructured grid outp
         <GroupRequirement quantity="Single"/>
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
+      <Input name="Source"
+             class="vtkMultiGroupDataSet">
+        <GroupRequirement quantity="Single"/>
+        <ArrayRequirement attribute="Point" components="1"/>
+      </Input>
     </Filter>
     <InputMenu trace_name="Source" property="Source"
                id="im"
