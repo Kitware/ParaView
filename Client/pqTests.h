@@ -20,5 +20,36 @@ void pqRunRegressionTests();
 /// Runs regression tests that require a UI
 void pqRunRegressionTests(QWidget& RootWidget);
 
+#include <QtCore/QObject>
+
+class pqTestTestingFramework :
+  public QObject
+{
+  Q_OBJECT
+
+private slots:
+  void testSuccess();
+  void testFailure();
+};
+
+class pqTestFileMenu :
+  public QObject
+{
+  Q_OBJECT
+  
+public:
+  pqTestFileMenu(QWidget& RootWidget) :
+    rootWidget(RootWidget)
+  {
+  }
+
+private:
+  QWidget& rootWidget;
+
+private slots:
+  void testFileMenu();
+  void testFileOpen();
+};
+
 #endif // !_pqTests_h
 

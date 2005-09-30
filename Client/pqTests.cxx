@@ -60,51 +60,6 @@ bool pqActivate(QAbstractButton* Button)
   return Button ? true : false;
 }
 
-class pqTestTestingFramework :
-  public QObject
-{
-  Q_OBJECT
-
-private slots:
-  void testSuccess()
-  {
-    COMPARE(true, true);
-  }
-  
-  void testFailure()
-  {
-    EXPECT_FAIL("", "Deliberate failure", Continue);
-    COMPARE(true, false);
-  }
-};
-
-class pqTestFileMenu :
-  public QObject
-{
-  Q_OBJECT
-  
-public:
-  pqTestFileMenu(QWidget& RootWidget) :
-    rootWidget(RootWidget)
-  {
-  }
-
-private:
-  QWidget& rootWidget;
-
-private slots:
-  void testFileMenu()
-  {
-    VERIFY(pqLookupObject<QWidget>(rootWidget, "menuBar/fileMenu"));
-  }
-  
-  void testFileOpen()
-  {
-    VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "fileOpenAction")));
-    VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenBrowser"));
-    VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenBrowser/buttonCancel")));
-  }
-};
 
 template<typename TestT>
 void pqRunRegressionTest()
@@ -122,6 +77,31 @@ void pqRunRegressionTest(QWidget& RootWidget)
 
 } // namespace
 
+
+
+void pqTestTestingFramework::testSuccess()
+{
+  COMPARE(true, true);
+}
+  
+void pqTestTestingFramework::testFailure()
+{
+  EXPECT_FAIL("", "Deliberate failure", Continue);
+  COMPARE(true, false);
+}
+
+void pqTestFileMenu::testFileMenu()
+{
+  VERIFY(pqLookupObject<QWidget>(rootWidget, "menuBar/fileMenu"));
+}
+  
+void pqTestFileMenu::testFileOpen()
+{
+  VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "fileOpenAction")));
+  VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenBrowser"));
+  VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenBrowser/buttonCancel")));
+}
+
 void pqRunRegressionTests()
 {
   pqRunRegressionTest<pqTestTestingFramework>();
@@ -131,6 +111,4 @@ void pqRunRegressionTests(QWidget& RootWidget)
 {
   pqRunRegressionTest<pqTestFileMenu>(RootWidget);
 }
-
-#include "moc_pqTests.cxx"
 
