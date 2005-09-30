@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithSpinButtons);
-vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.2");
+vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.3");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithSpinButtons::@WidgetType@WithSpinButtons()
@@ -103,7 +103,7 @@ void @WidgetType@WithSpinButtons::Pack()
   if (this->Widget && this->Widget->IsCreated())
     {
     tk_cmd << "pack " << this->Widget->GetWidgetName() 
-           << " -anchor nw -side left -fill x -expand y" << endl;
+           << " -anchor nw -side left -fill both -expand y" << endl;
     }
 
   if (this->SpinButtons && this->SpinButtons->IsCreated())
