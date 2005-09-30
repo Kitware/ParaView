@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.67");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.68");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -387,7 +387,8 @@ int vtkPVReaderModule::GetNumberOfTimeSteps()
   vtkPVScale* pvScale = vtkPVScale::SafeDownCast(pvWidget);
   if (pvScale)
     {
-    return static_cast<int>(pvScale->GetRangeMax() - pvScale->GetRangeMin());
+    // We want to return the max - min + 1.  That gives the total number of time steps.
+    return static_cast<int>(pvScale->GetRangeMax() - pvScale->GetRangeMin() + 1);
     }
 
   vtkPVSelectTimeSet* pvSelectTimeSet = vtkPVSelectTimeSet::SafeDownCast(
