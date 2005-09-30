@@ -1,11 +1,16 @@
 PROJECT(Client)
 
-SET(QT_INCLUDE_DIR "c:\\qt\\4.0.1\\include" CACHE PATH "The top-level path to the Qt4 headers")
-SET(QT_LIBRARIES_DIR "c:\\qt\\4.0.1\\lib" CACHE PATH "The path to the Qt4 libraries")
+SET(QT_INCLUDE_DIR "c:/qt/4.0.1/include" CACHE PATH "The top-level path to the Qt4 headers")
+SET(QT_LIBRARIES_DIR "c:/qt/4.0.1/lib" CACHE PATH "The path to the Qt4 libraries")
 SET(QT_LIBRARIES qtcore4.lib qtgui4.lib qt3support4.lib)
-SET(QT_MOC_EXECUTABLE "c:\\qt\\4.0.1\\bin\\moc.exe" CACHE FILEPATH "The Qt MOC binary")
+SET(QT_MOC_EXECUTABLE "c:/qt/4.0.1/bin/moc.exe" CACHE FILEPATH "The Qt MOC binary")
+
+SET(QT_TEST_INCLUDE_DIR "c:/qt/4.0.1/solutions/qttestlib/src" CACHE PATH "The top-level path to the QtTest4 headers")
+SET(QT_TEST_LIBRARIES_DIR "c:/qt/4.0.1/solutions/qttestlib/src/release" CACHE PATH "The path to the QtTest4 libraries")
+SET(QT_TEST_LIBRARIES qttest2.lib)
 
 INCLUDE_DIRECTORIES(
+  ${ParaQ_BINARY_DIR}/Client
   ${ParaQ_BINARY_DIR}/ParaView
   ${ParaQ_BINARY_DIR}/ParaView/VTK
   ${ParaQ_BINARY_DIR}/ParaView/Servers/Common
@@ -25,16 +30,18 @@ INCLUDE_DIRECTORIES(
   ${QT_INCLUDE_DIR}/QtCore
   ${QT_INCLUDE_DIR}/QtGui
   ${QT_INCLUDE_DIR}/Qt3Support
+  ${QT_TEST_INCLUDE_DIR}
+  ${QT_TEST_INCLUDE_DIR}/QtTest
 )
 
-SET(MOC_SOURCES
+QT_WRAP_CPP(pqClient MOC_BUILT_SOURCES
   pqMainWindow.h
   pqServerFileBrowser.h
   pqServerFileBrowserList.h
 )
 
-QT_WRAP_CPP(pqClient MOC_OUTPUT
-  MOC_SOURCES
+QT_WRAP_CPP(pqClient MOC_UNBUILT_SOURCES
+  pqTests.cxx
 )
 
 ADD_DEFINITIONS(
@@ -43,25 +50,28 @@ ADD_DEFINITIONS(
 
 ADD_EXECUTABLE(pqClient
   main.cxx
-  pqApplication.cxx
-  pqApplication.h
+  pqCamera.cxx
+  pqCamera.h
   pqMainWindow.cxx
   pqMainWindow.h
   pqOptions.cxx
   pqOptions.h
-  pqProcessModuleGUIHelper.cxx
-  pqProcessModuleGUIHelper.h
+  pqParts.cxx
+  pqParts.h
   pqServer.cxx
   pqServer.h
   pqServerFileBrowser.cxx
   pqServerFileBrowser.h
   pqServerFileBrowserList.cxx
   pqServerFileBrowserList.h
-  ${MOC_OUTPUT}
+  pqTests.cxx
+  pqTests.h
+  ${MOC_BUILT_SOURCES}
 )
 
-LINK_DIRECTORIES(pqClient
+LINK_DIRECTORIES(
   ${QT_LIBRARIES_DIR}
+  ${QT_TEST_LIBRARIES_DIR}
 )
 
 TARGET_LINK_LIBRARIES(pqClient
@@ -117,4 +127,5 @@ TARGET_LINK_LIBRARIES(pqClient
   vtkzlib.lib
   wsock32.lib
   ${QT_LIBRARIES}
+  ${QT_TEST_LIBRARIES}
 )

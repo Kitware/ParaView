@@ -457,7 +457,10 @@ void pqServerFileBrowserList::home()
 static const int autoopenTime = 750;
 
 
-
+QString pqServerFileBrowserList::getCurrentPath()
+{
+  return fullPath(currentItem());
+}
 
 QString pqServerFileBrowserList::fullPath(Q3ListViewItem* item)
 {

@@ -3,19 +3,28 @@
 
 #include "pqServerFileBrowserBase.ui.h"
 
+class pqServer;
+
 class pqServerFileBrowser :
   public QDialog
 {
   Q_OBJECT
 
 public:
-  pqServerFileBrowser();
-  
-public slots:
-  void onFileSelected(const QString&);
+  pqServerFileBrowser(pqServer& Server, QWidget* Parent = 0, const char* const Name = 0);
+
+signals:
+  void fileSelected(const QString&);
   
 private:
+  ~pqServerFileBrowser() {};
+  
   Ui::pqServerFileBrowserBase ui;
+ 
+private slots:
+  void onFileSelected(const QString&);
+  void accept();
+  void reject();
 };
 
 #endif // !_pqServerFileBrowser_h

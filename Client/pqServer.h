@@ -10,10 +10,24 @@
 #ifndef _pqServer_h
 #define _pqServer_h
 
-class vtkSMApplication;
+class vtkProcessModule;
+class vtkSMProxyManager;
+class vtkSMRenderModuleProxy;
 
-vtkSMApplication* GetServer();
-void FinalizeServer();
+class pqServer
+{
+public:
+  pqServer();
+  ~pqServer();
+
+  vtkProcessModule* GetProcessModule();
+  vtkSMProxyManager* GetProxyManager();
+  vtkSMRenderModuleProxy* GetRenderModule();
+  
+private:
+  class implementation;
+  implementation* const Implementation;
+};
 
 #endif // !_pqServer_h
 

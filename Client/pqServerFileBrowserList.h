@@ -39,12 +39,10 @@ public:
     ~pqServerFileBrowserList();
     
     void setProcessModule(vtkProcessModule *module);
-    QString fullPath(Q3ListViewItem* item);
-
+    QString getCurrentPath();
 
 signals:
     void fileSelected( const QString & );
-
 
 public slots:
     void upDir();
@@ -55,6 +53,7 @@ protected slots:
     void openFolder();
 
 private:
+    QString fullPath(Q3ListViewItem* item);
     void setDir(QString & ); 
     
     vtkProcessModule *mProcessModule;

@@ -1,3 +1,5 @@
+// -*- c++ -*-
+
 /*
  * Copyright 2004 Sandia Corporation.
  * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
@@ -7,31 +9,11 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _pqMainWindow_h
-#define _pqMainWindow_h
+#ifndef _pqCamera_h
+#define _pqCamera_h
 
-#include <QMainWindow>
-
-class pqOptions;
 class pqServer;
 
-class pqMainWindow :
-        public QMainWindow
-{
-  Q_OBJECT
+void pqResetCamera(pqServer& Server);
 
-public:
-  pqMainWindow(QApplication& Application);
-  
-private:
-  pqServer* const Server;
-
-private slots:
-  void onFileOpen();
-  void onFileOpen(const QString& File);
-  void onDebugHierarchy();
-  void onTestsRun();
-};
-
-#endif // !_pqMainWindow_h
-
+#endif //_pqCamera_h

@@ -9,19 +9,20 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqMainWindow.h"
+#include "pqCamera.h"
+#include "pqServer.h"
 
-#include <QApplication>
+#include <vtkSMRenderModuleProxy.h>
 
-//----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+void pqResetCamera(pqServer& Server)
 {
-  QApplication qapplication(argc, argv);
-  pqMainWindow qwindow(qapplication);
-  qwindow.resize(400, 400);
-  qwindow.show();
-  const int result = qapplication.exec();
+  double bounds[6];
+  Server.GetRenderModule()->ComputeVisiblePropBounds(bounds);
   
-  return result;
+  if (   (bounds[0] <= bounds[1])
+      && (bounds[2] <= bounds[3])
+      && (bounds[4] <= bounds[5]) )
+    {
+    Server.GetRenderModule()->ResetCamera(bounds);
+    }
 }
-
