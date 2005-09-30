@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.20");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -290,7 +290,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app)
     
     this->PopupButton->SetParent(this);
     this->PopupButton->Create(app);
-    this->PopupButton->GetLabel()->SetText("Edit material:");
+    this->PopupButton->GetLabel()->SetText("Material:");
     this->PopupButton->GetWidget()->SetText("");
     this->PopupButton->GetWidget()->SetPopupTitle("Material Properties");
 
