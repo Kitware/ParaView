@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.29");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.30");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -641,7 +641,6 @@ void vtkKWVolumePropertyWidget::Pack()
   const char *colspan = " -columnspan 2 ";
   const char *col0 = " -column 0 ";
   const char *col1 = " -column 1 ";
-  const char *padx = " -padx 2";
   const char *pad = " -padx 2 -pady 2";
   const char *pad_ed = " -padx 2 -pady 3";
   
