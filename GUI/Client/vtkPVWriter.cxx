@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.24");
+vtkCxxRevisionMacro(vtkPVWriter, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -42,6 +42,7 @@ vtkPVWriter::vtkPVWriter()
   this->DataModeMethod = 0;
   this->Extensions = vtkVector<const char*>::New();
   this->Iterator = this->Extensions->NewIterator();
+  this->SupportsTime = 0;
 }
 
 //----------------------------------------------------------------------------

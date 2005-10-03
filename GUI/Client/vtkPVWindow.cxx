@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.769");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2634,15 +2634,19 @@ void vtkPVWindow::WriteData()
     // If the current source is a reader and can provide time steps, ask
     // the user whether to write the whole time series.
     int timeSeries = 0;
-    vtkPVReaderModule* reader =
-      vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
-    if(reader && (reader->GetNumberOfTimeSteps() > 1) &&
-       vtkKWMessageDialog::PopupYesNo(
-         this->GetApplication(), this, "Timesteps",
-         "The current source provides multiple time steps.  "
-         "Do you want to save all time steps?", 0))
+    if (wm->GetSupportsTime())
       {
-      timeSeries = 1;
+      vtkPVReaderModule* reader =
+        vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
+      if(reader && 
+         reader->GetNumberOfTimeSteps() > 1 &&
+         vtkKWMessageDialog::PopupYesNo(
+           this->GetApplication(), this, "Timesteps",
+           "The current source provides multiple time steps.  "
+           "Do you want to save all time steps?", 0))
+        {
+        timeSeries = 1;
+        }
       }
     
     // Choose ghost level.

@@ -38,7 +38,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.52");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.53");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -875,6 +875,13 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
   if(data_mode_method)
     {
     pwm->SetDataModeMethod(data_mode_method);
+    }
+
+  // Check if the writer supports time.
+  int supports_time;
+  if(we->GetScalarAttribute("supports_time", &supports_time))
+    {
+    pwm->SetSupportsTime(supports_time);
     }
 
   // Add the writer.
