@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.5");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -157,6 +157,8 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
     vtkErrorMacro("Cound not cast object to data information.");
     return;
     }
+
+  this->DataIsComposite = info->GetDataIsComposite();
 
   unsigned int otherNumGroups = info->Internal->DataInformation.size();
   unsigned int numGroups = this->Internal->DataInformation.size();
