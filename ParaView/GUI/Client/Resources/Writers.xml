@@ -3,6 +3,7 @@
          class="vtkPVDWriter"
          writer="vtkXMLPVDWriter"
          extensions=".pvd"
+         supports_time="1"
          file_description="ParaView Data Files"/>
  <Writer input="vtkPolyData" 
          class="vtkPVWriter"

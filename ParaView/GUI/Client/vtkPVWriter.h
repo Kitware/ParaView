@@ -101,7 +101,13 @@ public:
   // Write the data from the given source to the given file name.
   virtual void Write(const char* fileName, vtkPVSource* pvs,
                      int numProcs, int ghostLevel, int timeSeries);
-  
+
+  // Description:
+  // If the writer supports writing multiple time steps, set this
+  // to true. Set to false otherwise.
+  vtkSetMacro(SupportsTime, int);
+  vtkGetMacro(SupportsTime, int);
+
 protected:
   vtkPVWriter();
   ~vtkPVWriter();
@@ -121,6 +127,8 @@ protected:
   int Parallel;
   char* DataModeMethod;
   
+  int SupportsTime;
+
 private:
   vtkPVWriter(const vtkPVWriter&); // Not implemented
   void operator=(const vtkPVWriter&); // Not implemented
