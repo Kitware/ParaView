@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()
@@ -87,6 +87,15 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy)
     vtkErrorMacro("Input does not have associated composite data "
                   "information. Cannot verify domain.");
     return 0;
+    }
+
+  if (!di->GetCompositeDataClassName())
+    {
+    // This domain isn't applicable if the data is not composite, so don't
+    // even consider whether the number of groups is right.
+    // This case happens when the filter accepts input that may or may not be
+    // vtkMultiGroupDataSet.
+    return 1;
     }
 
   if (cdi->GetNumberOfGroups() > 1 && 
