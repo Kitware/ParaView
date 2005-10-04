@@ -58,7 +58,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.159");
+vtkCxxRevisionMacro(vtkPVProbe, "1.160");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -335,7 +335,7 @@ void vtkPVProbe::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVProbe::SetVisibilityNoTrace(int val)
 {
-  if (this->PlotDisplayProxy)
+  if (this->PlotDisplayProxy && this->ShowXYPlotToggle->GetSelectedState())
     {
     this->PlotDisplayProxy->SetVisibilityCM(val);
     }
