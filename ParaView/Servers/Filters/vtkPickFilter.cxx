@@ -33,7 +33,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.17");
+vtkCxxRevisionMacro(vtkPickFilter, "1.18");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -624,7 +624,7 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
     int myId = this->Controller->GetLocalProcessId();
     int numProcs = this->Controller->GetNumberOfProcesses();
     int mysize = numPoints;
-    int sizes[numProcs];
+    int *sizes = new int[numProcs];
     if (myId == 0)
       {
       sizes[0] = mysize;
@@ -648,6 +648,8 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
       {
       myStart = myStart + sizes[idx];
       }
+
+    delete[] sizes;
     }
 
   if (globalIds == 0)
@@ -755,7 +757,7 @@ int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx,
     int myId = this->Controller->GetLocalProcessId();
     int numProcs = this->Controller->GetNumberOfProcesses();
     int mysize = numCells;
-    int sizes[numProcs];
+    int *sizes = new int[numProcs];
     if (myId == 0)
       {
       sizes[0] = mysize;
@@ -779,6 +781,7 @@ int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx,
       {
       myStart = myStart + sizes[idx];
       }
+    delete[] sizes;
     }
 
   if (globalIds == 0)
