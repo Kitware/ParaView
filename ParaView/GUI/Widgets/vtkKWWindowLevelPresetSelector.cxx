@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkImagePermute.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
@@ -55,7 +56,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.8");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -956,19 +957,45 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
     }
 
   double factor;
-  vtkImageData *output;
+  vtkImageData *output, *input;
 
-  vtkImageResample *resample = vtkImageResample::New();
-  resample->SetInput(screenshot);
-  resample->SetInterpolationModeToCubic();
-  resample->SetDimensionality(2);
+  // Permute, as a convenience
+
+  int *screenshot_dims = screenshot->GetDimensions();
+  vtkImagePermute *permute = NULL;
+  if (screenshot_dims[2] != 1)
+    {
+    permute = vtkImagePermute::New();
+    permute->SetInput(screenshot);
+    if (screenshot_dims[0] == 1)
+      {
+      permute->SetFilteredAxes(1, 2, 0);
+      }
+    else
+      {
+      permute->SetFilteredAxes(0, 2, 1);
+      }
+    input = permute->GetOutput();
+    }
+  else
+    {
+    input = screenshot;
+    }
 
   // Create the thumbnail
 
-  factor = (double)this->ThumbnailSize / 
-    (double)screenshot->GetDimensions()[0];
+  input->Update();
+  int *input_dims = input->GetDimensions();
+  double *input_spacing = input->GetSpacing();
+
+  vtkImageResample *resample = vtkImageResample::New();
+  resample->SetInput(input);
+  resample->SetInterpolationModeToCubic();
+  factor = (double)this->ThumbnailSize / (double)input_dims[0];
   resample->SetAxisMagnificationFactor(0, factor);
-  resample->SetAxisMagnificationFactor(1, factor);
+  resample->SetAxisMagnificationFactor(
+    1, factor * (input_spacing[1] / input_spacing[0]));
+  resample->SetDimensionality(2);
   resample->Update();
   output = resample->GetOutput();
 
@@ -986,10 +1013,10 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
 
   // Create the screenshot
 
-  factor = (double)this->ScreenshotSize / 
-    (double)screenshot->GetDimensions()[0];
+  factor = (double)this->ScreenshotSize / (double)input_dims[0];
   resample->SetAxisMagnificationFactor(0, factor);
-  resample->SetAxisMagnificationFactor(1, factor);
+  resample->SetAxisMagnificationFactor(
+    1, factor * (input_spacing[1] / input_spacing[0]));
   resample->Update();
   output = resample->GetOutput();
 
@@ -1006,6 +1033,10 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
     vtkKWIcon::ImageOptionFlipVertical);
 
   resample->Delete();
+  if (permute)
+    {
+    permute->Delete();
+    }
 
   // Update the icon cell
 
