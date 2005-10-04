@@ -33,11 +33,9 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.16");
+vtkCxxRevisionMacro(vtkPickFilter, "1.17");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
-
-
 
 //-----------------------------------------------------------------------------
 vtkPickFilter::vtkPickFilter ()
@@ -614,21 +612,65 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
 {
   vtkIdType bestId = -1;
   vtkIdType pointId, numPoints;
+  vtkIdType myStart = -1;
 
   vtkDataArray* globalIds;
   globalIds = input->GetPointData()->GetArray(this->GlobalIdArrayName);
   numPoints = input->GetNumberOfPoints();
 
+  if (globalIds == 0 && this->Controller)
+    {
+    //In parallel runs, fake a globalId array if none exists
+    int myId = this->Controller->GetLocalProcessId();
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int mysize = numPoints;
+    int sizes[numProcs];
+    if (myId == 0)
+      {
+      sizes[0] = mysize;
+      for (int idx = 1; idx < numProcs; ++idx)
+        {
+        this->Controller->Receive(&sizes[idx], 1, idx, vtkProcessModule::PickMakeGIDs);
+        }
+      for (int idx = 1; idx < numProcs; ++idx)
+        {
+        this->Controller->Send(&sizes[0], numProcs, idx, vtkProcessModule::PickMakeGIDs);
+        }
+      }
+    else
+      {
+      this->Controller->Send(&mysize, 1, 0, vtkProcessModule::PickMakeGIDs);
+      this->Controller->Receive(&sizes[0], numProcs, 0, vtkProcessModule::PickMakeGIDs);          
+      }
+    
+    myStart = 0;
+    for (int idx = 0; idx < myId; idx++)
+      {
+      myStart = myStart + sizes[idx];
+      }
+    }
+
   if (globalIds == 0)
     {
-    if (this->Id >= 0 && this->Id < numPoints)
+    if (myStart != -1)
       {
-      bestId = this->Id;
+      bestId = this->Id - myStart;
+      if (bestId < 0 || bestId >= numPoints)
+        {
+        bestId = -1;
+        }
+      }
+    else
+      {
+      if (this->Id >= 0 && this->Id < numPoints)
+        {
+        bestId = this->Id;
+        }
       }
     }
   else
     { // search for the id in the global id array.
-    for (pointId=0; pointId < numPoints; pointId++)
+    for (pointId=0; pointId < numPoints && pointId < globalIds->GetNumberOfTuples(); pointId++)
       {
       if (globalIds->GetComponent(pointId,0) == this->Id)
         { // This assumes that there is only one point with the global id.
@@ -701,16 +743,60 @@ int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx,
   vtkIdType cellId;
   vtkIdType numCells;
   vtkIdType bestId = -1;
+  vtkIdType myStart = -1;
 
   vtkDataArray* globalIds;
   globalIds = input->GetCellData()->GetArray(this->GlobalIdArrayName);
   numCells = input->GetNumberOfCells();
 
+  if (globalIds == 0 && this->Controller)
+    {
+    //In parallel runs, fake a globalId array if none exists
+    int myId = this->Controller->GetLocalProcessId();
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int mysize = numCells;
+    int sizes[numProcs];
+    if (myId == 0)
+      {
+      sizes[0] = mysize;
+      for (int idx = 1; idx < numProcs; ++idx)
+        {
+        this->Controller->Receive(&sizes[idx], 1, idx, vtkProcessModule::PickMakeGIDs);
+        }
+      for (int idx = 1; idx < numProcs; ++idx)
+        {
+        this->Controller->Send(&sizes[0], numProcs, idx, vtkProcessModule::PickMakeGIDs);
+        }
+      }
+    else
+      {
+      this->Controller->Send(&mysize, 1, 0, vtkProcessModule::PickMakeGIDs);
+      this->Controller->Receive(&sizes[0], numProcs, 0, vtkProcessModule::PickMakeGIDs);          
+      }
+    
+    myStart = 0;
+    for (int idx = 0; idx < myId; idx++)
+      {
+      myStart = myStart + sizes[idx];
+      }
+    }
+
   if (globalIds == 0)
     {
-    if (this->Id >= 0 && this->Id < numCells)
+    if (myStart != -1)
       {
-      bestId = this->Id;
+      bestId = this->Id - myStart;
+      if (bestId < 0 || bestId >= numCells)
+        {
+        bestId = -1;
+        } 
+      }
+    else
+      {
+      if (this->Id >= 0 && this->Id < numCells)
+        {
+        bestId = this->Id;
+        }
       }
     }
   else

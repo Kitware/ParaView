@@ -272,7 +272,10 @@ public:
     DuplicatePDNRecLen,
     DuplicatePDNAllBuffers,
     IntegrateAttrInfo,
-    IntegrateAttrData
+    IntegrateAttrData,
+    PickMakeGIDs,
+    TemporalPickHasData,
+    TemporalPicksData
   };
 //ETX
 

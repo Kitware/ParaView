@@ -24,8 +24,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkVertex.h"
 #include "vtkAppendFilter.h"
+#include "vtkProcessModule.h"
 
-vtkCxxRevisionMacro(vtkTemporalPickFilter, "1.1");
+vtkCxxRevisionMacro(vtkTemporalPickFilter, "1.2");
 vtkStandardNewMacro(vtkTemporalPickFilter);
 
 vtkCxxSetObjectMacro(vtkTemporalPickFilter, Controller, vtkMultiProcessController);
@@ -214,10 +215,10 @@ int vtkTemporalPickFilter::RequestData(
   //This gathers the valid inputs to the root to be plotted.
   if (this->Controller->GetLocalProcessId() > 0)
     {
-    this->Controller->Send(&this->HasAllData, 1, 0, 250623);
+    this->Controller->Send(&this->HasAllData, 1, 0, vtkProcessModule::TemporalPickHasData);
     if (this->HasAllData)
       {
-      this->Controller->Send(this->History, 0, 250624);
+      this->Controller->Send(this->History, 0, vtkProcessModule::TemporalPicksData);
       }
     output->ReleaseData();
     }
@@ -233,11 +234,11 @@ int vtkTemporalPickFilter::RequestData(
     for (int idx = 1; idx < numProcs; ++idx)
       {
       int TheyHaveAll = 0;
-      this->Controller->Receive(&TheyHaveAll, 1, idx, 250623);
+      this->Controller->Receive(&TheyHaveAll, 1, idx, vtkProcessModule::TemporalPickHasData);
       if (TheyHaveAll)
         {
         vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
-        this->Controller->Receive(tmp, idx, 250624);
+        this->Controller->Receive(tmp, idx, vtkProcessModule::TemporalPicksData);
         numArrs = tmp->GetPointData()->GetNumberOfArrays();
         if (numArrs > 0)
           {
