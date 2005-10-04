@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.25");
+vtkCxxRevisionMacro(vtkPVWriter, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -69,6 +69,8 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Parallel: " << this->Parallel << endl;
   os << indent << "DataModeMethod: " 
      << (this->DataModeMethod?this->DataModeMethod:"(none)") << endl;
+  os << indent << "SupportsTime: " << this->SupportsTime
+     << endl;
 }
 
 //----------------------------------------------------------------------------
