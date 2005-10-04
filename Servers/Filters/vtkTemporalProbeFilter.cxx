@@ -20,18 +20,22 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkPoints.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkPolyData.h"
+#include "vtkMultiProcessController.h"
+#include "vtkVertex.h"
 
-vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.4");
+vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.5");
 vtkStandardNewMacro(vtkTemporalProbeFilter);
 
+vtkCxxSetObjectMacro(vtkTemporalProbeFilter, Controller, vtkMultiProcessController);
 
 //----------------------------------------------------------------------------
 vtkTemporalProbeFilter::vtkTemporalProbeFilter()
 {
   this->History = NULL;
   this->Empty = true;
-  this->PointOrCell = 0; 
+  this->Controller = NULL;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
@@ -41,13 +45,13 @@ vtkTemporalProbeFilter::~vtkTemporalProbeFilter()
     this->History->Delete();
     this->History = NULL;
   }
+  this->SetController(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkTemporalProbeFilter::AnimateInit()
 {
   this->Empty = true;
-  this->Modified();
 
   if (this->History) {
     this->History->Delete();
@@ -60,40 +64,51 @@ void vtkTemporalProbeFilter::AnimateInit()
     return;
     }
 
-  vtkCellData *icd;
-  vtkPointData *ipd;
-  if (this->PointOrCell)
+  vtkPointData *ipd = NULL;
+  ipd = input->GetPointData();
+  if (!ipd) 
     {
-    icd = input->GetCellData();
-    if (!icd) 
-      {
-      return;
-      }
-    }
-  else
-    {
-    ipd = input->GetPointData();
-    if (!ipd) 
-      {
-      return;
-      }
+    return;
     }
 
-  this->History = vtkUnstructuredGrid::New();
+  this->History = vtkPolyData::New();
 
+  //In Parallel AppendPolydata will be called in MPIMoveData later on.
+  //APD requires at least one cell or it may output nothing.
+  vtkVertex *dummy = vtkVertex::New();
+  dummy->GetPointIds()->SetId(0, 0);
+  this->History->Allocate(1,1);
+  this->History->InsertNextCell(dummy->GetCellType(), dummy->GetPointIds());
+  dummy->Delete();
+
+  //Create an array for the time recordings.
   vtkPoints *opts = vtkPoints::New();
   this->History->SetPoints(opts);
+  //Make a dummy first time point in case RequestData is called before 
+  //AnimateTick puts any samples in.
+  opts->InsertNextPoint(0.0,0.0,0.0);
   opts->Delete();
 
+  //Copy the format of the input's pointdata arrays.
   vtkPointData *opd = this->History->GetPointData();
-  int numArrs = this->PointOrCell ? icd->GetNumberOfArrays() : ipd->GetNumberOfArrays();
+  int numArrs = ipd->GetNumberOfArrays();
   for (int i = 0; i < numArrs; i++) 
     {
-    vtkDataArray *ida = this->PointOrCell ? icd->GetArray(i) : ipd->GetArray(i);
-    opd->AddArray(ida->NewInstance());
-    vtkDataArray *oda = opd->GetArray(i);
-    oda->SetName(ida->GetName());
+    vtkDataArray *ida = ipd->GetArray(i);
+    vtkDataArray *idacp = ida->NewInstance();
+    idacp->SetName(ida->GetName());
+    opd->AddArray(idacp);
+    idacp->Delete();
     }
+
+  //Add initial attributes to go along with the first time point.
+  for (int i = 0; i < numArrs; i++) 
+    {
+    vtkDataArray *ida = ipd->GetArray(i);
+    vtkDataArray *oda = opd->GetArray(i);
+    oda->InsertNextTuple(ida->GetTuple(0));
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -105,48 +120,44 @@ void vtkTemporalProbeFilter::AnimateTick(double TheTime)
     return;
     }
 
-  vtkCellData *icd;
-  vtkPointData *ipd;
-  if (this->PointOrCell)
+  vtkPointData *ipd = NULL;
+  ipd = input->GetPointData();
+  if (!ipd) 
     {
-    icd = input->GetCellData();
-    if (!icd) 
-      {
-      return;
-      }
+    return;
+    }
+
+  //Make a new point corresponding to this time.
+  vtkPoints *opts = this->History->GetPoints();
+  if (this->Empty)
+    {
+    //Overwrite initial value from AnimateInit.
+    opts->InsertPoint(0, TheTime,0.0,0.0);
     }
   else
     {
-    ipd = input->GetPointData();
-    if (!ipd) 
-      {
-      return;
-      }
+    //Add this value to the History.
+    opts->InsertNextPoint(TheTime,0.0,0.0);
     }
 
-  //Want to run silently even when input is the line probe, so do not warn.
-  //int numPts = input->GetNumberOfPoints();
-  //if (numPts != 1) 
-  //{
-  //vtkWarningMacro("Warning TemporalProbeFilter will only probe first point.");
-  //}
-
-  vtkPoints *opts = this->History->GetPoints();
-  opts->InsertNextPoint(TheTime,0.0,0.0);
-
+  //Assign the input's first point's attribute data to the new point.
   vtkPointData *opd = this->History->GetPointData();
 
-  int numArrs = (this->PointOrCell) ? icd->GetNumberOfArrays() : ipd->GetNumberOfArrays();
+  int numArrs = ipd->GetNumberOfArrays();
   for (int i = 0; i < numArrs; i++) 
     {
-    vtkDataArray *ida = (this->PointOrCell) ? icd->GetArray(i) : ipd->GetArray(i);
+    vtkDataArray *ida = ipd->GetArray(i);
     vtkDataArray *oda = opd->GetArray(i);
-    int numComp = ida->GetNumberOfComponents();
-    double *x = new double[numComp];
-    ida->GetTuple(0,x);
-    oda->InsertNextTuple(x);
-    delete(x);
-    }  
+
+    if (this->Empty)
+      {
+      oda->InsertTuple(0, ida->GetTuple(0));
+      }
+    else
+      {
+      oda->InsertNextTuple(ida->GetTuple(0));
+      }
+    }
 
   this->Empty = false;
   this->Modified();
@@ -155,28 +166,46 @@ void vtkTemporalProbeFilter::AnimateTick(double TheTime)
 //----------------------------------------------------------------------------
 int vtkTemporalProbeFilter::RequestData(
   vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **inputVector,
+  vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
   // get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut from the info
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkDataSet *output = vtkDataSet::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if (this->Empty) 
+  if (!this->History)
     {
-    output->DeepCopy(input);
-    } 
-  else 
-    {
-    output->DeepCopy(History);
+    //make sure we have something to pass along
+    this->AnimateInit();
     }
 
+  output->DeepCopy(this->History);
+
+  //The PProbe input to this only has data on root node.
+  //Satellites do not have valid data anyway then, and if they 
+  //release their outputs MPIMoveData will work properly.
+  int procId = 0;
+  int numProcs = 1;
+  if ( this->Controller )
+    {
+    procId = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }  
+  if ( procId )
+    { 
+    output->ReleaseData();
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkTemporalProbeFilter::FillOutputPortInformation(int, vtkInformation *info)
+{
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
   return 1;
 }
 
@@ -184,7 +213,6 @@ int vtkTemporalProbeFilter::RequestData(
 void vtkTemporalProbeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "PointOrCell: " << this->PointOrCell << endl;
-
+  os << indent << "Controller " << this->Controller << endl;
 }
 

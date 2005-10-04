@@ -72,6 +72,7 @@ SET(Filters_SRCS
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
   vtkTemporalProbeFilter.cxx
+  vtkTemporalPickFilter.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(

@@ -30,8 +30,6 @@
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkXYPlotActor.h"
-#include "vtkXYPlotWidget.h"
 #include "vtkPVTraceHelper.h"
 
 #include "vtkSMXYPlotDisplayProxy.h"
@@ -43,7 +41,6 @@
 #include "vtkPVArraySelection.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMXYPlotActorProxy.h"
 
 #include "vtkKWLoadSaveButton.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -58,7 +55,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.160");
+vtkCxxRevisionMacro(vtkPVProbe, "1.161");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -369,11 +366,13 @@ void vtkPVProbe::AcceptCallbackInternal()
       return;
       }
     tip->AddProxy(this->GetProxy());    
-    this->TemporalProbeProxy->UpdateVTKObjects();
 
     this->PlotDisplayProxy->SetVisibilityCM(0); // also calls UpdateVTKObjects().
     this->AddDisplayToRenderModule(this->PlotDisplayProxy);
+    }
 
+
+    {
     //get correct value for plot
     vtkSMProperty *prop = vtkSMProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateInit"));
@@ -381,9 +380,11 @@ void vtkPVProbe::AcceptCallbackInternal()
       {
       prop->Modified();
       }
+
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
     double currTime = animScene->GetAnimationTime();
+
     vtkSMDoubleVectorProperty *prop2 = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TemporalProbeProxy->GetProperty("AnimateTick"));
     if (prop2) 
@@ -413,6 +414,7 @@ void vtkPVProbe::AcceptCallbackInternal()
   if (numPts == 1)
     { // Put the array information in the UI. 
     // Get the collected data from the display.
+    this->TemporalProbeProxy->UpdateVTKObjects();
     this->PlotDisplayProxy->Update();
     vtkPolyData* d = this->PlotDisplayProxy->GetCollectedData();
     vtkPointData* pd = d->GetPointData();
@@ -432,6 +434,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       if (array->GetName())
         {
         numComponents = array->GetNumberOfComponents();
+        int mostRecentSample = array->GetNumberOfTuples() - 1;
         if (numComponents > 1)
           {
           // make sure we fill buffer from the beginning
@@ -443,7 +446,7 @@ void vtkPVProbe::AcceptCallbackInternal()
             {
             // make sure we fill buffer from the beginning
             vtksys_ios::ostringstream tempStrm;
-            tempStrm << array->GetComponent( 0, j );
+            tempStrm << array->GetComponent( mostRecentSample, j );
             tempArray = tempStrm.str();
 
             if (j < numComponents - 1)
@@ -470,7 +473,7 @@ void vtkPVProbe::AcceptCallbackInternal()
           {
           // make sure we fill buffer from the beginning
           vtksys_ios::ostringstream arrayStrm;
-          arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl;
+          arrayStrm << array->GetName() << ": " << array->GetComponent( mostRecentSample, 0 ) << endl;
 
           label += arrayStrm.str();
           }
@@ -563,13 +566,19 @@ void vtkPVProbe::SaveInBatchScript(ofstream* file)
   this->Superclass::SaveInBatchScript(file);
 
   *file << endl;
-  *file << "  # Save the TemporalProbePrixy" << endl;
+  *file << "  # Save the TemporalProbeProxy" << endl;
   this->SaveTemporalProbeInBatchScript(file);
 
   *file << endl;
   *file << "  # Save the XY Plot" << endl;
   this->PlotDisplayProxy->SaveInBatchScript(file);
 
+  const char *filename = this->SaveButton->GetFileName();
+  if (filename)
+    {
+    cout << filename << endl;
+    *file << "  # Plot's .csv file name is " << filename << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -613,29 +622,6 @@ void vtkPVProbe::SaveTemporalProbeInBatchScript(ofstream* file)
         << endl;
       }
 
-    // Now, we save all the properties that are not Input.
-    // Also note that only exposed properties are getting saved.
-
-    vtkSMPropertyIterator* iter = this->TemporalProbeProxy->NewPropertyIterator();
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-      {
-      vtkSMProperty* p = iter->GetProperty();
-      if (vtkSMInputProperty::SafeDownCast(p))
-        {
-        // Input property has already been saved...so skip it.
-        continue;
-        }
-
-      if (!p->GetSaveable())
-        {
-        *file << "  # skipping not-saveable property " << p->GetXMLName() << endl;
-        continue;
-        }
-
-      *file << "  # skipping property " << p->GetXMLName() << endl;
-      }
-
-    iter->Delete();
     *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
     }
 }
@@ -652,11 +638,9 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVProbe::SaveDialogCallback()
 {
-  vtkXYPlotActor *xy = this->PlotDisplayProxy->GetXYPlotWidget()->GetXYPlotActor();
-  
-  ofstream f;
   const char *filename = this->SaveButton->GetFileName();
-  f.open( filename );
-  xy->PrintAsCSV(f);
-  f.close();
+  if (filename)
+    {
+    this->PlotDisplayProxy->PrintAsCSV(filename);
+    }
 }

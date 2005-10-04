@@ -80,16 +80,12 @@ public:
   virtual void MarkConsumersAsModified();
 
   // Description:
-  // Get the client side XY plot Widget.
-  vtkGetObjectMacro(XYPlotWidget,vtkXYPlotWidget);
-
-  // Description:
   // Sets the label of the plot to reflect either time or space sampling.
   void SetXAxisLabel(bool IsTemporal);
 
   // Description:
-  // Tell the display whether to pass on PolyData(0=default) or UnstructuredGrid(1)
-  void SetPolyOrUGrid(int which);
+  // Saves the plot's contents as a comma separated values text file.
+  void PrintAsCSV(const char *filename);
 
 protected:
   vtkSMXYPlotDisplayProxy();

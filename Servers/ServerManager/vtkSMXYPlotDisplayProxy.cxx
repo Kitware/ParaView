@@ -34,6 +34,7 @@
 #include "vtkMPIMoveData.h"
 #include "vtkPolyData.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVDataInformation.h"
 
 class vtkSMXYPlotDisplayProxyObserver : public vtkCommand
 {
@@ -59,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -139,6 +140,12 @@ void vtkSMXYPlotDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*,
   ip->AddProxy(input);
   this->CollectProxy->UpdateVTKObjects();
 
+  vtkPVDataInformation *DataInformation = input->GetDataInformation();
+  if (DataInformation->DataSetTypeIsA("vtkUnstructuredGrid"))
+    {
+    this->PolyOrUGrid = 1;
+    }
+
   this->SetupPipeline();
   this->SetupDefaults();
   this->SetupWidget();
@@ -166,14 +173,6 @@ void vtkSMXYPlotDisplayProxy::SetupWidget()
     this->Observer);
 }
 
-
-//-----------------------------------------------------------------------------
-void vtkSMXYPlotDisplayProxy::SetPolyOrUGrid(int which)
-{
-  if (which < 0) which = 0;
-  if (which > 1) which = 1;
-  this->PolyOrUGrid = which;
-}
 
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::SetupPipeline()
@@ -655,5 +654,22 @@ void vtkSMXYPlotDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XYPlotActorProxy: " << this->XYPlotActorProxy
     << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
-  os << indent << "XYPlotWidget: " << this->XYPlotWidget << endl;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::PrintAsCSV(const char *filename)
+{
+  vtkXYPlotActor *xy = this->XYPlotWidget->GetXYPlotActor();
+  ofstream f;
+  f.open( filename );
+  if (!f.good())
+    {
+    vtkErrorMacro("XYPlot save file open did not succeed.");
+    }
+  else
+    {
+    xy->PrintAsCSV(f);
+    f.close();
+    }
+}
+

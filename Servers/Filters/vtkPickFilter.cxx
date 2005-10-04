@@ -33,7 +33,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.15");
+vtkCxxRevisionMacro(vtkPickFilter, "1.16");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -557,16 +557,17 @@ void vtkPickFilter::IdExecute()
   int numInputs, idx;
   vtkAppendFilter* append = vtkAppendFilter::New();
 
+  int execOK = 0;
   numInputs = this->GetNumberOfInputs();
   for (idx = 0; idx < numInputs; ++idx)
     {
     if (this->PickCell)
       {
-      this->CellIdExecute(this->GetInput(idx), idx, append);
+      execOK += this->CellIdExecute(this->GetInput(idx), idx, append);
       }
     else
       {
-      this->PointIdExecute(this->GetInput(idx), idx, append);
+      execOK += this->PointIdExecute(this->GetInput(idx), idx, append);
       }
     }
   
@@ -594,13 +595,15 @@ void vtkPickFilter::IdExecute()
   //  output->GetFieldData()->PassData(append->GetOutput()->GetFieldData());
   //  }
   
-  append->Update();
-  vtkUnstructuredGrid* output = this->GetOutput();
-  output->CopyStructure(append->GetOutput());
-  output->GetPointData()->PassData(append->GetOutput()->GetPointData());
-  output->GetCellData()->PassData(append->GetOutput()->GetCellData());
-  output->GetFieldData()->PassData(append->GetOutput()->GetFieldData());
-    
+  if (execOK > 0)
+    {
+    append->Update();
+    vtkUnstructuredGrid* output = this->GetOutput();
+    output->CopyStructure(append->GetOutput());
+    output->GetPointData()->PassData(append->GetOutput()->GetPointData());
+    output->GetCellData()->PassData(append->GetOutput()->GetCellData());
+    output->GetFieldData()->PassData(append->GetOutput()->GetFieldData());    
+    }
   append->Delete();
 }
 
