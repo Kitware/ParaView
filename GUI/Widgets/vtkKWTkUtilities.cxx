@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.67");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.68");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -1977,13 +1977,15 @@ int vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
   int min_nb_of_cols = 10000;
   for (widget = 0; widget < nb_of_widgets; widget++)
     {
-    if (vtkKWTkUtilities::GetGridColumnWidths(
+    if (!vtkKWTkUtilities::GetGridColumnWidths(
       interp, widgets[widget], &nb_of_cols[widget], &col_widths[widget], 1))
       {
-      if (nb_of_cols[widget] < min_nb_of_cols)
-        {
-        min_nb_of_cols = nb_of_cols[widget];
-        }
+      nb_of_cols[widget] = 0;
+      col_widths[widget] = NULL;
+      }
+    if (nb_of_cols[widget] < min_nb_of_cols)
+      {
+      min_nb_of_cols = nb_of_cols[widget];
       }
     }
 
