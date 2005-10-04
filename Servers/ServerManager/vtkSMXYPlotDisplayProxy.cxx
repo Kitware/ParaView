@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -617,7 +617,7 @@ void vtkSMXYPlotDisplayProxy::SetXAxisLabel(bool IsTemporal)
   if (svp)
     {
     if (IsTemporal) 
-      svp->SetElement(0, "Time");
+      svp->SetElement(0, "Time Steps");
     else 
       svp->SetElement(0, "Line Divisions");
     }
