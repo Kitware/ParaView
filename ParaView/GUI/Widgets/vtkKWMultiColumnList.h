@@ -455,7 +455,8 @@ public:
   // Description:
   // Convenience method to set the contents of the cell given a column index
   // only and a text to look for in a specific column. If that text is
-  // found, its row index is used to set the contents of the cell.
+  // found, its row index is used to set the contents of the cell, if it is
+  // not found, a new row is inserted.
   virtual void FindAndInsertCellText(
     int look_for_col_index, const char *look_for_text , 
     int col_index, const char *text);

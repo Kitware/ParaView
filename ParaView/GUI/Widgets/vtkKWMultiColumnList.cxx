@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.24");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.25");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -1339,10 +1339,14 @@ void vtkKWMultiColumnList::FindAndInsertCellText(
   int row_index = 
     this->FindCellTextInColumn(look_for_col_index, look_for_text);
   
-  if (row_index >= 0)
+  if (row_index < 0)
     {
-    this->InsertCellText(row_index, col_index, text);
+    row_index = this->GetNumberOfRows();
+    this->InsertRow(row_index);
+    this->InsertCellText(row_index, look_for_col_index, look_for_text);
     }
+
+  this->InsertCellText(row_index, col_index, text);
 }
 
 //----------------------------------------------------------------------------
