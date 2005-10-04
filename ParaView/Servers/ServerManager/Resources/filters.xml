@@ -2472,18 +2472,51 @@
             <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
+            <DataType value="vtkPolyData"/>
           </DataTypeDomain>
     </InputProperty>
  
     <Property
        name="AnimateInit"
-       command="AnimateInit">
+       command="AnimateInit"
+       saveable="0">
     </Property>
 
     <DoubleVectorProperty
        name="AnimateTick"
        command="AnimateTick"
+       saveable="0"
+       number_of_elements="1"
+       default_values="0.0" >
+          <DoubleRangeDomain name="range" min="0" max="1" />
+    </DoubleVectorProperty>
+
+   <!-- End TemporalProbe -->
+   </SourceProxy>
+
+   <SourceProxy name="TemporalPick" class="vtkTemporalPickFilter">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+    </InputProperty>
+ 
+    <Property
+       name="AnimateInit"
+       command="AnimateInit"
+       saveable="0">
+    </Property>
+
+    <DoubleVectorProperty
+       name="AnimateTick"
+       command="AnimateTick"
+       saveable="0"
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
@@ -2500,7 +2533,7 @@
        </EnumerationDomain>
     </IntVectorProperty>
 
-   <!-- End TemporalProbe -->
+   <!-- End TemporalPick -->
    </SourceProxy>
 
 

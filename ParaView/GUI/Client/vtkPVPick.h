@@ -12,13 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPick - A special PVSource.
+// .NAME vtkPVPick - ParaViews client side control for the vtkPickFilter.
 // .SECTION Description
-// This class will set up defaults for thePVData.
-// It will also create a special PointLabelDisplay.
-// Both of these features should be specified in XML so we
-// can get rid of this special case.
-
+// 
 
 #ifndef __vtkPVPick_h
 #define __vtkPVPick_h
@@ -107,9 +103,9 @@ protected:
   vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
   char* PlotDisplayProxyName; 
   vtkSetStringMacro(PlotDisplayProxyName);
-  vtkSMProxy* TemporalProbeProxy;
-  char* TemporalProbeProxyName; 
-  vtkSetStringMacro(TemporalProbeProxyName);
+  vtkSMProxy* TemporalPickProxy;
+  char* TemporalPickProxyName; 
+  vtkSetStringMacro(TemporalPickProxyName);
   vtkTemporalPickObserver *Observer;
   vtkKWLoadSaveButton *SaveButton;
   int LastPorC;
