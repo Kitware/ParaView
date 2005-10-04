@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*
  * Copyright 2004 Sandia Corporation.
  * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
@@ -9,19 +7,21 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqMainWindow.h"
+#ifndef _pqServerBrowser_h
+#define _pqServerBrowser_h
 
-#include <vtkOutputWindow.h>
+#include "pqServerBrowser.ui.h"
 
-#include <QApplication>
-
-//----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+class pqServerBrowser :
+  public QDialog
 {
-  QApplication qapplication(argc, argv);
-  pqMainWindow qwindow(qapplication);
-  qwindow.resize(400, 400);
-  qwindow.show();
-  return qapplication.exec();
-}
+  Q_OBJECT
+
+public:
+  pqServerBrowser(QWidget* Parent = 0, const char* const Name = 0);
+ 
+  Ui::pqServerBrowser ui;
+};
+
+#endif // !_pqServerBrowser_h
 

@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>pqServerFileBrowserBase</class>
- <widget class="QDialog" name="pqServerFileBrowserBase" >
+ <class>pqServerFileBrowser</class>
+ <widget class="QDialog" name="pqServerFileBrowser" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -115,7 +115,7 @@
   <connection>
    <sender>buttonOk</sender>
    <signal>clicked()</signal>
-   <receiver>pqServerFileBrowserBase</receiver>
+   <receiver>pqServerFileBrowser</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -131,7 +131,7 @@
   <connection>
    <sender>buttonCancel</sender>
    <signal>clicked()</signal>
-   <receiver>pqServerFileBrowserBase</receiver>
+   <receiver>pqServerFileBrowser</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >

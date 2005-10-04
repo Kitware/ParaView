@@ -22,7 +22,9 @@
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderModuleProxy.h>
 
-// ClientServer wrapper initialization functions.
+#include <cassert>
+
+// Client / server wrapper initialization functions
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
@@ -41,24 +43,14 @@ extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 namespace
 {
 
-vtkSMApplication* pqGetSMApplication()
-{
-  static vtkSMApplication* sm_application = 0;
-  if(!sm_application)
-    {
-    sm_application = vtkSMApplication::New();
-    sm_application->Initialize();
-    vtkSMProperty::SetCheckDomains(0);
-    }
-    
-   return sm_application;
-}
-
 class pqProcessModuleGUIHelper :
   public vtkProcessModuleGUIHelper
 {
 public:
-  static pqProcessModuleGUIHelper* New();
+  static pqProcessModuleGUIHelper* New()
+  {
+    return new pqProcessModuleGUIHelper();
+  }
 
   virtual int OpenConnectionDialog(int *)
   {
@@ -94,168 +86,206 @@ private:
   void operator=(const pqProcessModuleGUIHelper&);
 };
 
-vtkStandardNewMacro(pqProcessModuleGUIHelper);
+///////////////////////////////////////////////////////////////////////////////////////
+// pqInitializeServer
 
-vtkProcessModule* pqGetProcessModule()
+void pqInitializeServer(pqOptions* options, vtkPVProcessModule*& process_module, vtkSMApplication*& server_manager, vtkSMRenderModuleProxy*& render_module)
 {
-  if(!vtkProcessModule::GetProcessModule())
+  process_module = 0;
+  server_manager = 0;
+  render_module = 0;
+  
+  if(options->GetClientMode()) 
     {
-    pqOptions* const options = pqOptions::New();
-    
-    vtkProcessModule* process_module = vtkPVProcessModule::New();
-//      vtkProcessModule* process_module = vtkPVClientServerModule::New();
-//      options->SetProcessType(vtkPVOptions::PVCLIENT);
-      
-/*
-    if(op->GetClientMode() || op->GetServerMode() || op->GetRenderServerMode()) 
+    process_module = vtkPVClientServerModule::New();
+    }
+  else
+    {
+  #ifdef VTK_USE_MPI
+    process_module = vtkPVMPIProcessModule::New();
+  #else 
+    process_module = vtkPVProcessModule::New();
+  #endif
+    }
+
+  process_module->Initialize();
+  process_module->SetOptions(options);
+  process_module->SetGUIHelper(pqProcessModuleGUIHelper::New());
+
+  vtkCommonCS_Initialize(process_module->GetInterpreter());
+  vtkFilteringCS_Initialize(process_module->GetInterpreter());
+  vtkGenericFilteringCS_Initialize(process_module->GetInterpreter());
+  vtkImagingCS_Initialize(process_module->GetInterpreter());
+  vtkGraphicsCS_Initialize(process_module->GetInterpreter());
+  vtkIOCS_Initialize(process_module->GetInterpreter());
+  vtkRenderingCS_Initialize(process_module->GetInterpreter());
+  vtkVolumeRenderingCS_Initialize(process_module->GetInterpreter());
+  vtkHybridCS_Initialize(process_module->GetInterpreter());
+  vtkWidgetsCS_Initialize(process_module->GetInterpreter());
+  vtkParallelCS_Initialize(process_module->GetInterpreter());
+  vtkPVServerCommonCS_Initialize(process_module->GetInterpreter());
+  vtkPVFiltersCS_Initialize(process_module->GetInterpreter());
+  vtkXdmfCS_Initialize(process_module->GetInterpreter());
+
+  vtkProcessModule::SetProcessModule(process_module);
+  if(process_module->Start(0, 0))
+    {
+    vtkProcessModule::SetProcessModule(0);
+    return; // Failed to connect!
+    }
+  
+  // Create server manager & proxy manager
+  server_manager = vtkSMApplication::New();
+  server_manager->Initialize();
+  vtkSMProperty::SetCheckDomains(0);
+  vtkSMProxyManager* const proxy_manager = server_manager->GetProxyManager();
+  
+  // Create render module ...
+  process_module->SynchronizeServerClientOptions();
+
+  const char* renderModuleName = 0;
+  if (!renderModuleName)
+    {
+    renderModuleName = options->GetRenderModuleName();
+    }
+  if (!renderModuleName)
+    {
+    // User didn't specify the render module to use.
+    if (options->GetTileDimensions()[0])
       {
-      pm = vtkPVClientServerModule::New();
+      // Server/client says we are rendering for a Tile Display.
+      // Now decide if we must use IceT or not.
+      if (process_module->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "IceTRenderModule";
+        }
+      else
+        {
+        renderModuleName = "MultiDisplayRenderModule";
+        }
+      }
+    else if (options->GetClientMode())
+      {
+      // Client server configuration without Tiles.
+      if (process_module->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "IceTDesktopRenderModule";
+        }
+      else
+        {
+        renderModuleName = "MPIRenderModule"; 
+        // TODO: if I separated the MPI and ClientServer
+        // render modules, this is where I will use
+        // the ClientServerRenderModule.
+        }
       }
     else
       {
-  #ifdef VTK_USE_MPI
-      pm = vtkPVMPIProcessModule::New();
-  #else 
-      pm = vtkPVProcessModule::New();
-  #endif
-      }
-*/
-
-    process_module->Initialize();
-    process_module->SetOptions(options);
-    process_module->SetGUIHelper(pqProcessModuleGUIHelper::New());
-    
-    // Initialize built-in wrapper modules.
-    vtkCommonCS_Initialize(process_module->GetInterpreter());
-    vtkFilteringCS_Initialize(process_module->GetInterpreter());
-    vtkGenericFilteringCS_Initialize(process_module->GetInterpreter());
-    vtkImagingCS_Initialize(process_module->GetInterpreter());
-    vtkGraphicsCS_Initialize(process_module->GetInterpreter());
-    vtkIOCS_Initialize(process_module->GetInterpreter());
-    vtkRenderingCS_Initialize(process_module->GetInterpreter());
-    vtkVolumeRenderingCS_Initialize(process_module->GetInterpreter());
-    vtkHybridCS_Initialize(process_module->GetInterpreter());
-    vtkWidgetsCS_Initialize(process_module->GetInterpreter());
-    vtkParallelCS_Initialize(process_module->GetInterpreter());
-    vtkPVServerCommonCS_Initialize(process_module->GetInterpreter());
-    vtkPVFiltersCS_Initialize(process_module->GetInterpreter());
-    vtkXdmfCS_Initialize(process_module->GetInterpreter());
-    
-    vtkProcessModule::SetProcessModule(process_module);
-    
-//    process_module->Start(0, 0);
-  }
-  
-  return vtkProcessModule::GetProcessModule();
-}
-
-vtkSMProxyManager* pqGetProxyManager()
-{
-  return pqGetSMApplication()->GetProxyManager();
-}
-
-vtkSMRenderModuleProxy* pqGetRenderModule()
-{
-  static vtkSMRenderModuleProxy* render_module_proxy = 0;
-  if(!render_module_proxy)
-    {
-      vtkSMProxyManager* const pxm = pqGetSMApplication()->GetProxyManager();
-      vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(pqGetProcessModule());
-      pm->SynchronizeServerClientOptions();
-
-      const char* renderModuleName = 0;
-
-      if (!renderModuleName)
-        {
-        renderModuleName = pm->GetOptions()->GetRenderModuleName();
-        }
-      if (!renderModuleName)
-        {
-        // User didn't specify the render module to use.
-        if (pm->GetOptions()->GetTileDimensions()[0])
-          {
-          // Server/client says we are rendering for a Tile Display.
-          // Now decide if we must use IceT or not.
-          if (pm->GetServerInformation()->GetUseIceT())
-            {
-            renderModuleName = "IceTRenderModule";
-            }
-          else
-            {
-            renderModuleName = "MultiDisplayRenderModule";
-            }
-          }
-        else if (pm->GetOptions()->GetClientMode())
-          {
-          // Client server configuration without Tiles.
-          if (pm->GetServerInformation()->GetUseIceT())
-            {
-            renderModuleName = "IceTDesktopRenderModule";
-            }
-          else
-            {
-            renderModuleName = "MPIRenderModule"; 
-            // TODO: if I separated the MPI and ClientServer
-            // render modules, this is where I will use
-            // the ClientServerRenderModule.
-            }
-          }
-        else
-          {
-          // Not running in Client Server Mode.
-          // Use local information to choose render module.
+      // Not running in Client Server Mode.
+      // Use local information to choose render module.
 #ifdef VTK_USE_MPI
-          renderModuleName = "MPIRenderModule";
+      renderModuleName = "MPIRenderModule";
 #else
-          renderModuleName = "LODRenderModule";
+      renderModuleName = "LODRenderModule";
 #endif
-          }
-        }
-      
-      vtkSMProxy *p = pxm->NewProxy("rendermodules", renderModuleName);
-      if (!p)
-        {
-        return 0;
-        }
-      
-      render_module_proxy = vtkSMRenderModuleProxy::SafeDownCast(p);
-      render_module_proxy->UpdateVTKObjects();
-
-      pm->GetOptions()->SetRenderModuleName(renderModuleName);
+      }
     }
   
-  return render_module_proxy;
+  vtkSMProxy* render_module_proxy = proxy_manager->NewProxy("rendermodules", renderModuleName);
+  render_module = vtkSMRenderModuleProxy::SafeDownCast(render_module_proxy);
+  render_module->UpdateVTKObjects();
+
+  options->SetRenderModuleName(renderModuleName);
 }
 
 } // namespace
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// pqServer
 
-class pqServer::implementation
+pqServer* pqServer::Standalone()
 {
-};
+  if(vtkProcessModule::GetProcessModule())
+    {
+    return 0;
+    }
 
-pqServer::pqServer() :
-  Implementation(new implementation())
+  // Initialize options ...
+  pqOptions* const options = pqOptions::New();
+  options->SetClientMode(false);
+  options->SetProcessType(vtkPVOptions::PARAVIEW);
+
+  vtkPVProcessModule* process_module = 0;
+  vtkSMApplication* server_manager = 0;
+  vtkSMRenderModuleProxy* render_module = 0;
+
+  pqInitializeServer(options, process_module, server_manager, render_module);
+  if(!process_module || !server_manager || !render_module)
+    return 0;
+    
+  return new pqServer(options, process_module, server_manager, render_module);
+}
+
+pqServer* pqServer::Connect(const char* const hostName, int portNumber)
+{
+  if(vtkProcessModule::GetProcessModule())
+    {
+    return 0;
+    }
+
+  // Initialize options ...
+  pqOptions* const options = pqOptions::New();
+  options->SetClientMode(true);
+  options->SetProcessType(vtkPVOptions::PVCLIENT);
+  options->SetServerHost(hostName);
+  options->SetServerPort(portNumber);
+
+  vtkPVProcessModule* process_module = 0;
+  vtkSMApplication* server_manager = 0;
+  vtkSMRenderModuleProxy* render_module = 0;
+    
+  pqInitializeServer(options, process_module, server_manager, render_module);
+  if(!process_module || !server_manager || !render_module)
+    return 0;
+    
+  return new pqServer(options, process_module, server_manager, render_module);
+}
+
+pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMApplication* server_manager, vtkSMRenderModuleProxy* render_module) :
+  Options(options),
+  ProcessModule(process_module),
+  ServerManager(server_manager),
+  RenderModule(render_module)
 {
 }
 
 pqServer::~pqServer()
 {
-  delete Implementation;
+  RenderModule->Delete();
+  
+  ServerManager->Finalize();
+  ServerManager->Delete();
+  
+  ProcessModule->Finalize();
+  ProcessModule->Delete();
+  
+  Options->Delete();
+  
+  vtkProcessModule::SetProcessModule(0);
 }
 
 vtkProcessModule* pqServer::GetProcessModule()
 {
-  return pqGetProcessModule();
+  return ProcessModule;
 }
 
 vtkSMProxyManager* pqServer::GetProxyManager()
 {
-  return pqGetProxyManager();
+  return ServerManager->GetProxyManager();
 }
 
 vtkSMRenderModuleProxy* pqServer::GetRenderModule()
 {
-  return pqGetRenderModule();
+  return RenderModule;
 }
-  
+

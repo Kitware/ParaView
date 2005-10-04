@@ -10,23 +10,34 @@
 #ifndef _pqServer_h
 #define _pqServer_h
 
+class pqOptions;
 class vtkProcessModule;
+class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMRenderModuleProxy;
+
+#include <string>
 
 class pqServer
 {
 public:
-  pqServer();
-  ~pqServer();
+  static pqServer* Standalone();
+  static pqServer* Connect(const char* const hostName, const int portNumber);
+  virtual ~pqServer();
 
   vtkProcessModule* GetProcessModule();
   vtkSMProxyManager* GetProxyManager();
   vtkSMRenderModuleProxy* GetRenderModule();
-  
+
 private:
-  class implementation;
-  implementation* const Implementation;
+  pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMRenderModuleProxy*);
+  pqServer(const pqServer&);
+  pqServer& operator=(const pqServer&);
+  
+  pqOptions* const Options;
+  vtkProcessModule* const ProcessModule;
+  vtkSMApplication* const ServerManager;
+  vtkSMRenderModuleProxy* const RenderModule;
 };
 
 #endif // !_pqServer_h

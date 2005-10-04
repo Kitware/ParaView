@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*
  * Copyright 2004 Sandia Corporation.
  * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
@@ -8,12 +6,6 @@
  * or without modification, are permitted provided that this Notice and any
  * statement of authorship are reproduced on all copies.
  */
-
-// .NAME pqOptions
-//
-// .SECTION Description
-//
-// Establishes options for the basic ParaView client.
 
 #ifndef __pqOptions_h
 #define __pqOptions_h
@@ -27,6 +19,10 @@ public:
   static pqOptions *New();
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  void SetClientMode(int Mode);
+  void SetServerHost(const char* const HostName);
+  void SetServerPort(int Port);
+
 protected:
   pqOptions();
   virtual ~pqOptions();
@@ -35,8 +31,8 @@ protected:
   virtual int PostProcess(int argc, const char * const *argv);
 
 private:
-  pqOptions(const pqOptions &);  // Not implemented.
-  void operator=(const pqOptions &);  // Not implemented.
+  pqOptions(const pqOptions &);
+  void operator=(const pqOptions &);
 };
 
 #endif //__pqOptions_h

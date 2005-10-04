@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*
  * Copyright 2004 Sandia Corporation.
  * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
@@ -9,19 +7,14 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqMainWindow.h"
+#include "pqServerBrowser.h"
 
-#include <vtkOutputWindow.h>
-
-#include <QApplication>
-
-//----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
+  QDialog(Parent, Name)
 {
-  QApplication qapplication(argc, argv);
-  pqMainWindow qwindow(qapplication);
-  qwindow.resize(400, 400);
-  qwindow.show();
-  return qapplication.exec();
+  this->ui.setupUi(this);
+  this->setName(Name);
+  
+  this->ui.serverType->addItem("Standalone");
+  this->ui.serverType->addItem("Remote Server");
 }
-

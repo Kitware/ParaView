@@ -43,6 +43,7 @@ INCLUDE_DIRECTORIES(
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMainWindow.h
+  pqServerBrowser.h
   pqServerFileBrowser.h
   pqServerFileBrowserList.h
   pqTestCases.h
@@ -64,6 +65,8 @@ ADD_EXECUTABLE(pqClient
   pqParts.h
   pqServer.cxx
   pqServer.h
+  pqServerBrowser.cxx
+  pqServerBrowser.h
   pqServerFileBrowser.cxx
   pqServerFileBrowser.h
   pqServerFileBrowserList.cxx

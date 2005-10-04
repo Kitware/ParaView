@@ -12,8 +12,8 @@
 
 #include <QMainWindow>
 
-class pqOptions;
 class pqServer;
+class QAction;
 
 class pqMainWindow :
         public QMainWindow
@@ -22,13 +22,22 @@ class pqMainWindow :
 
 public:
   pqMainWindow(QApplication& Application);
+  ~pqMainWindow();
   
 private:
-  pqServer* const Server;
+  void setServer(pqServer* Server);
 
+  pqServer* currentServer;
+  
+  QAction* fileOpenAction;
+  QAction* serverConnectAction;
+  QAction* serverDisconnectAction;
+  
 private slots:
   void onFileOpen();
   void onFileOpen(const QString& File);
+  void onServerConnect();
+  void onServerDisconnect();
   void onDebugHierarchy();
   void onTestsRun();
 };

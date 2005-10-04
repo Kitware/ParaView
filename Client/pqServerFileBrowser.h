@@ -1,7 +1,7 @@
 #ifndef _pqServerFileBrowser_h
 #define _pqServerFileBrowser_h
 
-#include "pqServerFileBrowserBase.ui.h"
+#include "pqServerFileBrowser.ui.h"
 
 class pqServer;
 
@@ -19,7 +19,7 @@ signals:
 private:
   ~pqServerFileBrowser() {};
   
-  Ui::pqServerFileBrowserBase ui;
+  Ui::pqServerFileBrowser ui;
  
 private slots:
   void onFileSelected(const QString&);
