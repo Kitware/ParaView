@@ -26,7 +26,7 @@
 #include "vtkAppendFilter.h"
 #include "vtkProcessModule.h"
 
-vtkCxxRevisionMacro(vtkTemporalPickFilter, "1.2");
+vtkCxxRevisionMacro(vtkTemporalPickFilter, "1.3");
 vtkStandardNewMacro(vtkTemporalPickFilter);
 
 vtkCxxSetObjectMacro(vtkTemporalPickFilter, Controller, vtkMultiProcessController);
@@ -105,19 +105,19 @@ void vtkTemporalPickFilter::AnimateInit()
 
   vtkPointData *opd = this->History->GetPointData();
   int numArrs = this->PointOrCell ? icd->GetNumberOfArrays() : ipd->GetNumberOfArrays();
-  for (int i = 0; i < numArrs; i++) 
+  int idx;
+  for (idx = 0; idx < numArrs; idx++) 
     {
-    vtkDataArray *ida = this->PointOrCell ? icd->GetArray(i) : ipd->GetArray(i);
+    vtkDataArray *ida = this->PointOrCell ? icd->GetArray(idx) : ipd->GetArray(idx);
     vtkDataArray *idacp = ida->NewInstance();
     idacp->SetName(ida->GetName());
     opd->AddArray(idacp);
     idacp->Delete();
     }
-
-  for (int i = 0; i < numArrs; i++) 
+  for (idx = 0; idx < numArrs; idx++) 
     {
-    vtkDataArray *ida = (this->PointOrCell) ? icd->GetArray(i) : ipd->GetArray(i);
-    vtkDataArray *oda = opd->GetArray(i);
+    vtkDataArray *ida = (this->PointOrCell) ? icd->GetArray(idx) : ipd->GetArray(idx);
+    vtkDataArray *oda = opd->GetArray(idx);
 
     oda->InsertNextTuple(ida->GetTuple(0));
     }

@@ -24,7 +24,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkVertex.h"
 
-vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.5");
+vtkCxxRevisionMacro(vtkTemporalProbeFilter, "1.6");
 vtkStandardNewMacro(vtkTemporalProbeFilter);
 
 vtkCxxSetObjectMacro(vtkTemporalProbeFilter, Controller, vtkMultiProcessController);
@@ -92,9 +92,10 @@ void vtkTemporalProbeFilter::AnimateInit()
   //Copy the format of the input's pointdata arrays.
   vtkPointData *opd = this->History->GetPointData();
   int numArrs = ipd->GetNumberOfArrays();
-  for (int i = 0; i < numArrs; i++) 
+  int idx;
+  for (idx = 0; idx < numArrs; idx++) 
     {
-    vtkDataArray *ida = ipd->GetArray(i);
+    vtkDataArray *ida = ipd->GetArray(idx);
     vtkDataArray *idacp = ida->NewInstance();
     idacp->SetName(ida->GetName());
     opd->AddArray(idacp);
@@ -102,10 +103,10 @@ void vtkTemporalProbeFilter::AnimateInit()
     }
 
   //Add initial attributes to go along with the first time point.
-  for (int i = 0; i < numArrs; i++) 
+  for (idx = 0; idx < numArrs; idx++) 
     {
-    vtkDataArray *ida = ipd->GetArray(i);
-    vtkDataArray *oda = opd->GetArray(i);
+    vtkDataArray *ida = ipd->GetArray(idx);
+    vtkDataArray *oda = opd->GetArray(idx);
     oda->InsertNextTuple(ida->GetTuple(0));
     }
 
