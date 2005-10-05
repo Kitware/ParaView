@@ -38,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkImagePermute.h"
+#include "vtkImageClip.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
@@ -56,7 +57,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.9");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWWindowLevelPresetSelectorInternals
@@ -957,17 +958,27 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
     }
 
   double factor;
-  vtkImageData *output, *input;
+  vtkImageData *resample_input;
+
+  // First, let's make sure we are processing the screenshot as it
+  // is by clipping its UpdateExtent. By doing so, we prevent our resample
+  // and permute filter the process the screenshot's *whole* extent.
+
+  vtkImageClip *clip = vtkImageClip::New();
+  clip->SetInput(screenshot);
+  clip->SetOutputWholeExtent(screenshot->GetUpdateExtent());
+  clip->Update();
 
   // Permute, as a convenience
 
-  int *screenshot_dims = screenshot->GetDimensions();
+  int *clip_dims = clip->GetOutput()->GetDimensions();
+
   vtkImagePermute *permute = NULL;
-  if (screenshot_dims[2] != 1)
+  if (clip_dims[2] != 1)
     {
     permute = vtkImagePermute::New();
-    permute->SetInput(screenshot);
-    if (screenshot_dims[0] == 1)
+    permute->SetInput(clip->GetOutput());
+    if (clip_dims[0] == 1)
       {
       permute->SetFilteredAxes(1, 2, 0);
       }
@@ -975,63 +986,74 @@ int vtkKWWindowLevelPresetSelector::SetWindowLevelPresetImage(
       {
       permute->SetFilteredAxes(0, 2, 1);
       }
-    input = permute->GetOutput();
+    resample_input = permute->GetOutput();
     }
   else
     {
-    input = screenshot;
+    resample_input = clip->GetOutput();
     }
 
   // Create the thumbnail
 
-  input->Update();
-  int *input_dims = input->GetDimensions();
-  double *input_spacing = input->GetSpacing();
+  resample_input->Update();
+  int *resample_input_dims = resample_input->GetDimensions();
+  double *resample_input_spacing = resample_input->GetSpacing();
+
+  int large_dim = 0, small_dim = 1;
+  if (resample_input_dims[0] < resample_input_dims[1])
+    {
+    large_dim = 1; small_dim = 0;
+    }
 
   vtkImageResample *resample = vtkImageResample::New();
-  resample->SetInput(input);
+  resample->SetInput(resample_input);
   resample->SetInterpolationModeToCubic();
-  factor = (double)this->ThumbnailSize / (double)input_dims[0];
-  resample->SetAxisMagnificationFactor(0, factor);
+  factor = 
+    (double)this->ThumbnailSize / (double)resample_input_dims[large_dim];
+  resample->SetAxisMagnificationFactor(large_dim, factor);
   resample->SetAxisMagnificationFactor(
-    1, factor * (input_spacing[1] / input_spacing[0]));
+    small_dim, factor * (resample_input_spacing[small_dim] / 
+                         resample_input_spacing[large_dim]));
   resample->SetDimensionality(2);
   resample->Update();
-  output = resample->GetOutput();
+  vtkImageData *resample_output = resample->GetOutput();
 
   if (!(*it)->Thumbnail)
     {
     (*it)->Thumbnail = vtkKWIcon::New();
     }
   (*it)->Thumbnail->SetImage(
-    (const unsigned char*)output->GetScalarPointer(),
-    output->GetDimensions()[0],
-    output->GetDimensions()[1],
+    (const unsigned char*)resample_output->GetScalarPointer(),
+    resample_output->GetDimensions()[0],
+    resample_output->GetDimensions()[1],
     3,
     0,
     vtkKWIcon::ImageOptionFlipVertical);
 
   // Create the screenshot
 
-  factor = (double)this->ScreenshotSize / (double)input_dims[0];
-  resample->SetAxisMagnificationFactor(0, factor);
+  factor = 
+    (double)this->ScreenshotSize / (double)resample_input_dims[large_dim];
+  resample->SetAxisMagnificationFactor(large_dim, factor);
   resample->SetAxisMagnificationFactor(
-    1, factor * (input_spacing[1] / input_spacing[0]));
+    small_dim, factor * (resample_input_spacing[small_dim] / 
+                         resample_input_spacing[large_dim]));
   resample->Update();
-  output = resample->GetOutput();
+  resample_output = resample->GetOutput();
 
   if (!(*it)->Screenshot)
     {
     (*it)->Screenshot = vtkKWIcon::New();
     }
   (*it)->Screenshot->SetImage(
-    (const unsigned char*)output->GetScalarPointer(),
-    output->GetDimensions()[0],
-    output->GetDimensions()[1],
+    (const unsigned char*)resample_output->GetScalarPointer(),
+    resample_output->GetDimensions()[0],
+    resample_output->GetDimensions()[1],
     3,
     0,
     vtkKWIcon::ImageOptionFlipVertical);
 
+  clip->Delete();
   resample->Delete();
   if (permute)
     {
@@ -1232,9 +1254,13 @@ void vtkKWWindowLevelPresetSelector::PresetCellIconCallback(
         }
 
       child->Create(list->GetApplication());
-      child->SetImageToIcon((*it)->Thumbnail);
       child->SetBorderWidth(0);
       child->SetHighlightThickness(0);
+      child->SetWidth(this->ThumbnailSize);
+      child->SetHeight(this->ThumbnailSize);
+      child->SetBackgroundColor(
+        list->GetCellCurrentBackgroundColor(row, VTK_KW_WLPS_ICON_COL));
+      child->SetImageToIcon((*it)->Thumbnail);
 
       list->AddBindingsToWidget(child);
       child->Delete();
