@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.28");
+vtkCxxRevisionMacro(vtkPVPick, "1.29");
 
 
 //*****************************************************************************
@@ -824,3 +824,73 @@ void vtkPVPick::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVPick::SaveInBatchScript(ofstream* file)
+{
+  if( this->VisitedFlag )
+    {
+    return;
+    }
+
+  this->Superclass::SaveInBatchScript(file);
+
+  *file << endl;
+  *file << "  # Save the TemporalPickProxy" << endl;
+  this->SaveTemporalPickInBatchScript(file);
+
+  *file << endl;
+  *file << "  # Save the XY Plot" << endl;
+  this->PlotDisplayProxy->SaveInBatchScript(file);
+
+  const char *filename = this->SaveButton->GetFileName();
+  if (filename)
+    {
+    cout << filename << endl;
+    *file << "  # Plot's .csv file name is " << filename << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPick::SaveTemporalPickInBatchScript(ofstream* file)
+{
+  // Some displays do not have VTKClassName set and hence only create Subproxies.
+  // For such displays we use their self ids. 
+  
+  unsigned int count = this->TemporalPickProxy->GetNumberOfIDs();
+  vtkClientServerID id = (count)? this->TemporalPickProxy->GetID(0) : this->TemporalPickProxy->GetSelfID();
+  count = (count)? count : 1;
+   
+  for (unsigned int kk = 0; kk < count ; kk++)
+    {
+    if (kk > 0)
+      {
+      id = this->TemporalPickProxy->GetID(kk);
+      }
+    
+    *file << endl;
+    *file << "set pvTemp" << id
+      << " [$proxyManager NewProxy " << this->TemporalPickProxy->GetXMLGroup() << " "
+      << this->TemporalPickProxy->GetXMLName() << "]" << endl;
+    *file << "  $proxyManager RegisterProxy " << this->TemporalPickProxy->GetXMLGroup()
+      << " pvTemp" << id <<" $pvTemp" << id << endl;
+    *file << "  $pvTemp" << id << " UnRegister {}" << endl;
+
+    //First set the input
+    vtkSMInputProperty* ipp;
+    ipp = vtkSMInputProperty::SafeDownCast(
+      this->TemporalPickProxy->GetProperty("Input"));
+    if (ipp && ipp->GetNumberOfProxies() > 0)
+      {
+      *file << "  [$pvTemp" << id << " GetProperty Input] "
+        " AddProxy $pvTemp" << ipp->GetProxy(0)->GetID(0)
+        << endl;
+      }
+    else
+      {
+      *file << "# Input to Display Proxy not set properly or takes no Input." 
+        << endl;
+      }
+
+    *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+    }
+}
