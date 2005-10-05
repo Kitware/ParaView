@@ -55,7 +55,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.162");
+vtkCxxRevisionMacro(vtkPVProbe, "1.163");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -549,7 +549,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
     this->SaveButton->SetEnabled(0);
     this->ShowXYPlotToggle->SetSelectedState(0);
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 0",
                                      this->ShowXYPlotToggle->GetTclName());
     }
 
@@ -653,6 +653,7 @@ void vtkPVProbe::SaveDialogCallback()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::SaveState(ofstream* file)
 {
   this->Superclass::SaveState(file);
