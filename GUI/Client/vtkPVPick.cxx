@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.29");
+vtkCxxRevisionMacro(vtkPVPick, "1.30");
 
 
 //*****************************************************************************
@@ -411,6 +411,10 @@ void vtkPVPick::AcceptCallbackInternal()
     ip->AddProxy(this->TemporalPickProxy);
     this->PlotDisplayProxy->SetXAxisLabel(true);
     this->AddDisplayToRenderModule(this->PlotDisplayProxy);
+
+    this->GetTraceHelper()->AddEntry("set kw(%s) [$kw(%s) GetShowXYPlotToggle ]",
+                                     this->ShowXYPlotToggle->GetTclName(),
+                                     this->GetTclName());
     }
 
   //choose either point or cell input to the temporal plot
@@ -456,6 +460,7 @@ void vtkPVPick::AcceptCallbackInternal()
       this->ArraySelection->SetPVSource(this);
       this->ArraySelection->SetLabelText("Cell Scalars");
       this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
+
       }
 
     int numArrays;
@@ -538,9 +543,13 @@ void vtkPVPick::AcceptCallbackInternal()
     {
     this->PlotDisplayProxy->SetVisibilityCM(1);
     this->SaveButton->SetEnabled(1);
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+                                     this->ShowXYPlotToggle->GetTclName());
     }
   else
-    {
+    { 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+                                     this->ShowXYPlotToggle->GetTclName());
     this->PlotDisplayProxy->SetVisibilityCM(0);
     this->SaveButton->SetEnabled(0);
     }
@@ -893,4 +902,18 @@ void vtkPVPick::SaveTemporalPickInBatchScript(ofstream* file)
 
     *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
     }
+}
+
+void vtkPVPick::SaveState(ofstream* file)
+{
+  this->Superclass::SaveState(file);
+  //save the state of the plot display toggle if on
+  if (this->ShowXYPlotToggle->GetSelectedState()) 
+    {
+    *file << "set kw(" << this->ShowXYPlotToggle->GetTclName() << ") [$kw(" << this->GetTclName() << ") GetShowXYPlotToggle ]" << endl;
+    *file << "$kw(" << this->ShowXYPlotToggle->GetTclName() << ") SetSelectedState 1" << endl; 
+    // Call accept.
+    *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
+    }
+
 }

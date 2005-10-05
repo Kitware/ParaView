@@ -55,7 +55,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.161");
+vtkCxxRevisionMacro(vtkPVProbe, "1.162");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -369,6 +369,10 @@ void vtkPVProbe::AcceptCallbackInternal()
 
     this->PlotDisplayProxy->SetVisibilityCM(0); // also calls UpdateVTKObjects().
     this->AddDisplayToRenderModule(this->PlotDisplayProxy);
+
+    this->GetTraceHelper()->AddEntry("set kw(%s) [$kw(%s) GetShowXYPlotToggle ]",
+                                     this->ShowXYPlotToggle->GetTclName(),
+                                     this->GetTclName());
     }
 
 
@@ -536,6 +540,8 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->PlotDisplayProxy->SetVisibilityCM(1);
     this->Script("pack %s -fill x -expand true", this->ArraySelection->GetWidgetName());  
     this->SaveButton->SetEnabled(1);
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+                                     this->ShowXYPlotToggle->GetTclName());
     }
   else
     {
@@ -543,6 +549,8 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
     this->SaveButton->SetEnabled(0);
     this->ShowXYPlotToggle->SetSelectedState(0);
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+                                     this->ShowXYPlotToggle->GetTclName());
     }
 
 }
@@ -642,5 +650,18 @@ void vtkPVProbe::SaveDialogCallback()
   if (filename)
     {
     this->PlotDisplayProxy->PrintAsCSV(filename);
+    }
+}
+
+void vtkPVProbe::SaveState(ofstream* file)
+{
+  this->Superclass::SaveState(file);
+  //save the state of the plot display toggle if on
+  if (this->ShowXYPlotToggle->GetSelectedState()) 
+    {
+    *file << "set kw(" << this->ShowXYPlotToggle->GetTclName() << ") [$kw(" << this->GetTclName() << ") GetShowXYPlotToggle ]" << endl;
+    *file << "$kw(" << this->ShowXYPlotToggle->GetTclName() << ") SetSelectedState 1" << endl; 
+    // Call accept.
+    *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
     }
 }
