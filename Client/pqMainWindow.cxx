@@ -64,7 +64,10 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 
 pqMainWindow::pqMainWindow(QApplication& Application) :
   currentServer(0),
-  fileOpenAction(0)
+  window(0),
+  fileOpenAction(0),
+  serverConnectAction(0),
+  serverDisconnectAction(0)
 {
   this->setName("mainWindow");
   this->setWindowTitle("ParaQ Client");
@@ -104,20 +107,28 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   testMenu->addAction(testsRunAction);
   
   this->setServer(0);
-
-  this->window = NULL;
-  
 }
 
 pqMainWindow::~pqMainWindow()
 {
+  delete this->window;
   delete this->currentServer;
 }
 
 void pqMainWindow::setServer(pqServer* Server)
 {
+  delete this->window;
+  this->window = 0;
+
   delete this->currentServer;
-  this->currentServer = Server;
+  this->currentServer = 0;
+  
+  if(Server)
+    {
+    this->window = new QVTKWidget(this);
+    this->setCentralWidget(this->window);
+    this->currentServer = Server;
+    }
   
   fileOpenAction->setEnabled(this->currentServer);
   serverConnectAction->setEnabled(!this->currentServer);
@@ -188,12 +199,6 @@ void pqMainWindow::onFileOpen(const QString& File)
   source->UpdateVTKObjects();
   
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
-
-  if(!this->window)
-    {
-    this->window = new QVTKWidget(this);
-    this->setCentralWidget(this->window);
-    }
 
   // Create a render window ...  
   vtkRenderWindow* const render_window = this->currentServer->GetRenderModule()->GetRenderWindow();
