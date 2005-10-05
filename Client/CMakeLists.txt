@@ -32,6 +32,7 @@ INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Filtering
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/GenericFiltering
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Rendering
+  ${ParaQ_SOURCE_DIR}/ParaView/VTK/GUISupport/Qt
   ${ParaQ_SOURCE_DIR}/ParaView/GUI/Client
   ${ParaQ_SOURCE_DIR}/ParaView/Servers/Common
   ${ParaQ_SOURCE_DIR}/ParaView/Servers/Filters
@@ -75,6 +76,8 @@ ADD_EXECUTABLE(pqClient
   pqTestCases.h
   pqTesting.cxx
   pqTesting.h
+  pqRenderViewProxy.cxx
+  pqRenderViewProxy.h
   ${MOC_BUILT_SOURCES}
 )
 
@@ -99,6 +102,8 @@ TARGET_LINK_LIBRARIES(pqClient
   vtkCommonCS
   vtkClientServer
   SPCTH
+
+  QVTK
 
   vtkParallel
   vtkHybrid

@@ -14,6 +14,7 @@
 
 class pqServer;
 class QAction;
+class QVTKWidget;
 
 class pqMainWindow :
         public QMainWindow
@@ -28,6 +29,7 @@ private:
   void setServer(pqServer* Server);
 
   pqServer* currentServer;
+  QVTKWidget* window;  // just a random place to put this for now
   
   QAction* fileOpenAction;
   QAction* serverConnectAction;

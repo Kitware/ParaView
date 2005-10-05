@@ -11,7 +11,8 @@
 #include "pqMainWindow.h"
 #include "pqParts.h"
 #include "pqServer.h"
-#include "pqServerFileBrowser.h"
+#include "pqRenderViewProxy.h"
+#include "pqServerFileDialog.h"
 #include "pqServerBrowser.h"
 #include "pqTesting.h"
 
@@ -30,6 +31,9 @@
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
+#include <vtkPVGenericRenderWindowInteractor.h>
+
+#include <QVTKWidget.h>
 
 namespace
 {
@@ -100,6 +104,9 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   testMenu->addAction(testsRunAction);
   
   this->setServer(0);
+
+  this->window = NULL;
+  
 }
 
 pqMainWindow::~pqMainWindow()
@@ -160,6 +167,10 @@ void pqMainWindow::onServerDisconnect()
 
 void pqMainWindow::onFileOpen()
 {
+  if(!this->currentServer)
+    {
+    return;
+    }
   pqServerFileBrowser* const file_browser = new pqServerFileBrowser(*this->currentServer, this, "fileOpenBrowser");
   file_browser->show();
   QObject::connect(file_browser, SIGNAL(fileSelected(const QString&)), this, SLOT(onFileOpen(const QString&)));
@@ -178,12 +189,30 @@ void pqMainWindow::onFileOpen(const QString& File)
   
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
 
+  if(!this->window)
+    {
+    this->window = new QVTKWidget(this);
+    this->setCentralWidget(this->window);
+    }
+
   // Create a render window ...  
   vtkRenderWindow* const render_window = this->currentServer->GetRenderModule()->GetRenderWindow();
-  render_window->SetWindowName("ParaQ Client");
-  render_window->SetPosition(500, 500);
-  render_window->SetSize(640, 480);
-  render_window->Render();  
+  this->window->SetRenderWindow(render_window);
+  this->window->setWindowTitle("ParaQ Client");
+  this->window->update();
+
+  pqRenderViewProxy* proxy = pqRenderViewProxy::New();
+  proxy->SetRenderWindow(this->window);
+  vtkPVGenericRenderWindowInteractor* iren = 
+       vtkPVGenericRenderWindowInteractor::SafeDownCast(this->currentServer->GetRenderModule()->GetInteractor());
+  iren->SetPVRenderView(proxy);
+  proxy->Delete();
+  iren->Enable();
+
+  //render_window->SetWindowName("ParaQ Client");
+  //render_window->SetPosition(500, 500);
+  //render_window->SetSize(640, 480);
+  //render_window->Render();
 
   pqResetCamera(currentServer->GetRenderModule());
   pqRedrawCamera(currentServer->GetRenderModule());
