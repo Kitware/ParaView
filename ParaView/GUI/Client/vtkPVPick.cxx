@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.30");
+vtkCxxRevisionMacro(vtkPVPick, "1.31");
 
 
 //*****************************************************************************
@@ -548,7 +548,7 @@ void vtkPVPick::AcceptCallbackInternal()
     }
   else
     { 
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 1",
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetSelectedState 0",
                                      this->ShowXYPlotToggle->GetTclName());
     this->PlotDisplayProxy->SetVisibilityCM(0);
     this->SaveButton->SetEnabled(0);
@@ -904,6 +904,7 @@ void vtkPVPick::SaveTemporalPickInBatchScript(ofstream* file)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPick::SaveState(ofstream* file)
 {
   this->Superclass::SaveState(file);
