@@ -66,6 +66,7 @@ public:
   // a user interface.
   // Overridden to save the plot display in batch.
   virtual void SaveInBatchScript(ofstream *file);
+  virtual void SaveState(ofstream *file);
 
   // Description:
   // Called when scalars are selected or deselected for the plot.
