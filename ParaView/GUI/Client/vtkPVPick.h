@@ -62,6 +62,12 @@ public:
   void UpdatePointLabelFontSize();
 
   // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
+  // Overridden to save the plot display in batch.
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
   // Called when scalars are selected or deselected for the plot.
   void ArraySelectionInternalCallback();
 
@@ -110,6 +116,8 @@ protected:
   vtkKWLoadSaveButton *SaveButton;
   int LastPorC;
   int LastUseId;
+
+  virtual void SaveTemporalPickInBatchScript(ofstream *file);
 
 private:
   vtkPVPick(const vtkPVPick&); // Not implemented
