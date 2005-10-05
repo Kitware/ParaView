@@ -12,7 +12,7 @@
 #include "pqParts.h"
 #include "pqServer.h"
 #include "pqRenderViewProxy.h"
-#include "pqServerFileDialog.h"
+#include "pqServerFileBrowser.h"
 #include "pqServerBrowser.h"
 #include "pqTesting.h"
 
