@@ -2547,7 +2547,7 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataTypeDomain name="input_type" composite_data_supported="1">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
