@@ -125,38 +125,38 @@ public:
   // This breaks rmi loops and cleans up processes.`                
   virtual void Exit() = 0;
 
-  // Description: 
-  // These methods construct/delete a vtk object in the vtkClientServerStream
-  // owned by the process module.  The type of the object is specified by
-  // string name, and the object to delete is specified by the object id
-  // passed in.  To send the stream to the server call SendStreamToServer or
-  // SendStreamToClientAndServer.  For construction, the unique id for the
-  // new object is returned.
+  // Description:
+  // These methods append commands to the given vtkClientServerStream
+  // to construct or delete a vtk object.  For construction, the type
+  // of the object is specified by string name and the new unique
+  // object id is returned.  For deletion the object is specified by
+  // its id.  These methods do not send the stream anywhere, so the
+  // caller must use SendStream() to actually perform the operation.
   vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream);
   void DeleteStreamObject(vtkClientServerID, vtkClientServerStream& stream);
-  
+
   // Description:
-  // Return the vtk object associated with the given id for the client.
-  // If the id is for an object on the server then 0 is returned.
+  // Return the vtk object associated with the given id for the
+  // client.  If the id is for an object on another node then 0 is
+  // returned.
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
-  
+
   // Description:
-  // Return the last result for the specified server.
-  // In this case, the server should be one of the ServerFlags,
-  // and not a combination of servers.  This always returns from 
-  // the root node of an MPI server.  There is no connection to the
-  // individual nodes of a server.
+  // Return the last result for the specified server.  In this case,
+  // the server should be exactly one of the ServerFlags, and not a
+  // combination of servers.  For an MPI server the result from the
+  // root node is returned.  There is no connection to the individual
+  // nodes of a server.
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 server);
-  
+
   // Description:
-  // Send a vtkClientServerStream to the specified servers.
-  // Servers are specified with a bit vector.   To send to more
-  // than one server use the bitwise or operator to combine servers.
-  // The stream can either be passed in or the current stream will
-  // be used.  If the current stream is used, then the stream is cleared
-  // after the call.  If a stream is passed the resetStream flag determines
-  // if Reset is called on the stream after it is sent.
-  int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, int resetStream=1);
+  // Send a vtkClientServerStream to the specified servers.  Servers
+  // are specified with a bit vector.  To send to more than one server
+  // use the bitwise or operator to combine servers.  The resetStream
+  // flag determines if Reset is called to clear the stream after it
+  // is sent.
+  int SendStream(vtkTypeUInt32 server, vtkClientServerStream& stream,
+                 int resetStream=1);
 
   // Description:
   // Get the interpreter used on the local process.
