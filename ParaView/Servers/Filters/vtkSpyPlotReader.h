@@ -104,6 +104,13 @@ public:
   vtkBooleanMacro(GenerateBlockIdArray,int);
   
   // Description:
+  // If true, the reader will convert volume fraction arrays to unsigned char.
+  // True by default.
+  vtkSetMacro(DownConvertVolumeFraction,int);
+  vtkGetMacro(DownConvertVolumeFraction,int);
+  vtkBooleanMacro(DownConvertVolumeFraction,int);
+  
+  // Description:
   // Get the time step range.
   vtkGetVector2Macro(TimeStepRange, int);
 
@@ -217,6 +224,8 @@ protected:
   
   int GenerateLevelArray; // user flag
   int GenerateBlockIdArray; // user flag
+
+  int DownConvertVolumeFraction;
   
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
