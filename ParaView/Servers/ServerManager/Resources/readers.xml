@@ -899,7 +899,7 @@
    <!-- End xyzreader -->
    </SourceProxy>
 
-   <SourceProxy name="P3DReader" class="vtkPLOT3DReader">
+   <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader">
      <StringVectorProperty
         name="FileName"
         animateable="1"
@@ -996,84 +996,6 @@
          <Entry value="201" text="Vector - Vorticity"/>
          <!-- <Entry value="202" text="Vector - Momentum"/> -->
          <Entry value="210" text="Vector - Pressure gradient"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-   <!-- End P3DReader -->
-   </SourceProxy>
-
-   <SourceProxy name="MBP3DReader" class="vtkMultiBlockPLOT3DReader">
-     <StringVectorProperty
-        name="FileName"
-        animateable="1"
-        command="SetFileName"
-        number_of_elements="1">
-        <StringListDomain name="files"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="QFileName"
-        command="SetQFileName"
-        animateable="1"
-        number_of_elements="1">
-       <StringListDomain name="files"/>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="BinaryFile" 
-        command="SetBinaryFile" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="MultiGrid" 
-        command="SetMultiGrid" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="HasByteCount" 
-        command="SetHasByteCount" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="IBlanking" 
-        command="SetIBlanking" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TwoDimensionalGeometry" 
-        command="SetTwoDimensionalGeometry" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ForceRead" 
-        command="SetForceRead" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ByteOrder" 
-        command="SetByteOrder" 
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="BigEndian"/>
-         <Entry value="1" text="LittleEndian"/>
        </EnumerationDomain>
      </IntVectorProperty>
    <!-- End P3DReader -->
