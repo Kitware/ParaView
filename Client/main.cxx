@@ -10,9 +10,6 @@
  */
 
 #include "pqMainWindow.h"
-
-#include <vtkOutputWindow.h>
-
 #include <QApplication>
 
 //----------------------------------------------------------------------------

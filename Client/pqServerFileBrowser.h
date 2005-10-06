@@ -17,7 +17,9 @@ signals:
   void fileSelected(const QString&);
   
 private:
-  ~pqServerFileBrowser() {};
+  ~pqServerFileBrowser();
+  pqServerFileBrowser(const pqServerFileBrowser&);
+  pqServerFileBrowser& operator=(const pqServerFileBrowser&);
   
   Ui::pqServerFileBrowser ui;
  

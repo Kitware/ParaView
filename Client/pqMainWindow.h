@@ -29,18 +29,19 @@ private:
   void setServer(pqServer* Server);
 
   pqServer* currentServer;
-  QVTKWidget* window;  // just a random place to put this for now
-  
-  QAction* fileOpenAction;
-  QAction* serverConnectAction;
+  QVTKWidget* window;
   QAction* serverDisconnectAction;
   
 private slots:
+  void onFileNew();
+  void onFileNew(pqServer* Server);
   void onFileOpen();
+  void onFileOpen(pqServer* Server);
   void onFileOpen(const QString& File);
   void onServerConnect();
+  void onServerConnect(pqServer* Server);
   void onServerDisconnect();
-  void onDebugHierarchy();
+  void onDebugQtHierarchy();
   void onTestsRun();
 };
 

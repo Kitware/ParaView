@@ -12,15 +12,29 @@
 
 #include "pqServerBrowser.ui.h"
 
+class pqServer;
+
 class pqServerBrowser :
   public QDialog
 {
   Q_OBJECT
 
 public:
-  pqServerBrowser(QWidget* Parent = 0, const char* const Name = 0);
+  pqServerBrowser(QWidget* Parent, const char* const Name);
+
+signals:
+  void serverConnected(pqServer*);
  
+private:
+  ~pqServerBrowser();
+  pqServerBrowser(const pqServerBrowser&);
+  pqServerBrowser& operator=(const pqServerBrowser&);
+  
   Ui::pqServerBrowser ui;
+  
+private slots:
+  void accept();
+  void reject();
 };
 
 #endif // !_pqServerBrowser_h

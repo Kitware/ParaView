@@ -14,6 +14,10 @@ pqServerFileBrowser::pqServerFileBrowser(pqServer& Server, QWidget* Parent, cons
   this->ui.fileList->setProcessModule(Server.GetProcessModule());
 }
 
+pqServerFileBrowser::~pqServerFileBrowser()
+{
+}
+
 void pqServerFileBrowser::onFileSelected(const QString& File)
 {
   accept();

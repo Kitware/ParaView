@@ -7,7 +7,10 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqServer.h"
 #include "pqServerBrowser.h"
+
+#include <QMessageBox>
 
 pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
   QDialog(Parent, Name)
@@ -17,4 +20,42 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
   
   this->ui.serverType->addItem("Standalone");
   this->ui.serverType->addItem("Remote Server");
+}
+
+pqServerBrowser::~pqServerBrowser()
+{
+}
+
+void pqServerBrowser::accept()
+{
+  pqServer* server = 0;
+  switch(ui.serverType->currentIndex())
+    {
+    case 0:
+      server = pqServer::Standalone();
+      break;
+    case 1:
+      server = pqServer::Connect(ui.hostName->text().ascii(), ui.portNumber->value());
+      break;
+    default:
+      QMessageBox::critical(this, tr("Pick Server:"), tr("Unknown server type"));
+      return;
+    }
+  
+  if(!server)
+    {
+    QMessageBox::critical(this, tr("Pick Server:"), tr("Error connecting to server"));
+    return;
+    }
+
+  emit serverConnected(server);
+
+  QDialog::accept();
+  delete this;
+}
+
+void pqServerBrowser::reject()
+{
+  QDialog::reject();
+  delete this;
 }
