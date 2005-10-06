@@ -9,13 +9,13 @@ ParseCommandLine $kw(vtkTemp75) $argv $argc
 set kw(vtkTemp1184) [$kw(vtkTemp1) GetAnimationManager]
 [$kw(vtkTemp1) GetRotateCameraButton] SetSelectedState 1
 $kw(vtkTemp1) ChangeInteractorStyle 1
-set kw(vtkTemp942) [$kw(vtkTemp1) InitializeReadCustom "MBP3DReader" "$DataDir/Data/comb_mb_ascii.mxyz"]
-$kw(vtkTemp1) ReadFileInformation $kw(vtkTemp942) "$DataDir/Data/comb_mb_ascii.mxyz"
-$kw(vtkTemp1) FinalizeRead $kw(vtkTemp942) "$DataDir/Data/comb_mb_ascii.mxyz"
+set kw(vtkTemp942) [$kw(vtkTemp1) InitializeReadCustom "P3DReader" "$DataDir/Data/comb_mb_ascii.xyz"]
+$kw(vtkTemp1) ReadFileInformation $kw(vtkTemp942) "$DataDir/Data/comb_mb_ascii.xyz"
+$kw(vtkTemp1) FinalizeRead $kw(vtkTemp942) "$DataDir/Data/comb_mb_ascii.xyz"
 set kw(vtkTemp974) [$kw(vtkTemp942) GetPVWidget {Filename}]
-$kw(vtkTemp974) SetValue "$DataDir/Data/comb_mb_ascii.mxyz"
+$kw(vtkTemp974) SetValue "$DataDir/Data/comb_mb_ascii.xyz"
 set kw(vtkTemp943) [$kw(vtkTemp942) GetPVWidget {QFileName}]
-$kw(vtkTemp943) SetValue "$DataDir/Data/comb_mb_ascii.mq"
+$kw(vtkTemp943) SetValue "$DataDir/Data/comb_mb_ascii.q"
 set kw(vtkTemp952) [$kw(vtkTemp942) GetPVWidget {BinaryFile}]
 $kw(vtkTemp952) SetSelectedState 0
 set kw(vtkTemp955) [$kw(vtkTemp942) GetPVWidget {MultiGrid}]

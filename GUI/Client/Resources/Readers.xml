@@ -379,7 +379,7 @@
           module_type="Reader"
           extensions=".xyz"
           file_description="PLOT3D Files">
-    <Source class="vtkPLOT3DReader"/>
+    <Source class="vtkMultiBlockPLOT3DReader"/>
     <FileEntry label="Q File"
                trace_name="QFileName"
                property="QFileName" extension="q"
@@ -421,53 +421,6 @@
     <ItemSelection label_text="Function"
                     property="Functions"
                     trace_name="FunctionSelection"/>
-  </Module>
-
-  <Module name="MBP3DReader"
-          class="vtkPVPLOT3DReaderModule"
-          root_name="Plot3D"
-          module_type="Reader"
-          extensions=".mxyz"
-          file_description="Multi-block PLOT3D Files">
-    <Source class="vtkPLOT3DReader"/>
-    <FileEntry label="Q File"
-               trace_name="QFileName"
-               property="QFileName" extension="mq"
-               keeps_timesteps="1"
-               help="Set the plot3d q file to read."/>
-    <LabeledToggle label="Binary"
-                   trace_name="BinaryFile"
-                   property="BinaryFile"
-                   help="Is this a binary file?"/>
-    <LabeledToggle label="Multi-block"
-                   trace_name="MultiGrid"
-                   property="MultiGrid"
-                   help="Does this file have multiple block information"/>
-    <LabeledToggle label="Fortran byte count"
-                   trace_name="HasByteCount"
-                   property="HasByteCount"
-                   help="Does this file use Fortran leading-trailing byte counts"/>
-    <LabeledToggle label="I blanking"
-                   trace_name="IBlanking"
-                   property="IBlanking"
-                   help="Any visibility information?"/>
-    <LabeledToggle label="2D geometry"
-                   trace_name="TwoDimensionalGeometry"
-                   property="TwoDimensionalGeometry"
-                   help="Is there only data for two dimensions?"/>
-    <LabeledToggle label="Force read"
-                   trace_name="ForceRead"
-                   property="ForceRead"
-                   help="Read even if file looks corrupt?"/>
-    <SelectionList label="Byte order"
-                   trace_name="ByteOrder"
-                   property="ByteOrder"
-                   help="Select the byte order of the binary file">
-      <Item name="big endian"
-            value="0"/>
-      <Item name="little endian"
-            value="1"/>
-    </SelectionList>
   </Module>
 
  <Module name="spcthreader"
