@@ -75,8 +75,10 @@ public:
   // Descrption:
   // If the input point/cell attributes has an array with this name,
   // then it is used to find the point.  Defaults to GlobalId.
-  vtkSetStringMacro(GlobalIdArrayName);
-  vtkGetStringMacro(GlobalIdArrayName);
+  vtkSetStringMacro(GlobalPointIdArrayName);
+  vtkGetStringMacro(GlobalPointIdArrayName);
+  vtkSetStringMacro(GlobalCellIdArrayName);
+  vtkGetStringMacro(GlobalCellIdArrayName);
   
   // Description:
   // This is set by default (if compiled with MPI).
@@ -105,7 +107,8 @@ protected:
 
   int UseIdToPick;
   vtkIdType Id;
-  char* GlobalIdArrayName;
+  char* GlobalPointIdArrayName;
+  char* GlobalCellIdArrayName;
 
   vtkMultiProcessController* Controller;
 

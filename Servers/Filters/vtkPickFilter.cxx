@@ -33,7 +33,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.19");
+vtkCxxRevisionMacro(vtkPickFilter, "1.20");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -49,8 +49,10 @@ vtkPickFilter::vtkPickFilter ()
   this->PointMap = 0;
   this->RegionPointIds = 0;
   this->BestInputIndex = -1;
-  this->GlobalIdArrayName = 0;
-  this->SetGlobalIdArrayName("GlobalId");
+  this->GlobalCellIdArrayName = 0;
+  this->SetGlobalCellIdArrayName("GlobalElementId");
+  this->GlobalPointIdArrayName = 0;
+  this->SetGlobalPointIdArrayName("GlobalNodeId");
   this->Id = 0;
   this->UseIdToPick = 0;
 }
@@ -59,7 +61,8 @@ vtkPickFilter::vtkPickFilter ()
 vtkPickFilter::~vtkPickFilter ()
 {
   this->SetController(0);
-  this->SetGlobalIdArrayName(0);  
+  this->SetGlobalCellIdArrayName(0);  
+  this->SetGlobalPointIdArrayName(0);  
 }
 
 //----------------------------------------------------------------------------
@@ -540,9 +543,13 @@ void vtkPickFilter::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "UseIdToPick: " << this->UseIdToPick << endl;
   os << indent << "Id: " << this->Id << endl;
-  if (this->GlobalIdArrayName)
+  if (this->GlobalPointIdArrayName)
     {
-    os << indent << "GlobalIdArrayName: " << this->GlobalIdArrayName << endl;
+    os << indent << "GlobalPointIdArrayName: " << this->GlobalPointIdArrayName << endl;
+    }
+  if (this->GlobalCellIdArrayName)
+    {
+    os << indent << "GlobalCellIdArrayName: " << this->GlobalCellIdArrayName << endl;
     }
 }
 
@@ -612,17 +619,20 @@ int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx,
 {
   vtkIdType bestId = -1;
   vtkIdType pointId, numPoints;
-  vtkIdType myStart = -1;
-
   vtkDataArray* globalIds;
-  globalIds = input->GetPointData()->GetArray(this->GlobalIdArrayName);
+  vtkIdType myStart = -1;
+  int numProcs = 0;
+
   numPoints = input->GetNumberOfPoints();
 
-  if (globalIds == 0 && this->Controller)
+  globalIds = input->GetPointData()->GetArray(this->GlobalPointIdArrayName);
+
+  if (this->Controller) numProcs = this->Controller->GetNumberOfProcesses();
+
+  if (globalIds == 0 && numProcs > 1)
     {
     //In parallel runs, fake a globalId array if none exists
     int myId = this->Controller->GetLocalProcessId();
-    int numProcs = this->Controller->GetNumberOfProcesses();
     int mysize = numPoints;
     int *sizes = new int[numProcs];
     if (myId == 0)
@@ -745,18 +755,21 @@ int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx,
 {
   vtkIdType cellId;
   vtkIdType numCells;
+  vtkDataArray* globalIds;
   vtkIdType bestId = -1;
   vtkIdType myStart = -1;
+  int numProcs = 0;
 
-  vtkDataArray* globalIds;
-  globalIds = input->GetCellData()->GetArray(this->GlobalIdArrayName);
   numCells = input->GetNumberOfCells();
 
-  if (globalIds == 0 && this->Controller)
+  globalIds = input->GetCellData()->GetArray(this->GlobalCellIdArrayName);
+
+  if (this->Controller) numProcs = this->Controller->GetNumberOfProcesses();
+
+  if (globalIds == 0 && numProcs > 1)
     {
     //In parallel runs, fake a globalId array if none exists
     int myId = this->Controller->GetLocalProcessId();
-    int numProcs = this->Controller->GetNumberOfProcesses();
     int mysize = numCells;
     int *sizes = new int[numProcs];
     if (myId == 0)
