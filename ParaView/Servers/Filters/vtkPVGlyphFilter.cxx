@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.23");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.24");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   this->SetColorModeToColorByScalar();
   this->SetScaleModeToScaleByVector();
   this->MaskPoints = vtkMaskPoints::New();
+  this->RandomMode = this->MaskPoints->GetRandomMode();
   this->MaximumNumberOfPoints = 5000;
   this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
     vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() : 1;
@@ -69,6 +70,9 @@ void vtkPVGlyphFilter::SetRandomMode(int mode)
     return;
     }
   this->MaskPoints->SetRandomMode(mode);
+  // Store random mode to so that we don't have to call
+  // MaskPoints->GetRandomMode() in tight loop.
+  this->RandomMode = mode;
   this->Modified();
 }
 
@@ -250,8 +254,15 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
       this->BlockPointCounter++ == this->BlockNextPoint)
     {
     this->BlockNumPts++;
-    this->BlockNextPoint += static_cast<vtkIdType>(
-      1+2*vtkMath::Random()*this->BlockOnRatio);
+    if (this->RandomMode)
+      {
+      this->BlockNextPoint += static_cast<vtkIdType>(
+        1+2*vtkMath::Random()*this->BlockOnRatio);
+      }
+    else
+      {
+      this->BlockNextPoint += static_cast<vtkIdType>(this->BlockOnRatio);
+      }
     return 1;
     }
 
@@ -340,8 +351,15 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
           }
         this->BlockPointCounter = 0;
         this->BlockNumPts = 0;
-        this->BlockNextPoint = static_cast<vtkIdType>(
-          1+vtkMath::Random()*this->BlockOnRatio);
+        if (this->MaskPoints->GetRandomMode())
+          {
+          this->BlockNextPoint = static_cast<vtkIdType>(
+            1+vtkMath::Random()*this->BlockOnRatio);
+          }
+        else
+          {
+          this->BlockNextPoint = static_cast<vtkIdType>(1+this->BlockOnRatio);
+          }
         
         //retVal = this->MaskAndExecute(blockNumPts, blockMaxNumPts, ds,
         //request, inputVs, outputVector);
