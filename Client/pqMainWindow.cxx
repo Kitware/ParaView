@@ -8,12 +8,14 @@
  */
 
 #include "pqCamera.h"
+#include "pqFileDialog.h"
+#include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqParts.h"
-#include "pqServer.h"
 #include "pqRenderViewProxy.h"
-#include "pqServerFileBrowser.h"
+#include "pqServer.h"
 #include "pqServerBrowser.h"
+#include "pqServerFileDialogModel.h"
 #include "pqTesting.h"
 
 #include <QApplication>
@@ -63,6 +65,7 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 } // namespace
 
 pqMainWindow::pqMainWindow(QApplication& Application) :
+  base(),
   currentServer(0),
   window(0),
   serverDisconnectAction(0)
@@ -85,6 +88,9 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   this->serverDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
   connect(this->serverDisconnectAction, SIGNAL(activated()), this, SLOT(onServerDisconnect()));
 
+  QAction* const debugOpenLocalFileAction = new QAction(tr("Open Local File"), this) << pqSetName("debugOpenLocalFileAction");
+  connect(debugOpenLocalFileAction, SIGNAL(activated()), this, SLOT(onDebugOpenLocalFile()));
+
   QAction* const debugQtHierarchyAction = new QAction(tr("Dump Hierarchy"), this) << pqSetName("debugHierarchyAction");
   connect(debugQtHierarchyAction, SIGNAL(activated()), this, SLOT(onDebugQtHierarchy()));
 
@@ -103,6 +109,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   serverMenu->addAction(this->serverDisconnectAction);
   
   QMenu* const debugMenu = this->menuBar()->addMenu(tr("Debug")) << pqSetName("debugMenu");
+  debugMenu->addAction(debugOpenLocalFileAction);
   debugMenu->addAction(debugQtHierarchyAction);
   
   QMenu* const testMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testMenu");
@@ -188,9 +195,10 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 {
   setServer(Server);
 
-  pqServerFileBrowser* const file_browser = new pqServerFileBrowser(*this->currentServer, this, "fileOpenBrowser");
-  QObject::connect(file_browser, SIGNAL(fileSelected(const QString&)), this, SLOT(onFileOpen(const QString&)));
-  file_browser->show();
+//  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->currentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  QObject::connect(file_dialog, SIGNAL(fileSelected(const QString&)), this, SLOT(onFileOpen(const QString&)));
+  file_dialog->show();
 }
 
 void pqMainWindow::onFileOpen(const QString& File)
@@ -229,6 +237,12 @@ void pqMainWindow::onServerDisconnect()
   setServer(0);
 }
 
+void pqMainWindow::onDebugOpenLocalFile()
+{
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Local File (does nothing):"), this, "fileOpenDialog");
+  file_dialog->show();
+}
+
 void pqMainWindow::onDebugQtHierarchy()
 {
   pqDumpQtHierarchy(cerr, *this);
@@ -239,4 +253,5 @@ void pqMainWindow::onTestsRun()
   pqRunRegressionTests();
   pqRunRegressionTests(*this);
 }
+
 

@@ -19,6 +19,8 @@ class QVTKWidget;
 class pqMainWindow :
         public QMainWindow
 {
+  typedef QMainWindow base;
+  
   Q_OBJECT
 
 public:
@@ -41,6 +43,7 @@ private slots:
   void onServerConnect();
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
+  void onDebugOpenLocalFile();
   void onDebugQtHierarchy();
   void onTestsRun();
 };

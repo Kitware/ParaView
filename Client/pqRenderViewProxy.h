@@ -14,7 +14,8 @@
 
 class QVTKWidget;
 
-class pqRenderViewProxy : public vtkPVRenderViewProxy
+class pqRenderViewProxy :
+  public vtkPVRenderViewProxy
 {
   public:
     static pqRenderViewProxy* New();
