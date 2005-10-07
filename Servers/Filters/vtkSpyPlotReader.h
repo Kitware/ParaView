@@ -176,6 +176,12 @@ protected:
                      vtkInformation* request, 
                      vtkInformationVector* outputVector);
 
+  // Description:
+  // This does the updating of the meta data for a series, when no case file provided
+  int UpdateNoCaseFile(const char *ext,
+                       vtkInformation* request, 
+                       vtkInformationVector* outputVector);
+
   void AddGhostLevelArray(int numLevels);
 
   // Description:
