@@ -10,21 +10,28 @@
 #ifndef _pqFileDialogModel_h
 #define _pqFileDialogModel_h
 
-#include <QAbstractItemModel>
+#include <QObject>
+
+class QAbstractItemModel;
+class QModelIndex;
+class QString;
 
 class pqFileDialogModel :
-  public QAbstractItemModel
+  public QObject
 {
-  typedef QAbstractItemModel base;
-
   Q_OBJECT
 
 public:
+  ~pqFileDialogModel();
+  
   virtual QString getStartDirectory() = 0;
   virtual void setViewDirectory(const QString&) = 0;
   virtual QString getViewDirectory() = 0;
   virtual bool isDir(const QModelIndex&) = 0;
   virtual QString getFilePath(const QModelIndex&) = 0;
+
+  virtual QAbstractItemModel* fileModel() = 0;
+  virtual QAbstractItemModel* favoriteModel() = 0;
 
 public slots:
   virtual void navigateUp() = 0;
@@ -32,7 +39,6 @@ public slots:
 
 protected:
   pqFileDialogModel(QObject* Parent = 0);
-  ~pqFileDialogModel();
 };
 
 #endif // !_pqFileDialogModel_h

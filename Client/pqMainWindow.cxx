@@ -88,8 +88,8 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   this->serverDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
   connect(this->serverDisconnectAction, SIGNAL(activated()), this, SLOT(onServerDisconnect()));
 
-  QAction* const debugOpenLocalFileAction = new QAction(tr("Open Local File"), this) << pqSetName("debugOpenLocalFileAction");
-  connect(debugOpenLocalFileAction, SIGNAL(activated()), this, SLOT(onDebugOpenLocalFile()));
+  QAction* const debugOpenLocalFilesAction = new QAction(tr("Open Local Files"), this) << pqSetName("debugOpenLocalFilesAction");
+  connect(debugOpenLocalFilesAction, SIGNAL(activated()), this, SLOT(onDebugOpenLocalFiles()));
 
   QAction* const debugQtHierarchyAction = new QAction(tr("Dump Hierarchy"), this) << pqSetName("debugHierarchyAction");
   connect(debugQtHierarchyAction, SIGNAL(activated()), this, SLOT(onDebugQtHierarchy()));
@@ -109,7 +109,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   serverMenu->addAction(this->serverDisconnectAction);
   
   QMenu* const debugMenu = this->menuBar()->addMenu(tr("Debug")) << pqSetName("debugMenu");
-  debugMenu->addAction(debugOpenLocalFileAction);
+  debugMenu->addAction(debugOpenLocalFilesAction);
   debugMenu->addAction(debugQtHierarchyAction);
   
   QMenu* const testMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testMenu");
@@ -195,24 +195,27 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 {
   setServer(Server);
 
-//  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), this, "fileOpenDialog");
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->currentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
-  QObject::connect(file_dialog, SIGNAL(fileSelected(const QString&)), this, SLOT(onFileOpen(const QString&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
 }
 
-void pqMainWindow::onFileOpen(const QString& File)
+void pqMainWindow::onFileOpen(const QStringList& Files)
 {
-  // Create a source ... see ParaView/Servers/ServerManager/Resources/sources.xml
-  vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
-  this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
-  source->Delete();
-  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FileName"))->SetElement(0, File.ascii());
-  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePrefix"))->SetElement(0, File.ascii());
-  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePattern"))->SetElement(0, "%s");
-  source->UpdateVTKObjects();
-  
-  pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
+  for(int i = 0; i != Files.size(); ++i)
+    {
+    QString file = Files[i];
+    
+    vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
+    this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
+    source->Delete();
+    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FileName"))->SetElement(0, file.ascii());
+    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePrefix"))->SetElement(0, file.ascii());
+    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePattern"))->SetElement(0, "%s");
+    source->UpdateVTKObjects();
+    
+    pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
+    }
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());
@@ -237,10 +240,19 @@ void pqMainWindow::onServerDisconnect()
   setServer(0);
 }
 
-void pqMainWindow::onDebugOpenLocalFile()
+void pqMainWindow::onDebugOpenLocalFiles()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Local File (does nothing):"), this, "fileOpenDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onDebugOpenLocalFiles(const QStringList&)));
   file_dialog->show();
+}
+
+void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
+{
+  for(int i = 0; i != Files.size(); ++i)
+    {
+    cerr << "File: " << Files[i].ascii() << endl;
+    }
 }
 
 void pqMainWindow::onDebugQtHierarchy()

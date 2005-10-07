@@ -10,7 +10,7 @@
 #include "pqFileDialogModel.h"
 
 pqFileDialogModel::pqFileDialogModel(QObject* Parent) :
-  base(Parent)
+  QObject(Parent)
 {
 }
 

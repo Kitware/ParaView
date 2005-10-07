@@ -25,18 +25,17 @@ public:
   pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name);
 
 signals:
-  void fileSelected(const QString&);
+  void filesSelected(const QStringList&);
 
 private:
   ~pqFileDialog();
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
 
-  pqFileDialogModel* model();
-
   void accept();
   void reject();
   
+  pqFileDialogModel* const model;
   Ui::pqFileDialog ui;
   const QModelIndex* temp;
   

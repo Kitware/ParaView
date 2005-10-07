@@ -8,28 +8,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>303</height>
+    <width>559</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QGridLayout" >
    <property name="margin" >
     <number>8</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item>
-    <widget class="QLabel" name="viewDirectory" >
-     <property name="text" >
-      <string>c:\foo\</string>
-     </property>
-    </widget>
-   </item>
-   <item>
+   <item row="0" column="1" >
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -53,7 +46,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox" >
+      <widget class="QComboBox" name="parents" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>7</hsizetype>
@@ -65,7 +58,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton" >
+      <widget class="QToolButton" name="navigateUp" >
        <property name="text" >
         <string/>
        </property>
@@ -76,10 +69,31 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QTreeView" name="treeView" />
+   <item row="1" column="1" >
+    <widget class="QTreeView" name="files" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>7</vsizetype>
+       <horstretch>2</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
-   <item>
+   <item rowspan="2" row="0" column="0" >
+    <widget class="QListView" name="favorites" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>7</vsizetype>
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
     <layout class="QGridLayout" >
      <property name="margin" >
       <number>0</number>
@@ -95,7 +109,7 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QComboBox" name="cbFileType" />
+      <widget class="QComboBox" name="fileType" />
      </item>
      <item row="0" column="2" >
       <widget class="QPushButton" name="buttonOk" >
@@ -112,7 +126,7 @@
       </widget>
      </item>
      <item row="0" column="1" >
-      <widget class="QLineEdit" name="leFileName" />
+      <widget class="QLineEdit" name="fileName" />
      </item>
      <item row="1" column="2" >
       <widget class="QPushButton" name="buttonCancel" >
@@ -135,12 +149,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>278</x>
-     <y>253</y>
+     <x>487</x>
+     <y>371</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>96</x>
-     <y>254</y>
+     <x>60</x>
+     <y>368</y>
     </hint>
    </hints>
   </connection>
@@ -151,12 +165,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>369</x>
-     <y>253</y>
+     <x>487</x>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>179</x>
-     <y>282</y>
+     <x>84</x>
+     <y>388</y>
     </hint>
    </hints>
   </connection>

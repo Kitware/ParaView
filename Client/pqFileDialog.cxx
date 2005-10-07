@@ -12,46 +12,50 @@
 
 #include <QTimer>
 
+#include <vtkstd/set>
+
 pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name) :
-  QDialog(Parent, Name)
+  QDialog(Parent, Name),
+  model(Model)
 {
   this->ui.setupUi(this);
-  this->ui.toolButton->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
-  this->ui.treeView->setModel(Model);
+  this->ui.navigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  this->ui.files->setModel(model->fileModel());
+  this->ui.favorites->setModel(model->favoriteModel());
+
+  this->ui.files->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->ui.files->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  
+  this->ui.favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->ui.favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->setWindowTitle(Title);
   this->setName(Name);
 
-  QObject::connect(Model, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
-  QObject::connect(ui.toolButton, SIGNAL(clicked()), Model, SLOT(navigateUp()));
-  QObject::connect(ui.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
+  QObject::connect(ui.navigateUp, SIGNAL(clicked()), Model, SLOT(navigateUp()));
+  QObject::connect(ui.files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(ui.favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
 
-  Model->setViewDirectory(Model->getStartDirectory());
+  model->setViewDirectory(model->getStartDirectory());
 }
 
 pqFileDialog::~pqFileDialog()
 {
+  delete model;
 }
-
-/*
-QStringList pqFileDialog::selectedFiles()
-{
-  QModelIndexList indexes = this->selections->selectedIndexes();
-  QStringList files;
-  foreach(QModelIndex index, indexes)
-    {
-    files.append(model->filePath(index));
-    }
-  return files;
-}
-*/
 
 void pqFileDialog::accept()
 {
-/*
-  QStringList files = this->selectedFiles();
-  emit fileSelected(files.at(0));
-*/
+  /** \todo For some reason, we get multiple copies of the same file back from selectedIndexes() */
+  vtkstd::set<QString> temp;
+  QModelIndexList indexes = this->ui.files->selectionModel()->selectedIndexes();
+  for(int i = 0; i != indexes.size(); ++i)
+    temp.insert(model->getFilePath(indexes[i]));
+
+  QStringList files;
+  vtkstd::copy(temp.begin(), temp.end(), vtkstd::back_inserter(files));
+  emit filesSelected(files);
   
   base::accept();
   QTimer::singleShot(0, this, SLOT(onAutoDelete()));
@@ -63,26 +67,24 @@ void pqFileDialog::reject()
   QTimer::singleShot(0, this, SLOT(onAutoDelete()));
 }
 
-pqFileDialogModel* pqFileDialog::model()
-{
-  return reinterpret_cast<pqFileDialogModel*>(this->ui.treeView->model());
-}
-
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
-  ui.viewDirectory->setText(this->model()->getViewDirectory());
+//  ui.viewDirectory->setText(this->model()->getViewDirectory());
 }
 
 void pqFileDialog::onActivated(const QModelIndex& Index)
 {
-  if(model()->isDir(Index))
+  if(model->isDir(Index))
     {
     this->temp = &Index;
     QTimer::singleShot(0, this, SLOT(onNavigateDown()));
     }
   else
     {
-    emit fileSelected(this->model()->getFilePath(Index));
+    QStringList files;
+    files.append(this->model->getFilePath(Index));
+    emit filesSelected(files);
+    
     QTimer::singleShot(0, this, SLOT(onAutoDelete()));
     }
 }
@@ -94,5 +96,5 @@ void pqFileDialog::onAutoDelete()
 
 void pqFileDialog::onNavigateDown()
 {
-  this->model()->navigateDown(*this->temp);
+  this->model->navigateDown(*this->temp);
 }

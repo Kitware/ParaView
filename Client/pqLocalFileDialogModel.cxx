@@ -24,17 +24,253 @@ QFileIconProvider& Icons()
   return *icons;
 }
 
+class FileModel :
+  public QAbstractItemModel
+{
+public:
+  void setViewDirectory(const QString& Path)
+  {
+    ViewDirectory.setPath(QDir::cleanPath(Path));
+    fileList = ViewDirectory.entryInfoList();
+    
+    emit layoutChanged();
+    emit dataChanged(QModelIndex(), QModelIndex());
+  }
+
+  QString getFilePath(const QModelIndex& Index)
+  {
+    if(Index.row() >= fileList.size())
+      return QString();
+      
+    QFileInfo& file = fileList[Index.row()];
+    return QDir::convertSeparators(ViewDirectory.path() + "/" + file.fileName());
+  }
+
+  bool isDir(const QModelIndex& Index)
+  {
+    if(Index.row() >= fileList.size())
+      return false;
+      
+    QFileInfo& file = fileList[Index.row()];
+    return file.isDir();
+  }
+
+  int columnCount(const QModelIndex& parent) const
+  {
+    return 3;
+  }
+
+  QVariant data(const QModelIndex & index, int role) const
+  {
+    if(!index.isValid())
+      return QVariant();
+
+    if(index.row() >= fileList.size())
+      return QVariant();
+
+    const QFileInfo& file = fileList[index.row()];
+
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(index.column())
+          {
+          case 0:
+            return file.fileName();
+          case 1:
+            return file.size();
+          case 2:
+            return file.lastModified();
+          }
+      case Qt::DecorationRole:
+        switch(index.column())
+          {
+          case 0:
+            return Icons().icon(file.isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
+          }
+      }
+      
+    return QVariant();
+  }
+
+  QModelIndex index(int row, int column, const QModelIndex& parent) const
+  {
+    return createIndex(row, column);
+  }
+
+  QModelIndex parent(const QModelIndex& index) const
+  {
+    return QModelIndex();
+  }
+
+  int rowCount(const QModelIndex& parent) const
+  {
+    return fileList.size();
+  }
+
+  bool hasChildren(const QModelIndex& parent) const
+  {
+    if(!parent.isValid())
+      return true;
+      
+    return false;
+  }
+
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  {
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(section)
+          {
+          case 0:
+            return tr("Filename");
+          case 1:
+            return tr("Size");
+          case 2:
+            return tr("Modified");
+          }
+      }
+      
+    return QVariant();
+  }
+
+  QDir ViewDirectory;
+  QFileInfoList fileList;
+};
+
+class FavoriteModel :
+  public QAbstractItemModel
+{
+public:
+  FavoriteModel()
+  {
+    favoriteList = QDir::drives();
+    favoriteList.push_back(QFileInfo(QDir::homePath()));
+  }
+
+  QString getFilePath(const QModelIndex& Index)
+  {
+    if(Index.row() >= favoriteList.size())
+      return QString();
+      
+    QFileInfo& file = favoriteList[Index.row()];
+    return QDir::convertSeparators(file.absoluteFilePath());
+  }
+
+  bool isDir(const QModelIndex& Index)
+  {
+    if(Index.row() >= favoriteList.size())
+      return false;
+      
+    QFileInfo& file = favoriteList[Index.row()];
+    return file.isDir();
+  }
+
+  virtual int columnCount(const QModelIndex& parent) const
+  {
+    return 1;
+  }
+  
+  virtual QVariant data(const QModelIndex & index, int role) const
+  {
+    if(!index.isValid())
+      return QVariant();
+
+    if(index.row() >= favoriteList.size())
+      return QVariant();
+
+    const QFileInfo& file = favoriteList[index.row()];
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(index.column())
+          {
+          case 0:
+            if(file.isRoot())
+              return file.absoluteFilePath();
+            else
+              return file.fileName();
+          }
+      case Qt::DecorationRole:
+        switch(index.column())
+          {
+          case 0:
+            if(file.isRoot())
+              return Icons().icon(QFileIconProvider::Drive);
+            if(file.isDir())
+              return Icons().icon(QFileIconProvider::Folder);
+            return Icons().icon(QFileIconProvider::File);
+          }
+      }
+      
+    return QVariant();
+  }
+  
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent) const
+  {
+    return createIndex(row, column);
+  }
+  
+  virtual QModelIndex parent(const QModelIndex& index) const
+  {
+    return QModelIndex();
+  }
+  
+  virtual int rowCount(const QModelIndex& parent) const
+  {
+    return favoriteList.size();
+  }
+  
+  virtual bool hasChildren(const QModelIndex& parent) const
+  {
+    if(!parent.isValid())
+      return true;
+      
+    return false;
+  }
+  
+  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  {
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(section)
+          {
+          case 0:
+            return tr("Favorites");
+          }
+      }
+      
+    return QVariant();
+  }
+  
+  QFileInfoList favoriteList;
+};
+
 } // namespace
 
 class pqLocalFileDialogModel::Implementation
 {
 public:
-  QDir ViewDirectory;
-  QFileInfoList ViewList;
+  Implementation() :
+    fileModel(new FileModel()),
+    favoriteModel(new FavoriteModel())
+  {
+  }
+  
+  ~Implementation()
+  {
+    delete fileModel;
+    delete favoriteModel;
+  }
+
+  FileModel* const fileModel;
+  FavoriteModel* const favoriteModel;
 };
 
 pqLocalFileDialogModel::pqLocalFileDialogModel(QObject* Parent) :
-  base(Parent),
+  pqFileDialogModel(Parent),
   implementation(new Implementation())
 {
 }
@@ -51,39 +287,49 @@ QString pqLocalFileDialogModel::getStartDirectory()
 
 void pqLocalFileDialogModel::setViewDirectory(const QString& Path)
 {
-  implementation->ViewDirectory.setPath(QDir::cleanPath(Path));
-  implementation->ViewList = implementation->ViewDirectory.entryInfoList();
-  
-  emit layoutChanged();
-  emit dataChanged(QModelIndex(), QModelIndex());
+  implementation->fileModel->setViewDirectory(Path);
 }
 
 QString pqLocalFileDialogModel::getViewDirectory()
 {
-  return QDir::convertSeparators(implementation->ViewDirectory.path());
+  return QDir::convertSeparators(implementation->fileModel->ViewDirectory.path());
 }
 
 QString pqLocalFileDialogModel::getFilePath(const QModelIndex& Index)
 {
-  if(Index.row() >= implementation->ViewList.size())
-    return QString();
-    
-  QFileInfo& file = implementation->ViewList[Index.row()];
-  return QDir::convertSeparators(implementation->ViewDirectory.path() + "/" + file.fileName());
+  if(Index.model() == implementation->fileModel)
+    return implementation->fileModel->getFilePath(Index);
+  
+  if(Index.model() == implementation->favoriteModel)
+    return implementation->favoriteModel->getFilePath(Index);  
+
+  return QString();    
 }
 
 bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
 {
-  if(Index.row() >= implementation->ViewList.size())
-    return false;
-    
-  QFileInfo& file = implementation->ViewList[Index.row()];
-  return file.isDir();
+  if(Index.model() == implementation->fileModel)
+    return implementation->fileModel->isDir(Index);
+  
+  if(Index.model() == implementation->favoriteModel)
+    return implementation->favoriteModel->isDir(Index);  
+
+  return false;    
+}
+
+QAbstractItemModel* pqLocalFileDialogModel::fileModel()
+{
+  return implementation->fileModel;
+}
+
+QAbstractItemModel* pqLocalFileDialogModel::favoriteModel()
+{
+  return implementation->favoriteModel;
 }
 
 void pqLocalFileDialogModel::navigateUp()
 {
-  QDir temp = implementation->ViewDirectory;
+  QDir temp = implementation->fileModel->ViewDirectory;
   temp.cdUp();
   
   setViewDirectory(temp.path());
@@ -91,94 +337,7 @@ void pqLocalFileDialogModel::navigateUp()
 
 void pqLocalFileDialogModel::navigateDown(const QModelIndex& Index)
 {
-  if(Index.row() >= implementation->ViewList.size())
-    return;
-    
-  QFileInfo& file = implementation->ViewList[Index.row()];
-  if(file.isDir())
-    {
-    setViewDirectory(implementation->ViewDirectory.path() + "/" + file.fileName());
-    return;
-    }
-}
-
-int pqLocalFileDialogModel::columnCount(const QModelIndex& parent) const
-{
-  return 3;
-}
-
-QVariant pqLocalFileDialogModel::data(const QModelIndex & index, int role) const
-{
-  if(!index.isValid())
-    return QVariant();
-
-  if(index.row() >= implementation->ViewList.size())
-    return QVariant();
-
-  QFileInfo& file = implementation->ViewList[index.row()];
-
-  switch(role)
-    {
-    case Qt::DisplayRole:
-      switch(index.column())
-        {
-        case 0:
-          return file.fileName();
-        case 1:
-          return file.size();
-        case 2:
-          return file.lastModified();
-        }
-    case Qt::DecorationRole:
-      switch(index.column())
-        {
-        case 0:
-          return Icons().icon(file.isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
-        }
-    }
-    
-  return QVariant();
-}
-
-QModelIndex pqLocalFileDialogModel::index(int row, int column, const QModelIndex& parent) const
-{
-  return createIndex(row, column);
-}
-
-QModelIndex pqLocalFileDialogModel::parent(const QModelIndex& index) const
-{
-  return QModelIndex();
-}
-
-int pqLocalFileDialogModel::rowCount(const QModelIndex& parent) const
-{
-  return implementation->ViewList.size();
-}
-
-bool pqLocalFileDialogModel::hasChildren(const QModelIndex& parent) const
-{
-  if(!parent.isValid())
-    return true;
-    
-  return false;
-}
-
-QVariant pqLocalFileDialogModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-  switch(role)
-    {
-    case Qt::DisplayRole:
-      switch(section)
-        {
-        case 0:
-          return tr("Filename");
-        case 1:
-          return tr("Size");
-        case 2:
-          return tr("Modified");
-        }
-    }
-    
-  return QVariant();
+  if(isDir(Index))
+    setViewDirectory(getFilePath(Index));
 }
 

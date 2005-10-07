@@ -11,42 +11,37 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
+#include <QtGui/QListView>
 #include <QtGui/QPushButton>
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
-#include <QtGui/QVBoxLayout>
 
 class Ui_pqFileDialog
 {
 public:
-    QVBoxLayout *vboxLayout;
-    QLabel *viewDirectory;
+    QGridLayout *gridLayout;
     QHBoxLayout *hboxLayout;
     QLabel *label_3;
-    QComboBox *comboBox;
-    QToolButton *toolButton;
-    QTreeView *treeView;
-    QGridLayout *gridLayout;
+    QComboBox *parents;
+    QToolButton *navigateUp;
+    QTreeView *files;
+    QListView *favorites;
+    QGridLayout *gridLayout1;
     QLabel *label_2;
-    QComboBox *cbFileType;
+    QComboBox *fileType;
     QPushButton *buttonOk;
     QLabel *label;
-    QLineEdit *leFileName;
+    QLineEdit *fileName;
     QPushButton *buttonCancel;
 
     void setupUi(QDialog *pqFileDialog)
     {
     pqFileDialog->setObjectName(QString::fromUtf8("pqFileDialog"));
-    pqFileDialog->resize(QSize(394, 303).expandedTo(pqFileDialog->minimumSizeHint()));
-    vboxLayout = new QVBoxLayout(pqFileDialog);
-    vboxLayout->setSpacing(6);
-    vboxLayout->setMargin(8);
-    vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
-    viewDirectory = new QLabel(pqFileDialog);
-    viewDirectory->setObjectName(QString::fromUtf8("viewDirectory"));
-
-    vboxLayout->addWidget(viewDirectory);
-
+    pqFileDialog->resize(QSize(559, 357).expandedTo(pqFileDialog->minimumSizeHint()));
+    gridLayout = new QGridLayout(pqFileDialog);
+    gridLayout->setSpacing(6);
+    gridLayout->setMargin(8);
+    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
     hboxLayout = new QHBoxLayout();
     hboxLayout->setSpacing(6);
     hboxLayout->setMargin(0);
@@ -61,66 +56,81 @@ public:
 
     hboxLayout->addWidget(label_3);
 
-    comboBox = new QComboBox(pqFileDialog);
-    comboBox->setObjectName(QString::fromUtf8("comboBox"));
+    parents = new QComboBox(pqFileDialog);
+    parents->setObjectName(QString::fromUtf8("parents"));
     QSizePolicy sizePolicy1((QSizePolicy::Policy)7, (QSizePolicy::Policy)0);
     sizePolicy1.setHorizontalStretch(0);
     sizePolicy1.setVerticalStretch(0);
-    sizePolicy1.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
-    comboBox->setSizePolicy(sizePolicy1);
+    sizePolicy1.setHeightForWidth(parents->sizePolicy().hasHeightForWidth());
+    parents->setSizePolicy(sizePolicy1);
 
-    hboxLayout->addWidget(comboBox);
+    hboxLayout->addWidget(parents);
 
-    toolButton = new QToolButton(pqFileDialog);
-    toolButton->setObjectName(QString::fromUtf8("toolButton"));
-    toolButton->setAutoRaise(true);
+    navigateUp = new QToolButton(pqFileDialog);
+    navigateUp->setObjectName(QString::fromUtf8("navigateUp"));
+    navigateUp->setAutoRaise(true);
 
-    hboxLayout->addWidget(toolButton);
+    hboxLayout->addWidget(navigateUp);
 
 
-    vboxLayout->addLayout(hboxLayout);
+    gridLayout->addLayout(hboxLayout, 0, 1, 1, 1);
 
-    treeView = new QTreeView(pqFileDialog);
-    treeView->setObjectName(QString::fromUtf8("treeView"));
+    files = new QTreeView(pqFileDialog);
+    files->setObjectName(QString::fromUtf8("files"));
+    QSizePolicy sizePolicy2((QSizePolicy::Policy)7, (QSizePolicy::Policy)7);
+    sizePolicy2.setHorizontalStretch(2);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(files->sizePolicy().hasHeightForWidth());
+    files->setSizePolicy(sizePolicy2);
 
-    vboxLayout->addWidget(treeView);
+    gridLayout->addWidget(files, 1, 1, 1, 1);
 
-    gridLayout = new QGridLayout();
-    gridLayout->setSpacing(6);
-    gridLayout->setMargin(0);
-    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+    favorites = new QListView(pqFileDialog);
+    favorites->setObjectName(QString::fromUtf8("favorites"));
+    QSizePolicy sizePolicy3((QSizePolicy::Policy)7, (QSizePolicy::Policy)7);
+    sizePolicy3.setHorizontalStretch(1);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(favorites->sizePolicy().hasHeightForWidth());
+    favorites->setSizePolicy(sizePolicy3);
+
+    gridLayout->addWidget(favorites, 0, 0, 2, 1);
+
+    gridLayout1 = new QGridLayout();
+    gridLayout1->setSpacing(6);
+    gridLayout1->setMargin(0);
+    gridLayout1->setObjectName(QString::fromUtf8("gridLayout1"));
     label_2 = new QLabel(pqFileDialog);
     label_2->setObjectName(QString::fromUtf8("label_2"));
 
-    gridLayout->addWidget(label_2, 0, 0, 1, 1);
+    gridLayout1->addWidget(label_2, 0, 0, 1, 1);
 
-    cbFileType = new QComboBox(pqFileDialog);
-    cbFileType->setObjectName(QString::fromUtf8("cbFileType"));
+    fileType = new QComboBox(pqFileDialog);
+    fileType->setObjectName(QString::fromUtf8("fileType"));
 
-    gridLayout->addWidget(cbFileType, 1, 1, 1, 1);
+    gridLayout1->addWidget(fileType, 1, 1, 1, 1);
 
     buttonOk = new QPushButton(pqFileDialog);
     buttonOk->setObjectName(QString::fromUtf8("buttonOk"));
 
-    gridLayout->addWidget(buttonOk, 0, 2, 1, 1);
+    gridLayout1->addWidget(buttonOk, 0, 2, 1, 1);
 
     label = new QLabel(pqFileDialog);
     label->setObjectName(QString::fromUtf8("label"));
 
-    gridLayout->addWidget(label, 1, 0, 1, 1);
+    gridLayout1->addWidget(label, 1, 0, 1, 1);
 
-    leFileName = new QLineEdit(pqFileDialog);
-    leFileName->setObjectName(QString::fromUtf8("leFileName"));
+    fileName = new QLineEdit(pqFileDialog);
+    fileName->setObjectName(QString::fromUtf8("fileName"));
 
-    gridLayout->addWidget(leFileName, 0, 1, 1, 1);
+    gridLayout1->addWidget(fileName, 0, 1, 1, 1);
 
     buttonCancel = new QPushButton(pqFileDialog);
     buttonCancel->setObjectName(QString::fromUtf8("buttonCancel"));
 
-    gridLayout->addWidget(buttonCancel, 1, 2, 1, 1);
+    gridLayout1->addWidget(buttonCancel, 1, 2, 1, 1);
 
 
-    vboxLayout->addLayout(gridLayout);
+    gridLayout->addLayout(gridLayout1, 2, 1, 1, 1);
 
     retranslateUi(pqFileDialog);
     QObject::connect(buttonOk, SIGNAL(clicked()), pqFileDialog, SLOT(accept()));
@@ -132,9 +142,8 @@ public:
     void retranslateUi(QDialog *pqFileDialog)
     {
     pqFileDialog->setWindowTitle(QApplication::translate("pqFileDialog", "Dialog", 0, QApplication::UnicodeUTF8));
-    viewDirectory->setText(QApplication::translate("pqFileDialog", "c:\\foo\\", 0, QApplication::UnicodeUTF8));
     label_3->setText(QApplication::translate("pqFileDialog", "Look in:", 0, QApplication::UnicodeUTF8));
-    toolButton->setText(QApplication::translate("pqFileDialog", "", 0, QApplication::UnicodeUTF8));
+    navigateUp->setText(QApplication::translate("pqFileDialog", "", 0, QApplication::UnicodeUTF8));
     label_2->setText(QApplication::translate("pqFileDialog", "File name:", 0, QApplication::UnicodeUTF8));
     buttonOk->setText(QApplication::translate("pqFileDialog", "OK", 0, QApplication::UnicodeUTF8));
     label->setText(QApplication::translate("pqFileDialog", "Files of type:", 0, QApplication::UnicodeUTF8));
