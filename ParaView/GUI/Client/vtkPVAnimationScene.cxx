@@ -55,6 +55,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 #ifdef _WIN32
@@ -68,7 +69,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.58");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1025,6 +1026,14 @@ void vtkPVAnimationScene::SetAnimationTime(double time)
   if (this->Window && this->Window->GetCurrentPVSource())
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
+    vtkSMSourceProxy *sourceProxy =
+      this->Window->GetCurrentPVSource()->GetProxy();
+    if (sourceProxy)
+      {
+      // Data information needs to be updated.
+      sourceProxy->MarkConsumersAsModified();
+      sourceProxy->GetDataInformation();
+      }
     }
 }
 
