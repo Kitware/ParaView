@@ -13,13 +13,20 @@
 #include <QMessageBox>
 
 pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
-  QDialog(Parent, Name)
+  base(Parent, Name)
 {
   this->ui.setupUi(this);
-  this->setName(Name);
   
-  this->ui.serverType->addItem("Standalone");
-  this->ui.serverType->addItem("Remote Server");
+  this->ui.serverType->addItem(tr("Builtin"));
+  this->ui.serverType->addItem(tr("Remote"));
+
+  QObject::connect(this->ui.serverType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
+
+  this->ui.serverType->setCurrentIndex(0);
+  this->onServerTypeActivated(0);
+
+  this->setWindowTitle(tr("Pick Server:"));
+  this->setName(Name);
 }
 
 pqServerBrowser::~pqServerBrowser()
@@ -38,7 +45,7 @@ void pqServerBrowser::accept()
       server = pqServer::Connect(ui.hostName->text().ascii(), ui.portNumber->value());
       break;
     default:
-      QMessageBox::critical(this, tr("Pick Server:"), tr("Unknown server type"));
+      QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));
       return;
     }
   
@@ -50,12 +57,19 @@ void pqServerBrowser::accept()
 
   emit serverConnected(server);
 
-  QDialog::accept();
+  base::accept();
   delete this;
 }
 
 void pqServerBrowser::reject()
 {
-  QDialog::reject();
+  base::reject();
   delete this;
 }
+
+void pqServerBrowser::onServerTypeActivated(int Index)
+{
+  this->ui.hostName->setEnabled(1 == Index);
+  this->ui.portNumber->setEnabled(1 == Index);
+}
+

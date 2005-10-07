@@ -17,6 +17,8 @@ class pqServer;
 class pqServerBrowser :
   public QDialog
 {
+  typedef QDialog base;
+
   Q_OBJECT
 
 public:
@@ -35,6 +37,7 @@ private:
 private slots:
   void accept();
   void reject();
+  void onServerTypeActivated(int);
 };
 
 #endif // !_pqServerBrowser_h
