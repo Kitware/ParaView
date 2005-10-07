@@ -779,7 +779,15 @@
         <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
 
- <IntVectorProperty 
+     <IntVectorProperty 
+        name="DownConvertVolumeFraction" 
+        command="SetDownConvertVolumeFraction" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
         name="DistributeFiles" 
         command="SetDistributeFiles" 
         number_of_elements="1"
@@ -787,7 +795,7 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
- <IntVectorProperty 
+     <IntVectorProperty 
         name="GenerateLevelArray" 
         command="SetGenerateLevelArray" 
         number_of_elements="1"
@@ -795,7 +803,7 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
- <IntVectorProperty 
+     <IntVectorProperty 
         name="GenerateBlockIdArray" 
         command="SetGenerateBlockIdArray" 
         number_of_elements="1"
