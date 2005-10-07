@@ -94,6 +94,8 @@ protected:
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumPts;
 
+  int RandomMode;
+
   virtual void ReportReferences(vtkGarbageCollector*);
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
