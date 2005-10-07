@@ -51,7 +51,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.30");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.31");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -146,6 +146,9 @@ public:
 
   Block* GetDataBlock(int block);
 
+  vtkSetMacro(DataTypeChanged, int);
+  void SetDownConvertVolumeFraction(int vf);
+
 protected:
   vtkSpyPlotUniReader();
   ~vtkSpyPlotUniReader();
@@ -207,11 +210,15 @@ private:
   int TimeStepRange[2];
   double TimeRange[2];
 
+  int DataTypeChanged;
+  int DownConvertVolumeFraction;
+
   int NumberOfCellFields;
 
   vtkDataArraySelection* CellArraySelection;
 
   Variable* GetCellField(int field);
+  int IsVolumeFraction(Variable* var);
 private:
   vtkSpyPlotUniReader(const vtkSpyPlotUniReader&); // Not implemented
   void operator=(const vtkSpyPlotUniReader&); // Not implemented
@@ -219,7 +226,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.30");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.31");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -260,6 +267,8 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
 
   this->NumberOfCellFields = 0;
   this->HaveInformation = 0;
+  this->DownConvertVolumeFraction = 1;
+  this->DataTypeChanged = 0;
   if ( !this->HaveInformation ) { vtkDebugMacro( << __LINE__ << " " << this << " Read: " << this->HaveInformation ); }
 }
 
@@ -315,6 +324,23 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
   delete [] this->DataDumps;
   this->SetFileName(0);
   this->SetCellArraySelection(0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::IsVolumeFraction(Variable* var)
+{
+  return strncmp(var->Name, READ_SPCTH_VOLUME_FRACTION, strlen(READ_SPCTH_VOLUME_FRACTION)) == 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotUniReader::SetDownConvertVolumeFraction(int vf)
+{
+  if ( this->DownConvertVolumeFraction == vf )
+    {
+    return;
+    }
+  this->DownConvertVolumeFraction = vf;
+  this->DataTypeChanged = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -951,18 +977,9 @@ int vtkSpyPlotUniReader::ReadData()
       vtkDebugMacro( " *** Looks like variable: " << var->Name << " is already loaded" );
       blocksExists = 1;
       }
-    if ( this->CellArraySelection->ArrayIsEnabled(var->Name) && !var->DataBlocks )
-      {
-      vtkDebugMacro( " ** Allocate new space for variable: " << var->Name << " - " << this->FileName );
-      var->DataBlocks = new vtkDataArray*[dp->ActualNumberOfBlocks];
-      memset(var->DataBlocks, 0, dp->ActualNumberOfBlocks * sizeof(vtkDataArray*));
-      var->GhostCellsFixed = new int[dp->ActualNumberOfBlocks];
-      memset(var->GhostCellsFixed, 0, dp->ActualNumberOfBlocks * sizeof(int));
-      vtkDebugMacro( " Allocate DataBlocks: " << var->DataBlocks );
-      }
-
     // Did we create data blocks that we do not need any more
-    if ( !this->CellArraySelection->ArrayIsEnabled(var->Name) )
+    if ( !this->CellArraySelection->ArrayIsEnabled(var->Name) ||
+      this->DataTypeChanged && this->IsVolumeFraction(var) )
       {
       if ( var->DataBlocks )
         {
@@ -980,7 +997,21 @@ int vtkSpyPlotUniReader::ReadData()
         vtkDebugMacro( "* Delete Data blocks for variable: " << var->Name );
         }
       vtkDebugMacro( " *** Ignore variable: " << var->Name );
-      continue;
+      if ( !this->CellArraySelection->ArrayIsEnabled(var->Name) )
+        {
+        continue;
+        }
+      }
+
+    if ( this->CellArraySelection->ArrayIsEnabled(var->Name) && !var->DataBlocks )
+      {
+      vtkDebugMacro( " ** Allocate new space for variable: " << var->Name << " - " << this->FileName );
+      var->DataBlocks = new vtkDataArray*[dp->ActualNumberOfBlocks];
+      memset(var->DataBlocks, 0, dp->ActualNumberOfBlocks * sizeof(vtkDataArray*));
+      var->GhostCellsFixed = new int[dp->ActualNumberOfBlocks];
+      memset(var->GhostCellsFixed, 0, dp->ActualNumberOfBlocks * sizeof(int));
+      vtkDebugMacro( " Allocate DataBlocks: " << var->DataBlocks );
+      blocksExists = 0;
       }
 
     if ( blocksExists )
@@ -1005,7 +1036,7 @@ int vtkSpyPlotUniReader::ReadData()
         vtkDataArray* dataArray = 0;
         if ( this->CellArraySelection->ArrayIsEnabled(var->Name) && !var->DataBlocks[actualBlockId] )
           {
-          if ( 0 && strncmp(var->Name, READ_SPCTH_VOLUME_FRACTION, strlen(READ_SPCTH_VOLUME_FRACTION)) == 0 )
+          if ( this->DownConvertVolumeFraction && this->IsVolumeFraction(var) )
             {
             unsignedCharArray = vtkUnsignedCharArray::New();
             dataArray = unsignedCharArray;
@@ -1067,6 +1098,7 @@ int vtkSpyPlotUniReader::ReadData()
         }
       }
     }
+  this->DataTypeChanged = 0;
   return 1;
 }
 
@@ -1540,7 +1572,7 @@ int vtkSpyPlotUniReader::MarkVectorsAsFixed(int block)
     return 0;
     }
   bk->VectorsFixedForGhostCells = 1;
-  vtkDebugMacro( " " << bk << " Vecors are fixed " << this->FileName );
+  vtkDebugMacro( " " << bk << " Vectors are fixed " << this->FileName );
   return 1;
 }
 
@@ -4029,6 +4061,24 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSpyPlotReader::SetDownConvertVolumeFraction(int vf)
+{
+  if ( vf == this->DownConvertVolumeFraction )
+    {
+    return;
+    }
+  vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
+  for ( mapIt = this->Map->Files.begin();
+    mapIt != this->Map->Files.end();
+    ++ mapIt )
+    {
+    mapIt->second->SetDownConvertVolumeFraction(vf);
+    }
+  this->DownConvertVolumeFraction = vf;
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -4044,6 +4094,16 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     os << "false"<<endl;
     }
   
+  os << "DownConvertVolumeFraction: ";
+  if(this->DownConvertVolumeFraction)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
+
   os << "GenerateLevelArray: ";
   if(this->GenerateLevelArray)
     {

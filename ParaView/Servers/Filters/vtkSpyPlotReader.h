@@ -106,7 +106,7 @@ public:
   // Description:
   // If true, the reader will convert volume fraction arrays to unsigned char.
   // True by default.
-  vtkSetMacro(DownConvertVolumeFraction,int);
+  void SetDownConvertVolumeFraction(int vf);
   vtkGetMacro(DownConvertVolumeFraction,int);
   vtkBooleanMacro(DownConvertVolumeFraction,int);
   
