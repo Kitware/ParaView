@@ -23,58 +23,55 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVSource.h"
+#include "vtkKWMultiColumnList.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.12");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
 {
-  this->StatsFrame = vtkKWFrameWithLabel::New();
-  this->TypeLabel = vtkKWLabel::New();
-  this->CompositeDataFrame = vtkKWFrame::New();
-  this->NumBlocksLabel = vtkKWLabel::New();
-  this->NumDataSetsLabel = vtkKWLabel::New();
-  this->NumCellsLabel = vtkKWLabel::New();
-  this->NumPointsLabel = vtkKWLabel::New();
-  this->MemorySizeLabel = vtkKWLabel::New();
-  this->BoundsDisplay = vtkKWBoundsDisplay::New();
-  this->ExtentDisplay = vtkKWBoundsDisplay::New();
+  this->StatsFrame = 0;
+  this->TypeLabel = 0;
+  this->CompositeDataFrame = 0;
+  this->NumBlocksLabel = 0;
+  this->NumDataSetsLabel = 0;
+  this->NumCellsLabel = 0;
+  this->NumPointsLabel = 0;
+  this->MemorySizeLabel = 0;
+  this->BoundsDisplay = 0;
+  this->ExtentDisplay = 0;
+  this->ArrayInformationFrame = 0;
+  this->ArrayInformationList = 0;
 }
+
+#define vtkKWRemoveIfExists(x) \
+  if ( this->x ) \
+    { \
+    this->x->Delete(); \
+    this->x = 0; \
+    }
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::~vtkPVInformationGUI()
-{    
-  this->StatsFrame->Delete();
-  this->StatsFrame = NULL;
-  
-  this->TypeLabel->Delete();
-  this->TypeLabel = NULL;
-  
-  this->CompositeDataFrame->Delete();
-  this->CompositeDataFrame = NULL;
-
-  this->NumBlocksLabel->Delete();
-  this->NumBlocksLabel = NULL;
-
-  this->NumDataSetsLabel->Delete();
-  this->NumDataSetsLabel = NULL;
-
-  this->NumCellsLabel->Delete();
-  this->NumCellsLabel = NULL;
-  
-  this->NumPointsLabel->Delete();
-  this->NumPointsLabel = NULL;
-  
-  this->MemorySizeLabel->Delete();
-  this->MemorySizeLabel = NULL;
-  
-  this->BoundsDisplay->Delete();
-  this->BoundsDisplay = NULL;
-  
-  this->ExtentDisplay->Delete();
-  this->ExtentDisplay = NULL;  
+{
+  vtkKWRemoveIfExists(StatsFrame);
+  vtkKWRemoveIfExists(TypeLabel);
+  vtkKWRemoveIfExists(CompositeDataFrame);
+  vtkKWRemoveIfExists(NumBlocksLabel);
+  vtkKWRemoveIfExists(NumDataSetsLabel);
+  vtkKWRemoveIfExists(NumCellsLabel);
+  vtkKWRemoveIfExists(NumPointsLabel);
+  vtkKWRemoveIfExists(MemorySizeLabel);
+  vtkKWRemoveIfExists(BoundsDisplay);
+  vtkKWRemoveIfExists(ExtentDisplay);
+  vtkKWRemoveIfExists(ArrayInformationFrame);
+  vtkKWRemoveIfExists(ArrayInformationList);
 }
 
 //----------------------------------------------------------------------------
@@ -87,6 +84,19 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
     }
   
   this->Superclass::Create(app);
+
+  this->StatsFrame = vtkKWFrameWithLabel::New();
+  this->TypeLabel = vtkKWLabel::New();
+  this->CompositeDataFrame = vtkKWFrame::New();
+  this->NumBlocksLabel = vtkKWLabel::New();
+  this->NumDataSetsLabel = vtkKWLabel::New();
+  this->NumCellsLabel = vtkKWLabel::New();
+  this->NumPointsLabel = vtkKWLabel::New();
+  this->MemorySizeLabel = vtkKWLabel::New();
+  this->BoundsDisplay = vtkKWBoundsDisplay::New();
+  this->ExtentDisplay = vtkKWBoundsDisplay::New();
+  this->ArrayInformationFrame = vtkKWFrameWithLabel::New();
+  this->ArrayInformationList = vtkKWMultiColumnList::New();
 
   this->StatsFrame->SetParent(this->GetFrame());
   this->StatsFrame->Create(this->GetApplication());
@@ -131,6 +141,24 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
                this->StatsFrame->GetWidgetName(),
                this->BoundsDisplay->GetWidgetName());
 
+  this->ArrayInformationFrame->SetParent(this->StatsFrame->GetFrame());
+  this->ArrayInformationFrame->Create(this->GetApplication());
+
+  this->ArrayInformationList->SetParent(this->ArrayInformationFrame->GetFrame());
+  this->ArrayInformationFrame->SetLabelText("Data Arrays");
+  this->ArrayInformationList->Create(this->GetApplication());
+  this->ArrayInformationList->AddColumn("Name");
+  this->ArrayInformationList->AddColumn("Type");
+  this->ArrayInformationList->AddColumn("Data Type");
+  this->ArrayInformationList->AddColumn("Data Range");
+  this->ArrayInformationList->SetColumnAlignmentToCenter(1);
+  this->ArrayInformationList->SetColumnAlignmentToCenter(2);
+  this->ArrayInformationList->StretchableColumnsOn();
+
+  this->Script("pack %s -side top -anchor nw -expand 1 -fill both -padx 2 -pady 2", 
+    this->ArrayInformationList->GetWidgetName());
+  this->Script("pack %s -fill x -expand t -pady 2 -side bottom", 
+               this->ArrayInformationFrame->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -152,27 +180,27 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     {
     type << "Polygonal";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
     type << "Unstructured Grid";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_STRUCTURED_GRID)
     {
     type << "Curvilinear";
     this->ExtentDisplay->SetExtent(dataInfo->GetExtent());
     this->Script("pack %s -fill x -expand t -pady 2", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_RECTILINEAR_GRID)
     {
     type << "Nonuniform Rectilinear";
     this->ExtentDisplay->SetExtent(dataInfo->GetExtent());
     this->Script("pack %s -fill x -expand t -pady 2", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_IMAGE_DATA)
     {
@@ -187,31 +215,31 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
       }
     this->ExtentDisplay->SetExtent(ext);
     this->Script("pack %s -fill x -expand t -pady 2", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_MULTIGROUP_DATA_SET)
     {
     type << "Multi-group";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_MULTIBLOCK_DATA_SET)
     {
     type << "Multi-block";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_HIERARCHICAL_DATA_SET)
     {
     type << "Hierarchical AMR";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else if (dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
     {
     type << "Hierarchical Uniform AMR";
     this->Script("pack forget %s", 
-                 this->ExtentDisplay->GetWidgetName());
+      this->ExtentDisplay->GetWidgetName());
     }
   else
     {
@@ -220,7 +248,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   type << ends;
   this->TypeLabel->SetText(type.str());
   delete[] type.str();
-  
+
   ostrstream numcells;
 
   int packNumBlocks = 0;
@@ -230,8 +258,8 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     {
     ostrstream numBlocks;
     numBlocks << "Number of groups: " 
-          << cdi->GetNumberOfGroups() 
-          << ends;
+      << cdi->GetNumberOfGroups() 
+      << ends;
     this->NumBlocksLabel->SetText(numBlocks.str());
     delete[] numBlocks.str();
     packNumBlocks = 1;
@@ -241,20 +269,20 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     {
     ostrstream numBlocks;
     numBlocks << "Number of blocks: " 
-          << cdi->GetNumberOfGroups() 
-          << ends;
+      << cdi->GetNumberOfGroups() 
+      << ends;
     this->NumBlocksLabel->SetText(numBlocks.str());
     delete[] numBlocks.str();
     packNumBlocks = 1;
     }
-  
+
   if (dataType == VTK_HIERARCHICAL_DATA_SET ||
-      dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
+    dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
     {
     ostrstream numBlocks;
     numBlocks << "Number of levels: " 
-          << cdi->GetNumberOfGroups() 
-          << ends;
+      << cdi->GetNumberOfGroups() 
+      << ends;
     this->NumBlocksLabel->SetText(numBlocks.str());
     delete[] numBlocks.str();
     packNumBlocks = 1;
@@ -263,33 +291,33 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   if (packNumBlocks)
     {
     this->Script("pack %s -side top -anchor nw ", 
-                 this->NumBlocksLabel->GetWidgetName());
+      this->NumBlocksLabel->GetWidgetName());
     }
   else
     {
     this->Script("pack forget %s", 
-                 this->NumBlocksLabel->GetWidgetName());
+      this->NumBlocksLabel->GetWidgetName());
     }
 
   if (dataType == VTK_MULTIGROUP_DATA_SET ||
-      dataType == VTK_MULTIBLOCK_DATA_SET ||
-      dataType == VTK_HIERARCHICAL_DATA_SET ||
-      dataType == VTK_HIERARCHICAL_BOX_DATA_SET ||
-      dataInfo->GetNumberOfDataSets() > 1)
+    dataType == VTK_MULTIBLOCK_DATA_SET ||
+    dataType == VTK_HIERARCHICAL_DATA_SET ||
+    dataType == VTK_HIERARCHICAL_BOX_DATA_SET ||
+    dataInfo->GetNumberOfDataSets() > 1)
     {
     ostrstream numds;
     numds << "Number of datasets: " 
-          << dataInfo->GetNumberOfDataSets() 
-          << ends;
+      << dataInfo->GetNumberOfDataSets() 
+      << ends;
     this->NumDataSetsLabel->SetText(numds.str());
     delete[] numds.str();
     this->Script("pack %s -side top -anchor nw ", 
-                 this->NumDataSetsLabel->GetWidgetName());
+      this->NumDataSetsLabel->GetWidgetName());
     }
   else
     {
     this->Script("pack forget %s", 
-                 this->NumDataSetsLabel->GetWidgetName());
+      this->NumDataSetsLabel->GetWidgetName());
     if (!packNumBlocks)
       {
       // If it is empty, the fame should not occupy any vertical
@@ -306,7 +334,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   numpts << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
   this->NumPointsLabel->SetText(numpts.str());
   delete[] numpts.str();
-  
+
   ostrstream memsize;
   memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
   this->MemorySizeLabel->SetText(memsize.str());
@@ -314,6 +342,41 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
 
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
+
+  int array;
+  int totalArray = 0;
+  vtkPVDataSetAttributesInformation* dataSetAttr[2];
+  dataSetAttr[0] = dataInfo->GetPointDataInformation();
+  dataSetAttr[1] = dataInfo->GetCellDataInformation();
+  int dt;
+  for ( dt = 0; dt < 2; ++ dt )
+    {
+    vtkPVDataSetAttributesInformation* dsa = dataSetAttr[dt];
+    for ( array = 0; array < dsa->GetNumberOfArrays(); ++ array )
+      {
+      vtkPVArrayInformation* dataArray = dsa->GetArrayInformation(array);
+      this->ArrayInformationList->InsertCellText(totalArray, 0, dataArray->GetName());
+      this->ArrayInformationList->InsertCellText(totalArray, 1, dt?"cell":"point");
+      char buffer[1024];
+      sprintf(buffer, "%d - %s", dataArray->GetNumberOfComponents(), vtkImageScalarTypeNameMacro(dataArray->GetDataType()));
+      this->ArrayInformationList->InsertCellText(totalArray, 2, buffer);
+      vtkstd::string res;
+      int comp;
+      for ( comp = 0; comp < dataArray->GetNumberOfComponents(); ++ comp )
+        {
+        if ( comp > 0 )
+          {
+          res += ", ";
+          }
+        double* range = dataArray->GetComponentRange(comp);
+        sprintf(buffer, "%f - %f", range[0], range[1]);
+        res += buffer;
+        }
+      this->ArrayInformationList->InsertCellText(totalArray, 3, res.c_str());
+      totalArray ++;
+      }
+    }
+  this->ArrayInformationList->SetHeight(totalArray);
 }
 
 //----------------------------------------------------------------------------
