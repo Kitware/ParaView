@@ -29,6 +29,7 @@ class vtkKWFrame;
 class vtkKWFrameWithLabel;
 class vtkKWLabel;
 class vtkKWBoundsDisplay;
+class vtkKWMultiColumnList;
 
 class VTK_EXPORT vtkPVInformationGUI : public vtkKWFrameWithScrollbar
 {
@@ -73,6 +74,9 @@ protected:
   
   vtkKWBoundsDisplay *BoundsDisplay;
   vtkKWBoundsDisplay *ExtentDisplay;
+
+  vtkKWFrameWithLabel *ArrayInformationFrame;
+  vtkKWMultiColumnList *ArrayInformationList;
 
   vtkPVInformationGUI(const vtkPVInformationGUI&); // Not implemented
   void operator=(const vtkPVInformationGUI&); // Not implemented
