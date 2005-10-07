@@ -5,9 +5,7 @@ set MainView [[$Application GetMainWindow] GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $pv(vtkTemp43) $argv $argc
 
-
-
-
+$MainView SetOrientationAxesVisibility 0
 
 set pv(vtkTemp533) [$pvWindow InitializeReadCustom "P3DReader" "$DataDir/Data/combxyz.bin"]
 $pvWindow ReadFileInformation $pv(vtkTemp533) "$DataDir/Data/combxyz.bin"
