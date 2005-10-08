@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.7");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.8");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -174,11 +174,11 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create(app);
-  this->WindowLevelPresetSelector->SetAddPresetCommand(
+  this->WindowLevelPresetSelector->SetPresetAddCommand(
     this, "WindowLevelPresetAddCallback");
-  this->WindowLevelPresetSelector->SetApplyPresetCommand(
+  this->WindowLevelPresetSelector->SetPresetApplyCommand(
     this, "WindowLevelPresetApplyCallback");
-  this->WindowLevelPresetSelector->SetUpdatePresetCommand(
+  this->WindowLevelPresetSelector->SetPresetUpdateCommand(
     this, "WindowLevelPresetUpdateCallback");
   this->WindowLevelPresetSelector->SetPresetHasChangedCommand(
     this, "WindowLevelPresetHasChangedCallback");

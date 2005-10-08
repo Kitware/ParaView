@@ -127,9 +127,9 @@ vtkKWWindowLevelPresetSelector wl_preset_selector
 
 wl_preset_selector SetParent [wl_frame GetFrame] 
 wl_preset_selector Create app
-wl_preset_selector SetApplyPresetCommand "" "wl_preset_apply"
-wl_preset_selector SetAddPresetCommand "" "wl_preset_add"
-wl_preset_selector SetUpdatePresetCommand "" "wl_preset_update"
+wl_preset_selector SetPresetApplyCommand "" "wl_preset_apply"
+wl_preset_selector SetPresetAddCommand "" "wl_preset_add"
+wl_preset_selector SetPresetUpdateCommand "" "wl_preset_update"
 wl_preset_selector SetPresetHasChangedCommand "" "wl_preset_has_changed"
 
 pack [wl_preset_selector GetWidgetName] -side top -anchor nw -expand n -fill x
