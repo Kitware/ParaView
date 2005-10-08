@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.25");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -35,11 +35,17 @@ public:
   
   vtksys_stl::vector<int> LastSelectionRowIndices;
   vtksys_stl::vector<int> LastSelectionColIndices;
+
+  int EditedCellRowIndex;
+  int EditedCellColumnIndex;
 };
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
 {
+  this->EditStartCommand = NULL;
+  this->EditEndCommand = NULL;
+  this->CellUpdatedCommand = NULL;
   this->SelectionCommand = NULL;
   this->SelectionChangedCommand = NULL;
   this->PotentialCellBackgroundColorChangedCommand = NULL;
@@ -50,6 +56,21 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::~vtkKWMultiColumnList()
 {
+  if (this->EditStartCommand)
+    {
+    delete [] this->EditStartCommand;
+    this->EditStartCommand = NULL;
+    }
+  if (this->EditEndCommand)
+    {
+    delete [] this->EditEndCommand;
+    this->EditEndCommand = NULL;
+    }
+  if (this->CellUpdatedCommand)
+    {
+    delete [] this->CellUpdatedCommand;
+    this->CellUpdatedCommand = NULL;
+    }
   if (this->SelectionCommand)
     {
     delete [] this->SelectionCommand;
@@ -97,7 +118,18 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 
   this->SetConfigurationOption("-activestyle", "none");
 
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, this, "EditStartCallback");
+  this->SetConfigurationOption("-editstartcommand", command);
+  delete [] command;
+
+  command = NULL;
+  this->SetObjectMethodCommand(&command, this, "EditEndCallback");
+  this->SetConfigurationOption("-editendcommand", command);
+  delete [] command;
+
   this->AddBinding("<<TablelistSelect>>", this, "SelectionCallback");
+  this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
   
   // Update enable state
 
@@ -129,19 +161,26 @@ int vtkKWMultiColumnList::GetHeight()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMultiColumnList::AddColumn(const char *title)
+int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
 {
   if (this->IsCreated() && title)
     {
     int nb_columns = this->GetNumberOfColumns();
-    this->Script("%s insertcolumns end 0 {%s}", this->GetWidgetName(), title);
+    this->Script(
+      "%s insertcolumns %d 0 {%s}", this->GetWidgetName(), col_index, title);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
       }
-    return this->GetNumberOfColumns() - 1;
+    return col_index;
     }
   return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::AddColumn(const char *title)
+{
+  return this->InsertColumn(this->GetNumberOfColumns(), title);
 }
 
 //----------------------------------------------------------------------------
@@ -304,6 +343,34 @@ double* vtkKWMultiColumnList::GetColumnLabelForegroundColor()
 void vtkKWMultiColumnList::SetColumnLabelForegroundColor(double r, double g, double b)
 {
   vtkKWTkUtilities::SetOptionColor(this, "-labelforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetColumnName(int col_index, const char *name)
+{
+  this->SetColumnConfigurationOptionAsText(col_index, "-name", name);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::GetColumnName(int col_index)
+{
+  return this->GetColumnConfigurationOptionAsText(col_index, "-name");
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetColumnIndexWithName(const char *name)
+{
+  if (this->IsCreated() && name)
+    {
+    int fail = atoi(
+      this->Script("catch {%s columnindex {%s}} %s_foo", 
+                   this->GetWidgetName(), name, this->GetTclName()));
+    if (!fail)
+      {
+      return atoi(this->Script("set %s_foo", this->GetTclName()));
+      }
+    }
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -1872,7 +1939,7 @@ int vtkKWMultiColumnList::FindCellTextInColumn(
 int vtkKWMultiColumnList::FindCellTextAsIntInColumn(
   int col_index, int value)
 {
-  if (this->IsCreated())
+  if (this->IsCreated() && col_index >= 0)
     {
     int nb_rows = this->GetNumberOfRows();
     for (int j = 0; j < nb_rows; j++)
@@ -2522,6 +2589,63 @@ void vtkKWMultiColumnList::ClearSelection()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetEditStartCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->EditStartCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::InvokeEditStartCommand(
+  int row, int col, const char *text)
+{
+  if (this->EditStartCommand && *this->EditStartCommand && this->IsCreated())
+    {
+    return this->Script("%s %d %d {%s}", 
+                        this->EditStartCommand, row, col, text);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetEditEndCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->EditEndCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::InvokeEditEndCommand(
+  int row, int col, const char *text)
+{
+  if (this->EditEndCommand && *this->EditEndCommand && this->IsCreated())
+    {
+    return this->Script("%s %d %d {%s}", 
+                        this->EditEndCommand, row, col, text);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellUpdatedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->CellUpdatedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeCellUpdatedCommand(
+  int row, int col, const char *text)
+{
+  if (this->CellUpdatedCommand && *this->CellUpdatedCommand && 
+      this->IsCreated())
+    {
+    this->Script("%s %d %d {%s}", 
+                 this->CellUpdatedCommand, row, col, text);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetSelectionCommand(
   vtkObject *object, const char *method)
 {
@@ -2577,10 +2701,46 @@ void vtkKWMultiColumnList::InvokePotentialCellBackgroundColorChangedCommand()
 }
 
 //----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::EditStartCallback(
+  const char *widget, int row, int col, const char *text)
+{
+  // Save the position of the cell that is being edited, so that
+  // CellUpdatedCallback can find and propagate which one it was
+
+  if (this->Internals)
+    {
+    this->Internals->EditedCellRowIndex = row;
+    this->Internals->EditedCellColumnIndex = col;
+    }
+
+  return this->InvokeEditStartCommand(row, col, text);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMultiColumnList::EditEndCallback(
+  const char *widget, int row, int col, const char *text)
+{
+  return this->InvokeEditEndCommand(row, col, text);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SelectionCallback()
 {
   this->InvokeSelectionCommand();
   this->HasSelectionChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellUpdatedCallback()
+{
+  int row = 0, col = 0;
+  if (this->Internals)
+    {
+    row = this->Internals->EditedCellRowIndex;
+    col = this->Internals->EditedCellColumnIndex;
+    }
+
+  this->InvokeCellUpdatedCommand(row, col, this->GetCellText(row, col));
 }
 
 //----------------------------------------------------------------------------
@@ -2638,32 +2798,6 @@ void vtkKWMultiColumnList::HasSelectionChanged()
   
   this->InvokeSelectionChangedCommand();
   this->InvokePotentialCellBackgroundColorChangedCommand();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetEditStartCommand(vtkObject* object, 
-                                               const char *method)
-{
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    this->SetConfigurationOption("-editstartcommand", command);
-    delete [] command;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetEditEndCommand(vtkObject* object, 
-                                             const char *method)
-{
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    this->SetConfigurationOption("-editendcommand", command);
-    delete [] command;
-    }
 }
 
 //----------------------------------------------------------------------------
