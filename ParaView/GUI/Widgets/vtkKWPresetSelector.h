@@ -398,7 +398,7 @@ protected:
   // Subclasses should override this method to release the memory allocated
   // by their own preset fields  (do not forget to call the superclass
   // first).
-  virtual void DeAllocatePreset(int id) {};
+  virtual void DeAllocatePreset(int vtkNotUsed(id)) {};
 
   // Description:
   // Update the preset row, i.e. add a row for that preset if it is not
