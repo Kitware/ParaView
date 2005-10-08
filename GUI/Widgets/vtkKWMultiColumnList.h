@@ -69,9 +69,26 @@ public:
     { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
-  // Add a column at the end.
+  // Insert a column just before the column given by col_index. If col_index
+  // is equal to (or greater than) the number of columns the new column is
+  // added to the end of the column list. The AddColumn method can be
+  // used to add a column directly to the end of the list.
   // Returns the index of the column
+  virtual int InsertColumn(int col_index, const char *title);
   virtual int AddColumn(const char *title);
+
+  // Description:
+  // Set a column name. Most of the API in this class uses numerical indices
+  // to refer to columns. Yet, the index of a column can change if columns
+  // are added or removed. Assigning a unique name to a column provides a
+  // way to refer to a column without worrying about its location. Use the
+  // GetColumnIndexWithName() to query the index of a column given its name.
+  // indexing is done using numerical index.
+  // Note that the name of a column has nothing to do with its title, which
+  // is used to label the column in the table.
+  virtual void SetColumnName(int col_index, const char *name);
+  virtual const char* GetColumnName(int col_index);
+  virtual int GetColumnIndexWithName(const char *name);
 
   // Description:
   // Get number columns.
@@ -806,23 +823,26 @@ public:
 
   // Description:
   // Specifies a command to be invoked when the interactive editing of a cell's
-  // contents is started. The command is automatically concatenated with the
-  // name of the tablelist widget (TableList), the cell's row and column
-  // indices, as well as the text displayed in the cell, the resulting script
-  // is evaluated in the global scope, and the return value becomes the 
-  // initial contents of the temporary embedded widget used for the editing.
+  // contents is started. The command is automatically concatenated with
+  // the cell's row and column indices, as well as the text displayed in
+  // the cell, the resulting script is evaluated in the global scope, and
+  // the return value becomes the initial contents of the temporary
+  // embedded widget used for the editing.
+  // The next step (validation) is handled by SetEditEndCommand (if any)
   virtual void SetEditStartCommand(vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be invoked on normal termination of the 
   // interactive editing of a cell's contents if the final text of the
   // temporary embedded widget used for the editing is different from its 
-  // initial one. The command is automatically concatenated with the name of 
-  // the tablelist widget, the cell's row and column indices, as well as the
-  // final contents of the edit window, the resulting script is evaluated in
-  // the global scope, and the return value becomes the cell's new contents 
-  // after destroying the temporary embedded widget. The main purpose of this
-  // script is to perform a final validation of the edit window's contents.
+  // initial one. The command is automatically concatenated with the 
+  // cell's row and column indices, as well as the final contents of the edit
+  // window, the resulting script is evaluated in the global scope, and the
+  // return value becomes the cell's new contents after destroying the
+  // temporary embedded widget. The main purpose of this script is to perform
+  // a final validation of the edit window's contents and eventually reject
+  // the input by calling the RejectInput() method.
+  // The next step (updating) is handled by SetCellUpdatedCommand (if any)
   virtual void SetEditEndCommand(vtkObject* object, const char *method);
 
   // Description:
@@ -831,6 +851,15 @@ public:
   // enables you to reject the widget's text during the final validation of the
   // string intended to become the new cell contents.
   virtual void RejectInput();
+
+  // Description:
+  // Specifies a command to be invoked when a cell contents has been
+  // successfully updated after editing it. The command is automatically
+  // concatenated with the cell's row and column indices, as well as the
+  // new contents of the cell. The main purpose of this script is to let
+  // external objects retrieve the new contents and update their own internal
+  // values.
+  virtual void SetCellUpdatedCommand(vtkObject* object, const char *method);
 
   // Description:
   // Specifies a command to be invoked when mouse button 1 is pressed over one
@@ -857,6 +886,11 @@ public:
   virtual void SelectionCallback();
   virtual void CellWindowDestroyRemoveChildCallback(
     const char*, int, int, const char*);
+  virtual void CellUpdatedCallback();
+  virtual const char* EditStartCallback(
+    const char *widget, int row, int col, const char *text);
+  virtual const char* EditEndCallback(
+    const char *widget, int row, int col, const char *text);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -870,6 +904,15 @@ public:
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
+
+  char *EditStartCommand;
+  const char* InvokeEditStartCommand(int row, int col, const char *text);
+
+  char *EditEndCommand;
+  const char* InvokeEditEndCommand(int row, int col, const char *text);
+
+  char *CellUpdatedCommand;
+  void InvokeCellUpdatedCommand(int row, int col, const char *text);
 
   char *SelectionCommand;
   virtual void InvokeSelectionCommand();
