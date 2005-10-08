@@ -53,17 +53,18 @@ public:
   virtual int SetPresetLevel(int id, double level);
 
   // Description:
-  // Query if a the pool has a given window/level preset
+  // Query if a the pool has a given window/level preset in a group
   virtual int HasPresetWithGroupWithWindowLevel(
     const char *group, double window, double level);
 
   // Description:
-  // Callback invoked when user starts editing a specific preset field
-  // located at cell ('row', 'col') with contents 'text'.
-  // This method returns the value that is to become the initial 
-  // contents of the temporary embedded widget used for editing.
-  // Most of the time, this is the same as 'text'.
-  // The next step (validation) is handled by PresetCellEditEndCallback
+  // Callback invoked when the user ends editing a specific preset field
+  // located at cell ('row', 'col').
+  // The main purpose of this method is to perform a final validation of
+  // the edit window's contents 'text'.
+  // This method returns the value that is to become the new contents
+  // for that cell.
+  // The next step (updating) is handled by PresetCellUpdateCallback
   virtual const char* PresetCellEditEndCallback(
     int row, int col, const char *text);
 
@@ -87,11 +88,14 @@ protected:
   // Description:
   // Create the columns.
   // Subclasses should override this method to add their own columns and
-  // display their own preset fields.
+  // display their own preset fields (do not forget to call the superclass
+  // first).
   virtual void CreateColumns();
 
   // Description:
-  // Update the row in the list for a given preset
+  // Update the preset row, i.e. add a row for that preset if it is not
+  // displayed already, hide it if it does not match GroupFilter, and
+  // update the table columns with the corresponding preset fields.
   // Subclass should override this method to display their own fields.
   // Return 1 on success, 0 if the row was not (or can not be) updated.
   // Subclasses should call the parent's UpdatePresetRow, and abort

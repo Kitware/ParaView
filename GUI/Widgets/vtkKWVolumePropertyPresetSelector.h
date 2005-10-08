@@ -28,8 +28,6 @@
 #include "vtkKWPresetSelector.h"
 
 class vtkVolumeProperty;
-class vtkPiecewiseFunction;
-class vtkColorTransferFunction;
 
 class KWWIDGETS_EXPORT vtkKWVolumePropertyPresetSelector : public vtkKWPresetSelector
 {
@@ -40,6 +38,9 @@ public:
 
   // Description:
   // Set/Get the volume property associated to the preset in the pool.
+  // Note that the volume property object passed as parameter is not
+  // stored or Register()'ed, only a copy is stored (and updated each
+  // time this method is called later on).
   // Return 1 on success, 0 on error
   virtual int SetPresetVolumeProperty(int id, vtkVolumeProperty *prop);
   virtual vtkVolumeProperty* GetPresetVolumeProperty(int id);
@@ -49,9 +50,10 @@ protected:
   ~vtkKWVolumePropertyPresetSelector();
 
   // Description:
-  // Deallocate a preset
+  // Deallocate a preset.
   // Subclasses should override this method to release the memory allocated
-  // by their own preset fields.
+  // by their own preset fields  (do not forget to call the superclass
+  // first).
   virtual void DeAllocatePreset(int id);
 
 private:
