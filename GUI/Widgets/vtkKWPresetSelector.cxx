@@ -52,7 +52,7 @@ const char *vtkKWPresetSelector::CommentColumnName = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -355,15 +355,14 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_UPDATE_ID);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPointFinger);
   pb->SetCommand(this, "PresetUpdateCallback");
-  pb->SetBalloonHelpString("Update a preset");
+  pb->SetBalloonHelpString("Update the selected preset(s)");
 
   // remove preset
 
   pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_REMOVE_ID);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconTrashcan);
   pb->SetCommand(this, "PresetRemoveCallback");
-  pb->SetBalloonHelpString(
-    "Remove the selected preset(s) from the list of presets");
+  pb->SetBalloonHelpString("Remove the selected preset(s)");
 
   // Pack
 
