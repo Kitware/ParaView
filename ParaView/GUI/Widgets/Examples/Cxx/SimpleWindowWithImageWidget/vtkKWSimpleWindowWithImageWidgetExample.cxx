@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.5");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.6");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -174,9 +174,9 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create(app);
-  this->WindowLevelPresetSelector->SetAddWindowLevelPresetCommand(
+  this->WindowLevelPresetSelector->SetAddPresetCommand(
     this, "AddWindowLevelPresetCallback");
-  this->WindowLevelPresetSelector->SetApplyWindowLevelPresetCommand(
+  this->WindowLevelPresetSelector->SetApplyPresetCommand(
     this, "ApplyWindowLevelPresetCallback");
   
   app->Script("pack %s -side top -anchor nw -expand n -fill x",
@@ -296,21 +296,28 @@ void vtkKWSimpleWindowWithImageWidgetExample::SetSliceOrientationToYZCallback()
 //----------------------------------------------------------------------------
 void vtkKWSimpleWindowWithImageWidgetExample::AddWindowLevelPresetCallback()
 {
-  int id = this->WindowLevelPresetSelector->AddWindowLevelPreset(
-    this->ImageViewer->GetColorWindow(), this->ImageViewer->GetColorLevel());
-  this->WindowLevelPresetSelector->SetWindowLevelPresetImageFromRenderWindow(
-    id, this->RenderWidget->GetRenderWindow());
+  int id = this->WindowLevelPresetSelector->AddPreset();
+  if (id >= 0)
+    {
+    this->WindowLevelPresetSelector->SetPresetWindow(
+      id, this->ImageViewer->GetColorWindow());
+    this->WindowLevelPresetSelector->SetPresetLevel(
+      id, this->ImageViewer->GetColorLevel());
+    this->WindowLevelPresetSelector->SetPresetImageFromRenderWindow(
+      id, this->RenderWidget->GetRenderWindow());
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSimpleWindowWithImageWidgetExample::ApplyWindowLevelPresetCallback(
   int id)
 {
-  double *wl = this->WindowLevelPresetSelector->GetWindowLevelPreset(id);
-  if (wl)
+  if (this->WindowLevelPresetSelector->HasPreset(id))
     {
-    this->ImageViewer->SetColorWindow(wl[0]);
-    this->ImageViewer->SetColorLevel(wl[1]);
+    this->ImageViewer->SetColorWindow(
+      this->WindowLevelPresetSelector->GetPresetWindow(id));
+    this->ImageViewer->SetColorLevel(
+      this->WindowLevelPresetSelector->GetPresetLevel(id));
     this->ImageViewer->Render();
     }
 }

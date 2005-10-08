@@ -127,21 +127,26 @@ vtkKWWindowLevelPresetSelector wl_preset_selector
 
 wl_preset_selector SetParent [wl_frame GetFrame] 
 wl_preset_selector Create app
-wl_preset_selector SetAddWindowLevelPresetCommand "" "add_wl_preset"
-wl_preset_selector SetApplyWindowLevelPresetCommand "" "apply_wl_preset"
+wl_preset_selector SetAddPresetCommand "" "add_wl_preset"
+wl_preset_selector SetApplyPresetCommand "" "apply_wl_preset"
 
 pack [wl_preset_selector GetWidgetName] -side top -anchor nw -expand n -fill x
 
 proc add_wl_preset {} {
-  set id [wl_preset_selector AddWindowLevelPreset [viewer GetColorWindow] [viewer GetColorLevel]]
-  wl_preset_selector SetWindowLevelPresetImageFromRenderWindow $id [rw GetRenderWindow]
+  set id [wl_preset_selector AddPreset]
+  if {$id >= 0} {
+    wl_preset_selector SetPresetWindow $id [viewer GetColorWindow]
+    wl_preset_selector SetPresetLevel $id [viewer GetColorLevel]
+    wl_preset_selector SetPresetImageFromRenderWindow $id [rw GetRenderWindow]
+  }
 }
 
 proc apply_wl_preset {id} {
-  set wl [wl_preset_selector GetWindowLevelPreset $id]
-  viewer SetColorWindow [lindex $wl 0]
-  viewer SetColorLevel [lindex $wl 1]
-  viewer Render
+  if {[wl_preset_selector HasPreset $id]} {
+    viewer SetColorWindow [wl_preset_selector GetPresetWindow $id]
+    viewer SetColorLevel [wl_preset_selector GetPresetLevel $id]
+    viewer Render
+  }
 }
 
 # Create a simple animation widget

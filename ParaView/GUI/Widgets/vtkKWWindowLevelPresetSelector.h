@@ -29,278 +29,79 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // through the NIH Roadmap for Medical Research, Grant U54 EB005149.
 // Information on the National Centers for Biomedical Computing
 // can be obtained from http://nihroadmap.nih.gov/bioinformatics.
+// .SECTION See Also
+// vtkKWPresetSelector
 
 #ifndef __vtkKWWindowLevelPresetSelector_h
 #define __vtkKWWindowLevelPresetSelector_h
 
-#include "vtkKWCompositeWidget.h"
+#include "vtkKWPresetSelector.h"
 
-class vtkKWWindowLevelPresetSelectorInternals;
-class vtkKWMultiColumnListWithScrollbars;
-class vtkKWSpinButtons;
-class vtkKWPushButtonSet;
-class vtkImageData;
-class vtkRenderWindow;
-
-class KWWIDGETS_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWCompositeWidget
+class KWWIDGETS_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWPresetSelector
 {
 public:
   static vtkKWWindowLevelPresetSelector* New();
-  vtkTypeRevisionMacro(vtkKWWindowLevelPresetSelector, vtkKWCompositeWidget);
+  vtkTypeRevisionMacro(vtkKWWindowLevelPresetSelector, vtkKWPresetSelector);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create(vtkKWApplication *app);
-  
-  // Description:
-  // Add a new window/level preset.
-  // Return the unique Id of the preset
-  virtual int AddWindowLevelPreset(double window, double level);
+  // Set/Get the window/level values for a given preset.
+  // Return 1 on success, 0 otherwise
+  virtual double GetPresetWindow(int id);
+  virtual int SetPresetWindow(int id, double window);
+  virtual double GetPresetLevel(int id);
+  virtual int SetPresetLevel(int id, double level);
 
   // Description:
-  // Assign a group to a preset in the pool.
-  // This provide a way of grouping window/level presets (say, if you
-  // have different dataset at the same time and want to store
-  // different window/level presets for each dataset).
-  // If there is already a window/level preset for that group, it is removed
-  // first.
-  // Return 1 on success, 0 on error
-  virtual int SetWindowLevelPresetGroup(int id, const char *group);
-  virtual const char* GetWindowLevelPresetGroup(int id);
+  // Query if a the pool has a given window/level preset
+  virtual int HasPresetWithGroupWithWindowLevel(
+    const char *group, double window, double level);
 
   // Description:
-  // Assign a comment to a preset in the pool.
-  // Return 1 on success, 0 on error
-  virtual int SetWindowLevelPresetComment(int id, const char *group);
-  virtual const char* GetWindowLevelPresetComment(int id);
-
-  // Description:
-  // Get the number of presets in the pool, or the number of presets with
-  // the same group in the pool, or the number of visible presets, i.e.
-  // the presets that are displayed despite the filters (see GroupFilter).
-  virtual int GetNumberOfWindowLevelPresets();
-  virtual int GetNumberOfWindowLevelPresetsWithGroup(const char *group);
-  virtual int GetNumberOfVisibleWindowLevelPresets();
-
-  // Description:
-  // Query if a preset is in the pool, given a window/level, and optionally
-  // a group. If no group is specified, the search is performed among
-  // all presets in the pool.
-  virtual int HasWindowLevelPreset(
-    double window, double level);
-  virtual int HasWindowLevelPresetWithGroup(
-    double window, double level, const char *group);
-
-  // Description:
-  // Set/Get a window/level preset given its unique Id, or its position in
-  // the pool (i.e. nth-preset), or its position in the pool within a group
-  // (i.e. nth-preset with a given group).
-  // Return 1 on success, 0 otherwise for methods that take a pointer
-  // to the window and level (return pointer to array of 2 elements
-  // on success, NULL otherwise for the other methods). 
-  virtual int GetWindowLevelPreset(
-    int id, double *window, double *level);
-  virtual double* GetWindowLevelPreset(int id);
-  virtual int GetNthWindowLevelPreset(
-    int index, double *window, double *level);
-  virtual double* GetNthWindowLevelPreset(int index);
-  virtual int GetNthWindowLevelPresetWithGroup(
-    int index, const char *group, double *window, double *level);
-  virtual double* GetNthWindowLevelPresetWithGroup(
-    int index, const char *group);
-  virtual int SetWindowLevelPreset(int id, double window, double level);
-
-  // Description:
-  // Retrieve the Id of the first preset with a given window/level,
-  // or given a window/level and a group, or given its position in the pool, or
-  // given its position in the pool within a group (i.e. nth-preset with
-  // a given group), or given its row position as currently displayed in the
-  // list.
-  // Return id on success, -1 otherwise
-  virtual int GetWindowLevelPresetId(double window, double level);
-  virtual int GetWindowLevelPresetIdWithGroup(
-    double window, double level, const char *group);
-  virtual int GetNthWindowLevelPresetId(int index);
-  virtual int GetNthWindowLevelPresetIdWithGroup(int index, const char *group);
-  virtual int GetNthVisibleWindowLevelPresetId(int row_index);
-
-  // Description:
-  // Retrieve the rank in the whole pool of the nth preset in the pool within
-  // a group (i.e. nth-preset with a given group).
-  // Return rank on success, -1 otherwise
-  virtual int GetNthWindowLevelPresetRankWithGroup(
-    int index, const char *group);
-
-  // Description:
-  // Remove a window/level preset, or all of them, or all of the presets
-  // with the same group.
-  // Return 1 on success, 0 on error
-  virtual int RemoveWindowLevelPreset(int id);
-  virtual int RemoveAllWindowLevelPresets();
-  virtual int RemoveAllWindowLevelPresetsWithGroup(const char *group);
-
-  // Description:
-  // Set/Get the group filter.
-  // If set to a non-empty value, only the presets have the same group
-  // as the filter will be displayed.
-  virtual void SetGroupFilter(const char *group);
-  vtkGetStringMacro(GroupFilter);
-
-  // Description:
-  // Set/Get the list height (in number of items)
-  // No effect if called before Create().
-  virtual void SetListHeight(int);
-  virtual int GetListHeight();
-
-  // Description:
-  // Set/Get the visibility of the image column.
-  // No effect if called before Create().
-  virtual void SetImageColumnVisibility(int);
-  virtual int GetImageColumnVisibility();
-  vtkBooleanMacro(ImageColumnVisibility, int);
-
-  // Description:
-  // Set/Get the visibility of the comment column.
-  // No effect if called before Create().
-  virtual void SetCommentColumnVisibility(int);
-  virtual int GetCommentColumnVisibility();
-  vtkBooleanMacro(CommentColumnVisibility, int);
-
-  // Description:
-  // Assign an image to a preset in the pool.
-  // It will be used to generate both a thumbnail view of the
-  // preset and a popup mini-screenshot.
-  // If passed a vtkRenderWindow, grab an image of the window contents.
-  virtual int SetWindowLevelPresetImage(int id, vtkImageData *img);
-  virtual int SetWindowLevelPresetImageFromRenderWindow(
-    int id, vtkRenderWindow *win);
-  virtual int HasWindowLevelPresetImage(int id);
-
-  // Description:
-  // Set/Get the thumbnail size.
-  // Changing the size will not resize the current thumbnails, but will
-  // affect the presets inserted later on.
-  vtkSetClampMacro(ThumbnailSize,int,8,512);
-  vtkGetMacro(ThumbnailSize,int);
-
-  // Description:
-  // Set/Get the screenshot size (i.e. the image that appears as
-  // a popup when the mouse is on top of the thumbnail).
-  vtkSetClampMacro(ScreenshotSize,int,8,2048);
-  vtkGetMacro(ScreenshotSize,int);
-
-  // Description:
-  // Specifies a command to be invoked when the "add" button is pressed.
-  // This is used by the application to actually check which window/level
-  // is used on whichever dataset is loaded or selected, and call back
-  // this object to add this window/level as a preset (using the
-  // AddWindowLevelPreset method for example).
-  // If it is not set, the 'add' button is not visible.
-  virtual void SetAddWindowLevelPresetCommand(
-    vtkObject* object, const char *method);
-
-  // Description:
-  // Specifies a command to be invoked when the "update" button is pressed.
-  // This is used by the application to actually check which window/level
-  // is used on whichever dataset is loaded or selected, and call back
-  // this object to update the window/level of the preset to update.
-  // The id of the preset to update is passed to the command.
-  // If it is not set, the 'update' button is not visible.
-  virtual void SetUpdateWindowLevelPresetCommand(
-    vtkObject* object, const char *method);
-
-  // Description:
-  // Specifies a command to be invoked when the the user tries to
-  // apply a window/level preset (by double-clicking on the preset for
-  // example). The id of the preset is passed to the command.
-  virtual void SetApplyWindowLevelPresetCommand(
-    vtkObject* object, const char *method);
-
-  // Description:
-  // Set/Get if a preset should be applied when it is selected (single-click),
-  // or only when it is double-clicked on.
-  // If set, only one preset can be selected at a time (if not, multiple
-  // preset can be selected, and removed for example).
-  virtual void SetApplyPresetOnSingleClick(int);
-  vtkGetMacro(ApplyPresetOnSingleClick,int);
-  vtkBooleanMacro(ApplyPresetOnSingleClick,int);
-
-  // Description:
-  // Specifies a command to be invoked when the the user tries to
-  // apply a window/level preset (by double-clicking on the preset for
-  // example). The id of the preset is passed to the command.
-  virtual void SetRemoveWindowLevelPresetCommand(
-    vtkObject* object, const char *method);
-
-  // Description:
-  // Refresh the interface.
-  virtual void Update();
-
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
-
-  // Description:
-  // Callbacks
-  virtual void PresetAddCallback();
-  virtual void PresetUpdateCallback();
-  virtual void PresetRemoveCallback();
-  virtual void PresetCellIconCallback(const char*, int, int, const char*);
-  virtual const char* PresetCellEditStartCallback(
-    const char*, int, int, const char*);
+  // Callback invoked when user starts editing a specific preset field
+  // located at cell ('row', 'col') with contents 'text'.
+  // This method returns the value that is to become the initial 
+  // contents of the temporary embedded widget used for editing.
+  // Most of the time, this is the same as 'text'.
+  // The next step (validation) is handled by PresetCellEditEndCallback
   virtual const char* PresetCellEditEndCallback(
-    const char*, int, int, const char*);
-  virtual void PresetSelectionCallback();
-  virtual void PresetSelectAndApplyPreviousCallback();
-  virtual void PresetSelectAndApplyNextCallback();
-
-protected:
-  vtkKWWindowLevelPresetSelector();
-  ~vtkKWWindowLevelPresetSelector();
-
-  vtkKWMultiColumnListWithScrollbars *PresetList;
-  vtkKWFrame                         *ControlFrame;
-  vtkKWSpinButtons                   *PresetSpinButtons;
-  vtkKWPushButtonSet                 *PresetButtons;
-
-  int ApplyPresetOnSingleClick;
-
-  int ThumbnailSize;
-  int ScreenshotSize;
-
-  char* GroupFilter;
+    int row, int col, const char *text);
 
   // Description:
-  // Called when the number of presets has changed
-  virtual void NumberOfWindowLevelPresetsHasChanged();
+  // Callback invoked when the user successfully updated the preset field
+  // located at ('row', 'col') with the new contents 'text', as a result
+  // of editing the corresponding cell interactively.
+  virtual void PresetCellUpdatedCallback(int row, int col, const char *text);
 
-  // PIMPL Encapsulation for STL containers
+  // Description:
+  // Some constants
   //BTX
-  vtkKWWindowLevelPresetSelectorInternals *Internals;
+  static const char *WindowColumnName;
+  static const char *LevelColumnName;
   //ETX
 
+protected:
+  vtkKWWindowLevelPresetSelector() {};
+  ~vtkKWWindowLevelPresetSelector() {};
+
   // Description:
-  // Update one or all rows in the list
-  virtual void UpdateRowsInPresetList();
-  virtual void UpdateRowInPresetList(void*);
+  // Create the columns.
+  // Subclasses should override this method to add their own columns and
+  // display their own preset fields.
+  virtual void CreateColumns();
 
-  char *AddWindowLevelPresetCommand;
-  virtual void InvokeAddWindowLevelPresetCommand();
+  // Description:
+  // Update the row in the list for a given preset
+  // Subclass should override this method to display their own fields.
+  // Return 1 on success, 0 if the row was not (or can not be) updated.
+  // Subclasses should call the parent's UpdatePresetRow, and abort
+  // if the result is not 1.
+  virtual int UpdatePresetRow(int id);
 
-  char *UpdateWindowLevelPresetCommand;
-  virtual void InvokeUpdateWindowLevelPresetCommand(int id);
-
-  char *ApplyWindowLevelPresetCommand;
-  virtual void InvokeApplyWindowLevelPresetCommand(int id);
-
-  char *RemoveWindowLevelPresetCommand;
-  virtual void InvokeRemoveWindowLevelPresetCommand(int id);
+  // Description:
+  // Convenience methods to get the index of a given column
+  virtual int GetWindowColumnIndex();
+  virtual int GetLevelColumnIndex();
 
 private:
 

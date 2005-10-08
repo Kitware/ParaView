@@ -83,7 +83,6 @@ SET (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 # Sources
 
 SET(KWWidgets_SRCS
-  vtkKWAbstractPresetSelector.cxx
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBalloonHelpManager.cxx
@@ -92,7 +91,6 @@ SET(KWWidgets_SRCS
   vtkKWCheckButton.cxx 
   vtkKWCheckButtonWithChangeColorButton.cxx
   vtkKWCheckButtonWithPopupFrame.cxx 
-# vtkKWColorPicker.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWComboBox.cxx
@@ -106,8 +104,8 @@ SET(KWWidgets_SRCS
   vtkKWEventMap.cxx
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
-  vtkKWFrameWithScrollbar.cxx
   vtkKWFrameWithLabel.cxx 
+  vtkKWFrameWithScrollbar.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotationEditor.cxx 
@@ -134,6 +132,7 @@ SET(KWWidgets_SRCS
   vtkKWPiecewiseFunctionEditor.cxx
   vtkKWPopupButton.cxx 
   vtkKWPopupFrame.cxx 
+  vtkKWPresetSelector.cxx
   vtkKWProgressGauge.cxx 
   vtkKWPushButton.cxx 
   vtkKWPushButtonWithMenu.cxx 
@@ -176,6 +175,7 @@ SET(KWWidgets_SRCS
   vtkKWUserInterfaceManagerNotebook.cxx
   vtkKWUserInterfacePanel.cxx
   vtkKWVolumeMaterialPropertyWidget.cxx
+  vtkKWVolumePropertyPresetSelector.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
   vtkKWWidgetSet.cxx 
@@ -185,6 +185,7 @@ SET(KWWidgets_SRCS
   vtkKWWindow.cxx 
   vtkKWWindowBase.cxx 
   vtkKWWindowLevelPresetSelector.cxx 
+# vtkKWColorPicker.cxx
 )
 
 SET(KWWidgets_Utils_SRCS
@@ -199,7 +200,6 @@ SET(KWWidgets_SRCS ${KWWidgets_SRCS} ${KWWidgets_Utils_SRCS})
 # Abstract/pure virtual classes
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkKWAbstractPresetSelector.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueHermiteFunctionEditor.cxx
