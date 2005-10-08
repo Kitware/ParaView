@@ -46,13 +46,13 @@
 #define VTK_KW_WLPS_BUTTON_UPDATE_ID 2
 
 const char *vtkKWPresetSelector::IdColumnName      = "Id";
-const char *vtkKWPresetSelector::ImageColumnName   = "Image";
+const char *vtkKWPresetSelector::ThumbnailColumnName   = "Image";
 const char *vtkKWPresetSelector::GroupColumnName   = "Group";
 const char *vtkKWPresetSelector::CommentColumnName = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.2");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -145,10 +145,10 @@ vtkKWPresetSelector::vtkKWPresetSelector()
 {
   this->Internals = new vtkKWPresetSelectorInternals;
 
-  this->AddPresetCommand    = NULL;
-  this->UpdatePresetCommand    = NULL;
-  this->ApplyPresetCommand  = NULL;
-  this->RemovePresetCommand = NULL;
+  this->PresetAddCommand    = NULL;
+  this->PresetUpdateCommand    = NULL;
+  this->PresetApplyCommand  = NULL;
+  this->PresetRemoveCommand = NULL;
   this->PresetHasChangedCommand    = NULL;
 
   this->PresetList        = NULL;
@@ -193,28 +193,28 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
     this->PresetButtons = NULL;
     }
 
-  if (this->AddPresetCommand)
+  if (this->PresetAddCommand)
     {
-    delete [] this->AddPresetCommand;
-    this->AddPresetCommand = NULL;
+    delete [] this->PresetAddCommand;
+    this->PresetAddCommand = NULL;
     }
 
-  if (this->UpdatePresetCommand)
+  if (this->PresetUpdateCommand)
     {
-    delete [] this->UpdatePresetCommand;
-    this->UpdatePresetCommand = NULL;
+    delete [] this->PresetUpdateCommand;
+    this->PresetUpdateCommand = NULL;
     }
 
-  if (this->ApplyPresetCommand)
+  if (this->PresetApplyCommand)
     {
-    delete [] this->ApplyPresetCommand;
-    this->ApplyPresetCommand = NULL;
+    delete [] this->PresetApplyCommand;
+    this->PresetApplyCommand = NULL;
     }
 
-  if (this->RemovePresetCommand)
+  if (this->PresetRemoveCommand)
     {
-    delete [] this->RemovePresetCommand;
-    this->RemovePresetCommand = NULL;
+    delete [] this->PresetRemoveCommand;
+    this->PresetRemoveCommand = NULL;
     }
 
   if (this->PresetHasChangedCommand)
@@ -414,8 +414,8 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnName(col, vtkKWPresetSelector::IdColumnName);
   list->ColumnVisibilityOff(col);
 
-  col = list->AddColumn(vtkKWPresetSelector::ImageColumnName);
-  list->SetColumnName(col, vtkKWPresetSelector::ImageColumnName);
+  col = list->AddColumn(vtkKWPresetSelector::ThumbnailColumnName);
+  list->SetColumnName(col, vtkKWPresetSelector::ThumbnailColumnName);
   list->SetColumnWidth(col, -this->ThumbnailSize);
   list->SetColumnResizable(col, 0);
   list->SetColumnStretchable(col, 0);
@@ -447,11 +447,11 @@ int vtkKWPresetSelector::GetIdColumnIndex()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetImageColumnIndex()
+int vtkKWPresetSelector::GetThumbnailColumnIndex()
 {
   return this->PresetList ? 
     this->PresetList->GetWidget()->GetColumnIndexWithName(
-      vtkKWPresetSelector::ImageColumnName) : -1;
+      vtkKWPresetSelector::ThumbnailColumnName) : -1;
 }
 
 //----------------------------------------------------------------------------
@@ -528,22 +528,22 @@ int vtkKWPresetSelector::GetListHeight()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetImageColumnVisibility(int arg)
+void vtkKWPresetSelector::SetThumbnailColumnVisibility(int arg)
 {
   if (this->PresetList)
     {
     this->PresetList->GetWidget()->SetColumnVisibility(
-      this->GetImageColumnIndex(), arg);
+      this->GetThumbnailColumnIndex(), arg);
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetImageColumnVisibility()
+int vtkKWPresetSelector::GetThumbnailColumnVisibility()
 {
   if (this->PresetList)
     {
     return this->PresetList->GetWidget()->GetColumnVisibility(
-      this->GetImageColumnIndex());
+      this->GetThumbnailColumnIndex());
     }
   return 0;
 }
@@ -1101,12 +1101,6 @@ int vtkKWPresetSelector::SetPresetImageFromRenderWindow(
   return 0;
 }
 
-//---------------------------------------------------------------------------
-int vtkKWPresetSelector::HasPresetImage(int id)
-{
-  return this->GetPresetThumbnail(id) ? 1 : 0;
-}
-
 //----------------------------------------------------------------------------
 vtkKWIcon* vtkKWPresetSelector::GetPresetThumbnail(int id)
 {
@@ -1484,11 +1478,11 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
   sprintf(buffer, "%03d", id);
   list->SetCellText(row, this->GetIdColumnIndex(), buffer);
 
-  int image_col_index = this->GetImageColumnIndex();
-  if (this->HasPresetImage(id))
+  int image_col_index = this->GetThumbnailColumnIndex();
+  if (this->GetPresetThumbnail(id))
     {
     list->SetCellWindowCommand(
-      row, image_col_index, this, "PresetCellImageCallback");
+      row, image_col_index, this, "PresetCellThumbnailCallback");
     list->SetCellWindowDestroyCommandToRemoveChild(row, image_col_index);
     list->RefreshCellWithWindowCommand(row, image_col_index);
     }
@@ -1510,7 +1504,7 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
 }
 
 //---------------------------------------------------------------------------
-void vtkKWPresetSelector::PresetCellImageCallback(
+void vtkKWPresetSelector::PresetCellThumbnailCallback(
   const char *, int row, int, const char *widget)
 {
   if (!this->PresetList || !widget)
@@ -1548,8 +1542,8 @@ void vtkKWPresetSelector::PresetCellImageCallback(
       child->SetHighlightThickness(0);
       child->SetWidth(this->ThumbnailSize);
       child->SetHeight(this->ThumbnailSize);
-      child->SetBackgroundColor(
-        list->GetCellCurrentBackgroundColor(row, this->GetImageColumnIndex()));
+      child->SetBackgroundColor(list->GetCellCurrentBackgroundColor(
+                                  row, this->GetThumbnailColumnIndex()));
       child->SetImageToIcon(thumbnail);
 
       list->AddBindingsToWidget(child);
@@ -1591,7 +1585,7 @@ void vtkKWPresetSelector::PresetCellUpdatedCallback(
 //---------------------------------------------------------------------------
 void vtkKWPresetSelector::PresetAddCallback()
 {
-  this->InvokeAddPresetCommand();
+  this->InvokePresetAddCommand();
 }
 
 //---------------------------------------------------------------------------
@@ -1615,7 +1609,7 @@ void vtkKWPresetSelector::PresetUpdateCallback()
 
     for (i = 0; i < nb_selected_rows; i++)
       {
-      this->InvokeUpdatePresetCommand(ids[i]);
+      this->InvokePresetUpdateCommand(ids[i]);
       }
 
     delete [] indices;
@@ -1650,14 +1644,16 @@ void vtkKWPresetSelector::PresetRemoveCallback()
             this->GetApplication(), 
             this->GetApplication()->GetNthWindow(0), 
             "Delete Preset",
-            "Are you sure you want to delete this preset?", 
+            "Are you sure you want to delete the preset(s)?", 
             vtkKWMessageDialog::WarningIcon | 
             vtkKWMessageDialog::InvokeAtPointer))
         {
         for (i = 0; i < nb_selected_rows; i++)
           {
-          this->InvokeRemovePresetCommand(ids[i]); // first
-          this->RemovePreset(ids[i]);
+          if (this->InvokePresetRemoveCommand(ids[i]))
+            {
+            this->RemovePreset(ids[i]);
+            }
           }
         }
       }
@@ -1682,7 +1678,7 @@ void vtkKWPresetSelector::PresetSelectionCallback()
         int id = this->GetPresetAtRowId(list->GetIndexOfFirstSelectedRow());
         if (this->HasPreset(id))
           {
-          this->InvokeApplyPresetCommand(id);
+          this->InvokePresetApplyCommand(id);
           }
         }
       }
@@ -1738,81 +1734,82 @@ void vtkKWPresetSelector::PresetSelectNextCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetAddPresetCommand(
+void vtkKWPresetSelector::SetPresetAddCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
-    &this->AddPresetCommand, object, method);
+    &this->PresetAddCommand, object, method);
   this->Update(); // this show/hide the add button
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::InvokeAddPresetCommand()
+void vtkKWPresetSelector::InvokePresetAddCommand()
 {
-  if (this->AddPresetCommand && 
-      *this->AddPresetCommand && 
+  if (this->PresetAddCommand && 
+      *this->PresetAddCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s", this->AddPresetCommand);
+    this->Script("eval %s", this->PresetAddCommand);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetUpdatePresetCommand(
+void vtkKWPresetSelector::SetPresetUpdateCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
-    &this->UpdatePresetCommand, object, method);
+    &this->PresetUpdateCommand, object, method);
   this->Update(); // this show/hide the update button
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::InvokeUpdatePresetCommand(int id)
+void vtkKWPresetSelector::InvokePresetUpdateCommand(int id)
 {
-  if (this->UpdatePresetCommand && 
-      *this->UpdatePresetCommand && 
+  if (this->PresetUpdateCommand && 
+      *this->PresetUpdateCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->UpdatePresetCommand, id);
+    this->Script("eval %s %d", this->PresetUpdateCommand, id);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetApplyPresetCommand(
+void vtkKWPresetSelector::SetPresetApplyCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
-    &this->ApplyPresetCommand, object, method);
+    &this->PresetApplyCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::InvokeApplyPresetCommand(int id)
+void vtkKWPresetSelector::InvokePresetApplyCommand(int id)
 {
-  if (this->ApplyPresetCommand && 
-      *this->ApplyPresetCommand && 
+  if (this->PresetApplyCommand && 
+      *this->PresetApplyCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->ApplyPresetCommand, id);
+    this->Script("eval %s %d", this->PresetApplyCommand, id);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetRemovePresetCommand(
+void vtkKWPresetSelector::SetPresetRemoveCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
-    &this->RemovePresetCommand, object, method);
+    &this->PresetRemoveCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::InvokeRemovePresetCommand(int id)
+int vtkKWPresetSelector::InvokePresetRemoveCommand(int id)
 {
-  if (this->RemovePresetCommand && 
-      *this->RemovePresetCommand && 
+  if (this->PresetRemoveCommand && 
+      *this->PresetRemoveCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->RemovePresetCommand, id);
+    return atoi(this->Script("eval %s %d", this->PresetRemoveCommand, id));
     }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1843,11 +1840,11 @@ void vtkKWPresetSelector::Update()
     {
     this->PresetButtons->SetWidgetVisibility(
       VTK_KW_WLPS_BUTTON_ADD_ID, 
-      (this->AddPresetCommand && *this->AddPresetCommand) ? 1 : 0);
+      (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
 
     this->PresetButtons->SetWidgetVisibility(
       VTK_KW_WLPS_BUTTON_UPDATE_ID, 
-      (this->UpdatePresetCommand && *this->UpdatePresetCommand) ? 1 : 0);
+      (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
 
     int has_selection = 
       (this->PresetList && 

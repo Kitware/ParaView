@@ -11,9 +11,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWPresetSelector - a volume property preset selector.
+// .NAME vtkKWPresetSelector - a preset selector.
 // .SECTION Description
-// This class is a widget that can be used to store and apply volume property
+// This class is the basis for a preset selector framework. 
+// Presets can be added to the selector and identified by unique IDs. 
+// They can be assigned pre-defined fields like a group, a filename, 
+// a comment, a thumbnail and a screenshot, as well as an unlimited number
+// of user-defined slots.
+// Presets are listed vertically in a table list widget (vtkKWMultiColumnList),
+// one by row. Each column is used to display one of the predefined field.
+// The class can be used as-is, or extended to support more columns or
+// features, as examplified in the vtkKWWindowLevelPresetSelector and
+// vtkKWVolumePropertyPresetSelector sub-classes.
+// Several callbacks can be specified to enable external code to
+// add presets, apply presets, update them, etc.
 // presets. 
 // .SECTION Thanks
 // This work is part of the National Alliance for Medical Image
@@ -21,19 +32,21 @@
 // through the NIH Roadmap for Medical Research, Grant U54 EB005149.
 // Information on the National Centers for Biomedical Computing
 // can be obtained from http://nihroadmap.nih.gov/bioinformatics.
+// .SECTION See Also
+// vtkKWWindowLevelPresetSelector vtkKWVolumePropertyPresetSelector
 
 #ifndef __vtkKWPresetSelector_h
 #define __vtkKWPresetSelector_h
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWPresetSelectorInternals;
-class vtkKWMultiColumnListWithScrollbars;
-class vtkKWSpinButtons;
-class vtkKWPushButtonSet;
 class vtkImageData;
-class vtkRenderWindow;
 class vtkKWIcon;
+class vtkKWMultiColumnListWithScrollbars;
+class vtkKWPresetSelectorInternals;
+class vtkKWPushButtonSet;
+class vtkKWSpinButtons;
+class vtkRenderWindow;
 
 class KWWIDGETS_EXPORT vtkKWPresetSelector : public vtkKWCompositeWidget
 {
@@ -57,58 +70,156 @@ public:
   virtual int HasPreset(int id);
 
   // Description:
-  // Assign a group to a preset in the pool.
-  // This provide a way of grouping presets (say, if you
-  // have different dataset at the same time and want to store
-  // different presets for each dataset).
-  // If there is already a preset for that group, it is removed
-  // first.
+  // Set/Get the group associated to a preset.
+  // This provide a way of grouping presets and filter them out using
+  // the SetGroupFilter() method.
+  // The group field is not displayed as a column by default, but this
+  // can be changed using the SetGroupColumnVisibility() method.
+  // This column can not be edited by default, but this can be changed by
+  // a subclass.
   // Return 1 on success, 0 on error
   virtual int SetPresetGroup(int id, const char *group);
   virtual const char* GetPresetGroup(int id);
 
   // Description:
-  // Set/Get the comment associated to a preset in the pool.
+  // Set/Get the visibility of the group column. Hidden by default.
+  // No effect if called before Create().
+  virtual void SetGroupColumnVisibility(int);
+  virtual int GetGroupColumnVisibility();
+  vtkBooleanMacro(GroupColumnVisibility, int);
+
+  // Description:
+  // Set/Get the group filter.
+  // Set it to a specific group to show only those presets with a matching
+  // group. Set it to NULL to display all presets.
+  virtual void SetGroupFilter(const char *group);
+  vtkGetStringMacro(GroupFilter);
+
+  // Description:
+  // Set/Get the comment associated to a preset.
+  // This provide a way to create a small description or comment for
+  // each preset. 
+  // The comment field is displayed as a column by default, but this 
+  // can be changed using the SetCommentColumnVisibility() method.
+  // This column can be edited by default, by double-clicking
+  // on the corresponding table cell.
   // Return 1 on success, 0 on error
   virtual int SetPresetComment(int id, const char *comment);
   virtual const char* GetPresetComment(int id);
 
   // Description:
-  // Set/Get the filename associated to a preset in the pool.
+  // Set/Get the visibility of the comment column.
+  // No effect if called before Create().
+  virtual void SetCommentColumnVisibility(int);
+  virtual int GetCommentColumnVisibility();
+  vtkBooleanMacro(CommentColumnVisibility, int);
+
+  // Description:
+  // Set/Get the filename associated to a preset.
+  // This field is neither used nor displayed in this implementation
+  // but is provided as a convenience for subclasses that need to
+  // save preset to disks and keep track of the corresponding filename.
   // Return 1 on success, 0 on error
   virtual int SetPresetFileName(int id, const char *filename);
   virtual const char* GetPresetFileName(int id);
 
   // Description:
-  // Get the creation time of a preset in the pool, as returned by
+  // Get the creation time of a preset, as returned by
   // the vtksys::SystemTools::GetTime() method (can be cast to time_t)
+  // This field is not displayed in this implementation, but is
+  // used internally in the thumbnail column so that sorting by
+  // "thumbnail" will actually sort by creation time.
   // Return 0 on error.
   virtual double GetPresetCreationTime(int id);
 
   // Description:
-  // Get the number of presets in the pool, or the number of presets with
-  // the same group in the pool, or the number of visible presets, i.e.
-  // the presets that are displayed despite the filters (see GroupFilter).
+  // Assign an image/screenshot to a preset.
+  // The image is not stored but is used right-away to create a thumbnail
+  // icon to be displayed in the image column, and a small screenshot to
+  // be displayed as a pop-up when the user hovers over that thumbnail. 
+  // The thumbnail field is displayed as a column by default, but this 
+  // can be changed using the SetThumbnailColumnVisibility() method.
+  // If passed a vtkRenderWindow, grabs an image of the window contents.
+  // Both thumbnail and screenshot icons can be retrieved.
+  virtual int SetPresetImage(int id, vtkImageData *img);
+  virtual int SetPresetImageFromRenderWindow(int id, vtkRenderWindow *win);
+  virtual vtkKWIcon* GetPresetThumbnail(int id);
+  virtual vtkKWIcon* GetPresetScreenshot(int id);
+
+  // Description:
+  // Set/Get the thumbnail size.
+  // Changing the size will not resize the current thumbnails, but will
+  // affect the presets added to the selector later on.
+  vtkSetClampMacro(ThumbnailSize,int,8,512);
+  vtkGetMacro(ThumbnailSize,int);
+
+  // Description:
+  // Set/Get the screenshot size, i.e. the image that appears as
+  // a popup when the mouse is on top of the thumbnail.
+  // Changing the size will not resize the current screenshots, but will
+  // affect the presets added to the selector later on.
+  vtkSetClampMacro(ScreenshotSize,int,8,2048);
+  vtkGetMacro(ScreenshotSize,int);
+
+  // Description:
+  // Set/Get the visibility of the thumbnail column.
+  // No effect if called before Create().
+  virtual void SetThumbnailColumnVisibility(int);
+  virtual int GetThumbnailColumnVisibility();
+  vtkBooleanMacro(ThumbnailColumnVisibility, int);
+
+  // Description:
+  // Set/Get a preset user slot.
+  // An unlimited number of slots can be added to a preset. Each slot is
+  // identified by a name (string). Convenience methods are provided to store
+  // and retrieve various types of data (double, int, string, pointer).
+  // Return 1 on success, 0 on error
+  virtual int HasPresetUserSlot(
+    int id, const char *slot_name);
+  virtual int SetPresetUserSlotAsDouble(
+    int id, const char *slot_name, double value);
+  virtual double GetPresetUserSlotAsDouble(
+    int id, const char *slot_name);
+  virtual int SetPresetUserSlotAsInt(
+    int id, const char *slot_name, int value);
+  virtual int GetPresetUserSlotAsInt(
+    int id, const char *slot_name);
+  virtual int SetPresetUserSlotAsString(
+    int id, const char *slot_name, const char *value);
+  virtual const char* GetPresetUserSlotAsString(
+    int id, const char *slot_name);
+  virtual int SetPresetUserSlotAsPointer(
+    int id, const char *slot_name, void *ptr);
+  virtual void* GetPresetUserSlotAsPointer(
+    int id, const char *slot_name);
+
+  // Description:
+  // Get the number of presets, or the number of presets with a specific
+  // group, or the number of visible presets, i.e. the presets that are
+  // displayed according to the GroupFilter for example.
   virtual int GetNumberOfPresets();
   virtual int GetNumberOfPresetsWithGroup(const char *group);
   virtual int GetNumberOfVisiblePresets();
 
   // Description:
   // Retrieve the Id of the nth-preset, or the id of the
-  // nth preset with a given group
+  // nth preset with a given group.
   // Return id on success, -1 otherwise
   virtual int GetNthPresetId(int index);
   virtual int GetNthPresetWithGroupId(int index, const char *group);
 
   // Description:
-  // Retrieve the Id of the preset at a given row in the table list, or
+  // Retrieve the Id of the preset at a given row in the table, or
   // the row of a given preset.
+  // Return id or row index on success, -1 otherwise
   virtual int GetPresetAtRowId(int row_index);
   virtual int GetPresetRow(int id);
 
   // Description:
-  // Retrieve the rank of the nth preset with a given group in the pool
-  // (i.e. nth-preset with a given group).
+  // Retrieve the rank of the nth preset with a given group
+  // (i.e. the nth-preset with a given group).
+  // This rank can then be used to retrieve the preset id using
+  // the GetNthPresetId() method.
   // Return rank on success, -1 otherwise
   virtual int GetNthPresetWithGroupRank(int index, const char *group);
 
@@ -121,103 +232,55 @@ public:
   virtual int RemoveAllPresetsWithGroup(const char *group);
 
   // Description:
-  // Set/Get the group filter.
-  // If set to a non-empty value, only the presets have the same group
-  // as the filter will be displayed.
-  virtual void SetGroupFilter(const char *group);
-  vtkGetStringMacro(GroupFilter);
-
-  // Description:
   // Set/Get the list height (in number of items)
   // No effect if called before Create().
   virtual void SetListHeight(int);
   virtual int GetListHeight();
 
   // Description:
-  // Set/Get the visibility of the image column.
-  // No effect if called before Create().
-  virtual void SetImageColumnVisibility(int);
-  virtual int GetImageColumnVisibility();
-  vtkBooleanMacro(ImageColumnVisibility, int);
-
-  // Description:
-  // Set/Get the visibility of the group column.
-  // No effect if called before Create().
-  virtual void SetGroupColumnVisibility(int);
-  virtual int GetGroupColumnVisibility();
-  vtkBooleanMacro(GroupColumnVisibility, int);
-
-  // Description:
-  // Set/Get the visibility of the comment column.
-  // No effect if called before Create().
-  virtual void SetCommentColumnVisibility(int);
-  virtual int GetCommentColumnVisibility();
-  vtkBooleanMacro(CommentColumnVisibility, int);
-
-  // Description:
   // Set/Get the visibility of the select spin buttons.
+  // The select spin button are two buttons that can be used
+  // to select the next or previous preset in the list.
+  // Note that if ApplyPresetOnSelection is On, this will also apply
+  // the preset at the same time, thus providing a quick way to
+  // loop over all presets and apply them.
   virtual void SetSelectSpinButtonsVisibility(int);
   vtkGetMacro(SelectSpinButtonsVisibility,int);
   vtkBooleanMacro(SelectSpinButtonsVisibility,int);
 
   // Description:
-  // Assign an image to a preset in the pool.
-  // This will create a thumbnail icon to be displayed in the image column,
-  // and a larger screenshot to be displayed when the user hovers over
-  // that thumbnail. 
-  // If passed a vtkRenderWindow, grab an image of the window contents.
-  virtual int SetPresetImage(int id, vtkImageData *img);
-  virtual int SetPresetImageFromRenderWindow(
-    int id, vtkRenderWindow *win);
-  virtual int HasPresetImage(int id);
-  virtual vtkKWIcon* GetPresetThumbnail(int id);
-  virtual vtkKWIcon* GetPresetScreenshot(int id);
-
-  // Description:
-  // Set/Get the thumbnail size.
-  // Changing the size will not resize the current thumbnails, but will
-  // affect the presets inserted later on.
-  vtkSetClampMacro(ThumbnailSize,int,8,512);
-  vtkGetMacro(ThumbnailSize,int);
-
-  // Description:
-  // Set/Get the screenshot size (i.e. the image that appears as
-  // a popup when the mouse is on top of the thumbnail).
-  vtkSetClampMacro(ScreenshotSize,int,8,2048);
-  vtkGetMacro(ScreenshotSize,int);
-
-  // Description:
-  // Specifies a command to be invoked when the "add" button is pressed.
+  // Specifies a command to be invoked when the "add preset" button is pressed.
   // This gives the opportunity for the application to check and collect the
-  // relevant information to store in a new preset. The application will then
-  // most likely add the preset (using the AddPreset method) and set its
-  // properties (using SetPresetGroup, SetPresetComment, SetPreset..., etc).
-  // If not set, the 'add' button is not visible.
-  virtual void SetAddPresetCommand(
-    vtkObject* object, const char *method);
+  // relevant information to store in a new preset. The application is then
+  // free to add the preset (using the AddPreset() method) and set its
+  // fields independently (using the SetPresetGroup(), SetPresetComment(),
+  // SetPreset...() methods).
+  // Note that if not set, the "add preset" button is not visible.
+  virtual void SetPresetAddCommand(vtkObject* object, const char *method);
 
   // Description:
-  // Specifies a command to be invoked when the "update" button is pressed.
-  // This gives the opportunity for the application to check and collect the
-  // relevant information to update in the preset. The application will then
-  // most likely update the presets's properties (using SetPresetGroup, 
-  // SetPresetComment, SetPreset..., etc).
+  // Specifies a command to be invoked when the "update selected preset" button
+  // is pressed. This gives the opportunity for the application to check and
+  // collect the relevant information to update in the preset. The application
+  // is then free to update the preset's fields independently (using the
+  // SetPresetGroup(), SetPresetComment(), SetPreset...() methods).
   // The id of the preset to update is passed to the command.
-  // If not set, the 'update' button is not visible.
-  virtual void SetUpdatePresetCommand(
-    vtkObject* object, const char *method);
+  // Note that if not set, the "update select preset" button is not visible.
+  virtual void SetPresetUpdateCommand(vtkObject* object, const char *method);
 
   // Description:
-  // Specifies a command to be invoked when the the user tries to
-  // apply a preset (by double-clicking on the preset for
-  // example). 
-  // The id of the preset is passed to the command.
-  virtual void SetApplyPresetCommand(
-    vtkObject* object, const char *method);
+  // Specifies a command to be invoked when the "apply selected preset" 
+  // button is pressed, or when ApplyPresetOnSelection is On and the user
+  // applies a preset by selecting it directly. This gives the opportunity
+  // for the application to query the preset's fields independently (using the
+  // GetPresetGroup(), GetPresetComment(), GetPreset...() methods) and
+  // apply those values to the relevant objects.
+  // The id of the preset to apply is passed to the command.
+  virtual void SetPresetApplyCommand(vtkObject* object, const char *method);
 
   // Description:
-  // Set/Get if a preset should be applied when it is selected (single-click),
-  // or only when it is double-clicked on.
+  // Set/Get if a preset should be applied directly when it is selected by a
+  // single-click, or only when the "apply selected preset" button is pressed.
   // If set, only one preset can be selected at a time (if not, multiple
   // preset can be selected, and removed for example).
   virtual void SetApplyPresetOnSelection(int);
@@ -225,24 +288,35 @@ public:
   vtkBooleanMacro(ApplyPresetOnSelection,int);
 
   // Description:
-  // Specifies a command to be invoked when the the user tries to
-  // remove a preset from the pool. 
-  // This command is called *before* the preset is removed from the pool,
-  // so that the callback can still query all the preset properties.
-  // The id of the preset is passed to the command.
-  virtual void SetRemovePresetCommand(
-    vtkObject* object, const char *method);
+  // Specifies a command to be invoked when the "remove selected preset"
+  // button is pressed. This command is called *before* the preset is
+  // removed from the pool: this gives the opportunity for the application 
+  // to query the preset's fields independently (using the
+  // GetPresetGroup(), GetPresetComment(), GetPreset...() methods),
+  // decide if the preset should be removed or not, and delete it from
+  // its internal structures accordingly, if needed.
+  // The id of the preset to remove is passed to the command.
+  // This command is expected to return an integer equal to 1 if the preset
+  // is really to be removed, 0 otherwise.
+  virtual void SetPresetRemoveCommand(vtkObject* object, const char *method);
 
   // Description:
-  // Set/Get if the user should be prompted before removing a preset
+  // Set/Get if the user should be prompted before removing one or
+  // more presets using "remove selected preset" button.
   vtkSetMacro(PromptBeforeRemovePreset, int);
   vtkGetMacro(PromptBeforeRemovePreset, int);
   vtkBooleanMacro(PromptBeforeRemovePreset, int);
 
   // Description:
   // Specifies a command to be invoked when the preset has been
-  // changed using the UI (say, its comment has been edited for example).
-  // The id of the preset is passed to the command.
+  // changed using direct user-interaction on the widget interface. 
+  // This includes double-clicking on a table cell (the comment field for
+  // example) and editing the contents of the cell directly, when allowed.
+  // This gives the opportunity for the application to query the preset's
+  // fields independently (using the GetPresetGroup(), GetPresetComment(), 
+  // GetPreset...() methods), and update its internal structures accordingly, 
+  // if needed.
+  // The id of the preset that has changed is passed to the command.
   virtual void SetPresetHasChangedCommand(
     vtkObject* object, const char *method);
 
@@ -270,14 +344,14 @@ public:
 
   // Description:
   // Callback used to refresh the contents of the image cell for each preset
-  virtual void PresetCellImageCallback(const char*, int, int, const char*);
+  virtual void PresetCellThumbnailCallback(const char*, int, int, const char*);
 
   // Description:
-  // Callback invoked when user starts editing a specific preset field
-  // located at cell ('row', 'col') with contents 'text'.
+  // Callback invoked when the user starts editing a specific preset field
+  // located at cell ('row', 'col'), which current contents is 'text'.
   // This method returns the value that is to become the initial 
-  // contents of the temporary embedded widget used for editing.
-  // Most of the time, this is the same as 'text'.
+  // contents of the temporary embedded widget used for editing: most of the
+  // time, this is the same value as 'text'.
   // The next step (validation) is handled by PresetCellEditEndCallback
   virtual const char* PresetCellEditStartCallback(
     int row, int col, const char *text);
@@ -300,32 +374,10 @@ public:
   virtual void PresetCellUpdatedCallback(int row, int col, const char *text);
 
   // Description:
-  // Set/Get a preset user slot.
-  // Return 1 on success, 0 on error
-  virtual int HasPresetUserSlot(
-    int id, const char *slot_name);
-  virtual int SetPresetUserSlotAsDouble(
-    int id, const char *slot_name, double value);
-  virtual double GetPresetUserSlotAsDouble(
-    int id, const char *slot_name);
-  virtual int SetPresetUserSlotAsInt(
-    int id, const char *slot_name, int value);
-  virtual int GetPresetUserSlotAsInt(
-    int id, const char *slot_name);
-  virtual int SetPresetUserSlotAsString(
-    int id, const char *slot_name, const char *value);
-  virtual const char* GetPresetUserSlotAsString(
-    int id, const char *slot_name);
-  virtual int SetPresetUserSlotAsPointer(
-    int id, const char *slot_name, void *ptr);
-  virtual void* GetPresetUserSlotAsPointer(
-    int id, const char *slot_name);
-
-  // Description:
   // Some constants
   //BTX
   static const char *IdColumnName;
-  static const char *ImageColumnName;
+  static const char *ThumbnailColumnName;
   static const char *GroupColumnName;
   static const char *CommentColumnName;
   //ETX
@@ -333,6 +385,30 @@ public:
 protected:
   vtkKWPresetSelector();
   ~vtkKWPresetSelector();
+
+  // Description:
+  // Create the columns.
+  // Subclasses should override this method to add their own columns and
+  // display their own preset fields (do not forget to call the superclass
+  // first).
+  virtual void CreateColumns();
+
+  // Description:
+  // Deallocate a preset.
+  // Subclasses should override this method to release the memory allocated
+  // by their own preset fields  (do not forget to call the superclass
+  // first).
+  virtual void DeAllocatePreset(int id) {};
+
+  // Description:
+  // Update the preset row, i.e. add a row for that preset if it is not
+  // displayed already, hide it if it does not match GroupFilter, and
+  // update the table columns with the corresponding preset fields.
+  // Subclass should override this method to display their own fields.
+  // Return 1 on success, 0 if the row was not (or can not be) updated.
+  // Subclasses should call the parent's UpdatePresetRow, and abort
+  // if the result is not 1.
+  virtual int UpdatePresetRow(int id);
 
   vtkKWMultiColumnListWithScrollbars *PresetList;
   vtkKWFrame                         *PresetControlFrame;
@@ -358,40 +434,20 @@ protected:
   //ETX
 
   // Description:
-  // Create the columns.
-  // Subclasses should override this method to add their own columns and
-  // display their own preset fields.
-  virtual void CreateColumns();
-
-  // Description:
-  // Deallocate a preset.
-  // Subclasses should override this method to release the memory allocated
-  // by their own preset fields.
-  virtual void DeAllocatePreset(int id) {};
-
-  // Description:
-  // Update the row in the list for a given preset.
-  // Subclass should override this method to display their own fields.
-  // Return 1 on success, 0 if the row was not (or can not be) updated.
-  // Subclasses should call the parent's UpdatePresetRow, and abort
-  // if the result is not 1.
-  virtual int UpdatePresetRow(int id);
-
-  // Description:
   // Update all rows in the list
   virtual void UpdateRowsInPresetList();
 
-  char *AddPresetCommand;
-  virtual void InvokeAddPresetCommand();
+  char *PresetAddCommand;
+  virtual void InvokePresetAddCommand();
 
-  char *UpdatePresetCommand;
-  virtual void InvokeUpdatePresetCommand(int id);
+  char *PresetUpdateCommand;
+  virtual void InvokePresetUpdateCommand(int id);
 
-  char *ApplyPresetCommand;
-  virtual void InvokeApplyPresetCommand(int id);
+  char *PresetApplyCommand;
+  virtual void InvokePresetApplyCommand(int id);
 
-  char *RemovePresetCommand;
-  virtual void InvokeRemovePresetCommand(int id);
+  char *PresetRemoveCommand;
+  virtual int InvokePresetRemoveCommand(int id);
 
   char *PresetHasChangedCommand;
   virtual void InvokePresetHasChangedCommand(int id);
@@ -399,7 +455,7 @@ protected:
   // Description:
   // Convenience methods to get the index of a given column
   virtual int GetIdColumnIndex();
-  virtual int GetImageColumnIndex();
+  virtual int GetThumbnailColumnIndex();
   virtual int GetGroupColumnIndex();
   virtual int GetCommentColumnIndex();
 

@@ -31,7 +31,7 @@ const char *vtkKWWindowLevelPresetSelector::LevelColumnName  = "Level";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.11");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.12");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
@@ -175,7 +175,7 @@ void vtkKWWindowLevelPresetSelector::PresetCellUpdatedCallback(
           }
         if (this->ApplyPresetOnSelection)
           {
-          this->InvokeApplyPresetCommand(id);
+          this->InvokePresetApplyCommand(id);
           }
         this->InvokePresetHasChangedCommand(id);
         return;
