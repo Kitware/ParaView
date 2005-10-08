@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.6");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.7");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -175,9 +175,13 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create(app);
   this->WindowLevelPresetSelector->SetAddPresetCommand(
-    this, "AddWindowLevelPresetCallback");
+    this, "WindowLevelPresetAddCallback");
   this->WindowLevelPresetSelector->SetApplyPresetCommand(
-    this, "ApplyWindowLevelPresetCallback");
+    this, "WindowLevelPresetApplyCallback");
+  this->WindowLevelPresetSelector->SetUpdatePresetCommand(
+    this, "WindowLevelPresetUpdateCallback");
+  this->WindowLevelPresetSelector->SetPresetHasChangedCommand(
+    this, "WindowLevelPresetHasChangedCallback");
   
   app->Script("pack %s -side top -anchor nw -expand n -fill x",
               this->WindowLevelPresetSelector->GetWidgetName());
@@ -294,22 +298,7 @@ void vtkKWSimpleWindowWithImageWidgetExample::SetSliceOrientationToYZCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::AddWindowLevelPresetCallback()
-{
-  int id = this->WindowLevelPresetSelector->AddPreset();
-  if (id >= 0)
-    {
-    this->WindowLevelPresetSelector->SetPresetWindow(
-      id, this->ImageViewer->GetColorWindow());
-    this->WindowLevelPresetSelector->SetPresetLevel(
-      id, this->ImageViewer->GetColorLevel());
-    this->WindowLevelPresetSelector->SetPresetImageFromRenderWindow(
-      id, this->RenderWidget->GetRenderWindow());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::ApplyWindowLevelPresetCallback(
+void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetApplyCallback(
   int id)
 {
   if (this->WindowLevelPresetSelector->HasPreset(id))
@@ -320,4 +309,30 @@ void vtkKWSimpleWindowWithImageWidgetExample::ApplyWindowLevelPresetCallback(
       this->WindowLevelPresetSelector->GetPresetLevel(id));
     this->ImageViewer->Render();
     }
+}
+//----------------------------------------------------------------------------
+void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetAddCallback()
+{
+  this->WindowLevelPresetUpdateCallback(
+    this->WindowLevelPresetSelector->AddPreset());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetUpdateCallback(
+  int id)
+{
+  this->WindowLevelPresetSelector->SetPresetWindow(
+    id, this->ImageViewer->GetColorWindow());
+  this->WindowLevelPresetSelector->SetPresetLevel(
+    id, this->ImageViewer->GetColorLevel());
+  this->WindowLevelPresetHasChangedCallback(id);
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetHasChangedCallback(
+  int id)
+{
+  this->WindowLevelPresetSelector->SetPresetImageFromRenderWindow(
+    id, this->RenderWidget->GetRenderWindow());
 }
