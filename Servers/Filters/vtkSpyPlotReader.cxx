@@ -52,7 +52,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.34");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.35");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -227,7 +227,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.34");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.35");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1649,7 +1649,7 @@ public:
     MapOfStringToSPCTH::iterator end=this->Files.end();
     while(it!=end)
       {
-      if ( it->second != save )
+      if ( it->second && it->second != save )
         {
         it->second->Delete();
         it->second = 0;
@@ -1657,6 +1657,16 @@ public:
       ++it;
       }
     this->Files.erase(this->Files.begin(),end);
+    }
+  vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, vtkSpyPlotReader* parent)
+    {
+    if ( !it->second )
+      {
+      it->second = vtkSpyPlotUniReader::New();
+      it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
+      cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
+      }
+    return it->second;
     }
 };
 
@@ -1669,6 +1679,7 @@ public:
   // files and timestep.
   virtual void Init(int numberOfProcessors,
                     int processorId,
+                    vtkSpyPlotReader *parent,
                     vtkSpyPlotReaderMap *fileMap,
                     int currentTimeStep)
     {
@@ -1677,6 +1688,7 @@ public:
       this->NumberOfProcessors=numberOfProcessors;
       this->ProcessorId=processorId;
       this->FileMap=fileMap;
+      this->Parent = parent;
       this->CurrentTimeStep=currentTimeStep;
       this->NumberOfFiles=this->FileMap->Files.size();
     }
@@ -1754,6 +1766,7 @@ protected:
     this->BlockEnd = 0;
     this->FileMap = 0;
     this->UniReader = 0;
+    this->Parent = 0;
     }
 
   virtual void FindFirstBlockOfCurrentOrNextFile()=0;
@@ -1774,6 +1787,7 @@ protected:
   int FileIndex;
   
   int BlockEnd;
+  vtkSpyPlotReader* Parent;
 };
 
 class vtkSpyPlotBlockDistributionBlockIterator
@@ -1798,7 +1812,7 @@ protected:
       while(!this->Off && !found)
         {
         const char *fname=this->FileIterator->first.c_str();
-        this->UniReader=this->FileIterator->second;
+        this->UniReader=this->FileMap->GetReader(this->FileIterator, this->Parent);
         this->UniReader->SetFileName(fname);
         this->UniReader->ReadInformation();
         this->UniReader->SetCurrentTimeStep(this->CurrentTimeStep);
@@ -1858,10 +1872,11 @@ public:
   virtual ~vtkSpyPlotFileDistributionBlockIterator() {}
   virtual void Init(int numberOfProcessors,
                     int processorId,
+                    vtkSpyPlotReader *parent,
                     vtkSpyPlotReaderMap *fileMap,
                     int currentTimeStep)
     {
-      vtkSpyPlotBlockIterator::Init(numberOfProcessors,processorId,fileMap,
+      vtkSpyPlotBlockIterator::Init(numberOfProcessors,processorId,parent,fileMap,
                              currentTimeStep);
       
       if(this->ProcessorId>=this->NumberOfFiles)
@@ -1914,7 +1929,7 @@ protected:
       while(!this->Off && !found)
         {
         const char *fname=this->FileIterator->first.c_str();
-        this->UniReader=this->FileIterator->second;
+        this->UniReader=this->FileMap->GetReader(this->FileIterator, this->Parent);
 //        vtkDebugMacro("Reading data from file: " << fname);
         
         this->UniReader->SetFileName(fname);
@@ -2253,7 +2268,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
       vtkSpyPlotUniReader* oldReader = 0;
       if ( mapIt != this->Map->Files.end() )
         {
-        oldReader = mapIt->second;
+        oldReader = this->Map->GetReader(mapIt, this);
         oldReader->Register(this);
         oldReader->Print(cout);
         }
@@ -2265,10 +2280,9 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
         }
       else
         {
-        this->Map->Files[this->FileName]=vtkSpyPlotUniReader::New();
+        this->Map->Files[this->FileName]= 0;
         vtkDebugMacro( << __LINE__ << " Create new uni reader: " << this->Map->Files[this->FileName] );
         }
-      this->Map->Files[this->FileName]->SetCellArraySelection(this->CellDataArraySelection);
       return this->UpdateMetaData(request, outputVector);
       }
     }
@@ -2364,9 +2378,8 @@ int vtkSpyPlotReader::UpdateNoCaseFile(const char *ext,
   for ( idx = minimum; idx <= maximum; ++ idx )
     {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    this->Map->Files[buffer]=vtkSpyPlotUniReader::New();
+    this->Map->Files[buffer]=0;
     vtkDebugMacro( << __LINE__ << " Create new uni reader: " << this->Map->Files[buffer] );
-    this->Map->Files[buffer]->SetCellArraySelection(this->CellDataArraySelection);
     }
   // Okay now open just the first file to get meta data
   vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << this->Map->Files.begin()->first.c_str());
@@ -2418,9 +2431,8 @@ int vtkSpyPlotReader::UpdateCaseFile(const char *fname,
           {
           f=::GetFilenamePath(this->FileName)+"/"+f;
           }
-        this->Map->Files[f.c_str()]=vtkSpyPlotUniReader::New();
+        this->Map->Files[f.c_str()]=0;
         vtkDebugMacro( << __LINE__ << " Create new uni reader: " << this->Map->Files[f.c_str()] );
-        this->Map->Files[f.c_str()]->SetCellArraySelection(this->CellDataArraySelection);
         }
       }
     }
@@ -2445,12 +2457,10 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
     vtkErrorMacro("The internal file map is empty!");
     return 0;
     }
-  else
-    {
-    fname=it->first.c_str();
-    uniReader=it->second;
-    }
-  
+
+  fname=it->first.c_str();
+  uniReader=this->Map->GetReader(it, this);
+
   int i;
   int num_time_steps;
   
@@ -2642,7 +2652,7 @@ int vtkSpyPlotReader::RequestData(
     blockIterator=new vtkSpyPlotBlockDistributionBlockIterator;
     }
   
-  blockIterator->Init(numProcessors,processNumber,this->Map,this->CurrentTimeStep);
+  blockIterator->Init(numProcessors,processNumber,this,this->Map,this->CurrentTimeStep);
 
 #if 1 // skip loading for valgrind test
   
@@ -4185,7 +4195,7 @@ void vtkSpyPlotReader::SetDownConvertVolumeFraction(int vf)
     mapIt != this->Map->Files.end();
     ++ mapIt )
     {
-    mapIt->second->SetDownConvertVolumeFraction(vf);
+    this->Map->GetReader(mapIt, this)->SetDownConvertVolumeFraction(vf);
     }
   this->DownConvertVolumeFraction = vf;
   this->Modified();
