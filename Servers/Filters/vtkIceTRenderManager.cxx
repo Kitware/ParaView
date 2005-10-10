@@ -17,59 +17,87 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-#include "vtkMath.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
+#include "vtkFloatArray.h"
+#include "vtkIceTContext.h"
 #include "vtkIceTRenderManager.h"
 #include "vtkIceTRenderer.h"
-#include "vtkPKdTree.h"
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
-#include "vtkRendererCollection.h"
-#include "vtkMPIController.h"
-#include "vtkMPI.h"
-#include "vtkFloatArray.h"
 #include "vtkIntArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkCamera.h"
+#include "vtkMath.h"
+#include "vtkMPI.h"
+#include "vtkMPIController.h"
+#include "vtkObjectFactory.h"
 #include "vtkPerspectiveTransform.h"
+#include "vtkPKdTree.h"
 #include "vtkProcessModule.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <GL/ice-t.h>
-#include <GL/ice-t_mpi.h>
 
 #include <vtkstd/algorithm>
+
+#ifndef GL_BGRA
+#define GL_BGRA GL_BGRA_EXT
+#endif
+
+#define MY_MAX(x, y)    ((x) < (y) ? (y) : (x))
+#define MY_MIN(x, y)    ((x) < (y) ? (x) : (y))
 
 //******************************************************************
 // Hidden structures.
 //******************************************************************
-struct IceTInformation {
+struct IceTWindowInformation {
   int TilesDirty;
+};
+const int ICET_WIN_INFO_SIZE = sizeof(struct IceTWindowInformation)/sizeof(int);
+
+struct IceTRendererInformation {
   int Strategy;
   int ComposeOperation;
 };
-const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
+const int ICET_REN_INFO_SIZE
+  = sizeof(struct IceTRendererInformation)/sizeof(int);
 
-class vtkIceTRenderManagerOpaqueContext
+// ******************************************************************
+// Callback commands.
+// ******************************************************************
+static void vtkIceTRenderManagerRecordIceTImage(vtkObject *caller,
+                                                unsigned long,
+                                                void *clientdata,
+                                                void *)
 {
-public:
-  IceTContext Handle;
-};
+  vtkIceTRenderer *renderer
+    = reinterpret_cast<vtkIceTRenderer *>(caller);
+  vtkIceTRenderManager *self
+    = reinterpret_cast<vtkIceTRenderManager *>(clientdata);
+  self->RecordIceTImage(renderer);
+}
+
+static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
+                                                       unsigned long,
+                                                       void *clientdata,
+                                                       void *)
+{
+  vtkIceTRenderManager *self
+    = reinterpret_cast<vtkIceTRenderManager *>(clientdata);
+  self->ForceImageWriteback();
+}
 
 //******************************************************************
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.27");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.28");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
-vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
-vtkCxxSetObjectMacro(vtkIceTRenderManager, DataReplicationGroup, vtkIntArray);
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
                      vtkPerspectiveTransform);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
 {
-  this->Context = new vtkIceTRenderManagerOpaqueContext;
-
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
   this->TileRanks = new int*[1];
@@ -77,22 +105,22 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->TileRanks[0][0] = 0;
   this->TilesDirty = 1;
 
-  this->Strategy = DEFAULT;
-  this->StrategyDirty = 1;
-
-  this->ComposeOperation = ComposeOperationClosest;
-  this->ComposeOperationDirty = 1;
-
-  this->SortingKdTree = NULL;
-
   this->LastKnownImageReductionFactor = 0;
 
   this->FullImageSharesData = 0;
   this->ReducedImageSharesData = 0;
 
-  this->DataReplicationGroup = NULL;
-
   this->TileViewportTransform = NULL;
+
+  vtkCallbackCommand *cbc = vtkCallbackCommand::New();
+  cbc->SetClientData(this);
+  cbc->SetCallback(vtkIceTRenderManagerRecordIceTImage);
+  this->RecordIceTImageCallback = cbc;
+
+  cbc = vtkCallbackCommand::New();
+  cbc->SetClientData(this);
+  cbc->SetCallback(vtkIceTRenderManagerReconstructWindowImage);
+  this->FixRenderWindowCallback = cbc;
 
   // Reload the controller so that we make an ICE-T context.
   this->Superclass::SetController(NULL);
@@ -109,11 +137,10 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
     delete[] this->TileRanks[x];
     }
   delete[] this->TileRanks;
-  this->SetSortingKdTree(NULL);
-  this->SetDataReplicationGroup(NULL);
   this->SetTileViewportTransform(NULL);
 
-  delete this->Context;
+  this->RecordIceTImageCallback->Delete();
+  this->FixRenderWindowCallback->Delete();
 }
 
 //-------------------------------------------------------------------------
@@ -134,10 +161,9 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
     return;
     }
 
-  vtkCommunicator *communicator = NULL;
   if (controller != NULL)
     {
-    communicator = controller->GetCommunicator();
+    vtkCommunicator *communicator = controller->GetCommunicator();
     if (!communicator || (!communicator->IsA("vtkMPICommunicator")))
       {
       vtkErrorMacro("vtkIceTRenderManager parallel compositor currently works only with an MPI communicator.");
@@ -145,34 +171,19 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
       }
     }
 
-  if (this->Controller)
-    {
-    icetDestroyContext(this->Context->Handle);
-    }
-
   this->Superclass::SetController(controller);
+}
 
-  if (this->Controller)
-    {
-    vtkMPICommunicator *MPICommunicator;
-    MPICommunicator = vtkMPICommunicator::SafeDownCast(communicator);
-    MPI_Comm handle = *MPICommunicator->GetMPIComm()->GetHandle();
-    IceTCommunicator icet_comm = icetCreateMPICommunicator(handle);
-    this->Context->Handle = icetCreateContext(icet_comm);
-    icetDestroyMPICommunicator(icet_comm);
-    vtkDebugMacro("Created new ICE-T context.");
+//-----------------------------------------------------------------------------
 
-    vtkIntArray *drg = vtkIntArray::New();
-    drg->SetNumberOfComponents(1);
-    drg->SetNumberOfTuples(1);
-    drg->SetValue(0, this->Controller->GetLocalProcessId());
-    this->SetDataReplicationGroup(drg);
-    drg->Delete();
-    }
-  else
+void vtkIceTRenderManager::SetRenderWindow(vtkRenderWindow *renwin)
+{
+  if (this->RenderWindow == renwin)
     {
-    this->SetDataReplicationGroup(NULL);
+    return;
     }
+
+  this->Superclass::SetRenderWindow(renwin);
 
   this->ContextDirty = 1;
 }
@@ -182,8 +193,6 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
 void vtkIceTRenderManager::UpdateIceTContext()
 {
   vtkDebugMacro("UpdateIceTContext");
-
-  icetSetContext(this->Context->Handle);
 
   if (this->ContextDirty || this->TilesDirty)
     {
@@ -197,123 +206,145 @@ void vtkIceTRenderManager::UpdateIceTContext()
     this->LastKnownImageReductionFactor = this->ImageReductionFactor;
     }
 
-  if (   this->ContextDirty || this->TilesDirty
-      || (this->CleanScreenWidth != this->FullImageSize[0])
-      || (this->CleanScreenHeight != this->FullImageSize[1]) )
-    {
-    int x, y;
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *ren;
 
-    icetResetTiles();
-    for (x = 0; x < this->TileDimensions[0]; x++)
+  renderers->InitTraversal(cookie);
+  while ((ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
+    if (icetRen == NULL)
       {
-      for (y = 0; y < this->TileDimensions[1]; y++)
+      // Assuming this renderer will be rendered after all IceT renderers
+      // (which can be assured if it is on a higher level), set up a callback
+      // to fix the composited image before rendering occurs.
+      ren->AddObserver(vtkCommand::StartEvent, this->FixRenderWindowCallback);
+      continue;
+      }
+    icetRen->AddObserver(vtkCommand::EndEvent, this->RecordIceTImageCallback);
+
+    icetRen->SetController(this->Controller);
+    icetRen->GetContext()->MakeCurrent();
+
+    if (   this->ContextDirty || this->TilesDirty
+        || (this->CleanScreenWidth != this->FullImageSize[0])
+        || (this->CleanScreenHeight != this->FullImageSize[1]) )
+      {
+      int x, y;
+
+      double normalizedRendererViewport[4];
+      icetRen->GetViewport(normalizedRendererViewport);
+
+      int *displaySize = this->RenderWindow->GetSize();
+
+      // Adjust the global viewport of the renderer.  That is convert the
+      // normalized renderer viewport (as values between 0 and 1) to actual
+      // pixel values.
+      int rendererViewport[4];
+      rendererViewport[0]
+        = (int)(displaySize[0]*normalizedRendererViewport[0] + 0.5);
+      rendererViewport[1]
+        = (int)(displaySize[1]*normalizedRendererViewport[1] + 0.5);
+      rendererViewport[2]
+        = (int)(displaySize[0]*normalizedRendererViewport[2] + 0.5);
+      rendererViewport[3]
+        = (int)(displaySize[1]*normalizedRendererViewport[3] + 0.5);
+
+      icetRen->SetPhysicalViewport(0, 0, 0, 0);
+
+      icetResetTiles();
+      for (x = 0; x < this->TileDimensions[0]; x++)
         {
-        icetAddTile(x*this->ReducedImageSize[0],
-                    (this->TileDimensions[1]-y-1)*this->ReducedImageSize[1],
-                    this->ReducedImageSize[0], this->ReducedImageSize[1],
-                    this->TileRanks[x][y]);
+        for (y = 0; y < this->TileDimensions[1]; y++)
+          {
+          int tileViewport[4];
+          this->GetTileViewport(x, y, tileViewport);
+
+          // Check to see if this renderer intersects this tile.
+          if (   (tileViewport[0] >= rendererViewport[2])
+              || (tileViewport[2] <= rendererViewport[0])
+              || (tileViewport[1] >= rendererViewport[3])
+              || (tileViewport[3] <= rendererViewport[1]) )
+            {
+            continue;
+            }
+
+          // Intersect the tile viewport by the renderer's viewport.
+          int visibleViewport[4];
+          visibleViewport[0] = MY_MAX(tileViewport[0], rendererViewport[0]);
+          visibleViewport[1] = MY_MAX(tileViewport[1], rendererViewport[1]);
+          visibleViewport[2] = MY_MIN(tileViewport[2], rendererViewport[2]);
+          visibleViewport[3] = MY_MIN(tileViewport[3], rendererViewport[3]);
+
+          icetAddTile(visibleViewport[0],
+                      visibleViewport[1],
+                      visibleViewport[2]-visibleViewport[0],
+                      visibleViewport[3]-visibleViewport[1],
+                      this->TileRanks[x][y]);
+
+          if (this->TileRanks[x][y] == this->Controller->GetLocalProcessId())
+            {
+            icetRen->SetPhysicalViewport(visibleViewport[0] - tileViewport[0],
+                                         visibleViewport[1] - tileViewport[1],
+                                         visibleViewport[2] - tileViewport[0],
+                                         visibleViewport[3] - tileViewport[1]);
+            }
+          }
         }
       }
-    this->TilesDirty = 0;
-    this->CleanScreenWidth = this->FullImageSize[0];
-    this->CleanScreenHeight = this->FullImageSize[1];
-    }
 
-  if (this->ContextDirty || this->StrategyDirty)
-    {
-    switch (this->Strategy)
+    if (this->ContextDirty || (this->MTime > this->ContextUpdateTime))
       {
-      case DEFAULT: icetStrategy(ICET_STRATEGY_REDUCE);  break;
-      case REDUCE:  icetStrategy(ICET_STRATEGY_REDUCE);  break;
-      case VTREE:   icetStrategy(ICET_STRATEGY_VTREE);   break;
-      case SPLIT:   icetStrategy(ICET_STRATEGY_SPLIT);   break;
-      case SERIAL:  icetStrategy(ICET_STRATEGY_SERIAL);  break;
-      case DIRECT:  icetStrategy(ICET_STRATEGY_DIRECT);  break;
-      default: vtkErrorMacro("Invalid strategy set"); break;
-      }
-    this->StrategyDirty = 0;
-    }
-
-  if (this->ContextDirty || this->ComposeOperationDirty)
-    {
-    switch (this->ComposeOperation)
-      {
-      case ComposeOperationClosest:
-        icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT,
-                               ICET_COLOR_BUFFER_BIT);
-        break;
-      case ComposeOperationOver:
-        icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT, ICET_COLOR_BUFFER_BIT);
-        break;
-      default:
-        vtkErrorMacro("Invalid compose operation set");
-        break;
-      }
-    this->ComposeOperationDirty = 0;
-    }
-
-  if (this->ContextDirty || (this->MTime > this->ContextUpdateTime))
-    {
-    if (this->Debug)
-      {
-      icetDiagnostics(ICET_DIAG_DEBUG | ICET_DIAG_ALL_NODES);
-      }
-    else
-      {
-      icetDiagnostics(ICET_DIAG_WARNINGS | ICET_DIAG_ALL_NODES);
-      }
-    icetEnable(ICET_DISPLAY_COLORED_BACKGROUND);
-    if (this->WriteBackImages)
-      {
-      icetEnable(ICET_DISPLAY);
-      }
-    else
-      {
-      icetDisable(ICET_DISPLAY);
-      }
-    if (this->MagnifyImages)
-      {
-      icetEnable(ICET_DISPLAY_INFLATE);
-      }
-    else
-      {
-      icetDisable(ICET_DISPLAY_INFLATE);
-      }
-    icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
-
-    if (this->UseCompositing)
-      {
-      // Compiler, optimize this away.
-      if (sizeof(int) == sizeof(GLint))
+      if (this->Debug)
         {
-        icetDataReplicationGroup(
-                      this->DataReplicationGroup->GetNumberOfTuples(),
-                      (const GLint *)this->DataReplicationGroup->GetPointer(0));
+        icetDiagnostics(ICET_DIAG_DEBUG | ICET_DIAG_ALL_NODES);
         }
       else
         {
-        vtkIdType numtuples = this->DataReplicationGroup->GetNumberOfTuples();
-        const int *original_data = this->DataReplicationGroup->GetPointer(0);
-        GLint *new_data = new GLint[numtuples];
-        vtkstd::copy(original_data, original_data + numtuples, new_data);
-        icetDataReplicationGroup(numtuples, new_data);
-        delete new_data;
+        icetDiagnostics(ICET_DIAG_WARNINGS | ICET_DIAG_ALL_NODES);
         }
-      }
-    else
-      {
-      // If we're not compositing, tell ICE-T that all processes have
-      // duplicated data.  ICE-T will just have each process render to its
-      // local tile instead.
-      GLint *drg = new GLint[this->Controller->GetNumberOfProcesses()];
-      for (GLint i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
+      icetDisable(ICET_DISPLAY);
+      icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
+
+      if (this->UseCompositing)
         {
-        drg[i] = i;
+        vtkIntArray *drg = icetRen->GetDataReplicationGroup();
+        // Compiler, optimize this away.
+        if (sizeof(int) == sizeof(GLint))
+          {
+          icetDataReplicationGroup(drg->GetNumberOfTuples(),
+                                   (const GLint *)drg->GetPointer(0));
+          }
+        else
+          {
+          vtkIdType numtuples = drg->GetNumberOfTuples();
+          const int *original_data = drg->GetPointer(0);
+          GLint *new_data = new GLint[numtuples];
+          vtkstd::copy(original_data, original_data + numtuples, new_data);
+          icetDataReplicationGroup(numtuples, new_data);
+          delete new_data;
+          }
         }
-      icetDataReplicationGroup(this->Controller->GetNumberOfProcesses(), drg);
-      delete[] drg;
+      else
+        {
+        // If we're not compositing, tell ICE-T that all processes have
+        // duplicated data.  ICE-T will just have each process render to its
+        // local tile instead.
+        GLint *drg = new GLint[this->Controller->GetNumberOfProcesses()];
+        for (GLint i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
+          {
+          drg[i] = i;
+          }
+        icetDataReplicationGroup(this->Controller->GetNumberOfProcesses(), drg);
+        delete[] drg;
+        }
       }
     }
+
+  this->TilesDirty = 0;
+  this->CleanScreenWidth = this->FullImageSize[0];
+  this->CleanScreenHeight = this->FullImageSize[1];
 
   this->ContextUpdateTime.Modified();
   this->ContextDirty = 0;
@@ -408,6 +439,13 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
 
   int rank = this->Controller->GetLocalProcessId();
 
+  // Initialize tiled window for 2D actors.  We may not be displaying any
+  // tile, in which case just show something.
+  this->RenderWindow->SetTileScale(this->TileDimensions);
+  this->RenderWindow->SetTileViewport(0.0, 0.0,
+                                      1.0/this->TileDimensions[0],
+                                      1.0/this->TileDimensions[1]);
+
   for (int y = 0; y < this->TileDimensions[1]; y++)
     {
     for (int x = 0; x < this->TileDimensions[0]; x++)
@@ -430,7 +468,6 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
           {
           // RenderWindow tiles from lower left instead of upper left.
           y = this->TileDimensions[1] - y - 1;
-          this->RenderWindow->SetTileScale(this->TileDimensions);
           this->RenderWindow->SetTileViewport
             (x*(1.0/(float)(this->TileDimensions[0])), 
              y*(1.0/(float)(this->TileDimensions[1])), 
@@ -446,14 +483,28 @@ void vtkIceTRenderManager::ComputeTileViewportTransform()
 
 //-----------------------------------------------------------------------------
 
-void vtkIceTRenderManager::SetStrategy(StrategyType strategy)
+void vtkIceTRenderManager::SetStrategy(int strategy)
 {
   vtkDebugMacro("SetStrategy to " << strategy);
 
-  if (this->Strategy == strategy) return;
+  if (!this->RenderWindow)
+    {
+    vtkErrorMacro("Must set the render window and its renderers before calling SetStrategy.");
+    return;
+    }
 
-  this->Strategy = strategy;
-  this->StrategyDirty = 1;
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    ren->SetStrategy(strategy);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -498,117 +549,212 @@ void vtkIceTRenderManager::SetComposeOperation(int operation)
 {
   vtkDebugMacro("SetComposeOperation to " << operation);
 
-  if (this->ComposeOperation == operation) return;
+  if (!this->RenderWindow)
+    {
+    vtkErrorMacro("Must set the render window and its renderers before calling SetComposeOperation.");
+    return;
+    }
 
-  this->ComposeOperation = operation;
-  this->ComposeOperationDirty = 1;
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    ren->SetComposeOperation(operation);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::SetSortingKdTree(vtkPKdTree *tree)
+{
+  vtkDebugMacro("SetSortingKdTree to " << tree);
+
+  if (!this->RenderWindow)
+    {
+    vtkErrorMacro("Must set the render window and its renderers before calling SetComposeOperation.");
+    return;
+    }
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    ren->SetSortingKdTree(tree);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::SetDataReplicationGroup(vtkIntArray *group)
+{
+  vtkDebugMacro("SetDataReplicationGroup to " << group);
+
+  if (!this->RenderWindow)
+    {
+    vtkErrorMacro("Must set the render window and its renderers before calling SetComposeOperation.");
+    return;
+    }
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    ren->SetDataReplicationGroup(group);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
 {
-  // Just use ICE-T to figure out groups, since it can do that already.
-  icetSetContext(this->Context->Handle);
+  vtkDebugMacro("SetDataReplicationGroupColor to " << color);
 
-  icetDataReplicationGroupColor(color);
-
-  vtkIntArray *drg = vtkIntArray::New();
-  drg->SetNumberOfComponents(1);
-  GLint size;
-  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP_SIZE, &size);
-  drg->SetNumberOfTuples(size);
-  // Compiler, optimize away.
-  if (sizeof(int) == sizeof(GLint))
+  if (!this->RenderWindow)
     {
-    icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, (GLint *)drg->GetPointer(0));
-    }
-  else
-    {
-    GLint *tmparray = new GLint[size];
-    icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, tmparray);
-    vtkstd::copy(tmparray, tmparray+size, drg->GetPointer(0));
-    delete[] tmparray;
+    vtkErrorMacro("Must set the render window and its renderers before calling SetComposeOperation.");
+    return;
     }
 
-  this->SetDataReplicationGroup(drg);
-  drg->Delete();
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    ren->SetDataReplicationGroupColor(color);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetRenderTime()
 {
-  if (this->Controller)
+  double t = 0.0;
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
     {
-    double t;
-    icetSetContext(this->Context->Handle);
-    icetGetDoublev(ICET_RENDER_TIME, &t);
-    return t;
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (ren)
+      {
+      t += ren->GetRenderTime();
+      }
+    else
+      {
+      t += _ren->GetLastRenderTimeInSeconds();
+      }
     }
-  else
-    {
-    return 0.0;
-    }
-}
+  return t;
+}  
 
 //-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetImageProcessingTime()
 {
-  return this->ImageProcessingTime + this->GetBufferReadTime()
-    + this->GetCompositeTime();
-}
+  double t = this->ImageProcessingTime;
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    t += ren->GetBufferReadTime();
+    }
+  return t;
+}  
 
 //-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetBufferReadTime()
 {
-  if (this->Controller)
+  double t = 0.0;
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
     {
-    double t;
-    icetSetContext(this->Context->Handle);
-    icetGetDoublev(ICET_BUFFER_READ_TIME, &t);
-    return t;
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    t += ren->GetBufferReadTime();
     }
-  else
-    {
-    return 0.0;
-    }
-}
+  return t;
+}  
 
 //-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetBufferWriteTime()
 {
-  if (this->Controller)
+  double t = 0.0;
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
     {
-    double t;
-    icetSetContext(this->Context->Handle);
-    icetGetDoublev(ICET_BUFFER_WRITE_TIME, &t);
-    return t;
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    t += ren->GetBufferWriteTime();
     }
-  else
-    {
-    return 0.0;
-    }
-}
+  return t;
+}  
 
 //-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetCompositeTime()
 {
-  if (this->Controller)
+  double t = 0.0;
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *_ren;
+
+  renderers->InitTraversal(cookie);
+  while ((_ren = renderers->GetNextRenderer(cookie)) != NULL)
     {
-    double t;
-    icetSetContext(this->Context->Handle);
-    icetGetDoublev(ICET_COMPOSITE_TIME, &t);
-    return t;
+    vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+    if (!ren) continue;
+
+    t += ren->GetCompositeTime();
     }
-  else
-    {
-    return 0.0;
-    }
+  return t;
 }
 
 //-----------------------------------------------------------------------------
@@ -657,18 +803,16 @@ void vtkIceTRenderManager::SendWindowInformation()
 
   this->Superclass::SendWindowInformation();
 
-  struct IceTInformation info;
+  struct IceTWindowInformation info;
   info.TilesDirty = this->TilesDirty;
-  info.Strategy = this->Strategy;
-  info.ComposeOperation = this->ComposeOperation;
 
   int numProcs = this->Controller->GetNumberOfProcesses();
   for (int id = 0; id < numProcs; id++)
     {
     if (id == this->RootProcessId) continue;
 
-    this->Controller->Send((int *)&info, ICET_INFO_SIZE, id,
-                           vtkProcessModule::IceTInfo);
+    this->Controller->Send((int *)&info, ICET_WIN_INFO_SIZE, id,
+                           vtkProcessModule::IceTWinInfo);
     if (this->TilesDirty)
       {
       this->Controller->Send(&this->TileDimensions[0], 1, id,
@@ -692,9 +836,10 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 
   this->Superclass::ReceiveWindowInformation();
 
-  struct IceTInformation info;
-  this->Controller->Receive((int *)&info, ICET_INFO_SIZE, this->RootProcessId,
-                            vtkProcessModule::IceTInfo);
+  struct IceTWindowInformation info;
+  this->Controller->Receive((int *)&info, ICET_WIN_INFO_SIZE,
+                            this->RootProcessId,
+                            vtkProcessModule::IceTWinInfo);
   if (info.TilesDirty)
     {
     int NewNumTilesX, NewNumTilesY;
@@ -709,9 +854,49 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
                                 vtkProcessModule::IceTTileRanks);
       }
     }
+}
 
-  this->SetStrategy((StrategyType)info.Strategy);
-  this->SetComposeOperation((ComposeOperationType)info.ComposeOperation);
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::SendRendererInformation(vtkRenderer *_ren)
+{
+  vtkDebugMacro("Sending renderer information for " << _ren);
+
+  this->Superclass::SendRendererInformation(_ren);
+
+  vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+  if (!ren) return;
+
+  struct IceTRendererInformation info;
+  info.Strategy = ren->GetStrategy();
+  info.ComposeOperation = ren->GetComposeOperation();
+
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  for (int id = 0; id < numProcs; id++)
+    {
+    if (id == this->RootProcessId) continue;
+
+    this->Controller->Send((int *)&info, ICET_REN_INFO_SIZE, id,
+                           vtkProcessModule::IceTRenInfo);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::ReceiveRendererInformation(vtkRenderer *_ren)
+{
+  vtkDebugMacro("Receiving renderer information for " << _ren);
+
+  this->Superclass::ReceiveRendererInformation(_ren);
+
+  vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+  if (!ren) return;
+
+  struct IceTRendererInformation info;
+  this->Controller->Receive((int *)&info, ICET_REN_INFO_SIZE, 0,
+                            vtkProcessModule::IceTRenInfo);
+  ren->SetStrategy(info.Strategy);
+  ren->SetComposeOperation(info.ComposeOperation);
 }
 
 //-----------------------------------------------------------------------------
@@ -733,16 +918,50 @@ void vtkIceTRenderManager::PreRenderProcessing()
 
   this->UpdateIceTContext();
 
-  // Only composite the first renderer.
-  rens->InitTraversal();
-  ren = rens->GetNextItem();
-  if (ren == NULL)
+  if (rens->GetNumberOfItems() == 0)
     {
     vtkErrorMacro("Missing renderer.");
     return;
     }
-  vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
-  if (icetRen == NULL)
+
+  int foundIceTRenderer = 0;
+
+  vtkCollectionSimpleIterator cookie;
+  rens->InitTraversal(cookie);
+  while ((ren = rens->GetNextRenderer(cookie)) != NULL)
+    {
+    vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
+    if (icetRen == NULL)
+      {
+      // For all non-IceT renderers, assume that the data is replicated, do no
+      // compositing, and asjust the camera to focus on the displayed tile.
+      ren->GetActiveCamera()
+        ->SetUserTransform(this->GetTileViewportTransform());
+      continue;
+      }
+
+    foundIceTRenderer = 1;
+
+    if (!icetRen->GetDraw())
+      {
+      // This renderer not being drawn.  Skip it.
+      continue;
+      }
+
+    icetRen->SetComposeNextFrame(1);
+
+    if (this->ImageReductionFactor > 1)
+      {
+      // Restore viewports.  ICE-T will handle reduced images better on its own.
+      double *viewport = ren->GetViewport();
+      ren->SetViewport(viewport[0]*this->ImageReductionFactor,
+                       viewport[1]*this->ImageReductionFactor,
+                       viewport[2]*this->ImageReductionFactor,
+                       viewport[3]*this->ImageReductionFactor);
+      }
+    }
+
+  if (!foundIceTRenderer)
     {
     vtkWarningMacro("vtkIceTRenderManager used with renderer that is not "
                     "vtkIceTRenderer.\n"
@@ -750,67 +969,10 @@ void vtkIceTRenderManager::PreRenderProcessing()
                     "    vtkParallelRenderManager::MakeRenderer()\n\n"
                     "in place of vtkRenderer::New()");
     }
-  else
-    {
-    icetRen->SetComposeNextFrame(1);
-    if (this->SortingKdTree && (this->ComposeOperation == ComposeOperationOver))
-      {
-      // Setup ICE-T context for correct sorting.
-      icetEnable(ICET_ORDERED_COMPOSITE);
-      vtkIntArray *orderedProcessIds = vtkIntArray::New();
 
-      // Order all the regions.
-      vtkCamera *camera = icetRen->GetActiveCamera();
-      if (camera->GetParallelProjection())
-        {
-        this->SortingKdTree->ViewOrderAllProcessesInDirection(
-                                             camera->GetDirectionOfProjection(),
-                                             orderedProcessIds);
-        }
-      else
-        {
-        this->SortingKdTree->ViewOrderAllProcessesFromPosition(
-                                                          camera->GetPosition(),
-                                                          orderedProcessIds);
-        }
-
-      // Compiler, optimize away.
-      if (sizeof(int) == sizeof(GLint))
-        {
-        icetCompositeOrder((GLint *)orderedProcessIds->GetPointer(0));
-        }
-      else
-        {
-        vtkIdType numprocs = orderedProcessIds->GetNumberOfTuples();
-        GLint *tmparray = new GLint[numprocs];
-        const int *opiarray = orderedProcessIds->GetPointer(0);
-        vtkstd::copy(opiarray, opiarray+numprocs, tmparray);
-        delete[] tmparray;
-        }
-      orderedProcessIds->Delete();
-      }
-    else
-      {
-      icetDisable(ICET_ORDERED_COMPOSITE);
-      }
-    }
-
-  if (this->ImageReductionFactor > 1)
-    {
-    // Restore viewports.  ICE-T will handle reduced images better on its own.
-    double *viewport = ren->GetViewport();
-    ren->SetViewport(viewport[0]*this->ImageReductionFactor,
-                     viewport[1]*this->ImageReductionFactor,
-                     viewport[2]*this->ImageReductionFactor,
-                     viewport[3]*this->ImageReductionFactor);
-    }
-
-  // For all subsequent renderers, assume that the data is replicated, do
-  // no compositing, and asjust the camera to focus on the displayed tile.
-  for (ren = rens->GetNextItem(); ren != NULL; ren = rens->GetNextItem())
-    {
-    ren->GetActiveCamera()->SetUserTransform(this->GetTileViewportTransform());
-    }
+  // Turn swap buffers off before the render so the end render method has a
+  // chance to add to the back buffer.
+  this->RenderWindow->SwapBuffersOff();
 }
 
 //-----------------------------------------------------------------------------
@@ -821,48 +983,46 @@ void vtkIceTRenderManager::PostRenderProcessing()
 
   this->Controller->Barrier();
 
-  if (this->WriteBackImages)
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
+  vtkRenderer *ren;
+  renderers->InitTraversal(cookie);
+  while ((ren = renderers->GetNextRenderer(cookie)) != NULL)
     {
-    this->RenderWindowImageUpToDate = true;
+    ren->RemoveObservers(vtkCommand::EndEvent, this->RecordIceTImageCallback);
+    ren->RemoveObservers(vtkCommand::StartEvent, this->FixRenderWindowCallback);
     }
+
+  this->WriteFullImage();
+
+  // Swap buffers here.
+  this->RenderWindow->SwapBuffersOn();
+  this->RenderWindow->Frame();
 }
 
 //-----------------------------------------------------------------------------
 
-void vtkIceTRenderManager::ReadReducedImage()
+void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
 {
-  vtkDebugMacro("Reading Reduced Image");
+  int physicalViewport[4];
+  icetRen->GetPhysicalViewport(physicalViewport);
+  int width  = physicalViewport[2] - physicalViewport[0];
+  int height = physicalViewport[3] - physicalViewport[1];
 
-  if (this->ReducedImageUpToDate)
-    {
-    return;
-    }
+  // See if this renderer is displaying anything in this tile.
+  if ((width < 1) || (height < 1)) return;
 
-  GLboolean icet_color_buffer_valid;
-  icetGetBooleanv(ICET_COLOR_BUFFER_VALID, &icet_color_buffer_valid);
-  if (!icet_color_buffer_valid)
-    {
-    this->Superclass::ReadReducedImage();
-    return;
-    }
+  icetRen->GetContext()->MakeCurrent();
 
-  vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-  rens->InitTraversal();
-  vtkRenderer *ren = rens->GetNextItem();
-  vtkIceTRenderer *icetren = vtkIceTRenderer::SafeDownCast(ren);
-  if (!icetren)
-    {
-    this->Superclass::ReadReducedImage();
-    return;
-    }
-
-#ifndef GL_BGRA
-#define GL_BGRA GL_BGRA_EXT
-#endif
   GLint color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-  if (color_format == GL_RGBA)
+
+  if (   (color_format == GL_RGBA)
+      && (width == this->ReducedImageSize[0])
+      && (height == this->ReducedImageSize[1]) )
     {
+    // Special case.  This renderer covers the entire tile and we don't have
+    // to copy the data.
     this->ReducedImage->SetArray(icetGetColorBuffer(),
                                  this->ReducedImageSize[0]
                                  *this->ReducedImageSize[1]*4,
@@ -872,33 +1032,65 @@ void vtkIceTRenderManager::ReadReducedImage()
                                           * this->ReducedImageSize[1]);
     this->ReducedImageSharesData = 1;
     }
+  else if (color_format == GL_RGBA)
+    {
+    this->ReducedImage->SetNumberOfComponents(4);
+    this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
+                                          * this->ReducedImageSize[1]);
+
+    // Copy as 4-bytes.  It's faster.
+    GLuint *dest = (GLuint *)this->ReducedImage->WritePointer(
+                      0, 4*this->ReducedImageSize[0]*this->ReducedImageSize[1]);
+    GLuint *src = (GLuint *)icetGetColorBuffer();
+    dest += physicalViewport[1]*this->ReducedImageSize[0];
+    for (int j = 0; j < height; j++)
+      {
+      dest += physicalViewport[0];
+      for (int i = 0; i < width; i++)
+        {
+        dest[0] = src[0];
+        dest++;  src++;
+        }
+      dest += (this->ReducedImageSize[0] - physicalViewport[2]);
+      }
+    }
   else if (color_format == GL_BGRA)
     {
     this->ReducedImage->SetNumberOfComponents(4);
     this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
                                           * this->ReducedImageSize[1]);
+    // Note: you could probably speed this up by copying as 4-bytes and
+    // doing integer arithmetic to convert from BGRA to RGBA.
     unsigned char *dest
       = this->ReducedImage->WritePointer(0,
                                          4*this->ReducedImageSize[0]
                                          *this->ReducedImageSize[1]);
     unsigned char *src = icetGetColorBuffer();
-    int image_size = this->ReducedImageSize[0]*this->ReducedImageSize[1];
-    for (int i = 0; i < image_size; i++, dest += 4, src += 4)
+    dest += 4*physicalViewport[1]*this->ReducedImageSize[0];
+    for (int j = 0; j < height; j++)
       {
-      dest[0] = src[2];
-      dest[1] = src[1];
-      dest[2] = src[0];
-      dest[3] = src[3];
+      dest += 4*physicalViewport[0];
+      for (int i = 0; i < width; i++)
+        {
+        dest[0] = src[2];
+        dest[1] = src[1];
+        dest[2] = src[0];
+        dest[3] = src[3];
+        dest += 4;  src += 4;
+        }
+      dest += 4*(this->ReducedImageSize[0] - physicalViewport[2]);
       }
     }
   else
     {
     vtkErrorMacro("ICE-T using unknown image format.");
-    this->Superclass::ReadReducedImage();
     return;
     }
 
-  this->ReducedImageUpToDate = true;
+  // If we read in any part of the image, record the image as up to date.
+  // Assuming the renderers cover the entire window, subsequent callbacks
+  // should fill in the rest of the data before it's actually used.
+  this->ReducedImageUpToDate = 1;
 
   if (this->ImageReductionFactor == 1)
     {
@@ -915,13 +1107,52 @@ void vtkIceTRenderManager::ReadReducedImage()
 
 //-----------------------------------------------------------------------------
 
+void vtkIceTRenderManager::ForceImageWriteback()
+{
+  vtkDebugMacro("Forcing image writeback.");
+
+  this->ReadReducedImage();
+
+  int SaveWriteBackImages = this->WriteBackImages;
+  this->WriteBackImages = 1;
+  this->WriteFullImage();
+  this->WriteBackImages = SaveWriteBackImages;
+}
+
+//-----------------------------------------------------------------------------
+
+int vtkIceTRenderManager::ImageReduceRenderer(vtkRenderer *ren)
+{
+  return ren->IsA("vtkIceTRenderer");
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::GetGlobalViewport(int viewport[4])
+{
+  viewport[0] = viewport[1] = 0;
+  viewport[2] = this->TileDimensions[0]*this->ReducedImageSize[0];
+  viewport[3] = this->TileDimensions[1]*this->ReducedImageSize[1];
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::GetTileViewport(int x, int y, int viewport[4])
+{
+  viewport[0] = x*this->ReducedImageSize[0];
+  viewport[1] = (this->TileDimensions[1]-y-1)*this->ReducedImageSize[1];
+
+  viewport[2] = viewport[0] + this->ReducedImageSize[0];
+  viewport[3] = viewport[1] + this->ReducedImageSize[1];
+}
+
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   int x, y;
 
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "ICE-T Context: " << this->Context->Handle << endl;
 
   os << indent << "Display: " << this->TileDimensions[0]
      << " X " << this->TileDimensions[1] << " with display ranks" << endl;
@@ -936,47 +1167,4 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     os << endl;
     }
   os.width(0);
-
-  os << indent << "Strategy: ";
-  switch (this->Strategy)
-    {
-    case DEFAULT: os << "DEFAULT"; break;
-    case REDUCE:  os << "REDUCE";  break;
-    case VTREE:   os << "VTREE";   break;
-    case SPLIT:   os << "SPLIT";   break;
-    case SERIAL:  os << "SERIAL";  break;
-    case DIRECT:  os << "DIRECT";  break;
-    }
-  os << endl;
-
-  os << indent << "Compose Operation: ";
-  switch (this->ComposeOperation)
-    {
-    case ComposeOperationClosest: os << "closest to camera"; break;
-    case ComposeOperationOver:    os << "Porter and Duff OVER operator"; break;
-    }
-  os << endl;
-
-  vtkIndent i2 = indent.GetNextIndent();
-  os << indent << "Sorting Kd tree: ";
-  if (this->SortingKdTree)
-    {
-    os << endl;
-    this->SortingKdTree->PrintSelf(os, i2);
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-
-  os << indent << "Data Replication Group: ";
-  if (this->DataReplicationGroup)
-    {
-    os << endl;
-    this->DataReplicationGroup->PrintSelf(os, i2);
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
 }

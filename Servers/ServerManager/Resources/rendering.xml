@@ -1405,57 +1405,63 @@
 
   <ProxyGroup name="composite_managers">
     <Proxy name="DesktopDeliveryClient" class="vtkDesktopDeliveryClient">
-      <ProxyProperty
-        name="RenderWindow"
-        command="SetRenderWindow">
+      <ProxyProperty name="RenderWindow"
+                     command="SetRenderWindow">
         <ProxyGroupDomain name="groups">
           <Group name="renderwindow" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <Property
-        name="InitializeRMIs"
-        command="InitializeRMIs">
+      <Property name="InitializeRMIs"
+                command="InitializeRMIs">
       </Property>
-      <Property
-        name="InitializeOffScreen"
-        command="InitializeOffScreen">
+      <Property name="InitializeOffScreen"
+                command="InitializeOffScreen">
       </Property>
-      <IntVectorProperty
-        name="ImageReductionFactor"
-        command="SetImageReductionFactor"
-        number_of_elements="1"
-        default_values="1">
+      <IntVectorProperty name="ImageReductionFactor"
+                         command="SetImageReductionFactor"
+                         number_of_elements="1"
+                         default_values="1">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="UseCompositing"
-        command="SetUseCompositing"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty name="UseCompositing"
+                         command="SetUseCompositing"
+                         number_of_elements="1"
+                         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="SquirtLevel"
-        command="SetSquirtLevel"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty name="SquirtLevel"
+                         command="SetSquirtLevel"
+                         number_of_elements="1"
+                         default_values="0">
         <IntRangeDomain name="range" min="0" max="7" />
       </IntVectorProperty>
+      <IntVectorProperty name="SyncRenderWindowRenderers"
+                         command="SetSyncRenderWindowRenderers"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="Renderers"
+                     command="AddRenderer"
+                     remove_command="RemoveRenderer"
+                     clean_command="RemoveAllRenderers">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </Proxy>
     
     <Proxy name="IceTRenderManager" class="vtkIceTRenderManager">
-      <ProxyProperty
-        name="RenderWindow"
-        command="SetRenderWindow">
+      <ProxyProperty name="RenderWindow"
+                     command="SetRenderWindow">
         <ProxyGroupDomain name="groups">
           <Group name="renderwindow" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty
-        name="TileDimensions"
-        command="SetTileDimensions"
-        number_of_elements="2"
-        default_values="0 0">
+      <IntVectorProperty name="TileDimensions"
+                         command="SetTileDimensions"
+                         number_of_elements="2"
+                         default_values="0 0">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
       <ProxyProperty name="SortingKdTree" command="SetSortingKdTree">
@@ -1463,15 +1469,6 @@
           <Group name="locators"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty name="ComposeOperation"
-                         command="SetComposeOperation"
-                         number_of_elements="1"
-                         default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Closest"/>
-          <Entry value="1" text="Over"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
     </Proxy>
 
     <Proxy name="MultiDisplayManager" class="vtkMultiDisplayManager">

@@ -41,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.18");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.19");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -140,16 +140,9 @@ void vtkDesktopDeliveryServer
     // Remove observers to RenderWindow.  We use the prm instead.
     if (this->ObservingRenderWindow)
       {
-      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-      vtkRenderer *ren;
-      rens->InitTraversal();
-      ren = rens->GetNextItem();
-      if (ren)
-        {
-        ren->RemoveObserver(this->StartRenderTag);
-        ren->RemoveObserver(this->EndRenderTag);
-        this->ObservingRenderWindow = false;
-        }
+      this->RenderWindow->RemoveObserver(this->StartRenderTag);
+      this->RenderWindow->RemoveObserver(this->EndRenderTag);
+      this->ObservingRenderWindow = false;
       }
     }
   else
@@ -160,7 +153,7 @@ void vtkDesktopDeliveryServer
       {
       vtkCallbackCommand *cbc;
         
-      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+      vtkRendererCollection *rens = this->GetRenderers();
       vtkRenderer *ren;
       rens->InitTraversal();
       ren = rens->GetNextItem();
@@ -193,7 +186,7 @@ void vtkDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 
   if (this->ObservingRenderWindow && this->ParallelRenderManager)
     {
-    vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+    vtkRendererCollection *rens = this->GetRenderers();
     vtkRenderer *ren;
     rens->InitTraversal();
     ren = rens->GetNextItem();
@@ -264,7 +257,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
     // the desired image size.
     if (this->ImageReductionFactor > 1)
       {
-      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+      vtkRendererCollection *rens = this->GetRenderers();
       // Just grab first renderer because that is all that the superclass
       // really does anything with right now.
       rens->InitTraversal();
@@ -293,8 +286,6 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
 void vtkDesktopDeliveryServer::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
-
-  this->Controller->Barrier();
 
   vtkDesktopDeliveryServer::ImageParams ip;
   ip.RemoteDisplay = this->RemoteDisplay;

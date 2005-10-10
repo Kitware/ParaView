@@ -26,7 +26,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
@@ -159,16 +159,14 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
+  vtkClientServerStream stream;
 
-  pp = vtkSMProxyProperty::SafeDownCast(
-                       this->DisplayManagerProxy->GetProperty("SortingKdTree"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property SortingKdTree on DisplayManagerProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->PKdTreeProxy);
+  // Cannot do this with the server manager because this method only
+  // exists on the render server, not the client.
+  stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+         << "SetSortingKdTree" << this->PKdTreeProxy->GetID(0)
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->DisplayManagerProxy->GetProperty("TileDimensions"));
@@ -195,7 +193,6 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
   pp->AddProxy(this->RenderWindowProxy);
   this->DisplayManagerProxy->UpdateVTKObjects(); 
 
-  vtkClientServerStream stream;
   unsigned int i;
 
   for (i=0; i < this->DisplayManagerProxy->GetNumberOfIDs(); i++)
@@ -253,6 +250,23 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     }
   pm->SendStream(
     vtkProcessModule::RENDER_SERVER_ROOT | vtkProcessModule::CLIENT, stream);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+         this->CompositeManagerProxy->GetProperty("SyncRenderWindowRenderers"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Falied to find property SyncRenderWindowRenderers");
+    return;
+    }
+  ivp->SetElement(0, 0);
+
+  pp = vtkSMProxyProperty::SafeDownCast(
+                         this->CompositeManagerProxy->GetProperty("Renderers"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->RendererProxy);
+  pp->AddProxy(this->Renderer2DProxy);
+
+  this->CompositeManagerProxy->UpdateVTKObjects();
   
   this->Superclass::InitializeCompositingPipeline();
   
@@ -349,18 +363,26 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       p->Modified();
       this->PKdTreeProxy->UpdateVTKObjects();
 
-      vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                    this->DisplayManagerProxy->GetProperty("ComposeOperation"));
-      ivp->SetElements1(1);     // Over
-      this->DisplayManagerProxy->UpdateVTKObjects();
+      // Cannot do this with the server manager because this method only
+      // exists on the render server, not the client.
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+             << "SetComposeOperation" << 1 // Over
+             << vtkClientServerStream::End;
+      vtkPVProcessModule::GetProcessModule()->SendStream(
+                                       vtkProcessModule::RENDER_SERVER, stream);
       }
     }
   else
     {
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                    this->DisplayManagerProxy->GetProperty("ComposeOperation"));
-    ivp->SetElements1(0);       // Closest
-    this->DisplayManagerProxy->UpdateVTKObjects();
+    // Cannot do this with the server manager because this method only
+    // exists on the render server, not the client.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+           << "SetComposeOperation" << 0 // Closest
+           << vtkClientServerStream::End;
+    vtkPVProcessModule::GetProcessModule()->SendStream(
+                                       vtkProcessModule::RENDER_SERVER, stream);
     }
 
   this->Superclass::StillRender();

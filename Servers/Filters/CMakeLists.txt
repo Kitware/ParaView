@@ -104,6 +104,7 @@ IF (PARAVIEW_USE_ICE_T)
     SET(Filters_SRCS 
       ${Filters_SRCS}
       vtkIceTClientCompositeManager.cxx
+      vtkIceTContext.cxx
       vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
       )
