@@ -63,10 +63,14 @@ public:
   virtual int GetHeight();
 
   // Description:
-  // Convenience method to Set the current background color of the widget
+  // Convenience method to Set the current background and
+  // foreground color of the widget
   virtual void SetBackgroundColor(double r, double g, double b);
   virtual void SetBackgroundColor(double rgb[3])
     { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
   // Insert a column just before the column given by col_index. If col_index
@@ -508,13 +512,16 @@ public:
       row_index, col_index, rgb[0], rgb[1], rgb[2]); };
 
   // Description:
-  // Get the current cell background color
+  // Get the current cell background or foreground color
   // In order of priority:
-  // - for background color: cell > row > stripe > column > widget.
-  // - if selected, selection background color: cell > row > column > widget
+  // - if not selected, color is: cell > row > stripe > column > widget.
+  // - if selected, color is: cell > row > column > widget.
   virtual void GetCellCurrentBackgroundColor(
     int row_index, int col_index, double *r, double *g, double *b);
   virtual double* GetCellCurrentBackgroundColor(int row_index, int col_index);
+  virtual void GetCellCurrentForegroundColor(
+    int row_index, int col_index, double *r, double *g, double *b);
+  virtual double* GetCellCurrentForegroundColor(int row_index, int col_index);
 
   // Description:
   // Specifies a boolean value that determines whether a specific row 
@@ -531,13 +538,13 @@ public:
   // be displayed simultaneously. If a WindowCommand is specified for that
   // cell, it overrides the image.
   // An attempt is made to blend the image with the current cell background
-  // color (as returned by GetCellBackgroundColor). But since resorting
+  // color (as returned by GetCellBackgroundColor). But since sorting
   // a column, or inserting new rows, can change the position of the cell
   // in a stripe (see SetStripeBackgroundColor), it is best to:
   //   - use images that do not have an alpha component, or 
   //   - set the cell image once all rows have been inserted,
   //   - refresh the image periodically (or each time a row is added/removed)
-  //     see SetPotentialCellBackgroundColorChangedCommand
+  //     see SetPotentialCellColorsChangedCommand
   virtual void SetCellImage(int row_index, int col_index, const char *);
   virtual void SetCellImageToIcon(
     int row_index, int col_index, vtkKWIcon *icon);
@@ -584,13 +591,16 @@ public:
 
   // Description:
   // Force a cell (or all cells) for which a WindowCommand has been defined
-  // to set the background color to the cell current background color.
+  // to set the background and foreground colors to the cell current
+  // background and foreground colors.
   // It does so by tyring to safe-down-cast the widget inside that cell into
   // a vtkKWCoreWidget and set its background color to the color returned
-  // by GetCellCurrentBackgroundColor (and its first level children as well).
-  virtual void RefreshBackgroundColorOfCellWithWindowCommand(
+  // by GetCellCurrentBackgroundColor and its foreground color to the color
+  // returned by GetCellCurrentForegroundColor. It then performs the same
+  // for the first level children of the widget inside that cell.
+  virtual void RefreshColorsOfCellWithWindowCommand(
     int row_index, int col_index);
-  virtual void RefreshBackgroundColorOfAllCellsWithWindowCommand();
+  virtual void RefreshColorsOfAllCellsWithWindowCommand();
 
   // Description:
   // Retrieve the path of the window contained in the cell as created by 
@@ -818,7 +828,7 @@ public:
   // is setting its own background color to match the background color
   // of a cell (using GetCellCurrentBackgroundColor). In that case,
   // set this command to RefreshAllCellWindowCommands. 
-  virtual void SetPotentialCellBackgroundColorChangedCommand(
+  virtual void SetPotentialCellColorsChangedCommand(
     vtkObject* object, const char *method);
 
   // Description:
@@ -920,8 +930,8 @@ protected:
   char *SelectionChangedCommand;
   virtual void InvokeSelectionChangedCommand();
 
-  char *PotentialCellBackgroundColorChangedCommand;
-  virtual void InvokePotentialCellBackgroundColorChangedCommand();
+  char *PotentialCellColorsChangedCommand;
+  virtual void InvokePotentialCellColorsChangedCommand();
 
   // Description:
   // Called when the number of rows/columns changed
