@@ -28,10 +28,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 const char *vtkKWWindowLevelPresetSelector::WindowColumnName = "Window";
 const char *vtkKWWindowLevelPresetSelector::LevelColumnName  = "Level";
+const char *vtkKWWindowLevelPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.12");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.13");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
@@ -70,6 +71,24 @@ double vtkKWWindowLevelPresetSelector::GetPresetLevel(int id)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::SetPresetModality(
+  int id, const char *val)
+{
+  int res = this->SetPresetUserSlotAsString(id, "Modality", val);
+  if (res)
+    {
+    this->UpdatePresetRow(id);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWindowLevelPresetSelector::GetPresetModality(int id)
+{
+  return this->GetPresetUserSlotAsString(id, "Modality");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindowLevelPresetSelector::CreateColumns()
 {
   this->Superclass::CreateColumns();
@@ -78,19 +97,31 @@ void vtkKWWindowLevelPresetSelector::CreateColumns()
 
   int col;
 
+  // Modality
+
   col = list->InsertColumn(this->GetCommentColumnIndex(), 
-                           vtkKWWindowLevelPresetSelector::WindowColumnName);
+                           vtkKWWindowLevelPresetSelector::ModalityColumnName);
+  list->SetColumnName(col, vtkKWWindowLevelPresetSelector::ModalityColumnName);
+  list->SetColumnResizable(col, 1);
+  list->SetColumnStretchable(col, 0);
+  list->SetColumnEditable(col, 0);
+  list->ColumnVisibilityOff(col);
+
+  // Window
+
+  col = list->InsertColumn(col + 1, "W");
   list->SetColumnName(col, vtkKWWindowLevelPresetSelector::WindowColumnName);
-  list->SetColumnWidth(col, 7);
+  list->SetColumnWidth(col, 6);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 1);
   list->SetColumnSortModeToReal(col);
 
-  col = list->InsertColumn(col + 1, 
-                           vtkKWWindowLevelPresetSelector::LevelColumnName);
+  // Level
+
+  col = list->InsertColumn(col + 1, "L");
   list->SetColumnName(col, vtkKWWindowLevelPresetSelector::LevelColumnName);
-  list->SetColumnWidth(col, 7);
+  list->SetColumnWidth(col, 6);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 1);
@@ -114,6 +145,35 @@ int vtkKWWindowLevelPresetSelector::GetLevelColumnIndex()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::GetModalityColumnIndex()
+{
+  return this->PresetList ? 
+    this->PresetList->GetWidget()->GetColumnIndexWithName(
+      vtkKWWindowLevelPresetSelector::ModalityColumnName) : -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowLevelPresetSelector::SetModalityColumnVisibility(int arg)
+{
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->SetColumnVisibility(
+      this->GetModalityColumnIndex(), arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindowLevelPresetSelector::GetModalityColumnVisibility()
+{
+  if (this->PresetList)
+    {
+    return this->PresetList->GetWidget()->GetColumnVisibility(
+      this->GetModalityColumnIndex());
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::UpdatePresetRow(int id)
 {
   if (!this->Superclass::UpdatePresetRow(id))
@@ -125,6 +185,9 @@ int vtkKWWindowLevelPresetSelector::UpdatePresetRow(int id)
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
 
+  list->SetCellText(
+    row, this->GetModalityColumnIndex(), this->GetPresetModality(id));
+  
   list->SetCellTextAsDouble(
     row, this->GetWindowColumnIndex(), this->GetPresetWindow(id));
 

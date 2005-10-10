@@ -53,6 +53,22 @@ public:
   virtual int SetPresetLevel(int id, double level);
 
   // Description:
+  // Set/Get the modality for a given preset.
+  // The modality field is not displayed as a column by default, but this
+  // can be changed using the SetModalityColumnVisibility() method.
+  // This column can not be edited.
+  // Return 1 on success, 0 otherwise
+  virtual int SetPresetModality(int id, const char *modality);
+  virtual const char* GetPresetModality(int id);
+
+  // Description:
+  // Set/Get the visibility of the modality column. Hidden by default.
+  // No effect if called before Create().
+  virtual void SetModalityColumnVisibility(int);
+  virtual int GetModalityColumnVisibility();
+  vtkBooleanMacro(ModalityColumnVisibility, int);
+
+  // Description:
   // Query if a the pool has a given window/level preset in a group
   virtual int HasPresetWithGroupWithWindowLevel(
     const char *group, double window, double level);
@@ -79,6 +95,7 @@ public:
   //BTX
   static const char *WindowColumnName;
   static const char *LevelColumnName;
+  static const char *ModalityColumnName;
   //ETX
 
 protected:
@@ -106,6 +123,7 @@ protected:
   // Convenience methods to get the index of a given column
   virtual int GetWindowColumnIndex();
   virtual int GetLevelColumnIndex();
+  virtual int GetModalityColumnIndex();
 
 private:
 
