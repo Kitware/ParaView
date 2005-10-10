@@ -89,6 +89,12 @@ public:
   vtkBooleanMacro(GroupColumnVisibility, int);
 
   // Description:
+  // Set/Get the title of the group column.
+  // No effect if called before Create().
+  virtual void SetGroupColumnTitle(const char *);
+  virtual const char* GetGroupColumnTitle();
+
+  // Description:
   // Set/Get the group filter.
   // Set it to a specific group to show only those presets with a matching
   // group. Set it to NULL to display all presets.
