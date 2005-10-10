@@ -22,26 +22,26 @@
 // .SECTION Description
 // A ParallelRenderManager object that uses the ICE-T library for compositing.
 // As such, it offers the capability of rendering to tiled displays.  By
-// default, it renders to a single tile located on the processor with
-// rank 0.  That is, it mimics the operation of other CompositeManagers such
-// as vtkTreeComposite.
+// default, it renders to a single tile located on the processor with rank 0.
+// That is, it mimics the operation of other vtkParallelRenderManagers such as
+// vtkCompositeRenderManager.
 //
 // .SECTION Note
-// In order for the the vtkIceTRenderManager class to work correctly, it
-// can only be used with the vtkIceTRenderer instance of the vtkRenderer
-// class (which requires OpenGL).  If any other renderer is used, warnings
-// are emitted and no compositing is performed.  Creating the vtkRenderer
-// with the MakeRenderer method (which you should do with any
-// vtkParallelRenderManager) will ensure that the correct renderer is used.
+// In order for vtkIceTRenderManager class to composite images, it needs to be
+// used in conjunction with a vtkIceTRenderer.  You can have multiple
+// vtkIceTRenderers and they will correctly composite so long as they do not
+// overlap.  If there are not vtkIceTRenderers attached to the render window, a
+// warning is issued.  Creating a vtkRenderer with the MakeRenderer method
+// (which you should do with any vtkParallelRenderManager) will ensure that the
+// correct renderer is used.  You can also mix composited and non-composited
+// viewports by adding regular vtkRenderers for the non-composited parts.  The
+// non IceT renderers can overlap each other or the IceT renderers.  However,
+// the non-IceT renderers must be on a higher level than all the IceT renderers.
 //
 // .SECTION Note
 // Due to current limitations of the ICE-T API, only an instance of
 // vtkMPIController will be accepted for a vtkMultiProcessController.
 // This restriction may or may not be lifted in the future based on demand.
-//
-// .SECTION Bugs
-// Expect bizarre behavior if using more than one renderer in the attached
-// render window.
 //
 // .SECTION See Also
 // vtkIceTRenderer
@@ -51,11 +51,10 @@
 
 #include "vtkParallelRenderManager.h"
 
-class vtkPKdTree;
+class vtkIceTRenderer;
 class vtkIntArray;
 class vtkPerspectiveTransform;
-
-class vtkIceTRenderManagerOpaqueContext;
+class vtkPKdTree;
 
 class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
@@ -67,6 +66,8 @@ public:
   virtual vtkRenderer *MakeRenderer();
 
   virtual void SetController(vtkMultiProcessController *controller);
+
+  virtual void SetRenderWindow(vtkRenderWindow *renwin);
 
   // Description:
   // Methods to set the characteristics of the tiled display.  Currently,
@@ -100,10 +101,9 @@ public:
 //ETX
 
   // Description:
-  // Methods to set the strategy.  The REDUCE strategy, which is also the
-  // default, is a good all-around strategy.
-  vtkGetMacro(Strategy, StrategyType);
-  virtual void SetStrategy(StrategyType strategy);
+  // Methods to set the strategy for all IceT renderers.  The REDUCE strategy,
+  // which is also the default, is a good all-around strategy.
+  virtual void SetStrategy(int strategy);
   virtual void SetStrategy(const char *strategy);
   void SetStrategyToDefault() { this->SetStrategy(DEFAULT); }
   void SetStrategyToReduce() { this->SetStrategy(REDUCE); }
@@ -120,10 +120,9 @@ public:
 //ETX
 
   // Description:
-  // Get/Set to operation to use when composing pixels together.  Note that
-  // not all operations are commutative.  That is, for some operations, the
-  // order of composition matters.
-  vtkGetMacro(ComposeOperation, int);
+  // Set to operation to use when composing pixels together for all IceT
+  // renderers.  Note that not all operations are commutative.  That is, for
+  // some operations, the order of composition matters.
   virtual void SetComposeOperation(int operation);
   // Description:
   // Sets the compose operation to pick the pixel color that is closest to
@@ -141,30 +140,32 @@ public:
   }
 
   // Description:
-  // Get/Set a parallel Kd-tree structure that will determine the order of
-  // image composition.  If set to NULL (the default), no ordering will be
-  // imposed.  Generally speaking, if the ComposeOperation is set to
-  // CLOSEST, then giving an ordering is unnecessary.  If the
-  // ComposeOperation is set to OVER, then an ordering is necessary.
+  // Set a parallel Kd-tree structure that will determine the order of image
+  // composition for all IceT renderers.  If there is more than one
+  // vtkIceTRenderer, each renderer should have its own sorting tree set
+  // directly.  If set to NULL (the default), no ordering will be imposed.
+  // Generally speaking, if the ComposeOperation is set to CLOSEST, then giving
+  // an ordering is unnecessary.  If the ComposeOperation is set to OVER, then
+  // an ordering is necessary.
   //
   // The given Kd-tree should have processes assigned to regions (the
   // default if created with the vtkDistributeDataFilter) and should have
   // the same controller as the one assigned to this object.  Furthermore,
   // the data held by each process should be strictly contained within the
   // Kd-tree regions it is assigned to (i.e. turn clipping on).
-  vtkGetObjectMacro(SortingKdTree, vtkPKdTree);
   virtual void SetSortingKdTree(vtkPKdTree *tree);
 
   // Description:
-  // Get/Set the data replication group.  The group comprises a list of
-  // process IDs that contian the exact same data (geometry).  Replicating
-  // data can reduce image composition time.  The local process ID should
-  // be in the group and all processes within the group should have set the
-  // exact same list in the same order.  This consistency is not checked,
-  // but bad things can happen if it is not maintained.  By default, the
-  // data replication group is set to a group containing only the local
-  // process and is reset every time the controller is set.
-  vtkGetObjectMacro(DataReplicationGroup, vtkIntArray);
+  // Set the data replication group for all IceT renderers.  If there is more
+  // than one vtkIceTRenderer, each renderer should probably have its own data
+  // replication group set directly.  The group comprises a list of process IDs
+  // that contian the exact same data (geometry).  Replicating data can reduce
+  // image composition time.  The local process ID should be in the group and
+  // all processes within the group should have set the exact same list in the
+  // same order.  This consistency is not checked, but bad things can happen if
+  // it is not maintained.  By default, the data replication group is set to a
+  // group containing only the local process and is reset every time the
+  // controller is set.
   virtual void SetDataReplicationGroup(vtkIntArray *group);
 
   // Description:
@@ -173,6 +174,14 @@ public:
   // (that is, they all have the same geometry).  This method will not
   // return until it is called in all methods of the communicator.
   virtual void SetDataReplicationGroupColor(int color);
+
+  // Description:
+  // DO NOT USE.  FOR INTERNAL USE ONLY.  CONSULT A PHYSICIAN BEFORE USING.
+  virtual void RecordIceTImage(vtkIceTRenderer *);
+
+  // Description:
+  // DO NOT USE.  FOR INTERNAL USE ONLY.  DO NOT EXCEED RECOMMENDED DOSAGE.
+  virtual void ForceImageWriteback();
 
 protected:
   vtkIceTRenderManager();
@@ -186,10 +195,12 @@ protected:
   virtual void SendWindowInformation();
   virtual void ReceiveWindowInformation();
 
+  virtual void SendRendererInformation(vtkRenderer *);
+  virtual void ReceiveRendererInformation(vtkRenderer *);
+
   virtual void PreRenderProcessing();
   virtual void PostRenderProcessing();
 
-  vtkIceTRenderManagerOpaqueContext *Context;
   int ContextDirty;
   vtkTimeStamp ContextUpdateTime;
 
@@ -199,16 +210,6 @@ protected:
   int CleanScreenWidth;
   int CleanScreenHeight;
 
-  StrategyType Strategy;
-  int StrategyDirty;
-
-  int ComposeOperation;
-  int ComposeOperationDirty;
-
-  vtkPKdTree *SortingKdTree;
-
-  vtkIntArray *DataReplicationGroup;
-
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which
   // means the tiles have gotten dirty.
@@ -217,7 +218,8 @@ protected:
   int FullImageSharesData;
   int ReducedImageSharesData;
 
-  virtual void ReadReducedImage();
+  vtkCommand *RecordIceTImageCallback;
+  vtkCommand *FixRenderWindowCallback;
 
   // Description:
   // Holds a transform that shifts a camera to the displayed viewport.
@@ -226,6 +228,14 @@ protected:
   virtual void SetTileViewportTransform(vtkPerspectiveTransform *arg);
 
   virtual void ComputeTileViewportTransform();
+
+  virtual int ImageReduceRenderer(vtkRenderer *);
+
+  // Description:
+  // Convenience functions for determining IceT's logical viewports for
+  // physical tiles.
+  void GetGlobalViewport(int viewport[4]);
+  void GetTileViewport(int x, int y, int viewport[4]);
 
 private:
   vtkIceTRenderManager(const vtkIceTRenderManager&); // Not implemented

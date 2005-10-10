@@ -34,6 +34,8 @@
 
 #include "vtkParallelRenderManager.h"
 
+class vtkCommand;
+
 class VTK_EXPORT vtkDesktopDeliveryClient : public vtkParallelRenderManager
 {
 public:
@@ -124,6 +126,10 @@ public:
   virtual void SetImageReductionFactorForUpdateRate(double desiredUpdateRate);
   float GetZBufferValue(int x, int y);
 
+  // Description:
+  // For internal use.
+  virtual void ReceiveImageFromServer();
+
 protected:
   vtkDesktopDeliveryClient();
   ~vtkDesktopDeliveryClient();
@@ -150,6 +156,9 @@ protected:
   void SquirtDecompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
 
   int UseCompositing;
+
+  int ReceivedImageFromServer;
+  vtkCommand *ReceiveImageCallback;
   
 private:
   vtkDesktopDeliveryClient(const vtkDesktopDeliveryClient &); //Not implemented

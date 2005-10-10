@@ -16,23 +16,36 @@
 #include "vtkDesktopDeliveryClient.h"
 #include "vtkDesktopDeliveryServer.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
 #include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
 #include "vtkCubeSource.h"
+#include "vtkDoubleArray.h"
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRendererCollection.h"
-#include "vtkCamera.h"
-#include "vtkLight.h"
-#include "vtkTimerLog.h"
-#include "vtkLightCollection.h"
-#include "vtkDoubleArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDoubleArray.h"
+#include "vtkRenderWindow.h"
 #include "vtkSquirtCompressor.h"
+#include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.24");
+//-----------------------------------------------------------------------------
+
+static void vtkDesktopDeliveryClientReceiveImageCallback(vtkObject *,
+                                                         unsigned long,
+                                                         void *clientdata,
+                                                         void *)
+{
+  vtkDesktopDeliveryClient *self
+    = reinterpret_cast<vtkDesktopDeliveryClient *>(clientdata);
+  self->ReceiveImageFromServer();
+}
+
+//-----------------------------------------------------------------------------
+
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.25");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -44,12 +57,19 @@ vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
   this->SquirtBuffer = vtkUnsignedCharArray::New();
   this->UseCompositing = 0;
   this->RemoteDisplay = 1;
+  this->ReceivedImageFromServer = 1;
+
+  vtkCallbackCommand *cbc = vtkCallbackCommand::New();
+  cbc->SetClientData(this);
+  cbc->SetCallback(vtkDesktopDeliveryClientReceiveImageCallback);
+  this->ReceiveImageCallback = cbc;
 }
 
 //----------------------------------------------------------------------------
 vtkDesktopDeliveryClient::~vtkDesktopDeliveryClient()
 {
   this->SquirtBuffer->Delete();
+  this->ReceiveImageCallback->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -151,32 +171,75 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
   this->Controller->Receive(&this->RemoteDisplay, 1, this->ServerProcessId,
                             vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
 
-  if (!this->RemoteDisplay)
+  if (this->ImageReductionFactor > 1)
     {
-    if (this->ImageReductionFactor > 1)
+    // Since we're not really doing parallel rendering, restore the renderer
+    // viewports.
+    vtkRendererCollection *rens = this->GetRenderers();
+    vtkRenderer *ren;
+    int i;
+    for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
       {
-      // Since we're not replacing the image, restore the renderer viewports.
-      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-      vtkRenderer *ren;
-      int i;
-      for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+      ren->SetViewport(this->Viewports->GetTuple(i));
+      }
+    }
+
+  this->ReceivedImageFromServer = 0;
+
+  if (!this->SyncRenderWindowRenderers)
+    {
+    // Establish a callback so that the image from the server is retrieved
+    // before we draw renderers that we are not synced with.  This will fail if
+    // a non-synced renderer is on a layer equal or less than a synced renderer.
+    vtkRendererCollection *allren = this->RenderWindow->GetRenderers();
+    vtkCollectionSimpleIterator cookie;
+    vtkRenderer *ren;
+    for (allren->InitTraversal(cookie);
+         (ren = allren->GetNextRenderer(cookie)) != NULL; )
+      {
+      if (!this->Renderers->IsItemPresent(ren))
         {
-        // TODO: Revert back once ren->SetViewport() takes double.
-        double *vp = this->Viewports->GetTuple(i);
-        ren->SetViewport(vp[0], vp[1], vp[2], vp[3]);
+        ren->AddObserver(vtkCommand::StartEvent, this->ReceiveImageCallback);
         }
       }
     }
+
+  // Turn swap buffers off before the render so the end render method has a
+  // chance to add to the back buffer.
+  this->RenderWindow->SwapBuffersOff();
 }
 
 //----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::PostRenderProcessing()
 {
-  // Adjust render time for actual render on server.
-  this->Timer->StartTimer();
-  this->Controller->Barrier();
+  this->ReceiveImageFromServer();
+
   this->Timer->StopTimer();
   this->RenderTime += this->Timer->GetElapsedTime();
+
+  if (!this->SyncRenderWindowRenderers)
+    {
+    vtkRendererCollection *allren = this->RenderWindow->GetRenderers();
+    vtkCollectionSimpleIterator cookie;
+    vtkRenderer *ren;
+    for (allren->InitTraversal(cookie);
+         (ren = allren->GetNextRenderer(cookie)) != NULL; )
+      {
+      ren->RemoveObservers(vtkCommand::StartEvent, this->ReceiveImageCallback);
+      }
+    }
+
+  // Swap buffers here.
+  this->RenderWindow->SwapBuffersOn();
+  this->RenderWindow->Frame();
+}
+
+//-----------------------------------------------------------------------------
+void vtkDesktopDeliveryClient::ReceiveImageFromServer()
+{
+  if (this->ReceivedImageFromServer) return;
+
+  this->ReceivedImageFromServer = 1;
 
   vtkDesktopDeliveryServer::ImageParams ip;
   int comm_success =
@@ -184,6 +247,10 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
                               vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
                               this->ServerProcessId,
                               vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+
+  // Adjust render time for actual render on server.
+  this->Timer->StopTimer();
+  this->RenderTime += this->Timer->GetElapsedTime();
 
   if (comm_success && ip.RemoteDisplay)
     {
@@ -242,6 +309,10 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
     this->ServerProcessId,
     vtkDesktopDeliveryServer::TIMING_METRICS_TAG);
   this->RemoteImageProcessingTime = tm.ImageProcessingTime;
+
+  this->WriteFullImage();
+
+  this->Timer->StartTimer();
 }
 
 //----------------------------------------------------------------------------
