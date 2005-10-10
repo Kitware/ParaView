@@ -52,7 +52,7 @@ const char *vtkKWPresetSelector::CommentColumnName = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.4");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -414,6 +414,8 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnName(col, vtkKWPresetSelector::IdColumnName);
   list->ColumnVisibilityOff(col);
 
+  // Thumbnail
+
   col = list->AddColumn(vtkKWPresetSelector::ThumbnailColumnName);
   list->SetColumnName(col, vtkKWPresetSelector::ThumbnailColumnName);
   list->SetColumnWidth(col, -this->ThumbnailSize);
@@ -423,13 +425,16 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnSortModeToReal(col);
   list->SetColumnFormatCommandToEmptyOutput(col);
 
+  // Group
+
   col = list->AddColumn(vtkKWPresetSelector::GroupColumnName);
   list->SetColumnName(col, vtkKWPresetSelector::GroupColumnName);
-  list->SetColumnWidth(col, 5);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 0);
   list->SetColumnEditable(col, 0);
   list->ColumnVisibilityOff(col);
+
+  // Comment
 
   col = list->AddColumn(vtkKWPresetSelector::CommentColumnName);
   list->SetColumnName(col, vtkKWPresetSelector::CommentColumnName);
@@ -588,6 +593,27 @@ int vtkKWPresetSelector::GetGroupColumnVisibility()
       this->GetGroupColumnIndex());
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetGroupColumnTitle(const char *arg)
+{
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->SetColumnTitle(
+      this->GetGroupColumnIndex(), arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetGroupColumnTitle()
+{
+  if (this->PresetList)
+    {
+    return this->PresetList->GetWidget()->GetColumnTitle(
+      this->GetGroupColumnIndex());
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
