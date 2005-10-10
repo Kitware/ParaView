@@ -138,7 +138,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.402");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.403");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -2754,7 +2754,8 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
 {
   const char* writerName = 0;
 
-  vtksys_stl::string ext_stl = vtksys::SystemTools::GetFilenameLastExtension(filename);
+  vtksys_stl::string ext_stl = 
+    vtksys::SystemTools::GetFilenameLastExtension(filename);
   if (ext_stl == ".bmp")
     {
     writerName = "vtkBMPWriter";
@@ -2776,8 +2777,8 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
     writerName = "vtkJPEGWriter";
     }
   this->Script("update");
-  if (this->RenderModuleProxy->WriteImage(filename, writerName) 
-    == vtkErrorCode::OutOfDiskSpaceError)
+  if (this->RenderModuleProxy->WriteImage(filename, writerName) == 
+      vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->ParentWindow, "Write Error",
