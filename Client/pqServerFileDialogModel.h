@@ -25,15 +25,15 @@ public:
   pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent = 0);
   ~pqServerFileDialogModel();
 
-  QString getStartDirectory();
-  void setViewDirectory(const QString&);
-  QString getViewDirectory();
+  QString getStartPath();
+  void setCurrentPath(const QString&);
+  QString getCurrentPath();
   bool isDir(const QModelIndex&);
   QString getFilePath(const QModelIndex&);
+  QString getParentPath(const QString&);
+  QStringList splitPath(const QString&);
   QAbstractItemModel* fileModel();
   QAbstractItemModel* favoriteModel();
-  void navigateUp();
-  void navigateDown(const QModelIndex&);
 
 private:
   class Implementation;

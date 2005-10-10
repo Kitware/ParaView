@@ -21,15 +21,15 @@ public:
   pqLocalFileDialogModel(QObject* Parent = 0);
   ~pqLocalFileDialogModel();
 
-  QString getStartDirectory();
-  void setViewDirectory(const QString& Path);
-  QString getViewDirectory();
+  QString getStartPath();
+  void setCurrentPath(const QString&);
+  QString getCurrentPath();
   bool isDir(const QModelIndex&);
   QString getFilePath(const QModelIndex&);
+  QString getParentPath(const QString&);
+  QStringList splitPath(const QString&);
   QAbstractItemModel* fileModel();
   QAbstractItemModel* favoriteModel();
-  void navigateUp();
-  void navigateDown(const QModelIndex&);
   
 private:
   class Implementation;

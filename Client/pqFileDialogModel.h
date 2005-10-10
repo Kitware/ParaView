@@ -24,18 +24,16 @@ class pqFileDialogModel :
 public:
   ~pqFileDialogModel();
   
-  virtual QString getStartDirectory() = 0;
-  virtual void setViewDirectory(const QString&) = 0;
-  virtual QString getViewDirectory() = 0;
+  virtual QString getStartPath() = 0;
+  virtual void setCurrentPath(const QString&) = 0;
+  virtual QString getCurrentPath() = 0;
   virtual bool isDir(const QModelIndex&) = 0;
   virtual QString getFilePath(const QModelIndex&) = 0;
+  virtual QString getParentPath(const QString&) = 0;
+  virtual QStringList splitPath(const QString&) = 0;
 
   virtual QAbstractItemModel* fileModel() = 0;
   virtual QAbstractItemModel* favoriteModel() = 0;
-
-public slots:
-  virtual void navigateUp() = 0;
-  virtual void navigateDown(const QModelIndex&) = 0;
 
 protected:
   pqFileDialogModel(QObject* Parent = 0);

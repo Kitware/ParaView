@@ -12,8 +12,17 @@
 #include <QDateTime>
 #include <QFileIconProvider>
 
+#include <vtkstd/vector>
+
+#ifdef WIN32
+#include <shlobj.h>
+#endif // WIN32
+
 namespace
 {
+
+//////////////////////////////////////////////////////////////////////
+// Icons
 
 QFileIconProvider& Icons()
 {
@@ -24,14 +33,62 @@ QFileIconProvider& Icons()
   return *icons;
 }
 
+//////////////////////////////////////////////////////////////////////
+// FileInfo
+
+class FileInfo
+{
+public:
+  FileInfo()
+  {
+  }
+
+  FileInfo(const QString& label, const QString& filePath, const bool isDir, const bool isRoot) :
+    Label(label),
+    FilePath(filePath),
+    IsDir(isDir),
+    IsRoot(isRoot)
+  {
+  }
+
+  const QString& getLabel() const
+  {
+    return Label;
+  }
+
+  const QString& filePath() const 
+  {
+    return FilePath;
+  }
+  
+  const bool isDir() const
+  {
+    return IsDir;
+  }
+  
+  const bool isRoot() const
+  {
+    return IsRoot;
+  }
+
+private:
+  QString Label;
+  QString FilePath;
+  bool IsDir;
+  bool IsRoot;
+};
+
+///////////////////////////////////////////////////////////////////////
+// FileModel
+
 class FileModel :
   public QAbstractItemModel
 {
 public:
-  void setViewDirectory(const QString& Path)
+  void setCurrentPath(const QString& Path)
   {
-    ViewDirectory.setPath(QDir::cleanPath(Path));
-    fileList = ViewDirectory.entryInfoList();
+    currentPath.setPath(QDir::cleanPath(Path));
+    fileList = currentPath.entryInfoList();
     
     emit layoutChanged();
     emit dataChanged(QModelIndex(), QModelIndex());
@@ -43,7 +100,7 @@ public:
       return QString();
       
     QFileInfo& file = fileList[Index.row()];
-    return QDir::convertSeparators(ViewDirectory.path() + "/" + file.fileName());
+    return QDir::convertSeparators(currentPath.path() + "/" + file.fileName());
   }
 
   bool isDir(const QModelIndex& Index)
@@ -135,9 +192,12 @@ public:
     return QVariant();
   }
 
-  QDir ViewDirectory;
+  QDir currentPath;
   QFileInfoList fileList;
 };
+
+//////////////////////////////////////////////////////////////////
+// FavoriteModel
 
 class FavoriteModel :
   public QAbstractItemModel
@@ -145,8 +205,31 @@ class FavoriteModel :
 public:
   FavoriteModel()
   {
-    favoriteList = QDir::drives();
-    favoriteList.push_back(QFileInfo(QDir::homePath()));
+#ifdef WIN32
+
+    TCHAR szPath[MAX_PATH];
+
+    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_HISTORY, NULL, 0, szPath)))
+      favoriteList.push_back(FileInfo(tr("History"), szPath, true, false));
+    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
+      favoriteList.push_back(FileInfo(tr("My Projects"), szPath, true, false));
+    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
+      favoriteList.push_back(FileInfo(tr("Desktop"), szPath, true, false));
+    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
+      favoriteList.push_back(FileInfo(tr("Favorites"), szPath, true, false));
+
+#else // WIN32
+
+    favoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath(), true, false));
+
+#endif // !WIN32
+  
+    const QFileInfoList drives = QDir::drives();
+    for(int i = 0; i != drives.size(); ++i)
+      {
+      QFileInfo drive = drives[i];
+      favoriteList.push_back(FileInfo(drive.absoluteFilePath(), drive.absoluteFilePath(), true, true));
+      }
   }
 
   QString getFilePath(const QModelIndex& Index)
@@ -154,8 +237,8 @@ public:
     if(Index.row() >= favoriteList.size())
       return QString();
       
-    QFileInfo& file = favoriteList[Index.row()];
-    return QDir::convertSeparators(file.absoluteFilePath());
+    FileInfo& file = favoriteList[Index.row()];
+    return QDir::convertSeparators(file.filePath());
   }
 
   bool isDir(const QModelIndex& Index)
@@ -163,7 +246,7 @@ public:
     if(Index.row() >= favoriteList.size())
       return false;
       
-    QFileInfo& file = favoriteList[Index.row()];
+    FileInfo& file = favoriteList[Index.row()];
     return file.isDir();
   }
 
@@ -180,17 +263,14 @@ public:
     if(index.row() >= favoriteList.size())
       return QVariant();
 
-    const QFileInfo& file = favoriteList[index.row()];
+    const FileInfo& file = favoriteList[index.row()];
     switch(role)
       {
       case Qt::DisplayRole:
         switch(index.column())
           {
           case 0:
-            if(file.isRoot())
-              return file.absoluteFilePath();
-            else
-              return file.fileName();
+            return file.getLabel();
           }
       case Qt::DecorationRole:
         switch(index.column())
@@ -245,10 +325,13 @@ public:
     return QVariant();
   }
   
-  QFileInfoList favoriteList;
+  vtkstd::vector<FileInfo> favoriteList;
 };
 
 } // namespace
+
+///////////////////////////////////////////////////////////////////////////
+// pqLocalFileDialogModel
 
 class pqLocalFileDialogModel::Implementation
 {
@@ -280,19 +363,19 @@ pqLocalFileDialogModel::~pqLocalFileDialogModel()
   delete implementation;
 }
 
-QString pqLocalFileDialogModel::getStartDirectory()
+QString pqLocalFileDialogModel::getStartPath()
 {
   return QDir::currentPath();
 }
 
-void pqLocalFileDialogModel::setViewDirectory(const QString& Path)
+void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
 {
-  implementation->fileModel->setViewDirectory(Path);
+  implementation->fileModel->setCurrentPath(Path);
 }
 
-QString pqLocalFileDialogModel::getViewDirectory()
+QString pqLocalFileDialogModel::getCurrentPath()
 {
-  return QDir::convertSeparators(implementation->fileModel->ViewDirectory.path());
+  return QDir::convertSeparators(implementation->fileModel->currentPath.path());
 }
 
 QString pqLocalFileDialogModel::getFilePath(const QModelIndex& Index)
@@ -306,6 +389,13 @@ QString pqLocalFileDialogModel::getFilePath(const QModelIndex& Index)
   return QString();    
 }
 
+QString pqLocalFileDialogModel::getParentPath(const QString& Path)
+{
+  QDir temp(Path);
+  temp.cdUp();
+  return temp.path();
+}
+
 bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
 {
   if(Index.model() == implementation->fileModel)
@@ -317,6 +407,18 @@ bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
   return false;    
 }
 
+QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
+{
+  QStringList results;
+  
+  for(int i = Path.indexOf(QDir::separator()); i != -1; i = Path.indexOf(QDir::separator(), i+1))
+    results.push_back(Path.left(i) + QDir::separator());
+    
+  results.push_back(Path);
+  
+  return results;
+}
+
 QAbstractItemModel* pqLocalFileDialogModel::fileModel()
 {
   return implementation->fileModel;
@@ -325,19 +427,5 @@ QAbstractItemModel* pqLocalFileDialogModel::fileModel()
 QAbstractItemModel* pqLocalFileDialogModel::favoriteModel()
 {
   return implementation->favoriteModel;
-}
-
-void pqLocalFileDialogModel::navigateUp()
-{
-  QDir temp = implementation->fileModel->ViewDirectory;
-  temp.cdUp();
-  
-  setViewDirectory(temp.path());
-}
-
-void pqLocalFileDialogModel::navigateDown(const QModelIndex& Index)
-{
-  if(isDir(Index))
-    setViewDirectory(getFilePath(Index));
 }
 

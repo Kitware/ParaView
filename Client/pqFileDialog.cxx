@@ -33,11 +33,12 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidg
   this->setName(Name);
 
   QObject::connect(model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
-  QObject::connect(ui.navigateUp, SIGNAL(clicked()), Model, SLOT(navigateUp()));
+  QObject::connect(ui.navigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
   QObject::connect(ui.files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
   QObject::connect(ui.favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(ui.parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
 
-  model->setViewDirectory(model->getStartDirectory());
+  model->setCurrentPath(model->getStartPath());
 }
 
 pqFileDialog::~pqFileDialog()
@@ -51,7 +52,7 @@ void pqFileDialog::accept()
   vtkstd::set<QString> temp;
   QModelIndexList indexes = this->ui.files->selectionModel()->selectedIndexes();
   for(int i = 0; i != indexes.size(); ++i)
-    temp.insert(model->getFilePath(indexes[i]));
+    temp.insert(this->model->getFilePath(indexes[i]));
 
   QStringList files;
   vtkstd::copy(temp.begin(), temp.end(), vtkstd::back_inserter(files));
@@ -69,7 +70,11 @@ void pqFileDialog::reject()
 
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
-//  ui.viewDirectory->setText(this->model()->getViewDirectory());
+  const QStringList split_path = this->model->splitPath(this->model->getCurrentPath());
+  ui.parents->clear();
+  for(int i = 0; i != split_path.size(); ++i)
+    ui.parents->addItem(split_path[i]);
+  ui.parents->setCurrentIndex(split_path.size() - 1);
 }
 
 void pqFileDialog::onActivated(const QModelIndex& Index)
@@ -89,12 +94,24 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     }
 }
 
+void pqFileDialog::onNavigate(const QString& Path)
+{
+  this->model->setCurrentPath(Path);
+}
+
+void pqFileDialog::onNavigateUp()
+{
+  this->model->setCurrentPath(this->model->getParentPath(this->model->getCurrentPath()));
+}
+
+void pqFileDialog::onNavigateDown()
+{
+  if(this->model->isDir(*this->temp))
+    this->model->setCurrentPath(this->model->getFilePath(*this->temp));
+}
+
 void pqFileDialog::onAutoDelete()
 {
   delete this;
 }
 
-void pqFileDialog::onNavigateDown()
-{
-  this->model->navigateDown(*this->temp);
-}
