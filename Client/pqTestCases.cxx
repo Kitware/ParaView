@@ -93,8 +93,8 @@ void pqTestFileMenu::testFileMenu()
 
 void pqTestFileMenu::testFileOpen()
 {
-  VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "fileOpenAction")));
-  VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenBrowser"));
-  VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenBrowser/buttonCancel")));
+  VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "debugOpenLocalFilesAction")));
+  VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenDialog"));
+  VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenDialog/buttonCancel")));
 }
 
