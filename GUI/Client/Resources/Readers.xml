@@ -426,7 +426,7 @@
  <Module name="spcthreader"
           class="vtkPVAdvancedReaderModule" root_name="SPCTH"
           module_type="Reader"
-          extensions=".spcth"
+          extensions=".spcth .0"
           file_description="SpyPlot CTH dataset">
     <Source class="vtkSpyPlotReader"/>
     <LabeledToggle label="Down-convert Volume Fraction"
