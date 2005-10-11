@@ -18,6 +18,7 @@ KWConvertImageToHeader --zlib --base64 \
     connection.png \
     document.png \
     empty_16x16.png \
+    empty_1x1.png \
     error.png \
     error_mini.png \
     error_red_mini.png \

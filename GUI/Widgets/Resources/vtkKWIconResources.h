@@ -42,6 +42,19 @@ static const unsigned char image_empty_16x16[] =
 
 /* 
  * Resource generated for file:
+ *    empty_1x1.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_empty_1x1_width          = 16;
+static const unsigned int  image_empty_1x1_height         = 16;
+static const unsigned int  image_empty_1x1_pixel_size     = 4;
+static const unsigned long image_empty_1x1_length         = 28;
+static const unsigned long image_empty_1x1_decoded_length = 1024;
+
+static const unsigned char image_empty_1x1[] = 
+  "eNr7//8/w/9RPIpH8YjEAFrT/R8=";
+
+/* 
+ * Resource generated for file:
  *    error.png (zlib, base64) (image file)
  */
 static const unsigned int  image_error_width          = 32;
