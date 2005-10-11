@@ -36,47 +36,54 @@ QFileIconProvider& Icons()
 //////////////////////////////////////////////////////////////////////
 // FileInfo
 
-class FileInfo
+class FileInfo :
+  public QFileInfo
 {
 public:
   FileInfo()
   {
   }
 
-  FileInfo(const QString& label, const QString& filePath, const bool isDir, const bool isRoot) :
-    Label(label),
-    FilePath(filePath),
-    IsDir(isDir),
-    IsRoot(isRoot)
+  FileInfo(const QString& Label, const QString& FilePath) :
+    label(Label),
+    QFileInfo(FilePath)
   {
   }
 
-  const QString& getLabel() const
-  {
-    return Label;
-  }
-
-  const QString& filePath() const 
-  {
-    return FilePath;
-  }
-  
-  const bool isDir() const
-  {
-    return IsDir;
-  }
-  
-  const bool isRoot() const
-  {
-    return IsRoot;
-  }
-
-private:
-  QString Label;
-  QString FilePath;
-  bool IsDir;
-  bool IsRoot;
+  QString label;
 };
+
+///////////////////////////////////////////////////////////////////////
+// FileGroup
+
+struct FileGroup
+{
+  FileGroup()
+  {
+  }
+  
+  FileGroup(const QString& Label) :
+    label(Label)
+  {
+  }
+  
+  FileGroup(const FileInfo& File) :
+    label(File.label)
+  {
+    files.push_back(File);
+  }
+  
+  QString label;
+  QList<FileInfo> files;
+};
+
+///////////////////////////////////////////////////////////////////////
+// SortFileAlpha
+
+bool SortFileAlpha(const QFileInfo& A, const QFileInfo& B)
+{
+  return A.absoluteFilePath() < B.absoluteFilePath();
+}
 
 ///////////////////////////////////////////////////////////////////////
 // FileModel
@@ -88,89 +95,175 @@ public:
   void setCurrentPath(const QString& Path)
   {
     currentPath.setPath(QDir::cleanPath(Path));
-    fileList = currentPath.entryInfoList();
     
+    fileGroups.clear();
+    
+    QFileInfoList files = currentPath.entryInfoList();
+    qSort(files.begin(), files.end(), SortFileAlpha);
+    
+    QRegExp regex("^(.*)\\.(\\d+)$");
+    FileGroup numbered_files;
+    for(int i = 0; i != files.size(); ++i)
+      {
+      if(-1 == regex.indexIn(files[i].fileName()))
+        {
+        if(numbered_files.files.size())
+          {
+          fileGroups.push_back(numbered_files);
+          numbered_files = FileGroup();
+          }
+          
+        fileGroups.push_back(FileGroup(FileInfo(files[i].fileName(), files[i].filePath())));
+        }
+      else
+        {
+        const QString name = regex.cap(1);
+        const QString index = regex.cap(2);
+        
+        if(name != numbered_files.label)
+          {
+          if(numbered_files.files.size())
+            fileGroups.push_back(numbered_files);
+              
+          numbered_files = FileGroup(name);
+          }
+          
+        numbered_files.files.push_back(FileInfo(files[i].fileName(), files[i].filePath()));
+        }
+      }
+      
+    if(numbered_files.files.size())
+      fileGroups.push_back(numbered_files);
+
     emit layoutChanged();
     emit dataChanged(QModelIndex(), QModelIndex());
   }
 
-  QString getFilePath(const QModelIndex& Index)
+  QStringList getFilePaths(const QModelIndex& Index)
   {
-    if(Index.row() >= fileList.size())
-      return QString();
+    QStringList results;
+    
+    if(Index.internalId()) // Selected a member of a file group
+      {
+      FileGroup& group = fileGroups[Index.internalId()-1];
+      FileInfo& file = group.files[Index.row()];
+      results.push_back(file.filePath());
+      }
+    else // Selected a file group
+      {
+      FileGroup& group = fileGroups[Index.row()];
+      for(int i = 0; i != group.files.size(); ++i)
+        results.push_back(group.files[i].filePath());
+      }
       
-    QFileInfo& file = fileList[Index.row()];
-    return QDir::convertSeparators(currentPath.path() + "/" + file.fileName());
+    return results;
   }
 
   bool isDir(const QModelIndex& Index)
   {
-    if(Index.row() >= fileList.size())
-      return false;
+    if(Index.internalId()) // This is a member of a file group ...
+      {
+      FileGroup& group = fileGroups[Index.internalId()-1];
+      FileInfo& file = group.files[Index.row()];
+      return file.isDir();
+      }
+    else // This is a file group
+      {
+      FileGroup& group = fileGroups[Index.row()];
+      if(1 == group.files.size())
+        return group.files[0].isDir();
+      }
       
-    QFileInfo& file = fileList[Index.row()];
-    return file.isDir();
+    return false;
   }
 
-  int columnCount(const QModelIndex& parent) const
+  int columnCount(const QModelIndex& Index) const
   {
     return 3;
   }
 
-  QVariant data(const QModelIndex & index, int role) const
+  QVariant data(const QModelIndex & Index, int role) const
   {
-    if(!index.isValid())
+    if(!Index.isValid())
       return QVariant();
 
-    if(index.row() >= fileList.size())
-      return QVariant();
-
-    const QFileInfo& file = fileList[index.row()];
-
+    const FileGroup* group = 0;
+    const FileInfo* file = 0;
+        
+    if(Index.internalId()) // This is a member of a file group ...
+      {
+      group = &fileGroups[Index.internalId()-1];
+      file = &group->files[Index.row()];
+      }      
+    else // This is a file group ...
+      {
+      group = &fileGroups[Index.row()];
+      if(1 == group->files.size())
+        file = &group->files[0];
+      }
+      
     switch(role)
       {
       case Qt::DisplayRole:
-        switch(index.column())
+        switch(Index.column())
           {
           case 0:
-            return file.fileName();
+            return file ? file->label : group->label + QString(" (%1 files)").arg(group->files.size());
           case 1:
-            return file.size();
+            return file ? file->size() : QVariant();
           case 2:
-            return file.lastModified();
+            return file ? file->lastModified() : QVariant();
           }
       case Qt::DecorationRole:
-        switch(index.column())
+        switch(Index.column())
           {
           case 0:
-            return Icons().icon(file.isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
+            if(file)
+              return Icons().icon(file->isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
           }
       }
       
     return QVariant();
   }
 
-  QModelIndex index(int row, int column, const QModelIndex& parent) const
+  QModelIndex index(int row, int column, const QModelIndex& Parent) const
   {
-    return createIndex(row, column);
-  }
-
-  QModelIndex parent(const QModelIndex& index) const
-  {
-    return QModelIndex();
-  }
-
-  int rowCount(const QModelIndex& parent) const
-  {
-    return fileList.size();
-  }
-
-  bool hasChildren(const QModelIndex& parent) const
-  {
-    if(!parent.isValid())
-      return true;
+    if(Parent.isValid()) // This is a member of a file group ...
+      return createIndex(row, column, Parent.row() + 1);
       
-    return false;
+    return createIndex(row, column, 0); // This is a file group ...
+  }
+
+  QModelIndex parent(const QModelIndex& Index) const
+  {
+    if(Index.internalId()) // This is a member of a file group ...
+      return createIndex(Index.internalId() - 1, 0, 0);
+      
+    return QModelIndex(); // This is a file group ...
+  }
+
+  int rowCount(const QModelIndex& Index) const
+  {
+    if(Index.isValid())
+      {
+      if(Index.internalId()) // This is a member of a file group ...
+        return 0;
+      return fileGroups[Index.row()].files.size(); // This is a file group ...
+      }
+  
+    return fileGroups.size(); // This is the top-level node ...
+  }
+
+  bool hasChildren(const QModelIndex& Index) const
+  {
+    if(Index.isValid())
+      {
+      if(Index.internalId()) // This is a member of a file group ...
+        return false;
+      return fileGroups[Index.row()].files.size() > 1; // This is a file group ...
+      }
+      
+    return true; // This is the top-level node ...
   }
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -193,7 +286,7 @@ public:
   }
 
   QDir currentPath;
-  QFileInfoList fileList;
+  QList<FileGroup> fileGroups;
 };
 
 //////////////////////////////////////////////////////////////////
@@ -210,17 +303,17 @@ public:
     TCHAR szPath[MAX_PATH];
 
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_HISTORY, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("History"), szPath, true, false));
+      favoriteList.push_back(FileInfo(tr("History"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("My Projects"), szPath, true, false));
+      favoriteList.push_back(FileInfo(tr("My Projects"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("Desktop"), szPath, true, false));
+      favoriteList.push_back(FileInfo(tr("Desktop"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("Favorites"), szPath, true, false));
+      favoriteList.push_back(FileInfo(tr("Favorites"), szPath));
 
 #else // WIN32
 
-    favoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath(), true, false));
+    favoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath()));
 
 #endif // !WIN32
   
@@ -228,17 +321,21 @@ public:
     for(int i = 0; i != drives.size(); ++i)
       {
       QFileInfo drive = drives[i];
-      favoriteList.push_back(FileInfo(drive.absoluteFilePath(), drive.absoluteFilePath(), true, true));
+      favoriteList.push_back(FileInfo(QDir::convertSeparators(drive.absoluteFilePath()), QDir::convertSeparators(drive.absoluteFilePath())));
       }
   }
 
-  QString getFilePath(const QModelIndex& Index)
+  QStringList getFilePaths(const QModelIndex& Index)
   {
-    if(Index.row() >= favoriteList.size())
-      return QString();
-      
-    FileInfo& file = favoriteList[Index.row()];
-    return QDir::convertSeparators(file.filePath());
+    QStringList results;
+    
+    if(Index.row() < favoriteList.size())
+      {
+      FileInfo& file = favoriteList[Index.row()];
+      results.push_back(QDir::convertSeparators(file.filePath()));
+      }
+    
+    return results;
   }
 
   bool isDir(const QModelIndex& Index)
@@ -270,7 +367,7 @@ public:
         switch(index.column())
           {
           case 0:
-            return file.getLabel();
+            return file.label;
           }
       case Qt::DecorationRole:
         switch(index.column())
@@ -325,7 +422,7 @@ public:
     return QVariant();
   }
   
-  vtkstd::vector<FileInfo> favoriteList;
+  QList<FileInfo> favoriteList;
 };
 
 } // namespace
@@ -378,15 +475,23 @@ QString pqLocalFileDialogModel::getCurrentPath()
   return QDir::convertSeparators(implementation->fileModel->currentPath.path());
 }
 
-QString pqLocalFileDialogModel::getFilePath(const QModelIndex& Index)
+QStringList pqLocalFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
   if(Index.model() == implementation->fileModel)
-    return implementation->fileModel->getFilePath(Index);
+    return implementation->fileModel->getFilePaths(Index);
   
   if(Index.model() == implementation->favoriteModel)
-    return implementation->favoriteModel->getFilePath(Index);  
+    return implementation->favoriteModel->getFilePaths(Index);  
 
-  return QString();    
+  return QStringList();
+}
+
+QString pqLocalFileDialogModel::getFilePath(const QString& Path)
+{
+  if(QDir::isAbsolutePath(Path))
+    return Path;
+    
+  return QDir::convertSeparators(implementation->fileModel->currentPath.path() + "/" + Path);
 }
 
 QString pqLocalFileDialogModel::getParentPath(const QString& Path)

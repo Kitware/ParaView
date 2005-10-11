@@ -28,7 +28,8 @@ public:
   virtual void setCurrentPath(const QString&) = 0;
   virtual QString getCurrentPath() = 0;
   virtual bool isDir(const QModelIndex&) = 0;
-  virtual QString getFilePath(const QModelIndex&) = 0;
+  virtual QStringList getFilePaths(const QModelIndex&) = 0;
+  virtual QString getFilePath(const QString&) = 0;
   virtual QString getParentPath(const QString&) = 0;
   virtual QStringList splitPath(const QString&) = 0;
 

@@ -25,7 +25,8 @@ public:
   void setCurrentPath(const QString&);
   QString getCurrentPath();
   bool isDir(const QModelIndex&);
-  QString getFilePath(const QModelIndex&);
+  QStringList getFilePaths(const QModelIndex&);
+  QString getFilePath(const QString&);
   QString getParentPath(const QString&);
   QStringList splitPath(const QString&);
   QAbstractItemModel* fileModel();

@@ -242,7 +242,7 @@ void pqMainWindow::onServerDisconnect()
 
 void pqMainWindow::onDebugOpenLocalFiles()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Local File (does nothing):"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onDebugOpenLocalFiles(const QStringList&)));
   file_dialog->show();
 }

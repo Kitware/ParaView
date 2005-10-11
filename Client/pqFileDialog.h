@@ -42,6 +42,7 @@ private:
 private slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);
   void onActivated(const QModelIndex&);
+  void onManualEntry(const QString&);
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown();
