@@ -65,13 +65,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define VTK_KW_SFLMGR_LABEL_PATTERN "%d x %d"
 #define VTK_KW_SFLMGR_HELP_PATTERN "Set window layout to %d column(s) by %d row(s)"
 #define VTK_KW_SFLMGR_ICON_PATTERN "KWWindowLayout%dx%d"
-#define VTK_KW_SFLMGR_ICON_SELECTED_PATTERN "KWWindowLayout%dx%dc"
 #define VTK_KW_SFLMGR_RESOLUTIONS {{ 1, 1}, { 1, 2}, { 2, 1}, { 2, 2}, { 2, 3}, { 3, 2}}
 #define VTK_KW_SFLMGR_MAX_SIZE 100
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.43");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.44");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -555,17 +554,6 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
-    "KWWindowLayout1x1c",
-    NULL,
-    NULL,
-    image_KWWindowLayout1x1c, 
-    image_KWWindowLayout1x1c_width, 
-    image_KWWindowLayout1x1c_height,
-    image_KWWindowLayout1x1c_pixel_size,
-    image_KWWindowLayout1x1c_length);
-
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
     "KWWindowLayout1x2",
     NULL,
     NULL,
@@ -574,17 +562,6 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x2_height,
     image_KWWindowLayout1x2_pixel_size,
     image_KWWindowLayout1x2_length);
-
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
-    "KWWindowLayout1x2c",
-    NULL,
-    NULL,
-    image_KWWindowLayout1x2c, 
-    image_KWWindowLayout1x2c_width, 
-    image_KWWindowLayout1x2c_height,
-    image_KWWindowLayout1x2c_pixel_size,
-    image_KWWindowLayout1x2c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -599,17 +576,6 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
-    "KWWindowLayout2x1c",
-    NULL,
-    NULL,
-    image_KWWindowLayout2x1c, 
-    image_KWWindowLayout2x1c_width, 
-    image_KWWindowLayout2x1c_height,
-    image_KWWindowLayout2x1c_pixel_size,
-    image_KWWindowLayout2x1c_length);
-
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
     "KWWindowLayout2x2",
     NULL,
     NULL,
@@ -618,17 +584,6 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x2_height,
     image_KWWindowLayout2x2_pixel_size,
     image_KWWindowLayout2x2_length);
-
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
-    "KWWindowLayout2x2c",
-    NULL,
-    NULL,
-    image_KWWindowLayout2x2c, 
-    image_KWWindowLayout2x2c_width, 
-    image_KWWindowLayout2x2c_height,
-    image_KWWindowLayout2x2c_pixel_size,
-    image_KWWindowLayout2x2c_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
@@ -643,17 +598,6 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
     parent->GetApplication(),
-    "KWWindowLayout2x3c",
-    NULL,
-    NULL,
-    image_KWWindowLayout2x3c, 
-    image_KWWindowLayout2x3c_width, 
-    image_KWWindowLayout2x3c_height,
-    image_KWWindowLayout2x3c_pixel_size,
-    image_KWWindowLayout2x3c_length);
-
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
     "KWWindowLayout3x2",
     NULL,
     NULL,
@@ -663,23 +607,12 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout3x2_pixel_size,
     image_KWWindowLayout3x2_length);
 
-  vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication(),
-    "KWWindowLayout3x2c",
-    NULL,
-    NULL,
-    image_KWWindowLayout3x2c, 
-    image_KWWindowLayout3x2c_width, 
-    image_KWWindowLayout3x2c_height,
-    image_KWWindowLayout3x2c_pixel_size,
-    image_KWWindowLayout3x2c_length);
-
   // Allowed resolutions
 
   vtksys_stl::string rbv(this->GetWidgetName());
   rbv += "reschoice";
 
-  char command[128], help[128], icon[128], icon_selected[128];  
+  char command[128], help[128], icon[128];  
 
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
   for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
@@ -689,14 +622,10 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
             res[idx][0], res[idx][1]);
     sprintf(icon, VTK_KW_SFLMGR_ICON_PATTERN, 
             res[idx][0], res[idx][1]);
-    sprintf(icon, VTK_KW_SFLMGR_ICON_PATTERN, 
-            res[idx][0], res[idx][1]);
-    sprintf(icon_selected, VTK_KW_SFLMGR_ICON_SELECTED_PATTERN, 
-            res[idx][0], res[idx][1]);
     int value = 
       ((res[idx][0] - 1) * VTK_KW_SFLMGR_MAX_SIZE + res[idx][1] - 1);
     this->ResolutionEntriesToolbar->AddRadioButtonImage(
-      value, icon, icon_selected, rbv.c_str(), this, command, help);
+      value, icon, icon, rbv.c_str(), this, command, help);
     }
 
   this->UpdateResolutionEntriesToolbar();
