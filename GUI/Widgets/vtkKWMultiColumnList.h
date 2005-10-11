@@ -805,6 +805,16 @@ public:
   virtual void ClearSelection();
 
   // Description:
+  // Specifies whether or not a selection in the widget should also be the X
+  // selection. If the selection is exported, then selecting in the widget
+  // deselects the current X selection, selecting outside the widget deselects
+  // any widget selection, and the widget will respond to selection retrieval
+  // requests when it has a selection.  
+  virtual void SetExportSelection(int);
+  virtual int GetExportSelection();
+  vtkBooleanMacro(ExportSelection, int);
+  
+  // Description:
   // Specifies a command to be invoked when an element is selected/deselected
   // in the widget. Re-selecting an element will trigger this command too.
   // If one want to be notified only when the selection has *changed* (the
