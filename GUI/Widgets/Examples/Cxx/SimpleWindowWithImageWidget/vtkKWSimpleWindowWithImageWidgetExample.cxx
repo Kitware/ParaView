@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.8");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.9");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -174,6 +174,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create(app);
+  this->WindowLevelPresetSelector->ThumbnailColumnVisibilityOn();
   this->WindowLevelPresetSelector->SetPresetAddCommand(
     this, "WindowLevelPresetAddCallback");
   this->WindowLevelPresetSelector->SetPresetApplyCommand(
