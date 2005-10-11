@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.29");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -120,6 +120,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   this->SetReliefToSunken();
   this->SetBorderWidth(2);
   this->SetRowSpacing(2);
+  this->ExportSelectionOff();
 
   this->SetConfigurationOption("-activestyle", "none");
 
@@ -2713,6 +2714,18 @@ void vtkKWMultiColumnList::ClearSelection()
     this->Script("%s selection clear 0 end", this->GetWidgetName());
     this->SelectionCallback();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetExportSelection(int arg)
+{
+  this->SetConfigurationOptionAsInt("-exportselection", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetExportSelection()
+{
+  return this->GetConfigurationOptionAsInt("-exportselection");
 }
 
 //----------------------------------------------------------------------------
