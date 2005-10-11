@@ -54,7 +54,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.62");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.63");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -78,16 +78,11 @@ vtkKWToolbar::vtkKWToolbar()
   this->Resizable                 = 0;
   this->Expanding                 = 0;
 
-  this->WidgetsFlatAdditionalPadX = 1;
+  this->WidgetsFlatAdditionalPadX = 0;
   this->WidgetsFlatAdditionalPadY = 0;
 
-#if defined(WIN32)
-  this->WidgetsPadX = 0;
-  this->WidgetsPadY = 0;
-#else
   this->WidgetsPadX = 1;
   this->WidgetsPadY = 1;
-#endif
 
   // This widget is used to keep track of default options
 
@@ -586,13 +581,21 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
                             this->WidgetsFlatAdditionalPadY : 0))
           << endl;
         num++;
-        if ( num == numPerRow ) 
+        if (num == numPerRow) 
           { 
           row++; 
-          num=0;
+          num = 0;
           }
         }
       }
+
+    while (row >= 0)
+      {
+      s << "grid rowconfigure " << this->GetFrame()->GetWidgetName() 
+        << " "<< row << " -weight 1 " << endl;
+      --row;
+      }
+
     s << ends;
     this->Script(s.str());
     s.rdbuf()->freeze(0);
@@ -641,8 +644,12 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     << " -pady "
     << (this->WidgetsPadY + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadY : 0))
-    << ends;
+    << endl;
 
+  s << "grid rowconfigure " << this->GetFrame()->GetWidgetName() 
+    << " 0 -weight 1 " << endl;
+
+  s << ends;
   this->Script(s.str());
   s.rdbuf()->freeze(0);
 }
