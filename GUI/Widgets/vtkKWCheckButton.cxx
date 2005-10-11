@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.43");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -217,6 +217,34 @@ int vtkKWCheckButton::GetAnchor()
 {
   return vtkKWTkOptions::GetAnchorFromTkOptionValue(
     this->GetConfigurationOption("-anchor"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetOffRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-offrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetOffRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-offrelief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetOverRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-overrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetOverRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-overrelief"));
 }
 
 //----------------------------------------------------------------------------

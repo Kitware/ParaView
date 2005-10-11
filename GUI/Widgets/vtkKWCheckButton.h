@@ -95,6 +95,57 @@ public:
     { this->SetAnchor(vtkKWTkOptions::AnchorCenter); };
 
   // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // Specifies the relief for the button when the indicator is not drawn 
+  // (i.e. IndicatorVisibility is Off) and the button is not selected. 
+  // The default value is Raised.  By setting this option to Flat and setting
+  // IndicatorVisibility to Off and OverRelief to Raised or Flat, the effect
+  // is achieved  of having a flat button that raises on mouse-over and which
+  // is depressed when activated. This is the behavior typically exhibited by
+  // the Bold, Italic, and Underline checkbuttons on the toolbar of a 
+  // word-processor, for example. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetOffRelief(int);
+  virtual int GetOffRelief();
+  virtual void SetOffReliefToRaised() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefRaised); };
+  virtual void SetOffReliefToSunken() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefSunken); };
+  virtual void SetOffReliefToFlat() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefFlat); };
+  virtual void SetOffReliefToRidge() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefRidge); };
+  virtual void SetOffReliefToSolid() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefSolid); };
+  virtual void SetOffReliefToGroove() 
+    { this->SetOffRelief(vtkKWTkOptions::ReliefGroove); };
+
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // Specifies an alternative relief for the button, to be used when the mouse
+  // cursor is over the widget. This option can be used to make toolbar 
+  // buttons, by configuring SetRelief to Flat and OverRelief to Raised.
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // If the value of this option is None, then no alternative relief is used
+  // when the mouse cursor is over the checkbutton. 
+  virtual void SetOverRelief(int);
+  virtual int GetOverRelief();
+  virtual void SetOverReliefToRaised() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefRaised); };
+  virtual void SetOverReliefToSunken() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefSunken); };
+  virtual void SetOverReliefToFlat() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefFlat); };
+  virtual void SetOverReliefToRidge() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefRidge); };
+  virtual void SetOverReliefToSolid() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefSolid); };
+  virtual void SetOverReliefToGroove() 
+    { this->SetOverRelief(vtkKWTkOptions::ReliefGroove); };
+  virtual void SetOverReliefToNone()
+    { this->SetOverRelief(vtkKWTkOptions::ReliefUnknown); };
+
+  // Description:
   // Specifies an image to display in the widget. Typically, if the image
   // is specified then it overrides other options that specify a bitmap or
   // textual value to display in the widget. Invoke vtkKWWidget's 

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.26");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -93,6 +93,20 @@ void vtkKWPushButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
     "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetOverRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-overrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetOverRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-overrelief"));
 }
 
 //----------------------------------------------------------------------------
