@@ -334,6 +334,65 @@ static const unsigned char image_point_finger[] =
 
 /* 
  * Resource generated for file:
+ *    preset_add.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_add_width          = 16;
+static const unsigned int  image_preset_add_height         = 16;
+static const unsigned int  image_preset_add_pixel_size     = 4;
+static const unsigned long image_preset_add_length         = 144;
+static const unsigned long image_preset_add_decoded_length = 1024;
+
+static const unsigned char image_preset_add[] = 
+  "eNq1ktkNgDAMQxk967EMK5hDIJngHEUQyepH8lwrLYAJpK0QCW5W6Zx7VNcj4+l8zVceVf"
+  "5qHxGv/MwMX/Ei2zCPZT40wt/uJL7KwfzFeVHGX/ksv5/xvWh/e6+j6P3U3+hIeWdaAbSb"
+  "xmo=";
+
+/* 
+ * Resource generated for file:
+ *    preset_apply.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_apply_width          = 16;
+static const unsigned int  image_preset_apply_height         = 16;
+static const unsigned int  image_preset_apply_pixel_size     = 4;
+static const unsigned long image_preset_apply_length         = 140;
+static const unsigned long image_preset_apply_decoded_length = 1024;
+
+static const unsigned char image_preset_apply[] = 
+  "eNq1k1EKwDAIQ3d0r7fL9ArZGBMk05oWJgR/8mwUCuBA0F2oBPJmen2fUmfM+NC3+W5Gl7"
+  "+7R8Vn88wMf/Ih5zL/9HFGn8w7q/B8y8iqvPtUNuNZnC+T71+9q4j3ru6q/r1V9gI8q8Sz";
+
+/* 
+ * Resource generated for file:
+ *    preset_delete.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_delete_width          = 16;
+static const unsigned int  image_preset_delete_height         = 16;
+static const unsigned int  image_preset_delete_pixel_size     = 4;
+static const unsigned long image_preset_delete_length         = 144;
+static const unsigned long image_preset_delete_decoded_length = 1024;
+
+static const unsigned char image_preset_delete[] = 
+  "eNqlk9ENACEIQx2d9VzmVqiamAvhLCUeScMPryAqgAanGWBCqD1p132i6pHxLl/zykPNr/"
+  "bB+JOfmYHtvspn95V5eR5Pp3JzXvfP+Hdnu1fMq+Yvr/aveHGu0vxM6s/FN8KkejANjY6W"
+  "aQ==";
+
+/* 
+ * Resource generated for file:
+ *    preset_update.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_update_width          = 16;
+static const unsigned int  image_preset_update_height         = 16;
+static const unsigned int  image_preset_update_pixel_size     = 4;
+static const unsigned long image_preset_update_length         = 144;
+static const unsigned long image_preset_update_decoded_length = 1024;
+
+static const unsigned char image_preset_update[] = 
+  "eNqtUoEJwCAM8/S+5zN7IRuiUDRNRVcIIiRNrAVQ4PAVImDiMnTeUrs9lN6dx/qsR5Y/m0"
+  "ekZ/3MDLd69V8up/RvnKdSOJ7MH/XY0d/4K+2f/myu6v3jPngRlr8nnmxP1P7OuZT+BdoR"
+  "yLk=";
+
+/* 
+ * Resource generated for file:
  *    question.png (zlib, base64) (image file)
  */
 static const unsigned int  image_question_width          = 32;

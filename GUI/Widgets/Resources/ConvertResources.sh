@@ -38,6 +38,10 @@ KWConvertImageToHeader --zlib --base64 \
     move_v.png \
     plus.png \
     point_finger.png \
+    preset_add.png \
+    preset_apply.png \
+    preset_delete.png \
+    preset_update.png \
     question.png \
     reload.png \
     shrink.png \
