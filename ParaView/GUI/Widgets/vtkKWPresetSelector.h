@@ -271,7 +271,7 @@ public:
   // is then free to update the preset's fields independently (using the
   // SetPresetGroup(), SetPresetComment(), SetPreset...() methods).
   // The id of the preset to update is passed to the command.
-  // Note that if not set, the "update select preset" button is not visible.
+  // Note that if not set, the "update selected preset" button is not visible.
   virtual void SetPresetUpdateCommand(vtkObject* object, const char *method);
 
   // Description:
@@ -282,6 +282,8 @@ public:
   // GetPresetGroup(), GetPresetComment(), GetPreset...() methods) and
   // apply those values to the relevant objects.
   // The id of the preset to apply is passed to the command.
+  // Note that if not set or ApplyPresetOnSelection is On, the 
+  // "apply selected preset" button is not visible.
   virtual void SetPresetApplyCommand(vtkObject* object, const char *method);
 
   // Description:
@@ -289,6 +291,7 @@ public:
   // single-click, or only when the "apply selected preset" button is pressed.
   // If set, only one preset can be selected at a time (if not, multiple
   // preset can be selected, and removed for example).
+  // Note that if set, the "apply selected preset" button is not visible.
   virtual void SetApplyPresetOnSelection(int);
   vtkGetMacro(ApplyPresetOnSelection,int);
   vtkBooleanMacro(ApplyPresetOnSelection,int);
@@ -342,6 +345,7 @@ public:
   // Description:
   // Callbacks
   virtual void PresetAddCallback();
+  virtual void PresetApplyCallback();
   virtual void PresetUpdateCallback();
   virtual void PresetRemoveCallback();
   virtual void PresetSelectionCallback();
