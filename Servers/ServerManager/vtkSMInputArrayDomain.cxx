@@ -14,18 +14,18 @@
 =========================================================================*/
 #include "vtkSMInputArrayDomain.h"
 
-#include "vtkDataSet.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.9");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -158,16 +158,16 @@ int vtkSMInputArrayDomain::IsFieldValid(
   int attributeType = this->AttributeType;
   if (!bypass)
     {
-    vtkSMIntVectorProperty* fds = vtkSMIntVectorProperty::SafeDownCast(
+    vtkSMStringVectorProperty* fds = vtkSMStringVectorProperty::SafeDownCast(
       this->GetRequiredProperty("FieldDataSelection"));
     if (fds)
       {
-      int val = fds->GetUncheckedElement(0);
-      if (val == vtkDataSet::POINT_DATA_FIELD)
+      int val = atoi(fds->GetUncheckedElement(3));
+      if (val == vtkDataObject::FIELD_ASSOCIATION_POINTS)
         {
         attributeType = vtkSMInputArrayDomain::POINT;
         }
-      else if (val == vtkDataSet::CELL_DATA_FIELD)
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_CELLS)
         {
         attributeType = vtkSMInputArrayDomain::CELL;
         }

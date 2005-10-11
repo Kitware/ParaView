@@ -30,14 +30,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSource.h"
 #include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.30");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.31");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -196,12 +195,12 @@ void vtkPVFieldMenu::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::ResetInternal()
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
-  if (ivp)
+  if (svp)
     {
-    this->SetValue(ivp->GetElement(0));
+    this->SetValue(atoi(svp->GetElement(3)));
     }
 
   this->ModifiedFlag = 0;
@@ -214,13 +213,16 @@ void vtkPVFieldMenu::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::UpdateProperty()
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
-  if (ivp)
+  if (svp)
     {
-    ivp->SetUncheckedElement(0, this->Value);
-    ivp->UpdateDependentDomains();
+    ostrstream currentValue;
+    currentValue << this->Value << ends;
+    svp->SetUncheckedElement(3, currentValue.str());
+    delete [] currentValue.str();
+    svp->UpdateDependentDomains();
     }
 }
 
