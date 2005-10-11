@@ -90,7 +90,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.28");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.29");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -577,7 +577,7 @@ void vtkIceTRenderManager::SetSortingKdTree(vtkPKdTree *tree)
 
   if (!this->RenderWindow)
     {
-    vtkErrorMacro("Must set the render window and its renderers before calling SetComposeOperation.");
+    vtkErrorMacro("Must set the render window and its renderers before calling SetSortingKdTree.");
     return;
     }
 
