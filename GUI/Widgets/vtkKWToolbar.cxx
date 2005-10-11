@@ -16,6 +16,8 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWRadioButton.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWCheckButton.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/list>
@@ -52,7 +54,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.61");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.62");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -474,79 +476,56 @@ void vtkKWToolbar::UpdateWidgetsAspect()
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
-    // Change the relief of buttons (let's say that everything that
-    // has a -command will qualify, -state could have been used, or
-    // a match on the widget type, etc).
-
-    vtkKWCoreWidget *core = vtkKWCoreWidget::SafeDownCast(*it);
-    if (core && core->HasConfigurationOption("-command"))
+    vtkKWPushButton *pb = vtkKWPushButton::SafeDownCast(*it);
+    vtkKWCheckButton *cb = vtkKWCheckButton::SafeDownCast(*it);
+    vtkKWRadioButton *rb = vtkKWRadioButton::SafeDownCast(*it);
+    if (pb)
       {
-      int use_relief = core->HasConfigurationOption("-relief");
-      if (core->HasConfigurationOption("-indicatoron"))
+      if (this->WidgetsFlatAspect)
         {
-        use_relief = core->GetConfigurationOptionAsInt("-indicatoron");
-        }
-        
-      if (use_relief)
-        {
-        if (this->WidgetsFlatAspect)
-          {
-          core->SetReliefToFlat();
-          }
-        else
-          {
-          core->SetReliefToRaised();
-          }
+        pb->SetReliefToFlat();
+        pb->SetOverReliefToSolid();
+        pb->SetBorderWidth(1);
         }
       else
         {
-        // Can not use -relief, try to hack -bd by specifying
-        // an empty border as the negative current value (i.e.
-        // the negative value will be handled as 0, but still will enable
-        // us to retrieve the old value using abs() later on).
-
-        if (core->HasConfigurationOption("-bd"))
-          {
-          int bd = core->GetConfigurationOptionAsInt("-bd");
-          core->SetConfigurationOptionAsInt(
-            "-bd", this->WidgetsFlatAspect ? -abs(bd) : abs(bd));
-          }
+        pb->SetReliefToRaised();
+        pb->SetOverReliefToNone();
+        pb->SetBorderWidth(1);
         }
-
-      // If radiobutton, remove the select color border in flat aspect
-
-      if (core->HasConfigurationOption("-selectcolor"))
+      }
+    else if (cb)
+      {
+      if (this->WidgetsFlatAspect)
         {
-        if (this->WidgetsFlatAspect)
-          {
-          core->SetConfigurationOptionAsColor(
-            "-selectcolor", core->GetBackgroundColor());
-          }
-        else
-          {
-          core->SetConfigurationOptionAsColor(
-            "-selectcolor", 
-            this->DefaultOptionsWidget->GetConfigurationOptionAsColor(
-              "-selectcolor"));
-          }
+        cb->SetReliefToFlat();
+        cb->SetOffReliefToFlat();
+        cb->SetOverReliefToSolid();
+        cb->SetBorderWidth(1);
         }
-
-      // Do not use active background in flat mode either
-
-      if (core->HasConfigurationOption("-activebackground"))
+      else
         {
-        if (this->WidgetsFlatAspect)
-          {
-          core->SetConfigurationOptionAsColor(
-            "-activebackground", core->GetBackgroundColor());
-          }
-        else
-          {
-          core->SetConfigurationOptionAsColor(
-            "-activebackground", 
-            this->DefaultOptionsWidget->GetConfigurationOptionAsColor(
-              "-activebackground"));
-          }
+        cb->SetReliefToFlat();
+        cb->SetOffReliefToRaised();
+        cb->SetOverReliefToNone();
+        cb->SetBorderWidth(1);
+        }
+      }
+    else if (rb)
+      {
+      if (this->WidgetsFlatAspect)
+        {
+        rb->SetReliefToFlat();
+        rb->SetOffReliefToFlat();
+        rb->SetOverReliefToSolid();
+        rb->SetBorderWidth(1);
+        }
+      else
+        {
+        rb->SetReliefToFlat();
+        rb->SetOffReliefToRaised();
+        rb->SetOverReliefToNone();
+        rb->SetBorderWidth(1);
         }
       }
     }
