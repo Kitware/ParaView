@@ -37,6 +37,7 @@ KWConvertImageToHeader --zlib --base64 \
     move.png \
     move_h.png \
     move_v.png \
+    pan_hand.png \
     plus.png \
     point_finger.png \
     preset_add.png \

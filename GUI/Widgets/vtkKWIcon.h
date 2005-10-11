@@ -63,6 +63,7 @@ public:
     IconMove                      = 80,
     IconMoveH                     = 81,
     IconMoveV                     = 82,
+    IconPanHand                   = 99,
     IconPlus                      = 100,
     IconPointFinger               = 90,
     IconPresetAdd                 = 94,
