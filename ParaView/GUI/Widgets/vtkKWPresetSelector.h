@@ -140,17 +140,24 @@ public:
 
   // Description:
   // Assign an image/screenshot to a preset.
-  // The image is not stored but is used right-away to create a thumbnail
-  // icon to be displayed in the image column, and a small screenshot to
+  // The 'image' is not stored but is used right-away to create a thumbnail
+  // icon to be displayed in the thumbnail column, and a small screenshot to
   // be displayed as a pop-up when the user hovers over that thumbnail. 
-  // The thumbnail field is displayed as a column by default, but this 
+  // The thumbnail field is not displayed as a column by default, but this 
   // can be changed using the SetThumbnailColumnVisibility() method.
   // If passed a vtkRenderWindow, grabs an image of the window contents.
   // Both thumbnail and screenshot icons can be retrieved.
-  virtual int SetPresetImage(int id, vtkImageData *img);
+  virtual int SetPresetImage(int id, vtkImageData *image);
   virtual int SetPresetImageFromRenderWindow(int id, vtkRenderWindow *win);
   virtual vtkKWIcon* GetPresetThumbnail(int id);
   virtual vtkKWIcon* GetPresetScreenshot(int id);
+
+  // Description:
+  // Set/Get the visibility of the thumbnail column.
+  // No effect if called before Create().
+  virtual void SetThumbnailColumnVisibility(int);
+  virtual int GetThumbnailColumnVisibility();
+  vtkBooleanMacro(ThumbnailColumnVisibility, int);
 
   // Description:
   // Set/Get the thumbnail size.
@@ -166,13 +173,6 @@ public:
   // affect the presets added to the selector later on.
   vtkSetClampMacro(ScreenshotSize,int,8,2048);
   vtkGetMacro(ScreenshotSize,int);
-
-  // Description:
-  // Set/Get the visibility of the thumbnail column.
-  // No effect if called before Create().
-  virtual void SetThumbnailColumnVisibility(int);
-  virtual int GetThumbnailColumnVisibility();
-  vtkBooleanMacro(ThumbnailColumnVisibility, int);
 
   // Description:
   // Set/Get a preset user slot.

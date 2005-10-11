@@ -53,7 +53,7 @@ const char *vtkKWPresetSelector::CommentColumnName = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.7");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -432,6 +432,7 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnEditable(col, 0);
   list->SetColumnSortModeToReal(col);
   list->SetColumnFormatCommandToEmptyOutput(col);
+  list->ColumnVisibilityOff(col);
 
   // Group
 
@@ -1513,16 +1514,12 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
   list->SetCellText(row, this->GetIdColumnIndex(), buffer);
 
   int image_col_index = this->GetThumbnailColumnIndex();
-  if (this->GetPresetThumbnail(id))
+  list->SetCellWindowCommand(
+    row, image_col_index, this, "PresetCellThumbnailCallback");
+  list->SetCellWindowDestroyCommandToRemoveChild(row, image_col_index);
+  if (this->GetThumbnailColumnVisibility())
     {
-    list->SetCellWindowCommand(
-      row, image_col_index, this, "PresetCellThumbnailCallback");
-    list->SetCellWindowDestroyCommandToRemoveChild(row, image_col_index);
     list->RefreshCellWithWindowCommand(row, image_col_index);
-    }
-  else
-    {
-    list->SetCellWindowCommand(row, image_col_index, NULL, NULL);
     }
 
   list->SetCellTextAsDouble(
@@ -1551,38 +1548,43 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
   int id = this->GetPresetAtRowId(row);
   if (this->HasPreset(id))
     {
+    vtkKWLabel *child = vtkKWLabel::New();
+    child->SetWidgetName(widget);
+    child->SetParent(list);
+
+    vtkKWIcon *screenshot = this->GetPresetScreenshot(id);
+    if (screenshot)
+      {
+      // Create out own balloon help manager for this one, so that
+      // we can set a much shorter delay
+      vtkKWBalloonHelpManager *mgr = vtkKWBalloonHelpManager::New();
+      mgr->SetApplication(list->GetApplication());
+      child->SetBalloonHelpManager(mgr);
+      mgr->SetDelay(10);
+      mgr->Delete();
+      child->SetBalloonHelpIcon(screenshot);
+      }
+
+    child->Create(list->GetApplication());
+    child->SetBorderWidth(0);
+    child->SetHighlightThickness(0);
+    child->SetWidth(this->ThumbnailSize);
+    child->SetHeight(this->ThumbnailSize);
+    child->SetBackgroundColor(list->GetCellCurrentBackgroundColor(
+                                row, this->GetThumbnailColumnIndex()));
+
     vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
     if (thumbnail)
       {
-      vtkKWLabel *child = vtkKWLabel::New();
-      child->SetWidgetName(widget);
-      child->SetParent(list);
-
-      vtkKWIcon *screenshot = this->GetPresetScreenshot(id);
-      if (screenshot)
-        {
-        // Create out own balloon help manager for this one, so that
-        // we can set a much shorter delay
-        vtkKWBalloonHelpManager *mgr = vtkKWBalloonHelpManager::New();
-        mgr->SetApplication(list->GetApplication());
-        child->SetBalloonHelpManager(mgr);
-        mgr->SetDelay(10);
-        mgr->Delete();
-        child->SetBalloonHelpIcon(screenshot);
-        }
-
-      child->Create(list->GetApplication());
-      child->SetBorderWidth(0);
-      child->SetHighlightThickness(0);
-      child->SetWidth(this->ThumbnailSize);
-      child->SetHeight(this->ThumbnailSize);
-      child->SetBackgroundColor(list->GetCellCurrentBackgroundColor(
-                                  row, this->GetThumbnailColumnIndex()));
       child->SetImageToIcon(thumbnail);
-
-      list->AddBindingsToWidget(child);
-      child->Delete();
       }
+    else
+      {
+      child->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty1x1);
+      }
+
+    list->AddBindingsToWidget(child);
+    child->Delete();
     }
 }
 
