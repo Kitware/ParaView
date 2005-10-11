@@ -2128,7 +2128,7 @@
           </DataTypeDomain>
           <InputArrayDomain name="input_array" number_of_components="1">
              <RequiredProperties>
-                <Property name="AttributeMode" function="FieldDataSelection"/>
+                <Property name="SelectInputScalars" function="FieldDataSelection"/>
              </RequiredProperties>
           </InputArrayDomain>
      </InputProperty>
@@ -2141,7 +2141,6 @@
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
-                <Property name="AttributeMode" function="FieldDataSelection"/>
              </RequiredProperties>
            </ArrayListDomain>
            <FieldDataDomain name="field_list">

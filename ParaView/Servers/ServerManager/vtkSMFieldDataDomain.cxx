@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
@@ -119,10 +119,23 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
     if (sp)
       {
       this->Update(pp, sp);
+      return;
       }
     }
 
-
+  // In case there is no valid unchecked proxy, use the actual
+  // proxy values
+  numProxs = pp->GetNumberOfProxies();
+  for (i=0; i<numProxs; i++)
+    {
+    vtkSMSourceProxy* sp = 
+      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
+    if (sp)
+      {
+      this->Update(pp, sp);
+      return;
+      }
+    }
 }
 
 //---------------------------------------------------------------------------

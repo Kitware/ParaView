@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.80");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.81");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -324,10 +324,16 @@ void vtkPVArrayMenu::UpdateProperty()
   
   if (svp)
     {
+    if (!(this->FieldMenu && svp->GetUncheckedElement(3)))
+      {
+      // Don't reset the unchecked element if it has already been set
+      // by changing the value of the field menu on which this array menu
+      // depends. (This is used by the Threshold filter.)
+      svp->SetUncheckedElement(3, svp->GetElement(3));
+      }
     svp->SetUncheckedElement(0, this->InputAttributeIndex);
     svp->SetUncheckedElement(1, svp->GetElement(1));
     svp->SetUncheckedElement(2, svp->GetElement(2));
-    svp->SetUncheckedElement(3, svp->GetElement(3));
     svp->SetUncheckedElement(4, this->ArrayName);
     svp->UpdateDependentDomains();
     }
