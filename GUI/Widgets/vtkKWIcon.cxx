@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.16");
+vtkCxxRevisionMacro(vtkKWIcon, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -312,6 +312,38 @@ void vtkKWIcon::SetImage(int image)
         image_point_finger_width, image_point_finger_height,
         image_point_finger_pixel_size, 
         image_point_finger_length);
+      break;      
+
+    case vtkKWIcon::IconPresetAdd:
+      this->SetImage(
+        image_preset_add, 
+        image_preset_add_width, image_preset_add_height,
+        image_preset_add_pixel_size, 
+        image_preset_add_length);
+      break;      
+
+    case vtkKWIcon::IconPresetApply:
+      this->SetImage(
+        image_preset_apply, 
+        image_preset_apply_width, image_preset_apply_height,
+        image_preset_apply_pixel_size, 
+        image_preset_apply_length);
+      break;      
+
+    case vtkKWIcon::IconPresetDelete:
+      this->SetImage(
+        image_preset_delete, 
+        image_preset_delete_width, image_preset_delete_height,
+        image_preset_delete_pixel_size, 
+        image_preset_delete_length);
+      break;      
+
+    case vtkKWIcon::IconPresetUpdate:
+      this->SetImage(
+        image_preset_update, 
+        image_preset_update_width, image_preset_update_height,
+        image_preset_update_pixel_size, 
+        image_preset_update_length);
       break;      
 
     case vtkKWIcon::IconQuestion:
