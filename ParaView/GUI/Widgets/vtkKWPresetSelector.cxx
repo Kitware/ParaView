@@ -53,7 +53,7 @@ const char *vtkKWPresetSelector::CommentColumnName = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.6");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -162,7 +162,7 @@ vtkKWPresetSelector::vtkKWPresetSelector()
 
   this->ThumbnailSize = 32;
   this->ScreenshotSize = 144;
-  this->PromptBeforeRemovePreset = 0;
+  this->PromptBeforeRemovePreset = 1;
 
   this->GroupFilter = NULL;
 }
