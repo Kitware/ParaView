@@ -44,6 +44,7 @@ public:
     IconConnection                = 1,
     IconDocument                  = 9,
     IconEmpty16x16                = 6,
+    IconEmpty1x1                  = 10,
     IconError                     = 2, 
     IconErrorMini                 = 3,
     IconErrorRedMini              = 4,
