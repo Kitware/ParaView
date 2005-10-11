@@ -30,6 +30,8 @@
 
 #include <GL/ice-t.h>
 
+#include <vtkstd/algorithm>
+
 //******************************************************************
 // Prototypes
 //******************************************************************
@@ -44,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.17");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.18");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
