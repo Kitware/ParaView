@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.14");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1044,8 +1044,35 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
 }
 
 //-----------------------------------------------------------------------------
+vtkImageData* vtkSMRenderModuleProxy::CaptureWindow(int magnification)
+{
+  // I am using the vtkPVRenderView approach for saving the image.
+  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
+  this->GetRenderWindow()->SetOffScreenRendering(1);
+  this->GetRenderWindow()->SwapBuffersOff();
+  this->StillRender();
+
+  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetRenderWindow());
+  w2i->SetMagnification(magnification);
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
+  w2i->Update();
+
+  vtkImageData* capture = vtkImageData::New();
+  capture->ShallowCopy(w2i->GetOutput());
+  w2i->Delete();
+
+  this->GetRenderWindow()->SwapBuffersOn();
+  this->GetRenderWindow()->Frame();
+  this->GetRenderWindow()->SetOffScreenRendering(0);
+
+  return capture;
+}
+
+//-----------------------------------------------------------------------------
 int vtkSMRenderModuleProxy::WriteImage(const char* filename,
-  const char* writerName)
+                                       const char* writerName)
 {
   if (!filename || !writerName)
     {
@@ -1065,29 +1092,15 @@ int vtkSMRenderModuleProxy::WriteImage(const char* filename,
     object->Delete();
     return vtkErrorCode::UnknownError;
     }
- 
-  // I am using the vtkPVRenderView approach for saving the image.
-  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
-  this->GetRenderWindow()->SwapBuffersOff();
-  this->StillRender();
-  
-  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(this->GetRenderWindow());
-  w2i->ReadFrontBufferOff();
-  w2i->ShouldRerenderOff();
-  w2i->Update();
 
-  this->GetRenderWindow()->SwapBuffersOn();
-  this->GetRenderWindow()->Frame();
-  
-
-  writer->SetInput(w2i->GetOutput());
+  vtkImageData* shot = this->CaptureWindow(1);
+  writer->SetInput(shot);
   writer->SetFileName(filename);
   writer->Write();
   int error_code = writer->GetErrorCode();
 
   writer->Delete();
-  w2i->Delete();
+  shot->Delete();
   
   return error_code;
 }
