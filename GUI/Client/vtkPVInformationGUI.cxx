@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.13");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -349,6 +349,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   dataSetAttr[0] = dataInfo->GetPointDataInformation();
   dataSetAttr[1] = dataInfo->GetCellDataInformation();
   int dt;
+  this->ArrayInformationList->DeleteAllRows();
   for ( dt = 0; dt < 2; ++ dt )
     {
     vtkPVDataSetAttributesInformation* dsa = dataSetAttr[dt];
