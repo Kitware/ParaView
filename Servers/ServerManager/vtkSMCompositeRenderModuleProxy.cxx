@@ -13,20 +13,32 @@
 
 =========================================================================*/
 #include "vtkSMCompositeRenderModuleProxy.h"
-#include "vtkSMCompositeDisplayProxy.h"
-#include "vtkPVLODPartDisplayInformation.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVOptions.h"
-#include "vtkCollection.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkRenderWindow.h"
-#include "vtkPVTreeComposite.h"
+
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
+#include "vtkImageExtractComponents.h"
+#include "vtkImageWriter.h"
+#include "vtkInstantiator.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVLODPartDisplayInformation.h"
+#include "vtkPVOptions.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVTreeComposite.h"
+#include "vtkPointData.h"
+#include "vtkRenderWindow.h"
+#include "vtkSMCompositeDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkWindowToImageFilter.h"
+
+#include "vtkCamera.h"
+#include "vtkRendererCollection.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -155,8 +167,7 @@ int vtkSMCompositeRenderModuleProxy::GetLocalRenderDecision(
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (static_cast<float>(totalMemory)/1000.0 < this->GetCompositeThreshold() ||
-    ( !pm->GetOptions()->GetClientMode() &&
-      pm->GetNumberOfPartitions() < 2) )
+      (!pm->GetOptions()->GetClientMode() && pm->GetNumberOfPartitions() < 2))
     {
     return 1; // Local render.
     }
