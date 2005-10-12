@@ -46,7 +46,7 @@ const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.268");
+vtkCxxRevisionMacro(vtkKWWindow, "1.269");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -312,7 +312,7 @@ void vtkKWWindow::Pack()
 
   if (this->StatusFrame && this->StatusFrame->IsCreated())
     {
-    vtkKWWidget *in = NULL;
+    vtkKWWidget *in = this;
     switch (this->StatusFramePosition)
       {
       case vtkKWWindow::StatusFramePositionMainPanel:
@@ -324,9 +324,20 @@ void vtkKWWindow::Pack()
       case vtkKWWindow::StatusFramePositionViewPanel:
         in = this->GetViewPanelFrame();
         break;
+      case vtkKWWindow::StatusFramePositionLeftOfDivider:
+        if (this->MainSplitFrame)
+          {
+          in = this->MainSplitFrame->GetFrame1();
+          }
+        break;
+      case vtkKWWindow::StatusFramePositionRightOfDivider:
+        if (this->MainSplitFrame)
+          {
+          in = this->MainSplitFrame->GetFrame2();
+          }
+        break;
       case vtkKWWindow::StatusFramePositionWindow:
       default:
-        in = this;
         break;
       }
     if (this->StatusFrameVisibility && in && in->IsCreated())
@@ -961,9 +972,9 @@ void vtkKWWindow::SetStatusFramePosition(int s)
     {
     s = vtkKWWindow::StatusFramePositionWindow;
     }
-  else if (s > vtkKWWindow::StatusFramePositionViewPanel) 
+  else if (s > vtkKWWindow::StatusFramePositionRightOfDivider) 
     {
-    s = vtkKWWindow::StatusFramePositionViewPanel;
+    s = vtkKWWindow::StatusFramePositionRightOfDivider;
     }
   if (s == this->StatusFramePosition)
     {
