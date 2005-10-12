@@ -20,13 +20,15 @@
 #define __vtkSMRenderModuleProxy_h
 
 #include "vtkSMProxy.h"
+
+class vtkCamera;
 class vtkCollection;
+class vtkImageData;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+class vtkRenderer;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
-class vtkRenderWindowInteractor;
-class vtkRenderWindow;
-class vtkRenderer;
-class vtkCamera;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
@@ -77,7 +79,7 @@ public:
   void SetUseImmediateMode(int val);
    
   // Description:
-  // Must find a way to avoid exposing this.
+  // Access to the rendering-related objects for the GUI.
   vtkGetObjectMacro(Renderer, vtkRenderer);
   vtkGetObjectMacro(Renderer2D, vtkRenderer);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
@@ -139,8 +141,7 @@ public:
 
   // Description:
   // Generate a screenshot from the render window.
-  // Mostly here for batch mode testing.
-  int WriteImage(const char* filename, const char* writerName);
+  virtual int WriteImage(const char* filename, const char* writerName);
 
   // Description:
   // Enable/Disable the LightKit.
@@ -163,6 +164,11 @@ public:
   // Description:
   // Update all visible displays (therefore sources)
   virtual void UpdateAllDisplays();  
+
+  // Description:
+  // Returns an image data that contains a "screenshot" of the window.
+  // It is the responsibility of the caller to delete the image data.
+  virtual vtkImageData* CaptureWindow(int magnification);
 
 protected:
   vtkSMRenderModuleProxy();
