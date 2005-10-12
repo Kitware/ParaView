@@ -272,14 +272,23 @@ public:
   // Description:
   // Set the status frame position. The default position is at the
   // bottom of the window, but this object can also be displayed
-  // at the bottom of the main, secondary or view panel.
+  // at the bottom of the main panel (MainPanel), at the bottom of
+  // the secondary panel (SecondaryPanel) or at the bottom of the view panel
+  // (ViewPanel). Note that if any of the above is used, the status bar
+  // will actually be hidden if the corresponding panel visibility is changed,
+  // since the status bar is actually packed in the panel frame itself. Set
+  // the position to LeftOfDivider or RightOfDivider to place the status
+  // bar out of the panel, but either of the left or the right of the
+  // main vertical divider.
   //BTX
   enum 
   {
     StatusFramePositionWindow = 0,
     StatusFramePositionMainPanel,
     StatusFramePositionSecondaryPanel,
-    StatusFramePositionViewPanel
+    StatusFramePositionViewPanel,
+    StatusFramePositionLeftOfDivider,
+    StatusFramePositionRightOfDivider
   };
   //ETX
   vtkGetMacro(StatusFramePosition, int);
@@ -296,6 +305,12 @@ public:
   virtual void SetStatusFramePositionToViewPanel()
     { this->SetStatusFramePosition(
       vtkKWWindow::StatusFramePositionViewPanel); };
+  virtual void SetStatusFramePositionToLeftOfDivider()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionLeftOfDivider); };
+  virtual void SetStatusFramePositionToRightOfDivider()
+    { this->SetStatusFramePosition(
+      vtkKWWindow::StatusFramePositionRightOfDivider); };
 
   // Description:
   // Call render on all widgets and elements that support that functionality
