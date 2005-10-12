@@ -50,12 +50,13 @@
 #include "vtkPVAnimationScene.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.163");
+vtkCxxRevisionMacro(vtkPVProbe, "1.164");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -71,6 +72,10 @@ public:
   void SetTemporalProbeProxy(vtkSMProxy * proxy)
     {
     this->TemporalProbeProxy = proxy;
+    }
+  void SetPVProbe(vtkPVProbe *probe)
+    {
+    this->PVProbe = probe;
     }
   virtual void Execute(vtkObject * vtkNotUsed(obj), unsigned long event, void* calldata)
     {
@@ -92,15 +97,22 @@ public:
           }
         case vtkCommand::AnimationCueTickEvent:
           {
-          //Tell the proxy, to tell the TemporalProbe, to take a time sample.
+          double timestamp = 0.0;
           vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
             vtkAnimationCue::AnimationCueInfo*>(calldata);
-          vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
+          if (!PVProbe->GetSourceTimeNow(timestamp))
+            {
+            timestamp = cueInfo->AnimationTime;
+            }
+
+          vtkSMDoubleVectorProperty *prop = 
+            vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalProbeProxy->GetProperty("AnimateTick"));
           if (prop) 
             {
-            prop->SetElement(0, cueInfo->AnimationTime);
+            prop->SetElement(0, timestamp);
             }
+
           this->TemporalProbeProxy->UpdateVTKObjects();
           break;
           }
@@ -111,8 +123,10 @@ protected:
   vtkTemporalProbeFilterObserver()
     {
     this->TemporalProbeProxy = 0;
+    this->PVProbe = 0;
     }
   vtkSMProxy* TemporalProbeProxy;
+  vtkPVProbe* PVProbe;
 };
 
 //----------------------------------------------------------------------------
@@ -275,6 +289,8 @@ void vtkPVProbe::CreateProperties()
     //Register the Proxy to receive events.
     this->Observer = vtkTemporalProbeFilterObserver::New();
     this->Observer->SetTemporalProbeProxy(this->TemporalProbeProxy);
+    this->Observer->SetPVProbe(this);
+
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
     animScene->AddObserver(vtkCommand::StartAnimationCueEvent, this->Observer);
@@ -665,4 +681,40 @@ void vtkPVProbe::SaveState(ofstream* file)
     // Call accept.
     *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVProbe::GetSourceTimeNow(double &TimeNow)
+{
+  //trace backward to get the reader
+  vtkPVSource *myinput = this->GetPVInput(0);
+  vtkPVSource *pinput = myinput->GetPVInput(0);
+  while (pinput != NULL)
+    {
+    myinput = pinput;    
+    pinput = myinput->GetPVInput(0);
+    }
+
+  //get the readers time values array, and the current index into it
+  vtkSMSourceProxy *proxy = myinput->GetProxy();
+  vtkSMProperty *prop;
+  vtkSMDoubleVectorProperty* tsvProp = NULL;
+  vtkSMIntVectorProperty* tsiProp = NULL;
+  
+  prop = proxy->GetProperty("TimestepValues");
+  if (prop) tsvProp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+
+  prop = proxy->GetProperty("TimeStep");
+  if (prop) tsiProp = vtkSMIntVectorProperty::SafeDownCast(prop);
+
+  //if we've got them both, return the real time
+  if (tsvProp && tsiProp)
+    {
+    int index = tsiProp->GetElement(0);
+    double *timevalues = tsvProp->GetElements();
+    TimeNow = timevalues[index];
+    return true;
+    }
+  return false;
+
 }

@@ -66,6 +66,10 @@ public:
   // Callback for the Save as comma separated values button.
   void SaveDialogCallback();
 
+  // Description:
+  // Attempts to find the real time from the source.
+  bool GetSourceTimeNow(double &TimeNow);
+
 protected:
   vtkPVProbe();
   ~vtkPVProbe();

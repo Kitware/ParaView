@@ -80,6 +80,10 @@ public:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
+  // Description:
+  // Attempts to find the real time from the source.
+  bool GetSourceTimeNow(double &TimeNow);
+
 protected:
   vtkPVPick();
   ~vtkPVPick();

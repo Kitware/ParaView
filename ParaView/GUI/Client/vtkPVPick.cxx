@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.31");
+vtkCxxRevisionMacro(vtkPVPick, "1.32");
 
 
 //*****************************************************************************
@@ -75,6 +75,10 @@ public:
   void SetTemporalPickProxy(vtkSMProxy * proxy)
     {
     this->TemporalPickProxy = proxy;
+    }
+  void SetPVPick(vtkPVPick *pick)
+    {
+    this->PVPick = pick;
     }
   virtual void Execute(vtkObject * vtkNotUsed(obj), unsigned long event, void* calldata)
     {
@@ -95,15 +99,22 @@ public:
           }
         case vtkCommand::AnimationCueTickEvent:
           {
-          //Tell the proxy, to tell the TemporalPick, to take a time sample.
+          double timestamp = 0.0;
           vtkAnimationCue::AnimationCueInfo *cueInfo = static_cast<
             vtkAnimationCue::AnimationCueInfo*>(calldata);
-          vtkSMDoubleVectorProperty *prop = vtkSMDoubleVectorProperty::SafeDownCast(
+          if (!PVPick->GetSourceTimeNow(timestamp))
+            {
+            timestamp = cueInfo->AnimationTime;
+            }
+
+          vtkSMDoubleVectorProperty *prop = 
+            vtkSMDoubleVectorProperty::SafeDownCast(
             this->TemporalPickProxy->GetProperty("AnimateTick"));
           if (prop) 
             {
-            prop->SetElement(0, cueInfo->AnimationTime);
+            prop->SetElement(0, timestamp);
             }
+
           this->TemporalPickProxy->UpdateVTKObjects();
           break;
           }
@@ -114,8 +125,10 @@ protected:
   vtkTemporalPickObserver()
     {
     this->TemporalPickProxy = 0;
+    this->PVPick = 0;
     }
   vtkSMProxy* TemporalPickProxy;
+  vtkPVPick* PVPick;
 };
 
 
@@ -318,6 +331,8 @@ void vtkPVPick::CreateProperties()
     //Register the Proxy to receive events.
     this->Observer = vtkTemporalPickObserver::New();
     this->Observer->SetTemporalPickProxy(this->TemporalPickProxy);
+    this->Observer->SetPVPick(this);
+
     vtkPVAnimationScene *animScene = 
       this->GetPVApplication()->GetMainWindow()->GetAnimationManager()->GetAnimationScene();
     animScene->AddObserver(vtkCommand::StartAnimationCueEvent, this->Observer);
@@ -916,5 +931,41 @@ void vtkPVPick::SaveState(ofstream* file)
     // Call accept.
     *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
     }
+
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPick::GetSourceTimeNow(double &TimeNow)
+{
+  //trace backward to get the reader
+  vtkPVSource *myinput = this->GetPVInput(0);
+  vtkPVSource *pinput = myinput->GetPVInput(0);
+  while (pinput != NULL)
+    {
+    myinput = pinput;    
+    pinput = myinput->GetPVInput(0);
+    }
+
+  //get the readers time values array, and the current index into it
+  vtkSMSourceProxy *proxy = myinput->GetProxy();
+  vtkSMProperty *prop;
+  vtkSMDoubleVectorProperty* tsvProp = NULL;
+  vtkSMIntVectorProperty* tsiProp = NULL;
+  
+  prop = proxy->GetProperty("TimestepValues");
+  if (prop) tsvProp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+
+  prop = proxy->GetProperty("TimeStep");
+  if (prop) tsiProp = vtkSMIntVectorProperty::SafeDownCast(prop);
+
+  //if we've got them both, return the real time
+  if (tsvProp && tsiProp)
+    {
+    int index = tsiProp->GetElement(0);
+    double *timevalues = tsvProp->GetElements();
+    TimeNow = timevalues[index];
+    return true;
+    }
+  return false;
 
 }
