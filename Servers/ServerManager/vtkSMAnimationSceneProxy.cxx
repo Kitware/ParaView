@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.16");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -239,11 +239,15 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
   this->SaveFailed = 0;
   if (this->MovieWriter)
     {
+    vtkImageData* capture = 
+      this->RenderModuleProxy->CaptureWindow(this->Magnification);
     ostrstream str;
     str << fileRoot << "." << ext << ends;
     this->MovieWriter->SetFileName(str.str());
     str.rdbuf()->freeze(0);
+    this->MovieWriter->SetInput(capture);
     this->MovieWriter->Start();
+    capture->Delete();
     }
 
   // Play the animation.
