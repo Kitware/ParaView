@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.26");
+vtkCxxRevisionMacro(vtkPVWriter, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -105,7 +105,7 @@ int vtkPVWriter::CanWriteFile(const char* fname)
       matches = 1;
       }
     }
-
+  delete[] ext;
   return matches;
 }
 
@@ -266,7 +266,24 @@ const char* vtkPVWriter::GetExtension(vtkIdType i)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVWriter::ExtractExtension(const char* fname)
+char* vtkPVWriter::ExtractExtension(const char* fname)
 {
-  return strrchr(fname, '.');
+  const char* ext = strrchr(fname, '.');
+  if (!ext || strlen(ext) < 1)
+    {
+    return 0;
+    }
+  size_t len = strlen(ext);
+  char* copy = new char[len+1];
+  strcpy(copy, ext);
+  // Replace all spaces with \0. Extensions should not
+  // contain spaces.
+  for (size_t i=len-1; i>0; i--)
+    {
+    if (copy[i] == ' ')
+      {
+      copy[i] = '\0';
+      }
+    }
+  return copy;
 }

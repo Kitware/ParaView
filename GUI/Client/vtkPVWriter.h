@@ -115,7 +115,7 @@ protected:
   virtual int WriteOneFile(const char* fileName, vtkPVSource* pvs,
                    int numProcs, int ghostLevel);
 
-  const char* ExtractExtension(const char* fname);
+  char* ExtractExtension(const char* fname);
   
   char* InputClassName;
   char* WriterClassName;
