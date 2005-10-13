@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.83");
+vtkCxxRevisionMacro(vtkKWMenu, "1.84");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -981,14 +981,12 @@ const char* vtkKWMenu::GetItemCommand(int idx)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
 {
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
   if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
     {
     return;
     }
-  this->Script("%s entryconfigure %d -compound left -image %s -hidemargin 1", 
+  this->Script("%s entryconfigure %d -compound left -image %s -hidemargin 0", 
                this->GetWidgetName(), idx, imagename);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -998,16 +996,31 @@ void vtkKWMenu::SetItemCompoundImage(const char *label, const char *imagename)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMenu::SetItemMarginVisibility(int idx, int flag)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -hidemargin %d", 
+               this->GetWidgetName(), idx, flag ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemMarginVisibility(const char *label, int flag)
+{
+  this->SetItemMarginVisibility(this->GetIndexOfItem(label), flag);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
 {
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
   if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -accelerator {%s}", 
                this->GetWidgetName(), idx, accelerator);
-#endif
 }
 
 //----------------------------------------------------------------------------
