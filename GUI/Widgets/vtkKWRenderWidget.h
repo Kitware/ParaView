@@ -26,7 +26,6 @@
 class vtkCamera;
 class vtkCornerAnnotation;
 class vtkKWGenericRenderWindowInteractor;
-class vtkCallbackCommand;
 class vtkProp;
 class vtkRenderWindow;
 class vtkRenderer;
@@ -214,11 +213,6 @@ public:
   vtkBooleanMacro(UseContextMenu, int);
   
   // Description:
-  // Method that processes the events
-  virtual void ProcessEvent(
-    vtkObject *caller, unsigned long event, void *calldata);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -263,6 +257,14 @@ public:
   // Get memory device context (when rendering to memory)
   virtual void* GetMemoryDC();
 
+  // Description:
+  // Add all the default observers needed by that object, or remove
+  // all the observers that were added through AddCallbackCommandObserver.
+  // Subclasses can override these methods to add/remove their own default
+  // observers, but should call the superclass too.
+  virtual void AddCallbackCommandObservers();
+  virtual void RemoveCallbackCommandObservers();
+
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -297,17 +299,19 @@ protected:
   virtual void ResumeScreenRendering();
   
   // Description:
-  // Add/remove the observers.
-  virtual void AddObservers();
-  virtual void RemoveObservers();
-  vtkCallbackCommand *CallbackCommand;
-  
-  // Description:
-  // Callback commmand. Pass the parameters to the virtual ProcessEvent method
-  static void ProcessEventFunction(
-    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
+  // Get the callback command. 
+  // Subclasses can override this method to set specific flags, like
+  // the AbortFlagOnExecute flag.
+  virtual vtkCallbackCommand* GetCallbackCommand();
 
-  // Content menu
+  // Description:
+  // Processes the events that are passed through CallbackCommand (or others).
+  // Subclasses can oberride this method to process their own events, but
+  // should call the superclass too.
+  virtual void ProcessCallbackCommandEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  
+  // Context menu
 
   int UseContextMenu;
   vtkKWMenu *ContextMenu;
