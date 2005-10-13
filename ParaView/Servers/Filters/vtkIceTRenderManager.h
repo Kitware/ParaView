@@ -232,6 +232,11 @@ protected:
   virtual int ImageReduceRenderer(vtkRenderer *);
 
   // Description:
+  // Keep around the last viewports so that we can rework the tiles if they
+  // change.
+  vtkDoubleArray *LastViewports;
+
+  // Description:
   // Convenience functions for determining IceT's logical viewports for
   // physical tiles.
   void GetGlobalViewport(int viewport[4]);

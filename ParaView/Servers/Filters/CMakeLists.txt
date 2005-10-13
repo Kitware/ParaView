@@ -32,6 +32,8 @@ SET(Filters_SRCS
   vtkPVCompositeBuffer.cxx
   vtkPVCompositeUtilities.cxx
   vtkPVConnectivityFilter.cxx
+  vtkPVDesktopDeliveryClient.cxx
+  vtkPVDesktopDeliveryServer.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx

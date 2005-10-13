@@ -1,0 +1,190 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVDesktopDeliveryServer.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkPVDesktopDeliveryServer - An object for remote rendering.
+//
+// .SECTION Description
+// The two vtkDesktopDelivery objects (vtkDesktopDeliveryClient and
+// vtkPVDesktopDeliveryServer) work together to enable interactive viewing of
+// remotely rendered data.  The server attaches itself to a vtkRenderWindow
+// and, optionally, another vtkParallelRenderManager.  Whenever a new
+// rendering is requested, the client alerts the server, the server renders
+// a new frame, and ships the image back to the client, which will display
+// the image in the vtkRenderWindow.
+//
+// .SECTION note
+//
+// .SECTION see also
+// vtkDesktopDeliveryClient vtkMultiProcessController vtkRenderWindow
+// vtkParallelRenderManager
+
+#ifndef __vtkPVDesktopDeliveryServer_h
+#define __vtkPVDesktopDeliveryServer_h
+
+#include "vtkParallelRenderManager.h"
+
+class vtkPVDesktopDeliveryServerRendererMap;
+
+class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkParallelRenderManager
+{
+public:
+  vtkTypeRevisionMacro(vtkPVDesktopDeliveryServer, vtkParallelRenderManager);
+  virtual void PrintSelf(ostream &os, vtkIndent indent);
+
+  static vtkPVDesktopDeliveryServer *New();
+
+  // Description:
+  // Set/Get the controller that is attached to a vtkDesktopDeliveryClient.
+  // This object will assume that the controller has two processors, and
+  // that the controller on the opposite side of the controller has been
+  // given to the server object.
+  virtual void SetController(vtkMultiProcessController *controller);
+
+  // Description:
+  // Set/Get a parallel render manager that is used for parallel rendering.
+  // If not set or set to NULL, rendering is done on the render window
+  // directly in single process mode.  It will be assumed that the
+  // ParallelRenderManager will have the final image stored at the local
+  // processes.
+  virtual void SetParallelRenderManager(vtkParallelRenderManager *prm);
+  vtkGetObjectMacro(ParallelRenderManager, vtkParallelRenderManager);
+
+  virtual void SetRenderWindow(vtkRenderWindow *renWin);
+
+  // Description:
+  // If on (the default) locally rendered images will be shipped back to
+  // the client.  To facilitate this, the local rendering windows will be
+  // resized based on the remote window settings.  If off, the images are
+  // assumed to be displayed locally.  The render window maintains its
+  // current size.
+  virtual void SetRemoteDisplay(int);
+  vtkGetMacro(RemoteDisplay, int);
+  vtkBooleanMacro(RemoteDisplay, int);
+
+  // Description:
+  // Because the client may have many vtkPVDesktopDeliveryClient objects
+  // attached to many render windows, separate renderers by the id associated
+  // with the same id on the client side.
+  virtual void AddRenderer(vtkRenderer *ren) { this->AddRenderer(0, ren); }
+  virtual void RemoveRenderer(vtkRenderer *ren) { this->RemoveRenderer(0,ren); }
+  virtual void RemoveAllRenderers() { this->RemoveAllRenderers(0); }
+  virtual void AddRenderer(int id, vtkRenderer *ren);
+  virtual void RemoveRenderer(int id, vtkRenderer *ren);
+  virtual void RemoveAllRenderers(int id);
+
+  virtual void InitializeRMIs();
+
+  // Description:
+  // DO NOT USE.  FOR INTERNAL USE ONLY.
+  virtual void UseRendererSet(int id);
+
+//BTX
+
+  enum Tags {
+    IMAGE_TAG=12433,
+    IMAGE_SIZE_TAG=12434,
+    REMOTE_DISPLAY_TAG=834340,
+    TIMING_METRICS_TAG=834341,
+    SQUIRT_OPTIONS_TAG=834342,
+    IMAGE_PARAMS_TAG=834343,
+    WINDOW_ID_RMI_TAG=502382,
+    WINDOW_GEOMETRY_TAG=502383
+  };
+
+  struct TimingMetrics {
+    double ImageProcessingTime;
+  };
+
+  struct WindowGeometry {
+    int Position[2];
+    int GUISize[2];
+    int Id;
+  };
+
+  struct SquirtOptions {
+    int Enabled;
+    int CompressLevel;
+  };
+
+  struct ImageParams {
+    int RemoteDisplay;
+    int SquirtCompressed;
+    int NumberOfComponents;
+    int BufferSize;
+    int ImageSize[2];
+  };
+
+  enum TimingMetricSize {
+    TIMING_METRICS_SIZE=sizeof(struct TimingMetrics)/sizeof(double)
+  };
+  enum WindowGeometrySize {
+    WINDOW_GEOMETRY_SIZE=sizeof(struct WindowGeometry)/sizeof(int)
+  };
+  enum SquirtOptionSize {
+    SQUIRT_OPTIONS_SIZE=sizeof(struct SquirtOptions)/sizeof(int)
+  };
+  enum ImageParamsSize {
+    IMAGE_PARAMS_SIZE=sizeof(struct ImageParams)/sizeof(int)
+  };
+
+//ETX
+  
+protected:
+  vtkPVDesktopDeliveryServer();
+  virtual ~vtkPVDesktopDeliveryServer();
+
+  virtual void PreRenderProcessing();
+  virtual void PostRenderProcessing();
+  virtual void LocalComputeVisiblePropBounds(vtkRenderer *, double bounds[6]);
+
+  vtkParallelRenderManager *ParallelRenderManager;
+
+  unsigned long StartParallelRenderTag;
+  unsigned long EndParallelRenderTag;
+
+  unsigned long ReceiveWindowIdTag;
+
+  virtual void SetRenderWindowSize();
+
+  virtual void ReadReducedImage();
+
+  virtual void ReceiveWindowInformation();
+  virtual void ReceiveRendererInformation(vtkRenderer *);
+
+  int Squirt;
+  int SquirtCompressionLevel;
+  void SquirtCompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
+
+  int RemoteDisplay;
+
+  vtkUnsignedCharArray *SquirtBuffer;
+
+  vtkPVDesktopDeliveryServerRendererMap *RendererMap;
+
+  int ClientWindowPosition[2];
+  int ClientWindowSize[2];
+  int ClientRequestedImageSize[2];
+  int ClientGUISize[2];
+
+  int ImageResized;
+
+  vtkUnsignedCharArray *SendImageBuffer;
+
+private:
+  vtkPVDesktopDeliveryServer(const vtkPVDesktopDeliveryServer &); //Not implemented
+  void operator=(const vtkPVDesktopDeliveryServer &);    //Not implemented
+};
+
+#endif
+
