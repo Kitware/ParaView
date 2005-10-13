@@ -25,4 +25,13 @@ SUBDIRS(
   ParaView
   Client
 )
+#########################################################################
+# Configure Testing
+OPTION(BUILD_TESTING "Build ParaQ Testing" ON)
+IF(BUILD_TESTING)
+  MAKE_DIRECTORY(${ParaView_BINARY_DIR}/Testing/Temporary)
+  ENABLE_TESTING()
+  SET(DART_ROOT "" CACHE INTERNAL "" FORCE)
+  INCLUDE (Dart)
+ENDIF(BUILD_TESTING)
 
