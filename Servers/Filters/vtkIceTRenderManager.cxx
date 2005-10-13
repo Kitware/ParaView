@@ -19,6 +19,7 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
+#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIceTContext.h"
 #include "vtkIceTRenderManager.h"
@@ -90,7 +91,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.29");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.30");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -111,6 +112,10 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->ReducedImageSharesData = 0;
 
   this->TileViewportTransform = NULL;
+
+  this->LastViewports = vtkDoubleArray::New();
+  this->LastViewports->SetNumberOfComponents(4);
+  this->LastViewports->SetNumberOfTuples(0);
 
   vtkCallbackCommand *cbc = vtkCallbackCommand::New();
   cbc->SetClientData(this);
@@ -141,6 +146,7 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
 
   this->RecordIceTImageCallback->Delete();
   this->FixRenderWindowCallback->Delete();
+  this->LastViewports->Delete();
 }
 
 //-------------------------------------------------------------------------
@@ -906,7 +912,9 @@ void vtkIceTRenderManager::PreRenderProcessing()
   vtkDebugMacro("PreRenderProcessing");
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens = renWin->GetRenderers();
+  vtkCollectionSimpleIterator cookie;
   vtkRenderer* ren;
+  int i;
 
   // Normally if this->UseCompositing was false, we would return here.  But
   // if we did that, the tile display would become invalid.  Instead, in
@@ -915,6 +923,30 @@ void vtkIceTRenderManager::PreRenderProcessing()
   // process render its local tile (if any).  The only real overhead is an
   // unnecessary frame buffer read back by ICE-T.  If that's a problem, we
   // could always add a special case to ICE-T...
+
+  // Make sure the viewports have not changed.
+  if (this->LastViewports->GetNumberOfTuples() != rens->GetNumberOfItems())
+    {
+    this->LastViewports->SetNumberOfTuples(rens->GetNumberOfItems());
+    this->TilesDirty = 1;
+    }
+  if (!this->TilesDirty)
+    {
+    for (rens->InitTraversal(cookie), i = 0;
+         (ren = rens->GetNextRenderer(cookie)) != NULL; i++)
+      {
+      double *lastViewport, *viewport;
+      lastViewport = this->LastViewports->GetTuple(i);
+      viewport = ren->GetViewport();
+      if (   (lastViewport[0] != viewport[0])
+          || (lastViewport[1] != viewport[1])
+          || (lastViewport[2] != viewport[2])
+          || (lastViewport[3] != viewport[3]) )
+        {
+        this->TilesDirty = 1;
+        }
+      }
+    }
 
   this->UpdateIceTContext();
 
@@ -926,10 +958,11 @@ void vtkIceTRenderManager::PreRenderProcessing()
 
   int foundIceTRenderer = 0;
 
-  vtkCollectionSimpleIterator cookie;
-  rens->InitTraversal(cookie);
-  while ((ren = rens->GetNextRenderer(cookie)) != NULL)
+  for (rens->InitTraversal(cookie), i = 0;
+       (ren = rens->GetNextRenderer(cookie)) != NULL; i++)
     {
+    this->LastViewports->SetTuple(i, ren->GetViewport());
+
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
     if (icetRen == NULL)
       {
@@ -949,16 +982,6 @@ void vtkIceTRenderManager::PreRenderProcessing()
       }
 
     icetRen->SetComposeNextFrame(1);
-
-    if (this->ImageReductionFactor > 1)
-      {
-      // Restore viewports.  ICE-T will handle reduced images better on its own.
-      double *viewport = ren->GetViewport();
-      ren->SetViewport(viewport[0]*this->ImageReductionFactor,
-                       viewport[1]*this->ImageReductionFactor,
-                       viewport[2]*this->ImageReductionFactor,
-                       viewport[3]*this->ImageReductionFactor);
-      }
     }
 
   if (!foundIceTRenderer)
