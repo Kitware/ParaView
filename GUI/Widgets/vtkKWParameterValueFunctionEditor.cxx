@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.69");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.70");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1445,36 +1445,23 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     this->HistogramLogModeOptionMenu->SetBalloonHelpString(
       "Change the histogram mode from log to linear.");
 
-    vtkKWIcon *icon = vtkKWIcon::New();
     vtksys_stl::string img_name;
 
-    icon->SetImage(vtkKWIcon::IconGridLinear);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img0";
-    vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
-                                  img_name.c_str(), 
-                                  icon->GetData(),
-                                  icon->GetWidth(),
-                                  icon->GetHeight(),
-                                  icon->GetPixelSize());
- 
+    vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
+      this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLinear);
+    
     this->HistogramLogModeOptionMenu->AddRadioButtonImage(
       img_name.c_str(), this, "HistogramLogModeCallback 0");
 
-    icon->SetImage(vtkKWIcon::IconGridLog);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img1";
-    vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
-                                  img_name.c_str(), 
-                                  icon->GetData(),
-                                  icon->GetWidth(),
-                                  icon->GetHeight(),
-                                  icon->GetPixelSize());
+    vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
+      this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLog);
  
     this->HistogramLogModeOptionMenu->AddRadioButtonImage(
       img_name.c_str(), this, "HistogramLogModeCallback 1");
-
-    icon->Delete();
 
     this->UpdateHistogramLogModeOptionMenu();
     }
