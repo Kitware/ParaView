@@ -458,6 +458,25 @@ static const unsigned char image_reload[] =
 
 /* 
  * Resource generated for file:
+ *    rotate.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_rotate_width          = 16;
+static const unsigned int  image_rotate_height         = 16;
+static const unsigned int  image_rotate_pixel_size     = 4;
+static const unsigned long image_rotate_length         = 436;
+static const unsigned long image_rotate_decoded_length = 1024;
+
+static const unsigned char image_rotate[] = 
+  "eNql07suBFEcx3FjDCvu67IhCNbuikSjoVKpFKIThWK3VtAq8QC8gJBsJ9lCq3IpXKIQcX"
+  "kBD4AHOL5Hfpv8nazYxCSf3WTm/Ob8Z/7/cc41uH+q4yhiB7vYkxziOvPncMYJ+pEy+THM"
+  "ohFRkL8w2XvMYCjIP+AdI2gO8pfKfuq/hD5Tf1Hn9zGKthr5CtZ0jztkkCh/qr3nlE8F+V"
+  "UM6xkPtdeC30d5n73GFNJ6B/ZI0KG6lpRf92uV9z+3yGtdeETmvS6a/IDyj3hRvv2PXpZM"
+  "PqN8WedW0Fmjf2EvP1DwM6B8QflX1ZD8kt3SuiOt61I+xoau+edY1gxU6+jGga4/2z6Z+W"
+  "nBppmzJ1yZ2XHq0Tyyfu9g/v1erbr3sfrxhhucYRvTmEAPmr4b9/P7iVRHr+rL6jubxDgG"
+  "1Z+4GvgCK2yfGQ==";
+
+/* 
+ * Resource generated for file:
  *    shrink.png (zlib, base64) (image file)
  */
 static const unsigned int  image_shrink_width          = 10;

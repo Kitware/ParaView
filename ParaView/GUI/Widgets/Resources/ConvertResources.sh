@@ -40,6 +40,7 @@ KWConvertImageToHeader --zlib --base64 \
     preset_update.png \
     question.png \
     reload.png \
+    rotate.png \
     shrink.png \
     stopwatch.png \
     transport_beginning.png \
