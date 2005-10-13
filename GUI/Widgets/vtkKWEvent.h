@@ -85,6 +85,7 @@ public:
     ImageScaleBarVisibilityChangedEvent,
     ImageSliceChangedEvent,
     ImageZoomFactorChangedEvent,
+    InteractionModeChangedEvent,
     InteractiveRenderStartEvent,
     LeftMouseOptionChangedEvent,
     LightActiveChangedEvent,
