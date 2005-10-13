@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.65");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.66");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -262,13 +262,9 @@ void vtkKWChangeColorButton::UpdateColorButton()
     }
   else
     {
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 3)
-    this->ColorButton->SetBackgroundColor(0.5, 0.5, 0.5);
-#else
     this->ColorButton->SetBackgroundColor(
       vtkKWTkUtilities::GetOptionColor(
         this->ColorButton, "-disabledforeground"));
-#endif   
     }
 }
 
