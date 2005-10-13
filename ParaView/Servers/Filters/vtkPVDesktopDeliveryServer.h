@@ -15,19 +15,18 @@
 // .NAME vtkPVDesktopDeliveryServer - An object for remote rendering.
 //
 // .SECTION Description
-// The two vtkDesktopDelivery objects (vtkDesktopDeliveryClient and
-// vtkPVDesktopDeliveryServer) work together to enable interactive viewing of
-// remotely rendered data.  The server attaches itself to a vtkRenderWindow
-// and, optionally, another vtkParallelRenderManager.  Whenever a new
-// rendering is requested, the client alerts the server, the server renders
-// a new frame, and ships the image back to the client, which will display
-// the image in the vtkRenderWindow.
 //
-// .SECTION note
+// The two vtkPVDesktopDelivery objects (vtkPVDesktopDeliveryClient and
+// vtkPVDesktopDeliveryServer) work together to enable interactive viewing of
+// remotely rendered data.  On the client side, there may be multiple render
+// windows arranged in a GUI, each having its own vtkPVDesktopDeliveryClient
+// object attached.  The server has a single render window and
+// vtkPVDesktopDeliveryServer.  All the vtkPVDesktopDeliveryClient objects
+// connect to a single vtkPVDesktopDeliveryServer object.
 //
 // .SECTION see also
-// vtkDesktopDeliveryClient vtkMultiProcessController vtkRenderWindow
-// vtkParallelRenderManager
+// vtkPVDesktopDeliveryClient
+//
 
 #ifndef __vtkPVDesktopDeliveryServer_h
 #define __vtkPVDesktopDeliveryServer_h
