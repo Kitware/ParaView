@@ -72,6 +72,7 @@ public:
     IconPresetUpdate              = 97,
     IconQuestion                  = 101,
     IconReload                    = 102,
+    IconRotate                    = 105,
     IconShrink                    = 103,
     IconStopwatch                 = 104,
     IconTransportBeginning        = 120,

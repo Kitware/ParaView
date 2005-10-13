@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.19");
+vtkCxxRevisionMacro(vtkKWIcon, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -376,6 +376,14 @@ void vtkKWIcon::SetImage(int image)
         image_reload_width, image_reload_height,
         image_reload_pixel_size, 
         image_reload_length);
+      break;
+
+    case vtkKWIcon::IconRotate:
+      this->SetImage(
+        image_rotate, 
+        image_rotate_width, image_rotate_height,
+        image_rotate_pixel_size, 
+        image_rotate_length);
       break;
 
     case vtkKWIcon::IconShrink:
