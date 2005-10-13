@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.2");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void vtkSMIceTMultiDisplayProxy::PrintSelf(ostream &os, vtkIndent indent)
 
 void vtkSMIceTMultiDisplayProxy::CreateVTKObjects(int numObjects)
 {
-  if (this->ObjectsCreated || !this->CanCreateProxy)
+  if (this->ObjectsCreated)
     {
     return;
     }
