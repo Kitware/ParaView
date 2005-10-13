@@ -13,12 +13,16 @@ EXEC_PROGRAM( ${QT_QMAKE_EXECUTABLE}
               ARGS -query QT_INSTALL_PREFIX
               OUTPUT_VARIABLE qt_install_prefix )
 FIND_PATH(QT_TEST_INCLUDE_DIR QtTest
-      NAMES "${qt_install_prefix}/include/QtTest" 
-            "${qt_install_prefix}/solutions/qttestlib/src/QtTest" 
-      CACHE PATH "The top-level path to the QtTest4 headers")
+      "${qt_install_prefix}/include/QtTest" 
+      "${qt_install_prefix}/solutions/qttestlib/src/QtTest" 
+      "$ENV{HOME}/Software/Develop/Qt/QtTest" 
+      DOC "The top-level path to the QtTest4 headers")
 FIND_LIBRARY( QT_TEST_LIBRARY NAMES QtTest QtTest2
-              PATHS ${qt_install_prefix}/solutions/qttestlib/src 
-                    ${qt_install_prefix}/lib)
+  PATHS
+  "${qt_install_prefix}/solutions/qttestlib/src"
+  "${qt_install_prefix}/lib"
+  "$ENV{HOME}/Software/Develop/Qt/QtTest/lib" 
+  )
 
 INCLUDE_DIRECTORIES(
   ${ParaQ_BINARY_DIR}/Client
