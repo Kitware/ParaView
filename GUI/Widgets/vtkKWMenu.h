@@ -175,9 +175,17 @@ public:
   const char* GetItemOption(const char *label, const char *option);
 
   // Description:
-  // Set the compound image of an entry
+  // Set the compound image of an entry.
+  // Check the SetItemMarginVisibility method too.
   void SetItemCompoundImage(int position, const char *imagename);
   void SetItemCompoundImage(const char *label, const char *imagename);
+
+  // Description:
+  // Set the visibility of the standard margin of an entry.
+  // Hiding the margin is useful when creating palette with images in them,
+  // i.e., color palettes, pattern palettes, etc.
+  void SetItemMarginVisibility(int position, int flag);
+  void SetItemMarginVisibility(const char *label, int flag);
 
   // Description:
   // Set/Get the accelerator for a given item.
