@@ -29,13 +29,14 @@
 #include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
+#include "vtkKWMenu.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.104");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.105");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -54,8 +55,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 {
   // The main callback
 
-  this->Observer = vtkCallbackCommand::New();
-  this->EventIdentifier = -1;
+  this->CallbackCommand = vtkCallbackCommand::New();
 
   // The vtkTkRenderWidget
 
@@ -82,8 +82,10 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->Interactor = vtkKWGenericRenderWindowInteractor::New();
   this->Interactor->SetRenderWidget(this);  
   this->Interactor->SetRenderWindow(this->RenderWindow);
-  this->Interactor->AddObserver(vtkCommand::CreateTimerEvent, this->Observer);
-  this->Interactor->AddObserver(vtkCommand::DestroyTimerEvent, this->Observer);
+  this->Interactor->AddObserver(vtkCommand::CreateTimerEvent, 
+                                this->CallbackCommand);
+  this->Interactor->AddObserver(vtkCommand::DestroyTimerEvent, 
+                                this->CallbackCommand);
   this->InteractorTimerToken = NULL;
 
   // Corner annotation
@@ -133,6 +135,11 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CollapsingRenders  = 0;
   this->InExpose           = 0;
   this->Printing           = 0;
+
+  // Context menu
+
+  this->UseContextMenu = 0;
+  this->ContextMenu = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -140,10 +147,10 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 {
   this->Close();
 
-  if (this->Observer)
+  if (this->CallbackCommand)
     {
-    this->Observer->Delete();
-    this->Observer = NULL;
+    this->CallbackCommand->Delete();
+    this->CallbackCommand = NULL;
     }
 
   if (this->Renderer)
@@ -197,6 +204,12 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     }
   
   this->SetDistanceUnits(NULL);
+
+  if (this->ContextMenu)
+    {
+    this->ContextMenu->Delete();
+    this->ContextMenu = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -217,7 +230,7 @@ int vtkKWRenderWidget::GetNumberOfRenderers()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRenderWidget::GetRendererId(vtkRenderer *ren)
+int vtkKWRenderWidget::GetRendererIndex(vtkRenderer *ren)
 {
   if (!ren || ren != this->Renderer)
     {
@@ -339,8 +352,8 @@ void vtkKWRenderWidget::AddBindings()
     {
     // Setup some default bindings
     
-    this->VTKWidget->SetBinding("<Expose>", this, "Exposed");
-    this->VTKWidget->SetBinding("<Enter>", this, "Enter %x %y");
+    this->VTKWidget->SetBinding("<Expose>", this, "ExposeCallback");
+    this->VTKWidget->SetBinding("<Enter>", this, "EnterCallback %x %y");
     this->VTKWidget->SetBinding("<FocusIn>", this, "FocusInCallback");
     this->VTKWidget->SetBinding("<FocusOut>", this, "FocusOutCallback");
     }
@@ -356,7 +369,7 @@ void vtkKWRenderWidget::AddBindings()
   // a helper in case the whole widget is resized but we do not want
   // to explicitly 'update' or Render.
 
-  this->SetBinding("<Configure>", this, "Configure %w %h");
+  this->SetBinding("<Configure>", this, "ConfigureCallback %w %h");
   
   this->AddInteractionBindings();
 
@@ -408,64 +421,64 @@ void vtkKWRenderWidget::AddInteractionBindings()
   if (this->VTKWidget->IsAlive())
     {
     this->VTKWidget->SetBinding(
-      "<Any-ButtonPress>", this, "AButtonPress %b %x %y 0 0");
+      "<Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 0 0");
 
     this->VTKWidget->SetBinding(
-      "<Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
+      "<Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Shift-Any-ButtonPress>", this, "AButtonPress %b %x %y 0 1");
+      "<Shift-Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 0 1");
 
     this->VTKWidget->SetBinding(
-      "<Shift-Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
+      "<Shift-Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Control-Any-ButtonPress>", this, "AButtonPress %b %x %y 1 0");
+      "<Control-Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 1 0");
 
     this->VTKWidget->SetBinding(
-      "<Control-Any-ButtonRelease>", this, "AButtonRelease %b %x %y");
+      "<Control-Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
 
     this->VTKWidget->SetBinding(
-      "<B1-Motion>", this, "MouseMove 1 %x %y");
+      "<B1-Motion>", this, "MouseMoveCallback 1 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<B2-Motion>", this, "MouseMove 2 %x %y");
+      "<B2-Motion>", this, "MouseMoveCallback 2 %x %y");
   
     this->VTKWidget->SetBinding(
-      "<B3-Motion>", this, "MouseMove 3 %x %y");
+      "<B3-Motion>", this, "MouseMoveCallback 3 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Shift-B1-Motion>", this, "MouseMove 1 %x %y");
+      "<Shift-B1-Motion>", this, "MouseMoveCallback 1 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Shift-B2-Motion>", this, "MouseMove 2 %x %y");
+      "<Shift-B2-Motion>", this, "MouseMoveCallback 2 %x %y");
   
     this->VTKWidget->SetBinding(
-      "<Shift-B3-Motion>", this, "MouseMove 3 %x %y");
+      "<Shift-B3-Motion>", this, "MouseMoveCallback 3 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Control-B1-Motion>", this, "MouseMove 1 %x %y");
+      "<Control-B1-Motion>", this, "MouseMoveCallback 1 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<Control-B2-Motion>", this, "MouseMove 2 %x %y");
+      "<Control-B2-Motion>", this, "MouseMoveCallback 2 %x %y");
   
     this->VTKWidget->SetBinding(
-      "<Control-B3-Motion>", this, "MouseMove 3 %x %y");
+      "<Control-B3-Motion>", this, "MouseMoveCallback 3 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<KeyPress>", this, "AKeyPress %A %x %y 0 0 %K");
+      "<KeyPress>", this, "KeyPressCallback %A %x %y 0 0 %K");
   
     this->VTKWidget->SetBinding(
-      "<Shift-KeyPress>", this, "AKeyPress %A %x %y 0 1 %K");
+      "<Shift-KeyPress>", this, "KeyPressCallback %A %x %y 0 1 %K");
   
     this->VTKWidget->SetBinding(
-      "<Control-KeyPress>", this, "AKeyPress %A %x %y 1 0 %K");
+      "<Control-KeyPress>", this, "KeyPressCallback %A %x %y 1 0 %K");
   
     this->VTKWidget->SetBinding(
-      "<Motion>", this, "MouseMove 0 %x %y");
+      "<Motion>", this, "MouseMoveCallback 0 %x %y");
 
     this->VTKWidget->SetBinding(
-      "<MouseWheel>", this, "MouseWheel %D");
+      "<MouseWheel>", this, "MouseWheelCallback %D");
     }
 }
 
@@ -508,14 +521,14 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
+void vtkKWRenderWidget::MouseMoveCallback(int vtkNotUsed(num), int x, int y)
 {
   this->Interactor->SetEventPositionFlipY(x, y);
   this->Interactor->MouseMoveEvent();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseWheel(int delta)
+void vtkKWRenderWidget::MouseWheelCallback(int delta)
 {
   if (delta < 0)
     {
@@ -528,29 +541,52 @@ void vtkKWRenderWidget::MouseWheel(int delta)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AButtonPress(int num, int x, int y,
+void vtkKWRenderWidget::MouseButtonPressCallback(int num, int x, int y,
                                      int ctrl, int shift)
 {
   this->VTKWidget->Focus();
   
-  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
-  
-  switch (num)
+  if (this->UseContextMenu && num == 3)
     {
-    case 1:
-      this->Interactor->LeftButtonPressEvent();
-      break;
-    case 2:
-      this->Interactor->MiddleButtonPressEvent();
-      break;
-    case 3:
-      this->Interactor->RightButtonPressEvent();
-      break;
+    if (!this->ContextMenu)
+      {
+      this->ContextMenu = vtkKWMenu::New();
+      }
+    if (!this->ContextMenu->IsCreated())
+      {
+      this->ContextMenu->Create(this->GetApplication());
+      }
+    this->ContextMenu->DeleteAllMenuItems();
+    this->PopulateContextMenu(this->ContextMenu);
+    if (this->ContextMenu->GetNumberOfItems())
+      {
+      this->Script("tk_popup %s [winfo pointerx %s] [winfo pointery %s]", 
+                   this->ContextMenu->GetWidgetName(), 
+                   this->VTKWidget->GetWidgetName(), 
+                   this->VTKWidget->GetWidgetName());
+      }
+    }
+  else
+    {
+    this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+    
+    switch (num)
+      {
+      case 1:
+        this->Interactor->LeftButtonPressEvent();
+        break;
+      case 2:
+        this->Interactor->MiddleButtonPressEvent();
+        break;
+      case 3:
+        this->Interactor->RightButtonPressEvent();
+        break;
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
+void vtkKWRenderWidget::MouseButtonReleaseCallback(int num, int x, int y)
 {
   this->Interactor->SetEventInformationFlipY(x, y, 0, 0);
   
@@ -569,7 +605,7 @@ void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AKeyPress(char key, 
+void vtkKWRenderWidget::KeyPressCallback(char key, 
                                   int x, int y,
                                   int ctrl, int shift,
                                   char *keysym)
@@ -583,14 +619,14 @@ void vtkKWRenderWidget::AKeyPress(char key,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::Configure(int width, int height)
+void vtkKWRenderWidget::ConfigureCallback(int width, int height)
 {
   this->Interactor->UpdateSize(width, height);
   this->Interactor->ConfigureEvent();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::Exposed()
+void vtkKWRenderWidget::ExposeCallback()
 {
   if (this->InExpose)
     {
@@ -613,6 +649,48 @@ void vtkKWRenderWidget::FocusInCallback()
 void vtkKWRenderWidget::FocusOutCallback()
 {
   this->InvokeEvent(vtkKWEvent::FocusOutEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::PopulateContextMenu(vtkKWMenu *menu)
+{
+  this->PopulateAnnotationMenu(menu);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
+{
+  if (!menu)
+    {
+    return;
+    }
+
+  if (menu->GetNumberOfItems())
+    {
+    menu->AddSeparator();
+    }
+
+  char *buttonvar;
+
+  // Corner Annotation
+
+  buttonvar = menu->CreateCheckButtonVariable(
+    this, "CornerAnnotationVisibility");
+  menu->AddCheckButton(
+    "Corner Annotation", buttonvar, this, "ToggleCornerAnnotationVisibility");
+  menu->CheckCheckButton(
+    this, "CornerAnnotationVisibility", this->GetCornerAnnotationVisibility());
+  delete [] buttonvar;
+
+  // Header Annotation
+
+  buttonvar = menu->CreateCheckButtonVariable(
+    this, "HeaderAnnotationVisibility");
+  menu->AddCheckButton(
+    "Header Annotation", buttonvar, this, "ToggleHeaderAnnotationVisibility");
+  menu->CheckCheckButton(
+    this, "HeaderAnnotationVisibility", this->GetHeaderAnnotationVisibility());
+  delete [] buttonvar;
 }
 
 //----------------------------------------------------------------------------
@@ -733,24 +811,6 @@ void vtkKWRenderWidget::Render()
     }
   
   static_in_render = 0;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWRenderWidget::GetRenderModeAsString()
-{
-  switch (this->RenderMode)
-    {
-    case vtkKWRenderWidget::InteractiveRender:
-      return "Interactive";
-    case vtkKWRenderWidget::StillRender:
-      return "Still";
-    case vtkKWRenderWidget::SingleRender:
-      return "Single";
-    case vtkKWRenderWidget::DisabledRender:
-      return "Disabled";
-    default:
-      return "Unknown (error)";
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1059,6 +1119,12 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::ToggleCornerAnnotationVisibility()
+{
+  this->SetCornerAnnotationVisibility(!this->GetCornerAnnotationVisibility());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationColor(double r, double g, double b)
 {
   double *color = this->GetCornerAnnotationColor();
@@ -1130,6 +1196,12 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::ToggleHeaderAnnotationVisibility()
+{
+  this->SetHeaderAnnotationVisibility(!this->GetHeaderAnnotationVisibility());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationColor(double r, double g, double b)
 {
   double *color = this->GetHeaderAnnotationColor();
@@ -1190,7 +1262,7 @@ char* vtkKWRenderWidget::GetHeaderAnnotationText()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCollapsingRenders(int r)
 {
-  if ( r )
+  if (r)
     {
     this->CollapsingRenders = 1;
     this->CollapsingRendersCount = 0;
@@ -1198,7 +1270,7 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
   else
     {
     this->CollapsingRenders = 0;
-    if ( this->CollapsingRendersCount )
+    if (this->CollapsingRendersCount)
       {
       this->Render();
       }
@@ -1208,16 +1280,17 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddObservers()
 {
-  if (this->Observer)
+  if (this->CallbackCommand)
     {
-    this->Observer->SetClientData(this); 
-    this->Observer->SetCallback(vtkKWRenderWidget::ProcessEventFunction);
-    this->Observer->AbortFlagOnExecuteOn();
+    this->CallbackCommand->SetClientData(this); 
+    this->CallbackCommand->SetCallback(
+      vtkKWRenderWidget::ProcessEventFunction);
+    this->CallbackCommand->AbortFlagOnExecuteOn();
     
     if (this->RenderWindow)
       {
       this->RenderWindow->AddObserver(
-        vtkCommand::CursorChangedEvent, this->Observer);
+        vtkCommand::CursorChangedEvent, this->CallbackCommand);
       }
     }
 }
@@ -1225,15 +1298,15 @@ void vtkKWRenderWidget::AddObservers()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveObservers()
 {
-  if (this->Observer)
+  if (this->CallbackCommand)
     {
-    this->Observer->SetClientData(NULL); 
-    this->Observer->SetCallback(NULL);
+    this->CallbackCommand->SetClientData(NULL); 
+    this->CallbackCommand->SetCallback(NULL);
     
     if (this->RenderWindow)
       {
       this->RenderWindow->RemoveObservers(
-        vtkCommand::CursorChangedEvent, this->Observer);
+        vtkCommand::CursorChangedEvent, this->CallbackCommand);
       }
     }
 }
@@ -1381,11 +1454,10 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Printing: " << this->Printing << endl;
   os << indent << "VTKWidget: " << this->VTKWidget << endl;
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
-  os << indent << "RenderMode: " << this->GetRenderModeAsString() << endl;
+  os << indent << "RenderMode: " << this->RenderMode << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->GetRenderer() << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
   os << indent << "DistanceUnits: " 
      << (this->DistanceUnits ? this->DistanceUnits : "(none)") << endl;
-  os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }
