@@ -34,6 +34,7 @@
 class vtkKWWidget;
 class vtkKWCoreWidget;
 class vtkKWApplication;
+class vtkKWIcon;
 struct Tcl_Interp;
 
 class KWWIDGETS_EXPORT vtkKWTkUtilities : public vtkObject
@@ -196,6 +197,22 @@ public:
                          const char *blend_with_name = 0,
                          const char *blend_color_option = 0,
                          int update_options = 0);
+
+  // Description:
+  // Update a Tk photo given by its name 'photo_name' using pixels stored in
+  // the icon 'icon'. 
+  static int UpdatePhotoFromIcon(vtkKWApplication *app,
+                                 const char *photo_name,
+                                 vtkKWIcon *icon,
+                                 const char *blend_with_name = 0,
+                                 const char *blend_color_option = 0,
+                                 int update_options = 0);
+  static int UpdatePhotoFromPredefinedIcon(vtkKWApplication *app,
+                                           const char *photo_name,
+                                           int icon_index,
+                                           const char *blend_with_name = 0,
+                                           const char *blend_color_option = 0,
+                                           int update_options = 0);
 
   // Description:
   // Update a Tk photo given by its name 'photo_name' using pixels stored in

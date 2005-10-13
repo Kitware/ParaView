@@ -16,6 +16,7 @@
 #include "vtkKWCoreWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWResourceUtilities.h"
+#include "vtkKWIcon.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.68");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.69");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -690,20 +691,20 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     pixels = decoded_data;
     }
 
+  // Tk does not seem to support transparency blending, only 
   // Set block struct
 
   Tk_PhotoImageBlock sblock;
 
   sblock.width     = width;
   sblock.height    = height;
-  sblock.pixelSize = 3;
-  sblock.pitch     = sblock.width * sblock.pixelSize;
   sblock.offset[0] = 0;
   sblock.offset[1] = 1;
   sblock.offset[2] = 2;
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
-  sblock.offset[3] = 0;
-#endif
+  sblock.offset[3] = 3;
+
+  sblock.pixelSize = 3;
+  sblock.pitch     = sblock.width * sblock.pixelSize;
   unsigned long sblock_size = sblock.pitch * sblock.height;
 
   unsigned char *pp = NULL;
@@ -714,6 +715,14 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     }
   else 
     {
+#if 0
+    sblock.pixelPtr = const_cast<unsigned char *>(pixels);
+
+    sblock.pixelSize = 4;
+    sblock.pitch     = sblock.width * sblock.pixelSize;
+    unsigned long sblock_size = sblock.pitch * sblock.height;
+
+#else
     pp = sblock.pixelPtr = new unsigned char[sblock_size];
 
     // At the moment let's not use the alpha layer inside the photo but 
@@ -773,6 +782,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       }
 
     pp = sblock.pixelPtr;
+#endif
     }
   
   if (update_options & vtkKWTkUtilities::UpdatePhotoOptionFlipVertical)
@@ -827,6 +837,56 @@ int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
     blend_with_name,
     blend_color_option,
     update_options);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::UpdatePhotoFromIcon(vtkKWApplication *app,
+                                          const char *photo_name,
+                                          vtkKWIcon *icon,
+                                          const char *blend_with_name,
+                                          const char *blend_color_option,
+                                          int update_options)
+{
+  if (!app || !icon)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::UpdatePhoto(
+    app->GetMainInterp(),
+    photo_name,
+    icon->GetData(), 
+    icon->GetWidth(), icon->GetHeight(), 
+    icon->GetPixelSize(),
+    0,
+    blend_with_name,
+    blend_color_option,
+    update_options);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
+  vtkKWApplication *app,
+  const char *photo_name,
+  int icon_index,
+  const char *blend_with_name,
+  const char *blend_color_option,
+  int update_options)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  int res = vtkKWTkUtilities::UpdatePhotoFromIcon(
+    app,
+    photo_name,
+    icon,
+    blend_with_name,
+    blend_color_option,
+    update_options);
+  icon->Delete();
+  return res;
 }
 
 //----------------------------------------------------------------------------
