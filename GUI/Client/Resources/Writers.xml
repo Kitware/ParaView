@@ -64,7 +64,7 @@
          class="vtkPVDWriter"
          writer="vtkXMLPMultiGroupDataWriter"
          extensions=".vtm"
-         file_description="VTK HierarchicalData Files"/>
+         file_description="VTK Multi Group Files"/>
  <Writer input="vtkDataSet"
          class="vtkPVWriter"
          writer="vtkDataSetWriter"
