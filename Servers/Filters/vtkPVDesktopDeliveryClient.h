@@ -13,21 +13,28 @@
 
 =========================================================================*/
 // .NAME vtkPVDesktopDeliveryClient - An object for remote rendering.
+//
 // .SECTION Description
-// The two vtkDesktopDelivery objects (vtkPVDesktopDeliveryClient and
-// vtkDesktopDeliveryServer) work together to enable interactive viewing of
-// remotely rendered data.  The client attaches itself to a vtkRenderWindow
-// and, optionally, a vtkRenderWindowInteractor.  Whenever a new rendering
-// is requested, the client alerts the server, the server renders a new
-// frame, and ships the image back to the client, which will display the
-// image in the vtkRenderWindow.
-// .SECTION note
-// You should set up the renderers and render window interactor before setting
-// the render window.  We set up observers on the renderer, and we have no
-// easy way of knowing when the renderers change.
-// .SECTION see also
-// vtkDesktopDeliveryServer vtkMultiProcessController vtkRenderWindow
-// vtkRenderWindowInteractor
+//
+// The two vtkPVDesktopDelivery objects (vtkPVDesktopDeliveryClient and
+// vtkPVDesktopDeliveryServer) work together to enable interactive viewing of
+// remotely rendered data.  On the client side, there may be multiple render
+// windows arranged in a GUI, each having its own vtkPVDesktopDeliveryClient
+// object attached.  The server has a single render window and
+// vtkPVDesktopDeliveryServer.  All the vtkPVDesktopDeliveryClient objects
+// connect to a single vtkPVDesktopDeliveryServer object.
+//
+// On the client side, each render window is assumed to be placed inside a
+// parent GUI window.  The layout of the render windows in the GUI window must
+// be given.  The following information must be given: a unique identifier for
+// the window, the position of the render window in the parent GUI window, and
+// the size of the parent GUI window.  The server will arrange the renderings
+// in its single render window to match the layout given for the parent GUI
+// window on the client side.
+//
+// .SECTION See Also
+// vtkPVDesktopDeliveryServer
+//
 
 #ifndef __vtkPVDesktopDeliveryClient_h
 #define __vtkPVDesktopDeliveryClient_h
