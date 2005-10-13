@@ -17,13 +17,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkCallbackCommand.h"
 
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.55");
+vtkCxxRevisionMacro(vtkKWObject, "1.56");
 
 vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
 
@@ -32,11 +33,19 @@ vtkKWObject::vtkKWObject()
 {
   this->TclName         = NULL;
   this->Application     = NULL;  
+  this->CallbackCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWObject::~vtkKWObject()
 {
+  if (this->CallbackCommand)
+    {
+    this->RemoveCallbackCommandObservers();
+    this->CallbackCommand->Delete();
+    this->CallbackCommand = NULL;
+    }
+
   if (this->TclName)
     {
     delete [] this->TclName;
@@ -146,6 +155,80 @@ void vtkKWObject::SetObjectMethodCommand(
   (*command)[object_len + method_len] = '\0';
 }
 
+//----------------------------------------------------------------------------
+vtkCallbackCommand* vtkKWObject::GetCallbackCommand()
+{
+  if (!this->CallbackCommand)
+    {
+    this->CallbackCommand = vtkCallbackCommand::New();
+    }
+
+  this->CallbackCommand->SetClientData(this); 
+  this->CallbackCommand->SetCallback(
+    vtkKWObject::ProcessCallbackCommandEventsFunction);
+
+  return this->CallbackCommand;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::AddCallbackCommandObserver(
+  vtkObject *object, unsigned long event)
+{
+  if (object)
+    {
+    vtkCallbackCommand *command = this->GetCallbackCommand();
+    if (command && !object->HasObserver(event, command))
+      {
+      object->AddObserver(event, command);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::RemoveCallbackCommandObserver(
+  vtkObject *object, unsigned long event)
+{
+  if (object && this->CallbackCommand)
+    {
+    object->RemoveObservers(event, this->CallbackCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::RemoveCallbackCommandObservers()
+{
+  if (this->CallbackCommand)
+    {
+    this->RemoveObserver(this->CallbackCommand);
+    this->CallbackCommand->SetClientData(NULL); 
+    this->CallbackCommand->SetCallback(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::ProcessCallbackCommandEventsFunction(
+  vtkObject *object,
+  unsigned long event,
+  void *clientdata,
+  void *calldata)
+{
+  // Pass to the virtual ProcessCallbackCommandEvents method
+
+  vtkKWObject* self = static_cast<vtkKWObject*>(clientdata);
+  if (self)
+    {
+    self->ProcessCallbackCommandEvents(object, event, calldata);
+    }
+}
+  
+//----------------------------------------------------------------------------
+void vtkKWObject::ProcessCallbackCommandEvents(
+  vtkObject *vtkNotUsed(caller),
+  unsigned long vtkNotUsed(event),
+  void *vtkNotUsed(calldata))
+{
+}
+  
 //----------------------------------------------------------------------------
 void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
 {

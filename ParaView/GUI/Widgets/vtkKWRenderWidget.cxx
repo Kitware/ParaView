@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.105");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.106");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -53,10 +53,6 @@ void vtkKWRenderWidget::UnRegister(vtkObjectBase* o)
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
-  // The main callback
-
-  this->CallbackCommand = vtkCallbackCommand::New();
-
   // The vtkTkRenderWidget
 
   this->VTKWidget = vtkKWCoreWidget::New();
@@ -82,10 +78,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->Interactor = vtkKWGenericRenderWindowInteractor::New();
   this->Interactor->SetRenderWidget(this);  
   this->Interactor->SetRenderWindow(this->RenderWindow);
-  this->Interactor->AddObserver(vtkCommand::CreateTimerEvent, 
-                                this->CallbackCommand);
-  this->Interactor->AddObserver(vtkCommand::DestroyTimerEvent, 
-                                this->CallbackCommand);
   this->InteractorTimerToken = NULL;
 
   // Corner annotation
@@ -146,12 +138,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
   this->Close();
-
-  if (this->CallbackCommand)
-    {
-    this->CallbackCommand->Delete();
-    this->CallbackCommand = NULL;
-    }
 
   if (this->Renderer)
     {
@@ -373,7 +359,7 @@ void vtkKWRenderWidget::AddBindings()
   
   this->AddInteractionBindings();
 
-  this->AddObservers();
+  this->AddCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -396,7 +382,7 @@ void vtkKWRenderWidget::RemoveBindings()
 
   this->RemoveInteractionBindings();
 
-  this->RemoveObservers();
+  this->RemoveCallbackCommandObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -1278,40 +1264,6 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::AddObservers()
-{
-  if (this->CallbackCommand)
-    {
-    this->CallbackCommand->SetClientData(this); 
-    this->CallbackCommand->SetCallback(
-      vtkKWRenderWidget::ProcessEventFunction);
-    this->CallbackCommand->AbortFlagOnExecuteOn();
-    
-    if (this->RenderWindow)
-      {
-      this->RenderWindow->AddObserver(
-        vtkCommand::CursorChangedEvent, this->CallbackCommand);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveObservers()
-{
-  if (this->CallbackCommand)
-    {
-    this->CallbackCommand->SetClientData(NULL); 
-    this->CallbackCommand->SetCallback(NULL);
-    
-    if (this->RenderWindow)
-      {
-      this->RenderWindow->RemoveObservers(
-        vtkCommand::CursorChangedEvent, this->CallbackCommand);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWRenderWidget_InteractorTimer(ClientData arg)
 {
   vtkRenderWindowInteractor *me = (vtkRenderWindowInteractor*)arg;
@@ -1319,25 +1271,48 @@ void vtkKWRenderWidget_InteractorTimer(ClientData arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ProcessEventFunction(
-  vtkObject *object,
-  unsigned long event,
-  void *clientdata,
-  void *calldata)
+vtkCallbackCommand* vtkKWRenderWidget::GetCallbackCommand()
 {
-  // Pass to the virtual ProcessEvent method
-
-  vtkKWRenderWidget* self = static_cast<vtkKWRenderWidget*>(clientdata);
-  if (self)
+  vtkCallbackCommand *command = this->Superclass::GetCallbackCommand();
+  if (command)
     {
-    self->ProcessEvent(object, event, calldata);
+    command->AbortFlagOnExecuteOn();
     }
+  return command;
 }
-  
+
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
-                                     unsigned long event,
-                                     void *calldata)
+void vtkKWRenderWidget::AddCallbackCommandObservers()
+{
+  this->Superclass::AddCallbackCommandObservers();
+
+  this->AddCallbackCommandObserver(
+    this->Interactor, vtkCommand::CreateTimerEvent);
+  this->AddCallbackCommandObserver(
+    this->Interactor, vtkCommand::DestroyTimerEvent);
+
+  this->AddCallbackCommandObserver(
+    this->RenderWindow, vtkCommand::CursorChangedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveCallbackCommandObservers()
+{
+  this->Superclass::RemoveCallbackCommandObservers();
+
+  this->RemoveCallbackCommandObserver(
+    this->Interactor, vtkCommand::CreateTimerEvent);
+  this->RemoveCallbackCommandObserver(
+    this->Interactor, vtkCommand::DestroyTimerEvent);
+
+  this->RemoveCallbackCommandObserver(
+    this->RenderWindow, vtkCommand::CursorChangedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
+                                                     unsigned long event,
+                                                     void *calldata)
 {
   // Handle the timer event for the generic interactor
 
@@ -1367,64 +1342,68 @@ void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
 
   // Handle event for this class
 
-  const char *cptr = 0;
-
-  switch (event)
+  if (caller == this->RenderWindow)
     {
-    case vtkCommand::CursorChangedEvent:
-      cptr = "left_ptr";
-      switch (*(static_cast<int*>(calldata))) 
-        {
-        case VTK_CURSOR_ARROW:
-          cptr = "arrow";
-          break;
-        case VTK_CURSOR_SIZENE:
+    const char *cptr = 0;
+    switch (event)
+      {
+      case vtkCommand::CursorChangedEvent:
+        cptr = "left_ptr";
+        switch (*(static_cast<int*>(calldata))) 
+          {
+          case VTK_CURSOR_ARROW:
+            cptr = "arrow";
+            break;
+          case VTK_CURSOR_SIZENE:
 #ifdef _WIN32
-          cptr = "size_ne_sw";
+            cptr = "size_ne_sw";
 #else
-          cptr = "top_right_corner";
+            cptr = "top_right_corner";
 #endif
-          break;
-        case VTK_CURSOR_SIZENW:
+            break;
+          case VTK_CURSOR_SIZENW:
 #ifdef _WIN32
-          cptr = "size_nw_se";
+            cptr = "size_nw_se";
 #else
-          cptr = "top_left_corner";
+            cptr = "top_left_corner";
 #endif
-          break;
-        case VTK_CURSOR_SIZESW:
+            break;
+          case VTK_CURSOR_SIZESW:
 #ifdef _WIN32
-          cptr = "size_ne_sw";
+            cptr = "size_ne_sw";
 #else
-          cptr = "bottom_left_corner";
+            cptr = "bottom_left_corner";
 #endif
-          break;
-        case VTK_CURSOR_SIZESE:
+            break;
+          case VTK_CURSOR_SIZESE:
 #ifdef _WIN32
-          cptr = "size_nw_se";
+            cptr = "size_nw_se";
 #else
-          cptr = "bottom_right_corner";
+            cptr = "bottom_right_corner";
 #endif
-          break;
-        case VTK_CURSOR_SIZENS:
-          cptr = "sb_v_double_arrow";
-          break;
-        case VTK_CURSOR_SIZEWE:
-          cptr = "sb_h_double_arrow";
-          break;
-        case VTK_CURSOR_SIZEALL:
-          cptr = "fleur";
-          break;
-        case VTK_CURSOR_HAND:
-          cptr = "hand2";
-          break;
-        }
-      if (this->GetParentWindow())
-        {
-        this->GetParentWindow()->SetConfigurationOption("-cursor", cptr);
-        }
-      break;
+            break;
+          case VTK_CURSOR_SIZENS:
+            cptr = "sb_v_double_arrow";
+            break;
+          case VTK_CURSOR_SIZEWE:
+            cptr = "sb_h_double_arrow";
+            break;
+          case VTK_CURSOR_SIZEALL:
+            cptr = "fleur";
+            break;
+          case VTK_CURSOR_HAND:
+            cptr = "hand2";
+            break;
+          }
+        if (this->GetParentWindow())
+          {
+          this->GetParentWindow()->SetConfigurationOption("-cursor", cptr);
+          }
+        break;
+      }
     }
+
+  this->Superclass::ProcessCallbackCommandEvents(caller, event, calldata);
 }
 
 //----------------------------------------------------------------------------

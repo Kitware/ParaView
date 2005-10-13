@@ -28,7 +28,6 @@ class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
-class vtkCallbackCommand;
 class vtkKWSelectionFrameInternals;
 class vtkKWToolbarSet;
 
@@ -221,13 +220,6 @@ public:
   virtual void ChangeTitleCallback();
   
   // Description:
-  // Method that processes the events
-  virtual void ProcessEvent(
-    vtkObject *vtkNotUsed(caller), 
-    unsigned long vtkNotUsed(event), 
-    void *vtkNotUsed(calldata)) {};
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -283,18 +275,6 @@ protected:
   // PIMPL Encapsulation for STL containers
 
   vtkKWSelectionFrameInternals *Internals;
-
-  vtkCallbackCommand *CallbackCommand;
-
-  // Description:
-  // Add/remove the callback command bindings.
-  virtual void AddCallbackCommandBindings();
-  virtual void RemoveCallbackCommandBindings();
-
-  // Description:
-  // Callback commmand. Pass the parameters to the virtual ProcessEvent method
-  static void ProcessEventFunction(
-    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:
 
