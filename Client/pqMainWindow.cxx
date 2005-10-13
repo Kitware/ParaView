@@ -12,6 +12,7 @@
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqParts.h"
+#include "pqProperties.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
 #include "pqServerBrowser.h"
@@ -33,6 +34,7 @@
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
+#include <vtkSMXMLParser.h>
 #include <vtkPVGenericRenderWindowInteractor.h>
 
 #include <QVTKWidget.h>
@@ -79,6 +81,12 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   QAction* const fileOpenAction = new QAction(tr("Open..."), this) << pqSetName("fileOpenAction");
   connect(fileOpenAction, SIGNAL(activated()), this, SLOT(onFileOpen()));
 
+  QAction* const fileOpenServerStateAction = new QAction(tr("Open Server State"), this) << pqSetName("fileOpenServerStateAction");
+  connect(fileOpenServerStateAction, SIGNAL(activated()), this, SLOT(onFileOpenServerState()));
+
+  QAction* const fileSaveServerStateAction = new QAction(tr("Save Server State"), this) << pqSetName("fileSaveServerStateAction");
+  connect(fileSaveServerStateAction, SIGNAL(activated()), this, SLOT(onFileSaveServerState()));
+
   QAction* const fileQuitAction = new QAction(tr("Quit"), this) << pqSetName("fileQuitAction");
   connect(fileQuitAction, SIGNAL(activated()), &Application, SLOT(quit()));
 
@@ -91,8 +99,8 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   QAction* const debugOpenLocalFilesAction = new QAction(tr("Open Local Files"), this) << pqSetName("debugOpenLocalFilesAction");
   connect(debugOpenLocalFilesAction, SIGNAL(activated()), this, SLOT(onDebugOpenLocalFiles()));
 
-  QAction* const debugQtHierarchyAction = new QAction(tr("Dump Hierarchy"), this) << pqSetName("debugHierarchyAction");
-  connect(debugQtHierarchyAction, SIGNAL(activated()), this, SLOT(onDebugQtHierarchy()));
+  QAction* const debugDumpQtHierarchyAction = new QAction(tr("Dump Qt Hierarchy"), this) << pqSetName("debugDumpQtHierarchyAction");
+  connect(debugDumpQtHierarchyAction, SIGNAL(activated()), this, SLOT(onDebugDumpQtHierarchy()));
 
   QAction* const testsRunAction = new QAction(tr("Run"), this) << pqSetName("testsRunAction");
   connect(testsRunAction, SIGNAL(activated()), this, SLOT(onTestsRun()));
@@ -102,6 +110,8 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   QMenu* const fileMenu = this->menuBar()->addMenu(tr("File")) << pqSetName("fileMenu");
   fileMenu->addAction(fileNewAction);
   fileMenu->addAction(fileOpenAction);
+//  fileMenu->addAction(fileOpenServerStateAction);
+  fileMenu->addAction(fileSaveServerStateAction);
   fileMenu->addAction(fileQuitAction);
   
   QMenu* const serverMenu = this->menuBar()->addMenu(tr("Server")) << pqSetName("serverMenu");
@@ -110,7 +120,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   
   QMenu* const debugMenu = this->menuBar()->addMenu(tr("Debug")) << pqSetName("debugMenu");
   debugMenu->addAction(debugOpenLocalFilesAction);
-  debugMenu->addAction(debugQtHierarchyAction);
+  debugMenu->addAction(debugDumpQtHierarchyAction);
   
   QMenu* const testMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testMenu");
   testMenu->addAction(testsRunAction);
@@ -168,12 +178,13 @@ void pqMainWindow::onFileNew(pqServer* Server)
   setServer(Server);
 
   // Create a source ... see ParaView/Servers/ServerManager/Resources/sources.xml
-  vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "Axes");
+  vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "CylinderSource");
   this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
   source->Delete();
-//  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FileName"))->SetElement(0, File.ascii());
-//  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePrefix"))->SetElement(0, File.ascii());
-//  vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePattern"))->SetElement(0, "%s");
+  pqSetProperty(source, "Resolution", 64);
+  pqSetProperty(source, "Radius", 0.1);
+  pqSetProperty(source, "foo", "bar");
+  pqSetProperty(source, "Radius", "ten");
   source->UpdateVTKObjects();
   
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
@@ -209,9 +220,9 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
     this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
     source->Delete();
-    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FileName"))->SetElement(0, file.ascii());
-    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePrefix"))->SetElement(0, file.ascii());
-    vtkSMStringVectorProperty::SafeDownCast(source->GetProperty("FilePattern"))->SetElement(0, "%s");
+    pqSetProperty(source, "FileName", file);
+    pqSetProperty(source, "FilePrefix", file);
+    pqSetProperty(source, "FilePattern", "%s");
     source->UpdateVTKObjects();
     
     pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
@@ -219,6 +230,52 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());
+}
+
+void pqMainWindow::onFileOpenServerState()
+{
+  setServer(0);
+  
+  pqServerBrowser* const server_browser = new pqServerBrowser(this, "serverBrowser");
+  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpenServerState(pqServer*)));
+  server_browser->show();
+}
+
+void pqMainWindow::onFileOpenServerState(pqServer* Server)
+{
+  setServer(Server);
+
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->currentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpenServerState(const QStringList&)));
+  file_dialog->show();
+}
+
+void pqMainWindow::onFileOpenServerState(const QStringList& Files)
+{
+}
+
+void pqMainWindow::onFileSaveServerState()
+{
+  if(!this->currentServer)
+    {
+    QMessageBox::critical(this, tr("Dump Server State:"), tr("No server connections to serialize"));
+    return;
+    }
+
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
+  file_dialog->show();
+}
+
+void pqMainWindow::onFileSaveServerState(const QStringList& Files)
+{
+  for(int i = 0; i != Files.size(); ++i)
+    {
+    ofstream file(Files[i]);
+    file << "<ServerState>" << "\n";
+    this->currentServer->GetProxyManager()->SaveState("test", &file, 0);
+    file << "</ServerState>" << "\n";
+    }
 }
 
 void pqMainWindow::onServerConnect()
@@ -255,7 +312,7 @@ void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
     }
 }
 
-void pqMainWindow::onDebugQtHierarchy()
+void pqMainWindow::onDebugDumpQtHierarchy()
 {
   pqDumpQtHierarchy(cerr, *this);
 }

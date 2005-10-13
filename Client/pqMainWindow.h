@@ -40,12 +40,17 @@ private slots:
   void onFileOpen();
   void onFileOpen(pqServer* Server);
   void onFileOpen(const QStringList& Files);
+  void onFileOpenServerState();
+  void onFileOpenServerState(pqServer* Server);
+  void onFileOpenServerState(const QStringList& Files);
+  void onFileSaveServerState();
+  void onFileSaveServerState(const QStringList& Files);
   void onServerConnect();
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
   void onDebugOpenLocalFiles();
   void onDebugOpenLocalFiles(const QStringList& Files);
-  void onDebugQtHierarchy();
+  void onDebugDumpQtHierarchy();
   void onTestsRun();
 };
 

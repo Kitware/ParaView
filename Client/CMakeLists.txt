@@ -35,6 +35,7 @@ INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Common
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Filtering
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/GenericFiltering
+  ${ParaQ_SOURCE_DIR}/ParaView/VTK/IO
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Rendering
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/GUISupport/Qt
   ${ParaQ_SOURCE_DIR}/ParaView/GUI/Client
@@ -76,6 +77,8 @@ ADD_EXECUTABLE(pqClient
   pqOptions.h
   pqParts.cxx
   pqParts.h
+  pqProperties.cxx
+  pqProperties.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx
