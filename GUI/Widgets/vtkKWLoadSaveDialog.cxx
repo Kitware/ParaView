@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.44");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -108,10 +108,8 @@ int vtkKWLoadSaveDialog::Invoke()
     {
     command << " -defaultextension {" 
             << (this->DefaultExtension ? this->DefaultExtension : "") << "}"
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
             << " -initialfile {" 
             << (this->InitialFileName ? this->InitialFileName : "") << "}"
-#endif
             << " -filetypes {" 
             << (this->FileTypes ? this->FileTypes : "") << "}";
     }

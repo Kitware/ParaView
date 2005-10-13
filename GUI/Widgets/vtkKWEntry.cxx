@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.70");
+vtkCxxRevisionMacro(vtkKWEntry, "1.71");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -249,19 +249,6 @@ void vtkKWEntry::UpdateEnableState()
     {
     this->SetState(this->GetEnabled());
     }
-
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  if (this->ReadOnly || !this->GetEnabled())
-    {
-    this->SetForegroundColor(0.0, 0.0, 0.0);
-    this->SetbackgroundColor(1.0, 1.0, 1.0);
-    }
-  else
-    {
-    this->SetForegroundColor(0.7, 0.7, 0.7);
-    this->SetbackgroundColor(0.9, 0.9, 0.9);
-    }
-#endif
 }
 
 //----------------------------------------------------------------------------
