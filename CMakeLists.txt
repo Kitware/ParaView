@@ -1,5 +1,5 @@
-
 PROJECT(ParaQ)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
 IF(NOT WIN32)
 # prevent runtime problems on Unix/Mac when Qt & VTK use
