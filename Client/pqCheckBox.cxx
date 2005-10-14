@@ -18,7 +18,7 @@ pqCheckBox::pqCheckBox(vtkSMProxy* const Proxy, vtkSMProperty* const Property, c
   property(Property),
   concrete_property(vtkSMIntVectorProperty::SafeDownCast(Property))
 {
-  this->setTristate(concrete_property ? true : false);
+  this->setTristate(concrete_property ? false : true);
   
   updateState(); 
   
