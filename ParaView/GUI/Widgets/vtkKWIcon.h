@@ -41,6 +41,7 @@ public:
   // These constants specify different icons.
   enum { 
     IconNoIcon                    = 0,
+    IconBoundingBox               = 13,
     IconColorBarAnnotation        = 12,
     IconConnection                = 1,
     IconCornerAnnotation          = 11,
@@ -142,6 +143,18 @@ public:
   // Description:
   // Get the pixel size of the image.
   vtkGetMacro(PixelSize, int);
+
+  // Description:
+  // Fade the icon by a factor.
+  // If the icon has an alpha channel, this multiplies each element in
+  // the alpha channel by 'factor'.
+  virtual void Fade(double factor);
+
+  // Description:
+  // Flatten the image against a color.
+  // If the icon has an alpha channel, this blends the image against
+  // a 'r', 'g', 'b' background and discards the alpha channel.
+  virtual void Flatten(double r, double g, double b);
 
 protected:
   vtkKWIcon();
