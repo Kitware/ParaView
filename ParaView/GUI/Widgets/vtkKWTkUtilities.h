@@ -162,12 +162,6 @@ public:
   // of bytes per pixel, 3 for RGB for example).
   // If 'buffer_length' is 0, compute it automatically by multiplying
   // 'pixel_size', 'width' and 'height' together.
-  // If RGBA ('pixel_size' > 3), blend the pixels with the background color of
-  // the 'blend_with_name' widget (otherwise use a [0.5, 0.5, 0.5] gray).
-  // If 'blend_color_option' is not NULL (say -fg or -selectcolor), use this
-  // option to retrieve the color instead of using the background color (-bg)
-  // of the 'blend_with_name'. If 'blend_color_option' does not start with
-  // a dash, interpret it as a Tk color and use it directly.
   // If UPDATE_PHOTO_OPTION_FLIP_V is set in 'update_option', flip the image
   // buffer vertically.
   // A convenience method is provided to specify the vtkKWApplication this
@@ -185,8 +179,6 @@ public:
                          int width, int height,
                          int pixel_size,
                          unsigned long buffer_length = 0,
-                         const char *blend_with_name = 0,
-                         const char *blend_color_option = 0,
                          int update_options = 0);
   static int UpdatePhoto(vtkKWApplication *app,
                          const char *photo_name,
@@ -194,8 +186,6 @@ public:
                          int width, int height,
                          int pixel_size,
                          unsigned long buffer_length = 0,
-                         const char *blend_with_name = 0,
-                         const char *blend_color_option = 0,
                          int update_options = 0);
 
   // Description:
@@ -204,14 +194,10 @@ public:
   static int UpdatePhotoFromIcon(vtkKWApplication *app,
                                  const char *photo_name,
                                  vtkKWIcon *icon,
-                                 const char *blend_with_name = 0,
-                                 const char *blend_color_option = 0,
                                  int update_options = 0);
   static int UpdatePhotoFromPredefinedIcon(vtkKWApplication *app,
                                            const char *photo_name,
                                            int icon_index,
-                                           const char *blend_with_name = 0,
-                                           const char *blend_color_option = 0,
                                            int update_options = 0);
 
   // Description:
@@ -235,9 +221,7 @@ public:
                                const unsigned char *pixels, 
                                int width, int height,
                                int pixel_size,
-                               unsigned long buffer_length = 0,
-                               const char *blend_with_name = 0,
-                               const char *blend_color_option = 0);
+                               unsigned long buffer_length = 0);
   static int UpdateOrLoadPhoto(vtkKWApplication *app,
                                const char *photo_name,
                                const char *file_name,
@@ -245,17 +229,14 @@ public:
                                const unsigned char *pixels, 
                                int width, int height,
                                int pixel_size,
-                               unsigned long buffer_length = 0,
-                               const char *blend_with_name = 0,
-                               const char *blend_color_option = 0);
+                               unsigned long buffer_length = 0);
 
   // Description:
   // Specifies an image to display in a widget. Typically, if the image
   // is specified then it overrides other options that specify a bitmap or
   // textual value to display in the widget.
   // Set the image option using pixel data. The parameters are the same
-  // as the one used in UpdatePhoto(), blend_with_name is missing since
-  // we already know which widget to blend the image with.
+  // as the one used in UpdatePhoto().
   // An image is created and associated to the Tk -image option or 
   // image_option if not NULL (ex: -selectimage).
   static void SetImageOptionToPixels(
@@ -264,7 +245,6 @@ public:
     int width, int height, 
     int pixel_size = 4,
     unsigned long buffer_length = 0,
-    const char *blend_color_option = 0,
     const char *image_option = 0);
 
   // Description:

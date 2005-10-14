@@ -29,7 +29,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.42");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -174,8 +174,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_open_width, 
                                      image_eye_open_height, 
                                      image_eye_open_pixel_size,
-                                     image_eye_open_length,
-                                     this->Canvas->GetWidgetName()))
+                                     image_eye_open_length))
     {
     vtkWarningMacro(<< "Error creating photo (eye open)");
     }
@@ -189,8 +188,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_gray_width, 
                                      image_eye_gray_height, 
                                      image_eye_gray_pixel_size,
-                                     image_eye_gray_length,
-                                     this->Canvas->GetWidgetName()))
+                                     image_eye_gray_length))
     {
     vtkWarningMacro(<< "Error creating photo (eye gray)");
     }
@@ -204,8 +202,7 @@ void vtkPVSourceList::ChildCreate()
                                      image_eye_novis_width, 
                                      image_eye_novis_height, 
                                      image_eye_novis_pixel_size,
-                                     image_eye_novis_length,
-                                     this->Canvas->GetWidgetName()))
+                                     image_eye_novis_length))
     {
     vtkWarningMacro(<< "Error creating photo (eye novis)");
     }

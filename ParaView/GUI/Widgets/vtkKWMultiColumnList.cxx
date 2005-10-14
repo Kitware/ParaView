@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.30");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -700,9 +700,7 @@ void vtkKWMultiColumnList::SetColumnLabelImageToPixels(
                                      image_name.c_str(),
                                      pixels, 
                                      width, height, pixel_size,
-                                     buffer_length,
-                                     this->GetWidgetName(),
-                                     "-labelbg"))
+                                     buffer_length))
     {
     vtkWarningMacro(
       << "Error updating Tk photo " << image_name.c_str());
@@ -1779,21 +1777,11 @@ void vtkKWMultiColumnList::SetCellImageToPixels(
     image_name += buffer;
     }
 
-  // Use the current cell background color to blend
-
-  double r, g, b;
-  this->GetCellCurrentBackgroundColor(row_index, col_index, &r, &g, &b);
-  char bgcolor[10];
-  sprintf(bgcolor, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-
   if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                      image_name.c_str(),
                                      pixels, 
                                      width, height, pixel_size,
-                                     buffer_length,
-                                     this->GetWidgetName(),
-                                     bgcolor))
+                                     buffer_length))
     {
     vtkWarningMacro(
       << "Error updating Tk photo " << image_name.c_str());

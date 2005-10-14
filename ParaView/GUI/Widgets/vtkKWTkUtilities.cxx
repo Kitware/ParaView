@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.69");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.70");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -606,8 +606,6 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   int width, int height,
                                   int pixel_size,
                                   unsigned long buffer_length,
-                                  const char *blend_with_name,
-                                  const char *blend_color_option,
                                   int update_options)
 {
   // Check params
@@ -670,10 +668,6 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 
   Tk_PhotoSetSize(photo, width, height);
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  Tk_PhotoBlank(photo);
-#endif
-
   unsigned long nb_of_raw_bytes = width * height * pixel_size;
 
   // Is the data encoded (zlib and/or base64) ?
@@ -702,87 +696,66 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   sblock.offset[1] = 1;
   sblock.offset[2] = 2;
   sblock.offset[3] = 3;
-
-  sblock.pixelSize = 3;
+  sblock.pixelSize = pixel_size;
   sblock.pitch     = sblock.width * sblock.pixelSize;
   unsigned long sblock_size = sblock.pitch * sblock.height;
+  sblock.pixelPtr = const_cast<unsigned char *>(pixels);
 
-  unsigned char *pp = NULL;
+  // Tcl/Tk 8.4.8 and before still do not support transparency correctly,
+  // they will handle only fully transparent (0) or opaque (255)
+  // Let's blend manually over a light-gray background
 
-  if (pixel_size <= 3)
+  unsigned char *blended_pixels = NULL;
+
+  int tcl_major, tcl_minor, tcl_patch_level;
+  Tcl_GetVersion(&tcl_major, &tcl_minor, &tcl_patch_level, NULL);
+  if (pixel_size == 4 &&
+      (tcl_major <= 8 && tcl_minor <= 4 && tcl_patch_level <= 8))
     {
-    sblock.pixelPtr = const_cast<unsigned char *>(pixels);
-    }
-  else 
-    {
-#if 0
-    sblock.pixelPtr = const_cast<unsigned char *>(pixels);
-
-    sblock.pixelSize = 4;
-    sblock.pitch     = sblock.width * sblock.pixelSize;
-    unsigned long sblock_size = sblock.pitch * sblock.height;
-
-#else
-    pp = sblock.pixelPtr = new unsigned char[sblock_size];
-
-    // At the moment let's not use the alpha layer inside the photo but 
-    // blend with the current background color
-
-    double r, g, b;
-    if (blend_with_name && !blend_color_option)
+    int need_blend = 0;
+    unsigned char *pixels_ptr = const_cast<unsigned char *>(pixels);
+    unsigned char *pixels_ptr_end = 
+      pixels_ptr + (long)width * (long)height * (long)pixel_size;
+    pixels_ptr += 3;
+    while (pixels_ptr < pixels_ptr_end)
       {
-      blend_color_option = "-background";
-      }
-    if (blend_color_option || blend_with_name)
-      {
-      // If it is not an option, interpret it as a color right away
-      // otherwise retrieve that option color from the widget to blend
-      // it against (blend_with_name)
-
-      if (blend_color_option && *blend_color_option != '-')
+      if (*pixels_ptr && *pixels_ptr != 255)
         {
-        vtkKWTkUtilities::GetRGBColor(
-          interp, 
-          blend_with_name ? blend_with_name : ".", 
-          blend_color_option, &r, &g, &b);
+        need_blend = 1;
+        break;
         }
-      else
-        {
-        vtkKWTkUtilities::GetOptionColor(
-          interp, 
-          blend_with_name ? blend_with_name : ".", 
-          blend_color_option, &r, &g, &b);
-        }
+      pixels_ptr += pixel_size;
       }
-    else
-      {
-      vtkKWTkUtilities::GetOptionColor(interp, ".", "-background", &r, &g, &b);
-      }
-    
-    r *= 255.0;
-    g *= 255.0;
-    b *= 255.0;
 
-    // Create photo pixels
-
-    int xx, yy;
-    for (yy=0; yy < height; yy++)
+    if (need_blend)
       {
-      for (xx=0; xx < width; xx++)
+      blended_pixels = sblock.pixelPtr = new unsigned char[sblock_size];
+
+      unsigned char *blended_pixels_ptr = blended_pixels;
+      pixels_ptr = const_cast<unsigned char *>(pixels);
+      while (pixels_ptr < pixels_ptr_end)
         {
-        double alpha = static_cast<float>(*(pixels + 3)) / 255.0;
-        
-        *(pp)     = static_cast<int>(r * (1 - alpha) + *(pixels)    * alpha);
-        *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(pixels+ 1) * alpha);
-        *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(pixels+ 2) * alpha);
-        
-        pixels += pixel_size;
-        pp += 3;
+        unsigned char alpha_char = *(pixels_ptr + 3);
+        if (alpha_char && alpha_char != 255)
+          {
+          double alpha = static_cast<double>(alpha_char) / 255.0;
+          *blended_pixels_ptr++ = 
+            static_cast<unsigned char>(212*(1-alpha) + *pixels_ptr++ * alpha);
+          *blended_pixels_ptr++ = 
+            static_cast<unsigned char>(208*(1-alpha) + *pixels_ptr++ * alpha);
+          *blended_pixels_ptr++ = 
+            static_cast<unsigned char>(200*(1-alpha) + *pixels_ptr++ * alpha);
+          *blended_pixels_ptr++ = 255; pixels_ptr++;
+          }
+        else
+          {
+          *blended_pixels_ptr++ = *pixels_ptr++;
+          *blended_pixels_ptr++ = *pixels_ptr++;
+          *blended_pixels_ptr++ = *pixels_ptr++;
+          *blended_pixels_ptr++ = *pixels_ptr++;
+          }
         }
       }
-
-    pp = sblock.pixelPtr;
-#endif
     }
   
   if (update_options & vtkKWTkUtilities::UpdatePhotoOptionFlipVertical)
@@ -791,17 +764,18 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     sblock.pixelPtr += sblock_size + sblock.pitch;
     }
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
-  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height, TK_PHOTO_COMPOSITE_SET);
-#else
-  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
+  Tk_PhotoPutBlock(
+    photo, &sblock, 0, 0, width, height
+#if !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
+    , TK_PHOTO_COMPOSITE_SET
 #endif
+    );
 
   // Free mem
 
-  if (pp)
+  if (blended_pixels)
     {
-    delete [] pp;
+    delete [] blended_pixels;
     }
 
   if (decoded_data)
@@ -819,8 +793,6 @@ int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
                                   int width, int height,
                                   int pixel_size,
                                   unsigned long buffer_length,
-                                  const char *blend_with_name,
-                                  const char *blend_color_option,
                                   int update_options)
 {
   if (!app)
@@ -834,8 +806,6 @@ int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
     width, height,
     pixel_size,
     buffer_length,
-    blend_with_name,
-    blend_color_option,
     update_options);
 }
 
@@ -843,8 +813,6 @@ int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
 int vtkKWTkUtilities::UpdatePhotoFromIcon(vtkKWApplication *app,
                                           const char *photo_name,
                                           vtkKWIcon *icon,
-                                          const char *blend_with_name,
-                                          const char *blend_color_option,
                                           int update_options)
 {
   if (!app || !icon)
@@ -858,8 +826,6 @@ int vtkKWTkUtilities::UpdatePhotoFromIcon(vtkKWApplication *app,
     icon->GetWidth(), icon->GetHeight(), 
     icon->GetPixelSize(),
     0,
-    blend_with_name,
-    blend_color_option,
     update_options);
 }
 
@@ -868,8 +834,6 @@ int vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
   vtkKWApplication *app,
   const char *photo_name,
   int icon_index,
-  const char *blend_with_name,
-  const char *blend_color_option,
   int update_options)
 {
   if (!app)
@@ -882,8 +846,6 @@ int vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
     app,
     photo_name,
     icon,
-    blend_with_name,
-    blend_color_option,
     update_options);
   icon->Delete();
   return res;
@@ -897,7 +859,6 @@ void vtkKWTkUtilities::SetImageOptionToPixels(
   int height,
   int pixel_size,
   unsigned long buffer_length,
-  const char *blend_color_option,
   const char *image_option)
 {
   if (!widget->IsCreated())
@@ -920,20 +881,11 @@ void vtkKWTkUtilities::SetImageOptionToPixels(
   image_name += ".";
   image_name += &image_option[1];
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  // This work-around is put here to "fix" what looks like a bug
-  // in Tk. Without this, there seems to be some weird problems
-  // with Tk picking some alpha values for some colors.
-  widget->Script("catch {destroy %s}", image_name.c_str());
-#endif
-  
   if (!vtkKWTkUtilities::UpdatePhoto(widget->GetApplication(),
                                      image_name.c_str(),
                                      pixels, 
                                      width, height, pixel_size,
-                                     buffer_length,
-                                     widget->GetWidgetName(),
-                                     blend_color_option))
+                                     buffer_length))
     {
     vtkWarningWithObjectMacro(
       widget, "Error updating Tk photo " << image_name.c_str());
@@ -951,9 +903,7 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
                                         const unsigned char *pixels, 
                                         int width, int height,
                                         int pixel_size,
-                                        unsigned long buffer_length,
-                                        const char *blend_with_name,
-                                        const char *blend_color_option)
+                                        unsigned long buffer_length)
 {
   // Try to find a PNG file with the same name in directory 
   // or directory/Resources
@@ -987,9 +937,7 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
     pixels, 
     width, height,
     pixel_size,
-    buffer_length,
-    blend_with_name,
-    blend_color_option);
+    buffer_length);
   
   if (png_buffer)
     {
@@ -1007,9 +955,7 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(vtkKWApplication *app,
                                         const unsigned char *pixels, 
                                         int width, int height,
                                         int pixel_size,
-                                        unsigned long buffer_length,
-                                        const char *blend_with_name,
-                                        const char *blend_color_option)
+                                        unsigned long buffer_length)
 {
   if (!app)
     {
@@ -1023,9 +969,7 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(vtkKWApplication *app,
     pixels, 
     width, height,
     pixel_size,
-    buffer_length,
-    blend_with_name,
-    blend_color_option);
+    buffer_length);
 }
 
 //----------------------------------------------------------------------------
