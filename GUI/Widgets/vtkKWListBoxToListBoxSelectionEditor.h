@@ -109,7 +109,7 @@ protected:
   vtkKWPushButton* UpButton;
   vtkKWPushButton* DownButton;
 
-  void MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2);
+  virtual void MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2);
   void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
   void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
   void ShiftItems(vtkKWListBox* l1, int down);

@@ -27,7 +27,7 @@ class vtkKWEntry;
 class vtkPVSource;
 class vtkKWScaleWithEntry;
 class vtkKWFrame;
-class vtkKWListBoxToListBoxSelectionEditor;
+class vtkPVListBoxToListBoxSelectionEditor;
 class vtkPVFileEntryObserver;
 class vtkKWPopupButton;
 
@@ -161,7 +161,7 @@ protected:
 
   int IgnoreFileListEvents;
 
-  vtkKWListBoxToListBoxSelectionEditor* FileListSelect;
+  vtkPVListBoxToListBoxSelectionEditor* FileListSelect;
   vtkKWPopupButton* FileListPopup;
 
   //BTX
