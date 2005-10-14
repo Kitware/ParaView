@@ -19,6 +19,7 @@
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWIcon.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
 #include "vtkMath.h"
@@ -35,8 +36,10 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
+#include <vtksys/stl/string>
+
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.107");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.108");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -656,27 +659,43 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
     menu->AddSeparator();
     }
 
+  vtksys_stl::string label;
   char *buttonvar;
+  int show_icons = 0;
 
   // Corner Annotation
 
+  label = "Corner Annotation";
   buttonvar = menu->CreateCheckButtonVariable(
     this, "CornerAnnotationVisibility");
   menu->AddCheckButton(
-    "Corner Annotation", buttonvar, this, "ToggleCornerAnnotationVisibility");
+    label.c_str(), buttonvar, this, "ToggleCornerAnnotationVisibility");
   menu->CheckCheckButton(
     this, "CornerAnnotationVisibility", this->GetCornerAnnotationVisibility());
   delete [] buttonvar;
+  if (show_icons)
+    {
+    menu->SetItemImageToPredefinedIcon(
+      label.c_str(), vtkKWIcon::IconCornerAnnotation);
+    menu->SetItemCompoundMode(label.c_str(), 1);
+    }
 
   // Header Annotation
 
+  label = "Header Annotation";
   buttonvar = menu->CreateCheckButtonVariable(
     this, "HeaderAnnotationVisibility");
   menu->AddCheckButton(
-    "Header Annotation", buttonvar, this, "ToggleHeaderAnnotationVisibility");
+    label.c_str(), buttonvar, this, "ToggleHeaderAnnotationVisibility");
   menu->CheckCheckButton(
     this, "HeaderAnnotationVisibility", this->GetHeaderAnnotationVisibility());
   delete [] buttonvar;
+  if (show_icons)
+    {
+    menu->SetItemImageToPredefinedIcon(
+      label.c_str(), vtkKWIcon::IconHeaderAnnotation);
+    menu->SetItemCompoundMode(label.c_str(), 1);
+    }
 }
 
 //----------------------------------------------------------------------------
