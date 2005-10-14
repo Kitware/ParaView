@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.21");
+vtkCxxRevisionMacro(vtkKWIcon, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -146,6 +146,14 @@ void vtkKWIcon::SetImage(int image)
   
   switch (image)
     {
+    case vtkKWIcon::IconBoundingBox:
+      this->SetImage(
+        image_bounding_box, 
+        image_bounding_box_width, image_bounding_box_height,
+        image_bounding_box_pixel_size, 
+        image_bounding_box_length);
+      break;
+
     case vtkKWIcon::IconColorBarAnnotation:
       this->SetImage(
         image_color_bar_annotation, 
@@ -618,6 +626,69 @@ void vtkKWIcon::SetImage(int image)
 const unsigned char* vtkKWIcon::GetData()
 {
   return this->Data;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWIcon::Fade(double factor)
+{
+  if (!this->Data || 
+      this->Width == 0 || 
+      this->Height == 0 || 
+      this->PixelSize != 4)
+    {
+    return;
+    }
+
+  unsigned long data_length = this->Width * this->Height * this->PixelSize;
+  unsigned char *data_ptr = this->Data;
+  const unsigned char *data_ptr_end = this->Data + data_length;
+
+  data_ptr += 3;
+  while (data_ptr < data_ptr_end)
+    {
+    *data_ptr = (unsigned char)((double)(*data_ptr) * factor);
+    data_ptr += this->PixelSize;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWIcon::Flatten(double r, double g, double b)
+{
+  if (!this->Data || 
+      this->Width == 0 || 
+      this->Height == 0 || 
+      this->PixelSize != 4)
+    {
+    return;
+    }
+
+  unsigned long data_length = this->Width * this->Height * this->PixelSize;
+  unsigned char *data_ptr = this->Data;
+  const unsigned char *data_ptr_end = this->Data + data_length;
+
+  unsigned long new_data_length = this->Width * this->Height * 3;
+  unsigned char *new_data = new unsigned char [new_data_length];
+  unsigned char *new_data_ptr = new_data;
+
+  unsigned char rc = (unsigned char)r * 255.0;
+  unsigned char gc = (unsigned char)g * 255.0;
+  unsigned char bc = (unsigned char)b * 255.0;
+
+  while (data_ptr < data_ptr_end)
+    {
+    double alpha = static_cast<double>(*(data_ptr + 3)) / 255.0;
+    *new_data_ptr++ = 
+      static_cast<unsigned char>(rc * (1 - alpha) + *data_ptr++ * alpha);
+    *new_data_ptr++ = 
+      static_cast<unsigned char>(gc * (1 - alpha) + *data_ptr++ * alpha);
+    *new_data_ptr++ = 
+      static_cast<unsigned char>(bc * (1 - alpha) + *data_ptr++ * alpha);
+    data_ptr++;
+    }
+
+  this->SetImage(new_data, this->Width, this->Height, 3, new_data_length);
+
+  delete [] new_data;
 }
 
 //----------------------------------------------------------------------------
