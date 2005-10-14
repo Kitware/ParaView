@@ -68,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.252");
+vtkCxxRevisionMacro(vtkKWApplication, "1.253");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1197,7 +1197,11 @@ void vtkKWApplication::AddAboutText(ostream &os)
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddAboutCopyrights(ostream &os)
 {
-  os << "Tcl/Tk" << endl
+  int tcl_major, tcl_minor, tcl_patch_level;
+  Tcl_GetVersion(&tcl_major, &tcl_minor, &tcl_patch_level, NULL);
+
+  os << "Tcl/Tk " 
+     << tcl_major << "." << tcl_minor << "." << tcl_patch_level << endl
      << "  - Copyright (c) 1989-1994 The Regents of the University of "
      << "California." << endl
      << "  - Copyright (c) 1994 The Australian National University." << endl
