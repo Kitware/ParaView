@@ -56,6 +56,11 @@ void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const double Value)
   pqSetProperty<vtkSMDoubleVectorProperty, double>(Proxy, Name, Value);
 }
 
+void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const bool Value)
+{
+  pqSetProperty<vtkSMIntVectorProperty, int>(Proxy, Name, Value);
+}
+
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const int Value)
 {
   pqSetProperty<vtkSMIntVectorProperty, int>(Proxy, Name, Value);

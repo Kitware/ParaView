@@ -14,6 +14,7 @@ class vtkSMProxy;
 class QString;
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const double Value);
+void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const bool Value);
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const int Value);
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const QString& Value);
 

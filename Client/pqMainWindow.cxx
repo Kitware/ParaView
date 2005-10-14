@@ -8,6 +8,7 @@
  */
 
 #include "pqCamera.h"
+#include "pqCheckBox.h"
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
@@ -17,12 +18,14 @@
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqSpinBox.h"
 #include "pqTesting.h"
 
 #include <QApplication>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QToolbar>
 
 #include <vtkRenderWindow.h>
 #include <vtkSMDataObjectDisplayProxy.h>
@@ -69,6 +72,7 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 pqMainWindow::pqMainWindow(QApplication& Application) :
   base(),
   currentServer(0),
+  toolbar(0),
   window(0),
   serverDisconnectAction(0)
 {
@@ -131,6 +135,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
 pqMainWindow::~pqMainWindow()
 {
   delete this->window;
+  delete this->toolbar;
   delete this->currentServer;
 }
 
@@ -138,6 +143,9 @@ void pqMainWindow::setServer(pqServer* Server)
 {
   delete this->window;
   this->window = 0;
+
+  delete this->toolbar;
+  this->toolbar = 0;
 
   delete this->currentServer;
   this->currentServer = 0;
@@ -186,6 +194,15 @@ void pqMainWindow::onFileNew(pqServer* Server)
   source->UpdateVTKObjects();
   
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
+
+  // Create a toolbar ...
+  this->toolbar = new QToolBar("Properties", this);
+  this->addToolBar(toolbar);
+
+  this->toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Capping", this->toolbar, "Capping"));
+  this->toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Again with the Capping", this->toolbar, "Again with the Capping"));
+  this->toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->toolbar, "Resolution"));
+  this->toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->toolbar, "Resolution Yet Again"));
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());

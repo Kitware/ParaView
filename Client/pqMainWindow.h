@@ -14,6 +14,7 @@
 
 class pqServer;
 class QAction;
+class QToolBar;
 class QVTKWidget;
 
 class pqMainWindow :
@@ -31,6 +32,7 @@ private:
   void setServer(pqServer* Server);
 
   pqServer* currentServer;
+  QToolBar* toolbar;
   QVTKWidget* window;
   QAction* serverDisconnectAction;
   

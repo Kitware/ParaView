@@ -48,12 +48,14 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqCheckBox.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqMainWindow.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
+  pqSpinBox.h
   pqTestCases.h
 )
 
@@ -65,6 +67,8 @@ ADD_EXECUTABLE(pqClient
   main.cxx
   pqCamera.cxx
   pqCamera.h
+  pqCheckBox.cxx
+  pqCheckBox.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
@@ -85,6 +89,8 @@ ADD_EXECUTABLE(pqClient
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
+  pqSpinBox.cxx
+  pqSpinBox.h
   pqTestCases.cxx
   pqTestCases.h
   pqTesting.cxx
