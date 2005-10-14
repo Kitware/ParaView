@@ -16,12 +16,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindowBase.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkKWIcon.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.84");
+vtkCxxRevisionMacro(vtkKWMenu, "1.85");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -979,20 +981,123 @@ const char* vtkKWMenu::GetItemCommand(int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
+void vtkKWMenu::SetItemImage(int idx, const char *imagename)
 {
   if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
     {
     return;
     }
-  this->Script("%s entryconfigure %d -compound left -image %s -hidemargin 0", 
+  this->Script("%s entryconfigure %d -image %s", 
                this->GetWidgetName(), idx, imagename);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundImage(const char *label, const char *imagename)
+void vtkKWMenu::SetItemImage(const char *label, const char *imagename)
 {
-  this->SetItemCompoundImage(this->GetIndexOfItem(label), imagename);
+  this->SetItemImage(this->GetIndexOfItem(label), imagename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemImageToPredefinedIcon(int idx, int icon_index)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+
+  char buffer[1024];
+
+  sprintf(buffer, "%s.PredefinedIcon%d", this->GetTclName(), icon_index);
+  if (!vtkKWTkUtilities::FindPhoto(this->GetApplication(), buffer))
+    {
+    vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
+      this->GetApplication(), buffer, icon_index);
+    }
+
+#if 0
+  this->SetItemSelectImage(idx, buffer);
+
+  sprintf(buffer, "%s.PredefinedIconFaded%d", this->GetTclName(), icon_index);
+  if (!vtkKWTkUtilities::FindPhoto(this->GetApplication(), buffer))
+    {
+    vtkKWIcon *icon_faded = vtkKWIcon::New();
+    icon_faded->SetImage(icon_index);
+    icon_faded->Fade(0.3);
+    
+    vtkKWTkUtilities::UpdatePhotoFromIcon(
+      this->GetApplication(), buffer, icon_faded);
+    icon_faded->Delete();
+    }
+  this->SetItemIndicatorVisibility(idx, 0);
+#endif
+
+  this->SetItemImage(idx, buffer);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemImageToPredefinedIcon(const char *label, int icon_index)
+{
+  this->SetItemImageToPredefinedIcon(this->GetIndexOfItem(label), icon_index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectImage(int idx, const char *imagename)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -selectimage %s", 
+               this->GetWidgetName(), idx, imagename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectImage(const char *label, const char *imagename)
+{
+  this->SetItemSelectImage(this->GetIndexOfItem(label), imagename);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectImageToPredefinedIcon(int idx, int icon_index)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+
+  char buffer[1024];
+  sprintf(buffer, "%s.PredefinedIcon%d", this->GetTclName(), icon_index);
+  if (!vtkKWTkUtilities::FindPhoto(this->GetApplication(), buffer))
+    {
+    vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
+      this->GetApplication(), buffer, icon_index);
+    }
+  this->SetItemSelectImage(idx, buffer);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectImageToPredefinedIcon(
+  const char *label, int icon_index)
+{
+  this->SetItemSelectImageToPredefinedIcon(
+    this->GetIndexOfItem(label), icon_index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemCompoundMode(int idx, int flag)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -compound %s", 
+               this->GetWidgetName(), idx, (flag ? "left" : "none"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemCompoundMode(const char *label, int mode)
+{
+  this->SetItemCompoundMode(this->GetIndexOfItem(label), mode);
 }
 
 //----------------------------------------------------------------------------
@@ -1010,6 +1115,23 @@ void vtkKWMenu::SetItemMarginVisibility(int idx, int flag)
 void vtkKWMenu::SetItemMarginVisibility(const char *label, int flag)
 {
   this->SetItemMarginVisibility(this->GetIndexOfItem(label), flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemIndicatorVisibility(int idx, int flag)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -indicatoron %d", 
+               this->GetWidgetName(), idx, flag ? 1 : 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemIndicatorVisibility(const char *label, int flag)
+{
+  this->SetItemIndicatorVisibility(this->GetIndexOfItem(label), flag);
 }
 
 //----------------------------------------------------------------------------

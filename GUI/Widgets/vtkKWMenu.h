@@ -175,10 +175,30 @@ public:
   const char* GetItemOption(const char *label, const char *option);
 
   // Description:
-  // Set the compound image of an entry.
+  // Set the image and select image of an entry.
+  // Check the SetItemCompoundMode if you want to display both the
+  // image and the text.
+  void SetItemImage(int position, const char *imagename);
+  void SetItemImage(const char *label, const char *imagename);
+  void SetItemImageToPredefinedIcon(int position, int icon_index);
+  void SetItemImageToPredefinedIcon(const char *label, int icon_index);
+
+  // Description:
+  // Set the select image of an entry.
+  // The select image is available only for checkbutton and radiobutton 
+  // entries. Specifies an image to display in the entry (in place of the 
+  // regular image) when it is selected. 
+  void SetItemSelectImage(int position, const char *imagename);
+  void SetItemSelectImage(const char *label, const char *imagename);
+  void SetItemSelectImageToPredefinedIcon(int position, int icon_index);
+  void SetItemSelectImageToPredefinedIcon(const char *label, int icon_index);
+
+  // Description:
+  // Set the compound mode of an entry. Set it to 'true' to display
+  // both the image and the text.
   // Check the SetItemMarginVisibility method too.
-  void SetItemCompoundImage(int position, const char *imagename);
-  void SetItemCompoundImage(const char *label, const char *imagename);
+  void SetItemCompoundMode(int position, int flag);
+  void SetItemCompoundMode(const char *label, int flag);
 
   // Description:
   // Set the visibility of the standard margin of an entry.
@@ -186,6 +206,12 @@ public:
   // i.e., color palettes, pattern palettes, etc.
   void SetItemMarginVisibility(int position, int flag);
   void SetItemMarginVisibility(const char *label, int flag);
+
+  // Description:
+  // Set the visibility of the indicator of an entry.
+  // Available only for checkbutton and radiobutton entries.
+  void SetItemIndicatorVisibility(int position, int flag);
+  void SetItemIndicatorVisibility(const char *label, int flag);
 
   // Description:
   // Set/Get the accelerator for a given item.
