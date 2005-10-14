@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.22");
+vtkCxxRevisionMacro(vtkKWIcon, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -670,9 +670,9 @@ void vtkKWIcon::Flatten(double r, double g, double b)
   unsigned char *new_data = new unsigned char [new_data_length];
   unsigned char *new_data_ptr = new_data;
 
-  unsigned char rc = (unsigned char)r * 255.0;
-  unsigned char gc = (unsigned char)g * 255.0;
-  unsigned char bc = (unsigned char)b * 255.0;
+  unsigned char rc = (unsigned char)(r * 255.0);
+  unsigned char gc = (unsigned char)(g * 255.0);
+  unsigned char bc = (unsigned char)(b * 255.0);
 
   while (data_ptr < data_ptr_end)
     {
