@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.106");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.107");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -1268,17 +1268,6 @@ void vtkKWRenderWidget_InteractorTimer(ClientData arg)
 {
   vtkRenderWindowInteractor *me = (vtkRenderWindowInteractor*)arg;
   me->InvokeEvent(vtkCommand::TimerEvent);
-}
-
-//----------------------------------------------------------------------------
-vtkCallbackCommand* vtkKWRenderWidget::GetCallbackCommand()
-{
-  vtkCallbackCommand *command = this->Superclass::GetCallbackCommand();
-  if (command)
-    {
-    command->AbortFlagOnExecuteOn();
-    }
-  return command;
 }
 
 //----------------------------------------------------------------------------

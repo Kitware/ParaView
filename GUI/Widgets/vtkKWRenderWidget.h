@@ -299,12 +299,6 @@ protected:
   virtual void ResumeScreenRendering();
   
   // Description:
-  // Get the callback command. 
-  // Subclasses can override this method to set specific flags, like
-  // the AbortFlagOnExecute flag.
-  virtual vtkCallbackCommand* GetCallbackCommand();
-
-  // Description:
   // Processes the events that are passed through CallbackCommand (or others).
   // Subclasses can oberride this method to process their own events, but
   // should call the superclass too.
