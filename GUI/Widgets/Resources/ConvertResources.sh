@@ -9,7 +9,10 @@ KWConvertImageToHeader --zlib --base64 \
 
 KWConvertImageToHeader --zlib --base64 \
     vtkKWIconResources.h \
+    bounding_box.png \
+    color_bar_annotation.png \
     connection.png \
+    corner_annotation.png \
     document.png \
     empty_16x16.png \
     empty_1x1.png \
@@ -23,6 +26,7 @@ KWConvertImageToHeader --zlib --base64 \
     folder_open.png \
     grid_linear.png \
     grid_log.png \
+    header_annotation.png \
     helpbubble.png \
     info_mini.png \
     lock.png \
@@ -31,6 +35,7 @@ KWConvertImageToHeader --zlib --base64 \
     move.png \
     move_h.png \
     move_v.png \
+    orientation_cube_annotation.png \
     pan_hand.png \
     plus.png \
     point_finger.png \
@@ -41,7 +46,9 @@ KWConvertImageToHeader --zlib --base64 \
     question.png \
     reload.png \
     rotate.png \
+    scale_bar_annotation.png \
     shrink.png \
+    side_annotation.png \
     stopwatch.png \
     transport_beginning.png \
     transport_end.png \

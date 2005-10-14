@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.20");
+vtkCxxRevisionMacro(vtkKWIcon, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -146,12 +146,28 @@ void vtkKWIcon::SetImage(int image)
   
   switch (image)
     {
+    case vtkKWIcon::IconColorBarAnnotation:
+      this->SetImage(
+        image_color_bar_annotation, 
+        image_color_bar_annotation_width, image_color_bar_annotation_height,
+        image_color_bar_annotation_pixel_size, 
+        image_color_bar_annotation_length);
+      break;
+
     case vtkKWIcon::IconConnection:
       this->SetImage(
         image_connection, 
         image_connection_width, image_connection_height,
         image_connection_pixel_size, 
         image_connection_length);
+      break;
+
+    case vtkKWIcon::IconCornerAnnotation:
+      this->SetImage(
+        image_corner_annotation, 
+        image_corner_annotation_width, image_corner_annotation_height,
+        image_corner_annotation_pixel_size, 
+        image_corner_annotation_length);
       break;
 
     case vtkKWIcon::IconDocument:
@@ -242,6 +258,14 @@ void vtkKWIcon::SetImage(int image)
         image_grid_log_length);
       break;      
 
+    case vtkKWIcon::IconHeaderAnnotation:
+      this->SetImage(
+        image_header_annotation, 
+        image_header_annotation_width, image_header_annotation_height,
+        image_header_annotation_pixel_size, 
+        image_header_annotation_length);
+      break;
+
     case vtkKWIcon::IconHelpBubble:
       this->SetImage(
         image_helpbubble, 
@@ -305,6 +329,15 @@ void vtkKWIcon::SetImage(int image)
         image_move_v_pixel_size, 
         image_move_v_length);
       break;      
+
+    case vtkKWIcon::IconOrientationCubeAnnotation:
+      this->SetImage(
+        image_orientation_cube_annotation, 
+        image_orientation_cube_annotation_width, 
+        image_orientation_cube_annotation_height,
+        image_orientation_cube_annotation_pixel_size, 
+        image_orientation_cube_annotation_length);
+      break;
 
     case vtkKWIcon::IconPanHand:
       this->SetImage(
@@ -384,6 +417,22 @@ void vtkKWIcon::SetImage(int image)
         image_rotate_width, image_rotate_height,
         image_rotate_pixel_size, 
         image_rotate_length);
+      break;
+
+    case vtkKWIcon::IconScaleBarAnnotation:
+      this->SetImage(
+        image_scale_bar_annotation, 
+        image_scale_bar_annotation_width, image_scale_bar_annotation_height,
+        image_scale_bar_annotation_pixel_size, 
+        image_scale_bar_annotation_length);
+      break;
+
+    case vtkKWIcon::IconSideAnnotation:
+      this->SetImage(
+        image_side_annotation, 
+        image_side_annotation_width, image_side_annotation_height,
+        image_side_annotation_pixel_size, 
+        image_side_annotation_length);
       break;
 
     case vtkKWIcon::IconShrink:
