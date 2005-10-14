@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.44");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -279,8 +279,7 @@ void vtkKWCheckButton::SetImageToPixels(
     this, pixels, width, height, pixel_size, buffer_length);
 
   vtkKWTkUtilities::SetImageOptionToPixels(
-    this, pixels, width, height, pixel_size, buffer_length,
-    "-selectcolor", "-selectimage");
+    this, pixels, width, height, pixel_size, buffer_length, "-selectimage");
 }
 
 // ---------------------------------------------------------------------------

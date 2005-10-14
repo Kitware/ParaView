@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.13");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.14");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -730,8 +730,7 @@ void vtkKWHSVColorSelector::UpdateHueSatWheelImage()
                                 img_name.str(),
                                 buffer,
                                 diameter, diameter, 4,
-                                diameter * diameter * 4,
-                                this->HueSatWheelCanvas->GetWidgetName());
+                                diameter * diameter * 4);
 
   delete [] buffer;
   img_name.rdbuf()->freeze(0);
@@ -746,8 +745,7 @@ void vtkKWHSVColorSelector::UpdateHueSatWheelImage()
                                 img_name_d.str(),
                                 buffer_d,
                                 diameter, diameter, 4,
-                                diameter * diameter * 4,
-                                this->HueSatWheelCanvas->GetWidgetName());
+                                diameter * diameter * 4);
 
   delete [] buffer_d;
   img_name_d.rdbuf()->freeze(0);
@@ -957,8 +955,7 @@ void vtkKWHSVColorSelector::UpdateValueBoxImage()
                                 img_name.str(),
                                 buffer,
                                 width, height, 3,
-                                width * height * 3,
-                                this->ValueBoxCanvas->GetWidgetName());
+                                width * height * 3);
 
   delete [] buffer;
   img_name.rdbuf()->freeze(0);
@@ -973,8 +970,7 @@ void vtkKWHSVColorSelector::UpdateValueBoxImage()
                                 img_name_d.str(),
                                 buffer_d,
                                 width, height, 4,
-                                width * height * 4,
-                                this->ValueBoxCanvas->GetWidgetName());
+                                width * height * 4);
 
   delete [] buffer_d;
   img_name_d.rdbuf()->freeze(0);

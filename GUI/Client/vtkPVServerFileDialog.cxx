@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.49");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.50");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -397,8 +397,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                                      image_PVFolder_width, 
                                      image_PVFolder_height, 
                                      image_PVFolder_pixel_size,
-                                     image_PVFolder_length,
-                                     this->FileList->GetWidgetName()))
+                                     image_PVFolder_length))
     {
     vtkWarningMacro(<< "Error creating photo (eye open)");
     }
@@ -412,8 +411,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                                      image_PVDocument_width, 
                                      image_PVDocument_height, 
                                      image_PVDocument_pixel_size,
-                                     image_PVDocument_length,
-                                     this->FileList->GetWidgetName()))
+                                     image_PVDocument_length))
     {
     vtkWarningMacro(<< "Error creating photo (eye gray)");
     }

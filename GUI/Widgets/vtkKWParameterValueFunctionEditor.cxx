@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.70");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.71");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -5656,8 +5656,6 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
           width, height,
           pixel_size,
           buffer_length,
-          canv,
-          NULL,
           vtkKWTkUtilities::UpdatePhotoOptionFlipVertical);
         }
       if (blend)
