@@ -52,11 +52,27 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.35");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
 #define READ_SPCTH_VOLUME_FRACTION "Material volume fraction"
+
+class vtkSpyPlotWriteString
+{
+public:
+  vtkSpyPlotWriteString(const char* data, size_t length) : Data(data), Length(length) {}
+
+  const char* Data;
+  size_t Length;
+};
+
+inline ostream& operator<< (ostream& os, const vtkSpyPlotWriteString& c)
+{
+  os.write(c.Data, c.Length);
+  os.flush();
+  return os;
+}
 
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -227,7 +243,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.35");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -429,18 +445,18 @@ int vtkSpyPlotUniReader::ReadInformation()
   // Initial checks
   if ( !this->CellArraySelection )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cell array selection not specified" << endl;
+    vtkErrorMacro( "Cell array selection not specified" );
     return 0;
     }
   if ( !this->FileName )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "FileName not specifed" << endl;
+    vtkErrorMacro( "FileName not specifed" );
     return 0;
     }
   ifstream ifs(this->FileName, ios::binary|ios::in);
   if ( !ifs )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot open file: " << this->FileName << endl;
+    vtkErrorMacro( "Cannot open file: " << this->FileName );
     return 0;
     }
   vtkDebugMacro( << this << " Reading file: " << this->FileName );
@@ -451,37 +467,35 @@ int vtkSpyPlotUniReader::ReadInformation()
   char magic[8];
   if ( !this->ReadString(ifs, magic, 8) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read magic" << endl;
+    vtkErrorMacro( "Cannot read magic" );
     return 0;
     }
   if ( strncmp(magic, "spydata", 7) != 0 || magic[7] != 0)
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Bad magic: ";
-    cerr.write(magic, 7);
-    cerr << __FILE__ << ":" << __LINE__ << ": " << endl;
+    vtkErrorMacro( "Bad magic: " << vtkSpyPlotWriteString(magic, 7) );
     return 0;
     }
   if ( !this->ReadString(ifs, this->FileDescription, 128) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read FileDescription" << endl;
+    vtkErrorMacro( "Cannot read FileDescription" );
     return 0;
     }
   //printf("here: %ld\n", ifs.tellg());
   if ( !this->ReadInt(ifs, &(this->FileVersion), 8) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read file version" << endl;
+    vtkErrorMacro( "Cannot read file version" );
     return 0;
     }
   //printf("here: %ld\n", ifs.tellg());
   if ( !this->ReadDouble(ifs, this->GlobalMin, 6) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read file version" << endl;
+    vtkErrorMacro( "Cannot read file version" );
     return 0;
     }
   //printf("here: %ld\n", ifs.tellg());
   if ( !this->ReadInt(ifs, &(this->NumberOfBlocks), 2) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read file version" << endl;
+    vtkErrorMacro( "Cannot read file version" );
     return 0;
     }
   // Done with header
@@ -490,7 +504,7 @@ int vtkSpyPlotUniReader::ReadInformation()
   // Read all possible cell fields
   if ( !this->ReadInt(ifs, &(this->NumberOfPossibleCellFields), 1) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read number of material fields" << endl;
+    vtkErrorMacro( "Cannot read number of material fields" );
     return 0;
     }
   this->CellFields = new vtkSpyPlotUniReader::CellMaterialField[this->NumberOfPossibleCellFields];
@@ -501,19 +515,19 @@ int vtkSpyPlotUniReader::ReadInformation()
     field->Index = 0;
     if ( !this->ReadString(ifs, field->Id, 30) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " id" << endl;
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
       return 0;
       }
     if ( !this->ReadString(ifs, field->Comment, 80) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " commenet" << endl;
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
       return 0;
       }
     if ( this->FileVersion >= 101 )
       {
       if ( !this->ReadInt(ifs, &(field->Index), 1) )
         {
-        cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " int" << endl;
+        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
         return 0;
         }
       }
@@ -523,7 +537,7 @@ int vtkSpyPlotUniReader::ReadInformation()
   // Read all possible material fields
   if ( !this->ReadInt(ifs, &(this->NumberOfPossibleMaterialFields), 1) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read number of material fields" << endl;
+    vtkErrorMacro( "Cannot read number of material fields" );
     return 0;
     }
 
@@ -534,19 +548,19 @@ int vtkSpyPlotUniReader::ReadInformation()
     field->Index = 0;
     if ( !this->ReadString(ifs, field->Id, 30) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " id" << endl;
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
       return 0;
       }
     if ( !this->ReadString(ifs, field->Comment, 80) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " commenet" << endl;
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
       return 0;
       }
     if ( this->FileVersion >= 101 )
       {
       if ( !this->ReadInt(ifs, &(field->Index), 1) )
         {
-        cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read field " << fieldCnt << " int" << endl;
+        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
         return 0;
         }
       }
@@ -577,7 +591,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     GroupHeader gh;
     if ( !this->ReadFileOffset(ifs, &(gh.Offset), 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot get group header offset" << endl;
+      vtkErrorMacro( "Cannot get group header offset" );
       return 0;
       }
     vtkTypeInt64 cpos = ifs.tellg();
@@ -585,28 +599,28 @@ int vtkSpyPlotUniReader::ReadInformation()
     //vtkDebugMacro( "offset:   " << gh.Offset );
     if ( cpos > gh.Offset )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "The offset is back in file" << endl;
+      vtkErrorMacro("The offset is back in file: " << cpos << " > " << gh.Offset);
       return 0;
       }
     ifs.seekg(gh.Offset);
     if ( !this->ReadInt(ifs, &(gh.NumberOfDataDumps), 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num dumps" << endl;
+      vtkErrorMacro( "Problem reading the num dumps" );
       return 0;
       }
     if ( !this->ReadInt(ifs, gh.DumpCycle, MAX_DUMPS) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the dump times" << endl;
+      vtkErrorMacro( "Problem reading the dump times" );
       return 0;
       }
     if ( !this->ReadDouble(ifs, gh.DumpTime, MAX_DUMPS) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the dump times" << endl;
+      vtkErrorMacro( "Problem reading the dump times" );
       return 0;
       }
     if ( !this->ReadFileOffset(ifs, gh.DumpOffset, MAX_DUMPS) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the dump offsets" << endl;
+      vtkErrorMacro( "Problem reading the dump offsets" );
       return 0;
       }
     //vtkDebugMacro( "Number of dumps: " << gh.NumberOfDataDumps );
@@ -641,7 +655,6 @@ int vtkSpyPlotUniReader::ReadInformation()
       {
       break;
       }
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "**** Untested code." << endl;
     }
 
   this->TimeStepRange[1] = this->NumberOfDataDumps-1;
@@ -655,20 +668,19 @@ int vtkSpyPlotUniReader::ReadInformation()
     vtkTypeInt64 offset = this->DumpOffset[dump];
     if ( cpos > offset )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "The offset is back in file" << endl;
-      return 0;
+      vtkDebugMacro(<< "The offset is back in file: " << cpos << " > " << offset);
       }
     ifs.seekg(offset);
     vtkSpyPlotUniReader::DataDump *dh = &this->DataDumps[dump];
     memset(dh, 0, sizeof(dh));
     if ( !this->ReadInt(ifs, &(dh->NumVars), 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read number of variables" << endl;
+      vtkErrorMacro( "Cannot read number of variables" );
       return 0;
       }
     if ( dh->NumVars <= 0 )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Got bad number of variables: " << dh->NumVars << endl;
+      vtkErrorMacro( "Got bad number of variables: " << dh->NumVars );
       return 0;
       }
     dh->SavedVariables = new int[ dh->NumVars ];
@@ -676,12 +688,12 @@ int vtkSpyPlotUniReader::ReadInformation()
     //printf("Reading saved variables: %ld\n", ifs.tellg());
     if ( !this->ReadInt(ifs, dh->SavedVariables, dh->NumVars) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read the saved variables" << endl;
+      vtkErrorMacro( "Cannot read the saved variables" );
       return 0;
       }
     if ( !this->ReadFileOffset(ifs, dh->SavedVariableOffsets, dh->NumVars) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read the saved variable offsets" << endl;
+      vtkErrorMacro( "Cannot read the saved variable offsets" );
       return 0;
       }
     dh->Variables = new vtkSpyPlotUniReader::Variable[dh->NumVars];
@@ -725,7 +737,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         }
       if ( variable->Material < 0 )
         {
-        cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot found variable or material with ID: " << var << endl;
+        vtkErrorMacro( "Cannot found variable or material with ID: " << var );
         return 0;
         }
       if ( variable->Index >= 0 )
@@ -754,7 +766,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     int numberOfTracers;
     if ( !this->ReadInt(ifs, &numberOfTracers, 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of tracers" << endl;
+      vtkErrorMacro( "Problem reading the num of tracers" );
       return 0;
       }
     if ( numberOfTracers > 0 )
@@ -765,7 +777,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         int someSize;
         if ( !this->ReadInt(ifs, &someSize, 1) )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of tracers" << endl;
+          vtkErrorMacro( "Problem reading the num of tracers" );
           return 0;
           }
         ifs.seekg(someSize, ios::cur);
@@ -776,7 +788,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     int numberOfIndicators;
     if ( !this->ReadInt(ifs, &numberOfIndicators, 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of tracers" << endl;
+      vtkErrorMacro( "Problem reading the num of tracers" );
       return 0;
       }
     if ( numberOfIndicators > 0 )
@@ -792,7 +804,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         int numBins;
         if ( !this->ReadInt(ifs, &numBins, 1) )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of tracers" << endl;
+          vtkErrorMacro( "Problem reading the num of tracers" );
           return 0;
           }
         if ( numBins > 0 )
@@ -800,7 +812,7 @@ int vtkSpyPlotUniReader::ReadInformation()
           int someSize;
           if ( !this->ReadInt(ifs, &someSize, 1) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of tracers" << endl;
+            vtkErrorMacro( "Problem reading the num of tracers" );
             return 0;
             }
           ifs.seekg(someSize, ios::cur);
@@ -811,12 +823,12 @@ int vtkSpyPlotUniReader::ReadInformation()
     // Now read the data blocks information
     if ( !this->ReadInt(ifs, &dh->NumberOfBlocks, 1) )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the num of blocks" << endl;
+      vtkErrorMacro( "Problem reading the num of blocks" );
       return 0;
       }
     if ( this->NumberOfBlocks != dh->NumberOfBlocks )
       {
-      cerr << __FILE__ << ":" << __LINE__ << ": " << "Different number of blocks..." << endl;
+      vtkErrorMacro( "Different number of blocks..." );
       }
     dh->Blocks = new vtkSpyPlotUniReader::Block[dh->NumberOfBlocks];
     int block;
@@ -832,7 +844,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         }
       if ( !this->ReadInt(ifs, &(b->Nx), 6) )
         {
-        cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the block information" << endl;
+        vtkErrorMacro( "Problem reading the block information" );
         return 0;
         }
       //printf("Read data block header: n %d allocated %d pos %ld\n", block, b->Allocated, l);
@@ -869,7 +881,7 @@ int vtkSpyPlotUniReader::ReadInformation()
           {
           if ( !this->ReadInt(ifs, &numBytes, 1) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the number of bytes" << endl;
+            vtkErrorMacro( "Problem reading the number of bytes" );
             return 0;
             }
           //vtkDebugMacro( "  Number of bytes for " << component << ": " << numBytes );
@@ -880,7 +892,7 @@ int vtkSpyPlotUniReader::ReadInformation()
 
           if ( !this->ReadString(ifs, &*arrayBuffer.begin(), numBytes) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the bytes" << endl;
+            vtkErrorMacro( "Problem reading the bytes" );
             return 0;
             }
           vtkFloatArray* currentArray = 0;
@@ -892,14 +904,14 @@ int vtkSpyPlotUniReader::ReadInformation()
             }
           if ( !currentArray )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Internal error" << endl;
+            vtkErrorMacro( "Internal error" );
             return 0;
             }
           float* array = currentArray->GetPointer(0);
           int *size = (&b->Nx)+component;
           if ( !this->RunLengthDeltaDecode(&*arrayBuffer.begin(), numBytes, array, (*size) + 1) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem RLD decoding rectilinear grid array: " << component << endl;
+            vtkErrorMacro( "Problem RLD decoding rectilinear grid array: " << component );
             return 0;
             }
           b->VectorsFixedForGhostCells = 0;
@@ -1058,7 +1070,7 @@ int vtkSpyPlotUniReader::ReadData()
           int planeSize = bk->Nx * bk->Ny;
           if ( !this->ReadInt(ifs, &numBytes, 1) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the number of bytes" << endl;
+            vtkErrorMacro( "Problem reading the number of bytes" );
             return 0;
             }
           if ( static_cast<int>(arrayBuffer.size()) < numBytes )
@@ -1067,7 +1079,7 @@ int vtkSpyPlotUniReader::ReadData()
             }
           if ( !this->ReadString(ifs, &*arrayBuffer.begin(), numBytes) )
             {
-            cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem reading the bytes" << endl;
+            vtkErrorMacro( "Problem reading the bytes" );
             return 0;
             }
           if ( floatArray )
@@ -1075,7 +1087,7 @@ int vtkSpyPlotUniReader::ReadData()
             float* ptr = floatArray->GetPointer(zax * planeSize);
             if ( !this->RunLengthDataDecode(&*arrayBuffer.begin(), numBytes, ptr, planeSize) )
               {
-              cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem RLD decoding float data array" << endl;
+              vtkErrorMacro( "Problem RLD decoding float data array" );
               return 0;
               }
             }
@@ -1084,7 +1096,7 @@ int vtkSpyPlotUniReader::ReadData()
             unsigned char* ptr = unsignedCharArray->GetPointer(zax * planeSize);
             if ( !this->RunLengthDataDecode(&*arrayBuffer.begin(), numBytes, ptr, planeSize) )
               {
-              cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem RLD decoding unsigned char data array" << endl;
+              vtkErrorMacro( "Problem RLD decoding unsigned char data array" );
               return 0;
               }
             }
@@ -1293,7 +1305,7 @@ int vtkSpyPlotUniReader::RunLengthDeltaDecode(const unsigned char* in, int inSiz
         {
         if ( outIndex >= outSize )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem doing RLD decode. Too much data generated. Excpected: " << outSize << endl;
+          vtkErrorMacro( "Problem doing RLD decode. Too much data generated. Excpected: " << outSize );
           return 0;
           }
         out[outIndex] = val + outIndex*delta;
@@ -1308,7 +1320,7 @@ int vtkSpyPlotUniReader::RunLengthDeltaDecode(const unsigned char* in, int inSiz
         {
         if ( outIndex >= outSize )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem doing RLD decode. Too much data generated. Excpected: " << outSize << endl;
+          vtkErrorMacro( "Problem doing RLD decode. Too much data generated. Excpected: " << outSize );
           return 0;
           }
         float nval;
@@ -1327,7 +1339,7 @@ int vtkSpyPlotUniReader::RunLengthDeltaDecode(const unsigned char* in, int inSiz
 
 //-----------------------------------------------------------------------------
 template<class t>
-int vtkSpyPlotUniReaderRunLengthDataDecode(const unsigned char* in, int inSize, t* out, int outSize, t scale=1)
+int vtkSpyPlotUniReaderRunLengthDataDecode(vtkSpyPlotUniReader* self, const unsigned char* in, int inSize, t* out, int outSize, t scale=1)
 {
   int outIndex = 0, inIndex = 0;
 
@@ -1351,7 +1363,7 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(const unsigned char* in, int inSize, 
         {
         if ( outIndex >= outSize )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem doing RLD decode. Too much data generated. Excpected: " << outSize << endl;
+          vtkErrorWithObjectMacro(self, "Problem doing RLD decode. Too much data generated. Excpected: " << outSize );
           return 0;
           }
         out[outIndex] = static_cast<t>(val*scale);
@@ -1366,7 +1378,7 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(const unsigned char* in, int inSize, 
         {
         if ( outIndex >= outSize )
           {
-          cerr << __FILE__ << ":" << __LINE__ << ": " << "Problem doing RLD decode. Too much data generated. Excpected: " << outSize << endl;
+          vtkErrorWithObjectMacro(self, "Problem doing RLD decode. Too much data generated. Excpected: " << outSize );
           return 0;
           }
         float val;
@@ -1386,13 +1398,13 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(const unsigned char* in, int inSize, 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::RunLengthDataDecode(const unsigned char* in, int inSize, float* out, int outSize)
 {
-  return ::vtkSpyPlotUniReaderRunLengthDataDecode(in, inSize, out, outSize);
+  return ::vtkSpyPlotUniReaderRunLengthDataDecode(this, in, inSize, out, outSize);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::RunLengthDataDecode(const unsigned char* in, int inSize, unsigned char* out, int outSize)
 {
-  return ::vtkSpyPlotUniReaderRunLengthDataDecode(in, inSize, out, outSize, static_cast<unsigned char>(255));
+  return ::vtkSpyPlotUniReaderRunLengthDataDecode(this, in, inSize, out, outSize, static_cast<unsigned char>(255));
 }
 
 //-----------------------------------------------------------------------------
@@ -4171,7 +4183,7 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
   char magic[8];
   if ( !::vtkSpyPlotReadString(ifs, magic, 8) )
     {
-    cerr << __FILE__ << ":" << __LINE__ << ": " << "Cannot read magic" << endl;
+    vtkErrorMacro( "Cannot read magic" );
     return 0;
     }
   if ( strncmp(magic, "spydata", 7) != 0 &&
