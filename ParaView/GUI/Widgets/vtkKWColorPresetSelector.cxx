@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.19");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.20");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -819,7 +819,8 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
             it->ColorTransferFunction, img_name.c_str());
           }
         
-        menu->SetItemCompoundImage(preset_label.c_str(), img_name.c_str());
+        menu->SetItemImage(preset_label.c_str(), img_name.c_str());
+        menu->SetItemCompoundMode(preset_label.c_str(), 1);
         menu->SetItemMarginVisibility(preset_label.c_str(), 0);
         }
       }
