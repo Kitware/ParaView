@@ -95,7 +95,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.49");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.50");
 
 //----------------------------------------------------------------------------
 
@@ -2000,6 +2000,10 @@ void vtkPVDisplayGUI::Initialize()
       this->GetPVApplication()->GetMainWindow()->SetStatusText("Using outline for large unstructured grid.");
       this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
       }
+    }
+  else if (dataSetType == VTK_GENERIC_DATA_SET)
+    {
+    this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
     }
   else
     {
