@@ -183,8 +183,6 @@ void pqMainWindow::onFileNew(pqServer* Server)
   source->Delete();
   pqSetProperty(source, "Resolution", 64);
   pqSetProperty(source, "Radius", 0.1);
-  pqSetProperty(source, "foo", "bar");
-  pqSetProperty(source, "Radius", "ten");
   source->UpdateVTKObjects();
   
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
