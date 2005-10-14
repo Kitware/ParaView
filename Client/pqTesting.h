@@ -12,10 +12,8 @@
 
 class QWidget;
 
-/// Runs regression tests that do not require a UI
-void pqRunRegressionTests();
-/// Runs regression tests that require a UI
-void pqRunRegressionTests(QWidget& RootWidget);
+/// Runs all regression tests
+void pqRunRegressionTests(QWidget* RootWidget);
 
 #endif // !_pqTesting_h
 

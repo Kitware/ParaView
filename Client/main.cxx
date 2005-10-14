@@ -10,6 +10,8 @@
  */
 
 #include "pqMainWindow.h"
+#include "pqTesting.h"
+
 #include <QApplication>
 
 //----------------------------------------------------------------------------
@@ -19,6 +21,20 @@ int main(int argc, char* argv[])
   pqMainWindow qwindow(qapplication);
   qwindow.resize(400, 400);
   qwindow.show();
+  
+  for(int i = 1; i < argc; ++i)
+    {
+    const QString argument = argv[i];
+    if(argument == "--runtests")
+      {
+      pqRunRegressionTests(&qwindow);
+      }
+    else if(argument == "--exit")
+      {
+      return 0;
+      }
+    }
+  
   return qapplication.exec();
 }
 

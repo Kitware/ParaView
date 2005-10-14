@@ -63,38 +63,36 @@ bool pqActivate(QAbstractButton* Button)
 
 } // namespace
 
-
 /////////////////////////////////////////////////////////////////////////
-// pqTestTestingFramework
+// pqTestCases
 
-void pqTestTestingFramework::testSuccess()
+pqTestCases::pqTestCases(QWidget* const RootWidget) :
+  rootWidget(RootWidget)
+{
+}
+
+void pqTestCases::testSuccess()
 {
   COMPARE(true, true);
 }
 
-void pqTestTestingFramework::testFailure()
+void pqTestCases::testFailure()
 {
   EXPECT_FAIL("", "Deliberate failure", Continue);
   COMPARE(true, false);
 }
 
-//////////////////////////////////////////////////////////////////////////
-// pqTestFileMenu
-
-pqTestFileMenu::pqTestFileMenu(QWidget& RootWidget) :
-  rootWidget(RootWidget)
+void pqTestCases::testFileMenu()
 {
+  VERIFY(rootWidget);  
+  VERIFY(pqLookupObject<QWidget>(*rootWidget, "menuBar/fileMenu"));
 }
 
-void pqTestFileMenu::testFileMenu()
+void pqTestCases::testFileOpen()
 {
-  VERIFY(pqLookupObject<QWidget>(rootWidget, "menuBar/fileMenu"));
-}
-
-void pqTestFileMenu::testFileOpen()
-{
-  VERIFY(pqActivate(pqLookupObject<QAction>(rootWidget, "debugOpenLocalFilesAction")));
-  VERIFY(pqLookupObject<QWidget>(rootWidget, "fileOpenDialog"));
-  VERIFY(pqActivate(pqLookupObject<QAbstractButton>(rootWidget, "fileOpenDialog/buttonCancel")));
+  VERIFY(rootWidget);
+  VERIFY(pqActivate(pqLookupObject<QAction>(*rootWidget, "debugOpenLocalFilesAction")));
+  VERIFY(pqLookupObject<QWidget>(*rootWidget, "fileOpenDialog"));
+  VERIFY(pqActivate(pqLookupObject<QAbstractButton>(*rootWidget, "fileOpenDialog/buttonCancel")));
 }
 

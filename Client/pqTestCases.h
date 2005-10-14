@@ -14,28 +14,20 @@
 
 class QWidget;
 
-class pqTestTestingFramework :
-  public QObject
-{
-  Q_OBJECT
-
-private slots:
-  void testSuccess();
-  void testFailure();
-};
-
-class pqTestFileMenu :
+class pqTestCases :
   public QObject
 {
   Q_OBJECT
   
 public:
-  pqTestFileMenu(QWidget& RootWidget);
+  pqTestCases(QWidget* RootWidget);
 
 private:
-  QWidget& rootWidget;
-
+  QWidget* const rootWidget;
+  
 private slots:
+  void testSuccess();
+  void testFailure();
   void testFileMenu();
   void testFileOpen();
 };

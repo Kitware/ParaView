@@ -12,32 +12,9 @@
 
 #include <QtTest>
 
-namespace
+void pqRunRegressionTests(QWidget* const RootWidget)
 {
-
-template<typename TestT>
-void pqRunRegressionTest()
-{
-  TestT test;
-  QtTest::exec(&test);
-}
-
-template<typename TestT>
-void pqRunRegressionTest(QWidget& RootWidget)
-{
-  TestT test(RootWidget);
-  QtTest::exec(&test);
-}
-
-} // namespace
-
-void pqRunRegressionTests()
-{
-  pqRunRegressionTest<pqTestTestingFramework>();
-}
-
-void pqRunRegressionTests(QWidget& RootWidget)
-{
-  pqRunRegressionTest<pqTestFileMenu>(RootWidget);
+  pqTestCases test_cases(RootWidget);
+  QtTest::exec(&test_cases);
 }
 

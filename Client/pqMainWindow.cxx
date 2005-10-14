@@ -45,15 +45,6 @@
 namespace
 {
 
-void pqDumpQtHierarchy(ostream& Stream, QObject& Object, unsigned long Indent = 0)
-{
-  Stream << vtkstd::string(Indent, '\t') << Object.name("[unspecified]") << endl;
-  
-  QList<QObject*> children = Object.findChildren<QObject*>();
-  for(QList<QObject*>::iterator child = children.begin(); child != children.end(); ++child)
-    pqDumpQtHierarchy(Stream, **child, Indent+1);
-}
-
 struct pqSetName
 {
   pqSetName(const vtkstd::string& Name) : name(Name) {}
@@ -329,13 +320,12 @@ void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
 
 void pqMainWindow::onDebugDumpQtHierarchy()
 {
-  pqDumpQtHierarchy(cerr, *this);
+  dumpObjectTree();
 }
 
 void pqMainWindow::onTestsRun()
 {
-  pqRunRegressionTests();
-  pqRunRegressionTests(*this);
+  pqRunRegressionTests(this);
 }
 
 
