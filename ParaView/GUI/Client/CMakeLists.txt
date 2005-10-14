@@ -138,6 +138,7 @@ SET( ParaViewClient_SRCS
   vtkPVLabeledToggle.cxx
   vtkPVLineSourceWidget.cxx
   vtkPVLineWidget.cxx
+  vtkPVListBoxToListBoxSelectionEditor.cxx
   vtkPVLookmark.cxx
   vtkPVLookmarkManager.cxx
   vtkPVMPIRenderModuleUI.cxx

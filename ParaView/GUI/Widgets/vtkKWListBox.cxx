@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.45");
+vtkCxxRevisionMacro(vtkKWListBox, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -222,12 +222,20 @@ int vtkKWListBox::AppendUnique(const char* name)
     }
   if(!found)
     {
-    this->InsertEntry(size, name);
+    return this->Append(name);
     }
   return !found;
 }
 
 
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::Append(const char* name)
+{
+  int size = this->GetNumberOfItems();
+  this->InsertEntry(size, name);
+  return 1;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWListBox::Create(vtkKWApplication *app)

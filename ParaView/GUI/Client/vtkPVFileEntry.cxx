@@ -25,12 +25,12 @@
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVListBoxToListBoxSelectionEditor.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
-#include "vtkKWListBoxToListBoxSelectionEditor.h"
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWEvent.h"
@@ -39,8 +39,6 @@
 #include "vtkPVTraceHelper.h"
 
 #include <vtksys/SystemTools.hxx>
-
-#define MAX_FILES_ON_THE_LIST 500
 
 //===========================================================================
 //***************************************************************************
@@ -72,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.118");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.119");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -93,7 +91,7 @@ vtkPVFileEntry::vtkPVFileEntry()
 
   this->FileListPopup = vtkKWPopupButton::New();
 
-  this->FileListSelect = vtkKWListBoxToListBoxSelectionEditor::New();
+  this->FileListSelect = vtkPVListBoxToListBoxSelectionEditor::New();
   this->ListObserverTag = 0;
   this->IgnoreFileListEvents = 0;
 
@@ -488,85 +486,90 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     sprintf(firstformat, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
     pm->GetDirectoryListing(path.c_str(), 0, files, 0);
-    int cnt = 0;
-    for ( cc = 0; cc < files->GetLength(); cc ++ )
-      {
-      if ( files->GetLength() < MAX_FILES_ON_THE_LIST)
-        {
-        this->FileListSelect->AddSourceElement(files->GetString(cc));
-        }
-      if ( vtksys::SystemTools::StringStartsWith(
-             files->GetString(cc), file.c_str() ) &&
-           vtksys::SystemTools::StringEndsWith(
-             files->GetString(cc), ext.c_str()) )
-        {
-        cnt ++;
-        }
-      }
+
+    this->FileListSelect->SetSourceList(files);
+
     int med = atoi(number);
     fnameLength = (int)(strlen(fileName)) * 2;
     char* rfname = new char[ fnameLength ];
-    int min = med+cnt;
-    int max = med-cnt;
-    int foundone = 0;
-    for ( cc = med-cnt; cc < med+cnt; cc ++ )
+    int min;
+    int max;
+    
+    // Find upper limit.
+    int increment = 2;
+    for ( max = med; increment!=0; )
       {
-      sprintf(rfname, firstformat, path.c_str(), file.c_str(), cc, ext.c_str());
+      sprintf(rfname, firstformat, path.c_str(), file.c_str(), 
+        (max + increment), ext.c_str());
       if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
-        if ( max < cc )
-          {
-          max = cc;
-          }
-        if ( min > cc )
-          {
-          min = cc;
-          }
-        foundone = 1;
+        // Found!
+        max += increment;
+        increment <<= 1;
         }
-      else if ( foundone )
+      else
         {
-        if ( min > max || med < min || med > max )
-          {
-          min = cc;
-          }
-        else
-          {
-          break;
-          }
+        increment >>= 1;
         }
       }
-    foundone = 0;
-    int smin = med+cnt;
-    int smax = med-cnt;
-    for ( cc = med-cnt; cc < med+cnt; cc ++ )
+    
+    // Find lower limit.
+    increment = 2;
+    for ( min = med; increment!=0; )
       {
-      sprintf(rfname, secondformat, path.c_str(), file.c_str(), cc, ext.c_str());
+      sprintf(rfname, firstformat, path.c_str(), file.c_str(), 
+        (min - increment), ext.c_str());
       if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
-        if ( smax < cc )
-          {
-          smax = cc;
-          }
-        if ( smin > cc )
-          {
-          smin = cc;
-          }
-        foundone = 1;
+        // Found!
+        min -= increment;
+        increment <<= 1;
         }
-      else if ( foundone )
+      else
         {
-        if ( smin > smax || med < smin || med > smax )
-          {
-          smin = cc;
-          }
-        else
-          {
-          break;
-          }
+        increment >>= 1;
+        }
+      }
+
+    int smin;
+    int smax;
+     // Find upper limit.
+    increment = 2;
+    for ( smax = med; increment!=0; )
+      {
+      sprintf(rfname, secondformat, path.c_str(), file.c_str(), 
+        (smax + increment), ext.c_str());
+      if ( files->GetIndex(rfname+path.size()+1) >= 0 )
+        {
+        // Found!
+        smax += increment;
+        increment <<= 1;
+        }
+      else
+        {
+        increment >>= 1;
+        }
+      }
+    
+    // Find lower limit.
+    increment = 2;
+    for ( smin = med; increment!=0; )
+      {
+      sprintf(rfname, secondformat, path.c_str(), file.c_str(), 
+        (smin - increment), ext.c_str());
+      if ( files->GetIndex(rfname+path.size()+1) >= 0 )
+        {
+        // Found!
+        smin -= increment;
+        increment <<= 1;
+        }
+      else
+        {
+        increment >>= 1;
         }
       }
     delete [] rfname;
+
     // If second range is bigger than first range, use second format
     if ( (smax - smin) >= (max - min) )
       {
@@ -578,18 +581,21 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       {
       format = firstformat;
       }
-    if ( max - min < MAX_FILES_ON_THE_LIST )
+    if ( max - min)
       {
       char* name = new char [ fnameLength ];
+      vtkStringList* finallist = vtkStringList::New();
       for ( cc = min; cc <= max; cc ++ )
         {
         sprintf(name, format, path.c_str(), prefix, cc, ext.c_str());
         vtksys_stl::string shname = vtksys::SystemTools::GetFilenameName(name);
         if ( files->GetIndex(shname.c_str()) >= 0 )
           {
-          this->FileListSelect->AddFinalElement(shname.c_str(), 1);
+          finallist->AddString(shname.c_str());
           }
         }
+      this->FileListSelect->SetFinalList(finallist, 1);
+      finallist->Delete();
       delete [] name;
       }
     }
@@ -599,7 +605,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     file = vtksys::SystemTools::GetFilenameName(fileName);
     this->FileListSelect->AddFinalElement(file.c_str(), 1);
     }
-
+  
   if ( !this->Initialized )
     {
     dom->RemoveAllStrings();
@@ -766,14 +772,16 @@ void vtkPVFileEntry::Initialize()
     if (sld)
       {
       this->IgnoreFileListEvents = 1;
-      this->FileListSelect->RemoveItemsFromFinalList();
+      vtkStringList* finallist = vtkStringList::New();
       unsigned int cc;
       for ( cc = 0; cc < sld->GetNumberOfStrings(); cc ++ )
         {
         vtksys_stl::string filename = 
           vtksys::SystemTools::GetFilenameName(sld->GetString(cc));
-        this->FileListSelect->AddFinalElement(filename.c_str(), 1);
+        finallist->AddString(filename.c_str());
         }
+      this->FileListSelect->SetFinalList(finallist, 1);
+      finallist->Delete();
       }
     else
       {
@@ -999,20 +1007,15 @@ void vtkPVFileEntry::UpdateAvailableFiles( int force )
     {
     return;
     }
-
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
   pm->GetDirectoryListing(this->Path, 0, files, 0);
 
-  if ( files->GetLength() < MAX_FILES_ON_THE_LIST || force )
+  if (force)
     {
     this->IgnoreFileListEvents = 1;
     this->FileListSelect->RemoveItemsFromSourceList();
-    int cc;
-    for ( cc = 0; cc < files->GetLength(); cc ++ )
-      {
-      this->FileListSelect->AddSourceElement(files->GetString(cc));
-      }
+    this->FileListSelect->SetSourceList(files);
     this->IgnoreFileListEvents = 0;
     }
   files->Delete();

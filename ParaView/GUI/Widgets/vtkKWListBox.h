@@ -81,6 +81,11 @@ public:
   // Append a unique string to the list. If the string exists,
   // it will not be appended
   virtual int AppendUnique(const char* name);
+
+  // Description:
+  // Append a string to the list. This call does not check if the string
+  // is unique.
+  virtual int Append(const char* name);
   
   // Description:
   // Set callback for single and double click on a list item.
