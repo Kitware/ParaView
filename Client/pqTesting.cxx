@@ -10,7 +10,7 @@
 #include "pqTestCases.h"
 #include "pqTesting.h"
 
-#include <QtTest>
+#include <QtTest/qttest.h>
 
 void pqRunRegressionTests(QWidget* const RootWidget)
 {

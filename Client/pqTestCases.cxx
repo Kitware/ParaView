@@ -15,7 +15,7 @@
 #include <QAction>
 #include <QObject>
 #include <QWidget>
-#include <QtTest>
+#include <QtTest/qttest.h>
 #include <QtTest/qttest_gui.h>
 
 namespace

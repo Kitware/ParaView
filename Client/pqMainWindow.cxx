@@ -25,7 +25,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QToolbar>
+#include <QToolBar>
 
 #include <vtkRenderWindow.h>
 #include <vtkSMDataObjectDisplayProxy.h>
