@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.27");
+vtkCxxRevisionMacro(vtkPVWriter, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -90,7 +90,7 @@ int vtkPVWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
 //----------------------------------------------------------------------------
 int vtkPVWriter::CanWriteFile(const char* fname)
 {
-  const char* ext = this->ExtractExtension(fname);
+  char* ext = this->ExtractExtension(fname);
   int matches = 0;
 
   // Check if the file name matches any of our extensions.
