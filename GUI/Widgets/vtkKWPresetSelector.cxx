@@ -53,7 +53,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.9");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1514,6 +1514,10 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
       }
     list->AddRow();
     row = list->GetNumberOfRows() - 1;
+    if (row < 0)
+      {
+      return 0;
+      }
     }
 
   // Found ? Remove it if the group filter does not match

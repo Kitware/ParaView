@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.31");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -172,8 +172,14 @@ int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
   if (this->IsCreated() && title)
     {
     int nb_columns = this->GetNumberOfColumns();
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script(
       "%s insertcolumns %d 0 {%s}", this->GetWidgetName(), col_index, title);
+    this->SetEnabled(old_enabled);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -227,8 +233,14 @@ void vtkKWMultiColumnList::DeleteColumn(int col_index)
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s deletecolumns %d %d", 
                  this->GetWidgetName(), col_index, col_index);
+    this->SetEnabled(old_enabled);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -242,7 +254,13 @@ void vtkKWMultiColumnList::DeleteAllColumns()
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s deletecolumns 0 end", this->GetWidgetName());
+    this->SetEnabled(old_enabled);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -974,8 +992,14 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         item += "\"\" ";
         }
       int nb_rows = this->GetNumberOfRows();
+      int old_enabled = this->GetEnabled();
+      if (!this->GetEnabled())
+        {
+        this->SetEnabled(1);
+        }
       this->Script("%s insert %d {%s}", 
                    this->GetWidgetName(), row_index, item.c_str());
+      this->SetEnabled(old_enabled);
       if (this->GetNumberOfRows() != nb_rows)
         {
         this->NumberOfRowsChanged();
@@ -1033,8 +1057,14 @@ void vtkKWMultiColumnList::DeleteRow(int row_index)
   if (this->IsCreated())
     {
     int nb_rows = this->GetNumberOfRows();
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s delete %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    this->SetEnabled(old_enabled);
     if (this->GetNumberOfRows() != nb_rows)
       {
       this->NumberOfRowsChanged();
@@ -1048,7 +1078,13 @@ void vtkKWMultiColumnList::DeleteAllRows()
   if (this->IsCreated())
     {
     int nb_rows = this->GetNumberOfRows();
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s delete 0 end", this->GetWidgetName());
+    this->SetEnabled(old_enabled);
     if (this->GetNumberOfRows() != nb_rows)
       {
       this->NumberOfRowsChanged();
@@ -1193,7 +1229,13 @@ void vtkKWMultiColumnList::ActivateRow(int row_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s activate %d", this->GetWidgetName(), row_index);
+    this->SetEnabled(old_enabled);
     }
 }
 
@@ -1335,7 +1377,13 @@ void vtkKWMultiColumnList::InsertCellTextAsFormattedDouble(
 void vtkKWMultiColumnList::SetCellText(
   int row_index, int col_index, const char *text)
 {
+  int old_enabled = this->GetEnabled();
+  if (!this->GetEnabled())
+    {
+    this->SetEnabled(1);
+    }
   this->SetCellConfigurationOptionAsText(row_index, col_index, "-text", text);
+  this->SetEnabled(old_enabled);
 }
 
 //----------------------------------------------------------------------------
@@ -1428,8 +1476,14 @@ void vtkKWMultiColumnList::ActivateCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s activate %d,%d", 
                  this->GetWidgetName(), row_index, col_index);
+    this->SetEnabled(old_enabled);
     }
 }
 
@@ -1722,8 +1776,14 @@ const char* vtkKWMultiColumnList::GetCellImage(
 void vtkKWMultiColumnList::SetCellImage(
   int row_index, int col_index, const char *image_name)
 {
+  int old_enabled = this->GetEnabled();
+  if (!this->GetEnabled())
+    {
+    this->SetEnabled(1);
+    }
   this->SetCellConfigurationOption(
     row_index, col_index, "-image", image_name);
+  this->SetEnabled(old_enabled);
 }
 
 //----------------------------------------------------------------------------
@@ -1801,8 +1861,14 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", command);
+    this->SetEnabled(old_enabled);
     delete [] command;
     }
 }
@@ -1817,8 +1883,14 @@ void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index,
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->SetCellConfigurationOption(
       row_index, col_index, "-windowdestroy", command);
+    this->SetEnabled(old_enabled);
     delete [] command;
     }
 }
@@ -1852,10 +1924,16 @@ void vtkKWMultiColumnList::RefreshCellWithWindowCommand(int row_index,
   if (command && *command)
     {
     vtksys_stl::string command_str(command);
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", "");
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", command_str.c_str());
+    this->SetEnabled(old_enabled);
     }
 }
 
@@ -2064,8 +2142,14 @@ void vtkKWMultiColumnList::EditCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s editcell %d,%d", 
                  this->GetWidgetName(), row_index, col_index);
+    this->SetEnabled(old_enabled);
     }
 }
 
@@ -2532,8 +2616,14 @@ void vtkKWMultiColumnList::SelectRow(int row_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s selection set %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    this->SetEnabled(old_enabled);
     this->SelectionCallback();
     }
 }
@@ -2543,8 +2633,14 @@ void vtkKWMultiColumnList::DeselectRow(int row_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s selection clear %d %d", 
                  this->GetWidgetName(), row_index, row_index);
+    this->SetEnabled(old_enabled);
     this->SelectionCallback();
     }
 }
@@ -2623,9 +2719,15 @@ void vtkKWMultiColumnList::SelectCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s cellselection set %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
+    this->SetEnabled(old_enabled);
     this->SelectionCallback();
     }
 }
@@ -2635,9 +2737,15 @@ void vtkKWMultiColumnList::DeselectCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s cellselection clear %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
+    this->SetEnabled(old_enabled);
     this->SelectionCallback();
     }
 }
@@ -2699,7 +2807,13 @@ void vtkKWMultiColumnList::ClearSelection()
 {
   if (this->IsCreated())
     {
+    int old_enabled = this->GetEnabled();
+    if (!this->GetEnabled())
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s selection clear 0 end", this->GetWidgetName());
+    this->SetEnabled(old_enabled);
     this->SelectionCallback();
     }
 }
