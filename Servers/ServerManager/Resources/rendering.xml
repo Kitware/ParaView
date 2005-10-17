@@ -1567,6 +1567,20 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty name="SyncRenderWindowRenderers"
+                         command="SetSyncRenderWindowRenderers"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="Renderers"
+                     command="AddRenderer"
+                     remove_command="RemoveRenderer"
+                     clean_command="RemoveAllRenderers">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </Proxy>
 
     <Proxy name="ClientCompositeManager" class="vtkClientCompositeManager">
@@ -1613,6 +1627,20 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty name="SyncRenderWindowRenderers"
+                         command="SetSyncRenderWindowRenderers"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="Renderers"
+                     command="AddRenderer"
+                     remove_command="RemoveRenderer"
+                     clean_command="RemoveAllRenderers">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </Proxy>
     
     <Proxy name="MPICompositeManager" class="vtkMPICompositeManager">

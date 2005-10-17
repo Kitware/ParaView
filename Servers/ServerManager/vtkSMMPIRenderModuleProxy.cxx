@@ -22,9 +22,10 @@
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -69,6 +70,9 @@ void vtkSMMPIRenderModuleProxy::CreateCompositeManager()
 //-----------------------------------------------------------------------------
 void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
 {
+  vtkSMIntVectorProperty* ivp;
+  vtkSMProxyProperty* pp;
+
   if (!this->CompositeManagerProxy)
     {
     vtkErrorMacro("CompositeManagerProxy not set.");
@@ -118,6 +122,24 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
       }
     pm->SendStream(this->CompositeManagerProxy->GetServers(), stream);
     }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+         this->CompositeManagerProxy->GetProperty("SyncRenderWindowRenderers"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Falied to find property SyncRenderWindowRenderers");
+    return;
+    }
+  ivp->SetElement(0, 0);
+
+  pp = vtkSMProxyProperty::SafeDownCast(
+                         this->CompositeManagerProxy->GetProperty("Renderers"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->RendererProxy);
+  pp->AddProxy(this->Renderer2DProxy);
+
+  this->CompositeManagerProxy->UpdateVTKObjects();
+
 //  this->SetCompositer("CompressCompositer");
   this->SetCompositer("TreeCompositer");
   this->Superclass::InitializeCompositingPipeline();
