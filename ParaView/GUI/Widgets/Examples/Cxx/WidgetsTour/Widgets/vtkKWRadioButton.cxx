@@ -29,13 +29,13 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   radiob1->SetParent(parent);
   radiob1->Create(app);
   radiob1->SetText("A radiobutton");
-  radiob1->SetValue(123);
+  radiob1->SetValueAsInt(123);
 
   vtkKWRadioButton *radiob1b = vtkKWRadioButton::New();
   radiob1b->SetParent(parent);
   radiob1b->Create(app);
   radiob1b->SetText("Another radiobutton");
-  radiob1b->SetValue(456);
+  radiob1b->SetValueAsInt(456);
 
   radiob1->SetSelectedState(1);
   radiob1b->SetVariableName(radiob1->GetVariableName());

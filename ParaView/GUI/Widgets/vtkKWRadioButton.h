@@ -39,16 +39,20 @@ public:
   virtual int GetSelectedState();
 
   // Description:
-  // Specify the value to store in the button's associated variable 
+  // Set/Get the value to store in the button's associated variable 
   // whenever this button is selected.
-  virtual void SetValue(int v);
   virtual void SetValue(const char *v);
+  virtual void SetValueAsInt(int v);
+  virtual const char* GetValue();
+  virtual int GetValueAsInt();
 
   // Description:
-  // Convenience method to set the button's associated variable directly
+  // Convenience method to set/get the button's associated variable directly
   // to a specific value.
-  virtual void SetVariableValue(int v);
   virtual void SetVariableValue(const char *v);
+  virtual void SetVariableValueAsInt(int v);
+  virtual const char* GetVariableValue();
+  virtual int GetVariableValueAsInt();
 
 protected:
   vtkKWRadioButton() {};

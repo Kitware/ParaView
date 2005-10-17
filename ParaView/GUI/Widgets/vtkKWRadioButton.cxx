@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.22");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.23");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app)
@@ -39,24 +39,27 @@ void vtkKWRadioButton::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRadioButton::SetValue(int v)
-{
-  this->SetConfigurationOptionAsInt("-value", v);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWRadioButton::SetValue(const char *v)
 {
   this->SetConfigurationOption("-value", v);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRadioButton::SetVariableValue(int v)
+const char* vtkKWRadioButton::GetValue()
 {
-  if (this->IsCreated())
-    {
-    this->Script("set %s %d", this->GetVariableName(), v);
-    }
+  return this->GetConfigurationOption("-value");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::SetValueAsInt(int v)
+{
+  this->SetConfigurationOptionAsInt("-value", v);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRadioButton::GetValueAsInt()
+{
+  return this->GetConfigurationOptionAsInt("-value");
 }
 
 //----------------------------------------------------------------------------
@@ -66,6 +69,30 @@ void vtkKWRadioButton::SetVariableValue(const char *v)
     {
     this->Script("set %s {%s}", this->GetVariableName(), v);
     }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWRadioButton::GetVariableValue()
+{
+  if (this->IsCreated())
+    {
+    return this->Script("set %s", this->GetVariableName());
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::SetVariableValueAsInt(int v)
+{
+  char buffer[256];
+  sprintf(buffer, "%d", v);
+  this->SetVariableValue(buffer);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRadioButton::GetVariableValueAsInt()
+{
+  return atoi(this->GetVariableValue());
 }
 
 //----------------------------------------------------------------------------
