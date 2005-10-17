@@ -77,6 +77,10 @@ public:
   virtual vtkKWWidget* GetWidget(const char *name);
 
   // Description:
+  // Retrieve the nth- widget
+  virtual vtkKWWidget* GetNthWidget(int rank);
+
+  // Description:
   // Convenience method to create and add a specific type of widget 
   // Note: for radiobutton, the variable_name should be the same for
   //       each radiobutton in the set of radiobuttons.

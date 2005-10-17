@@ -54,7 +54,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.63");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.64");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -339,6 +339,27 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
 }
 
 //----------------------------------------------------------------------------
+vtkKWWidget* vtkKWToolbar::GetNthWidget(int rank)
+{
+  if (this->Internals)
+    {
+    vtkKWToolbarInternals::WidgetsContainerIterator it = 
+      this->Internals->Widgets.begin();
+    vtkKWToolbarInternals::WidgetsContainerIterator end = 
+      this->Internals->Widgets.end();
+    for (; it != end && rank >= 0; ++it, --rank)
+      {
+      if (rank == 0)
+        {
+        return *it;
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value, 
                                                const char *image_name, 
                                                const char *select_image_name, 
@@ -357,7 +378,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   rb->SetParent(this->GetFrame());
   rb->Create(this->GetApplication());
   rb->IndicatorVisibilityOff();
-  rb->SetValue(value);
+  rb->SetValueAsInt(value);
 
   if (image_name)
     {
