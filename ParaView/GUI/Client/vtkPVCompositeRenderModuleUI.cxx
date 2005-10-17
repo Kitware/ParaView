@@ -13,25 +13,31 @@
 
 =========================================================================*/
 #include "vtkPVCompositeRenderModuleUI.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWFrameWithLabel.h"
+
 #include "vtkKWCheckButton.h"
-#include "vtkKWLabel.h"
-#include "vtkKWScale.h"
-#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkKWFrame.h"
-#include "vtkTimerLog.h"
+#include "vtkKWFrameWithLabel.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVDisplayInformation.h"
+#include "vtkPVOptions.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkTimerLog.h"
+#include "vtkToolkits.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.29");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -83,8 +89,12 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
                              this->CompositeWithRGBAFlag);
     pvapp->SetRegistryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionFlag);
-    pvapp->SetRegistryValue(2, "RunTime", "CompositeThreshold", "%f",
-                             this->CompositeThreshold);
+    // Do not store value if widget is not enabled.
+    if (this->CompositeCheck->GetEnabled())
+      {
+      pvapp->SetRegistryValue(2, "RunTime", "CompositeThreshold", "%f",
+                              this->CompositeThreshold);
+      }
     pvapp->SetRegistryValue(2, "RunTime", "ReductionFactor", "%d",
                              this->ReductionFactor);
     pvapp->SetRegistryValue(2, "RunTime", "SquirtLevel", "%d",
@@ -399,18 +409,50 @@ void vtkPVCompositeRenderModuleUI::Initialize()
     vtkErrorMacro("No application.");
     return;
     }
+
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   // Consider the command line option that turns compositing off.
   // This is to avoid compositing when it is not available
   // on the server.
-  if (!pvApp->GetProcessModule()->GetServerInformation()->GetRemoteRendering())
+  if (!pm->GetServerInformation()->GetRemoteRendering())
     {
     this->CompositeOptionEnabled = 0;
     }
+
+  int foundDisplay = 1;
+  vtkPVClientServerModule* csm = vtkPVClientServerModule::SafeDownCast(pm);
+  if (csm)
+    {
+    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+    csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
+    if (!di->GetCanOpenDisplay())
+      {
+      this->CompositeOptionEnabled = 0;
+      foundDisplay = 0;
+      }
+    di->Delete();
+    }
+
   if ( ! this->CompositeOptionEnabled)
     {
     this->CompositeCheck->SetSelectedState(0);
     this->SetCompositeThreshold(VTK_LARGE_FLOAT);
     this->CompositeCheck->EnabledOff();
+    }
+
+  // This has to happen after compositing is disabled because it
+  // causes the first render to happen.
+  if (!foundDisplay)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      pvApp, 0, 
+      "Unable to open display",
+      "One or more of the server nodes cannot access a display. Compositing will be "
+      "disabled and all rendering will be performed locally. Note that this will "
+      "not scale well to large data. To enable compositing, compile and run the "
+      "server with offscreen Mesa support or assign a valid display to all server "
+      "nodes.");
     }
 }
 
