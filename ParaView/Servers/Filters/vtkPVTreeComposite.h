@@ -34,7 +34,6 @@ class vtkMPIController;
 
 class vtkDataArray;
 class vtkFloatArray;
-class vtkRenderWindowInteractor;
 
 class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeRenderManager
 {
@@ -57,34 +56,15 @@ public:
   vtkGetMacro(EnableAbort, int);
   vtkBooleanMacro(EnableAbort, int);
 
-  // Description:
-  // Avoid having the cross hairs contribute to the bounds unless
-  // it is the only actor.  This method considers Pickable flag.
-  virtual void ComputeVisiblePropBounds(vtkRenderer *ren, 
-                                        double bounds[6]);
-
 
   // Description:
   // Also initialize rmi to check for data.
   virtual void InitializeRMIs();
 
   // Description:
-  // Public because it is an RMI,  It checks to see if data exists
-  // on the remote processes before bothering to composite.
-  // It uses the supperclasses "UseComposite" flag to disable compositing.
-  virtual void StartRender();
-  virtual void SatelliteStartRender();
-  virtual void WriteFullImage();
-  void WriteFullFloatImage();
-
-  // Description:
   // Public because it is an RMI.  
-  void CheckForDataRMI();
-  virtual void ComputeVisiblePropBoundsRMI();
+  virtual void CheckForDataRMI();
   
-  virtual void SetRenderWindow(vtkRenderWindow *renWin);
-  virtual void PostRenderProcessing();
-
   vtkGetMacro(CompositeTime, double);
   vtkGetMacro(GetBuffersTime, double);
   vtkGetMacro(SetBuffersTime, double);
@@ -93,8 +73,6 @@ public:
   // Description:
   // Get the value of the z buffer at a position.
   float GetZ(int x, int y);
-
-  void ExitInteractor();
 
   void SetUseChar(int useChar);
   vtkGetMacro(UseChar, int);
@@ -118,6 +96,10 @@ protected:
   void InternalStartRender();
   void MagnifyFullFloatImage();
   virtual void PreRenderProcessing();
+  virtual void PostRenderProcessing();
+
+  virtual void WriteFullImage();
+  void WriteFullFloatImage();
 
 //BTX
 
@@ -160,16 +142,11 @@ protected:
 #endif
 //ETX  
 
-  vtkRenderWindowInteractor *RenderWindowInteractor;
-  void SetRenderWindowInteractor(vtkRenderWindowInteractor *iren);
-
   void ReallocDataArrays();
   virtual void ReadReducedImage();
   virtual void MagnifyReducedFloatImage();
   virtual void SetRenderWindowFloatPixelData(vtkFloatArray *pixels,
                                              const int pixelDimensions[2]);
-  
-  int ExitInteractorTag;
 
   int UseChar;
   int UseRGB;
