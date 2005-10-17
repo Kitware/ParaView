@@ -63,7 +63,11 @@ int main(int argc, char* argv[])
   vtkPVBatchOptions* options = vtkPVBatchOptions::New();
   options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModuleBatchHelper* helper = vtkPVProcessModuleBatchHelper::New();
-  int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  if (ret)
+    {
+    ret = helper->Run(options);
+    }
   helper->Delete();
   pvmain->Delete();
   options->Delete();

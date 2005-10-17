@@ -39,7 +39,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.9");
+vtkCxxRevisionMacro(vtkPVMain, "1.10");
 
 
 
@@ -118,13 +118,11 @@ void u_fpu_setup()
 #endif //PARAVIEW_ENABLE_FPE
 
 //----------------------------------------------------------------------------
-int vtkPVMain::Run(vtkPVOptions* options,
+int vtkPVMain::Initialize(vtkPVOptions* options,
                    vtkProcessModuleGUIHelper* helper,
                    INITIALIZE_INTERPRETER_FUNCTION initInterp, 
                    int argc, char* argv[])
 {
-  int retVal = 0;
-  int startVal = 0;
   // Avoid Ghost windows on windows XP
 #ifdef _WIN32
   typedef void (* VOID_FUN)();
@@ -195,6 +193,18 @@ int vtkPVMain::Run(vtkPVOptions* options,
 
   (*initInterp)(this->ProcessModule);
 
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVMain::Run(vtkPVOptions* options)
+{
+  if (!this->ProcessModule)
+    {
+    vtkErrorMacro("ProcessModule must be set before calling Run().");
+    return 0;
+    }
+
   // Start the application's event loop.  This will enable
   // vtkOutputWindow's user prompting for any further errors now that
   // startup is completed.
@@ -202,11 +212,10 @@ int vtkPVMain::Run(vtkPVOptions* options,
   char** new_argv = 0;
   options->GetRemainingArguments(&new_argc, &new_argv);
 
-  startVal = this->ProcessModule->Start(new_argc, new_argv);
-  return (retVal?retVal:startVal);
+  return this->ProcessModule->Start(new_argc, new_argv);
 }
 
-
+//-----------------------------------------------------------------------------
 void vtkPVMain::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os, indent);

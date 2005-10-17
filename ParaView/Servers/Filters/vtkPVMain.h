@@ -33,11 +33,28 @@ public:
   vtkTypeRevisionMacro(vtkPVMain,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   typedef void (*INITIALIZE_INTERPRETER_FUNCTION )(vtkProcessModule* pm);
-  int Run(vtkPVOptions*, vtkProcessModuleGUIHelper* guihelp,
+
+  // Description:
+  // Initializes ProcessModule/Interpreter etc.
+  int Initialize(vtkPVOptions*, vtkProcessModuleGUIHelper* guihelp,
           INITIALIZE_INTERPRETER_FUNCTION func,
           int argc, char* argv[]);
+  
+  // Description:
+  // Initializes MPI (if needed). This must be called before any
+  // VTK objects are created.
   static void Initialize(int* argc, char** argv[]);
+
+  // Description:
+  // Finalize.
   static void Finalize();
+
+  // Description:
+  // Typically one would call vtkProcessModuleGUIHelper::Run() to 
+  // start the application event loop.
+  // However, if helper is not present, eg. renderserver, then 
+  // we call this method to call this->ProcessModule->Start().
+  int Run(vtkPVOptions*);
 protected:
   // Description:
   // Default constructor.

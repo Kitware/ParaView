@@ -52,7 +52,11 @@ int main(int argc, char* argv[])
   vtkPVPythonOptions* options = vtkPVPythonOptions::New();
   options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModulePythonHelper* helper = vtkPVProcessModulePythonHelper::New();
-  int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  if (ret)
+    {
+    ret = helper->Run(options);
+    }
   helper->Delete();
   pvmain->Delete();
   options->Delete();
