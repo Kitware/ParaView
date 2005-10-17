@@ -473,6 +473,21 @@ protected:
   // Pack
   virtual void Pack();
 
+  // Description:
+  // Set the default balloon help strings
+  // Subclass can override this method to change the help strings
+  // associated to the buttons.
+  virtual void SetDefaultHelpStrings();
+
+  // Description:
+  // Some constants
+  //BTX
+  static int AddButtonId;
+  static int ApplyButtonId;
+  static int RemoveButtonId;
+  static int UpdateButtonId;
+  //ETX
+
 private:
 
   vtkKWPresetSelector(const vtkKWPresetSelector&); // Not implemented
