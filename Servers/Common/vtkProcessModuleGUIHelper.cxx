@@ -16,7 +16,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 
-vtkCxxRevisionMacro(vtkProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(vtkProcessModuleGUIHelper, "1.4");
 //-----------------------------------------------------------------------------
 vtkProcessModuleGUIHelper::vtkProcessModuleGUIHelper()
 {
@@ -29,7 +29,7 @@ int vtkProcessModuleGUIHelper::Run(vtkPVOptions* options)
   if (!this->ProcessModule)
     {
     vtkErrorMacro("ProcessModule must be set before calling Start().");
-    return 0;
+    return 1;
     }
 
   int new_argc = 0;

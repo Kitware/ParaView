@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   // run the paraview main
   int ret = pvmain->Initialize(options, 0, ParaViewInitializeInterpreter, 
     argc, argv);
-  if (ret)
+  if (!ret)
     {
     ret = pvmain->Run(options);
     }

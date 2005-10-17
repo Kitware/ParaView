@@ -86,7 +86,7 @@ int MyMain(int argc, char *argv[])
   // run the paraview main
   int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter,
     argc, argv);
-  if (ret)
+  if (!ret)
     {
     ret = helper->Run(options);
     }
