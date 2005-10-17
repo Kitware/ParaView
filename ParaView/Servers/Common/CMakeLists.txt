@@ -13,6 +13,7 @@ SET(Common_SRCS
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
+  vtkPVDisplayInformation.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx

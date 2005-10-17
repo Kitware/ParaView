@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45");
 
 
 //----------------------------------------------------------------------------
@@ -1147,7 +1147,7 @@ vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
   if(this->Options->GetClientMode())
     {
     vtkSocketController* controller = this->SocketController;
-    if(this->GatherRenderServer)
+    if(this->GatherRenderServer && this->Options->GetRenderServerMode())
       {
       controller = this->RenderServerSocket;
       }
@@ -1172,7 +1172,7 @@ vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
   int myId = this->Controller->GetLocalProcessId();
   if(!object)
     {
-    vtkErrorMacro("Deci id must be wrong.");
+    vtkDebugMacro("Object id must be wrong.");
     return;
     }
 
