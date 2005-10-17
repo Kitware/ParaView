@@ -14,19 +14,37 @@
 =========================================================================*/
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 
-vtkCxxRevisionMacro(vtkProcessModuleGUIHelper, "1.2");
-
+vtkCxxRevisionMacro(vtkProcessModuleGUIHelper, "1.3");
+//-----------------------------------------------------------------------------
 vtkProcessModuleGUIHelper::vtkProcessModuleGUIHelper()
 {
   this->ProcessModule = 0;
 }
 
+//-----------------------------------------------------------------------------
+int vtkProcessModuleGUIHelper::Run(vtkPVOptions* options)
+{
+  if (!this->ProcessModule)
+    {
+    vtkErrorMacro("ProcessModule must be set before calling Start().");
+    return 0;
+    }
+
+  int new_argc = 0;
+  char** new_argv = 0;
+  options->GetRemainingArguments(&new_argc, &new_argv);
+ return this->ProcessModule->Start(new_argc, new_argv); 
+}
+
+//-----------------------------------------------------------------------------
 void vtkProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
+//-----------------------------------------------------------------------------
 void vtkProcessModuleGUIHelper::SetProcessModule(vtkProcessModule* pm)
 {
   this->ProcessModule = pm;

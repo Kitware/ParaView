@@ -61,7 +61,12 @@ int main(int argc, char* argv[])
   // Create a pvmain
   vtkPVMain* pvmain = vtkPVMain::New();
   // run the paraview main
-  int ret = pvmain->Run(options, 0, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, 0, ParaViewInitializeInterpreter, 
+    argc, argv);
+  if (ret)
+    {
+    ret = pvmain->Run(options);
+    }
   // clean up and return
   pvmain->Delete();
   options->Delete();

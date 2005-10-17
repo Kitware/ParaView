@@ -84,7 +84,12 @@ int MyMain(int argc, char *argv[])
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkProcessModuleGUIHelper* helper = vtkPVProcessModuleGUIHelper::New();;
   // run the paraview main
-  int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter,
+    argc, argv);
+  if (ret)
+    {
+    ret = helper->Run(options);
+    }
   helper->Delete();
   pvmain->Delete();
   options->Delete();

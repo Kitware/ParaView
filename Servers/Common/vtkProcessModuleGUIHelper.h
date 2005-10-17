@@ -23,12 +23,22 @@
 #include "vtkObject.h"
 
 class vtkProcessModule;
+class vtkPVOptions;
 
 class VTK_EXPORT vtkProcessModuleGUIHelper : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkProcessModuleGUIHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Does some set up and then calls this->ProcessModule->Start(),
+  // which would eventually lead on 
+  // vtkProcessModuleGUIHelper::RunGUIStart() on the client.
+  // This is the method that should be called to start the client
+  // event loop.
+  virtual int Run(vtkPVOptions* options);
+  
   // Description: 
   // run main gui loop from process module
   virtual int RunGUIStart(int argc, char **argv, int numServerProcs, int myId) = 0; 
