@@ -39,7 +39,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.10");
+vtkCxxRevisionMacro(vtkPVMain, "1.11");
 
 
 
@@ -193,7 +193,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
 
   (*initInterp)(this->ProcessModule);
 
-  return 1;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ int vtkPVMain::Run(vtkPVOptions* options)
   if (!this->ProcessModule)
     {
     vtkErrorMacro("ProcessModule must be set before calling Run().");
-    return 0;
+    return 1;
     }
 
   // Start the application's event loop.  This will enable
