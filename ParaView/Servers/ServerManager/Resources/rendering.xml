@@ -1344,6 +1344,9 @@
         <Proxy name="DisplayManager" proxygroup="composite_managers"
           proxyname="IceTRenderManager">
         </Proxy>
+        <ExposedProperties>
+          <Property name="InitializeOffScreen" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="CompositeManager" proxygroup="composite_managers"
@@ -1469,6 +1472,9 @@
           <Group name="locators"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+      <Property name="InitializeOffScreen"
+                command="InitializeOffScreen">
+      </Property>
     </Proxy>
 
     <Proxy name="MultiDisplayManager" class="vtkMultiDisplayManager">
