@@ -49,6 +49,7 @@
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVClientServerModule.h"
 #include "vtkPVConfig.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVProcessModuleGUIHelper.h"
@@ -112,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.371");
+vtkCxxRevisionMacro(vtkPVApplication, "1.372");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -659,7 +660,15 @@ vtkPVWindow *vtkPVApplication::GetMainWindow()
 //----------------------------------------------------------------------------
 vtkPVRenderView *vtkPVApplication::GetMainView()
 {
-  return this->GetMainWindow()->GetMainView();
+  vtkPVWindow* mainWindow = this->GetMainWindow();
+  if (mainWindow)
+    {
+    return mainWindow->GetMainView();
+    }
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -968,11 +977,12 @@ void vtkPVApplication::Initialize()
   // Find the installation directory (now that we have the app name)
   this->FindInstallationDirectory();
 
+  vtkPVProcessModule* pm = this->GetProcessModule();
+
 #ifdef VTK_USE_MANGLED_MESA
   if (this->Options->GetUseSoftwareRendering())
     {
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = this->GetProcessModule();
     vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory", stream);
     stream << vtkClientServerStream::Invoke
            << gf << "SetUseMesaClasses" << 1
