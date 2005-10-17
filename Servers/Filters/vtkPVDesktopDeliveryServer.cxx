@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.1");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.2");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -532,7 +532,7 @@ void vtkPVDesktopDeliveryServer::PostRenderProcessing()
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryServer::AddRenderer(int id, vtkRenderer *ren)
 {
-  if (this->RendererMap->Renderers[id] == NULL)
+  if (this->RendererMap->Renderers[id].GetPointer() == NULL)
     {
     this->RendererMap->Renderers[id]
       = vtkSmartPointer<vtkRendererCollection>::New();
