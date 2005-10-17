@@ -155,6 +155,11 @@ protected:
   virtual int SetFunctionMidPoint(int id, double pos) = 0;
 
   // Description:
+  // Return 1 if the 'mid-point' of the point 'id' is locked (can/should 
+  // not be changed/edited), 0 otherwise.
+  virtual int FunctionMidPointIsLocked(int id);
+
+  // Description:
   // Retrieve the sharpness of the transition between two adjacent points
   // 'id' and 'id + 1'.
   // Return 1 on success (there is a sharpness defined for this point),
@@ -168,12 +173,16 @@ protected:
   virtual int SetFunctionSharpness(int id, double sharpness) = 0;
 
   // Description:
+  // Return 1 if the 'sharpness' of the point 'id' is locked (can/should 
+  // not be changed/edited), 0 otherwise.
+  virtual int FunctionSharpnessIsLocked(int id);
+
+  // Description:
   // Update point entries
   virtual void UpdatePointEntries(int id);
 
   int    MidPointEntryVisibility;
   int    SharpnessEntryVisibility;
-  int    MidPointVisibility;
   int    MidPointGuidelineVisibility;
   int    MidPointGuidelineValueVisibility;
   double MidPointColor[3];
@@ -222,6 +231,9 @@ protected:
   //ETX
 
 private:
+
+  int    MidPointVisibility;
+
   vtkKWParameterValueHermiteFunctionEditor(const vtkKWParameterValueHermiteFunctionEditor&); // Not implemented
   void operator=(const vtkKWParameterValueHermiteFunctionEditor&); // Not implemented
 };

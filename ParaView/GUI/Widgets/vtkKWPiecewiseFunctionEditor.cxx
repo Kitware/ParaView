@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.38");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -174,6 +174,21 @@ int vtkKWPiecewiseFunctionEditor::FunctionPointValueIsLocked(int id)
            this->WindowLevelModeLockEndPointValue &&
            ((this->GetFunctionSize() > 0 && id==this->GetFunctionSize()-1) ||
             (this->GetFunctionSize() > 1 && id==this->GetFunctionSize()-2))));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionMidPointIsLocked(int id)
+{
+  return (this->Superclass::FunctionMidPointIsLocked(id) ||
+          this->WindowLevelMode);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionSharpnessIsLocked(
+  int id)
+{
+  return (this->Superclass::FunctionSharpnessIsLocked(id) ||
+          this->WindowLevelMode);
 }
 
 //----------------------------------------------------------------------------
@@ -846,6 +861,7 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
 
   this->UpdatePointsFromWindowLevel();
   this->Update();
+  this->RedrawFunction();
 }
 
 //----------------------------------------------------------------------------
@@ -873,6 +889,12 @@ void vtkKWPiecewiseFunctionEditor::SetValueEntryVisibility(int arg)
   this->Modified();
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::GetMidPointVisibility()
+{
+  return this->Superclass::GetMidPointVisibility() && !this->WindowLevelMode;
 }
 
 //----------------------------------------------------------------------------
@@ -1046,7 +1068,8 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 
     while (this->GetFunctionSize() > 4)
       {
-      if (this->GetFunctionPointParameter(this->GetFunctionSize()-1, &parameter))
+      if (this->GetFunctionPointParameter(
+            this->GetFunctionSize() - 1, &parameter))
         {
         this->PiecewiseFunction->RemovePoint(parameter);
         }
@@ -1068,6 +1091,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
       }
 
     // Set the points
+
     int size = this->GetFunctionSize();
     for (id = 0; id < 4; id++)
       {
@@ -1082,6 +1106,8 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
         this->PiecewiseFunction->AddPoint(
           points[id], id < 2 ? start_v : end_v);
         }
+      this->SetFunctionMidPoint(id, 0.5);
+      this->SetFunctionSharpness(id, 0.0);
       }
     }
 
