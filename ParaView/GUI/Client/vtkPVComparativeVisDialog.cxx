@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.12");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.13");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -198,7 +198,7 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   r1->Create(this->GetApplication());
   r1->SetVariableName("vtkPVComparativeVisDialogVar");
   unsigned int value = this->Internal->RadioButtons.size() - 1;
-  r1->SetValue(value);
+  r1->SetValueAsInt(value);
   ostrstream comm;
   comm << "CueSelected " << value << ends;
   r1->SetCommand(this, comm.str());
