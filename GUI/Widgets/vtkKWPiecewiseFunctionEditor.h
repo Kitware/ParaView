@@ -69,6 +69,7 @@ public:
   // - no point can be added or removed (similar to DisableAddAndRemove)
   // - the first and second point have the same value (they move together)
   // - the last and last-1 point have the same value (they move together) 
+  // - the mid-point and sharpness are set to (0.5 / 0.0) and can not be edited
   virtual void SetWindowLevelMode(int);
   vtkBooleanMacro(WindowLevelMode, int);
   vtkGetMacro(WindowLevelMode, int);
@@ -176,6 +177,10 @@ protected:
   virtual int SetFunctionMidPoint(int id, double pos);
   virtual int GetFunctionSharpness(int id, double *sharpness);
   virtual int SetFunctionSharpness(int id, double sharpness);
+  virtual int FunctionMidPointIsLocked(int id);
+  virtual int FunctionSharpnessIsLocked(int id);
+
+  virtual int GetMidPointVisibility();
 
   // Description:
   // Higher-level methods to manipulate the function. 

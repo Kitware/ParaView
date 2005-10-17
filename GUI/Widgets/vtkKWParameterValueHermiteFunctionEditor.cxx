@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.5");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.6");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -277,6 +277,12 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::FunctionMidPointIsLocked(int id)
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::SetMidPointEntryVisibility(int arg)
 {
   if (this->MidPointEntryVisibility == arg)
@@ -316,12 +322,13 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntry(int id)
       !this->GetFunctionMidPoint(id, &pos))
     {
     this->MidPointEntry->SetEnabled(0);
+    return;
     }
-  else
-    {
-    this->MidPointEntry->SetValue(pos);
-    this->MidPointEntry->SetEnabled(this->GetEnabled());
-    }
+
+  this->MidPointEntry->SetEnabled(
+    this->FunctionMidPointIsLocked(id) ? 0 : this->GetEnabled());
+
+  this->MidPointEntry->SetValue(pos);
 }
 
 //----------------------------------------------------------------------------
@@ -356,6 +363,13 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback()
       this->InvokeFunctionChangingCommand();
       }
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::FunctionSharpnessIsLocked(
+  int id)
+{
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -400,12 +414,13 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateSharpnessEntry(int id)
       
     { 
     this->SharpnessEntry->SetEnabled(0);
+    return;
     }
-  else
-    {
-    this->SharpnessEntry->SetValue(sharpness);
-    this->SharpnessEntry->SetEnabled(this->GetEnabled());
-    }
+
+  this->SharpnessEntry->SetEnabled(
+    this->FunctionSharpnessIsLocked(id) ? 0 : this->GetEnabled());
+
+  this->SharpnessEntry->SetValue(sharpness);
 }
 
 //----------------------------------------------------------------------------
@@ -700,7 +715,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   else
     {
     if (is_not_visible || 
-        !this->MidPointVisibility || 
+        !this->GetMidPointVisibility() || 
         !this->CanvasVisibility)
       {
       *tk_cmd << canv << " itemconfigure m_p" << id << " -state hidden" <<endl;
