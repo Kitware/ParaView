@@ -41,19 +41,19 @@
 
 #include <time.h>
 
-#define VTK_KW_WLPS_BUTTON_ADD_ID    0
-#define VTK_KW_WLPS_BUTTON_APPLY_ID  1
-#define VTK_KW_WLPS_BUTTON_REMOVE_ID 2
-#define VTK_KW_WLPS_BUTTON_UPDATE_ID 3
+int vtkKWPresetSelector::AddButtonId    = 0;
+int vtkKWPresetSelector::ApplyButtonId  = 1;
+int vtkKWPresetSelector::RemoveButtonId = 2;
+int vtkKWPresetSelector::UpdateButtonId = 3;
 
-const char *vtkKWPresetSelector::IdColumnName      = "Id";
-const char *vtkKWPresetSelector::ThumbnailColumnName   = "Image";
-const char *vtkKWPresetSelector::GroupColumnName   = "Group";
-const char *vtkKWPresetSelector::CommentColumnName = "Comment";
+const char *vtkKWPresetSelector::IdColumnName        = "Id";
+const char *vtkKWPresetSelector::ThumbnailColumnName = "Image";
+const char *vtkKWPresetSelector::GroupColumnName     = "Group";
+const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.8");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -317,10 +317,6 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   this->PresetSelectSpinButtons->SetArrowOrientationToVertical();
   this->PresetSelectSpinButtons->SetButtonsPadX(2);
   this->PresetSelectSpinButtons->SetButtonsPadY(2);
-  this->PresetSelectSpinButtons->GetPreviousButton()->SetBalloonHelpString(
-    "Select and apply previous preset");
-  this->PresetSelectSpinButtons->GetNextButton()->SetBalloonHelpString(
-    "Select and apply next preset");
   this->PresetSelectSpinButtons->SetPreviousCommand(
     this, "PresetSelectPreviousCallback");
   this->PresetSelectSpinButtons->SetNextCommand(
@@ -346,31 +342,29 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
 
   // add preset
 
-  pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_ADD_ID);
+  pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::AddButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetAdd);
   pb->SetCommand(this, "PresetAddCallback");
-  pb->SetBalloonHelpString("Add a preset");
 
   // add preset
 
-  pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_APPLY_ID);
+  pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::ApplyButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetApply);
   pb->SetCommand(this, "PresetApplyCallback");
-  pb->SetBalloonHelpString("Apply the selected preset(s)");
 
   // update preset
 
-  pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_UPDATE_ID);
+  pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::UpdateButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetUpdate);
   pb->SetCommand(this, "PresetUpdateCallback");
-  pb->SetBalloonHelpString("Update the selected preset(s)");
 
   // remove preset
 
-  pb = this->PresetButtons->AddWidget(VTK_KW_WLPS_BUTTON_REMOVE_ID);
+  pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::RemoveButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetDelete);
   pb->SetCommand(this, "PresetRemoveCallback");
-  pb->SetBalloonHelpString("Delete the selected preset(s)");
+
+  this->SetDefaultHelpStrings();
 
   // Pack
 
@@ -450,6 +444,33 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 1);
   list->SetColumnEditable(col, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetDefaultHelpStrings()
+{
+  if (this->PresetSelectSpinButtons)
+    {
+    this->PresetSelectSpinButtons->GetPreviousButton()->SetBalloonHelpString(
+      "Select and apply previous preset");
+    this->PresetSelectSpinButtons->GetNextButton()->SetBalloonHelpString(
+      "Select and apply next preset");
+    }
+
+  if (this->PresetButtons)
+    {
+    this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
+      SetBalloonHelpString("Add a preset");
+
+    this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
+      SetBalloonHelpString("Apply the selected preset(s)");
+
+    this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
+      SetBalloonHelpString("Update the selected preset(s)");
+    
+    this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
+      SetBalloonHelpString("Delete the selected preset(s)");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1700,7 +1721,7 @@ void vtkKWPresetSelector::PresetRemoveCallback()
             this->GetApplication(), 
             this->GetApplication()->GetNthWindow(0), 
             "Delete Preset",
-            "Are you sure you want to delete the preset(s)?", 
+            "Are you sure you want to delete the selected item(s)?", 
             vtkKWMessageDialog::WarningIcon | 
             vtkKWMessageDialog::InvokeAtPointer))
         {
@@ -1884,16 +1905,16 @@ void vtkKWPresetSelector::Update()
   if (this->PresetButtons)
     {
     this->PresetButtons->SetWidgetVisibility(
-      VTK_KW_WLPS_BUTTON_ADD_ID, 
+      vtkKWPresetSelector::AddButtonId, 
       (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
 
     this->PresetButtons->SetWidgetVisibility(
-      VTK_KW_WLPS_BUTTON_APPLY_ID, 
+      vtkKWPresetSelector::ApplyButtonId, 
       this->PresetApplyCommand && *this->PresetApplyCommand &&
       !this->ApplyPresetOnSelection ? 1 : 0);
 
     this->PresetButtons->SetWidgetVisibility(
-      VTK_KW_WLPS_BUTTON_UPDATE_ID, 
+      vtkKWPresetSelector::UpdateButtonId, 
       (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
 
     int has_selection = 
@@ -1901,15 +1922,15 @@ void vtkKWPresetSelector::Update()
        this->PresetList->GetWidget()->GetNumberOfSelectedCells());
     
     this->PresetButtons->GetWidget(
-      VTK_KW_WLPS_BUTTON_APPLY_ID)->SetEnabled(
+      vtkKWPresetSelector::ApplyButtonId)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
 
     this->PresetButtons->GetWidget(
-      VTK_KW_WLPS_BUTTON_REMOVE_ID)->SetEnabled(
+      vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
 
     this->PresetButtons->GetWidget(
-      VTK_KW_WLPS_BUTTON_UPDATE_ID)->SetEnabled(
+      vtkKWPresetSelector::UpdateButtonId)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
     }
 
