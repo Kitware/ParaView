@@ -18,6 +18,8 @@
 #include "vtkClientServerID.h"
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVProcessModule.h"
 #include "vtkRenderWindow.h"
@@ -26,7 +28,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
@@ -274,14 +276,51 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
   for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
     {
     // The client server manager needs to set parameters on the IceT manager.
-    stream << vtkClientServerStream::Invoke << this->CompositeManagerProxy->GetID(i)
-      << "SetParallelRenderManager" << this->DisplayManagerProxy->GetID(i)
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(i)
+           << "SetParallelRenderManager" 
+           << this->DisplayManagerProxy->GetID(i)
+           << vtkClientServerStream::End;
 
-    stream << vtkClientServerStream::Invoke << this->CompositeManagerProxy->GetID(i)
-      << "SetRemoteDisplay" << this->RemoteDisplay << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(i)
+           << "SetRemoteDisplay" 
+           << this->RemoteDisplay 
+           << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
+
+  if (pm->GetOptions()->GetUseOffscreenRendering())
+    {
+    int enableOffscreen = 1;
+
+    // Non-mesa, X offscreen rendering requires access to the display
+    vtkPVClientServerModule* csm = 
+      vtkPVClientServerModule::SafeDownCast(pm);
+    if (csm)
+      {
+      vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+      csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
+      if (!di->GetCanOpenDisplay())
+        {
+        enableOffscreen = 0;
+        }
+      di->Delete();
+      }
+    if (enableOffscreen)
+      {
+      vtkSMProperty* p = 
+        this->DisplayManagerProxy->GetProperty("InitializeOffScreen");
+      if (!p)
+        {
+        vtkErrorMacro("Failed to find property InitializeOffScreen "
+                      "on CompositeManagerProxy.");
+        return;
+        }
+      p->Modified();
+      this->DisplayManagerProxy->UpdateVTKObjects();
+      }
+    }
 
 }
 
@@ -388,10 +427,6 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
   this->Superclass::StillRender();
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

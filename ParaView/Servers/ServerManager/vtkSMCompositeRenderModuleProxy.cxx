@@ -22,6 +22,8 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVProcessModule.h"
@@ -31,14 +33,12 @@
 #include "vtkSMCompositeDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkCamera.h"
-#include "vtkRendererCollection.h"
-
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -133,13 +133,33 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
 
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
-    p = this->CompositeManagerProxy->GetProperty("InitializeOffScreen");
-    if (!p)
+    int enableOffscreen = 1;
+
+    // Non-mesa, X offscreen rendering requires access to the display
+    vtkPVClientServerModule* csm = 
+      vtkPVClientServerModule::SafeDownCast(pm);
+    if (csm)
       {
-      vtkErrorMacro("Failed to find property InitializeOffScreen on CompositeManagerProxy.");
-      return;
+      vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+      csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
+      if (!di->GetCanOpenDisplay())
+        {
+        enableOffscreen = 0;
+        }
+      di->Delete();
       }
-    p->Modified();
+
+    if (enableOffscreen)
+      {
+      p = this->CompositeManagerProxy->GetProperty("InitializeOffScreen");
+      if (!p)
+        {
+        vtkErrorMacro("Failed to find property InitializeOffScreen on "
+                      "CompositeManagerProxy.");
+        return;
+        }
+      p->Modified();
+      }
     }
  
   ivp = vtkSMIntVectorProperty::SafeDownCast(
