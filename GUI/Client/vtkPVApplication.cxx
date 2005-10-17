@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.372");
+vtkCxxRevisionMacro(vtkPVApplication, "1.373");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -977,11 +977,11 @@ void vtkPVApplication::Initialize()
   // Find the installation directory (now that we have the app name)
   this->FindInstallationDirectory();
 
-  vtkPVProcessModule* pm = this->GetProcessModule();
-
 #ifdef VTK_USE_MANGLED_MESA
   if (this->Options->GetUseSoftwareRendering())
     {
+    vtkPVProcessModule* pm = this->GetProcessModule();
+
     vtkClientServerStream stream;
     vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory", stream);
     stream << vtkClientServerStream::Invoke
