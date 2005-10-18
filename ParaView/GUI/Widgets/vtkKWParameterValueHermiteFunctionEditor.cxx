@@ -18,7 +18,7 @@
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.7");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -277,7 +277,7 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueHermiteFunctionEditor::FunctionMidPointIsLocked(int id)
+int vtkKWParameterValueHermiteFunctionEditor::FunctionMidPointIsLocked(int vtkNotUsed(id))
 {
   return 0;
 }
@@ -367,7 +367,7 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback()
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueHermiteFunctionEditor::FunctionSharpnessIsLocked(
-  int id)
+  int vtkNotUsed(id))
 {
   return 0;
 }
