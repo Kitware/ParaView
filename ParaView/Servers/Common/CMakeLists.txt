@@ -64,6 +64,11 @@ INCLUDE_DIRECTORIES(
   ${KWCommon_INCLUDE_PATH}
   )
 
+IF (VTK_USE_X)
+  FIND_PACKAGE(X11)
+  INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
+ENDIF (VTK_USE_X)
+
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
 VTK_MAKE_INSTANTIATOR3(vtkPVServerCommonInstantiator CommonInst_SRCS 
