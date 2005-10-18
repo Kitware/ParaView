@@ -189,9 +189,6 @@ protected:
 
   virtual void UpdateIceTContext();
 
-  virtual void StartRender();
-  virtual void SatelliteStartRender();
-
   virtual void SendWindowInformation();
   virtual void ReceiveWindowInformation();
 
@@ -215,9 +212,6 @@ protected:
   // means the tiles have gotten dirty.
   double LastKnownImageReductionFactor;
 
-  int FullImageSharesData;
-  int ReducedImageSharesData;
-
   vtkCommand *RecordIceTImageCallback;
   vtkCommand *FixRenderWindowCallback;
 
@@ -235,6 +229,8 @@ protected:
   // Keep around the last viewports so that we can rework the tiles if they
   // change.
   vtkDoubleArray *LastViewports;
+
+  vtkUnsignedCharArray *InflateImageBuffer;
 
   // Description:
   // Convenience functions for determining IceT's logical viewports for

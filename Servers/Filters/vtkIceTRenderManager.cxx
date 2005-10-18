@@ -34,6 +34,7 @@
 #include "vtkProcessModule.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
+#include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 
 #include <GL/ice-t.h>
@@ -91,7 +92,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.30");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.31");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -108,14 +109,13 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 
   this->LastKnownImageReductionFactor = 0;
 
-  this->FullImageSharesData = 0;
-  this->ReducedImageSharesData = 0;
-
   this->TileViewportTransform = NULL;
 
   this->LastViewports = vtkDoubleArray::New();
   this->LastViewports->SetNumberOfComponents(4);
   this->LastViewports->SetNumberOfTuples(0);
+
+  this->InflateImageBuffer = vtkUnsignedCharArray::New();
 
   vtkCallbackCommand *cbc = vtkCallbackCommand::New();
   cbc->SetClientData(this);
@@ -147,6 +147,7 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
   this->RecordIceTImageCallback->Delete();
   this->FixRenderWindowCallback->Delete();
   this->LastViewports->Delete();
+  this->InflateImageBuffer->Delete();
 }
 
 //-------------------------------------------------------------------------
@@ -765,44 +766,6 @@ double vtkIceTRenderManager::GetCompositeTime()
 
 //-----------------------------------------------------------------------------
 
-void vtkIceTRenderManager::StartRender()
-{
-  if (this->FullImageSharesData)
-    {
-    this->FullImage->Initialize();
-    this->FullImageSharesData = 0;
-    }
-
-  if (this->ReducedImageSharesData)
-    {
-    this->ReducedImage->Initialize();
-    this->ReducedImageSharesData = 0;
-    }
-
-  this->Superclass::StartRender();
-}
-
-//-----------------------------------------------------------------------------
-
-void vtkIceTRenderManager::SatelliteStartRender()
-{
-  if (this->FullImageSharesData)
-    {
-    this->FullImage->Initialize();
-    this->FullImageSharesData = 0;
-    }
-
-  if (this->ReducedImageSharesData)
-    {
-    this->ReducedImage->Initialize();
-    this->ReducedImageSharesData = 0;
-    }
-
-  this->Superclass::SatelliteStartRender();
-}
-
-//-----------------------------------------------------------------------------
-
 void vtkIceTRenderManager::SendWindowInformation()
 {
   vtkDebugMacro("Sending Window Information");
@@ -993,6 +956,36 @@ void vtkIceTRenderManager::PreRenderProcessing()
                     "in place of vtkRenderer::New()");
     }
 
+  // We will be updating the reduced image in renderer callbacks.  By the time
+  // the render window completely finishes, the image should be completely up to
+  // date.  Also, if some renderers were shut off, we need to use cached images
+  // from the last render.  Go a head and just say we have valid images.
+  this->ReducedImageUpToDate = 1;
+  if (this->MagnifyImages && this->WriteBackImages)
+    {
+    // We will also magnify the images as we receive them.
+    this->FullImageUpToDate = 1;
+    this->FullImage->SetNumberOfComponents(4);
+    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
+                                       * this->FullImageSize[1]);
+    }
+
+  if (this->ImageReductionFactor == 1)
+    {
+    // Share the two image buffers.
+    this->FullImage->SetNumberOfComponents(4);
+    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
+                                       * this->FullImageSize[1]);
+    this->ReducedImage->SetArray(this->FullImage->GetPointer(0),
+                                 4*this->FullImageSize[0]
+                                  *this->FullImageSize[1], 1);
+    this->FullImageUpToDate = 1;
+    }
+
+  this->ReducedImage->SetNumberOfComponents(4);
+  this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
+                                        * this->ReducedImageSize[1]);
+
   // Turn swap buffers off before the render so the end render method has a
   // chance to add to the back buffer.
   this->RenderWindow->SwapBuffersOff();
@@ -1035,27 +1028,17 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
   // See if this renderer is displaying anything in this tile.
   if ((width < 1) || (height < 1)) return;
 
+  // Yeah, this screws up the render timing for the superclass.  But if you look
+  // at my implementation for GetRenderTime, you'll see that that measurement is
+  // not used.
+  this->Timer->StartTimer();
+
   icetRen->GetContext()->MakeCurrent();
 
   GLint color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
 
-  if (   (color_format == GL_RGBA)
-      && (width == this->ReducedImageSize[0])
-      && (height == this->ReducedImageSize[1]) )
-    {
-    // Special case.  This renderer covers the entire tile and we don't have
-    // to copy the data.
-    this->ReducedImage->SetArray(icetGetColorBuffer(),
-                                 this->ReducedImageSize[0]
-                                 *this->ReducedImageSize[1]*4,
-                                 1);
-    this->ReducedImage->SetNumberOfComponents(4);
-    this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
-                                          * this->ReducedImageSize[1]);
-    this->ReducedImageSharesData = 1;
-    }
-  else if (color_format == GL_RGBA)
+  if (color_format == GL_RGBA)
     {
     this->ReducedImage->SetNumberOfComponents(4);
     this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
@@ -1110,21 +1093,34 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
     return;
     }
 
-  // If we read in any part of the image, record the image as up to date.
-  // Assuming the renderers cover the entire window, subsequent callbacks
-  // should fill in the rest of the data before it's actually used.
-  this->ReducedImageUpToDate = 1;
+  this->Timer->StopTimer();
+  this->ImageProcessingTime += this->Timer->GetElapsedTime();
 
-  if (this->ImageReductionFactor == 1)
+  if (this->FullImage->GetPointer(0) != this->ReducedImage->GetPointer(0))
     {
-    this->FullImage->SetArray(this->ReducedImage->GetPointer(0),
-                              this->FullImageSize[0]*this->FullImageSize[1]*4,
-                              1);
-    this->FullImage->SetNumberOfComponents(4);
-    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
-                                       * this->FullImageSize[1]);
-    this->FullImageSharesData = 1;
-    this->FullImageUpToDate = true;
+    int fullImageViewport[4];
+    fullImageViewport[0] =(int)(physicalViewport[0]*this->ImageReductionFactor);
+    fullImageViewport[1] =(int)(physicalViewport[1]*this->ImageReductionFactor);
+    fullImageViewport[2] =(int)(physicalViewport[2]*this->ImageReductionFactor);
+    fullImageViewport[3] =(int)(physicalViewport[3]*this->ImageReductionFactor);
+
+    // In case of rounding error, make sure the renderers are resized to the
+    // full window.
+    if (  (this->FullImageSize[0] - fullImageViewport[2])
+        < this->ImageReductionFactor )
+      {
+      fullImageViewport[2] = this->FullImageSize[0];
+      }
+    if (  (this->FullImageSize[1] - fullImageViewport[3])
+        < this->ImageReductionFactor )
+      {
+      fullImageViewport[3] = this->FullImageSize[1];
+      }
+
+    this->Timer->StartTimer();
+    this->MagnifyImage(this->FullImage, this->FullImageSize,
+                       this->ReducedImage, this->ReducedImageSize,
+                       fullImageViewport, physicalViewport);
     }
 }
 
