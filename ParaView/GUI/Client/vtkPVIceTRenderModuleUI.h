@@ -44,6 +44,14 @@ public:
   void SetCollectThreshold(float val);
   vtkGetMacro(CollectThreshold, float);
 
+  // Description:
+  // Tracing uses the method with the argument.
+  // A reduction value of 1 is equivalent to having the feature
+  // disabled.
+  void StillReductionCheckCallback();
+  void StillReductionFactorScaleCallback();
+  void SetStillReductionFactor(int val);
+
 protected:
   vtkPVIceTRenderModuleUI();
   ~vtkPVIceTRenderModuleUI();
@@ -53,6 +61,12 @@ protected:
   vtkKWScale       *CollectThresholdScale;
   vtkKWLabel       *CollectThresholdLabel;
   float             CollectThreshold;
+
+  vtkKWLabel*       StillReductionLabel;
+  vtkKWCheckButton* StillReductionCheck;
+  vtkKWScale*       StillReductionFactorScale;
+  vtkKWLabel*       StillReductionFactorLabel;
+  int               StillReductionFactor;
 
   vtkPVIceTRenderModuleUI(const vtkPVIceTRenderModuleUI&); // Not implemented
   void operator=(const vtkPVIceTRenderModuleUI&); // Not implemented

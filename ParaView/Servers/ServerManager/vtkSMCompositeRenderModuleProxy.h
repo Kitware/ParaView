@@ -74,7 +74,7 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
   // Computes the reduction factor to use in compositing.
-  void ComputeReductionFactor();
+  void ComputeReductionFactor(int inReductionFactor);
   int ReductionFactor;
   int SquirtLevel;
 
