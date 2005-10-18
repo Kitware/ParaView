@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.13");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -170,7 +170,7 @@ void vtkSMComparativeVisProxy::Generate()
   vtkTimerLog::MarkStartEvent("CV: Play One (all)");
   this->CurrentFrame = 0;
   this->ComputeNumberOfFrames();
-  this->PlayOne(0);
+  this->PlayOne(this->Internal->Cues.size() - 1);
   vtkTimerLog::MarkEndEvent("CV: Play One (all)");
   this->InFirstShow = 1;
   if (!this->ShouldAbort)
@@ -396,10 +396,14 @@ void vtkSMComparativeVisProxy::ExecuteEvent(
         // 0 1
         // 1 0
         // 1 1
-        if (paramIndex < this->Internal->Cues.size() - 1)
+        if (paramIndex > 0)
           {
-          this->PlayOne(paramIndex+1);
+          this->PlayOne(paramIndex-1);
           }
+//         if (paramIndex < this->Internal->Cues.size() - 1)
+//           {
+//           this->PlayOne(paramIndex+1);
+//           }
         // If last property, render the frame and store the geometry
         else
           {
@@ -476,7 +480,13 @@ void vtkSMComparativeVisProxy::StoreGeometry()
           unsigned int numEls = this->Adaptor->GetNumberOfRangeElements();
           for (unsigned int j=0; j<numEls; j++)
             {
-            text_s << this->Adaptor->GetRangeValue(j);
+            const char* value = this->Adaptor->GetRangeValue(j);
+            size_t len = strlen(value);
+            if (len > 18)
+              {
+              value = value + len - 18;
+              }
+            text_s << value;
             if (j < numEls - 1)
               {
               text_s << ",";
@@ -485,7 +495,14 @@ void vtkSMComparativeVisProxy::StoreGeometry()
           }
         else
           {
-          text_s << this->Adaptor->GetRangeValue(cue->GetAnimatedElement());
+          const char* value = 
+            this->Adaptor->GetRangeValue(cue->GetAnimatedElement());
+          size_t len = strlen(value);
+          if (len > 18)
+            {
+            value = value + len - 18;
+            }
+          text_s << value;
           }
         if (i != numCues - 1)
           {
@@ -843,11 +860,11 @@ int vtkSMComparativeVisProxy::Show()
         //position->SetElements3(xPos, yPos, 0);
         }
       }
-    iy++;
-    if (iy == this->NumberOfYFrames)
+    ix++;
+    if (ix == this->NumberOfXFrames)
       {
-      iy = 0;
-      ix++;
+      ix = 0;
+      iy++;
       }
     }
   
