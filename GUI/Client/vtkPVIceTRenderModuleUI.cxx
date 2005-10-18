@@ -19,15 +19,16 @@
 #include "vtkKWFrame.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
+#include "vtkPVOptions.h"
 #include "vtkPVTraceHelper.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMIceTRenderModuleProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkTimerLog.h"
-
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -39,8 +40,13 @@ vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
   this->CollectThresholdScale = vtkKWScale::New();
   this->CollectThresholdLabel = vtkKWLabel::New();
   this->CollectThreshold = 100.0;
-}
 
+  this->StillReductionLabel = vtkKWLabel::New();
+  this->StillReductionCheck = vtkKWCheckButton::New();
+  this->StillReductionFactorScale = vtkKWScale::New();
+  this->StillReductionFactorLabel = vtkKWLabel::New();
+  this->StillReductionFactor = 0;
+}
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
@@ -51,6 +57,8 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
     {
     pvapp->SetRegistryValue(2, "RunTime", "CollectThreshold", "%d",
                             this->CollectThreshold);
+    pvapp->SetRegistryValue(2, "RunTime", "StillReductionFactor", "%d",
+                            this->StillReductionFactor);
     }
 
   this->CollectLabel->Delete();
@@ -61,6 +69,15 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
   this->CollectThresholdScale = NULL;
   this->CollectThresholdLabel->Delete();
   this->CollectThresholdLabel = NULL;
+
+  this->StillReductionLabel->Delete();
+  this->StillReductionLabel = NULL;
+  this->StillReductionCheck->Delete();
+  this->StillReductionCheck = NULL;
+  this->StillReductionFactorScale->Delete();
+  this->StillReductionFactorScale = NULL;
+  this->StillReductionFactorLabel->Delete();
+  this->StillReductionFactorLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +94,50 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
   vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
   // Skip over LOD res and threshold, composite threshold, and subsample rate.
   int row = 10;
+
+  this->StillReductionLabel->SetParent(this->LODScalesFrame);
+  this->StillReductionLabel->Create(app);
+  this->StillReductionLabel->SetAnchorToWest();
+  this->StillReductionLabel->SetText("Still Subsample Rate:");
+
+  this->StillReductionCheck->SetParent(this->LODScalesFrame);
+  this->StillReductionCheck->Create(app);
+  this->StillReductionCheck->SetSelectedState(1);
+  this->StillReductionCheck->SetCommand(this, "StillReductionCheckCallback");
+
+  this->StillReductionFactorScale->SetParent(this->LODScalesFrame);
+  this->StillReductionFactorScale->Create(app);
+  this->StillReductionFactorScale->SetRange(2, 20);
+  this->StillReductionFactorScale->SetResolution(1);
+  this->StillReductionFactorScale->SetValue(2);
+  this->StillReductionFactorScale->SetCommand(this, "StillReductionFactorScaleCallback");
+  this->StillReductionFactorScale->SetBalloonHelpString(
+    "Subsampling is a compositing LOD technique. "
+    "Still subsampling will use larger pixels during still rendering.");
+
+  this->StillReductionFactorLabel->SetParent(this->LODScalesFrame);
+  this->StillReductionFactorLabel->SetText("2 Pixels");
+  this->StillReductionFactorLabel->Create(app);
+  this->StillReductionFactorLabel->SetAnchorToWest();
+  if (pvapp &&
+      pvapp->GetRegistryValue(2, "RunTime", "StillReductionFactor", 0))
+    {
+    this->SetStillReductionFactor(
+      pvapp->GetIntRegistryValue(2, "RunTime", "StillReductionFactor"));
+    }
+  else
+    {
+    this->SetStillReductionFactor(1);
+    }
+
+  pvapp->Script("grid %s -row %d -column 2 -sticky nws",
+                this->StillReductionFactorLabel->GetWidgetName(), row++);
+  pvapp->Script("grid %s -row %d -column 0 -sticky nws",
+                this->StillReductionLabel->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 1 -sticky nes",
+                this->StillReductionCheck->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 2 -sticky news",
+                this->StillReductionFactorScale->GetWidgetName(), row++);
 
   this->CollectLabel->SetParent(this->LODScalesFrame);
   this->CollectLabel->Create(app);
@@ -207,7 +268,72 @@ void vtkPVIceTRenderModuleUI::SetCollectThreshold(float threshold)
                                    this->GetTclName(), threshold);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::StillReductionCheckCallback()
+{
+  int val = this->StillReductionCheck->GetSelectedState();
+  if (val)
+    {
+    val = (int)(this->StillReductionFactorScale->GetValue());
+    }
+  else
+    { // value of 1 is disabled.
+    val = 1;
+    }
+  this->SetStillReductionFactor(val);
+}
 
+//----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::StillReductionFactorScaleCallback()
+{
+  int val = (int)(this->StillReductionFactorScale->GetValue());
+  this->SetStillReductionFactor(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::SetStillReductionFactor(int factor)
+{
+  if (this->StillReductionFactor == factor)
+    {
+    return;
+    }
+
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetStillReductionFactor %d}", 
+                      this->GetTclName(), factor);
+  this->StillReductionFactor = factor;
+
+  if (factor == 1)
+    {
+    this->StillReductionFactorScale->EnabledOff();
+    this->StillReductionFactorLabel->EnabledOff();
+    this->StillReductionCheck->SetSelectedState(0);
+    this->StillReductionFactorLabel->SetText("Subsampling Disabled"); 
+    vtkTimerLog::MarkEvent("--- Still reduction disabled.");
+    }
+  else
+    {
+    this->StillReductionFactorScale->EnabledOn();
+    this->StillReductionFactorLabel->EnabledOn();
+    this->StillReductionFactorScale->SetValue(factor);
+    this->StillReductionCheck->SetSelectedState(1);
+    char str[128];
+    sprintf(str, "%d Pixels", factor);
+    this->StillReductionFactorLabel->SetText(str); 
+     vtkTimerLog::FormatAndMarkEvent("--- Still reduction factor %d.", factor);
+   }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("StillReductionFactor"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find StillReductionFactor on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, factor);
+  this->RenderModuleProxy->UpdateVTKObjects();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)

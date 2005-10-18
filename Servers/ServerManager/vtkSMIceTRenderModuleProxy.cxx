@@ -13,18 +13,20 @@
 
 =========================================================================*/
 #include "vtkSMIceTRenderModuleProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
-#include "vtkClientServerStream.h"
+
 #include "vtkClientServerID.h"
+#include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
+#include "vtkPVProcessModule.h"
+#include "vtkSMIceTMultiDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkPVOptions.h"
-#include "vtkCollection.h"
-#include "vtkSMIceTMultiDisplayProxy.h"
+#include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -34,6 +36,8 @@ vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
   this->RemoteDisplay = 0;
 
   this->CollectGeometryThreshold = 100.0;
+
+  this->StillReductionFactor = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -94,6 +98,9 @@ void vtkSMIceTRenderModuleProxy::InteractiveRender()
 void vtkSMIceTRenderModuleProxy::StillRender()
 {
   this->ChooseSuppressGeometryCollection();
+  this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
+  this->ComputeReductionFactor(this->StillReductionFactor);
+
   this->Superclass::StillRender();
 }
 
@@ -192,4 +199,6 @@ void vtkSMIceTRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "CollectGeometryThreshold: "
      << this->CollectGeometryThreshold << endl;
+  os << indent << "StillReductionFactor: "
+     << this->StillReductionFactor << endl;
 }

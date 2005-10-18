@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -233,7 +233,10 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   //Turn of ImageReductionFactor if the CompositeManager supports it.
   if (this->CompositeManagerProxy)
     {
-    this->SetImageReductionFactor(this->CompositeManagerProxy, 1);
+    if ( ! this->IsA("vtkSMIceTRenderModuleProxy") )
+      {
+      this->SetImageReductionFactor(this->CompositeManagerProxy, 1);
+      }
     this->SetSquirtLevel(this->CompositeManagerProxy, ((this->SquirtLevel)? 1 : 0) );
     this->SetUseCompositing(this->CompositeManagerProxy, ((this->LocalRender)? 0 : 1));
     }
@@ -291,7 +294,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
   if (!this->LocalRender)
     {
     this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
-    this->ComputeReductionFactor();
+    this->ComputeReductionFactor(this->ReductionFactor);
     }
 
   this->Superclass::InteractiveRender();
@@ -301,7 +304,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor()
+void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor(int inReductionFactor)
 {
   vtkRenderWindow* renWin = this->GetRenderWindow();
   float renderTime = 1.0 / renWin->GetDesiredUpdateRate();
@@ -316,10 +319,10 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor()
   newReductionFactor = 1;
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
-  if (this->ReductionFactor > 1)
+  if (inReductionFactor > 1)
     {
     // We have to come up with a more consistent way to compute reduction.
-    newReductionFactor = this->ReductionFactor;
+    newReductionFactor = inReductionFactor;
     if (this->CompositeManagerProxy)
       {
       vtkPVTreeComposite *composite = 
@@ -330,7 +333,7 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor()
         // Leave halve time for compositing.
         renderTime = renderTime * 0.5;
         // Try to factor in user preference.
-        renderTime = renderTime / (float)(this->ReductionFactor);
+        renderTime = renderTime / (float)(inReductionFactor);
         // Compute time for each pixel on the last render.
         area = windowSize[0] * windowSize[1];
         reductionFactor = (float)composite->GetImageReductionFactor();
@@ -347,9 +350,9 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor()
 
         // Do not let the width go below 150.
         maxReductionFactor = windowSize[0] / 150.0;
-        if (maxReductionFactor > this->ReductionFactor)
+        if (maxReductionFactor > inReductionFactor)
           {
-          maxReductionFactor = this->ReductionFactor;
+          maxReductionFactor = inReductionFactor;
           }
         if (newReductionFactor > maxReductionFactor)
           {

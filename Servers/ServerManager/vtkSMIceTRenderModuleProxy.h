@@ -37,11 +37,18 @@ public:
   // Indicates if we should locally render.
   virtual int IsRenderLocal() { return 0; }
 
+  // Description:
+  // Set this flag to indicate whether to calculate the reduction factor for
+  // use in tree composite (or client server) when still rendering.
+  vtkSetMacro(StillReductionFactor, int);
+  vtkGetMacro(StillReductionFactor, int);
+
 protected:
   vtkSMIceTRenderModuleProxy();
   ~vtkSMIceTRenderModuleProxy();
 
   double CollectGeometryThreshold;
+  int StillReductionFactor;
 
   // Description:
   // Subclasses should override this method to intialize the Composite Manager.

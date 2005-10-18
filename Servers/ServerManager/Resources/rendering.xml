@@ -1373,6 +1373,14 @@
         update_self="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty
+        name="StillReductionFactor"
+        command="SetStillReductionFactor"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
     </IceTRenderModuleProxy>
 
     <CaveRenderModuleProxy name="CaveRenderModule"
