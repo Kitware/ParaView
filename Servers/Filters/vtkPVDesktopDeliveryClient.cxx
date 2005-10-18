@@ -43,7 +43,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.1");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.2");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -168,6 +168,7 @@ void vtkPVDesktopDeliveryClient::SendWindowInformation()
     = (  winGeoInfo.GUISize[1]
        - this->WindowPosition[1] - this->RenderWindow->GetSize()[1] );
   winGeoInfo.Id = this->Id;
+  winGeoInfo.AnnotationLayer = this->AnnotationLayer;
   this->Controller->Send(reinterpret_cast<int *>(&winGeoInfo),
                          vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_SIZE,
                          this->ServerProcessId,
