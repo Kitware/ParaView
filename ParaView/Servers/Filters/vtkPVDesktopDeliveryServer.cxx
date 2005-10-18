@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.2");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.3");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -288,7 +288,9 @@ void vtkPVDesktopDeliveryServer::UseRendererSet(int id)
     for (rens->InitTraversal(cookie);
          (ren = rens->GetNextRenderer(cookie)) != NULL; )
       {
-      if (this->Renderers->IsItemPresent(ren))
+      // Turn off everything that is not annotation.  The superclass will
+      // later turn on any renderers that the client requested.
+      if (ren->GetLayer() >= this->AnnotationLayer)
         {
         ren->DrawOn();
         }
@@ -325,6 +327,8 @@ void vtkPVDesktopDeliveryServer::ReceiveWindowInformation()
   this->ClientGUISize[0] = winGeoInfo.GUISize[0];
   this->ClientGUISize[1] = winGeoInfo.GUISize[1];
 
+  this->AnnotationLayer = winGeoInfo.AnnotationLayer;
+
   this->UseRendererSet(winGeoInfo.Id);
 
   vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
@@ -343,6 +347,16 @@ void vtkPVDesktopDeliveryServer::ReceiveRendererInformation(vtkRenderer *ren)
   double viewport[4];
   ren->GetViewport(viewport);
 
+  if (this->ParallelRenderManager && (this->ImageReductionFactor > 1.0))
+    {
+    // Undo the image reduction so that the other parallel render manager may
+    // take care of it correctly.
+    viewport[0] *= this->ImageReductionFactor;
+    viewport[1] *= this->ImageReductionFactor;
+    viewport[2] *= this->ImageReductionFactor;
+    viewport[3] *= this->ImageReductionFactor;
+    }
+
   double scaleX = (double)this->ClientWindowSize[0]/this->ClientGUISize[0];
   double scaleY = (double)this->ClientWindowSize[1]/this->ClientGUISize[1];
   viewport[0] *= scaleX;
@@ -350,10 +364,13 @@ void vtkPVDesktopDeliveryServer::ReceiveRendererInformation(vtkRenderer *ren)
   viewport[2] *= scaleX;
   viewport[3] *= scaleY;
 
-  double offsetX = ((double)this->ClientWindowPosition[0]/this->ClientGUISize[0]
-                    /this->ImageReductionFactor);
-  double offsetY = ((double)this->ClientWindowPosition[1]/this->ClientGUISize[1]
-                    /this->ImageReductionFactor);
+  double offsetX = (double)this->ClientWindowPosition[0]/this->ClientGUISize[0];
+  double offsetY = (double)this->ClientWindowPosition[1]/this->ClientGUISize[1];
+  if (!this->ParallelRenderManager && (this->ImageReductionFactor > 1.0))
+    {
+    offsetX /= this->ImageReductionFactor;
+    offsetY /= this->ImageReductionFactor;
+    }
   viewport[0] += offsetX;
   viewport[1] += offsetY;
   viewport[2] += offsetX;
@@ -373,20 +390,6 @@ void vtkPVDesktopDeliveryServer::PreRenderProcessing()
 
   if (this->ParallelRenderManager)
     {
-    // If we are chaining this to another parallel render manager, restore
-    // the renderers so that the other parallel render manager may render
-    // the desired image size.
-    if (this->ImageReductionFactor > 1)
-      {
-      vtkRendererCollection *rens = this->GetRenderers();
-      // Just grab first renderer because that is all that the superclass
-      // really does anything with right now.
-      rens->InitTraversal();
-      vtkRenderer *ren = rens->GetNextItem();
-      double *viewport = this->Viewports->GetPointer(0);
-      ren->SetViewport(viewport);
-      }
-
     // Make sure the prm has the correct image reduction factor.
     if (  this->ParallelRenderManager->GetMaxImageReductionFactor()
           < this->ImageReductionFactor)

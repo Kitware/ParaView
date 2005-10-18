@@ -109,6 +109,7 @@ public:
     int Position[2];
     int GUISize[2];
     int Id;
+    int AnnotationLayer;
   };
 
   struct SquirtOptions {
@@ -175,6 +176,8 @@ protected:
   int ClientWindowSize[2];
   int ClientRequestedImageSize[2];
   int ClientGUISize[2];
+
+  int AnnotationLayer;
 
   int ImageResized;
 
