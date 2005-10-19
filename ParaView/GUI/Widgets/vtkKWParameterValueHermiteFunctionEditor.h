@@ -145,37 +145,37 @@ protected:
   // Return 1 on success (there is a midpoint at normalized position 'pos'),
   // 0 otherwise.
   // The default implementation here does not provide any mid-point.
-  virtual int GetFunctionMidPoint(int id, double *pos) = 0;
+  virtual int GetFunctionPointMidPoint(int id, double *pos) = 0;
 
   // Description:
   // Set the mid-point between two adjacent points 'id' and 'id + 1'.
   // Return 1 on success (the midpoint was successfully set at normalized
   // position 'pos'), 0 otherwise.
   // The default implementation here does not provide any mid-point.
-  virtual int SetFunctionMidPoint(int id, double pos) = 0;
+  virtual int SetFunctionPointMidPoint(int id, double pos) = 0;
 
   // Description:
   // Return 1 if the 'mid-point' of the point 'id' is locked (can/should 
   // not be changed/edited), 0 otherwise.
-  virtual int FunctionMidPointIsLocked(int id);
+  virtual int FunctionPointMidPointIsLocked(int id);
 
   // Description:
   // Retrieve the sharpness of the transition between two adjacent points
   // 'id' and 'id + 1'.
   // Return 1 on success (there is a sharpness defined for this point),
   // 0 otherwise.
-  virtual int GetFunctionSharpness(int id, double *sharpness) = 0;
+  virtual int GetFunctionPointSharpness(int id, double *sharpness) = 0;
 
   // Description:
   // Set the sharpness of the transition between two adjacent points
   // 'id' and 'id + 1'.
   // Return 1 on success (the sharpness was successfully set), 0 otherwise.
-  virtual int SetFunctionSharpness(int id, double sharpness) = 0;
+  virtual int SetFunctionPointSharpness(int id, double sharpness) = 0;
 
   // Description:
   // Return 1 if the 'sharpness' of the point 'id' is locked (can/should 
   // not be changed/edited), 0 otherwise.
-  virtual int FunctionSharpnessIsLocked(int id);
+  virtual int FunctionPointSharpnessIsLocked(int id);
 
   // Description:
   // Update point entries

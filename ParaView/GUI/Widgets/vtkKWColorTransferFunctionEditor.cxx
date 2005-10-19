@@ -31,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.42");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.43");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -369,7 +369,7 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::GetFunctionMidPoint(
+int vtkKWColorTransferFunctionEditor::GetFunctionPointMidPoint(
   int id, double *pos)
 {
   if (id < 0 || id >= this->GetFunctionSize() || !pos)
@@ -385,7 +385,7 @@ int vtkKWColorTransferFunctionEditor::GetFunctionMidPoint(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::SetFunctionMidPoint(
+int vtkKWColorTransferFunctionEditor::SetFunctionPointMidPoint(
   int id, double pos)
 {
   if (id < 0 || id >= this->GetFunctionSize())
@@ -413,7 +413,7 @@ int vtkKWColorTransferFunctionEditor::SetFunctionMidPoint(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::GetFunctionSharpness(
+int vtkKWColorTransferFunctionEditor::GetFunctionPointSharpness(
   int id, double *sharpness)
 {
   if (id < 0 || id >= this->GetFunctionSize() || !sharpness)
@@ -429,7 +429,7 @@ int vtkKWColorTransferFunctionEditor::GetFunctionSharpness(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::SetFunctionSharpness(
+int vtkKWColorTransferFunctionEditor::SetFunctionPointSharpness(
   int id, double sharpness)
 {
   if (id < 0 || id >= this->GetFunctionSize())
