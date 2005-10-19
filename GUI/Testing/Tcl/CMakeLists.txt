@@ -295,6 +295,12 @@ SET (PROJECT_TESTS_NO_BATCH
 )
 REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
 
+ADD_TEST(TestEmptyInput-ParaView
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/TestEmptyInput.pvs
+  )
 
 # for each test add a batch test that will possibly run in mpi mode
 FOREACH (tfile ${PROJECT_TESTS})
