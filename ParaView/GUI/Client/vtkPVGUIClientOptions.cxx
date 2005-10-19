@@ -14,14 +14,14 @@
 #include "vtkPVGUIClientOptions.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
 
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.7");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -32,6 +32,7 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
   this->StartEmpty = 0;
   this->ParaViewScriptName = 0;
   this->ParaViewDataName = 0;
+  this->InternalScriptName = 0;
   this->SetProcessType(vtkPVOptions::PARAVIEW);
 }
 
@@ -40,6 +41,7 @@ vtkPVGUIClientOptions::~vtkPVGUIClientOptions()
 {
   this->SetParaViewScriptName(0);
   this->SetParaViewDataName(0);
+  this->SetInternalScriptName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -100,6 +102,12 @@ int vtkPVGUIClientOptions::WrongArgument(const char* argument)
     this->SetParaViewScriptName(argument);
     return 1;
     }
+  vtkstd::string larg = vtksys::SystemTools::LowerCase(argument);
+  if ( vtksys::SystemTools::StringStartsWith(larg.c_str(), "script:") )
+    {
+    this->SetInternalScriptName(argument + strlen("script:"));
+    return 1;
+    }
 
   return this->Superclass::WrongArgument(argument);
 }
@@ -113,5 +121,6 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
   os << indent << "ParaViewScriptName: " << (this->ParaViewScriptName?this->ParaViewScriptName:"(none)") << endl;
+  os << indent << "InternalScriptName: " << (this->InternalScriptName?this->InternalScriptName:"(none)") << endl;
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
 }
