@@ -62,7 +62,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.456");
+vtkCxxRevisionMacro(vtkPVSource, "1.457");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2801,7 +2801,10 @@ int vtkPVSource::InitializeClone(int makeCurrent)
   // initialize widgets.
   // Unfortunately, there are some filters/modules with which
   // this does not work. These are avoided.
-  if (!this->IsA("vtkPVReaderModule") && !this->IsA("vtkPVProbe"))
+  if (!this->IsA("vtkPVReaderModule") && !this->IsA("vtkPVProbe") &&
+      strcmp(this->GetSourceClassName(), "vtkMergeArrays") != 0 &&
+      strcmp(this->GetSourceClassName(), "vtkAppendFilter") != 0 &&
+      strcmp(this->GetSourceClassName(), "vtkAppendPolyData") != 0)
     {
     this->Proxy->UpdateInformation();
     }
