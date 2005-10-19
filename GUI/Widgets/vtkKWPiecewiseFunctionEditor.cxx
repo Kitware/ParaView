@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.39");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -177,17 +177,17 @@ int vtkKWPiecewiseFunctionEditor::FunctionPointValueIsLocked(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::FunctionMidPointIsLocked(int id)
+int vtkKWPiecewiseFunctionEditor::FunctionPointMidPointIsLocked(int id)
 {
-  return (this->Superclass::FunctionMidPointIsLocked(id) ||
+  return (this->Superclass::FunctionPointMidPointIsLocked(id) ||
           this->WindowLevelMode);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::FunctionSharpnessIsLocked(
+int vtkKWPiecewiseFunctionEditor::FunctionPointSharpnessIsLocked(
   int id)
 {
-  return (this->Superclass::FunctionSharpnessIsLocked(id) ||
+  return (this->Superclass::FunctionPointSharpnessIsLocked(id) ||
           this->WindowLevelMode);
 }
 
@@ -437,7 +437,7 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointColorInCanvas(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::GetFunctionMidPoint(
+int vtkKWPiecewiseFunctionEditor::GetFunctionPointMidPoint(
   int id, double *pos)
 {
   if (id < 0 || id >= this->GetFunctionSize() || !pos)
@@ -453,7 +453,7 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionMidPoint(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::SetFunctionMidPoint(
+int vtkKWPiecewiseFunctionEditor::SetFunctionPointMidPoint(
   int id, double pos)
 {
   if (id < 0 || id >= this->GetFunctionSize())
@@ -479,7 +479,7 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionMidPoint(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::GetFunctionSharpness(
+int vtkKWPiecewiseFunctionEditor::GetFunctionPointSharpness(
   int id, double *sharpness)
 {
   if (id < 0 || id >= this->GetFunctionSize() || !sharpness)
@@ -495,7 +495,7 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionSharpness(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPiecewiseFunctionEditor::SetFunctionSharpness(
+int vtkKWPiecewiseFunctionEditor::SetFunctionPointSharpness(
   int id, double sharpness)
 {
   if (id < 0 || id >= this->GetFunctionSize())
@@ -534,8 +534,8 @@ int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
   // superclass implementation (staight line between id1 and id2) is fine
 
   double midpoint, sharpness;
-  if (this->GetFunctionMidPoint(id1, &midpoint) &&
-      this->GetFunctionSharpness(id1, &sharpness))
+  if (this->GetFunctionPointMidPoint(id1, &midpoint) &&
+      this->GetFunctionPointSharpness(id1, &sharpness))
     {
     return (sharpness == 0.0 && midpoint == 0.5) ? 0 : 1;
     }
@@ -556,8 +556,8 @@ void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
   // We assume all parameters are OK, they were checked by RedrawLine
 
   double midpoint, sharpness;
-  this->GetFunctionMidPoint(id1, &midpoint);
-  this->GetFunctionSharpness(id1, &sharpness);
+  this->GetFunctionPointMidPoint(id1, &midpoint);
+  this->GetFunctionPointSharpness(id1, &sharpness);
 
   int sharp_1 = (sharpness == 1.0) ? 1 : 0;
   int sharp_0 = (sharpness == 0.0 && 
@@ -1106,8 +1106,8 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
         this->PiecewiseFunction->AddPoint(
           points[id], id < 2 ? start_v : end_v);
         }
-      this->SetFunctionMidPoint(id, 0.5);
-      this->SetFunctionSharpness(id, 0.0);
+      this->SetFunctionPointMidPoint(id, 0.5);
+      this->SetFunctionPointSharpness(id, 0.0);
       }
     }
 

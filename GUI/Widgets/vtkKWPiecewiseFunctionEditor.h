@@ -173,12 +173,12 @@ protected:
   virtual int SetFunctionPoint(int id, double parameter, const double *values);
   virtual int RemoveFunctionPoint(int id);
   virtual int FunctionLineIsSampledBetweenPoints(int id1, int id2);
-  virtual int GetFunctionMidPoint(int id, double *pos);
-  virtual int SetFunctionMidPoint(int id, double pos);
-  virtual int GetFunctionSharpness(int id, double *sharpness);
-  virtual int SetFunctionSharpness(int id, double sharpness);
-  virtual int FunctionMidPointIsLocked(int id);
-  virtual int FunctionSharpnessIsLocked(int id);
+  virtual int GetFunctionPointMidPoint(int id, double *pos);
+  virtual int SetFunctionPointMidPoint(int id, double pos);
+  virtual int GetFunctionPointSharpness(int id, double *sharpness);
+  virtual int SetFunctionPointSharpness(int id, double sharpness);
+  virtual int FunctionPointMidPointIsLocked(int id);
+  virtual int FunctionPointSharpnessIsLocked(int id);
 
   virtual int GetMidPointVisibility();
 
