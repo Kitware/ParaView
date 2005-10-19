@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.373");
+vtkCxxRevisionMacro(vtkPVApplication, "1.374");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1157,6 +1157,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     ui->InitializeDefaultInterfacesOff();
     }
+  else
+    {
+//    abort();
+    }
 
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
@@ -1316,6 +1320,34 @@ void vtkPVApplication::Start(int argc, char*argv[])
   else if (this->Options->GetParaViewScriptName())
     {
     this->LoadScript(this->Options->GetParaViewScriptName());
+    }
+  else if (this->Options->GetInternalScriptName())
+    {
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    char temp1[1024];
+    sprintf(temp1, "%s.pvs", this->Options->GetInternalScriptName());
+
+    const char* scriptDir = pm->GetPath("Scripts", "Scripts", temp1);
+    if ( scriptDir )
+      {
+      sprintf(temp1, "%s/Scripts/%s.pvs", 
+        scriptDir, this->Options->GetInternalScriptName());
+      this->LoadScript(temp1);
+      }
+    else
+      {
+      char buffer[1024];
+      sprintf(buffer, "Cannot find internal script named: \"%s\". Continue anyway?",
+        temp1);
+      int all = vtkKWMessageDialog::PopupYesNo(
+        this, ui, "Error Finding Internal Script",
+        buffer,
+        vtkKWMessageDialog::QuestionIcon);
+      if ( !all )
+        {
+        this->Exit();
+        }
+      }
     }
   if ( this->Options->GetParaViewDataName() )
     {
@@ -1776,7 +1808,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
   vtkPVProcessModule* pm = this->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetDemoPath"
+         << pm->GetProcessModuleID() << "GetPath" << "Demos" << "Demos" << "Demo1.pvs"
          << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   if(!pm->GetLastResult(
@@ -1785,15 +1817,17 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
     demoDataPath = 0;
     }
   // Client path
-  demoScriptPath = pm->GetDemoPath();
+  demoScriptPath = pm->GetPath("Demos", "Demos", "Demo1.pvs");
 
   if (demoDataPath && demoScriptPath)
     {
+    cout << "DemoScriptPath: " << demoScriptPath << endl;
+    cout << "DemoDataPath: " << demoDataPath << endl;
     char temp1[1024];
-    sprintf(temp1, "%s/Demo1.pvs", 
+    sprintf(temp1, "%s/Demos/Demo1.pvs", 
             demoScriptPath);
 
-    window->Script("set DemoDir {%s}", demoDataPath);
+    window->Script("set DemoDir {%s/Demos}", demoDataPath);
     window->LoadScript(temp1);
     }
   else

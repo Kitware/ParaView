@@ -41,26 +41,39 @@
 #include "vtkInstantiator.h"
 #include "vtkPVServerOptions.h"
 #include "vtkKWProcessStatistics.h"
+#include "vtkPVPaths.h"
 
-#include "vtkPVDemoPaths.h"
+#include "vtkStdString.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtkstd/map>
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
 int vtkPVProcessModule::GlobalStreamBlock = 0;
 
+//----------------------------------------------------------------------------
+//============================================================================
+class vtkPVProcessModuleInternals
+{
+public:
+  typedef vtkstd::map<vtkStdString, vtkStdString> MapStringToString;
+  MapStringToString Paths;
+};
+//============================================================================
+//----------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.39");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
+  this->Internals = new vtkPVProcessModuleInternals;
   this->MPIMToNSocketConnectionID.ID = 0;
   this->LogThreshold = 0;
-  this->DemoPath = 0;
   this->ServerInformation = vtkPVServerInformation::New();
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 1;
@@ -73,11 +86,11 @@ vtkPVProcessModule::vtkPVProcessModule()
 vtkPVProcessModule::~vtkPVProcessModule()
 { 
   this->SetGUIHelper(0);
-  this->SetDemoPath(0);
   this->SetApplicationInstallationDirectory(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
   this->Timer->Delete();
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -202,7 +215,6 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
-  os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
   os << indent << "UseTriangleStrips: " << this->UseTriangleStrips << endl;
   os << indent << "UseImmediateMode: " << this->UseImmediateMode << endl;
 
@@ -414,36 +426,31 @@ int vtkPVProcessModule::GetGlobalStreamBlock()
 
 //============================================================================
 // Stuff that is a part of render-process module.
-
 //-----------------------------------------------------------------------------
-const char* vtkPVProcessModule::GetDemoPath()
+const char* vtkPVProcessModule::GetPath(const char* tag, const char* relativePath, const char* file)
 {
+  if ( !tag || !relativePath || !file )
+    {
+    return 0;
+    }
   int found=0;
-  char temp1[1024];
-
-  this->SetDemoPath(NULL);
 
   if(this->Options)
     {
     vtksys_stl::string selfPath, errorMsg;
     if (vtksys::SystemTools::FindProgramPath(
-          this->Options->GetArgv0(), selfPath, errorMsg))
+        this->Options->GetArgv0(), selfPath, errorMsg))
       {
       selfPath = vtksys::SystemTools::GetFilenamePath(selfPath);
-      const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-      char* newPath = new char[selfPath.size()+strlen(relPath)+2];
-      sprintf(newPath, "%s/%s", selfPath.c_str(), relPath);
-
-      char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-      sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-      if(vtksys::SystemTools::FileExists(demoFile))
+      vtkstd::string str = selfPath;
+      str += "/../share/paraview-" PARAVIEW_VERSION "/";
+      str += relativePath;
+      str += file;
+      if(vtksys::SystemTools::FileExists(str.c_str()))
         {
-        this->SetDemoPath(newPath);
+        this->Internals->Paths[tag] = str.c_str();
         found = 1;
         }
-      delete[] demoFile;
-      delete[] newPath;
       }
     }
 
@@ -451,18 +458,26 @@ const char* vtkPVProcessModule::GetDemoPath()
     {
     // Look in binary and installation directories
     const char** dir;
-    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+    for(dir=PARAVIEW_PATHS; !found && *dir; ++dir)
       {
-      sprintf(temp1, "%s/Demo1.pvs", *dir);
-      if(vtksys::SystemTools::FileExists(temp1))
+      vtkstd::string fullFile = *dir;
+      fullFile += "/";
+      fullFile += relativePath;
+      fullFile += "/";
+      fullFile += file;
+      if(vtksys::SystemTools::FileExists(fullFile.c_str()))
         {
-        this->SetDemoPath(*dir);
+        this->Internals->Paths[tag] = *dir;
         found = 1;
         }
       }
     }
+  if ( this->Internals->Paths.find(tag) == this->Internals->Paths.end() )
+    {
+    return 0;
+    }
 
-  return this->DemoPath;
+  return this->Internals->Paths[tag].c_str();
 }
 
 //----------------------------------------------------------------------------

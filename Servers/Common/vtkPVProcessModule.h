@@ -42,6 +42,7 @@ class vtkSocketController;
 class vtkKWApplication;
 class vtkPVServerInformation;
 class vtkPVOptions;
+class vtkPVProcessModuleInternals;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
@@ -143,9 +144,7 @@ public:
 
   // Description:
   // We need to get the data path for the demo on the server.
-  const char* GetDemoPath();
-
-  vtkSetStringMacro(DemoPath);
+  const char* GetPath(const char* tag, const char* relativePath, const char* file);
 
   // Description:
   // Need to put a global flag that indicates interactive rendering.  All
@@ -207,12 +206,12 @@ protected:
   static int GlobalStreamBlock;
   
   float LogThreshold;
-  char* DemoPath;
   vtkPVServerInformation* ServerInformation;
   int UseTriangleStrips;
   int UseImmediateMode;
   char* ApplicationInstallationDirectory;
   vtkTimerLog *Timer;
+  vtkPVProcessModuleInternals* Internals;
 
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

@@ -87,8 +87,8 @@ INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
 INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 
-CONFIGURE_FILE(${PVServerCommon_SOURCE_DIR}/vtkPVDemoPaths.h.in
-  ${PVServerCommon_BINARY_DIR}/vtkPVDemoPaths.h
+CONFIGURE_FILE(${PVServerCommon_SOURCE_DIR}/vtkPVPaths.h.in
+  ${PVServerCommon_BINARY_DIR}/vtkPVPaths.h
   ESCAPE_QUOTES)
 
 # Wrap PVServerCommon
