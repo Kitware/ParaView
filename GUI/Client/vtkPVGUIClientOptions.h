@@ -40,6 +40,8 @@ public:
   vtkGetMacro(StartEmpty, int);
   vtkGetStringMacro(ParaViewScriptName);
   vtkSetStringMacro(ParaViewScriptName);
+  vtkGetStringMacro(InternalScriptName);
+
 protected:
   // Description:
   // Default constructor.
@@ -66,14 +68,15 @@ private:
   vtkPVGUIClientOptions(const vtkPVGUIClientOptions&); // Not implemented
   void operator=(const vtkPVGUIClientOptions&); // Not implemented
 
+  vtkSetStringMacro(InternalScriptName);
+
   // Options:
   int PlayDemoFlag;
   int DisableRegistry;
   int CrashOnErrors;
   int StartEmpty;
   char* ParaViewScriptName;
-
+  char* InternalScriptName;
 };
 
 #endif // #ifndef __vtkPVGUIClientOptions_h
-
