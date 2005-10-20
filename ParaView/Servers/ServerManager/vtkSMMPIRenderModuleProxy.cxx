@@ -25,7 +25,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -80,13 +80,13 @@ void vtkSMMPIRenderModuleProxy::InteractiveRender()
       this->CompositeManagerProxy->GetProperty("RenderEventPropagation"));
     if (this->LocalRender)
       {
-      pr->SetElement(0, 0);
-      rep->SetElement(0, 0);
+      if (pr) {pr->SetElement(0, 0);}
+      if (rep) {rep->SetElement(0, 0);}
       }
     else
       {
-      pr->SetElement(0, 1);
-      rep->SetElement(0, 1);
+      if (pr) {pr->SetElement(0, 1);}
+      if (rep) {rep->SetElement(0, 1);}
       }
     this->CompositeManagerProxy->UpdateVTKObjects();
     }
@@ -106,16 +106,10 @@ void vtkSMMPIRenderModuleProxy::CreateVTKObjects(int numObjects)
   // By default, disable render propagation.
   vtkSMIntVectorProperty* pr = vtkSMIntVectorProperty::SafeDownCast(
     this->CompositeManagerProxy->GetProperty("ParallelRendering"));
-  if (pr)
-    {
-    pr->SetElement(0, 0);
-    }
+  if (pr) {pr->SetElement(0, 0);}
   vtkSMIntVectorProperty* rep = vtkSMIntVectorProperty::SafeDownCast(
     this->CompositeManagerProxy->GetProperty("RenderEventPropagation"));
-  if (rep)
-    {
-    rep->SetElement(0, 0);
-    }
+  if (rep) {rep->SetElement(0, 0);}
 }
 
 //-----------------------------------------------------------------------------
