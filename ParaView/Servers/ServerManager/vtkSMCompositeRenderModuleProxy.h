@@ -56,7 +56,14 @@ public:
   vtkSetMacro(SquirtLevel, int);
   vtkGetMacro(SquirtLevel, int);
 
+  // Description:
+  // Render based on the interactive render parameters. This usually means
+  // LOD size, LOD geometry.
   virtual void InteractiveRender();
+
+  // Description:
+  // Render based on the still render parameters. This usually means
+  // full size, full geometry.
   virtual void StillRender();
 
   // Description:

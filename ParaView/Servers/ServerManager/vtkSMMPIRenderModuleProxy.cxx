@@ -25,7 +25,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -34,6 +34,82 @@ vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::~vtkSMMPIRenderModuleProxy()
 {
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMPIRenderModuleProxy::StillRender()
+{
+  if (this->CompositeManagerProxy)
+    {
+    this->LocalRender = this->GetLocalRenderDecision(
+      this->GetTotalVisibleGeometryMemorySize(), 1);
+    vtkSMIntVectorProperty* pr = vtkSMIntVectorProperty::SafeDownCast(
+      this->CompositeManagerProxy->GetProperty("ParallelRendering"));
+    vtkSMIntVectorProperty* rep = vtkSMIntVectorProperty::SafeDownCast(
+      this->CompositeManagerProxy->GetProperty("RenderEventPropagation"));
+    if (this->LocalRender)
+      {
+      pr->SetElement(0, 0);
+      rep->SetElement(0, 0);
+      }
+    else
+      {
+      pr->SetElement(0, 1);
+      rep->SetElement(0, 1);
+      }
+    this->CompositeManagerProxy->UpdateVTKObjects();
+    }
+
+  this->Superclass::StillRender();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMPIRenderModuleProxy::InteractiveRender()
+{
+  if (this->CompositeManagerProxy)
+    {
+    int useLOD = this->GetUseLODDecision();
+    unsigned long totalMemory = 0;
+    totalMemory = (useLOD)? this->GetTotalVisibleLODGeometryMemorySize() :
+      this->GetTotalVisibleGeometryMemorySize();
+    this->LocalRender = this->GetLocalRenderDecision(totalMemory, 0);
+
+    vtkSMIntVectorProperty* pr = vtkSMIntVectorProperty::SafeDownCast(
+      this->CompositeManagerProxy->GetProperty("ParallelRendering"));
+    vtkSMIntVectorProperty* rep = vtkSMIntVectorProperty::SafeDownCast(
+      this->CompositeManagerProxy->GetProperty("RenderEventPropagation"));
+    if (this->LocalRender)
+      {
+      pr->SetElement(0, 0);
+      rep->SetElement(0, 0);
+      }
+    else
+      {
+      pr->SetElement(0, 1);
+      rep->SetElement(0, 1);
+      }
+    this->CompositeManagerProxy->UpdateVTKObjects();
+    }
+
+  this->Superclass::StillRender();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMPIRenderModuleProxy::CreateVTKObjects(int numObjects)
+{
+  if (this->ObjectsCreated )
+    {
+    return;
+    }
+  this->Superclass::CreateVTKObjects(numObjects);
+
+  // By default, disable render propagation.
+  vtkSMIntVectorProperty* pr = vtkSMIntVectorProperty::SafeDownCast(
+    this->CompositeManagerProxy->GetProperty("ParallelRendering"));
+  vtkSMIntVectorProperty* rep = vtkSMIntVectorProperty::SafeDownCast(
+    this->CompositeManagerProxy->GetProperty("RenderEventPropagation"));
+  pr->SetElement(0, 0);
+  rep->SetElement(0, 0);
 }
 
 //-----------------------------------------------------------------------------

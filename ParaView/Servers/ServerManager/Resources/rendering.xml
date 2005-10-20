@@ -1575,6 +1575,20 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty
+        name="ParallelRendering"
+        command="SetParallelRendering"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="RenderEventPropagation"
+        command="SetRenderEventPropagation"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty name="SyncRenderWindowRenderers"
                          command="SetSyncRenderWindowRenderers"
                          number_of_elements="1"
