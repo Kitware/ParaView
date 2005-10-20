@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.15");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -396,6 +396,7 @@ void vtkSMIntRangeDomain::Update(vtkSMProperty* prop)
         this->AddMaximum(i/2, ivp->GetElement(i));
         }
       }
+    this->InvokeModified();
     }
 }
 

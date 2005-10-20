@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -40,7 +40,7 @@ vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
+void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
 {
   this->RemoveAllMinima();
   this->RemoveAllMaxima();
@@ -68,9 +68,17 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     return;
     }
   
+  if (array->GetNumberOfUncheckedElements() < 5)
+    {
+    return;
+    }
   const char* arrayName = array->GetUncheckedElement(4);
   if (!arrayName || arrayName[0] == '\0')
     {
+    if (array->GetNumberOfElements() < 5)
+      {
+      return;
+      }
     arrayName = array->GetElement(4);
     }
 
@@ -89,6 +97,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     if (source)
       {
       this->Update(arrayName, ip, source);
+      this->InvokeModified();
       return;
       }
     }
@@ -103,6 +112,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     if (source)
       {
       this->Update(arrayName, ip, source);
+      this->InvokeModified();
       return;
       }
     }

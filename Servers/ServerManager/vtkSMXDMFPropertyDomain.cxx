@@ -18,7 +18,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMXDMFPropertyDomain);
-vtkCxxRevisionMacro(vtkSMXDMFPropertyDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMXDMFPropertyDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMXDMFPropertyDomain::vtkSMXDMFPropertyDomain()
@@ -55,6 +55,7 @@ void vtkSMXDMFPropertyDomain::Update(vtkSMProperty* prop)
       int max = min + atoi(svp->GetElement(i*5+4)) - 1;
       this->AddMaximum(i, max);
       }
+    this->InvokeModified();
     }
 }
 

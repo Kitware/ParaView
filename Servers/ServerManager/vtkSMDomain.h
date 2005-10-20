@@ -49,7 +49,7 @@ public:
   // Description:
   // Update self based on the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
-  virtual void Update(vtkSMProperty*) {};
+  virtual void Update(vtkSMProperty*) {this->InvokeModified();};
 
   // Description:
   // Set the value of an element of a property from the animation editor.
@@ -107,6 +107,9 @@ protected:
 
   vtkSMDomainInternals* Internals;
 
+  // Description:
+  // Invoked DomainModifiedEvent.
+  void InvokeModified();
 
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented

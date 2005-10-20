@@ -21,7 +21,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
-vtkCxxRevisionMacro(vtkSMExtentDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMExtentDomain::vtkSMExtentDomain()
@@ -44,6 +44,7 @@ void vtkSMExtentDomain::Update(vtkSMProperty*)
   if (pp)
     {
     this->Update(pp);
+    this->InvokeModified();
     }
 }
 
@@ -61,7 +62,7 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
       vtkPVDataInformation *info = sp->GetDataInformation();
       if (!info)
         {
-        return;
+        continue;
         }
       int extent[6];
       info->GetExtent(extent);
@@ -70,6 +71,33 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
         this->AddMinimum(j, extent[2*j]);
         this->AddMaximum(j, extent[2*j+1]);
         }
+      this->InvokeModified();
+      return;
+      }
+    }
+
+  // In case there is no valid unchecked proxy, use the actual
+  // proxy values
+  numProxs = pp->GetNumberOfProxies();
+  for (i=0; i<numProxs; i++)
+    {
+    vtkSMSourceProxy* sp = 
+      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
+    if (sp)
+      {
+      vtkPVDataInformation *info = sp->GetDataInformation();
+      if (!info)
+        {
+        continue;
+        }
+      int extent[6];
+      info->GetExtent(extent);
+      for (j = 0; j < 3; j++)
+        {
+        this->AddMinimum(j, extent[2*j]);
+        this->AddMaximum(j, extent[2*j+1]);
+        }
+      this->InvokeModified();
       return;
       }
     }
