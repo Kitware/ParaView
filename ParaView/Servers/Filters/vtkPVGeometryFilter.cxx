@@ -29,6 +29,7 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiGroupDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -41,11 +42,12 @@
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.54");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.55");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -71,6 +73,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   this->OutlineSource = vtkOutlineSource::New();
+
+  this->GenerateGroupScalars = 0;
+  this->CurrentGroup = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -220,9 +225,9 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
-  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
+  vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
     inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
-  if (hdInput) 
+  if (mgInput) 
     {
     return this->RequestCompositeData(request, inputVector, outputVector);
     }
@@ -258,36 +263,40 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     info->Get(vtkDataObject::DATA_OBJECT()));
   if (!output) {return 0;}
 
-  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
+  vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
     inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
-  if (!hdInput) {return 0;}
 
-
-  if (this->CheckAttributes(hdInput))
+  if (this->CheckAttributes(mgInput))
     {
     return 0;
     }
 
-  vtkCompositeDataIterator* iter = hdInput->NewIterator();
-  iter->GoToFirstItem();
   vtkAppendPolyData* append = vtkAppendPolyData::New();
   int numInputs = 0;
-  while (!iter->IsDoneWithTraversal())
+  unsigned int numGroups = mgInput->GetNumberOfGroups();
+  this->GenerateGroupScalars = 1;
+  for (unsigned int group=0; group<numGroups; group++)
     {
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-    if (ds)
+    unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
+    this->CurrentGroup = group;
+    for (unsigned int dataset=0; dataset<numDataSets; dataset++)
       {
-      vtkPolyData* tmpOut = vtkPolyData::New();
-      this->ExecuteBlock(ds, tmpOut, 0);
-      append->AddInput(tmpOut);
-      // Call FastDelete() instead of Delete() to avoid garbage
-      // collection checks. This improves the preformance significantly
-      tmpOut->FastDelete();
-      numInputs++;
+      vtkDataSet* ds = 
+        vtkDataSet::SafeDownCast(mgInput->GetDataSet(group, dataset));
+      if (ds)
+        {
+        vtkPolyData* tmpOut = vtkPolyData::New();
+        this->ExecuteBlock(ds, tmpOut, 0);
+        append->AddInput(tmpOut);
+        // Call FastDelete() instead of Delete() to avoid garbage
+        // collection checks. This improves the preformance significantly
+        tmpOut->FastDelete();
+        numInputs++;
+        }
       }
-    iter->GoToNextItem();
     }
-  iter->Delete();
+  this->GenerateGroupScalars = 0;
+
   if (numInputs > 0)
     {
     append->Update();
@@ -471,6 +480,20 @@ void vtkPVGeometryFilter::DataSetExecute(
     
     output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
     output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+
+    if (this->GenerateGroupScalars)
+      {
+      vtkUnsignedCharArray* newArray = vtkUnsignedCharArray::New();
+      vtkIdType numCells = output->GetNumberOfCells();
+      newArray->SetNumberOfTuples(numCells);
+      for(vtkIdType cellId=0; cellId<numCells; cellId++)
+        {
+        newArray->SetValue(cellId, this->CurrentGroup);
+        }
+      newArray->SetName("GroupScalars");
+      output->GetCellData()->AddArray(newArray);
+      newArray->Delete();
+      }
     }
 }
 

@@ -134,6 +134,9 @@ protected:
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented
+
+  int GenerateGroupScalars;
+  unsigned int CurrentGroup;
 };
 
 #endif
