@@ -19,7 +19,9 @@
 #include "vtkMath.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.9");
+#include <ctype.h>
+
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.10");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -1620,7 +1622,7 @@ void vtkKWParameterValueHermiteFunctionEditor::MoveMidPointCallback(
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::EndMidPointInteractionCallback(
-  int x, int y)
+  int vtkNotUsed(x), int vtkNotUsed(y))
 {
   if (!this->HasMidPointSelection())
     {

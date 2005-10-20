@@ -30,10 +30,12 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWIcon.h"
 
+#include <ctype.h>
+
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.72");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.73");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -6694,7 +6696,7 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEventsFunction2(
 void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
   vtkObject *caller,
   unsigned long event,
-  void *calldata)
+  void *vtkNotUsed(calldata))
 {
   vtkKWParameterValueFunctionEditor *pvfe =
     reinterpret_cast<vtkKWParameterValueFunctionEditor *>(caller);

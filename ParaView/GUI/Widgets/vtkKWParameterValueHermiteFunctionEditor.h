@@ -151,7 +151,7 @@ public:
   //BTX
   enum
   {
-    MidPointSelectionChangedEvent = 11000,
+    MidPointSelectionChangedEvent = 11000
   };
   //ETX
 
