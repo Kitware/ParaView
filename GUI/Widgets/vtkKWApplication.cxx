@@ -52,14 +52,6 @@ static Tcl_Interp *Et_Interp = 0;
 #include "Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.h"
 #endif
 
-// I need those two Tcl functions. They usually are declared in tclIntDecls.h,
-// but Unix build do not have access to VTK's tkInternals include path.
-// Since the signature has not changed for years (at least since 8.2),
-// let's just prototype them.
-
-EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
-EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
-
 const char *vtkKWApplication::ExitDialogName = "ExitApplication";
 const char *vtkKWApplication::BalloonHelpVisibilityRegKey = "ShowBalloonHelp";
 const char *vtkKWApplication::SaveUserInterfaceGeometryRegKey = "SaveUserInterfaceGeometry";
@@ -68,7 +60,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.253");
+vtkCxxRevisionMacro(vtkKWApplication, "1.254");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -436,7 +428,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   // than just finding the executable (for ex:, it will set variables 
   // depending on the value of TCL_LIBRARY, TK_LIBRARY)
 
-  Tcl_FindExecutable(argv[0]);
+  vtkTclApplicationInitExecutable(argc, argv);
 
   // Create the interpreter
 
@@ -449,109 +441,15 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_SetVar(interp, (char *)"argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, (char *)"tcl_interactive", (char *)"0", TCL_GLOBAL_ONLY);
 
-  // Find the path to our internal Tcl/Tk support library/packages
-  // if we are not using the installed Tcl/Tk (i.e., if the support
-  // file were copied to the build/install dir)
-  // Sets the path to the Tcl and Tk library manually
-  
-#ifdef VTK_TCL_TK_COPY_SUPPORT_LIBRARY
-
-  int has_tcllibpath_env = getenv("TCL_LIBRARY") ? 1 : 0;
-  int has_tklibpath_env = getenv("TK_LIBRARY") ? 1 : 0;
-  if (!has_tcllibpath_env || !has_tklibpath_env)
+  const char* relative_dirs[] =
     {
-    const char *nameofexec = Tcl_GetNameOfExecutable();
-    if (nameofexec && vtksys::SystemTools::FileExists(nameofexec))
-      {
-      char dir_unix[1024], buffer[1024];
-      vtksys_stl::string dir = vtksys::SystemTools::GetFilenamePath(nameofexec);
-      vtksys::SystemTools::ConvertToUnixSlashes(dir);
-      strcpy(dir_unix, dir.c_str());
-
-      // Installed KW application, otherwise build tree/windows
-      sprintf(buffer, "%s/..%s/TclTk", dir_unix, KW_INSTALL_LIB_DIR);
-      int exists = vtksys::SystemTools::FileExists(buffer);
-      if (!exists)
-        {
-        sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = vtksys::SystemTools::FileExists(buffer);
-        }
-      vtksys_stl::string collapsed = 
-        vtksys::SystemTools::CollapseFullPath(buffer);
-      sprintf(buffer, collapsed.c_str());
-      if (exists)
-        {
-        // Also prepend our Tcl Tk lib path to the library paths
-        // This *is* mandatory if we want encodings files to be found, as they
-        // are searched by browsing TclGetLibraryPath().
-        // (nope, updating the Tcl tcl_libPath var won't do the trick)
-        
-        Tcl_Obj *new_libpath = Tcl_NewObj();
-        
-        // Tcl lib path
-        
-        if (!has_tcllibpath_env)
-        {
-        char tcl_library[1024] = "";
-        sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (vtksys::SystemTools::FileExists(tcl_library))
-          {
-          if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
-                          TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
-            {
-            if (err)
-              {
-              *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) 
-                   << endl;
-              }
-            return NULL;
-            }
-          Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
-          if (obj && 
-              !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK &&
-              err)
-            {
-            *err << "Tcl_ListObjAppendElement error: " 
-                 << Tcl_GetStringResult(interp) << endl;
-            }
-          }
-        }
-  
-        // Tk lib path
-
-        if (!has_tklibpath_env)
-          {
-          char tk_library[1024] = "";
-          sprintf(tk_library, "%s/lib/tk%s", buffer, TK_VERSION);
-          if (vtksys::SystemTools::FileExists(tk_library))
-            {
-            if (!Tcl_SetVar(interp, "tk_library", tk_library, 
-                            TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
-              {
-              if (err)
-                {
-                *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) 
-                     << endl;
-                }
-              return NULL;
-              }
-            Tcl_Obj *obj = Tcl_NewStringObj(tk_library, -1);
-            if (obj && 
-                !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK 
-                && err)
-              {
-              *err << "Tcl_ListObjAppendElement error: " 
-                   << Tcl_GetStringResult(interp) << endl;
-              }
-            }
-          }
-
-        TclSetLibraryPath(new_libpath);
-        }
-      }
-    }
-
-#endif
+      "../lib/TclTk/lib",
+      "TclTk/lib",
+      ".." KW_INSTALL_TclTk_DIR,     // for exe in PREFIX/bin
+      "../.." KW_INSTALL_TclTk_DIR,  // for exe in PREFIX/lib/foo-V.v
+      0
+    };
+  vtkTclApplicationInitTclTk(interp, relative_dirs);
 
   return vtkKWApplication::InitializeTcl(interp, err);
 }
