@@ -31,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.43");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.44");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -781,28 +781,6 @@ void vtkKWColorTransferFunctionEditor::Pack()
            << " -side left -fill both -padx 0" << endl;
     }
 
-  // Value entries (in top right frame)
-
-  if (this->ValueEntriesVisibility && this->PointEntriesVisibility)
-    {
-    vtksys_stl::string before;
-    if (this->MidPointEntry && this->MidPointEntry->IsCreated() && 
-        this->MidPointEntryVisibility)
-      {
-      before = " -before ";
-      before += this->MidPointEntry->GetWidgetName();
-      }
-    int i;
-    for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
-      {
-      if (this->ValueEntries[i] && this->ValueEntries[i]->IsCreated())
-        {
-        tk_cmd << "pack " << this->ValueEntries[i]->GetWidgetName() 
-               << " -side left -pady 0" << before.c_str() << endl;
-        }
-      }
-    }
-
   // Color ramp
 
   if (this->ColorRampVisibility && 
@@ -845,6 +823,41 @@ void vtkKWColorTransferFunctionEditor::Pack()
            << " -columnspan 2 -sticky w -padx 0 "
            << " -pady " << (this->CanvasVisibility ? 2 : 0)
            << " -column " << col << " -row " << row << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::PackPointEntries()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Pack the other entries
+
+  this->Superclass::PackPointEntries();
+
+  ostrstream tk_cmd;
+
+  // Value entries (in top right frame)
+
+  if (this->HasSelection() &&
+      this->ValueEntriesVisibility && 
+      this->PointEntriesVisibility)
+    {
+    for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
+      {
+      if (this->ValueEntries[i] && this->ValueEntries[i]->IsCreated())
+        {
+        tk_cmd << "pack " << this->ValueEntries[i]->GetWidgetName() 
+               << " -side left -pady 0" << endl;
+        }
+      }
     }
   
   tk_cmd << ends;
@@ -1003,7 +1016,7 @@ void vtkKWColorTransferFunctionEditor::DoubleClickOnPointCallback(
 
   // No point found
 
-  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y))
     {
     return;
     }

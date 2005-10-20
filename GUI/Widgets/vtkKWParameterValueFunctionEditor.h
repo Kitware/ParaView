@@ -201,9 +201,18 @@ public:
   // allows you to use a function set in a different internal range than 
   // the one you want to display. This works by mapping the relative position
   // of the VisibleParameterRange inside the WholeParameterRange to
-  // the DisplayedWholeParameterRange (the GetDisplayedVisibleParameterRange
-  // is a convenience function that will return that result).
-  // If both ends of that range are the same, it is not used.
+  // the DisplayedWholeParameterRange.
+  // The GetDisplayedVisibleParameterRange is a convenience function that
+  // will return the visible parameter range mapped inside that displayed
+  // parameter range.
+  // The MapParameterToDisplayedParameter is a convenience function that
+  // will map a parameter to the displayed parameter range.
+  // The MapDisplayedParameterToParameter is a convenience function that
+  // will map a displayed parameter back to the parameter range.
+  // The GetFunctionPointDisplayedParameter is a convenience function that
+  // will map the parameter of a point 'id' to the displayed parameter range.
+  // If both ends of that range are the same, it is not used and all the
+  // functions return the same parameter.
   vtkGetVector2Macro(DisplayedWholeParameterRange, double);
   virtual void SetDisplayedWholeParameterRange(double r0, double r1);
   virtual void SetDisplayedWholeParameterRange(double range[2]) 
@@ -211,6 +220,9 @@ public:
   virtual void GetDisplayedVisibleParameterRange(double &r0, double &r1);
   virtual void GetDisplayedVisibleParameterRange(double range[2])
     { this->GetDisplayedVisibleParameterRange(range[0], range[1]); };
+  virtual void MapParameterToDisplayedParameter(double p, double *displayed_p);
+  virtual void MapDisplayedParameterToParameter(double displayed_p, double *p);
+  virtual int GetFunctionPointDisplayedParameter(int id, double *displayed_p);
   
   // Description:
   // Set the position of points in the value range. 
@@ -664,8 +676,8 @@ public:
 
   // Description:
   // Add a point
-  virtual int AddPointAtCanvasCoordinates(int x, int y, int &id);
-  virtual int AddPointAtParameter(double parameter, int &id);
+  virtual int AddPointAtCanvasCoordinates(int x, int y, int *id);
+  virtual int AddPointAtParameter(double parameter, int *id);
 
   // Description:
   // Merge all the points from another function editor.
@@ -900,14 +912,13 @@ public:
   // Synchronize the visible parameter range between two editors A and B.
   // Each time the visible range of A is changed, the same visible range
   // is assigned to the synchronized editor B, and vice-versa.
-
-  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // Note that a call A->(B) is the same as a call B->(A), 
   // i.e. this is a double-link, only one call is needed to set the sync.
   // Return 1 on success, 0 otherwise.
-  static int SynchronizeVisibleParameterRange(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
-  static int DoNotSynchronizeVisibleParameterRange(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  virtual int SynchronizeVisibleParameterRange(
+    vtkKWParameterValueFunctionEditor *b);
+  virtual int DoNotSynchronizeVisibleParameterRange(
+    vtkKWParameterValueFunctionEditor *b);
 
   // Description:
   // Synchronize points between two editors A and B.
@@ -915,37 +926,35 @@ public:
   // parameter space (by calling MergePointsFromEditor on each other).
   // Then each time a point in A is added, moved or removed through 
   // user interaction, the same point in B is altered and vice-versa.
-  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // Note that a call A->(B) is the same as a call B->(A), 
   // i.e. this is a double-link, only one call is needed to set the sync.
   // Return 1 on success, 0 otherwise.
-  static int SynchronizePoints(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
-  static int DoNotSynchronizePoints(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  virtual int SynchronizePoints(vtkKWParameterValueFunctionEditor *b);
+  virtual int DoNotSynchronizePoints(vtkKWParameterValueFunctionEditor *b);
 
   // Description:
   // Synchronize single selection between two editors A and B.
   // Each time a point is selected in A, the selection is cleared in B, 
   // and vice-versa.
-  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // Note that a call A->(B) is the same as a call B->(A), 
   // i.e. this is a double-link, only one call is needed to set the sync.
   // Return 1 on success, 0 otherwise.
-  static int SynchronizeSingleSelection(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
-  static int DoNotSynchronizeSingleSelection(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  virtual int SynchronizeSingleSelection(
+    vtkKWParameterValueFunctionEditor *b);
+  virtual int DoNotSynchronizeSingleSelection(
+    vtkKWParameterValueFunctionEditor *b);
 
   // Description:
   // Synchronize same selection between two editors A and B.
   // Each time a point is selected in A, the same point is selected in B, 
   // and vice-versa.
-  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // Note that a call A->(B) is the same as a call B->(A), 
   // i.e. this is a double-link, only one call is needed to set the sync.
   // Return 1 on success, 0 otherwise.
-  static int SynchronizeSameSelection(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
-  static int DoNotSynchronizeSameSelection(
-    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  virtual int SynchronizeSameSelection(
+    vtkKWParameterValueFunctionEditor *b);
+  virtual int DoNotSynchronizeSameSelection(
+    vtkKWParameterValueFunctionEditor *b);
 
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -1030,16 +1039,16 @@ protected:
   // Higher-level methods to manipulate the function. 
   virtual int  GetFunctionPointColorInCanvas(int id, double rgb[3]);
   virtual int  GetFunctionPointTextColorInCanvas(int id, double rgb[3]);
-  virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y);
+  virtual int  GetFunctionPointCanvasCoordinates(int id, int *x, int *y);
   virtual int  GetFunctionPointCanvasCoordinatesAtParameter(
-    double parameter, int &x, int &y);
-  virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id);
-  virtual int  AddFunctionPointAtParameter(double parameter, int &id);
+    double parameter, int *x, int *y);
+  virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int *id);
+  virtual int  AddFunctionPointAtParameter(double parameter, int *id);
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y);
   virtual int  MoveFunctionPointToParameter(int id,double parameter,int i=0);
   virtual int  EqualFunctionPointValues(const double *values1, const double *values2);
   virtual int  FindFunctionPointAtCanvasCoordinates(
-    int x, int y, int &id, int &c_x, int &c_y);
+    int x, int y, int *id, int *c_x, int *c_y);
 
   virtual void UpdatePointEntries(int id);
 
@@ -1063,7 +1072,7 @@ protected:
   // same parameter location, thus resulting in the creation of a new point.
   // Return 1 if a point was added (and set its id in 'new_id'), 0 otherwise
   virtual int MergePointFromEditor(
-    vtkKWParameterValueFunctionEditor *editor, int editor_id, int &new_id);
+    vtkKWParameterValueFunctionEditor *editor, int editor_id, int *new_id);
 
   // Description:
   // Copy the point 'id' parameter and values from another function editor
@@ -1233,10 +1242,11 @@ protected:
   // Description:
   // Pack the widget
   virtual void Pack();
+  virtual void PackPointEntries();
 
   // Description:
   // Get the center of a given canvas item (using its item id)
-  virtual void GetCanvasItemCenter(int item_id, int &x, int &y);
+  virtual void GetCanvasItemCenter(int item_id, int *x, int *y);
 
   // Description:
   // Get the scaling factors used to translate parameter/value to x/y canvas
@@ -1327,7 +1337,8 @@ protected:
     ConstrainedMoveVertical
   };
   //ETX
-  int           LastSelectCanvasCoordinates[2];
+  int           LastSelectionCanvasCoordinateX;
+  int           LastSelectionCanvasCoordinateY;
   int           LastConstrainedMove;
 
   // Description:
@@ -1364,9 +1375,14 @@ protected:
   virtual int AddObserversList(int nb_events, int *events, vtkCommand *cmd);
   virtual int RemoveObserversList(int nb_events, int *events, vtkCommand *cmd);
 
-  static void ProcessSynchronizationEvents(
+  virtual void ProcessSynchronizationEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  static void ProcessSynchronizationEventsFunction(
     vtkObject *object, unsigned long event, void *clientdata, void *calldata);
-  static void ProcessSynchronizationEvents2(
+
+  virtual void ProcessSynchronizationEvents2(
+    vtkObject *caller, unsigned long event, void *calldata);
+  static void ProcessSynchronizationEventsFunction2(
     vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:

@@ -54,10 +54,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Pack the widget
-  virtual void Pack();
-
-  // Description:
   // Get/Set a specific function to display in the color ramp. If not
   // specified, the ColorTransferFunction will be used.
   vtkGetObjectMacro(PointColorTransferFunction, vtkColorTransferFunction);
@@ -69,7 +65,7 @@ public:
   // - no point can be added or removed (similar to DisableAddAndRemove)
   // - the first and second point have the same value (they move together)
   // - the last and last-1 point have the same value (they move together) 
-  // - the mid-point and sharpness are set to (0.5 / 0.0) and can not be edited
+  // - the midpoint and sharpness are set to (0.5 / 0.0) and can not be edited
   virtual void SetWindowLevelMode(int);
   vtkBooleanMacro(WindowLevelMode, int);
   vtkGetMacro(WindowLevelMode, int);
@@ -205,6 +201,11 @@ protected:
 
   virtual void UpdatePointsFromWindowLevel(int interactive = 0);
   virtual void UpdateWindowLevelFromPoints();
+
+  // Description:
+  // Pack the widget
+  virtual void Pack();
+  virtual void PackPointEntries();
 
   // Commands
 

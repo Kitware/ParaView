@@ -144,10 +144,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Pack the widget
-  virtual void Pack();
-
-  // Description:
   // Callbacks
   virtual void ColorSpaceCallback();
   virtual void ValueEntriesCallback();
@@ -231,6 +227,11 @@ protected:
   //BTX
   virtual void UpdateHistogramImageDescriptor(vtkKWHistogram::ImageDescriptor*);
   //ETX
+
+  // Description:
+  // Pack the widget
+  virtual void Pack();
+  virtual void PackPointEntries();
 
   // Description:
   // Redraw the color ramp
