@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMDomain.h"
 
+#include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
@@ -21,7 +22,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMDomain, "1.10");
 
 struct vtkSMDomainInternals
 {
@@ -138,6 +139,12 @@ void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
   
   prop->AddDependent(this);
   this->Internals->RequiredProperties[function] = prop;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::InvokeModified()
+{
+  this->InvokeEvent(vtkCommand::DomainModifiedEvent, 0);
 }
 
 //---------------------------------------------------------------------------

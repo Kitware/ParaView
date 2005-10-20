@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.7");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -49,6 +49,7 @@ void vtkSMBoundsDomain::Update(vtkSMProperty*)
   if (this->Mode == vtkSMBoundsDomain::ORIENTED_MAGNITUDE)
     {
     this->UpdateOriented();
+    this->InvokeModified();
     return;
     }
 
@@ -57,6 +58,7 @@ void vtkSMBoundsDomain::Update(vtkSMProperty*)
   if (pp)
     {
     this->Update(pp);
+    this->InvokeModified();
     }
 }
 
@@ -98,10 +100,27 @@ void vtkSMBoundsDomain::UpdateOriented()
     double normalv[3], originv[3];
 
     unsigned int i;
-    for (i=0; i<3; i++)
+    if (normal->GetNumberOfUncheckedElements() > 2 && 
+        origin->GetNumberOfUncheckedElements() > 2)
       {
-      normalv[i] = normal->GetUncheckedElement(i);
-      originv[i] = origin->GetUncheckedElement(i); 
+      for (i=0; i<3; i++)
+        {
+        normalv[i] = normal->GetUncheckedElement(i);
+        originv[i] = origin->GetUncheckedElement(i); 
+        }
+      }
+    else if (normal->GetNumberOfElements() > 2 && 
+             origin->GetNumberOfElements() > 2)
+      {
+      for (i=0; i<3; i++)
+        {
+        normalv[i] = normal->GetElement(i);
+        originv[i] = origin->GetElement(i); 
+        }
+      }
+    else
+      {
+      return;
       }
 
     unsigned int j;

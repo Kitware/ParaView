@@ -18,7 +18,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
-vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
@@ -50,6 +50,7 @@ void vtkSMArraySelectionDomain::Update(vtkSMProperty* prop)
       {
       this->AddString(svp->GetElement(i*2));
       }
+    this->InvokeModified();
     }
 }
 

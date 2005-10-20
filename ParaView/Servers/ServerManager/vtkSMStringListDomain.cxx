@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.14");
 
 struct vtkSMStringListDomainInternals
 {
@@ -153,6 +153,7 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
       {
       this->AddString(svp->GetElement(i));
       }
+    this->InvokeModified();
     }
 }
 

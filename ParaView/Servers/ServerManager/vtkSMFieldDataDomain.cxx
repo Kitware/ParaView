@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
@@ -77,6 +77,7 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     this->AddEntry("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS);
     }
 
+  this->InvokeModified();
 }
 
 //---------------------------------------------------------------------------
