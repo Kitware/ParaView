@@ -17,11 +17,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWCanvas.h"
 #include "vtkMath.h"
+#include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.9");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
+const char *vtkKWParameterValueHermiteFunctionEditor::MidPointSelectedTag = "mpselected_tag";
 
 // For some reasons, the end-point of a line/rectangle is not drawn on Win32. 
 // Comply with that.
@@ -42,18 +44,29 @@ vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEdit
   this->SharpnessEntry           = NULL;
 
   this->MidPointEntryVisibility  = 1;
+  this->DisplayMidPointValueInParameterDomain  = 1;
   this->SharpnessEntryVisibility = 1;
 
   this->MidPointVisibility          = 1;
   this->MidPointGuidelineVisibility = 0;
   this->MidPointGuidelineValueVisibility = 0;
 
-  this->MidPointColor[0]     = 0.2;
-  this->MidPointColor[1]     = 0.2;
-  this->MidPointColor[2]     = 0.2;
+  this->MidPointColor[0]     = this->FrameBackgroundColor[0];
+  this->MidPointColor[1]     = this->FrameBackgroundColor[1];
+  this->MidPointColor[2]     = this->FrameBackgroundColor[2];
+
+  this->SelectedMidPointColor[0] = this->SelectedPointColor[0];
+  this->SelectedMidPointColor[1] = this->SelectedPointColor[1];
+  this->SelectedMidPointColor[2] = this->SelectedPointColor[2];
+
+  this->SelectedMidPoint = -1;
+  this->LastMidPointSelectionCanvasCoordinateY    = 0;
+  this->LastMidPointSelectionSharpness    = 0.0;
 
   this->MidPointGuidelineValueFormat        = NULL;
   this->SetMidPointGuidelineValueFormat("%-#6.3g");
+
+  this->MidPointSelectionChangedCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -76,13 +89,17 @@ vtkKWParameterValueHermiteFunctionEditor::~vtkKWParameterValueHermiteFunctionEdi
     delete [] this->MidPointGuidelineValueFormat;
     this->MidPointGuidelineValueFormat = NULL;
     }
+
+  if (this->MidPointSelectionChangedCommand)
+    {
+    delete [] this->MidPointSelectionChangedCommand;
+    this->MidPointSelectionChangedCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::UpdatePointEntries(int id)
+void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntries(int id)
 {
-  this->Superclass::UpdatePointEntries(id);
-
   this->UpdateMidPointEntry(id);
   this->UpdateSharpnessEntry(id);
 }
@@ -131,8 +148,6 @@ vtkKWScaleWithEntry* vtkKWParameterValueHermiteFunctionEditor::GetMidPointEntry(
   if (!this->MidPointEntry)
     {
     this->MidPointEntry = vtkKWScaleWithEntry::New();
-    this->MidPointEntry->SetResolution(0.01);
-    this->MidPointEntry->SetRange(0.0, 1.0);
     this->MidPointEntry->ClampValueOn();
     if (this->MidPointEntryVisibility && 
         this->PointEntriesVisibility && 
@@ -158,13 +173,15 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateMidPointEntry(
     this->MidPointEntry->SetParent(this->PointEntriesFrame);
     this->MidPointEntry->PopupModeOn();
     this->MidPointEntry->Create(app);
-    this->MidPointEntry->SetEntryWidth(4);
+    this->MidPointEntry->SetEntryWidth(7);
     this->MidPointEntry->SetLabelText("M:");
     this->MidPointEntry->SetLength(100);
     this->MidPointEntry->RangeVisibilityOff();
-    this->MidPointEntry->SetBalloonHelpString("Mid-point position");
+    this->MidPointEntry->SetBalloonHelpString(
+      "Midpoint position. Enter a new value, drag the scale slider, or drag "
+      "the midpoint horizontally with the left mouse button.");
 
-    this->UpdateMidPointEntry(this->GetSelectedPoint());
+    this->UpdateMidPointEntry(this->GetSelectedMidPoint());
 
     this->MidPointEntry->SetCommand(this, "MidPointEntryChangingCallback");
     this->MidPointEntry->SetEndCommand(this, "MidPointEntryChangedCallback");
@@ -205,13 +222,15 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateSharpnessEntry(
     this->SharpnessEntry->SetParent(this->PointEntriesFrame);
     this->SharpnessEntry->PopupModeOn();
     this->SharpnessEntry->Create(app);
-    this->SharpnessEntry->SetEntryWidth(4);
+    this->SharpnessEntry->SetEntryWidth(7);
     this->SharpnessEntry->SetLabelText("S:");
     this->SharpnessEntry->SetLength(100);
     this->SharpnessEntry->RangeVisibilityOff();
-    this->SharpnessEntry->SetBalloonHelpString("Sharpness");
+    this->SharpnessEntry->SetBalloonHelpString(
+      "Sharpness. Enter a new value, drag the scale slider, or drag "
+      "the midpoint vertically with the right mouse button.");
 
-    this->UpdateSharpnessEntry(this->GetSelectedPoint());
+    this->UpdateSharpnessEntry(this->GetSelectedMidPoint());
 
     this->SharpnessEntry->SetCommand(this, "SharpnessEntryChangingCallback");
     this->SharpnessEntry->SetEndCommand(this, "SharpnessEntryChangedCallback");
@@ -229,22 +248,23 @@ int vtkKWParameterValueHermiteFunctionEditor::IsPointEntriesFrameUsed()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::Pack()
+void vtkKWParameterValueHermiteFunctionEditor::PackPointEntries()
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  // Pack the whole widget
+  // Pack the other entries
 
-  this->Superclass::Pack();
+  this->Superclass::PackPointEntries();
 
   ostrstream tk_cmd;
 
   // Midpoint entry
   
-  if (this->MidPointEntryVisibility && 
+  if (this->HasMidPointSelection() &&
+      this->MidPointEntryVisibility && 
       this->PointEntriesVisibility &&
       this->MidPointEntry && this->MidPointEntry->IsCreated())
     {
@@ -254,7 +274,8 @@ void vtkKWParameterValueHermiteFunctionEditor::Pack()
   
   // Sharpness entry
   
-  if (this->SharpnessEntryVisibility && 
+  if (this->HasMidPointSelection() &&
+      this->SharpnessEntryVisibility && 
       this->PointEntriesVisibility && 
       this->SharpnessEntry && this->SharpnessEntry->IsCreated())
     {
@@ -265,6 +286,14 @@ void vtkKWParameterValueHermiteFunctionEditor::Pack()
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::Update()
+{
+  this->Superclass::Update();
+
+  this->UpdateMidPointEntries(this->GetSelectedMidPoint());
 }
 
 //----------------------------------------------------------------------------
@@ -302,11 +331,26 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointEntryVisibility(int ar
     this->CreateMidPointEntry(this->GetApplication());
     }
 
-  this->UpdateMidPointEntry(this->GetSelectedPoint());
+  this->UpdateMidPointEntry(this->GetSelectedMidPoint());
 
   this->Modified();
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SetDisplayMidPointValueInParameterDomain(int arg)
+{
+  if (this->DisplayMidPointValueInParameterDomain == arg)
+    {
+    return;
+    }
+
+  this->DisplayMidPointValueInParameterDomain = arg;
+
+  this->UpdateMidPointEntry(this->GetSelectedMidPoint());
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -317,32 +361,62 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntry(int id)
     return;
     }
 
-  double pos;
+  double midpoint;
   if (id < 0 || id >= this->GetFunctionSize() ||
-      !this->GetFunctionPointMidPoint(id, &pos))
+      !this->GetFunctionPointMidPoint(id, &midpoint))
     {
     this->MidPointEntry->SetEnabled(0);
     return;
     }
 
+  if (this->DisplayMidPointValueInParameterDomain)
+    {
+    double p1, p2;
+    this->GetFunctionPointParameter(id, &p1);
+    this->GetFunctionPointParameter(id + 1, &p2);
+    this->MapParameterToDisplayedParameter(p1, &p1);
+    this->MapParameterToDisplayedParameter(p2, &p2);
+    double parameter = p1 + (p2 - p1) * midpoint;
+    this->MidPointEntry->SetResolution((p2 - p1) / 100.0);
+    this->MidPointEntry->SetRange(p1, p2);
+    this->MidPointEntry->SetValue(parameter);
+    }
+  else
+    {
+    this->MidPointEntry->SetResolution(0.01);
+    this->MidPointEntry->SetRange(0.0, 1.0);
+    this->MidPointEntry->SetValue(midpoint);
+    }
+
   this->MidPointEntry->SetEnabled(
     this->FunctionPointMidPointIsLocked(id) ? 0 : this->GetEnabled());
-
-  this->MidPointEntry->SetValue(pos);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback()
 {
-  if (this->MidPointEntry && this->HasSelection())
+  if (this->MidPointEntry && this->HasMidPointSelection())
     {
+    int id = this->GetSelectedMidPoint();
     unsigned long mtime = this->GetFunctionMTime();
-    double pos = this->MidPointEntry->GetValue();
-    this->SetFunctionPointMidPoint(this->GetSelectedPoint(), pos);
+    if (this->DisplayMidPointValueInParameterDomain)
+      {
+      double p1, p2;
+      this->GetFunctionPointParameter(id, &p1);
+      this->GetFunctionPointParameter(id + 1, &p2);
+      this->MapParameterToDisplayedParameter(p1, &p1);
+      this->MapParameterToDisplayedParameter(p2, &p2);
+      this->SetFunctionPointMidPoint(
+        id, (this->MidPointEntry->GetValue() - p1) / (p2 - p1));
+      }
+    else
+      {
+      this->SetFunctionPointMidPoint(id, this->MidPointEntry->GetValue());
+      }
     if (this->GetFunctionMTime() > mtime)
       {
-      this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
-      this->InvokePointChangedCommand(this->GetSelectedPoint());
+      this->RedrawSinglePointDependentElements(id);
+      this->InvokePointChangedCommand(id);
       this->InvokeFunctionChangedCommand();
       }
     }
@@ -351,15 +425,28 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback()
 {
-  if (this->MidPointEntry && this->HasSelection())
+  if (this->MidPointEntry && this->HasMidPointSelection())
     {
+    int id = this->GetSelectedMidPoint();
     unsigned long mtime = this->GetFunctionMTime();
-    double pos = this->MidPointEntry->GetValue();
-    this->SetFunctionPointMidPoint(this->GetSelectedPoint(), pos);
+    if (this->DisplayMidPointValueInParameterDomain)
+      {
+      double p1, p2;
+      this->GetFunctionPointParameter(id, &p1);
+      this->GetFunctionPointParameter(id + 1, &p2);
+      this->MapParameterToDisplayedParameter(p1, &p1);
+      this->MapParameterToDisplayedParameter(p2, &p2);
+      this->SetFunctionPointMidPoint(
+        id, (this->MidPointEntry->GetValue() - p1) / (p2 - p1));
+      }
+    else
+      {
+      this->SetFunctionPointMidPoint(id, this->MidPointEntry->GetValue());
+      }
     if (this->GetFunctionMTime() > mtime)
       {
-      this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
-      this->InvokePointChangingCommand(this->GetSelectedPoint());
+      this->RedrawSinglePointDependentElements(id);
+      this->InvokePointChangingCommand(id);
       this->InvokeFunctionChangingCommand();
       }
     }
@@ -393,7 +480,7 @@ void vtkKWParameterValueHermiteFunctionEditor::SetSharpnessEntryVisibility(
     this->CreateSharpnessEntry(this->GetApplication());
     }
 
-  this->UpdateSharpnessEntry(this->GetSelectedPoint());
+  this->UpdateSharpnessEntry(this->GetSelectedMidPoint());
 
   this->Modified();
 
@@ -426,15 +513,15 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateSharpnessEntry(int id)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangedCallback()
 {
-  if (this->SharpnessEntry && this->HasSelection())
+  if (this->SharpnessEntry && this->HasMidPointSelection())
     {
     unsigned long mtime = this->GetFunctionMTime();
     if (this->SetFunctionPointSharpness(
-          this->GetSelectedPoint(), this->SharpnessEntry->GetValue()) &&
+          this->GetSelectedMidPoint(), this->SharpnessEntry->GetValue()) &&
         this->GetFunctionMTime() > mtime)
       {
-      this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
-      this->InvokePointChangedCommand(this->GetSelectedPoint());
+      this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
+      this->InvokePointChangedCommand(this->GetSelectedMidPoint());
       this->InvokeFunctionChangedCommand();
       }
     }
@@ -443,15 +530,15 @@ void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangingCallback()
 {
-  if (this->SharpnessEntry && this->HasSelection())
+  if (this->SharpnessEntry && this->HasMidPointSelection())
     {
     unsigned long mtime = this->GetFunctionMTime();
     if (this->SetFunctionPointSharpness(
-          this->GetSelectedPoint(), this->SharpnessEntry->GetValue()) &&
+          this->GetSelectedMidPoint(), this->SharpnessEntry->GetValue()) &&
         this->GetFunctionMTime() > mtime)
       {
-      this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
-      this->InvokePointChangingCommand(this->GetSelectedPoint());
+      this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
+      this->InvokePointChangingCommand(this->GetSelectedMidPoint());
       this->InvokeFunctionChangingCommand();
       }
     }
@@ -459,7 +546,7 @@ void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangingCallback()
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueHermiteFunctionEditor::MergePointFromEditor(
-  vtkKWParameterValueFunctionEditor *editor, int editor_id, int &new_id)
+  vtkKWParameterValueFunctionEditor *editor, int editor_id, int *new_id)
 {
   int added = 
     this->Superclass::MergePointFromEditor(editor, editor_id, new_id);
@@ -473,14 +560,14 @@ int vtkKWParameterValueHermiteFunctionEditor::MergePointFromEditor(
     h_editor->GetFunctionPointMidPoint(editor_id, &editor_midpoint);
     h_editor->GetFunctionPointSharpness(editor_id, &editor_sharpness);
 
-    this->GetFunctionPointMidPoint(new_id, &midpoint);
-    this->GetFunctionPointSharpness(new_id, &sharpness);
+    this->GetFunctionPointMidPoint(*new_id, &midpoint);
+    this->GetFunctionPointSharpness(*new_id, &sharpness);
     
     if (midpoint != editor_midpoint || sharpness != editor_sharpness)
       {
-      this->SetFunctionPointMidPoint(new_id, editor_midpoint);
-      this->SetFunctionPointSharpness(new_id, editor_sharpness);
-      this->RedrawSinglePointDependentElements(new_id);
+      this->SetFunctionPointMidPoint(*new_id, editor_midpoint);
+      this->SetFunctionPointSharpness(*new_id, editor_sharpness);
+      this->RedrawSinglePointDependentElements(*new_id);
       }
     }
   return added;
@@ -633,6 +720,186 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SetSelectedMidPointColor(
+  double r, double g, double b)
+{
+  if ((r == this->SelectedMidPointColor[0] &&
+       g == this->SelectedMidPointColor[1] &&
+       b == this->SelectedMidPointColor[2]) ||
+      r < 0.0 || r > 1.0 ||
+      g < 0.0 || g > 1.0 ||
+      b < 0.0 || b > 1.0)
+    {
+    return;
+    }
+
+  this->SelectedMidPointColor[0] = r;
+  this->SelectedMidPointColor[1] = g;
+  this->SelectedMidPointColor[2] = b;
+
+  this->Modified();
+
+  this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::GetMidPointCanvasCoordinates(
+  int id, int *x, int *y, double *p)
+{
+  double midpoint;
+  if (!this->IsCreated() || 
+      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize() - 1 ||
+      !this->GetFunctionPointMidPoint(id, &midpoint))
+    {
+    return 0;
+    }
+
+  double p1, p2;
+  this->GetFunctionPointParameter(id, &p1);
+  this->GetFunctionPointParameter(id + 1, &p2);
+
+  *p = p1 + (p2 - p1) * midpoint;
+
+  return this->GetFunctionPointCanvasCoordinatesAtParameter(*p, x, y);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::FindMidPointAtCanvasCoordinates(
+  int x, int y, int *id, int *c_x, int *c_y)
+{
+  if (!this->IsCreated() || !this->HasFunction())
+    {
+    return 0;
+    }
+
+  const char *canv = this->Canvas->GetWidgetName();
+
+  // If we are out of the canvas, clamp the coordinates
+
+  if (x < 0)
+    {
+    x = 0;
+    }
+  else if (x > this->CanvasWidth - 1)
+    {
+    x = this->CanvasWidth - 1;
+    }
+
+  if (y < 0)
+    {
+    y = 0;
+    }
+  else if (y > this->CanvasHeight - 1)
+    {
+    y = this->CanvasHeight - 1;
+    }
+
+  // Get the real canvas coordinates
+
+  *c_x = atoi(this->Script("%s canvasx %d", canv, x));
+  *c_y = atoi(this->Script("%s canvasy %d", canv, y));
+
+  // Find the closest element
+  // Get its first tag, which should be a midpoint tag (in
+  // the form of m_pid, ex: m_p0)
+
+  *id = -1;
+
+  const char *closest = 
+    this->Script("%s find closest %d %d", canv, *c_x, *c_y);
+  if (closest && *closest)
+    {
+    const char *tag = 
+      this->Script("lindex [%s itemcget %s -tags] 0", canv, closest);
+    if (tag && strlen(tag) > 3 && !strncmp(tag, "m_p", 3) && isdigit(tag[3]))
+      {
+      *id = atoi(tag + 3);
+      }
+    }
+
+  return (*id < 0 || *id >= this->GetFunctionSize() - 1) ? 0 : 1;
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWParameterValueHermiteFunctionEditor::RedrawFunctionDependentElements()
+{
+  this->Superclass::RedrawFunctionDependentElements();
+
+  this->UpdateMidPointEntries(this->GetSelectedMidPoint());
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWParameterValueHermiteFunctionEditor::RedrawSinglePointDependentElements(
+  int id)
+{
+  this->Superclass::RedrawSinglePointDependentElements(id);
+
+  if (id < 0 || id >= this->GetFunctionSize())
+    {
+    return;
+    }
+
+  if (id == this->GetSelectedMidPoint())
+    {
+    this->UpdateMidPointEntries(id);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::RedrawFunction()
+{
+  if (!this->IsCreated() || 
+      !this->Canvas || 
+      !this->Canvas->IsAlive() ||
+      this->DisableRedraw)
+    {
+    return;
+    }
+
+  // Are we going to create or delete points ?
+
+  int c_nb_points = 
+    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
+  int nb_points_changed = (c_nb_points != this->GetFunctionSize());
+
+  // Try to save the midpoint selection before (eventually) creating new points
+
+  int s_x = 0, s_y = 0;
+  if (nb_points_changed && this->HasMidPointSelection())
+    {
+    int item_id = atoi(
+      this->Script(
+        "lindex [%s find withtag %s] 0",
+        this->Canvas->GetWidgetName(), 
+        vtkKWParameterValueHermiteFunctionEditor::MidPointSelectedTag));
+    this->GetCanvasItemCenter(item_id, &s_x, &s_y);
+    }
+
+  // Draw the function
+
+  this->Superclass::RedrawFunction();
+
+  // Try to restore the midpoint selection
+
+  if (nb_points_changed && this->HasMidPointSelection())
+    {
+    int i, p_x, p_y, nb_points = this->GetFunctionSize();
+    double p;
+    for (i = 0; i < nb_points - 1; i++)
+      {
+      if (this->GetMidPointCanvasCoordinates(i, &p_x, &p_y, &p) &&
+          p_x == s_x && p_y == s_y)
+        {
+        this->SelectMidPoint(i);
+        break;
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   int id, int id2, ostrstream *tk_cmd)
 {
@@ -661,7 +928,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   // Is visible ? Is valid (not that there is no midpoint for the last point)
 
-  double p;
+  double p, displayed_p;
   int x, y, r;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= (this->GetFunctionSize() - 1));
@@ -679,13 +946,13 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   if (!is_not_valid)
     {
-    double p1, p2;
-    this->GetFunctionPointParameter(id, &p1);
-    this->GetFunctionPointParameter(id + 1, &p2);
-    p = p1 + (p2 - p1) * midpoint;
-    this->GetFunctionPointCanvasCoordinatesAtParameter(p, x, y);
+    this->GetMidPointCanvasCoordinates(id, &x, &y, &p);
 
-    r = (int)((double)this->PointRadius * 0.75);
+    r = (int)((double)this->PointRadius * 0.72);
+    if (id == this->GetSelectedMidPoint())
+      {
+      r = (int)ceil((double)r * this->SelectedPointRadius);
+      }
 
     // If the midpoint is not in the visible range, hide it
 
@@ -736,13 +1003,13 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
               << " " << x + r << " " << y + r
               << endl;
       char color[10];
+      double *rgb = (id == this->GetSelectedMidPoint()) 
+        ? this->SelectedMidPointColor : this->MidPointColor;
       sprintf(color, "#%02x%02x%02x", 
-              (int)(this->MidPointColor[0] * 255.0),
-              (int)(this->MidPointColor[1] * 255.0),
-              (int)(this->MidPointColor[2] * 255.0));
+              (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
       *tk_cmd << canv << " itemconfigure m_p" << id 
               << " -state normal  -width " << this->PointOutlineWidth
-              << " -outline " << color << endl;
+              << " -outline black -fill " << color << endl;
       }
     }
 
@@ -834,8 +1101,9 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
                 << endl;
         if (this->MidPointGuidelineValueFormat)
           {
+          this->MapParameterToDisplayedParameter(p, &displayed_p);
           char buffer[256];
-          sprintf(buffer, this->MidPointGuidelineValueFormat, p);
+          sprintf(buffer, this->MidPointGuidelineValueFormat, displayed_p);
           *tk_cmd << gv_canv << " itemconfigure m_g" << id 
                   << " -text {" << buffer << "}" << endl;
           }
@@ -855,6 +1123,524 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SelectPoint(int id)
+{
+  this->Superclass::SelectPoint(id);
+
+  // Deselect any midpoint selection, (we want only one type of
+  // selection at a time)
+
+  if (this->HasSelection())
+    {
+    this->ClearMidPointSelection();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::HasMidPointSelection()
+{
+  return (this->GetSelectedMidPoint() >= 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SelectMidPoint(int id)
+{
+  if (!this->HasFunction() || 
+      id < 0 || id >= this->GetFunctionSize() - 1 ||
+      this->GetSelectedMidPoint() == id)
+    {
+    return;
+    }
+
+  // First deselect any selection, i.e. both the current point selection
+  // *and* the midpoint selection (we want only one type at a time)
+
+  this->ClearSelection();
+  this->ClearMidPointSelection();
+
+  // Now selects
+
+  this->SelectedMidPoint = id;
+
+  // Add the selection tag to the midpoint
+
+  if (this->IsCreated())
+    {
+    this->Script("%s addtag %s withtag m_p%d", 
+                 this->Canvas->GetWidgetName(),
+                 vtkKWParameterValueHermiteFunctionEditor::MidPointSelectedTag,
+                 this->GetSelectedMidPoint());
+    }
+
+  // Draw the selected midpoint accordingly and update its aspect
+  
+  this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
+  this->PackPointEntries();
+
+  this->InvokeMidPointSelectionChangedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::ClearMidPointSelection()
+{
+  if (!this->HasMidPointSelection())
+    {
+    return;
+    }
+
+  // Remove the selection tag from the selected midpoint
+
+  if (this->IsCreated())
+    {
+    this->Script("%s dtag m_p%d %s", 
+                 this->Canvas->GetWidgetName(),
+                 this->GetSelectedMidPoint(),
+                 vtkKWParameterValueHermiteFunctionEditor::MidPointSelectedTag);
+    }
+
+  // Deselect
+
+  int old_selection = this->GetSelectedMidPoint();
+  this->SelectedMidPoint = -1;
+
+  // Redraw the midpoint that used to be selected and update its aspect
+
+  this->RedrawSinglePointDependentElements(old_selection);
+
+  // Show the selected midpoint description in the point label
+  // Since nothing is selected, the expected side effect is to clear the
+  // point label
+
+  this->UpdateMidPointEntries(this->GetSelectedMidPoint());
+  this->PackPointEntries();
+
+  this->InvokeMidPointSelectionChangedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::InvokeMidPointSelectionChangedCommand()
+{
+  this->InvokeCommand(this->MidPointSelectionChangedCommand);
+
+  this->InvokeEvent(
+    vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent);
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWParameterValueHermiteFunctionEditor::SetMidPointSelectionChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->MidPointSelectionChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::SynchronizeSingleSelection(
+  vtkKWParameterValueFunctionEditor *pvfe_b)
+{
+  this->Superclass::SynchronizeSingleSelection(pvfe_b);
+
+  vtkKWParameterValueHermiteFunctionEditor *b =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(pvfe_b);
+
+  if (!b)
+    {
+    return 0;
+    }
+  
+  // Make sure only one of those editors has a selected midpoint from now
+  
+  if (this->HasMidPointSelection())
+    {
+    b->ClearMidPointSelection();
+    }
+  else if (b->HasMidPointSelection())
+    {
+    this->ClearMidPointSelection();
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent
+    };
+  
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
+
+  this->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::DoNotSynchronizeSingleSelection(
+  vtkKWParameterValueFunctionEditor *pvfe_b)
+{
+  this->Superclass::DoNotSynchronizeSingleSelection(pvfe_b);
+
+  vtkKWParameterValueHermiteFunctionEditor *b =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(pvfe_b);
+
+  if (!b)
+    {
+    return 0;
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent
+    };
+  
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
+
+  this->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::SynchronizeSameSelection(
+  vtkKWParameterValueFunctionEditor *pvfe_b)
+{
+  this->Superclass::SynchronizeSameSelection(pvfe_b);
+
+  vtkKWParameterValueHermiteFunctionEditor *b =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(pvfe_b);
+
+  if (!b)
+    {
+    return 0;
+    }
+  
+  // Make sure those editors have the same selected midpoint from now
+  
+  if (this->HasMidPointSelection())
+    {
+    b->SelectMidPoint(this->GetSelectedMidPoint());
+    }
+  else if (b->HasMidPointSelection())
+    {
+    this->SelectMidPoint(b->GetSelectedMidPoint());
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent
+    };
+  
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand2);
+
+  this->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueHermiteFunctionEditor::DoNotSynchronizeSameSelection(
+  vtkKWParameterValueFunctionEditor *pvfe_b)
+{
+  this->Superclass::DoNotSynchronizeSameSelection(pvfe_b);
+
+  vtkKWParameterValueHermiteFunctionEditor *b =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(pvfe_b);
+
+  if (!b)
+    {
+    return 0;
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent
+    };
+  
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand2);
+  
+  this->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::ProcessSynchronizationEvents(
+  vtkObject *caller,
+  unsigned long event,
+  void *calldata)
+{
+  this->Superclass::ProcessSynchronizationEvents(caller, event, calldata);
+
+  vtkKWParameterValueHermiteFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(caller);
+  
+  switch (event)
+    {
+    // Synchronize single midpoint selection
+
+    case vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent:
+      if (pvfe->HasMidPointSelection())
+        {
+        this->ClearMidPointSelection();
+        this->ClearSelection();
+        }
+      break;
+
+    // Synchronize Single selection
+      
+    case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
+      if (pvfe->HasSelection())
+        {
+        this->ClearMidPointSelection();
+        }
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::ProcessSynchronizationEvents2(
+  vtkObject *caller,
+  unsigned long event,
+  void *calldata)
+{
+  this->Superclass::ProcessSynchronizationEvents2(caller, event, calldata);
+  
+  vtkKWParameterValueHermiteFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueHermiteFunctionEditor *>(caller);
+  
+  switch (event)
+    {
+    // Synchronize same midpoint selection
+
+    case vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent:
+      if (pvfe->HasMidPointSelection())
+        {
+        this->SelectMidPoint(pvfe->GetSelectedMidPoint());
+        }
+      else
+        {
+        this->ClearMidPointSelection();
+        }
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::Bind()
+{
+  this->Superclass::Bind();
+
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  // Canvas
+
+  if (this->Canvas && this->Canvas->IsAlive())
+    {
+    const char *canv = this->Canvas->GetWidgetName();
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueHermiteFunctionEditor::MidPointTag
+           << " <B1-Motion> {" << this->GetTclName() 
+           << " MoveMidPointCallback %%x %%y 1}" << endl;
+     
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueHermiteFunctionEditor::MidPointTag
+           << " <B3-Motion> {" << this->GetTclName() 
+           << " MoveMidPointCallback %%x %%y 3}" << endl;
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
+           << " <Any-ButtonRelease> {" << this->GetTclName() 
+           << " EndMidPointInteractionCallback %%x %%y}" << endl;
+    }
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::UnBind()
+{
+  this->Superclass::UnBind();
+
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  // Canvas
+
+  if (this->Canvas && this->Canvas->IsAlive())
+    {
+    const char *canv = this->Canvas->GetWidgetName();
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
+           << " <B1-Motion> {}" << endl;
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
+           << " <ButtonRelease-1> {}" << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWParameterValueHermiteFunctionEditor::StartInteractionCallback(
+  int x, int y)
+{
+  int id, c_x, c_y;
+
+  // No midpoint found ? Proceed with the rest
+
+  if (!this->FindMidPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y))
+    {
+    this->Superclass::StartInteractionCallback(x, y);
+    return;
+    }
+
+  // Select the midpoint
+
+  double p;
+  this->SelectMidPoint(id);
+  this->GetMidPointCanvasCoordinates(
+    this->GetSelectedMidPoint(), &c_x, &c_y, &p);
+  this->LastMidPointSelectionCanvasCoordinateY = y;
+  this->GetFunctionPointSharpness(
+    this->GetSelectedMidPoint(),
+    &this->LastMidPointSelectionSharpness);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::MoveMidPointCallback(
+  int x, int y, int button)
+{
+  if (!this->IsCreated() || !this->HasMidPointSelection())
+    {
+    return;
+    }
+
+  const char *canv = this->Canvas->GetWidgetName();
+
+  // If we are out of the canvas, clamp the coordinates
+
+  if (x < 0)
+    {
+    x = 0;
+    }
+  else if (x > this->CanvasWidth - 1)
+    {
+    x = this->CanvasWidth - 1;
+    }
+
+  // Get the real canvas coordinates
+
+  int c_x = atoi(this->Script("%s canvasx %d", canv, x));
+
+  // We assume we can not go before or beyond the points 'id' and 'id + 1'
+  // (i.e. the two end-points between which the midpoint is defined)
+
+  int prev_x, prev_y;
+  this->GetFunctionPointCanvasCoordinates(
+    this->GetSelectedMidPoint(), &prev_x, &prev_y);
+  if (c_x < prev_x)
+    {
+    c_x = prev_x;
+    }
+
+  int next_x, next_y;
+  this->GetFunctionPointCanvasCoordinates(
+    this->GetSelectedMidPoint() + 1, &next_x, &next_y);
+  if (c_x > next_x)
+    {
+    c_x = next_x;
+    }
+
+  unsigned long mtime = this->GetFunctionMTime();
+
+  const char *cursor;
+  if (button == 1)
+    {
+    cursor = "sb_h_double_arrow";
+    this->SetFunctionPointMidPoint(
+      this->GetSelectedMidPoint(), 
+      (double)(c_x - prev_x) / (double)(next_x - prev_x));
+    }
+  else if (button == 3)
+    {
+    cursor = "sb_v_double_arrow";
+    double sharpness = this->LastMidPointSelectionSharpness - 
+      ((double)(y - this->LastMidPointSelectionCanvasCoordinateY) /
+       (double)this->CanvasHeight) * 2.0;
+    if (sharpness < 0.0)
+      {
+      sharpness = 0.0;
+      }
+    else if (sharpness > 1.0)
+      {
+      sharpness = 1.0;
+      }
+    this->SetFunctionPointSharpness(this->GetSelectedMidPoint(), sharpness);
+    }
+
+  // Update cursor to show which interaction is going on
+
+  if (this->ChangeMouseCursor)
+    {
+    this->Canvas->SetConfigurationOption("-cursor", cursor);
+    }
+
+  // Invoke the commands/callbacks
+
+  if (this->GetFunctionMTime() > mtime)
+    {
+    this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
+    this->InvokePointChangingCommand(this->GetSelectedMidPoint());
+    this->InvokeFunctionChangingCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::EndMidPointInteractionCallback(
+  int x, int y)
+{
+  if (!this->HasMidPointSelection())
+    {
+    return;
+    }
+
+  // Invoke the commands/callbacks
+
+  this->InvokePointChangedCommand(this->GetSelectedMidPoint());
+  this->InvokeFunctionChangedCommand();
+
+  // Remove any interaction icon
+
+  if (this->Canvas && this->ChangeMouseCursor)
+    {
+    this->Canvas->SetConfigurationOption("-cursor", NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -864,6 +1650,9 @@ void vtkKWParameterValueHermiteFunctionEditor::PrintSelf(ostream& os, vtkIndent 
 
   os << indent << "MidPointEntryVisibility: "
      << (this->MidPointEntryVisibility ? "On" : "Off") << endl;
+
+  os << indent << "DisplayMidPointValueInParameterDomain: "
+     << (this->DisplayMidPointValueInParameterDomain ? "On" : "Off") << endl;
 
   os << indent << "MidPointVisibility: "
      << (this->MidPointVisibility ? "On" : "Off") << endl;
@@ -878,6 +1667,8 @@ void vtkKWParameterValueHermiteFunctionEditor::PrintSelf(ostream& os, vtkIndent 
      << this->MidPointColor[0] << ", " 
      << this->MidPointColor[1] << ", " 
      << this->MidPointColor[2] << ")" << endl;
+
+  os << indent << "SelectedMidPoint: "<< this->GetSelectedMidPoint() << endl;
 
   os << indent << "MidPointGuidelineValueFormat: "
      << (this->MidPointGuidelineValueFormat ? this->MidPointGuidelineValueFormat : "(None)") << endl;

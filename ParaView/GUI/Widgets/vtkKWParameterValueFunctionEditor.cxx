@@ -33,7 +33,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.71");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.72");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -219,8 +219,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 
   this->LastRedrawFunctionTime      = 0;
 
-  this->LastSelectCanvasCoordinates[0]    = 0;
-  this->LastSelectCanvasCoordinates[1]    = 0;
+  this->LastSelectionCanvasCoordinateX    = 0;
+  this->LastSelectionCanvasCoordinateY    = 0;
   this->LastConstrainedMove               = vtkKWParameterValueFunctionEditor::ConstrainedMoveFree;
 
   // Synchronization callbacks
@@ -228,12 +228,12 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->SynchronizeCallbackCommand = vtkCallbackCommand::New();
   this->SynchronizeCallbackCommand->SetClientData(this); 
   this->SynchronizeCallbackCommand->SetCallback(
-    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents);
+    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEventsFunction);
 
   this->SynchronizeCallbackCommand2 = vtkCallbackCommand::New();
   this->SynchronizeCallbackCommand2->SetClientData(this); 
   this->SynchronizeCallbackCommand2->SetCallback(
-    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2);
+    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEventsFunction2);
 
   // Histogram
 
@@ -720,7 +720,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointTextColorInCanvas(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParameter(double parameter, int &x, int &y)
+int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParameter(double parameter, int *x, int *y)
 {
   if (!this->IsCreated() || !this->HasFunction())
     {
@@ -730,7 +730,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
   double factors[2] = {0.0, 0.0};
   this->GetCanvasScalingFactors(factors);
 
-  x = vtkMath::Round(parameter * factors[0]);
+  *x = vtkMath::Round(parameter * factors[0]);
 
   double *v_w_range = this->GetWholeValueRange();
   double *v_v_range = this->GetVisibleValueRange();
@@ -740,7 +740,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
   if (this->PointPositionInValueRange == 
       vtkKWParameterValueFunctionEditor::PointPositionTop)
     {
-    y = vtkMath::Round((v_w_range[1] - v_v_range[1]) * factors[1]);
+    *y = vtkMath::Round((v_w_range[1] - v_v_range[1]) * factors[1]);
     }
 
   // If the value is forced to be placed at bottom
@@ -748,7 +748,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
   else if (this->PointPositionInValueRange == 
            vtkKWParameterValueFunctionEditor::PointPositionBottom)
     {
-    y = vtkMath::Round((v_w_range[1] - v_v_range[0]) * factors[1]);
+    *y = vtkMath::Round((v_w_range[1] - v_v_range[0]) * factors[1]);
     }
 
   // If the value is forced to be placed at center, or is multi-dimensional, 
@@ -758,7 +758,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
            vtkKWParameterValueFunctionEditor::PointPositionCenter ||
            this->GetFunctionPointDimensionality() != 1)
     {
-    y = vtkMath::Floor(
+    *y = vtkMath::Floor(
       (v_w_range[1] - (v_v_range[1] + v_v_range[0]) * 0.5) * factors[1]);
     }
 
@@ -772,7 +772,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
       {
       return 0;
       }
-    y = vtkMath::Round((v_w_range[1] - values[0]) * factors[1]);
+    *y = vtkMath::Round((v_w_range[1] - values[0]) * factors[1]);
     }
     
   return 1;
@@ -780,7 +780,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
-  int id, int &x, int &y)
+  int id, int *x, int *y)
 {
   if (!this->IsCreated() || 
       !this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
@@ -799,7 +799,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::AddFunctionPointAtCanvasCoordinates(
-  int x, int y, int &id)
+  int x, int y, int *id)
 {
   if (!this->IsCreated() || !this->HasFunction() ||
       !this->FunctionPointCanBeAdded())
@@ -842,12 +842,12 @@ int vtkKWParameterValueFunctionEditor::AddFunctionPointAtCanvasCoordinates(
 
   // Add the point
 
-  return this->AddFunctionPoint(parameter, values, &id);
+  return this->AddFunctionPoint(parameter, values, id);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::AddFunctionPointAtParameter(
-  double parameter, int &id)
+  double parameter, int *id)
 {
   if (!this->HasFunction() || !this->FunctionPointCanBeAdded())
     {
@@ -865,7 +865,7 @@ int vtkKWParameterValueFunctionEditor::AddFunctionPointAtParameter(
 
   // Add the point
 
-  return this->AddFunctionPoint(parameter, values, &id);
+  return this->AddFunctionPoint(parameter, values, id);
 }
 
 //----------------------------------------------------------------------------
@@ -1766,7 +1766,6 @@ void vtkKWParameterValueFunctionEditor::Pack()
       vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault &&
       this->IsPointEntriesFrameUsed())
     {
-    this->PointEntriesFrame->UnpackChildren();
     tk_cmd << "grid " << this->PointEntriesFrame->GetWidgetName() 
            << " -stick ens -pady 1"
            << " -column " << col_d << " -row " << row << endl;
@@ -1848,7 +1847,6 @@ void vtkKWParameterValueFunctionEditor::Pack()
       vtkKWParameterValueFunctionEditor::PointEntriesPositionRight &&
       this->IsPointEntriesFrameUsed())
     {
-    this->PointEntriesFrame->UnpackChildren();
     tk_cmd << "grid " << this->PointEntriesFrame->GetWidgetName() 
            << " -sticky wns -padx 2 -pady 0 -column " << col_f 
            << " -row " << row << endl;
@@ -1881,21 +1879,48 @@ void vtkKWParameterValueFunctionEditor::Pack()
            << " -sticky ew -padx 0 -pady 2"
            << " -columnspan 2 -column " << col_c << " -row " << row << endl;
     }
+
+  this->PackPointEntries();
   
+  // Make sure it will resize properly
+  
+  tk_cmd << "grid columnconfigure " 
+         << this->GetWidgetName() << " " << col_c << " -weight 1" << endl;
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::PackPointEntries()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything in the point entries frame
+
+  if (this->PointEntriesFrame)
+    {
+    this->PointEntriesFrame->UnpackChildren();
+    }
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
   // ParameterEntry (PE)
   
-  if (this->ParameterEntryVisibility && 
+  if (this->HasSelection() &&
+      this->ParameterEntryVisibility && 
       this->PointEntriesVisibility &&
       this->ParameterEntry && this->ParameterEntry->IsCreated())
     {
     tk_cmd << "pack " << this->ParameterEntry->GetWidgetName() 
            << " -side left -padx 2 " << endl;
     }
-  
-  // Make sure it will resize properly
-  
-  tk_cmd << "grid columnconfigure " 
-         << this->GetWidgetName() << " " << col_c << " -weight 1" << endl;
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -1925,7 +1950,7 @@ void vtkKWParameterValueFunctionEditor::Bind()
     // Mouse motion
 
     this->Canvas->SetBinding(
-      "<ButtonPress-1>", this, "StartInteractionCallback %x %y");
+      "<Any-ButtonPress>", this, "StartInteractionCallback %x %y");
 
     tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
            << " <B1-Motion> {" << this->GetTclName() 
@@ -4022,7 +4047,7 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogram(
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::GetCanvasItemCenter(int item_id, 
-                                                            int &x, int &y)
+                                                            int *x, int *y)
 {
   if (!this->IsCreated())
     {
@@ -4046,8 +4071,8 @@ void vtkKWParameterValueFunctionEditor::GetCanvasItemCenter(int item_id,
       {
       return;
       }
-    x = vtkMath::Round((c_x1 + c_x2) * 0.5);
-    y = vtkMath::Round((c_y1 + c_y2) * 0.5);
+    *x = vtkMath::Round((c_x1 + c_x2) * 0.5);
+    *y = vtkMath::Round((c_y1 + c_y2) * 0.5);
     }
 }
 
@@ -4722,7 +4747,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
 
       double p_v_step = (p_v_range[1] - p_v_range[0]) / 
         (double)(this->NumberOfParameterTicks + 1);
-      double p_v_pos = p_v_range[0] + p_v_step;
+      double displayed_p, p_v_pos = p_v_range[0] + p_v_step;
 
       for (int i = 0; i < this->NumberOfParameterTicks; i++)
         {
@@ -4737,7 +4762,8 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
                << x << " " << -1 << endl;
         if (this->ParameterTicksFormat)
           {
-          sprintf(buffer, this->ParameterTicksFormat, p_v_pos);
+          this->MapParameterToDisplayedParameter(p_v_pos, &displayed_p);
+          sprintf(buffer, this->ParameterTicksFormat, displayed_p);
           tk_cmd << p_t_canv << " itemconfigure p_tick_b_t" <<  i << " " 
                  << " -text {" << buffer << "}" << endl;
           }
@@ -4911,7 +4937,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   if (!is_not_valid)
     {
-    this->GetFunctionPointCanvasCoordinates(id, x, y);
+    this->GetFunctionPointCanvasCoordinates(id, &x, &y);
 
     r = this->PointRadius;
     if (id == this->GetSelectedPoint())
@@ -5247,8 +5273,8 @@ int vtkKWParameterValueFunctionEditor::FunctionLineIsInVisibleRangeBetweenPoints
   // Get the line coordinates
 
   int x1, y1, x2, y2;
-  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
-  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+  this->GetFunctionPointCanvasCoordinates(id1, &x1, &y1);
+  this->GetFunctionPointCanvasCoordinates(id2, &x2, &y2);
 
   // Reorder so that it matches the canvas coords
 
@@ -5393,8 +5419,8 @@ void vtkKWParameterValueFunctionEditor::GetLineCoordinates(
   // Use either a straight line, or sample points
 
   int x1, y1, x2, y2;
-  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
-  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+  this->GetFunctionPointCanvasCoordinates(id1, &x1, &y1);
+  this->GetFunctionPointCanvasCoordinates(id2, &x2, &y2);
 
   *tk_cmd << " " << x1 << " " << y1;
 
@@ -5423,7 +5449,7 @@ void vtkKWParameterValueFunctionEditor::GetLineCoordinates(
       for (int i = 1; i < nb_steps; i++)
         {
         double p = id1_p + (id2_p - id1_p)*((double)i / (double)nb_steps);
-        if (this->GetFunctionPointCanvasCoordinatesAtParameter(p, x, y))
+        if (this->GetFunctionPointCanvasCoordinatesAtParameter(p, &x, &y))
           {
           *tk_cmd << " " << x << " " << y;
           }
@@ -5469,7 +5495,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
     int item_id = atoi(
       this->Script("lindex [%s find withtag %s] 0",
                    canv, vtkKWParameterValueFunctionEditor::SelectedTag));
-    this->GetCanvasItemCenter(item_id, s_x, s_y);
+    this->GetCanvasItemCenter(item_id, &s_x, &s_y);
     }
 
   // Create the points 
@@ -5510,7 +5536,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
     int p_x = 0, p_y = 0;
     for (i = 0; i < nb_points; i++)
       {
-      this->GetFunctionPointCanvasCoordinates(i, p_x, p_y);
+      this->GetFunctionPointCanvasCoordinates(i, &p_x, &p_y);
       if (p_x == s_x && p_y == s_y)
         {
         this->SelectPoint(i);
@@ -5763,10 +5789,7 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
   // Draw the selected point accordingly and update its aspect
   
   this->RedrawSinglePointDependentElements(this->GetSelectedPoint());
-
-  // Show the selected point description in the point label
-
-  this->UpdatePointEntries(this->GetSelectedPoint());
+  this->PackPointEntries();
 
   this->InvokeSelectionChangedCommand();
 }
@@ -5807,10 +5830,11 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
   this->RedrawSinglePointDependentElements(old_selection);
 
   // Show the selected point description in the point label
-  // Since nothing is selected, the expect side effect is to clear the
+  // Since nothing is selected, the expected side effect is to clear the
   // point label
 
   this->UpdatePointEntries(this->GetSelectedPoint());
+  this->PackPointEntries();
 
   this->InvokeSelectionChangedCommand();
 }
@@ -5918,7 +5942,7 @@ int vtkKWParameterValueFunctionEditor::RemovePointAtParameter(double parameter)
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
-  int x, int y, int &id)
+  int x, int y, int *id)
 {
   if (!this->AddFunctionPointAtCanvasCoordinates(x, y, id))
     {
@@ -5931,12 +5955,12 @@ int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
 
   // If the point was inserted before the selection, shift the selection
 
-  if (this->HasSelection() && id <= this->GetSelectedPoint())
+  if (this->HasSelection() && *id <= this->GetSelectedPoint())
     {
     this->SelectPoint(this->GetSelectedPoint() + 1);
     }
 
-  this->InvokePointAddedCommand(id);
+  this->InvokePointAddedCommand(*id);
   this->InvokeFunctionChangedCommand();
 
   return 1;
@@ -5944,7 +5968,7 @@ int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::AddPointAtParameter(
-  double parameter, int &id)
+  double parameter, int *id)
 {
   if (!this->AddFunctionPointAtParameter(parameter, id))
     {
@@ -5957,12 +5981,12 @@ int vtkKWParameterValueFunctionEditor::AddPointAtParameter(
 
   // If we the point was inserted before the selection, shift the selection
 
-  if (this->HasSelection() && id <= this->GetSelectedPoint())
+  if (this->HasSelection() && *id <= this->GetSelectedPoint())
     {
     this->SelectPoint(this->GetSelectedPoint() + 1);
     }
 
-  this->InvokePointAddedCommand(id);
+  this->InvokePointAddedCommand(*id);
   this->InvokeFunctionChangedCommand();
 
   return 1;
@@ -5986,7 +6010,7 @@ int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
   int new_id;
   for (int editor_id = 0; editor_id < editor_size; editor_id++)
     {
-    this->MergePointFromEditor(editor, editor_id, new_id);
+    this->MergePointFromEditor(editor, editor_id, &new_id);
     }
 
   // Do we have new points as the result of the merging ?
@@ -6002,7 +6026,7 @@ int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::MergePointFromEditor(
-  vtkKWParameterValueFunctionEditor *editor, int editor_id, int &new_id)
+  vtkKWParameterValueFunctionEditor *editor, int editor_id, int *new_id)
 {
   double parameter, editor_parameter;
   if (editor && 
@@ -6122,30 +6146,74 @@ void vtkKWParameterValueFunctionEditor::SetDisplayedWholeParameterRange(
   this->DisplayedWholeParameterRange[1] = r1;
 
   this->UpdateRangeLabel();
-  this->UpdateParameterEntry(this->GetSelectedPoint());
+  this->UpdatePointEntries(this->GetSelectedPoint());
+
+  this->RedrawSizeDependentElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::MapParameterToDisplayedParameter(
+  double p, double *displayed_p)
+{
+  if (this->DisplayedWholeParameterRange[0] !=
+      this->DisplayedWholeParameterRange[1])
+    {
+    double d_p_w_delta = (this->DisplayedWholeParameterRange[1] - 
+                          this->DisplayedWholeParameterRange[0]);
+    double *p_w_range = this->GetWholeParameterRange();
+    double p_w_delta = p_w_range[1] - p_w_range[0];
+    double rel_p = (p - p_w_range[0]) / p_w_delta;
+    *displayed_p = this->DisplayedWholeParameterRange[0] + rel_p * d_p_w_delta;
+    }
+  else
+    {
+    *displayed_p = p;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::MapDisplayedParameterToParameter(
+  double displayed_p, double *p)
+{
+  if (this->DisplayedWholeParameterRange[0] !=
+      this->DisplayedWholeParameterRange[1])
+    {
+    double d_p_w_delta = (this->DisplayedWholeParameterRange[1] - 
+                          this->DisplayedWholeParameterRange[0]);
+    double *p_w_range = this->GetWholeParameterRange();
+    double p_w_delta = p_w_range[1] - p_w_range[0];
+    double rel_displayed_p = 
+      (displayed_p - this->DisplayedWholeParameterRange[0]) / d_p_w_delta;
+    *p = p_w_range[0] + rel_displayed_p * p_w_delta;
+    }
+  else
+    {
+    *p = displayed_p;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::GetDisplayedVisibleParameterRange(
   double &r0, double &r1)
 {
-  if (this->DisplayedWholeParameterRange[0] !=
-      this->DisplayedWholeParameterRange[1])
+  this->MapParameterToDisplayedParameter(
+    this->GetVisibleParameterRange()[0], &r0);
+  this->MapParameterToDisplayedParameter(
+    this->GetVisibleParameterRange()[1], &r1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::GetFunctionPointDisplayedParameter(
+  int id, double *displayed_p)
+{
+  double parameter;
+  if (!this->GetFunctionPointParameter(id, &parameter))
     {
-    double displayed_delta = 
-      (this->DisplayedWholeParameterRange[1] - 
-       this->DisplayedWholeParameterRange[0]);
-    double rel_vis_range[2];
-    this->GetRelativeVisibleParameterRange(rel_vis_range);
-    r0 = this->DisplayedWholeParameterRange[0] + 
-      displayed_delta * rel_vis_range[0];
-    r1 = this->DisplayedWholeParameterRange[0] + 
-      displayed_delta * rel_vis_range[1];
+    return 0;
     }
-  else
-    {
-    this->GetVisibleParameterRange(r0, r1);
-    }
+
+  this->MapParameterToDisplayedParameter(parameter, displayed_p);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -6215,21 +6283,7 @@ void vtkKWParameterValueFunctionEditor::UpdateParameterEntry(int id)
   this->ParameterEntry->SetEnabled(
     this->FunctionPointParameterIsLocked(id) ? 0 : this->GetEnabled());
 
-  // Map from the displayed parameter range to the internal parameter range
-  // if needed
-
-  if (this->DisplayedWholeParameterRange[0] !=
-      this->DisplayedWholeParameterRange[1])
-    {
-    double d_p_w_delta = 
-      (this->DisplayedWholeParameterRange[1] - 
-       this->DisplayedWholeParameterRange[0]);
-    double *p_w_range = this->GetWholeParameterRange();
-    double p_w_delta = p_w_range[1] - p_w_range[0];
-    double rel_parameter = (parameter - p_w_range[0]) / p_w_delta;
-    parameter = this->DisplayedWholeParameterRange[0] + 
-      rel_parameter * d_p_w_delta;
-    }
+  this->MapParameterToDisplayedParameter(parameter, &parameter);
 
   if (this->ParameterEntryFormat)
     {
@@ -6255,24 +6309,9 @@ void vtkKWParameterValueFunctionEditor::ParameterEntryCallback()
 
   double parameter = this->ParameterEntry->GetWidget()->GetValueAsDouble();
 
-  // Map from the internal parameter range to the displayed  parameter range
-  // if needed
+  this->MapDisplayedParameterToParameter(parameter, &parameter);
 
-  if (this->DisplayedWholeParameterRange[0] !=
-      this->DisplayedWholeParameterRange[1])
-    {
-    double d_p_w_delta = 
-      (this->DisplayedWholeParameterRange[1] - 
-       this->DisplayedWholeParameterRange[0]);
-    double *p_w_range = this->GetWholeParameterRange();
-    double p_w_delta = p_w_range[1] - p_w_range[0];
-    double rel_parameter = 
-      (parameter - this->DisplayedWholeParameterRange[0]) / d_p_w_delta;
-    parameter = p_w_range[0] + rel_parameter * p_w_delta;
-    }
-
-  this->MoveFunctionPointToParameter(
-    this->GetSelectedPoint(), parameter);
+  this->MoveFunctionPointToParameter(this->GetSelectedPoint(), parameter);
 
   if (this->GetFunctionMTime() > mtime)
     {
@@ -6351,19 +6390,16 @@ int vtkKWParameterValueFunctionEditor::RemoveObserversList(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRange(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
   
   // Make sure both editors have the same visible range from now
 
-  b->SetVisibleParameterRange(a->GetVisibleParameterRange());
+  b->SetVisibleParameterRange(this->GetVisibleParameterRange());
 
   int events[] = 
     {
@@ -6372,9 +6408,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRange(
     };
 
   b->AddObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->AddObserversList(
+  this->AddObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
 
   return 1;
@@ -6382,12 +6418,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRange(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRange(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
@@ -6399,9 +6432,9 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRange(
     };
 
   b->RemoveObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->RemoveObserversList(
+  this->RemoveObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
 
   return 1;
@@ -6409,20 +6442,17 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRange(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::SynchronizePoints(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
 
   // Make sure they share the same points in the parameter space from now
 
-  a->MergePointsFromEditor(b);
-  b->MergePointsFromEditor(a);
+  this->MergePointsFromEditor(b);
+  b->MergePointsFromEditor(this);
 
   int events[] = 
     {
@@ -6433,9 +6463,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizePoints(
     };
 
   b->AddObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->AddObserversList(
+  this->AddObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
 
   return 1;
@@ -6443,12 +6473,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizePoints(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
@@ -6462,9 +6489,9 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
     };
 
   b->RemoveObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->RemoveObserversList(
+  this->RemoveObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
 
   return 1;
@@ -6472,25 +6499,22 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
   
   // Make sure only one of those editors has a selected point from now
   
-  if (a->HasSelection())
+  if (this->HasSelection())
     {
     b->ClearSelection();
     }
   else if (b->HasSelection())
     {
-    a->ClearSelection();
+    this->ClearSelection();
     }
   
   int events[] = 
@@ -6499,9 +6523,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
     };
   
   b->AddObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->AddObserversList(
+  this->AddObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
   
   return 1;
@@ -6509,12 +6533,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-  
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
@@ -6525,9 +6546,9 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
     };
   
   b->RemoveObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand);
 
-  a->RemoveObserversList(
+  this->RemoveObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
   
   return 1;
@@ -6535,25 +6556,22 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
   
   // Make sure those editors have the same selected point from now
   
-  if (a->HasSelection())
+  if (this->HasSelection())
     {
-    b->SelectPoint(a->GetSelectedPoint());
+    b->SelectPoint(this->GetSelectedPoint());
     }
   else if (b->HasSelection())
     {
-    a->SelectPoint(b->GetSelectedPoint());
+    this->SelectPoint(b->GetSelectedPoint());
     }
   
   int events[] = 
@@ -6562,9 +6580,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
     };
   
   b->AddObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand2);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand2);
 
-  a->AddObserversList(
+  this->AddObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
   
   return 1;
@@ -6572,12 +6590,9 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSameSelection(
-  vtkKWParameterValueFunctionEditor *a,
   vtkKWParameterValueFunctionEditor *b)
 {
-  // Static method
-  
-  if (!a || !b)
+  if (!b)
     {
     return 0;
     }
@@ -6588,26 +6603,37 @@ int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSameSelection(
     };
   
   b->RemoveObserversList(
-    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand2);
+    sizeof(events) / sizeof(int), events, this->SynchronizeCallbackCommand2);
   
-  a->RemoveObserversList(
+  this->RemoveObserversList(
     sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
   
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEventsFunction(
   vtkObject *object,
   unsigned long event,
   void *clientdata,
   void *calldata)
 {
-  vtkKWParameterValueFunctionEditor *pvfe =
-    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(object);
-  
   vtkKWParameterValueFunctionEditor *self =
     reinterpret_cast<vtkKWParameterValueFunctionEditor *>(clientdata);
+  if (self)
+    {
+    self->ProcessSynchronizationEvents(object, event, calldata);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
+  vtkObject *caller,
+  unsigned long event,
+  void *calldata)
+{
+  vtkKWParameterValueFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(caller);
   
   int *point_id = reinterpret_cast<int *>(calldata);
   double *dargs = reinterpret_cast<double *>(calldata);
@@ -6620,22 +6646,22 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
     case vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent:
     case vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent:
       pvfe->GetRelativeVisibleParameterRange(range);
-      self->SetRelativeVisibleParameterRange(range);
+      this->SetRelativeVisibleParameterRange(range);
       break;
       
     // Synchronize points
       
     case vtkKWParameterValueFunctionEditor::PointChangingEvent:
     case vtkKWParameterValueFunctionEditor::PointChangedEvent:
-      self->CopyPointFromEditor(pvfe, *point_id);
+      this->CopyPointFromEditor(pvfe, *point_id);
       break;
 
     case vtkKWParameterValueFunctionEditor::PointRemovedEvent:
-      self->RemovePointAtParameter(dargs[1]);
+      this->RemovePointAtParameter(dargs[1]);
       break;
 
     case vtkKWParameterValueFunctionEditor::FunctionChangedEvent:
-      self->MergePointsFromEditor(pvfe);
+      this->MergePointsFromEditor(pvfe);
       break;
 
     // Synchronize Single selection
@@ -6643,24 +6669,35 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
       if (pvfe->HasSelection())
         {
-        self->ClearSelection();
+        this->ClearSelection();
         }
       break;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEventsFunction2(
   vtkObject *object,
   unsigned long event,
   void *clientdata,
-  void *vtkNotUsed(calldata))
+  void *calldata)
 {
-  vtkKWParameterValueFunctionEditor *pvfe =
-    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(object);
-  
   vtkKWParameterValueFunctionEditor *self =
     reinterpret_cast<vtkKWParameterValueFunctionEditor *>(clientdata);
+  if (self)
+    {
+    self->ProcessSynchronizationEvents2(object, event, calldata);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
+  vtkObject *caller,
+  unsigned long event,
+  void *calldata)
+{
+  vtkKWParameterValueFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(caller);
   
   switch (event)
     {
@@ -6669,11 +6706,11 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
       if (pvfe->HasSelection())
         {
-        self->SelectPoint(pvfe->GetSelectedPoint());
+        this->SelectPoint(pvfe->GetSelectedPoint());
         }
       else
         {
-        self->ClearSelection();
+        this->ClearSelection();
         }
       break;
     }
@@ -6749,7 +6786,7 @@ void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangedCallback()
 
 //----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
-  int x, int y, int &id, int &c_x, int &c_y)
+  int x, int y, int *id, int *c_x, int *c_y)
 {
   if (!this->IsCreated() || !this->HasFunction())
     {
@@ -6780,28 +6817,28 @@ int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
 
   // Get the real canvas coordinates
 
-  c_x = atoi(this->Script("%s canvasx %d", canv, x));
-  c_y = atoi(this->Script("%s canvasy %d", canv, y));
+  *c_x = atoi(this->Script("%s canvasx %d", canv, x));
+  *c_y = atoi(this->Script("%s canvasy %d", canv, y));
 
   // Find the closest element
   // Get its first tag, which should be either a point or a text (in
   // the form of tid or pid, ex: t0, or p0)
 
-  id = -1;
+  *id = -1;
 
-  const char *closest = this->Script("%s find closest %d %d", 
-                                     this->Canvas->GetWidgetName(), c_x, c_y);
+  const char *closest = 
+    this->Script("%s find closest %d %d", canv, *c_x, *c_y);
   if (closest && *closest)
     {
-    const char *tag = this->Script("lindex [%s itemcget %s -tags] 0",
-                                   this->Canvas->GetWidgetName(), closest);
-    if (tag && *tag && (tag[0] == 't' || tag[0] == 'p'))
+    const char *tag = 
+      this->Script("lindex [%s itemcget %s -tags] 0", canv, closest);
+    if (tag && *tag && (tag[0] == 't' || tag[0] == 'p') && isdigit(tag[1]))
       {
-      id = atoi(tag + 1);
+      *id = atoi(tag + 1);
       }
     }
 
-  return (id < 0 || id >= this->GetFunctionSize()) ? 0 : 1;
+  return (*id < 0 || *id >= this->GetFunctionSize()) ? 0 : 1;
 }
 
 //----------------------------------------------------------------------------
@@ -6812,7 +6849,7 @@ void vtkKWParameterValueFunctionEditor::DoubleClickOnPointCallback(
 
   // No point found
 
-  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y))
     {
     return;
     }
@@ -6844,9 +6881,9 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
 
   // No point found, then let's add that point
 
-  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, id, c_x, c_y))
+  if (!this->FindFunctionPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y))
     {
-    if (!this->AddPointAtCanvasCoordinates(c_x, c_y, id))
+    if (!this->AddPointAtCanvasCoordinates(c_x, c_y, &id))
       {
       return;
       }
@@ -6855,9 +6892,9 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   // Select the point (that was found or just added)
 
   this->SelectPoint(id);
-  this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint(), c_x, c_y);
-  this->LastSelectCanvasCoordinates[0] = c_x;
-  this->LastSelectCanvasCoordinates[1] = c_y;
+  this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint(),&c_x, &c_y);
+  this->LastSelectionCanvasCoordinateX = c_x;
+  this->LastSelectionCanvasCoordinateY = c_y;
 
   this->InUserInteraction = 1;
 }
@@ -6915,7 +6952,7 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
     {
     int prev_x, prev_y;
     this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint() - 1, 
-                                            prev_x, prev_y);
+                                            &prev_x, &prev_y);
     if (c_x <= prev_x)
       {
       c_x = prev_x + 1;
@@ -6926,7 +6963,7 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
     {
     int next_x, next_y;
     this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint() + 1,
-                                            next_x, next_y);
+                                            &next_x, &next_y);
     if (c_x >= next_x)
       {
       c_x = next_x - 1;
@@ -6943,8 +6980,8 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
     if (this->LastConstrainedMove == 
         vtkKWParameterValueFunctionEditor::ConstrainedMoveFree)
       {
-      if (fabs((double)(c_x - LastSelectCanvasCoordinates[0])) >
-          fabs((double)(c_y - LastSelectCanvasCoordinates[1])))
+      if (fabs((double)(c_x - this->LastSelectionCanvasCoordinateX)) >
+          fabs((double)(c_y - this->LastSelectionCanvasCoordinateY)))
         {
         this->LastConstrainedMove = 
           vtkKWParameterValueFunctionEditor::ConstrainedMoveHorizontal;
@@ -6959,13 +6996,13 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
         vtkKWParameterValueFunctionEditor::ConstrainedMoveHorizontal)
       {
       move_h_only = 1;
-      c_y = LastSelectCanvasCoordinates[1];
+      c_y = this->LastSelectionCanvasCoordinateY;
       }
     else if (this->LastConstrainedMove == 
              vtkKWParameterValueFunctionEditor::ConstrainedMoveVertical)
       {
       move_v_only = 1;
-      c_x = LastSelectCanvasCoordinates[0];
+      c_x = this->LastSelectionCanvasCoordinateX;
       }
     }
   else

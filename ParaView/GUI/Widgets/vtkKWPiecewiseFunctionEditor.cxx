@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.40");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -529,7 +529,7 @@ int vtkKWPiecewiseFunctionEditor::FunctionLineIsSampledBetweenPoints(
     return 0;
     }
 
-  // If sharpness == 0.0 and mid-point = 0.5, then it's the good 
+  // If sharpness == 0.0 and midpoint = 0.5, then it's the good 
   // old piecewise linear and we do not need to sample, the default
   // superclass implementation (staight line between id1 and id2) is fine
 
@@ -548,14 +548,14 @@ void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
 {
   // We want to intercept specific case like
   // sharpness = 1.0: step (3 segments), could not be done using sampling
-  // sharpness = 0.0 and mid-point != 0.5: two segments, for efficiency
+  // sharpness = 0.0 and midpoint != 0.5: two segments, for efficiency
   //      (also mid_point should be != 0.0 or 1.0 otherwise the midpoint
   //       parameter is the same as one of the end-point, and its value
   //       (vertical position) is wrong).
 
   // We assume all parameters are OK, they were checked by RedrawLine
 
-  double midpoint, sharpness;
+  double midpoint, sharpness, p;
   this->GetFunctionPointMidPoint(id1, &midpoint);
   this->GetFunctionPointSharpness(id1, &sharpness);
 
@@ -573,16 +573,12 @@ void vtkKWPiecewiseFunctionEditor::GetLineCoordinates(
   // Get end-point coordinates
 
   int x1, y1, x2, y2, xp, yp;
-  this->GetFunctionPointCanvasCoordinates(id1, x1, y1);
-  this->GetFunctionPointCanvasCoordinates(id2, x2, y2);
+  this->GetFunctionPointCanvasCoordinates(id1, &x1, &y1);
+  this->GetFunctionPointCanvasCoordinates(id2, &x2, &y2);
 
-  // Get mid-point coordinates
+  // Get midpoint coordinates
 
-  double p1, p2, p;
-  this->GetFunctionPointParameter(id1, &p1);
-  this->GetFunctionPointParameter(id2, &p2);
-  p = p1 + (p2 - p1) * midpoint;
-  this->GetFunctionPointCanvasCoordinatesAtParameter(p, xp, yp);
+  this->GetMidPointCanvasCoordinates(id1, &xp, &yp, &p);
 
   *tk_cmd << " " << x1 << " " << y1;
   if (sharp_1)
@@ -736,24 +732,6 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 
   ostrstream tk_cmd;
 
-  // Value entry (in top right frame)
-
-  if (this->ValueEntryVisibility  && 
-      this->PointEntriesVisibility && 
-      this->ValueEntry && this->ValueEntry->IsCreated())
-    {
-    vtksys_stl::string before;
-    if (this->MidPointEntry && this->MidPointEntry->IsCreated() && 
-        this->MidPointEntryVisibility)
-      {
-      before = " -before ";
-      before += this->MidPointEntry->GetWidgetName();
-      }
-    
-    tk_cmd << "pack " << this->ValueEntry->GetWidgetName() 
-           << " -side left" << before.c_str() << endl;
-    }
-
   // Window/Level mode (in top left frame)
 
   if (this->WindowLevelModeButtonVisibility &&
@@ -762,6 +740,36 @@ void vtkKWPiecewiseFunctionEditor::Pack()
     {
     tk_cmd << "pack " << this->WindowLevelModeCheckButton->GetWidgetName() 
            << " -side left -fill both -padx 0" << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::PackPointEntries()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Pack the other entries
+
+  this->Superclass::PackPointEntries();
+
+  ostrstream tk_cmd;
+
+  // Value entry (in top right frame)
+
+  if (this->HasSelection() &&
+      this->ValueEntryVisibility  && 
+      this->PointEntriesVisibility && 
+      this->ValueEntry && this->ValueEntry->IsCreated())
+    {
+    tk_cmd << "pack " << this->ValueEntry->GetWidgetName() 
+           << " -side left" << endl;
     }
   
   tk_cmd << ends;

@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.30");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.31");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -596,8 +596,8 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app)
 
   // Sync
 
-  vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
-    this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+  this->ScalarColorFunctionEditor->SynchronizeSingleSelection(
+    this->ScalarOpacityFunctionEditor);
 
   // Pack
 
@@ -1133,13 +1133,13 @@ void vtkKWVolumePropertyWidget::Update()
 
     if (this->GetIndependentComponents() && have_funcs)
       {
-      vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRange(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->SynchronizeVisibleParameterRange(
+        this->ScalarOpacityFunctionEditor);
       }
     else
       {
-      vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRange(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->DoNotSynchronizeVisibleParameterRange(
+        this->ScalarOpacityFunctionEditor);
       }
 
     // (un)Synchronize both opacity and color functions points
@@ -1147,32 +1147,32 @@ void vtkKWVolumePropertyWidget::Update()
     if (this->GetIndependentComponents() &&
         this->LockOpacityAndColor[this->SelectedComponent] && have_funcs)
       {
-      vtkKWParameterValueFunctionEditor::SynchronizePoints(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->SynchronizePoints(
+        this->ScalarOpacityFunctionEditor);
 
-      vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->DoNotSynchronizeSingleSelection(
+        this->ScalarOpacityFunctionEditor);
 
-      vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->SynchronizeSameSelection(
+        this->ScalarOpacityFunctionEditor);
       }
     else
       {
-      vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->DoNotSynchronizePoints(
+        this->ScalarOpacityFunctionEditor);
 
-      vtkKWParameterValueFunctionEditor::DoNotSynchronizeSameSelection(
-        this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+      this->ScalarColorFunctionEditor->DoNotSynchronizeSameSelection(
+        this->ScalarOpacityFunctionEditor);
 
       if (have_funcs)
         {
-        vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
-          this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+        this->ScalarColorFunctionEditor->SynchronizeSingleSelection(
+          this->ScalarOpacityFunctionEditor);
         }
       else
         {
-        vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
-          this->ScalarColorFunctionEditor, this->ScalarOpacityFunctionEditor);
+        this->ScalarColorFunctionEditor->DoNotSynchronizeSingleSelection(
+          this->ScalarOpacityFunctionEditor);
         }
       }
     }
