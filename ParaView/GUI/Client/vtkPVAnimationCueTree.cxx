@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.18");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -286,7 +286,7 @@ void vtkPVAnimationCueTree::AdjustEndPoints()
       // add we need just one point.
       int id;
       this->TimeLine->RemoveAll();
-      this->TimeLine->AddPointAtParameter(maxbounds[0], id);
+      this->TimeLine->AddPointAtParameter(maxbounds[0], &id);
       }
     else 
       {
@@ -294,8 +294,8 @@ void vtkPVAnimationCueTree::AdjustEndPoints()
         {
         int id;//id is dummy---needed just for the function call. 
         this->TimeLine->RemoveAll();
-        this->TimeLine->AddPointAtParameter(maxbounds[0], id);
-        this->TimeLine->AddPointAtParameter(maxbounds[1], id);
+        this->TimeLine->AddPointAtParameter(maxbounds[0], &id);
+        this->TimeLine->AddPointAtParameter(maxbounds[1], &id);
         }
       else if (maxbounds[0] != this->LastParameterBounds[0] || 
         maxbounds[1] != this->LastParameterBounds[1])
