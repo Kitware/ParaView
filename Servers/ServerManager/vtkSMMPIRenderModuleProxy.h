@@ -33,9 +33,21 @@ public:
   // Compression uses active pixel encoding of color and zbuffer.
   virtual void SetUseCompositeCompression(int val);
   
+  // Description:
+  // Render based on the interactive render parameters. This usually means
+  // LOD size, LOD geometry.
+  virtual void InteractiveRender();
+
+  // Description:
+  // Render based on the still render parameters. This usually means
+  // full size, full geometry.
+  virtual void StillRender();
+
 protected:
   vtkSMMPIRenderModuleProxy();
   ~vtkSMMPIRenderModuleProxy();
+
+  virtual void CreateVTKObjects(int numObjects);
 
   // Description:
   // Subclasses must decide what type of CompositeManagerProxy they need.
