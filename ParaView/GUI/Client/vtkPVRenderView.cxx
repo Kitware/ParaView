@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.404");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.405");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1230,7 +1230,7 @@ void vtkPVRenderView::CreateViewProperties()
   // Setup the frame
   this->LightParameterFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
   this->LightParameterFrame->Create(this->GetApplication());
-  this->LightParameterFrame->SetLabelText("Light Kit Parameter");
+  this->LightParameterFrame->SetLabelText("Light Kit Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LightParameterFrame->GetWidgetName());
 
@@ -1259,12 +1259,12 @@ void vtkPVRenderView::CreateViewProperties()
   this->KeyLightLabel->SetText("Key :");
   this->KeyLightLabel->SetWidth(4);
   this->KeyLightLabel->SetBalloonHelpString(
-     "The key light is the main light, it is usually"
-     "positioned so that it appears like an overhead light."
-     "It is generally positioned to shine down on the"
-     "scene from about a 45 degree angle vertically and at least a little"
-     "offset side to side.  The key light is usually at least about twice as"
-     "bright as the total of all other lights in the scene to provide good"
+     "The key light is the main light, it is usually "
+     "positioned so that it appears like an overhead light. "
+     "It is generally positioned to shine down on the "
+     "scene from about a 45 degree angle vertically and at least a little "
+     "offset side to side. The key light is usually at least about twice as "
+     "bright as the total of all other lights in the scene to provide good "
      "modeling of object features.");
 
   this->FillLightLabel->SetParent(this->LightParameterFrame->GetFrame());
@@ -1272,9 +1272,9 @@ void vtkPVRenderView::CreateViewProperties()
   this->FillLightLabel->SetText("Fill:");
   this->FillLightLabel->SetWidth(4);
   this->FillLightLabel->SetBalloonHelpString(
-     "The fill light is usually positioned across from or opposite from the"
-     "key light (though still on the same side of the object as the"
-     "camera) in order to simulate diffuse reflections from other objects"
+     "The fill light is usually positioned across from or opposite from the "
+     "key light (though still on the same side of the object as the "
+     "camera) in order to simulate diffuse reflections from other objects "
      "in the scene." );
 
   this->BackLightLabel->SetParent(this->LightParameterFrame->GetFrame());
@@ -1282,8 +1282,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->BackLightLabel->SetText("Back:");
   this->BackLightLabel->SetWidth(4);
   this->BackLightLabel->SetBalloonHelpString(
-     "The two back lights, one on the left of the object as seen"
-     "from the observer and one on the right, fill on the high-contrast"
+     "The two back lights, one on the left of the object as seen "
+     "from the observer and one on the right, fill in the high-contrast "
      "areas behind the object." );
 
   this->HeadLightLabel->SetParent(this->LightParameterFrame->GetFrame());
@@ -1291,7 +1291,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->HeadLightLabel->SetText("Head:");
   this->HeadLightLabel->SetWidth(4);
   this->HeadLightLabel->SetBalloonHelpString(
-     "The headlight, always located at the position of the camera, reduces"
+     "The headlight, always located at the position of the camera, reduces "
      "the contrast between areas lit by the key and fill light.");
 
   // This structure has to be kept synchronize with LightKitSubType
