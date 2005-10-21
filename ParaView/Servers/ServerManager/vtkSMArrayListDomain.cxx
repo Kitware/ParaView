@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.8");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -183,7 +183,7 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayListDomain::Update(vtkSMProperty* prop)
+void vtkSMArrayListDomain::Update(vtkSMProperty*)
 {
   this->RemoveAllStrings();
 

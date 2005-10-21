@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.9");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -40,7 +40,7 @@ vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
+void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 {
   this->RemoveAllMinima();
   this->RemoveAllMaxima();
