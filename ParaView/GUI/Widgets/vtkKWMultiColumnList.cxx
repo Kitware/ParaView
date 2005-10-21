@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.32");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.33");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -109,8 +109,11 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   this->SetBackgroundColor(0.98, 0.98, 0.98);
   this->SetStripeBackgroundColor(0.878, 0.909, 0.941);
 
+#ifdef _WIN32
   this->SetSelectionBackgroundColor(0.0392157, 0.141176, 0.415686);
-  //this->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
+#else
+  this->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
+#endif
 
   this->SetColumnSeparatorsVisibility(1);
   this->SetSortArrowVisibility(0);
