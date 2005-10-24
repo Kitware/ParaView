@@ -19,7 +19,7 @@ pqSpinBox::pqSpinBox(vtkSMProxy* const Proxy, vtkSMProperty* const Property, QWi
   property(Property),
   concrete_property(vtkSMIntVectorProperty::SafeDownCast(Property))
 {
-  this->setName(Name);
+  this->setObjectName(Name);
 
   updateState(); 
   

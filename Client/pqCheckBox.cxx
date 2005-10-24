@@ -13,11 +13,12 @@
 #include <vtkSMProxy.h>
 
 pqCheckBox::pqCheckBox(vtkSMProxy* const Proxy, vtkSMProperty* const Property, const QString& Text, QWidget* Parent, const char* Name) :
-  QCheckBox(Text, Parent, Name),
+  QCheckBox(Text, Parent),
   proxy(Proxy),
   property(Property),
   concrete_property(vtkSMIntVectorProperty::SafeDownCast(Property))
 {
+  this->setObjectName(Name);
   this->setTristate(concrete_property ? false : true);
   
   updateState(); 

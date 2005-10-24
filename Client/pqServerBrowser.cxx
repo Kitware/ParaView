@@ -13,7 +13,7 @@
 #include <QMessageBox>
 
 pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
-  base(Parent, Name)
+  base(Parent)
 {
   this->ui.setupUi(this);
   
@@ -26,7 +26,7 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
   this->onServerTypeActivated(0);
 
   this->setWindowTitle(tr("Pick Server:"));
-  this->setName(Name);
+  this->setObjectName(Name);
 }
 
 pqServerBrowser::~pqServerBrowser()
@@ -42,7 +42,7 @@ void pqServerBrowser::accept()
       server = pqServer::Standalone();
       break;
     case 1:
-      server = pqServer::Connect(ui.hostName->text().ascii(), ui.portNumber->value());
+      server = pqServer::Connect(ui.hostName->text().toAscii().data(), ui.portNumber->value());
       break;
     default:
       QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));

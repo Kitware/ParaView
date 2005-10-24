@@ -54,7 +54,7 @@ struct pqSetName
 template<typename T>
 T* operator<<(T* LHS, const pqSetName& RHS)
 {
-  LHS->setName(RHS.name.c_str());
+  LHS->setObjectName(RHS.name.c_str());
   return LHS;
 }
 
@@ -67,7 +67,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   window(0),
   serverDisconnectAction(0)
 {
-  this->setName("mainWindow");
+  this->setObjectName("mainWindow");
   this->setWindowTitle("ParaQ Client");
 
   QAction* const fileNewAction = new QAction(tr("New..."), this) << pqSetName("fileNewAction");
@@ -277,7 +277,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
-    ofstream file(Files[i]);
+    ofstream file(Files[i].toAscii().data());
     file << "<ServerState>" << "\n";
     this->currentServer->GetProxyManager()->SaveState("test", &file, 0);
     file << "</ServerState>" << "\n";
@@ -314,7 +314,7 @@ void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
-    cerr << "File: " << Files[i].ascii() << endl;
+    cerr << "File: " << Files[i].toAscii().data() << endl;
     }
 }
 

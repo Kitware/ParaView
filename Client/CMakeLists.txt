@@ -4,7 +4,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 PROJECT(Client)
 
 FIND_PACKAGE(Qt4)
-SET(QT_USE_QT3SUPPORT TRUE)
 INCLUDE(${QT_USE_FILE})
 
 
@@ -18,6 +17,12 @@ FIND_PATH(QT_TEST_INCLUDE_DIR QtTest
       "$ENV{HOME}/Software/Develop/Qt/QtTest" 
       DOC "The top-level path to the QtTest4 headers")
 FIND_LIBRARY( QT_TEST_LIBRARY NAMES QtTest QtTest2
+  PATHS
+  "${qt_install_prefix}/solutions/qttestlib/src"
+  "${qt_install_prefix}/lib"
+  "$ENV{HOME}/Software/Develop/Qt/QtTest/lib" 
+  )
+FIND_LIBRARY( QT_TEST_DEBUG_LIBRARY NAMES QtTest_debug QtTest2_debug
   PATHS
   "${qt_install_prefix}/solutions/qttestlib/src"
   "${qt_install_prefix}/lib"
@@ -57,10 +62,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerFileDialogModel.h
   pqSpinBox.h
   pqTestCases.h
-)
-
-ADD_DEFINITIONS(
-  -DQT3_SUPPORT
 )
 
 ADD_EXECUTABLE(pqClient
@@ -147,7 +148,7 @@ TARGET_LINK_LIBRARIES(pqClient
   vtkDICOMParser
 
   ${QT_LIBRARIES}
-  ${QT_TEST_LIBRARY}
+  optimized ${QT_TEST_LIBRARY} debug ${QT_TEST_DEBUG_LIBRARY}
 
   ${JPEG_LIBRARY}
   ${PNG_LIBRARY}

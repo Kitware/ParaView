@@ -32,11 +32,11 @@ void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const ValueT& Value)
     return;
     }
   
-  vtkSMProperty* const abstract_property = Proxy->GetProperty(Name.ascii());
+  vtkSMProperty* const abstract_property = Proxy->GetProperty(Name.toAscii().data());
   if(!abstract_property)
     {
     QString message = "Property [" + Name + "] not found\n";
-    vtkOutputWindowDisplayErrorText(message.ascii());
+    vtkOutputWindowDisplayErrorText(message.toAscii().data());
     return;
     }
   
@@ -44,7 +44,7 @@ void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const ValueT& Value)
   if(!concrete_property)
     {
     QString message = "Property [" + Name + "] type mismatch\n";
-    vtkOutputWindowDisplayErrorText(message.ascii());
+    vtkOutputWindowDisplayErrorText(message.toAscii().data());
     return;
     }
   
@@ -68,6 +68,6 @@ void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const int Value)
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const QString& Value)
 {
-  pqSetProperty<vtkSMStringVectorProperty, const char*>(Proxy, Name, Value.ascii());
+  pqSetProperty<vtkSMStringVectorProperty, const char*>(Proxy, Name, Value.toAscii().data());
 }
 

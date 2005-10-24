@@ -15,9 +15,10 @@
 #include <vtkstd/set>
 
 pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name) :
-  QDialog(Parent, Name),
+  QDialog(Parent),
   model(Model)
 {
+  this->setObjectName(Name);
   this->ui.setupUi(this);
   this->ui.navigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
   this->ui.files->setModel(model->fileModel());
@@ -30,7 +31,7 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidg
   this->ui.favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->setWindowTitle(Title);
-  this->setName(Name);
+//  this->setName(Name);
 //  this->setModal(true);
 
   QObject::connect(this->model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
