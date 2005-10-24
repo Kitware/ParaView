@@ -33,7 +33,6 @@ public:
   // Generalized interface for asking the executive to fullfill update
   // requests.
   virtual int ProcessRequest(vtkInformation* request,
-                             int forward,
                              vtkInformationVector** inInfo,
                              vtkInformationVector* outInfo);
 
