@@ -47,7 +47,7 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.55");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.56");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -483,7 +483,7 @@ void vtkPVGeometryFilter::DataSetExecute(
 
     if (this->GenerateGroupScalars)
       {
-      vtkUnsignedCharArray* newArray = vtkUnsignedCharArray::New();
+      vtkFloatArray* newArray = vtkFloatArray::New();
       vtkIdType numCells = output->GetNumberOfCells();
       newArray->SetNumberOfTuples(numCells);
       for(vtkIdType cellId=0; cellId<numCells; cellId++)
@@ -491,7 +491,7 @@ void vtkPVGeometryFilter::DataSetExecute(
         newArray->SetValue(cellId, this->CurrentGroup);
         }
       newArray->SetName("GroupScalars");
-      output->GetCellData()->AddArray(newArray);
+      output->GetCellData()->SetScalars(newArray);
       newArray->Delete();
       }
     }
@@ -667,6 +667,20 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
     outline->Delete();
+
+    if (this->GenerateGroupScalars)
+      {
+      vtkFloatArray* newArray = vtkFloatArray::New();
+      vtkIdType numCells = output->GetNumberOfCells();
+      newArray->SetNumberOfTuples(numCells);
+      for(vtkIdType cellId=0; cellId<numCells; cellId++)
+        {
+        newArray->SetValue(cellId, this->CurrentGroup);
+        }
+      newArray->SetName("GroupScalars");
+      output->GetCellData()->SetScalars(newArray);
+      newArray->Delete();
+      }
     }
   else
     {

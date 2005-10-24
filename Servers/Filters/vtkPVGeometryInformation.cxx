@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVGeometryInformation);
-vtkCxxRevisionMacro(vtkPVGeometryInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVGeometryInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVGeometryInformation::vtkPVGeometryInformation()
@@ -42,7 +42,7 @@ void vtkPVGeometryInformation::CopyFromObject(vtkObject* object)
   vtkPVGeometryFilter* gf = vtkPVGeometryFilter::SafeDownCast(object);
   if (gf)
     {
-    this->CopyFromDataSet(gf->GetOutput());
+    this->Superclass::CopyFromObject(gf->GetOutput());
     return;
     }
 
