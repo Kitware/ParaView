@@ -7,11 +7,53 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqCommand.h"
+#include "pqCommandDispatcher.h"
+#include "pqCommandDispatcherManager.h"
 #include "pqSpinBox.h"
 
 #include <vtkSMIntRangeDomain.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
+
+namespace
+{
+
+class pqSpinBoxCommand :
+  public pqCommand
+{
+public:
+  pqSpinBoxCommand(vtkSMProxy& Proxy, vtkSMIntVectorProperty& ConcreteProperty, int OldValue, int NewValue) :
+    proxy(Proxy),
+    concrete_property(ConcreteProperty),
+    old_value(OldValue),
+    new_value(NewValue)
+  {
+  }
+
+  void undoCommand()
+  {
+    concrete_property.SetElement(0, old_value);
+    proxy.UpdateVTKObjects();
+    proxy.MarkConsumersAsModified();
+  }
+  
+  void redoCommand()
+  {
+    concrete_property.SetElement(0, new_value);
+    proxy.UpdateVTKObjects();
+    proxy.MarkConsumersAsModified();
+  }
+
+private:
+  vtkSMProxy& proxy;
+  vtkSMIntVectorProperty& concrete_property;
+  const int old_value;
+  const int new_value;
+};
+
+} // namespace
+
 
 pqSpinBox::pqSpinBox(vtkSMProxy* const Proxy, vtkSMProperty* const Property, QWidget* Parent, const char* Name) :
   QSpinBox(Parent),
@@ -40,17 +82,13 @@ pqSpinBox::~pqSpinBox()
 
 void pqSpinBox::onValueChanged(int Value)
 {
-  if(concrete_property)
+  if(proxy && concrete_property)
     {
-    if(concrete_property->GetElement(0) != Value) 
-      {
-      concrete_property->SetElement(0, Value);
-      if(proxy)
-        {
-        proxy->UpdateVTKObjects();
-        proxy->MarkConsumersAsModified();
-        }
-      }
+    const int old_value = concrete_property->GetElement(0);
+    const int new_value = Value;
+    
+    if(old_value != new_value)
+      pqCommandDispatcherManager::instance().getDispatcher().dispatchCommand(new pqSpinBoxCommand(*proxy, *concrete_property, old_value, new_value));
     }
 }
 

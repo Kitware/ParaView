@@ -12,6 +12,7 @@
 
 #include <QMainWindow>
 
+class pqRefreshToolbar;
 class pqServer;
 class QAction;
 class QToolBar;
@@ -32,7 +33,8 @@ private:
   void setServer(pqServer* Server);
 
   pqServer* currentServer;
-  QToolBar* toolbar;
+  pqRefreshToolbar* refresh_toolbar;
+  QToolBar* property_toolbar;
   QVTKWidget* window;
   QAction* serverDisconnectAction;
   
@@ -54,6 +56,9 @@ private slots:
   void onDebugOpenLocalFiles(const QStringList& Files);
   void onDebugDumpQtHierarchy();
   void onTestsRun();
+  
+  void onDispatcherChanged();
+  void onRedrawWindows();
 };
 
 #endif // !_pqMainWindow_h

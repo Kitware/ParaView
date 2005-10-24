@@ -54,14 +54,19 @@ INCLUDE_DIRECTORIES(
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCheckBox.h
+  pqCommandDispatcher.h
+  pqCommandDispatcherManager.h
+  pqExplicitCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqMainWindow.h
+  pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSpinBox.h
   pqTestCases.h
+  pqTimeoutCommandDispatcher.h
 )
 
 ADD_EXECUTABLE(pqClient
@@ -70,10 +75,19 @@ ADD_EXECUTABLE(pqClient
   pqCamera.h
   pqCheckBox.cxx
   pqCheckBox.h
+  pqCommand.h
+  pqCommandDispatcher.cxx
+  pqCommandDispatcher.h
+  pqCommandDispatcherManager.cxx
+  pqCommandDispatcherManager.h
+  pqExplicitCommandDispatcher.cxx
+  pqExplicitCommandDispatcher.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
+  pqImmediateCommandDispatcher.cxx
+  pqImmediateCommandDispatcher.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
   pqMainWindow.cxx
@@ -84,6 +98,8 @@ ADD_EXECUTABLE(pqClient
   pqParts.h
   pqProperties.cxx
   pqProperties.h
+  pqRefreshToolbar.cxx
+  pqRefreshToolbar.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx
@@ -96,6 +112,8 @@ ADD_EXECUTABLE(pqClient
   pqTestCases.h
   pqTesting.cxx
   pqTesting.h
+  pqTimeoutCommandDispatcher.cxx
+  pqTimeoutCommandDispatcher.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   ${MOC_BUILT_SOURCES}

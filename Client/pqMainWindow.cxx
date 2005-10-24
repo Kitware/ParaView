@@ -9,11 +9,14 @@
 
 #include "pqCamera.h"
 #include "pqCheckBox.h"
+#include "pqCommandDispatcher.h"
+#include "pqCommandDispatcherManager.h"
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqParts.h"
 #include "pqProperties.h"
+#include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
 #include "pqServerBrowser.h"
@@ -63,7 +66,8 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 pqMainWindow::pqMainWindow(QApplication& Application) :
   base(),
   currentServer(0),
-  toolbar(0),
+  refresh_toolbar(0),
+  property_toolbar(0),
   window(0),
   serverDisconnectAction(0)
 {
@@ -120,13 +124,19 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   QMenu* const testMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testMenu");
   testMenu->addAction(testsRunAction);
   
+  QObject::connect(&pqCommandDispatcherManager::instance(), SIGNAL(dispatcherChanged()), this, SLOT(onDispatcherChanged()));
+  
+  this->refresh_toolbar = new pqRefreshToolbar(this);
+  this->addToolBar(this->refresh_toolbar);
+
   this->setServer(0);
 }
 
 pqMainWindow::~pqMainWindow()
 {
   delete this->window;
-  delete this->toolbar;
+  delete this->property_toolbar;
+  delete this->refresh_toolbar;
   delete this->currentServer;
 }
 
@@ -135,8 +145,8 @@ void pqMainWindow::setServer(pqServer* Server)
   delete this->window;
   this->window = 0;
 
-  delete this->toolbar;
-  this->toolbar = 0;
+  delete this->property_toolbar;
+  this->property_toolbar = 0;
 
   delete this->currentServer;
   this->currentServer = 0;
@@ -187,13 +197,13 @@ void pqMainWindow::onFileNew(pqServer* Server)
   pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
 
   // Create a toolbar ...
-  this->toolbar = new QToolBar("Properties", this);
-  this->addToolBar(toolbar);
+  this->property_toolbar = new QToolBar("Properties", this);
+  this->addToolBar(this->property_toolbar);
 
-  this->toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Capping", this->toolbar, "Capping"));
-  this->toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Again with the Capping", this->toolbar, "Again with the Capping"));
-  this->toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->toolbar, "Resolution"));
-  this->toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->toolbar, "Resolution Yet Again"));
+  this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Capping", this->property_toolbar, "Capping"));
+  this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Again with the Capping", this->property_toolbar, "Again with the Capping"));
+  this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution"));
+  this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution Yet Again"));
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());
@@ -326,6 +336,17 @@ void pqMainWindow::onDebugDumpQtHierarchy()
 void pqMainWindow::onTestsRun()
 {
   pqRunRegressionTests(this);
+}
+
+void pqMainWindow::onDispatcherChanged()
+{
+  QObject::connect(&pqCommandDispatcherManager::instance().getDispatcher(), SIGNAL(updateWindow()), this, SLOT(onRedrawWindows()));
+}
+
+void pqMainWindow::onRedrawWindows()
+{
+  if(this->currentServer)
+    this->currentServer->GetRenderModule()->StillRender();
 }
 
 

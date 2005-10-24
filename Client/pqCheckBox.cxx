@@ -8,9 +8,50 @@
  */
 
 #include "pqCheckBox.h"
+#include "pqCommand.h"
+#include "pqCommandDispatcher.h"
+#include "pqCommandDispatcherManager.h"
 
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
+
+namespace
+{
+
+class pqCheckBoxCommand :
+  public pqCommand
+{
+public:
+  pqCheckBoxCommand(vtkSMProxy& Proxy, vtkSMIntVectorProperty& ConcreteProperty, bool OldState, bool NewState) :
+    proxy(Proxy),
+    concrete_property(ConcreteProperty),
+    old_state(OldState),
+    new_state(NewState)
+  {
+  }
+
+  void undoCommand()
+  {
+    concrete_property.SetElement(0, old_state);
+    proxy.UpdateVTKObjects();
+    proxy.MarkConsumersAsModified();
+  }
+  
+  void redoCommand()
+  {
+    concrete_property.SetElement(0, new_state);
+    proxy.UpdateVTKObjects();
+    proxy.MarkConsumersAsModified();
+  }
+
+private:
+  vtkSMProxy& proxy;
+  vtkSMIntVectorProperty& concrete_property;
+  const bool old_state;
+  const bool new_state;
+};
+
+} // namespace
 
 pqCheckBox::pqCheckBox(vtkSMProxy* const Proxy, vtkSMProperty* const Property, const QString& Text, QWidget* Parent, const char* Name) :
   QCheckBox(Text, Parent),
@@ -37,20 +78,13 @@ pqCheckBox::~pqCheckBox()
 
 void pqCheckBox::onStateChanged(int State)
 {
-  if(concrete_property)
+  if(proxy && concrete_property)
     {
     const bool old_state = concrete_property->GetElement(0) ? true : false;
     const bool new_state = State == Qt::Checked ? true : false;
     
-    if(old_state != new_state) 
-      {
-      concrete_property->SetElement(0, new_state);
-      if(proxy)
-        {
-        proxy->UpdateVTKObjects();
-        proxy->MarkConsumersAsModified();
-        }
-      }
+    if(old_state != new_state)
+      pqCommandDispatcherManager::instance().getDispatcher().dispatchCommand(new pqCheckBoxCommand(*proxy, *concrete_property, old_state, new_state));
     }
   else
     {
