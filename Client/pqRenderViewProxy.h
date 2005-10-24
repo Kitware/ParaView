@@ -12,7 +12,7 @@
 
 #include "vtkPVRenderViewProxy.h"
 
-class QVTKWidget;
+class vtkSMRenderModuleProxy;
 
 class pqRenderViewProxy :
   public vtkPVRenderViewProxy
@@ -24,11 +24,11 @@ class pqRenderViewProxy :
     virtual void Render();
     virtual void EventuallyRender();
     
-    virtual vtkRenderWindow* GetRenderWindow();
-    void SetRenderWindow(QVTKWidget* win);
+    vtkRenderWindow* GetRenderWindow();
+    void SetRenderModule(vtkSMRenderModuleProxy* rm);
 
   private:
-    QVTKWidget* mRenWin;
+    vtkSMRenderModuleProxy* RenderModule;
 };
 
 #endif

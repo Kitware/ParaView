@@ -1,34 +1,33 @@
 
 #include "pqRenderViewProxy.h"
-#include "QVTKWidget.h"
-#include "vtkRenderWindow.h"
+#include "vtkSMRenderModuleProxy.h"
 
 pqRenderViewProxy* pqRenderViewProxy::New()
 {
   return new pqRenderViewProxy;
 }
 
-// what is EventuallyRender for??  is that a Tk thing?
 void pqRenderViewProxy::EventuallyRender()
 {
   this->Render();
 }
 
-vtkRenderWindow* pqRenderViewProxy::GetRenderWindow()
-{
-  return mRenWin->GetRenderWindow();
-}
-
 void pqRenderViewProxy::Render()
 {
-  // bypass Qt and tell the VTK window to render
-  // this may/may not work on the Mac where
-  // Qt works with the composite window manager to render at the right time
-  mRenWin->GetRenderWindow()->Render();
+  // render LOD's
+  //RenderModule->InteractiveRender();
+
+  // do not render LOD's
+  RenderModule->StillRender();
 }
 
-void pqRenderViewProxy::SetRenderWindow(QVTKWidget* win)
+vtkRenderWindow* pqRenderViewProxy::GetRenderWindow()
 {
-  mRenWin = win;
+  return RenderModule->GetRenderWindow();
+}
+
+void pqRenderViewProxy::SetRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  RenderModule = rm;
 }
 

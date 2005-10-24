@@ -71,34 +71,34 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   this->setWindowTitle("ParaQ Client");
 
   QAction* const fileNewAction = new QAction(tr("New..."), this) << pqSetName("fileNewAction");
-  connect(fileNewAction, SIGNAL(activated()), this, SLOT(onFileNew()));
+  connect(fileNewAction, SIGNAL(triggered()), this, SLOT(onFileNew()));
 
   QAction* const fileOpenAction = new QAction(tr("Open..."), this) << pqSetName("fileOpenAction");
-  connect(fileOpenAction, SIGNAL(activated()), this, SLOT(onFileOpen()));
+  connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(onFileOpen()));
 
   QAction* const fileOpenServerStateAction = new QAction(tr("Open Server State"), this) << pqSetName("fileOpenServerStateAction");
-  connect(fileOpenServerStateAction, SIGNAL(activated()), this, SLOT(onFileOpenServerState()));
+  connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
 
   QAction* const fileSaveServerStateAction = new QAction(tr("Save Server State"), this) << pqSetName("fileSaveServerStateAction");
-  connect(fileSaveServerStateAction, SIGNAL(activated()), this, SLOT(onFileSaveServerState()));
+  connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
 
   QAction* const fileQuitAction = new QAction(tr("Quit"), this) << pqSetName("fileQuitAction");
-  connect(fileQuitAction, SIGNAL(activated()), &Application, SLOT(quit()));
+  connect(fileQuitAction, SIGNAL(triggered()), &Application, SLOT(quit()));
 
   QAction* const serverConnectAction = new QAction(tr("Connect..."), this) << pqSetName("serverConnectAction");
-  connect(serverConnectAction, SIGNAL(activated()), this, SLOT(onServerConnect()));
+  connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(onServerConnect()));
 
   this->serverDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
-  connect(this->serverDisconnectAction, SIGNAL(activated()), this, SLOT(onServerDisconnect()));
+  connect(this->serverDisconnectAction, SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
 
   QAction* const debugOpenLocalFilesAction = new QAction(tr("Open Local Files"), this) << pqSetName("debugOpenLocalFilesAction");
-  connect(debugOpenLocalFilesAction, SIGNAL(activated()), this, SLOT(onDebugOpenLocalFiles()));
+  connect(debugOpenLocalFilesAction, SIGNAL(triggered()), this, SLOT(onDebugOpenLocalFiles()));
 
   QAction* const debugDumpQtHierarchyAction = new QAction(tr("Dump Qt Hierarchy"), this) << pqSetName("debugDumpQtHierarchyAction");
-  connect(debugDumpQtHierarchyAction, SIGNAL(activated()), this, SLOT(onDebugDumpQtHierarchy()));
+  connect(debugDumpQtHierarchyAction, SIGNAL(triggered()), this, SLOT(onDebugDumpQtHierarchy()));
 
   QAction* const testsRunAction = new QAction(tr("Run"), this) << pqSetName("testsRunAction");
-  connect(testsRunAction, SIGNAL(activated()), this, SLOT(onTestsRun()));
+  connect(testsRunAction, SIGNAL(triggered()), this, SLOT(onTestsRun()));
 
   this->menuBar() << pqSetName("menuBar");
 
@@ -151,7 +151,7 @@ void pqMainWindow::setServer(pqServer* Server)
     this->window->update();
 
     pqRenderViewProxy* proxy = pqRenderViewProxy::New();
-    proxy->SetRenderWindow(this->window);
+    proxy->SetRenderModule(Server->GetRenderModule());
     vtkPVGenericRenderWindowInteractor* interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(Server->GetRenderModule()->GetInteractor());
     interactor->SetPVRenderView(proxy);
     proxy->Delete();
