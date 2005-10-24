@@ -14,25 +14,13 @@
 =========================================================================*/
 #include "vtkPVDisplayGUI.h"
 
-#include "vtkPVColorMap.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
+#include "vtkCollection.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMDisplayProxy.h"
-#include "vtkSMPointLabelDisplayProxy.h"
-#include "vtkSMLODDisplayProxy.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkPVColorSelectionWidget.h"
-#include "vtkCollection.h"
-#include "vtkColorTransferFunction.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -42,25 +30,37 @@
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWWidget.h"
-#include "vtkKWMenu.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPiecewiseFunction.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVColorMap.h"
+#include "vtkPVColorSelectionWidget.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVRenderModuleUI.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVVolumeAppearanceEditor.h"
 #include "vtkPVWindow.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -68,21 +68,22 @@
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDisplayProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMLODDisplayProxy.h"
+#include "vtkSMPointLabelDisplayProxy.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkStdString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVRenderModuleUI.h"
 #include "vtkVolumeProperty.h"
-#include "vtkPVOptions.h"
-#include "vtkStdString.h"
-#include "vtkPVTraceHelper.h"
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkRenderWindow.h"
 
 #define VTK_PV_OUTLINE_LABEL              "Outline"
 #define VTK_PV_SURFACE_LABEL              "Surface"
@@ -95,7 +96,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.50");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.51");
 
 //----------------------------------------------------------------------------
 
@@ -1351,6 +1352,24 @@ void vtkPVDisplayGUI::UpdateColorMenu()
       attrInfo = dataInfo->GetCellDataInformation();
       }
     arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+    if (!arrayInfo)
+      {
+      vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
+      if (dproxy)
+        {
+        vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
+        if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+          {
+          attrInfo = geomInfo->GetPointDataInformation();
+          }
+        else
+          {
+          attrInfo = geomInfo->GetCellDataInformation();
+          }
+
+        arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+        }
+      }
     if (arrayInfo == 0)
       {
       this->PVSource->SetDefaultColorParameters();
@@ -1553,7 +1572,8 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
 {
-  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByArray {%s} %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByArray {%s} %d", 
+                                   this->GetTclName(),
     array, field);
   
   this->PVSource->ColorByArray(array, field);
@@ -1571,7 +1591,8 @@ void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
 void vtkPVDisplayGUI::ColorByProperty()
 {
   this->ColorSetByUser = 1;
-  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByProperty", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByProperty", 
+                                   this->GetTclName());
   this->ColorSelectionMenu->SetValue("Property");
   this->ColorByPropertyInternal();
 }
@@ -1627,7 +1648,8 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
     // See if the array satisfies conditions necessary for direct coloring.  
     vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
-    if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+    if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == 
+        vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1635,7 +1657,8 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
       {
       attrInfo = dataInfo->GetCellDataInformation();
       }
-    vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());      
+    vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
+      colorMap->GetArrayName());      
     // First set of conditions.
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {
@@ -1644,7 +1667,8 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         { // I would like to have two as an option also ...
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
-        this->MapScalarsCheck->SetSelectedState(this->PVSource->GetDisplayProxy()->GetColorModeCM());
+        this->MapScalarsCheck->SetSelectedState(
+          this->PVSource->GetDisplayProxy()->GetColorModeCM());
         }
       else
         { // Keep VTK from directly coloring single component arrays.
@@ -1687,6 +1711,7 @@ void vtkPVDisplayGUI::SetRepresentation(const char* repr)
     vtkErrorMacro("Don't know the representation: " << repr);
     this->DrawSurface();
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1698,12 +1723,14 @@ void vtkPVDisplayGUI::DrawWireframe()
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::WIREFRAME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(
+    vtkSMDataObjectDisplayProxy::WIREFRAME);
 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+  this->UpdateColorGUI(); 
 }
 
 //----------------------------------------------------------------------------
@@ -1715,12 +1742,14 @@ void vtkPVDisplayGUI::DrawPoints()
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::POINTS);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(
+    vtkSMDataObjectDisplayProxy::POINTS);
   
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+  this->UpdateColorGUI(); 
 }
 
 //----------------------------------------------------------------------------
@@ -1732,15 +1761,17 @@ void vtkPVDisplayGUI::DrawVolume()
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
   this->VolumeRenderModeOn();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::VOLUME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(
+    vtkSMDataObjectDisplayProxy::VOLUME);
 
-  this->GetPVRenderView()->GetRenderWindow()->AddObserver( vtkCommand::StartEvent,
-                                                           this->VRObserver );
+  this->GetPVRenderView()->GetRenderWindow()->AddObserver( 
+    vtkCommand::StartEvent, this->VRObserver );
   
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+  this->UpdateColorGUI(); 
 }
 
 //----------------------------------------------------------------------------
@@ -1801,12 +1832,15 @@ void vtkPVDisplayGUI::DrawSurface()
   
   // fixme
   // It would be better to loop over part displays from the render module.
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(
+    vtkSMDataObjectDisplayProxy::SURFACE);
 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+
+  this->UpdateColorGUI();
 }
 
 //----------------------------------------------------------------------------
@@ -1818,12 +1852,15 @@ void vtkPVDisplayGUI::DrawOutline()
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(
+    vtkSMDataObjectDisplayProxy::OUTLINE);
 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+
+  this->UpdateColorGUI();
 }
 
 

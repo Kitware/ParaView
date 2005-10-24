@@ -21,11 +21,12 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkPVSource.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -71,6 +72,19 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
   
   attrInfo = dataInfo->GetCellDataInformation();
   this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+
+  vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
+  if (dproxy)
+    {
+    vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
+    
+    attrInfo = geomInfo->GetPointDataInformation();
+    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    
+    attrInfo = geomInfo->GetCellDataInformation();
+    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -98,11 +112,14 @@ void vtkPVColorSelectionWidget::AddArray(
       continue;
       }
 
-    this->AddRadioButton(label, this->Target,  command);
-    if (setFirstValue)
+    if (!this->GetMenu()->HasItem(label))
       {
-      this->SetValue(label);
-      setFirstValue = 0;
+      this->AddRadioButton(label, this->Target,  command);
+      if (setFirstValue)
+        {
+        this->SetValue(label);
+        setFirstValue = 0;
+        }
       }
     }
 }
@@ -122,7 +139,8 @@ int vtkPVColorSelectionWidget::FormLabel(vtkPVArrayInformation* arrayInfo,
     vtkErrorMacro("Field  must be POINT_FIELD_DATA or CELL_FIELD_DATA.");
     return 0;
     } 
-  const char* pre_text = (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)?
+  const char* pre_text = 
+    (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)?
     "Point" : "Cell";
   int numComps = arrayInfo->GetNumberOfComponents();
   if (numComps > 1)
@@ -137,24 +155,52 @@ int vtkPVColorSelectionWidget::FormLabel(vtkPVArrayInformation* arrayInfo,
 }
 
 //-----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkPVColorSelectionWidget::GetArrayInformation(
+  vtkPVDataInformation* dataInfo, const char* arrayname, int field)
+{
+  vtkPVDataSetAttributesInformation* attrInfo = 0;
+  switch(field)
+    {
+    case vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA:
+      attrInfo = dataInfo->GetPointDataInformation();
+      break;
+    case vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA:
+      attrInfo = dataInfo->GetCellDataInformation();
+      break;
+    default:
+      vtkErrorMacro("Field type " << field << " not supported.");
+      return 0;
+    }
+
+  if (attrInfo)
+    {
+    return attrInfo->GetArrayInformation(arrayname);
+    }
+  vtkErrorMacro("Attribute information does not exist. Returning null.");
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVColorSelectionWidget::SetValue(const char* arrayname, int field)
 {
   char label[350];
   vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
-  vtkPVDataSetAttributesInformation* attrInfo;
-  switch(field)
+  vtkPVArrayInformation* aInfo = 
+    this->GetArrayInformation(dataInfo, arrayname, field);
+
+  // If the array is not found in the data information, look at
+  // the geometry information.
+  if (!aInfo)
     {
-  case vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA:
-    attrInfo = dataInfo->GetPointDataInformation();
-    break;
-  case vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA:
-    attrInfo = dataInfo->GetCellDataInformation();
-    break;
-  default:
-    vtkErrorMacro("Field type " << field << " not supported.");
-    return;
+    vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
+    if (dproxy)
+      {
+      vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
+      aInfo = 
+        this->GetArrayInformation(geomInfo, arrayname, field);
+      }
     }
-  if (!this->FormLabel(attrInfo->GetArrayInformation(arrayname), field, label))
+  if (!this->FormLabel(aInfo, field, label))
     {
     return;
     }

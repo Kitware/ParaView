@@ -32,6 +32,7 @@ class vtkKWView;
 class vtkPVApplication;
 class vtkPVColorMap;
 class vtkPVDataInformation;
+class vtkPVDataSetAttributesInformation;
 class vtkPVDisplayGUI;
 class vtkPVInputProperty;
 class vtkPVLookmark;
@@ -647,6 +648,11 @@ protected:
 //ETX 
 
   vtkPVLookmark *Lookmark;
+
+  int ColorByScalars(
+    vtkPVDataSetAttributesInformation* attrInfo,
+    vtkPVDataSetAttributesInformation* inAttrInfo,
+    int field);
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
