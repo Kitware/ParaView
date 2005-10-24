@@ -18,7 +18,7 @@
 #include <QString>
 
 template<typename PropertyT, typename ValueT>
-void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const ValueT& Value)
+void pqSetPropertyImplementation(vtkSMProxy* Proxy, const QString& Name, const ValueT& Value)
 {
   if(!Proxy)
     {
@@ -53,21 +53,21 @@ void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const ValueT& Value)
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const double Value)
 {
-  pqSetProperty<vtkSMDoubleVectorProperty, double>(Proxy, Name, Value);
+  pqSetPropertyImplementation<vtkSMDoubleVectorProperty, double>(Proxy, Name, Value);
 }
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const bool Value)
 {
-  pqSetProperty<vtkSMIntVectorProperty, int>(Proxy, Name, Value);
+  pqSetPropertyImplementation<vtkSMIntVectorProperty, int>(Proxy, Name, Value);
 }
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const int Value)
 {
-  pqSetProperty<vtkSMIntVectorProperty, int>(Proxy, Name, Value);
+  pqSetPropertyImplementation<vtkSMIntVectorProperty, int>(Proxy, Name, Value);
 }
 
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const QString& Value)
 {
-  pqSetProperty<vtkSMStringVectorProperty, const char*>(Proxy, Name, Value.toAscii().data());
+  pqSetPropertyImplementation<vtkSMStringVectorProperty, const char*>(Proxy, Name, Value.toAscii().data());
 }
 
