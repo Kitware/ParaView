@@ -31,41 +31,6 @@ $kw(vtkTemp889) SetSelectedState 0
 set kw(vtkTemp892) [$kw(vtkTemp873) GetPVWidget {TimeStep}]
 $kw(vtkTemp892) SetValue 0
 $kw(vtkTemp873) AcceptCallback
-# Saving state of the Display Proxy associated with the source
-set pvDisp(vtkTemp873) [$kw(vtkTemp873) GetDisplayProxy] 
-[$pvDisp(vtkTemp873) GetProperty LODResolution] SetElement 0 50
-[$pvDisp(vtkTemp873) GetProperty Representation] SetElement 0 3
-[$pvDisp(vtkTemp873) GetProperty Visibility] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty UseStrips] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty ColorArray] SetElement 0 {}
-[$pvDisp(vtkTemp873) GetProperty ColorMode] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty ImmediateModeRendering] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty InterpolateScalarsBeforeMapping] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty ScalarMode] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty ScalarVisibility] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty UseLookupTableScalarRange] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty Orientation] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty Orientation] SetElement 1 0
-[$pvDisp(vtkTemp873) GetProperty Orientation] SetElement 2 0
-[$pvDisp(vtkTemp873) GetProperty Origin] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty Origin] SetElement 1 0
-[$pvDisp(vtkTemp873) GetProperty Origin] SetElement 2 0
-[$pvDisp(vtkTemp873) GetProperty Position] SetElement 0 0
-[$pvDisp(vtkTemp873) GetProperty Position] SetElement 1 0
-[$pvDisp(vtkTemp873) GetProperty Position] SetElement 2 0
-[$pvDisp(vtkTemp873) GetProperty Scale] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty Scale] SetElement 1 1
-[$pvDisp(vtkTemp873) GetProperty Scale] SetElement 2 1
-[$pvDisp(vtkTemp873) GetProperty Color] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty Color] SetElement 1 1
-[$pvDisp(vtkTemp873) GetProperty Color] SetElement 2 1
-[$pvDisp(vtkTemp873) GetProperty Interpolation] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty LineWidth] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty Opacity] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty PointSize] SetElement 0 1
-[$pvDisp(vtkTemp873) GetProperty Specular] SetElement 0 0
-$pvDisp(vtkTemp873) UpdateVTKObjects
-[$kw(vtkTemp873) GetPVOutput] ColorByProperty
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp873)
 set kw(vtkTemp922) [$kw(vtkTemp2) CreatePVSource CTHPart]
 $kw(vtkTemp922) SetLabel {CTHPart0}
@@ -112,8 +77,8 @@ set pvDisp(vtkTemp922) [$kw(vtkTemp922) GetDisplayProxy]
 [$pvDisp(vtkTemp922) GetProperty Specular] SetElement 0 0
 $pvDisp(vtkTemp922) UpdateVTKObjects
 [$kw(vtkTemp922) GetPVOutput] ColorByArray {Fractal Volume Fraction} 3
-$kw(vtkTemp873) SetVisibility 0
 $kw(vtkTemp922) SetVisibility 1
+$kw(vtkTemp873) SetVisibility 1
 set kw(vtkTemp1006) [$kw(vtkTemp2) GetPVColorMap {Fractal Volume Fraction} 1]
 $kw(vtkTemp1006) SetScalarBarTitle {Fractal Volume Fraction}
 $kw(vtkTemp1006) SetScalarBarVectorTitle {Magnitude}
