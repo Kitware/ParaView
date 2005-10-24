@@ -112,13 +112,19 @@ int my_main(int argc, char *argv[])
   tree->RedrawOnIdleOn();
   tree->SelectionFillOn();
 
-  tree->AddNode(NULL, "core", "Core Widgets", NULL, 1, 0);
+  tree->AddNode(NULL, "core", "Core Widgets");
+  tree->OpenNode("core");
+  tree->SetNodeSelectableFlag("core", 0);
   tree->SetNodeFontWeightToBold("core");
 
-  tree->AddNode(NULL, "composite", "Composite Widgets", NULL, 1, 0);
+  tree->AddNode(NULL, "composite", "Composite Widgets");
+  tree->OpenNode("composite");
+  tree->SetNodeSelectableFlag("composite", 0);
   tree->SetNodeFontWeightToBold("composite");
 
-  tree->AddNode(NULL, "vtk", "VTK Widgets", NULL, 1, 0);
+  tree->AddNode(NULL, "vtk", "VTK Widgets");
+  tree->OpenNode("vtk");
+  tree->SetNodeSelectableFlag("vtk", 0);
   tree->SetNodeFontWeightToBold("vtk");
  
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
@@ -240,7 +246,7 @@ int my_main(int argc, char *argv[])
           break;
         }
       widgets_tree->GetWidget()->AddNode(
-        parent_node, node_ptr->Name, node_ptr->Name, NULL, 1, 1);
+        parent_node, node_ptr->Name, node_ptr->Name);
 
       // Try to find the C++ source
 
@@ -298,10 +304,10 @@ int my_main(int argc, char *argv[])
   // bring the C++ and Tcl source for each example
 
   sprintf(buffer, 
-          "if [%s HasSelection] {"
+          "{if [%s HasSelection] {"
           "%s ShowViewUserInterface [%s GetSelection] ; "
           "%s SetText $cxx_source([%s GetSelection]) ; "
-          "%s SetText $tcl_source([%s GetSelection]) } ",
+          "%s SetText $tcl_source([%s GetSelection]) }}",
           widgets_tree->GetWidget()->GetTclName(),
           win->GetTclName(),
           widgets_tree->GetWidget()->GetTclName(),

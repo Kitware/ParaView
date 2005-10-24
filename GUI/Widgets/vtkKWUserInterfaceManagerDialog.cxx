@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.9");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -547,8 +547,11 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
       {
       if (!tree->HasNode(panel_node.c_str()))
         {
-        tree->AddNode(parent_node.c_str(), panel_node.c_str(), 
-                      panel->GetName(), NULL, 1, 0);
+        tree->AddNode(parent_node.c_str(), 
+                      panel_node.c_str(), 
+                      panel->GetName());
+        tree->OpenNode(panel_node.c_str());
+        tree->SetNodeSelectableFlag(panel_node.c_str(), 0);
         tree->SetNodeFontWeightToBold(panel_node.c_str());
         }
       parent_node = panel_node;
@@ -563,8 +566,11 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
       {
       if (!tree->HasNode(page_node.c_str()))
         {
-        tree->AddNode(parent_node.c_str(), page_node.c_str(), 
-                      this->Notebook->GetPageTitle(page_id), NULL, 1, 0);
+        tree->AddNode(parent_node.c_str(), 
+                      page_node.c_str(), 
+                      this->Notebook->GetPageTitle(page_id));
+        tree->OpenNode(page_node.c_str());
+        tree->SetNodeSelectableFlag(page_node.c_str(), 0);
         tree->SetNodeFontWeightToBold(page_node.c_str());
         }
       parent_node = page_node;
@@ -577,8 +583,11 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
     section_node += frame->GetTclName();
     if (!tree->HasNode(section_node.c_str()))
       {
-      tree->AddNode(parent_node.c_str(), section_node.c_str(), 
-                    frame->GetLabel()->GetText(), widget->GetWidgetName(),1,1);
+      tree->AddNode(parent_node.c_str(), 
+                    section_node.c_str(), 
+                    frame->GetLabel()->GetText());
+      tree->OpenNode(section_node.c_str());
+      tree->SetNodeUserData(section_node.c_str(), widget->GetWidgetName());
       }
     if (!first_node.size())
       {
@@ -590,11 +599,11 @@ void vtkKWUserInterfaceManagerDialog::PopulateTree()
 
   if (tree->HasNode(selected_node.c_str()))
     {
-    tree->SetSelectionToNode(selected_node.c_str());
+    tree->SelectSingleNode(selected_node.c_str());
     }
   else if (first_node.size())
     {
-    tree->SetSelectionToNode(first_node.c_str());
+    tree->SelectSingleNode(first_node.c_str());
     }
 }
 
@@ -697,7 +706,7 @@ void vtkKWUserInterfaceManagerDialog::RaiseSection(
       node += frame->GetTclName();
       if (tree->HasNode(node.c_str()))
         {
-        tree->SetSelectionToNode(node.c_str());
+        tree->SelectSingleNode(node.c_str());
         this->ShowSelectedNodeSection();
         this->TopLevel->Display();
         break;

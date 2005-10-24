@@ -54,8 +54,75 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set the selection to node
-  virtual void SetSelectionToNode(const char *node);
+  // Add a new node identified by 'node' at the end of the children list of 
+  // 'parent'. If parent is NULL, or an empty string or 'root', insert at the
+  // root of the tree automatically. Note that the 'node' parameter is the
+  // string identifier to be used later on to refer to the node. The label
+  // of the node itself is provided by the 'text' parameter.
+  // A new node is selectable and closed by default.
+  virtual void AddNode(const char *parent, const char *node, const char *text);
+
+  // Description:
+  // Set/Get the label of the node
+  virtual const char* GetNodeText(const char *node);
+  virtual void SetNodeText(const char *node, const char *text);
+
+  // Description:
+  // Set/Get if node can be selected
+  virtual int GetNodeSelectableFlag(const char *node);
+  virtual void SetNodeSelectableFlag(const char *node, int flag);
+
+  // Description:
+  // Set/Get the node font
+  virtual const char* GetNodeFont(const char *node);
+  virtual void SetNodeFont(const char *node, const char *font);
+  virtual void SetNodeFontWeightToBold(const char *node);
+  virtual void SetNodeFontWeightToNormal(const char *node);
+  virtual void SetNodeFontSlantToItalic(const char *node);
+  virtual void SetNodeFontSlantToRoman(const char *node);
+
+  // Description:
+  // Set/Get the user data associated to the node. This can be used
+  // to bury additional data in the node.
+  virtual const char* GetNodeUserData(const char *node);
+  virtual void SetNodeUserData(const char *node, const char *data);
+
+  // Description:
+  // Query if given node exists in the tree
+  virtual int HasNode(const char *node);
+
+  // Description:
+  // Delete all nodes
+  virtual void DeleteAllNodes();
+
+  // Description:
+  // Get node's children as a space separated list of nodes
+  virtual const char* GetNodeChildren(const char *node);
+
+  // Description:
+  // Get node's parent
+  virtual const char* GetNodeParent(const char *node);
+
+  // Description:
+  // Set/Get the one of several styles for manipulating the selection. 
+  // Valid constants can be found in vtkKWTkOptions::SelectionModeType.
+  virtual void SetSelectionMode(int);
+  vtkGetMacro(SelectionMode, int);
+  virtual void SetSelectionModeToSingle() 
+    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeSingle); };
+  virtual void SetSelectionModeToMultiple() 
+    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeMultiple); };
+
+  // Description:
+  // Select a node (this adds the node to the selection), deselect a node.
+  // Note that this selecting more than one node is likely not to work if
+  // the SelectionMode is not Multiple.
+  virtual void SelectNode(const char *node);
+  virtual void DeselectNode(const char *node);
+
+  // Description:
+  // Select a single node (any other selection is cleared first)
+  virtual void SelectSingleNode(const char *node);
 
   // Description:
   // Clear the selection
@@ -70,19 +137,11 @@ public:
   virtual int HasSelection();
 
   // Description:
-  // Add a new node identified by 'node' at the end of the children list of 
-  // 'parent'. If parent is NULL, or an emptry string or 'root', insert at the
-  // root of the tree automatically.
-  // Provides its text (i.e. the label displayed at the node 
-  // position), an optional user-data field to associate with that node,
-  // its open and selectable status.
-  // On a Pentium M 1.8 GHz, a Debug build could fill about 5000 nodes/s.
-  virtual void AddNode(const char *parent,
-                       const char *node,
-                       const char *text = NULL,
-                       const char *data = NULL,
-                       int is_open = 0,
-                       int is_selectable = 1);
+  // Convenience method to select/deselect all the node's children.
+  // Note that this selecting more than one node is likely not to work if
+  // the SelectionMode is not Multiple.
+  virtual void SelectNodeChildren(const char *node);
+  virtual void DeselectNodeChildren(const char *node);
 
   // Description:
   // Arrange the tree to see a given node
@@ -103,37 +162,6 @@ public:
   // Open/close a tree, i.e. a node and all its children.
   virtual void OpenTree(const char *node);
   virtual void CloseTree(const char *node);
-
-  // Description:
-  // Query if given node exists in the tree
-  virtual int HasNode(const char *node);
-
-  // Description:
-  // Delete all nodes
-  virtual void DeleteAllNodes();
-
-  // Description:
-  // Get node's children as a space separated list of nodes
-  virtual const char* GetNodeChildren(const char *node);
-
-  // Description:
-  // Get node's parent
-  virtual const char* GetNodeParent(const char *node);
-
-  // Description:
-  // Set/Get the parameters
-  virtual const char* GetNodeUserData(const char *node);
-  virtual void SetNodeUserData(const char *node, const char *data);
-  virtual const char* GetNodeText(const char *node);
-  virtual void SetNodeText(const char *node, const char *text);
-  virtual int GetNodeSelectableFlag(const char *node);
-  virtual void SetNodeSelectableFlag(const char *node, int flag);
-  virtual const char* GetNodeFont(const char *node);
-  virtual void SetNodeFont(const char *node, const char *font);
-  virtual void SetNodeFontWeightToBold(const char *node);
-  virtual void SetNodeFontWeightToNormal(const char *node);
-  virtual void SetNodeFontSlantToItalic(const char *node);
-  virtual void SetNodeFontSlantToRoman(const char *node);
 
   // Description:
   // Set/Get the width/height.
@@ -209,9 +237,18 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks
+  virtual void SelectionCallback();
+
 protected:
-  vtkKWTree() {};
-  ~vtkKWTree() {};
+  vtkKWTree();
+  ~vtkKWTree();
+
+  int SelectionMode;
+
+  char *SelectionChangedCommand;
+  virtual void InvokeSelectionChangedCommand();
 
 private:
   vtkKWTree(const vtkKWTree&); // Not implemented

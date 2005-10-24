@@ -63,7 +63,9 @@ $tree RedrawOnIdleOn
 $tree SelectionFillOn
 
 foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "vtk" "VTK Widgets"} {
-  $tree AddNode "" $node $text "" 1 0
+  $tree AddNode "" $node $text
+  $tree OpenNode $node
+  $tree SetNodeSelectableFlag $node 0
   $tree SetNodeFontWeightToBold $node
 }
 
@@ -172,7 +174,7 @@ foreach widget $widgets {
         set parent_node "vtk"
       }
     }
-    [widgets_tree GetWidget] AddNode $parent_node $name $name "" 1 1
+    [widgets_tree GetWidget] AddNode $parent_node $name $name
 
     set tcl_source($name) [read [open $widget]]
 
@@ -189,7 +191,8 @@ foreach widget $widgets {
 
 # Raise the example panel
 
-set cmd {
+proc selection_callback {} {
+  global tcl_source cxx_source
   if [[widgets_tree GetWidget] HasSelection] {
     win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection]
     [[tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[widgets_tree GetWidget] GetSelection]) 
@@ -197,7 +200,7 @@ set cmd {
   } 
 }
 
-[widgets_tree GetWidget] SetSelectionChangedCommand "" $cmd
+[widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
 
 # Start the application
 # If --test was provided, do not enter the event loop
