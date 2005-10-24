@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.60");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.61");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -186,7 +186,7 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
     return;
     }
 
-  this->Tree->GetWidget()->SetSelectionToNode(item);
+  this->Tree->GetWidget()->SelectSingleNode(item);
   const char* result = this->Tree->GetWidget()->GetNodeUserData(item);
   if (result[0] == '\0')
     {
@@ -219,7 +219,8 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
     {
     return;
     }
-  this->Tree->GetWidget()->AddNode(parent, name, text, data);
+  this->Tree->GetWidget()->AddNode(parent, name, text);
+  this->Tree->GetWidget()->SetNodeUserData(name, data);
 }
 
 
@@ -362,7 +363,7 @@ void vtkPVSelectTimeSet::CommonReset()
       if (actualTimeValue == timeValue && !matchFound)
         {
         matchFound=1;
-        this->Tree->GetWidget()->SetSelectionToNode(timeValueName);
+        this->Tree->GetWidget()->SelectSingleNode(timeValueName);
         }
       }
     if (timeSetId == 1)

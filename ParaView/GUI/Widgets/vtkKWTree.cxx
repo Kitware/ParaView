@@ -39,12 +39,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTkUtilities.h"
 
 #include <vtksys/stl/string>
+#include <vtksys/stl/vector>
+#include <vtksys/SystemTools.hxx>
 
 #include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.14");
+vtkCxxRevisionMacro(vtkKWTree, "1.15");
+
+//----------------------------------------------------------------------------
+vtkKWTree::vtkKWTree()
+{
+  this->SelectionMode = vtkKWTkOptions::SelectionModeSingle;
+  this->SelectionChangedCommand = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWTree::~vtkKWTree()
+{
+  if (this->SelectionChangedCommand)
+    {
+    delete [] this->SelectionChangedCommand;
+    this->SelectionChangedCommand = NULL;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkKWTree::Create(vtkKWApplication *app)
@@ -65,6 +84,8 @@ void vtkKWTree::Create(vtkKWApplication *app)
   this->SetReliefToFlat();
   this->SetBorderWidth(0);
   this->SetHighlightThickness(0);
+  this->SetBinding("<<TreeSelect>>", this, "SelectionCallback");
+  this->SetSelectionModeToSingle();
 
   // Update enable state
 
@@ -72,7 +93,128 @@ void vtkKWTree::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetSelectionToNode(const char *node)
+void vtkKWTree::SelectionCallback()
+{
+  // This widget does not support multiple or single selection mode
+  // natively. Let's take care of that.
+
+  static int in_SelectionCallback = 0;
+  if (in_SelectionCallback)
+    {
+    return;
+    }
+  in_SelectionCallback = 1;
+
+  if (this->SelectionMode == vtkKWTkOptions::SelectionModeSingle)
+    {
+    vtksys_stl::vector<vtksys_stl::string> sel_nodes;
+    vtksys::SystemTools::Split(this->GetSelection(), sel_nodes, ' ');
+    if (sel_nodes.size() > 1)
+      {
+      this->SelectSingleNode(sel_nodes[sel_nodes.size() - 1].c_str());
+      // We need to return now actually. A selection event will
+      // still go through as we select that single node, and will
+      // call that callback again, triggering InvokeSelectionChangedCommand.
+      // It does not seem to be possible to avoid that event to be triggered
+      in_SelectionCallback = 0;
+      return;
+      }
+    }
+
+  this->InvokeSelectionChangedCommand();
+
+  in_SelectionCallback = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetSelectionMode(int arg)
+{
+  if ((arg != vtkKWTkOptions::SelectionModeSingle &&
+       arg != vtkKWTkOptions::SelectionModeMultiple) ||
+      arg == this->SelectionMode)
+    {
+    return;
+    }
+
+  this->SelectionMode = arg;
+
+  // If we are switching to single mode, select the first node only
+
+  if (this->SelectionMode == vtkKWTkOptions::SelectionModeSingle &&
+      this->HasSelection())
+    {
+    vtksys_stl::vector<vtksys_stl::string> sel_nodes;
+    vtksys::SystemTools::Split(this->GetSelection(), sel_nodes, ' ');
+    this->SelectSingleNode(sel_nodes[0].c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetSelectionChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->SelectionChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::InvokeSelectionChangedCommand()
+{
+  if (this->SelectionChangedCommand && 
+      *this->SelectionChangedCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval %s", this->SelectionChangedCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SelectNode(const char *node)
+{
+  if (this->IsCreated() && node && *node)
+    {
+    this->Script("%s selection add %s", this->GetWidgetName(), node);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::DeselectNode(const char *node)
+{
+  if (this->IsCreated() && node && *node)
+    {
+    this->Script("%s selection remove %s", this->GetWidgetName(), node);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SelectNodeChildren(const char *node)
+{
+  vtksys_stl::vector<vtksys_stl::string> children;
+  vtksys::SystemTools::Split(this->GetNodeChildren(node), children, ' ');
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = children.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = children.end();
+  for (; it != end; it++)
+    {
+    this->SelectNode((*it).c_str());
+    this->SelectNodeChildren((*it).c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::DeselectNodeChildren(const char *node)
+{
+  vtksys_stl::vector<vtksys_stl::string> children;
+  vtksys::SystemTools::Split(this->GetNodeChildren(node), children, ' ');
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = children.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = children.end();
+  for (; it != end; it++)
+    {
+    this->DeselectNode((*it).c_str());
+    this->DeselectNodeChildren((*it).c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SelectSingleNode(const char *node)
 {
   if (this->IsCreated() && node && *node)
     {
@@ -109,10 +251,7 @@ int vtkKWTree::HasSelection()
 //----------------------------------------------------------------------------
 void vtkKWTree::AddNode(const char *parent,
                         const char *node,
-                        const char *text,
-                        const char *data,
-                        int is_open,
-                        int is_selectable)
+                        const char *text)
 {
   if (!this->IsCreated() || !node)
     {
@@ -129,14 +268,6 @@ void vtkKWTree::AddNode(const char *parent,
       text, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     cmd.append(" -text \"").append(val).append("\"");
     }
-  if (data && *data)
-    {
-    const char *val = this->ConvertInternalStringToTclString(
-      data, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
-    cmd.append(" -data \"").append(val).append("\"");
-    }
-  cmd.append(" -open ").append(is_open ? "1" : "0");
-  cmd.append(" -selectable ").append(is_selectable ? "1" : "0");
 
   vtkKWTkUtilities::EvaluateSimpleString(
     this->GetApplication(), cmd.c_str());
@@ -544,13 +675,6 @@ void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *obj,
                                             const char *method)
 {
   this->SetBindText("<ButtonPress-1>", obj, method);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTree::SetSelectionChangedCommand(vtkObject *obj, 
-                                           const char *method)
-{
-  this->SetBinding("<<TreeSelect>>", obj, method);
 }
 
 //----------------------------------------------------------------------------
