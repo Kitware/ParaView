@@ -10,7 +10,7 @@
 #ifndef _pqRefreshToolbar_h
 #define _pqRefreshToolbar_h
 
-#include <QToolbar>
+#include <QToolBar>
 
 class QComboBox;
 class QPushButton;

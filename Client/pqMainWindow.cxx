@@ -22,7 +22,9 @@
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqSpinBox.h"
-#include "pqTesting.h"
+#ifdef PARAQ_BUILD_TESTING
+#  include "pqTesting.h"
+#endif
 
 #include <QApplication>
 #include <QMenu>
@@ -335,7 +337,9 @@ void pqMainWindow::onDebugDumpQtHierarchy()
 
 void pqMainWindow::onTestsRun()
 {
+#ifdef PARAQ_BUILD_TESTING
   pqRunRegressionTests(this);
+#endif
 }
 
 void pqMainWindow::onDispatcherChanged()

@@ -10,7 +10,9 @@
  */
 
 #include "pqMainWindow.h"
-#include "pqTesting.h"
+#ifdef PARAQ_BUILD_TESTING
+#  include "pqTesting.h"
+#endif
 
 #include <QApplication>
 
@@ -27,7 +29,9 @@ int main(int argc, char* argv[])
     const QString argument = argv[i];
     if(argument == "--runtests")
       {
+#ifdef PARAQ_BUILD_TESTING
       pqRunRegressionTests(&qwindow);
+#endif
       }
     else if(argument == "--exit")
       {

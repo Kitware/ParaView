@@ -6,7 +6,7 @@ PROJECT(Client)
 FIND_PACKAGE(Qt4)
 INCLUDE(${QT_USE_FILE})
 
-
+IF(BUILD_TESTING)
 # find QtTestLib
 EXEC_PROGRAM( ${QT_QMAKE_EXECUTABLE} 
               ARGS -query QT_INSTALL_PREFIX
@@ -28,6 +28,18 @@ FIND_LIBRARY( QT_TEST_DEBUG_LIBRARY NAMES QtTest_debug QtTest2_debug
   "${qt_install_prefix}/lib"
   "$ENV{HOME}/Software/Develop/Qt/QtTest/lib" 
   )
+  ADD_DEFINITIONS(-DPARAQ_BUILD_TESTING)
+  SET(TEST_SRCS
+    pqTestCases.cxx
+    pqTestCases.h
+    pqTesting.cxx
+    pqTesting.h
+    )
+  SET(TEST_MOCS
+    pqTestCases.h
+    )
+  SET(QT_TEST_LIBRARIES optimized ${QT_TEST_LIBRARY} debug ${QT_TEST_DEBUG_LIBRARY})
+ENDIF(BUILD_TESTING)
 
 INCLUDE_DIRECTORIES(
   ${ParaQ_BINARY_DIR}/Client
@@ -65,8 +77,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSpinBox.h
-  pqTestCases.h
   pqTimeoutCommandDispatcher.h
+  ${TEST_MOCS}
 )
 
 ADD_EXECUTABLE(pqClient
@@ -108,14 +120,11 @@ ADD_EXECUTABLE(pqClient
   pqServerFileDialogModel.h
   pqSpinBox.cxx
   pqSpinBox.h
-  pqTestCases.cxx
-  pqTestCases.h
-  pqTesting.cxx
-  pqTesting.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  ${TEST_SRCS}
   ${MOC_BUILT_SOURCES}
 )
 
@@ -165,8 +174,8 @@ TARGET_LINK_LIBRARIES(pqClient
   vtkMPEG2Encode
   vtkDICOMParser
 
+  ${QT_TEST_LIBRARIES}
   ${QT_LIBRARIES}
-  optimized ${QT_TEST_LIBRARY} debug ${QT_TEST_DEBUG_LIBRARY}
 
   ${JPEG_LIBRARY}
   ${PNG_LIBRARY}
