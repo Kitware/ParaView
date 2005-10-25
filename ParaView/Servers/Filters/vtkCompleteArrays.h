@@ -22,7 +22,7 @@
 #ifndef __vtkCompleteArrays_h
 #define __vtkCompleteArrays_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 
 class vtkMultiProcessController;
 class vtkPVArrayInformation;
@@ -30,10 +30,10 @@ class vtkPVDataSetAttributesInformation;
 class vtkDataSetAttributes;
 
 
-class VTK_EXPORT vtkCompleteArrays : public vtkDataSetToDataSetFilter 
+class VTK_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkCompleteArrays,vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -50,7 +50,9 @@ protected:
   vtkCompleteArrays();
   ~vtkCompleteArrays();
 
-  void Execute();
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
   void FillArrays(vtkDataSetAttributes* da, 
                   vtkPVDataSetAttributesInformation* attrInfo);
 

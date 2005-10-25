@@ -22,6 +22,8 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkLongArray.h"
 #include "vtkMultiProcessController.h"
@@ -37,7 +39,7 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.7");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.8");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
@@ -63,10 +65,19 @@ vtkCompleteArrays::~vtkCompleteArrays()
 }
 
 //-----------------------------------------------------------------------------
-void vtkCompleteArrays::Execute()
+int vtkCompleteArrays::RequestData(
+  vtkInformation*,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
 {
-  vtkDataSet *input = this->GetInput();
-  vtkDataSet *output = this->GetOutput();
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkDataSet *output = vtkDataSet::SafeDownCast(
+    info->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   int noNeed = 0;
   int myProcId;
   int numProcs;
@@ -77,9 +88,9 @@ void vtkCompleteArrays::Execute()
   //
   vtkDebugMacro(<<"Completing array");
 
-  this->GetOutput()->CopyStructure( input );
-  this->GetOutput()->GetPointData()->PassData(input->GetPointData());
-  this->GetOutput()->GetCellData()->PassData(input->GetCellData());
+  output->CopyStructure( input );
+  output->GetPointData()->PassData(input->GetPointData());
+  output->GetCellData()->PassData(input->GetCellData());
 
   myProcId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
@@ -96,7 +107,7 @@ void vtkCompleteArrays::Execute()
       }
     if (noNeed)
       {
-      return;
+      return 1;
       }
     // Receive and collected information from the remote processes.
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
@@ -143,7 +154,7 @@ void vtkCompleteArrays::Execute()
     this->Controller->Receive(&noNeed, 1, 0, 3389001);
     if (noNeed)
       {
-      return;
+      return 1;
       }
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
     dataInfo->CopyFromObject(output);
@@ -156,6 +167,8 @@ void vtkCompleteArrays::Execute()
     this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 3389003);
     dataInfo->Delete();
     }
+
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
