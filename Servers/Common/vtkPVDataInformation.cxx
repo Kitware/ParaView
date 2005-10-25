@@ -29,6 +29,7 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
@@ -41,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.15");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -59,6 +60,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
 
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
+
+  this->PointArrayInformation = vtkPVArrayInformation::New();
   
   this->Name = 0;
   this->DataClassName = 0;
@@ -76,6 +79,8 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->CellDataInformation = NULL;
   this->CompositeDataInformation->Delete();
   this->CompositeDataInformation = NULL;
+  this->PointArrayInformation->Delete();
+  this->PointArrayInformation = NULL;
   
   this->SetName(0);
   this->SetDataClassName(0);
@@ -138,6 +143,7 @@ void vtkPVDataInformation::Initialize()
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
   this->CompositeDataInformation->Initialize();
+  this->PointArrayInformation->Initialize();
   
   this->SetName(0);
   this->SetDataClassName(0);
@@ -178,6 +184,8 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
   this->CompositeDataInformation->AddInformation(
     dataInfo->GetCompositeDataInformation());
+  this->PointArrayInformation->AddInformation(
+    dataInfo->GetPointArrayInformation());
 
   this->SetName(dataInfo->GetName());
 }
@@ -284,6 +292,12 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
       {
       this->Extent[idx] = ext[idx];
       }
+    }
+
+  vtkPointSet* ps = vtkPointSet::SafeDownCast(data);
+  if (ps && ps->GetPoints())
+    {
+    this->PointArrayInformation->CopyFromObject(ps->GetPoints()->GetData());
     }
 
   // Copy Point Data information
@@ -517,6 +531,7 @@ void vtkPVDataInformation::AddInformation(
 
 
   // Now for the messy part, all of the arrays.
+  this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
@@ -757,6 +772,12 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
   const unsigned char* data;
   vtkClientServerStream dcss;
 
+  this->PointArrayInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
+
+  dcss.Reset();
+
   this->PointDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
@@ -836,7 +857,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   vtkstd::vector<unsigned char> data;
   vtkClientServerStream dcss;
 
-  // Point data array information.
+  // Point array information.
   if(!css->GetArgumentLength(0, 9, &length))
     {
     vtkErrorMacro("Error parsing length of point data information.");
@@ -849,16 +870,31 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
   dcss.SetData(&*data.begin(), length);
+  this->PointArrayInformation->CopyFromStream(&dcss);
+
+  // Point data array information.
+  if(!css->GetArgumentLength(0, 10, &length))
+    {
+    vtkErrorMacro("Error parsing length of point data information.");
+    return;
+    }
+  data.resize(length);
+  if(!css->GetArgument(0, 10, &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing point data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
   this->PointDataInformation->CopyFromStream(&dcss);
 
   // Cell data array information.
-  if(!css->GetArgumentLength(0, 10, &length))
+  if(!css->GetArgumentLength(0, 11, &length))
     {
     vtkErrorMacro("Error parsing length of cell data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 10, &*data.begin(), length))
+  if(!css->GetArgument(0, 11, &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing cell data information.");
     return;
@@ -867,27 +903,27 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   this->CellDataInformation->CopyFromStream(&dcss);
 
   const char* compositedataclassname = 0;
-  if(!css->GetArgument(0, 11, &compositedataclassname))
+  if(!css->GetArgument(0, 12, &compositedataclassname))
     {
     vtkErrorMacro("Error parsing class name of data.");
     return;
     }
   this->SetCompositeDataClassName(compositedataclassname);
 
-  if(!css->GetArgument(0, 12, &this->CompositeDataSetType))
+  if(!css->GetArgument(0, 13, &this->CompositeDataSetType))
     {
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
 
   // Composite data information.
-  if(!css->GetArgumentLength(0, 13, &length))
+  if(!css->GetArgumentLength(0, 14, &length))
     {
     vtkErrorMacro("Error parsing length of cell data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 13, &*data.begin(), length))
+  if(!css->GetArgument(0, 14, &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing cell data information.");
     return;

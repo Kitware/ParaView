@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.28");
+vtkCxxRevisionMacro(vtkPVWriter, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -177,6 +177,22 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 
   if(this->Parallel)
     {
+    if (numProcs > 1)
+      {
+      vtkClientServerID ca_id = 
+        pm->NewStreamObject("vtkCompleteArrays", stream);
+
+      stream << vtkClientServerStream::Invoke
+             << ca_id << "SetInput" << dataID
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << ca_id << "GetOutput" 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << writerID << "SetInput" << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
+      pm->DeleteStreamObject(ca_id, stream);
+      }
     stream << vtkClientServerStream::Invoke
            << writerID << "SetGhostLevel" << ghostLevel
            << vtkClientServerStream::End;

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.13");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -133,7 +133,8 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     for(i=0; i < pvs->GetNumberOfParts(); ++i)
       {
       stream << vtkClientServerStream::Invoke
-             << writerID << "AddInput" << pvs->GetPart(i)->GetID(0) << pvs->GetName()
+             << writerID << "AddInput" 
+             << pvs->GetPart(i)->GetID(0) << pvs->GetName()
              << vtkClientServerStream::End;
       }
     
@@ -164,21 +165,61 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     }
   else
     {
+    vtkClientServerID dataID = pvs->GetPart()->GetID(0);
     // Plug the inputs into the writer.
     if (pvs->GetNumberOfParts() == 1)
       {
-      stream << vtkClientServerStream::Invoke
-             << writerID << "SetInput" << pvs->GetPart()->GetID(0)
-             << vtkClientServerStream::End;
+      if (numProcs > 1)
+        {
+        vtkClientServerID ca_id = 
+          pm->NewStreamObject("vtkCompleteArrays", stream);
+        
+        stream << vtkClientServerStream::Invoke
+               << ca_id << "SetInput" << dataID
+               << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke
+               << ca_id << "GetOutput" 
+               << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke
+               << writerID << "SetInput" << vtkClientServerStream::LastResult
+               << vtkClientServerStream::End;
+        pm->DeleteStreamObject(ca_id, stream);
+        }
+      else
+        {
+        stream << vtkClientServerStream::Invoke
+               << writerID << "SetInput" << dataID
+               << vtkClientServerStream::End;
+        }
       }
     else
       {
       int i;
       for(i=0; i < pvs->GetNumberOfParts(); ++i)
         {
-        stream << vtkClientServerStream::Invoke
-               << writerID << "AddInput" << pvs->GetPart(i)->GetID(0)
-               << vtkClientServerStream::End;
+        dataID = pvs->GetPart(i)->GetID(0);
+        if (numProcs > 1)
+          {
+          vtkClientServerID ca_id = 
+            pm->NewStreamObject("vtkCompleteArrays", stream);
+          
+          stream << vtkClientServerStream::Invoke
+                 << ca_id << "SetInput" << dataID
+                 << vtkClientServerStream::End;
+          stream << vtkClientServerStream::Invoke
+                 << ca_id << "GetOutput" 
+                 << vtkClientServerStream::End;
+          stream << vtkClientServerStream::Invoke
+                 << writerID << "AddInput" << vtkClientServerStream::LastResult
+                 << vtkClientServerStream::End;
+          pm->DeleteStreamObject(ca_id, stream);
+          }
+        else
+          {
+          stream << vtkClientServerStream::Invoke
+                 << writerID << "AddInput" << dataID
+                 << vtkClientServerStream::End;
+          }
         }
       }
 

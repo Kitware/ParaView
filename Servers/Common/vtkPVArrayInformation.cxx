@@ -8,7 +8,7 @@
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -19,26 +19,34 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
 {
   this->Name = 0;
-  this->DataType = VTK_VOID;
-  this->NumberOfComponents = 0;
   this->Ranges = 0;
-  this->IsPartial = 0;
+  this->Initialize();
 }
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::~vtkPVArrayInformation()
 {
+  this->Initialize();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::Initialize()
+{
   this->SetName(0);
+  this->DataType = VTK_VOID;
+  this->NumberOfComponents = 0;
   if(this->Ranges)
     {
     delete [] this->Ranges;
+    this->Ranges = 0;
     }
+  this->IsPartial = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -292,10 +300,17 @@ int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
 {
+  if (!obj)
+    {
+    this->Initialize();
+    }
+
   vtkDataArray* array = vtkDataArray::SafeDownCast(obj);
   if(!array)
     {
     vtkErrorMacro("Cannot downcast to array.");
+    this->Initialize();
+    return;
     }
 
   double range[2];
@@ -322,8 +337,32 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::AddInformation(vtkPVInformation*)
+void vtkPVArrayInformation::AddInformation(vtkPVInformation* info)
 {
+  if (!info)
+    {
+    return;
+    }
+
+  vtkPVArrayInformation* aInfo = vtkPVArrayInformation::SafeDownCast(info);
+  if (!aInfo)
+    {
+    vtkErrorMacro("Could not downcast info to array info.");
+    return;
+    }
+  if (aInfo->GetNumberOfComponents() > 0)
+    {
+    if (this->NumberOfComponents == 0)
+      {
+      // If this object is uninitialized, copy.
+      this->DeepCopy(aInfo);
+      }
+    else
+      {
+      // Leave everything but ranges as original, add ranges.
+      this->AddRanges(aInfo);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

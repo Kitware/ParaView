@@ -30,13 +30,14 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
+#include "vtkPointSet.h"
 #include "vtkShortArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.6");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.7");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
@@ -111,8 +112,29 @@ void vtkCompleteArrays::Execute()
       delete [] data;
       dataInfo->AddInformation(tmpInfo);
       }
-    this->FillArrays(output->GetPointData(), dataInfo->GetPointDataInformation());
-    this->FillArrays(output->GetCellData(), dataInfo->GetCellDataInformation());
+    this->FillArrays(
+      output->GetPointData(), dataInfo->GetPointDataInformation());
+    this->FillArrays(
+      output->GetCellData(), dataInfo->GetCellDataInformation());
+    vtkPointSet* ps = vtkPointSet::SafeDownCast(output);
+    if (ps)
+      {
+      vtkDataArray* pointArray = this->CreateArray(
+        dataInfo->GetPointArrayInformation());
+      if (!pointArray)
+        {
+        vtkErrorMacro("Could not create point array. "
+                      "The output will not contain points");
+        }
+      else
+        {
+        vtkPoints* pts = vtkPoints::New();
+        pts->SetData(pointArray);
+        pointArray->Delete();
+        ps->SetPoints(pts);
+        pts->Delete();
+        }
+      }
     dataInfo->Delete();
     tmpInfo->Delete();
     }
@@ -136,6 +158,57 @@ void vtkCompleteArrays::Execute()
     }
 }
 
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkCompleteArrays::CreateArray(vtkPVArrayInformation* aInfo)
+{
+  vtkDataArray* array = 0;
+  switch (aInfo->GetDataType())
+    {
+    case VTK_FLOAT:
+      array = vtkFloatArray::New();
+      break;
+    case VTK_DOUBLE:
+      array = vtkDoubleArray::New();
+      break;
+    case VTK_INT:
+      array = vtkIntArray::New();
+      break;
+    case VTK_CHAR:
+      array = vtkCharArray::New();
+      break;
+    case VTK_ID_TYPE:
+      array = vtkIdTypeArray::New();
+      break;
+    case VTK_LONG:
+      array = vtkLongArray::New();
+      break;
+    case VTK_SHORT:
+      array = vtkShortArray::New();
+      break;
+    case VTK_UNSIGNED_CHAR:
+      array = vtkUnsignedCharArray::New();
+      break;
+    case VTK_UNSIGNED_INT:
+      array = vtkUnsignedIntArray::New();
+      break;
+    case VTK_UNSIGNED_LONG:
+      array = vtkUnsignedLongArray::New();
+      break;
+    case VTK_UNSIGNED_SHORT:
+      array = vtkUnsignedShortArray::New();
+      break;
+    default:
+      array = NULL;
+    }
+  if (array)
+    {
+    array->SetNumberOfComponents(aInfo->GetNumberOfComponents());
+    array->SetName(aInfo->GetName());
+    }
+
+  return array;
+
+}
 
 //-----------------------------------------------------------------------------
 void vtkCompleteArrays::FillArrays(vtkDataSetAttributes* da, 
@@ -150,48 +223,9 @@ void vtkCompleteArrays::FillArrays(vtkDataSetAttributes* da,
   for (idx = 0; idx < num; ++idx)
     {
     arrayInfo = attrInfo->GetArrayInformation(idx);
-    switch (arrayInfo->GetDataType())
-      {
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_ID_TYPE:
-        array = vtkIdTypeArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      default:
-        array = NULL;
-      }
+    array = this->CreateArray(arrayInfo);
     if (array)
       {
-      array->SetNumberOfComponents(arrayInfo->GetNumberOfComponents());
-      array->SetName(arrayInfo->GetName());
       switch (attrInfo->IsArrayAnAttribute(idx))
         {
         case vtkDataSetAttributes::SCALARS:
