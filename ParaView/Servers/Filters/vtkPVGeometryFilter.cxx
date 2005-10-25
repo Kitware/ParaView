@@ -47,7 +47,7 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.56");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.57");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -474,25 +474,28 @@ void vtkPVGeometryFilter::DataSetExecute(
         }
       }
 
-    // only output in process 0.
-    this->OutlineSource->SetBounds(bds);
-    this->OutlineSource->Update();
-    
-    output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
-    output->SetLines(this->OutlineSource->GetOutput()->GetLines());
-
-    if (this->GenerateGroupScalars)
+    if (bds[1] >= bds[0] && bds[3] >= bds[2] && bds[5] >= bds[4])
       {
-      vtkFloatArray* newArray = vtkFloatArray::New();
-      vtkIdType numCells = output->GetNumberOfCells();
-      newArray->SetNumberOfTuples(numCells);
-      for(vtkIdType cellId=0; cellId<numCells; cellId++)
+      // only output in process 0.
+      this->OutlineSource->SetBounds(bds);
+      this->OutlineSource->Update();
+    
+      output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
+      output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+
+      if (this->GenerateGroupScalars)
         {
-        newArray->SetValue(cellId, this->CurrentGroup);
+        vtkFloatArray* newArray = vtkFloatArray::New();
+        vtkIdType numCells = output->GetNumberOfCells();
+        newArray->SetNumberOfTuples(numCells);
+        for(vtkIdType cellId=0; cellId<numCells; cellId++)
+          {
+          newArray->SetValue(cellId, this->CurrentGroup);
+          }
+        newArray->SetName("GroupScalars");
+        output->GetCellData()->SetScalars(newArray);
+        newArray->Delete();
         }
-      newArray->SetName("GroupScalars");
-      output->GetCellData()->SetScalars(newArray);
-      newArray->Delete();
       }
     }
 }
