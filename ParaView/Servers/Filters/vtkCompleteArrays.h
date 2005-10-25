@@ -25,6 +25,7 @@
 #include "vtkDataSetToDataSetFilter.h"
 
 class vtkMultiProcessController;
+class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkDataSetAttributes;
 
@@ -54,6 +55,8 @@ protected:
                   vtkPVDataSetAttributesInformation* attrInfo);
 
   vtkMultiProcessController* Controller;
+
+  vtkDataArray* CreateArray(vtkPVArrayInformation* aInfo);
 
 private:
   vtkCompleteArrays(const vtkCompleteArrays&);  // Not implemented.

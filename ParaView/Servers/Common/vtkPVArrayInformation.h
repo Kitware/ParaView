@@ -99,6 +99,10 @@ public:
   vtkSetMacro(IsPartial, int);
   vtkGetMacro(IsPartial, int);
 
+  // Description:
+  // Remove all infommation. Next add will be like a copy.
+  void Initialize();
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation();

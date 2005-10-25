@@ -28,6 +28,7 @@
 class vtkCollection;
 class vtkCompositeDataSet;
 class vtkDataSet;
+class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkGenericDataSet;
@@ -79,6 +80,11 @@ public:
   // Of course Extent is only valid for structured data sets.
   // Extent is the largest extent that contains all the parts.
   vtkGetVector6Macro(Extent, int);
+
+  // Description:
+  // Access to information about points. Only valid for subclasses
+  // of vtkPointSet.
+  vtkGetObjectMacro(PointArrayInformation,vtkPVArrayInformation);
 
   // Description:
   // Access to information about point and cell data.
@@ -139,6 +145,8 @@ protected:
   vtkPVDataSetAttributesInformation* CellDataInformation;
 
   vtkPVCompositeDataInformation* CompositeDataInformation;
+
+  vtkPVArrayInformation* PointArrayInformation;
 
 private:
   int NameSetToDefault;
