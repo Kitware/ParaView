@@ -65,10 +65,12 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqSpinBox.h
   pqCheckBox.h
   pqCommandDispatcher.h
   pqCommandDispatcherManager.h
   pqExplicitCommandDispatcher.h
+  pqTimeoutCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
@@ -76,8 +78,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
-  pqSpinBox.h
-  pqTimeoutCommandDispatcher.h
+  pqSMAdaptor.h
   ${TEST_MOCS}
 )
 
@@ -124,6 +125,8 @@ ADD_EXECUTABLE(pqClient
   pqTimeoutCommandDispatcher.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
   ${TEST_SRCS}
   ${MOC_BUILT_SOURCES}
 )

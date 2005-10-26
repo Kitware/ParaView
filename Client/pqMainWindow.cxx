@@ -8,7 +8,10 @@
  */
 
 #include "pqCamera.h"
+/*
 #include "pqCheckBox.h"
+#include "pqSpinBox.h"
+*/
 #include "pqCommandDispatcher.h"
 #include "pqCommandDispatcherManager.h"
 #include "pqFileDialog.h"
@@ -21,7 +24,7 @@
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
-#include "pqSpinBox.h"
+#include "pqSMAdaptor.h"
 #ifdef PARAQ_BUILD_TESTING
 #  include "pqTesting.h"
 #endif
@@ -31,6 +34,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QCheckBox>
 
 #include <vtkRenderWindow.h>
 #include <vtkSMDataObjectDisplayProxy.h>
@@ -132,6 +136,7 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   this->addToolBar(this->refresh_toolbar);
 
   this->setServer(0);
+  this->Adaptor = new pqSMAdaptor;  // should go in pqServer?
 }
 
 pqMainWindow::~pqMainWindow()
@@ -140,6 +145,7 @@ pqMainWindow::~pqMainWindow()
   delete this->property_toolbar;
   delete this->refresh_toolbar;
   delete this->currentServer;
+  delete this->Adaptor;
 }
 
 void pqMainWindow::setServer(pqServer* Server)
@@ -202,10 +208,27 @@ void pqMainWindow::onFileNew(pqServer* Server)
   this->property_toolbar = new QToolBar("Properties", this);
   this->addToolBar(this->property_toolbar);
 
+  /*
   this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Capping", this->property_toolbar, "Capping"));
   this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Again with the Capping", this->property_toolbar, "Again with the Capping"));
   this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution"));
   this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution Yet Again"));
+  */
+  
+  QCheckBox* cb = new QCheckBox;
+  this->property_toolbar->addWidget(cb);
+  Adaptor->LinkPropertyTo(cb, "checked", SIGNAL(toggled(bool)), source, source->GetProperty("Capping"), 0);
+  QObject::connect(cb, SIGNAL(toggled(bool)), window, SLOT(update()));
+  
+  QSpinBox* sb = new QSpinBox(this->property_toolbar);
+  this->property_toolbar->addWidget(sb);
+  Adaptor->LinkPropertyTo(sb, "value", SIGNAL(valueChanged(int)), source, source->GetProperty("Resolution"), 0);
+  Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, sb, "value"); 
+  QSlider* le = new QSlider(Qt::Horizontal, this->property_toolbar);
+  this->property_toolbar->addWidget(le);
+  Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, le, "value"); 
+  Adaptor->LinkPropertyTo(le, "value", SIGNAL(valueChanged(int)), source, source->GetProperty("Resolution"), 0);
+  QObject::connect(sb, SIGNAL(valueChanged(int)), window, SLOT(update()));
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());

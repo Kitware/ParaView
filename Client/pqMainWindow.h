@@ -17,6 +17,7 @@ class pqServer;
 class QAction;
 class QToolBar;
 class QVTKWidget;
+class pqSMAdaptor;
 
 class pqMainWindow :
         public QMainWindow
@@ -37,6 +38,7 @@ private:
   QToolBar* property_toolbar;
   QVTKWidget* window;
   QAction* serverDisconnectAction;
+  pqSMAdaptor *Adaptor;
   
 private slots:
   void onFileNew();
