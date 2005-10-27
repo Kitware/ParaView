@@ -14,6 +14,8 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPropertyAdaptor.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMDomain.h"
 #include "vtkSMVectorProperty.h"
 
 
@@ -78,6 +80,10 @@ public:
   
   // handle changes from the Qt side
   QSignalMapper* QtConnections;
+
+  // handle domain connections
+  typedef vtkstd::multimap<vtkSMProperty*, vtkstd::pair<QObject*, QByteArray> > DomainConnectionMap;
+  DomainConnectionMap DomainConnections;
 };
 
 
@@ -250,10 +256,6 @@ void pqSMAdaptor::UnlinkPropertyFrom(QObject* qObject, const char* qProperty, co
 
 void pqSMAdaptor::SMLinkedPropertyChanged(vtkObject*, unsigned long, void* data)
 {
-
-  // TODO : handle domains
-  //        there is no vtkSMPropertyAdaptor like thing to handle domains
-
   SMGroup* d = static_cast<SMGroup*>(data);
   
   typedef vtkstd::pair<pqSMAdaptorInternal::LinkMap::iterator,
@@ -289,4 +291,59 @@ void pqSMAdaptor::QtLinkedPropertyChanged(QWidget* data)
     }
 }
 
+void pqSMAdaptor::ConnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+{
+  if(!QMetaObject::checkConnectArgs(SIGNAL(foo(vtkSMProperty*)), slot))
+    {
+    qWarning("Incorrect slot %s::%s for pqSMAdaptor::ConnectDomain\n", 
+              qObject->metaObject()->className(),
+              slot+1);
+    return;
+    }
+
+  vtkSMDomainIterator* domainIter = property->NewDomainIterator();
+  for(; !domainIter->IsAtEnd(); domainIter->Next())
+    {
+    pqSMAdaptorInternal::DomainConnectionMap::iterator iter =
+      this->Internal->DomainConnections.insert(this->Internal->DomainConnections.end(),
+                                               pqSMAdaptorInternal::DomainConnectionMap::value_type(
+                                                 property, vtkstd::pair<QObject*, QByteArray>(
+                                                   qObject, slot)));
+    this->Internal->VTKConnections->Connect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,
+                                            this, SLOT(SMDomainChanged(vtkObject*, unsigned long, void*)),
+                                            &*iter);
+    }
+  domainIter->Delete();
+}
+
+void pqSMAdaptor::DisconnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+{
+  typedef vtkstd::pair<pqSMAdaptorInternal::DomainConnectionMap::iterator, pqSMAdaptorInternal::DomainConnectionMap::iterator> PairIter;
+
+  PairIter iters = this->Internal->DomainConnections.equal_range(property);
+
+  for(; iters.first != iters.second; ++iters.first)
+    {
+    if(iters.first->second.first == qObject && iters.first->second.second == slot)
+      {
+      vtkSMDomainIterator* domainIter = property->NewDomainIterator();
+      for(; !domainIter->IsAtEnd(); domainIter->Next())
+        {
+        this->Internal->VTKConnections->Disconnect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,
+                                                   this, SLOT(SMDomainChanged(vtkObject*, unsigned long, void*)),
+                                                   &*iters.first);
+        this->Internal->DomainConnections.erase(iters.first);
+        }
+      domainIter->Delete();
+      return;
+      }
+    }
+}
+
+void pqSMAdaptor::SMDomainChanged(vtkObject*, unsigned long event, void* data)
+{
+  pqSMAdaptorInternal::DomainConnectionMap::value_type* call = 
+    reinterpret_cast<pqSMAdaptorInternal::DomainConnectionMap::value_type*>(data);
+  QMetaObject::invokeMethod(call->second.first, call->second.second.data(), Q_ARG(vtkSMProperty*, call->first));
+}
 

@@ -40,6 +40,8 @@ public:
   // Get the specified property of a proxy
   QVariant GetProperty(vtkSMProperty* Property, int Index);
   
+  
+  // Property Linking
 
   // Description:
   // Link a property of a proxy to a property of a QObject.
@@ -63,6 +65,16 @@ public:
   void UnlinkPropertyFrom(QObject* qObject, const char* qProperty, const char* signal,
                           vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
 
+
+  // Description:
+  // Connect a domain modified event to a Qt slot
+  // Slot must be of signature "foo(vtkSMProperty*)"
+  void ConnectDomain(vtkSMProperty* Property, QObject* qObject, const char* slot);
+  
+  // Description:
+  // Disconnect a domain modified event from a Qt slot
+  void DisconnectDomain(vtkSMProperty* Property, QObject* qObject, const char* slot);
+
 signals:
 
   // Description:
@@ -75,6 +87,7 @@ signals:
 protected slots:
   void SMLinkedPropertyChanged(vtkObject*, unsigned long, void*);
   void QtLinkedPropertyChanged(QWidget*);
+  void SMDomainChanged(vtkObject*, unsigned long, void*);
 
 protected:
   pqSMAdaptorInternal* Internal;
