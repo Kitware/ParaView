@@ -1,10 +1,27 @@
+/*
+ * Copyright 2004 Sandia Corporation.
+ * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+ * license for use of this work by or on behalf of the
+ * U.S. Government. Redistribution and use in source and binary forms, with
+ * or without modification, are permitted provided that this Notice and any
+ * statement of authorship are reproduced on all copies.
+ */
 
 #include "pqRenderViewProxy.h"
+#include "vtkObjectFactory.h"
 #include "vtkSMRenderModuleProxy.h"
 
-pqRenderViewProxy* pqRenderViewProxy::New()
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.3");
+vtkStandardNewMacro(pqRenderViewProxy);
+
+pqRenderViewProxy::pqRenderViewProxy()
 {
-  return new pqRenderViewProxy;
+  this->RenderModule = 0;
+}
+
+pqRenderViewProxy::~pqRenderViewProxy()
+{
+  this->RenderModule = 0;
 }
 
 void pqRenderViewProxy::EventuallyRender()
@@ -18,16 +35,24 @@ void pqRenderViewProxy::Render()
   //RenderModule->InteractiveRender();
 
   // do not render LOD's
-  RenderModule->StillRender();
+  this->RenderModule->StillRender();
 }
 
 vtkRenderWindow* pqRenderViewProxy::GetRenderWindow()
 {
-  return RenderModule->GetRenderWindow();
+  if (!this->RenderModule)
+    {
+    return 0;
+    }
+  return this->RenderModule->GetRenderWindow();
 }
 
 void pqRenderViewProxy::SetRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  RenderModule = rm;
+  this->RenderModule = rm;
 }
 
+void pqRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

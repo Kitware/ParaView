@@ -14,21 +14,28 @@
 
 class vtkSMRenderModuleProxy;
 
-class pqRenderViewProxy :
-  public vtkPVRenderViewProxy
+class pqRenderViewProxy : public vtkPVRenderViewProxy
 {
-  public:
-    static pqRenderViewProxy* New();
-    vtkTypeMacro(pqRenderViewProxy,vtkPVRenderViewProxy)
+public:
+  static pqRenderViewProxy* New();
+  vtkTypeRevisionMacro(pqRenderViewProxy,vtkPVRenderViewProxy);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
-    virtual void Render();
-    virtual void EventuallyRender();
-    
-    vtkRenderWindow* GetRenderWindow();
-    void SetRenderModule(vtkSMRenderModuleProxy* rm);
+  virtual void Render();
+  virtual void EventuallyRender();
+  
+  vtkRenderWindow* GetRenderWindow();
+  void SetRenderModule(vtkSMRenderModuleProxy* rm);
+ 
+protected:
+  pqRenderViewProxy();
+  ~pqRenderViewProxy();
+ 
+private:
+  pqRenderViewProxy(const pqRenderViewProxy&); // Not implemented
+  void operator=(const pqRenderViewProxy&); // Not implemented
 
-  private:
-    vtkSMRenderModuleProxy* RenderModule;
+  vtkSMRenderModuleProxy* RenderModule;
 };
 
 #endif
