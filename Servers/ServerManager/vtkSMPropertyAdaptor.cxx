@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.15");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.16");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -103,10 +103,6 @@ void vtkSMPropertyAdaptor::SetDomain(vtkSMDomain* domain)
   if (!this->ProxyGroupDomain)
     {
     this->ProxyGroupDomain = vtkSMProxyGroupDomain::SafeDownCast(domain);
-    }
-  if (!this->StringListDomain)
-    {
-    this->StringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
     }
   if (!this->StringListDomain)
     {
