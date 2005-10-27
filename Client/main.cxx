@@ -9,7 +9,10 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqEventObserverStdout.h"
+#include "pqEventTranslator.h"
 #include "pqMainWindow.h"
+
 #ifdef PARAQ_BUILD_TESTING
 #  include "pqTesting.h"
 #endif
@@ -24,16 +27,27 @@ int main(int argc, char* argv[])
   qwindow.resize(400, 400);
   qwindow.show();
   
+  pqEventTranslator event_translator;
+  pqEventObserverStdout event_observer;
+  QObject::connect(
+    &event_translator,
+    SIGNAL(abstractEvent(const QString&, const QString&, const QString&)),
+    &event_observer,
+    SLOT(onAbstractEvent(const QString&, const QString&, const QString&)));
+  
   for(int i = 1; i < argc; ++i)
     {
     const QString argument = argv[i];
+    
+#ifdef PARAQ_BUILD_TESTING
     if(argument == "--runtests")
       {
-#ifdef PARAQ_BUILD_TESTING
       pqRunRegressionTests(&qwindow);
-#endif
+      continue;
       }
-    else if(argument == "--exit")
+#endif
+
+    if(argument == "--exit")
       {
       return 0;
       }

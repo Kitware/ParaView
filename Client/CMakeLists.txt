@@ -65,10 +65,12 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  pqSpinBox.h
-  pqCheckBox.h
+  pqAbstractSliderEventTranslator.h
+  pqCheckBoxEventTranslator.h
   pqCommandDispatcher.h
   pqCommandDispatcherManager.h
+  pqEventObserverStdout.h
+  pqEventTranslator.h
   pqExplicitCommandDispatcher.h
   pqTimeoutCommandDispatcher.h
   pqFileDialog.h
@@ -79,20 +81,28 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
+  pqSpinBoxEventTranslator.h
+  pqWidgetEventTranslator.h
   ${TEST_MOCS}
 )
 
 ADD_EXECUTABLE(pqClient
   main.cxx
+  pqAbstractSliderEventTranslator.cxx
+  pqAbstractSliderEventTranslator.h
   pqCamera.cxx
   pqCamera.h
-  pqCheckBox.cxx
-  pqCheckBox.h
+  pqCheckBoxEventTranslator.cxx
+  pqCheckBoxEventTranslator.h
   pqCommand.h
   pqCommandDispatcher.cxx
   pqCommandDispatcher.h
   pqCommandDispatcherManager.cxx
   pqCommandDispatcherManager.h
+  pqEventObserverStdout.cxx
+  pqEventObserverStdout.h
+  pqEventTranslator.cxx
+  pqEventTranslator.h
   pqExplicitCommandDispatcher.cxx
   pqExplicitCommandDispatcher.h
   pqFileDialog.cxx
@@ -119,14 +129,15 @@ ADD_EXECUTABLE(pqClient
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
-  pqSpinBox.cxx
-  pqSpinBox.h
+  pqSpinBoxEventTranslator.cxx
+  pqSpinBoxEventTranslator.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
+  pqWidgetEventTranslator.h
   ${TEST_SRCS}
   ${MOC_BUILT_SOURCES}
 )

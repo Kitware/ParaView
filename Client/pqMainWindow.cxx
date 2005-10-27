@@ -8,10 +8,6 @@
  */
 
 #include "pqCamera.h"
-/*
-#include "pqCheckBox.h"
-#include "pqSpinBox.h"
-*/
 #include "pqCommandDispatcher.h"
 #include "pqCommandDispatcherManager.h"
 #include "pqFileDialog.h"
@@ -208,23 +204,20 @@ void pqMainWindow::onFileNew(pqServer* Server)
   this->property_toolbar = new QToolBar("Properties", this);
   this->addToolBar(this->property_toolbar);
 
-  /*
-  this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Capping", this->property_toolbar, "Capping"));
-  this->property_toolbar->addWidget(new pqCheckBox(source, source->GetProperty("Capping"), "Again with the Capping", this->property_toolbar, "Again with the Capping"));
-  this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution"));
-  this->property_toolbar->addWidget(new pqSpinBox(source, source->GetProperty("Resolution"), this->property_toolbar, "Resolution Yet Again"));
-  */
-  
-  QCheckBox* cb = new QCheckBox;
+  QCheckBox* cb = new QCheckBox();
+  cb->setObjectName("Capping");
   this->property_toolbar->addWidget(cb);
   Adaptor->LinkPropertyTo(cb, "checked", SIGNAL(toggled(bool)), source, source->GetProperty("Capping"), 0);
   QObject::connect(cb, SIGNAL(toggled(bool)), window, SLOT(update()));
   
   QSpinBox* sb = new QSpinBox(this->property_toolbar);
+  sb->setObjectName("Resolution");
   this->property_toolbar->addWidget(sb);
   Adaptor->LinkPropertyTo(sb, "value", SIGNAL(valueChanged(int)), source, source->GetProperty("Resolution"), 0);
-  Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, sb, "value"); 
+  Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, sb, "value");
+ 
   QSlider* le = new QSlider(Qt::Horizontal, this->property_toolbar);
+  le->setObjectName("Resolution");
   this->property_toolbar->addWidget(le);
   Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, le, "value"); 
   Adaptor->LinkPropertyTo(le, "value", SIGNAL(valueChanged(int)), source, source->GetProperty("Resolution"), 0);
