@@ -1,0 +1,7 @@
+/*! @mainpage ${PROJECT_NAME} ${KWWIDGETS_MAJOR_VERSION}.${KWWIDGETS_MINOR_VERSION} Documentation
+
+  @image html KWWidgetsSplashScreen.png
+  @li KWWidgets Home: http://public.kitware.com/Wiki/KWWidgets
+  @li KWWidgets API: http://public.kitware.com/KWWidgets/doc/nightly/html/
+ */
+

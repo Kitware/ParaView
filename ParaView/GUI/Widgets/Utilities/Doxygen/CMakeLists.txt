@@ -27,6 +27,10 @@ IF (BUILD_DOCUMENTATION)
     ${CMAKE_CURRENT_SOURCE_DIR}/doc_makeall.sh.in
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
 
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/doc_version.dox.in
+    ${CMAKE_CURRENT_BINARY_DIR}/dox/doc_${PROJECT_NAME}_version.dox)
+
   ADD_CUSTOM_TARGET(KWWidgetsDoxygenDoc
     ${BASH}
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)

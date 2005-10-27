@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for KWWidgets
-# modified by S. Barre (Time-stamp: <2005-06-23 16:44:06 barre>
+# modified by S. Barre (Time-stamp: <2005-10-27 14:31:49 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = KWWidgets
@@ -35,14 +35,16 @@ GRAPHICAL_HIERARCHY  = YES
 
 ALLEXTERNALS         = NO
 
-IMAGE_PATH           = "@KWWidgets_SOURCE_DIR@/Utilities/Doxygen"
+IMAGE_PATH           = "@KWWidgets_SOURCE_DIR@/Utilities/Doxygen" "@KWWidgets_SOURCE_DIR@/Examples/Resources"
 
 OUTPUT_DIRECTORY     = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/doc"
 
 INPUT                = \
  "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox" \
  "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/Templates" \
- "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/doc_KWWidgets_index.dox" 
+ "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/doc_KWWidgets_index.dox" \
+ "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/dox/doc_KWWidgets_version.dox" 
+
 
 TAGFILES             = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
 
