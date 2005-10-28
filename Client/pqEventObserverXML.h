@@ -11,7 +11,7 @@
 #define _pqEventObserverXML_h
 
 #include <QObject>
-#include <vtkIOstream.h>
+#include <vtkIOStream.h>
 
 /// Observes high-level ParaQ events, and serializes them as XML for possible playback (as a test-case, demo, tutorial, etc)
 class pqEventObserverXML :
