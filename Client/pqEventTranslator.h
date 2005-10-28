@@ -30,7 +30,7 @@ public:
 
 signals:
   /// This signal will be emitted every time a translator generates a high-level ParaQ event.  Observers should connect to this signal to serialize high-level events.
-  void abstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+  void recordEvent(const QString& Object, const QString& Command, const QString& Arguments);
 
 private:
   pqEventTranslator(const pqEventTranslator&);
@@ -40,6 +40,9 @@ private:
 
   /// Stores the working set of widget translators  
   QVector<pqWidgetEventTranslator*> translators;
+  
+private slots:
+  void onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments);
 };
 
 #endif // !_pqEventTranslator_h

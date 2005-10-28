@@ -7,6 +7,7 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqEventPlayer.h"
 #include "pqTestCases.h"
 
 #include <vtkstd/string>
@@ -82,12 +83,21 @@ void pqTestCases::testFailure()
   COMPARE(true, false);
 }
 
+void pqTestCases::testFileNew()
+{
+  VERIFY(rootWidget);
+  
+  pqEventPlayer player(*rootWidget);
+  VERIFY(player.playEvent("fileNewAction", "trigger_action", ""));
+}
+
 void pqTestCases::testFileMenu()
 {
   VERIFY(rootWidget);  
   VERIFY(pqLookupObject<QWidget>(*rootWidget, "menuBar/fileMenu"));
 }
 
+/*
 void pqTestCases::testFileOpen()
 {
   VERIFY(rootWidget);
@@ -95,4 +105,12 @@ void pqTestCases::testFileOpen()
   VERIFY(pqLookupObject<QWidget>(*rootWidget, "fileOpenDialog"));
   VERIFY(pqActivate(pqLookupObject<QAbstractButton>(*rootWidget, "fileOpenDialog/buttonCancel")));
 }
+*/
 
+void pqTestCases::testSlider()
+{
+  VERIFY(rootWidget);
+  
+  pqEventPlayer player(*rootWidget);
+  VERIFY(player.playEvent("Resolution", "set_int", "8"));
+}

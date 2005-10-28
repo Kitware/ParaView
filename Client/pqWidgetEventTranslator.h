@@ -19,11 +19,12 @@ class pqWidgetEventTranslator :
   Q_OBJECT
   
 public:
-  ~pqWidgetEventTranslator() {}
-  virtual bool translateEvent(QObject* Watcher, QEvent* Event) = 0;
+  virtual ~pqWidgetEventTranslator() {}
+  virtual bool translateEvent(QObject* Object, QEvent* Event) = 0;
 
 signals:
-  void abstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+  /// Derivatives should emit this signal whenever they wish to record a high-level event
+  void recordEvent(QObject* Object, const QString& Command, const QString& Arguments);
 
 protected:
   pqWidgetEventTranslator() {}

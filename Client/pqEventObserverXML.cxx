@@ -21,7 +21,7 @@ pqEventObserverXML::~pqEventObserverXML()
   this->stream << "</pqevents>\n";
 }
 
-void pqEventObserverXML::onAbstractEvent(const QString& Widget, const QString& Command, const QString& Arguments)
+void pqEventObserverXML::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
 {
   this->stream
     << "\t<pqevent><widget>"

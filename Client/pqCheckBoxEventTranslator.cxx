@@ -40,5 +40,5 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqCheckBoxEventTranslator::onStateChanged(int State)
 {
-  emit abstractEvent(this->currentObject->objectName(), "set_value", State ? "true" : "false");
+  emit recordEvent(this->currentObject, "set_value", State ? "true" : "false");
 }

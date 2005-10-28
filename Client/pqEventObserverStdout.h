@@ -19,7 +19,7 @@ class pqEventObserverStdout :
   Q_OBJECT
 
 public slots:
-  void onAbstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+  void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments);
 };
 
 #endif // !_pqEventObserverStdout_h

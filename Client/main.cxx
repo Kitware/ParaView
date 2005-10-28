@@ -34,17 +34,17 @@ int main(int argc, char* argv[])
   pqEventObserverStdout event_observer_stdout;
   QObject::connect(
     &event_translator,
-    SIGNAL(abstractEvent(const QString&, const QString&, const QString&)),
+    SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
     &event_observer_stdout,
-    SLOT(onAbstractEvent(const QString&, const QString&, const QString&)));
+    SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
 */
   
   pqEventObserverXML event_observer_xml(cout);
   QObject::connect(
     &event_translator,
-    SIGNAL(abstractEvent(const QString&, const QString&, const QString&)),
+    SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
     &event_observer_xml,
-    SLOT(onAbstractEvent(const QString&, const QString&, const QString&)));
+    SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
   
   for(int i = 1; i < argc; ++i)
     {

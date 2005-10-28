@@ -217,7 +217,7 @@ void pqMainWindow::onFileNew(pqServer* Server)
   Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, sb, "value");
  
   QSlider* le = new QSlider(Qt::Horizontal, this->property_toolbar);
-  le->setObjectName("Resolution");
+  le->setObjectName("Resolution2");
   this->property_toolbar->addWidget(le);
   Adaptor->LinkPropertyTo(source, source->GetProperty("Resolution"), 0, le, "value"); 
   Adaptor->LinkPropertyTo(le, "value", SIGNAL(valueChanged(int)), source, source->GetProperty("Resolution"), 0);

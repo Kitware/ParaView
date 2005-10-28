@@ -31,7 +31,9 @@ private slots:
   void testSuccess();
   void testFailure();
   void testFileMenu();
-  void testFileOpen();
+  void testFileNew();
+//  void testFileOpen();
+  void testSlider();
 };
 
 #endif // !_pqTestCases_h

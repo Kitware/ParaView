@@ -78,6 +78,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqMainWindow.h
+  pqMenuEventTranslator.h
+  pqMenuEventTranslatorAdaptor.h
   pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -89,8 +91,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 
 ADD_EXECUTABLE(pqClient
   main.cxx
+  pqAbstractIntEventPlayer.cxx
+  pqAbstractIntEventPlayer.h
   pqAbstractSliderEventTranslator.cxx
   pqAbstractSliderEventTranslator.h
+  pqActionEventPlayer.cxx
+  pqActionEventPlayer.h
   pqCamera.cxx
   pqCamera.h
   pqCheckBoxEventTranslator.cxx
@@ -104,6 +110,8 @@ ADD_EXECUTABLE(pqClient
   pqEventObserverStdout.h
   pqEventObserverXML.cxx
   pqEventObserverXML.h
+  pqEventPlayer.cxx
+  pqEventPlayer.h
   pqEventTranslator.cxx
   pqEventTranslator.h
   pqExplicitCommandDispatcher.cxx
@@ -118,6 +126,10 @@ ADD_EXECUTABLE(pqClient
   pqLocalFileDialogModel.h
   pqMainWindow.cxx
   pqMainWindow.h
+  pqMenuEventTranslator.cxx
+  pqMenuEventTranslator.h
+  pqMenuEventTranslatorAdaptor.cxx
+  pqMenuEventTranslatorAdaptor.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx
@@ -140,6 +152,7 @@ ADD_EXECUTABLE(pqClient
   pqRenderViewProxy.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
+  pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   ${TEST_SRCS}
   ${MOC_BUILT_SOURCES}

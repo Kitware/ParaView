@@ -18,7 +18,6 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidg
   QDialog(Parent),
   model(Model)
 {
-  this->setObjectName(Name);
   this->ui.setupUi(this);
   this->ui.navigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
   this->ui.files->setModel(model->fileModel());
@@ -31,8 +30,7 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidg
   this->ui.favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->setWindowTitle(Title);
-//  this->setName(Name);
-//  this->setModal(true);
+  this->setObjectName(Name);
 
   QObject::connect(this->model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
   QObject::connect(this->ui.navigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));

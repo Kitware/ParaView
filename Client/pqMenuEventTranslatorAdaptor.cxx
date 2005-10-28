@@ -7,12 +7,17 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqEventObserverStdout.h"
+#include "pqMenuEventTranslatorAdaptor.h"
 
-#include <vtkIOStream.h>
+#include <QAction>
 
-void pqEventObserverStdout::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
+pqMenuEventTranslatorAdaptor::pqMenuEventTranslatorAdaptor(QAction* Action) :
+  action(Action)
 {
-  cout << "event: " << Widget.toAscii().data() << " " << Command.toAscii().data() << " " << Arguments.toAscii().data() << endl;
+  QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(onTriggered(bool)));
 }
 
+void pqMenuEventTranslatorAdaptor::onTriggered(bool)
+{
+  recordEvent(action, "trigger_action", "");
+}

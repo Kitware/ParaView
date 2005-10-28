@@ -24,7 +24,7 @@ public:
   ~pqEventObserverXML();
 
 public slots:
-  void onAbstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+  void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments);
 
 private:
   /// Stores a stream that will be used to store the XML output

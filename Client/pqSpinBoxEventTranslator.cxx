@@ -40,5 +40,5 @@ bool pqSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqSpinBoxEventTranslator::onValueChanged(int Value)
 {
-  emit abstractEvent(this->currentObject->objectName(), "set_value", QString().setNum(Value));
+  emit recordEvent(this->currentObject, "set_int", QString().setNum(Value));
 }
