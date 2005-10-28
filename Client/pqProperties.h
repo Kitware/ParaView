@@ -13,9 +13,13 @@
 class vtkSMProxy;
 class QString;
 
+/// Convenience function for setting the value of a property by name
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const double Value);
+/// Convenience function for setting the value of a property by name
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const bool Value);
+/// Convenience function for setting the value of a property by name
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const int Value);
+/// Convenience function for setting the value of a property by name
 void pqSetProperty(vtkSMProxy* Proxy, const QString& Name, const QString& Value);
 
 #endif // !_pqProperties_h

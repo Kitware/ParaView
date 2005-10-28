@@ -18,10 +18,13 @@ class vtkSMRenderModuleProxy;
 
 #include <string>
 
+/// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
 class pqServer
 {
 public:
+  /// Constructs a standalone or "built-in" server connection, returns NULL on failure
   static pqServer* Standalone();
+  /// Constructs a server connection to a remote host, returns NULL on failure
   static pqServer* Connect(const char* const hostName, const int portNumber);
   virtual ~pqServer();
 

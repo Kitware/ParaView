@@ -14,6 +14,7 @@
 
 class vtkProcessModule;
 
+/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
 class pqServerFileDialogModel :
   public pqFileDialogModel
 {

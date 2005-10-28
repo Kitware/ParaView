@@ -12,7 +12,7 @@
 
 class QWidget;
 
-/// Runs all regression tests
+/// Runs all built-in test-cases
 void pqRunRegressionTests(QWidget* RootWidget);
 
 #endif // !_pqTesting_h

@@ -10,6 +10,8 @@
 #ifndef _pqCommand_h
 #define _pqCommand_h
 
+/// Abstract interface for recording undo/redo-able state changes
+/** \todo This will probably be moved into the server manager */
 class pqCommand
 {
 public:

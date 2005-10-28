@@ -10,6 +10,7 @@
  */
 
 #include "pqEventObserverStdout.h"
+#include "pqEventObserverXML.h"
 #include "pqEventTranslator.h"
 #include "pqMainWindow.h"
 
@@ -28,11 +29,21 @@ int main(int argc, char* argv[])
   qwindow.show();
   
   pqEventTranslator event_translator;
-  pqEventObserverStdout event_observer;
+  
+/*
+  pqEventObserverStdout event_observer_stdout;
   QObject::connect(
     &event_translator,
     SIGNAL(abstractEvent(const QString&, const QString&, const QString&)),
-    &event_observer,
+    &event_observer_stdout,
+    SLOT(onAbstractEvent(const QString&, const QString&, const QString&)));
+*/
+  
+  pqEventObserverXML event_observer_xml(cout);
+  QObject::connect(
+    &event_translator,
+    SIGNAL(abstractEvent(const QString&, const QString&, const QString&)),
+    &event_observer_xml,
     SLOT(onAbstractEvent(const QString&, const QString&, const QString&)));
   
   for(int i = 1; i < argc; ++i)

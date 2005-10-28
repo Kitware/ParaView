@@ -12,6 +12,8 @@
 
 #include <vtkPVOptions.h>
 
+/// This is a pqServer implementation detail
+/** \todo Make this private to pqServer */
 class pqOptions : public vtkPVOptions
 {
 public:

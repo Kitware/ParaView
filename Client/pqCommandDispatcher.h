@@ -14,6 +14,8 @@
 
 class pqCommand;
 
+/// Abstract interface for an object that implements an "update" policy
+/** \todo Need to figure-out how this will interoperate with pqSMAdaptor and server-manager undo/redo */
 class pqCommandDispatcher :
   public QObject
 {

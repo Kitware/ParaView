@@ -14,7 +14,9 @@
 
 class vtkSMRenderModuleProxy;
 
+/// Updates the camera so that all geometry is visible in the display
 void pqResetCamera(vtkSMRenderModuleProxy* RenderModule);
+/// Forces the camera to redraw the display
 void pqRedrawCamera(vtkSMRenderModuleProxy* RenderModule);
 
 #endif //_pqCamera_h

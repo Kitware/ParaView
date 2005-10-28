@@ -12,6 +12,7 @@
 
 #include "pqFileDialogModel.h"
 
+/// Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem
 class pqLocalFileDialogModel :
   public pqFileDialogModel
 {

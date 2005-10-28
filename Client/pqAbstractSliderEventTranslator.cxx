@@ -26,12 +26,12 @@ bool pqAbstractSliderEventTranslator::translateEvent(QObject* Object, QEvent* Ev
   switch(Event->type())
     {
     case QEvent::Enter:
-      currentObject = Object;
+      this->currentObject = Object;
       connect(object, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      currentObject = 0;
+      this->currentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqAbstractSliderEventTranslator::translateEvent(QObject* Object, QEvent* Ev
 
 void pqAbstractSliderEventTranslator::onValueChanged(int Value)
 {
-  emit abstractEvent(currentObject->objectName(), "set_value", QString().setNum(Value));
+  emit abstractEvent(this->currentObject->objectName(), "set_value", QString().setNum(Value));
 }

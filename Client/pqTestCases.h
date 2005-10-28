@@ -14,6 +14,8 @@
 
 class QWidget;
 
+/// Defines a set of built-in test-cases implemented in C++
+/** \todo Support execution of individual test-cases from the command-line */
 class pqTestCases :
   public QObject
 {

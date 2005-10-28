@@ -15,6 +15,7 @@
 class QComboBox;
 class QPushButton;
 
+/// Provides a user-interface component that allows the user to choose their preferred screen-update policy
 class pqRefreshToolbar :
   public QToolBar
 {

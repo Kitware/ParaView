@@ -16,6 +16,7 @@ class QAbstractItemModel;
 class QModelIndex;
 class QString;
 
+/// Abstract interface to a file-browsing "back-end" that can be used by the pqFileDialog "front-end"
 class pqFileDialogModel :
   public QObject
 {

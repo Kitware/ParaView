@@ -12,6 +12,7 @@
 
 #include "pqWidgetEventTranslator.h"
 
+/// Translates low-level Qt spinbox events into high-level ParaQ events that can be recorded as test cases
 class pqSpinBoxEventTranslator :
   public pqWidgetEventTranslator
 {

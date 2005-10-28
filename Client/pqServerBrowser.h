@@ -14,6 +14,7 @@
 
 class pqServer;
 
+/// Provides a user-interface component for creating server connections
 class pqServerBrowser :
   public QDialog
 {
@@ -25,6 +26,7 @@ public:
   pqServerBrowser(QWidget* Parent, const char* const Name);
 
 signals:
+  /// This signal will be emitted iff a server connection is successfully created
   void serverConnected(pqServer*);
  
 private:

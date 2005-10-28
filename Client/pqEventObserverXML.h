@@ -7,20 +7,29 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _pqEventObserverStdout_h
-#define _pqEventObserverStdout_h
+#ifndef _pqEventObserverXML_h
+#define _pqEventObserverXML_h
 
 #include <QObject>
+#include <vtkIOstream.h>
 
-/// Observes high-level ParaQ "events" and writes them to stdout, mainly for debugging purposes
-class pqEventObserverStdout :
+/// Observes high-level ParaQ events, and serializes them as XML for possible playback (as a test-case, demo, tutorial, etc)
+class pqEventObserverXML :
   public QObject
 {
   Q_OBJECT
+  
+public:
+  pqEventObserverXML(ostream& Stream);
+  ~pqEventObserverXML();
 
 public slots:
   void onAbstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
+
+private:
+  /// Stores a stream that will be used to store the XML output
+  ostream& stream;
 };
 
-#endif // !_pqEventObserverStdout_h
+#endif // !_pqEventObserverXML_h
 

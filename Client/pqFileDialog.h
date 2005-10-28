@@ -14,6 +14,7 @@
 
 class pqFileDialogModel;
 
+/// Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing
 class pqFileDialog :
   public QDialog
 {

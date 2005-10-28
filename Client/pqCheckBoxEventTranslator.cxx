@@ -26,12 +26,12 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      currentObject = Object;
+      this->currentObject = Object;
       connect(object, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged(int)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      currentObject = 0;
+      this->currentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqCheckBoxEventTranslator::onStateChanged(int State)
 {
-  emit abstractEvent(currentObject->objectName(), "set_value", State ? "true" : "false");
+  emit abstractEvent(this->currentObject->objectName(), "set_value", State ? "true" : "false");
 }

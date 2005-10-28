@@ -70,6 +70,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCommandDispatcher.h
   pqCommandDispatcherManager.h
   pqEventObserverStdout.h
+  pqEventObserverXML.h
   pqEventTranslator.h
   pqExplicitCommandDispatcher.h
   pqTimeoutCommandDispatcher.h
@@ -101,6 +102,8 @@ ADD_EXECUTABLE(pqClient
   pqCommandDispatcherManager.h
   pqEventObserverStdout.cxx
   pqEventObserverStdout.h
+  pqEventObserverXML.cxx
+  pqEventObserverXML.h
   pqEventTranslator.cxx
   pqEventTranslator.h
   pqExplicitCommandDispatcher.cxx

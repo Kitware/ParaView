@@ -19,6 +19,7 @@ class QToolBar;
 class QVTKWidget;
 class pqSMAdaptor;
 
+/// Provides the main window for the ParaQ application
 class pqMainWindow :
         public QMainWindow
 {

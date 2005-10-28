@@ -16,17 +16,17 @@ class pqServer;
 class vtkSMDisplayProxy;
 class vtkSMSourceProxy;
 
-// Description:
-// Adds a part to be displayed.  The part should be a source or filter
-// created with the proxy manager (retrived with GetProxyManager).  This
-// method returns a vtkSMDisplayProxy, which can be used to modify how
-// the part is displayed or to remove the part with RemovePart.  The
-// vtkSMDisplayProxy is maintained internally, so the calling application
-// does NOT have to delete it (it can be ignored).
+/**
+Adds a part to be displayed.  The part should be a source or filter
+created with the proxy manager (retrived with GetProxyManager).  This
+method returns a vtkSMDisplayProxy, which can be used to modify how
+the part is displayed or to remove the part with RemovePart.  The
+vtkSMDisplayProxy is maintained internally, so the calling application
+does NOT have to delete it (it can be ignored).
+*/
 vtkSMDisplayProxy* pqAddPart(pqServer* Server, vtkSMSourceProxy* Part);
 
-// Description:
-// Remove a part created with AddPart.
+/// Removes a part created with AddPart.
 void pqRemovePart(vtkSMDisplayProxy* Part);
 
 #endif //_pqParts_h

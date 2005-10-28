@@ -14,6 +14,7 @@
 
 class vtkSMRenderModuleProxy;
 
+/// Integrates the PVS render window with the Qt window
 class pqRenderViewProxy : public vtkPVRenderViewProxy
 {
 public:

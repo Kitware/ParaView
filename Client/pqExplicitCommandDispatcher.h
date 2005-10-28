@@ -12,6 +12,8 @@
 
 #include "pqCommandDispatcher.h"
 
+/// Implements an update policy that defers state changes until the user explicitly OKs them
+/** \todo Need to figure-out how this will interoperate with pqSMAdaptor and server-manager undo/redo */
 class pqExplicitCommandDispatcher :
   public pqCommandDispatcher
 {

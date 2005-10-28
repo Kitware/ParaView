@@ -17,6 +17,7 @@ class vtkObject;
 class QWidget;
 #include <QObject>
 
+/// Translates server manager events into Qt-compatible slots and signals
 class pqSMAdaptor : public QObject
 {
   Q_OBJECT
@@ -26,62 +27,46 @@ public:
   ~pqSMAdaptor();
 
 
-  // Description:
-  // Set the specified property of a proxy
-  // property index 0 is assumed if Value is not a QList
+  /// Set the specified property of a proxy property index 0 is assumed if Value is not a QList
   void SetProperty(vtkSMProperty* Property, QVariant Value);
-  // Get the specified property of a proxy
-  // if property has more than one element, a QList is returned
+  /// Get the specified property of a proxy if property has more than one element, a QList is returned
   QVariant GetProperty(vtkSMProperty* Property);
   
-  // Description:
-  // Set the specified property of a proxy
+  /// Set the specified property of a proxy
   void SetProperty(vtkSMProperty* Property, int Index, QVariant Value);
-  // Get the specified property of a proxy
+  /// Get the specified property of a proxy
   QVariant GetProperty(vtkSMProperty* Property, int Index);
   
   
   // Property Linking
 
-  // Description:
-  // Link a property of a proxy to a property of a QObject.
-  // The QObject property follows the vtkSMProperty.
+  /// Link a property of a proxy to a property of a QObject. The QObject property follows the vtkSMProperty.
   void LinkPropertyTo(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
                          QObject* qObject, const char* qProperty);
   
-  // Description:
-  // Unlink a property of a proxy from a property of a QObject.
+  /// Unlink a property of a proxy from a property of a QObject.
   void UnlinkPropertyFrom(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
                             QObject* qObject, const char* qProperty);
 
-  // Description:
-  // Link a property of a QObject to a property of a proxy.
-  // The vtkSMProperty follows the QObject's property.
+  /// Link a property of a QObject to a property of a proxy. The vtkSMProperty follows the QObject's property.
   void LinkPropertyTo(QObject* qObject, const char* qProperty, const char* signal,
                       vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
   
-  // Description:
-  // Unlink a property of a QObject from a property of a proxy.
+  /// Unlink a property of a QObject from a property of a proxy.
   void UnlinkPropertyFrom(QObject* qObject, const char* qProperty, const char* signal,
                           vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
 
 
-  // Description:
-  // Connect a domain modified event to a Qt slot
-  // Slot must be of signature "foo(vtkSMProperty*)"
+  /// Connect a domain modified event to a Qt slot Slot must be of signature "foo(vtkSMProperty*)"
   void ConnectDomain(vtkSMProperty* Property, QObject* qObject, const char* slot);
   
-  // Description:
-  // Disconnect a domain modified event from a Qt slot
+  /// Disconnect a domain modified event from a Qt slot
   void DisconnectDomain(vtkSMProperty* Property, QObject* qObject, const char* slot);
 
 signals:
-
-  // Description:
-  // Signal emitted when Server Manager creates an instance
+  /// Signal emitted when Server Manager creates an instance
   void ProxyCreated(vtkSMProxy* proxy);
-  // Description:
-  // Signal emitted when Server Manager deletes an instance
+  /// Signal emitted when Server Manager deletes an instance
   void ProxyDeleted(vtkSMProxy* proxy);
 
 protected slots:

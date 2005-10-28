@@ -12,6 +12,7 @@
 
 #include <QObject>
 
+/// Abstract interface for an object that can translate low-level Qt events into high-level, serializable ParaQ events, for test-cases, demos, tutorials, etc.
 class pqWidgetEventTranslator :
   public QObject
 {

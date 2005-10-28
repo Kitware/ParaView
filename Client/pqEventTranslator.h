@@ -15,6 +15,7 @@
 
 class pqWidgetEventTranslator;
 
+/// Manages translation of low-level Qt events to high-level ParaQ events that can be serialized as test-cases, demos, tutorials, etc.
 class pqEventTranslator :
   public QObject
 {
@@ -24,9 +25,11 @@ public:
   pqEventTranslator();
   ~pqEventTranslator();
 
+  /// Adds a new translator to the current working set of widget translators.  pqEventTranslator assumes control of the lifetime of the supplied object.
   void addWidgetEventTranslator(pqWidgetEventTranslator*);
 
 signals:
+  /// This signal will be emitted every time a translator generates a high-level ParaQ event.  Observers should connect to this signal to serialize high-level events.
   void abstractEvent(const QString& Widget, const QString& Command, const QString& Arguments);
 
 private:
@@ -34,7 +37,8 @@ private:
   pqEventTranslator& operator=(const pqEventTranslator&);
 
   bool eventFilter(QObject* Object, QEvent* Event);
-  
+
+  /// Stores the working set of widget translators  
   QVector<pqWidgetEventTranslator*> translators;
 };
 
