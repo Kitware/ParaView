@@ -12,7 +12,7 @@
 
 #include <QMessageBox>
 
-pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
+pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   base(Parent)
 {
   this->ui.setupUi(this);
@@ -26,7 +26,13 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent, const char* const Name) :
   this->onServerTypeActivated(0);
 
   this->setWindowTitle(tr("Pick Server:"));
-  this->setObjectName(Name);
+  
+  this->setObjectName("serverBrowser");
+  this->ui.serverType->setObjectName("serverBrowser/serverType");
+  this->ui.hostName->setObjectName("serverBrowser/hostName");
+  this->ui.portNumber->setObjectName("serverBrowser/portNumber");
+  this->ui.okButton->setObjectName("serverBrowser/okButton");
+  this->ui.cancelButton->setObjectName("serverBrowser/cancelButton");
 }
 
 pqServerBrowser::~pqServerBrowser()

@@ -25,6 +25,8 @@ public:
   pqEventTranslator();
   ~pqEventTranslator();
 
+  /// Adds the default set of widget translators to the working set.  Translators are executed in order, so you may call addWidgetEventTranslator() before this function to "override" the default translators
+  void addDefaultWidgetEventTranslators();
   /// Adds a new translator to the current working set of widget translators.  pqEventTranslator assumes control of the lifetime of the supplied object.
   void addWidgetEventTranslator(pqWidgetEventTranslator*);
 

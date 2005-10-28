@@ -72,6 +72,7 @@ pqTestCases::pqTestCases(QWidget* const RootWidget) :
 {
 }
 
+/*
 void pqTestCases::testSuccess()
 {
   COMPARE(true, true);
@@ -82,22 +83,28 @@ void pqTestCases::testFailure()
   EXPECT_FAIL("", "Deliberate failure", Continue);
   COMPARE(true, false);
 }
+*/
 
 void pqTestCases::testFileNew()
 {
   VERIFY(rootWidget);
   
   pqEventPlayer player(*rootWidget);
-  VERIFY(player.playEvent("fileNewAction", "trigger_action", ""));
+  player.addDefaultWidgetEventPlayers();
+  
+  VERIFY(player.playEvent("fileNewAction", "trigger_action"));
+  VERIFY(player.playEvent("serverBrowser/okButton", "clicked"));
+  VERIFY(player.playEvent("Capping", "set_boolean", "true"));
+  VERIFY(player.playEvent("Resolution", "set_int", "8"));
 }
 
+/*
 void pqTestCases::testFileMenu()
 {
   VERIFY(rootWidget);  
   VERIFY(pqLookupObject<QWidget>(*rootWidget, "menuBar/fileMenu"));
 }
 
-/*
 void pqTestCases::testFileOpen()
 {
   VERIFY(rootWidget);
@@ -105,7 +112,6 @@ void pqTestCases::testFileOpen()
   VERIFY(pqLookupObject<QWidget>(*rootWidget, "fileOpenDialog"));
   VERIFY(pqActivate(pqLookupObject<QAbstractButton>(*rootWidget, "fileOpenDialog/buttonCancel")));
 }
-*/
 
 void pqTestCases::testSlider()
 {
@@ -114,3 +120,4 @@ void pqTestCases::testSlider()
   pqEventPlayer player(*rootWidget);
   VERIFY(player.playEvent("Resolution", "set_int", "8"));
 }
+*/

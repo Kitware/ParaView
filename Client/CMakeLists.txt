@@ -80,6 +80,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMainWindow.h
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.h
+  pqPushButtonEventTranslator.h
   pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -99,6 +100,8 @@ ADD_EXECUTABLE(pqClient
   pqActionEventPlayer.h
   pqCamera.cxx
   pqCamera.h
+  pqCheckBoxEventPlayer.cxx
+  pqCheckBoxEventPlayer.h
   pqCheckBoxEventTranslator.cxx
   pqCheckBoxEventTranslator.h
   pqCommand.h
@@ -136,6 +139,10 @@ ADD_EXECUTABLE(pqClient
   pqParts.h
   pqProperties.cxx
   pqProperties.h
+  pqPushButtonEventPlayer.cxx
+  pqPushButtonEventPlayer.h
+  pqPushButtonEventTranslator.cxx
+  pqPushButtonEventTranslator.h
   pqRefreshToolbar.cxx
   pqRefreshToolbar.h
   pqServer.cxx

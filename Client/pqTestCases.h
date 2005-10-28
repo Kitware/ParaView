@@ -28,12 +28,12 @@ private:
   QWidget* const rootWidget;
   
 private slots:
-  void testSuccess();
-  void testFailure();
-  void testFileMenu();
+//  void testSuccess();
+//  void testFailure();
+//  void testFileMenu();
   void testFileNew();
 //  void testFileOpen();
-  void testSlider();
+//  void testSlider();
 };
 
 #endif // !_pqTestCases_h

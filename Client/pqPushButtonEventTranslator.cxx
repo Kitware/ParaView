@@ -7,19 +7,19 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqCheckBoxEventTranslator.h"
+#include "pqPushButtonEventTranslator.h"
 
-#include <QCheckBox>
+#include <QPushButton>
 #include <QEvent>
 
-pqCheckBoxEventTranslator::pqCheckBoxEventTranslator() :
+pqPushButtonEventTranslator::pqPushButtonEventTranslator() :
   currentObject(0)
 {
 }
 
-bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 {
-  QCheckBox* const object = qobject_cast<QCheckBox*>(Object);
+  QPushButton* const object = qobject_cast<QPushButton*>(Object);
   if(!object)
     return false;
     
@@ -27,7 +27,7 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
     {
     case QEvent::Enter:
       this->currentObject = Object;
-      connect(object, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged(int)));
+      connect(object, SIGNAL(clicked(bool)), this, SLOT(onClicked(bool)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
@@ -38,7 +38,7 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   return true;
 }
 
-void pqCheckBoxEventTranslator::onStateChanged(int State)
+void pqPushButtonEventTranslator::onClicked(bool)
 {
-  emit recordEvent(this->currentObject, "set_boolean", State ? "true" : "false");
+  emit recordEvent(this->currentObject, "clicked", "");
 }

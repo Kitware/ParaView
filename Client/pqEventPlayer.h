@@ -10,6 +10,7 @@
 #ifndef _pqEventPlayer_h
 #define _pqEventPlayer_h
 
+#include <QString>
 #include <QVector>
 
 class QObject;
@@ -22,11 +23,13 @@ public:
   pqEventPlayer(QObject& RootObject);
   ~pqEventPlayer();
 
-  /// Adds a new translator to the current working set of widget translators.  pqEventPlayer assumes control of the lifetime of the supplied object.
+  /// Adds the default set of widget players to the current working set.  Players are executed in-order, so you can call addWidgetEventPlayer() before this function to override default players.
+  void addDefaultWidgetEventPlayers();
+  /// Adds a new player to the current working set of widget players.  pqEventPlayer assumes control of the lifetime of the supplied object.
   void addWidgetEventPlayer(pqWidgetEventPlayer*);
 
   /// This method is called with each high-level ParaQ event, which will invoke the corresponding low-level Qt functionality in-turn.  Returns true on success, false on failure.
-  bool playEvent(const QString& Object, const QString& Command, const QString& Arguments);
+  bool playEvent(const QString& Object, const QString& Command, const QString& Arguments = QString());
 
 private:
   pqEventPlayer(const pqEventPlayer&);

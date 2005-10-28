@@ -23,7 +23,7 @@ class pqServerBrowser :
   Q_OBJECT
 
 public:
-  pqServerBrowser(QWidget* Parent, const char* const Name);
+  pqServerBrowser(QWidget* Parent);
 
 signals:
   /// This signal will be emitted iff a server connection is successfully created

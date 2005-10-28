@@ -10,6 +10,7 @@
 #include "pqAbstractSliderEventTranslator.h"
 #include "pqCheckBoxEventTranslator.h"
 #include "pqMenuEventTranslator.h"
+#include "pqPushButtonEventTranslator.h"
 #include "pqSpinBoxEventTranslator.h"
 
 #include "pqEventTranslator.h"
@@ -19,11 +20,6 @@
 pqEventTranslator::pqEventTranslator()
 {
   QCoreApplication::instance()->installEventFilter(this);
-  
-  addWidgetEventTranslator(new pqAbstractSliderEventTranslator());
-  addWidgetEventTranslator(new pqCheckBoxEventTranslator());
-  addWidgetEventTranslator(new pqMenuEventTranslator());
-  addWidgetEventTranslator(new pqSpinBoxEventTranslator());
 }
 
 pqEventTranslator::~pqEventTranslator()
@@ -32,6 +28,15 @@ pqEventTranslator::~pqEventTranslator()
   
   for(int i = 0; i != this->translators.size(); ++i)
     delete this->translators[i];
+}
+
+void pqEventTranslator::addDefaultWidgetEventTranslators()
+{
+  addWidgetEventTranslator(new pqAbstractSliderEventTranslator());
+  addWidgetEventTranslator(new pqCheckBoxEventTranslator());
+  addWidgetEventTranslator(new pqMenuEventTranslator());
+  addWidgetEventTranslator(new pqPushButtonEventTranslator());
+  addWidgetEventTranslator(new pqSpinBoxEventTranslator());
 }
 
 void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Translator)
@@ -66,6 +71,13 @@ bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 
 void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments)
 {
-  emit recordEvent(Object->objectName(), Command, Arguments);
+  QString name = Object->objectName();
+  
+/*
+  for(QObject* parent = Object->parent(); parent; parent = parent->parent())
+    name = parent->objectName() + "/" + name;
+*/
+  
+  emit recordEvent(name, Command, Arguments);
 }
 

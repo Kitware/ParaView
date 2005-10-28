@@ -9,7 +9,8 @@
 
 #include "pqAbstractIntEventPlayer.h"
 #include "pqActionEventPlayer.h"
-//#include "pqCheckBoxEventPlayer.h"
+#include "pqCheckBoxEventPlayer.h"
+#include "pqPushButtonEventPlayer.h"
 
 #include "pqEventPlayer.h"
 
@@ -40,14 +41,20 @@ QObject* pqFindObjectByName(QObject& Object, const QString& Name)
 pqEventPlayer::pqEventPlayer(QObject& RootObject) :
   root_object(RootObject)
 {
-  addWidgetEventPlayer(new pqAbstractIntEventPlayer());
-  addWidgetEventPlayer(new pqActionEventPlayer());
 }
 
 pqEventPlayer::~pqEventPlayer()
 {
   for(int i = 0; i != this->players.size(); ++i)
     delete this->players[i];
+}
+
+void pqEventPlayer::addDefaultWidgetEventPlayers()
+{
+  addWidgetEventPlayer(new pqAbstractIntEventPlayer());
+  addWidgetEventPlayer(new pqActionEventPlayer());
+  addWidgetEventPlayer(new pqCheckBoxEventPlayer());
+  addWidgetEventPlayer(new pqPushButtonEventPlayer());
 }
 
 void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)

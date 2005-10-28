@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
   qwindow.show();
   
   pqEventTranslator event_translator;
+  event_translator.addDefaultWidgetEventTranslators();
   
 /*
   pqEventObserverStdout event_observer_stdout;

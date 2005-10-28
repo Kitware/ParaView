@@ -181,7 +181,7 @@ void pqMainWindow::onFileNew()
 {
   setServer(0);
   
-  pqServerBrowser* const server_browser = new pqServerBrowser(this, "serverBrowser");
+  pqServerBrowser* const server_browser = new pqServerBrowser(this);
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileNew(pqServer*)));
   server_browser->show();
 }
@@ -194,7 +194,8 @@ void pqMainWindow::onFileNew(pqServer* Server)
   vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "CylinderSource");
   this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
   source->Delete();
-  pqSetProperty(source, "Resolution", 64);
+  pqSetProperty(source, "Capping", false);
+  pqSetProperty(source, "Resolution", 32);
   pqSetProperty(source, "Radius", 0.1);
   source->UpdateVTKObjects();
   
@@ -231,7 +232,7 @@ void pqMainWindow::onFileOpen()
 {
   setServer(0);
   
-  pqServerBrowser* const server_browser = new pqServerBrowser(this, "serverBrowser");
+  pqServerBrowser* const server_browser = new pqServerBrowser(this);
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
   server_browser->show();
 }
@@ -270,7 +271,7 @@ void pqMainWindow::onFileOpenServerState()
 {
   setServer(0);
   
-  pqServerBrowser* const server_browser = new pqServerBrowser(this, "serverBrowser");
+  pqServerBrowser* const server_browser = new pqServerBrowser(this);
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpenServerState(pqServer*)));
   server_browser->show();
 }
@@ -316,7 +317,7 @@ void pqMainWindow::onServerConnect()
 {
   setServer(0);
   
-  pqServerBrowser* const server_browser = new pqServerBrowser(this, "serverBrowser");
+  pqServerBrowser* const server_browser = new pqServerBrowser(this);
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onServerConnect(pqServer*)));
   server_browser->show();
 }
