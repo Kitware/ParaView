@@ -39,6 +39,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
@@ -62,7 +63,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.457");
+vtkCxxRevisionMacro(vtkPVSource, "1.457.2.1");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1385,6 +1386,33 @@ void vtkPVSource::SetupDisplays()
   pDisp->Delete();
 }
 
+int vtkPVSource::ColorByScalars(
+  vtkPVDataSetAttributesInformation* attrInfo,
+  vtkPVDataSetAttributesInformation* inAttrInfo,
+  int field)
+{
+  // Check for new point scalars.
+  vtkPVArrayInformation* arrayInfo = 
+    attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  vtkPVArrayInformation* inArrayInfo = 0;
+  if (arrayInfo)
+    {
+    if (inAttrInfo)
+      {
+      inArrayInfo = inAttrInfo->GetAttributeInformation(
+        vtkDataSetAttributes::SCALARS);
+      }
+    if (inArrayInfo == 0 ||  
+        strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
+      { // No input or different scalars: use the new scalars.
+      this->ColorByArray(
+        arrayInfo->GetName(), field);
+      return 1;
+      }
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 // Only call this when the source is current!
 // The rules are:
@@ -1397,11 +1425,17 @@ void vtkPVSource::SetDefaultColorParameters()
   vtkPVSource* input = this->GetPVInput(0);
   vtkPVDataInformation* inDataInfo = 0;
   vtkPVDataSetAttributesInformation* inAttrInfo = 0;
-  vtkPVArrayInformation* inArrayInfo = 0;
   vtkPVDataInformation* dataInfo;
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
   vtkPVColorMap* colorMap;  
+    
+  vtkSMDisplayProxy* dproxy = this->GetDisplayProxy();
+  vtkPVDataInformation* geomInfo = 0;
+  if (dproxy)
+    {
+    geomInfo = dproxy->GetGeometryInformation();
+    }
     
   dataInfo = this->GetDataInformation();
   if (input)
@@ -1427,34 +1461,54 @@ void vtkPVSource::SetDefaultColorParameters()
     
   // Check for new point scalars.
   attrInfo = dataInfo->GetPointDataInformation();
-  arrayInfo = attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-  if (arrayInfo)
+  if (inDataInfo)
     {
-    if (inDataInfo)
+    inAttrInfo = inDataInfo->GetPointDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  if (this->ColorByScalars(
+        attrInfo, inAttrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA))
+    {
+    return;
+    }
+
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetPointDataInformation();
+    if (this->ColorByScalars(
+          attrInfo, inAttrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA))
       {
-      inAttrInfo = inDataInfo->GetPointDataInformation();
-      inArrayInfo = inAttrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-      }
-    if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
-      { // No input or different scalars: use the new scalars.
-      this->ColorByArray(arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
       return;
       }
     }
 
   // Check for new cell scalars.
   attrInfo = dataInfo->GetCellDataInformation();
-  arrayInfo = attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-  if (arrayInfo)
+  if (inDataInfo)
     {
-    if (inDataInfo)
+    inAttrInfo = inDataInfo->GetCellDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  if (this->ColorByScalars(
+        attrInfo, inAttrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA))
+    {
+    return;
+    }
+
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetCellDataInformation();
+    if (this->ColorByScalars(
+          attrInfo, inAttrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA))
       {
-      inAttrInfo = inDataInfo->GetCellDataInformation();
-      inArrayInfo = inAttrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-      }
-    if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
-      { // No input or different scalars: use the new scalars.
-      this->ColorByArray(arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       return;
       }
     }
@@ -1477,7 +1531,8 @@ void vtkPVSource::SetDefaultColorParameters()
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->ColorByArray(colorMap, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+            this->ColorByArray(
+              colorMap, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
             return;
             }
           break;
@@ -1487,7 +1542,8 @@ void vtkPVSource::SetDefaultColorParameters()
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->ColorByArray(colorMap, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+            this->ColorByArray(
+              colorMap, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
             return;
             }
           break;
@@ -1525,15 +1581,29 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
     dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
   vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
     arrayname);
+  // Try geometry information
+  if (!arrayInfo)
+    {
+    vtkSMDisplayProxy* dproxy = this->GetDisplayProxy();
+    if (dproxy)
+      {
+      vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
+      attrInfo =
+       (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA) ?
+       geomInfo->GetPointDataInformation() :  geomInfo->GetCellDataInformation();
+      arrayInfo = attrInfo->GetArrayInformation(arrayname);
+      }
+    }
+
   if (!arrayInfo)
     {
     vtkErrorMacro("Failed to find " << arrayname);
     return;
     }
 
-  vtkPVColorMap* colorMap = this->GetPVWindow()->GetPVColorMap(arrayname,
-    arrayInfo->GetNumberOfComponents());
-  this->ColorByArray( colorMap, field);
+  vtkPVColorMap* colorMap = this->GetPVWindow()->GetPVColorMap(
+    arrayname, arrayInfo->GetNumberOfComponents());
+  this->ColorByArray(colorMap, field);
 
 }
 

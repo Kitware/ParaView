@@ -52,7 +52,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36.2.1");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -243,7 +243,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36.2.1");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1676,7 +1676,7 @@ public:
       {
       it->second = vtkSpyPlotUniReader::New();
       it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
-      cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
+      //cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
       }
     return it->second;
     }

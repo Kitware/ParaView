@@ -24,9 +24,11 @@
 #define __vtkPVColorSelectionWidget_h
 
 #include "vtkKWMenuButton.h"
-class vtkPVSource;
-class vtkPVDataSetAttributesInformation;
+
 class vtkPVArrayInformation;
+class vtkPVDataInformation;
+class vtkPVDataSetAttributesInformation;
+class vtkPVSource;
 
 class VTK_EXPORT vtkPVColorSelectionWidget : public vtkKWMenuButton
 {
@@ -72,8 +74,11 @@ protected:
 
   void AddArray(vtkPVDataSetAttributesInformation* attrInfo, int field_type);
 
+  vtkPVArrayInformation* GetArrayInformation(
+    vtkPVDataInformation* dataInfo, const char* arrayname, int field);
 
   int FormLabel(vtkPVArrayInformation* arrayInfo, int field, char *label);
+
 private:
   vtkPVColorSelectionWidget(const vtkPVColorSelectionWidget&); // Not implemented.
   void operator=(const vtkPVColorSelectionWidget&); // Not implemented.

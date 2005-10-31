@@ -41,6 +41,7 @@ class vtkKWPushButton;
 class vtkKWScaleWithEntry;
 class vtkPVTextPropertyEditor;
 class vtkPVApplication;
+class vtkPVDataSetAttributesInformation;
 class vtkPVRenderView;
 class vtkPVColorMapObserver;
 class vtkPVSource;
@@ -49,6 +50,7 @@ class vtkTextProperty;
 class vtkSMScalarBarWidgetProxy;
 class vtkSMLookupTableProxy;
 class vtkSMProxy;
+
 class VTK_EXPORT vtkPVColorMap : public vtkPVTracedWidget
 {
 public:
@@ -493,6 +495,10 @@ protected:
   // For determining how many data objects are using the color map.
   //  This is used to make the scalar bar invisible when not used.
   int UseCount;
+
+  void ComputeScalarRange(
+    vtkPVDataSetAttributesInformation* attrInfo, double* range);
+
 private:
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented
