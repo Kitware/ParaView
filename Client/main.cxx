@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 {
   QApplication qapplication(argc, argv);
   pqMainWindow qwindow(qapplication);
-  qwindow.resize(400, 400);
+  qwindow.resize(800, 600);
   qwindow.show();
   
   pqEventTranslator event_translator;

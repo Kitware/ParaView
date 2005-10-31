@@ -73,11 +73,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEventObserverXML.h
   pqEventTranslator.h
   pqExplicitCommandDispatcher.h
-  pqTimeoutCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqMainWindow.h
+  pqObjectInspector.h
+  pqObjectInspectorItem.h
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.h
   pqPushButtonEventTranslator.h
@@ -85,6 +86,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
+  pqTimeoutCommandDispatcher.h
   pqSpinBoxEventTranslator.h
   pqWidgetEventTranslator.h
   ${TEST_MOCS}
@@ -133,6 +135,10 @@ ADD_EXECUTABLE(pqClient
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.cxx
   pqMenuEventTranslatorAdaptor.h
+  pqObjectInspector.cxx
+  pqObjectInspector.h
+  pqObjectInspectorItem.cxx
+  pqObjectInspectorItem.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx
@@ -145,20 +151,20 @@ ADD_EXECUTABLE(pqClient
   pqPushButtonEventTranslator.h
   pqRefreshToolbar.cxx
   pqRefreshToolbar.h
+  pqRenderViewProxy.cxx
+  pqRenderViewProxy.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
   pqSpinBoxEventTranslator.cxx
   pqSpinBoxEventTranslator.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
-  pqRenderViewProxy.cxx
-  pqRenderViewProxy.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   ${TEST_SRCS}

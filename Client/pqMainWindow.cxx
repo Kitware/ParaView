@@ -13,6 +13,7 @@
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
+#include "pqObjectInspector.h"
 #include "pqParts.h"
 #include "pqProperties.h"
 #include "pqRefreshToolbar.h"
@@ -26,11 +27,14 @@
 #endif
 
 #include <QApplication>
+#include <QCheckBox>
+#include <QDockWidget>
+#include <QHeaderView>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QToolBar>
-#include <QCheckBox>
+#include <QTreeView>
 
 #include <vtkRenderWindow.h>
 #include <vtkSMDataObjectDisplayProxy.h>
@@ -71,7 +75,10 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   refresh_toolbar(0),
   property_toolbar(0),
   window(0),
-  serverDisconnectAction(0)
+  serverDisconnectAction(0),
+  Inspector(0),
+  InspectorDock(0),
+  InspectorView(0)
 {
   this->setObjectName("mainWindow");
   this->setWindowTitle("ParaQ Client");
@@ -131,12 +138,46 @@ pqMainWindow::pqMainWindow(QApplication& Application) :
   this->refresh_toolbar = new pqRefreshToolbar(this);
   this->addToolBar(this->refresh_toolbar);
 
+  // Create the object inspector model.
+  this->Inspector = new pqObjectInspector(this);
+  if(this->Inspector)
+    this->Inspector->setObjectName("Inspector");
+
+  // Add the object inspector dock window.
+  this->InspectorDock = new QDockWidget("Object Inspector", this);
+  if(this->InspectorDock)
+    {
+    this->InspectorDock->setObjectName("InspectorDock");
+    this->InspectorDock->setAllowedAreas(
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    this->InspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+    this->InspectorView = new QTreeView(this->InspectorDock);
+    if(this->InspectorView)
+      {
+      this->InspectorView->setObjectName("InspectorView");
+      this->InspectorView->setAlternatingRowColors(true);
+      this->InspectorView->header()->hide();
+      this->InspectorDock->setWidget(this->InspectorView);
+      this->InspectorView->setModel(this->Inspector);
+      }
+
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
+    }
+
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;  // should go in pqServer?
 }
 
 pqMainWindow::~pqMainWindow()
 {
+  // Clean up the model before deleting the adaptor.
+  if(this->Inspector)
+  {
+    if(this->InspectorView)
+      this->InspectorView->setModel(0);
+    delete this->Inspector;
+  }
+
   delete this->window;
   delete this->property_toolbar;
   delete this->refresh_toolbar;
@@ -226,6 +267,10 @@ void pqMainWindow::onFileNew(pqServer* Server)
 
   pqResetCamera(this->currentServer->GetRenderModule());
   pqRedrawCamera(this->currentServer->GetRenderModule());
+
+  // TEMP: Add cylinder source to the object inspector model.
+  if(this->Inspector)
+    this->Inspector->SetProxy(this->Adaptor, source);
 }
 
 void pqMainWindow::onFileOpen()

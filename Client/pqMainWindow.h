@@ -12,12 +12,16 @@
 
 #include <QMainWindow>
 
+class pqObjectInspector;
 class pqRefreshToolbar;
 class pqServer;
-class QAction;
-class QToolBar;
-class QVTKWidget;
 class pqSMAdaptor;
+
+class QAction;
+class QDockWidget;
+class QToolBar;
+class QTreeView;
+class QVTKWidget;
 
 /// Provides the main window for the ParaQ application
 class pqMainWindow :
@@ -40,6 +44,9 @@ private:
   QVTKWidget* window;
   QAction* serverDisconnectAction;
   pqSMAdaptor *Adaptor;
+  pqObjectInspector *Inspector;
+  QDockWidget *InspectorDock;
+  QTreeView *InspectorView;
   
 private slots:
   void onFileNew();

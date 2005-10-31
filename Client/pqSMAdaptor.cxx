@@ -118,7 +118,9 @@ void pqSMAdaptor::SetProperty(vtkSMProperty* Property, QVariant QtProperty)
 QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property)
 {
   vtkSMVectorProperty* VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
-  assert(VectorProperty != NULL);
+  if(VectorProperty == NULL)
+    return QVariant();
+
   int numElems = VectorProperty->GetNumberOfElements();
   if(numElems == 1)
     {
@@ -147,6 +149,24 @@ QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property, int Index)
   vtkSMPropertyAdaptor* adapter = vtkSMPropertyAdaptor::New();
   adapter->SetProperty(Property);
   QVariant var = adapter->GetRangeValue(Index);
+
+  // Convert the variant to the appropriate type.
+  switch(adapter->GetElementType())
+    {
+    case vtkSMPropertyAdaptor::INT:
+      if(var.canConvert(QVariant::Int))
+        var.convert(QVariant::Int);
+      break;
+    case vtkSMPropertyAdaptor::DOUBLE:
+      if(var.canConvert(QVariant::Double))
+        var.convert(QVariant::Double);
+      break;
+    case vtkSMPropertyAdaptor::BOOLEAN:
+      if(var.canConvert(QVariant::Bool))
+        var.convert(QVariant::Bool);
+      break;
+    }
+
   adapter->Delete();
   return var;
 }
