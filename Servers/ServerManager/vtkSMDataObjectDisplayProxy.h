@@ -123,10 +123,8 @@ public:
   void SetInputAsGeometryFilter(vtkSMProxy* onProxy);
 
   // Description:
-  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
-  // should add their functionality and call this.
-  // Overridden to clean up cached geometry as well. 
-  virtual void MarkConsumersAsModified(); 
+  // Chains to superclass and calls InvalidateGeometry().
+  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
 
   //BTX
   // Interpolation types.
@@ -250,6 +248,21 @@ public:
   // Convenience method to get/set ImmediateModeRendering property.
   void SetImmediateModeRenderingCM(int f);
   int GetImmediateModeRenderingCM();
+
+  // Description:
+  // UseCache tells the display to whether to try to use geometry cache
+  // (when true) or not (when false) when invalidating geometry. If
+  // UseCache is true, cached geometry is not marked as invalid (and
+  // is not updated on server).
+  static void SetUseCache(int useCache)
+    {
+      vtkSMDataObjectDisplayProxy::UseCache = useCache;
+    }
+  static int GetUseCache()
+    {
+      return vtkSMDataObjectDisplayProxy::UseCache;
+    }
+
 protected:
   vtkSMDataObjectDisplayProxy();
   ~vtkSMDataObjectDisplayProxy();
@@ -273,6 +286,8 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
 
   virtual void GatherGeometryInformation();
+
+  static int UseCache;
 
 //BTX
   // This is the least intrusive way of giving vtkPVComparativeVisManager
@@ -328,7 +343,10 @@ protected:
   int GeometryInformationIsValid;
   vtkPVGeometryInformation* GeometryInformation;
 
-  virtual void InvalidateGeometryInternal();
+  // Invalidate geometry. If useCache is true, do not invalidate
+  // cached geometry
+  virtual void InvalidateGeometryInternal(int useCache);
+
 private:
   vtkSMDataObjectDisplayProxy(const vtkSMDataObjectDisplayProxy&); // Not implemented.
   void operator=(const vtkSMDataObjectDisplayProxy&); // Not implemented.

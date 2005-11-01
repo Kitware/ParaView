@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.14");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -602,9 +602,9 @@ void vtkSMXYPlotDisplayProxy::InvalidateGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMXYPlotDisplayProxy::MarkConsumersAsModified()
+void vtkSMXYPlotDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  this->Superclass::MarkConsumersAsModified();
+  this->Superclass::MarkModified(modifiedProxy);
   this->InvalidateGeometry();
 }
 

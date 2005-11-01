@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.24");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -149,8 +149,11 @@ void vtkPVSourceNotebook::Update()
     }
   this->UpdateEnableStateWithSource(this->PVSource);
   this->UpdateDescriptionFrame(this->PVSource);
-  this->DisplayGUI->Update();
-  this->InformationGUI->Update(this->PVSource);
+  if (this->PVSource->GetInitialized())
+    {
+    this->DisplayGUI->Update();
+    this->InformationGUI->Update(this->PVSource);
+    }
 }
   
 

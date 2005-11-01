@@ -50,6 +50,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
@@ -69,7 +70,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.60");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1031,8 +1032,14 @@ void vtkPVAnimationScene::SetAnimationTime(double time)
     if (sourceProxy)
       {
       // Data information needs to be updated.
-      sourceProxy->MarkConsumersAsModified();
+
+      // Tell the displays the update are calling from animation and
+      // that they should use their cache if possible.
+      int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
+      vtkSMDataObjectDisplayProxy::SetUseCache(1);
+      sourceProxy->MarkModified(0);
       sourceProxy->GetDataInformation();
+      vtkSMDataObjectDisplayProxy::SetUseCache(prev);
       }
     }
 }

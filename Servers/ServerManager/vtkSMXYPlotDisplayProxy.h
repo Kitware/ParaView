@@ -74,10 +74,8 @@ public:
   virtual void InvalidateGeometry();
 
   // Description:
-  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
-  // should add their functionality and call this.
-  // Overridden to clean up cached geometry as well. 
-  virtual void MarkConsumersAsModified();
+  // Chains to superclass and calls InvalidateGeometry().
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
   // Sets the label of the plot to reflect either time or space sampling.

@@ -34,9 +34,11 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.3");
+
+int vtkSMDataObjectDisplayProxy::UseCache = 0;
+
 //-----------------------------------------------------------------------------
 vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
 {
@@ -94,10 +96,18 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::MarkConsumersAsModified()
+void vtkSMDataObjectDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  this->Superclass::MarkConsumersAsModified();
-  this->InvalidateGeometry();
+  this->Superclass::MarkModified(modifiedProxy);
+
+  // Do not invalidate geometry if MarkModified() was called by self.
+  // A lot of the changes to the display proxy do not require
+  // invalidating geometry. Those that do should call InvalidateGeometry()
+  // explicitly.
+  if (modifiedProxy != this)
+    {
+    this->InvalidateGeometryInternal(this->UseCache);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1081,19 +1091,23 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::InvalidateGeometry()
 {
-  this->InvalidateGeometryInternal();
+  this->InvalidateGeometryInternal(0);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal()
+void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
 {
-  this->GeometryIsValid = 0;
   this->VolumeGeometryIsValid = 0;
   this->GeometryInformationIsValid = 0;
-  if (this->UpdateSuppressorProxy)
+  if (!useCache)
     {
-    vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-    p->Modified();
+    this->GeometryIsValid = 0;
+    if (this->UpdateSuppressorProxy)
+      {
+      vtkSMProperty *p = 
+        this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+      p->Modified();
+      }
     }
 }
 

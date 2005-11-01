@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770");
+vtkCxxRevisionMacro(vtkPVWindow, "1.771");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3426,7 +3426,8 @@ void vtkPVWindow::UpdateFilterMenu()
     }
 
   if (this->CurrentPVSource &&
-      !this->CurrentPVSource->GetIsPermanent())
+      !this->CurrentPVSource->GetIsPermanent() &&
+      this->CurrentPVSource->GetInitialized())
     {
     vtkPVDataInformation *pvdi = this->CurrentPVSource->GetDataInformation();
     if (pvdi->GetNumberOfPoints() <= 0)

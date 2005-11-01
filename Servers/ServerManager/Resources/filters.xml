@@ -3251,8 +3251,6 @@
           <Group name="locators"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-      <ProxyProperty name="PKdTreeInfo" command="GetPKdTree"
-                     information_only="1"/>
       <StringVectorProperty name="OutputType"
                             command="SetOutputType"
                             number_of_elements="1">

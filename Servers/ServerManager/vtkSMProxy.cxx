@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.43");
+vtkCxxRevisionMacro(vtkSMProxy, "1.44");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -156,7 +156,8 @@ vtkSMProxy::~vtkSMProxy()
     prop->RemoveAllDependents();
     if (prop->IsA("vtkSMProxyProperty"))
       {
-      vtkSMProxyProperty::SafeDownCast(prop)->RemoveConsumers(this);
+      vtkSMProxyProperty::SafeDownCast(
+        prop)->RemoveConsumerFromPreviousProxies(this);
       }
     }
   delete this->Internals;
@@ -492,6 +493,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       this->PushProperty(it->first.c_str(), 
                          this->SelfID, 
                          vtkProcessModule::CLIENT);
+      this->MarkModified(this);
       }
     else
       {
@@ -508,6 +510,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
         {
         vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
         pm->SendStream(this->Servers, str);
+        this->MarkModified(this);
         }
       }
     it->second.ModifiedFlag = 0;
@@ -572,6 +575,7 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
         }
       prop->UpdateDependentDomains();
       }
+    this->MarkModified(this);
     }
 }
 
@@ -621,6 +625,8 @@ void vtkSMProxy::UpdateInformation()
       {
       it2->second.GetPointer()->UpdateInformation();
       }
+
+    this->MarkModified(this);
     }
 }
 
@@ -664,6 +670,8 @@ void vtkSMProxy::UpdateVTKObjects()
   
   this->SelfPropertiesModified = 0;
 
+  int wasModified = 0;
+
   // Make each property push their values to each VTK object
   // referred by the proxy. This is done by appending all
   // the command to a streaming and executing that stream
@@ -690,6 +698,7 @@ void vtkSMProxy::UpdateVTKObjects()
             this->PushProperty(it->first.c_str(), 
               this->SelfID, 
               vtkProcessModule::CLIENT);
+            wasModified = 1;
             }
           }
         it->second.ModifiedFlag = 0;
@@ -717,6 +726,7 @@ void vtkSMProxy::UpdateVTKObjects()
           this->PushProperty(it->first.c_str(), 
             this->SelfID, 
             vtkProcessModule::CLIENT);
+          wasModified = 1;
           }
         else
           {
@@ -731,6 +741,7 @@ void vtkSMProxy::UpdateVTKObjects()
     if (str.GetNumberOfMessages() > 0)
       {
       pm->SendStream(this->Servers, str);
+      wasModified = 1;
       }
     }
 
@@ -743,10 +754,10 @@ void vtkSMProxy::UpdateVTKObjects()
     it2->second.GetPointer()->UpdateVTKObjects();
     }
 
-  // I am am removing this because it was causing the animation to
-  // loose its caches when it Updated the VTK objects.
-  // It has to be called separately now.
-  //this->MarkConsumersAsModified();
+  if (wasModified)
+    {
+    this->MarkModified(this);
+    }
 
   this->InUpdateVTKObjects = 0;
   // If any properties got modified while pushing them,
@@ -919,7 +930,13 @@ vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMProxy::MarkConsumersAsModified()
+void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
+{
+  this->MarkConsumersAsModified(modifiedProxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxy::MarkConsumersAsModified(vtkSMProxy* modifiedProxy)
 {
   unsigned int numConsumers = this->GetNumberOfConsumers();
   for (unsigned int i=0; i<numConsumers; i++)
@@ -927,7 +944,7 @@ void vtkSMProxy::MarkConsumersAsModified()
     vtkSMProxy* cons = this->GetConsumerProxy(i);
     if (cons)
       {
-      cons->MarkConsumersAsModified();
+      cons->MarkModified(modifiedProxy);
       }
     }
 }

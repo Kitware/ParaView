@@ -17,6 +17,7 @@
 #include "vtkAnimationCue.h"
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
@@ -24,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.12");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -102,7 +103,7 @@ void vtkSMAnimationCueProxy::SetCaching(int enable)
   this->Caching = enable;
   if (!this->Caching && this->AnimatedProxy)
     {
-    this->AnimatedProxy->MarkConsumersAsModified();
+    this->AnimatedProxy->MarkModified(this);
     }
 }
   
@@ -215,7 +216,7 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
     case vtkSMAnimationCueManipulatorProxy::StateModifiedEvent:
       if (!this->Caching && this->AnimatedProxy)
         {
-        this->AnimatedProxy->MarkConsumersAsModified();
+        this->AnimatedProxy->MarkModified(this);
         }
       }
     }
@@ -225,36 +226,61 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
 void vtkSMAnimationCueProxy::StartCueInternal(
   void* info)
 {
+  // Tell the displays the update are calling from animation and
+  // that they should use their cache if possible.
+  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
+  if (this->Caching)
+    {
+    vtkSMDataObjectDisplayProxy::SetUseCache(1);
+    }
   if (this->Manipulator)
     {
     // let the manipulator know that the cue has been restarted.
     this->Manipulator->Initialize(this);
     }
   this->InvokeEvent(vtkCommand::StartAnimationCueEvent, info);
+  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::EndCueInternal(
   void* info)
 {
+  // Tell the displays the update are calling from animation and
+  // that they should use their cache if possible.
+  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
+  if (this->Caching)
+    {
+    vtkSMDataObjectDisplayProxy::SetUseCache(1);
+    }
   if (this->Manipulator)
     {
     // let the manipulator know that the cue has ended.
     this->Manipulator->Finalize(this);
     }
   this->InvokeEvent(vtkCommand::EndAnimationCueEvent, info);
+  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::TickInternal(
   void* info)
 {
+  // Tell the displays the update are calling from animation and
+  // that they should use their cache if possible.
+  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
+  if (this->Caching)
+    {
+    vtkSMDataObjectDisplayProxy::SetUseCache(1);
+    }
+
   // determine normalized  currenttime.
   vtkAnimationCue::AnimationCueInfo *cueInfo = 
     reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
   if (!cueInfo)
     {
     vtkErrorMacro("Invalid object thrown by Tick event");
+    vtkSMDataObjectDisplayProxy::SetUseCache(prev);
     return;
     }
  
@@ -270,6 +296,8 @@ void vtkSMAnimationCueProxy::TickInternal(
     this->Manipulator->UpdateValue(ctime, this);
     }
   this->InvokeEvent(vtkCommand::AnimationCueTickEvent, info);
+  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
+
 }
 
 //----------------------------------------------------------------------------
