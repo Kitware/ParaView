@@ -132,6 +132,7 @@ INCLUDE_DIRECTORIES(
   ${SPCTH_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
   ${XDMF_INCLUDE_DIRS}
+  ${ExtraParaViewServerFiltersIncludes}
   )
 
 # The following was copy/paste from vtkIncludeDirectories.cmake
