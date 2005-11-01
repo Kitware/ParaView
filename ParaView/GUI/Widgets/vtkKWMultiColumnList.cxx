@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.33");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.34");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -3020,29 +3020,28 @@ void vtkKWMultiColumnList::HasSelectionChanged()
       }
     }
 
-  // No change, return
-
-  if (!selection_has_changed)
-    {
-    return;
-    }
-
   // Changes, let's save the selection
 
-  if (nb_of_selected_cells != prev_nb_of_selected_cells)
+  if (selection_has_changed)
     {
-    this->Internals->LastSelectionRowIndices.resize(nb_of_selected_cells);
-    this->Internals->LastSelectionColIndices.resize(nb_of_selected_cells);
-    }
-  vtksys_stl::copy(row_indices, 
-                   row_indices + nb_of_selected_cells, 
-                   this->Internals->LastSelectionRowIndices.begin());
-  vtksys_stl::copy(col_indices, 
-                   col_indices + nb_of_selected_cells, 
-                   this->Internals->LastSelectionColIndices.begin());
+    if (nb_of_selected_cells != prev_nb_of_selected_cells)
+      {
+      this->Internals->LastSelectionRowIndices.resize(nb_of_selected_cells);
+      this->Internals->LastSelectionColIndices.resize(nb_of_selected_cells);
+      }
+    vtksys_stl::copy(row_indices, 
+                     row_indices + nb_of_selected_cells, 
+                     this->Internals->LastSelectionRowIndices.begin());
+    vtksys_stl::copy(col_indices, 
+                     col_indices + nb_of_selected_cells, 
+                     this->Internals->LastSelectionColIndices.begin());
   
-  this->InvokeSelectionChangedCommand();
-  this->InvokePotentialCellColorsChangedCommand();
+    this->InvokeSelectionChangedCommand();
+    this->InvokePotentialCellColorsChangedCommand();
+    }
+
+  delete [] row_indices;
+  delete [] col_indices;
 }
 
 //----------------------------------------------------------------------------
