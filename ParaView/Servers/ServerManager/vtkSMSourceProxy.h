@@ -113,7 +113,7 @@ public:
   // Chains to superclass as well as mark the data information as
   // invalid (next time data information is requested, it will be
   // re-created).
-  virtual void MarkConsumersAsModified();
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
   // Return a property (see superclass documentation). Overwritten

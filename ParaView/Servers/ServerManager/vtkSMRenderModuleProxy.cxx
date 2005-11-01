@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.15");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -599,7 +599,7 @@ void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
       {
       ivp->SetElement(0, val);
       disp->UpdateVTKObjects();
-      disp->MarkConsumersAsModified();
+      disp->MarkModified(this);
       }
     }
   iter->Delete();  

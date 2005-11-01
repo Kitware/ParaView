@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.46");
 
 
 //----------------------------------------------------------------------------
@@ -1360,7 +1360,7 @@ vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
 
   // for RenderServer mode keep the bit vector the same
   // because all servers are different processes
-  if(this->Options->GetRenderServerMode())
+  if(this->Options && this->Options->GetRenderServerMode())
     {
     return servers;
     }
@@ -1392,7 +1392,7 @@ vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::SendStreamToClient(vtkClientServerStream& stream)
 { 
-  if(!this->Options->GetClientMode())
+  if(this->Options && !this->Options->GetClientMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToClient on server node.");
     return -1;

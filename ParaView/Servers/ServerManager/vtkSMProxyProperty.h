@@ -158,19 +158,21 @@ protected:
   // Saves the state of the object in XML format. 
   virtual void SaveState(const char* name,  ostream* file, vtkIndent indent);
 
-  // Previous proxies are used by the ProxyProperty internally.
-  // All proxies added with AddProxy() will become "consumers" of
-  // the proxy passed to AppendCommandToStream().
-  // Proxies that were added previous but that are no longer in the list
-  // (removed) are no longer consumers of the proxy therefore RemoveProxy
-  // is called on them. This requires keeping track of previous proxies.
   // Description:
-  void AddPreviousProxy(vtkSMProxy* proxy);
-  void RemoveAllPreviousProxies();
+
+  // Previous proxies are used by the ProxyProperty internally.  The owner
+  // (consumer arg) of this property will become "consumer" of the proxies
+  // passed to AppendCommandToStream().  Also, the consumer will be removed
+  // from the consumer list of proxies that were added previously
+  // but that are no longer in the list (removed). This requires
+  // keeping track of previous proxies.
+  void AddPreviousProxy(vtkSMProxy* consumer, vtkSMProxy* proxy);
+  void RemoveAllPreviousProxies(vtkSMProxy* consumer);
 
   // Description:
-  // Given a proxy, remove all previous proxies from it's consumer list.
-  void RemoveConsumers(vtkSMProxy* proxy);
+  // Remove the given proxy from the list consumer list of all
+  // previous proxies.
+  void RemoveConsumerFromPreviousProxies(vtkSMProxy* cons);
 
   //BTX
   friend class vtkSMProxy;

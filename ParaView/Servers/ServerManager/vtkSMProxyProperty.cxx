@@ -23,18 +23,23 @@
 #include "vtkSmartPointer.h"
 #include "vtkPVXMLElement.h"
 
+#include <vtkstd/map>
 #include <vtkstd/vector>
 #include <vtkstd/algorithm>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.21");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.22");
 
 struct vtkSMProxyPropertyInternals
 {
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > Proxies;
-  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > PreviousProxies;
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxy> > 
+          PreviousProxiesVectorType;
+  typedef vtkstd::map<vtkSMProxy*, PreviousProxiesVectorType> 
+          PreviousProxiesType;
+  PreviousProxiesType PreviousProxies;
   vtkstd::vector<vtkSMProxy*> UncheckedProxies;
 };
 
@@ -79,6 +84,9 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
     return;
     }
 
+  vtkSMProxyPropertyInternals::PreviousProxiesVectorType& prevProxies =
+    this->PPInternals->PreviousProxies[cons];
+
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToRemove;
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToAdd;
  
@@ -86,21 +94,21 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
   // These are the proxies to remove.
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_remove(proxiesToRemove);
-  vtkstd::set_difference(this->PPInternals->PreviousProxies.begin(),
-    this->PPInternals->PreviousProxies.end(),
-    this->PPInternals->Proxies.begin(),
-    this->PPInternals->Proxies.end(),
-    ii_remove);
+  vtkstd::set_difference(prevProxies.begin(),
+                         prevProxies.end(),
+                         this->PPInternals->Proxies.begin(),
+                         this->PPInternals->Proxies.end(),
+                         ii_remove);
   
   // Determine the proxies in the Proxies but not in PreviousProxies.
   // These are the proxies to add.
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_add(proxiesToAdd);
   vtkstd::set_difference(this->PPInternals->Proxies.begin(),
-    this->PPInternals->Proxies.end(),
-    this->PPInternals->PreviousProxies.begin(),
-    this->PPInternals->PreviousProxies.end(),
-    ii_add   );
+                         this->PPInternals->Proxies.end(),
+                         prevProxies.begin(),
+                         prevProxies.end(),
+                         ii_add   );
 
   // Remove the proxies to remove.
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter1;
@@ -126,10 +134,10 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
  
   // Set PreviousProxies to match the current Proxies.
   // (which is same as PreviousProxies - proxiesToRemove + proxiesToAdd).
-  this->PPInternals->PreviousProxies.clear();
+  prevProxies.clear();
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii(
-    this->PPInternals->PreviousProxies);
+    prevProxies);
   vtkstd::copy(this->PPInternals->Proxies.begin(),
     this->PPInternals->Proxies.end(),
     ii);
@@ -165,10 +173,9 @@ void vtkSMProxyProperty::AppendCommandToStream(
     }
 
   // Remove all consumers (using previous proxies)
-  this->RemoveConsumers(cons);
+  this->RemoveConsumerFromPreviousProxies(cons);
   // Remove all previous proxies before adding new ones.
-  this->RemoveAllPreviousProxies();
-
+  this->RemoveAllPreviousProxies(cons);
   
   for (unsigned int idx=0; idx < numProxies; idx++)
     {
@@ -176,7 +183,7 @@ void vtkSMProxyProperty::AppendCommandToStream(
     // Keep track of all proxies that point to this as a
     // consumer so that we can remove this from the consumer
     // list later if necessary
-    this->AddPreviousProxy(proxy);
+    this->AddPreviousProxy(cons, proxy);
     if (proxy)
       {
       proxy->AddConsumer(this, cons);
@@ -251,29 +258,36 @@ void vtkSMProxyProperty::AppendProxyToStream(vtkSMProxy* toAppend,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::RemoveAllPreviousProxies()
+void vtkSMProxyProperty::RemoveAllPreviousProxies(vtkSMProxy* cons)
 {
-  this->PPInternals->PreviousProxies.erase(
-    this->PPInternals->PreviousProxies.begin(),
-    this->PPInternals->PreviousProxies.end());
+  vtkSMProxyPropertyInternals::PreviousProxiesVectorType& prevProxies =
+    this->PPInternals->PreviousProxies[cons];
+
+  prevProxies.erase(prevProxies.begin(), prevProxies.end());
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::AddPreviousProxy(vtkSMProxy* proxy)
+void vtkSMProxyProperty::AddPreviousProxy(vtkSMProxy* cons, vtkSMProxy* proxy)
 {
-  this->PPInternals->PreviousProxies.push_back(proxy);
+  vtkSMProxyPropertyInternals::PreviousProxiesVectorType& prevProxies =
+    this->PPInternals->PreviousProxies[cons];
+
+  prevProxies.push_back(proxy);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::RemoveConsumers(vtkSMProxy* proxy)
+void vtkSMProxyProperty::RemoveConsumerFromPreviousProxies(vtkSMProxy* cons)
 {
+  vtkSMProxyPropertyInternals::PreviousProxiesVectorType& prevProxies =
+    this->PPInternals->PreviousProxies[cons];
+
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator it =
-    this->PPInternals->PreviousProxies.begin();
-  for(; it != this->PPInternals->PreviousProxies.end(); it++)
+    prevProxies.begin();
+  for(; it != prevProxies.end(); it++)
     {
     if (it->GetPointer())
       {
-      it->GetPointer()->RemoveConsumer(this, proxy);
+      it->GetPointer()->RemoveConsumer(this, cons);
       }
     }
 }

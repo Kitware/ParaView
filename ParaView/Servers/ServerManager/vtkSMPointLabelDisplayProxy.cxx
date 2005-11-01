@@ -308,9 +308,9 @@ void vtkSMPointLabelDisplayProxy::InvalidateGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::MarkConsumersAsModified()
+void vtkSMPointLabelDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  this->Superclass::MarkConsumersAsModified();
+  this->Superclass::MarkModified(modifiedProxy);
   this->InvalidateGeometry();
 }
 

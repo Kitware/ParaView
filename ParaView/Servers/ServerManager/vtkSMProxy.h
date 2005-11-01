@@ -281,9 +281,13 @@ public:
     int proxyPropertyCopyFlag);
   
   // Description:
-  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
+  // Calls MarkModified() on all consumers. Sub-classes
   // should add their functionality and call this.
-  virtual void MarkConsumersAsModified();
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
+  // Description:
+  // Calls MarkModified() on all consumers.
+  virtual void MarkConsumersAsModified(vtkSMProxy* modifiedProxy);
 
 protected:
   vtkSMProxy();

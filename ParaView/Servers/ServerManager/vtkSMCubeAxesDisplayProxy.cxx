@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -197,9 +197,9 @@ void vtkSMCubeAxesDisplayProxy::SetVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplayProxy::MarkConsumersAsModified()
+void vtkSMCubeAxesDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  this->Superclass::MarkConsumersAsModified();
+  this->Superclass::MarkModified(modifiedProxy);
   this->InvalidateGeometry();
 }
 

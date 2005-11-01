@@ -63,9 +63,8 @@ public:
   //ETX
   
   // Description:
-  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
-  // should add their functionality and call this.
-  virtual void MarkConsumersAsModified();
+  // Chains to superclass and calls InvalidateGeometry().
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
   // Accessor to the font size in the sub proxy.

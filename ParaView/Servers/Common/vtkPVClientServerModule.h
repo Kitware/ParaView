@@ -101,13 +101,13 @@ public:
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
                                   vtkStringList* files, int save);
   
-//BTX
+  //BTX
   enum 
     {
     SINGLE_PROCESS_MODE = 0,
     MPI_MODE
     };
-//ETX
+  //ETX
   
   static void ErrorCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 
@@ -115,6 +115,7 @@ public:
   // Process a client server message on the server.
   void ProcessMessage(unsigned char* arg, size_t len);
   
+  //BTX
   friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
   //ETX
 
