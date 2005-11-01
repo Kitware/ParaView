@@ -121,7 +121,7 @@ IF (PARAVIEW_WRAP_PYTHON)
   VTK_WRAP_PYTHON3(
     vtkPVServerCommonPython 
     ServerCommonPython_SRCS 
-    "${ServerCommonCommon_SRCS};${SMInstantiator_SRCS}"
+    "${Common_SRCS};${SMInstantiator_SRCS}"
     ""
     )
   IF(NOT WIN32)
