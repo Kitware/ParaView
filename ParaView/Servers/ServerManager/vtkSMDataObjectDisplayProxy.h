@@ -254,14 +254,8 @@ public:
   // (when true) or not (when false) when invalidating geometry. If
   // UseCache is true, cached geometry is not marked as invalid (and
   // is not updated on server).
-  static void SetUseCache(int useCache)
-    {
-      vtkSMDataObjectDisplayProxy::UseCache = useCache;
-    }
-  static int GetUseCache()
-    {
-      return vtkSMDataObjectDisplayProxy::UseCache;
-    }
+  static void SetUseCache(int useCache);
+  static int GetUseCache();
 
 protected:
   vtkSMDataObjectDisplayProxy();

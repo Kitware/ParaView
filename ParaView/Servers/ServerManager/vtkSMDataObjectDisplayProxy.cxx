@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.4");
 
 int vtkSMDataObjectDisplayProxy::UseCache = 0;
 
@@ -93,6 +93,18 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
   this->OpacityFunctionProxy = 0;
   this->ColorTransferFunctionProxy = 0;
   this->GeometryInformation->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetUseCache(int useCache)
+{
+  vtkSMDataObjectDisplayProxy::UseCache = useCache;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetUseCache()
+{
+  return vtkSMDataObjectDisplayProxy::UseCache;
 }
 
 //-----------------------------------------------------------------------------
