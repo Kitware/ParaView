@@ -48,13 +48,14 @@
 class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWNotebook;
+class vtkKWPushButton;
+class vtkKWSeparator;
+class vtkKWSplitFrame;
+class vtkKWTopLevel;
+class vtkKWTreeWithScrollbars;
+class vtkKWUserInterfaceManagerDialogInternals;
 class vtkKWUserInterfacePanel;
 class vtkKWWidget;
-class vtkKWUserInterfaceManagerDialogInternals;
-class vtkKWTopLevel;
-class vtkKWSplitFrame;
-class vtkKWTreeWithScrollbars;
-class vtkKWPushButton;
 
 class KWWIDGETS_EXPORT vtkKWUserInterfaceManagerDialog : public vtkKWUserInterfaceManager
 {
@@ -178,6 +179,12 @@ public:
   virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int page_id);
 
   // Description:
+  // Set/Get the vertical scrollbar visibility of the tree (off by default)
+  virtual void SetVerticalScrollbarVisibility(int val);
+  virtual int GetVerticalScrollbarVisibility();
+  vtkBooleanMacro(VerticalScrollbarVisibility, int);
+
+  // Description:
   // Callbacks
   virtual void SelectionChangedCallback();
 
@@ -198,6 +205,7 @@ protected:
   vtkKWSplitFrame         *SplitFrame;
   vtkKWTreeWithScrollbars *Tree;
   vtkKWPushButton         *CloseButton;
+  vtkKWSeparator          *Separator;
 
   // PIMPL Encapsulation for STL containers
   //BTX

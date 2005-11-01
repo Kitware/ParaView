@@ -18,15 +18,16 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWWindowBase.h"
-#include "vtkKWTopLevel.h"
-#include "vtkKWTkUtilities.h"
-#include "vtkKWUserInterfacePanel.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWSplitFrame.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWSeparator.h"
+#include "vtkKWSplitFrame.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkKWTopLevel.h"
 #include "vtkKWTree.h"
 #include "vtkKWTreeWithScrollbars.h"
+#include "vtkKWUserInterfacePanel.h"
+#include "vtkKWWindowBase.h"
+#include "vtkObjectFactory.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/list>
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.10");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.11");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -52,6 +53,7 @@ vtkKWUserInterfaceManagerDialog::vtkKWUserInterfaceManagerDialog()
   this->TopLevel    = vtkKWTopLevel::New();
   this->SplitFrame  = vtkKWSplitFrame::New();
   this->CloseButton = vtkKWPushButton::New();
+  this->Separator = vtkKWSeparator::New();
   this->Tree        = vtkKWTreeWithScrollbars::New();
 
   this->Internals = new vtkKWUserInterfaceManagerDialogInternals;
@@ -85,6 +87,12 @@ vtkKWUserInterfaceManagerDialog::~vtkKWUserInterfaceManagerDialog()
     {
     this->CloseButton->Delete();
     this->CloseButton = NULL;
+    }
+
+  if (this->Separator)
+    {
+    this->Separator->Delete();
+    this->Separator = NULL;
     }
 
   if (this->Tree)
@@ -131,7 +139,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   this->SplitFrame->SetFrame1Size(220);
   this->SplitFrame->SetFrame1MinimumSize(this->SplitFrame->GetFrame1Size());
   
-  this->Script("pack %s -side top -expand y -fill both -padx 1 -pady 2", 
+  this->Script("pack %s -side top -expand y -fill both -padx 2 -pady 4", 
                this->SplitFrame->GetWidgetName());
   
   // Create the tree
@@ -139,11 +147,13 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   this->Tree->SetParent(this->SplitFrame->GetFrame1());
   this->Tree->Create(app);
   this->Tree->HorizontalScrollbarVisibilityOff();
+  this->Tree->VerticalScrollbarVisibilityOff();
+  this->Tree->SetPadX(0);
+  this->Tree->SetPadY(0);
+  this->Tree->SetBorderWidth(2);
+  this->Tree->SetReliefToSunken();
 
   vtkKWTree *tree = this->Tree->GetWidget();
-  tree->SetPadX(0);
-  tree->SetReliefToFlat();
-  tree->SetBorderWidth(0);
   tree->SetHighlightThickness(0);
   tree->SetBackgroundColor(1.0, 1.0, 1.0);
   tree->SetSelectionForegroundColor(1.0, 1.0, 1.0);
@@ -153,18 +163,26 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   tree->SetWidth(350 / 8);
   tree->SetSelectionChangedCommand(this, "SelectionChangedCallback");
 
-  this->Script("pack %s -side top -expand y -fill both", 
+  this->Script("pack %s -side top -expand y -fill both -padx 1", 
                this->Tree->GetWidgetName());
     
+  // Separator
+
+  this->Separator->SetParent(parent);
+  this->Separator->Create(app);
+  
+  this->Script("pack %s -side top -fill x  -padx 2 -pady 0", 
+               this->Separator->GetWidgetName());
+  
   // Close button
 
   this->CloseButton->SetParent(parent);
   this->CloseButton->Create(app);
   this->CloseButton->SetText("Close");
-  this->CloseButton->SetWidth(30);
+  this->CloseButton->SetWidth(20);
   this->CloseButton->SetCommand(this->TopLevel, "Withdraw");
   
-  this->Script("pack %s -side top -anchor c -fill x -padx 1 -pady 2", 
+  this->Script("pack %s -side top -anchor e -fill none -padx 2 -pady 4", 
                this->CloseButton->GetWidgetName());
   
   // Create the notebook
@@ -728,6 +746,25 @@ void vtkKWUserInterfaceManagerDialog::RaiseSection(
     target_page_title = this->Notebook->GetPageTitle(target_page_id);
     }
   this->RaiseSection(target_panel, target_page_title, target_section);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManagerDialog::SetVerticalScrollbarVisibility(int arg)
+{
+  if (this->Tree)
+    {
+    this->Tree->SetVerticalScrollbarVisibility(arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceManagerDialog::GetVerticalScrollbarVisibility()
+{
+  if (this->Tree)
+    {
+    return this->Tree->GetVerticalScrollbarVisibility();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
