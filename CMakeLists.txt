@@ -533,6 +533,8 @@ SET(ExtraParaViewServerNonWrapped_SRCS)
 SET(ExtraParaViewClient_SRCS)
 SET(ExtraParaViewBinary_SRCS)
 SET(ExtraParaViewServer_SRCS)
+SET(ExtraParaViewServerFiltersIncludes)
+SET(ExtraParaViewGUIIncludes)
 
 MACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
   SET(ExtraParaViewServerNonWrapped_SRCS
@@ -551,6 +553,12 @@ ENDMACRO(PARAVIEW_INCLUDE_EXECUTABLE_SOURCES SRCS)
 MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
   SET(ExtraParaViewServer_SRCS ${ExtraParaViewServer_SRCS} ${SRCS})
 ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
+MACRO(PARAVIEW_FILTERS_INCLUDE_DIRECTORIES SRCS)
+  SET(ExtraParaViewServerFiltersIncludes ${ExtraParaViewServerFiltersIncludes} ${SRCS})
+ENDMACRO(PARAVIEW_FILTERS_INCLUDE_DIRECTORIES SRCS)
+MACRO(PARAVIEW_GUI_INCLUDE_DIRECTORIES SRCS)
+  SET(ExtraParaViewGUIIncludes ${ExtraParaViewGUIIncludes} ${SRCS})
+ENDMACRO(PARAVIEW_GUI_INCLUDE_DIRECTORIES SRCS)
 
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
