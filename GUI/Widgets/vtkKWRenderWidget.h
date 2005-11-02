@@ -98,13 +98,12 @@ public:
   virtual void Reset();
 
   // Description:
-  // Reset the camera to display all the actors in the scene. 
+  // Reset the camera to display all the actors in the scene, or just
+  // the camera clipping range.
+  // This is done for each renderer (if multiple renderer are supported)
   virtual void ResetCamera();
+  virtual void ResetCameraClippingRange();
   
-  // Description:
-  // Get the current camera
-  vtkCamera *GetCurrentCamera();
-
   // Description:
   // Add/remove the widget bindings.
   // The AddBindings() method sets up general bindings like the Expose or
@@ -187,11 +186,15 @@ public:
   // GetRendererIndex() gets the id of a given renderer (or -1 if this renderer
   // does not belong to this widget), i.e. its index/position in the list
   // of renderers.
+  // The ComputeVisiblePropBounds() method returns the bounds of the 
+  // visible props for a given renderer. By default, it is just a call
+  // to vtkRenderer::ComputeVisiblePropBounds().
   virtual vtkRenderer* GetRenderer() { return this->GetNthRenderer(0); }
   virtual vtkRenderer* GetOverlayRenderer();
   virtual vtkRenderer* GetNthRenderer(int index);
   virtual int GetNumberOfRenderers();
   virtual int GetRendererIndex(vtkRenderer*);
+  virtual void ComputeVisiblePropBounds(int index, double bounds[6]);
 
   // Description:
   // Set/Get the printing flag (i.e., are we printing?)

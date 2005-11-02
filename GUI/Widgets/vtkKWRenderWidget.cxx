@@ -39,7 +39,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.108");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.109");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -111,7 +111,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   // Get the camera, use it in overlay renderer too
 
-  vtkCamera *cam = this->GetCurrentCamera();
+  vtkCamera *cam = this->GetRenderer()->GetActiveCamera();
   if (cam)
     {
     cam->ParallelProjectionOn();
@@ -236,15 +236,13 @@ vtkRenderer* vtkKWRenderWidget::GetOverlayRenderer()
 }
 
 //----------------------------------------------------------------------------
-vtkCamera* vtkKWRenderWidget::GetCurrentCamera()
+void vtkKWRenderWidget::ComputeVisiblePropBounds(int index, double bounds[6])
 {
-  vtkRenderer *ren = this->GetRenderer();
-  if (ren)
+  vtkRenderer *renderer = this->GetNthRenderer(index);
+  if (renderer)
     {
-    return ren->GetActiveCamera();
+    renderer->ComputeVisiblePropBounds(bounds);
     }
-
-  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -708,80 +706,115 @@ void vtkKWRenderWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::ResetCamera()
 {
-  vtkRenderer *ren = this->GetRenderer();
-  if (!ren)
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
     {
-    return;
-    }
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      double bounds[6];
+      this->ComputeVisiblePropBounds(i, bounds);
+      if (bounds[0] == VTK_LARGE_FLOAT)
+        {
+        vtkDebugMacro(<< "Cannot reset camera!");
+        return;
+        }
 
-  double bounds[6];
-  double center[3];
-  double distance, width, viewAngle, vn[3], *vup;
+      double vn[3];
+      vtkCamera *cam = renderer->GetActiveCamera();
+      if (cam != NULL)
+        {
+        cam->GetViewPlaneNormal(vn);
+        }
+      else
+        {
+        vtkErrorMacro(<< "Trying to reset non-existant camera");
+        return;
+        }
+
+      double center[3];
+      center[0] = ((bounds[0] + bounds[1]) / 2.0);
+      center[1] = ((bounds[2] + bounds[3]) / 2.0);
+      center[2] = ((bounds[4] + bounds[5]) / 2.0);
+
+      double aspect[2];
+      renderer->ComputeAspect();
+      renderer->GetAspect(aspect);
+
+      double distance, width, viewAngle, *vup;
+
+      // Check Y and Z for the Y axis on the window
+
+      width = (bounds[3] - bounds[2]) / aspect[1];
+      
+      if (((bounds[5] - bounds[4]) / aspect[1]) > width) 
+        {
+        width = (bounds[5] - bounds[4]) / aspect[1];
+        }
+      
+      // Check X and Y for the X axis on the window
+
+      if (((bounds[1] - bounds[0]) / aspect[0]) > width) 
+        {
+        width = (bounds[1] - bounds[0]) / aspect[0];
+        }
+
+      if (((bounds[3] - bounds[2]) / aspect[0]) > width) 
+        {
+        width = (bounds[3] - bounds[2]) / aspect[0];
+        }
   
-  ren->ComputeVisiblePropBounds(bounds);
-  if (bounds[0] == VTK_LARGE_FLOAT)
-    {
-    vtkDebugMacro(<< "Cannot reset camera!");
-    return;
-    }
-
-  vtkCamera *cam = this->GetCurrentCamera();
-  if (cam != NULL)
-    {
-    cam->GetViewPlaneNormal(vn);
-    }
-  else
-    {
-    vtkErrorMacro(<< "Trying to reset non-existant camera");
-    return;
-    }
-
-  center[0] = (double)(((double)bounds[0] + (double)bounds[1]) / 2.0);
-  center[1] = (double)(((double)bounds[2] + (double)bounds[3]) / 2.0);
-  center[2] = (double)(((double)bounds[4] + (double)bounds[5]) / 2.0);
-
-  width = (double)bounds[3] - (double)bounds[2];
-  if (width < ((double)bounds[1] - (double)bounds[0]))
-    {
-    width = (double)bounds[1] - (double)bounds[0];
-    }
-  if (width < ((double)bounds[5] - (double)bounds[4]))
-    {
-    width = (double)bounds[5] - (double)bounds[4];
-    }
+      if (cam->GetParallelProjection())
+        {
+        viewAngle = 30;  // the default in vtkCamera
+        }
+      else
+        {
+        viewAngle = cam->GetViewAngle();
+        }
   
-  if (cam->GetParallelProjection())
-    {
-    viewAngle = 30;  // the default in vtkCamera
+      distance = width / (double)tan(viewAngle * vtkMath::Pi() / 360.0);
+
+      // Check view-up vector against view plane normal
+
+      vup = cam->GetViewUp();
+      if (fabs(vtkMath::Dot(vup, vn)) > 0.999)
+        {
+        vtkWarningMacro(
+          "Resetting view-up since view plane normal is parallel");
+        cam->SetViewUp(-vup[2], vup[0], vup[1]);
+        }
+
+      // Update the camera
+      
+      cam->SetFocalPoint(center[0], center[1], center[2]);
+      cam->SetPosition((center[0] + distance * vn[0]),
+                       (center[1] + distance * vn[1]),
+                       (center[2] + distance * vn[2]));
+
+      // Setup default parallel scale
+      
+      cam->SetParallelScale(0.5 * width);
+      }
     }
-  else
+
+  this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ResetCameraClippingRange()
+{
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
     {
-    viewAngle = cam->GetViewAngle();
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      double bounds[6];
+      this->ComputeVisiblePropBounds(i, bounds);
+      renderer->ResetCameraClippingRange(bounds);
+      }
     }
-  
-  distance = width / (double)tan(viewAngle * vtkMath::Pi() / 360.0);
-
-  // Check view-up vector against view plane normal
-
-  vup = cam->GetViewUp();
-  if (fabs(vtkMath::Dot(vup,vn)) > 0.999)
-    {
-    vtkWarningMacro(<<"Resetting view-up since view plane normal is parallel");
-    cam->SetViewUp(-vup[2], vup[0], vup[1]);
-    }
-
-  // Update the camera
-
-  cam->SetFocalPoint(center[0], center[1], center[2]);
-  cam->SetPosition((double)((double)center[0] + distance * vn[0]),
-                   (double)((double)center[1] + distance * vn[1]),
-                   (double)((double)center[2] + distance * vn[2]));
-
-  ren->ResetCameraClippingRange(bounds);
-
-  // Setup default parallel scale
-
-  cam->SetParallelScale(0.5 * width);
 }
 
 //----------------------------------------------------------------------------
@@ -807,11 +840,7 @@ void vtkKWRenderWidget::Render()
 
   if (this->RenderMode != vtkKWRenderWidget::DisabledRender)
     {
-    vtkRenderer *ren = this->GetRenderer();
-    if (ren)
-      {
-      ren->ResetCameraClippingRange();
-      }
+    this->ResetCameraClippingRange();
     this->RenderWindow->Render();
     }
   
@@ -957,10 +986,14 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddViewProp(vtkProp *prop)
 {
-  vtkRenderer *ren = this->GetRenderer();
-  if (ren)
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
     {
-    ren->AddViewProp(prop);
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->AddViewProp(prop);
+      }
     }
 }
 
@@ -993,10 +1026,14 @@ void vtkKWRenderWidget::RemoveViewProp(vtkProp* prop)
 {
   // safe to call both, vtkViewport does a check first
 
-  vtkRenderer *ren = this->GetRenderer();
-  if (ren)
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
     {
-    ren->RemoveViewProp(prop);
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveViewProp(prop);
+      }
     }
 
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
@@ -1009,10 +1046,14 @@ void vtkKWRenderWidget::RemoveViewProp(vtkProp* prop)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllViewProps()
 {
-  vtkRenderer *ren = this->GetRenderer();
-  if (ren)
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
     {
-    ren->RemoveAllViewProps();
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveAllViewProps();
+      }
     }
 
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
