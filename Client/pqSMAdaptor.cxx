@@ -307,7 +307,7 @@ void pqSMAdaptor::QtLinkedPropertyChanged(QWidget* data)
     {
     this->SetProperty(iter->first.Property, iter->first.Index, prop);
     iter->first.Proxy->UpdateVTKObjects();
-    iter->first.Proxy->MarkConsumersAsModified();
+    //iter->first.Proxy->MarkConsumersAsModified();
     }
 }
 
