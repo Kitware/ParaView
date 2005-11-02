@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.405");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.406");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1332,7 +1332,7 @@ void vtkPVRenderView::CreateViewProperties()
   vtkstd::string p;
   vtkLightKit::LightKitSubType subtype;
   int cc;
-  float reg_value;
+  float reg_value=0;
   int reg_value_valid;
   for ( cc = 0; cc < 4; cc ++ )
     {
