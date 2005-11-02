@@ -27,6 +27,7 @@
 #include "vtkKWProgressGauge.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
+#include "vtkRenderer.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWScaleWithEntrySet.h"
 #include "vtkKWTkUtilities.h"
@@ -60,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -788,7 +789,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
 
   double pos[3], view_up[3], angle, parallel_scale;
 
-  vtkCamera *cam = this->RenderWidget->GetCurrentCamera();
+  vtkCamera *cam = this->RenderWidget->GetRenderer()->GetActiveCamera();
   cam->GetPosition(pos);
   cam->GetViewUp(view_up);
   angle = cam->GetViewAngle();
@@ -982,7 +983,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
 
   double pos[3], fp[3], parallel_scale;
 
-  vtkCamera *cam = this->RenderWidget->GetCurrentCamera();
+  vtkCamera *cam = this->RenderWidget->GetRenderer()->GetActiveCamera();
   cam->GetPosition(pos);
   cam->GetFocalPoint(fp);
   parallel_scale = cam->GetParallelScale();
