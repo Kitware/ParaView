@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.44");
+vtkCxxRevisionMacro(vtkSMProxy, "1.45");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -794,13 +794,14 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     }
   this->ObjectsCreated = 1;
 
-  if (this->VTKClassName)
+  if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
     for (int i=0; i<numObjects; i++)
       {
-      vtkClientServerID objectId = pm->NewStreamObject(this->VTKClassName, stream);
+      vtkClientServerID objectId = 
+        pm->NewStreamObject(this->VTKClassName, stream);
 
       this->Internals->IDs.push_back(objectId);
 
