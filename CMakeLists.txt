@@ -25,9 +25,9 @@ SET(VTK_NO_LIBRARY_VERSION 1)
 SET(VTK_LIBRARY_PROPERTIES VERSION "pv${PARAVIEW_VERSION}")
 
 # Setup output directories.
-SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
+SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all libraries.")
-SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
+SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
 
 # See VTK/CMakeLists.txt for an explanation of this default selection.
