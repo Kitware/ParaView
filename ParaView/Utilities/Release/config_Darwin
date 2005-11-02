@@ -1,5 +1,14 @@
 PLATFORM="darwin"
-CC="cc"
+CC="gcc"
 CXX="c++"
-CMAKE="/Users/kitware/Nightly/CMake18-install/bin/cmake"
+CMAKE="/Users/kitware/Dashboards/CMake/CMakeBin/bin/cmake"
 DISPLAY=
+
+write_cache()
+{
+  write_standard_cache
+  cat >> CMakeCache.txt <<EOF
+VTK_USE_CARBON:BOOL=OFF
+VTK_USE_X:BOOL=ON
+EOF
+}
