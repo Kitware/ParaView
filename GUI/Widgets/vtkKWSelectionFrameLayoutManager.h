@@ -132,6 +132,18 @@ public:
     vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2);
 
   // Description:
+  // Check if a widget is maximized, i.e. at position (0,0) in a (1,1)
+  // resolution. Maximize it (this will save the old resolution and position)
+  // or undo maximize (this will restore old resolution and position).
+  // Toggle maximize will maximize if widget is not maximized already or undo
+  // the maximize
+  // Return 1 on success, 0 on error
+  virtual int IsWidgetMaximized(vtkKWSelectionFrame *w);
+  virtual int MaximizeWidget(vtkKWSelectionFrame *w);
+  virtual int UndoMaximizeWidget();
+  virtual int ToggleMaximizeWidget(vtkKWSelectionFrame *w);
+
+  // Description:
   // Select a a widget.
   // If arg is NULL, nothing is selected (all others are deselected)
   virtual void SelectWidget(vtkKWSelectionFrame *widget);
