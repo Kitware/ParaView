@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.44");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.45");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -107,8 +107,8 @@ vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
   this->SelectionChangedCommand = NULL;
 
   this->GetResolution(this->Internals->ResolutionBeforeMaximize);
-  this->Internals->SelectionPositionBeforeMaximize[0] = 1;
-  this->Internals->SelectionPositionBeforeMaximize[1] = 1;
+  this->Internals->SelectionPositionBeforeMaximize[0] = 0;
+  this->Internals->SelectionPositionBeforeMaximize[1] = 0;
 
   this->SetResolution(1, 1);
 }
@@ -1456,71 +1456,100 @@ void vtkKWSelectionFrameLayoutManager::SelectWidgetCallback(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::IsWidgetMaximized(
+  vtkKWSelectionFrame *widget)
+{
+  int col, row;
+  return (widget && 
+          this->GetWidgetPosition(widget, &col, &row) &&
+          col == 0 && row == 0 && 
+          this->Resolution[0] == 1 && this->Resolution[1] == 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::MaximizeWidget(
+  vtkKWSelectionFrame *widget)
+{
+  // Save the resolution and the position so that both can
+  // be restored on UndoMaximize
+
+  if (widget && this->Internals &&
+      this->GetWidgetPosition(
+        widget, 
+        this->Internals->SelectionPositionBeforeMaximize))
+    {
+    this->GetResolution(this->Internals->ResolutionBeforeMaximize);
+
+    // Set the resolution to full (1, 1)
+    // then switch whichever widget was at [0, 0] with our widget
+
+    this->SetResolution(1, 1);
+    
+    vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
+    if (at00)
+      {
+      this->SwitchWidgetsPosition(widget, at00);
+      }
+    else
+      {
+      this->SetWidgetPosition(widget, 0, 0);
+      }
+
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::UndoMaximizeWidget()
+{
+  if (this->Resolution[0] == 1 && this->Resolution[1] == 1 && this->Internals)
+    {
+    this->SetResolution(this->Internals->ResolutionBeforeMaximize);
+
+    vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
+    vtkKWSelectionFrame *atpos = this->GetWidgetAtPosition(
+      this->Internals->SelectionPositionBeforeMaximize);
+    if (atpos && at00)
+      {
+      this->SwitchWidgetsPosition(at00, atpos);
+      }
+    else if (at00)
+      {
+      this->SetWidgetPosition(
+        at00, this->Internals->SelectionPositionBeforeMaximize);
+      }
+    else if (atpos)
+      {
+      this->SetWidgetPosition(atpos, 0, 0);
+      }
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSelectionFrameLayoutManager::ToggleMaximizeWidget(
+  vtkKWSelectionFrame *widget)
+{
+  if (this->IsWidgetMaximized(widget))
+    {
+    return this->UndoMaximizeWidget();
+    }
+  else
+    {
+    return this->MaximizeWidget(widget);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
   this->SelectWidget(selection);
-
-  // If we are already maximized, go back to the previous resolution
-  // otherwise maximize
-
-  if (this->Resolution[0] == 1 && this->Resolution[1] == 1)
-    {
-    if (this->Internals)
-      {
-      this->SetResolution(this->Internals->ResolutionBeforeMaximize);
-
-      vtkKWSelectionFrame *atpos = 
-        this->GetWidgetAtPosition(
-          this->Internals->SelectionPositionBeforeMaximize);
-      if (atpos)
-        {
-        this->SwitchWidgetsPosition(selection, atpos);
-        }
-      else
-        {
-        this->SetWidgetPosition(
-          selection, 
-          this->Internals->SelectionPositionBeforeMaximize);
-        }
-      }
-    }
-  else
-    {
-    // Save the resolution and the selection position so that both can
-    // be restored on minimize
-
-    this->GetResolution(this->Internals->ResolutionBeforeMaximize);
-    if (selection)
-      {
-      this->GetWidgetPosition(
-        selection, 
-        this->Internals->SelectionPositionBeforeMaximize);
-      }
-    else
-      {
-      this->Internals->SelectionPositionBeforeMaximize[0] = 1;
-      this->Internals->SelectionPositionBeforeMaximize[0] = 1;
-      }
-
-    // Set the resolution to full (1, 1)
-    // then switch whichever dataset was at [0, 0] with our selection
-
-    this->SetResolution(1, 1);
-    
-    if (selection)
-      {
-      vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
-      if (at00)
-        {
-        this->SwitchWidgetsPosition(selection, at00);
-        }
-      else
-        {
-        this->SetWidgetPosition(selection, 0, 0);
-        }
-      }
-    }
+  this->ToggleMaximizeWidget(selection);
 }
 
 //---------------------------------------------------------------------------
