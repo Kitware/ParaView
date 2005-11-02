@@ -27,7 +27,7 @@
 class vtkSMXYPlotDisplayProxyObserver;
 class vtkXYPlotWidget;
 class vtkSMRenderModuleProxy;
-
+class vtkSMSourceProxy;
 class vtkPolyData;
 
 class VTK_EXPORT vtkSMXYPlotDisplayProxy : public vtkSMConsumerDisplayProxy
