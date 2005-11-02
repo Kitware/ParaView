@@ -1,5 +1,22 @@
 /* 
  * Resource generated for file:
+ *    angle_tool.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_angle_tool_width          = 16;
+static const unsigned int  image_angle_tool_height         = 16;
+static const unsigned int  image_angle_tool_pixel_size     = 4;
+static const unsigned long image_angle_tool_length         = 288;
+static const unsigned long image_angle_tool_decoded_length = 1024;
+
+static const unsigned char image_angle_tool[] = 
+  "eNpjYMAArEC8CIgVGEgHIL3Lgfg/ENuQodcLiCcA8S0gjmUgD2wF4mCoWaQCPiD+CKXJAR"
+  "FAvIGBfLAGiJ8B8RwgDiJRLyfU7RZAnAzEa4G4G4jFCehjhtL+QLwTTbwEagYxAJRmsrGY"
+  "vZYIv4Di/g0OtyZDwwPmR2zADYgP45DTAOLrSPakAXEbWvqcAvUrtvRgDsR/oHpA8XMGmr"
+  "6/QcMMBF5A9YPwTKiaN9D4uAIVq4SmS0eoOQpIdmyFppsJUPeB4lAYh3/0oP4gBjATUgAA"
+  "SAgovg==";
+
+/* 
+ * Resource generated for file:
  *    bounding_box.png (zlib, base64) (image file)
  */
 static const unsigned int  image_bounding_box_width          = 16;
@@ -53,6 +70,40 @@ static const unsigned long image_corner_annotation_decoded_length = 768;
 
 static const unsigned char image_corner_annotation[] = 
   "eNpjYCAZPH1wg0gEV49LO5o42epJdc+oeuqqH1TxSxIAAOVLrKQ=";
+
+/* 
+ * Resource generated for file:
+ *    contour_tool.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_contour_tool_width          = 16;
+static const unsigned int  image_contour_tool_height         = 16;
+static const unsigned int  image_contour_tool_pixel_size     = 4;
+static const unsigned long image_contour_tool_length         = 428;
+static const unsigned long image_contour_tool_decoded_length = 1024;
+
+static const unsigned char image_contour_tool[] = 
+  "eNr7//8/w38smEHu/5H/OOQIYZBeBpm3lxnkfh8nSz8DgyqD+NF/QPoNEFcCMSeJ+nc21F"
+  "b8P318//+0lMT/UHPyiTEHCGJDgvz/P31wA44P7dv+PyUpDiT5AoizgZgVW/gAgTBIzaZ1"
+  "K1D0w/C+XVv+J8RF/2eQOPmTQebDBXQzgGBmfm4mVr3IWFND/T+DzMfzaHptzEyNCeo9cW"
+  "QvSPF91Pj6dxQodnXKxB6C+jvbmkD6Z6LEtfSL64IaVwjqBWF3V2eQfn9U+38fB4r9engH"
+  "vxkgeZA6bPEIBIsm9nXi1Hvl/In/C+fO+M8gefE9jnh3s7e1hqvfv3vL/77utv/hoUH/1V"
+  "RVIGlI8tI7BpnXV3HlDVC8Ojna/+fl4QGpvwrE84A4EYi1COUrSJ55dwlsPgMDH7n5jlQ9"
+  "APFsqHM=";
+
+/* 
+ * Resource generated for file:
+ *    distance_tool.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_distance_tool_width          = 16;
+static const unsigned int  image_distance_tool_height         = 16;
+static const unsigned int  image_distance_tool_pixel_size     = 4;
+static const unsigned long image_distance_tool_length         = 144;
+static const unsigned long image_distance_tool_decoded_length = 1024;
+
+static const unsigned char image_distance_tool[] = 
+  "eNr7//8/w38SMBAo/CdRD5JeCyD+BsSJZOp9A8RpQPwYiN3I0GsD5RsD8S0gFidVL5I4Jw"
+  "l6QdiCTP/aQPFMcv1Lrr0U6KWGf7fSyc2s0PQUTEG6zgfiq8SkJyLM4KTADD1S9QAAY/tv"
+  "XQ==";
 
 /* 
  * Resource generated for file:
@@ -126,11 +177,13 @@ static const unsigned char image_error[] =
 static const unsigned int  image_error_mini_width          = 16;
 static const unsigned int  image_error_mini_height         = 16;
 static const unsigned int  image_error_mini_pixel_size     = 4;
-static const unsigned long image_error_mini_length         = 64;
+static const unsigned long image_error_mini_length         = 196;
 static const unsigned long image_error_mini_decoded_length = 1024;
 
 static const unsigned char image_error_mini[] = 
-  "eNr7//8/w38aYCD4j4wHWv/MmTP/j+qnn34QBulBxv9plNaGY/qhV/gBAHZtokc=";
+  "eNqNkgEKgDAMA33a9rJtL49ECIRQq4XA1F6WrQK4EBpjIIWi740752Dv/Yhr6suH39TvXG"
+  "rOiY5lqdd9WHrOHOK9nPfiO/avtSDW86VHspnBs1ceVR7xzOD33eX44v/s7xLPebh/d37P"
+  "kHdYsW9nEZszkEc3/5yflOeo1tXe3f+f5+1YSTNJievY9ElVfTdYlrtJ";
 
 /* 
  * Resource generated for file:
@@ -139,11 +192,13 @@ static const unsigned char image_error_mini[] =
 static const unsigned int  image_error_red_mini_width          = 16;
 static const unsigned int  image_error_red_mini_height         = 16;
 static const unsigned int  image_error_red_mini_pixel_size     = 4;
-static const unsigned long image_error_red_mini_length         = 64;
+static const unsigned long image_error_red_mini_length         = 160;
 static const unsigned long image_error_red_mini_decoded_length = 1024;
 
 static const unsigned char image_error_red_mini[] = 
-  "eNr7//8/w39aYAYghYwHWP/MmTP/j+qno34gBulBxv9pldaGY/qhU/gBAPFTzhs=";
+  "eNqlklEOwCAIQz06N+8WIwupBcdm0h/lFawCGCDZGGBB1GUchE4+Gad8SnaeCjbss4fFGl"
+  "/Mhv15FzPIudkj8fQZLJuVl8rzniHNrWCP/J/+jftvGTbzl2/w8v2d/fL/Yu/u/8/Yx2Nl"
+  "umlxFbv5kFTdBXgpgFA=";
 
 /* 
  * Resource generated for file:
@@ -276,14 +331,13 @@ static const unsigned char image_helpbubble[] =
 static const unsigned int  image_info_mini_width          = 16;
 static const unsigned int  image_info_mini_height         = 16;
 static const unsigned int  image_info_mini_pixel_size     = 4;
-static const unsigned long image_info_mini_length         = 264;
+static const unsigned long image_info_mini_length         = 176;
 static const unsigned long image_info_mini_decoded_length = 1024;
 
 static const unsigned char image_info_mini[] = 
-  "eNr7//8/w38qY0F+/v8MDAxwDOITo8/IwBis3iYq6r951kI4BvFB4iB5fHql9Az+u7ef/m"
-  "/XcvZ/9YaXILVgGsQHiYPkcZkBMh+kxnfCDbD6xJlX/k/b/RhMg/ggcZA8SB26Xnl5ebAb"
-  "YWpANAzA9MPEQepA6tHtBvkTph+kHmQ3CBQuuY2iH6QO3Q3Y9IP00Us/uv9hYQcCsDDE53"
-  "/k8AfZhQ3A3IAt/NHjH+RmULzDMIhPKP4pTX/40j8uNw8GDADD16Au";
+  "eNqtk1EOgDAIQzn6jrabYaZrrKxszkjSH8eDQtDdzUmlFM/kIVdxszCzU4odc29x1FqHGo"
+  "pv3xQPH5hn5VkFe1j1Vv3ZQ9Z/5v9vvs2zw2P+bIc8e6zBbO9rlx2TPrK+6h5xX7EOuBkL"
+  "cS7qiF3ZG/UbeexqV+z7Cx/+zeHtAEpHBL0=";
 
 /* 
  * Resource generated for file:
@@ -822,14 +876,13 @@ static const unsigned char image_warning[] =
 static const unsigned int  image_warning_mini_width          = 16;
 static const unsigned int  image_warning_mini_height         = 16;
 static const unsigned int  image_warning_mini_pixel_size     = 4;
-static const unsigned long image_warning_mini_length         = 264;
+static const unsigned long image_warning_mini_length         = 148;
 static const unsigned long image_warning_mini_decoded_length = 1024;
 
 static const unsigned char image_warning_mini[] = 
-  "eNrFkrENhDAMRV3R0FBdiTIB9a3CVCzDEgzAGvRUPj0s31lWQBRIV1iWf/6P/Z2oqujD0b"
-  "YvFZFvUN/RDcP74E+T6LKIzrNlanDOr7TjKLptBqEtxTI1OOdnd3D/vv+4TWM9yX4n52BZ"
-  "2/flmDHqu8645KiHBz/3xqdD8OP+XE/AyzNQu0/vg1dwss/le6npY39iXW1/5IjX+mf/7o"
-  "FecfYz/3n/cc7sq7b/2vu7hzjP1fvX/h/6u//vif//j/gAd0GI4Q==";
+  "eNqlkUEOACEIA3k6P++GGCMhFME99KAwUikAQSJVwRZIDwrWX4nM3sh4VcULO/Xg+cX0PU"
+  "R2q+uhwzMP2c4iX3mIvJ3XvHsW9c7vWTCeyXtgrNVPH/fwh7fa1Dv7g8+rozX75LDPExn3"
+  "AZ/Fj8c=";
 
 /* 
  * Resource generated for file:

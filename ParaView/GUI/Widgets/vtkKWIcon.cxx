@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.23");
+vtkCxxRevisionMacro(vtkKWIcon, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -146,6 +146,14 @@ void vtkKWIcon::SetImage(int image)
   
   switch (image)
     {
+    case vtkKWIcon::IconAngleTool:
+      this->SetImage(
+        image_angle_tool, 
+        image_angle_tool_width, image_angle_tool_height,
+        image_angle_tool_pixel_size, 
+        image_angle_tool_length);
+      break;
+
     case vtkKWIcon::IconBoundingBox:
       this->SetImage(
         image_bounding_box, 
@@ -170,12 +178,28 @@ void vtkKWIcon::SetImage(int image)
         image_connection_length);
       break;
 
+    case vtkKWIcon::IconContourTool:
+      this->SetImage(
+        image_contour_tool, 
+        image_contour_tool_width, image_contour_tool_height,
+        image_contour_tool_pixel_size, 
+        image_contour_tool_length);
+      break;
+
     case vtkKWIcon::IconCornerAnnotation:
       this->SetImage(
         image_corner_annotation, 
         image_corner_annotation_width, image_corner_annotation_height,
         image_corner_annotation_pixel_size, 
         image_corner_annotation_length);
+      break;
+
+    case vtkKWIcon::IconDistanceTool:
+      this->SetImage(
+        image_distance_tool, 
+        image_distance_tool_width, image_distance_tool_height,
+        image_distance_tool_pixel_size, 
+        image_distance_tool_length);
       break;
 
     case vtkKWIcon::IconDocument:

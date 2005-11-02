@@ -41,10 +41,13 @@ public:
   // These constants specify different icons.
   enum { 
     IconNoIcon                    = 0,
+    IconAngleTool                 = 14,
     IconBoundingBox               = 13,
     IconColorBarAnnotation        = 12,
     IconConnection                = 1,
+    IconContourTool               = 16,
     IconCornerAnnotation          = 11,
+    IconDistanceTool              = 15,
     IconDocument                  = 9,
     IconEmpty16x16                = 6,
     IconEmpty1x1                  = 10,
