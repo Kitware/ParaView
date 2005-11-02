@@ -63,7 +63,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.459");
+vtkCxxRevisionMacro(vtkPVSource, "1.460");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1739,7 +1739,7 @@ void vtkPVSource::MarkSourcesForUpdate()
   vtkPVSource* consumer;
 
   this->InvalidateDataInformation();
-  //this->Proxy->MarkModified(this->Proxy);
+  this->Proxy->MarkModified(this->Proxy);
 
   // Get rid of caches.
   int numParts;
