@@ -1,6 +1,12 @@
 PROJECT(ParaQ)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
+# Setup output directories.
+SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
+  "Single output directory for building all libraries.")
+SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
+  "Single output directory for building all executables.")
+
 IF(NOT WIN32)
 # prevent runtime problems on Unix/Mac when Qt & VTK use
 # separate instances of these libraries
