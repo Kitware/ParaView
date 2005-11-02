@@ -59,8 +59,6 @@ public:
   virtual void Update();
   virtual void UpdateDataToDistribute();
 
-  virtual void CacheUpdate(int idx, int total);
-
 protected:
   vtkSMCompositeDisplayProxy();
   ~vtkSMCompositeDisplayProxy();
@@ -90,18 +88,12 @@ protected:
   int CollectionDecision;
   int LODCollectionDecision;
 
-  int DistributedGeometryIsValid;
-  int DistributedLODGeometryIsValid;
-  int DistributedVolumeGeometryIsValid;
-
   int OrderedCompositing;
 
   vtkSMProxy* OrderedCompositingTree;
 
   virtual void RemoveGeometryFromCompositingTree();
   virtual void AddGeometryToCompositingTree();
-
-  virtual void InvalidateGeometryInternal();
 
 private:
   vtkSMCompositeDisplayProxy(const vtkSMCompositeDisplayProxy&); // Not implemented.

@@ -54,7 +54,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.4");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.4.2.1");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -202,6 +202,14 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
+  vtkBSPCuts *cuts = this->PKdTree->GetCuts();
+  if (cuts == NULL)
+    {
+    // No partitioning has been defined.  Just pass the data through.
+    output->ShallowCopy(input);
+    return 1;
+    }
+
   this->UpdateProgress(0.01);
 
   if (this->D3 == NULL)
@@ -216,7 +224,7 @@ int vtkOrderedCompositeDistributor::RequestData(
 
   this->D3->SetBoundaryModeToSplitBoundaryCells();
   this->D3->SetInput(input);
-  this->D3->GetKdtree()->SetCuts(this->PKdTree->GetCuts());
+  this->D3->GetKdtree()->SetCuts(cuts);
   this->D3->SetController(this->Controller);
   this->D3->Update();
 
