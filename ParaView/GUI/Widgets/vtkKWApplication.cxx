@@ -60,7 +60,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.256");
+vtkCxxRevisionMacro(vtkKWApplication, "1.257");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -839,6 +839,33 @@ int vtkKWApplication::OpenLink(const char *
   HINSTANCE result = ShellExecute(
     NULL, "open", link, NULL, NULL, SW_SHOWNORMAL);
   if ((int)result <= 32)
+    {
+    return 0;
+    }
+#endif
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::ExploreLink(const char *
+#ifdef _WIN32
+                                  link
+#endif
+)
+{
+#ifdef _WIN32
+
+  vtksys_stl::string filename = 
+    vtksys::SystemTools::CollapseFullPath(link);
+  vtksys::SystemTools::ReplaceString(filename, "/", "\\");
+
+  vtksys_stl::string command("explorer.exe /n,/e,");
+  if (!vtksys::SystemTools::FileIsDirectory(filename.c_str()))
+    {
+    command += "/select,";
+    }
+  command += filename;
+  if (WinExec(command.c_str(), SW_SHOWNORMAL) <= 32)
     {
     return 0;
     }
