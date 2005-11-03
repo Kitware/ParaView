@@ -310,6 +310,15 @@ public:
   vtkGetStringMacro(EmailFeedbackAddress);
 
   // Description:
+  // Send email (win32 only for the moment, use MAPI).
+  virtual int SendEmail(
+    const char *to,
+    const char *subject,
+    const char *message,
+    const char *attachment_filename,
+    const char *extra_error_msg);
+
+  // Description:
   // Display the on-line help for this application.
   // Optionally provide a master window this dialog should be the slave of.
   virtual void DisplayHelpDialog(vtkKWWindowBase *master);
