@@ -60,7 +60,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.257");
+vtkCxxRevisionMacro(vtkKWApplication, "1.258");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1745,7 +1745,7 @@ int vtkKWApplication::SendEmail(
   if (err != SUCCESS_SUCCESS)
     {
     ostrstream msg;
-    msg << "Sorry, an error occurred while trying to email feedback. "
+    msg << "Sorry, an error occurred while trying to send an email. "
         << "Please make sure that your default email client has been "
         << "configured properly. The Microsoft Simple MAPI (Messaging "
         << "Application Program Interface) is used to perform this "
@@ -1757,7 +1757,7 @@ int vtkKWApplication::SendEmail(
       }
     msg << ends;
     vtkKWMessageDialog::PopupMessage(
-      this, 0, subject, msg.str(), vtkKWMessageDialog::ErrorIcon);
+      this, 0, "Send Email Error", msg.str(), vtkKWMessageDialog::ErrorIcon);
     msg.rdbuf()->freeze(0);
     }
 
