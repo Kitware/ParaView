@@ -525,6 +525,21 @@ static const unsigned char image_preset_delete[] =
 
 /* 
  * Resource generated for file:
+ *    preset_email.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_email_width          = 16;
+static const unsigned int  image_preset_email_height         = 16;
+static const unsigned int  image_preset_email_pixel_size     = 4;
+static const unsigned long image_preset_email_length         = 156;
+static const unsigned long image_preset_email_decoded_length = 1024;
+
+static const unsigned char image_preset_email[] = 
+  "eNqlklEOwCAIQ3d0rrfL7ArdTCQhlYLbTBo+7KuIAjgQ9CwogbyZpm9ZuxkVH+pnvsvo+u"
+  "/mofgsz8zwl6/eK+lX8rhOKffMfhfePYr1WvFZBu/tnF9VxVfn8v3jPLn/bobDz3rzftl/"
+  "GcpylZi9AXnlnkE=";
+
+/* 
+ * Resource generated for file:
  *    preset_update.png (zlib, base64) (image file)
  */
 static const unsigned int  image_preset_update_width          = 16;
