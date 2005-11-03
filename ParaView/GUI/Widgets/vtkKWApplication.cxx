@@ -60,7 +60,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.255");
+vtkCxxRevisionMacro(vtkKWApplication, "1.256");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1647,13 +1647,13 @@ void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::EmailFeedback()
+int vtkKWApplication::SendEmail(
+  const char *to,
+  const char *subject,
+  const char *message,
+  const char *attachment_filename,
+  const char *extra_error_msg)
 {
-  if (!this->CanEmailFeedback())
-    {
-    return;
-    }
-
 #ifdef _WIN32
 
   // Load MAPI
@@ -1661,7 +1661,7 @@ void vtkKWApplication::EmailFeedback()
   HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
   if (!g_hMAPI)
     {
-    return;
+    return 0;
     }
 
   // Recipient To: (no SMTP: for Mozilla)
@@ -1671,28 +1671,30 @@ void vtkKWApplication::EmailFeedback()
       0L,
       MAPI_TO,
       NULL,
-      this->EmailFeedbackAddress,
+      (LPSTR)to,
       0L,
       NULL
     };
 
-  // Body of the message
+  // Attachement
 
-  ostrstream body;
-  this->AddEmailFeedbackBody(body);
-  body << endl << ends;
+  MapiFileDesc attachment = 
+    {
+      0L,
+      0L,
+      -1L,
+      (LPSTR)attachment_filename,
+      NULL,
+      NULL
+    };
 
   // The email itself
-
-  ostrstream email_subject;
-  this->AddEmailFeedbackSubject(email_subject);
-  email_subject << ends;
 
   MapiMessage email = 
     {
       0, 
-      email_subject.str(),
-      body.str(),
+      (LPSTR)subject,
+      (LPSTR)message,
       NULL, 
       NULL, 
       NULL, 
@@ -1700,8 +1702,8 @@ void vtkKWApplication::EmailFeedback()
       NULL,
       1, 
       &recip_to, 
-      0, 
-      NULL
+      attachment_filename ? 1 : 0, 
+      attachment_filename ? &attachment : NULL
     };
 
   // Send it
@@ -1720,22 +1722,54 @@ void vtkKWApplication::EmailFeedback()
         << "Please make sure that your default email client has been "
         << "configured properly. The Microsoft Simple MAPI (Messaging "
         << "Application Program Interface) is used to perform this "
-        << "operation and it might not be accessible as long as your "
-        << "default email client is not running simultaneously. If you "
-        << "continue to have problems please use your email client to "
-        << "send us feedback at " << this->EmailFeedbackAddress << "."
-        << ends;
-
+        << "operation and it might not be accessible if your "
+        << "default email client is not running. ";
+    if (extra_error_msg)
+      {
+      msg << extra_error_msg;
+      }
+    msg << ends;
     vtkKWMessageDialog::PopupMessage(
-      this, 0, email_subject.str(), msg.str(), vtkKWMessageDialog::ErrorIcon);
+      this, 0, subject, msg.str(), vtkKWMessageDialog::ErrorIcon);
     msg.rdbuf()->freeze(0);
     }
 
-  body.rdbuf()->freeze(0);
-  email_subject.rdbuf()->freeze(0);
-
   ::FreeLibrary(g_hMAPI);
+
+  return (err != SUCCESS_SUCCESS ? 0 : 1);
 #endif
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::EmailFeedback()
+{
+  if (!this->CanEmailFeedback())
+    {
+    return;
+    }
+
+  ostrstream email_subject;
+  this->AddEmailFeedbackSubject(email_subject);
+  email_subject << ends;
+
+  ostrstream message;
+  this->AddEmailFeedbackBody(message);
+  message << endl << ends;
+
+  ostrstream extra_error_msg;
+  extra_error_msg 
+    << "If you continue to experience problems please use your email "
+    << "client to send us feedback at " << this->EmailFeedbackAddress 
+    << "." << ends;
+
+  this->SendEmail(
+    this->EmailFeedbackAddress,
+    email_subject.str(),
+    message.str(),
+    "C:/boot.ini",
+    extra_error_msg.str());
 }
 
 //----------------------------------------------------------------------------
