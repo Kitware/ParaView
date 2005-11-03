@@ -53,7 +53,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.10");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.11");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -924,7 +924,7 @@ int vtkKWPresetSelector::SetPresetUserSlotAsString(
       this->Internals->GetPresetNode(id);
     if (it != this->Internals->PresetPool.end())
       {
-      (*it)->UserSlotPool[slot_name].StringValue = value;
+      (*it)->UserSlotPool[slot_name].StringValue = value ? value : "";
       this->UpdatePresetRow(id);
       return 1;
       }
@@ -1313,6 +1313,7 @@ int vtkKWPresetSelector::RemovePreset(int id)
       this->Internals->GetPresetNode(id);
     if (it != this->Internals->PresetPool.end())
       {
+      this->DeAllocatePreset(id);
       if (this->PresetList)
         {
         int row = this->GetPresetRow(id);
@@ -1321,7 +1322,6 @@ int vtkKWPresetSelector::RemovePreset(int id)
           this->PresetList->GetWidget()->DeleteRow(row);
           }
         }
-      this->DeAllocatePreset(id);
       delete (*it);
       this->Internals->PresetPool.erase(it);
       this->NumberOfPresetsHasChanged();
@@ -1337,10 +1337,6 @@ int vtkKWPresetSelector::RemoveAllPresets()
 {
   // Is faster than calling RemovePreset on each preset
 
-  if (this->PresetList)
-    {
-    this->PresetList->GetWidget()->DeleteAllRows();
-    }
   if (this->Internals)
     {
     int nb_deleted = this->GetNumberOfPresets();
@@ -1355,6 +1351,11 @@ int vtkKWPresetSelector::RemoveAllPresets()
     for (; it != end; ++it)
       {
       this->DeAllocatePreset((*it)->Id);
+      }
+
+    if (this->PresetList)
+      {
+      this->PresetList->GetWidget()->DeleteAllRows();
       }
 
     // Then remove the presets
@@ -1393,6 +1394,7 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
       {
       if (!(*it)->Group.compare(group))
         {
+        this->DeAllocatePreset((*it)->Id);
         if (this->PresetList)
           {
           int row = this->GetPresetRow((*it)->Id);
@@ -1401,7 +1403,6 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
             this->PresetList->GetWidget()->DeleteRow(row);
             }
           }
-        this->DeAllocatePreset((*it)->Id);
         }
       }
 
