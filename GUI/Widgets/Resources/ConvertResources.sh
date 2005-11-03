@@ -46,6 +46,7 @@ KWConvertImageToHeader --zlib --base64 \
     preset_apply.png \
     preset_delete.png \
     preset_email.png \
+    preset_locate.png \
     preset_update.png \
     question.png \
     reload.png \

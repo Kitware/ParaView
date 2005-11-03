@@ -540,6 +540,21 @@ static const unsigned char image_preset_email[] =
 
 /* 
  * Resource generated for file:
+ *    preset_locate.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_preset_locate_width          = 16;
+static const unsigned int  image_preset_locate_height         = 16;
+static const unsigned int  image_preset_locate_pixel_size     = 4;
+static const unsigned long image_preset_locate_length         = 144;
+static const unsigned long image_preset_locate_decoded_length = 1024;
+
+static const unsigned char image_preset_locate[] = 
+  "eNrFkksKgEAMQz16r+dlvEL8MEKN6bR140CYTV4IoQAWOB0PkUBepeF7vWrGjHf/Zz7LyP"
+  "pne0S8yjMzqM07/OXf1oeCrmVeiTOYn92N6uH5Toex2a/8zXT3O/2s6m7+XlgqNxKzOzu+"
+  "ra0=";
+
+/* 
+ * Resource generated for file:
  *    preset_update.png (zlib, base64) (image file)
  */
 static const unsigned int  image_preset_update_width          = 16;
