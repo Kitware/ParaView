@@ -1,0 +1,43 @@
+
+PROJECT(QtClient)
+
+SET(QT_CLIENT_VERSION_MAJOR 0)
+SET(QT_CLIENT_VERSION_MINOR 9)
+SET(QT_CLIENT_VERSION_PATCH 0)
+SET(QT_CLIENT_VERSION ${QT_CLIENT_VERSION_MAJOR}.${QT_CLIENT_VERSION_MINOR})
+
+INCLUDE_DIRECTORIES(
+  ${QtClient_BINARY_DIR}
+  ${QtWidgets_BINARY_DIR}
+  ${QtWidgets_SOURCE_DIR}
+)
+
+QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqMainWindow.h
+)
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+  pqAbout.ui
+)
+
+QT4_ADD_RESOURCES(RCS_SOURCES
+  pqClient.qrc
+)
+
+ADD_EXECUTABLE(pqClient
+  main.cxx
+  pqMainWindow.cxx
+  pqMainWindow.h
+  ${MOC_BUILT_SOURCES}
+  ${RCS_SOURCES}
+)
+
+TARGET_LINK_LIBRARIES(pqClient
+  pqWidgets
+)
+
+
+CONFIGURE_FILE(${QtClient_SOURCE_DIR}/pqConfig.h.in
+               ${QtClient_BINARY_DIR}/pqConfig.h)
+
+
