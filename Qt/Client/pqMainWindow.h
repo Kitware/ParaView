@@ -41,11 +41,11 @@ signals:
 private:
   void setServer(pqServer* Server);
 
-  pqServer* currentServer;
-  pqRefreshToolbar* refreshToolbar;
-  QToolBar* property_toolbar;
-  QVTKWidget* window;
-  QAction* serverDisconnectAction;
+  pqServer* CurrentServer;
+  pqRefreshToolbar* RefreshToolbar;
+  QToolBar* PropertyToolbar;
+  QVTKWidget* Window;
+  QAction* ServerDisconnectAction;
   pqSMAdaptor *Adaptor;
   QMenu* SourcesMenu;
   pqObjectInspector *Inspector;

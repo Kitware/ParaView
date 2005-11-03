@@ -71,11 +71,11 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 
 pqMainWindow::pqMainWindow() :
   base(),
-  currentServer(0),
-  refresh_toolbar(0),
-  property_toolbar(0),
-  window(0),
-  serverDisconnectAction(0),
+  CurrentServer(0),
+  RefreshToolbar(0),
+  PropertyToolbar(0),
+  Window(0),
+  ServerDisconnectAction(0),
   Inspector(0),
   InspectorDock(0),
   InspectorView(0)
@@ -84,34 +84,34 @@ pqMainWindow::pqMainWindow() :
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
 
   QAction* const fileNewAction = new QAction(tr("New..."), this) << pqSetName("fileNewAction");
-  connect(fileNewAction, SIGNAL(triggered()), this, SLOT(onFileNew()));
+  QObject::connect(fileNewAction, SIGNAL(triggered()), this, SLOT(onFileNew()));
 
   QAction* const fileOpenAction = new QAction(tr("Open..."), this) << pqSetName("fileOpenAction");
-  connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(onFileOpen()));
+  QObject::connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(onFileOpen()));
 
   QAction* const fileOpenServerStateAction = new QAction(tr("Open Server State"), this) << pqSetName("fileOpenServerStateAction");
-  connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
+  QObject::connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
 
   QAction* const fileSaveServerStateAction = new QAction(tr("Save Server State"), this) << pqSetName("fileSaveServerStateAction");
-  connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
+  QObject::connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
 
   QAction* const fileQuitAction = new QAction(tr("Quit"), this) << pqSetName("fileQuitAction");
-  connect(fileQuitAction, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+  QObject::connect(fileQuitAction, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 
   QAction* const serverConnectAction = new QAction(tr("Connect..."), this) << pqSetName("serverConnectAction");
-  connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(onServerConnect()));
+  QObject::connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(onServerConnect()));
 
-  this->serverDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
-  connect(this->serverDisconnectAction, SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
+  this->ServerDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
+  QObject::connect(this->ServerDisconnectAction, SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
 
   QAction* const debugOpenLocalFilesAction = new QAction(tr("Open Local Files"), this) << pqSetName("debugOpenLocalFilesAction");
-  connect(debugOpenLocalFilesAction, SIGNAL(triggered()), this, SLOT(onDebugOpenLocalFiles()));
+  QObject::connect(debugOpenLocalFilesAction, SIGNAL(triggered()), this, SLOT(onDebugOpenLocalFiles()));
 
   QAction* const debugDumpQtHierarchyAction = new QAction(tr("Dump Qt Hierarchy"), this) << pqSetName("debugDumpQtHierarchyAction");
-  connect(debugDumpQtHierarchyAction, SIGNAL(triggered()), this, SLOT(onDebugDumpQtHierarchy()));
+  QObject::connect(debugDumpQtHierarchyAction, SIGNAL(triggered()), this, SLOT(onDebugDumpQtHierarchy()));
 
   QAction* const testsRunAction = new QAction(tr("Run"), this) << pqSetName("testsRunAction");
-  connect(testsRunAction, SIGNAL(triggered()), this, SLOT(onTestsRun()));
+  QObject::connect(testsRunAction, SIGNAL(triggered()), this, SLOT(onTestsRun()));
 
   this->menuBar() << pqSetName("menuBar");
 
@@ -124,10 +124,10 @@ pqMainWindow::pqMainWindow() :
   
   QMenu* const serverMenu = this->menuBar()->addMenu(tr("Server")) << pqSetName("serverMenu");
   serverMenu->addAction(serverConnectAction);
-  serverMenu->addAction(this->serverDisconnectAction);
+  serverMenu->addAction(this->ServerDisconnectAction);
 
-  SourcesMenu = this->menuBar()->addMenu(tr("Sources")) << pqSetName("sourcesMenu");
-  connect(this, SIGNAL(serverChanged()), SLOT(updateSourcesMenu()));
+  this->SourcesMenu = this->menuBar()->addMenu(tr("Sources")) << pqSetName("sourcesMenu");
+  QObject::connect(this, SIGNAL(serverChanged()), SLOT(updateSourcesMenu()));
   
   QMenu* const debugMenu = this->menuBar()->addMenu(tr("Debug")) << pqSetName("debugMenu");
   debugMenu->addAction(debugOpenLocalFilesAction);
@@ -139,13 +139,13 @@ pqMainWindow::pqMainWindow() :
   // keep help last
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help")) << pqSetName("helpMenu");
   QAction* aboutAction = new QAction(tr("About") + " " + tr("ParaQ") + " " + QT_CLIENT_VERSION, this) << pqSetName("aboutAction");
-  connect(aboutAction, SIGNAL(triggered()), this, SLOT(onAbout()));
+  QObject::connect(aboutAction, SIGNAL(triggered()), this, SLOT(onAbout()));
   helpMenu->addAction(aboutAction);
   
   QObject::connect(&pqCommandDispatcherManager::instance(), SIGNAL(dispatcherChanged()), this, SLOT(onDispatcherChanged()));
  
-  this->refresh_toolbar = new pqRefreshToolbar(this);
-  this->addToolBar(this->refresh_toolbar);
+  this->RefreshToolbar = new pqRefreshToolbar(this);
+  this->addToolBar(this->RefreshToolbar);
 
   // Create the object inspector model.
   this->Inspector = new pqObjectInspector(this);
@@ -187,32 +187,32 @@ pqMainWindow::~pqMainWindow()
     delete this->Inspector;
   }
 
-  delete this->window;
-  delete this->property_toolbar;
-  delete this->refresh_toolbar;
-  delete this->currentServer;
+  delete this->Window;
+  delete this->PropertyToolbar;
+  delete this->RefreshToolbar;
+  delete this->CurrentServer;
   delete this->Adaptor;
 }
 
 void pqMainWindow::setServer(pqServer* Server)
 {
-  delete this->window;
-  this->window = 0;
+  delete this->Window;
+  this->Window = 0;
 
-  delete this->property_toolbar;
-  this->property_toolbar = 0;
+  delete this->PropertyToolbar;
+  this->PropertyToolbar = 0;
 
-  delete this->currentServer;
-  this->currentServer = 0;
+  delete this->CurrentServer;
+  this->CurrentServer = 0;
 
   if(Server)
     {
-    this->window = new QVTKWidget(this);
-    this->setCentralWidget(this->window);
+    this->Window = new QVTKWidget(this);
+    this->setCentralWidget(this->Window);
 
-    vtkRenderWindow* const render_window = Server->GetRenderModule()->GetRenderWindow();
-    this->window->SetRenderWindow(render_window);
-    this->window->update();
+    vtkRenderWindow* const rw = Server->GetRenderModule()->GetRenderWindow();
+    this->Window->SetRenderWindow(rw);
+    this->Window->update();
 
     pqRenderViewProxy* proxy = pqRenderViewProxy::New();
     proxy->SetRenderModule(Server->GetRenderModule());
@@ -221,10 +221,10 @@ void pqMainWindow::setServer(pqServer* Server)
     proxy->Delete();
     interactor->Enable();
     
-    this->currentServer = Server;
+    this->CurrentServer = Server;
     }
   
-  serverDisconnectAction->setEnabled(this->currentServer);
+  this->ServerDisconnectAction->setEnabled(this->CurrentServer);
   emit serverChanged();
 
 }
@@ -256,7 +256,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 {
   setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->currentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
 }
@@ -267,19 +267,19 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     {
     QString file = Files[i];
     
-    vtkSMProxy* const source = this->currentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
-    this->currentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
+    vtkSMProxy* const source = this->CurrentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
+    this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
     source->Delete();
     Adaptor->SetProperty(source->GetProperty("FileName"), file);
     Adaptor->SetProperty(source->GetProperty("FilePrefix"), file);
     Adaptor->SetProperty(source->GetProperty("FilePattern"), "%s");
     source->UpdateVTKObjects();
     
-    pqAddPart(currentServer, vtkSMSourceProxy::SafeDownCast(source));
+    pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
     }
 
-  this->currentServer->GetRenderModule()->ResetCamera();
-  window->update();
+  this->CurrentServer->GetRenderModule()->ResetCamera();
+  this->Window->update();
 }
 
 void pqMainWindow::onFileOpenServerState()
@@ -295,7 +295,7 @@ void pqMainWindow::onFileOpenServerState(pqServer* Server)
 {
   setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->currentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpenServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -306,7 +306,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 
 void pqMainWindow::onFileSaveServerState()
 {
-  if(!this->currentServer)
+  if(!this->CurrentServer)
     {
     QMessageBox::critical(this, tr("Dump Server State:"), tr("No server connections to serialize"));
     return;
@@ -323,7 +323,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     {
     ofstream file(Files[i].toAscii().data());
     file << "<ServerState>" << "\n";
-    this->currentServer->GetProxyManager()->SaveState("test", &file, 0);
+    this->CurrentServer->GetProxyManager()->SaveState("test", &file, 0);
     file << "</ServerState>" << "\n";
     }
 }
@@ -381,17 +381,17 @@ void pqMainWindow::onDispatcherChanged()
 
 void pqMainWindow::onRedrawWindows()
 {
-  if(this->currentServer)
-    this->currentServer->GetRenderModule()->StillRender();
+  if(this->CurrentServer)
+    this->CurrentServer->GetRenderModule()->StillRender();
 }
 
 void pqMainWindow::updateSourcesMenu()
 {
   this->SourcesMenu->clear();
 
-  if(this->currentServer)
+  if(this->CurrentServer)
     {
-    vtkSMProxyManager* manager = this->currentServer->GetProxyManager();
+    vtkSMProxyManager* manager = this->CurrentServer->GetProxyManager();
     int numSources = manager->GetNumberOfProxies("sources");
     for(int i=0; i<numSources; i++)
       {
