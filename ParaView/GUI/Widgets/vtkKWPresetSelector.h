@@ -255,6 +255,15 @@ public:
   vtkBooleanMacro(SelectSpinButtonsVisibility,int);
 
   // Description:
+  // Set/Get the visibility of the email preset button (hidden by default).
+  // If visible, triggering this button will email all selected presets
+  // as attachments. The attachment location is retrieved by calling
+  // the GetPresetFileName method. Win32/MAPI only at the moment.
+  virtual void SetEmailButtonVisibility(int);
+  vtkGetMacro(EmailButtonVisibility,int);
+  vtkBooleanMacro(EmailButtonVisibility,int);
+
+  // Description:
   // Specifies a command to be invoked when the "add preset" button is pressed.
   // This gives the opportunity for the application to check and collect the
   // relevant information to store in a new preset. The application is then
@@ -348,6 +357,7 @@ public:
   virtual void PresetApplyCallback();
   virtual void PresetUpdateCallback();
   virtual void PresetRemoveCallback();
+  virtual void PresetEmailCallback();
   virtual void PresetSelectionCallback();
   virtual void PresetSelectPreviousCallback();
   virtual void PresetSelectNextCallback();
@@ -427,6 +437,7 @@ protected:
 
   int ApplyPresetOnSelection;
   int SelectSpinButtonsVisibility;
+  int EmailButtonVisibility;
 
   int ThumbnailSize;
   int ScreenshotSize;
@@ -484,8 +495,9 @@ protected:
   //BTX
   static int AddButtonId;
   static int ApplyButtonId;
-  static int RemoveButtonId;
   static int UpdateButtonId;
+  static int RemoveButtonId;
+  static int EmailButtonId;
   //ETX
 
 private:
