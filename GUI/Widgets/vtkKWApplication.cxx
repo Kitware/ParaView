@@ -13,22 +13,25 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 
+#include "vtkKWBalloonHelpManager.h"
+#include "vtkKWEntry.h"
+#include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
 #include "vtkKWRegistryHelper.h"
-#include "vtkKWBalloonHelpManager.h"
+#include "vtkKWSeparator.h"
 #include "vtkKWSplashScreen.h"
+#include "vtkKWText.h"
+#include "vtkKWTextWithScrollbars.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWToolbar.h"
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
-#include "vtkKWText.h"
-#include "vtkKWTextWithScrollbars.h"
 #include "vtkTclUtil.h"
-#include "vtkKWLoadSaveDialog.h"
-#include "vtkKWToolbar.h"
 
 #include <stdarg.h>
 
@@ -60,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.258");
+vtkCxxRevisionMacro(vtkKWApplication, "1.259");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1683,85 +1686,191 @@ int vtkKWApplication::SendEmail(
 {
 #ifdef _WIN32
 
-  // Load MAPI
+  int retry = 1;
+  ULONG err;
 
-  HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
-  if (!g_hMAPI)
+  while (retry)
     {
-    return 0;
-    }
+    // Load MAPI
 
-  // Recipient To: (no SMTP: for Mozilla)
-
-  MapiRecipDesc recip_to = 
-    {
-      0L,
-      MAPI_TO,
-      NULL,
-      (LPSTR)to,
-      0L,
-      NULL
-    };
-
-  // Attachement
-
-  MapiFileDesc attachment = 
-    {
-      0L,
-      0L,
-      -1L,
-      (LPSTR)attachment_filename,
-      NULL,
-      NULL
-    };
-
-  // The email itself
-
-  MapiMessage email = 
-    {
-      0, 
-      (LPSTR)subject,
-      (LPSTR)message,
-      NULL, 
-      NULL, 
-      NULL, 
-      0, 
-      NULL,
-      1, 
-      &recip_to, 
-      attachment_filename ? 1 : 0, 
-      attachment_filename ? &attachment : NULL
-    };
-
-  // Send it
-
-  ULONG err = ((LPMAPISENDMAIL)GetProcAddress(g_hMAPI, "MAPISendMail"))(
-    0L,
-    0L,
-    &email,
-    MAPI_DIALOG | MAPI_LOGON_UI,
-    0L);
-
-  if (err != SUCCESS_SUCCESS)
-    {
-    ostrstream msg;
-    msg << "Sorry, an error occurred while trying to send an email. "
-        << "Please make sure that your default email client has been "
-        << "configured properly. The Microsoft Simple MAPI (Messaging "
-        << "Application Program Interface) is used to perform this "
-        << "operation and it might not be accessible if your "
-        << "default email client is not running. ";
-    if (extra_error_msg)
+    HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
+    if (!g_hMAPI)
       {
-      msg << extra_error_msg;
+      return 0;
       }
-    msg << ends;
-    vtkKWMessageDialog::PopupMessage(
-      this, 0, "Send Email Error", msg.str(), vtkKWMessageDialog::ErrorIcon);
-    msg.rdbuf()->freeze(0);
-    }
 
-  ::FreeLibrary(g_hMAPI);
+    // Recipient To: (no SMTP: for Mozilla)
+
+    MapiRecipDesc recip_to = 
+      {
+        0L,
+        MAPI_TO,
+        NULL,
+        (LPSTR)to,
+        0L,
+        NULL
+      };
+
+    // Attachement
+
+    MapiFileDesc attachment = 
+      {
+        0L,
+        0L,
+        -1L,
+        (LPSTR)attachment_filename,
+        NULL,
+        NULL
+      };
+
+    // The email itself
+
+    MapiMessage email = 
+      {
+        0, 
+        (LPSTR)subject,
+        (LPSTR)message,
+        NULL, 
+        NULL, 
+        NULL, 
+        0, 
+        NULL,
+        1, 
+        &recip_to, 
+        attachment_filename ? 1 : 0, 
+        attachment_filename ? &attachment : NULL
+      };
+
+    // Send it
+
+    err = ((LPMAPISENDMAIL)GetProcAddress(g_hMAPI, "MAPISendMail"))(
+      0L,
+      0L,
+      &email,
+      MAPI_DIALOG | MAPI_LOGON_UI,
+      0L);
+
+    retry = 0;
+
+    if (err != SUCCESS_SUCCESS)
+      {
+      vtksys_stl::string msg =
+        "Sorry, an error occurred while trying to send an email.\n\n"
+        "Please make sure that your default email client has been "
+        "configured properly. The Microsoft Simple MAPI (Messaging "
+        "Application Program Interface) is used to perform this "
+        "operation and it might not be accessible if your "
+        "default email client is not running.";
+      if (extra_error_msg)
+        {
+        msg += "\n\n";
+        msg += extra_error_msg;
+        }
+
+      vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+      dlg->SetStyleToOkCancel();
+      dlg->SetOptions(vtkKWMessageDialog::ErrorIcon);
+      dlg->SetTitle("Send Email Error");
+      dlg->SetText(msg.c_str());
+      dlg->SetOKButtonText("Retry");
+      if (attachment_filename)
+        {
+        dlg->SetStyleToOkOtherCancel();
+        dlg->SetOtherButtonText("Locate attachment");
+        }
+      dlg->Create(this);
+      dlg->SetIcon();
+
+      vtkKWSeparator *sep = vtkKWSeparator::New();
+      sep->SetParent(dlg->GetBottomFrame());
+      sep->Create(this);
+
+      this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill x",
+                   sep->GetWidgetName());
+
+      int label_width = 14;
+
+      vtkKWEntryWithLabel *to_entry = vtkKWEntryWithLabel::New();
+      to_entry->SetParent(dlg->GetBottomFrame());
+      to_entry->Create(this);
+      to_entry->SetLabelText("To:");
+      to_entry->SetLabelWidth(label_width);
+      to_entry->GetWidget()->SetValue(to ? to : "");
+      to_entry->GetWidget()->ReadOnlyOn();
+
+      if (to)
+        {
+        this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill x",
+                     to_entry->GetWidgetName());
+        }
+
+      vtkKWEntryWithLabel *subject_entry = vtkKWEntryWithLabel::New();
+      subject_entry->SetParent(dlg->GetBottomFrame());
+      subject_entry->Create(this);
+      subject_entry->SetLabelText("Subject:");
+      subject_entry->SetLabelWidth(label_width);
+      subject_entry->GetWidget()->SetValue(subject ? subject : "");
+      subject_entry->GetWidget()->ReadOnlyOn();
+
+      if (subject)
+        {
+        this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill x",
+                     subject_entry->GetWidgetName());
+        }
+
+      vtkKWEntryWithLabel *attachment_entry = vtkKWEntryWithLabel::New();
+      attachment_entry->SetParent(dlg->GetBottomFrame());
+      attachment_entry->Create(this);
+      attachment_entry->SetLabelText("Attachment:");
+      attachment_entry->SetLabelWidth(label_width);
+      attachment_entry->GetWidget()->SetValue(
+        attachment_filename ? attachment_filename : "");
+      attachment_entry->GetWidget()->ReadOnlyOn();
+
+      if (attachment_filename)
+        {
+        this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill x",
+                     attachment_entry->GetWidgetName());
+        }
+
+      vtkKWTextWithScrollbars *message_text = vtkKWTextWithScrollbars::New();
+      message_text->SetParent(dlg->GetBottomFrame());
+      message_text->Create(this);
+      message_text->VerticalScrollbarVisibilityOn();
+      message_text->HorizontalScrollbarVisibilityOff();
+      vtkKWText *text_widget = message_text->GetWidget();
+      text_widget->SetWidth(60);
+      text_widget->SetHeight(8);
+      text_widget->SetWrapToWord();
+      text_widget->ReadOnlyOn();
+      text_widget->SetText(message ? message : "");
+
+      if (message)
+        {
+        this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill both",
+                     message_text->GetWidgetName());
+        }
+
+      int res = dlg->Invoke();
+      if (res == 1 || res == 2)
+        {
+        retry = 1;
+        if (res == 2)
+          {
+          this->ExploreLink(attachment_filename);
+          }
+        }
+
+      sep->Delete();
+      to_entry->Delete();
+      subject_entry->Delete();
+      attachment_entry->Delete();
+      message_text->Delete();
+      dlg->Delete();
+      }
+
+    ::FreeLibrary(g_hMAPI);
+    }
 
   return (err != SUCCESS_SUCCESS ? 0 : 1);
 #endif
@@ -1795,7 +1904,7 @@ void vtkKWApplication::EmailFeedback()
     this->EmailFeedbackAddress,
     email_subject.str(),
     message.str(),
-    "C:/boot.ini",
+    NULL,
     extra_error_msg.str());
 }
 
