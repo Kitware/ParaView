@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.24");
+vtkCxxRevisionMacro(vtkKWIcon, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -417,6 +417,14 @@ void vtkKWIcon::SetImage(int image)
         image_preset_delete_width, image_preset_delete_height,
         image_preset_delete_pixel_size, 
         image_preset_delete_length);
+      break;      
+
+    case vtkKWIcon::IconPresetEmail:
+      this->SetImage(
+        image_preset_email, 
+        image_preset_email_width, image_preset_email_height,
+        image_preset_email_pixel_size, 
+        image_preset_email_length);
       break;      
 
     case vtkKWIcon::IconPresetUpdate:
