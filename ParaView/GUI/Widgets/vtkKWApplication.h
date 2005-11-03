@@ -316,7 +316,7 @@ public:
     const char *subject,
     const char *message,
     const char *attachment_filename,
-    const char *extra_error_msg);
+    const char *extra_error_msg = NULL);
 
   // Description:
   // Display the on-line help for this application.
