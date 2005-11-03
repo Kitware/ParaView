@@ -18,12 +18,12 @@ pqObjectInspectorItem::~pqObjectInspectorItem()
 {
   if(this->Internal)
     {
-    this->ClearChildren();
+    this->clearChildren();
     delete this->Internal;
     }
 }
 
-void pqObjectInspectorItem::SetPropertyName(const QString &name)
+void pqObjectInspectorItem::setPropertyName(const QString &name)
 {
   if(this->Name != name)
     {
@@ -32,7 +32,7 @@ void pqObjectInspectorItem::SetPropertyName(const QString &name)
     }
 }
 
-void pqObjectInspectorItem::SetValue(const QVariant &value)
+void pqObjectInspectorItem::setValue(const QVariant &value)
 {
   if(this->Value != value)
     {
@@ -41,14 +41,14 @@ void pqObjectInspectorItem::SetValue(const QVariant &value)
     }
 }
 
-int pqObjectInspectorItem::GetChildCount() const
+int pqObjectInspectorItem::getChildCount() const
 {
   if(this->Internal)
     return this->Internal->size();
   return 0;
 }
 
-int pqObjectInspectorItem::GetChildIndex(pqObjectInspectorItem *child) const
+int pqObjectInspectorItem::getChildIndex(pqObjectInspectorItem *child) const
 {
   for(int row = 0; this->Internal && row < this->Internal->size(); row++)
     {
@@ -59,14 +59,14 @@ int pqObjectInspectorItem::GetChildIndex(pqObjectInspectorItem *child) const
   return -1;
 }
 
-pqObjectInspectorItem *pqObjectInspectorItem::GetChild(int index) const
+pqObjectInspectorItem *pqObjectInspectorItem::getChild(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->size())
     return (*this->Internal)[index];
   return 0;
 }
 
-void pqObjectInspectorItem::ClearChildren()
+void pqObjectInspectorItem::clearChildren()
 {
   if(this->Internal)
     {
@@ -85,7 +85,7 @@ void pqObjectInspectorItem::ClearChildren()
     }
 }
 
-void pqObjectInspectorItem::AddChild(pqObjectInspectorItem *child)
+void pqObjectInspectorItem::addChild(pqObjectInspectorItem *child)
 {
   if(!this->Internal)
     this->Internal = new pqObjectInspectorItemInternal();

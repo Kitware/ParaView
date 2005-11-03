@@ -13,7 +13,7 @@
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOptions, "1.1");
+vtkCxxRevisionMacro(pqOptions, "1.2");
 vtkStandardNewMacro(pqOptions);
 
 //-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ void pqOptions::PrintSelf(ostream &os, vtkIndent indent)
 
 void pqOptions::SetClientMode(int Mode)
 {
-  ClientMode = Mode;
+  this->ClientMode = Mode;
 }
 
 void pqOptions::SetServerHost(const char* const Host)
@@ -49,7 +49,7 @@ void pqOptions::SetServerHost(const char* const Host)
 
 void pqOptions::SetServerPort(int Port)
 {
-  ServerPort = Port;
+  this->ServerPort = Port;
 }
 
 

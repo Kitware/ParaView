@@ -34,17 +34,17 @@ public:
 
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
-  void SetProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy);
+  void setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy);
 
 protected:
-  void CleanData(bool notify=true);
+  void cleanData(bool notify=true);
 
 private:
-  int GetItemIndex(pqObjectInspectorItem *item) const;
+  int getItemIndex(pqObjectInspectorItem *item) const;
 
 private slots:
-  void HandleNameChange(pqObjectInspectorItem *item);
-  void HandleValueChange(pqObjectInspectorItem *item);
+  void handleNameChange(pqObjectInspectorItem *item);
+  void handleValueChange(pqObjectInspectorItem *item);
 
 private:
   pqObjectInspectorInternal *Internal;

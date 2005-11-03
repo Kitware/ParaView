@@ -12,28 +12,28 @@ class pqObjectInspectorItemInternal;
 class pqObjectInspectorItem : public QObject
 {
   Q_OBJECT
-  Q_PROPERTY(QString propertyName READ GetPropertyName WRITE SetPropertyName)
-  Q_PROPERTY(QVariant value READ GetValue WRITE SetValue)
+  Q_PROPERTY(QString propertyName READ getPropertyName WRITE setPropertyName)
+  Q_PROPERTY(QVariant value READ getValue WRITE setValue)
 
 public:
   pqObjectInspectorItem(QObject *parent=0);
   ~pqObjectInspectorItem();
 
-  const QString &GetPropertyName() const {return this->Name;}
-  void SetPropertyName(const QString &name);
+  const QString &getPropertyName() const {return this->Name;}
+  void setPropertyName(const QString &name);
 
-  const QVariant &GetValue() const {return this->Value;}
-  void SetValue(const QVariant &value);
+  const QVariant &getValue() const {return this->Value;}
+  void setValue(const QVariant &value);
 
-  int GetChildCount() const;
-  int GetChildIndex(pqObjectInspectorItem *child) const;
-  pqObjectInspectorItem *GetChild(int index) const;
+  int getChildCount() const;
+  int getChildIndex(pqObjectInspectorItem *child) const;
+  pqObjectInspectorItem *getChild(int index) const;
 
-  void ClearChildren();
-  void AddChild(pqObjectInspectorItem *child);
+  void clearChildren();
+  void addChild(pqObjectInspectorItem *child);
 
-  pqObjectInspectorItem *GetParent() const {return this->Parent;}
-  void SetParent(pqObjectInspectorItem *parent) {this->Parent = parent;}
+  pqObjectInspectorItem *getParent() const {return this->Parent;}
+  void setParent(pqObjectInspectorItem *parent) {this->Parent = parent;}
 
 signals:
   void nameChanged(pqObjectInspectorItem *item);

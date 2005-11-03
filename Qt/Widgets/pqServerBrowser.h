@@ -34,7 +34,7 @@ private:
   pqServerBrowser(const pqServerBrowser&);
   pqServerBrowser& operator=(const pqServerBrowser&);
   
-  Ui::pqServerBrowser ui;
+  Ui::pqServerBrowser Ui;
   
 private slots:
   void accept();

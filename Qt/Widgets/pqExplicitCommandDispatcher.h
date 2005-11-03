@@ -31,7 +31,7 @@ signals:
   void commandsPending(bool);
 
 private:
-  QList<pqCommand*> commands;
+  QList<pqCommand*> Commands;
 };
 
 #endif // !_pqExplicitCommandDispatcher_h

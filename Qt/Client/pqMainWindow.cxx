@@ -270,9 +270,9 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     vtkSMProxy* const source = this->CurrentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
     this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
     source->Delete();
-    Adaptor->SetProperty(source->GetProperty("FileName"), file);
-    Adaptor->SetProperty(source->GetProperty("FilePrefix"), file);
-    Adaptor->SetProperty(source->GetProperty("FilePattern"), "%s");
+    Adaptor->setProperty(source->GetProperty("FileName"), file);
+    Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
+    Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
     source->UpdateVTKObjects();
     
     pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));

@@ -62,19 +62,19 @@ struct FileGroup
   {
   }
   
-  FileGroup(const QString& Label) :
-    label(Label)
+  FileGroup(const QString& label) :
+    Label(label)
   {
   }
   
   FileGroup(const FileInfo& File) :
-    label(File.label)
+    Label(File.label)
   {
-    files.push_back(File);
+    this->Files.push_back(File);
   }
   
-  QString label;
-  QList<FileInfo> files;
+  QString Label;
+  QList<FileInfo> Files;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -88,17 +88,17 @@ bool SortFileAlpha(const QFileInfo& A, const QFileInfo& B)
 ///////////////////////////////////////////////////////////////////////
 // FileModel
 
-class FileModel :
+class pqFileModel :
   public QAbstractItemModel
 {
 public:
   void setCurrentPath(const QString& Path)
   {
-    currentPath.setPath(QDir::cleanPath(Path));
+    this->CurrentPath.setPath(QDir::cleanPath(Path));
     
-    fileGroups.clear();
+    this->FileGroups.clear();
     
-    QFileInfoList files = currentPath.entryInfoList();
+    QFileInfoList files = this->CurrentPath.entryInfoList();
     qSort(files.begin(), files.end(), SortFileAlpha);
     
     QRegExp regex("^(.*)\\.(\\d+)$");
@@ -107,33 +107,33 @@ public:
       {
       if(-1 == regex.indexIn(files[i].fileName()))
         {
-        if(numbered_files.files.size())
+        if(numbered_files.Files.size())
           {
-          fileGroups.push_back(numbered_files);
+          this->FileGroups.push_back(numbered_files);
           numbered_files = FileGroup();
           }
           
-        fileGroups.push_back(FileGroup(FileInfo(files[i].fileName(), files[i].filePath())));
+        this->FileGroups.push_back(FileGroup(FileInfo(files[i].fileName(), files[i].filePath())));
         }
       else
         {
         const QString name = regex.cap(1);
         const QString index = regex.cap(2);
         
-        if(name != numbered_files.label)
+        if(name != numbered_files.Label)
           {
-          if(numbered_files.files.size())
-            fileGroups.push_back(numbered_files);
+          if(numbered_files.Files.size())
+            this->FileGroups.push_back(numbered_files);
               
           numbered_files = FileGroup(name);
           }
           
-        numbered_files.files.push_back(FileInfo(files[i].fileName(), files[i].filePath()));
+        numbered_files.Files.push_back(FileInfo(files[i].fileName(), files[i].filePath()));
         }
       }
       
-    if(numbered_files.files.size())
-      fileGroups.push_back(numbered_files);
+    if(numbered_files.Files.size())
+      this->FileGroups.push_back(numbered_files);
 
     emit layoutChanged();
     emit dataChanged(QModelIndex(), QModelIndex());
@@ -145,15 +145,15 @@ public:
     
     if(Index.internalId()) // Selected a member of a file group
       {
-      FileGroup& group = fileGroups[Index.internalId()-1];
-      FileInfo& file = group.files[Index.row()];
+      FileGroup& group = this->FileGroups[Index.internalId()-1];
+      FileInfo& file = group.Files[Index.row()];
       results.push_back(file.filePath());
       }
     else // Selected a file group
       {
-      FileGroup& group = fileGroups[Index.row()];
-      for(int i = 0; i != group.files.size(); ++i)
-        results.push_back(group.files[i].filePath());
+      FileGroup& group = this->FileGroups[Index.row()];
+      for(int i = 0; i != group.Files.size(); ++i)
+        results.push_back(group.Files[i].filePath());
       }
       
     return results;
@@ -163,15 +163,15 @@ public:
   {
     if(Index.internalId()) // This is a member of a file group ...
       {
-      FileGroup& group = fileGroups[Index.internalId()-1];
-      FileInfo& file = group.files[Index.row()];
+      FileGroup& group = this->FileGroups[Index.internalId()-1];
+      FileInfo& file = group.Files[Index.row()];
       return file.isDir();
       }
     else // This is a file group
       {
-      FileGroup& group = fileGroups[Index.row()];
-      if(1 == group.files.size())
-        return group.files[0].isDir();
+      FileGroup& group = this->FileGroups[Index.row()];
+      if(1 == group.Files.size())
+        return group.Files[0].isDir();
       }
       
     return false;
@@ -192,14 +192,14 @@ public:
         
     if(Index.internalId()) // This is a member of a file group ...
       {
-      group = &fileGroups[Index.internalId()-1];
-      file = &group->files[Index.row()];
+      group = &this->FileGroups[Index.internalId()-1];
+      file = &group->Files[Index.row()];
       }      
     else // This is a file group ...
       {
-      group = &fileGroups[Index.row()];
-      if(1 == group->files.size())
-        file = &group->files[0];
+      group = &this->FileGroups[Index.row()];
+      if(1 == group->Files.size())
+        file = &group->Files[0];
       }
       
     switch(role)
@@ -208,7 +208,7 @@ public:
         switch(Index.column())
           {
           case 0:
-            return file ? file->label : group->label + QString(" (%1 files)").arg(group->files.size());
+            return file ? file->label : group->Label + QString(" (%1 files)").arg(group->Files.size());
           case 1:
             return file ? file->size() : QVariant();
           case 2:
@@ -248,10 +248,10 @@ public:
       {
       if(Index.internalId()) // This is a member of a file group ...
         return 0;
-      return fileGroups[Index.row()].files.size(); // This is a file group ...
+      return this->FileGroups[Index.row()].Files.size(); // This is a file group ...
       }
   
-    return fileGroups.size(); // This is the top-level node ...
+    return this->FileGroups.size(); // This is the top-level node ...
   }
 
   bool hasChildren(const QModelIndex& Index) const
@@ -260,7 +260,7 @@ public:
       {
       if(Index.internalId()) // This is a member of a file group ...
         return false;
-      return fileGroups[Index.row()].files.size() > 1; // This is a file group ...
+      return this->FileGroups[Index.row()].Files.size() > 1; // This is a file group ...
       }
       
     return true; // This is the top-level node ...
@@ -285,35 +285,35 @@ public:
     return QVariant();
   }
 
-  QDir currentPath;
-  QList<FileGroup> fileGroups;
+  QDir CurrentPath;
+  QList<FileGroup> FileGroups;
 };
 
 //////////////////////////////////////////////////////////////////
 // FavoriteModel
 
-class FavoriteModel :
+class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
-  FavoriteModel()
+  pqFavoriteModel()
   {
 #ifdef WIN32
 
     TCHAR szPath[MAX_PATH];
 
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_HISTORY, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("History"), szPath));
+      this->FavoriteList.push_back(FileInfo(tr("History"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("My Projects"), szPath));
+      this->FavoriteList.push_back(FileInfo(tr("My Projects"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("Desktop"), szPath));
+      this->FavoriteList.push_back(FileInfo(tr("Desktop"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
-      favoriteList.push_back(FileInfo(tr("Favorites"), szPath));
+      this->FavoriteList.push_back(FileInfo(tr("Favorites"), szPath));
 
 #else // WIN32
 
-    favoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath()));
+    this->FavoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath()));
 
 #endif // !WIN32
   
@@ -321,7 +321,7 @@ public:
     for(int i = 0; i != drives.size(); ++i)
       {
       QFileInfo drive = drives[i];
-      favoriteList.push_back(FileInfo(QDir::convertSeparators(drive.absoluteFilePath()), QDir::convertSeparators(drive.absoluteFilePath())));
+      this->FavoriteList.push_back(FileInfo(QDir::convertSeparators(drive.absoluteFilePath()), QDir::convertSeparators(drive.absoluteFilePath())));
       }
   }
 
@@ -329,9 +329,9 @@ public:
   {
     QStringList results;
     
-    if(Index.row() < favoriteList.size())
+    if(Index.row() < this->FavoriteList.size())
       {
-      FileInfo& file = favoriteList[Index.row()];
+      FileInfo& file = this->FavoriteList[Index.row()];
       results.push_back(QDir::convertSeparators(file.filePath()));
       }
     
@@ -340,10 +340,10 @@ public:
 
   bool isDir(const QModelIndex& Index)
   {
-    if(Index.row() >= favoriteList.size())
+    if(Index.row() >= this->FavoriteList.size())
       return false;
       
-    FileInfo& file = favoriteList[Index.row()];
+    FileInfo& file = this->FavoriteList[Index.row()];
     return file.isDir();
   }
 
@@ -357,10 +357,10 @@ public:
     if(!index.isValid())
       return QVariant();
 
-    if(index.row() >= favoriteList.size())
+    if(index.row() >= this->FavoriteList.size())
       return QVariant();
 
-    const FileInfo& file = favoriteList[index.row()];
+    const FileInfo& file = this->FavoriteList[index.row()];
     switch(role)
       {
       case Qt::DisplayRole:
@@ -396,7 +396,7 @@ public:
   
   virtual int rowCount(const QModelIndex& parent) const
   {
-    return favoriteList.size();
+    return this->FavoriteList.size();
   }
   
   virtual bool hasChildren(const QModelIndex& parent) const
@@ -422,7 +422,7 @@ public:
     return QVariant();
   }
   
-  QList<FileInfo> favoriteList;
+  QList<FileInfo> FavoriteList;
 };
 
 } // namespace
@@ -430,34 +430,34 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // pqLocalFileDialogModel
 
-class pqLocalFileDialogModel::Implementation
+class pqLocalFileDialogModel::pqImplementation
 {
 public:
-  Implementation() :
-    fileModel(new FileModel()),
-    favoriteModel(new FavoriteModel())
+  pqImplementation() :
+    FileModel(new pqFileModel()),
+    FavoriteModel(new pqFavoriteModel())
   {
   }
   
-  ~Implementation()
+  ~pqImplementation()
   {
-    delete fileModel;
-    delete favoriteModel;
+    delete this->FileModel;
+    delete this->FavoriteModel;
   }
 
-  FileModel* const fileModel;
-  FavoriteModel* const favoriteModel;
+  pqFileModel* const FileModel;
+  pqFavoriteModel* const FavoriteModel;
 };
 
 pqLocalFileDialogModel::pqLocalFileDialogModel(QObject* Parent) :
   pqFileDialogModel(Parent),
-  implementation(new Implementation())
+  Implementation(new pqImplementation())
 {
 }
 
 pqLocalFileDialogModel::~pqLocalFileDialogModel()
 {
-  delete implementation;
+  delete this->Implementation;
 }
 
 QString pqLocalFileDialogModel::getStartPath()
@@ -467,21 +467,21 @@ QString pqLocalFileDialogModel::getStartPath()
 
 void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
 {
-  implementation->fileModel->setCurrentPath(Path);
+  this->Implementation->FileModel->setCurrentPath(Path);
 }
 
 QString pqLocalFileDialogModel::getCurrentPath()
 {
-  return QDir::convertSeparators(implementation->fileModel->currentPath.path());
+  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path());
 }
 
 QStringList pqLocalFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
-  if(Index.model() == implementation->fileModel)
-    return implementation->fileModel->getFilePaths(Index);
+  if(Index.model() == this->Implementation->FileModel)
+    return this->Implementation->FileModel->getFilePaths(Index);
   
-  if(Index.model() == implementation->favoriteModel)
-    return implementation->favoriteModel->getFilePaths(Index);  
+  if(Index.model() == this->Implementation->FavoriteModel)
+    return this->Implementation->FavoriteModel->getFilePaths(Index);  
 
   return QStringList();
 }
@@ -491,7 +491,7 @@ QString pqLocalFileDialogModel::getFilePath(const QString& Path)
   if(QDir::isAbsolutePath(Path))
     return Path;
     
-  return QDir::convertSeparators(implementation->fileModel->currentPath.path() + "/" + Path);
+  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
 }
 
 QString pqLocalFileDialogModel::getParentPath(const QString& Path)
@@ -503,11 +503,11 @@ QString pqLocalFileDialogModel::getParentPath(const QString& Path)
 
 bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
 {
-  if(Index.model() == implementation->fileModel)
-    return implementation->fileModel->isDir(Index);
+  if(Index.model() == this->Implementation->FileModel)
+    return this->Implementation->FileModel->isDir(Index);
   
-  if(Index.model() == implementation->favoriteModel)
-    return implementation->favoriteModel->isDir(Index);  
+  if(Index.model() == this->Implementation->FavoriteModel)
+    return this->Implementation->FavoriteModel->isDir(Index);  
 
   return false;    
 }
@@ -526,11 +526,11 @@ QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
 
 QAbstractItemModel* pqLocalFileDialogModel::fileModel()
 {
-  return implementation->fileModel;
+  return this->Implementation->FileModel;
 }
 
 QAbstractItemModel* pqLocalFileDialogModel::favoriteModel()
 {
-  return implementation->favoriteModel;
+  return this->Implementation->FavoriteModel;
 }
 

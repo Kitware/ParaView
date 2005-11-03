@@ -12,30 +12,30 @@
 
 pqExplicitCommandDispatcher::~pqExplicitCommandDispatcher()
 {
-  for(int i = 0; i != commands.size(); ++i)
-    delete commands[i];
+  for(int i = 0; i != this->Commands.size(); ++i)
+    delete this->Commands[i];
 }
 
 void pqExplicitCommandDispatcher::dispatchCommand(pqCommand* Command)
 {
   if(Command)
     {
-    commands.push_back(Command);
+    this->Commands.push_back(Command);
     emit commandsPending(true);
     }
 }
 
 void pqExplicitCommandDispatcher::onExecute()
 {
-  for(int i = 0; i != commands.size(); ++i)
-    commands[i]->redoCommand();
+  for(int i = 0; i != this->Commands.size(); ++i)
+    this->Commands[i]->redoCommand();
     
   emit updateWindow();
   
-  for(int i = 0; i != commands.size(); ++i)
-    delete commands[i];
+  for(int i = 0; i != this->Commands.size(); ++i)
+    delete this->Commands[i];
     
-  commands.clear();
+  this->Commands.clear();
   
   emit commandsPending(false);
 }

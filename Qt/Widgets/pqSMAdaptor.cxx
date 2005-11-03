@@ -61,13 +61,13 @@ class pqSMAdaptorInternal
 public:
   pqSMAdaptorInternal()
     {
-    VTKConnections = vtkEventQtSlotConnect::New();
-    QtConnections = new QSignalMapper;
+    this->VTKConnections = vtkEventQtSlotConnect::New();
+    this->QtConnections = new QSignalMapper;
     }
   ~pqSMAdaptorInternal()
     {
-    VTKConnections->Delete();
-    delete QtConnections;
+    this->VTKConnections->Delete();
+    delete this->QtConnections;
     }
 
   // managed links
@@ -91,7 +91,7 @@ pqSMAdaptor::pqSMAdaptor()
 {
   this->Internal = new pqSMAdaptorInternal;
   QObject::connect(this->Internal->QtConnections, SIGNAL(mapped(QWidget*)), 
-                   this, SLOT(QtLinkedPropertyChanged(QWidget*)));
+                   this, SLOT(qtLinkedPropertyChanged(QWidget*)));
 }
 
 pqSMAdaptor::~pqSMAdaptor()
@@ -99,7 +99,7 @@ pqSMAdaptor::~pqSMAdaptor()
   delete this->Internal;
 }
 
-void pqSMAdaptor::SetProperty(vtkSMProperty* Property, QVariant QtProperty)
+void pqSMAdaptor::setProperty(vtkSMProperty* Property, QVariant QtProperty)
 {
   QList<QVariant> props;
   if(QtProperty.type() == QVariant::List)
@@ -111,11 +111,11 @@ void pqSMAdaptor::SetProperty(vtkSMProperty* Property, QVariant QtProperty)
   assert(props.size() <= VectorProperty->GetNumberOfElements());
   for(int i=0; i<props.size(); i++)
     {
-    this->SetProperty(Property, i, props[i]);
+    this->setProperty(Property, i, props[i]);
     }
 }
 
-QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property)
+QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property)
 {
   vtkSMVectorProperty* VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
   if(VectorProperty == NULL)
@@ -124,17 +124,17 @@ QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property)
   int numElems = VectorProperty->GetNumberOfElements();
   if(numElems == 1)
     {
-    return this->GetProperty(Property, 0);
+    return this->getProperty(Property, 0);
     }
   QList<QVariant> props;
   for(int i=0; i<numElems; i++)
     {
-    props.push_back(this->GetProperty(Property, i));
+    props.push_back(this->getProperty(Property, i));
     }
   return props;
 }
 
-void pqSMAdaptor::SetProperty(vtkSMProperty* Property, int Index, QVariant QtProperty)
+void pqSMAdaptor::setProperty(vtkSMProperty* Property, int Index, QVariant QtProperty)
 {
   vtkSMPropertyAdaptor* adapter = vtkSMPropertyAdaptor::New();
   adapter->SetProperty(Property);
@@ -144,7 +144,7 @@ void pqSMAdaptor::SetProperty(vtkSMProperty* Property, int Index, QVariant QtPro
   adapter->Delete();
 }
 
-QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property, int Index)
+QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property, int Index)
 {
   vtkSMPropertyAdaptor* adapter = vtkSMPropertyAdaptor::New();
   adapter->SetProperty(Property);
@@ -172,14 +172,14 @@ QVariant pqSMAdaptor::GetProperty(vtkSMProperty* Property, int Index)
 }
 
 
-void pqSMAdaptor::LinkPropertyTo(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
+void pqSMAdaptor::linkPropertyTo(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
                                         QObject* qObject, const char* qProperty)
 {
   if(!Property || !qObject)
     return;
 
   // set the property on the QObject, so they start in-sync
-  qObject->setProperty(qProperty, this->GetProperty(Property, Index));
+  qObject->setProperty(qProperty, this->getProperty(Property, Index));
 
   pqSMAdaptorInternal::LinkMap::iterator iter = this->Internal->SMLinks.find(SMGroup(Proxy, Property, Index));
   bool found = iter != this->Internal->SMLinks.end();
@@ -193,12 +193,12 @@ void pqSMAdaptor::LinkPropertyTo(vtkSMProxy* Proxy, vtkSMProperty* Property, int
     {
     // connect SM property changed to QObject set property
     this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
-                                            this, SLOT(SMLinkedPropertyChanged(vtkObject*, unsigned long, void*)),
+                                            this, SLOT(smLinkedPropertyChanged(vtkObject*, unsigned long, void*)),
                                             (void*)&(iter->first));
     }
 }
 
-void pqSMAdaptor::UnlinkPropertyFrom(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
+void pqSMAdaptor::unlinkPropertyFrom(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index,
                                             QObject* qObject, const char* qProperty)
 {
   typedef vtkstd::pair<pqSMAdaptorInternal::LinkMap::iterator,
@@ -229,13 +229,13 @@ void pqSMAdaptor::UnlinkPropertyFrom(vtkSMProxy* Proxy, vtkSMProperty* Property,
     }
 }
 
-void pqSMAdaptor::LinkPropertyTo(QObject* qObject, const char* qProperty, const char* signal,
+void pqSMAdaptor::linkPropertyTo(QObject* qObject, const char* qProperty, const char* signal,
                                         vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
   if(!Proxy || !Property || !qObject)
     return;
 
-  qObject->setProperty(qProperty, this->GetProperty(Property, Index));
+  qObject->setProperty(qProperty, this->getProperty(Property, Index));
 
   pqSMAdaptorInternal::LinkMap::iterator iter = this->Internal->QtLinks.insert(this->Internal->QtLinks.end(), 
                                pqSMAdaptorInternal::LinkMap::value_type(
@@ -246,7 +246,7 @@ void pqSMAdaptor::LinkPropertyTo(QObject* qObject, const char* qProperty, const 
 
 }
 
-void pqSMAdaptor::UnlinkPropertyFrom(QObject* qObject, const char* qProperty, const char* signal,
+void pqSMAdaptor::unlinkPropertyFrom(QObject* qObject, const char* qProperty, const char* signal,
                                             vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
   typedef vtkstd::pair<pqSMAdaptorInternal::LinkMap::iterator,
@@ -274,7 +274,7 @@ void pqSMAdaptor::UnlinkPropertyFrom(QObject* qObject, const char* qProperty, co
     }
 }
 
-void pqSMAdaptor::SMLinkedPropertyChanged(vtkObject*, unsigned long, void* data)
+void pqSMAdaptor::smLinkedPropertyChanged(vtkObject*, unsigned long, void* data)
 {
   SMGroup* d = static_cast<SMGroup*>(data);
   
@@ -285,7 +285,7 @@ void pqSMAdaptor::SMLinkedPropertyChanged(vtkObject*, unsigned long, void* data)
   // is there a way to not do a lookup?
   Iters iters = this->Internal->SMLinks.equal_range(*d);
   
-  QVariant var = this->GetProperty(d->Property, d->Index);
+  QVariant var = this->getProperty(d->Property, d->Index);
   
   for(iter = iters.first; iter != iters.second; ++iter)
     {
@@ -295,23 +295,23 @@ void pqSMAdaptor::SMLinkedPropertyChanged(vtkObject*, unsigned long, void* data)
     }
 }
 
-void pqSMAdaptor::QtLinkedPropertyChanged(QWidget* data)
+void pqSMAdaptor::qtLinkedPropertyChanged(QWidget* data)
 {
   // map::value_type is masked as a QWidget
   pqSMAdaptorInternal::LinkMap::value_type* iter = 
     reinterpret_cast<pqSMAdaptorInternal::LinkMap::value_type*>(data);
   
   QVariant prop = iter->second.first->property(iter->second.second.data());
-  QVariant old = this->GetProperty(iter->first.Property, iter->first.Index);
+  QVariant old = this->getProperty(iter->first.Property, iter->first.Index);
   if(prop != old)
     {
-    this->SetProperty(iter->first.Property, iter->first.Index, prop);
+    this->setProperty(iter->first.Property, iter->first.Index, prop);
     iter->first.Proxy->UpdateVTKObjects();
     //iter->first.Proxy->MarkConsumersAsModified();
     }
 }
 
-void pqSMAdaptor::ConnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+void pqSMAdaptor::connectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
 {
   if(!QMetaObject::checkConnectArgs(SIGNAL(foo(vtkSMProperty*)), slot))
     {
@@ -330,13 +330,13 @@ void pqSMAdaptor::ConnectDomain(vtkSMProperty* property, QObject* qObject, const
                                                  property, vtkstd::pair<QObject*, QByteArray>(
                                                    qObject, slot)));
     this->Internal->VTKConnections->Connect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,
-                                            this, SLOT(SMDomainChanged(vtkObject*, unsigned long, void*)),
+                                            this, SLOT(smDomainChanged(vtkObject*, unsigned long, void*)),
                                             &*iter);
     }
   domainIter->Delete();
 }
 
-void pqSMAdaptor::DisconnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+void pqSMAdaptor::disconnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
 {
   typedef vtkstd::pair<pqSMAdaptorInternal::DomainConnectionMap::iterator, pqSMAdaptorInternal::DomainConnectionMap::iterator> PairIter;
 
@@ -350,7 +350,7 @@ void pqSMAdaptor::DisconnectDomain(vtkSMProperty* property, QObject* qObject, co
       for(; !domainIter->IsAtEnd(); domainIter->Next())
         {
         this->Internal->VTKConnections->Disconnect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,
-                                                   this, SLOT(SMDomainChanged(vtkObject*, unsigned long, void*)),
+                                                   this, SLOT(smDomainChanged(vtkObject*, unsigned long, void*)),
                                                    &*iters.first);
         this->Internal->DomainConnections.erase(iters.first);
         }
@@ -360,7 +360,7 @@ void pqSMAdaptor::DisconnectDomain(vtkSMProperty* property, QObject* qObject, co
     }
 }
 
-void pqSMAdaptor::SMDomainChanged(vtkObject*, unsigned long event, void* data)
+void pqSMAdaptor::smDomainChanged(vtkObject*, unsigned long event, void* data)
 {
   pqSMAdaptorInternal::DomainConnectionMap::value_type* call = 
     reinterpret_cast<pqSMAdaptorInternal::DomainConnectionMap::value_type*>(data);

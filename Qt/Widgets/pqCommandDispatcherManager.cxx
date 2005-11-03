@@ -20,27 +20,27 @@ pqCommandDispatcherManager& pqCommandDispatcherManager::instance()
 }
 
 pqCommandDispatcherManager::pqCommandDispatcherManager() :
-  dispatcher(new pqImmediateCommandDispatcher())
+  Dispatcher(new pqImmediateCommandDispatcher())
 {
 }
 
 pqCommandDispatcherManager::~pqCommandDispatcherManager()
 {
-  delete dispatcher;
+  delete this->Dispatcher;
 }
 
 pqCommandDispatcher& pqCommandDispatcherManager::getDispatcher()
 {
-  if(!dispatcher)
-    dispatcher = new pqImmediateCommandDispatcher();
+  if(!this->Dispatcher)
+    this->Dispatcher = new pqImmediateCommandDispatcher();
     
-  return *dispatcher;
+  return *this->Dispatcher;
 }
 
-void pqCommandDispatcherManager::setDispatcher(pqCommandDispatcher* Dispatcher)
+void pqCommandDispatcherManager::setDispatcher(pqCommandDispatcher* dispatcher)
 {
-  delete dispatcher;
-  dispatcher = Dispatcher;
+  delete this->Dispatcher;
+  this->Dispatcher = dispatcher;
   
   emit dispatcherChanged();
 }

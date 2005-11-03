@@ -25,7 +25,7 @@ public:
   pqRefreshToolbar(QWidget* Parent);
 
 private:
-  QPushButton* refresh_button;
+  QPushButton* RefreshButton;
   
 private slots:
   void onRefreshType(int);

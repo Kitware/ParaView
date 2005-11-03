@@ -36,9 +36,9 @@ private:
   void accept();
   void reject();
   
-  pqFileDialogModel* const model;
-  Ui::pqFileDialog ui;
-  const QModelIndex* temp;
+  pqFileDialogModel* const Model;
+  Ui::pqFileDialog Ui;
+  const QModelIndex* Temp;
   
 private slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);
@@ -47,7 +47,7 @@ private slots:
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown();
-  void onAutoDelete(); 
+  void onAutoDelete();
 };
 
 #endif // !_pqFileDialog_h

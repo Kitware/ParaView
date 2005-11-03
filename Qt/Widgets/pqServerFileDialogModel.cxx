@@ -61,24 +61,24 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// FileModel
+// pqFileModel
 
-class FileModel :
+class pqFileModel :
   public QAbstractItemModel
 {
 public:
-  FileModel(vtkProcessModule* processModule) :
+  pqFileModel(vtkProcessModule* processModule) :
     ProcessModule(processModule)
   {
   } 
 
   void setCurrentPath(const QString& Path)
   {
-    currentPath.setPath(QDir::cleanPath(Path));
-    fileList.clear();
+    this->CurrentPath.setPath(QDir::cleanPath(Path));
+    this->FileList.clear();
 
-    fileList.push_back(FileInfo(".", true));
-    fileList.push_back(FileInfo("..", true));
+    this->FileList.push_back(FileInfo(".", true));
+    this->FileList.push_back(FileInfo("..", true));
 
     vtkClientServerStream stream;
     const vtkClientServerID ID = ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
@@ -101,7 +101,7 @@ public:
         const char* directory_name = 0;
         if(result.GetArgument(0, i, &directory_name))
           {
-          fileList.push_back(FileInfo(directory_name, true));
+          this->FileList.push_back(FileInfo(directory_name, true));
           }
         }
 
@@ -111,7 +111,7 @@ public:
         const char* file_name = 0;
         if(result.GetArgument(1, i, &file_name))
           {
-          fileList.push_back(FileInfo(file_name, false));
+          this->FileList.push_back(FileInfo(file_name, false));
           }
         }
       }
@@ -131,10 +131,10 @@ public:
     if(!index.isValid())
       return QVariant();
 
-    if(index.row() >= fileList.size())
+    if(index.row() >= this->FileList.size())
       return QVariant();
 
-    const FileInfo& file = fileList[index.row()];
+    const FileInfo& file = this->FileList[index.row()];
 
     switch(role)
       {
@@ -167,7 +167,7 @@ public:
 
   int rowCount(const QModelIndex& parent) const
   {
-    return fileList.size();
+    return this->FileList.size();
   }
 
   bool hasChildren(const QModelIndex& parent) const
@@ -194,14 +194,14 @@ public:
   }
 
   vtkProcessModule* const ProcessModule;
-  QDir currentPath;
-  QList<FileInfo> fileList;
+  QDir CurrentPath;
+  QList<FileInfo> FileList;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// FavoriteModel
+// pqFavoriteModel
 
-class FavoriteModel :
+class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
@@ -249,23 +249,23 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqServerFileDialogModel::Implementation
 
-class pqServerFileDialogModel::Implementation
+class pqServerFileDialogModel::pqImplementation
 {
 public:
-  Implementation(vtkProcessModule* processModule) :
-    fileModel(new FileModel(processModule)),
-    favoriteModel(new FavoriteModel())
+  pqImplementation(vtkProcessModule* processModule) :
+    FileModel(new pqFileModel(processModule)),
+    FavoriteModel(new pqFavoriteModel())
   {
   }
   
-  ~Implementation()
+  ~pqImplementation()
   {
-    delete fileModel;
-    delete favoriteModel;
+    delete this->FileModel;
+    delete this->FavoriteModel;
   }
 
-  FileModel* const fileModel;
-  FavoriteModel* const favoriteModel;
+  pqFileModel* const FileModel;
+  pqFavoriteModel* const FavoriteModel;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -273,52 +273,52 @@ public:
 
 pqServerFileDialogModel::pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent) :
   base(Parent),
-  implementation(new Implementation(ProcessModule))
+  Implementation(new pqImplementation(ProcessModule))
 {
 }
 
 pqServerFileDialogModel::~pqServerFileDialogModel()
 {
-  delete implementation;
+  delete this->Implementation;
 }
 
 QString pqServerFileDialogModel::getStartPath()
 {
   vtkClientServerStream stream;
-  const vtkClientServerID id = implementation->fileModel->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
+  const vtkClientServerID id = this->Implementation->FileModel->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
   stream
     << vtkClientServerStream::Invoke
     << id
     << "GetCurrentWorkingDirectory"
     << vtkClientServerStream::End;
     
-  implementation->fileModel->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  this->Implementation->FileModel->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   const char* cwd = "";
-  implementation->fileModel->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd);
+  this->Implementation->FileModel->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd);
   QString result = cwd;
-  implementation->fileModel->ProcessModule->DeleteStreamObject(id, stream);
+  this->Implementation->FileModel->ProcessModule->DeleteStreamObject(id, stream);
   
   return result;
 }
 
 void pqServerFileDialogModel::setCurrentPath(const QString& Path)
 {
-  implementation->fileModel->setCurrentPath(Path);
+  this->Implementation->FileModel->setCurrentPath(Path);
 }
 
 QString pqServerFileDialogModel::getCurrentPath()
 {
-  return QDir::convertSeparators(implementation->fileModel->currentPath.path());
+  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path());
 }
 
 QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
   QStringList results;
   
-  if(Index.row() < implementation->fileModel->fileList.size())
+  if(Index.row() < this->Implementation->FileModel->FileList.size())
     { 
-    FileInfo& file = implementation->fileModel->fileList[Index.row()];
-    results.push_back(QDir::convertSeparators(implementation->fileModel->currentPath.path() + "/" + file.fileName()));
+    FileInfo& file = this->Implementation->FileModel->FileList[Index.row()];
+    results.push_back(QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + file.fileName()));
     }
     
   return results;
@@ -329,7 +329,7 @@ QString pqServerFileDialogModel::getFilePath(const QString& Path)
   if(QDir::isAbsolutePath(Path))
     return Path;
     
-  return QDir::convertSeparators(implementation->fileModel->currentPath.path() + "/" + Path);
+  return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
 }
 
 QString pqServerFileDialogModel::getParentPath(const QString& Path)
@@ -341,10 +341,10 @@ QString pqServerFileDialogModel::getParentPath(const QString& Path)
 
 bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
 {
-  if(Index.row() >= implementation->fileModel->fileList.size())
+  if(Index.row() >= this->Implementation->FileModel->FileList.size())
     return false;
     
-  FileInfo& file = implementation->fileModel->fileList[Index.row()];
+  FileInfo& file = this->Implementation->FileModel->FileList[Index.row()];
   return file.isDir();
 }
 
@@ -362,11 +362,11 @@ QStringList pqServerFileDialogModel::splitPath(const QString& Path)
 
 QAbstractItemModel* pqServerFileDialogModel::fileModel()
 {
-  return implementation->fileModel;
+  return this->Implementation->FileModel;
 }
 
 QAbstractItemModel* pqServerFileDialogModel::favoriteModel()
 {
-  return implementation->favoriteModel;
+  return this->Implementation->FavoriteModel;
 }
 

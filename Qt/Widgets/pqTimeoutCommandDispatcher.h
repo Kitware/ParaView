@@ -28,8 +28,8 @@ public:
   void dispatchCommand(pqCommand*);
   
 private:
-  QTimer timer;
-  QList<pqCommand*> commands;
+  QTimer Timer;
+  QList<pqCommand*> Commands;
   
 private slots:
   void onExecute();

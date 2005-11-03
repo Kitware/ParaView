@@ -38,8 +38,8 @@ public:
   QAbstractItemModel* favoriteModel();
 
 private:
-  class Implementation;
-  Implementation* const implementation;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqServerFileDialogModel_h

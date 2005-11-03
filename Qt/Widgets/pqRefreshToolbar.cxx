@@ -18,7 +18,7 @@
 
 pqRefreshToolbar::pqRefreshToolbar(QWidget* Parent) :
   QToolBar("Refresh", Parent),
-  refresh_button(0)
+  RefreshButton(0)
 {
   QComboBox* const combo = new QComboBox(this);
   combo->addItem(tr("Immediate"));
@@ -26,8 +26,8 @@ pqRefreshToolbar::pqRefreshToolbar(QWidget* Parent) :
   combo->addItem(tr("Explicit"));
   this->addWidget(combo);
 
-  this->refresh_button = new QPushButton(tr("Refresh"), this);
-  this->addWidget(this->refresh_button);
+  this->RefreshButton = new QPushButton(tr("Refresh"), this);
+  this->addWidget(this->RefreshButton);
 
   onRefreshType(0);
   QObject::connect(combo, SIGNAL(activated(int)), this, SLOT(onRefreshType(int)));
@@ -39,21 +39,21 @@ void pqRefreshToolbar::onRefreshType(int Index)
     {
     case 0:
       pqCommandDispatcherManager::instance().setDispatcher(new pqImmediateCommandDispatcher());
-      this->refresh_button->setDisabled(true);
+      this->RefreshButton->setDisabled(true);
       break;
       
     case 1:
       pqCommandDispatcherManager::instance().setDispatcher(new pqTimeoutCommandDispatcher(1000));
-      this->refresh_button->setDisabled(true);
+      this->RefreshButton->setDisabled(true);
       break;
       
     case 2:
       {
       pqExplicitCommandDispatcher* const dispatcher = new pqExplicitCommandDispatcher();
       pqCommandDispatcherManager::instance().setDispatcher(dispatcher);
-      QObject::connect(dispatcher, SIGNAL(commandsPending(bool)), this->refresh_button, SLOT(setEnabled(bool)));
-      QObject::connect(this->refresh_button, SIGNAL(clicked()), dispatcher, SLOT(onExecute()));
-      this->refresh_button->setDisabled(true);
+      QObject::connect(dispatcher, SIGNAL(commandsPending(bool)), this->RefreshButton, SLOT(setEnabled(bool)));
+      QObject::connect(this->RefreshButton, SIGNAL(clicked()), dispatcher, SLOT(onExecute()));
+      this->RefreshButton->setDisabled(true);
       }
       break;
     }

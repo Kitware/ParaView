@@ -34,7 +34,7 @@ private:
   pqCommandDispatcherManager();
   ~pqCommandDispatcherManager();
 
-  pqCommandDispatcher* dispatcher;
+  pqCommandDispatcher* Dispatcher;
 };
 
 

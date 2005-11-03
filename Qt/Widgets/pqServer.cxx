@@ -261,15 +261,15 @@ pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMAp
 
 pqServer::~pqServer()
 {
-  RenderModule->Delete();
+  this->RenderModule->Delete();
   
-  ServerManager->Finalize();
-  ServerManager->Delete();
+  this->ServerManager->Finalize();
+  this->ServerManager->Delete();
   
-  ProcessModule->Finalize();
-  ProcessModule->Delete();
+  this->ProcessModule->Finalize();
+  this->ProcessModule->Delete();
   
-  Options->Delete();
+  this->Options->Delete();
   
   vtkProcessModule::SetProcessModule(0);
 }
