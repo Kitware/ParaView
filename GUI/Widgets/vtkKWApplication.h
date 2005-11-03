@@ -382,9 +382,15 @@ public:
   virtual int IsDialogUp();
   
   // Description:
-  // Open a link (media).On Win32, use ShellExecute to trigger the default
-  // viewers.
+  // Open a link (media).
+  // On Win32, use ShellExecute to trigger the default viewers.
   static int OpenLink(const char *link);
+
+  // Description:
+  // Explore link.
+  // On Win32, this will launch the Explorer, open it in the directory
+  // of the link, and eventually select that link itself in the directory.
+  static int ExploreLink(const char *link);
 
   // Description:
   // Some constants
