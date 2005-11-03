@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.46");
+vtkCxxRevisionMacro(vtkSMProxy, "1.47");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -493,7 +493,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       this->PushProperty(it->first.c_str(), 
                          this->SelfID, 
                          vtkProcessModule::CLIENT);
-      //this->MarkModified(this);
+      this->MarkModified(this);
       }
     else
       {
@@ -510,7 +510,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
         {
         vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
         pm->SendStream(this->Servers, str);
-        //this->MarkModified(this);
+        this->MarkModified(this);
         }
       }
     it->second.ModifiedFlag = 0;
@@ -575,7 +575,7 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
         }
       prop->UpdateDependentDomains();
       }
-    //this->MarkModified(this);
+    this->MarkModified(this);
     }
 }
 
@@ -626,7 +626,7 @@ void vtkSMProxy::UpdateInformation()
       it2->second.GetPointer()->UpdateInformation();
       }
 
-    //this->MarkModified(this);
+    this->MarkModified(this);
     }
 }
 
@@ -756,7 +756,7 @@ void vtkSMProxy::UpdateVTKObjects()
 
   if (wasModified)
     {
-    //this->MarkModified(this);
+    this->MarkModified(this);
     }
 
   this->InUpdateVTKObjects = 0;
