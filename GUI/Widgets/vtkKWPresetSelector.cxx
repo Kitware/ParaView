@@ -45,7 +45,8 @@ int vtkKWPresetSelector::AddButtonId    = 0;
 int vtkKWPresetSelector::ApplyButtonId  = 1;
 int vtkKWPresetSelector::UpdateButtonId = 2;
 int vtkKWPresetSelector::RemoveButtonId = 3;
-int vtkKWPresetSelector::EmailButtonId  = 4;
+int vtkKWPresetSelector::LocateButtonId  = 4;
+int vtkKWPresetSelector::EmailButtonId  = 5;
 
 const char *vtkKWPresetSelector::IdColumnName        = "Id";
 const char *vtkKWPresetSelector::ThumbnailColumnName = "Image";
@@ -54,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.12");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -160,6 +161,7 @@ vtkKWPresetSelector::vtkKWPresetSelector()
 
   this->ApplyPresetOnSelection = 1;
   this->SelectSpinButtonsVisibility = 1;
+  this->LocateButtonVisibility = 0;
   this->EmailButtonVisibility = 0;
 
   this->ThumbnailSize = 32;
@@ -366,6 +368,12 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetDelete);
   pb->SetCommand(this, "PresetRemoveCallback");
 
+  // locate preset
+
+  pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::LocateButtonId);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetLocate);
+  pb->SetCommand(this, "PresetLocateCallback");
+
   // email preset
 
   pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::EmailButtonId);
@@ -479,6 +487,9 @@ void vtkKWPresetSelector::SetDefaultHelpStrings()
     this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
       SetBalloonHelpString("Delete the selected preset(s)");
 
+    this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
+      SetBalloonHelpString("Locate the selected preset(s)");
+
     this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
       SetBalloonHelpString("Email the selected preset(s)");
     }
@@ -552,6 +563,20 @@ void vtkKWPresetSelector::SetSelectSpinButtonsVisibility(int arg)
   this->Modified();
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetLocateButtonVisibility(int arg)
+{
+  if (this->LocateButtonVisibility == arg)
+    {
+    return;
+    }
+
+  this->LocateButtonVisibility = arg;
+  this->Modified();
+
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1771,6 +1796,29 @@ void vtkKWPresetSelector::PresetRemoveCallback()
 }
 
 //---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetLocateCallback()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+
+    int *indices = new int [list->GetNumberOfRows()];
+    int i, nb_selected_rows = list->GetSelectedRows(indices);
+    for (i = 0; i < nb_selected_rows; i++)
+      {
+      int id = this->GetPresetAtRowId(indices[i]);
+      const char *filename = this->GetPresetFileName(id);
+      if (filename && *filename && vtksys::SystemTools::FileExists(filename))
+        {
+        this->GetApplication()->ExploreLink(filename);
+        }
+      }
+    
+    delete [] indices;
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkKWPresetSelector::PresetEmailCallback()
 {
   if (this->PresetList)
@@ -1828,7 +1876,7 @@ void vtkKWPresetSelector::PresetEmailCallback()
       message += "Creation Time: ";
       time_t t = (time_t)this->GetPresetCreationTime(id);
       message += ctime(&t);
-          
+
       this->GetApplication()->SendEmail(
         NULL, subject.c_str(), message.c_str(), native_filename.c_str(), NULL);
       }
@@ -2028,6 +2076,14 @@ void vtkKWPresetSelector::Update()
 
     this->PresetButtons->GetWidget(
       vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
+        has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+    this->PresetButtons->SetWidgetVisibility(
+      vtkKWPresetSelector::LocateButtonId, 
+      this->LocateButtonVisibility ? 1 : 0);
+
+    this->PresetButtons->GetWidget(
+      vtkKWPresetSelector::LocateButtonId)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
 
     this->PresetButtons->SetWidgetVisibility(
