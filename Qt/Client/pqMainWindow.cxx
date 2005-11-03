@@ -22,9 +22,6 @@
 #include "pqSMAdaptor.h"
 #include "ui_pqAbout.h"
 #include "pqConfig.h"
-#ifdef PARAQ_BUILD_TESTING
-#  include "pqTesting.h"
-#endif
 
 #include <QApplication>
 #include <QCheckBox>
@@ -110,9 +107,6 @@ pqMainWindow::pqMainWindow() :
   QAction* const debugDumpQtHierarchyAction = new QAction(tr("Dump Qt Hierarchy"), this) << pqSetName("debugDumpQtHierarchyAction");
   QObject::connect(debugDumpQtHierarchyAction, SIGNAL(triggered()), this, SLOT(onDebugDumpQtHierarchy()));
 
-  QAction* const testsRunAction = new QAction(tr("Run"), this) << pqSetName("testsRunAction");
-  QObject::connect(testsRunAction, SIGNAL(triggered()), this, SLOT(onTestsRun()));
-
   this->menuBar() << pqSetName("menuBar");
 
   QMenu* const fileMenu = this->menuBar()->addMenu(tr("File")) << pqSetName("fileMenu");
@@ -133,9 +127,6 @@ pqMainWindow::pqMainWindow() :
   debugMenu->addAction(debugOpenLocalFilesAction);
   debugMenu->addAction(debugDumpQtHierarchyAction);
   
-  QMenu* const testMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testMenu");
-  testMenu->addAction(testsRunAction);
-
   // keep help last
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help")) << pqSetName("helpMenu");
   QAction* aboutAction = new QAction(tr("About") + " " + tr("ParaQ") + " " + QT_CLIENT_VERSION, this) << pqSetName("aboutAction");
@@ -365,13 +356,6 @@ void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
 void pqMainWindow::onDebugDumpQtHierarchy()
 {
   dumpObjectTree();
-}
-
-void pqMainWindow::onTestsRun()
-{
-#ifdef PARAQ_BUILD_TESTING
-  pqRunRegressionTests(this);
-#endif
 }
 
 void pqMainWindow::onDispatcherChanged()

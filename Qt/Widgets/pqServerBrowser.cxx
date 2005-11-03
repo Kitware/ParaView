@@ -28,11 +28,6 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   this->setWindowTitle(tr("Pick Server:"));
   
   this->setObjectName("serverBrowser");
-  this->Ui.serverType->setObjectName("serverBrowser/serverType");
-  this->Ui.hostName->setObjectName("serverBrowser/hostName");
-  this->Ui.portNumber->setObjectName("serverBrowser/portNumber");
-  this->Ui.okButton->setObjectName("serverBrowser/okButton");
-  this->Ui.cancelButton->setObjectName("serverBrowser/cancelButton");
 }
 
 pqServerBrowser::~pqServerBrowser()

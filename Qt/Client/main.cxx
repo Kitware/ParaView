@@ -12,10 +12,9 @@
 #include "pqMainWindow.h"
 
 #ifdef PARAQ_BUILD_TESTING
-#include "pqEventObserverStdout.h"
-#include "pqEventObserverXML.h"
-#include "pqEventTranslator.h"
-#include "pqTesting.h"
+#include <Testing/pqEventObserverStdout.h>
+#include <Testing/pqEventObserverXML.h>
+#include <Testing/pqEventTranslator.h>
 #endif
 
 #include <QApplication>
@@ -40,7 +39,7 @@ int main(int argc, char* argv[])
     &event_observer_stdout,
     SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
 */
-  
+ 
   pqEventObserverXML event_observer_xml(cout);
   QObject::connect(
     &event_translator,
@@ -53,14 +52,6 @@ int main(int argc, char* argv[])
     {
     const QString argument = argv[i];
     
-#ifdef PARAQ_BUILD_TESTING
-    if(argument == "--runtests")
-      {
-      pqRunRegressionTests(&qwindow);
-      continue;
-      }
-#endif
-
     if(argument == "--exit")
       {
       return 0;

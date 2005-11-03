@@ -69,7 +69,6 @@ private slots:
   void onDebugOpenLocalFiles();
   void onDebugOpenLocalFiles(const QStringList& Files);
   void onDebugDumpQtHierarchy();
-  void onTestsRun();
   void updateSourcesMenu();
   void onAbout();
   

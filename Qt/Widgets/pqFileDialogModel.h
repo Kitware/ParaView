@@ -25,16 +25,26 @@ class pqFileDialogModel :
 public:
   ~pqFileDialogModel();
   
+  /// Returns the path that will be automatically displayed when the file dialog is opened
   virtual QString getStartPath() = 0;
+  /// Sets the path that the file dialog will display
   virtual void setCurrentPath(const QString&) = 0;
+  /// Returns the path the the file dialog will display
   virtual QString getCurrentPath() = 0;
+  /// Return true iff the given row is a directory
   virtual bool isDir(const QModelIndex&) = 0;
+  /// Returns the set of file paths associated with the given row (a row may represent one-to-many paths if grouping is implemented)
   virtual QStringList getFilePaths(const QModelIndex&) = 0;
+  /// Converts a file into an absolute path
   virtual QString getFilePath(const QString&) = 0;
+  /// Returns the parent path of the given file path (this is handled by the back-end so it can deal with issues of delimiters, symlinks, network resources, etc)
   virtual QString getParentPath(const QString&) = 0;
+  /// Splits a path into its components (this is handled by the back-end so it can deal with issues of delimiters, symlinks, multi-root filesystems, etc)
   virtual QStringList splitPath(const QString&) = 0;
 
+  /// Returns a Qt model that will contain the contents of the right-hand pane of the file dialog
   virtual QAbstractItemModel* fileModel() = 0;
+  /// Returns a Qt model that will contain the contents of the left-hand pane of the file dialog
   virtual QAbstractItemModel* favoriteModel() = 0;
 
 protected:

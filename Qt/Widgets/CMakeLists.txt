@@ -7,63 +7,63 @@ FIND_PACKAGE(Qt4)
 INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqCommandDispatcher.h
+  pqCommandDispatcherManager.h
+  pqExplicitCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
+  pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
-  pqCommandDispatcher.h
-  pqRefreshToolbar.h
-  pqCommandDispatcherManager.h
   pqTimeoutCommandDispatcher.h
-  pqExplicitCommandDispatcher.h
 )
 
-ADD_LIBRARY(pqWidgets
+ADD_LIBRARY(QtWidgets
+  pqCommandDispatcher.cxx
+  pqCommandDispatcher.h
+  pqCommandDispatcherManager.cxx
+  pqCommandDispatcherManager.h
+  pqCommand.h  
+  pqExplicitCommandDispatcher.cxx
+  pqExplicitCommandDispatcher.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
+  pqImmediateCommandDispatcher.cxx
+  pqImmediateCommandDispatcher.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorItem.cxx
   pqObjectInspectorItem.h
+  pqOptions.cxx
+  pqOptions.h
+  pqParts.cxx
+  pqParts.h
+  pqRefreshToolbar.cxx
+  pqRefreshToolbar.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqServer.cxx
   pqServer.h
-  pqOptions.cxx
-  pqOptions.h
   pqServerBrowser.cxx
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
-  pqParts.cxx
-  pqParts.h
-  pqCommandDispatcher.cxx
-  pqCommandDispatcher.h
-  pqImmediateCommandDispatcher.cxx
-  pqImmediateCommandDispatcher.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
-  pqExplicitCommandDispatcher.cxx
-  pqExplicitCommandDispatcher.h
-  pqRefreshToolbar.cxx
-  pqRefreshToolbar.h
-  pqCommandDispatcherManager.cxx
-  pqCommandDispatcherManager.h
-  pqCommand.h  
   ${MOC_BUILT_SOURCES}
 )
 
-TARGET_LINK_LIBRARIES(pqWidgets
+TARGET_LINK_LIBRARIES(QtWidgets
   vtkPVServerManager
   vtkPVFiltersCS
   vtkPVFilters

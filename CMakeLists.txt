@@ -23,7 +23,7 @@ SET(PARAVIEW_BUILD_GUI OFF CACHE BOOL "Build end user applications (ParaView, pv
 
 SUBDIRS(
   ParaView
-  Client
+  Qt
 )
 #########################################################################
 # Configure Testing
