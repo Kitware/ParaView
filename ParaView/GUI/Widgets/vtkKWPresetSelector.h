@@ -255,6 +255,16 @@ public:
   vtkBooleanMacro(SelectSpinButtonsVisibility,int);
 
   // Description:
+  // Set/Get the visibility of the locate preset button (hidden by default).
+  // If visible, triggering this button will locate all selected presets
+  // by calling the GetPresetFileName method and trying to open
+  // the directory they are in and select the proper file.
+  // Win32 only at the moment.
+  virtual void SetLocateButtonVisibility(int);
+  vtkGetMacro(LocateButtonVisibility,int);
+  vtkBooleanMacro(LocateButtonVisibility,int);
+
+  // Description:
   // Set/Get the visibility of the email preset button (hidden by default).
   // If visible, triggering this button will email all selected presets
   // as attachments. The attachment location is retrieved by calling
@@ -358,6 +368,7 @@ public:
   virtual void PresetUpdateCallback();
   virtual void PresetRemoveCallback();
   virtual void PresetEmailCallback();
+  virtual void PresetLocateCallback();
   virtual void PresetSelectionCallback();
   virtual void PresetSelectPreviousCallback();
   virtual void PresetSelectNextCallback();
@@ -438,6 +449,7 @@ protected:
   int ApplyPresetOnSelection;
   int SelectSpinButtonsVisibility;
   int EmailButtonVisibility;
+  int LocateButtonVisibility;
 
   int ThumbnailSize;
   int ScreenshotSize;
@@ -497,6 +509,7 @@ protected:
   static int ApplyButtonId;
   static int UpdateButtonId;
   static int RemoveButtonId;
+  static int LocateButtonId;
   static int EmailButtonId;
   //ETX
 
