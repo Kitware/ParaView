@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.87");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.88");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -109,12 +109,6 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true",
                this->TopFrame->GetWidgetName());
 
-  this->BottomFrame->SetParent(this->MessageDialogFrame);
-  this->BottomFrame->Create(app);
-
-  this->Script("pack %s -side top -fill both -expand true",
-               this->BottomFrame->GetWidgetName());
-
   this->Message->SetParent(this->MessageDialogFrame);
   this->Message->Create(app);
   this->Message->SetWidth(300);
@@ -135,6 +129,12 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app)
     this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                  this->CheckButton->GetWidgetName());
     }
+
+  this->BottomFrame->SetParent(this->MessageDialogFrame);
+  this->BottomFrame->Create(app);
+
+  this->Script("pack %s -side top -fill both -expand true",
+               this->BottomFrame->GetWidgetName());
 
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
   this->ButtonFrame->Create(app);
