@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.10");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -298,7 +298,7 @@ const char* vtkKWCoreWidget::ConvertInternalStringToTclString(
       // Convert from that encoding
       // We need to escape interpretable chars to perform that conversion
 
-      dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
+      dest = vtksys::SystemTools::EscapeChars(source, "[]$\"\\");
       res = source = this->Script(
         "encoding convertfrom %s \"%s\"", tcl_encoding_name, dest.c_str());
       }
@@ -315,7 +315,7 @@ const char* vtkKWCoreWidget::ConvertInternalStringToTclString(
       }
     if (options & vtkKWCoreWidget::ConvertStringEscapeInterpretable)
       {
-      escape_chars += "[]$\"";
+      escape_chars += "[]$\"\\";
       }
     dest = 
       vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
@@ -346,7 +346,7 @@ const char* vtkKWCoreWidget::ConvertTclStringToInternalString(
     // Convert from that encoding
     // We need to escape interpretable chars to perform that conversion
 
-    dest = vtksys::SystemTools::EscapeChars(source, "[]$\"");
+    dest = vtksys::SystemTools::EscapeChars(source, "[]$\"\\");
     res = source = this->Script(
       "encoding convertfrom identity \"%s\"", dest.c_str());
     }
@@ -362,7 +362,7 @@ const char* vtkKWCoreWidget::ConvertTclStringToInternalString(
       }
     if (options & vtkKWCoreWidget::ConvertStringEscapeInterpretable)
       {
-      escape_chars += "[]$\"";
+      escape_chars += "[]$\"\\";
       }
     dest = 
       vtksys::SystemTools::EscapeChars(source, escape_chars.c_str());
