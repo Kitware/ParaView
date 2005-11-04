@@ -24,6 +24,7 @@
 
 #include "vtkOrderedCompositeDistributor.h"
 
+#include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -54,7 +55,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.5");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.6");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -78,6 +79,10 @@ vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
   this->PassThrough = 0;
 
   this->OutputType = NULL;
+
+  this->LastInput = NULL;
+  this->LastOutput = NULL;
+  this->LastCuts = vtkBSPCuts::New();
 }
 
 vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
@@ -89,6 +94,9 @@ vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
   this->SetToPolyData(NULL);
 
   this->SetOutputType(NULL);
+
+  if (this->LastOutput) this->LastOutput->Delete();
+  if (this->LastCuts) this->LastCuts->Delete();
 }
 
 void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
@@ -210,6 +218,45 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
+  // Check to see if update needs to be done (parallel operation), and pass
+  // through old data if not.
+  int needUpdate = 0;
+  if (   (this->LastInput != input)
+      || (this->LastUpdate < input->GetMTime())
+      || !this->LastCuts->Equals(cuts) )
+    {
+    needUpdate = 1;
+    }
+
+  const int COLLECT_NEED_UPDATE = 25234;
+  const int BROADCAST_NEED_UPDATE = 25235;
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    int i, numproc;
+    numproc = this->Controller->GetNumberOfProcesses();
+    for (i = 1; i < numproc; i++)
+      {
+      int remoteNeedUpdate;
+      this->Controller->Receive(&remoteNeedUpdate, 1, i, COLLECT_NEED_UPDATE);
+      needUpdate |= remoteNeedUpdate;
+      }
+    for (i = 1; i < numproc; i++)
+      {
+      this->Controller->Send(&needUpdate, 1, i, BROADCAST_NEED_UPDATE);
+      }
+    }
+  else
+    {
+    this->Controller->Send(&needUpdate, 1, 0, COLLECT_NEED_UPDATE);
+    this->Controller->Receive(&needUpdate, 1, 0, BROADCAST_NEED_UPDATE);
+    }
+
+  if (!needUpdate)
+    {
+    output->ShallowCopy(this->LastOutput);
+    return 1;
+    }
+
   this->UpdateProgress(0.01);
 
   if (this->D3 == NULL)
@@ -226,6 +273,7 @@ int vtkOrderedCompositeDistributor::RequestData(
   this->D3->SetInput(input);
   this->D3->GetKdtree()->SetCuts(cuts);
   this->D3->SetController(this->Controller);
+  this->D3->Modified();
   this->D3->Update();
 
   this->D3->RemoveObserver(cbc);
@@ -252,6 +300,21 @@ int vtkOrderedCompositeDistributor::RequestData(
                   << "type.");
     return 0;
     }
+
+  this->LastUpdate.Modified();
+  this->LastInput = input;
+  this->LastCuts->CreateCuts(cuts->GetKdNodeTree());
+
+  if (this->LastOutput && !this->LastOutput->IsA(output->GetClassName()))
+    {
+    this->LastOutput->Delete();
+    this->LastOutput = NULL;
+    }
+  if (!this->LastOutput)
+    {
+    this->LastOutput = output->NewInstance();
+    }
+  this->LastOutput->ShallowCopy(output);
 
   return 1;
 }

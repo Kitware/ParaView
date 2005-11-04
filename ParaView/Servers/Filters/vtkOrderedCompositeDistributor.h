@@ -41,6 +41,8 @@
 
 #include "vtkPointSetAlgorithm.h"
 
+class vtkBSPCuts;
+class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkDistributedDataFilter;
 class vtkMultiProcessController;
@@ -103,6 +105,11 @@ protected:
   virtual void ReportReferences(vtkGarbageCollector *collector);
 
   char *OutputType;
+
+  vtkDataSet *LastInput;
+  vtkDataSet *LastOutput;
+  vtkBSPCuts *LastCuts;
+  vtkTimeStamp LastUpdate;
 
 private:
   vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &);  // Not implemented.
