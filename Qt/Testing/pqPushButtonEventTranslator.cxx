@@ -13,7 +13,7 @@
 #include <QEvent>
 
 pqPushButtonEventTranslator::pqPushButtonEventTranslator() :
-  currentObject(0)
+  CurrentObject(0)
 {
 }
 
@@ -26,12 +26,12 @@ bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      this->currentObject = Object;
+      this->CurrentObject = Object;
       connect(object, SIGNAL(clicked(bool)), this, SLOT(onClicked(bool)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      this->currentObject = 0;
+      this->CurrentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqPushButtonEventTranslator::onClicked(bool)
 {
-  emit recordEvent(this->currentObject, "activate", "");
+  emit recordEvent(this->CurrentObject, "activate", "");
 }

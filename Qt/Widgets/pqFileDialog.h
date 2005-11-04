@@ -27,7 +27,7 @@ public:
 
 signals:
   /// Signal emitted when the user has chosen a set of files and accepted the dialog
-  void FilesSelected(const QStringList&);
+  void filesSelected(const QStringList&);
 
 private:
   ~pqFileDialog();
@@ -42,13 +42,13 @@ private:
   const QModelIndex* Temp;
   
 private slots:
-  void OnDataChanged(const QModelIndex&, const QModelIndex&);
-  void OnActivated(const QModelIndex&);
-  void OnManualEntry(const QString&);
-  void OnNavigate(const QString&);
-  void OnNavigateUp();
-  void OnNavigateDown();
-  void OnAutoDelete();
+  void onDataChanged(const QModelIndex&, const QModelIndex&);
+  void onActivated(const QModelIndex&);
+  void onManualEntry(const QString&);
+  void onNavigate(const QString&);
+  void onNavigateUp();
+  void onNavigateDown();
+  void onAutoDelete();
 };
 
 #endif // !_pqFileDialog_h

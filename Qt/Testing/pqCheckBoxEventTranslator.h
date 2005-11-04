@@ -27,7 +27,7 @@ private:
   pqCheckBoxEventTranslator(const pqCheckBoxEventTranslator&);
   pqCheckBoxEventTranslator& operator=(const pqCheckBoxEventTranslator&);
 
-  QObject* currentObject;
+  QObject* CurrentObject;
   
 private slots:
   void onStateChanged(int);  

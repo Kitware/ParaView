@@ -36,7 +36,7 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event)
       for(int i = 0; i != actions.size(); ++i)
         {
         pqMenuEventTranslatorAdaptor* const adaptor = new pqMenuEventTranslatorAdaptor(actions[i]);
-        this->actions.push_back(adaptor);
+        this->Actions.push_back(adaptor);
         QObject::connect(
           adaptor,
           SIGNAL(recordEvent(QObject*, const QString&, const QString&)),
@@ -55,10 +55,9 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqMenuEventTranslator::clearActions()
 {
-  for(int i = 0; i != this->actions.size(); ++i)
-    delete this->actions[i];
-    
-  this->actions.clear();
+  for(int i = 0; i != this->Actions.size(); ++i)
+    delete this->Actions[i];
+  this->Actions.clear();
 }
 
 void pqMenuEventTranslator::onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments)

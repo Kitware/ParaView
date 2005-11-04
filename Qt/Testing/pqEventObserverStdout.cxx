@@ -13,6 +13,13 @@
 
 void pqEventObserverStdout::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
 {
-  cout << "event: " << Widget.toAscii().data() << " " << Command.toAscii().data() << " " << Arguments.toAscii().data() << endl;
+  cout
+    << "event: "
+    << Widget.toAscii().data()
+    << " "
+    << Command.toAscii().data()
+    << " "
+    << Arguments.toAscii().data()
+    << endl;
 }
 

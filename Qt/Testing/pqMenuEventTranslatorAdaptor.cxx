@@ -11,13 +11,13 @@
 
 #include <QAction>
 
-pqMenuEventTranslatorAdaptor::pqMenuEventTranslatorAdaptor(QAction* Action) :
-  action(Action)
+pqMenuEventTranslatorAdaptor::pqMenuEventTranslatorAdaptor(QAction* action) :
+  Action(action)
 {
   QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(onTriggered(bool)));
 }
 
 void pqMenuEventTranslatorAdaptor::onTriggered(bool)
 {
-  recordEvent(action, "activate", "");
+  recordEvent(Action, "activate", "");
 }

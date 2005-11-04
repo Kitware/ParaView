@@ -13,7 +13,7 @@
 #include <QEvent>
 
 pqCheckBoxEventTranslator::pqCheckBoxEventTranslator() :
-  currentObject(0)
+  CurrentObject(0)
 {
 }
 
@@ -26,12 +26,12 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      this->currentObject = Object;
+      this->CurrentObject = Object;
       connect(object, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged(int)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      this->currentObject = 0;
+      this->CurrentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqCheckBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqCheckBoxEventTranslator::onStateChanged(int State)
 {
-  emit recordEvent(this->currentObject, "set_boolean", State ? "true" : "false");
+  emit recordEvent(this->CurrentObject, "set_boolean", State ? "true" : "false");
 }

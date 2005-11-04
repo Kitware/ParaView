@@ -27,7 +27,7 @@ private:
   pqDoubleSpinBoxEventTranslator(const pqDoubleSpinBoxEventTranslator&);
   pqDoubleSpinBoxEventTranslator& operator=(const pqDoubleSpinBoxEventTranslator&);
 
-  QObject* currentObject;
+  QObject* CurrentObject;
   
 private slots:
   void onValueChanged(double);  

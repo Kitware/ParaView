@@ -27,7 +27,7 @@ private:
   pqPushButtonEventTranslator(const pqPushButtonEventTranslator&);
   pqPushButtonEventTranslator& operator=(const pqPushButtonEventTranslator&);
 
-  QObject* currentObject;
+  QObject* CurrentObject;
   
 private slots:
   void onClicked(bool);  

@@ -26,7 +26,7 @@ public:
   pqTimeoutCommandDispatcher(unsigned long Interval);
   ~pqTimeoutCommandDispatcher();
 
-  void DispatchCommand(pqCommand*);
+  void dispatchCommand(pqCommand*);
   
 private:
   QTimer Timer;
@@ -35,7 +35,7 @@ private:
   
 private slots:
   /// Called to execute commands after some amount of time has elapsed
-  void OnExecute();
+  void onExecute();
 };
 
 #endif // !_pqTimeoutCommandDispatcher_h

@@ -36,9 +36,9 @@ private:
   pqEventPlayer& operator=(const pqEventPlayer&);
 
   /// Stores the working set of widget players  
-  QVector<pqWidgetEventPlayer*> players;
+  QVector<pqWidgetEventPlayer*> Players;
   /// Stores the root of the Qt object hierarchy
-  QObject& root_object;
+  QObject& RootObject;
 };
 
 #endif // !_pqEventPlayer_h

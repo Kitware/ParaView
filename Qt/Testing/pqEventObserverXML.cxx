@@ -9,21 +9,21 @@
 
 #include "pqEventObserverXML.h"
 
-pqEventObserverXML::pqEventObserverXML(ostream& Stream) :
-  stream(Stream)
+pqEventObserverXML::pqEventObserverXML(ostream& stream) :
+  Stream(stream)
 {
-  this->stream << "<?xml version=\"1.0\" ?>\n";
-  this->stream << "<pqevents>\n";
+  this->Stream << "<?xml version=\"1.0\" ?>\n";
+  this->Stream << "<pqevents>\n";
 }
 
 pqEventObserverXML::~pqEventObserverXML()
 {
-  this->stream << "</pqevents>\n";
+  this->Stream << "</pqevents>\n";
 }
 
 void pqEventObserverXML::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
 {
-  this->stream
+  this->Stream
     << "\t<pqevent><widget>"
     << Widget.toAscii().data()
     << "</widget><command>"

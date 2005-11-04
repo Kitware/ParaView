@@ -32,7 +32,7 @@ private:
   
   void clearActions();
   
-  QList<pqMenuEventTranslatorAdaptor*> actions;
+  QList<pqMenuEventTranslatorAdaptor*> Actions;
   
 private slots:
   void onRecordEvent(QObject*, const QString&, const QString&);

@@ -27,7 +27,7 @@ private:
   pqAbstractSliderEventTranslator(const pqAbstractSliderEventTranslator&);
   pqAbstractSliderEventTranslator& operator=(const pqAbstractSliderEventTranslator&);
 
-  QObject* currentObject;
+  QObject* CurrentObject;
   
 private slots:
   void onValueChanged(int);  

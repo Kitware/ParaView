@@ -25,15 +25,15 @@ public:
   static pqCommandDispatcherManager& Instance();
 
   /// Returns the current command dispatcher
-  pqCommandDispatcher& GetDispatcher();
+  pqCommandDispatcher& getDispatcher();
   /// Sets a new current command dispatcher (this object assumes ownership of the supplied dispatcher)
-  void SetDispatcher(pqCommandDispatcher*);
+  void setDispatcher(pqCommandDispatcher*);
 
 signals:
   /// Signal emitted whenever a new command dispatcher becomes current
-  void DispatcherChanged();
+  void dispatcherChanged();
   /// Signal emitted whenever the current command dispatcher has requested screen updates
-  void UpdateWindows();
+  void updateWindows();
   
 private:
   pqCommandDispatcherManager();

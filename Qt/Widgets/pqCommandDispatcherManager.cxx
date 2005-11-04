@@ -29,7 +29,7 @@ pqCommandDispatcherManager::~pqCommandDispatcherManager()
   delete this->Dispatcher;
 }
 
-pqCommandDispatcher& pqCommandDispatcherManager::GetDispatcher()
+pqCommandDispatcher& pqCommandDispatcherManager::getDispatcher()
 {
   if(!this->Dispatcher)
     this->Dispatcher = new pqImmediateCommandDispatcher();
@@ -37,13 +37,13 @@ pqCommandDispatcher& pqCommandDispatcherManager::GetDispatcher()
   return *this->Dispatcher;
 }
 
-void pqCommandDispatcherManager::SetDispatcher(pqCommandDispatcher* dispatcher)
+void pqCommandDispatcherManager::setDispatcher(pqCommandDispatcher* dispatcher)
 {
   delete this->Dispatcher;
   this->Dispatcher = dispatcher;
   
-  QObject::connect(this->Dispatcher, SIGNAL(UpdateWindows()), this, SIGNAL(UpdateWindows()));
+  QObject::connect(this->Dispatcher, SIGNAL(updateWindows()), this, SIGNAL(updateWindows()));
   
-  emit DispatcherChanged();
+  emit dispatcherChanged();
 }
 

@@ -20,10 +20,10 @@ pqServerBrowser::pqServerBrowser(QWidget* Parent) :
   this->Ui.serverType->addItem(tr("Builtin"));
   this->Ui.serverType->addItem(tr("Remote"));
 
-  QObject::connect(this->Ui.serverType, SIGNAL(activated(int)), this, SLOT(OnServerTypeActivated(int)));
+  QObject::connect(this->Ui.serverType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
 
   this->Ui.serverType->setCurrentIndex(0);
-  this->OnServerTypeActivated(0);
+  this->onServerTypeActivated(0);
 
   this->setWindowTitle(tr("Pick Server:"));
   
@@ -56,7 +56,7 @@ void pqServerBrowser::accept()
     return;
     }
 
-  emit ServerConnected(server);
+  emit serverConnected(server);
 
   base::accept();
   delete this;
@@ -68,7 +68,7 @@ void pqServerBrowser::reject()
   delete this;
 }
 
-void pqServerBrowser::OnServerTypeActivated(int Index)
+void pqServerBrowser::onServerTypeActivated(int Index)
 {
   this->Ui.hostName->setEnabled(1 == Index);
   this->Ui.portNumber->setEnabled(1 == Index);

@@ -39,15 +39,15 @@ QObject* pqFindObjectByName(QObject& Object, const QString& Name)
 
 } // namespace
 
-pqEventPlayer::pqEventPlayer(QObject& RootObject) :
-  root_object(RootObject)
+pqEventPlayer::pqEventPlayer(QObject& root) :
+  RootObject(root)
 {
 }
 
 pqEventPlayer::~pqEventPlayer()
 {
-  for(int i = 0; i != this->players.size(); ++i)
-    delete this->players[i];
+  for(int i = 0; i != this->Players.size(); ++i)
+    delete this->Players[i];
 }
 
 void pqEventPlayer::addDefaultWidgetEventPlayers()
@@ -63,19 +63,19 @@ void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
 {
   if(Player)
     {
-    this->players.push_back(Player);
+    this->Players.push_back(Player);
     }
 }
 
 bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, const QString& Arguments)
 {
-  QObject* object = pqFindObjectByName(root_object, Object);
+  QObject* object = pqFindObjectByName(RootObject, Object);
   if(!object)
     return false;
 
-  for(int i = 0; i != this->players.size(); ++i)
+  for(int i = 0; i != this->Players.size(); ++i)
     {
-    if(this->players[i]->playEvent(object, Command, Arguments))
+    if(this->Players[i]->playEvent(object, Command, Arguments))
       return true;
     }
     

@@ -34,10 +34,10 @@ public:
   ~pqMainWindow();
 
 signals:
-  void ServerChanged();
+  void serverChanged();
   
 private:
-  void SetServer(pqServer* Server);
+  void setServer(pqServer* Server);
 
   pqServer* CurrentServer;
   pqRefreshToolbar* RefreshToolbar;
@@ -51,23 +51,25 @@ private:
   QTreeView *InspectorView;
   
 private slots:
-  void OnFileNew();
-  void OnFileNew(pqServer* Server);
-  void OnFileOpen();
-  void OnFileOpen(pqServer* Server);
-  void OnFileOpen(const QStringList& Files);
-  void OnFileOpenServerState();
-  void OnFileOpenServerState(pqServer* Server);
-  void OnFileOpenServerState(const QStringList& Files);
-  void OnFileSaveServerState();
-  void OnFileSaveServerState(const QStringList& Files);
-  void OnServerConnect();
-  void OnServerConnect(pqServer* Server);
-  void OnServerDisconnect();
-  void OnUpdateSourcesMenu();
-  void OnHelpAbout();
+  void onFileNew();
+  void onFileNew(pqServer* Server);
+  void onFileOpen();
+  void onFileOpen(pqServer* Server);
+  void onFileOpen(const QStringList& Files);
+  void onFileOpenServerState();
+  void onFileOpenServerState(pqServer* Server);
+  void onFileOpenServerState(const QStringList& Files);
+  void onFileSaveServerState();
+  void onFileSaveServerState(const QStringList& Files);
+  void onServerConnect();
+  void onServerConnect(pqServer* Server);
+  void onServerDisconnect();
+  void onUpdateSourcesMenu();
+  void onHelpAbout();
+  void onUpdateWindows();
   
-  void OnUpdateWindows();
+  void onRecordTest();
+  void onRecordTest(const QStringList& Files);
 };
 
 #endif // !_pqMainWindow_h

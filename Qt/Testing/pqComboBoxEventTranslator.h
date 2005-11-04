@@ -27,7 +27,7 @@ private:
   pqComboBoxEventTranslator(const pqComboBoxEventTranslator&);
   pqComboBoxEventTranslator& operator=(const pqComboBoxEventTranslator&);
 
-  QObject* currentObject;
+  QObject* CurrentObject;
   
 private slots:
   void onDestroyed(QObject*);

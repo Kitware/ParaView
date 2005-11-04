@@ -23,11 +23,11 @@ class pqCommandDispatcher :
   
 public:
   /// Called to dispatch (execute) a command, possibly at a later time (the dispatcher assumes ownership of the supplied command object)
-  virtual void DispatchCommand(pqCommand*) = 0;
+  virtual void dispatchCommand(pqCommand*) = 0;
 
 signals:
   /// Signal emitted to indicate that a screen update is required
-  void UpdateWindows();
+  void updateWindows();
 };
 
 #endif // !pqCommandDispatcher_h

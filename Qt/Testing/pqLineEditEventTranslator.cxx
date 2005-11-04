@@ -13,7 +13,7 @@
 #include <QEvent>
 
 pqLineEditEventTranslator::pqLineEditEventTranslator() :
-  currentObject(0)
+  CurrentObject(0)
 {
 }
 
@@ -26,12 +26,12 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      this->currentObject = Object;
+      this->CurrentObject = Object;
       connect(object, SIGNAL(textEdited(const QString&)), this, SLOT(onStateChanged(const QString&)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      this->currentObject = 0;
+      this->CurrentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqLineEditEventTranslator::onStateChanged(const QString& State)
 {
-  emit recordEvent(this->currentObject, "set_string", State);
+  emit recordEvent(this->CurrentObject, "set_string", State);
 }

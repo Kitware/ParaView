@@ -41,7 +41,7 @@ private:
   bool eventFilter(QObject* Object, QEvent* Event);
 
   /// Stores the working set of widget translators  
-  QVector<pqWidgetEventTranslator*> translators;
+  QVector<pqWidgetEventTranslator*> Translators;
   
 private slots:
   void onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments);

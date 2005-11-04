@@ -13,7 +13,7 @@
 #include <QEvent>
 
 pqComboBoxEventTranslator::pqComboBoxEventTranslator() :
-  currentObject(0)
+  CurrentObject(0)
 {
 }
 
@@ -26,14 +26,14 @@ bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      if(this->currentObject != Object)
+      if(this->CurrentObject != Object)
         {
-        if(this->currentObject)
+        if(this->CurrentObject)
           {
-          disconnect(this->currentObject, 0, this, 0);
+          disconnect(this->CurrentObject, 0, this, 0);
           }
         
-        this->currentObject = Object;
+        this->CurrentObject = Object;
         connect(object, SIGNAL(destroyed(QObject*)), this, SLOT(onDestroyed(QObject*)));
         connect(object, SIGNAL(activated(const QString&)), this, SLOT(onStateChanged(const QString&)));
         connect(object, SIGNAL(editTextChanged(const QString&)), this, SLOT(onStateChanged(const QString&)));
@@ -46,10 +46,10 @@ bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqComboBoxEventTranslator::onDestroyed(QObject* Object)
 {
-  this->currentObject = 0;
+  this->CurrentObject = 0;
 }
 
 void pqComboBoxEventTranslator::onStateChanged(const QString& State)
 {
-  emit recordEvent(this->currentObject, "set_string", State);
+  emit recordEvent(this->CurrentObject, "set_string", State);
 }

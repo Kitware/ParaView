@@ -29,7 +29,7 @@ private:
   pqMenuEventTranslatorAdaptor(const pqMenuEventTranslatorAdaptor&);
   pqMenuEventTranslatorAdaptor& operator=(const pqMenuEventTranslatorAdaptor&);
   
-  QAction* const action;
+  QAction* const Action;
   
 private slots:
   void onTriggered(bool);

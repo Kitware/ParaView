@@ -6,6 +6,11 @@ PROJECT(QtTesting)
 FIND_PACKAGE(Qt4)
 INCLUDE(${QT_USE_FILE})
 
+INCLUDE_DIRECTORIES(
+  ${QtTesting_BINARY_DIR}
+  ${QtTesting_SOURCE_DIR}
+)
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAbstractSliderEventTranslator.h
   pqCheckBoxEventTranslator.h
@@ -18,8 +23,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.h
   pqPushButtonEventTranslator.h
+  pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqWidgetEventTranslator.h
+)
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+  pqRecordEventsDialog.ui
 )
 
 ADD_LIBRARY(QtTesting
@@ -57,11 +67,14 @@ ADD_LIBRARY(QtTesting
   pqMenuEventTranslatorAdaptor.h
   pqPushButtonEventTranslator.cxx
   pqPushButtonEventTranslator.h
+  pqRecordEventsDialog.cxx
+  pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx
   pqSpinBoxEventTranslator.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   ${MOC_BUILT_SOURCES}
+  ${UI_BUILT_SOURCES}
 )
 
 TARGET_LINK_LIBRARIES(QtTesting

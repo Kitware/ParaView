@@ -30,8 +30,8 @@ pqEventTranslator::~pqEventTranslator()
 {
   QCoreApplication::instance()->removeEventFilter(this);
   
-  for(int i = 0; i != this->translators.size(); ++i)
-    delete this->translators[i];
+  for(int i = 0; i != this->Translators.size(); ++i)
+    delete this->Translators[i];
 }
 
 void pqEventTranslator::addDefaultWidgetEventTranslators()
@@ -50,7 +50,7 @@ void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Transl
 {
   if(Translator)
     {
-    this->translators.push_back(Translator);
+    this->Translators.push_back(Translator);
     
     QObject::connect(
       Translator,
@@ -62,9 +62,9 @@ void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Transl
 
 bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
-  for(int i = 0; i != this->translators.size(); ++i)
+  for(int i = 0; i != this->Translators.size(); ++i)
     {
-    if(this->translators[i]->translateEvent(Object, Event))
+    if(this->Translators[i]->translateEvent(Object, Event))
       return false;
     }
     

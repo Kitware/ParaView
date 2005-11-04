@@ -17,7 +17,7 @@ public:
   virtual ~pqCommand() {}
   
   /// Called to execute the command encapsulated by this object
-  virtual void Execute() = 0;
+  virtual void execute() = 0;
   
 protected:
   pqCommand() {}

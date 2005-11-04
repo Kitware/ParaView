@@ -17,7 +17,7 @@ class pqImmediateCommandDispatcher :
   public pqCommandDispatcher
 {
 public:
-  void DispatchCommand(pqCommand*);
+  void dispatchCommand(pqCommand*);
 };
 
 #endif // !_pqImmediateCommandDispatcher_h

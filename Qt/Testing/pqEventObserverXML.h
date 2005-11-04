@@ -28,7 +28,7 @@ public slots:
 
 private:
   /// Stores a stream that will be used to store the XML output
-  ostream& stream;
+  ostream& Stream;
 };
 
 #endif // !_pqEventObserverXML_h

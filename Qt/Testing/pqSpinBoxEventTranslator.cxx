@@ -13,7 +13,7 @@
 #include <QEvent>
 
 pqSpinBoxEventTranslator::pqSpinBoxEventTranslator() :
-  currentObject(0)
+  CurrentObject(0)
 {
 }
 
@@ -26,12 +26,12 @@ bool pqSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   switch(Event->type())
     {
     case QEvent::Enter:
-      this->currentObject = Object;
+      this->CurrentObject = Object;
       connect(object, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
-      this->currentObject = 0;
+      this->CurrentObject = 0;
       break;
     }
       
@@ -40,5 +40,5 @@ bool pqSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 
 void pqSpinBoxEventTranslator::onValueChanged(int Value)
 {
-  emit recordEvent(this->currentObject, "set_int", QString().setNum(Value));
+  emit recordEvent(this->CurrentObject, "set_int", QString().setNum(Value));
 }
