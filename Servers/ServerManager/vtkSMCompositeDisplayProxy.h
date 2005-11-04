@@ -56,8 +56,23 @@ public:
   // Overridden to set up ordered compositing correctly.
   virtual void SetVisibility(int visible);
 
+  // Description:
+  // Causes redistribution to occur.
+  virtual void InvalidateDistributedGeometry();
+
+  // Description:
+  // Returns true if some distributed geometry is still valid.
+  virtual int IsDistributedGeometryValid();
+
+  // Description:
+  // If the ordered compositing tree changed, just invalidate the distributed
+  // geometry.
+  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
+
   virtual void Update();
-  virtual void UpdateDataToDistribute();
+  virtual void UpdateDistributedGeometry();
+
+  virtual void CacheUpdate(int idx, int total);
 
 protected:
   vtkSMCompositeDisplayProxy();
@@ -87,6 +102,10 @@ protected:
 
   int CollectionDecision;
   int LODCollectionDecision;
+
+  int DistributedGeometryIsValid;
+  int DistributedLODGeometryIsValid;
+  int DistributedVolumeGeometryIsValid;
 
   int OrderedCompositing;
 

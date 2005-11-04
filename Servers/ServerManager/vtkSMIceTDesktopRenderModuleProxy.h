@@ -20,6 +20,8 @@
 
 #include "vtkSMCompositeRenderModuleProxy.h"
 
+class vtkSMIceTDesktopRenderModuleProxyProxySet;
+
 class VTK_EXPORT vtkSMIceTDesktopRenderModuleProxy : public vtkSMCompositeRenderModuleProxy
 {
 public:
@@ -37,6 +39,8 @@ public:
   virtual void AddDisplay(vtkSMDisplayProxy* disp);
 
   virtual void StillRender();
+
+  virtual void UpdateAllDisplays();
 
 protected:
   vtkSMIceTDesktopRenderModuleProxy();
@@ -66,6 +70,8 @@ protected:
 
   vtkSMProxy* DisplayManagerProxy;
   vtkSMProxy* PKdTreeProxy;
+
+  vtkSMIceTDesktopRenderModuleProxyProxySet *PartitionedData;
 private:
   vtkSMIceTDesktopRenderModuleProxy(const vtkSMIceTDesktopRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMIceTDesktopRenderModuleProxy&); // Not implemented.
