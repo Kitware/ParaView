@@ -35,6 +35,7 @@ ADD_EXECUTABLE(pqClient
   pqMainWindow.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
+  ${UI_BUILT_SOURCES}
 )
 
 TARGET_LINK_LIBRARIES(pqClient
