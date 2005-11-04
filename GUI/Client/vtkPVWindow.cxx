@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.1");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -788,9 +788,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     idx++, "Save Batch Script", 
     this, "SaveBatchScript", 7, 
     "Write a script which can run in batch by ParaView");
-  menu->InsertCommand(
-    idx++, "Save SM State", 
-    this, "SaveSMState", 6, "Server the server manager state as xml.");
+//  menu->InsertCommand(
+//    idx++, "Save SM State", 
+//    this, "SaveSMState", 6, "Server the server manager state as xml.");
   menu->InsertCommand(
     idx++, "Import Package", 
     this,  "OpenPackage", 3, "Import modules defined in a ParaView package ");
