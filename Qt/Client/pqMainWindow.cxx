@@ -67,7 +67,6 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 } // namespace
 
 pqMainWindow::pqMainWindow() :
-  base(),
   CurrentServer(0),
   RefreshToolbar(0),
   PropertyToolbar(0),
@@ -81,38 +80,31 @@ pqMainWindow::pqMainWindow() :
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
 
   QAction* const fileNewAction = new QAction(tr("New..."), this) << pqSetName("fileNewAction");
-  QObject::connect(fileNewAction, SIGNAL(triggered()), this, SLOT(onFileNew()));
+  QObject::connect(fileNewAction, SIGNAL(triggered()), this, SLOT(OnFileNew()));
 
   QAction* const fileOpenAction = new QAction(tr("Open..."), this) << pqSetName("fileOpenAction");
-  QObject::connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(onFileOpen()));
+  QObject::connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(OnFileOpen()));
 
   QAction* const fileOpenServerStateAction = new QAction(tr("Open Server State"), this) << pqSetName("fileOpenServerStateAction");
-  QObject::connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
+  QObject::connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(OnFileOpenServerState()));
 
   QAction* const fileSaveServerStateAction = new QAction(tr("Save Server State"), this) << pqSetName("fileSaveServerStateAction");
-  QObject::connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
+  QObject::connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(OnFileSaveServerState()));
 
   QAction* const fileQuitAction = new QAction(tr("Quit"), this) << pqSetName("fileQuitAction");
   QObject::connect(fileQuitAction, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 
   QAction* const serverConnectAction = new QAction(tr("Connect..."), this) << pqSetName("serverConnectAction");
-  QObject::connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(onServerConnect()));
+  QObject::connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(OnServerConnect()));
 
   this->ServerDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
-  QObject::connect(this->ServerDisconnectAction, SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
-
-  QAction* const debugOpenLocalFilesAction = new QAction(tr("Open Local Files"), this) << pqSetName("debugOpenLocalFilesAction");
-  QObject::connect(debugOpenLocalFilesAction, SIGNAL(triggered()), this, SLOT(onDebugOpenLocalFiles()));
-
-  QAction* const debugDumpQtHierarchyAction = new QAction(tr("Dump Qt Hierarchy"), this) << pqSetName("debugDumpQtHierarchyAction");
-  QObject::connect(debugDumpQtHierarchyAction, SIGNAL(triggered()), this, SLOT(onDebugDumpQtHierarchy()));
+  QObject::connect(this->ServerDisconnectAction, SIGNAL(triggered()), this, SLOT(OnServerDisconnect()));
 
   this->menuBar() << pqSetName("menuBar");
 
   QMenu* const fileMenu = this->menuBar()->addMenu(tr("File")) << pqSetName("fileMenu");
   fileMenu->addAction(fileNewAction);
   fileMenu->addAction(fileOpenAction);
-//  fileMenu->addAction(fileOpenServerStateAction);
   fileMenu->addAction(fileSaveServerStateAction);
   fileMenu->addAction(fileQuitAction);
   
@@ -121,19 +113,15 @@ pqMainWindow::pqMainWindow() :
   serverMenu->addAction(this->ServerDisconnectAction);
 
   this->SourcesMenu = this->menuBar()->addMenu(tr("Sources")) << pqSetName("sourcesMenu");
-  QObject::connect(this, SIGNAL(serverChanged()), SLOT(updateSourcesMenu()));
-  
-  QMenu* const debugMenu = this->menuBar()->addMenu(tr("Debug")) << pqSetName("debugMenu");
-  debugMenu->addAction(debugOpenLocalFilesAction);
-  debugMenu->addAction(debugDumpQtHierarchyAction);
+  QObject::connect(this, SIGNAL(ServerChanged()), SLOT(OnUpdateSourcesMenu()));
   
   // keep help last
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help")) << pqSetName("helpMenu");
   QAction* aboutAction = new QAction(tr("About") + " " + tr("ParaQ") + " " + QT_CLIENT_VERSION, this) << pqSetName("aboutAction");
-  QObject::connect(aboutAction, SIGNAL(triggered()), this, SLOT(onAbout()));
+  QObject::connect(aboutAction, SIGNAL(triggered()), this, SLOT(OnHelpAbout()));
   helpMenu->addAction(aboutAction);
   
-  QObject::connect(&pqCommandDispatcherManager::instance(), SIGNAL(dispatcherChanged()), this, SLOT(onDispatcherChanged()));
+  QObject::connect(&pqCommandDispatcherManager::Instance(), SIGNAL(UpdateWindows()), this, SLOT(OnUpdateWindows()));
  
   this->RefreshToolbar = new pqRefreshToolbar(this);
   this->addToolBar(this->RefreshToolbar);
@@ -164,7 +152,7 @@ pqMainWindow::pqMainWindow() :
     this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
     }
 
-  this->setServer(0);
+  this->SetServer(0);
   this->Adaptor = new pqSMAdaptor;  // should go in pqServer?
 }
 
@@ -185,7 +173,7 @@ pqMainWindow::~pqMainWindow()
   delete this->Adaptor;
 }
 
-void pqMainWindow::setServer(pqServer* Server)
+void pqMainWindow::SetServer(pqServer* Server)
 {
   delete this->Window;
   this->Window = 0;
@@ -216,43 +204,43 @@ void pqMainWindow::setServer(pqServer* Server)
     }
   
   this->ServerDisconnectAction->setEnabled(this->CurrentServer);
-  emit serverChanged();
+  emit ServerChanged();
 
 }
 
-void pqMainWindow::onFileNew()
+void pqMainWindow::OnFileNew()
 {
-  setServer(0);
+  SetServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileNew(pqServer*)));
+  QObject::connect(server_browser, SIGNAL(ServerConnected(pqServer*)), this, SLOT(OnFileNew(pqServer*)));
   server_browser->show();
 }
 
-void pqMainWindow::onFileNew(pqServer* Server)
+void pqMainWindow::OnFileNew(pqServer* Server)
 {
-  setServer(Server);
+  SetServer(Server);
 }
 
-void pqMainWindow::onFileOpen()
+void pqMainWindow::OnFileOpen()
 {
-  setServer(0);
+  SetServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
+  QObject::connect(server_browser, SIGNAL(ServerConnected(pqServer*)), this, SLOT(OnFileOpen(pqServer*)));
   server_browser->show();
 }
 
-void pqMainWindow::onFileOpen(pqServer* Server)
+void pqMainWindow::OnFileOpen(pqServer* Server)
 {
-  setServer(Server);
+  SetServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(FilesSelected(const QStringList&)), this, SLOT(OnFileOpen(const QStringList&)));
   file_dialog->show();
 }
 
-void pqMainWindow::onFileOpen(const QStringList& Files)
+void pqMainWindow::OnFileOpen(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
@@ -273,29 +261,29 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
   this->Window->update();
 }
 
-void pqMainWindow::onFileOpenServerState()
+void pqMainWindow::OnFileOpenServerState()
 {
-  setServer(0);
+  SetServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpenServerState(pqServer*)));
+  QObject::connect(server_browser, SIGNAL(ServerConnected(pqServer*)), this, SLOT(OnFileOpenServerState(pqServer*)));
   server_browser->show();
 }
 
-void pqMainWindow::onFileOpenServerState(pqServer* Server)
+void pqMainWindow::OnFileOpenServerState(pqServer* Server)
 {
-  setServer(Server);
+  SetServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpenServerState(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(FilesSelected(const QStringList&)), this, SLOT(OnFileOpenServerState(const QStringList&)));
   file_dialog->show();
 }
 
-void pqMainWindow::onFileOpenServerState(const QStringList& Files)
+void pqMainWindow::OnFileOpenServerState(const QStringList& Files)
 {
 }
 
-void pqMainWindow::onFileSaveServerState()
+void pqMainWindow::OnFileSaveServerState()
 {
   if(!this->CurrentServer)
     {
@@ -304,11 +292,11 @@ void pqMainWindow::onFileSaveServerState()
     }
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(FilesSelected(const QStringList&)), this, SLOT(OnFileSaveServerState(const QStringList&)));
   file_dialog->show();
 }
 
-void pqMainWindow::onFileSaveServerState(const QStringList& Files)
+void pqMainWindow::OnFileSaveServerState(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
@@ -319,57 +307,32 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     }
 }
 
-void pqMainWindow::onServerConnect()
+void pqMainWindow::OnServerConnect()
 {
-  setServer(0);
+  SetServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onServerConnect(pqServer*)));
+  QObject::connect(server_browser, SIGNAL(ServerConnected(pqServer*)), this, SLOT(OnServerConnect(pqServer*)));
   server_browser->show();
 }
 
-void pqMainWindow::onServerConnect(pqServer* Server)
+void pqMainWindow::OnServerConnect(pqServer* Server)
 {
-  setServer(Server);
+  SetServer(Server);
 }
 
-void pqMainWindow::onServerDisconnect()
+void pqMainWindow::OnServerDisconnect()
 {
-  setServer(0);
+  SetServer(0);
 }
 
-void pqMainWindow::onDebugOpenLocalFiles()
-{
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open File:"), this, "fileOpenDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onDebugOpenLocalFiles(const QStringList&)));
-  file_dialog->show();
-}
-
-void pqMainWindow::onDebugOpenLocalFiles(const QStringList& Files)
-{
-  for(int i = 0; i != Files.size(); ++i)
-    {
-    cerr << "File: " << Files[i].toAscii().data() << endl;
-    }
-}
-
-void pqMainWindow::onDebugDumpQtHierarchy()
-{
-  dumpObjectTree();
-}
-
-void pqMainWindow::onDispatcherChanged()
-{
-  QObject::connect(&pqCommandDispatcherManager::instance().getDispatcher(), SIGNAL(updateWindow()), this, SLOT(onRedrawWindows()));
-}
-
-void pqMainWindow::onRedrawWindows()
+void pqMainWindow::OnUpdateWindows()
 {
   if(this->CurrentServer)
     this->CurrentServer->GetRenderModule()->StillRender();
 }
 
-void pqMainWindow::updateSourcesMenu()
+void pqMainWindow::OnUpdateSourcesMenu()
 {
   this->SourcesMenu->clear();
 
@@ -384,7 +347,7 @@ void pqMainWindow::updateSourcesMenu()
     }
 }
 
-void pqMainWindow::onAbout()
+void pqMainWindow::OnHelpAbout()
 {
   QDialog about(this);
   Ui::pqAboutDialog ui;

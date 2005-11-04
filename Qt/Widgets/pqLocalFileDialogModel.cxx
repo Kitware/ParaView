@@ -92,7 +92,7 @@ class pqFileModel :
   public QAbstractItemModel
 {
 public:
-  void setCurrentPath(const QString& Path)
+  void SetCurrentPath(const QString& Path)
   {
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     
@@ -139,7 +139,7 @@ public:
     emit dataChanged(QModelIndex(), QModelIndex());
   }
 
-  QStringList getFilePaths(const QModelIndex& Index)
+  QStringList GetFilePaths(const QModelIndex& Index)
   {
     QStringList results;
     
@@ -159,7 +159,7 @@ public:
     return results;
   }
 
-  bool isDir(const QModelIndex& Index)
+  bool IsDir(const QModelIndex& Index)
   {
     if(Index.internalId()) // This is a member of a file group ...
       {
@@ -325,7 +325,7 @@ public:
       }
   }
 
-  QStringList getFilePaths(const QModelIndex& Index)
+  QStringList GetFilePaths(const QModelIndex& Index)
   {
     QStringList results;
     
@@ -338,7 +338,7 @@ public:
     return results;
   }
 
-  bool isDir(const QModelIndex& Index)
+  bool IsDir(const QModelIndex& Index)
   {
     if(Index.row() >= this->FavoriteList.size())
       return false;
@@ -460,33 +460,33 @@ pqLocalFileDialogModel::~pqLocalFileDialogModel()
   delete this->Implementation;
 }
 
-QString pqLocalFileDialogModel::getStartPath()
+QString pqLocalFileDialogModel::GetStartPath()
 {
   return QDir::currentPath();
 }
 
-void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
+void pqLocalFileDialogModel::SetCurrentPath(const QString& Path)
 {
-  this->Implementation->FileModel->setCurrentPath(Path);
+  this->Implementation->FileModel->SetCurrentPath(Path);
 }
 
-QString pqLocalFileDialogModel::getCurrentPath()
+QString pqLocalFileDialogModel::GetCurrentPath()
 {
   return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path());
 }
 
-QStringList pqLocalFileDialogModel::getFilePaths(const QModelIndex& Index)
+QStringList pqLocalFileDialogModel::GetFilePaths(const QModelIndex& Index)
 {
   if(Index.model() == this->Implementation->FileModel)
-    return this->Implementation->FileModel->getFilePaths(Index);
+    return this->Implementation->FileModel->GetFilePaths(Index);
   
   if(Index.model() == this->Implementation->FavoriteModel)
-    return this->Implementation->FavoriteModel->getFilePaths(Index);  
+    return this->Implementation->FavoriteModel->GetFilePaths(Index);  
 
   return QStringList();
 }
 
-QString pqLocalFileDialogModel::getFilePath(const QString& Path)
+QString pqLocalFileDialogModel::GetFilePath(const QString& Path)
 {
   if(QDir::isAbsolutePath(Path))
     return Path;
@@ -494,25 +494,25 @@ QString pqLocalFileDialogModel::getFilePath(const QString& Path)
   return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
 }
 
-QString pqLocalFileDialogModel::getParentPath(const QString& Path)
+QString pqLocalFileDialogModel::GetParentPath(const QString& Path)
 {
   QDir temp(Path);
   temp.cdUp();
   return temp.path();
 }
 
-bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
+bool pqLocalFileDialogModel::IsDir(const QModelIndex& Index)
 {
   if(Index.model() == this->Implementation->FileModel)
-    return this->Implementation->FileModel->isDir(Index);
+    return this->Implementation->FileModel->IsDir(Index);
   
   if(Index.model() == this->Implementation->FavoriteModel)
-    return this->Implementation->FavoriteModel->isDir(Index);  
+    return this->Implementation->FavoriteModel->IsDir(Index);  
 
   return false;    
 }
 
-QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
+QStringList pqLocalFileDialogModel::SplitPath(const QString& Path)
 {
   QStringList results;
   
@@ -524,12 +524,12 @@ QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
   return results;
 }
 
-QAbstractItemModel* pqLocalFileDialogModel::fileModel()
+QAbstractItemModel* pqLocalFileDialogModel::FileModel()
 {
   return this->Implementation->FileModel;
 }
 
-QAbstractItemModel* pqLocalFileDialogModel::favoriteModel()
+QAbstractItemModel* pqLocalFileDialogModel::FavoriteModel()
 {
   return this->Implementation->FavoriteModel;
 }

@@ -22,17 +22,20 @@ class pqTimeoutCommandDispatcher :
   Q_OBJECT
   
 public:
+  /// Constructs the dispatcher, ready to execute commands whenever the given number of milliseconds have elapsed since the most recent command was dispatched
   pqTimeoutCommandDispatcher(unsigned long Interval);
   ~pqTimeoutCommandDispatcher();
 
-  void dispatchCommand(pqCommand*);
+  void DispatchCommand(pqCommand*);
   
 private:
   QTimer Timer;
+  /// Stores the list of queued commands
   QList<pqCommand*> Commands;
   
 private slots:
-  void onExecute();
+  /// Called to execute commands after some amount of time has elapsed
+  void OnExecute();
 };
 
 #endif // !_pqTimeoutCommandDispatcher_h

@@ -26,16 +26,16 @@ public:
   pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent = 0);
   ~pqServerFileDialogModel();
 
-  QString getStartPath();
-  void setCurrentPath(const QString&);
-  QString getCurrentPath();
-  bool isDir(const QModelIndex&);
-  QStringList getFilePaths(const QModelIndex&);
-  QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
-  QAbstractItemModel* fileModel();
-  QAbstractItemModel* favoriteModel();
+  QString GetStartPath();
+  void SetCurrentPath(const QString&);
+  QString GetCurrentPath();
+  bool IsDir(const QModelIndex&);
+  QStringList GetFilePaths(const QModelIndex&);
+  QString GetFilePath(const QString&);
+  QString GetParentPath(const QString&);
+  QStringList SplitPath(const QString&);
+  QAbstractItemModel* FileModel();
+  QAbstractItemModel* FavoriteModel();
 
 private:
   class pqImplementation;

@@ -16,27 +16,27 @@ pqExplicitCommandDispatcher::~pqExplicitCommandDispatcher()
     delete this->Commands[i];
 }
 
-void pqExplicitCommandDispatcher::dispatchCommand(pqCommand* Command)
+void pqExplicitCommandDispatcher::DispatchCommand(pqCommand* Command)
 {
   if(Command)
     {
     this->Commands.push_back(Command);
-    emit commandsPending(true);
+    emit CommandsPending(true);
     }
 }
 
-void pqExplicitCommandDispatcher::onExecute()
+void pqExplicitCommandDispatcher::OnExecute()
 {
   for(int i = 0; i != this->Commands.size(); ++i)
-    this->Commands[i]->redoCommand();
+    this->Commands[i]->Execute();
     
-  emit updateWindow();
+  emit UpdateWindows();
   
   for(int i = 0; i != this->Commands.size(); ++i)
     delete this->Commands[i];
     
   this->Commands.clear();
   
-  emit commandsPending(false);
+  emit CommandsPending(false);
 }
 

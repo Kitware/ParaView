@@ -13,7 +13,7 @@
 pqTimeoutCommandDispatcher::pqTimeoutCommandDispatcher(unsigned long Interval)
 {
   this->Timer.setInterval(Interval);
-  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(onExecute()));
+  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(OnExecute()));
 }
 
 pqTimeoutCommandDispatcher::~pqTimeoutCommandDispatcher()
@@ -22,7 +22,7 @@ pqTimeoutCommandDispatcher::~pqTimeoutCommandDispatcher()
     delete this->Commands[i];
 }
 
-void pqTimeoutCommandDispatcher::dispatchCommand(pqCommand* Command)
+void pqTimeoutCommandDispatcher::DispatchCommand(pqCommand* Command)
 {
   if(Command)
     {
@@ -32,14 +32,14 @@ void pqTimeoutCommandDispatcher::dispatchCommand(pqCommand* Command)
     }
 }
 
-void pqTimeoutCommandDispatcher::onExecute()
+void pqTimeoutCommandDispatcher::OnExecute()
 {
   this->Timer.stop();
   
   for(int i = 0; i != this->Commands.size(); ++i)
-    this->Commands[i]->redoCommand();
+    this->Commands[i]->Execute();
     
-  emit updateWindow();
+  emit UpdateWindows();
   
   for(int i = 0; i != this->Commands.size(); ++i)
     delete this->Commands[i];

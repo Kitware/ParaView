@@ -72,7 +72,7 @@ public:
   {
   } 
 
-  void setCurrentPath(const QString& Path)
+  void SetCurrentPath(const QString& Path)
   {
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     this->FileList.clear();
@@ -282,7 +282,7 @@ pqServerFileDialogModel::~pqServerFileDialogModel()
   delete this->Implementation;
 }
 
-QString pqServerFileDialogModel::getStartPath()
+QString pqServerFileDialogModel::GetStartPath()
 {
   vtkClientServerStream stream;
   const vtkClientServerID id = this->Implementation->FileModel->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
@@ -301,17 +301,17 @@ QString pqServerFileDialogModel::getStartPath()
   return result;
 }
 
-void pqServerFileDialogModel::setCurrentPath(const QString& Path)
+void pqServerFileDialogModel::SetCurrentPath(const QString& Path)
 {
-  this->Implementation->FileModel->setCurrentPath(Path);
+  this->Implementation->FileModel->SetCurrentPath(Path);
 }
 
-QString pqServerFileDialogModel::getCurrentPath()
+QString pqServerFileDialogModel::GetCurrentPath()
 {
   return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path());
 }
 
-QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
+QStringList pqServerFileDialogModel::GetFilePaths(const QModelIndex& Index)
 {
   QStringList results;
   
@@ -324,7 +324,7 @@ QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
   return results;
 }
 
-QString pqServerFileDialogModel::getFilePath(const QString& Path)
+QString pqServerFileDialogModel::GetFilePath(const QString& Path)
 {
   if(QDir::isAbsolutePath(Path))
     return Path;
@@ -332,14 +332,14 @@ QString pqServerFileDialogModel::getFilePath(const QString& Path)
   return QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + Path);
 }
 
-QString pqServerFileDialogModel::getParentPath(const QString& Path)
+QString pqServerFileDialogModel::GetParentPath(const QString& Path)
 {
   QDir temp(Path);
   temp.cdUp();
   return temp.path();
 }
 
-bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
+bool pqServerFileDialogModel::IsDir(const QModelIndex& Index)
 {
   if(Index.row() >= this->Implementation->FileModel->FileList.size())
     return false;
@@ -348,7 +348,7 @@ bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
   return file.isDir();
 }
 
-QStringList pqServerFileDialogModel::splitPath(const QString& Path)
+QStringList pqServerFileDialogModel::SplitPath(const QString& Path)
 {
   QStringList results;
   
@@ -360,12 +360,12 @@ QStringList pqServerFileDialogModel::splitPath(const QString& Path)
   return results;
 }
 
-QAbstractItemModel* pqServerFileDialogModel::fileModel()
+QAbstractItemModel* pqServerFileDialogModel::FileModel()
 {
   return this->Implementation->FileModel;
 }
 
-QAbstractItemModel* pqServerFileDialogModel::favoriteModel()
+QAbstractItemModel* pqServerFileDialogModel::FavoriteModel()
 {
   return this->Implementation->FavoriteModel;
 }

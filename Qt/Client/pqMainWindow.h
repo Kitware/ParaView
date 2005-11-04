@@ -27,8 +27,6 @@ class QVTKWidget;
 class pqMainWindow :
         public QMainWindow
 {
-  typedef QMainWindow base;
-  
   Q_OBJECT
 
 public:
@@ -36,10 +34,10 @@ public:
   ~pqMainWindow();
 
 signals:
-  void serverChanged();
+  void ServerChanged();
   
 private:
-  void setServer(pqServer* Server);
+  void SetServer(pqServer* Server);
 
   pqServer* CurrentServer;
   pqRefreshToolbar* RefreshToolbar;
@@ -53,27 +51,23 @@ private:
   QTreeView *InspectorView;
   
 private slots:
-  void onFileNew();
-  void onFileNew(pqServer* Server);
-  void onFileOpen();
-  void onFileOpen(pqServer* Server);
-  void onFileOpen(const QStringList& Files);
-  void onFileOpenServerState();
-  void onFileOpenServerState(pqServer* Server);
-  void onFileOpenServerState(const QStringList& Files);
-  void onFileSaveServerState();
-  void onFileSaveServerState(const QStringList& Files);
-  void onServerConnect();
-  void onServerConnect(pqServer* Server);
-  void onServerDisconnect();
-  void onDebugOpenLocalFiles();
-  void onDebugOpenLocalFiles(const QStringList& Files);
-  void onDebugDumpQtHierarchy();
-  void updateSourcesMenu();
-  void onAbout();
+  void OnFileNew();
+  void OnFileNew(pqServer* Server);
+  void OnFileOpen();
+  void OnFileOpen(pqServer* Server);
+  void OnFileOpen(const QStringList& Files);
+  void OnFileOpenServerState();
+  void OnFileOpenServerState(pqServer* Server);
+  void OnFileOpenServerState(const QStringList& Files);
+  void OnFileSaveServerState();
+  void OnFileSaveServerState(const QStringList& Files);
+  void OnServerConnect();
+  void OnServerConnect(pqServer* Server);
+  void OnServerDisconnect();
+  void OnUpdateSourcesMenu();
+  void OnHelpAbout();
   
-  void onDispatcherChanged();
-  void onRedrawWindows();
+  void OnUpdateWindows();
 };
 
 #endif // !_pqMainWindow_h

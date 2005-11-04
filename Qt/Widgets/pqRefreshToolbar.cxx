@@ -38,19 +38,19 @@ void pqRefreshToolbar::onRefreshType(int Index)
   switch(Index)
     {
     case 0:
-      pqCommandDispatcherManager::instance().setDispatcher(new pqImmediateCommandDispatcher());
+      pqCommandDispatcherManager::Instance().SetDispatcher(new pqImmediateCommandDispatcher());
       this->RefreshButton->setDisabled(true);
       break;
       
     case 1:
-      pqCommandDispatcherManager::instance().setDispatcher(new pqTimeoutCommandDispatcher(1000));
+      pqCommandDispatcherManager::Instance().SetDispatcher(new pqTimeoutCommandDispatcher(1000));
       this->RefreshButton->setDisabled(true);
       break;
       
     case 2:
       {
       pqExplicitCommandDispatcher* const dispatcher = new pqExplicitCommandDispatcher();
-      pqCommandDispatcherManager::instance().setDispatcher(dispatcher);
+      pqCommandDispatcherManager::Instance().SetDispatcher(dispatcher);
       QObject::connect(dispatcher, SIGNAL(commandsPending(bool)), this->RefreshButton, SLOT(setEnabled(bool)));
       QObject::connect(this->RefreshButton, SIGNAL(clicked()), dispatcher, SLOT(onExecute()));
       this->RefreshButton->setDisabled(true);

@@ -13,12 +13,11 @@
 #include "pqCommandDispatcher.h"
 
 /// Implements an update policy that executes state changes immediately to provide interactive feedback
-/** \todo Need to figure-out how this will interoperate with pqSMAdaptor and server-manager undo/redo */
 class pqImmediateCommandDispatcher :
   public pqCommandDispatcher
 {
 public:
-  void dispatchCommand(pqCommand*);
+  void DispatchCommand(pqCommand*);
 };
 
 #endif // !_pqImmediateCommandDispatcher_h

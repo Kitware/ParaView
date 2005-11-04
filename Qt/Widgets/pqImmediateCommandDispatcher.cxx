@@ -10,12 +10,12 @@
 #include "pqCommand.h"
 #include "pqImmediateCommandDispatcher.h"
 
-void pqImmediateCommandDispatcher::dispatchCommand(pqCommand* Command)
+void pqImmediateCommandDispatcher::DispatchCommand(pqCommand* Command)
 {
   if(Command)
     {
-    Command->redoCommand();
-    emit updateWindow();
+    Command->Execute();
+    emit UpdateWindows();
     delete Command;
     }  
 }

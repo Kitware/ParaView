@@ -27,7 +27,7 @@ public:
 
 signals:
   /// This signal will be emitted iff a server connection is successfully created
-  void serverConnected(pqServer*);
+  void ServerConnected(pqServer*);
  
 private:
   ~pqServerBrowser();
@@ -39,7 +39,7 @@ private:
 private slots:
   void accept();
   void reject();
-  void onServerTypeActivated(int);
+  void OnServerTypeActivated(int);
 };
 
 #endif // !_pqServerBrowser_h

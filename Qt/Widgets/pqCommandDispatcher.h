@@ -14,7 +14,7 @@
 
 class pqCommand;
 
-/// Abstract interface for an object that implements an "update" policy
+/// Abstract interface for an object that implements a screen update policy
 /** \todo Need to figure-out how this will interoperate with pqSMAdaptor and server-manager undo/redo */
 class pqCommandDispatcher :
   public QObject
@@ -22,10 +22,12 @@ class pqCommandDispatcher :
   Q_OBJECT
   
 public:
-  virtual void dispatchCommand(pqCommand*) = 0;
+  /// Called to dispatch (execute) a command, possibly at a later time (the dispatcher assumes ownership of the supplied command object)
+  virtual void DispatchCommand(pqCommand*) = 0;
 
 signals:
-  void updateWindow();
+  /// Signal emitted to indicate that a screen update is required
+  void UpdateWindows();
 };
 
 #endif // !pqCommandDispatcher_h

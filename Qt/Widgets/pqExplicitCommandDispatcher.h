@@ -22,15 +22,18 @@ class pqExplicitCommandDispatcher :
 public:
   ~pqExplicitCommandDispatcher();
 
-  void dispatchCommand(pqCommand*);
+  void DispatchCommand(pqCommand*);
 
 public slots:
-  void onExecute();
+  /// Called by the UI layer to execute any queued commands
+  void OnExecute();
 
 signals:
-  void commandsPending(bool);
+  /// Signal emitted to indicate whether there are any commands queued or not
+  void CommandsPending(bool);
 
 private:
+  /// Stores the list of pending commands
   QList<pqCommand*> Commands;
 };
 

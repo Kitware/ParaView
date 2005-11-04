@@ -22,18 +22,24 @@ class pqCommandDispatcherManager :
   Q_OBJECT
   
 public:
-  static pqCommandDispatcherManager& instance();
+  static pqCommandDispatcherManager& Instance();
 
-  pqCommandDispatcher& getDispatcher();
-  void setDispatcher(pqCommandDispatcher*);
+  /// Returns the current command dispatcher
+  pqCommandDispatcher& GetDispatcher();
+  /// Sets a new current command dispatcher (this object assumes ownership of the supplied dispatcher)
+  void SetDispatcher(pqCommandDispatcher*);
 
 signals:
-  void dispatcherChanged();
+  /// Signal emitted whenever a new command dispatcher becomes current
+  void DispatcherChanged();
+  /// Signal emitted whenever the current command dispatcher has requested screen updates
+  void UpdateWindows();
   
 private:
   pqCommandDispatcherManager();
   ~pqCommandDispatcherManager();
 
+  /// Stores the current command dispatcher
   pqCommandDispatcher* Dispatcher;
 };
 

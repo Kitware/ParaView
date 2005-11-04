@@ -10,15 +10,14 @@
 #ifndef _pqCommand_h
 #define _pqCommand_h
 
-/// Abstract interface for recording undo/redo-able state changes
-/** \todo This will probably be moved into the server manager */
+/// Abstract interface for recording "commands" that will be executed at a later time (makes it possible to implement varying screen update policies)
 class pqCommand
 {
 public:
   virtual ~pqCommand() {}
   
-  virtual void undoCommand() = 0;
-  virtual void redoCommand() = 0;
+  /// Called to execute the command encapsulated by this object
+  virtual void Execute() = 0;
   
 protected:
   pqCommand() {}

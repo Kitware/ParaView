@@ -10,13 +10,13 @@
 #include "pqCommandDispatcherManager.h"
 #include "pqImmediateCommandDispatcher.h"
 
-pqCommandDispatcherManager& pqCommandDispatcherManager::instance()
+pqCommandDispatcherManager& pqCommandDispatcherManager::Instance()
 {
-  static pqCommandDispatcherManager* g_instance = 0;
-  if(!g_instance)
-    g_instance = new pqCommandDispatcherManager();
+  static pqCommandDispatcherManager* instance = 0;
+  if(!instance)
+    instance = new pqCommandDispatcherManager();
   
-  return *g_instance;
+  return *instance;
 }
 
 pqCommandDispatcherManager::pqCommandDispatcherManager() :
@@ -29,7 +29,7 @@ pqCommandDispatcherManager::~pqCommandDispatcherManager()
   delete this->Dispatcher;
 }
 
-pqCommandDispatcher& pqCommandDispatcherManager::getDispatcher()
+pqCommandDispatcher& pqCommandDispatcherManager::GetDispatcher()
 {
   if(!this->Dispatcher)
     this->Dispatcher = new pqImmediateCommandDispatcher();
@@ -37,11 +37,13 @@ pqCommandDispatcher& pqCommandDispatcherManager::getDispatcher()
   return *this->Dispatcher;
 }
 
-void pqCommandDispatcherManager::setDispatcher(pqCommandDispatcher* dispatcher)
+void pqCommandDispatcherManager::SetDispatcher(pqCommandDispatcher* dispatcher)
 {
   delete this->Dispatcher;
   this->Dispatcher = dispatcher;
   
-  emit dispatcherChanged();
+  QObject::connect(this->Dispatcher, SIGNAL(UpdateWindows()), this, SIGNAL(UpdateWindows()));
+  
+  emit DispatcherChanged();
 }
 
