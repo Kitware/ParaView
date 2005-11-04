@@ -10,7 +10,7 @@
 #ifndef _pqServerBrowser_h
 #define _pqServerBrowser_h
 
-#include "pqServerBrowser.ui.h"
+#include "ui_pqServerBrowser.h"
 
 class pqServer;
 

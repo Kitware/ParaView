@@ -6,6 +6,8 @@ PROJECT(QtWidgets)
 FIND_PACKAGE(Qt4)
 INCLUDE(${QT_USE_FILE})
 
+INCLUDE_DIRECTORIES(${QtWidgets_BINARY_DIR} ${QtWidgets_SOURCE_DIR})
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCommandDispatcher.h
   pqCommandDispatcherManager.h
@@ -20,6 +22,11 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerFileDialogModel.h
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.h
+)
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+  pqFileDialog.ui
+  pqServerBrowser.ui
 )
 
 ADD_LIBRARY(QtWidgets
@@ -61,6 +68,7 @@ ADD_LIBRARY(QtWidgets
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
   ${MOC_BUILT_SOURCES}
+  ${UI_BUILT_SOURCES}
 )
 
 TARGET_LINK_LIBRARIES(QtWidgets

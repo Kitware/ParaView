@@ -10,7 +10,7 @@
 #ifndef _pqFileDialog_h
 #define _pqFileDialog_h
 
-#include "pqFileDialog.ui.h"
+#include "ui_pqFileDialog.h"
 
 class pqFileDialogModel;
 
