@@ -368,7 +368,10 @@ void pqObjectInspector::cleanData(bool notify)
     // Make sure the view is notified of the removed items.
     bool notifyView = this->Internal->size() > 0;
     if(notify && notifyView)
+    {
       this->beginRemoveRows(QModelIndex(), 0, this->Internal->size() - 1);
+      this->endRemoveRows();
+    }
 
     // Clean up the list of items.
     pqObjectInspectorInternal::Iterator iter = this->Internal->begin();
@@ -406,8 +409,8 @@ void pqObjectInspector::cleanData(bool notify)
       }
 
     this->Internal->clear();
-    if(notify && notifyView)
-      this->endRemoveRows();
+    //if(notify && notifyView)
+    //  this->endRemoveRows();
     }
 }
 

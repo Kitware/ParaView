@@ -386,6 +386,9 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
   source->UpdateVTKObjects();
   this->CurrentSourceProxy = vtkSMSourceProxy::SafeDownCast(source);
   emit newSourceProxy(this->CurrentSourceProxy);
+  //TEMP
+  if(this->Inspector)
+    this->Inspector->setProxy(this->Adaptor, this->CurrentSourceProxy);
   pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
   this->CurrentServer->GetRenderModule()->ResetCamera();
   this->Window->update();
@@ -402,6 +405,9 @@ void pqMainWindow::onCreateFilter(QAction* action)
   vtkSMProxyProperty::SafeDownCast(sp->GetProperty("Input"))->AddProxy(this->CurrentSourceProxy);
   this->CurrentSourceProxy = sp;
   emit newSourceProxy(this->CurrentSourceProxy);
+  //TEMP
+  if(this->Inspector)
+    this->Inspector->setProxy(this->Adaptor, this->CurrentSourceProxy);
   pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
   this->CurrentServer->GetRenderModule()->ResetCamera();
   this->Window->update();
