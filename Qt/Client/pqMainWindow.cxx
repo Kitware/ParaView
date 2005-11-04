@@ -365,24 +365,63 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
     {
     vtkSMProxyManager* manager = this->CurrentServer->GetProxyManager();
     manager->InstantiateGroupPrototypes("filters");
-    manager->InstantiateGroupPrototypes("sources");
     int numFilters = manager->GetNumberOfProxies("filters_prototypes");
     for(int i=0; i<numFilters; i++)
       {
-      this->FiltersMenu->addAction(tr(manager->GetProxyName("filters_prototypes",i)));
+      const char* proxyName = manager->GetProxyName("filters_prototypes",i);
+      QAction* action = this->FiltersMenu->addAction(proxyName);
+      action->setData(proxyName);
       }
+
+#if 1
+    // hard code sources
+    QAction* action = this->SourcesMenu->addAction("2D Glyph");
+    action->setData("GlyphSource2D");
+    action = this->SourcesMenu->addAction("3D Text");
+    action->setData("VectorText");
+    action = this->SourcesMenu->addAction("Arrow");
+    action->setData("ArrowSource");
+    action = this->SourcesMenu->addAction("Axes");
+    action->setData("Axes");
+    action = this->SourcesMenu->addAction("Box");
+    action->setData("CubeSource");
+    action = this->SourcesMenu->addAction("Cone");
+    action->setData("ConeSource");
+    action = this->SourcesMenu->addAction("Cylinder");
+    action->setData("CylinderSource");
+    action = this->SourcesMenu->addAction("Hierarchical Fractal");
+    action->setData("HierarchicalFractal");
+    action = this->SourcesMenu->addAction("Line");
+    action->setData("LineSource");
+    action = this->SourcesMenu->addAction("Mandelbrot");
+    action->setData("ImageMandelbrotSource");
+    action = this->SourcesMenu->addAction("Plane");
+    action->setData("PlaneSource");
+    action = this->SourcesMenu->addAction("Sphere");
+    action->setData("SphereSource");
+    action = this->SourcesMenu->addAction("Superquadric");
+    action->setData("SuperquadricSource");
+    action = this->SourcesMenu->addAction("Wavelet");
+    action->setData("RTAnalyticSource");
+#else
+    manager->InstantiateGroupPrototypes("sources");
     int numSources = manager->GetNumberOfProxies("sources_prototypes");
     for(int i=0; i<numSources; i++)
       {
-      this->SourcesMenu->addAction(tr(manager->GetProxyName("sources_prototypes",i)));
+      const char* proxyName = manager->GetProxyName("sources_prototypes",i);
+      QAction* action = this->SourcesMenu->addAction(proxyName);
+      action->setData(proxyName);
       }
+#endif
     }
 } void pqMainWindow::onCreateSource(QAction* action)
 {
   if(!action)
     return;
 
-  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("sources", action->text().toAscii().data());
+  QByteArray sourceName = action->data().toString().toAscii();
+
+  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("sources", sourceName.data());
   source->UpdateVTKObjects();
   this->CurrentSourceProxy = vtkSMSourceProxy::SafeDownCast(source);
   emit newSourceProxy(this->CurrentSourceProxy);
@@ -398,8 +437,10 @@ void pqMainWindow::onCreateFilter(QAction* action)
 {
   if(!action)
     return;
+  
+  QByteArray filterName = action->data().toString().toAscii();
 
-  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("filters", action->text().toAscii().data());
+  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("filters", filterName.data());
   source->UpdateVTKObjects();
   vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
   vtkSMProxyProperty::SafeDownCast(sp->GetProperty("Input"))->AddProxy(this->CurrentSourceProxy);
