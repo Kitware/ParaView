@@ -20,7 +20,7 @@ class pqObjectInspectorInternal : public QList<pqObjectInspectorItem *> {};
 pqObjectInspector::pqObjectInspector(QObject *parent)
   : QAbstractItemModel(parent)
 {
-  this->Commit = CommitType::Individually;
+  this->Commit = pqObjectInspector::Individually;
   this->Internal = new pqObjectInspectorInternal();
   this->Adapter = 0;
   this->Proxy = 0;
@@ -169,7 +169,7 @@ bool pqObjectInspector::setData(const QModelIndex &index,
 
         // If in immediate update mode, push the data to the server.
         // Otherwise, mark the item as modified for a later commit.
-        if(this->Commit == CommitType::Individually)
+        if(this->Commit == pqObjectInspector::Individually)
           {
           if(this->Adapter && this->Proxy)
             {
