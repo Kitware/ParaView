@@ -119,7 +119,10 @@ pqMainWindow::pqMainWindow() :
   serverMenu->addAction(this->ServerDisconnectAction);
 
   this->SourcesMenu = this->menuBar()->addMenu(tr("Sources")) << pqSetName("sourcesMenu");
-  QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesMenu()));
+  this->FiltersMenu = this->menuBar()->addMenu(tr("Filters")) << pqSetName("filtersMenu");
+  QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesFiltersMenu()));
+  QObject::connect(this->SourcesMenu, SIGNAL(triggered(QAction*)), this, SLOT(onCreateSource(QAction*)));
+  QObject::connect(this->FiltersMenu, SIGNAL(triggered(QAction*)), this, SLOT(onCreateFilter(QAction*)));
 
   // Test menu
 #ifdef PARAQ_BUILD_TESTING
@@ -353,19 +356,55 @@ void pqMainWindow::onUpdateWindows()
     this->CurrentServer->GetRenderModule()->StillRender();
 }
 
-void pqMainWindow::onUpdateSourcesMenu()
+void pqMainWindow::onUpdateSourcesFiltersMenu()
 {
+  this->FiltersMenu->clear();
   this->SourcesMenu->clear();
 
   if(this->CurrentServer)
     {
     vtkSMProxyManager* manager = this->CurrentServer->GetProxyManager();
-    int numSources = manager->GetNumberOfProxies("sources");
+    manager->InstantiateGroupPrototypes("filters");
+    manager->InstantiateGroupPrototypes("sources");
+    int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+    for(int i=0; i<numFilters; i++)
+      {
+      this->FiltersMenu->addAction(tr(manager->GetProxyName("filters_prototypes",i)));
+      }
+    int numSources = manager->GetNumberOfProxies("sources_prototypes");
     for(int i=0; i<numSources; i++)
       {
-      this->SourcesMenu->addAction(tr(manager->GetProxyName("sources", i)));
+      this->SourcesMenu->addAction(tr(manager->GetProxyName("sources_prototypes",i)));
       }
     }
+} void pqMainWindow::onCreateSource(QAction* action)
+{
+  if(!action)
+    return;
+
+  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("sources", action->text().toAscii().data());
+  source->UpdateVTKObjects();
+  this->CurrentSourceProxy = vtkSMSourceProxy::SafeDownCast(source);
+  emit newSourceProxy(this->CurrentSourceProxy);
+  pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
+  this->CurrentServer->GetRenderModule()->ResetCamera();
+  this->Window->update();
+}
+
+void pqMainWindow::onCreateFilter(QAction* action)
+{
+  if(!action)
+    return;
+
+  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("filters", action->text().toAscii().data());
+  source->UpdateVTKObjects();
+  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
+  vtkSMProxyProperty::SafeDownCast(sp->GetProperty("Input"))->AddProxy(this->CurrentSourceProxy);
+  this->CurrentSourceProxy = sp;
+  emit newSourceProxy(this->CurrentSourceProxy);
+  pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
+  this->CurrentServer->GetRenderModule()->ResetCamera();
+  this->Window->update();
 }
 
 void pqMainWindow::onHelpAbout()
@@ -384,7 +423,7 @@ void pqMainWindow::onRecordTest()
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
   
-#endif PARAQ_BUILD_TESTING
+#endif //PARAQ_BUILD_TESTING
 }
 
 void pqMainWindow::onRecordTest(const QStringList& Files)
@@ -397,5 +436,5 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
     dialog->show();
     }
   
-#endif PARAQ_BUILD_TESTING
+#endif //PARAQ_BUILD_TESTING
 }

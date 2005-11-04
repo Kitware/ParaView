@@ -30,7 +30,7 @@ QT4_ADD_RESOURCES(RCS_SOURCES
   pqClient.qrc
 )
 
-ADD_EXECUTABLE(pqClient
+ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   main.cxx
   pqMainWindow.cxx
   pqMainWindow.h

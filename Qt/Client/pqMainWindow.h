@@ -18,6 +18,8 @@ class pqRefreshToolbar;
 class pqServer;
 class pqSMAdaptor;
 
+class vtkSMSourceProxy;
+
 class QAction;
 class QDockWidget;
 class QToolBar;
@@ -36,6 +38,7 @@ public:
 
 signals:
   void serverChanged();
+  void newSourceProxy(vtkSMSourceProxy*);
   
 private:
   void setServer(pqServer* Server);
@@ -47,10 +50,13 @@ private:
   QAction* ServerDisconnectAction;
   pqSMAdaptor *Adaptor;
   QMenu* SourcesMenu;
+  QMenu* FiltersMenu;
   pqObjectInspector *Inspector;
   pqObjectInspectorDelegate *InspectorDelegate;
   QDockWidget *InspectorDock;
   QTreeView *InspectorView;
+
+  vtkSMSourceProxy* CurrentSourceProxy;  // cheat for now until we do this the right way
   
 private slots:
   void onFileNew();
@@ -66,9 +72,11 @@ private slots:
   void onServerConnect();
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
-  void onUpdateSourcesMenu();
+  void onUpdateSourcesFiltersMenu();
   void onHelpAbout();
   void onUpdateWindows();
+  void onCreateSource(QAction*);
+  void onCreateFilter(QAction*);
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);
