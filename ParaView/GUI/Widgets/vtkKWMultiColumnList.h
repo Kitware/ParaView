@@ -243,6 +243,36 @@ public:
       col_index, vtkKWMultiColumnList::SortByDecreasingOrder); };
 
   // Description:
+  // Set/Get the type of the temporary embedded widget to be used for
+  // interactive editing of the contents of the given column's cells.
+  // It can be one of entry (which is the default), spinbox or checkbutton
+  // at the moment. This can be set at the cell level too.
+  // If set to anything other than entry, you should probably call
+  // SetColumnFormatCommandToEmptyOutput on this column too to prevent
+  // the actual text contents (i.e. the 0 or 1 value for a checkbutton for
+  // example) to display as text instead of as a checkbutton or spinbox, etc.
+  //BTX
+  enum 
+  {
+    ColumnEditWindowEntry = 0,
+    ColumnEditWindowCheckButton,
+    ColumnEditWindowSpinBox,
+    ColumnEditWindowUnknown
+  };
+  //ETX
+  virtual int GetColumnEditWindow(int col_index);
+  virtual void SetColumnEditWindow(int col_index, int arg);
+  virtual void SetColumnEditWindowToEntry(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowEntry); };
+  virtual void SetColumnEditWindowToCheckButton(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowCheckButton); };
+  virtual void SetColumnEditWindowToSpinBox(int col_index)
+    { this->SetColumnEditWindow(
+      col_index, vtkKWMultiColumnList::ColumnEditWindowSpinBox); };
+
+  // Description:
   // Set/Get each column sort mode
   //BTX
   enum 
@@ -555,6 +585,35 @@ public:
     const unsigned char *pixels, int width, int height, int pixel_size,
     unsigned long buffer_length = 0);
   virtual const char* GetCellImage(int row_index, int col_index);
+
+  // Description:
+  // Set/Get the type of the temporary embedded widget to be used for
+  // interactive editing of the contents of the cell.
+  // This option overrides the one with the same name for the column
+  // containing the given cell, and may have the same values as its
+  // column-related counterpart (see SetColumnEditWindow).
+  // It can be one of entry (which is the default), spinbox or checkbutton
+  // at the moment. This can be set at the cell level too.
+  //BTX
+  enum 
+  {
+    CellEditWindowEntry = 0,
+    CellEditWindowCheckButton,
+    CellEditWindowSpinBox,
+    CellEditWindowUnknown
+  };
+  //ETX
+  virtual int GetCellEditWindow(int row_index, int col_index);
+  virtual void SetCellEditWindow(int row_index, int col_index, int arg);
+  virtual void SetCellEditWindowToEntry(int row_index, int col_index)
+    { this->SetCellEditWindow(
+      row_index, col_index, vtkKWMultiColumnList::CellEditWindowEntry); };
+  virtual void SetCellEditWindowToCheckButton(int row_index, int col_index)
+    { this->SetCellEditWindow(
+      row_index,col_index, vtkKWMultiColumnList::CellEditWindowCheckButton);};
+  virtual void SetCellEditWindowToSpinBox(int row_index, int col_index)
+    { this->SetCellEditWindow(
+      row_index, col_index, vtkKWMultiColumnList::CellEditWindowSpinBox); };
 
   // Description:
   // Specifies a Tcl command to create the window (i.e. widget) to be embedded

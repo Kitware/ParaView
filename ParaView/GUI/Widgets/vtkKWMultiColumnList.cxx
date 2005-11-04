@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.34");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -172,7 +172,7 @@ int vtkKWMultiColumnList::GetHeight()
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
 {
-  if (this->IsCreated() && title)
+  if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
     int old_enabled = this->GetEnabled();
@@ -181,7 +181,8 @@ int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
       this->SetEnabled(1);
       }
     this->Script(
-      "%s insertcolumns %d 0 {%s}", this->GetWidgetName(), col_index, title);
+      "%s insertcolumns %d 0 {%s}", 
+      this->GetWidgetName(), col_index, title ? title : "");
     this->SetEnabled(old_enabled);
     if (this->GetNumberOfColumns() != nb_columns)
       {
@@ -452,6 +453,60 @@ int vtkKWMultiColumnList::GetColumnStretchable(int col_index)
 void vtkKWMultiColumnList::SetStretchableColumns(int arg)
 {
   this->SetConfigurationOption("-stretch", arg ? "all" : "");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetColumnEditWindow(int col_index, int arg)
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  const char *arg_opt;
+  switch (arg)
+    {
+    case vtkKWMultiColumnList::ColumnEditWindowEntry:
+      arg_opt = "entry";
+      break;
+    case vtkKWMultiColumnList::ColumnEditWindowCheckButton:
+      arg_opt = "checkbutton";
+      break;
+    case vtkKWMultiColumnList::ColumnEditWindowSpinBox:
+      arg_opt = "spinbox";
+      break;
+    default:
+      arg_opt = "entry";
+      break;
+    }
+  this->SetColumnConfigurationOption(col_index, "-editwindow", arg_opt);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetColumnEditWindow(int col_index)
+{
+  if (this->IsCreated())
+    {
+    const char *val = 
+      this->GetColumnConfigurationOption(col_index, "-editwindow");
+    if (val && *val)
+      {
+      if (!strcmp(val, "entry"))
+        {
+        return vtkKWMultiColumnList::ColumnEditWindowEntry;
+        }
+      if (!strcmp(val, "checkbutton"))
+        {
+        return vtkKWMultiColumnList::ColumnEditWindowCheckButton;
+        }
+      if (!strcmp(val, "spinbox"))
+        {
+        return vtkKWMultiColumnList::ColumnEditWindowSpinBox;
+        }
+      }
+    }
+
+  return vtkKWMultiColumnList::ColumnEditWindowUnknown;
 }
 
 //----------------------------------------------------------------------------
@@ -1852,6 +1907,62 @@ void vtkKWMultiColumnList::SetCellImageToPixels(
     }
 
   this->SetCellImage(row_index, col_index, image_name.c_str());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellEditWindow(
+  int row_index, int col_index, int arg)
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  const char *arg_opt;
+  switch (arg)
+    {
+    case vtkKWMultiColumnList::CellEditWindowEntry:
+      arg_opt = "entry";
+      break;
+    case vtkKWMultiColumnList::CellEditWindowCheckButton:
+      arg_opt = "checkbutton";
+      break;
+    case vtkKWMultiColumnList::CellEditWindowSpinBox:
+      arg_opt = "spinbox";
+      break;
+    default:
+      arg_opt = "entry";
+      break;
+    }
+  this->SetCellConfigurationOption(
+    row_index, col_index, "-editwindow", arg_opt);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetCellEditWindow(int row_index, int col_index)
+{
+  if (this->IsCreated())
+    {
+    const char *val = 
+      this->GetCellConfigurationOption(row_index, col_index, "-editwindow");
+    if (val && *val)
+      {
+      if (!strcmp(val, "entry"))
+        {
+        return vtkKWMultiColumnList::CellEditWindowEntry;
+        }
+      if (!strcmp(val, "checkbutton"))
+        {
+        return vtkKWMultiColumnList::CellEditWindowCheckButton;
+        }
+      if (!strcmp(val, "spinbox"))
+        {
+        return vtkKWMultiColumnList::CellEditWindowSpinBox;
+        }
+      }
+    }
+
+  return vtkKWMultiColumnList::CellEditWindowUnknown;
 }
 
 //----------------------------------------------------------------------------
