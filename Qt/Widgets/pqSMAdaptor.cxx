@@ -138,9 +138,19 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, int Index, QVariant QtPro
 {
   vtkSMPropertyAdaptor* adapter = vtkSMPropertyAdaptor::New();
   adapter->SetProperty(Property);
-  if(QtProperty.type() == QVariant::Bool) // bools expand to "true" or "false" instead of "1" or "0"
-    QtProperty = QtProperty.toInt();
-  adapter->SetRangeValue(Index, QtProperty.toString().toAscii().data());
+  if(adapter->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION &&
+      adapter->GetElementType() == vtkSMPropertyAdaptor::INT)
+    {
+    adapter->SetEnumerationValue(QtProperty.toString().toAscii().data());
+    }
+  else
+    {
+    // bools expand to "true" or "false" instead of "1" or "0"
+    if(QtProperty.type() == QVariant::Bool)
+      QtProperty = QtProperty.toInt();
+    adapter->SetRangeValue(Index, QtProperty.toString().toAscii().data());
+    }
+
   adapter->Delete();
 }
 
@@ -154,6 +164,8 @@ QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property, int Index)
   switch(adapter->GetElementType())
     {
     case vtkSMPropertyAdaptor::INT:
+      if(adapter->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+        var = adapter->GetEnumerationValue();
       if(var.canConvert(QVariant::Int))
         var.convert(QVariant::Int);
       break;

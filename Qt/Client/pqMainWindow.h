@@ -13,6 +13,7 @@
 #include <QMainWindow>
 
 class pqObjectInspector;
+class pqObjectInspectorDelegate;
 class pqRefreshToolbar;
 class pqServer;
 class pqSMAdaptor;
@@ -47,6 +48,7 @@ private:
   pqSMAdaptor *Adaptor;
   QMenu* SourcesMenu;
   pqObjectInspector *Inspector;
+  pqObjectInspectorDelegate *InspectorDelegate;
   QDockWidget *InspectorDock;
   QTreeView *InspectorView;
   

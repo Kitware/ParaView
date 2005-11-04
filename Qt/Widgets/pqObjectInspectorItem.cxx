@@ -1,17 +1,22 @@
 
 #include "pqObjectInspectorItem.h"
 
-#include <QVariant>
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyAdaptor.h"
+
+#include <QList>
+#include <QStringList>
 
 
 class pqObjectInspectorItemInternal : public QList<pqObjectInspectorItem *> {};
 
 
 pqObjectInspectorItem::pqObjectInspectorItem(QObject *parent)
-  : QObject(parent), Name(), Value()
+  : QObject(parent), Name(), Value(), Domain()
 {
   this->Internal = 0;
   this->Parent = 0;
+  this->Modified = false;
 }
 
 pqObjectInspectorItem::~pqObjectInspectorItem()
@@ -92,6 +97,77 @@ void pqObjectInspectorItem::addChild(pqObjectInspectorItem *child)
 
   if(this->Internal)
     this->Internal->append(child);
+}
+
+void pqObjectInspectorItem::updateDomain(vtkSMProperty *property)
+{
+  if(!property || this->Parent)
+    return;
+
+  vtkSMPropertyAdaptor *adaptor = vtkSMPropertyAdaptor::New();
+  if(adaptor)
+    {
+    adaptor->SetProperty(property);
+    if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+      this->Domain = QVariant(QString("StringListRange"));
+    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::RANGE)
+      {
+      // Make a list of two values: min, max. If either is missing use
+      // an invalid variant as a placeholder.
+      int elemType = adaptor->GetElementType();
+      QList<QVariant> list;
+      if(this->getChildCount() > 0)
+        {
+        pqObjectInspectorItem *item = 0;
+        unsigned int total = adaptor->GetNumberOfRangeElements();
+        for(int i = 0; i < this->Internal->size() && i < (int)total; i++)
+          {
+          list.clear();
+          list.append(this->convertLimit(adaptor->GetRangeMinimum(i), elemType));
+          list.append(this->convertLimit(adaptor->GetRangeMaximum(i), elemType));
+          (*this->Internal)[i]->setDomain(list);
+          }
+        }
+      else
+        {
+        list.append(this->convertLimit(adaptor->GetRangeMinimum(0), elemType));
+        list.append(this->convertLimit(adaptor->GetRangeMaximum(0), elemType));
+        this->Domain = list;
+        }
+      }
+    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+      {
+      if(adaptor->GetElementType() == vtkSMPropertyAdaptor::BOOLEAN)
+        this->Domain = QVariant(QString("Boolean"));
+      else if(adaptor->GetElementType() == vtkSMPropertyAdaptor::STRING)
+        this->Domain = QVariant(QString("StringList"));
+      else if(adaptor->GetElementType() == vtkSMPropertyAdaptor::INT)
+        {
+        // Get the list of enumeration names.
+        QStringList names;
+        unsigned int total = adaptor->GetNumberOfEnumerationElements();
+        for(unsigned int i = 0; i < total; i++)
+          names.append(QString(adaptor->GetEnumerationName(i)));
+        this->Domain = QVariant(names);
+        }
+      }
+
+    adaptor->Delete();
+    }
+}
+
+QVariant pqObjectInspectorItem::convertLimit(const char *limit, int type) const
+{
+  if(limit)
+    {
+    QString value = limit;
+    if(type == vtkSMPropertyAdaptor::INT)
+      return QVariant(value.toInt());
+    else if(type == vtkSMPropertyAdaptor::DOUBLE)
+      return QVariant(value.toDouble());
+    }
+
+  return QVariant();
 }
 
 

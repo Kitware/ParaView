@@ -50,6 +50,8 @@ ADD_LIBRARY(QtWidgets
   pqLocalFileDialogModel.h
   pqObjectInspector.cxx
   pqObjectInspector.h
+  pqObjectInspectorDelegate.cxx
+  pqObjectInspectorDelegate.h
   pqObjectInspectorItem.cxx
   pqObjectInspectorItem.h
   pqOptions.cxx

@@ -4,11 +4,13 @@
 #include "pqObjectInspectorItem.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyAdaptor.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QVariant>
 
 
@@ -18,6 +20,7 @@ class pqObjectInspectorInternal : public QList<pqObjectInspectorItem *> {};
 pqObjectInspector::pqObjectInspector(QObject *parent)
   : QAbstractItemModel(parent)
 {
+  this->Commit = CommitType::Individually;
   this->Internal = new pqObjectInspectorInternal();
   this->Adapter = 0;
   this->Proxy = 0;
@@ -150,13 +153,84 @@ QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
 bool pqObjectInspector::setData(const QModelIndex &index,
     const QVariant &value, int role)
 {
+  if(index.isValid() && index.model() == this && index.column() == 1)
+    {
+    pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
+        index.internalPointer());
+    if(item && item->getChildCount() == 0 && value.isValid())
+      {
+      // Save the value according to the item's type. The value
+      // coming from the delegate might not preserve the correct
+      // property type.
+      QVariant localValue = value;
+      if(localValue.convert(item->getValue().type()))
+        {
+        item->setValue(localValue);
+
+        // If in immediate update mode, push the data to the server.
+        // Otherwise, mark the item as modified for a later commit.
+        if(this->Commit == CommitType::Individually)
+          {
+          if(this->Adapter && this->Proxy)
+            {
+            this->commitChange(item);
+            this->Proxy->UpdateVTKObjects();
+            }
+          }
+        else
+          item->setModified(true);
+
+        return true;
+        }
+      }
+    }
+
   return false;
 }
 
 Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
 {
-  // TODO: Add editable to the flags for the item values.
-  return (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  // Add editable to the flags for the item values.
+  Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  if(index.isValid() && index.model() == this && index.column() == 1)
+    {
+    pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
+        index.internalPointer());
+    if(item && item->getChildCount() == 0)
+      flags |= Qt::ItemIsEditable;
+    }
+  return flags;
+}
+
+QString pqObjectInspector::getPropertyName(const QModelIndex &index) const
+{
+  if(index.isValid() && index.model() == this)
+    {
+    pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
+        index.internalPointer());
+    if(item)
+      {
+      if(item->getParent())
+        return item->getParent()->getPropertyName();
+      else
+        return item->getPropertyName();
+      }
+    }
+
+  return QString();
+}
+
+QVariant pqObjectInspector::getDomain(const QModelIndex &index) const
+{
+  if(index.isValid() && index.model() == this)
+    {
+    pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
+        index.internalPointer());
+    if(item)
+      return item->getDomain();
+    }
+
+  return QVariant();
 }
 
 void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
@@ -223,8 +297,15 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
           connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
               this, SLOT(handleValueChange(pqObjectInspectorItem *)));
           }
+
+        // Set up the property domain information and link it to the server.
+        item->updateDomain(prop);
+        this->Adapter->connectDomain(prop, item,
+            SLOT(updateDomain(vtkSMProperty*)));
         }
       }
+
+    iter->Delete();
 
     // Notify the view that new rows will be inserted. Then, copy
     // the new rows to the model's list.
@@ -237,6 +318,47 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
       this->endInsertRows();
       }
     }
+}
+
+void pqObjectInspector::setCommitType(pqObjectInspector::CommitType commit)
+{
+  this->Commit = commit;
+}
+
+void pqObjectInspector::commitChanges()
+{
+  if(!this->Adapter || !this->Proxy || !this->Internal)
+    return;
+
+  // Loop through all the properties and commit the modified values.
+  int changeCount = 0;
+  pqObjectInspectorInternal::Iterator iter = this->Internal->begin();
+  for( ; iter != this->Internal->end(); ++iter)
+    {
+    pqObjectInspectorItem *item = *iter;
+    if(item->getChildCount() > 0)
+      {
+      pqObjectInspectorItem *child = 0;
+      for(int i = 0; i < item->getChildCount(); i++)
+        {
+        child = item->getChild(i);
+        if(child->isModified())
+          {
+          this->commitChange(child);
+          changeCount++;
+          }
+        }
+      }
+    else if(item->isModified())
+      {
+      this->commitChange(item);
+      changeCount++;
+      }
+    }
+
+  // Update the server.
+  if(changeCount > 0)
+    this->Proxy->UpdateVTKObjects();
 }
 
 void pqObjectInspector::cleanData(bool notify)
@@ -307,6 +429,43 @@ int pqObjectInspector::getItemIndex(pqObjectInspectorItem *item) const
     }
 
   return -1;
+}
+
+void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
+{
+  if(!item)
+    return;
+
+  int index = 0;
+  vtkSMProperty *property = 0;
+  item->setModified(false);
+  if(item->getParent())
+    {
+    // Get the parent name.
+    index = this->getItemIndex(item);
+    property = this->Proxy->GetProperty(
+        item->getParent()->getPropertyName().toAscii().data());
+    this->Adapter->setProperty(property, index, item->getValue());
+    }
+  else if(item->getChildCount() > 0)
+    {
+    // Set the value for each element of the property.
+    pqObjectInspectorItem *child = 0;
+    property = this->Proxy->GetProperty(
+        item->getPropertyName().toAscii().data());
+    for(index = 0; index < item->getChildCount(); index++)
+      {
+      child = item->getChild(index);
+      this->Adapter->setProperty(property, index, child->getValue());
+      child->setModified(false);
+      }
+    }
+  else
+    {
+    property = this->Proxy->GetProperty(
+        item->getPropertyName().toAscii().data());
+    this->Adapter->setProperty(property, 0, item->getValue());
+    }
 }
 
 void pqObjectInspector::handleNameChange(pqObjectInspectorItem *item)

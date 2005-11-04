@@ -16,6 +16,12 @@ class pqObjectInspector : public QAbstractItemModel
   Q_OBJECT
 
 public:
+  enum CommitType {
+    Individually,
+    Collectively
+  };
+
+public:
   pqObjectInspector(QObject *parent=0);
   virtual ~pqObjectInspector();
 
@@ -34,19 +40,32 @@ public:
 
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
+  QString getPropertyName(const QModelIndex &index) const;
+  QVariant getDomain(const QModelIndex &index) const;
+
   void setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy);
+  vtkSMProxy *getProxy() const {return this->Proxy;}
+  pqSMAdaptor *getAdaptor() const {return this->Adapter;}
+
+  CommitType getCommitType() const {return this->Commit;}
+
+public slots:
+  void setCommitType(CommitType commit);
+  void commitChanges();
 
 protected:
   void cleanData(bool notify=true);
 
 private:
   int getItemIndex(pqObjectInspectorItem *item) const;
+  void commitChange(pqObjectInspectorItem *item);
 
 private slots:
   void handleNameChange(pqObjectInspectorItem *item);
   void handleValueChange(pqObjectInspectorItem *item);
 
 private:
+  CommitType Commit;
   pqObjectInspectorInternal *Internal;
   pqSMAdaptor *Adapter;
   vtkSMProxy *Proxy;

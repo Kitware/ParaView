@@ -13,6 +13,7 @@
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqObjectInspector.h"
+#include "pqObjectInspectorDelegate.h"
 #include "pqParts.h"
 #include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
@@ -77,6 +78,7 @@ pqMainWindow::pqMainWindow() :
   Window(0),
   ServerDisconnectAction(0),
   Inspector(0),
+  InspectorDelegate(0),
   InspectorDock(0),
   InspectorView(0)
 {
@@ -146,6 +148,8 @@ pqMainWindow::pqMainWindow() :
   if(this->Inspector)
     this->Inspector->setObjectName("Inspector");
 
+  this->InspectorDelegate = new pqObjectInspectorDelegate(this);
+
   // Add the object inspector dock window.
   this->InspectorDock = new QDockWidget("Object Inspector", this);
   if(this->InspectorDock)
@@ -162,6 +166,8 @@ pqMainWindow::pqMainWindow() :
       this->InspectorView->header()->hide();
       this->InspectorDock->setWidget(this->InspectorView);
       this->InspectorView->setModel(this->Inspector);
+      if(this->InspectorDelegate)
+        this->InspectorView->setItemDelegate(this->InspectorDelegate);
       }
 
     this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
