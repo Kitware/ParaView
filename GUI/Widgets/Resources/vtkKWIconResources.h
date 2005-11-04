@@ -216,6 +216,20 @@ static const unsigned char image_expand[] =
 
 /* 
  * Resource generated for file:
+ *    eye.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_eye_width          = 11;
+static const unsigned int  image_eye_height         = 10;
+static const unsigned int  image_eye_pixel_size     = 4;
+static const unsigned long image_eye_length         = 88;
+static const unsigned long image_eye_decoded_length = 440;
+
+static const unsigned char image_eye[] = 
+  "eNr7//8/w38oBoL/6Pg/kjyyGlzihOSQ5ZH52OzGpQdNL4Y6dDfA1GFTi66eWPuJ8RuxYY"
+  "Yujs9cGAYAX4LcJA==";
+
+/* 
+ * Resource generated for file:
  *    file_open.png (zlib, base64) (image file)
  */
 static const unsigned int  image_file_open_width          = 16;
