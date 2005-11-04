@@ -7,12 +7,6 @@ SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
 SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
 
-IF(NOT WIN32)
-# prevent runtime problems on Unix/Mac when Qt & VTK use
-# separate instances of these libraries
-  SET(VTK_USE_SYSTEM_FREETYPE ON CACHE BOOL "Use system freetype")
-ENDIF(NOT WIN32)
-
 # build VTK/Qt support
 SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
 SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
