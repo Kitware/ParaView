@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.374");
+vtkCxxRevisionMacro(vtkPVApplication, "1.375");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1172,11 +1172,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
-  this->Script(
-    "proc bgerror { m } "
-    "{ global Application errorInfo; "
-    "$Application DisplayTCLError \"$m $errorInfo\"}");
-
   this->OutputWindow->SetApplication(this);
 
   this->Script(
@@ -1724,12 +1719,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::DisplayTCLError(const char* message)
-{
-  vtkErrorMacro("TclTk error: "<<message);
 }
 
 //----------------------------------------------------------------------------
