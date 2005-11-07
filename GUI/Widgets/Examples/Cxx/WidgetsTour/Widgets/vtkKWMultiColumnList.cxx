@@ -70,7 +70,6 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
   mcl1->SetColumnAlignmentToCenter(col_index);
 
   col_index = mcl1->AddColumn(NULL);
-  mcl1->SetColumnLabelImageToPredefinedIcon(col_index, vtkKWIcon::IconLock);
   mcl1->SetColumnFormatCommandToEmptyOutput(col_index);
 
   col_index = mcl1->AddColumn("Color");
@@ -81,15 +80,16 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
   // we will display a frame which length will represent the % of completion
   // In order to do so, we have to hide the text, and later on set a 
   // a callback on each cell that will create that internal frame
-  /*
-  col_index = mcl1->AddColumn("Foo");
-  mcl1->SetColumnLabelImageToPredefinedIcon(
-    col_index, vtkKWIcon::IconInfoMini);
+
+  col_index = mcl1->AddColumn("Completion");
+  mcl1->SetColumnLabelImageToPredefinedIcon(col_index,vtkKWIcon::IconInfoMini);
   mcl1->SetColumnWidth(col_index, -75);
   mcl1->ColumnResizableOff(col_index);
   mcl1->ColumnStretchableOff(col_index);
   mcl1->SetColumnFormatCommandToEmptyOutput(col_index);
-  */
+
+  mcl1->SetColumnLabelImageToPredefinedIcon(4, vtkKWIcon::IconLock);
+
   // The callback that is invoked for each cell in the completion column. 
   // This is rather ugly to do in C++. In a real application, you will
   // want to use a real C++ callback, and create C++ KWWidgets inside that
@@ -117,11 +117,9 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
     mcl1->InsertCellText(i, 5, project.Color);
     mcl1->SetCellWindowCommandToColorButton(i, 5);
 
-    //    mcl1->InsertCellTextAsDouble(i, 6, project.Completion);
-    //mcl1->SetCellWindowCommand(i, 6, NULL, "CreateCompletionCellCallback");
+    mcl1->InsertCellTextAsDouble(i, 6, project.Completion);
+    mcl1->SetCellWindowCommand(i, 6, NULL, "CreateCompletionCellCallback");
     }
-
-  cout << mcl1->GetTclName() << endl;
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
