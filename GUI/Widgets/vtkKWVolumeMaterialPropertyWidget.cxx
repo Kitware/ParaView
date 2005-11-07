@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -70,7 +70,11 @@ vtkKWVolumeMaterialPropertyWidget::~vtkKWVolumeMaterialPropertyWidget()
     this->EnableShadingCheckButton = NULL;
     }
 
-  this->SetVolumeProperty(NULL);
+  if (this->VolumeProperty)
+    {
+    this->VolumeProperty->Delete();
+    this->VolumeProperty = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
