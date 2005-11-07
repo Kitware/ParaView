@@ -9,8 +9,9 @@
 
 #include "pqLineEditEventTranslator.h"
 
-#include <QLineEdit>
 #include <QEvent>
+#include <QLineEdit>
+#include <QSpinBox>
 
 pqLineEditEventTranslator::pqLineEditEventTranslator() :
   CurrentObject(0)
@@ -22,7 +23,11 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   QLineEdit* const object = qobject_cast<QLineEdit*>(Object);
   if(!object)
     return false;
-    
+  
+  // If this line edit is part of a spinbox, don't translate events (the spinbox translator will receive the final value directly)
+  if(qobject_cast<QSpinBox*>(Object->parent()))
+    return false;
+  
   switch(Event->type())
     {
     case QEvent::Enter:
