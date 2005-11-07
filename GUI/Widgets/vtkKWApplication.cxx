@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.260");
+vtkCxxRevisionMacro(vtkKWApplication, "1.261");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -201,6 +201,10 @@ vtkKWApplication::vtkKWApplication()
   // As a convenience, set the 'Application' Tcl variable to ourself
 
   this->Script("set Application %s",this->GetTclName());
+  this->Script(
+    "proc bgerror { m } "
+    "{ global Application errorInfo; "
+    "$Application TclBgErrorCallback \"$m\n$errorInfo\"}");
 }
 
 //----------------------------------------------------------------------------
@@ -822,13 +826,18 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
   this->SetRegistryValue(
     2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey, "%d", 
     vtkKWToolbar::GetGlobalWidgetsFlatAspect()); 
-
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::DoOneTclEvent()
 {
   Tcl_DoOneEvent(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::TclBgErrorCallback(const char* message)
+{
+  vtkErrorMacro("TclTk error: "<< message);
 }
 
 //----------------------------------------------------------------------------
