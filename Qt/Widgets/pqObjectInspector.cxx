@@ -30,7 +30,7 @@ pqObjectInspector::~pqObjectInspector()
 {
   if(this->Internal)
     {
-    this->cleanData(false);
+    this->cleanData();
     delete this->Internal;
     this->Internal = 0;
     }
@@ -248,9 +248,6 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
     vtkSMProperty *prop = 0;
     vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
 
-    // Put the items on a temporary list. The view needs to know
-    // the number of rows that will be added.
-    QList<pqObjectInspectorItem *> tempList;
     for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       // Skip the property if it doesn't have a valid value. This
@@ -266,7 +263,7 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
       item = new pqObjectInspectorItem();
       if(item)
         {
-        tempList.append(item);
+        this->Internal->append(item);
         item->setPropertyName(iter->GetKey());
         if(value.type() == QVariant::List)
           {
@@ -306,18 +303,10 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
       }
 
     iter->Delete();
-
-    // Notify the view that new rows will be inserted. Then, copy
-    // the new rows to the model's list.
-    if(tempList.size() > 0)
-      {
-      this->beginInsertRows(QModelIndex(), 0, tempList.size() - 1);
-      QList<pqObjectInspectorItem *>::Iterator li = tempList.begin();
-      for( ; li != tempList.end(); ++li)
-        this->Internal->append(*li);
-      this->endInsertRows();
-      }
     }
+
+  // Notify the view that the model has changed.
+  this->reset();
 }
 
 void pqObjectInspector::setCommitType(pqObjectInspector::CommitType commit)
@@ -361,18 +350,10 @@ void pqObjectInspector::commitChanges()
     this->Proxy->UpdateVTKObjects();
 }
 
-void pqObjectInspector::cleanData(bool notify)
+void pqObjectInspector::cleanData()
 {
   if(this->Internal)
     {
-    // Make sure the view is notified of the removed items.
-    bool notifyView = this->Internal->size() > 0;
-    if(notify && notifyView)
-    {
-      this->beginRemoveRows(QModelIndex(), 0, this->Internal->size() - 1);
-      this->endRemoveRows();
-    }
-
     // Clean up the list of items.
     pqObjectInspectorInternal::Iterator iter = this->Internal->begin();
     for( ; iter != this->Internal->end(); ++iter)
@@ -409,8 +390,6 @@ void pqObjectInspector::cleanData(bool notify)
       }
 
     this->Internal->clear();
-    //if(notify && notifyView)
-    //  this->endRemoveRows();
     }
 }
 

@@ -54,7 +54,7 @@ public slots:
   void commitChanges();
 
 protected:
-  void cleanData(bool notify=true);
+  void cleanData();
 
 private:
   int getItemIndex(pqObjectInspectorItem *item) const;
