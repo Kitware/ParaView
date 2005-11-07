@@ -1,4 +1,10 @@
 
+/// \file pqObjectInspector.cxx
+/// \brief
+///   The pqObjectInspector class is a model for an object's properties.
+///
+/// \date 11/7/2005
+
 #include "pqObjectInspector.h"
 
 #include "pqObjectInspectorItem.h"
@@ -200,24 +206,6 @@ Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
       flags |= Qt::ItemIsEditable;
     }
   return flags;
-}
-
-QString pqObjectInspector::getPropertyName(const QModelIndex &index) const
-{
-  if(index.isValid() && index.model() == this)
-    {
-    pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
-    if(item)
-      {
-      if(item->getParent())
-        return item->getParent()->getPropertyName();
-      else
-        return item->getPropertyName();
-      }
-    }
-
-  return QString();
 }
 
 QVariant pqObjectInspector::getDomain(const QModelIndex &index) const

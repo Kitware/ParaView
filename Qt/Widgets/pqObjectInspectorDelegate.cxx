@@ -1,4 +1,11 @@
 
+/// \file pqObjectInspectorDelegate.cxx
+/// \brief
+///   The pqObjectInspectorDelegate class is used to edit the
+///   pqObjectInspector model from the view.
+///
+/// \date 11/7/2005
+
 #include "pqObjectInspectorDelegate.h"
 
 #include "pqObjectInspector.h"

@@ -1,4 +1,11 @@
 
+/// \file pqObjectInspectorItem.h
+/// \brief
+///   The pqObjectInspectorItem class is used to represent an object
+///   property.
+///
+/// \date 11/7/2005
+
 #ifndef _pqObjectInspectorItem_h
 #define _pqObjectInspectorItem_h
 
@@ -10,6 +17,14 @@ class pqObjectInspectorItemInternal;
 class vtkSMProperty;
 
 
+/// \class pqObjectInspectorItem
+/// \brief
+///   The pqObjectInspectorItem class is used to represent an object
+///   property.
+///
+/// The pqObjectInspector contains a list of properties using this
+/// class. The pqObjectInspectorItem can be used to create a hierarchy
+/// of properties. This is used when a property contains a list of values.
 class pqObjectInspectorItem : public QObject
 {
   Q_OBJECT
@@ -17,48 +32,151 @@ class pqObjectInspectorItem : public QObject
   Q_PROPERTY(QVariant value READ getValue WRITE setValue)
 
 public:
+  /// \brief
+  ///   Creates a pqObjectInspectorItem instance.
+  /// \param parent The parent object.
   pqObjectInspectorItem(QObject *parent=0);
   ~pqObjectInspectorItem();
 
+  /// \name Property Information
+  //@{
+  /// \brief
+  ///   Gets the property name.
+  /// \return
+  ///   The name  of the property.
   const QString &getPropertyName() const {return this->Name;}
+
+  /// \brief
+  ///   Sets the property name.
+  /// \param name The name of the property.
   void setPropertyName(const QString &name);
 
+  /// \brief
+  ///   Gets the property value.
+  /// \return
+  ///   The value of the property.
   const QVariant &getValue() const {return this->Value;}
+
+  /// \brief
+  ///   Sets the property value.
+  /// \param value The value of the property.
   void setValue(const QVariant &value);
 
+  /// \brief
+  ///   Gets the property domain.
+  /// \return
+  ///   The domain of the property.
   const QVariant &getDomain() const {return this->Domain;}
+
+  /// \brief
+  ///   Sets the property domain.
+  /// \param domain The domain of the property.
+  /// \sa pqObjectInspectorItem::updateDomain(vtkSMProperty *)
   void setDomain(const QVariant &domain) {this->Domain = domain;}
 
+  /// \brief
+  ///   Gets whether or not the property has been modified by the user.
+  /// return
+  ///   True if the property has been modified by the user.
+  bool isModified() const {return this->Modified;}
+
+  /// \brief
+  ///   Sets whether or not the property has been modified by the user.
+  /// \param modified True if the property has been modified by the user.
+  void setModified(bool modified) {this->Modified = modified;}
+  //@}
+
+  /// \name Hierarchy Methods
+  //@{
+  /// \brief
+  ///   Gets the number of child items.
+  /// \return
+  ///   The number of child items.
   int getChildCount() const;
+
+  /// \brief
+  ///   Gets the index of a specific child item.
+  /// \return
+  ///   The index of the child item. -1 if it doesn't exist.
   int getChildIndex(pqObjectInspectorItem *child) const;
+
+  /// \brief
+  ///   Gets the child item at a specific index.
+  /// \return
+  ///   A pointer to the child at the given index.
   pqObjectInspectorItem *getChild(int index) const;
 
+  /// \brief
+  ///   Clears the list of child items.
+  ///
+  /// The child items will be deleted before removing them from the
+  /// list.
   void clearChildren();
+
+  /// \brief
+  ///   Adds an item to the list of children.
+  /// \param child The item to add to the list.
   void addChild(pqObjectInspectorItem *child);
 
+  /// \brief
+  ///   Gets the parent of this item.
+  /// \return
+  ///   A pointer to the parent item or null if there is no parent.
   pqObjectInspectorItem *getParent() const {return this->Parent;}
-  void setParent(pqObjectInspectorItem *parent) {this->Parent = parent;}
 
-  bool isModified() const {return this->Modified;}
-  void setModified(bool modified) {this->Modified = modified;}
+  /// \brief
+  ///   Sets the parent of this item.
+  /// \param parent The new parent of this item.
+  void setParent(pqObjectInspectorItem *parent) {this->Parent = parent;}
+  //@}
 
 public slots:
+  /// \brief
+  ///   Updates the property domain information.
+  ///
+  /// The \c property parameter is used to get the domain information.
+  /// The domain data is converted and stored for use in the item
+  /// delegate. The domain is used to determine an appropriate editor.
+  ///
+  /// \param property The property to get domain information from.
+  /// \sa pqObjectInspectorItem::convertLimit(const char *, int),
+  ///     pqObjectInspectorDelegate
   void updateDomain(vtkSMProperty *property);
 
 signals:
+  /// \brief
+  ///   Called when the property name changes.
+  /// \param item The instance being modified.
   void nameChanged(pqObjectInspectorItem *item);
+
+  /// \brief
+  ///   Called when the property value changes.
+  /// \param item The instance being modified.
   void valueChanged(pqObjectInspectorItem *item);
 
 private:
+  /// \brief
+  ///   Converts a min/max limit from a property.
+  ///
+  /// The property returns the limit as a string. This method converts
+  /// the string to a value based on the type of value (int or double).
+  /// If the string is empty (meaning there is no limit), an invalid
+  /// value is returned.
+  ///
+  /// \param limit The min/max limit string to be converted.
+  /// \param type The value type.
+  /// \return
+  ///   The converted value of the limit string.
+  /// \sa pqObjectInspectorItem::updateDomain(vtkSMProperty *)
   QVariant convertLimit(const char *limit, int type) const;
 
 private:
-  QString Name;
-  QVariant Value;
-  QVariant Domain;
-  pqObjectInspectorItemInternal *Internal;
-  pqObjectInspectorItem *Parent;
-  bool Modified;
+  QString Name;                            ///< The property name.
+  QVariant Value;                          ///< The property value.
+  QVariant Domain;                         ///< The property domain.
+  pqObjectInspectorItemInternal *Internal; ///< The list of child items.
+  pqObjectInspectorItem *Parent;           ///< A pointer to the parent.
+  bool Modified;                           ///< True if the item is modified.
 };
 
 

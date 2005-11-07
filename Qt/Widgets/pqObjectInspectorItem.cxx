@@ -1,4 +1,11 @@
 
+/// \file pqObjectInspectorItem.cxx
+/// \brief
+///   The pqObjectInspectorItem class is used to represent an object
+///   property.
+///
+/// \date 11/7/2005
+
 #include "pqObjectInspectorItem.h"
 
 #include "vtkSMProperty.h"
