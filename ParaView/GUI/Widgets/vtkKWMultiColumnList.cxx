@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.36");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2183,6 +2183,7 @@ const char* vtkKWMultiColumnList::GetCellWindowWidgetName(int row_index,
 void vtkKWMultiColumnList::SetCellWindowCommandToCheckButton(
   int row_index, int col_index)
 {
+  this->SetCellWindowCommand(row_index, col_index, NULL, NULL);
   this->SetCellWindowCommand(
     row_index, col_index, this, "CellWindowCommandToCheckButtonCallback");
   this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
@@ -2237,6 +2238,7 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonSelectCallback(
 void vtkKWMultiColumnList::SetCellWindowCommandToColorButton(
   int row_index, int col_index)
 {
+  this->SetCellWindowCommand(row_index, col_index, NULL, NULL);
   this->SetCellWindowCommand(
     row_index, col_index, this, "CellWindowCommandToColorButtonCallback");
   this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
