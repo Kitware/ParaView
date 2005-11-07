@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.13");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1648,6 +1648,7 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
     child->SetHeight(this->ThumbnailSize);
     child->SetBackgroundColor(list->GetCellCurrentBackgroundColor(
                                 row, this->GetThumbnailColumnIndex()));
+    child->SetEnabled(list->GetEnabled());
 
     vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
     if (thumbnail)
