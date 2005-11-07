@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.37");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2139,8 +2139,8 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
           if (grand_child)
             {
             is_frame = vtkKWFrame::SafeDownCast(grand_child) ? 1 : 0;
-            int is_check = (vtkKWCheckButton::SafeDownCast(child) || 
-                            vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
+            is_check = (vtkKWCheckButton::SafeDownCast(child) || 
+                        vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
             grand_child->SetBackgroundColor(br, bg, bb);
             if (!is_frame && !is_check)
               {
