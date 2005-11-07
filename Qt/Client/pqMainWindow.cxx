@@ -7,8 +7,11 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqAboutDialog.h"
 #include "pqCommandDispatcher.h"
 #include "pqCommandDispatcherManager.h"
+#include "pqConfig.h"
+#include "pqConnect.h"
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
@@ -20,9 +23,9 @@
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqSetData.h"
+#include "pqSetName.h"
 #include "pqSMAdaptor.h"
-#include "ui_pqAbout.h"
-#include "pqConfig.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -50,26 +53,10 @@
 #include <QVTKWidget.h>
 
 #ifdef PARAQ_BUILD_TESTING
+#include <pqEventPlayer.h>
+#include <pqEventPlayerXML.h>
 #include <pqRecordEventsDialog.h>
 #endif // PARAQ_BUILD_TESTING
-
-namespace
-{
-
-struct pqSetName
-{
-  pqSetName(const vtkstd::string& Name) : name(Name) {}
-  const vtkstd::string name;
-};
-
-template<typename T>
-T* operator<<(T* LHS, const pqSetName& RHS)
-{
-  LHS->setObjectName(RHS.name.c_str());
-  return LHS;
-}
-
-} // namespace
 
 pqMainWindow::pqMainWindow() :
   CurrentServer(0),
@@ -85,64 +72,76 @@ pqMainWindow::pqMainWindow() :
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
 
-  QAction* const fileNewAction = new QAction(tr("New..."), this) << pqSetName("fileNewAction");
-  QObject::connect(fileNewAction, SIGNAL(triggered()), this, SLOT(onFileNew()));
-
-  QAction* const fileOpenAction = new QAction(tr("Open..."), this) << pqSetName("fileOpenAction");
-  QObject::connect(fileOpenAction, SIGNAL(triggered()), this, SLOT(onFileOpen()));
-
-  QAction* const fileOpenServerStateAction = new QAction(tr("Open Server State"), this) << pqSetName("fileOpenServerStateAction");
-  QObject::connect(fileOpenServerStateAction, SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
-
-  QAction* const fileSaveServerStateAction = new QAction(tr("Save Server State"), this) << pqSetName("fileSaveServerStateAction");
-  QObject::connect(fileSaveServerStateAction, SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
-
-  QAction* const fileQuitAction = new QAction(tr("Quit"), this) << pqSetName("fileQuitAction");
-  QObject::connect(fileQuitAction, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
-
-  QAction* const serverConnectAction = new QAction(tr("Connect..."), this) << pqSetName("serverConnectAction");
-  QObject::connect(serverConnectAction, SIGNAL(triggered()), this, SLOT(onServerConnect()));
-
-  this->ServerDisconnectAction = new QAction(tr("Disconnect"), this) << pqSetName("serverDisconnectAction");
-  QObject::connect(this->ServerDisconnectAction, SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
-
   this->menuBar() << pqSetName("menuBar");
 
-  QMenu* const fileMenu = this->menuBar()->addMenu(tr("File")) << pqSetName("fileMenu");
-  fileMenu->addAction(fileNewAction);
-  fileMenu->addAction(fileOpenAction);
-  fileMenu->addAction(fileSaveServerStateAction);
-  fileMenu->addAction(fileQuitAction);
+  // File menu.
+  QMenu* const fileMenu = this->menuBar()->addMenu(tr("File"))
+    << pqSetName("fileMenu");
   
-  QMenu* const serverMenu = this->menuBar()->addMenu(tr("Server")) << pqSetName("serverMenu");
-  serverMenu->addAction(serverConnectAction);
-  serverMenu->addAction(this->ServerDisconnectAction);
+  fileMenu->addAction(tr("New..."))
+    << pqSetName("New")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileNew()));
+    
+  fileMenu->addAction(tr("Open..."))
+    << pqSetName("Open")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpen()));
+    
+  fileMenu->addAction(tr("Save Server State..."))
+    << pqSetName("SaveServerState")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
+    
+  fileMenu->addAction(tr("Quit"))
+    << pqSetName("Quit")
+    << pqConnect(SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 
-  this->SourcesMenu = this->menuBar()->addMenu(tr("Sources")) << pqSetName("sourcesMenu");
-  this->FiltersMenu = this->menuBar()->addMenu(tr("Filters")) << pqSetName("filtersMenu");
+  // Server menu.
+  QMenu* const serverMenu = this->menuBar()->addMenu(tr("Server"))
+    << pqSetName("serverMenu");
+  
+  serverMenu->addAction(tr("Connect..."))
+    << pqSetName("Connect")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onServerConnect()));
+
+  this->ServerDisconnectAction = serverMenu->addAction(tr("Disconnect"))
+    << pqSetName("Disconnect")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onServerDisconnect()));    
+
+  // Sources & Filters menus.
+  this->SourcesMenu = this->menuBar()->addMenu(tr("Sources"))
+    << pqSetName("sourcesMenu")
+    << pqConnect(SIGNAL(triggered(QAction*)), this, SLOT(onCreateSource(QAction*)));
+    
+  this->FiltersMenu = this->menuBar()->addMenu(tr("Filters"))
+    << pqSetName("filtersMenu")
+    << pqConnect(SIGNAL(triggered(QAction*)), this, SLOT(onCreateFilter(QAction*)));
+  
   QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesFiltersMenu()));
-  QObject::connect(this->SourcesMenu, SIGNAL(triggered(QAction*)), this, SLOT(onCreateSource(QAction*)));
-  QObject::connect(this->FiltersMenu, SIGNAL(triggered(QAction*)), this, SLOT(onCreateFilter(QAction*)));
 
-  // Test menu
 #ifdef PARAQ_BUILD_TESTING
-
-  QAction* const testRecordAction = new QAction(tr("Record"), this) << pqSetName("testRecordAction");
-  QObject::connect(testRecordAction, SIGNAL(triggered()), this, SLOT(onRecordTest()));
+  // Test menu.
+  QMenu* const testsMenu = this->menuBar()->addMenu(tr("Tests"))
+    << pqSetName("testsMenu");
   
-  QMenu* const testsMenu = this->menuBar()->addMenu(tr("Tests")) << pqSetName("testsMenu");
-  testsMenu->addAction(testRecordAction);
-
+  testsMenu->addAction(tr("Record"))
+    << pqSetName("Record")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTest()));
+    
+  testsMenu->addAction(tr("Play"))
+    << pqSetName("Play")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
+    
 #endif // PARAQ_BUILD_TESTING
   
-  // keep help last
-  QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help")) << pqSetName("helpMenu");
-  QAction* aboutAction = new QAction(tr("About") + " " + tr("ParaQ") + " " + QT_CLIENT_VERSION, this) << pqSetName("aboutAction");
-  QObject::connect(aboutAction, SIGNAL(triggered()), this, SLOT(onHelpAbout()));
-  helpMenu->addAction(aboutAction);
+  // Help menu.
+  QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help"))
+    << pqSetName("helpMenu");
   
-  QObject::connect(&pqCommandDispatcherManager::Instance(), SIGNAL(updateWindows()), this, SLOT(onUpdateWindows()));
+  helpMenu->addAction(QString(tr("About %1 %2")).arg("ParaQ").arg(QT_CLIENT_VERSION))
+    << pqSetName("About")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onHelpAbout()));
  
+  // Setup the refresh toolbar.
+  QObject::connect(&pqCommandDispatcherManager::Instance(), SIGNAL(updateWindows()), this, SLOT(onUpdateWindows()));
   this->RefreshToolbar = new pqRefreshToolbar(this);
   this->addToolBar(this->RefreshToolbar);
 
@@ -369,52 +368,38 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
     for(int i=0; i<numFilters; i++)
       {
       const char* proxyName = manager->GetProxyName("filters_prototypes",i);
-      QAction* action = this->FiltersMenu->addAction(proxyName);
-      action->setData(proxyName);
+      this->FiltersMenu->addAction(proxyName) << pqSetName(proxyName) << pqSetData(proxyName);
       }
 
 #if 1
     // hard code sources
-    QAction* action = this->SourcesMenu->addAction("2D Glyph");
-    action->setData("GlyphSource2D");
-    action = this->SourcesMenu->addAction("3D Text");
-    action->setData("VectorText");
-    action = this->SourcesMenu->addAction("Arrow");
-    action->setData("ArrowSource");
-    action = this->SourcesMenu->addAction("Axes");
-    action->setData("Axes");
-    action = this->SourcesMenu->addAction("Box");
-    action->setData("CubeSource");
-    action = this->SourcesMenu->addAction("Cone");
-    action->setData("ConeSource");
-    action = this->SourcesMenu->addAction("Cylinder");
-    action->setData("CylinderSource");
-    action = this->SourcesMenu->addAction("Hierarchical Fractal");
-    action->setData("HierarchicalFractal");
-    action = this->SourcesMenu->addAction("Line");
-    action->setData("LineSource");
-    action = this->SourcesMenu->addAction("Mandelbrot");
-    action->setData("ImageMandelbrotSource");
-    action = this->SourcesMenu->addAction("Plane");
-    action->setData("PlaneSource");
-    action = this->SourcesMenu->addAction("Sphere");
-    action->setData("SphereSource");
-    action = this->SourcesMenu->addAction("Superquadric");
-    action->setData("SuperquadricSource");
-    action = this->SourcesMenu->addAction("Wavelet");
-    action->setData("RTAnalyticSource");
+    this->SourcesMenu->addAction("2D Glyph") << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
+    this->SourcesMenu->addAction("3D Text") << pqSetName("3D Text") << pqSetData("VectorText");
+    this->SourcesMenu->addAction("Arrow") << pqSetName("Arrow") << pqSetData("ArrowSource");
+    this->SourcesMenu->addAction("Axes") << pqSetName("Axes") << pqSetData("Axes");
+    this->SourcesMenu->addAction("Box") << pqSetName("Box") << pqSetData("CubeSource");
+    this->SourcesMenu->addAction("Cone") << pqSetName("Cone") << pqSetData("ConeSource");
+    this->SourcesMenu->addAction("Cylinder") << pqSetName("Cylinder") << pqSetData("CylinderSource");
+    this->SourcesMenu->addAction("Hierarchical Fractal") << pqSetName("Hierarchical Fractal") << pqSetData("HierarchicalFractal");
+    this->SourcesMenu->addAction("Line") << pqSetName("Line") << pqSetData("LineSource");
+    this->SourcesMenu->addAction("Mandelbrot") << pqSetName("Mandelbrot") << pqSetData("ImageMandelbrotSource");
+    this->SourcesMenu->addAction("Plane") << pqSetName("Plane") << pqSetData("PlaneSource");
+    this->SourcesMenu->addAction("Sphere") << pqSetName("Sphere") << pqSetData("SphereSource");
+    this->SourcesMenu->addAction("Superquadric") << pqSetName("Superquadric") << pqSetData("SuperquadricSource");
+    this->SourcesMenu->addAction("Wavelet") << pqSetName("Wavelet") << pqSetData("RTAnalyticSource");
 #else
     manager->InstantiateGroupPrototypes("sources");
     int numSources = manager->GetNumberOfProxies("sources_prototypes");
     for(int i=0; i<numSources; i++)
       {
       const char* proxyName = manager->GetProxyName("sources_prototypes",i);
-      QAction* action = this->SourcesMenu->addAction(proxyName);
-      action->setData(proxyName);
+      this->SourcesMenu->addAction(proxyName) << pqSetName(proxyName) << pqSetData(proxyName);
       }
 #endif
     }
-} void pqMainWindow::onCreateSource(QAction* action)
+}
+
+void pqMainWindow::onCreateSource(QAction* action)
 {
   if(!action)
     return;
@@ -456,10 +441,8 @@ void pqMainWindow::onCreateFilter(QAction* action)
 
 void pqMainWindow::onHelpAbout()
 {
-  QDialog about(this);
-  Ui::pqAboutDialog ui;
-  ui.setupUi(&about);
-  about.exec();
+  pqAboutDialog* const dialog = new pqAboutDialog(this);
+  dialog->show();
 }
 
 void pqMainWindow::onRecordTest()
@@ -470,7 +453,7 @@ void pqMainWindow::onRecordTest()
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
   
-#endif //PARAQ_BUILD_TESTING
+#endif // PARAQ_BUILD_TESTING
 }
 
 void pqMainWindow::onRecordTest(const QStringList& Files)
@@ -483,5 +466,33 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
     dialog->show();
     }
   
-#endif //PARAQ_BUILD_TESTING
+#endif // PARAQ_BUILD_TESTING
 }
+
+void pqMainWindow::onPlayTest()
+{
+#ifdef PARAQ_BUILD_TESTING
+
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
+  file_dialog->show();
+  
+#endif // PARAQ_BUILD_TESTING
+}
+
+void pqMainWindow::onPlayTest(const QStringList& Files)
+{
+#ifdef PARAQ_BUILD_TESTING
+
+  pqEventPlayer player(*this);
+  player.addDefaultWidgetEventPlayers();
+
+  for(int i = 0; i != Files.size(); ++i)
+    {
+      pqEventPlayerXML xml_player;
+      xml_player.playXML(player, Files[i]);
+    }
+
+#endif // PARAQ_BUILD_TESTING
+}
+

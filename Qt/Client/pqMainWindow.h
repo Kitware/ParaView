@@ -80,6 +80,8 @@ private slots:
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);
+  void onPlayTest();
+  void onPlayTest(const QStringList& Files);
 };
 
 #endif // !_pqMainWindow_h

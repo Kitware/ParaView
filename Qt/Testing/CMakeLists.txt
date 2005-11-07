@@ -57,6 +57,8 @@ ADD_LIBRARY(QtTesting
   pqEventObserverXML.h
   pqEventPlayer.cxx
   pqEventPlayer.h
+  pqEventPlayerXML.cxx
+  pqEventPlayerXML.h
   pqEventTranslator.cxx
   pqEventTranslator.h
   pqLineEditEventTranslator.cxx
@@ -79,5 +81,6 @@ ADD_LIBRARY(QtTesting
 
 TARGET_LINK_LIBRARIES(QtTesting
   ${QT_LIBRARIES}
+  ${QT_XML_LIBRARIES}
 )
 

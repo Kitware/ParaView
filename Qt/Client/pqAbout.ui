@@ -23,6 +23,9 @@
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
+  <property name="modal" >
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" >
    <property name="margin" >
     <number>8</number>

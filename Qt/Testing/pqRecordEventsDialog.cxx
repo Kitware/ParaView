@@ -47,7 +47,7 @@ pqRecordEventsDialog::pqRecordEventsDialog(const QString& Path, QWidget* Parent)
   this->Ui.label->setText(QString(tr("Recording User Input to %1")).arg(Path));
   
   this->setWindowTitle(tr("Recording User Input"));
-  this->setObjectName("RecordEventsDialog");
+  this->setObjectName("");
 }
 
 pqRecordEventsDialog::~pqRecordEventsDialog()

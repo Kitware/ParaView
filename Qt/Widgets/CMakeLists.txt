@@ -37,7 +37,9 @@ ADD_LIBRARY(QtWidgets
   pqCommandDispatcher.h
   pqCommandDispatcherManager.cxx
   pqCommandDispatcherManager.h
-  pqCommand.h  
+  pqCommand.h
+  pqConnect.cxx
+  pqConnect.h
   pqExplicitCommandDispatcher.cxx
   pqExplicitCommandDispatcher.h
   pqFileDialog.cxx
@@ -68,6 +70,10 @@ ADD_LIBRARY(QtWidgets
   pqServerBrowser.h
   pqServerFileDialogModel.cxx
   pqServerFileDialogModel.h
+  pqSetData.cxx
+  pqSetData.h
+  pqSetName.cxx
+  pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.cxx

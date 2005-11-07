@@ -24,12 +24,10 @@ pqEventObserverXML::~pqEventObserverXML()
 void pqEventObserverXML::onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments)
 {
   this->Stream
-    << "\t<pqevent><widget>"
-    << Widget.toAscii().data()
-    << "</widget><command>"
-    << Command.toAscii().data()
-    << "</command><arguments>"
-    << Arguments.toAscii().data()
-    << "</arguments></pqevent>\n";
+    << "\t<pqevent "
+    << "object=\"" << Widget.toAscii().data() << "\" "
+    << "command=\"" << Command.toAscii().data() << "\" "
+    << "arguments=\"" << Arguments.toAscii().data() << "\" "
+    << "/>\n";
 }
 

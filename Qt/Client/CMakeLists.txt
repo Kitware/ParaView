@@ -1,4 +1,3 @@
-
 PROJECT(QtClient)
 
 SET(QT_CLIENT_VERSION_MAJOR 0)
@@ -19,6 +18,7 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqAboutDialog.h
   pqMainWindow.h
 )
 
@@ -36,6 +36,8 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   main.cxx
+  pqAboutDialog.cxx
+  pqAboutDialog.h
   pqMainWindow.cxx
   pqMainWindow.h
   ${MOC_BUILT_SOURCES}

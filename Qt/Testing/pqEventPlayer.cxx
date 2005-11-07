@@ -17,10 +17,13 @@
 
 #include <QCoreApplication>
 #include <QObject>
+#include <QStringList>
+#include <QtDebug>
 
 namespace
 {
 
+/*
 /// Given a Qt object, lookup a child object by name, assuming that all names are unique
 QObject* pqFindObjectByName(QObject& Object, const QString& Name)
 {
@@ -35,6 +38,21 @@ QObject* pqFindObjectByName(QObject& Object, const QString& Name)
     }
 
   return 0;       
+}
+*/
+
+/// Given a slash-delimited "path", lookup a Qt object hierarchically
+QObject* pqFindObjectByTree(QObject& Root, const QString& Path)
+{
+  QObject* object = &Root;
+  const QStringList paths = Path.split("/");
+  for(int i = 1; i < paths.size(); ++i) // Note - we're ignoring the top-level path, since it already represents the root node
+    {
+    if(object)
+      object = object->findChild<QObject*>(paths[i]);
+    }  
+  
+  return object;
 }
 
 } // namespace
@@ -69,16 +87,20 @@ void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
 
 bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, const QString& Arguments)
 {
-  QObject* object = pqFindObjectByName(RootObject, Object);
+  QObject* object = pqFindObjectByTree(RootObject, Object);
   if(!object)
+    {
+    qCritical() << "could not locate object " << Object;
     return false;
+    }
 
   for(int i = 0; i != this->Players.size(); ++i)
     {
     if(this->Players[i]->playEvent(object, Command, Arguments))
       return true;
     }
-    
+
+  qCritical() << "no player for object " << object;
   return false;
 }
 
