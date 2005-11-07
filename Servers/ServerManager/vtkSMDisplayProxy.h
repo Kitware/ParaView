@@ -59,6 +59,13 @@ public:
   // Description:
   // Called to update the Display. Default implementation does nothing.
   virtual void Update() { }
+
+  // Description:
+  // When doing an ordered composite, some displays will need to run extra
+  // filters that redistribute or clip their data before a render occurs.
+  // This method makes sure that the distributed data is up to date.  The
+  // default implementation just calls Update().
+  virtual void UpdateDistributedGeometry() { this->Update(); }
   
   // Description:
   // Convenience method to get/set Visibility property.

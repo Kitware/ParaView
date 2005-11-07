@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.16");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -575,7 +575,9 @@ void vtkSMRenderModuleProxy::UpdateAllDisplays()
       // Some displays don't need updating.
       continue;
       }
-    disp->Update();
+    // In case of ordered compositing, make sure any distributed geometry is up
+    // to date.
+    disp->UpdateDistributedGeometry();
     // We don;t use properties here since it tends to slow things down.
     }
   iter->Delete();  
