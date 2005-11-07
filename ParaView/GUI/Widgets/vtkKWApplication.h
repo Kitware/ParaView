@@ -402,6 +402,10 @@ public:
   static const char *PrintTargetDPIRegKey;
   //ETX
 
+  // Description:
+  // Callbacks
+  virtual void TclBgErrorCallback(const char* message);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
