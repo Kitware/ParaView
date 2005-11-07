@@ -40,8 +40,6 @@ public:
 
   virtual void StillRender();
 
-  virtual void UpdateAllDisplays();
-
 protected:
   vtkSMIceTDesktopRenderModuleProxy();
   ~vtkSMIceTDesktopRenderModuleProxy();

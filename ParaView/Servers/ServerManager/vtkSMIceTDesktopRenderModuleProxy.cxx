@@ -30,7 +30,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.8");
 
 //-----------------------------------------------------------------------------
 class vtkSMIceTDesktopRenderModuleProxyProxySet
@@ -488,33 +488,6 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
     }
 
   this->Superclass::StillRender();
-}
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderModuleProxy::UpdateAllDisplays()
-{
-  if (this->OrderedCompositing)
-    {
-    // Make sure the distribution is up to date.
-    vtkObject *obj;
-    vtkCollectionSimpleIterator cookie;
-    this->Displays->InitTraversal(cookie);
-    for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
-         obj = this->Displays->GetNextItemAsObject(cookie))
-      {
-      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
-      if (disp && disp->GetVisibilityCM())
-        {
-        vtkSMProperty *p = disp->GetProperty("UpdateDistributedGeometry");
-        if (p)
-          {
-          p->Modified();
-          }
-        disp->UpdateVTKObjects();
-        }
-      }
-    }
-
-  this->Superclass::UpdateAllDisplays();
 }
 
 //-----------------------------------------------------------------------------
