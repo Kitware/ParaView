@@ -12,9 +12,10 @@ KWConvertImageToHeader --zlib --base64 \
     angle_tool.png \
     bounding_box.png \
     color_bar_annotation.png \
+    color_squares.png \
     connection.png \
-    corner_annotation.png \
     contour_tool.png \
+    corner_annotation.png \
     distance_tool.png \
     document.png \
     empty_16x16.png \

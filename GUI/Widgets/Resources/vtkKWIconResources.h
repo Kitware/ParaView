@@ -45,6 +45,20 @@ static const unsigned char image_color_bar_annotation[] =
 
 /* 
  * Resource generated for file:
+ *    color_squares.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_color_squares_width          = 16;
+static const unsigned int  image_color_squares_height         = 16;
+static const unsigned int  image_color_squares_pixel_size     = 4;
+static const unsigned long image_color_squares_length         = 112;
+static const unsigned long image_color_squares_decoded_length = 1024;
+
+static const unsigned char image_color_squares[] = 
+  "eNpjYGD4z0AGBgIQwQBmNzSg4G1AMWTMcMYYFQPFGkBqh4v+/w0oGM04YEDNRMXDTH8Dmg"
+  "n/GxhQMEgtMh5u+snBMP0gjG4+sRimnxIMAMWCXb0=";
+
+/* 
+ * Resource generated for file:
  *    connection.png (zlib, base64) (image file)
  */
 static const unsigned int  image_connection_width          = 16;
@@ -57,19 +71,6 @@ static const unsigned char image_connection[] =
   "eNq9kgEOgDAIA3mgj+Jp/Axlc0nDcAxjjLlE2brUtapKzKwRqgfldH17uWnfRL/qPahf/Z"
   "PNRGQCz8A9/qzu/XqYHj2g3mYGro9ZhF9H3/t3NPOl/k1/vL6af0Ufecr8e32U/8ix0h+f"
   "5U5/ovyx/1l/VpyvmjtU";
-
-/* 
- * Resource generated for file:
- *    corner_annotation.png (zlib, base64) (image file)
- */
-static const unsigned int  image_corner_annotation_width          = 16;
-static const unsigned int  image_corner_annotation_height         = 16;
-static const unsigned int  image_corner_annotation_pixel_size     = 3;
-static const unsigned long image_corner_annotation_length         = 52;
-static const unsigned long image_corner_annotation_decoded_length = 768;
-
-static const unsigned char image_corner_annotation[] = 
-  "eNpjYCAZPH1wg0gEV49LO5o42epJdc+oeuqqH1TxSxIAAOVLrKQ=";
 
 /* 
  * Resource generated for file:
@@ -89,6 +90,19 @@ static const unsigned char image_contour_tool[] =
   "vxkgeZA6bPEIBIsm9nXi1Hvl/In/C+fO+M8gefE9jnh3s7e1hqvfv3vL/77utv/hoUH/1V"
   "RVIGlI8tI7BpnXV3HlDVC8Ojna/+fl4QGpvwrE84A4EYi1COUrSJ55dwlsPgMDH7n5jlQ9"
   "APFsqHM=";
+
+/* 
+ * Resource generated for file:
+ *    corner_annotation.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_corner_annotation_width          = 16;
+static const unsigned int  image_corner_annotation_height         = 16;
+static const unsigned int  image_corner_annotation_pixel_size     = 3;
+static const unsigned long image_corner_annotation_length         = 52;
+static const unsigned long image_corner_annotation_decoded_length = 768;
+
+static const unsigned char image_corner_annotation[] = 
+  "eNpjYCAZPH1wg0gEV49LO5o42epJdc+oeuqqH1TxSxIAAOVLrKQ=";
 
 /* 
  * Resource generated for file:
