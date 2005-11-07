@@ -184,8 +184,6 @@ public:
   static const char* const ExitProc;
   //ETX
 
-  void DisplayTCLError(const char* message);
-
   // Description: 
   // Set or get the display 3D widgets flag.  When this flag is set,
   // the 3D widgets will be displayed when they are created. Otherwise
