@@ -40,10 +40,10 @@ void pqServerBrowser::accept()
   switch(this->Ui.serverType->currentIndex())
     {
     case 0:
-      server = pqServer::Standalone();
+      server = pqServer::standalone();
       break;
     case 1:
-      server = pqServer::Connect(this->Ui.hostName->text().toAscii().data(), this->Ui.portNumber->value());
+      server = pqServer::connect(this->Ui.hostName->text().toAscii().data(), this->Ui.portNumber->value());
       break;
     default:
       QMessageBox::critical(this, tr("Pick Server:"), tr("Internal error: unknown server type"));

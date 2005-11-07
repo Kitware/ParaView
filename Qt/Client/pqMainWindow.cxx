@@ -26,6 +26,7 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
+#include "pqPipelineData.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -212,13 +213,13 @@ void pqMainWindow::setServer(pqServer* Server)
     this->Window = new QVTKWidget(this);
     this->setCentralWidget(this->Window);
 
-    vtkRenderWindow* const rw = Server->GetRenderModule()->GetRenderWindow();
+    vtkRenderWindow* const rw = Server->renderModule()->GetRenderWindow();
     this->Window->SetRenderWindow(rw);
     this->Window->update();
 
     pqRenderViewProxy* proxy = pqRenderViewProxy::New();
-    proxy->SetRenderModule(Server->GetRenderModule());
-    vtkPVGenericRenderWindowInteractor* interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(Server->GetRenderModule()->GetInteractor());
+    proxy->SetRenderModule(Server->renderModule());
+    vtkPVGenericRenderWindowInteractor* interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(Server->renderModule()->GetInteractor());
     interactor->SetPVRenderView(proxy);
     proxy->Delete();
     interactor->Enable();
@@ -258,7 +259,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 {
   setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->processModule()), tr("Open File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
 }
@@ -269,8 +270,8 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     {
     QString file = Files[i];
     
-    vtkSMProxy* const source = this->CurrentServer->GetProxyManager()->NewProxy("sources", "ExodusReader");
-    this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
+    vtkSMProxy* source = this->CurrentServer->pipelineData()->newSMProxy("sources", "ExodusReader");
+    this->CurrentServer->proxyManager()->RegisterProxy("paraq", "source1", source);
     source->Delete();
     Adaptor->setProperty(source->GetProperty("FileName"), file);
     Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
@@ -278,9 +279,11 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     source->UpdateVTKObjects();
     
     pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
+    if(this->Inspector)
+      this->Inspector->setProxy(this->Adaptor, source);
     }
 
-  this->CurrentServer->GetRenderModule()->ResetCamera();
+  this->CurrentServer->renderModule()->ResetCamera();
   this->Window->update();
 }
 
@@ -297,7 +300,7 @@ void pqMainWindow::onFileOpenServerState(pqServer* Server)
 {
   setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->processModule()), tr("Open Server State File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(pnFileOpenServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -325,7 +328,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     {
     ofstream file(Files[i].toAscii().data());
     file << "<ServerState>" << "\n";
-    this->CurrentServer->GetProxyManager()->SaveState("test", &file, 0);
+    this->CurrentServer->proxyManager()->SaveState("test", &file, 0);
     file << "</ServerState>" << "\n";
     }
 }
@@ -352,7 +355,7 @@ void pqMainWindow::onServerDisconnect()
 void pqMainWindow::onUpdateWindows()
 {
   if(this->CurrentServer)
-    this->CurrentServer->GetRenderModule()->StillRender();
+    this->CurrentServer->renderModule()->StillRender();
 }
 
 void pqMainWindow::onUpdateSourcesFiltersMenu()
@@ -362,7 +365,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
 
   if(this->CurrentServer)
     {
-    vtkSMProxyManager* manager = this->CurrentServer->GetProxyManager();
+    vtkSMProxyManager* manager = this->CurrentServer->proxyManager();
     manager->InstantiateGroupPrototypes("filters");
     int numFilters = manager->GetNumberOfProxies("filters_prototypes");
     for(int i=0; i<numFilters; i++)
@@ -406,15 +409,13 @@ void pqMainWindow::onCreateSource(QAction* action)
 
   QByteArray sourceName = action->data().toString().toAscii();
 
-  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("sources", sourceName.data());
-  source->UpdateVTKObjects();
-  this->CurrentSourceProxy = vtkSMSourceProxy::SafeDownCast(source);
-  emit newSourceProxy(this->CurrentSourceProxy);
+  vtkSMProxy* source = this->CurrentServer->pipelineData()->newSMProxy("sources", sourceName);
+  
   //TEMP
   if(this->Inspector)
-    this->Inspector->setProxy(this->Adaptor, this->CurrentSourceProxy);
+    this->Inspector->setProxy(this->Adaptor, source);
   pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
-  this->CurrentServer->GetRenderModule()->ResetCamera();
+  this->CurrentServer->renderModule()->ResetCamera();
   this->Window->update();
 }
 
@@ -425,17 +426,15 @@ void pqMainWindow::onCreateFilter(QAction* action)
   
   QByteArray filterName = action->data().toString().toAscii();
 
-  vtkSMProxy* source = this->CurrentServer->GetProxyManager()->NewProxy("filters", filterName.data());
-  source->UpdateVTKObjects();
+  vtkSMSourceProxy* cp = this->CurrentServer->pipelineData()->currentProxy();
+  vtkSMProxy* source = this->CurrentServer->pipelineData()->newSMProxy("filters", filterName);
   vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
-  vtkSMProxyProperty::SafeDownCast(sp->GetProperty("Input"))->AddProxy(this->CurrentSourceProxy);
-  this->CurrentSourceProxy = sp;
-  emit newSourceProxy(this->CurrentSourceProxy);
+  this->CurrentServer->pipelineData()->addInput(sp, cp);
   //TEMP
   if(this->Inspector)
-    this->Inspector->setProxy(this->Adaptor, this->CurrentSourceProxy);
-  pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
-  this->CurrentServer->GetRenderModule()->ResetCamera();
+    this->Inspector->setProxy(this->Adaptor, sp);
+  pqAddPart(this->CurrentServer, sp);
+  this->CurrentServer->renderModule()->ResetCamera();
   this->Window->update();
 }
 

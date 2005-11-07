@@ -11,26 +11,29 @@
 #define _pqServer_h
 
 class pqOptions;
+class pqPipelineData;
 class vtkProcessModule;
 class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMRenderModuleProxy;
 
 #include <string>
+#include <QObject>
 
 /// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
-class pqServer
+class pqServer : public QObject
 {
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure
-  static pqServer* Standalone();
+  static pqServer* standalone();
   /// Constructs a server connection to a remote host, returns NULL on failure
-  static pqServer* Connect(const char* const hostName, const int portNumber);
+  static pqServer* connect(const char* const hostName, const int portNumber);
   virtual ~pqServer();
 
-  vtkProcessModule* GetProcessModule();
-  vtkSMProxyManager* GetProxyManager();
-  vtkSMRenderModuleProxy* GetRenderModule();
+  vtkProcessModule* processModule();
+  vtkSMProxyManager* proxyManager();
+  vtkSMRenderModuleProxy* renderModule();
+  pqPipelineData* pipelineData();
 
 private:
   pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMRenderModuleProxy*);
@@ -41,6 +44,7 @@ private:
   vtkProcessModule* const ProcessModule;
   vtkSMApplication* const ServerManager;
   vtkSMRenderModuleProxy* const RenderModule;
+  pqPipelineData* PipelineData;
 };
 
 #endif // !_pqServer_h

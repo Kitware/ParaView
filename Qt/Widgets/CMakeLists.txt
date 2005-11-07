@@ -25,6 +25,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerFileDialogModel.h
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.h
+  pqPipelineData.h
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -78,6 +79,8 @@ ADD_LIBRARY(QtWidgets
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
+  pqPipelineData.cxx
+  pqPipelineData.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

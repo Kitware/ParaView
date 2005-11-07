@@ -38,7 +38,6 @@ public:
 
 signals:
   void serverChanged();
-  void newSourceProxy(vtkSMSourceProxy*);
   
 private:
   void setServer(pqServer* Server);
@@ -56,8 +55,6 @@ private:
   QDockWidget *InspectorDock;
   QTreeView *InspectorView;
 
-  vtkSMSourceProxy* CurrentSourceProxy;  // cheat for now until we do this the right way
-  
 private slots:
   void onFileNew();
   void onFileNew(pqServer* Server);

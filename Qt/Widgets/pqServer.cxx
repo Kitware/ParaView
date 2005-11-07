@@ -9,6 +9,7 @@
 
 #include "pqServer.h"
 #include "pqOptions.h"
+#include "pqPipelineData.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkProcessModuleGUIHelper.h>
@@ -203,7 +204,7 @@ void pqInitializeServer(pqOptions* options, vtkPVProcessModule*& process_module,
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
-pqServer* pqServer::Standalone()
+pqServer* pqServer::standalone()
 {
   if(vtkProcessModule::GetProcessModule())
     {
@@ -226,7 +227,7 @@ pqServer* pqServer::Standalone()
   return new pqServer(options, process_module, server_manager, render_module);
 }
 
-pqServer* pqServer::Connect(const char* const hostName, int portNumber)
+pqServer* pqServer::connect(const char* const hostName, int portNumber)
 {
   if(vtkProcessModule::GetProcessModule())
     {
@@ -257,6 +258,7 @@ pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMAp
   ServerManager(server_manager),
   RenderModule(render_module)
 {
+  this->PipelineData = new pqPipelineData(this);
 }
 
 pqServer::~pqServer()
@@ -274,18 +276,24 @@ pqServer::~pqServer()
   vtkProcessModule::SetProcessModule(0);
 }
 
-vtkProcessModule* pqServer::GetProcessModule()
+vtkProcessModule* pqServer::processModule()
 {
   return ProcessModule;
 }
 
-vtkSMProxyManager* pqServer::GetProxyManager()
+vtkSMProxyManager* pqServer::proxyManager()
 {
   return ServerManager->GetProxyManager();
 }
 
-vtkSMRenderModuleProxy* pqServer::GetRenderModule()
+vtkSMRenderModuleProxy* pqServer::renderModule()
 {
   return RenderModule;
 }
+
+pqPipelineData* pqServer::pipelineData()
+{
+  return PipelineData;
+}
+
 
