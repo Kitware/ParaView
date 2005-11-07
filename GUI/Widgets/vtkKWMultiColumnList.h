@@ -246,11 +246,14 @@ public:
   // Set/Get the type of the temporary embedded widget to be used for
   // interactive editing of the contents of the given column's cells.
   // It can be one of entry (which is the default), spinbox or checkbutton
-  // at the moment. This can be set at the cell level too.
-  // If set to anything other than entry, you should probably call
-  // SetColumnFormatCommandToEmptyOutput on this column too to prevent
-  // the actual text contents (i.e. the 0 or 1 value for a checkbutton for
-  // example) to display as text instead of as a checkbutton or spinbox, etc.
+  // at the moment. 
+  // This can be set at the cell level too (see SetCellEditWindow).
+  // Note that this setting controls the widget used for *editing*, not for
+  // display. The cell contents is still displayed using whatever text (see
+  // SetCellText), image (see SetCellImage) or custom window (see 
+  // SetCellWindowCommand) is defined at the cell level. Check the
+  // SetCellWindowCommandToCheckButton or SetCellWindowCommandToColorButton
+  // methods for more advanced display *and* editing features.
   //BTX
   enum 
   {
@@ -572,9 +575,9 @@ public:
   // a column, or inserting new rows, can change the position of the cell
   // in a stripe (see SetStripeBackgroundColor), it is best to:
   //   - use images that do not have an alpha component, or 
-  //   - set the cell image once all rows have been inserted,
-  //   - refresh the image periodically (or each time a row is added/removed)
-  //     see SetPotentialCellColorsChangedCommand
+  //   - refresh the image periodically (each time a row is added/removed)
+  //     also check SetPotentialCellColorsChangedCommand and
+  //     RefreshAllCellWindowCommands.
   virtual void SetCellImage(int row_index, int col_index, const char *);
   virtual void SetCellImageToIcon(
     int row_index, int col_index, vtkKWIcon *icon);
@@ -593,7 +596,13 @@ public:
   // containing the given cell, and may have the same values as its
   // column-related counterpart (see SetColumnEditWindow).
   // It can be one of entry (which is the default), spinbox or checkbutton
-  // at the moment. This can be set at the cell level too.
+  // at the moment.
+  // Note that this setting controls the widget used for *editing*, not for
+  // display. The cell contents is still displayed using whatever text (see
+  // SetCellText), image (see SetCellImage) or custom window (see 
+  // SetCellWindowCommand) is defined at the cell level. Check the
+  // SetCellWindowCommandToCheckButton or SetCellWindowCommandToColorButton
+  // methods for more advanced display *and* editing features.
   //BTX
   enum 
   {
@@ -622,8 +631,49 @@ public:
   // widget, the cell's row and column indices, as well as the path name of
   // the embedded window to be created, and the resulting script is evaluated
   // in the global scope.
+  // In most case, you should attempt to set the widget's background and
+  // foreground colors to match the cell's background and foreground colors
+  // (retrieve them using GetCellCurrentBackgroundColor and 
+  // GetCellCurrentForegroundColor). 
+  // Since the background and foreground colors of the cell change dynamically
+  // depending on the sorting order and the selected rows, you should set
+  // the SetPotentialCellColorsChangedCommand to this object's own
+  // RefreshColorsOfAllCellsWithWindowCommand method so that each time
+  // the cell colors change, this user-defined widget is refreshed.
+  // Also, if you have set a text contents in the same cell (using SetCellText)
+  // you may want to hide it automatically using 
+  // SetColumnFormatCommandToEmptyOutput.
   virtual void SetCellWindowCommand(
     int row_index, int col_index, vtkObject* object, const char *method);
+
+  // Description:
+  // The SetCellWindowCommandToCheckButton method is a very convenient
+  // way to automatically display a checkbutton in the cell. The selected
+  // state of the button is interpreted directly from the text in the cell
+  // (as set by SetCellText for example), and thus should be either 0 or 1.
+  // The editable flag of the cell is automatically set to 0, do
+  // not change it manually using SetCellEditable. 
+  // When the checkbutton selected state changes, the contents of
+  // the cell is updated automatically (to 0 or 1). Note that the
+  // EditEndCommand and CellUpdatedCommand are handled the same way.
+  // Check the SetCellWindowCommand method for more information.
+  virtual void SetCellWindowCommandToCheckButton(int row_index, int col_index);
+
+  // Description:
+  // The SetCellWindowCommandToColorButton method is a convenient
+  // way to automatically display a color button in the cell. The color of
+  // the button is interpreted directly from the text in the cell 
+  // (as set by SetCellText for example), provided it is a space separated
+  // list of 3 normalized floating point numbers representing the
+  // red, green and blue components of the color (ex: "1.0 0.2 0.6").
+  // When the color button is edited (if the column or cell is
+  // made editable), a color dialog pops up so that the user can pick
+  // a new color. The contents of the cell is updated automatically 
+  // with the new color value, as a similar space separated list of
+  // normalized R, G, B values. Note that the EditStartCommand, 
+  // EditEndCommand and CellUpdatedCommand are handled the same way.
+  // Check the SetCellWindowCommand method for more information.
+  virtual void SetCellWindowCommandToColorButton(int row_index, int col_index);
 
   // Description:
   // Specifies a Tcl command to be invoked when the window embedded into
@@ -657,6 +707,9 @@ public:
   // by GetCellCurrentBackgroundColor and its foreground color to the color
   // returned by GetCellCurrentForegroundColor. It then performs the same
   // for the first level children of the widget inside that cell.
+  // This can be useful when the cell contents is an image with an alpha
+  // channel (transparency), or a user-defined dynamic widget 
+  // (see SetCellWindowCommand)
   virtual void RefreshColorsOfCellWithWindowCommand(
     int row_index, int col_index);
   virtual void RefreshColorsOfAllCellsWithWindowCommand();
@@ -891,13 +944,20 @@ public:
     vtkObject* object, const char *method);
 
   // Description:
-  // Specifies a command to be invoked when the any change is made that
-  // can potentially affect the background color of a cell. 
+  // Specifies a command to be invoked when any change is made that
+  // can potentially affect the background color of a cell (selecting
+  // a cell, sorting a column, adding/removing rows, etc). 
   // This is useful if a user-defined dynamic widget created in a cell
+  // (using the SetCellWindowCommand methods)
   // is setting its own background color to match the background color
   // of a cell (using GetCellCurrentBackgroundColor). In that case,
-  // set this command to RefreshAllCellWindowCommands. 
+  // just set this command to RefreshColorsOfAllCellsWithWindowCommand. 
   virtual void SetPotentialCellColorsChangedCommand(
+    vtkObject* object, const char *method);
+
+  // Description:
+  // Specifies a command to be invoked when a column has been sorted. 
+  virtual void SetColumnSortedCommand(
     vtkObject* object, const char *method);
 
   // Description:
@@ -920,12 +980,15 @@ public:
   // return value becomes the cell's new contents after destroying the
   // temporary embedded widget. The main purpose of this script is to perform
   // a final validation of the edit window's contents and eventually reject
-  // the input by calling the RejectInput() method.
+  // the input by calling the RejectInput() method. Another purpose of thi
+  // command is to convert the edit window's text to the cell's new internal
+  // contents, which is necessary if, due to the SetColumnFormatCommand option
+  // the cell's internal value is different from its external representation. 
   // The next step (updating) is handled by SetCellUpdatedCommand (if any)
   virtual void SetEditEndCommand(vtkObject* object, const char *method);
 
   // Description:
-  // If invoked from within EditEndCommand, then this method prevents the
+  // If invoked from within EditEndCommand, this method prevents the
   // termination of the interactive editing of the contents of a cell.  It
   // enables you to reject the widget's text during the final validation of the
   // string intended to become the new cell contents.
@@ -936,8 +999,8 @@ public:
   // successfully updated after editing it. The command is automatically
   // concatenated with the cell's row and column indices, as well as the
   // new contents of the cell. The main purpose of this script is to let
-  // external objects retrieve the new contents and update their own internal
-  // values.
+  // external/third-party applications/objects retrieve the new cell contents
+  // and update their own internal values.
   virtual void SetCellUpdatedCommand(vtkObject* object, const char *method);
 
   // Description:
@@ -970,6 +1033,13 @@ public:
     const char *widget, int row, int col, const char *text);
   virtual const char* EditEndCallback(
     const char *widget, int row, int col, const char *text);
+  virtual void CellWindowCommandToCheckButtonCallback(
+    const char*, int, int, const char*);
+  virtual void CellWindowCommandToCheckButtonSelectCallback(
+    vtkKWWidget*, int, int);
+  virtual void CellWindowCommandToColorButtonCallback(
+    const char*, int, int, const char*);
+  virtual void ColumnSortedCallback();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -1001,6 +1071,9 @@ protected:
 
   char *PotentialCellColorsChangedCommand;
   virtual void InvokePotentialCellColorsChangedCommand();
+
+  char *ColumnSortedCommand;
+  void InvokeColumnSortedCommand();
 
   // Description:
   // Called when the number of rows/columns changed

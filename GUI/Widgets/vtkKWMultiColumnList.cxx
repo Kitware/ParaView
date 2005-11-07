@@ -17,6 +17,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWRadioButton.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
@@ -27,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.35");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -50,6 +52,7 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
   this->SelectionCommand = NULL;
   this->SelectionChangedCommand = NULL;
   this->PotentialCellColorsChangedCommand = NULL;
+  this->ColumnSortedCommand = NULL;
 
   this->Internals = new vtkKWMultiColumnListInternals;
 }
@@ -86,6 +89,11 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
     {
     delete [] this->PotentialCellColorsChangedCommand;
     this->PotentialCellColorsChangedCommand = NULL;
+    }
+  if (this->ColumnSortedCommand)
+    {
+    delete [] this->ColumnSortedCommand;
+    this->ColumnSortedCommand = NULL;
     }
   delete this->Internals;
 }
@@ -139,6 +147,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
 
   this->AddBinding("<<TablelistSelect>>", this, "SelectionCallback");
   this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
+  this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
   
   // Update enable state
 
@@ -175,15 +184,15 @@ int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script(
       "%s insertcolumns %d 0 {%s}", 
       this->GetWidgetName(), col_index, title ? title : "");
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -237,14 +246,14 @@ void vtkKWMultiColumnList::DeleteColumn(int col_index)
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s deletecolumns %d %d", 
                  this->GetWidgetName(), col_index, col_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -258,13 +267,13 @@ void vtkKWMultiColumnList::DeleteAllColumns()
   if (this->IsCreated())
     {
     int nb_columns = this->GetNumberOfColumns();
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s deletecolumns 0 end", this->GetWidgetName());
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     if (this->GetNumberOfColumns() != nb_columns)
       {
       this->NumberOfColumnsChanged();
@@ -1050,14 +1059,14 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         item += "\"\" ";
         }
       int nb_rows = this->GetNumberOfRows();
-      int old_enabled = this->GetEnabled();
-      if (!this->GetEnabled())
+      int old_state = this->GetState();
+      if (this->GetState() != vtkKWTkOptions::StateNormal)
         {
-        this->SetEnabled(1);
+        this->SetStateToNormal();
         }
       this->Script("%s insert %d {%s}", 
                    this->GetWidgetName(), row_index, item.c_str());
-      this->SetEnabled(old_enabled);
+      this->SetState(old_state);
       if (this->GetNumberOfRows() != nb_rows)
         {
         this->NumberOfRowsChanged();
@@ -1115,14 +1124,14 @@ void vtkKWMultiColumnList::DeleteRow(int row_index)
   if (this->IsCreated())
     {
     int nb_rows = this->GetNumberOfRows();
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s delete %d %d", 
                  this->GetWidgetName(), row_index, row_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     if (this->GetNumberOfRows() != nb_rows)
       {
       this->NumberOfRowsChanged();
@@ -1136,13 +1145,13 @@ void vtkKWMultiColumnList::DeleteAllRows()
   if (this->IsCreated())
     {
     int nb_rows = this->GetNumberOfRows();
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s delete 0 end", this->GetWidgetName());
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     if (this->GetNumberOfRows() != nb_rows)
       {
       this->NumberOfRowsChanged();
@@ -1287,13 +1296,13 @@ void vtkKWMultiColumnList::ActivateRow(int row_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s activate %d", this->GetWidgetName(), row_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     }
 }
 
@@ -1435,13 +1444,13 @@ void vtkKWMultiColumnList::InsertCellTextAsFormattedDouble(
 void vtkKWMultiColumnList::SetCellText(
   int row_index, int col_index, const char *text)
 {
-  int old_enabled = this->GetEnabled();
-  if (!this->GetEnabled())
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
     {
-    this->SetEnabled(1);
+    this->SetStateToNormal();
     }
   this->SetCellConfigurationOptionAsText(row_index, col_index, "-text", text);
-  this->SetEnabled(old_enabled);
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
@@ -1534,14 +1543,14 @@ void vtkKWMultiColumnList::ActivateCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s activate %d,%d", 
                  this->GetWidgetName(), row_index, col_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     }
 }
 
@@ -1623,6 +1632,14 @@ void vtkKWMultiColumnList::GetCellCurrentBackgroundColor(
   int row_index, int col_index, double *r, double *g, double *b)
 {
   const char *bgcolor;
+
+  // If disabled, everything is background
+
+  if (!this->GetEnabled())
+    {
+    this->GetBackgroundColor(r, g, b);
+    return;
+    }
 
   // Selection has priority
 
@@ -1717,6 +1734,14 @@ void vtkKWMultiColumnList::GetCellCurrentForegroundColor(
   int row_index, int col_index, double *r, double *g, double *b)
 {
   const char *fgcolor;
+
+  // If disabled, everything is disabledforeground
+
+  if (!this->GetEnabled())
+    {
+    vtkKWTkUtilities::GetOptionColor(this, "-disabledforeground", r, g, b);
+    return;
+    }
 
   // Selection has priority
 
@@ -1834,14 +1859,14 @@ const char* vtkKWMultiColumnList::GetCellImage(
 void vtkKWMultiColumnList::SetCellImage(
   int row_index, int col_index, const char *image_name)
 {
-  int old_enabled = this->GetEnabled();
-  if (!this->GetEnabled())
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
     {
-    this->SetEnabled(1);
+    this->SetStateToNormal();
     }
   this->SetCellConfigurationOption(
     row_index, col_index, "-image", image_name);
-  this->SetEnabled(old_enabled);
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
@@ -1975,14 +2000,14 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", command);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     delete [] command;
     }
 }
@@ -1997,14 +2022,14 @@ void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index,
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->SetCellConfigurationOption(
       row_index, col_index, "-windowdestroy", command);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     delete [] command;
     }
 }
@@ -2038,16 +2063,16 @@ void vtkKWMultiColumnList::RefreshCellWithWindowCommand(int row_index,
   if (command && *command)
     {
     vtksys_stl::string command_str(command);
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", "");
     this->SetCellConfigurationOption(
       row_index, col_index, "-window", command_str.c_str());
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     }
 }
 
@@ -2083,17 +2108,30 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
       if (child)
         {
         int is_frame = vtkKWFrame::SafeDownCast(child) ? 1 : 0;
+        int is_check = (vtkKWCheckButton::SafeDownCast(child) || 
+                        vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
         double br, bg, bb, fr, fg, fb;
         this->GetCellCurrentBackgroundColor(
           row_index, col_index, &br, &bg, &bb);
         this->GetCellCurrentForegroundColor(
           row_index, col_index, &fr, &fg, &fb);
-        child->SetBackgroundColor(br, bg, bb);
-        if (!is_frame)
+        int nb_grand_children = child->GetNumberOfChildren();
+
+        // If it is a frame and it has no children, let's assume that
+        // frame is used for a specific purpose other than being just
+        // a container, and don't modify its color (maybe a color button ?)
+        // unless the widget is disabled in that case do it anyhow
+        if (!(is_frame && nb_grand_children == 0) || !this->GetEnabled())
+          {
+          child->SetBackgroundColor(br, bg, bb);
+          }
+        // If it a frame, no foreground color option. If it is a check
+        // or radio button, do not change its foreground color since it
+        // controls the color of the 'tick' mark
+        if (!is_frame && !is_check)
           {
           child->SetForegroundColor(fr, fg, fb);
           }
-        int nb_grand_children = child->GetNumberOfChildren();
         for (int i = 0; i < nb_grand_children; i++)
           {
           vtkKWCoreWidget *grand_child = vtkKWCoreWidget::SafeDownCast(
@@ -2101,8 +2139,10 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
           if (grand_child)
             {
             is_frame = vtkKWFrame::SafeDownCast(grand_child) ? 1 : 0;
+            int is_check = (vtkKWCheckButton::SafeDownCast(child) || 
+                            vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
             grand_child->SetBackgroundColor(br, bg, bb);
-            if (!is_frame)
+            if (!is_frame && !is_check)
               {
               grand_child->SetForegroundColor(fr, fg, fb);
               }
@@ -2137,6 +2177,95 @@ const char* vtkKWMultiColumnList::GetCellWindowWidgetName(int row_index,
                         this->GetWidgetName(), row_index, col_index);
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToCheckButton(
+  int row_index, int col_index)
+{
+  this->SetCellWindowCommand(
+    row_index, col_index, this, "CellWindowCommandToCheckButtonCallback");
+  this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
+  this->SetCellEditable(row_index, col_index, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
+  const char *, int row, int col, const char *widget)
+{
+  vtkKWCheckButton *child = vtkKWCheckButton::New();
+  child->SetWidgetName(widget);
+  child->SetParent(this);
+  child->Create(this->GetApplication());
+  child->SetHighlightThickness(0);
+  child->SetBorderWidth(0);
+  child->SetPadX(0);
+  child->SetPadY(0);
+  child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
+  child->SetSelectedState(this->GetCellTextAsInt(row, col));
+  child->SetEnabled(this->GetEnabled()); 
+  char command[256];
+  sprintf(command, 
+          "CellWindowCommandToCheckButtonSelectCallback %s %d %d", 
+          child->GetTclName(), row, col);
+  child->SetCommand(this, command);
+  child->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToCheckButtonSelectCallback(
+  vtkKWWidget *widget, int row, int col)
+{
+  vtkKWCheckButton *cb = vtkKWCheckButton::SafeDownCast(widget);
+  if (widget)
+    {
+    char cb_state[10];
+    sprintf(cb_state, "%d", cb->GetSelectedState());
+    int validated = atoi(this->InvokeEditEndCommand(row, col, cb_state));
+    cb->SetSelectedState(validated);
+    int cell_content = this->GetCellTextAsInt(row, col);
+    if (cell_content != validated)
+      {
+      this->SetCellTextAsInt(row, col, validated);
+      sprintf(cb_state, "%d", this->GetCellTextAsInt(row, col));
+      this->InvokeCellUpdatedCommand(row, col, cb_state);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToColorButton(
+  int row_index, int col_index)
+{
+  this->SetCellWindowCommand(
+    row_index, col_index, this, "CellWindowCommandToColorButtonCallback");
+  this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToColorButtonCallback(
+  const char *, int row, int col, const char *widget)
+{
+  vtkKWFrame *child = vtkKWFrame::New();
+  child->SetWidgetName(widget);
+  child->SetParent(this);
+  child->Create(this->GetApplication());
+  child->SetBorderWidth(1);
+  child->SetReliefToSolid();
+  child->SetWidth(16);
+  child->SetHeight(16);
+  child->SetPadX(0);
+  child->SetPadY(0);
+  double r, g, b;
+  if (!this->GetEnabled() ||
+      sscanf(this->GetCellText(row, col), "%lg %lg %lg", &r, &g, &b) != 3)
+    {
+    this->GetCellCurrentBackgroundColor(row, col, &r, &g, &b);
+    }
+  child->SetBackgroundColor(r, g, b);
+  child->SetEnabled(this->GetEnabled()); 
+  this->AddBindingsToWidget(child);
+  child->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -2256,14 +2385,14 @@ void vtkKWMultiColumnList::EditCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s editcell %d,%d", 
                  this->GetWidgetName(), row_index, col_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     }
 }
 
@@ -2730,14 +2859,14 @@ void vtkKWMultiColumnList::SelectRow(int row_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s selection set %d %d", 
                  this->GetWidgetName(), row_index, row_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     this->SelectionCallback();
     }
 }
@@ -2747,14 +2876,14 @@ void vtkKWMultiColumnList::DeselectRow(int row_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s selection clear %d %d", 
                  this->GetWidgetName(), row_index, row_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     this->SelectionCallback();
     }
 }
@@ -2833,15 +2962,15 @@ void vtkKWMultiColumnList::SelectCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s cellselection set %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     this->SelectionCallback();
     }
 }
@@ -2851,15 +2980,15 @@ void vtkKWMultiColumnList::DeselectCell(int row_index, int col_index)
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s cellselection clear %d,%d %d,%d", 
                  this->GetWidgetName(), 
                  row_index, col_index, row_index, col_index);
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     this->SelectionCallback();
     }
 }
@@ -2921,13 +3050,13 @@ void vtkKWMultiColumnList::ClearSelection()
 {
   if (this->IsCreated())
     {
-    int old_enabled = this->GetEnabled();
-    if (!this->GetEnabled())
+    int old_state = this->GetState();
+    if (this->GetState() != vtkKWTkOptions::StateNormal)
       {
-      this->SetEnabled(1);
+      this->SetStateToNormal();
       }
     this->Script("%s selection clear 0 end", this->GetWidgetName());
-    this->SetEnabled(old_enabled);
+    this->SetState(old_state);
     this->SelectionCallback();
     }
 }
@@ -2960,7 +3089,7 @@ const char* vtkKWMultiColumnList::InvokeEditStartCommand(
     return this->Script("%s %d %d {%s}", 
                         this->EditStartCommand, row, col, text);
     }
-  return NULL;
+  return text;
 }
 
 //----------------------------------------------------------------------------
@@ -2979,7 +3108,7 @@ const char* vtkKWMultiColumnList::InvokeEditEndCommand(
     return this->Script("%s %d %d {%s}", 
                         this->EditEndCommand, row, col, text);
     }
-  return NULL;
+  return text;
 }
 
 //----------------------------------------------------------------------------
@@ -3057,6 +3186,23 @@ void vtkKWMultiColumnList::InvokePotentialCellColorsChangedCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetColumnSortedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ColumnSortedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeColumnSortedCommand()
+{
+  if (this->ColumnSortedCommand && *this->ColumnSortedCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval %s", this->ColumnSortedCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWMultiColumnList::EditStartCallback(
   const char *, int row, int col, const char *text)
 {
@@ -3067,6 +3213,56 @@ const char* vtkKWMultiColumnList::EditStartCallback(
     {
     this->Internals->EditedCellRowIndex = row;
     this->Internals->EditedCellColumnIndex = col;
+    }
+
+  // Check if the cell is a user-defined widget that we have control
+  // of (as set by SetCellWindowCommandToColorButton for example):
+
+  const char *command = 
+    this->GetCellConfigurationOption(row, col, "-window");
+  if (command && *command)
+    {
+    char *color_button_command = NULL;
+    this->SetObjectMethodCommand(
+      &color_button_command, this, "CellWindowCommandToColorButtonCallback");
+    int res = !strcmp(command, color_button_command);
+    delete [] color_button_command;
+    if (res)
+      {
+      this->CancelEditing();
+      vtksys_stl::string cell_contents(this->GetCellText(row, col));
+      vtksys_stl::string start_contents(
+        this->InvokeEditStartCommand(row, col, cell_contents.c_str()));
+      double r, g, b, out_r, out_g, out_b;
+      if (sscanf(start_contents.c_str(), "%lg %lg %lg", &r, &g, &b) == 3 &&
+          vtkKWTkUtilities::QueryUserForColor(
+            this->GetApplication(), this->GetWidgetName(), "Pick Color", 
+            r, g, b, &out_r, &out_g, &out_b))
+        {
+        char buffer[256];
+        sprintf(buffer, "%g %g %g", out_r, out_g, out_b);
+        vtksys_stl::string validated_contents(
+          this->InvokeEditEndCommand(row, col, buffer));
+        if (strcmp(validated_contents.c_str(), cell_contents.c_str()) &&
+            sscanf(validated_contents.c_str(), "%lg %lg %lg", &r, &g, &b) == 3)
+          {
+          this->SetCellText(row, col, validated_contents.c_str());
+          const char *child_name = this->GetCellWindowWidgetName(row, col);
+          if (child_name && *child_name)
+            {
+            vtkKWFrame *child = vtkKWFrame::SafeDownCast(
+              this->GetChildWidgetWithName(child_name));
+            if (child)
+              {
+              child->SetBackgroundColor(r, g, b);
+              }
+            }
+          this->InvokeCellUpdatedCommand(
+            row, col, validated_contents.c_str());
+          }
+        }
+      return NULL;
+      }
     }
 
   return this->InvokeEditStartCommand(row, col, text);
@@ -3097,6 +3293,13 @@ void vtkKWMultiColumnList::CellUpdatedCallback()
     }
 
   this->InvokeCellUpdatedCommand(row, col, this->GetCellText(row, col));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ColumnSortedCallback()
+{
+  this->InvokePotentialCellColorsChangedCommand();
+  this->InvokeColumnSortedCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -3187,6 +3390,8 @@ void vtkKWMultiColumnList::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->SetState(this->GetEnabled());
+
+  this->RefreshAllCellsWithWindowCommand();
 }
 
 //----------------------------------------------------------------------------
