@@ -3,6 +3,7 @@ vtkKWCoreWidget GetForegroundColor                     307 3
 vtkKWExtent     GetExtentRange                         307 6
 vtkKWMultiColumnList FindCellText                      304 2
 vtkKWMultiColumnList GetCellBackgroundColor            307 3
+vtkKWMultiColumnList GetCellCurrentForegroundColor     307 3
 vtkKWMultiColumnList GetCellCurrentBackgroundColor     307 3
 vtkKWMultiColumnList GetCellForegroundColor            307 3
 vtkKWMultiColumnList GetCellSelectionBackgroundColor   307 3
@@ -13,7 +14,6 @@ vtkKWMultiColumnList GetColumnSelectionBackgroundColor 307 3
 vtkKWMultiColumnList GetColumnSelectionForegroundColor 307 3
 vtkKWMultiColumnList GetColumnLabelBackgroundColor     307 3
 vtkKWMultiColumnList GetColumnLabelForegroundColor     307 3
-vtkKWMultiColumnList GetCurrentCellBackgroundColor     307 3
 vtkKWMultiColumnList GetRowBackgroundColor             307 3
 vtkKWMultiColumnList GetRowForegroundColor             307 3
 vtkKWMultiColumnList GetRowSelectionBackgroundColor    307 3
