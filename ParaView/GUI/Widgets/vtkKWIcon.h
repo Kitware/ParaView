@@ -44,6 +44,7 @@ public:
     IconAngleTool                 = 14,
     IconBoundingBox               = 13,
     IconColorBarAnnotation        = 12,
+    IconColorSquares              = 18,
     IconConnection                = 1,
     IconContourTool               = 16,
     IconCornerAnnotation          = 11,
