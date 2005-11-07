@@ -27,8 +27,14 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 
+#include <vtkstd/set>
+
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.6.2.1");
+
+//-----------------------------------------------------------------------------
+class vtkSMIceTDesktopRenderModuleProxyProxySet
+  : public vtkstd::set<vtkSMProxy *> { };
 
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
@@ -39,12 +45,14 @@ vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
 
   this->DisplayManagerProxy = NULL;
   this->PKdTreeProxy = NULL;
+
+  this->PartitionedData = new vtkSMIceTDesktopRenderModuleProxyProxySet;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::~vtkSMIceTDesktopRenderModuleProxy()
 {
-
+  delete this->PartitionedData;
 }
 
 //-----------------------------------------------------------------------------
@@ -375,29 +383,84 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
 {
   if (this->OrderedCompositing)
     {
-    // Update the PKdTree, but only if there is something divide.
+    // Update the PKdTree, but only if there is something to divide that has
+    // not been divided the last time or some geometry has become invalid.
     int doBuildLocator = 0;
-    vtkObject *obj;
-    this->Displays->InitTraversal();
-    for (obj = this->Displays->GetNextItemAsObject(); obj != NULL;
-         obj = this->Displays->GetNextItemAsObject())
+
+    // Check to see if there is anything new added to the k-d tree.
+    vtkSMProxyProperty *toPartition = vtkSMProxyProperty::SafeDownCast(
+                                   this->PKdTreeProxy->GetProperty("DataSets"));
+    unsigned int i, numProxies;
+    numProxies = toPartition->GetNumberOfProxies();
+    for (i = 0; i < numProxies; i++)
       {
-      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
-      if (   disp && disp->GetVisibilityCM()
-          && disp->GetProperty("OrderedCompositingTree") )
+      if (   this->PartitionedData->find(toPartition->GetProxy(i))
+          == this->PartitionedData->end() )
         {
         doBuildLocator = 1;
-        vtkSMProperty *p = disp->GetProperty("UpdateDataToDistribute");
-        if (p)
+        break;
+        }
+      }
+
+    // Check to see if the geometry of any visible objects has changed.
+    vtkObject *obj;
+    vtkCollectionSimpleIterator cookie;
+    this->Displays->InitTraversal(cookie);
+    for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
+         obj = this->Displays->GetNextItemAsObject(cookie))
+      {
+      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+      if (disp && disp->GetVisibilityCM())
+        {
+        vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                               disp->GetProperty("IsDistributedGeometryValid"));
+        if (ivp)
           {
-          p->Modified();
-          disp->UpdateVTKObjects();
+          disp->UpdatePropertyInformation(ivp);
+          if (!ivp->GetElement(0))
+            {
+            doBuildLocator = 1;
+            break;
+            }
           }
         }
       }
 
     if (doBuildLocator)
       {
+      // Update PartitionedData ivar.
+      this->PartitionedData->erase(this->PartitionedData->begin(),
+                                   this->PartitionedData->end());
+      for (i = 0; i < numProxies; i++)
+        {
+        this->PartitionedData->insert(toPartition->GetProxy(i));
+        }
+
+      // For all visibile displays, make sure their geometry is up to date
+      // for the k-d tree and make sure the distribution gets updated after
+      // the tree is reformed.
+      this->Displays->InitTraversal(cookie);
+      for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
+           obj = this->Displays->GetNextItemAsObject(cookie))
+        {
+        vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+        if (disp && disp->GetVisibilityCM())
+          {
+          vtkSMProperty *p = disp->GetProperty("Update");
+          if (p)
+            {
+            p->Modified();
+            }
+          p = disp->GetProperty("InvalidateDistributedGeometry");
+          if (p)
+            {
+            p->Modified();
+            }
+          disp->UpdateVTKObjects();
+          }
+        }
+
+      // Build the global k-d tree.
       vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
       p->Modified();
       this->PKdTreeProxy->UpdateVTKObjects();
@@ -425,6 +488,33 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
     }
 
   this->Superclass::StillRender();
+}
+//-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::UpdateAllDisplays()
+{
+  if (this->OrderedCompositing)
+    {
+    // Make sure the distribution is up to date.
+    vtkObject *obj;
+    vtkCollectionSimpleIterator cookie;
+    this->Displays->InitTraversal(cookie);
+    for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
+         obj = this->Displays->GetNextItemAsObject(cookie))
+      {
+      vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
+      if (disp && disp->GetVisibilityCM())
+        {
+        vtkSMProperty *p = disp->GetProperty("UpdateDistributedGeometry");
+        if (p)
+          {
+          p->Modified();
+          }
+        disp->UpdateVTKObjects();
+        }
+      }
+    }
+
+  this->Superclass::UpdateAllDisplays();
 }
 
 //-----------------------------------------------------------------------------

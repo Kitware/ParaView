@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.4.2.1");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.4.2.2");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -49,6 +49,10 @@ vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
   // I set these to -1 to ensure the decision is propagated.
   this->CollectionDecision = -1;
   this->LODCollectionDecision = -1;
+
+  this->DistributedGeometryIsValid = 0;
+  this->DistributedLODGeometryIsValid = 0;
+  this->DistributedVolumeGeometryIsValid = 0;
 
   this->OrderedCompositing = -1;
   this->OrderedCompositingTree = NULL;
@@ -744,6 +748,28 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::InvalidateDistributedGeometry()
+{
+  this->DistributedGeometryIsValid = 0;
+  this->DistributedLODGeometryIsValid = 0;
+  this->DistributedVolumeGeometryIsValid = 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMCompositeDisplayProxy::IsDistributedGeometryValid()
+{
+  if (this->VolumeRenderMode)
+    {
+    return (   this->DistributedVolumeGeometryIsValid
+            && this->VolumeGeometryIsValid );
+    }
+  else
+    {
+    return (this->DistributedGeometryIsValid && this->GeometryIsValid);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
 {
   if (!this->ObjectsCreated)
@@ -835,6 +861,11 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositing(int val)
     return;
     }
 
+  if (this->OrderedCompositing == val)
+    {
+    return;
+    }
+
   this->OrderedCompositing = val;
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -842,6 +873,8 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositing(int val)
   ivp->SetElements1(!this->OrderedCompositing);
 
   this->UpdateVTKObjects();
+
+  this->InvalidateDistributedGeometry();
 }
 
 //-----------------------------------------------------------------------------
@@ -891,13 +924,12 @@ void vtkSMCompositeDisplayProxy::RemoveGeometryFromCompositingTree()
   if (ip->GetNumberOfProxies() < 1) return;
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                   this->OrderedCompositingTree->GetProperty("RemoveDataSets"));
-  pp->RemoveAllProxies();
+                         this->OrderedCompositingTree->GetProperty("DataSets"));
 
   vtkSMSourceProxy *input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
   for (i = 0; i < input->GetNumberOfParts(); i++)
     {
-    pp->AddProxy(input->GetPart(i));
+    pp->RemoveProxy(input->GetPart(i));
     }
 
   if (this->VolumeDistributorProxy)
@@ -907,7 +939,7 @@ void vtkSMCompositeDisplayProxy::RemoveGeometryFromCompositingTree()
     input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
     for (i = 0; i < input->GetNumberOfParts(); i++)
       {
-      pp->AddProxy(input->GetPart(i));
+      pp->RemoveProxy(input->GetPart(i));
       }
     }
 
@@ -937,8 +969,7 @@ void vtkSMCompositeDisplayProxy::AddGeometryToCompositingTree()
     vtkSMSourceProxy *input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
 
     vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                      this->OrderedCompositingTree->GetProperty("AddDataSets"));
-    pp->RemoveAllProxies();
+                         this->OrderedCompositingTree->GetProperty("DataSets"));
 
     for (unsigned int i = 0; i < input->GetNumberOfParts(); i++)
       {
@@ -962,17 +993,39 @@ void vtkSMCompositeDisplayProxy::SetVisibility(int visible)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeDisplayProxy::Update()
+void vtkSMCompositeDisplayProxy::CacheUpdate(int idx, int total)
 {
-  this->UpdateDataToDistribute();
+  this->Superclass::CacheUpdate(idx, total);
 
   if (this->VolumeRenderMode)
     {
-    if (this->VolumeGeometryIsValid)
+    this->DistributedVolumeGeometryIsValid = 0;
+    }
+  else
+    {
+    this->DistributedGeometryIsValid = 0;
+    }
+
+  this->DistributedLODGeometryIsValid = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::UpdateDistributedGeometry()
+{
+  // Prevent infinite loop.
+  if (this->OrderedCompositing)
+    {
+    this->Update();
+    }
+
+  if (this->VolumeRenderMode)
+    {
+    if (!this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid)
       {
       vtkSMProperty *p
         = this->VolumeDistributorSuppressorProxy->GetProperty("ForceUpdate");
       p->Modified();
+      this->DistributedVolumeGeometryIsValid = 1;
       // Make sure any ForceUpates are called in the correct order.  That is,
       // the superclasses' suppressors should be called before ours.
       this->VolumeUpdateSuppressorProxy->UpdateVTKObjects();
@@ -981,11 +1034,12 @@ void vtkSMCompositeDisplayProxy::Update()
     }
   else
     {
-    if (this->GeometryIsValid)
+    if (!this->DistributedGeometryIsValid && this->GeometryIsValid)
       {
       vtkSMProperty *p
         = this->DistributorSuppressorProxy->GetProperty("ForceUpdate");
       p->Modified();
+      this->DistributedGeometryIsValid = 1;
       // Make sure any ForceUpates are called in the correct order.  That is,
       // the superclasses' suppressors should be called before ours.
       this->UpdateSuppressorProxy->UpdateVTKObjects();
@@ -993,11 +1047,12 @@ void vtkSMCompositeDisplayProxy::Update()
       }
     }
 
-  if (this->LODGeometryIsValid)
+  if (!this->DistributedLODGeometryIsValid && this->LODGeometryIsValid)
     {
     vtkSMProperty *p
       = this->LODDistributorSuppressorProxy->GetProperty("ForceUpdate");
     p->Modified();
+    this->DistributedLODGeometryIsValid = 1;
     // Make sure any ForceUpates are called in the correct order.  That is,
     // the superclasses' suppressors should be called before ours.
     this->LODUpdateSuppressorProxy->UpdateVTKObjects();
@@ -1006,9 +1061,26 @@ void vtkSMCompositeDisplayProxy::Update()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeDisplayProxy::UpdateDataToDistribute()
+void vtkSMCompositeDisplayProxy::Update()
 {
+  // If any geometry is going to be updated, make sure we invalidate the
+  // distributed geometry.
+  this->DistributedGeometryIsValid
+    = this->DistributedGeometryIsValid && this->GeometryIsValid;
+  this->DistributedLODGeometryIsValid =
+    this->DistributedLODGeometryIsValid && this->LODGeometryIsValid;
+  this->DistributedVolumeGeometryIsValid
+    = this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid;
+
   this->Superclass::Update();
+
+  if (!this->OrderedCompositing)
+    {
+    // If OrderedCompositing is on, we can expect the render module to call
+    // UpdateDistributedGeometry when the ordered tree is ready.  Otherwise,
+    // that method may never be called externally.
+    this->UpdateDistributedGeometry();
+    }
 }
 
 //-----------------------------------------------------------------------------

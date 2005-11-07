@@ -2234,9 +2234,24 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
-      <Property name="UpdateDataToDistribute"
-                command="UpdateDataToDistribute"
+      <Property name="InvalidateGeometry"
+                command="InvalidateGeometry"
+                update_self="1">
+      </Property>
+      <Property name="InvalidateDistributedGeometry"
+                command="InvalidateDistributedGeometry"
                 update_self="1" />
+      <Property name="UpdateDistributedGeometry"
+                command="UpdateDistributedGeometry"
+                update_self="1" />
+      <IntVectorProperty name="IsDistributedGeometryValid"
+                         information_only="1"
+                         command="IsDistributedGeometryValid"
+                         number_of_elements="1"
+                         default_values="1"
+                         update_self="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
