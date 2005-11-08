@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62.2.1");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1081,6 +1081,7 @@ void vtkPVAnimationManager::SaveAnimation()
     const char* ext = ext_stl.c_str();
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetTitle("Image Size");
     dlg->SetMasterWindow(pvWin);
     dlg->Create(this->GetApplication());
     // is this a video format
