@@ -141,7 +141,18 @@ QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
         if(index.column() == 0)
           return QVariant(item->getPropertyName());
         else
-          return QVariant(item->getValue().toString());
+          {
+          QVariant domain = item->getDomain();
+          if(item->getValue().type() == QVariant::Int &&
+              domain.type() == QVariant::StringList)
+            {
+            // Return the enum name instead of the index.
+            QStringList names = domain.toStringList();
+            return QVariant(names[item->getValue().toInt()]);
+            }
+          else
+            return QVariant(item->getValue().toString());
+          }
         }
       case Qt::EditRole:
         {
