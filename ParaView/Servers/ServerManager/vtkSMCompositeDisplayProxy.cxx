@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -776,7 +776,7 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
     {
     return 0;
     }
-  if ( ! this->GeometryIsValid)
+  if ( ! this->LODGeometryIsValid)
     { // Update but with collection filter off.
     this->CollectionDecision = 0;
     this->LODCollectionDecision = 0;
@@ -1012,11 +1012,7 @@ void vtkSMCompositeDisplayProxy::CacheUpdate(int idx, int total)
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::UpdateDistributedGeometry()
 {
-  // Prevent infinite loop.
-  if (this->OrderedCompositing)
-    {
-    this->Update();
-    }
+  this->Update();
 
   if (this->VolumeRenderMode)
     {
@@ -1073,14 +1069,6 @@ void vtkSMCompositeDisplayProxy::Update()
     = this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid;
 
   this->Superclass::Update();
-
-  if (!this->OrderedCompositing)
-    {
-    // If OrderedCompositing is on, we can expect the render module to call
-    // UpdateDistributedGeometry when the ordered tree is ready.  Otherwise,
-    // that method may never be called externally.
-    this->UpdateDistributedGeometry();
-    }
 }
 
 //-----------------------------------------------------------------------------
