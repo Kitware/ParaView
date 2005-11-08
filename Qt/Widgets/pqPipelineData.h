@@ -29,10 +29,11 @@ signals:
 public slots:
   /// set the current proxy
   void setCurrentProxy(vtkSMSourceProxy* proxy);
+
+public:
   /// get the current proxy
   vtkSMSourceProxy* currentProxy() const;
 
-public:
   /// create pipline object  \todo perhaps move this when server manager can emit event
   vtkSMProxy* newSMProxy(const char* groupname, const char* proxyname);
   /// create a pipline connection \todo perhaps move this when server manager can emit event

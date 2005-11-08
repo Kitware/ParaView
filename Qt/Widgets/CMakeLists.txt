@@ -28,10 +28,25 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
 )
 
-QT4_WRAP_UI(UI_BUILT_SOURCES
+SET(UI_FORMS
   pqFileDialog.ui
   pqServerBrowser.ui
 )
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+  ${UI_FORMS}
+)
+
+
+SOURCE_GROUP("Resources" FILES
+  ${UI_FORMS}
+)
+
+SOURCE_GROUP("Generated" FILES
+  ${MOC_BUILT_SOURCES}
+  ${UI_BUILT_SOURCES}
+)
+
 
 ADD_LIBRARY(QtWidgets
   pqCommandDispatcher.cxx
@@ -61,6 +76,8 @@ ADD_LIBRARY(QtWidgets
   pqOptions.h
   pqParts.cxx
   pqParts.h
+  pqPipelineData.cxx
+  pqPipelineData.h
   pqRefreshToolbar.cxx
   pqRefreshToolbar.h
   pqRenderViewProxy.cxx
@@ -79,8 +96,6 @@ ADD_LIBRARY(QtWidgets
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
-  pqPipelineData.cxx
-  pqPipelineData.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )
