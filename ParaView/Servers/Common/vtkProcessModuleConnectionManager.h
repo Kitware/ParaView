@@ -41,8 +41,8 @@
 
 #include "vtkObject.h"
 #include "vtkConnectionID.h" // Needed for SelfConnectionID.
+#include "vtkClientServerID.h" // Needed for ClientServerID.
 
-class vtkClientServerID;
 class vtkClientServerStream;
 class vtkClientSocket;
 class vtkConnectionIterator;
@@ -60,12 +60,22 @@ public:
   static vtkProcessModuleConnectionManager* New();
   vtkTypeRevisionMacro(vtkProcessModuleConnectionManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+//BTX
   // The ID used for SelfConnection.
-  static vtkConnectionID SelfConnectionID;
+  static vtkConnectionID GetSelfConnectionID() 
+    { 
+    vtkConnectionID id;
+    id.ID = 0;
+    return id; 
+    }
 
   // The ID used for All Connections.
-  static vtkConnectionID AllConnectionsID;
+  static vtkConnectionID GetAllConnectionsID() 
+    { 
+    vtkConnectionID id;
+    id.ID = 1;
+    return id; 
+    }
 
   // The ID used for Connection to all Servers. What connection qualifies a 
   // server depends on the mode of operation. When in ParaView mode (with or 
@@ -74,7 +84,12 @@ public:
   // data (and render) servers), SelfConnection is not a ServerConnection. 
   // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision complete transparent to the ServerManager.
-  static vtkConnectionID AllServerConnectionsID;
+  static vtkConnectionID GetAllServerConnectionsID() 
+    { 
+    vtkConnectionID id;
+    id.ID = 2;
+    return id; 
+    }
 
   // This ID represents the first server connection. What connection qualifies a 
   // server depends on the mode of operation. When in ParaView mode (with or 
@@ -83,8 +98,14 @@ public:
   // data (and render) servers), SelfConnection is not a ServerConnection. 
   // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision complete transparent to the ServerManager.
-  static vtkConnectionID RootServerConnectionID;
-  
+  static vtkConnectionID GetRootServerConnectionID()
+    { 
+    vtkConnectionID id;
+    id.ID = 3;
+    return id; 
+    }
+
+//ETX  
   // Description:
   // Initializes the manager. Among other things, this setsup
   // the first connection i.e. the SelfConnection.
@@ -112,13 +133,13 @@ public:
   // This obtains a root connection for the connection. 
   static inline vtkConnectionID GetRootConnection(vtkConnectionID connection)
     {
-    if (connection == vtkProcessModuleConnectionManager::AllConnectionsID)
+    if (connection == vtkProcessModuleConnectionManager::GetAllConnectionsID())
       {
-      return vtkProcessModuleConnectionManager::SelfConnectionID;
+      return vtkProcessModuleConnectionManager::GetSelfConnectionID();
       }
-    if (connection == vtkProcessModuleConnectionManager::AllServerConnectionsID)
+    if (connection == vtkProcessModuleConnectionManager::GetAllServerConnectionsID())
       {
-      return vtkProcessModuleConnectionManager::RootServerConnectionID;
+      return vtkProcessModuleConnectionManager::GetRootServerConnectionID();
       }
     return connection;
     }
@@ -292,7 +313,7 @@ protected:
   // a server connection. When running in client-server mode, only remote
   // connections qualify as server connections.
   int IsServerConnection(vtkConnectionID connection);
-
+//BTX
   // A collection of all open sockets.
   vtkSocketCollection* SocketCollection;
   vtkProcessModuleConnectionManagerInternals* Internals;
@@ -300,7 +321,7 @@ protected:
   vtkConnectionID UniqueConnectionID;
   int UniqueServerSocketID;
   int ClientMode;
-//BTX
+
   friend class vtkConnectionIterator;
 //ETX
 private:

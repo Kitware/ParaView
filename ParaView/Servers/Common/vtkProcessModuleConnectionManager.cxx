@@ -37,15 +37,9 @@
 #include <vtkstd/map>
 #include <vtkstd/deque>
 
-
-vtkConnectionID vtkProcessModuleConnectionManager::SelfConnectionID = { 0 };
-vtkConnectionID vtkProcessModuleConnectionManager::AllConnectionsID = { 1 };
-vtkConnectionID vtkProcessModuleConnectionManager::AllServerConnectionsID = { 2 };
-vtkConnectionID vtkProcessModuleConnectionManager::RootServerConnectionID = { 3 };
-
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.1");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -96,7 +90,7 @@ int vtkProcessModuleConnectionManager::Initialize(int argc, char** argv,
     {
     sc = vtkMPISelfConnection::New();
     }
-  this->SetConnection(vtkProcessModuleConnectionManager::SelfConnectionID,
+  this->SetConnection(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
     sc);
   sc->Delete();
 
@@ -359,14 +353,14 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
 int vtkProcessModuleConnectionManager::IsServerConnection(
   vtkConnectionID connection)
 {
-  if (connection == vtkProcessModuleConnectionManager::AllConnectionsID ||
-    connection == vtkProcessModuleConnectionManager::AllServerConnectionsID ||
-    connection == vtkProcessModuleConnectionManager::RootServerConnectionID)
+  if (connection == vtkProcessModuleConnectionManager::GetAllConnectionsID() ||
+    connection == vtkProcessModuleConnectionManager::GetAllServerConnectionsID() ||
+    connection == vtkProcessModuleConnectionManager::GetRootServerConnectionID())
     {
     vtkErrorMacro("Cannot call IsServerConnection with collective connections ID.");
     return 0;
     }
-  if (connection != vtkProcessModuleConnectionManager::SelfConnectionID)
+  if (connection != vtkProcessModuleConnectionManager::GetSelfConnectionID())
     {
     // Any remote connection is ofcourse a server connection.
     return 1;
@@ -395,7 +389,7 @@ int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID,
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     if (iter->GetCurrentConnectionID() == 
-      vtkProcessModuleConnectionManager::SelfConnectionID)
+      vtkProcessModuleConnectionManager::GetSelfConnectionID())
       {
       send_to_self = 1;
       continue;
@@ -413,7 +407,7 @@ int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID,
 
   if (send_to_self)
     {
-    this->GetConnectionFromID(vtkProcessModuleConnectionManager::SelfConnectionID)->
+    this->GetConnectionFromID(vtkProcessModuleConnectionManager::GetSelfConnectionID())->
       SendStream(serverFlags, stream);
     }
 

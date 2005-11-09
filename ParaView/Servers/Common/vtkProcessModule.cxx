@@ -50,8 +50,9 @@
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //*****************************************************************************
-struct vtkProcessModuleInternals
+class vtkProcessModuleInternals
 {
+public:
   typedef 
   vtkstd::map<vtkStdString, vtkSmartPointer<vtkDataObject> > DataTypesType;
   typedef vtkstd::map<vtkStdString, vtkStdString> MapStringToString;
@@ -92,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.27");
+vtkCxxRevisionMacro(vtkProcessModule, "1.28");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -760,7 +761,7 @@ int vtkProcessModule::GetNumberOfPartitions()
     // TODO: This is again legacy. 
     // How can the client know which server is the caller interested in?
     return this->ConnectionManager->GetNumberOfPartitions(
-      vtkProcessModuleConnectionManager::RootServerConnectionID);
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID());
     }
   
   if (vtkMultiProcessController::GetGlobalController())
@@ -1063,7 +1064,7 @@ int vtkProcessModule::LoadModule(vtkConnectionID connectionID,
 int vtkProcessModule::LoadModuleInternal(const char* name, const char* dir)
 {
   return this->ConnectionManager->LoadModule(
-    vtkProcessModuleConnectionManager::SelfConnectionID, name, dir);
+    vtkProcessModuleConnectionManager::GetSelfConnectionID(), name, dir);
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,7 +1133,7 @@ int vtkProcessModule::GetStreamBlock(vtkConnectionID id)
 void vtkProcessModule::SetStreamBlockInternal(int val)
 {
   this->ConnectionManager->SetStreamBlock(
-    vtkProcessModuleConnectionManager::SelfConnectionID, val);
+    vtkProcessModuleConnectionManager::GetSelfConnectionID(), val);
 }
 
 
@@ -1296,25 +1297,25 @@ static vtkConnectionID ServerFlagsToConnections(vtkTypeUInt32 inFlags,
 
   if (hasServerConnection && hasSelfConnection)
     {
-    return vtkProcessModuleConnectionManager::AllConnectionsID;
+    return vtkProcessModuleConnectionManager::GetAllConnectionsID();
     }
   
   if (hasServerConnection)
     {
-    return vtkProcessModuleConnectionManager::AllServerConnectionsID;
+    return vtkProcessModuleConnectionManager::GetAllServerConnectionsID();
     }
   if (outFlags == 0)
     {
     outFlags = vtkProcessModule::DATA_SERVER_ROOT;
     }
     
-  return vtkProcessModuleConnectionManager::SelfConnectionID; 
+  return vtkProcessModuleConnectionManager::GetSelfConnectionID(); 
 }
 
 int vtkProcessModule::LoadModule(vtkTypeUInt32 serverFlags, const char* name, 
     const char* directory)
 {
-  return this->LoadModule(vtkProcessModuleConnectionManager::AllConnectionsID,
+  return this->LoadModule(vtkProcessModuleConnectionManager::GetAllConnectionsID(),
     serverFlags, name, directory);
 }
 
@@ -1323,7 +1324,7 @@ void vtkProcessModule::GatherInformation(vtkPVInformation* info,
   vtkClientServerID id)
 {
   this->GatherInformation(
-    vtkProcessModuleConnectionManager::AllServerConnectionsID,
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID(),
     vtkProcessModule::DATA_SERVER, info, id);
 }
 
@@ -1332,7 +1333,7 @@ void vtkProcessModule::GatherInformationRenderServer(vtkPVInformation* info,
   vtkClientServerID id)
 {
   this->GatherInformation(
-    vtkProcessModuleConnectionManager::AllServerConnectionsID,
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID(),
     vtkProcessModule::RENDER_SERVER, info, id);
 }
 
@@ -1357,13 +1358,13 @@ int vtkProcessModule::SendStream(vtkTypeUInt32 server,
 vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID()
 {
   return this->GetMPIMToNSocketConnectionID(
-    vtkProcessModuleConnectionManager::RootServerConnectionID);
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
 }
 //-----------------------------------------------------------------------------
 vtkPVServerInformation* vtkProcessModule::GetServerInformation()
 {
   vtkPVServerInformation* info = this->GetServerInformation(
-    vtkProcessModuleConnectionManager::RootServerConnectionID);
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
   return (info)? info : this->ServerInformation;
 }
 //-----------------------------------------------------------------------------
@@ -1386,7 +1387,7 @@ int vtkProcessModule::GetDirectoryListing(const char* dir,
     vtkStringList* dirs, vtkStringList* files, int save)
 {
   return this->GetDirectoryListing(
-    vtkProcessModuleConnectionManager::RootServerConnectionID, dir,
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), dir,
     dirs, files, save);
 }
 
@@ -1406,7 +1407,7 @@ vtkSocketController* vtkProcessModule::GetSocketController()
   // Get first Server Connection.
   vtkConnectionIterator  * iter = this->ConnectionManager->NewIterator();
   iter->SetMatchConnectionID(
-    vtkProcessModuleConnectionManager::AllServerConnectionsID);
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID());
   
   vtkRemoteConnection* conn = 0;
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -1432,7 +1433,7 @@ vtkSocketController* vtkProcessModule::GetRenderServerSocketController()
   // Get first Server Connection.
   vtkConnectionIterator  * iter = this->ConnectionManager->NewIterator();
   iter->SetMatchConnectionID(
-    vtkProcessModuleConnectionManager::AllServerConnectionsID);
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkServerConnection* sconn = vtkServerConnection::SafeDownCast(
