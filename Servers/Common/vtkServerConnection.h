@@ -142,8 +142,8 @@ protected:
   vtkPVServerInformation* ServerInformation;
   vtkClientServerStream* LastResultStream;
 private:
-  vtkServerConnection(const vtkServerConnection&);
-  void operator=(const vtkServerConnection&);
+  vtkServerConnection(const vtkServerConnection&); // Not implemented.
+  void operator=(const vtkServerConnection&); // Not implemented.
 
 };
 
