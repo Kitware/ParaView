@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.4");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.5");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -133,6 +133,8 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
     // Remove all observers.
     this->ParallelRenderManager->RemoveObserver(this->StartParallelRenderTag);
     this->ParallelRenderManager->RemoveObserver(this->EndParallelRenderTag);
+    this->StartParallelRenderTag = 0;
+    this->EndParallelRenderTag = 0;
 
     // Delete the reference.
     this->ParallelRenderManager->UnRegister(this);
@@ -182,6 +184,8 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
       this->RenderWindow->RemoveObserver(this->StartRenderTag);
       this->RenderWindow->RemoveObserver(this->EndRenderTag);
       this->ObservingRenderWindow = 0;
+      this->StartRenderTag = 0;
+      this->EndRenderTag = 0;
       }
     }
   else
@@ -191,32 +195,20 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
     if (this->RenderWindow)
       {
       vtkCallbackCommand *cbc;
-        
-      vtkRendererCollection *rens = this->GetRenderers();
-      if (rens)
-        {
-        vtkRenderer *ren;
-        rens->InitTraversal();
-        ren = rens->GetNextItem();
-        if (ren)
-          {
-          this->ObservingRenderWindow = 1;
-          
-          cbc= vtkCallbackCommand::New();
-          cbc->SetCallback(::SatelliteStartRender);
-          cbc->SetClientData(this);
-          this->StartRenderTag
-            = ren->AddObserver(vtkCommand::StartEvent,cbc);
-          cbc->Delete();
-          
-          cbc = vtkCallbackCommand::New();
-          cbc->SetCallback(::SatelliteEndRender);
-          cbc->SetClientData(this);
-          this->EndRenderTag
-            = ren->AddObserver(vtkCommand::EndEvent,cbc);
-          cbc->Delete();
-          }
-        }
+      
+      cbc = vtkCallbackCommand::New();
+      cbc->SetCallback(::SatelliteStartRender);
+      cbc->SetClientData(this);
+      this->StartRenderTag
+        = this->RenderWindow->AddObserver(vtkCommand::StartEvent,cbc);
+      cbc->Delete();
+
+      cbc = vtkCallbackCommand::New();
+      cbc->SetCallback(::SatelliteEndRender);
+      cbc->SetClientData(this);
+      this->EndRenderTag
+        = this->RenderWindow->AddObserver(vtkCommand::EndEvent,cbc);
+      cbc->Delete();
       }
     }
 }
@@ -228,17 +220,11 @@ void vtkPVDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 
   if (this->ObservingRenderWindow && this->ParallelRenderManager)
     {
-    vtkRendererCollection *rens = this->GetRenderers();
-    vtkRenderer *ren;
-    rens->InitTraversal();
-    ren = rens->GetNextItem();
-    if (ren)
-      {
-      // Don't need the observers we just attached.
-      ren->RemoveObserver(this->StartRenderTag);
-      ren->RemoveObserver(this->EndRenderTag);
-      this->ObservingRenderWindow = 0;
-      }
+    this->RenderWindow->RemoveObserver(this->StartRenderTag);
+    this->RenderWindow->RemoveObserver(this->EndRenderTag);
+    this->ObservingRenderWindow = 0;
+    this->StartRenderTag = 0;
+    this->EndRenderTag = 0;
     }
 }
 
@@ -572,6 +558,16 @@ void vtkPVDesktopDeliveryServer::SetRenderWindowSize()
   if (this->RemoteDisplay)
     {
     this->Superclass::SetRenderWindowSize();
+    // vtkXOpenGLRenderWindow::GetSize() called right after
+    // vtkXOpenGLRenderWindow::SetSize() might return the wrong
+    // value due to what seems to be a bug in X. Instead of
+    // relying on that, set the size explicitly
+    if (this->ParallelRenderManager)
+      {
+      this->ParallelRenderManager->SetForceRenderWindowSize(1);
+      this->ParallelRenderManager->SetRenderWindowSize(
+        this->FullImageSize[0], this->FullImageSize[1]);
+      }
     }
   else
     {
