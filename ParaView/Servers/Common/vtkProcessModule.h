@@ -26,11 +26,11 @@
 
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
+#include "vtkConnectionID.h" // needed for ConnectionID.
 
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
-struct vtkConnectionID;
 class vtkDataObject;
 class vtkKWProcessStatistics;
 class vtkMultiProcessController;
