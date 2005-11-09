@@ -29,7 +29,7 @@ class vtkKWTextWithScrollbars;
 class vtkKWWidget;
 class vtkPVApplication;
 
-class vtkPVCredits : public vtkKWObject
+class VTK_EXPORT vtkPVCredits : public vtkKWObject
 {
 public:
   static vtkPVCredits* New();

@@ -134,7 +134,7 @@ protected:
 
   int AbortConnection;
 private:
-  vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implented.
+  vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implemented.
   void operator=(const vtkProcessModuleConnection&); // Not implemented.
 
   //BTX
