@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.38");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2220,6 +2220,31 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonSelectCallback(
   vtkKWCheckButton *cb = vtkKWCheckButton::SafeDownCast(widget);
   if (widget)
     {
+    // Make sure we are dealing with the right one
+    // Sometimes when a column is sorted, not *all* cells with a user-defined
+    // window are re-created. In our case, our user-defined checkbutton
+    // has its row,col location coded in its callback. Yet, sorting the
+    // column might have moved the checkbutton around, without re-creating
+    // it, i.e. without updating its callback. Let's check if this is the
+    // case, and look for the right location if not matching.
+
+    if (strcmp(widget->GetWidgetName(), 
+               this->GetCellWindowWidgetName(row, col)))
+      {
+      for (row = 0; row < this->GetNumberOfRows(); row++)
+        {
+        if (!strcmp(widget->GetWidgetName(), 
+                    this->GetCellWindowWidgetName(row, col)))
+          {
+          break;
+          }
+        }
+      if (row == this->GetNumberOfRows())
+        {
+        return;
+        }
+      }
+
     char cb_state[10];
     sprintf(cb_state, "%d", cb->GetSelectedState());
     int validated = atoi(this->InvokeEditEndCommand(row, col, cb_state));
