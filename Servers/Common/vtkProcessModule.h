@@ -89,7 +89,7 @@ public:
       return serverId;
       }
     
-    if (serverId == DATA_SERVER | RENDER_SERVER)
+    if (serverId == (DATA_SERVER | RENDER_SERVER) )
       {
       return DATA_SERVER_ROOT;
       }
