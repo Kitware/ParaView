@@ -42,6 +42,7 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
 
   set col_index [mcl1 AddColumn ""]
   mcl1 SetColumnFormatCommandToEmptyOutput $col_index
+  mcl1 SetColumnLabelImageToPredefinedIcon $col_index 62
 
   set col_index [mcl1 AddColumn "Color"]
   mcl1 ColumnEditableOn $col_index
@@ -58,8 +59,6 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
   mcl1 ColumnResizableOff $col_index
   mcl1 ColumnStretchableOff $col_index
   mcl1 SetColumnFormatCommandToEmptyOutput $col_index
-
-  mcl1 SetColumnLabelImageToPredefinedIcon 4 62
 
   # The callback that is invoked for each cell in the completion column. 
 

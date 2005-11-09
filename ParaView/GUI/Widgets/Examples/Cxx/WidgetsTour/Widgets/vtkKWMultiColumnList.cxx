@@ -71,6 +71,7 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
 
   col_index = mcl1->AddColumn(NULL);
   mcl1->SetColumnFormatCommandToEmptyOutput(col_index);
+  mcl1->SetColumnLabelImageToPredefinedIcon(col_index, vtkKWIcon::IconLock);
 
   col_index = mcl1->AddColumn("Color");
   mcl1->ColumnEditableOn(col_index);
@@ -87,8 +88,6 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
   mcl1->ColumnResizableOff(col_index);
   mcl1->ColumnStretchableOff(col_index);
   mcl1->SetColumnFormatCommandToEmptyOutput(col_index);
-
-  mcl1->SetColumnLabelImageToPredefinedIcon(4, vtkKWIcon::IconLock);
 
   // The callback that is invoked for each cell in the completion column. 
   // This is rather ugly to do in C++. In a real application, you will

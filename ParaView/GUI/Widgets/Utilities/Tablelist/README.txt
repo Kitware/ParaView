@@ -26,7 +26,13 @@ The changes are:
      then remove everything below: tablelist::condEditContainingCell ... \ 
   b) in: bind TablelistBody <Button-1> {...}
      remove the line: tablelist::condEditContainingCell ... \ + next line
-         
+
+- in tablelistUtil.tcl, fix a bug related to images in column label. Quoting 
+  the author: "In the interim you can work around this bug by inserting the
+  statement
+    set data(lastCol) $col
+  after line #986".
+
 --------------------------------------------------------------------------
 
                The Multi-Column Listbox Package Tablelist
