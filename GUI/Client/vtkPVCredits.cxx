@@ -28,8 +28,10 @@
 
 #include "Resources/vtkPVSplashScreen.h" // for image.
 
+#include <vtkstd/string>
+
 vtkStandardNewMacro(vtkPVCredits);
-vtkCxxRevisionMacro(vtkPVCredits, "1.1");
+vtkCxxRevisionMacro(vtkPVCredits, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVCredits::vtkPVCredits()
 {
