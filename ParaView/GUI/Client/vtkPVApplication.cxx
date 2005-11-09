@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.376");
+vtkCxxRevisionMacro(vtkPVApplication, "1.377");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1700,6 +1700,16 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowSourcesLongHelp?"on":"off") << endl;
   os << indent << "SourcesBrowserAlwaysShowName: " 
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
+  os << indent << "Credits: ";
+  if (this->Credits)
+    {
+    this->Credits->ProcessModule(os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+    
 
   os << indent << "SMApplication: ";
   if (this->SMApplication)
