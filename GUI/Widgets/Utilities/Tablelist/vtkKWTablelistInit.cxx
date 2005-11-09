@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTablelistInit );
-vtkCxxRevisionMacro(vtkKWTablelistInit, "1.1");
+vtkCxxRevisionMacro(vtkKWTablelistInit, "1.2");
 
 int vtkKWTablelistInit::Initialized = 0;
 
@@ -44,7 +44,7 @@ void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
 
   vtkKWTablelistInit::Initialized = 1;
 
-  // Create the images required for tree.tcl
+  // Create the images required by the lib
 
   if (!vtkKWTkUtilities::UpdatePhoto(
         interp, 

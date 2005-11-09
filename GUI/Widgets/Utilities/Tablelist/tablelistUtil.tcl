@@ -984,6 +984,7 @@ proc tablelist::setupColumns {win columns createLabels} {
 	    set pixels 0
 	}
 	lappend data(colList) $pixels $alignment
+    set data(lastCol) $col
 
 	if {$createLabels} {
 	    set data($col-elided) 0
