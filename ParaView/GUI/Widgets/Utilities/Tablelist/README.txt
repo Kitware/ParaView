@@ -33,6 +33,11 @@ The changes are:
     set data(lastCol) $col
   after line #986".
 
+- another bug fix, in tablelistConfig.tcl please locate the 2 statements
+    if {$existsAux && [string compare $val $data($name)] == 0} {
+  and replace:
+    if {$existsAux && [info exists data($name)] && [string compare $val $data($name)] == 0} {
+
 --------------------------------------------------------------------------
 
                The Multi-Column Listbox Package Tablelist
