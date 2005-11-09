@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 
 // forward declare the initialize function
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);

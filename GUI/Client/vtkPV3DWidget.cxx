@@ -24,9 +24,9 @@
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 
+#include "vtkProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVTraceHelper.h"
 
 #include "vtkSMProxyManager.h"
@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.75");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.76");
 
 //===========================================================================
 //***************************************************************************

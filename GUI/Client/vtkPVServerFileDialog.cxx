@@ -28,14 +28,14 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.50");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.51");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -776,7 +776,7 @@ vtkPVApplication* vtkPVServerFileDialog::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Update()
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
 

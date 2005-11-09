@@ -20,7 +20,7 @@
 
 #include "vtkObject.h"
 
-class vtkPVProcessModule;
+class vtkProcessModule;
 
 class VTK_EXPORT vtkPVServerObject : public vtkObject
 {
@@ -31,15 +31,15 @@ public:
 
   // Description:
   // Get/Set the process module for this node.
-  virtual void SetProcessModule(vtkPVProcessModule*);
-  vtkGetObjectMacro(ProcessModule, vtkPVProcessModule);
+  virtual void SetProcessModule(vtkProcessModule*);
+  vtkGetObjectMacro(ProcessModule, vtkProcessModule);
 
 protected:
   vtkPVServerObject();
   ~vtkPVServerObject();
 
   // The process module for this node.
-  vtkPVProcessModule* ProcessModule;
+  vtkProcessModule* ProcessModule;
 
 private:
   vtkPVServerObject(const vtkPVServerObject&); // Not implemented

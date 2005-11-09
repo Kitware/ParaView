@@ -24,9 +24,9 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVListBoxToListBoxSelectionEditor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.119");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.120");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -428,7 +428,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   // Have to regenerate prefix, pattern...
 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
 
   char* number = new char [ strlen(fileName) + 1];
@@ -1007,7 +1007,7 @@ void vtkPVFileEntry::UpdateAvailableFiles( int force )
     {
     return;
     }
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
   pm->GetDirectoryListing(this->Path, 0, files, 0);
 

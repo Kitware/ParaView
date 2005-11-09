@@ -16,7 +16,6 @@
 
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPDataSetReader.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -27,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.21");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.22");
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetReaderModule::CreateProperties()

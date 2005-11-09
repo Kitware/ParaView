@@ -25,8 +25,8 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVTraceHelper.h"
@@ -149,7 +149,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.40");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -177,7 +177,7 @@ vtkPVXDMFParameters::~vtkPVXDMFParameters()
   this->SetFrameLabel(0);
   if(this->ServerSideID.ID)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     vtkClientServerStream stream;
     pm->DeleteStreamObject(this->ServerSideID, stream);
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
@@ -366,7 +366,7 @@ void vtkPVXDMFParameters::Accept()
 //---------------------------------------------------------------------------
 void vtkPVXDMFParameters::SetParameterIndex(const char* label, int value)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->VTKReaderID << "SetParameterIndex" << label << value

@@ -15,15 +15,14 @@
 #include "vtkPVProcessModuleGUIHelper.h"
 #include "vtkPVConfig.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVClientServerModule.h"
 #include "vtkPVGUIClientOptions.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 #include "vtkKWMessageDialog.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.25");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.26");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -95,8 +94,7 @@ int vtkPVProcessModuleGUIHelper::InitializeApplication()
     this->PVApplication = vtkPVApplication::New();
     this->PVApplication->SetOptions(vtkPVGUIClientOptions::SafeDownCast(options));
 
-    this->PVApplication->SetProcessModule(
-      vtkPVProcessModule::SafeDownCast(this->ProcessModule));
+    this->PVApplication->SetProcessModule(this->ProcessModule);
     // Start the application (UI). 
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
     this->PVApplication->SetupTrapsForSignals(myId);   
@@ -209,8 +207,11 @@ void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
     }
   if ( this->ProcessModule->GetProgressRequests() == 0 )
     {
+    /* TODO: I am disabling this since, the old ProcessMOdule
+     * never used the Enabled flag anyways.
     this->ProcessModule->SetProgressEnabled(
       this->PVApplication->GetMainWindow()->GetEnabled());
+      */
     }
 }
 

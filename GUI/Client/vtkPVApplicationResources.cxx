@@ -85,10 +85,6 @@
 #include "Resources/vtkPVAttributeEditor.h"
 
 
-// Splash screen
-
-#include "Resources/vtkPVSplashScreen.h"
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
 {
@@ -476,112 +472,6 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVAttributeEditor_height,
     image_PVAttributeEditor_pixel_size,
     image_PVAttributeEditor_length);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CreateSplashScreen()
-{
-  // copy the image from the header file into memory
-  unsigned char *buffer = 
-    new unsigned char [image_PVSplashScreen_length];
-
-  unsigned int i;
-  unsigned char *curPos = buffer;
-  for (i = 0; i < image_PVSplashScreen_nb_sections; i++)
-    {
-    size_t len = strlen((const char*)image_PVSplashScreen_sections[i]);
-    memcpy(curPos, image_PVSplashScreen_sections[i], len);
-    curPos += len;
-    }
-  
-  this->CreatePhoto("PVSplashScreen", 
-                    buffer, 
-                    image_PVSplashScreen_width, 
-                    image_PVSplashScreen_height,
-                    image_PVSplashScreen_pixel_size,
-                    image_PVSplashScreen_length);
-  delete [] buffer;
-
-  if (!this->GetSplashScreen()->IsCreated())
-    {
-    this->GetSplashScreen()->Create(this);
-    }
-  this->GetSplashScreen()->SetProgressMessageVerticalOffset(-17);
-  this->GetSplashScreen()->SetImageName("PVSplashScreen");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::ConfigureAboutDialog()
-{
-  this->Superclass::ConfigureAboutDialog();
-
-  if (!this->SaveRuntimeInfoButton)
-    {
-    this->SaveRuntimeInfoButton = vtkKWPushButton::New();
-    }
-  if (!this->SaveRuntimeInfoButton->IsCreated())
-    {
-    this->SaveRuntimeInfoButton->SetParent(
-      this->AboutDialog->GetBottomFrame());
-    this->SaveRuntimeInfoButton->SetText("Save Information");
-    this->SaveRuntimeInfoButton->Create(this);
-    this->SaveRuntimeInfoButton->SetWidth(16);
-    this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
-    }
-  this->Script("pack %s -side bottom",
-               this->SaveRuntimeInfoButton->GetWidgetName());
-  this->AboutRuntimeInfo->GetWidget()->SetHeight(14);
-  this->AboutRuntimeInfo->GetWidget()->SetConfigurationOption(
-    "-font", "Helvetica 9");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SaveRuntimeInformation()
-{
-  vtkKWLoadSaveDialog *dialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog, "RuntimeInformationPath");
-  dialog->SaveDialogOn();
-  dialog->SetParent(this->AboutDialog);
-  dialog->SetTitle("Save Runtime Information");
-  dialog->SetFileTypes("{{text file} {.txt}}");
-  dialog->Create(this);
-
-  if (dialog->Invoke() &&
-      strlen(dialog->GetFileName()) > 0)
-    {
-    const char *filename = dialog->GetFileName();
-    ofstream file;
-    file.open(filename, ios::out);
-    if (file.fail())
-      {
-      vtkErrorMacro("Could not write file " << filename);
-      dialog->Delete();
-      return;
-      }
-    this->AddAboutText(file);
-    file << endl;
-    this->AddAboutCopyrights(file);
-    this->GetApplication()->SaveDialogLastPathRegistryValue(dialog, "RuntimeInformationPath");
-    }
-  dialog->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::AddAboutText(ostream &os)
-{
-  os << this->GetName() << " was developed by Kitware Inc." << endl
-     << "http://www.paraview.org" << endl
-     << "http://www.kitware.com" << endl
-     << "This is version " << this->MajorVersion << "." << this->MinorVersion
-     << ", release " << this->GetReleaseName() << endl;
-
-  ostrstream str;
-  vtkIndent indent;
-  this->GetOptions()->PrintSelf( str, indent.GetNextIndent() );
-  str << ends;
-  vtkstd::string tmp = str.str();
-  os << endl << tmp.substr( tmp.find( "Runtime information:" ) ).c_str();
-  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

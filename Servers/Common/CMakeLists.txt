@@ -2,13 +2,16 @@ PROJECT(PVServerCommon)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Common_SRCS
+  vtkClientConnection.cxx
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
+  vtkConnectionIterator.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
+  vtkMPISelfConnection.cxx
   vtkPVArrayInformation.cxx
   vtkPVClassNameInformation.cxx
-  vtkPVClientServerModule.cxx
+  #vtkPVClientServerModule.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
@@ -17,35 +20,45 @@ SET(Common_SRCS
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
-  vtkPVMPIProcessModule.cxx
+  #vtkPVMPIProcessModule.cxx
+  #vtkNewProcessModule.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
-  vtkPVProcessModule.cxx
+  #vtkPVProcessModule.cxx
   vtkPVProgressHandler.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
+  vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
   vtkProcessModule.cxx
+  vtkProcessModuleConnection.cxx
+  vtkProcessModuleConnectionManager.cxx
   vtkProcessModuleGUIHelper.cxx
+  vtkRemoteConnection.cxx
+  vtkSelfConnection.cxx
+  vtkServerConnection.cxx
   vtkStringList.cxx  
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkProcessModuleGUIHelper
-  vtkProcessModule
-  vtkPVInformation
   vtkPVCreateProcessModule
+  vtkPVInformation
+  vtkProcessModuleConnection
+  vtkProcessModuleGUIHelper
+  vtkRemoteConnection
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
+  vtkConnectionIterator.cxx
   vtkPVProgressHandler.cxx
   vtkStringList.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVServerOptions.cxx
+  vtkPVServerSocket.cxx
   vtkPVCreateProcessModule
   WRAP_EXCLUDE)
 

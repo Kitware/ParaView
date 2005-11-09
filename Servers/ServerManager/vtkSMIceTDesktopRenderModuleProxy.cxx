@@ -18,10 +18,9 @@
 #include "vtkClientServerID.h"
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVClientServerModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
@@ -30,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.9");
 
 //-----------------------------------------------------------------------------
 class vtkSMIceTDesktopRenderModuleProxyProxySet
@@ -96,8 +95,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   ivp->SetElements1(0);
   this->PKdTreeProxy->UpdateVTKObjects();
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   // We must create an ICE-T Renderer on the server and a regular renderer on the
   // client.
@@ -143,8 +141,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateCompositeManager()
     return;
     }
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   // Similar to the renderer, we create our peculiar CompositeManager.
   this->CompositeManagerProxy->SetServers(vtkProcessModule::CLIENT);
@@ -167,8 +164,7 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
   vtkSMIntVectorProperty* ivp;
   vtkSMProxyProperty* pp;
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
   // Cannot do this with the server manager because this method only
@@ -303,18 +299,14 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     int enableOffscreen = 1;
 
     // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVClientServerModule* csm = 
-      vtkPVClientServerModule::SafeDownCast(pm);
-    if (csm)
+    
+    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+    pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
+    if (!di->GetCanOpenDisplay())
       {
-      vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-      csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
-      if (!di->GetCanOpenDisplay())
-        {
-        enableOffscreen = 0;
-        }
-      di->Delete();
+      enableOffscreen = 0;
       }
+    di->Delete();
     if (enableOffscreen)
       {
       vtkSMProperty* p = 
@@ -471,8 +463,8 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
              << "SetComposeOperation" << 1 // Over
              << vtkClientServerStream::End;
-      vtkPVProcessModule::GetProcessModule()->SendStream(
-                                       vtkProcessModule::RENDER_SERVER, stream);
+      vtkProcessModule::GetProcessModule()->SendStream(
+        vtkProcessModule::RENDER_SERVER, stream);
       }
     }
   else
@@ -483,8 +475,8 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
     stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
            << "SetComposeOperation" << 0 // Closest
            << vtkClientServerStream::End;
-    vtkPVProcessModule::GetProcessModule()->SendStream(
-                                       vtkProcessModule::RENDER_SERVER, stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModule::RENDER_SERVER, stream);
     }
 
   this->Superclass::StillRender();

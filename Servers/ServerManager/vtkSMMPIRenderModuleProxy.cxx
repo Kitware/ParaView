@@ -13,19 +13,19 @@
 
 =========================================================================*/
 #include "vtkSMMPIRenderModuleProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
-#include "vtkSMProxyManager.h"
-#include "vtkClientServerStream.h"
+
 #include "vtkClientServerID.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -91,7 +91,7 @@ void vtkSMMPIRenderModuleProxy::InteractiveRender()
     this->CompositeManagerProxy->UpdateVTKObjects();
     }
 
-  this->Superclass::StillRender();
+  this->Superclass::InteractiveRender();
 }
 
 //-----------------------------------------------------------------------------
@@ -116,8 +116,7 @@ void vtkSMMPIRenderModuleProxy::CreateVTKObjects(int numObjects)
 void vtkSMMPIRenderModuleProxy::CreateCompositeManager()
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   // Composite Manager is vtkClientCompositeManager in client/server/renderserver mode.
   // Otherwise, vtkPVTreeComposite is used.
@@ -155,8 +154,7 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
     return;
     }
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   unsigned int i;
   vtkClientServerStream stream;

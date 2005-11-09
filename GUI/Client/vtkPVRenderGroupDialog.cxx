@@ -15,7 +15,6 @@
 #include "vtkPVRenderGroupDialog.h"
 
 #include "vtkKWApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
@@ -29,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.10");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVRenderGroupDialog::vtkPVRenderGroupDialog()

@@ -29,7 +29,6 @@ class vtkProcessModule;
 class vtkPVWindow;
 class vtkTimerLog;
 class vtkMPIController;
-class vtkSocketController;
 class vtkPVProgressHandlerInternal;
 
 class VTK_EXPORT vtkPVProgressHandler : public vtkObject
@@ -73,10 +72,6 @@ public:
   // Description:
   // This method register object to be observed.
   virtual void RegisterProgressEvent(vtkObject* po, int id);
-
-  // Description:
-  // Set the socket controller.
-  virtual void SetSocketController(vtkSocketController* soc);
 
   // Description:
   // Set client and server mode
@@ -127,7 +122,6 @@ protected:
   vtkTimerLog* ProgressTimer;
 
   vtkMPIController* MPIController;
-  vtkSocketController* SocketController;
   vtkPVProgressHandlerInternal* Internals;
 
   vtkPVProgressHandler(const vtkPVProgressHandler&); // Not implemented

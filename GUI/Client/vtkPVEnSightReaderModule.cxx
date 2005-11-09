@@ -15,15 +15,15 @@
 #include "vtkPVEnSightReaderModule.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVFileEntry.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVFileEntry.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.58");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -56,7 +56,7 @@ int vtkPVEnSightReaderModule::InitializeData()
 {
   int numSources = this->GetNumberOfVTKSources();
   int i;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
   for(i = 0; i < numSources; ++i)
     {
@@ -105,7 +105,7 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
   if(strcmp(this->SourceClassName, "vtkPVEnSightMasterServerReader") == 0)
     {
     int i;
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     int numSources = this->GetNumberOfVTKSources();
     vtkClientServerStream stream;
     for(i=0; i < numSources; ++i)

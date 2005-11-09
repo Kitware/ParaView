@@ -32,6 +32,7 @@
 
 #include "vtkObject.h"
 class vtkMultiProcessController;
+class vtkServerSocket;
 class vtkSocketCommunicator;
 class vtkMPIMToNSocketConnectionPortInformation;
 class vtkMPIMToNSocketConnectionInternals;
@@ -95,6 +96,7 @@ protected:
 private:
   int PortNumber;
   int Socket;
+  vtkServerSocket* ServerSocket;
   char* HostName;
   char* MachinesFileName;
   vtkSetStringMacro(HostName);

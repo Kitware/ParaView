@@ -28,6 +28,7 @@
 #include "vtkActor.h"
 
 class vtkMapper;
+class vtkPVRenderModuleHelper;
 
 class VTK_EXPORT vtkPVLODActor : public vtkActor
 {
@@ -64,6 +65,13 @@ public:
   vtkMapper *GetMapper() {return this->SelectMapper();}
 
   // Description:
+  // Get/Set the vtkPVRenderModuleHelper. This helper is a representation
+  // of the render module and must be set before rendering. The helper is used
+  // to query the LOD rendering decision made by the render module.
+  vtkGetObjectMacro(RenderModuleHelper, vtkPVRenderModuleHelper);
+  void SetRenderModuleHelper(vtkPVRenderModuleHelper*);
+
+  // Description:
   // When this objects gets modified, this method also modifies the object.
   void Modified();
   
@@ -82,6 +90,8 @@ protected:
   vtkMapper           *LODMapper;
 
   vtkMapper *SelectMapper();
+
+  vtkPVRenderModuleHelper* RenderModuleHelper;
 
   int EnableLOD;
 

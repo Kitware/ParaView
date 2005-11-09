@@ -27,12 +27,11 @@
 #include "vtkSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
-#include "vtkPVProcessModule.h"
 
 // Only required for the prototype streaming feature.
 #include "vtkPolyDataStreamer.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.30");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.31");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -96,7 +95,8 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   // This conditional is only used for the temporary streaming feature.
   // It can be removed when the streaming feature is removed.
   vtkPolyData *pInput = vtkPolyData::SafeDownCast(input);
-  if (vtkPVProcessModule::GetGlobalStreamBlock())
+  // TODO: For now I am disabling Streaming.
+  if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
     {
     this->PreviousUpdateWasBlockedByStreaming = 1;  
     input->SetUpdatePiece(this->UpdatePiece*200);

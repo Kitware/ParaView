@@ -18,12 +18,11 @@
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.27");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVAdvancedReaderModule::vtkPVAdvancedReaderModule()

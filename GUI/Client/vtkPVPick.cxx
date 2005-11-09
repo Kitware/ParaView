@@ -24,7 +24,6 @@
 #include "vtkCellData.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSourceNotebook.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMInputProperty.h"
@@ -60,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.32");
+vtkCxxRevisionMacro(vtkPVPick, "1.33");
 
 
 //*****************************************************************************

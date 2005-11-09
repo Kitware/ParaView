@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVClassNameInformation);
-vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation::vtkPVClassNameInformation()
@@ -52,8 +52,14 @@ void vtkPVClassNameInformation::CopyFromObject(vtkObject* obj)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClassNameInformation::AddInformation(vtkPVInformation*)
+void vtkPVClassNameInformation::AddInformation(vtkPVInformation* info)
 {
+  if (vtkPVClassNameInformation::SafeDownCast(info))
+    {
+    this->SetVTKClassName(
+      vtkPVClassNameInformation::SafeDownCast(info)->GetVTKClassName());
+    }
+  
 }
 
 //----------------------------------------------------------------------------

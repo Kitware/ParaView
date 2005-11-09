@@ -27,6 +27,7 @@ class vtkImageData;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkRenderer;
+class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
 
@@ -184,6 +185,10 @@ protected:
   // Overridden since Interactor properties must be cleared.
   void UnRegisterVTKObjects();
 
+  // Description:
+  // Set the LOD decision.
+  void SetLODFlag(int val);
+
   // This collection keeps a reference to all Display Proxies added
   // to this module.
   vtkCollection* Displays;
@@ -201,6 +206,7 @@ protected:
   vtkSMProxy* InteractorProxy;
   vtkSMProxy* LightKitProxy;
   vtkSMProxy* LightProxy;
+  vtkSMProxy* HelperProxy;
 
   vtkGetObjectMacro(RendererProxy, vtkSMProxy);
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
@@ -208,6 +214,7 @@ protected:
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
   vtkGetObjectMacro(LightKitProxy, vtkSMProxy);
   vtkGetObjectMacro(LightProxy, vtkSMProxy);
+  vtkGetObjectMacro(HelperProxy, vtkSMProxy);
 
   // Pointer to client side objects,
   // for convienience.
@@ -216,6 +223,7 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkRenderWindowInteractor* Interactor;
   vtkCamera* ActiveCamera;
+  vtkPVRenderModuleHelper* Helper;
   
 
   // Description:
@@ -242,6 +250,9 @@ protected:
   int ResetCameraClippingRangeTag;
   int AbortCheckTag;
   int StartRenderEventTag;
+
+  int UseTriangleStrips;
+  int UseImmediateMode;
 
   // Description:
   // Method called before/after Still Render is called.

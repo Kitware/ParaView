@@ -18,19 +18,19 @@
 #include "vtkErrorCode.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
+#include "vtkSMPart.h"
 #include <vtkstd/string>
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.29");
+vtkCxxRevisionMacro(vtkPVWriter, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -154,7 +154,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
                               int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerID dataID = pvs->GetPart()->GetID(0);
   int success = 1;
 

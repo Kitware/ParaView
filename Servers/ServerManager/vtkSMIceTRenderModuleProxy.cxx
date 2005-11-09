@@ -18,15 +18,16 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModuleHelper.h"
 #include "vtkSMIceTMultiDisplayProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkRenderWindow.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -49,8 +50,7 @@ vtkSMIceTRenderModuleProxy::~vtkSMIceTRenderModuleProxy()
 void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
 {
   vtkSMIntVectorProperty* ivp;
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int *tileDims =  pm->GetOptions()->GetTileDimensions();
   this->TileDimensions[0] = tileDims[0];
   this->TileDimensions[1] = tileDims[1];
@@ -111,7 +111,7 @@ void vtkSMIceTRenderModuleProxy::BeginStillRender()
   // HACK to make the client use LOD when compositing.
   if (!this->LocalRender)
     {
-    vtkPVProcessModule::SetGlobalLODFlagInternal(1);
+    this->Helper->SetLODFlag(1);
     }
 }
 
@@ -120,7 +120,7 @@ void vtkSMIceTRenderModuleProxy::EndStillRender()
 {
   if (!this->LocalRender)
     {
-    vtkPVProcessModule::SetGlobalLODFlagInternal(0);
+    this->Helper->SetLODFlag(0);
     }
   this->Superclass::EndStillRender();
   
@@ -133,7 +133,7 @@ void vtkSMIceTRenderModuleProxy::BeginInteractiveRender()
   // Force LOD on the client when Compositing (but not using LOD).
   if (!this->LocalRender && !this->GetUseLODDecision())
     {
-    vtkPVProcessModule::SetGlobalLODFlagInternal(1);
+    this->Helper->SetLODFlag(1);
     }
 }
 
@@ -143,7 +143,7 @@ void vtkSMIceTRenderModuleProxy::EndInteractiveRender()
   // Reset force LOD on the client when Compositing (but not using LOD).
   if (!this->LocalRender && !this->GetUseLODDecision())
     {
-    vtkPVProcessModule::SetGlobalLODFlagInternal(0);
+    this->Helper->SetLODFlag(0);
     }
   this->Superclass::EndInteractiveRender();
 }

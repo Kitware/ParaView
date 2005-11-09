@@ -17,12 +17,12 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.3");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -133,8 +133,7 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
     {
     vtkClientServerStream cmd;
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-                                          vtkProcessModule::GetProcessModule());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "LogStartEvent" << "Execute OutlineCollect"

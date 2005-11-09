@@ -39,10 +39,10 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkProcessModule.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
@@ -63,7 +63,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.461");
+vtkCxxRevisionMacro(vtkPVSource, "1.462");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2149,7 +2149,7 @@ void vtkPVSource::RemoveAllPVInputs()
     vtkPVApplication *pvApp = this->GetPVApplication();
     if (pvApp)
       {
-      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkProcessModule* pm = pvApp->GetProcessModule();
 
       int numSources = this->GetNumberOfVTKSources();
       vtkClientServerStream stream;

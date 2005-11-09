@@ -22,11 +22,10 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVClientServerModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
@@ -38,7 +37,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -93,8 +92,7 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
   vtkSMProxyProperty* pp;
   vtkSMIntVectorProperty* ivp;
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
  
   p = this->CompositeManagerProxy->GetProperty("InitializeRMIs");
   if (!p)
@@ -136,18 +134,13 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     int enableOffscreen = 1;
 
     // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVClientServerModule* csm = 
-      vtkPVClientServerModule::SafeDownCast(pm);
-    if (csm)
+    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+    pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
+    if (!di->GetCanOpenDisplay())
       {
-      vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-      csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
-      if (!di->GetCanOpenDisplay())
-        {
-        enableOffscreen = 0;
-        }
-      di->Delete();
+      enableOffscreen = 0;
       }
+    di->Delete();
 
     if (enableOffscreen)
       {
@@ -204,8 +197,7 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   vtkObject* object;
   vtkSMCompositeDisplayProxy* pDisp;
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress();
 
   this->UpdateAllDisplays();
@@ -252,8 +244,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
   vtkObject* object;
   vtkSMCompositeDisplayProxy* pDisp;
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule()); 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress();
 
   this->UpdateAllDisplays();
@@ -317,8 +308,7 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor(int inReductionFact
   float maxReductionFactor;
 
   newReductionFactor = 1;
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (inReductionFactor > 1)
     {
     // We have to come up with a more consistent way to compute reduction.
@@ -468,8 +458,7 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
     }
 
   // Only MPI has a pointer to a composite.
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!this->CompositeManagerProxy)
     {
     vtkErrorMacro("CompositeManagerProxy not defined!");

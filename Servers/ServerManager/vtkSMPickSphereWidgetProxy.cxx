@@ -15,7 +15,7 @@
 #include "vtkSMPickSphereWidgetProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkCommand.h"
@@ -26,7 +26,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMPickSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickSphereWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPickSphereWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMPickSphereWidgetProxy::vtkSMPickSphereWidgetProxy()

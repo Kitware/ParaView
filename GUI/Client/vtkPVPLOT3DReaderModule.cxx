@@ -18,8 +18,8 @@
 #include "vtkErrorCode.h"
 #include "vtkPLOT3DReader.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkSMPart.h"
 #include "vtkPVLabeledToggle.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.33");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVPLOT3DReaderModule::vtkPVPLOT3DReaderModule()
@@ -54,7 +54,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   vtkPVWindow* window = this->GetPVWindow();
 
   this->UpdateVTKSourceParameters();
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
 
   stream << vtkClientServerStream::Invoke 

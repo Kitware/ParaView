@@ -20,14 +20,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.14");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -62,7 +62,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
                          int numProcs, int ghostLevel, int timeSeries)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(pvs);
   if(!rm)
     {

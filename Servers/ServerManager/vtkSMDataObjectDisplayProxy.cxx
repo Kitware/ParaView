@@ -22,7 +22,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.5");
 
 int vtkSMDataObjectDisplayProxy::UseCache = 0;
 
@@ -363,8 +363,7 @@ void vtkSMDataObjectDisplayProxy::SetupPipeline()
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetupDefaults()
 {
-  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("ProcessModule should be set before setting up the display "
@@ -377,7 +376,7 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GeometryFilterProxy->GetProperty("UseStrips"));
-  ivp->SetElement(0, pm->GetUseTriangleStrips());
+  ivp->SetElement(0, 0);
 
   //TODO: stuff for logging geometry filter times.
   vtkClientServerStream stream;
@@ -434,7 +433,7 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
     vtkErrorMacro("Failed to find property ImmediateModeRendering on MapperProxy.");
     return;
     }
-  ivp->SetElement(0, pm->GetUseImmediateMode());
+  ivp->SetElement(0, 0);
 
   // Init Property properties.
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -641,8 +640,7 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
     }
   ivp->SetElement(0, 0);
 
-  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
-                                          vtkProcessModule::GetProcessModule());
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("ProcessModule should be set before setting up the display "

@@ -19,13 +19,13 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.12");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.13");
 //===========================================================================
 //***************************************************************************
 class vtkSM3DWidgetProxyObserver : public vtkCommand

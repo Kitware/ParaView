@@ -19,10 +19,9 @@
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVProcessModule.h"
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()

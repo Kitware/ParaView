@@ -80,6 +80,7 @@ SET( ParaViewClient_SRCS
   vtkPVComparativeVisManagerGUI.cxx
   vtkPVComparativeVisProgressDialog.cxx
   vtkPVComparativeVisPropertyWidget.cxx
+  vtkPVCredits.cxx
   vtkPVHorizontalAnimationInterface.cxx
   vtkPVVerticalAnimationInterface.cxx
   vtkPVApplicationResources.cxx

@@ -14,52 +14,64 @@
 =========================================================================*/
 // .NAME vtkProcessModule
 // .SECTION Description
-// A class to encapaulate all of the process initialization,
-// This super class assumes the application is running all in one process
-// with no MPI.
+// This is the class that encapsulates all the process initialization.
+// The processes module creates a vtkProcessModuleConnectionManager which
+// is used to setup connections to self, and remote machines (either client or 
+// servers). The Self connection manages MPI process communication, if any.
+// Each connection is assigned a Unique ID. SendStream etc are expected to
+// provide the ID of the connection on which the stream is to be sent. 
 
 #ifndef __vtkProcessModule_h
 #define __vtkProcessModule_h
 
 #include "vtkObject.h"
+#include "vtkClientServerID.h" // needed for UniqueID.
 
-#include "vtkClientServerID.h" // Needed for UniqueID ...
-
-class vtkAlgorithm;
-class vtkMultiProcessController;
-class vtkPVInformation;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
+class vtkConnectionID;
 class vtkDataObject;
-class vtkPVProgressHandler;
-class vtkProcessObject;
-class vtkProcessModuleGUIHelper;
-class vtkPVOptions;
 class vtkKWProcessStatistics;
-
-//BTX
-struct vtkProcessModuleInternals;
-//ETX
-
+class vtkMultiProcessController;
+class vtkProcessModuleInternals;
 class vtkProcessModuleObserver;
+class vtkProcessModuleConnectionManager;
+class vtkProcessModuleGUIHelper;
+class vtkPVInformation;
+class vtkPVOptions;
+class vtkPVProgressHandler;
+class vtkPVServerInformation;
+class vtkRemoteConnection;
+class vtkSocketController;
+class vtkStringList;
+class vtkTimerLog;
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
 public:
+  static vtkProcessModule* New();
+  vtkTypeRevisionMacro(vtkProcessModule, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
 //BTX
   // Description: 
   // These flags are used to specify destination servers for the
-  // SendStream function. 
+  // SendStream function. Note that the new interface no longer
+  // support the server flag CLIENT.
   enum ServerFlags
-  {
-    DATA_SERVER = 0x1,
-    DATA_SERVER_ROOT = 0x2,
-    RENDER_SERVER = 0x4,
-    RENDER_SERVER_ROOT = 0x8,
+    {
+    DATA_SERVER = 0x01,
+    DATA_SERVER_ROOT = 0x02,
+    RENDER_SERVER = 0x04,
+    RENDER_SERVER_ROOT = 0x08,
+    SERVERS = DATA_SERVER | RENDER_SERVER,
+    // CLIENT is only here for the time being.
+    // Step 2 of conversion should relinquish the notion of Client,
+    // instead use SelfConnection.
     CLIENT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
-  };
+    };
 
   enum ProgressEventEnum
     {
@@ -68,32 +80,53 @@ public:
 
   static inline int GetRootId(int serverId)
     {
-      if (serverId == ( DATA_SERVER | CLIENT) || serverId == ( RENDER_SERVER | CLIENT) || serverId == CLIENT_AND_SERVERS)
-        {
-        return CLIENT;
-        }
-      if (serverId > CLIENT)
-        {
-        vtkGenericWarningMacro("Server ID correspond to either data or "
-                               "render server");
-        return 0;
-        }
-      if (serverId == DATA_SERVER_ROOT || serverId == RENDER_SERVER_ROOT)
-        {
-        return serverId;
-        }
-      if (serverId == CLIENT)
-        {
-        return CLIENT;
-        }
-      return serverId << 1;
+    if (serverId & CLIENT)
+      {
+      return CLIENT;
+      }
+    
+    if (serverId == DATA_SERVER_ROOT || serverId == RENDER_SERVER_ROOT)
+      {
+      return serverId;
+      }
+    
+    if (serverId == DATA_SERVER | RENDER_SERVER)
+      {
+      return DATA_SERVER_ROOT;
+      }
+    return serverId << 1;
     }
-//ETX
-  
-  vtkTypeRevisionMacro(vtkProcessModule,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
+
+  // Description:
+  // Get a directory listing for the given directory.  Returns 1 for
+  // success, and 0 for failure (when the directory does not exist).
+  virtual int GetDirectoryListing(vtkConnectionID connectionID, const char* dir, 
+    vtkStringList* dirs, vtkStringList* files, int save);
+  // Description:
+  // Legacy Method.
+  virtual int GetDirectoryListing(const char* dir, 
+    vtkStringList* dirs, vtkStringList* files, int save);
+  
+  // Description:
+  // Load a ClientServer wrapper module dynamically in the server
+  // processes.  Returns 1 if all server nodes loaded the module and 0
+  // otherwise.  connectionID identifies the connection. 
+  // serverFlags can be used to indicate if this is a data server module
+  // or a render server module. The directory argument may be used 
+  // to specify a directory in which to look for the module. 
+  virtual int LoadModule(vtkConnectionID connectionID,
+    vtkTypeUInt32 serverFlags, const char* name, const char* directory);
+
+  // Description:
+  // Legacy Method.
+  int LoadModule(vtkTypeUInt32 serverFlags, const char* name, 
+    const char* directory);
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  virtual int LoadModuleInternal(const char* name, const char* directory);
+
   // Description:
   // Returns a data object of the given type. This is a utility
   // method used to increase performance. The first time the
@@ -101,29 +134,27 @@ public:
   // and put in map. The following calls do not cause instantiation.
   // Used while comparing data types for input matching.
   vtkDataObject* GetDataObjectOfType(const char* classname);
+  
+  // Description:
+  // This is the method to be called to gather information.
+  // This method require the ID of the connection from which
+  // this information must be collected.
+  virtual void GatherInformation(vtkConnectionID connectionID,
+    vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id);
 
   // Description:
-  // This is going to be a generic method of getting/gathering 
-  // information form the server.
-  virtual void GatherInformation(vtkPVInformation* info,
-                                 vtkClientServerID id);
+  // Legacy Methods.
+  void GatherInformation(vtkPVInformation* info, vtkClientServerID id);
+  void GatherInformationRenderServer(vtkPVInformation* info, vtkClientServerID id);
+
   // Description:
-  // Same as GatherInformation but use render server.
-  virtual void GatherInformationRenderServer(vtkPVInformation* info,
-                                             vtkClientServerID id);
-  //ETX
-  virtual void GatherInformationInternal(const char* infoClassName,
-                                         vtkObject* object);
-  
-//BTX  
-  // ParaView.cxx (main) calls this method to setup the processes.
-  // It currently creates the application, but I will try to pass
-  // the application as an argument.
-  virtual int Start(int, char **) = 0;
-  
+  // Start the process modules. It will create the application
+  // and start the event loop. Returns 0 on success.
+  virtual int Start(int argc, char** argv);
+
   // Description:
-  // This breaks rmi loops and cleans up processes.`                
-  virtual void Exit() = 0;
+  // Breaks the event loops and cleans up.
+  virtual void Exit();
 
   // Description:
   // These methods append commands to the given vtkClientServerStream
@@ -140,14 +171,19 @@ public:
   // client.  If the id is for an object on another node then 0 is
   // returned.
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
-
+  
   // Description:
   // Return the last result for the specified server.  In this case,
   // the server should be exactly one of the ServerFlags, and not a
   // combination of servers.  For an MPI server the result from the
   // root node is returned.  There is no connection to the individual
   // nodes of a server.
-  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 server);
+  virtual const vtkClientServerStream& GetLastResult(vtkConnectionID connectionID,
+    vtkTypeUInt32 server);
+
+  // Description:
+  // Legacy Method.
+  const vtkClientServerStream& GetLastResult(vtkTypeUInt32 server);
 
   // Description:
   // Send a vtkClientServerStream to the specified servers.  Servers
@@ -155,12 +191,17 @@ public:
   // use the bitwise or operator to combine servers.  The resetStream
   // flag determines if Reset is called to clear the stream after it
   // is sent.
-  int SendStream(vtkTypeUInt32 server, vtkClientServerStream& stream,
-                 int resetStream=1);
+  int SendStream(vtkConnectionID connectionID, vtkTypeUInt32 server, 
+    vtkClientServerStream& stream, int resetStream=1);
+
+  // Description:
+  // Legacy Method.
+  int SendStream(vtkTypeUInt32 server, 
+    vtkClientServerStream& stream, int resetStream=1);
 
   // Description:
   // Get the interpreter used on the local process.
-  virtual vtkClientServerInterpreter* GetInterpreter();
+  vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
 
   // Description:
   // Initialize/Finalize the process module's
@@ -173,7 +214,7 @@ public:
   // Initialize and finalize process module.
   void Initialize();
   void Finalize();
-
+  
   // Description:
   // Set/Get whether to report errors from the Interpreter.
   vtkGetMacro(ReportInterpreterErrors, int);
@@ -181,26 +222,38 @@ public:
   vtkBooleanMacro(ReportInterpreterErrors, int);
 
   // Description:
-  // The controller is needed for filter that communicate internally.
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  // This is the controller used to communicate with the MPI nodes
+  // by the SelfConnection. 
+  vtkMultiProcessController* GetController();
 
   // Description:
   // Get the partition piece.  -1 means no assigned piece.
-  virtual int GetPartitionId() { return 0;} ;
+  virtual int GetPartitionId();
 
   // Description:
   // Get the number of processes participating in sharing the data.
-  virtual int GetNumberOfPartitions() { return 1;} ;
-  
+  virtual int GetNumberOfPartitions();
+//BTX 
+  // Description:
+  // Get a unique vtkClientServerID for this process module.
   vtkClientServerID GetUniqueID();
-  vtkClientServerID GetProcessModuleID();
 
+  // Description:
+  // Get the vtkClientServerID used for the ProcessModule.
+  vtkClientServerID GetProcessModuleID();
+//ETX
+  // Description:
+  // Get/Set the global process module.
   static vtkProcessModule* GetProcessModule();
   static void SetProcessModule(vtkProcessModule* pm);
 
   // Description:
   // Register object with progress handler.
   void RegisterProgressEvent(vtkObject* po, int id);
+ 
+  // Description:
+  // Internal method--called when a progress event is received.
+  void ProgressEvent(vtkObject *o, int val, const char* filter);
 
   // Description:
   virtual void SendPrepareProgress();
@@ -216,26 +269,13 @@ public:
   void CleanupPendingProgress();
 
   // Description:
-  // Execute event on callback
-  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
-
-  //BTX
-  // Description:
-  // Get the observer.
-  vtkCommand* GetObserver();
-  //ETX
-
-  // Description:
-  // Set the local progress. Subclass should overwrite it.
-  virtual void SetLocalProgress(const char* filter, int progress) = 0;
+  // Set the local progress. This simply forwards the call to GUIHelper,
+  // if any.
+  void SetLocalProgress(const char* filter, int progress);
   vtkGetMacro(ProgressRequests, int);
   vtkSetMacro(ProgressRequests, int);
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 
-  // Description:
-  vtkSetMacro(ProgressEnabled, int);
-  vtkGetMacro(ProgressEnabled, int);
-  
   // Description:
   // Set and get the application options
   vtkGetObjectMacro(Options, vtkPVOptions);
@@ -245,12 +285,102 @@ public:
   // Set the gui helper
   void SetGUIHelper(vtkProcessModuleGUIHelper*);
 
-  // Description:
+ // Description:
   // Get a pointer to the log file.
   ofstream* GetLogFile();
-
   virtual void CreateLogFile();
 
+  // Description:
+  // For loggin from Tcl start and end execute events.  We do not have c
+  // pointers to all filters.
+  void LogStartEvent(const char* str);
+  void LogEndEvent(const char* str);
+
+  // Description:
+  // More timer log access methods.  Static methods are not accessible 
+  // from tcl.  We need a timer object on all procs.
+  void SetLogBufferLength(int length);
+  void ResetLog();
+  void SetEnableLog(int flag);
+
+  // Description:
+  // Time threshold for event (start-end) when getting the log with indents.
+  // We do not have a timer object on all procs.  Statics do not work with Tcl.
+  vtkSetMacro(LogThreshold, double);
+  vtkGetMacro(LogThreshold, double);
+
+//BTX
+  // Description:
+  // I am experimenting with streaming. This turns streaming on and off.
+  // When this value is zero, pipelines do not update.
+  // When the flag is turned on, then the pipeline streams.
+  void SetStreamBlock(vtkConnectionID id, int val);
+  int GetStreamBlock(vtkConnectionID id);
+//ETX
+  void SetStreamBlockInternal(int val);
+
+  // Description:
+  // We need to get the data path for the demo on the server.
+  const char* GetPath(const char* tag, const char* relativePath, const char* file);
+  
+  // Description:  
+  // This method leaks memory.  It is a quick and dirty way to set different 
+  // DISPLAY environment variables on the render server.  I think the string 
+  // cannot be deleted until paraview exits.  The var should have the form:
+  // "DISPLAY=amber1"
+  virtual void SetProcessEnvironmentVariable(int processId, const char* var);
+
+  // Description:
+  // Propagate from the options so that it is available in CS
+  int GetRenderNodePort();
+  char* GetMachinesFileName();
+  int GetClientMode();
+  unsigned int GetNumberOfMachines();
+  const char* GetMachineName(unsigned int idx);
+
+//BTX
+  // Description:
+  // Earlier, the ServerInformation was synchronized with the ClientOptions.
+  // This no longer is appropriate. Hence, we provide access to the server information
+  // on each connection.
+  vtkPVServerInformation* GetServerInformation(vtkConnectionID id);
+
+  // Description:
+  // Legacy Method
+  vtkPVServerInformation* GetServerInformation();
+
+  // Description:
+  // Get the ID used for MPIMToNSocketConnection for the given connection.
+  vtkClientServerID GetMPIMToNSocketConnectionID(vtkConnectionID id);
+  
+  // Description:
+  // Legacy Method.
+  vtkClientServerID GetMPIMToNSocketConnectionID(); 
+//ETX
+
+  // Description:
+  // Synchronizes the Client options with the specified server.
+  // Not sure this is applicable in anything but legacy ParaView.
+  // Synchronizes with the the first server connection.
+  void SynchronizeServerClientOptions();
+  
+  // Description:
+  // Legacy Methods. These methods returns the controller for the first
+  // server connection for now. Need to figure out how to get rid of them.
+  vtkSocketController* GetSocketController();
+  vtkSocketController* GetRenderServerSocketController();
+  
+
+  // Description:
+  // Get the active remote connection.
+  vtkGetObjectMacro(ActiveRemoteConnection, vtkRemoteConnection);
+
+  // Description:
+  // Get the socket controller associated with the ActiveRemoteConnection;
+  vtkSocketController* GetActiveSocketController();
+
+  // Description:
+  // Get and Set the application installation directory
 //BTX
   enum CommunicationIds
   {
@@ -278,72 +408,102 @@ public:
     TemporalPickHasData,
     TemporalPicksData
   };
-//ETX
 
+//ETX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
 
-  // Description:
-  // Given the servers that need to receive the stream, create a flag
-  // that will send it to the correct places for this process module and
-  // make sure it only gets sent to each server once.
-  virtual vtkTypeUInt32 CreateSendFlag(vtkTypeUInt32 servers);
-  // send a stream to the client
-  virtual int SendStreamToClient(vtkClientServerStream&);
-  // send a stream to the data server
-  virtual int SendStreamToDataServer(vtkClientServerStream&);
-  // send a stream to the data server root mpi process
-  virtual int SendStreamToDataServerRoot(vtkClientServerStream&);
-  // send a stream to the render server
-  virtual int SendStreamToRenderServer(vtkClientServerStream&);
-  // send a stream to the render server root mpi process
-  virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
-
-  // Description:
-  // Get the last result from the DataServer, RenderServer or Client.
-  // If these are MPI processes, only the root last result is returned.
-  virtual const vtkClientServerStream& GetLastDataServerResult();
-  virtual const vtkClientServerStream& GetLastRenderServerResult();
-  virtual const vtkClientServerStream& GetLastClientResult();
-  
-  
-  static void InterpreterCallbackFunction(vtkObject* caller,
-                                          unsigned long eid,
-                                          void* cd, void* d);
-  virtual void InterpreterCallback(unsigned long eid, void*);
-
-  virtual const char* DetermineLogFilePrefix() { return "NodeLog"; }
-
-  vtkMultiProcessController *Controller;
-  vtkPVInformation *TemporaryInformation;
-
-  vtkClientServerInterpreter* Interpreter;
-  vtkClientServerStream* ClientServerStream;
-  vtkClientServerID UniqueID;
-  vtkCallbackCommand* InterpreterObserver;
-  int ReportInterpreterErrors;
-
   static vtkProcessModule* ProcessModule;
 
-  vtkProcessModuleInternals* Internals;
+  static void InterpreterCallbackFunction(vtkObject* caller,
+    unsigned long eid, void* cd, void* d);
+  virtual void InterpreterCallback(unsigned long eid, void*);
 
-  void ProgressEvent(vtkObject *o, int val, const char* filter);
+  // Description:
+  // Detemines the log file prefix depending upon node type.
+  virtual const char* DetermineLogFilePrefix();
+
+
+  // Description:
+  // Execute event on callback.
+  void ExecuteEvent(vtkObject* o, unsigned long event, void* calldata);
+
+  // Description:
+  // Called to set up the connections, if any. 
+  // Returns 0 on error, 1 on success.
+  int InitializeConnections();
+
+  // Description:
+  // Connect to a remote server or client already waiting for us.
+  // Returns 0 on error, 1 on success.
+  int ConnectToRemote();
+
+  // Description:
+  // Setup a wait connection that is waiting for a remote process to
+  // connect to it.  This can be either the client or the server.
+  // Returns 0 on error, 1 on success.
+  int SetupWaitForConnection();
+
+  // Description:
+  // Return 1 if the connection should wait, and 0 if the connet
+  int ShouldWaitForConnection();
+  
+
+  // Description:
+  // Called on client in reverse connection mode. Returns after the
+  // client has connected to a RenderServer/DataServer (in case of 
+  // client-render-server) or Server.
+  int ClientWaitForConnection();
+  
+  // Description:
+  // ProcessModule runs on a SingleThread. Hence, we have the notion 
+  // of which connection has some activity at a given time. This "active"
+  // connection is identified by ActiveRemoteConnection. This only applies 
+  // to remote connections. A remote connection is active
+  // when it is processing some stream on the SelfConnection.
+  // It is the responsibility of vtkRemoteConnection (and subclasses)
+  // to set this pointer appropriately. Note that this is reference counted.
+  vtkRemoteConnection* ActiveRemoteConnection;
+  void SetActiveRemoteConnection(vtkRemoteConnection*);
+  //BTX
+  // so that this class can access SetActiveConnection.
+  friend class vtkRemoteConnection;
+  //ETX
+
+  
+  vtkClientServerID UniqueID;
+  
+  vtkClientServerInterpreter* Interpreter;
+  vtkCallbackCommand* InterpreterObserver;
+  int ReportInterpreterErrors;
+  //BTX
+  friend class vtkProcessModuleObserver;
+  //ETX
+
+  vtkProcessModuleInternals* Internals;
+  vtkProcessModuleObserver* Observer;
+  vtkProcessModuleConnectionManager* ConnectionManager;
 
   vtkPVProgressHandler* ProgressHandler;
   int ProgressRequests;
-  int ProgressEnabled;
 
-  vtkProcessModuleObserver* Observer;
   vtkPVOptions* Options;
   vtkProcessModuleGUIHelper* GUIHelper;
-  ofstream *LogFile;
 
-  vtkKWProcessStatistics *MemoryInformation;
+  // Description:
+  // A system wide server information object.
+  vtkPVServerInformation* ServerInformation;
+  double LogThreshold;
+  ofstream *LogFile;
+  vtkTimerLog* Timer;
+  vtkKWProcessStatistics* MemoryInformation;
 
 private:
-  vtkProcessModule(const vtkProcessModule&); // Not implemented
-  void operator=(const vtkProcessModule&); // Not implemented
+  vtkProcessModule(const vtkProcessModule&); // Not implemented.
+  void operator=(const vtkProcessModule&); // Not implemented.
 };
 
+
 #endif
+

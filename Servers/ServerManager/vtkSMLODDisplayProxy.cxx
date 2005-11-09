@@ -14,16 +14,18 @@
 =========================================================================*/
 
 #include "vtkSMLODDisplayProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVLODPartDisplayInformation.h"
+#include "vtkPVRenderModuleHelper.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInputProperty.h"
-#include "vtkPVLODPartDisplayInformation.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -258,11 +260,37 @@ void vtkSMLODDisplayProxy::CacheUpdate(int idx, int total)
 }
 
 //-----------------------------------------------------------------------------
+int vtkSMLODDisplayProxy::GetLODFlag()
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ActorProxy->GetProperty("RenderModuleHelper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property RenderModuleHelper.");
+    return 1;
+    }
+  if (pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("RenderModuleHelper not set.");
+    return 1;
+    }
+  vtkPVRenderModuleHelper* helper = vtkPVRenderModuleHelper::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->
+    GetObjectFromID(pp->GetProxy(0)->GetID(0)));
+  if (!helper)
+    {
+    vtkErrorMacro("RenderModuleHelper object not found.");
+    return 1;
+    }
+  return helper->GetLODFlag();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMLODDisplayProxy::Update()
 {
   this->Superclass::Update();
 
-  if (!this->LODGeometryIsValid && vtkPVProcessModule::GetGlobalLODFlag() && 
+  if (!this->LODGeometryIsValid && this->GetLODFlag() && 
     this->LODUpdateSuppressorProxy)
     {
     this->UpdateLODPipeline();
@@ -291,12 +319,28 @@ void vtkSMLODDisplayProxy::UpdateLODPipeline()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMLODDisplayProxy::InvalidateLODGeometry()
+void vtkSMLODDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
+{
+  this->Superclass::MarkModified(modifiedProxy);
+
+  // Do not invalidate geometry if MarkModified() was called by self.
+  // A lot of the changes to the display proxy do not require
+  // invalidating geometry. Those that do should call InvalidateGeometry()
+  // explicitly.
+  if (modifiedProxy != this)
+    {
+    this->InvalidateLODGeometry(this->UseCache);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMLODDisplayProxy::InvalidateLODGeometry(int useCache)
 {
   this->LODGeometryIsValid = 0;
   this->LODInformationIsValid = 0;
   this->InvokeEvent(vtkSMLODDisplayProxy::InformationInvalidatedEvent);
-  if (this->LODUpdateSuppressorProxy)
+  
+  if (!useCache && this->LODUpdateSuppressorProxy)
     {
     vtkSMProperty* p = this->LODUpdateSuppressorProxy->GetProperty("RemoveAllCaches");
     if (!p)
@@ -312,7 +356,7 @@ void vtkSMLODDisplayProxy::InvalidateLODGeometry()
 void vtkSMLODDisplayProxy::InvalidateGeometry()
 {
   this->Superclass::InvalidateGeometry();
-  this->InvalidateLODGeometry();
+  this->InvalidateLODGeometry(0);
 }
 
 //-----------------------------------------------------------------------------

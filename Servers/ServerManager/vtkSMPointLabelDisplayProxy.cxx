@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkSMPointLabelDisplayProxy.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMStringVectorProperty.h"
+#include "vtkMPIMoveData.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkMPIMoveData.h"
-#include "vtkPVDataInformation.h"
+
 vtkStandardNewMacro(vtkSMPointLabelDisplayProxy);
 vtkCxxRevisionMacro(vtkSMPointLabelDisplayProxy, "Revision: 1.1$");
 
@@ -185,8 +186,7 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::SetupDefaults()
 {
-  vtkPVProcessModule* pm =
-    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   vtkSMIntVectorProperty* ivp;
 

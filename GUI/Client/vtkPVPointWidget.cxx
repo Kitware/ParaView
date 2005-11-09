@@ -23,7 +23,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -35,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()

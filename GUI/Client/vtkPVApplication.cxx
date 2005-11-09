@@ -46,12 +46,12 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplicationSettingsInterface.h"
-#include "vtkPVClientServerModule.h"
 #include "vtkPVConfig.h"
+#include "vtkPVCredits.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVHelpPaths.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVProcessModuleGUIHelper.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkPVRenderView.h"
@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.375");
+vtkCxxRevisionMacro(vtkPVApplication, "1.376");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -455,10 +455,11 @@ vtkPVApplication::vtkPVApplication()
   this->SourcesBrowserAlwaysShowName = 0;
   this->ShowSourcesLongHelp = 1;
 
+  this->Credits = vtkPVCredits::New();
+  this->Credits->SetApplication(this);
 
   this->SMApplication = vtkSMApplication::New();
 
-  this->SaveRuntimeInfoButton = NULL;
   this->RenderModuleProxy = 0;
   this->RenderModuleProxyName = 0;
 }
@@ -492,20 +493,13 @@ vtkPVApplication::~vtkPVApplication()
     this->SMApplication->Delete();
     this->SMApplication = NULL;
     }
-  if (this->SaveRuntimeInfoButton)
-    {
-    this->SaveRuntimeInfoButton->Delete();
-    this->SaveRuntimeInfoButton = 0;
-    }
-  
-
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
+void vtkPVApplication::SetProcessModule(vtkProcessModule *pm)
 {
   this->ProcessModule = pm;
-  vtkPVProcessModule::SetProcessModule(pm);
+  vtkProcessModule::SetProcessModule(pm);
   if(pm)
     {  
     // copy all the command line settings from the application
@@ -527,8 +521,7 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 int vtkPVApplication::SetupRenderModule()
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   pm->SynchronizeServerClientOptions();
 
   const char* renderModuleName = 0;
@@ -642,12 +635,7 @@ vtkMultiProcessController* vtkPVApplication::GetController()
 //----------------------------------------------------------------------------
 vtkSocketController* vtkPVApplication::GetSocketController()
 {
-  vtkPVClientServerModule *csm;
-  csm = vtkPVClientServerModule::SafeDownCast(this->ProcessModule);
-  if (csm)
-    {
-    return csm->GetSocketController();
-    }
+  vtkErrorMacro("GetSocketController called!!!"); 
   return NULL;
 }
 
@@ -980,7 +968,7 @@ void vtkPVApplication::Initialize()
 #ifdef VTK_USE_MANGLED_MESA
   if (this->Options->GetUseSoftwareRendering())
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkProcessModule* pm = this->GetProcessModule();
 
     vtkClientServerStream stream;
     vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory", stream);
@@ -1120,11 +1108,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
 //      }
 
   // Splash screen ?
-
+  // Note this creates a cycle...we will break it in Exit().
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
-    this->CreateSplashScreen();
-    this->GetSplashScreen()->SetProgressMessage("Initializing application...");
+    this->Credits->ShowSplashScreen();
+    this->Credits->SetSplashScreenProgressMessage("Initializing application...");
     }
 
   // Application Icon 
@@ -1148,7 +1136,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
-    this->GetSplashScreen()->SetProgressMessage("Creating icons...");
+    this->Credits->SetSplashScreenProgressMessage("Creating icons...");
     }
 
   this->CreateButtonPhotos();
@@ -1164,7 +1152,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
-    this->GetSplashScreen()->SetProgressMessage("Creating UI...");
+    this->Credits->SetSplashScreenProgressMessage("Creating UI...");
     }
 
   ui->Create(this);
@@ -1205,14 +1193,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
-    this->GetSplashScreen()->SetProgressMessage("Looking for old trace files...");
+    this->Credits->SetSplashScreenProgressMessage("Looking for old trace files...");
     }
   char traceName[128];
   int foundTrace = this->CheckForTraceFile(traceName, 128);
 
   if (this->SupportSplashScreen && this->SplashScreenVisibility)
     {
-    this->GetSplashScreen()->Withdraw();
+    this->Credits->HideSplashScreen();
     }
 
   const char* loadedTraceName = 0;
@@ -1318,7 +1306,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   else if (this->Options->GetInternalScriptName())
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkProcessModule* pm = this->GetProcessModule();
     char temp1[1024];
     sprintf(temp1, "%s.pvs", this->Options->GetInternalScriptName());
 
@@ -1362,6 +1350,18 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Break a circular reference.
   this->SetRenderModuleProxy(0);
+}
+
+//----------------------------------------------------------------------------
+vtkKWSplashScreen* vtkPVApplication::GetSplashScreen()
+{
+  return this->Credits->GetSplashScreen();  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DisplayAboutDialog(vtkKWWindowBase *master)
+{
+  this->Credits->ShowAboutDialog(master);  
 }
 
 //----------------------------------------------------------------------------
@@ -1465,6 +1465,13 @@ int vtkPVApplication::Exit()
 {  
   // If errors were reported to the output window, return a bad
   // status.
+  if (this->Credits)
+    {
+    // break the cycle.
+    this->Credits->SetApplication(0);
+    this->Credits->Delete();
+    this->Credits = 0;
+    }
 
   if (vtkPVOutputWindow* w =
       vtkPVOutputWindow::SafeDownCast(vtkOutputWindow::GetInstance()))
@@ -1497,11 +1504,6 @@ int vtkPVApplication::Exit()
   if (this->TraceFileName)
     {
     unlink(this->TraceFileName);
-    }
-  if (this->SaveRuntimeInfoButton)
-    {
-    this->SaveRuntimeInfoButton->Delete();
-    this->SaveRuntimeInfoButton = 0;
     }
   return 1;
 }
@@ -1794,7 +1796,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
     }
 
   // Server path
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = this->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << pm->GetProcessModuleID() << "GetPath" << "Demos" << "Demos" << "Demo1.pvs"

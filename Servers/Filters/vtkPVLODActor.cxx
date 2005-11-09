@@ -19,21 +19,21 @@
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
+#include "vtkPVRenderModuleHelper.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
-#include "vtkPVProcessModule.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.1");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
-
+vtkCxxSetObjectMacro(vtkPVLODActor, RenderModuleHelper, vtkPVRenderModuleHelper);
 //----------------------------------------------------------------------------
 vtkPVLODActor::vtkPVLODActor()
 {
@@ -46,11 +46,13 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
+  this->RenderModuleHelper = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVLODActor::~vtkPVLODActor()
 {
+  this->SetRenderModuleHelper(NULL);
   this->SetLODMapper(NULL);
   this->Device->Delete();
   this->Device = NULL;
@@ -70,7 +72,7 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->Mapper;
     }
 
-  if (vtkPVProcessModule::GetGlobalLODFlag())
+  if (this->RenderModuleHelper && this->RenderModuleHelper->GetLODFlag())
     {
     return this->LODMapper;
     }

@@ -15,12 +15,12 @@
 #include "vtkPVServerObject.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerObject);
-vtkCxxRevisionMacro(vtkPVServerObject, "1.1");
-vtkCxxSetObjectMacro(vtkPVServerObject, ProcessModule, vtkPVProcessModule);
+vtkCxxRevisionMacro(vtkPVServerObject, "1.2");
+vtkCxxSetObjectMacro(vtkPVServerObject, ProcessModule, vtkProcessModule);
 
 //----------------------------------------------------------------------------
 vtkPVServerObject::vtkPVServerObject()

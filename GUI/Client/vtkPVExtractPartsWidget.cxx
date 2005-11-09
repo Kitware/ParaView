@@ -25,7 +25,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMIntVectorProperty.h"
@@ -33,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()

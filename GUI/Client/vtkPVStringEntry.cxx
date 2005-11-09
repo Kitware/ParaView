@@ -20,7 +20,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
@@ -30,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.48");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()

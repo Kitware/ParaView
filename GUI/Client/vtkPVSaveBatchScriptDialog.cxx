@@ -15,7 +15,6 @@
 #include "vtkPVSaveBatchScriptDialog.h"
 
 #include "vtkKWApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -30,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.20");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()

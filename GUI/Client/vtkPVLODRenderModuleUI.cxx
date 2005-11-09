@@ -40,7 +40,6 @@
 #include "vtkSMPart.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVLODRenderModuleUI.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
@@ -58,7 +57,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.33");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()

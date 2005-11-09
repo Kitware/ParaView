@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkPVTimerLogDisplay.h"
 
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVTimerInformation.h"
 #include "vtkPVApplication.h"
 #include "vtkKWCheckButton.h"
@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.37");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -235,7 +235,7 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
   vtkPVApplication* pvApp = this->GetPVApplication();
   if ( pvApp )
     {
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    vtkProcessModule* pm = pvApp->GetProcessModule();
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke 
            << pm->GetProcessModuleID() << "SetLogThreshold" << val
@@ -258,7 +258,7 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
   this->Modified();
 
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << pm->GetProcessModuleID() << "SetLogBufferLength" << 2*length
@@ -280,7 +280,7 @@ int vtkPVTimerLogDisplay::GetBufferLength()
 void vtkPVTimerLogDisplay::Clear()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << pm->GetProcessModuleID() << "ResetLog"
@@ -295,7 +295,7 @@ void vtkPVTimerLogDisplay::Clear()
 void vtkPVTimerLogDisplay::EnableCheckCallback()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetSelectedState()
@@ -394,7 +394,7 @@ void vtkPVTimerLogDisplay::Update()
     this->TimerInformation = NULL;
     }
   this->TimerInformation = vtkPVTimerInformation::New();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   pm->GatherInformation(this->TimerInformation, pm->GetProcessModuleID());
 
   // Special case for client-server.  add the client process as a log.

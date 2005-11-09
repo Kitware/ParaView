@@ -19,7 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -191,8 +191,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
     {
     vtkClientServerStream cmd;
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-      vtkProcessModule::GetProcessModule());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
@@ -270,8 +269,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
     {
     vtkClientServerStream cmd;
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-      vtkProcessModule::GetProcessModule());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogStartEvent"
@@ -610,8 +608,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
     {
     vtkClientServerStream cmd;
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-                                          vtkProcessModule::GetProcessModule());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogStartEvent"
@@ -658,8 +655,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
     {
     vtkClientServerStream cmd;
     vtkClientServerStream stream;
-    vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-      vtkProcessModule::GetProcessModule());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogStartEvent"
@@ -694,8 +690,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
 { 
-  vtkPVProcessModule* pm = 
-    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   int i, num;
   
@@ -848,7 +843,7 @@ void vtkSMCompositeDisplayProxy::SetLODCollectionDecision(int v)
     ivp->SetElement(0, 2);
     }
   //ivp->SetElement(0, this->LODCollectionDecision);
-  this->InvalidateLODGeometry();
+  this->InvalidateLODGeometry(0);
   this->UpdateVTKObjects();
 }
 

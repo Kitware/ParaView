@@ -21,10 +21,10 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkKWListBox.h"
@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.42");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.43");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -96,7 +96,7 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
     return VTK_ERROR;
     }
 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << clone->GetVTKSourceID(0) << "SetFileName" << fname
@@ -115,7 +115,7 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
 int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 {
   int cc;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVApplication* pvApp = this->GetPVApplication();
 
   vtkClientServerStream stream;
@@ -287,7 +287,7 @@ int vtkXDMFReaderModule::Finalize(const char* fname)
 //----------------------------------------------------------------------------
 void vtkXDMFReaderModule::UpdateGrids()
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
 
   // Get the number of grids.
@@ -342,7 +342,7 @@ void vtkXDMFReaderModule::UpdateGrids()
 //----------------------------------------------------------------------------
 void vtkXDMFReaderModule::UpdateDomains()
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
 
   // Get the number of domains.
