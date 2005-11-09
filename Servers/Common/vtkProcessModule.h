@@ -30,7 +30,6 @@
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
-class vtkConnectionID;
 class vtkDataObject;
 class vtkKWProcessStatistics;
 class vtkMultiProcessController;
