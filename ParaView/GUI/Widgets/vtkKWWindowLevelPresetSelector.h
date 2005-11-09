@@ -69,7 +69,7 @@ public:
   vtkBooleanMacro(ModalityColumnVisibility, int);
 
   // Description:
-  // Query if a the pool has a given window/level preset in a group
+  // Query if the pool has a given window/level preset in a group
   virtual int HasPresetWithGroupWithWindowLevel(
     const char *group, double window, double level);
 
