@@ -11,7 +11,6 @@ SET(Common_SRCS
   vtkMPISelfConnection.cxx
   vtkPVArrayInformation.cxx
   vtkPVClassNameInformation.cxx
-  #vtkPVClientServerModule.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
@@ -20,12 +19,9 @@ SET(Common_SRCS
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
-  #vtkPVMPIProcessModule.cxx
-  #vtkNewProcessModule.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
-  #vtkPVProcessModule.cxx
   vtkPVProgressHandler.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx

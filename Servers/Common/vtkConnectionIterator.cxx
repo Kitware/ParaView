@@ -28,13 +28,14 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkConnectionIterator);
-vtkCxxRevisionMacro(vtkConnectionIterator, "1.1");
+vtkCxxRevisionMacro(vtkConnectionIterator, "1.2");
 vtkCxxSetObjectMacro(vtkConnectionIterator, ConnectionManager,
   vtkProcessModuleConnectionManager);
 //-----------------------------------------------------------------------------
 vtkConnectionIterator::vtkConnectionIterator()
 {
-  this->MatchConnectionID = vtkProcessModuleConnectionManager::AllConnectionsID;
+  this->MatchConnectionID = 
+    vtkProcessModuleConnectionManager::GetAllConnectionsID();
   this->ConnectionManager = 0;
   this->Internals = new vtkConnectionIteratorInternals;
   this->InBegin = 0;
@@ -58,15 +59,15 @@ void vtkConnectionIterator::Begin()
     }
   this->InBegin = 1;
   if (this->MatchConnectionID == 
-    vtkProcessModuleConnectionManager::AllConnectionsID)
+    vtkProcessModuleConnectionManager::GetAllConnectionsID())
     {
     this->Internals->Iter = 
       this->ConnectionManager->Internals->IDToConnectionMap.begin();
     }
   else if (this->MatchConnectionID ==
-    vtkProcessModuleConnectionManager::AllServerConnectionsID ||
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID() ||
     this->MatchConnectionID == 
-    vtkProcessModuleConnectionManager::RootServerConnectionID)
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID())
     {
     this->Internals->Iter = 
       this->ConnectionManager->Internals->IDToConnectionMap.begin();
@@ -112,9 +113,9 @@ void vtkConnectionIterator::Next()
   // If the match id was to match only a single conneciton,
   // we terminate the iteration.
   if (!this->InBegin && this->MatchConnectionID != 
-    vtkProcessModuleConnectionManager::AllConnectionsID &&
+    vtkProcessModuleConnectionManager::GetAllConnectionsID() &&
     this->MatchConnectionID !=
-    vtkProcessModuleConnectionManager::AllServerConnectionsID)
+    vtkProcessModuleConnectionManager::GetAllServerConnectionsID())
     {
     // The Root server connection was already pointed to when Begin() 
     // was called. So we finish iteration.
