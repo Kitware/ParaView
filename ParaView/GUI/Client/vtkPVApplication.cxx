@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.377");
+vtkCxxRevisionMacro(vtkPVApplication, "1.378");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1703,7 +1703,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Credits: ";
   if (this->Credits)
     {
-    this->Credits->ProcessModule(os << endl, indent.GetNextIndent());
+    this->Credits->PrintSelf(os << endl, indent.GetNextIndent());
     }
   else
     {
