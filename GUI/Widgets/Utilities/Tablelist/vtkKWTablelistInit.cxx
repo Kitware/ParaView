@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTablelistInit );
-vtkCxxRevisionMacro(vtkKWTablelistInit, "1.2");
+vtkCxxRevisionMacro(vtkKWTablelistInit, "1.3");
 
 int vtkKWTablelistInit::Initialized = 0;
 
@@ -44,7 +44,7 @@ void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
 
   vtkKWTablelistInit::Initialized = 1;
 
-  // Create the images required by the lib
+  // Create the images required by the lib (checkbutton)
 
   if (!vtkKWTkUtilities::UpdatePhoto(
         interp, 

@@ -2247,7 +2247,7 @@ proc tablelist::doCellConfig {row col win opt val} {
 		}
 		set aux $w.l$key,$col
 		set existsAux [winfo exists $aux]
-		if {$existsAux && [string compare $val $data($name)] == 0} {
+		if {$existsAux && [info exists data($name)] && [string compare $val $data($name)] == 0} {
 		    set keepAux 1
 		} else {
 		    set keepAux 0
@@ -2547,7 +2547,7 @@ proc tablelist::doCellConfig {row col win opt val} {
 		}
 		set aux $w.f$key,$col
 		set existsAux [winfo exists $aux]
-		if {$existsAux && [string compare $val $data($name)] == 0} {
+		if {$existsAux && [info exists data($name)] && [string compare $val $data($name)] == 0} {
 		    set keepAux 1
 		} else {
 		    set keepAux 0

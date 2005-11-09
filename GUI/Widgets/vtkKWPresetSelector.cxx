@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.15");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1590,13 +1590,11 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
   list->SetCellText(row, this->GetIdColumnIndex(), buffer);
 
   int image_col_index = this->GetThumbnailColumnIndex();
-  if (this->GetThumbnailColumnVisibility())
-    {
-    //temporary fix
   list->SetCellWindowCommand(
     row, image_col_index, this, "PresetCellThumbnailCallback");
   list->SetCellWindowDestroyCommandToRemoveChild(row, image_col_index);
-  // end fix. should be out of the if, right before it
+  if (this->GetThumbnailColumnVisibility())
+    {
     list->RefreshCellWithWindowCommand(row, image_col_index);
     }
 
