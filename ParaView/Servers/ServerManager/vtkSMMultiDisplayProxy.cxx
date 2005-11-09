@@ -17,10 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {
@@ -53,9 +53,7 @@ void vtkSMMultiDisplayProxy::SetLODCollectionDecision(int)
 void vtkSMMultiDisplayProxy::CreateVTKObjects(int numObjects)
 {
   this->Superclass::CreateVTKObjects(numObjects);
-  vtkPVProcessModule* pm;
-  
-  pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int i;
   
   vtkClientServerStream stream;
@@ -73,8 +71,6 @@ void vtkSMMultiDisplayProxy::CreateVTKObjects(int numObjects)
     }
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkSMMultiDisplayProxy::PrintSelf(ostream &os, vtkIndent indent)
 {

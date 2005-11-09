@@ -21,11 +21,10 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVClientServerModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVTraceHelper.h"
@@ -37,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.30");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -410,7 +409,7 @@ void vtkPVCompositeRenderModuleUI::Initialize()
     return;
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
 
   // Consider the command line option that turns compositing off.
   // This is to avoid compositing when it is not available
@@ -421,18 +420,14 @@ void vtkPVCompositeRenderModuleUI::Initialize()
     }
 
   int foundDisplay = 1;
-  vtkPVClientServerModule* csm = vtkPVClientServerModule::SafeDownCast(pm);
-  if (csm)
+  vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+  pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
+  if (!di->GetCanOpenDisplay())
     {
-    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    csm->GatherInformationRenderServer(di, csm->GetProcessModuleID());
-    if (!di->GetCanOpenDisplay())
-      {
-      this->CompositeOptionEnabled = 0;
-      foundDisplay = 0;
-      }
-    di->Delete();
+    this->CompositeOptionEnabled = 0;
+    foundDisplay = 0;
     }
+  di->Delete();
 
   if ( ! this->CompositeOptionEnabled)
     {

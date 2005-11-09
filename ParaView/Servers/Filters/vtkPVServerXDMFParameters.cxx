@@ -16,7 +16,6 @@
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
 #include "vtkXdmfReader.h"
 #include "vtkClientServerStream.h"
 
@@ -24,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerXDMFParameters);
-vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.1");
+vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVServerXDMFParametersInternals

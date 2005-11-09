@@ -21,11 +21,10 @@
 #define __vtkPVApplication_h
 
 #include "vtkKWApplication.h"
-class vtkPVProcessModule;
+class vtkProcessModule;
 
 class vtkDataSet;
 class vtkKWMessageDialog;
-class vtkKWPushButton;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkSocketController;
@@ -43,6 +42,7 @@ class vtkSMApplication;
 class vtkPVGUIClientOptions;
 class vtkPVOptions;
 class vtkSMRenderModuleProxy;
+class vtkPVCredits;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -66,8 +66,8 @@ public:
   // Description:
   // Process module contains all methods for managing 
   // processes and communication.
-  void SetProcessModule(vtkPVProcessModule *module);
-  vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
+  void SetProcessModule(vtkProcessModule *module);
+  vtkProcessModule* GetProcessModule() { return this->ProcessModule;}
 
   // Description:
   // RenderModuleProxy manages rendering.
@@ -298,35 +298,42 @@ public:
   void DeferredGarbageCollectionPop();
 
   // Description:
-  // Save to a file the information available in the "About ParaView" dialog.
-  void SaveRuntimeInformation();
-
-  // Description:
   // Test some of the features that cannot be tested from the tcl.
   int SelfTest();
-
-protected:
-  vtkPVApplication();
-  ~vtkPVApplication();
-
-  virtual void CreateSplashScreen();
-  virtual void ConfigureAboutDialog();
-  virtual void AddAboutText(ostream &);
-
-  vtkKWPushButton *SaveRuntimeInfoButton;
-
-  void CreateButtonPhotos();
+  
+  // Description:
+  // Helper method to load a resource image.
   void CreatePhoto(const char *name, 
                    const unsigned char *data, 
                    int width, int height, int pixel_size, 
                    unsigned long buffer_length = 0,
                    const char *filename = 0);
+
+  // Description:
+  // Get the about dialog/spash screen.
+  vtkGetObjectMacro(Credits, vtkPVCredits);
+
+  // Description:
+  // Retrieve the splash screen object
+  // As a convenience, this will also call vtkKWSplashScreen::Create() to
+  // create the splash screen widget itself.
+  virtual vtkKWSplashScreen* GetSplashScreen();
+
+  // Description:
+  // Display the about dialog for this application.
+  // Optionally provide a master window this dialog should be the slave of.
+  virtual void DisplayAboutDialog(vtkKWWindowBase *master);
+protected:
+  vtkPVApplication();
+  ~vtkPVApplication();
+
+  void CreateButtonPhotos();
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
   virtual void FindInstallationDirectory();
 
-  vtkPVProcessModule *ProcessModule;
+  vtkProcessModule *ProcessModule;
 
   // For running with SGI pipes.
   int NumberOfPipes;
@@ -368,6 +375,7 @@ protected:
   vtkSMApplication* SMApplication;
 
   vtkPVGUIClientOptions* Options;
+  vtkPVCredits* Credits;
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
   char* RenderModuleProxyName;

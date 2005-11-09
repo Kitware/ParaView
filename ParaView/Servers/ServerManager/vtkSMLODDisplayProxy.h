@@ -48,6 +48,10 @@ public:
   virtual void InvalidateGeometry();
 
   // Description:
+  // Chains to superclass and calls InvalidateGeometry().
+  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
+  
+  // Description:
   // Returns an up to data information object.
   // Do not keep a reference to this object.
   virtual vtkPVLODPartDisplayInformation* GetLODInformation();
@@ -80,11 +84,14 @@ protected:
   int LODInformationIsValid;
   vtkPVLODPartDisplayInformation* LODInformation;  
 
-  void InvalidateLODGeometry();
+  void InvalidateLODGeometry(int useCache);
 
   // Calls Force Update on the LOD Update suppressor.
   void UpdateLODPipeline();
 
+  // Description:
+  // Method to get the render module decision from the RenderModuleHelper.
+  int GetLODFlag();
 private:
   vtkSMLODDisplayProxy(const vtkSMLODDisplayProxy&); // Not implemented.
   void operator=(const vtkSMLODDisplayProxy&); // Not implemented.

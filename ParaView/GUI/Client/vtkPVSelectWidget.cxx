@@ -23,7 +23,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkCollectionIterator.h"
@@ -38,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.74");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.75");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()

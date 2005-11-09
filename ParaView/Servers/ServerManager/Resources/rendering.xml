@@ -831,6 +831,10 @@
           <Group name="mappers" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <ProxyProperty name="RenderModuleHelper"
+        command="SetRenderModuleHelper"
+        saveable="0">
+      </ProxyProperty>
       <!-- End of LODActor -->
     </Proxy>
 
@@ -840,6 +844,10 @@
         <ProxyGroupDomain name="groups">
           <Group name="mappers" />
         </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty name="RenderModuleHelper"
+        command="SetRenderModuleHelper"
+        saveable="0">
       </ProxyProperty>
       <!-- End of LODVolume -->
     </Proxy>
@@ -1165,6 +1173,20 @@
       </IntVectorProperty>
         
       <!-- SubProxies -->
+      <SubProxy>
+        <!-- This is the helper for the render module
+          on the server side : kind of a server side representation
+          for this render module -->
+        <Proxy name="Helper" class="vtkPVRenderModuleHelper">
+          <IntVectorProperty
+            name="LODFlag"
+            command="SetLODFlag"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+        </Proxy>
+      </SubProxy>
       <SubProxy>
         <Proxy name="Light" proxyname="Light" proxygroup="lights">
         </Proxy>
@@ -2047,6 +2069,7 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
+          <Property name="RenderModuleHelper" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>

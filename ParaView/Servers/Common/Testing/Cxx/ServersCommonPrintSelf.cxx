@@ -13,26 +13,31 @@
 
 =========================================================================*/
 
+#include "vtkClientConnection.h"
+#include "vtkConnectionIterator.h"
 #include "vtkMPIMToNSocketConnection.h"
-#include "vtkPVClassNameInformation.h"
-#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVMPIProcessModule.h"
-#include "vtkPVServerInformation.h"
+#include "vtkMPISelfConnection.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModuleGUIHelper.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVNumberOfOutputsInformation.h"
-#include "vtkPVTimerInformation.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVProcessModule.h"
-#include "vtkStringList.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVInformation.h"
-#include "vtkPVProgressHandler.h"
+#include "vtkPVLODPartDisplayInformation.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkPVServerInformation.h"
+#include "vtkPVServerSocket.h"
+#include "vtkPVTimerInformation.h"
+#include "vtkRemoteConnection.h"
+#include "vtkSelfConnection.h"
+#include "vtkServerConnection.h"
+#include "vtkStringList.h"
 
 int main(int, char * [])
 {
@@ -42,8 +47,6 @@ int main(int, char * [])
   c = vtkPVClassNameInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
   c = vtkMPIMToNSocketConnectionPortInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVClientServerModule::New(); c->Print(cout); c->Delete();
-  c = vtkPVMPIProcessModule::New(); c->Print(cout); c->Delete();
   c = vtkPVServerInformation::New(); c->Print(cout); c->Delete();
   c = vtkProcessModuleGUIHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVDataInformation::New(); c->Print(cout); c->Delete();
@@ -51,7 +54,6 @@ int main(int, char * [])
   c = vtkPVTimerInformation::New(); c->Print(cout); c->Delete();
   c = vtkProcessModule::New(); c->Print(cout); c->Delete();
   c = vtkPVDataSetAttributesInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVProcessModule::New(); c->Print(cout); c->Delete();
   c = vtkStringList::New(); c->Print(cout); c->Delete();
   c = vtkPVArrayInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVInformation::New(); c->Print(cout); c->Delete();
@@ -59,5 +61,13 @@ int main(int, char * [])
   c = vtkPVOptions::New(); c->Print(cout); c->Delete();
   c = vtkPVCompositeDataInformation::New(); c->Print(cout); c->Delete();
 
+  c = vtkClientConnection::New(); c->Print(cout); c->Delete();
+  c = vtkConnectionIterator::New(); c->Print(cout); c->Delete();
+  c = vtkMPISelfConnection::New(); c->Print(cout); c->Delete();
+  c = vtkPVServerSocket::New(); c->Print(cout); c->Delete();
+  c = vtkProcessModuleConnectionManager::New(); c->Print(cout); c->Delete();
+  c = vtkRemoteConnection::New(); c->Print(cout); c->Delete();
+  c = vtkSelfConnection::New(); c->Print(cout); c->Delete();
+  c = vtkServerConnection::New(); c->Print(cout); c->Delete();
   return 0;
 }

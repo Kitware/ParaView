@@ -19,7 +19,6 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -29,7 +28,7 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 

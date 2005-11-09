@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModuleHelper.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.17");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -95,6 +95,7 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
+  this->HelperProxy = 0;
   this->Displays = vtkCollection::New();
   this->RendererProps = vtkCollection::New();
   this->Renderer2DProps = vtkCollection::New();
@@ -109,6 +110,10 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
+  this->Helper = 0;
+
+  this->UseTriangleStrips = 0;
+  this->UseImmediateMode = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -139,6 +144,7 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
+  this->HelperProxy = 0;
   this->SetDisplayXMLName(0);
 
   this->Renderer = 0;
@@ -146,6 +152,7 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
+  this->Helper = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,6 +170,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->InteractorProxy = this->GetSubProxy("Interactor");
   this->LightKitProxy = this->GetSubProxy("LightKit");
   this->LightProxy = this->GetSubProxy("Light");
+  this->HelperProxy = this->GetSubProxy("Helper");
 
   if (!this->RendererProxy)
     {
@@ -206,6 +214,12 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
                   "file.");
     return;
     }
+  if (!this->HelperProxy)
+    {
+    vtkErrorMacro("Helper subproxy must be defined in the configuration "
+                  "file.");
+    return;
+    }
     
 
   // I don't directly use this->SetServers() to set the servers of the
@@ -230,11 +244,12 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->HelperProxy->SetServers(
+    vtkProcessModule::CLIENT_AND_SERVERS);
 
   this->Superclass::CreateVTKObjects(numObjects);
 
-  vtkPVProcessModule* pvm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
   
   // Set all the client side pointers.
   this->Renderer2D = vtkRenderer::SafeDownCast(
@@ -247,6 +262,8 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
   this->ActiveCamera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
+  this->Helper = vtkPVRenderModuleHelper::SafeDownCast(
+    pvm->GetObjectFromID(this->HelperProxy->GetID(0)));
 
   //Set the defaul style for the interactor.
   vtkInteractorStyleTrackballCamera* style = vtkInteractorStyleTrackballCamera::New();
@@ -420,6 +437,23 @@ void vtkSMRenderModuleProxy::SetUseLight(int enable)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::SetLODFlag(int val)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->HelperProxy->GetProperty("LODFlag"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property LODFlag on HelperProxy.");
+    return;
+    }
+  if (ivp->GetElement(0) != val)
+    {
+    ivp->SetElement(0, val);
+    this->HelperProxy->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::InteractiveRender()
 {
   this->UpdateAllDisplays();
@@ -466,8 +500,7 @@ void vtkSMRenderModuleProxy::StillRender()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::BeginStillRender()
 {
-  vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule())->
-    SetGlobalLODFlag(0);
+  this->SetLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
 }
 
@@ -484,8 +517,32 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
     {
     return;
     }
+  
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    disp->GetProperty("UseStrips"));
+  if (ivp)
+    {
+    ivp->SetElement(0, this->UseTriangleStrips);
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    disp->GetProperty("ImmediateModeRendering"));
+  if (ivp)
+    {
+    ivp->SetElement(0, this->UseImmediateMode);
+    }
+ 
   this->Displays->AddItem(disp);
+
   disp->AddToRenderModule(this);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    disp->GetProperty("RenderModuleHelper"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->HelperProxy);
+    }
+  disp->UpdateVTKObjects(); 
 }
 
 //-----------------------------------------------------------------------------
@@ -586,6 +643,7 @@ void vtkSMRenderModuleProxy::UpdateAllDisplays()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
 {
+  this->UseTriangleStrips = val;
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -619,6 +677,7 @@ void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetUseImmediateMode(int val)
 {
+  this->UseImmediateMode = val;
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {

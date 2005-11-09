@@ -28,6 +28,7 @@
 
 class vtkLODProp3D;
 class vtkMapper;
+class vtkPVRenderModuleHelper;
 
 class VTK_EXPORT vtkPVLODVolume : public vtkVolume
 {
@@ -73,6 +74,12 @@ public:
   // Overloads the virtual vtkProp method.
   virtual void SetAllocatedRenderTime(double t, vtkViewport *v);
 
+  // Description:
+  // Get/Set the vtkPVRenderModuleHelper. This helper is a representation
+  // of the render module and must be set before rendering. The helper is used
+  // to query the LOD rendering decision made by the render module.
+  vtkGetObjectMacro(RenderModuleHelper, vtkPVRenderModuleHelper);
+  void SetRenderModuleHelper(vtkPVRenderModuleHelper*);
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume();
@@ -85,6 +92,8 @@ protected:
 
   double MapperBounds[6];
   vtkTimeStamp BoundsMTime;
+
+  vtkPVRenderModuleHelper* RenderModuleHelper;
 
   virtual void UpdateLODProperty();
 

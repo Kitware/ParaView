@@ -15,32 +15,18 @@
 #include "vtkPVCreateProcessModule.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVMPIProcessModule.h"
 #include "vtkToolkits.h" // For 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVCreateProcessModule, "1.1");
+vtkCxxRevisionMacro(vtkPVCreateProcessModule, "1.2");
 
 //----------------------------------------------------------------------------
 vtkProcessModule* vtkPVCreateProcessModule::CreateProcessModule(vtkPVOptions* op)
 {
   vtkProcessModule *pm;
-  if (op->GetClientMode() || op->GetServerMode() ||
-    op->GetRenderServerMode()) 
-    {
-    pm = vtkPVClientServerModule::New();
-    }
-  else
-    {
-#ifdef VTK_USE_MPI
-    pm = vtkPVMPIProcessModule::New();
-#else 
-    pm = vtkPVProcessModule::New();
-#endif
-    }
-
+  pm = vtkProcessModule::New();
   pm->SetOptions(op);
   vtkProcessModule::SetProcessModule(pm);
   return pm;

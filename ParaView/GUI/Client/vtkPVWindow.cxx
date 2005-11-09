@@ -60,7 +60,7 @@
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSaveBatchScriptDialog.h"
@@ -97,6 +97,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVCredits.h"
 
 #include "vtkPVLookmarkManager.h"
 
@@ -135,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.771");
+vtkCxxRevisionMacro(vtkPVWindow, "1.772");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -346,7 +347,7 @@ vtkPVWindow::~vtkPVWindow()
   if(this->ServerFileListingID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    vtkProcessModule *pm = pvApp->GetProcessModule();
     if (pm)
       {
       pm->DeleteStreamObject(this->ServerFileListingID, stream);
@@ -1111,7 +1112,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
 
   this->Withdraw();
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
 
   // Put the version in the status bar.
   char version[128];
@@ -1126,7 +1127,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
                     app->GetNumberOfWindows() == 1);
   if (use_splash)
     {
-    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
+    pvApp->GetCredits()->SetSplashScreenProgressMessage("Creating UI (menus)...");
     }
   this->InitializeMenus(app);
 
@@ -1134,7 +1135,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
 
   if (use_splash)
     {
-    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
+    pvApp->GetCredits()->SetSplashScreenProgressMessage("Creating UI (toolbars)...");
     }
 
   this->InteractorToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
@@ -1179,13 +1180,13 @@ void vtkPVWindow::Create(vtkKWApplication *app)
   // Create the main view.
   if (use_splash)
     {
-    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (main view)...");
+    pvApp->GetCredits()->SetSplashScreenProgressMessage("Creating UI (main view)...");
     }
   this->CreateMainView(pvApp);
 
   if (use_splash)
     {
-    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
+    pvApp->GetCredits()->SetSplashScreenProgressMessage("Creating UI (interactors)...");
     }
   this->InitializeInteractorInterfaces(app);
   this->PickCenterToolbar->SetParent(this->GetMainToolbarSet()->GetToolbarsFrame());
@@ -1530,7 +1531,7 @@ void vtkPVWindow::Create(vtkKWApplication *app)
 
   if (use_splash)
     {
-    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
+    pvApp->GetCredits()->SetSplashScreenProgressMessage("Creating UI (preferences)...");
     }
 
   // Update toolbar aspect
@@ -2073,7 +2074,7 @@ void vtkPVWindow::PlayDemo()
 //-----------------------------------------------------------------------------
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkClientServerStream stream;
   if(!this->ServerFileListingID.ID)
     {

@@ -26,12 +26,11 @@
 #include "vtkPVGUIClientOptions.h"
 
 // This is only for the temorary prototype streaming feature.
-#include "vtkPVProcessModule.h"
 #include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.28");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -409,7 +408,8 @@ void vtkPVApplicationSettingsInterface::StreamBlockCallback()
   int flag = this->StreamBlockCheckButton->GetSelectedState() ? 1 : 0;
 
   vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
-  app->GetProcessModule()->SetGlobalStreamBlock(flag);
+//TODO: disabling Streaming stuff for time being.
+//  app->GetProcessModule()->SetGlobalStreamBlock(flag);
   
   if (flag == 0)
     { // Turning the normal update back on.

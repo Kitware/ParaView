@@ -20,9 +20,9 @@
 #include "vtkPVApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
+#include "vtkProcessModule.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVScale.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.68");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.69");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -116,7 +116,7 @@ int vtkPVReaderModule::CloneAndInitialize(int makeCurrent,
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::CanReadFile(const char* fname)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   const char* ext = this->ExtractExtension(fname);
   int matches = 0;
   int canRead = 0;
@@ -352,7 +352,7 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
     {
     vtkSMProperty *prop = this->FileEntry->GetSMProperty();
     this->FileEntry->SetValue(fname);
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     // Since this is a reader, it is ok to assume that there is on
     // VTKSource. Hence, the use of index 0.
     if (prop)

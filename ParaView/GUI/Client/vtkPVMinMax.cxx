@@ -22,7 +22,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntRangeDomain.h"
@@ -34,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.51");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 

@@ -23,7 +23,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
@@ -34,7 +34,7 @@ vtkSMDisplayProxy::vtkSMDisplayProxy()
 vtkSMDisplayProxy::~vtkSMDisplayProxy()
 {
 }
-
+ 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDisplayProxy::GetInteractorProxy(vtkSMRenderModuleProxy* ren)
 {

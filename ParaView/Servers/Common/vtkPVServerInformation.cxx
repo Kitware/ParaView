@@ -16,14 +16,14 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkPVConfig.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
 #include "vtkObjectFactory.h"
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -82,13 +82,14 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(obj);
+  vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
   if(!pm)
     {
-    vtkErrorMacro("Cannot downcast to vtkPVProcessModule.");
+    vtkErrorMacro("Cannot downcast to vtkProcessModule.");
     return;
     }
     
+  // TODO: Process module can no longer give us global ServerOptions.
   this->DeepCopy(pm->GetServerInformation());
 
   vtkPVServerOptions *options =

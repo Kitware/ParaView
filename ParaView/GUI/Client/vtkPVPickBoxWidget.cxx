@@ -26,6 +26,7 @@
 #include "vtkKWView.h"
 #include "vtkMatrix4x4.h" 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
@@ -37,7 +38,6 @@
 #include "vtkSMPickBoxWidgetProxy.h"
 #include "vtkKWCheckButton.h"
 #include "vtkPickBoxWidget.h"
-#include "vtkPVProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 // ATTRIBUTE EDITOR
 #include "vtkSMDoubleVectorProperty.h"
@@ -50,7 +50,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPickBoxWidget);
-vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::vtkPVPickBoxWidget()

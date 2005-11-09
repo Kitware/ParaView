@@ -19,7 +19,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVScaleFactorEntry.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
@@ -35,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 

@@ -21,11 +21,11 @@
 #include "vtkProcessModule.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.20");
+vtkCxxRevisionMacro(vtkSMPart, "1.21");
 
 
 //----------------------------------------------------------------------------
@@ -400,7 +400,8 @@ void vtkSMPart::Update()
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
     // When getting rid of streaming, though away the conditional and keep the else.
-    if (vtkPVProcessModule::GetGlobalStreamBlock())
+    // TODO: disabling for now.
+    if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
       {
       stream << vtkClientServerStream::Invoke
              << pm->GetProcessModuleID() << "GetPartitionId"

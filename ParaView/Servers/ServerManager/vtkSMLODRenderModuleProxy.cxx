@@ -18,8 +18,8 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCollection.h"
 #include "vtkSMLODDisplayProxy.h"
+#include "vtkProcessModule.h"
 #include "vtkPVLODPartDisplayInformation.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMProxyManager.h"
@@ -59,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -231,20 +231,18 @@ void vtkSMLODRenderModuleProxy::InteractiveRender()
 
   // Used in subclass for window subsampling, but not really necessary here.
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
 
   // We need to decide globally whether to use decimated geometry.  
   if (this->GetUseLODDecision())
     {
-    pm->SetGlobalLODFlag(1);
+    this->SetLODFlag(1);
     // We call this again because the LOD branches
     // may not have been updated.
     // this->UpdateAllDisplays(); Superclass::InteractiveRender will call this.
     }
   else
     {
-    pm->SetGlobalLODFlag(0);
+    this->SetLODFlag(0);
     }  
 
   this->Superclass::InteractiveRender();

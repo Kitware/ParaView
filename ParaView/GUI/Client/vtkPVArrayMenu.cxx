@@ -29,7 +29,6 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVFieldMenu.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
@@ -40,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.81");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.82");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);

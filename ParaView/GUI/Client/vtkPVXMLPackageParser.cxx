@@ -17,10 +17,10 @@
 #include "vtkArrayMap.txx"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInputProperty.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -38,7 +38,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.53");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.54");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -670,9 +670,9 @@ int vtkPVXMLPackageParser::LoadPackageLibrary(vtkPVXMLElement* le)
   const char* directory = le->GetAttribute("directory");
 
   // Load the module on the server nodes.
-  vtkPVProcessModule* pm =
+  vtkProcessModule* pm =
     this->Window->GetPVApplication()->GetProcessModule();
-  if(!pm->LoadModule(name, directory))
+  if(!pm->LoadModule(vtkProcessModule::CLIENT_AND_SERVERS, name, directory))
     {
     vtkErrorMacro("Error loading Library component " << name);
     return 0;

@@ -28,7 +28,6 @@ Wylie, Brian
 
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSourceNotebook.h"
 #include "vtkPVWindow.h"
 #include "vtkPVFileEntry.h"
@@ -61,7 +60,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.10");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.11");
 
 
 //----------------------------------------------------------------------------

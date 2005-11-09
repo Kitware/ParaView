@@ -16,7 +16,7 @@
 
 #include <sys/stat.h>
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -65,8 +65,7 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
     return;
     }
   
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   unsigned int i;
   vtkClientServerStream stream;
@@ -138,8 +137,7 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
 void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 {
   int idx;
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
   const char* fileName = pm->GetOptions()->GetCaveConfigurationFileName();
   ifstream *File = 0;
@@ -228,8 +226,7 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 //-----------------------------------------------------------------------------
 void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
 {
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVServerInformation* serverInfo = pm->GetServerInformation();
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(

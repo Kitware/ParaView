@@ -16,7 +16,7 @@
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkSource.h"
 #include "vtkClientServerStream.h"
 
@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.4");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals

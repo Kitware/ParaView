@@ -17,7 +17,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModule.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkClientServerInterpreter.h"
@@ -32,8 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.3");
-vtkCxxSetObjectMacro(vtkPVProgressHandler, SocketController, vtkSocketController);
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.4");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -67,7 +65,6 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->ProgressTimer->StartTimer();
 
   this->MPIController = 0;
-  this->SocketController = 0;
 
   this->ReceivingProgressReports = 0;
 
@@ -80,7 +77,6 @@ vtkPVProgressHandler::vtkPVProgressHandler()
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
-  this->SetSocketController(0);
 #ifdef VTK_USE_MPI
   if (this->ProgressPending)
     {
@@ -252,6 +248,8 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
 {
   int id = -1;
   int progress = -1;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  
   vtkPVProgressHandlerInternal::MapOfObjectIds::iterator it 
     = this->Internals->ObjectIdsMap.find(o);
   if ( it != this->Internals->ObjectIdsMap.end() )
@@ -261,15 +259,15 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
   while ( this->ReceiveProgressFromSatellite(&id, &progress) );
   vtkClientServerID nid;
   nid.ID = id;
-  vtkObjectBase* base = 
-    vtkProcessModule::GetProcessModule()->GetInterpreter()->GetObjectFromID(nid, 1);
-  if ( base )
+  vtkObjectBase* base = pm->GetInterpreter()->GetObjectFromID(nid, 1);
+  vtkSocketController* controller = pm->GetActiveSocketController();
+  if (base && controller)
     {
     char buffer[1024];
     buffer[0] = progress;
     sprintf(buffer+1, "%s", base->GetClassName());
     int len = strlen(buffer+1) + 2;
-    this->SocketController->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
+    controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
     }
   else
     {
@@ -439,11 +437,16 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
             }
           else
             {
-            char buffer[1024];
-            buffer[0] = progress;
-            sprintf(buffer+1, "%s", base->GetClassName());
-            int len = strlen(buffer+1) + 2;
-            this->SocketController->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
+            vtkSocketController* controller = 
+              vtkProcessModule::GetProcessModule()->GetActiveSocketController();
+            if (controller)
+              {
+              char buffer[1024];
+              buffer[0] = progress;
+              sprintf(buffer+1, "%s", base->GetClassName());
+              int len = strlen(buffer+1) + 2;
+              controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
+              }
             }
           }
         }

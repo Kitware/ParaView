@@ -23,6 +23,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDisplayGUI.h"
@@ -30,7 +31,6 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.13");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.14");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ void vtkPVSelectArrays::Accept()
     return;
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->PVSource->GetVTKSourceID(0) << "RemoveAllVolumeArrayNames"

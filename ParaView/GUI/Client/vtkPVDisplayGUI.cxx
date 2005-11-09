@@ -42,6 +42,7 @@
 #include "vtkKWWidget.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -53,7 +54,6 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -96,7 +96,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.51");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.52");
 
 //----------------------------------------------------------------------------
 

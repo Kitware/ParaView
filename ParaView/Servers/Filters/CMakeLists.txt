@@ -48,6 +48,7 @@ SET(Filters_SRCS
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMain.cxx
   vtkPVRenderViewProxy.cxx
+  vtkPVRenderModuleHelper.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx

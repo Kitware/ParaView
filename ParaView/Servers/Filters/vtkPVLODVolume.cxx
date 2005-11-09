@@ -24,18 +24,19 @@
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
+#include "vtkPVRenderModuleHelper.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
-#include "vtkPVProcessModule.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.3");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.4");
+vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
 vtkPVLODVolume::vtkPVLODVolume()
@@ -49,12 +50,15 @@ vtkPVLODVolume::vtkPVLODVolume()
 
   this->MapperBounds[0] = this->MapperBounds[1] = this->MapperBounds[2] = 0;
   this->MapperBounds[3] = this->MapperBounds[4] = this->MapperBounds[5] = 0;
+
+  this->RenderModuleHelper = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVLODVolume::~vtkPVLODVolume()
 {
   this->LODProp->Delete();
+  this->SetRenderModuleHelper(0);
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +73,7 @@ int vtkPVLODVolume::SelectLOD()
     return this->LowLODId;
     }
 
-  if (vtkPVProcessModule::GetGlobalLODFlag())
+  if (this->RenderModuleHelper && this->RenderModuleHelper->GetLODFlag())
     {
     return this->LowLODId;
     }

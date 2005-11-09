@@ -13,15 +13,20 @@
 
 =========================================================================*/
 #include "vtkMPIMToNSocketConnection.h"
-#include "vtkSocketCommunicator.h"
-#include "vtkMultiProcessController.h"
+
+#include "vtkClientSocket.h"
 #include "vtkObjectFactory.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
+#include "vtkMultiProcessController.h"
+#include "vtkServerSocket.h"
+#include "vtkSocketCommunicator.h"
+
+
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.5");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -50,10 +55,16 @@ vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
   this->SetController(vtkMultiProcessController::GetGlobalController());  
   this->SocketCommunicator = 0;
   this->NumberOfConnections = -1;
+  this->ServerSocket = 0;
 }
 
 vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
 {
+  if (this->ServerSocket)
+    {
+    this->ServerSocket->Delete();
+    this->ServerSocket = 0;
+    }
   if(this->SocketCommunicator)
     {
     this->SocketCommunicator->CloseConnection();
@@ -155,9 +166,11 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port
   vtkDebugMacro( << "open with port " << this->PortNumber );
-  int sock = this->SocketCommunicator->OpenSocket(this->PortNumber);
+  this->ServerSocket = vtkServerSocket::New();
+  this->ServerSocket->CreateServer(this->PortNumber);
+  
   // find out the random port picked
-  int port = this->SocketCommunicator->GetPort(sock);
+  int port = this->ServerSocket->GetServerPort();
   if(this->Internals->MachineNames.size())
     {
     if( myId < this->Internals->MachineNames.size())
@@ -179,7 +192,6 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     this->SetHostName("localhost");
     }
   this->PortNumber = port;
-  this->Socket = sock;
   if(this->NumberOfConnections == -1)
     {
       this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
@@ -194,14 +206,26 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     {
     return;
     }
-  if(!this->SocketCommunicator)
+  if(!this->SocketCommunicator || !this->ServerSocket)
     {
     vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
     }
   cout << "WaitForConnection: id :" 
        << myId << "  Port:" << this->PortNumber << "\n";
-  this->SocketCommunicator->WaitForConnectionOnSocket(this->Socket);
+  vtkClientSocket* socket = this->ServerSocket->WaitForConnection();
+  this->ServerSocket->Delete();
+  this->ServerSocket = 0;
+  if (!socket)
+    {
+    vtkErrorMacro("Failed to get connection!");
+    return;
+    }
+  this->SocketCommunicator->SetSocket(socket);
+  this->SocketCommunicator->ServerSideHandshake();
+
+  socket->Delete();
+
   int data;
   this->SocketCommunicator->Receive(&data, 1, 1, 1238);
   cout << "Received Hello from process " << data << "\n";

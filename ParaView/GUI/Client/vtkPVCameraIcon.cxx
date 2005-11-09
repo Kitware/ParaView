@@ -22,7 +22,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -33,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.28");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 

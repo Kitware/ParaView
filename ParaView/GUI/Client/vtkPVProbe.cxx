@@ -19,13 +19,13 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
 
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
@@ -56,7 +56,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.164");
+vtkCxxRevisionMacro(vtkPVProbe, "1.165");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -225,7 +225,7 @@ vtkPVProbe::~vtkPVProbe()
 void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
     
   this->Superclass::CreateProperties();

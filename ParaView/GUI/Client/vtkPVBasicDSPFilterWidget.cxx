@@ -35,19 +35,18 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkKWPushButton.h"
 #include "vtkKWEntry.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
-
+#include "vtkPVTraceHelper.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
-#include "vtkPVTraceHelper.h"
 
 #include <stdlib.h>
 #include <vtkstd/map>
@@ -57,7 +56,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.2");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -1186,7 +1185,7 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
   ////////////////////////////////
 
   vtkPVSource *l_pvsource = this->GetPVSource();
-  vtkPVProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
   int numSources = l_pvsource->GetNumberOfVTKSources();
 
   if(numSources != 1)
@@ -1626,7 +1625,7 @@ void vtkPVBasicDSPFilterWidget::Initialize()
 
 
     vtkPVSource *l_pvsource = this->GetPVSource();
-    vtkPVProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
     //note there should only be one source.....should check this XXX
     int numSources = l_pvsource->GetNumberOfVTKSources();
     int i;
@@ -1736,7 +1735,7 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
 
 
   vtkPVSource *l_pvsource = this->GetPVSource();
-  vtkPVProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
   //note there should only be one source.....should check this XXX
   int numSources = l_pvsource->GetNumberOfVTKSources();
   if(numSources!=1)
@@ -2071,7 +2070,7 @@ void vtkPVBasicDSPFilterWidget::RemoveThisFilterFromSource(const char *a_outputN
 
 
     vtkPVSource *l_pvsource = this->GetPVSource();
-    vtkPVProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = l_pvsource->GetPVApplication()->GetProcessModule();
     //note there should only be one source.....should check this XXX
     int numSources = l_pvsource->GetNumberOfVTKSources();
     if(numSources!=1)

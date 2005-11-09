@@ -32,7 +32,6 @@
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVWindow.h"
 #include "vtkPVTraceHelper.h"
 
@@ -46,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.66");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.67");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 

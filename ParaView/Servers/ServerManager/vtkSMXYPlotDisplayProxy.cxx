@@ -14,27 +14,26 @@
 =========================================================================*/
 #include "vtkSMXYPlotDisplayProxy.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkCommand.h"
-#include "vtkXYPlotWidget.h"
-#include "vtkXYPlotActor.h"
 #include "vtkClientServerStream.h"
-#include "vtkPVProcessModule.h"
+#include "vtkCommand.h"
+#include "vtkMPIMoveData.h"
+#include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
+#include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVOptions.h"
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkMPIMoveData.h"
-#include "vtkPolyData.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkPVDataInformation.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkXYPlotWidget.h"
+#include "vtkXYPlotActor.h"
 
 class vtkSMXYPlotDisplayProxyObserver : public vtkCommand
 {
@@ -60,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.15");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -240,8 +239,7 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::SetupDefaults()
 {
-  vtkPVProcessModule* pm =
-    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkProcessModule* pm =vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   
   int i, num;

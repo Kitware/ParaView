@@ -13,24 +13,25 @@
 
 =========================================================================*/
 #include "vtkSMCubeAxesDisplayProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSMPart.h"
-#include "vtkSMSourceProxy.h"
+
 #include "vtkClientServerStream.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkCubeAxesActor2D.h"
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPart.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -218,8 +219,7 @@ void vtkSMCubeAxesDisplayProxy::Update()
     }
     
   double bounds[6];
-  vtkPVProcessModule *pm;
-  pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   
   vtkClientServerStream stream;
   

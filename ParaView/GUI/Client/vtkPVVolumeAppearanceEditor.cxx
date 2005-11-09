@@ -27,7 +27,6 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
@@ -41,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.38");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.39");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {

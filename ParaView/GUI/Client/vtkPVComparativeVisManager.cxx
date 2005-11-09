@@ -23,7 +23,6 @@
 #include "vtkPVApplication.h"
 #include "vtkSMComparativeVisProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -42,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.19");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.20");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals

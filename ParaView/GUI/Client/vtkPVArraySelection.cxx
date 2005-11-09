@@ -25,7 +25,6 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMSourceProxy.h"
@@ -44,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.76");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.77");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()

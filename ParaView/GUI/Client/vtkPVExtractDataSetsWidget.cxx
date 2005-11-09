@@ -24,7 +24,6 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMIntVectorProperty.h"
@@ -34,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.8");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {

@@ -21,20 +21,19 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.37");
 
 class vtkPVSourceVectorInternals
 {

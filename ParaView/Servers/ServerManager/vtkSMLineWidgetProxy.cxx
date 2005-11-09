@@ -16,7 +16,7 @@
 
 #include "vtkLineWidget.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {

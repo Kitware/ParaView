@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEWriter);
-vtkCxxRevisionMacro(vtkPVEWriter, "1.1");
+vtkCxxRevisionMacro(vtkPVEWriter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVEWriter::vtkPVEWriter()
@@ -58,7 +58,7 @@ int vtkPVEWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 {
 
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerID dataID = pvs->GetPart()->GetID(0);
   int success = 1;
 

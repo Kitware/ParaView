@@ -22,6 +22,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
@@ -32,7 +33,6 @@
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVWindow.h"
 #include "vtkPVTraceHelper.h"
 
@@ -52,7 +52,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVPickSphereWidget);
-vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.2");
 
 //*****************************************************************************
 //----------------------------------------------------------------------------

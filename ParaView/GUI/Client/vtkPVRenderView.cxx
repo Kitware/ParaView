@@ -53,7 +53,7 @@
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkSMPart.h"
-#include "vtkPVProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.406");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.407");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1996,7 +1996,6 @@ void vtkPVRenderView::ForceRender()
       this->TimerToken = NULL;
       }
     this->CornerAnnotation->UpdateCornerText();
-    pvApp->GetProcessModule()->SetGlobalLODFlag(0);
     this->RenderModuleProxy->StillRender();
     }
 }
@@ -2144,10 +2143,9 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   vtkPVApplication *pvApp = this->GetPVApplication();
   if (pvApp)
     {
-    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    vtkProcessModule *pm = pvApp->GetProcessModule();
     if (pm)
       {
-      pm->SetGlobalLODFlag(0);
       vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
       if (rm)
         {
@@ -2200,10 +2198,6 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     }
   ivp->SetElement(0, state);
   rm->UpdateVTKObjects();
-
-  // Save this selection on the server manager so new
-  // part displays will have it a s a default.
-  this->GetPVApplication()->GetProcessModule()->SetUseTriangleStrips(state);
 
   this->EventuallyRender();
 }
@@ -2313,10 +2307,6 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   ivp->SetElement(0, state);
   rm->UpdateVTKObjects();
   
-  // Save this selection on the server manager so new
-  // part displays will have it a s a default.
-  this->GetPVApplication()->GetProcessModule()->SetUseImmediateMode(state);
-
   this->EventuallyRender();
 }
 

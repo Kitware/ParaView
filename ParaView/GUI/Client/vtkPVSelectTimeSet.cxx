@@ -21,8 +21,8 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.61");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.62");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -68,7 +68,7 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->TimeSets->Delete();
   if(this->ServerSideID.ID)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     vtkClientServerStream stream;
     pm->DeleteStreamObject(this->ServerSideID, stream);
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
@@ -444,7 +444,7 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeSetsFromReader()
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->TimeSets->RemoveAllItems();
 
   vtkClientServerStream stream;
