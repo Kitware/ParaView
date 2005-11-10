@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.20");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWRadioButton* vtkKWRadioButtonSet::GetWidget(int id)
@@ -31,14 +31,23 @@ vtkKWRadioButton* vtkKWRadioButtonSet::GetWidget(int id)
 //----------------------------------------------------------------------------
 vtkKWRadioButton* vtkKWRadioButtonSet::AddWidget(int id)
 {
-  return static_cast<vtkKWRadioButton*>(this->AddWidgetInternal(id));
+  return static_cast<vtkKWRadioButton*>(this->InsertWidgetInternal(
+                                          id, this->GetNumberOfWidgets()));
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKWRadioButtonSet::AddWidgetInternal(int id)
+vtkKWRadioButton* vtkKWRadioButtonSet::InsertWidget(int id, int pos)
 {
-  vtkKWRadioButton *widget = 
-    static_cast<vtkKWRadioButton*>(this->Superclass::AddWidgetInternal(id));
+  return static_cast<vtkKWRadioButton*>(this->InsertWidgetInternal(
+                                          id, pos));
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWRadioButtonSet::InsertWidgetInternal(
+  int id, int pos)
+{
+  vtkKWRadioButton *widget = static_cast<vtkKWRadioButton*>(
+    this->Superclass::InsertWidgetInternal(id, pos));
   if (widget)
     {
     widget->SetValueAsInt(id);

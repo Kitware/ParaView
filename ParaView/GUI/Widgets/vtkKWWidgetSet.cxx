@@ -22,7 +22,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.12");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -36,8 +36,8 @@ public:
     vtkKWWidget *Widget;
   };
 
-  typedef vtksys_stl::list<WidgetSlot> WidgetsContainer;
-  typedef vtksys_stl::list<WidgetSlot>::iterator WidgetsContainerIterator;
+  typedef vtksys_stl::vector<WidgetSlot> WidgetsContainer;
+  typedef vtksys_stl::vector<WidgetSlot>::iterator WidgetsContainerIterator;
 
   WidgetsContainer Widgets;
 };
@@ -140,6 +140,24 @@ int vtkKWWidgetSet::GetNthWidgetId(int rank)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWidgetSet::GetWidgetPosition(int id)
+{
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
+    {
+    if (it->Id == id)
+      {
+      return it - this->Internals->Widgets.begin();
+      }
+    }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWidgetSet::Create(vtkKWApplication *app)
 {
   // Check if already created
@@ -175,7 +193,7 @@ void vtkKWWidgetSet::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget* vtkKWWidgetSet::AddWidgetInternal(int id)
+vtkKWWidget* vtkKWWidgetSet::InsertWidgetInternal(int id, int pos)
 {
   // Widget must have been created
 
@@ -202,8 +220,16 @@ vtkKWWidget* vtkKWWidgetSet::AddWidgetInternal(int id)
   widget_slot.Visibility = 1;
   widget_slot.Widget = this->AllocateAndCreateWidget();
   this->PropagateEnableState(widget_slot.Widget);
-
-  this->Internals->Widgets.push_back(widget_slot);
+ 
+  if (pos < 0 || (unsigned int)pos >= this->Internals->Widgets.size())
+    {
+    this->Internals->Widgets.push_back(widget_slot);
+    }
+  else
+    {
+    this->Internals->Widgets.insert(
+      this->Internals->Widgets.begin() + (unsigned int)pos, widget_slot);
+    }
 
   // Pack the set
 

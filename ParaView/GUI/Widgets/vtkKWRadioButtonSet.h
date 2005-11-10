@@ -46,6 +46,12 @@ public:
   virtual vtkKWRadioButton* AddWidget(int id);
 
   // Description:
+  // Insert a vtkKWRadioButton at a specific position in the set.
+  // The id has to be unique among the set.
+  // Return a pointer to the vtkKWRadioButton, or NULL on error.
+  virtual vtkKWRadioButton* InsertWidget(int id, int pos);
+
+  // Description:
   // Get a vtkKWRadioButton from the set, given its unique id.
   // Return a pointer to the vtkKWRadioButton, or NULL on error.
   virtual vtkKWRadioButton* GetWidget(int id);
@@ -57,7 +63,7 @@ protected:
   // Helper methods
 
   virtual vtkKWWidget* AllocateAndCreateWidget();
-  virtual vtkKWWidget* AddWidgetInternal(int id);
+  virtual vtkKWWidget* InsertWidgetInternal(int id, int pos);
 
 private:
   vtkKWRadioButtonSet(const vtkKWRadioButtonSet&); // Not implemented

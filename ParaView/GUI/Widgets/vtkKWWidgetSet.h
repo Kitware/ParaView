@@ -54,6 +54,11 @@ public:
   virtual int HasWidget(int id);
 
   // Description:
+  // Retrieve the position in the set the vtkKWWidget was insert at.
+  // Return pos if exists, -1 otherwise
+  virtual int GetWidgetPosition(int id);
+
+  // Description:
   // Hide/show a vtkKWWidget, given its unique id.
   // Get the number of visible vtkKWWidget in the set.
   virtual void HideWidget(int id);
@@ -141,7 +146,7 @@ protected:
   // Helper methods
 
   virtual vtkKWWidget* GetWidgetInternal(int id);
-  virtual vtkKWWidget* AddWidgetInternal(int id);
+  virtual vtkKWWidget* InsertWidgetInternal(int id, int pos);
 
   // Description:
   // Pack the widgets

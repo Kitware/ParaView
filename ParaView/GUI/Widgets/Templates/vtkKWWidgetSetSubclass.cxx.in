@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(@WidgetType@Set);
-vtkCxxRevisionMacro(@WidgetType@Set, "1.5");
+vtkCxxRevisionMacro(@WidgetType@Set, "1.6");
 
 //----------------------------------------------------------------------------
 @WidgetType@* @WidgetType@Set::GetWidget(int id)
@@ -31,7 +31,15 @@ vtkCxxRevisionMacro(@WidgetType@Set, "1.5");
 //----------------------------------------------------------------------------
 @WidgetType@* @WidgetType@Set::AddWidget(int id)
 {
-  return static_cast<@WidgetType@*>(this->AddWidgetInternal(id));
+  return static_cast<@WidgetType@*>(this->InsertWidgetInternal(
+                                      id, this->GetNumberOfWidgets()));
+}
+
+//----------------------------------------------------------------------------
+@WidgetType@* @WidgetType@Set::InsertWidget(int id, int pos)
+{
+  return static_cast<@WidgetType@*>(this->InsertWidgetInternal(
+                                      id, pos));
 }
 
 //----------------------------------------------------------------------------

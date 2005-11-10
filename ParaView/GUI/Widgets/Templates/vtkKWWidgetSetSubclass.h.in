@@ -48,10 +48,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Add a @WidgetType@ to the set.
+  // Add a @WidgetType@ to the end of the set.
   // The id has to be unique among the set.
   // Return a pointer to the @WidgetType@, or NULL on error.
   virtual @WidgetType@* AddWidget(int id);
+
+  // Description:
+  // Insert a @WidgetType@ at a specific position in the set.
+  // The id has to be unique among the set.
+  // Return a pointer to the @WidgetType@, or NULL on error.
+  virtual @WidgetType@* InsertWidget(int id, int pos);
 
   // Description:
   // Get a @WidgetType@ from the set, given its unique id.
