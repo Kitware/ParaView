@@ -13,7 +13,6 @@
 
 #include <vtkObjectFactory.h>
 #include <vtkProcessModuleGUIHelper.h>
-//#include <vtkPVClientServerModule.h>
 #include <vtkPVOptions.h>
 #include <vtkProcessModule.h>
 #include <vtkPVServerInformation.h>
@@ -95,20 +94,8 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
   process_module = 0;
   server_manager = 0;
   render_module = 0;
-  
-  if(options->GetClientMode()) 
-    {
-//    process_module = vtkPVClientServerModule::New();
-    }
-  else
-    {
-  #ifdef VTK_USE_MPI
-    process_module = vtkPVMPIProcessModule::New();
-  #else 
-    process_module = vtkProcessModule::New();
-  #endif
-    }
 
+  process_module = vtkProcessModule::New();  
   if(!process_module)
     return;
 
