@@ -28,7 +28,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkConnectionIterator);
-vtkCxxRevisionMacro(vtkConnectionIterator, "1.2");
+vtkCxxRevisionMacro(vtkConnectionIterator, "1.3");
 vtkCxxSetObjectMacro(vtkConnectionIterator, ConnectionManager,
   vtkProcessModuleConnectionManager);
 //-----------------------------------------------------------------------------
@@ -155,4 +155,6 @@ void vtkConnectionIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MatchConnectionID: " << this->MatchConnectionID << endl;
+  os << indent << "ConnectionManager: " << this->ConnectionManager << endl;
+  
 }

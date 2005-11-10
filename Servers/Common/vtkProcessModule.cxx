@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.28");
+vtkCxxRevisionMacro(vtkProcessModule, "1.29");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -1460,4 +1460,49 @@ vtkSocketController* vtkProcessModule::GetRenderServerSocketController()
 void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "LogThreshold: " << this->LogThreshold << endl;
+  os << indent << "ProgressRequests: " << this->ProgressRequests << endl;
+  os << indent << "ReportInterpreterErrors: " << this->ReportInterpreterErrors
+    << endl;
+ 
+  os << indent << "Interpreter: " ;
+  if (this->Interpreter)
+    {
+    this->Interpreter->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ProgressHandler: " ;
+  if (this->ProgressHandler)
+    {
+    this->ProgressHandler->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ActiveRemoteConnection: " ;
+  if (this->ActiveRemoteConnection)
+    {
+    this->ActiveRemoteConnection->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  
+  os << indent << "Options: ";
+  if (this->Options)
+    {
+    this->Options->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+    
 }
