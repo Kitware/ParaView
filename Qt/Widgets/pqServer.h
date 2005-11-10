@@ -25,15 +25,15 @@ class pqServer : public QObject
 {
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure
-  static pqServer* standalone();
+  static pqServer* CreateStandalone();
   /// Constructs a server connection to a remote host, returns NULL on failure
-  static pqServer* connect(const char* const hostName, const int portNumber);
+  static pqServer* CreateConnection(const char* const hostName, const int portNumber);
   virtual ~pqServer();
 
-  vtkProcessModule* processModule();
-  vtkSMProxyManager* proxyManager();
-  vtkSMRenderModuleProxy* renderModule();
-  pqPipelineData* pipelineData();
+  vtkProcessModule* GetProcessModule();
+  vtkSMProxyManager* GetProxyManager();
+  vtkSMRenderModuleProxy* GetRenderModule();
+  pqPipelineData* GetPipelineData();
 
 private:
   pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMRenderModuleProxy*);

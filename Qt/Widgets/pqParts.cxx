@@ -25,7 +25,7 @@ vtkSMDisplayProxy* pqAddPart(pqServer* Server, vtkSMSourceProxy* Part)
   Part->CreateParts();
 
   // Create part display.
-  vtkSMRenderModuleProxy *rm = Server->renderModule();
+  vtkSMRenderModuleProxy *rm = Server->GetRenderModule();
   vtkSMDisplayProxy *partdisplay = rm->CreateDisplayProxy();
 
   // Set the part as input to the part display.
@@ -56,7 +56,7 @@ vtkSMDisplayProxy* pqAddPart(pqServer* Server, vtkSMSourceProxy* Part)
 
 void pqRemovePart(pqServer* Server, vtkSMDisplayProxy* Part)
 {
-  vtkSMRenderModuleProxy *rm = Server->renderModule();
+  vtkSMRenderModuleProxy *rm = Server->GetRenderModule();
   vtkSMProxyProperty *pp
     = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
   pp->RemoveProxy(Part);

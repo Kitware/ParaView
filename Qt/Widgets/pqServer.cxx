@@ -13,9 +13,9 @@
 
 #include <vtkObjectFactory.h>
 #include <vtkProcessModuleGUIHelper.h>
-#include <vtkPVClientServerModule.h>
+//#include <vtkPVClientServerModule.h>
 #include <vtkPVOptions.h>
-#include <vtkPVProcessModule.h>
+#include <vtkProcessModule.h>
 #include <vtkPVServerInformation.h>
 #include <vtkSMApplication.h>
 #include <vtkSMProperty.h>
@@ -90,7 +90,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////
 // pqInitializeServer
 
-void pqInitializeServer(pqOptions* options, vtkPVProcessModule*& process_module, vtkSMApplication*& server_manager, vtkSMRenderModuleProxy*& render_module)
+void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, vtkSMApplication*& server_manager, vtkSMRenderModuleProxy*& render_module)
 {
   process_module = 0;
   server_manager = 0;
@@ -98,16 +98,19 @@ void pqInitializeServer(pqOptions* options, vtkPVProcessModule*& process_module,
   
   if(options->GetClientMode()) 
     {
-    process_module = vtkPVClientServerModule::New();
+//    process_module = vtkPVClientServerModule::New();
     }
   else
     {
   #ifdef VTK_USE_MPI
     process_module = vtkPVMPIProcessModule::New();
   #else 
-    process_module = vtkPVProcessModule::New();
+    process_module = vtkProcessModule::New();
   #endif
     }
+
+  if(!process_module)
+    return;
 
   process_module->Initialize();
   process_module->SetOptions(options);
@@ -204,19 +207,18 @@ void pqInitializeServer(pqOptions* options, vtkPVProcessModule*& process_module,
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
-pqServer* pqServer::standalone()
+pqServer* pqServer::CreateStandalone()
 {
+  /** \todo Get rid of this logic once multiple connections are fully supported */
   if(vtkProcessModule::GetProcessModule())
-    {
     return 0;
-    }
 
   // Initialize options ...
   pqOptions* const options = pqOptions::New();
   options->SetClientMode(false);
   options->SetProcessType(vtkPVOptions::PARAVIEW);
 
-  vtkPVProcessModule* process_module = 0;
+  vtkProcessModule* process_module = 0;
   vtkSMApplication* server_manager = 0;
   vtkSMRenderModuleProxy* render_module = 0;
 
@@ -227,12 +229,11 @@ pqServer* pqServer::standalone()
   return new pqServer(options, process_module, server_manager, render_module);
 }
 
-pqServer* pqServer::connect(const char* const hostName, int portNumber)
+pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
 {
+  /** \todo Get rid of this logic once multiple connections are fully supported */
   if(vtkProcessModule::GetProcessModule())
-    {
     return 0;
-    }
 
   // Initialize options ...
   pqOptions* const options = pqOptions::New();
@@ -241,7 +242,7 @@ pqServer* pqServer::connect(const char* const hostName, int portNumber)
   options->SetServerHost(hostName);
   options->SetServerPort(portNumber);
 
-  vtkPVProcessModule* process_module = 0;
+  vtkProcessModule* process_module = 0;
   vtkSMApplication* server_manager = 0;
   vtkSMRenderModuleProxy* render_module = 0;
     
@@ -276,22 +277,22 @@ pqServer::~pqServer()
   vtkProcessModule::SetProcessModule(0);
 }
 
-vtkProcessModule* pqServer::processModule()
+vtkProcessModule* pqServer::GetProcessModule()
 {
   return ProcessModule;
 }
 
-vtkSMProxyManager* pqServer::proxyManager()
+vtkSMProxyManager* pqServer::GetProxyManager()
 {
   return ServerManager->GetProxyManager();
 }
 
-vtkSMRenderModuleProxy* pqServer::renderModule()
+vtkSMRenderModuleProxy* pqServer::GetRenderModule()
 {
   return RenderModule;
 }
 
-pqPipelineData* pqServer::pipelineData()
+pqPipelineData* pqServer::GetPipelineData()
 {
   return PipelineData;
 }

@@ -29,7 +29,7 @@ vtkSMSourceProxy * pqPipelineData::currentProxy() const
 
 vtkSMProxy* pqPipelineData::newSMProxy(const char* groupname, const char* proxyname)
 {
-  vtkSMProxy* proxy = this->Server->proxyManager()->NewProxy(groupname, proxyname);
+  vtkSMProxy* proxy = this->Server->GetProxyManager()->NewProxy(groupname, proxyname);
   proxy->UpdateVTKObjects();
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
   this->setCurrentProxy(source);
