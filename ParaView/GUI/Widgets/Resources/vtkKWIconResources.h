@@ -31,6 +31,21 @@ static const unsigned char image_bounding_box[] =
 
 /* 
  * Resource generated for file:
+ *    camera.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_camera_width          = 16;
+static const unsigned int  image_camera_height         = 16;
+static const unsigned int  image_camera_pixel_size     = 4;
+static const unsigned long image_camera_length         = 172;
+static const unsigned long image_camera_decoded_length = 1024;
+
+static const unsigned char image_camera[] = 
+  "eNrNk0EKgDAMBP1eftXnVfAtfiEmh5V2SWMEDxbm0LrTLKKquunPsKURVVfPPWR1xzTDcq"
+  "21aa7v4XMXnrfqHuXgi8gNsofFAM44h55+X+99crH4Ds8h++RHHao+U/HH9x65/jzzxw4R"
+  "yGQ+9+C57GffawZc4Ps3fPWvXZXsaIA=";
+
+/* 
+ * Resource generated for file:
  *    color_bar_annotation.png (zlib, base64) (image file)
  */
 static const unsigned int  image_color_bar_annotation_width          = 16;

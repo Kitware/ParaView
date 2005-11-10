@@ -43,6 +43,7 @@ public:
     IconNoIcon                    = 0,
     IconAngleTool                 = 14,
     IconBoundingBox               = 13,
+    IconCamera                    = 19,
     IconColorBarAnnotation        = 12,
     IconColorSquares              = 18,
     IconConnection                = 1,
