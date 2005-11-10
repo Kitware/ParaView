@@ -188,6 +188,7 @@
           <Group name="lights"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+    <!-- End Renderer -->
     </Proxy>
   </ProxyGroup>
 
@@ -1354,6 +1355,24 @@
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
 
       <IntVectorProperty
+         name="WindowPosition"
+         command="SetWindowPosition"
+         number_of_elements="2"
+         default_values="0 0"
+         update_self="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GUISize"
+         command="SetGUISize"
+         number_of_elements="2"
+         default_values="300 300"
+         update_self="1">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="OrderedCompositing"
         command="SetOrderedCompositing"
         number_of_elements="1"
@@ -1437,7 +1456,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="composite_managers">
-    <Proxy name="DesktopDeliveryClient" class="vtkDesktopDeliveryClient">
+    <Proxy name="DesktopDeliveryClient" class="vtkPVDesktopDeliveryClient">
       <ProxyProperty name="RenderWindow"
                      command="SetRenderWindow">
         <ProxyGroupDomain name="groups">
@@ -1482,6 +1501,11 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+    </Proxy>
+
+    <Proxy name="DesktopDeliveryServer" class="vtkPVDesktopDeliveryServer"
+           base_proxygroup="composite_managers" 
+           base_proxyname="DesktopDeliveryClient">
     </Proxy>
     
     <Proxy name="IceTRenderManager" class="vtkIceTRenderManager">

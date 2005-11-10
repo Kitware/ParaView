@@ -29,7 +29,17 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.10");
+
+vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
+                     ServerRenderWindowProxy,
+                     vtkSMProxy);
+vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
+                     ServerCompositeManagerProxy,
+                     vtkSMProxy);
+vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
+                     ServerDisplayManagerProxy,
+                     vtkSMProxy);
 
 //-----------------------------------------------------------------------------
 class vtkSMIceTDesktopRenderModuleProxyProxySet
@@ -42,8 +52,14 @@ vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
   this->RemoteDisplay = 1;
   this->OrderedCompositing = 0;
 
-  this->DisplayManagerProxy = NULL;
-  this->PKdTreeProxy = NULL;
+  this->DisplayManagerProxy = 0;
+  this->PKdTreeProxy = 0;
+
+  this->ServerRenderWindowProxy = 0;
+  this->ServerCompositeManagerProxy = 0;
+  this->ServerDisplayManagerProxy = 0;
+
+  this->RenderModuleId = 0;
 
   this->PartitionedData = new vtkSMIceTDesktopRenderModuleProxyProxySet;
 }
@@ -51,7 +67,39 @@ vtkSMIceTDesktopRenderModuleProxy::vtkSMIceTDesktopRenderModuleProxy()
 //-----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderModuleProxy::~vtkSMIceTDesktopRenderModuleProxy()
 {
-  delete this->PartitionedData;
+  this->SetServerRenderWindowProxy(0);
+  this->SetServerCompositeManagerProxy(0);
+  this->SetServerDisplayManagerProxy(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::SetGUISize(int x, int y)
+{
+  if (this->CompositeManagerProxy)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(0)
+           << "SetGUISize" << x << y
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderModuleProxy::SetWindowPosition(int x, int y)
+{
+  if (this->CompositeManagerProxy)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(0)
+           << "SetWindowPosition" << x << y
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -62,8 +110,15 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->RendererProxy = this->GetSubProxy("Renderer");
+  this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
   this->DisplayManagerProxy = this->GetSubProxy("DisplayManager");
   this->PKdTreeProxy = this->GetSubProxy("PKdTree");
+
+  if (!this->RenderWindowProxy)
+    {
+    vtkErrorMacro("RenderWindow subproxy must be defined.");
+    return;
+    }
 
   if (!this->RendererProxy)
     {
@@ -84,7 +139,22 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     }
 
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
   this->DisplayManagerProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+  if (this->ServerDisplayManagerProxy)
+    {
+    vtkClientServerID id = pm->GetUniqueID();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Assign 
+           << id
+           << this->ServerDisplayManagerProxy->GetID(0)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+
+    this->DisplayManagerProxy->CreateVTKObjects(0);
+    this->DisplayManagerProxy->SetID(0, id);
+    }
   this->DisplayManagerProxy->UpdateVTKObjects();
 
   this->PKdTreeProxy->SetServers(vtkProcessModule::RENDER_SERVER);
@@ -95,21 +165,42 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   ivp->SetElements1(0);
   this->PKdTreeProxy->UpdateVTKObjects();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  // We must create an ICE-T Renderer on the server and a regular renderer on the
-  // client.
+  // We must create an ICE-T Renderer on the server and a regular renderer
+  // on the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
-  this->RendererProxy->UpdateVTKObjects(); // this will create the regular renderer on the client.
+  this->RendererProxy->UpdateVTKObjects(); // this will create the regular
+                                           // renderer on the client.
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::New << "vtkIceTRenderer" << this->RendererProxy->GetID(0)
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+  vtkClientServerStream stream1;
+  stream1 << vtkClientServerStream::New 
+          << "vtkIceTRenderer" << this->RendererProxy->GetID(0)
+          << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::RENDER_SERVER, stream1);
 
-  this->RendererProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->RendererProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   // Now we can use the RendererProxy as one!
 
+  // If there is a server side render window, use it. This is
+  // used in multi-view mode where the server has one render window
+  // whereas the client can have many.
+  if (this->ServerRenderWindowProxy)
+    {
+    this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT);
+
+    // this will create the regular render window on the client.
+    this->RenderWindowProxy->UpdateVTKObjects(); 
+
+    vtkClientServerStream stream2;
+    stream2 << vtkClientServerStream::Assign 
+           << this->RenderWindowProxy->GetID(0)
+           << this->ServerRenderWindowProxy->GetID(0)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream2);
+
+    this->RenderWindowProxy->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    }
   
   this->Superclass::CreateVTKObjects(numObjects);
 
@@ -117,10 +208,10 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
     (pm->GetNumberOfPartitions() > 1))
     {
-    stream << vtkClientServerStream::Invoke
-      << this->RenderWindowProxy->GetID(0) << "SetMultiSamples" << 0
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+    stream1 << vtkClientServerStream::Invoke
+            << this->RenderWindowProxy->GetID(0) << "SetMultiSamples" << 0
+            << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream1);
     }
 
   // Ordered compositing requires alpha bit planes.
@@ -148,12 +239,26 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateCompositeManager()
   // The XML must define only the manager to be created on the client.
 
   this->CompositeManagerProxy->UpdateVTKObjects();
-  // Create the vtkDesktopDeliveryServer.
-  stream << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
-    << this->CompositeManagerProxy->GetID(0)
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
-
+  // If there is a server side composite manager, use it. This is used in
+  // multi-view mode where the server has one desktop delivery server
+  // whereas the client can have many desktop delivery clients.
+  if (this->ServerCompositeManagerProxy)
+    {
+    stream << vtkClientServerStream::Assign 
+           << this->CompositeManagerProxy->GetID(0)
+           << this->ServerCompositeManagerProxy->GetID(0)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+    }
+  else
+    {
+    // Create the vtkDesktopDeliveryServer.
+    stream << vtkClientServerStream::New << "vtkPVDesktopDeliveryServer"
+           << this->CompositeManagerProxy->GetID(0)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
+    }
+    
   this->CompositeManagerProxy->SetServers(vtkProcessModule::CLIENT | 
     vtkProcessModule::RENDER_SERVER_ROOT);
 }
@@ -201,23 +306,22 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 
   unsigned int i;
 
-  for (i=0; i < this->DisplayManagerProxy->GetNumberOfIDs(); i++)
+  if (this->RenderModuleId == 0)
     {
     stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID()
-      << "GetController"
-      << vtkClientServerStream::End;
+           << pm->GetProcessModuleID()
+           << "GetController"
+           << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-      << this->DisplayManagerProxy->GetID(i) << "SetController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
+           << this->DisplayManagerProxy->GetID(0) << "SetController"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-      << this->DisplayManagerProxy->GetID(i) 
-      << "InitializeRMIs"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+           << this->DisplayManagerProxy->GetID(0) 
+           << "InitializeRMIs"
+           << vtkClientServerStream::End;
     }
-
+    
   for (i = 0; i < this->PKdTreeProxy->GetNumberOfIDs(); i++)
     {
     stream << vtkClientServerStream::Invoke
@@ -237,23 +341,20 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
            << this->PKdTreeProxy->GetID(i) << "SetNumberOfRegionsOrMore"
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
+  pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
   //************************************************************
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
-  for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-      << "GetRenderServerSocketController"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-      << this->CompositeManagerProxy->GetID(i)
-      << "SetController" << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+         << "GetRenderServerSocketController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->CompositeManagerProxy->GetID(0)
+         << "SetController" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::RENDER_SERVER_ROOT | vtkProcessModule::CLIENT, stream);
 
@@ -268,12 +369,32 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 
   pp = vtkSMProxyProperty::SafeDownCast(
                          this->CompositeManagerProxy->GetProperty("Renderers"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->RendererProxy);
-  pp->AddProxy(this->Renderer2DProxy);
+  if (this->RenderModuleId == 0)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->RendererProxy);
+    //pp->AddProxy(this->Renderer2DProxy);
+    this->CompositeManagerProxy->UpdateVTKObjects();
+    }
+  else
+    {
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(0)
+           << "AddRenderer" << this->RenderModuleId << this->RendererProxy->GetID(0)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
-  this->CompositeManagerProxy->UpdateVTKObjects();
-  
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(0)
+           << "AddRenderer" << this->RendererProxy->GetID(0)
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->CompositeManagerProxy->GetID(0)
+           << "SetId" << this->RenderModuleId 
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    }
+
   this->Superclass::InitializeCompositingPipeline();
   
   
@@ -321,7 +442,6 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
       this->DisplayManagerProxy->UpdateVTKObjects();
       }
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -491,8 +611,57 @@ void vtkSMIceTDesktopRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RemoteDisplay: " << this->RemoteDisplay 
     << endl;
   os << indent << "OrderedCompositing: " << this->OrderedCompositing << endl;
-  os << indent << "DisplayManagerProxy: " << this->DisplayManagerProxy
-    <<endl;
-  os << indent << "PKdTreeProxy: " << this->PKdTreeProxy << endl;
+
+  os << indent << "DisplayManagerProxy: ";
+  if (this->DisplayManagerProxy)
+    {
+    this->DisplayManagerProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "PKdTreeProxy: ";
+  if (this->PKdTreeProxy)
+    {
+    this->PKdTreeProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ServerCompositeManagerProxy: ";
+  if (this->ServerCompositeManagerProxy)
+    {
+    this->ServerCompositeManagerProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ServerDisplayManagerProxy: ";
+  if (this->ServerDisplayManagerProxy)
+    {
+    this->ServerDisplayManagerProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ServerRenderWindowProxy: ";
+  if (this->ServerRenderWindowProxy)
+    {
+    this->ServerRenderWindowProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "RenderModuleId: " << this->RenderModuleId << endl;
 }
 

@@ -314,6 +314,7 @@ protected:
   friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
+  friend class vtkSMIceTDesktopRenderModuleProxy;
 //ETX
 
   // Description:
