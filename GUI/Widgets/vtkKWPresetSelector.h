@@ -425,6 +425,12 @@ protected:
   virtual void CreateColumns();
 
   // Description:
+  // Create the buttons.
+  // Subclasses should override this method to add their own preset buttons
+  // (do not forget to call the superclass first).
+  virtual void CreatePresetButtons();
+
+  // Description:
   // Deallocate a preset.
   // Subclasses should override this method to release the memory allocated
   // by their own preset fields  (do not forget to call the superclass
