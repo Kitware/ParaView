@@ -69,6 +69,9 @@ protected:
   vtkSMProxy* DisplayManagerProxy;
   vtkSMProxy* PKdTreeProxy;
 
+  // Description:
+  // The set of inputs (as proxies) to PKdTreeProxy that existed the last
+  // time BuildLocator was called on PKdTreeProxy.
   vtkSMIceTDesktopRenderModuleProxyProxySet *PartitionedData;
 private:
   vtkSMIceTDesktopRenderModuleProxy(const vtkSMIceTDesktopRenderModuleProxy&); // Not implemented.
