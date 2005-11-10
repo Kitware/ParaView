@@ -31,6 +31,7 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QDockWidget>
+#include <QFileInfo>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMenuBar>
@@ -50,6 +51,13 @@
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSMXMLParser.h>
 #include <vtkPVGenericRenderWindowInteractor.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkBMPWriter.h>
+#include <vtkTIFFWriter.h>
+#include <vtkPNMWriter.h>
+#include <vtkPNGWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkErrorCode.h>
 
 #include <QVTKWidget.h>
 
@@ -90,7 +98,11 @@ pqMainWindow::pqMainWindow() :
   fileMenu->addAction(tr("Save Server State..."))
     << pqSetName("SaveServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
-    
+   
+  fileMenu->addAction(tr("Save Screenshot..."))
+    << pqSetName("SaveScreenshot")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveScreenshot())); 
+  
   fileMenu->addAction(tr("Quit"))
     << pqSetName("Quit")
     << pqConnect(SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
@@ -331,6 +343,62 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     this->CurrentServer->GetProxyManager()->SaveState("test", &file, 0);
     file << "</ServerState>" << "\n";
     }
+}
+
+void pqMainWindow::onFileSaveScreenshot()
+{
+  if(!this->CurrentServer)
+    {
+    QMessageBox::critical(this, tr("Save Screenshot:"), tr("No server connections to save"));
+    return;
+    }
+
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "fileSaveDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
+  file_dialog->show();
+}
+
+template<typename WriterT>
+bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
+{
+  WriterT* const writer = WriterT::New();
+  writer->SetInput(Capture->GetOutput());
+  writer->SetFileName(File.filePath().toAscii().data());
+  writer->Write();
+  const bool result = writer->GetErrorCode() == vtkErrorCode::NoError;
+  writer->Delete();
+  
+  return result;
+}
+
+void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
+{
+  vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
+  capture->SetInput(this->Window->GetRenderWindow());
+  capture->Update();
+
+  for(int i = 0; i != Files.size(); ++i)
+    {
+    const QFileInfo file(Files[i]);
+    
+    bool success = false;
+    
+    if(file.completeSuffix() == "bmp")
+      success = saveImage<vtkBMPWriter>(capture, file);
+    else if(file.completeSuffix() == "tif")
+      success = saveImage<vtkTIFFWriter>(capture, file);
+    else if(file.completeSuffix() == "ppm")
+      success = saveImage<vtkPNMWriter>(capture, file);
+    else if(file.completeSuffix() == "png")
+      success = saveImage<vtkPNGWriter>(capture, file);
+    else if(file.completeSuffix() == "jpg")
+      success = saveImage<vtkJPEGWriter>(capture, file);
+      
+    if(!success)
+      QMessageBox::critical(this, tr("Save Screenshot:"), tr("Error saving file"));
+    }
+    
+  capture->Delete();
 }
 
 void pqMainWindow::onServerConnect()

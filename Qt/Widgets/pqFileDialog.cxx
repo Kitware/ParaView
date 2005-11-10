@@ -68,6 +68,9 @@ void pqFileDialog::accept()
   if(!manual_filename.isEmpty())
     selected_files.push_back(this->Model->getFilePath(manual_filename));
   
+  // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
+  this->hide();
+  
   if(selected_files.size())
     emit filesSelected(selected_files);
   
@@ -99,6 +102,9 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     }
   else
     {
+    // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
+    this->hide();
+  
     emit filesSelected(this->Model->getFilePaths(Index));
     QTimer::singleShot(0, this, SLOT(onAutoDelete()));
     }

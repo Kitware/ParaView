@@ -66,6 +66,8 @@ private slots:
   void onFileOpenServerState(const QStringList& Files);
   void onFileSaveServerState();
   void onFileSaveServerState(const QStringList& Files);
+  void onFileSaveScreenshot();
+  void onFileSaveScreenshot(const QStringList& Files);
   void onServerConnect();
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
