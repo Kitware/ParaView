@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.16");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.17");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -342,6 +342,27 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   this->PresetButtons->ExpandWidgetsOn();
   this->PresetButtons->Create(app);
 
+  this->CreatePresetButtons();
+
+  this->SetDefaultHelpStrings();
+
+  // Pack
+
+  this->Pack();
+
+  // Update enable state
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::CreatePresetButtons()
+{
+  if (!this->PresetButtons)
+    {
+    return;
+    }
+
   vtkKWPushButton *pb = NULL;
 
   // add preset
@@ -379,16 +400,6 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   pb = this->PresetButtons->AddWidget(vtkKWPresetSelector::EmailButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconPresetEmail);
   pb->SetCommand(this, "PresetEmailCallback");
-
-  this->SetDefaultHelpStrings();
-
-  // Pack
-
-  this->Pack();
-
-  // Update enable state
-
-  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1648,7 +1659,6 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
     child->SetHeight(this->ThumbnailSize);
     child->SetBackgroundColor(list->GetCellCurrentBackgroundColor(
                                 row, this->GetThumbnailColumnIndex()));
-    child->SetEnabled(list->GetEnabled());
 
     vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
     if (thumbnail)
