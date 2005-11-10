@@ -967,13 +967,16 @@ proc tablelist::setupColumns {win columns createLabels} {
     # Build the list data(colList), and create the labels if requested
     #
     set widgetFont $data(-font)
+    set oldColCount $data(colCount)
     set data(colList) {}
+    set data(colCount) 0
+    set data(lastCol) -1
     set col 0
     foreach {width title alignment} $data(-columns) {
-	#
-	# Append the width in pixels and the
-	# alignment to the list data(colList)
-	#
+        #
+        # Append the width in pixels and the
+        # alignment to the list data(colList)
+        #
 	if {$width > 0} {		;# convention: width in characters
 	    set pixels [charsToPixels $win $widgetFont $width]
 	    set data($col-lastStaticWidth) $pixels
@@ -983,8 +986,9 @@ proc tablelist::setupColumns {win columns createLabels} {
 	} else {			;# convention: dynamic width
 	    set pixels 0
 	}
-	lappend data(colList) $pixels $alignment
-    set data(lastCol) $col
+        lappend data(colList) $pixels $alignment
+        incr data(colCount)
+        set data(lastCol) $col
 
 	if {$createLabels} {
 	    set data($col-elided) 0
@@ -1051,13 +1055,6 @@ proc tablelist::setupColumns {win columns createLabels} {
 
 	incr col
     }
-
-    #
-    # Save the number of columns in data(colCount)
-    #
-    set oldColCount $data(colCount)
-    set data(colCount) $col
-    set data(lastCol) [expr {$col - 1}]
 
     #
     # Clean up the data associated with the deleted columns
