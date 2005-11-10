@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.5");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.6");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -565,7 +565,7 @@ void vtkPVDesktopDeliveryServer::SetRenderWindowSize()
     if (this->ParallelRenderManager)
       {
       this->ParallelRenderManager->SetForceRenderWindowSize(1);
-      this->ParallelRenderManager->SetRenderWindowSize(
+      this->ParallelRenderManager->SetForcedRenderWindowSize(
         this->FullImageSize[0], this->FullImageSize[1]);
       }
     }
