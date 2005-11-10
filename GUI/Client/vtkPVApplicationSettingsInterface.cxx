@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.28");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.28.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -255,8 +255,8 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "When this option is on, data are not updated."
     "Whole pipelines can be setup without processing any data.");
 
-  tk_cmd << "pack " << this->StreamBlockCheckButton->GetWidgetName()
-    << "  -side top -anchor w -expand no -fill none" << endl;
+//  tk_cmd << "pack " << this->StreamBlockCheckButton->GetWidgetName()
+//    << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
   // Interface customization
