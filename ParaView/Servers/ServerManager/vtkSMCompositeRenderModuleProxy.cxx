@@ -37,7 +37,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -97,28 +97,30 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
   p = this->CompositeManagerProxy->GetProperty("InitializeRMIs");
   if (!p)
     {
-    vtkErrorMacro("Failed to find property InitializeRMIs on CompositeManagerProxy.");
+    vtkErrorMacro("Failed to find property InitializeRMIs on "
+                  "CompositeManagerProxy.");
     return;
     }
   p->Modified();
   this->CompositeManagerProxy->UpdateVTKObjects();
-  // Some CompositeManagerProxies need that InitializeRMIs is called before RenderWindow
-  // is set.
- 
+  // Some CompositeManagerProxies need that InitializeRMIs is 
+  // called before RenderWindow is set.
+  
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CompositeManagerProxy->GetProperty("RenderWindow"));
   if (!pp)
     {
-    vtkErrorMacro("Failed to find proeprty RenderWindow on CompositeManagerProxy.");
+    vtkErrorMacro("Failed to find property RenderWindow on "
+                  "CompositeManagerProxy.");
     return;
     }
   pp->RemoveAllProxies();
   pp->AddProxy(this->RenderWindowProxy);
-
+  
   // Update the server process so that the render window is set before
   // we initialize offscreen rendering.
   this->CompositeManagerProxy->UpdateVTKObjects();
-
+  
   if (getenv("PV_DISABLE_COMPOSITE_INTERRUPTS"))
     {
     p = this->CompositeManagerProxy->GetProperty("EnableAbort");
@@ -128,11 +130,11 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
       p->Modified();
       }
     }
-
+  
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
     int enableOffscreen = 1;
-
+    
     // Non-mesa, X offscreen rendering requires access to the display
     vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
     pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
@@ -154,7 +156,7 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
       p->Modified();
       }
     }
- 
+  
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CompositeManagerProxy->GetProperty("UseCompositing"));
   if (ivp)
@@ -162,9 +164,8 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     // So that the server window does not popup until needed.
     ivp->SetElement(0, 0); 
     }
-
+  
   this->CompositeManagerProxy->UpdateVTKObjects();
-
 }
 
 //-----------------------------------------------------------------------------
