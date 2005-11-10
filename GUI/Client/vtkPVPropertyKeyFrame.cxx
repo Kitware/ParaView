@@ -19,7 +19,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVContourEntry.h"
+#include "vtkPVCutEntry.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMAnimationCueProxy.h"
@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.6");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.6.2.1");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -151,7 +151,15 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
         " vtkSMDoubleVectorProperty alone.");
       return;
       }
-    vtkPVContourEntry* valueList = vtkPVContourEntry::New();
+    vtkPVContourEntry* valueList;
+    if (domain->IsA("vtkSMBoundsDomain"))
+      {
+      valueList = vtkPVCutEntry::New();
+      }
+    else
+      {
+      valueList = vtkPVContourEntry::New();
+      }
     valueList->SetParent(this);
     // vtkPVContourEntry complains if the property is not set.
     valueList->SetSMProperty(property);
