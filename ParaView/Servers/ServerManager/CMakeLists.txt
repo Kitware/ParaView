@@ -80,6 +80,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxy.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
+  vtkSMProxyLink.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMRampKeyFrameProxy.cxx

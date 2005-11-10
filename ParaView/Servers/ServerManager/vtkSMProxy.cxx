@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.47");
+vtkCxxRevisionMacro(vtkSMProxy, "1.48");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -468,6 +468,8 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
     return;
     }
 
+  this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)name);
+
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.find(name);
   if (it == this->Internals->Properties.end())
@@ -759,6 +761,8 @@ void vtkSMProxy::UpdateVTKObjects()
     this->MarkModified(this);
     }
 
+  this->InvokeEvent(vtkCommand::UpdateEvent, 0);
+
   this->InUpdateVTKObjects = 0;
   // If any properties got modified while pushing them,
   // we need to call UpdateVTKObjects again.
@@ -802,7 +806,7 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
       {
       vtkClientServerID objectId = 
         pm->NewStreamObject(this->VTKClassName, stream);
-
+      
       this->Internals->IDs.push_back(objectId);
 
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
