@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.2");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 vtkCxxSetObjectMacro(vtkPVLODActor, RenderModuleHelper, vtkPVRenderModuleHelper);
@@ -307,5 +307,16 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
   if (this->LODMapper)
     {
     os << indent << "LODMapper: " << this->GetLODMapper() << endl;
+    }
+
+  os << indent << "RenderModuleHelper: ";
+  if (this->RenderModuleHelper)
+    {
+    os << endl;
+    os << this->RenderModuleHelper->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
     }
 }
