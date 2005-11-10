@@ -96,18 +96,22 @@ public:
       }
     return serverId << 1;
     }
+//ETX
 
-
+//BTX
   // Description:
   // Get a directory listing for the given directory.  Returns 1 for
   // success, and 0 for failure (when the directory does not exist).
   virtual int GetDirectoryListing(vtkConnectionID connectionID, const char* dir, 
     vtkStringList* dirs, vtkStringList* files, int save);
+//ETX
+
   // Description:
   // Legacy Method.
   virtual int GetDirectoryListing(const char* dir, 
     vtkStringList* dirs, vtkStringList* files, int save);
-  
+
+//BTX
   // Description:
   // Load a ClientServer wrapper module dynamically in the server
   // processes.  Returns 1 if all server nodes loaded the module and 0
@@ -122,7 +126,8 @@ public:
   // Legacy Method.
   int LoadModule(vtkTypeUInt32 serverFlags, const char* name, 
     const char* directory);
-
+//ETX
+  
   // Description:
   // Used internally.  Do not call.  Use LoadModule instead.
   virtual int LoadModuleInternal(const char* name, const char* directory);
@@ -134,7 +139,8 @@ public:
   // and put in map. The following calls do not cause instantiation.
   // Used while comparing data types for input matching.
   vtkDataObject* GetDataObjectOfType(const char* classname);
-  
+
+//BTX
   // Description:
   // This is the method to be called to gather information.
   // This method require the ID of the connection from which
@@ -146,6 +152,7 @@ public:
   // Legacy Methods.
   void GatherInformation(vtkPVInformation* info, vtkClientServerID id);
   void GatherInformationRenderServer(vtkPVInformation* info, vtkClientServerID id);
+//ETX
 
   // Description:
   // Start the process modules. It will create the application
@@ -156,6 +163,7 @@ public:
   // Breaks the event loops and cleans up.
   virtual void Exit();
 
+//BTX
   // Description:
   // These methods append commands to the given vtkClientServerStream
   // to construct or delete a vtk object.  For construction, the type
@@ -165,13 +173,13 @@ public:
   // caller must use SendStream() to actually perform the operation.
   vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream);
   void DeleteStreamObject(vtkClientServerID, vtkClientServerStream& stream);
-
+  
   // Description:
   // Return the vtk object associated with the given id for the
   // client.  If the id is for an object on another node then 0 is
   // returned.
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
-  
+
   // Description:
   // Return the last result for the specified server.  In this case,
   // the server should be exactly one of the ServerFlags, and not a
