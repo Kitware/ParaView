@@ -315,6 +315,7 @@ protected:
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
   friend class vtkSMIceTDesktopRenderModuleProxy;
+  friend class vtkSMCompoundProxy;
 //ETX
 
   // Description:
@@ -435,6 +436,20 @@ protected:
   // Description:
   // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
   vtkSMProxy* GetSubProxy(const char* name);
+
+  // Description:
+  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
+  vtkSMProxy* GetSubProxy(unsigned int index);
+
+  // Description:
+  // Returns the name used to store sub-proxy. Returns 0 if sub-proxy does
+  // not exist.
+  const char* GetSubProxyName(unsigned int index);
+
+  // Description:
+  // Returns the number of sub-proxies.
+  unsigned int GetNumberOfSubProxies();
+
 
   // Description:
   // Called by a proxy property, this adds the property,proxy

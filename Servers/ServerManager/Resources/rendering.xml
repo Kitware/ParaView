@@ -1359,7 +1359,8 @@
          command="SetWindowPosition"
          number_of_elements="2"
          default_values="0 0"
-         update_self="1">
+         update_self="1"
+         immediate_update="1">
          <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
 
@@ -1368,7 +1369,8 @@
          command="SetGUISize"
          number_of_elements="2"
          default_values="300 300"
-         update_self="1">
+         update_self="1"
+         immediate_update="1">
          <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
 
@@ -1427,6 +1429,30 @@
     <CaveRenderModuleProxy name="CaveRenderModule"
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
     </CaveRenderModuleProxy>
+
+    <MultiViewRenderModuleProxy name="MultiViewRenderModule">
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" 
+                                   proxygroup="renderwindow">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="OffScreenRendering" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CompositeManager" proxygroup="composite_managers"
+          proxyname="DesktopDeliveryServer">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="DisplayManager" proxygroup="composite_managers"
+          proxyname="IceTRenderManager">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="InitializeOffScreen" />
+        </ExposedProperties>
+      </SubProxy>
+    </MultiViewRenderModuleProxy>
   </ProxyGroup>
   
   <ProxyGroup name="interactors">

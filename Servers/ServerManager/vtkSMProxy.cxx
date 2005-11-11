@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.48");
+vtkCxxRevisionMacro(vtkSMProxy, "1.49");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -827,6 +827,46 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     it2->second.GetPointer()->CreateVTKObjects(numObjects);
     }
 
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxy::GetNumberOfSubProxies()
+{
+  return this->Internals->SubProxies.size();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxy::GetSubProxyName(unsigned int index)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for(unsigned int idx = 0; 
+      it2 != this->Internals->SubProxies.end(); 
+      it2++, idx++)
+    {
+    if (idx == index)
+      {
+      return it2->first.c_str();
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxy::GetSubProxy(unsigned int index)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for(unsigned int idx = 0; 
+      it2 != this->Internals->SubProxies.end(); 
+      it2++, idx++)
+    {
+    if (idx == index)
+      {
+      return it2->second.GetPointer();
+      }
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------
