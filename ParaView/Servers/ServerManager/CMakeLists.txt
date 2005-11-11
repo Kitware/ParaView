@@ -30,6 +30,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMComparativeVisProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
+  vtkSMCompoundProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
@@ -63,6 +64,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMLODRenderModuleProxy.cxx
   vtkSMMultiDisplayProxy.cxx
   vtkSMMultiDisplayRenderModuleProxy.cxx
+  vtkSMMultiViewRenderModuleProxy.cxx
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
