@@ -11,6 +11,7 @@
 #define _pqMainWindow_h
 
 #include <QMainWindow>
+#include <vtkIOStream.h>
 
 class pqObjectInspector;
 class pqObjectInspectorDelegate;
@@ -35,6 +36,9 @@ class pqMainWindow :
 public:
   pqMainWindow();
   ~pqMainWindow();
+
+  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
+  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output);
 
 signals:
   void serverChanged();
