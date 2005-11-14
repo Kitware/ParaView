@@ -27,7 +27,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVCameraKeyFrame);
-vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.4");
 //------------------------------------------------------------------------------
 vtkPVCameraKeyFrame::vtkPVCameraKeyFrame()
 {
@@ -173,7 +173,7 @@ void vtkPVCameraKeyFrame::SetKeyValue(vtkSMProxy* cameraProxy)
     return;
     }
   vtkSMDoubleVectorProperty* sdvp;
-  cameraProxy->UpdateInformation();
+  cameraProxy->UpdatePropertyInformation();
 
   const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
   const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 

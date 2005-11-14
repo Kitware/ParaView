@@ -19,7 +19,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()
@@ -93,7 +93,7 @@ vtkSMCameraKeyFrameProxy::~vtkSMCameraKeyFrameProxy()
 //----------------------------------------------------------------------------
 void vtkSMCameraKeyFrameProxy::SetKeyValue(vtkSMProxy* cameraProxy)
 {
-  cameraProxy->UpdateInformation();
+  cameraProxy->UpdatePropertyInformation();
 
   PropertyToCamera(cameraProxy, this->Camera, Position);
   PropertyToCamera(cameraProxy, this->Camera, FocalPoint);

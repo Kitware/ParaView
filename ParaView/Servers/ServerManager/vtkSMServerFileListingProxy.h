@@ -50,7 +50,14 @@ public:
   // and populating the values. It also calls UpdateDependentDomains()
   // on all properties to make sure that domains that depend on the
   // information are updated.
-  virtual void UpdateInformation();
+  virtual void UpdatePropertyInformation();
+
+  // Description:
+  // Similar to UpdatePropertyInformation() but updates only the given property.
+  // If the property does not belong to the proxy, the call is ignored.
+  virtual void UpdatePropertyInformation(vtkSMProperty* prop)
+    { this->Superclass::UpdatePropertyInformation(prop); }
+    
 protected:
   vtkSMServerFileListingProxy();
   ~vtkSMServerFileListingProxy();

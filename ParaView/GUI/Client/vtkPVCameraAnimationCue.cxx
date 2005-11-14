@@ -24,7 +24,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkPVCameraAnimationCue);
-vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraAnimationCue, "1.5");
 //------------------------------------------------------------------------------
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
@@ -60,7 +60,7 @@ void vtkPVCameraAnimationCue::SetAnimatedProxy(vtkSMProxy* proxy)
   this->PropertyStatusManager->UnregisterAllProperties();
   if (proxy)
     {
-    proxy->UpdateInformation();
+    proxy->UpdatePropertyInformation();
     const char* names[] = {"CameraPositionInfo", "CameraFocalPointInfo",
         "CameraViewUpInfo", "CameraViewAngleInfo",  0 };
     for (int i=0; names[i]; i++)
@@ -81,7 +81,7 @@ void vtkPVCameraAnimationCue::StartRecording()
     return;
     }
   vtkSMProxy* proxy = this->CueProxy->GetAnimatedProxy();
-  proxy->UpdateInformation();
+  proxy->UpdatePropertyInformation();
   this->Superclass::StartRecording();
 }
 
@@ -105,7 +105,7 @@ void vtkPVCameraAnimationCue::RecordState(double ntime, double offset)
     return;
     }
   vtkSMProxy* cameraProxy = this->CueProxy->GetAnimatedProxy();
-  cameraProxy->UpdateInformation();
+  cameraProxy->UpdatePropertyInformation();
 
   const char* names[] = {"CameraPositionInfo", "CameraFocalPointInfo",
         "CameraViewUpInfo", "CameraViewAngleInfo",  0};

@@ -49,8 +49,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Calls UpdateInformation() on all sources (chains to superclass).
-  virtual void UpdateInformation();
+  // Calls UpdateInformation() on all sources.
+  virtual void UpdatePipelineInformation();
 
   // Description:
   // Calls Update() on all sources. It also creates parts if

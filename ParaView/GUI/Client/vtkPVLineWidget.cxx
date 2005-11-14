@@ -38,7 +38,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.74");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.75");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -178,7 +178,7 @@ void vtkPVLineWidget::GetPoint1(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetPoint1Internal(pt);
 }
 
@@ -236,7 +236,7 @@ void vtkPVLineWidget::GetPoint2(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetPoint2Internal(pt);
 }
 
@@ -317,7 +317,7 @@ int vtkPVLineWidget::GetResolution()
     return 0;
     }
 
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   return this->GetResolutionInternal();
 }
 
@@ -373,7 +373,7 @@ void vtkPVLineWidget::Accept()
   int res;
   const char* variablename;
   
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetPoint1Internal(pt1);
   this->GetPoint2Internal(pt2);
   res = this->GetResolutionInternal();
@@ -724,7 +724,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     double pos1[3];
     double pos2[3];
     int res;
-    this->WidgetProxy->UpdateInformation();
+    this->WidgetProxy->UpdatePropertyInformation();
     this->GetPoint1Internal(pos1);
     this->Point1[0]->SetValueAsDouble(pos1[0]);
     this->Point1[1]->SetValueAsDouble(pos1[1]);

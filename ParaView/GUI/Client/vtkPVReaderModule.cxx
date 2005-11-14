@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.69");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.70");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -217,7 +217,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
     }
 
   // Update the reader's information.
-  this->Proxy->UpdateInformation();
+  this->Proxy->UpdatePipelineInformation();
 
   return VTK_OK;
 }

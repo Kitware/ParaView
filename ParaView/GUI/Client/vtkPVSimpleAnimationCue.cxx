@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.19");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.20");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -875,7 +875,7 @@ int vtkPVSimpleAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
   this->KeyFrameManipulatorProxy->UpdateVTKObjects();
   
   // I hate this...but what can I do, I need the index returned by the manipulator.
-  this->KeyFrameManipulatorProxy->UpdateInformation();
+  this->KeyFrameManipulatorProxy->UpdatePropertyInformation();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->KeyFrameManipulatorProxy->GetProperty("LastAddedKeyFrameIndex"));
   return ivp->GetElement(0);

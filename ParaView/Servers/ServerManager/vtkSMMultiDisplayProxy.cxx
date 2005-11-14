@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {
@@ -52,7 +52,13 @@ void vtkSMMultiDisplayProxy::SetLODCollectionDecision(int)
 //-----------------------------------------------------------------------------
 void vtkSMMultiDisplayProxy::CreateVTKObjects(int numObjects)
 {
+  if (this->ObjectsCreated || !this->CanCreateProxy)
+    {
+    return;
+    }
+  
   this->Superclass::CreateVTKObjects(numObjects);
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int i;
   

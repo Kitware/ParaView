@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.49");
+vtkCxxRevisionMacro(vtkSMProxy, "1.50");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -44,9 +44,21 @@ public:
   static vtkSMProxyObserver *New() 
     { return new vtkSMProxyObserver; }
 
-  virtual void Execute(vtkObject*, unsigned long, void*)
+  virtual void Execute(vtkObject* obj, unsigned long event, void* data)
     {
-      this->Proxy->SetPropertyModifiedFlag(this->PropertyName, 1);
+    if (this->Proxy)
+      {
+      if (this->PropertyName)
+        {
+        // This is observing a property.
+        this->Proxy->SetPropertyModifiedFlag(this->PropertyName, 1);
+        }
+      else 
+        {
+        this->Proxy->ExecuteSubProxyEvent(vtkSMProxy::SafeDownCast(obj), 
+          event, data);
+        }
+      }
     }
 
   void SetPropertyName(const char* name)
@@ -134,6 +146,9 @@ vtkSMProxy::vtkSMProxy()
   str << "pvTemp" << this->SelfID << ends;
   this->SetName(str.str());
   str.rdbuf()->freeze(0);
+
+  this->SubProxyObserver = vtkSMProxyObserver::New();
+  this->SubProxyObserver->SetProxy(this);
 }
 
 //---------------------------------------------------------------------------
@@ -165,6 +180,9 @@ vtkSMProxy::~vtkSMProxy()
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetXMLElement(0);
+  
+  this->SubProxyObserver->SetProxy(0);
+  this->SubProxyObserver->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -318,6 +336,15 @@ void vtkSMProxy::RemoveAllObservers()
       prop->RemoveObserver(it->second.ObserverTag);
       }
     }
+  
+  vtkSMProxyInternals::ProxyMap::iterator it2;
+  for (it2 = this->Internals->SubProxies.begin();
+    it2 != this->Internals->SubProxies.end();
+    ++it2)
+    {
+    it2->second.GetPointer()->RemoveObserver(this->SubProxyObserver);
+    }
+
 }
 
 //---------------------------------------------------------------------------
@@ -422,13 +449,17 @@ void vtkSMProxy::AddPropertyToSelf(
 
   unsigned int tag=0;
 
-  vtkSMProxyObserver* obs = vtkSMProxyObserver::New();
-  obs->SetProxy(this);
-  obs->SetPropertyName(name);
-  // We have to store the tag in order to be able to remove
-  // the observer later.
-  tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
-  obs->Delete();
+  // We are not concerned about modifications to information properties.
+  if (!prop->GetInformationOnly())
+    {
+    vtkSMProxyObserver* obs = vtkSMProxyObserver::New();
+    obs->SetProxy(this);
+    obs->SetPropertyName(name);
+    // We have to store the tag in order to be able to remove
+    // the observer later.
+    tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
+    obs->Delete();
+    }
 
   vtkSMProxyInternals::PropertyInfo newEntry;
   newEntry.Property = prop;
@@ -582,53 +613,59 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::UpdateInformation()
+void vtkSMProxy::UpdatePropertyInformation()
 {
   this->CreateVTKObjects(1);
 
-  if (this->ObjectsCreated)
+  if (!this->ObjectsCreated)
     {
-    vtkSMProxyInternals::PropertyInfoMap::iterator it;
-    // Update all properties.
-    for (it  = this->Internals->Properties.begin();
-         it != this->Internals->Properties.end();
-         ++it)
+    return;
+    }
+
+  // We don;t want the proxy to be marked as modified when we are merely
+  // updating information properties.
+  int old_flag = this->DoNotModifyProperty;
+  this->DoNotModifyProperty = 1;
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  // Update all properties.
+  for (it  = this->Internals->Properties.begin();
+    it != this->Internals->Properties.end();
+    ++it)
+    {
+    vtkSMProperty* prop = it->second.Property.GetPointer();
+    if (prop->GetInformationOnly())
       {
-      vtkSMProperty* prop = it->second.Property.GetPointer();
-      if (prop->GetInformationOnly())
+      if (prop->GetUpdateSelf())
         {
-        if (prop->GetUpdateSelf())
-          {
-          prop->UpdateInformation(vtkProcessModule::CLIENT, this->SelfID);
-          }
-        else
-          {
-          prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
-          }
+        prop->UpdateInformation(vtkProcessModule::CLIENT, this->SelfID);
+        }
+      else
+        {
+        prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
         }
       }
+    }
+  this->DoNotModifyProperty = old_flag;
 
-    // Make sure all dependent domains are updated. UpdateInformation()
-    // might have produced new information that invalidates the domains.
-    for (it  = this->Internals->Properties.begin();
-         it != this->Internals->Properties.end();
-         ++it)
+  // Make sure all dependent domains are updated. UpdateInformation()
+  // might have produced new information that invalidates the domains.
+  for (it  = this->Internals->Properties.begin();
+    it != this->Internals->Properties.end();
+    ++it)
+    {
+    vtkSMProperty* prop = it->second.Property.GetPointer();
+    if (prop->GetInformationOnly())
       {
-      vtkSMProperty* prop = it->second.Property.GetPointer();
-      if (prop->GetInformationOnly())
-        {
-        prop->UpdateDependentDomains();
-        }
+      prop->UpdateDependentDomains();
       }
-    
-    vtkSMProxyInternals::ProxyMap::iterator it2 =
-      this->Internals->SubProxies.begin();
-    for( ; it2 != this->Internals->SubProxies.end(); it2++)
-      {
-      it2->second.GetPointer()->UpdateInformation();
-      }
+    }
 
-    this->MarkModified(this);
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->UpdatePropertyInformation();
     }
 }
 
@@ -790,6 +827,17 @@ void vtkSMProxy::UpdateSelfAndAllInputs()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::UpdatePipelineInformation()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->UpdatePipelineInformation();
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated)
@@ -894,9 +942,13 @@ void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
   if (it != this->Internals->SubProxies.end())
     {
     vtkWarningMacro("Proxy " << name  << " already exists. Replacing");
+    // needed to remove any observers.
+    this->RemoveSubProxy(name);
     }
 
   this->Internals->SubProxies[name] = proxy;
+  
+  proxy->AddObserver(vtkCommand::ModifiedEvent, this->SubProxyObserver);
 }
 
 //---------------------------------------------------------------------------
@@ -907,8 +959,38 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 
   if (it != this->Internals->SubProxies.end())
     {
+    it->second.GetPointer()->RemoveObserver(this->SubProxyObserver);
+    // Note, we are assuming here that a proxy cannot be added
+    // twice as a subproxy to the same proxy.
     this->Internals->SubProxies.erase(it);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy, 
+  unsigned long event, void* data)
+{
+  if (subproxy && event == vtkCommand::PropertyModifiedEvent)
+    {
+    // A Subproxy has been modified.
+    const char* name = reinterpret_cast<const char*>(data);
+    const char* exposed_name = 0;
+    if (name && subproxy->GetExposedProperty(name))
+      {
+      // the modified property was exposed by the subproxy.
+      exposed_name = name;
+      }
+    // Let the world know that one of the subproxies of this proxy has 
+    // been modified. If the subproxy exposed the modified property, we
+    // provide the name of the property. Otherwise, 0, indicating
+    // some internal property has changed.
+    this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)exposed_name);
+    }
+
+  // Note we are not throwing vtkCommand::UpdateEvent fired by subproxies.
+  // Since doing so would imply that this proxy (as well as all its subproxies)
+  // are updated, which is not necessarily true when a subproxy fires
+  // an UpdateEvent.
 }
 
 //---------------------------------------------------------------------------
@@ -977,6 +1059,7 @@ vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
 //----------------------------------------------------------------------------
 void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
+  this->UpdatePropertyInformation();
   this->MarkConsumersAsModified(modifiedProxy);
 }
 
