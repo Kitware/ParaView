@@ -45,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.67");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.68");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -192,7 +192,7 @@ void vtkPVSphereWidget::Accept()
   double center[3];
   double radius;
   
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetCenterInternal(center);
   radius = this->GetRadiusInternal();
 
@@ -597,7 +597,7 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
       {
       double center[3];
       double radius;
-      this->WidgetProxy->UpdateInformation();
+      this->WidgetProxy->UpdatePropertyInformation();
       this->GetCenterInternal(center);
       radius = this->GetRadiusInternal();
       this->CenterEntry[0]->SetValueAsDouble(center[0]);
@@ -669,7 +669,7 @@ void vtkPVSphereWidget::GetCenter(double pt[3])
     vtkErrorMacro("Not created yet");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetCenterInternal(pt);
 }
 
@@ -691,7 +691,7 @@ double vtkPVSphereWidget::GetRadius()
     vtkErrorMacro("Not created yet");
     return 0.0;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   return this->GetRadiusInternal();
 }
 

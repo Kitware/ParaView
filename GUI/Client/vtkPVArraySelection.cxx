@@ -43,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.77");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.78");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -364,7 +364,7 @@ void vtkPVArraySelection::PostAccept()
 {
   // In case changing the selection caused changes in other 
   // selections, we update information and GUI from reader
-  this->GetPVSource()->GetProxy()->UpdateInformation();
+  this->GetPVSource()->GetProxy()->UpdatePipelineInformation();
   this->UpdateSelections(1);
   this->UpdateGUI();
 }

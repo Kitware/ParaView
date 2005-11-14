@@ -63,7 +63,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.462");
+vtkCxxRevisionMacro(vtkPVSource, "1.463");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2866,8 +2866,8 @@ int vtkPVSource::InitializeClone(int makeCurrent)
 
   this->InitializeWidgets();
 
-  // If this is not a reader module, call UpdateInformation.
-  // Some filters may require UpdateInformation is called to
+  // If this is not a reader module, call UpdatePipelineInformation.
+  // Some filters may require UpdatePipelineInformation is called to
   // initialize widgets.
   // Unfortunately, there are some filters/modules with which
   // this does not work. These are avoided.
@@ -2876,7 +2876,7 @@ int vtkPVSource::InitializeClone(int makeCurrent)
       strcmp(this->GetSourceClassName(), "vtkAppendFilter") != 0 &&
       strcmp(this->GetSourceClassName(), "vtkAppendPolyData") != 0)
     {
-    this->Proxy->UpdateInformation();
+    this->Proxy->UpdatePipelineInformation();
     }
 
   // Display page must be created before source is selected.

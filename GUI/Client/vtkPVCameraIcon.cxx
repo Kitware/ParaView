@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.29");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -191,7 +191,7 @@ void vtkPVCameraIcon::StoreCamera()
     this->Camera = vtkCamera::New();
     
     vtkSMProxy* renModuleProxy = this->RenderView->GetRenderModuleProxy();
-    renModuleProxy->UpdateInformation();
+    renModuleProxy->UpdatePropertyInformation();
     vtkSMDoubleVectorProperty* dvp;
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(

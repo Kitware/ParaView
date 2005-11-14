@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.51");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.52");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -494,7 +494,7 @@ void vtkPVServerFileDialog::OK()
       this->ServerFileListingProxy->GetProperty("ActiveFileName"));
     svp->SetElement(0, fileName.c_str());
     this->ServerFileListingProxy->UpdateVTKObjects();
-    this->ServerFileListingProxy->UpdateInformation();
+    this->ServerFileListingProxy->UpdatePropertyInformation();
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->ServerFileListingProxy->GetProperty("ActiveFileIsDirectory"));
     int isdir = (ivp)? ivp->GetElement(0) : 0;
@@ -784,7 +784,7 @@ void vtkPVServerFileDialog::Update()
   if(!this->LastPath)
     {
     this->CreateServerSide();
-    this->ServerFileListingProxy->UpdateInformation();
+    this->ServerFileListingProxy->UpdatePropertyInformation();
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       this->ServerFileListingProxy->GetProperty("CurrentWorkingDirectory"));
     const char* cwd = (svp)? svp->GetElement(0) : "";
@@ -797,7 +797,7 @@ void vtkPVServerFileDialog::Update()
     {
     // Directory did not exist, use current directory instead.
     this->CreateServerSide();
-    this->ServerFileListingProxy->UpdateInformation();
+    this->ServerFileListingProxy->UpdatePropertyInformation();
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       this->ServerFileListingProxy->GetProperty("CurrentWorkingDirectory"));
     const char* cwd = (svp)? svp->GetElement(0) : "";

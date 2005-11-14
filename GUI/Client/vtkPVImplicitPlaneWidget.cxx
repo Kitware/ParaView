@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -284,7 +284,7 @@ void vtkPVImplicitPlaneWidget::Accept()
   double center[3];
   double normal[3];
 
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetCenterInternal(center);
   this->GetNormalInternal(normal);
 
@@ -744,7 +744,7 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     {
     double center[3];
     double normal[3];
-    this->WidgetProxy->UpdateInformation();
+    this->WidgetProxy->UpdatePropertyInformation();
     this->GetCenterInternal(center);
     this->GetNormalInternal(normal);
 
@@ -871,7 +871,7 @@ void vtkPVImplicitPlaneWidget::GetCenter(double pt[3])
     vtkErrorMacro("Not created yet");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetCenterInternal(pt);
 }
 
@@ -918,7 +918,7 @@ void vtkPVImplicitPlaneWidget::GetNormal(double pt[3])
     vtkErrorMacro("Not created yet");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetNormalInternal(pt);
 }
 
@@ -973,7 +973,7 @@ void vtkPVImplicitPlaneWidget::UpdateOffsetRange()
 {
   double center[3];
   double normal[3];
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetCenterInternal(center);
   this->GetNormalInternal(normal);
 
@@ -1020,7 +1020,7 @@ void vtkPVImplicitPlaneWidget::Update()
 
     double center[3];
     double normal[3];
-    this->WidgetProxy->UpdateInformation();
+    this->WidgetProxy->UpdatePropertyInformation();
     this->GetCenterInternal(center);
     this->GetNormalInternal(normal);
   

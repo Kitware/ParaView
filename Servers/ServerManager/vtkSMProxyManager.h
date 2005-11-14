@@ -32,6 +32,8 @@
 class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMProxy;
+class vtkSMProxyManagerObserver;
+
 //BTX
 struct vtkSMProxyManagerInternals;
 //ETX
@@ -104,8 +106,11 @@ public:
 
   // Description:
   // Calls UpdateVTKObjects() on all managed proxies.
-  void UpdateRegisteredProxies(const char* groupname);
-  void UpdateRegisteredProxies();
+  // If modified_only flag is set, then UpdateVTKObjects will be called 
+  // only those proxies that have any properties that were modifed i.e.
+  // not pushed to the VTK objects.
+  void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
+  void UpdateRegisteredProxies(int modified_only=1);
 
   // Description:
   // Save the state of the server manager in XML format in a file.
@@ -152,6 +157,7 @@ protected:
   friend class vtkSMXMLParser;
   friend class vtkSMProxyIterator;
   friend class vtkSMProxy;
+  friend class vtkSMProxyManagerObserver;
 //ETX
 
   // Description:
@@ -165,8 +171,17 @@ protected:
   vtkPVXMLElement* GetProxyElement(const char* groupName,
     const char* proxyName);
 
+  // Description:
+  // Handles events.
+  virtual void ExecuteEvent(vtkObject* obj, unsigned long event, void* data);
+
+  // Description:
+  // Mark/UnMark a proxy as modified.
+  void MarkProxyAsModified(vtkSMProxy*);
+  void UnMarkProxyAsModified(vtkSMProxy*);
 private:
   vtkSMProxyManagerInternals* Internals;
+  vtkSMProxyManagerObserver* Observer;
 
 private:
   vtkSMProxyManager(const vtkSMProxyManager&); // Not implemented

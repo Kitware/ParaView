@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.62");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.63");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -183,7 +183,7 @@ void vtkPVBoxWidget::Accept()
   int modFlag = this->GetModifiedFlag();
   
   double values[3][3];
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetScaleInternal(values[0]);
   this->GetPositionInternal(values[1]);
   this->GetRotationInternal(values[2]);
@@ -788,7 +788,7 @@ void vtkPVBoxWidget::GetPositionInternal(double position[3])
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::UpdateFromBox()
 {
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
 
   double scale[3], position[3], rotation[3];
   this->GetScaleInternal(scale);

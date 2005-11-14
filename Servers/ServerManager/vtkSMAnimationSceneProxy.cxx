@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.17");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
   this->InSaveAnimation = 1;
   this->SetAnimationTime(0);
 
-  this->RenderModuleProxy->UpdateInformation();
+  this->RenderModuleProxy->UpdatePropertyInformation();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderModuleProxy->GetProperty("RenderWindowSizeInfo"));
   int *size = ivp->GetElements();

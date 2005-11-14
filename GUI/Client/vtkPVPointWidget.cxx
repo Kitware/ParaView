@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -147,7 +147,7 @@ void vtkPVPointWidget::Accept()
   double pt[3];
   const char* variablename;
   
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetPositionInternal(pt);
   
   vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
@@ -330,7 +330,7 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   if(l == vtkCommand::WidgetModifiedEvent)
     {
     double pos[3];
-    this->WidgetProxy->UpdateInformation();
+    this->WidgetProxy->UpdatePropertyInformation();
     this->GetPositionInternal(pos);
     this->PositionEntry[0]->SetValueAsDouble(pos[0]);
     this->PositionEntry[1]->SetValueAsDouble(pos[1]);
@@ -394,7 +394,7 @@ void vtkPVPointWidget::GetPosition(double pt[3])
     vtkErrorMacro("Cannot get your point.");
     return;
     }
-  this->WidgetProxy->UpdateInformation();
+  this->WidgetProxy->UpdatePropertyInformation();
   this->GetPositionInternal(pt);
 }
 

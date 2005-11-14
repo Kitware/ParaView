@@ -110,6 +110,7 @@ class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyManager;
+class vtkSMProxyObserver;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -231,10 +232,10 @@ public:
   // and populating the values. It also calls UpdateDependentDomains()
   // on all properties to make sure that domains that depend on the
   // information are updated.
-  virtual void UpdateInformation();
+  virtual void UpdatePropertyInformation();
 
   // Description:
-  // Similar to UpdateInformation() but updates only the given property.
+  // Similar to UpdatePropertyInformation() but updates only the given property.
   // If the property does not belong to the proxy, the call is ignored.
   virtual void UpdatePropertyInformation(vtkSMProperty* prop);
 
@@ -400,7 +401,8 @@ protected:
 
   // Description:
   // Cleanup code. Remove all observers from all properties assigned to
-  // this proxy.  Called before deleting properties/
+  // this proxy.  Called before deleting properties.
+  // This also removes observers on subproxies.
   void RemoveAllObservers();
 
   // Description:
@@ -480,6 +482,17 @@ protected:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
+  // Description:
+  // Handle events fired by subproxies.
+  virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, 
+    void* data);
+
+  // Description:
+  // This method simply iterates over subproxies and calls 
+  // UpdatePipelineInformation() on them. vtkSMSourceProxy overrides this method
+  // (makes it public) and updates the pipeline information.
+  virtual void UpdatePipelineInformation();
+
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);
 
@@ -520,6 +533,7 @@ protected:
 
 private:
   vtkSMProxyInternals* Internals;
+  vtkSMProxyObserver* SubProxyObserver;
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented

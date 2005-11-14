@@ -28,7 +28,7 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -176,7 +176,7 @@ void vtkPVLineSourceWidget::Accept()
     vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
       this->SourceProxy->GetProperty("Resolution"));
     double pt[3];
-    this->WidgetProxy->UpdateInformation();
+    this->WidgetProxy->UpdatePropertyInformation();
     if (pt1p)
       {
       this->GetPoint1Internal(pt);

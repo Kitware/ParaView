@@ -42,7 +42,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.5");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -332,7 +332,7 @@ void vtkPVItemSelection::PostAccept()
 {
   // In case changing the selection caused changes in other 
   // selections, we update information and GUI from reader
-  this->GetPVSource()->GetProxy()->UpdateInformation();
+  this->GetPVSource()->GetProxy()->UpdatePipelineInformation();
   this->UpdateSelections(1);
   this->UpdateGUI();
 }
