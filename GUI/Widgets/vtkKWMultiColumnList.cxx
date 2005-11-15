@@ -18,6 +18,7 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWComboBox.h"
 #include "vtkKWRadioButton.h"
 
 #include <vtksys/stl/string>
@@ -29,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.39");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2293,6 +2294,105 @@ void vtkKWMultiColumnList::CellWindowCommandToColorButtonCallback(
   child->SetEnabled(this->GetEnabled()); 
   this->AddBindingsToWidget(child);
   child->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetCellWindowCommandToReadOnlyComboBox(
+  int row_index, int col_index)
+{
+  this->SetCellWindowCommand(row_index, col_index, NULL, NULL);
+  this->SetCellWindowCommand(
+    row_index, col_index, this, "CellWindowCommandToReadOnlyComboBoxCallback");
+  this->SetCellWindowDestroyCommandToRemoveChild(row_index, col_index);
+  this->SetCellEditable(row_index, col_index, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::CellWindowCommandToReadOnlyComboBoxCallback(
+  const char *, int row, int col, const char *widget)
+{
+  vtkKWComboBox *child = vtkKWComboBox::New();
+  child->SetWidgetName(widget);
+  child->SetParent(this);
+  child->Create(this->GetApplication());
+  child->SetHighlightThickness(0);
+  child->SetBorderWidth(0);
+  // Set the default based on the current column width.. 
+  // child->SetWidth( this->GetColumnWidth(col)-2 );
+  child->SetWidth( 20 );
+  child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
+  child->SetEnabled(this->GetEnabled()); 
+  child->ReadOnlyOn();
+  child->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetNthEntryInReadOnlyComboBox( 
+                int i, const char *value, int row, int col)
+{
+  const char *child_name = this->GetCellWindowWidgetName(row, col);
+  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
+                  this->GetChildWidgetWithName(child_name));
+
+  // If it is a combo box
+  if ( child )
+    {
+    // If we have (i+1) entries, remove that entry and add a fresh one
+    if ( i < child->GetNumberOfValues() ) 
+      {
+      child->ReplaceNthValue( i, value );
+
+      // Set the title of the combo box to be the same as the first entry.
+      // The main title will be present because of the MulticolumnList anyway
+      if ( i == 0 ) 
+        {
+        child->SetValue( value );    
+        }
+      }
+    else
+      {
+      child->AddValue( value );
+
+      // Set the title of the combo box to be the same as the first entry.
+      if ( child->GetNumberOfValues() == 1 )
+        {
+        child->SetValue( value );    
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::DeleteNthEntryInReadOnlyComboBox( 
+                                     int i, int row, int col)
+{
+  const char *child_name = this->GetCellWindowWidgetName(row, col);
+  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
+                  this->GetChildWidgetWithName(child_name));
+
+  // If it is a combo box
+  if ( child )
+    {
+    // If we have (i+1) entries, remove that entry 
+    if ( i < child->GetNumberOfValues() ) 
+      {
+      child->DeleteValue( i );
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWMultiColumnList::DeleteAllEntriesInReadOnlyComboBox( int row, int col)
+{
+  const char *child_name = this->GetCellWindowWidgetName(row, col);
+  vtkKWComboBox *child = vtkKWComboBox::SafeDownCast(
+                  this->GetChildWidgetWithName(child_name));
+
+  // If it is a combo box
+  if ( child )
+    {
+    child->DeleteAllValues();
+    }
 }
 
 //----------------------------------------------------------------------------

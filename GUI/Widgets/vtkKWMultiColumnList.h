@@ -660,6 +660,18 @@ public:
   virtual void SetCellWindowCommandToCheckButton(int row_index, int col_index);
 
   // Description:
+  // The SetCellWindowCommandToReadOnlyComboBox is a convenience method to 
+  // add a list of items in a combo box within one of the cells. For instance, 
+  // similar items may be grouped and added in a pull down list. This also
+  // prevents overcrowding the Multi-column list by having things hidden in a 
+  // combo box.
+  virtual void SetCellWindowCommandToReadOnlyComboBox(int row_index, int col_index);
+  virtual void SetNthEntryInReadOnlyComboBox(int i, const char *value, 
+                                                      int row, int col);
+  virtual void DeleteNthEntryInReadOnlyComboBox(int i, int row, int col);
+  virtual void DeleteAllEntriesInReadOnlyComboBox(int row, int col);
+
+  // Description:
   // The SetCellWindowCommandToColorButton method is a convenient
   // way to automatically display a color button in the cell. The color of
   // the button is interpreted directly from the text in the cell 
@@ -1034,6 +1046,8 @@ public:
   virtual const char* EditEndCallback(
     const char *widget, int row, int col, const char *text);
   virtual void CellWindowCommandToCheckButtonCallback(
+    const char*, int, int, const char*);
+  virtual void CellWindowCommandToReadOnlyComboBoxCallback(
     const char*, int, int, const char*);
   virtual void CellWindowCommandToCheckButtonSelectCallback(
     vtkKWWidget*, int, int);
