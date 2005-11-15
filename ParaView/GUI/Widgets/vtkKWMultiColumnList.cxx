@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.40");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2317,9 +2317,19 @@ void vtkKWMultiColumnList::CellWindowCommandToReadOnlyComboBoxCallback(
   child->Create(this->GetApplication());
   child->SetHighlightThickness(0);
   child->SetBorderWidth(0);
+  
   // Set the default based on the current column width.. 
-  // child->SetWidth( this->GetColumnWidth(col)-2 );
-  child->SetWidth( 20 );
+  child->SetWidth( this->GetColumnWidth(col)-2 );
+
+  // If the column width is too small make the list box, when it drops down is
+  // at least wide enough to display enough text, instead of displaying an 
+  // annoying scroll bar.
+  if( this->GetColumnWidth(col) < 20 ) 
+    {
+    child->SetListboxWidth( 20 ); 
+    }
+  
+  //child->SetWidth( 20 );
   child->SetBackgroundColor(this->GetCellCurrentBackgroundColor(row, col));
   child->SetEnabled(this->GetEnabled()); 
   child->ReadOnlyOn();
