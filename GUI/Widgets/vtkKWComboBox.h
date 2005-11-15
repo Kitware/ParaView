@@ -53,6 +53,10 @@ public:
   virtual void DeleteAllValues();
 
   // Description:
+  // Replace the nth value in the combo box with another string value.
+  virtual void ReplaceNthValue( int n, const char* value );
+
+  // Description:
   // Set/Get the value of the entry in a few different formats.
   // Overriden to comply with the Tk type
   virtual void SetValue(const char *);
