@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.3");
 
 vtkCxxSetObjectMacro(vtkSMCompoundProxy, MainProxy, vtkSMProxy);
 
@@ -107,6 +107,17 @@ unsigned int vtkSMCompoundProxy::GetNumberOfProxies()
 void vtkSMCompoundProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "MainProxy: " << this->MainProxy;
+  if (this->MainProxy)
+    {
+    os << ": ";
+    this->MainProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << endl;
+    }
 }
 
 
