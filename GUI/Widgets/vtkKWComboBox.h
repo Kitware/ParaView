@@ -80,6 +80,13 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Specify the width of the listbox in the dropdown . Defaults to the same
+  // size as the combobox. Usually users will not need to use this method, 
+  // unless they need a different dropdown width. The width is specified as a
+  // factor of the width of the combo box. 
+  virtual void SetListboxWidth( int n );
+
 protected:
   vtkKWComboBox() {};
   ~vtkKWComboBox() {};
