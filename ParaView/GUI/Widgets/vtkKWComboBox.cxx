@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.5");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -74,6 +74,26 @@ void vtkKWComboBox::AddValue(const char* value)
 
   this->Script("%s configure -values [concat [%s cget -values] {\"%s\"}]", 
     this->GetWidgetName(), this->GetWidgetName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::ReplaceNthValue( int idx, const char *value )
+{
+  if (!this->IsCreated() || this->HasValue(value))
+    {
+    return;
+    }
+  if (idx < 0 || idx >= this->GetNumberOfValues())
+    {
+    vtkErrorMacro(
+      "This combobox has only " << this->GetNumberOfValues()
+      << " elements. Index " << idx << " is out of range");
+    return;
+    }
+
+  this->Script("%s configure -values [lreplace [%s cget -values] %d %d %s]", 
+    this->GetWidgetName(), this->GetWidgetName(), idx, idx, value);
+
 }
 
 //----------------------------------------------------------------------------
