@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.51");
+vtkCxxRevisionMacro(vtkSMProxy, "1.52");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1064,7 +1064,11 @@ vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
 //----------------------------------------------------------------------------
 void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  this->UpdatePropertyInformation();
+  if (this->ObjectsCreated)
+    {
+    // If not created yet, don't worry syncing the info properties.
+    this->UpdatePropertyInformation();
+    }
   this->MarkConsumersAsModified(modifiedProxy);
 }
 
