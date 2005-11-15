@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.6");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create(vtkKWApplication *app)
@@ -199,6 +199,17 @@ void vtkKWComboBox::UpdateEnableState()
     {
     this->SetConfigurationOptionAsInt("-editable", this->ReadOnly ? 0 : 1);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::SetListboxWidth( int n )
+{
+  if ( (n < 0) || (this->Width <= 0 ) ) 
+    {
+    return;
+    }
+  int listboxwidth = this->Width * n;
+  this->SetConfigurationOptionAsInt( "-listboxwidth", listboxwidth );
 }
 
 //----------------------------------------------------------------------------
