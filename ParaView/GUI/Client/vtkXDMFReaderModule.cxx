@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.43");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.44");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -468,7 +468,7 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
           << " GetProperty DomainName] SetElement 0 {"
           << this->Domain << "}" << endl;
     *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
-    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateInformation" << endl;
+    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdatePipelineInformation" << endl;
     }
   int numGrids=0;
   vtkXDMFReaderModuleInternal::GridListType::iterator mit;

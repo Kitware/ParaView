@@ -43,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.78");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.79");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -507,7 +507,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     *file << "  " 
           << "$pvTemp" << sourceID << " UpdateVTKObjects\n";
     *file << "  " 
-          << "$pvTemp" << sourceID << " UpdateInformation\n";
+          << "$pvTemp" << sourceID << " UpdatePipelineInformation\n";
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMPropertyName << "] SetNumberOfElements " 
           << 2*numElems << endl;
