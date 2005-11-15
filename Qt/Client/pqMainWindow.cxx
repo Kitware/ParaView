@@ -66,11 +66,9 @@
 
 #include <QVTKWidget.h>
 
-#ifdef PARAQ_BUILD_TESTING
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
 #include <pqRecordEventsDialog.h>
-#endif // PARAQ_BUILD_TESTING
 
 pqMainWindow::pqMainWindow() :
   CurrentServer(0),
@@ -135,7 +133,6 @@ pqMainWindow::pqMainWindow() :
   
   QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesFiltersMenu()));
 
-#ifdef PARAQ_BUILD_TESTING
   // Test menu.
   QMenu* const testsMenu = this->menuBar()->addMenu(tr("Tests"))
     << pqSetName("testsMenu");
@@ -147,8 +144,6 @@ pqMainWindow::pqMainWindow() :
   testsMenu->addAction(tr("Play"))
     << pqSetName("Play")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
-    
-#endif // PARAQ_BUILD_TESTING
   
   // Help menu.
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help"))
@@ -602,43 +597,29 @@ void pqMainWindow::onHelpAbout()
 
 void pqMainWindow::onRecordTest()
 {
-#ifdef PARAQ_BUILD_TESTING
-
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
-  
-#endif // PARAQ_BUILD_TESTING
 }
 
 void pqMainWindow::onRecordTest(const QStringList& Files)
 {
-#ifdef PARAQ_BUILD_TESTING
-
   for(int i = 0; i != Files.size(); ++i)
     {
     pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(Files[i], this);
     dialog->show();
     }
-  
-#endif // PARAQ_BUILD_TESTING
 }
 
 void pqMainWindow::onPlayTest()
 {
-#ifdef PARAQ_BUILD_TESTING
-
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();
-  
-#endif // PARAQ_BUILD_TESTING
 }
 
 void pqMainWindow::onPlayTest(const QStringList& Files)
 {
-#ifdef PARAQ_BUILD_TESTING
-
   pqEventPlayer player(*this);
   player.addDefaultWidgetEventPlayers();
 
@@ -647,7 +628,5 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
       pqEventPlayerXML xml_player;
       xml_player.playXML(player, Files[i]);
     }
-
-#endif // PARAQ_BUILD_TESTING
 }
 

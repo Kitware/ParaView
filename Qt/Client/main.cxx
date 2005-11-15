@@ -70,7 +70,6 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
   
   for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
     {
-#ifdef PARAQ_BUILD_TESTING
     if(*argument == "--run-test" && ++argument != Arguments.end())
       {
       pqEventPlayer player(RootObject);
@@ -81,7 +80,6 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
       
       continue;
       }
-#endif // PARAQ_BUILD_TESTING
 
     unused.push_back(*argument);
     }

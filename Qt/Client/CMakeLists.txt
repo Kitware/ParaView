@@ -65,6 +65,7 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
 
 TARGET_LINK_LIBRARIES(pqClient
   QtWidgets
+  QtTesting
 )
 
 IF(WIN32)
@@ -74,12 +75,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(BUILD_TESTING)
-  ADD_DEFINITIONS(-DPARAQ_BUILD_TESTING)
-
-  TARGET_LINK_LIBRARIES(pqClient
-    QtTesting
-  )
-
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient)
   SET(TEST_XML ${QtClient_SOURCE_DIR}/Testing/XML)
 
@@ -87,8 +82,6 @@ IF(BUILD_TESTING)
 #  ADD_TEST(QtClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_XML}/CreateSource.png)
 ENDIF(BUILD_TESTING)
 
-
 CONFIGURE_FILE(${QtClient_SOURCE_DIR}/pqConfig.h.in
                ${QtClient_BINARY_DIR}/pqConfig.h)
-
 
