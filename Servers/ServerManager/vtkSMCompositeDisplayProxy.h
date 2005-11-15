@@ -88,6 +88,9 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
 
+  // The generic set method.
+  void SetOrderedCompositingTreeInternal(vtkSMProxy* tree);
+
   vtkSMProxy* CollectProxy;
   vtkSMProxy* LODCollectProxy;
   vtkSMProxy* VolumeCollectProxy;

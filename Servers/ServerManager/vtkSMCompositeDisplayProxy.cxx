@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -61,7 +61,7 @@ vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::~vtkSMCompositeDisplayProxy()
 {
-  this->SetOrderedCompositingTree(NULL);
+  this->SetOrderedCompositingTreeInternal(NULL);
 
   this->CollectProxy = 0;
   this->LODCollectProxy = 0;
@@ -874,6 +874,13 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositing(int val)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::SetOrderedCompositingTreeInternal(
+  vtkSMProxy* tree)
+{
+  vtkSetObjectBodyMacro(OrderedCompositingTree, vtkSMProxy, tree);
+}
+
+//-----------------------------------------------------------------------------
 
 void vtkSMCompositeDisplayProxy::SetOrderedCompositingTree(vtkSMProxy *tree)
 {
@@ -885,14 +892,12 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositingTree(vtkSMProxy *tree)
   if (this->OrderedCompositingTree)
     {
     this->RemoveGeometryFromCompositingTree();
-    this->OrderedCompositingTree->UnRegister(this);
     }
 
-  this->OrderedCompositingTree = tree;
+  this->SetOrderedCompositingTreeInternal(tree);
 
   if (this->OrderedCompositingTree)
     {
-    this->OrderedCompositingTree->Register(this);
     this->AddGeometryToCompositingTree();
     }
 
