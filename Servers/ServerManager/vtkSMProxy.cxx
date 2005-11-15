@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.50");
+vtkCxxRevisionMacro(vtkSMProxy, "1.51");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -117,6 +117,8 @@ vtkSMProxy::vtkSMProxy()
   this->XMLElement = 0;
   this->DoNotModifyProperty = 0;
 
+  this->SubProxyObserver = 0;
+
   // Assign a unique clientserver id to this object.
   // Note that this ups the reference count to 2.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -180,9 +182,12 @@ vtkSMProxy::~vtkSMProxy()
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetXMLElement(0);
-  
-  this->SubProxyObserver->SetProxy(0);
-  this->SubProxyObserver->Delete();
+
+  if (this->SubProxyObserver)
+    {
+    this->SubProxyObserver->SetProxy(0);
+    this->SubProxyObserver->Delete();
+    }
 }
 
 //---------------------------------------------------------------------------
