@@ -19,7 +19,7 @@ SUBDIRS(
   ParaView
   Qt
 )
-#########################################################################
+
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaQ Testing" ON)
 IF(BUILD_TESTING)
@@ -28,3 +28,5 @@ IF(BUILD_TESTING)
   INCLUDE (CTest)
 ENDIF(BUILD_TESTING)
 
+# Configure data directory
+FIND_PATH(PARAQ_DATA_ROOT ParaQData.readme ${ParaQ_SOURCE_DIR}/../ParaQData $ENV{PARAQ_DATA_ROOT})

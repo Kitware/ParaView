@@ -116,7 +116,7 @@ const arguments_t handleCompareView(const arguments_t& Arguments, pqMainWindow& 
     if(*argument == "--compare-view" && ++argument != Arguments.end())
       {
       Quit = true;
-      Error = MainWindow.compareView(argument->c_str(), g_image_threshold, cout);
+      Error = !MainWindow.compareView(argument->c_str(), g_image_threshold, cout);
       continue;
       }
 
