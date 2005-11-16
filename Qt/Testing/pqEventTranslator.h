@@ -11,7 +11,6 @@
 #define _pqEventTranslator_h
 
 #include <QObject>
-#include <QVector>
 
 class pqWidgetEventTranslator;
 
@@ -30,21 +29,24 @@ public:
   /// Adds a new translator to the current working set of widget translators.  pqEventTranslator assumes control of the lifetime of the supplied object.
   void addWidgetEventTranslator(pqWidgetEventTranslator*);
 
+  /// Adds an object to a list of objects that should be ignored when translating events (useful to prevent recording UI events from being captured as part of the recording)
+  void ignoreObject(QObject* Object);
+
 signals:
   /// This signal will be emitted every time a translator generates a high-level ParaQ event.  Observers should connect to this signal to serialize high-level events.
   void recordEvent(const QString& Object, const QString& Command, const QString& Arguments);
 
+private slots:
+  void onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  
 private:
   pqEventTranslator(const pqEventTranslator&);
   pqEventTranslator& operator=(const pqEventTranslator&);
 
   bool eventFilter(QObject* Object, QEvent* Event);
 
-  /// Stores the working set of widget translators  
-  QVector<pqWidgetEventTranslator*> Translators;
-  
-private slots:
-  void onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  struct pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqEventTranslator_h

@@ -10,7 +10,7 @@
 #ifndef _pqRecordEventsDialog_h
 #define _pqRecordEventsDialog_h
 
-#include "ui_pqRecordEventsDialog.h"
+#include <QDialog>
 
 class pqRecordEventsDialog :
   public QDialog
@@ -20,20 +20,18 @@ class pqRecordEventsDialog :
 public:
   pqRecordEventsDialog(const QString& Path, QWidget* Parent);
 
+private slots:
+  void accept();
+  void reject();
+  void onAutoDelete();
+
 private:
   pqRecordEventsDialog(const pqRecordEventsDialog&);
   pqRecordEventsDialog& operator=(const pqRecordEventsDialog&);
   ~pqRecordEventsDialog();
 
-  class pqImplementation;
+  struct pqImplementation;
   pqImplementation* const Implementation;
-
-  Ui::pqRecordEventsDialog Ui;
-
-private slots:
-  void accept();
-  void reject();
-  void onAutoDelete();
 };
 
 #endif // !_pqRecordEventsDialog_h

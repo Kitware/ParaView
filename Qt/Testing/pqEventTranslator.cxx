@@ -20,8 +20,31 @@
 
 #include <QCoreApplication>
 #include <QtDebug>
+#include <QSet>
+#include <QVector>
 
-pqEventTranslator::pqEventTranslator()
+////////////////////////////////////////////////////////////////////////////////
+// pqEventTranslator::pqImplementation
+
+struct pqEventTranslator::pqImplementation
+{
+  ~pqImplementation()
+  {
+  for(int i = 0; i != this->Translators.size(); ++i)
+    delete this->Translators[i];
+  }
+
+  /// Stores the working set of widget translators  
+  QVector<pqWidgetEventTranslator*> Translators;
+  /// Stores the set of objects that should be ignored when translating events
+  QSet<QObject*> IgnoredObjects;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// pqEventTranslator
+
+pqEventTranslator::pqEventTranslator() :
+  Implementation(new pqImplementation())
 {
   QCoreApplication::instance()->installEventFilter(this);
 }
@@ -30,8 +53,7 @@ pqEventTranslator::~pqEventTranslator()
 {
   QCoreApplication::instance()->removeEventFilter(this);
   
-  for(int i = 0; i != this->Translators.size(); ++i)
-    delete this->Translators[i];
+  delete Implementation;
 }
 
 void pqEventTranslator::addDefaultWidgetEventTranslators()
@@ -50,7 +72,7 @@ void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Transl
 {
   if(Translator)
     {
-    this->Translators.push_back(Translator);
+    this->Implementation->Translators.push_back(Translator);
     
     QObject::connect(
       Translator,
@@ -60,11 +82,16 @@ void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Transl
     }
 }
 
+void pqEventTranslator::ignoreObject(QObject* Object)
+{
+  this->Implementation->IgnoredObjects.insert(Object);
+}
+
 bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
-  for(int i = 0; i != this->Translators.size(); ++i)
+  for(int i = 0; i != this->Implementation->Translators.size(); ++i)
     {
-    if(this->Translators[i]->translateEvent(Object, Event))
+    if(this->Implementation->Translators[i]->translateEvent(Object, Event))
       return false;
     }
     
@@ -73,6 +100,9 @@ bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 
 void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments)
 {
+  if(this->Implementation->IgnoredObjects.contains(Object))
+    return;
+
   QString name = Object->objectName();
   if(name.isEmpty())
     {

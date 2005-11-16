@@ -7,44 +7,53 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqRecordEventsDialog.h"
-
 #include "pqEventObserverXML.h"
 #include "pqEventTranslator.h"
+#include "pqRecordEventsDialog.h"
+#include "ui_pqRecordEventsDialog.h"
 
 #include <QPushButton>
 #include <QTimer>
 
 #include <vtkIOStream.h>
 
-class pqRecordEventsDialog::pqImplementation
+//////////////////////////////////////////////////////////////////////////////////
+// pqImplementation
+
+struct pqRecordEventsDialog::pqImplementation
 {
 public:
   pqImplementation(const QString& Path) :
-    file(Path.toAscii().data()),
-    observer(file)
+    File(Path.toAscii().data()),
+    Observer(File)
   {
-    translator.addDefaultWidgetEventTranslators();
-    
-    QObject::connect(
-      &translator,
-      SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
-      &observer,
-      SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
   }
 
-private:
-  ofstream file;
-  pqEventTranslator translator;
-  pqEventObserverXML observer;
+  Ui::pqRecordEventsDialog Ui;
+
+  ofstream File;
+  pqEventTranslator Translator;
+  pqEventObserverXML Observer;
 };
+
+///////////////////////////////////////////////////////////////////////////////////
+// pqRecordEventsDialog
 
 pqRecordEventsDialog::pqRecordEventsDialog(const QString& Path, QWidget* Parent) :
   QDialog(Parent),
   Implementation(new pqImplementation(Path))
 {
-  this->Ui.setupUi(this);
-  this->Ui.label->setText(QString(tr("Recording User Input to %1")).arg(Path));
+  this->Implementation->Ui.setupUi(this);
+  this->Implementation->Ui.label->setText(QString(tr("Recording User Input to %1")).arg(Path));
+
+  this->Implementation->Translator.ignoreObject(this->Implementation->Ui.stopButton);
+  this->Implementation->Translator.addDefaultWidgetEventTranslators();
+  
+  QObject::connect(
+    &this->Implementation->Translator,
+    SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
+    &this->Implementation->Observer,
+    SLOT(onRecordEvent(const QString&, const QString&, const QString&)));
   
   this->setWindowTitle(tr("Recording User Input"));
   this->setObjectName("");
