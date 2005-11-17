@@ -23,21 +23,21 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWVolumePropertyPresetSelector::~vtkKWVolumePropertyPresetSelector()
 {
-  // Remove all presets
+  // Delete all presets
 
-  // We do not have much choice here but to call RemoveAllPresets(), even
+  // We do not have much choice here but to call DeleteAllPresets(), even
   // though it is done in the destructor of the superclass too. The problem
   // with this code is that we override the virtual function DeAllocatePreset()
-  // which is used by RemoveAllPresets(). At the time it is called by
+  // which is used by DeleteAllPresets(). At the time it is called by
   // the superclass, the virtual table of the subclass is gone, and
   // our DeAllocatePreset() is never called.
 
-  this->RemoveAllPresets();
+  this->DeleteAllPresets();
 }
 
 //----------------------------------------------------------------------------

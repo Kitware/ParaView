@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.17");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.18");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -230,7 +230,7 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
 
   // Remove all presets
 
-  this->RemoveAllPresets();
+  this->DeleteAllPresets();
 
   // Delete our pool
 
@@ -282,6 +282,8 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
     }
   list->SetSelectionCommand(
     this, "PresetSelectionCallback");
+  list->SetSelectionChangedCommand(
+    this, "PresetSelectionChangedCallback");
   list->SetPotentialCellColorsChangedCommand(
     list, "RefreshColorsOfAllCellsWithWindowCommand");
   // list->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
@@ -1394,10 +1396,8 @@ int vtkKWPresetSelector::RemovePreset(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::RemoveAllPresets()
+int vtkKWPresetSelector::DeleteAllPresets()
 {
-  // Is faster than calling RemovePreset on each preset
-
   if (this->Internals)
     {
     int nb_deleted = this->GetNumberOfPresets();
@@ -1414,11 +1414,6 @@ int vtkKWPresetSelector::RemoveAllPresets()
       this->DeAllocatePreset((*it)->Id);
       }
 
-    if (this->PresetList)
-      {
-      this->PresetList->GetWidget()->DeleteAllRows();
-      }
-
     // Then remove the presets
 
     it = this->Internals->PresetPool.begin();
@@ -1427,10 +1422,26 @@ int vtkKWPresetSelector::RemoveAllPresets()
       delete (*it);
       }
     this->Internals->PresetPool.clear();
-    if (nb_deleted)
-      {
-      this->NumberOfPresetsHasChanged();
-      }
+
+    return nb_deleted;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::RemoveAllPresets()
+{
+  int nb_deleted = this->DeleteAllPresets();
+
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->DeleteAllRows();
+    }
+
+  if (nb_deleted)
+    {
+    this->NumberOfPresetsHasChanged();
     }
 
   return 1;
