@@ -10,7 +10,6 @@
  */
 
 #include "pqParts.h"
-#include "pqServer.h"
 
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDisplayProxy.h>
@@ -18,14 +17,13 @@
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 
-vtkSMDisplayProxy* pqAddPart(pqServer* Server, vtkSMSourceProxy* Part)
+vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
   // without this, you will get runtime errors from the part display
   // (connected below). this should be fixed
   Part->CreateParts();
 
   // Create part display.
-  vtkSMRenderModuleProxy *rm = Server->GetRenderModule();
   vtkSMDisplayProxy *partdisplay = rm->CreateDisplayProxy();
 
   // Set the part as input to the part display.
@@ -54,9 +52,8 @@ vtkSMDisplayProxy* pqAddPart(pqServer* Server, vtkSMSourceProxy* Part)
   return partdisplay;
 }
 
-void pqRemovePart(pqServer* Server, vtkSMDisplayProxy* Part)
+void pqRemovePart(vtkSMRenderModuleProxy* rm, vtkSMDisplayProxy* Part)
 {
-  vtkSMRenderModuleProxy *rm = Server->GetRenderModule();
   vtkSMProxyProperty *pp
     = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
   pp->RemoveProxy(Part);

@@ -20,6 +20,7 @@
 #include "pqParts.h"
 #include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
+#include "vtkSMMultiViewRenderModuleProxy.h"
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
@@ -27,6 +28,8 @@
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
 #include "pqPipelineData.h"
+#include "pqMultiViewManager.h"
+#include "pqMultiViewFrame.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -38,6 +41,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QSignalMapper>
 
 #include <vtkRenderWindow.h>
 #include <vtkSMDataObjectDisplayProxy.h>
@@ -74,13 +78,15 @@ pqMainWindow::pqMainWindow() :
   CurrentServer(0),
   RefreshToolbar(0),
   PropertyToolbar(0),
-  Window(0),
+  MultiViewManager(0),
   ServerDisconnectAction(0),
   Inspector(0),
   InspectorDelegate(0),
   InspectorDock(0),
-  InspectorView(0)
+  InspectorView(0),
+  ActiveView(0)
 {
+
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
 
@@ -190,6 +196,7 @@ pqMainWindow::pqMainWindow() :
 
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;  // should go in pqServer?
+
 }
 
 pqMainWindow::~pqMainWindow()
@@ -201,8 +208,14 @@ pqMainWindow::~pqMainWindow()
       this->InspectorView->setModel(0);
     delete this->Inspector;
   }
+  
+  // clean up multiview before server
+  if(this->MultiViewManager)
+    {
+    delete this->MultiViewManager;
+    this->MultiViewManager = 0;
+    }
 
-  delete this->Window;
   delete this->PropertyToolbar;
   delete this->RefreshToolbar;
   delete this->CurrentServer;
@@ -211,8 +224,11 @@ pqMainWindow::~pqMainWindow()
 
 void pqMainWindow::setServer(pqServer* Server)
 {
-  delete this->Window;
-  this->Window = 0;
+  if(this->MultiViewManager)
+    {
+    delete this->MultiViewManager;
+    this->MultiViewManager = 0;
+    }
 
   delete this->PropertyToolbar;
   this->PropertyToolbar = 0;
@@ -222,26 +238,16 @@ void pqMainWindow::setServer(pqServer* Server)
 
   if(Server)
     {
-    this->Window = new QVTKWidget(this);
-    this->setCentralWidget(this->Window);
-
-    vtkRenderWindow* const rw = Server->GetRenderModule()->GetRenderWindow();
-    this->Window->SetRenderWindow(rw);
-    this->Window->update();
-
-    pqRenderViewProxy* proxy = pqRenderViewProxy::New();
-    proxy->SetRenderModule(Server->GetRenderModule());
-    vtkPVGenericRenderWindowInteractor* interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(Server->GetRenderModule()->GetInteractor());
-    interactor->SetPVRenderView(proxy);
-    proxy->Delete();
-    interactor->Enable();
-    
     this->CurrentServer = Server;
+
+    this->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
+    QObject::connect(this->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)), this, SLOT(onNewQVTKWidget(pqMultiViewFrame*)));
+    QObject::connect(this->MultiViewManager, SIGNAL(frameRemoved(pqMultiViewFrame*)), this, SLOT(onDeleteQVTKWidget(pqMultiViewFrame*)));
+    this->setCentralWidget(this->MultiViewManager);
     }
   
   this->ServerDisconnectAction->setEnabled(this->CurrentServer);
   emit serverChanged();
-
 }
 
 void pqMainWindow::onFileNew()
@@ -260,16 +266,22 @@ void pqMainWindow::onFileNew(pqServer* Server)
 
 void pqMainWindow::onFileOpen()
 {
-  setServer(0);
-  
-  pqServerBrowser* const server_browser = new pqServerBrowser(this);
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
-  server_browser->show();
+  if(!this->CurrentServer)
+    {
+    pqServerBrowser* const server_browser = new pqServerBrowser(this);
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
+    server_browser->show();
+    }
+  else
+    {
+    this->onFileOpen(this->CurrentServer);
+    }
 }
 
 void pqMainWindow::onFileOpen(pqServer* Server)
 {
-  setServer(Server);
+  if(this->CurrentServer != Server)
+    setServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
@@ -278,6 +290,12 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 
 void pqMainWindow::onFileOpen(const QStringList& Files)
 {
+  if(!this->ActiveView)
+    return;
+    
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
+  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
+
   for(int i = 0; i != Files.size(); ++i)
     {
     QString file = Files[i];
@@ -290,13 +308,13 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
     source->UpdateVTKObjects();
     
-    pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
+    pqAddPart(rm, vtkSMSourceProxy::SafeDownCast(source));
     if(this->Inspector)
       this->Inspector->setProxy(this->Adaptor, source);
     }
 
-  this->CurrentServer->GetRenderModule()->ResetCamera();
-  this->Window->update();
+  rm->ResetCamera();
+  w->update();
 }
 
 void pqMainWindow::onFileOpenServerState()
@@ -373,6 +391,7 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 
 void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
 {
+  /*
   vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
   capture->SetInput(this->Window->GetRenderWindow());
   capture->Update();
@@ -399,6 +418,7 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
     }
     
   capture->Delete();
+  */
 }
 
 bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output)
@@ -420,7 +440,10 @@ bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, 
   
   // Get a screenshot
   vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
-  screenshot->SetInput(this->Window->GetRenderWindow());
+  if(this->ActiveView)
+    {
+    screenshot->SetInput(qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow());
+    }
   screenshot->Update();
 
   // Compute the difference between the reference image and the screenshot
@@ -505,8 +528,10 @@ void pqMainWindow::onServerDisconnect()
 
 void pqMainWindow::onUpdateWindows()
 {
+  /*
   if(this->CurrentServer)
     this->CurrentServer->GetRenderModule()->StillRender();
+    */
 }
 
 void pqMainWindow::onUpdateSourcesFiltersMenu()
@@ -555,7 +580,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
 
 void pqMainWindow::onCreateSource(QAction* action)
 {
-  if(!action)
+  if(!action || !this->ActiveView)
     return;
 
   QByteArray sourceName = action->data().toString().toAscii();
@@ -565,14 +590,17 @@ void pqMainWindow::onCreateSource(QAction* action)
   //TEMP
   if(this->Inspector)
     this->Inspector->setProxy(this->Adaptor, source);
-  pqAddPart(this->CurrentServer, vtkSMSourceProxy::SafeDownCast(source));
-  this->CurrentServer->GetRenderModule()->ResetCamera();
-  this->Window->update();
+  
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
+  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
+  pqAddPart(rm, vtkSMSourceProxy::SafeDownCast(source));
+  rm->ResetCamera();
+  w->update();
 }
 
 void pqMainWindow::onCreateFilter(QAction* action)
 {
-  if(!action)
+  if(!action || !this->ActiveView)
     return;
   
   QByteArray filterName = action->data().toString().toAscii();
@@ -584,9 +612,12 @@ void pqMainWindow::onCreateFilter(QAction* action)
   //TEMP
   if(this->Inspector)
     this->Inspector->setProxy(this->Adaptor, sp);
-  pqAddPart(this->CurrentServer, sp);
-  this->CurrentServer->GetRenderModule()->ResetCamera();
-  this->Window->update();
+  
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
+  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
+  pqAddPart(rm, sp);
+  rm->ResetCamera();
+  w->update();
 }
 
 void pqMainWindow::onHelpAbout()
@@ -629,4 +660,107 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
       xml_player.playXML(player, Files[i]);
     }
 }
+
+
+class pqMultiViewRenderModuleUpdater : public QObject
+{
+public:
+  pqMultiViewRenderModuleUpdater(vtkSMProxy* view, QObject* parent)
+    : QObject(parent), View(view) {}
+
+protected:
+  bool eventFilter(QObject* caller, QEvent* e)
+    {
+    // TODO, apparently, this should watch for window positions, not resizes
+    if(e->type() == QEvent::Resize)
+      {
+      // find top level window;
+      QWidget* me = qobject_cast<QWidget*>(caller);
+      QWidget* top = me;
+      while(top->parentWidget() != NULL)
+        top = top->parentWidget();
+      
+      vtkSMIntVectorProperty* prop = 0;
+      
+      // set size of main window
+      prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("GUISize"));
+      if(prop)
+        {
+        prop->SetElements2(top->width(), top->height());
+        }
+      
+      // position relative to main window
+      prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("WindowPosition"));
+      if(prop)
+        {
+        QPoint pos = me->pos();
+        pos = me->mapTo(top, pos);
+        prop->SetElements2(pos.x(), pos.y());
+        }
+      }
+    return false;
+    }
+
+  vtkSMProxy* View;
+
+};
+
+void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
+{
+  vtkSMMultiViewRenderModuleProxy* rm = this->CurrentServer->GetRenderModule();
+  vtkSMRenderModuleProxy* view = vtkSMRenderModuleProxy::SafeDownCast(rm->NewRenderModule());
+  view->UpdateVTKObjects();
+
+  QVTKWidget* w = new QVTKWidget(parent);
+  parent->setMainWidget(w);
+
+  w->SetRenderWindow(view->GetRenderWindow());
+
+  pqRenderViewProxy* vp = pqRenderViewProxy::New();
+  vp->SetRenderModule(view);
+  vtkPVGenericRenderWindowInteractor* iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(view->GetInteractor());
+  iren->SetPVRenderView(vp);
+  vp->Delete();
+  iren->Enable();
+
+  this->GraphicsViews.insert(w, view);
+
+  QSignalMapper* sm = new QSignalMapper(parent);
+  sm->setMapping(parent, parent);
+  QObject::connect(parent, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
+  QObject::connect(sm, SIGNAL(mapped(QWidget*)), this, SLOT(onFrameActive(QWidget*)));
+
+  parent->setActive(1);
+  
+}
+
+void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
+{
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(parent->mainWidget());
+  QMap<QVTKWidget*, vtkSMRenderModuleProxy*>::iterator iter;
+  iter = this->GraphicsViews.find(w);
+  this->GraphicsViews.erase(iter);
+  
+  // delete render module
+  (*iter)->Delete();
+
+  if(this->ActiveView == parent)
+    {
+    this->ActiveView = 0;
+    }
+}
+
+void pqMainWindow::onFrameActive(QWidget* w)
+{
+  if(this->ActiveView && this->ActiveView != w)
+    {
+    pqMultiViewFrame* f = qobject_cast<pqMultiViewFrame*>(this->ActiveView);
+    if(f->active())
+      f->setActive(0);
+    }
+
+  this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
+}
+
+
 

@@ -15,7 +15,7 @@ class pqPipelineData;
 class vtkProcessModule;
 class vtkSMApplication;
 class vtkSMProxyManager;
-class vtkSMRenderModuleProxy;
+class vtkSMMultiViewRenderModuleProxy;
 
 #include <string>
 #include <QObject>
@@ -32,18 +32,18 @@ public:
 
   vtkProcessModule* GetProcessModule();
   vtkSMProxyManager* GetProxyManager();
-  vtkSMRenderModuleProxy* GetRenderModule();
+  vtkSMMultiViewRenderModuleProxy* GetRenderModule();
   pqPipelineData* GetPipelineData();
 
 private:
-  pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMRenderModuleProxy*);
+  pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMMultiViewRenderModuleProxy*);
   pqServer(const pqServer&);
   pqServer& operator=(const pqServer&);
   
   pqOptions* const Options;
   vtkProcessModule* const ProcessModule;
   vtkSMApplication* const ServerManager;
-  vtkSMRenderModuleProxy* const RenderModule;
+  vtkSMMultiViewRenderModuleProxy* const RenderModule;
   pqPipelineData* PipelineData;
 };
 

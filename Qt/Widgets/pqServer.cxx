@@ -10,7 +10,9 @@
 #include "pqServer.h"
 #include "pqOptions.h"
 #include "pqPipelineData.h"
+#include <QCoreApplication>
 
+#include <vtkToolkits.h>
 #include <vtkObjectFactory.h>
 #include <vtkProcessModuleGUIHelper.h>
 #include <vtkPVOptions.h>
@@ -21,6 +23,7 @@
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderModuleProxy.h>
+#include <vtkSMMultiViewRenderModuleProxy.h>
 
 #include <cassert>
 
@@ -89,7 +92,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////
 // pqInitializeServer
 
-void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, vtkSMApplication*& server_manager, vtkSMRenderModuleProxy*& render_module)
+void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, vtkSMApplication*& server_manager, vtkSMMultiViewRenderModuleProxy*& render_module)
 {
   process_module = 0;
   server_manager = 0;
@@ -134,7 +137,12 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
   // Create render module ...
   process_module->SynchronizeServerClientOptions();
 
+  render_module = 
+    vtkSMMultiViewRenderModuleProxy::SafeDownCast(
+      proxy_manager->NewProxy("rendermodules", "MultiViewRenderModule"));
+
   const char* renderModuleName = 0;
+
   if (!renderModuleName)
     {
     renderModuleName = options->GetRenderModuleName();
@@ -182,11 +190,9 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
       }
     }
   
-  vtkSMProxy* render_module_proxy = proxy_manager->NewProxy("rendermodules", renderModuleName);
-  render_module = vtkSMRenderModuleProxy::SafeDownCast(render_module_proxy);
-  render_module->UpdateVTKObjects();
-
   options->SetRenderModuleName(renderModuleName);
+  render_module->SetRenderModuleName(renderModuleName);
+  render_module->UpdateVTKObjects();
 }
 
 } // namespace
@@ -207,7 +213,7 @@ pqServer* pqServer::CreateStandalone()
 
   vtkProcessModule* process_module = 0;
   vtkSMApplication* server_manager = 0;
-  vtkSMRenderModuleProxy* render_module = 0;
+  vtkSMMultiViewRenderModuleProxy* render_module = 0;
 
   pqInitializeServer(options, process_module, server_manager, render_module);
   if(!process_module || !server_manager || !render_module)
@@ -231,7 +237,7 @@ pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
 
   vtkProcessModule* process_module = 0;
   vtkSMApplication* server_manager = 0;
-  vtkSMRenderModuleProxy* render_module = 0;
+  vtkSMMultiViewRenderModuleProxy* render_module = 0;
     
   pqInitializeServer(options, process_module, server_manager, render_module);
   if(!process_module || !server_manager || !render_module)
@@ -240,7 +246,7 @@ pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
   return new pqServer(options, process_module, server_manager, render_module);
 }
 
-pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMApplication* server_manager, vtkSMRenderModuleProxy* render_module) :
+pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMApplication* server_manager, vtkSMMultiViewRenderModuleProxy* render_module) :
   Options(options),
   ProcessModule(process_module),
   ServerManager(server_manager),
@@ -262,6 +268,7 @@ pqServer::~pqServer()
   this->Options->Delete();
   
   vtkProcessModule::SetProcessModule(0);
+
 }
 
 vtkProcessModule* pqServer::GetProcessModule()
@@ -274,7 +281,7 @@ vtkSMProxyManager* pqServer::GetProxyManager()
   return ServerManager->GetProxyManager();
 }
 
-vtkSMRenderModuleProxy* pqServer::GetRenderModule()
+vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
 {
   return RenderModule;
 }

@@ -9,7 +9,14 @@
  * statement of authorship are reproduced on all copies.
  */
 
+
+#include <vtkToolkits.h>
 #include "pqMainWindow.h"
+#include <QApplication>
+
+#ifdef VTK_USE_MPI
+# include <mpi.h>
+#endif
 
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
@@ -151,10 +158,16 @@ void handleUnusedArguments(const arguments_t& Arguments, bool& Quit, bool& Error
       Quit = true;
       Error = true;
       }
- }
+}
 
 int main(int argc, char* argv[])
 {
+#ifdef VTK_USE_MPI
+  int myId =0;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myId);
+#endif
+
   bool quit = false;
   bool error = false;
 
@@ -188,6 +201,12 @@ int main(int argc, char* argv[])
     return error ? 1 : 0;
 
   // Main GUI event loop
-  return application.exec();
+  int ret = application.exec();
+
+#ifdef VTK_USE_MPI
+  MPI_Finalize();
+#endif
+
+  return ret;
 }
 

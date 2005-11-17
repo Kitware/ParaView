@@ -18,6 +18,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
+  pqMultiView.h
+  pqMultiViewFrame.h
+  pqMultiViewManager.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqRefreshToolbar.h
@@ -28,9 +31,14 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
 )
 
+QT4_ADD_RESOURCES(RCS_SOURCES
+  pqWidgets.qrc
+)
+
 SET(UI_FORMS
   pqFileDialog.ui
   pqServerBrowser.ui
+  pqMultiViewFrameMenu.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -66,6 +74,12 @@ ADD_LIBRARY(QtWidgets
   pqImmediateCommandDispatcher.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
+  pqMultiView.cxx
+  pqMultiView.h
+  pqMultiViewFrame.cxx
+  pqMultiViewFrame.h
+  pqMultiViewManager.cxx
+  pqMultiViewManager.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorDelegate.cxx
@@ -97,6 +111,7 @@ ADD_LIBRARY(QtWidgets
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
   ${MOC_BUILT_SOURCES}
+  ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
 )
 
@@ -148,5 +163,4 @@ TARGET_LINK_LIBRARIES(QtWidgets
 
   ${QT_LIBRARIES}
 )
-
 

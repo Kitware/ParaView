@@ -11,6 +11,7 @@
 #define _pqMainWindow_h
 
 #include <QMainWindow>
+#include <QMap>
 #include <vtkIOStream.h>
 
 class pqObjectInspector;
@@ -18,14 +19,18 @@ class pqObjectInspectorDelegate;
 class pqRefreshToolbar;
 class pqServer;
 class pqSMAdaptor;
+class pqMultiViewManager;
+class pqMultiViewFrame;
 
 class vtkSMSourceProxy;
+class QVTKWidget;
+class vtkSMRenderModuleProxy;
 
 class QAction;
 class QDockWidget;
 class QToolBar;
 class QTreeView;
-class QVTKWidget;
+class QTabWidget;
 
 /// Provides the main window for the ParaQ application
 class pqMainWindow :
@@ -49,7 +54,7 @@ private:
   pqServer* CurrentServer;
   pqRefreshToolbar* RefreshToolbar;
   QToolBar* PropertyToolbar;
-  QVTKWidget* Window;
+  pqMultiViewManager* MultiViewManager;
   QAction* ServerDisconnectAction;
   pqSMAdaptor *Adaptor;
   QMenu* SourcesMenu;
@@ -58,8 +63,15 @@ private:
   pqObjectInspectorDelegate *InspectorDelegate;
   QDockWidget *InspectorDock;
   QTreeView *InspectorView;
+  QMap<QVTKWidget*, vtkSMRenderModuleProxy*> GraphicsViews;
+  pqMultiViewFrame* ActiveView;
 
 private slots:
+  
+  void onNewQVTKWidget(pqMultiViewFrame* parent);
+  void onDeleteQVTKWidget(pqMultiViewFrame* parent);
+  void onFrameActive(QWidget*);
+
   void onFileNew();
   void onFileNew(pqServer* Server);
   void onFileOpen();
