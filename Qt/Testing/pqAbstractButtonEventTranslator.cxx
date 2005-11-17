@@ -7,19 +7,19 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqPushButtonEventTranslator.h"
+#include "pqAbstractButtonEventTranslator.h"
 
-#include <QPushButton>
+#include <QAbstractButton>
 #include <QEvent>
 
-pqPushButtonEventTranslator::pqPushButtonEventTranslator() :
+pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator() :
   CurrentObject(0)
 {
 }
 
-bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
 {
-  QPushButton* const object = qobject_cast<QPushButton*>(Object);
+  QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object);
   if(!object)
     return false;
     
@@ -27,7 +27,10 @@ bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
     {
     case QEvent::Enter:
       this->CurrentObject = Object;
-      connect(object, SIGNAL(clicked(bool)), this, SLOT(onClicked(bool)));
+      if(object->isCheckable())
+        connect(object, SIGNAL(clicked(bool)), this, SLOT(onToggled(bool)));
+      else
+        connect(object, SIGNAL(clicked(bool)), this, SLOT(onClicked(bool)));
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
@@ -38,7 +41,13 @@ bool pqPushButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event)
   return true;
 }
 
-void pqPushButtonEventTranslator::onClicked(bool)
+void pqAbstractButtonEventTranslator::onClicked(bool)
 {
   emit recordEvent(this->CurrentObject, "activate", "");
 }
+
+void pqAbstractButtonEventTranslator::onToggled(bool Checked)
+{
+  emit recordEvent(this->CurrentObject, "set_boolean", Checked ? "true" : "false");
+}
+

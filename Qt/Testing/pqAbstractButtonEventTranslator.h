@@ -7,31 +7,32 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _pqPushButtonEventTranslator_h
-#define _pqPushButtonEventTranslator_h
+#ifndef _pqAbstractButtonEventTranslator_h
+#define _pqAbstractButtonEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
 
 /// Translates low-level Qt push button events into high-level ParaQ events that can be recorded as test cases
-class pqPushButtonEventTranslator :
+class pqAbstractButtonEventTranslator :
   public pqWidgetEventTranslator
 {
   Q_OBJECT
   
 public:
-  pqPushButtonEventTranslator();
+  pqAbstractButtonEventTranslator();
   
   virtual bool translateEvent(QObject* Object, QEvent* Event);
 
 private:
-  pqPushButtonEventTranslator(const pqPushButtonEventTranslator&);
-  pqPushButtonEventTranslator& operator=(const pqPushButtonEventTranslator&);
+  pqAbstractButtonEventTranslator(const pqAbstractButtonEventTranslator&);
+  pqAbstractButtonEventTranslator& operator=(const pqAbstractButtonEventTranslator&);
 
   QObject* CurrentObject;
   
 private slots:
-  void onClicked(bool);  
+  void onClicked(bool);
+  void onToggled(bool);
 };
 
-#endif // !_pqPushButtonEventTranslator_h
+#endif // !_pqAbstractButtonEventTranslator_h
 

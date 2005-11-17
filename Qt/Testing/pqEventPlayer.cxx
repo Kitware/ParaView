@@ -15,31 +15,13 @@
 
 #include "pqEventPlayer.h"
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QObject>
 #include <QStringList>
 #include <QtDebug>
 
 namespace
 {
-
-/*
-/// Given a Qt object, lookup a child object by name, assuming that all names are unique
-QObject* pqFindObjectByName(QObject& Object, const QString& Name)
-{
-  if(QObject* child = Object.findChild<QObject*>(Name))
-    return child;
-    
-  QObjectList children = Object.children();
-  for(int i = 0; i != children.size(); ++i)
-    {
-    if(QObject* child = pqFindObjectByName(*children[i], Name))
-      return child;
-    }
-
-  return 0;       
-}
-*/
 
 /// Given a slash-delimited "path", lookup a Qt object hierarchically
 QObject* pqFindObjectByTree(QObject& Root, const QString& Path)
@@ -97,7 +79,10 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
   for(int i = 0; i != this->Players.size(); ++i)
     {
     if(this->Players[i]->playEvent(object, Command, Arguments))
+      {
+      QApplication::instance()->processEvents();
       return true;
+      }
     }
 
   qCritical() << "no player for object " << object;

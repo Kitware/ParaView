@@ -177,8 +177,7 @@ int main(int argc, char* argv[])
   arguments = handleTestCases(arguments, main_window, quit, error);
   // Set the image threshold value
   arguments = handleImageThreshold(arguments, quit, error);
-  // Ensure that the main window has a chance to display, then performing image comparisons
-  application.processEvents();
+  // Perform image comparisons
   arguments = handleCompareView(arguments, main_window, quit, error);
   // Exit the application if requested
   arguments = handleExit(arguments, quit, error);

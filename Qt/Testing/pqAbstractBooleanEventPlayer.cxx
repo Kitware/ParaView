@@ -9,7 +9,7 @@
 
 #include "pqAbstractBooleanEventPlayer.h"
 
-#include <QCheckBox>
+#include <QAbstractButton>
 
 pqAbstractBooleanEventPlayer::pqAbstractBooleanEventPlayer()
 {
@@ -22,7 +22,7 @@ bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Com
 
   const bool value = Arguments == "true" ? true : false;
 
-  if(QCheckBox* const object = qobject_cast<QCheckBox*>(Object))
+  if(QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object))
     {
     if(value != object->isChecked())
       object->setChecked(value);

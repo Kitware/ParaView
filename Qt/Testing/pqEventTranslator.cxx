@@ -7,13 +7,12 @@
  * statement of authorship are reproduced on all copies.
  */
 
+#include "pqAbstractButtonEventTranslator.h"
 #include "pqAbstractSliderEventTranslator.h"
-#include "pqCheckBoxEventTranslator.h"
 #include "pqComboBoxEventTranslator.h"
 #include "pqDoubleSpinBoxEventTranslator.h"
 #include "pqLineEditEventTranslator.h"
 #include "pqMenuEventTranslator.h"
-#include "pqPushButtonEventTranslator.h"
 #include "pqSpinBoxEventTranslator.h"
 
 #include "pqEventTranslator.h"
@@ -58,13 +57,12 @@ pqEventTranslator::~pqEventTranslator()
 
 void pqEventTranslator::addDefaultWidgetEventTranslators()
 {
+  addWidgetEventTranslator(new pqAbstractButtonEventTranslator());
   addWidgetEventTranslator(new pqAbstractSliderEventTranslator());
-  addWidgetEventTranslator(new pqCheckBoxEventTranslator());
   addWidgetEventTranslator(new pqComboBoxEventTranslator());
   addWidgetEventTranslator(new pqDoubleSpinBoxEventTranslator());
   addWidgetEventTranslator(new pqLineEditEventTranslator());
   addWidgetEventTranslator(new pqMenuEventTranslator());
-  addWidgetEventTranslator(new pqPushButtonEventTranslator());
   addWidgetEventTranslator(new pqSpinBoxEventTranslator());
 }
 

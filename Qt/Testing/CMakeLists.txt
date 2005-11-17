@@ -13,8 +13,8 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqAbstractButtonEventTranslator.h
   pqAbstractSliderEventTranslator.h
-  pqCheckBoxEventTranslator.h
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.h
   pqEventObserverStdout.h
@@ -23,7 +23,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.h
-  pqPushButtonEventTranslator.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqWidgetEventTranslator.h
@@ -38,6 +37,8 @@ ADD_LIBRARY(QtTesting
   pqAbstractActivateEventPlayer.h
   pqAbstractBooleanEventPlayer.cxx
   pqAbstractBooleanEventPlayer.h
+  pqAbstractButtonEventTranslator.cxx
+  pqAbstractButtonEventTranslator.h
   pqAbstractDoubleEventPlayer.cxx
   pqAbstractDoubleEventPlayer.h
   pqAbstractIntEventPlayer.cxx
@@ -46,8 +47,6 @@ ADD_LIBRARY(QtTesting
   pqAbstractSliderEventTranslator.h
   pqAbstractStringEventPlayer.cxx
   pqAbstractStringEventPlayer.h
-  pqCheckBoxEventTranslator.cxx
-  pqCheckBoxEventTranslator.h
   pqComboBoxEventTranslator.cxx
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.cxx
@@ -68,8 +67,6 @@ ADD_LIBRARY(QtTesting
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.cxx
   pqMenuEventTranslatorAdaptor.h
-  pqPushButtonEventTranslator.cxx
-  pqPushButtonEventTranslator.h
   pqRecordEventsDialog.cxx
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx
