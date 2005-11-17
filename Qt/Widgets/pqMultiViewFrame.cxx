@@ -38,12 +38,12 @@ pqMultiViewFrame::~pqMultiViewFrame()
 {
 }
 
-bool pqMultiViewFrame::autoHide() const
+bool pqMultiViewFrame::menuAutoHide() const
 {
   return this->AutoHide;
 }
 
-void pqMultiViewFrame::setAutoHide(bool autohide)
+void pqMultiViewFrame::setMenuAutoHide(bool autohide)
 {
   this->AutoHide = autohide;
 }
@@ -70,12 +70,12 @@ void pqMultiViewFrame::setActive(bool a)
     }
 }
 
-QColor pqMultiViewFrame::color() const
+QColor pqMultiViewFrame::borderColor() const
 {
   return this->Color;
 }
 
-void pqMultiViewFrame::setColor(QColor c)
+void pqMultiViewFrame::setBorderColor(QColor c)
 {
   this->Color = c;
 }
