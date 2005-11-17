@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
@@ -84,8 +84,8 @@ void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
                   "vtk objects");
     return;
     }
-  if (strcmp(this->RenderModuleName, "IceTDesktopRenderModuleProxy") == 0||
-      strcmp(this->RenderModuleName, "IceTRenderModuleProxy") == 0)
+  if (strcmp(this->RenderModuleName, "IceTDesktopRenderModule") == 0||
+      strcmp(this->RenderModuleName, "IceTRenderModule") == 0)
     {
     vtkSMProxy* renWin = this->GetProxyManager()->NewProxy(
       "renderwindow", "RenderWindow");
