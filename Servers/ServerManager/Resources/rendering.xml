@@ -1431,27 +1431,6 @@
     </CaveRenderModuleProxy>
 
     <MultiViewRenderModuleProxy name="MultiViewRenderModule">
-      <SubProxy>
-        <Proxy name="RenderWindow" proxyname="RenderWindow" 
-                                   proxygroup="renderwindow">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="OffScreenRendering" />
-        </ExposedProperties>
-      </SubProxy>
-      <SubProxy>
-        <Proxy name="CompositeManager" proxygroup="composite_managers"
-          proxyname="DesktopDeliveryServer">
-        </Proxy>
-      </SubProxy>
-      <SubProxy>
-        <Proxy name="DisplayManager" proxygroup="composite_managers"
-          proxyname="IceTRenderManager">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="InitializeOffScreen" />
-        </ExposedProperties>
-      </SubProxy>
     </MultiViewRenderModuleProxy>
   </ProxyGroup>
   
