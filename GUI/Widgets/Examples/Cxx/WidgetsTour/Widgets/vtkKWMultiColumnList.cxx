@@ -92,11 +92,12 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
   mcl1->ColumnStretchableOff(col_index);
   mcl1->SetColumnFormatCommandToEmptyOutput(col_index);
 
+  /*
   col_index = mcl1->AddColumn("Finances");
   mcl1->SetColumnWidth(col_index, 20);
   mcl1->ColumnResizableOff(col_index);
   mcl1->ColumnStretchableOff(col_index);
-  
+  */
   // The callback that is invoked for each cell in the completion column. 
   // This is rather ugly to do in C++. In a real application, you will
   // want to use a real C++ callback, and create C++ KWWidgets inside that
@@ -126,11 +127,13 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
 
     mcl1->InsertCellTextAsDouble(i, 6, project.Completion);
     mcl1->SetCellWindowCommand(i, 6, NULL, "CreateCompletionCellCallback");
-    
+
+    /*    
     mcl1->SetCellWindowCommandToReadOnlyComboBox( i, 7 );
     mcl1->SetNthEntryInReadOnlyComboBox( 0, project.TotalFunding, i, 7 );
     mcl1->SetNthEntryInReadOnlyComboBox( 1, project.AmountSpent, i, 7 );
     mcl1->SetNthEntryInReadOnlyComboBox( 2, project.FundingTerminationDate, i, 7 );
+    */
     }
 
   app->Script(
