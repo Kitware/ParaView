@@ -370,6 +370,7 @@ public:
   virtual void PresetEmailCallback();
   virtual void PresetLocateCallback();
   virtual void PresetSelectionCallback();
+  virtual void PresetSelectionChangedCallback() {};
   virtual void PresetSelectPreviousCallback();
   virtual void PresetSelectNextCallback();
 
@@ -518,6 +519,13 @@ protected:
   static int LocateButtonId;
   static int EmailButtonId;
   //ETX
+
+  // Description:
+  // Delete all presets, i.e. deallocate all presets and remove them
+  // from the pool. Does not delete/remove any rows, see RemoveAllPresets()
+  // to both delete all presets and update the table accordingly.
+  // Return the number of presets deleted
+  virtual int DeleteAllPresets();
 
 private:
 
