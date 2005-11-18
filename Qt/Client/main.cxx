@@ -83,7 +83,11 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
       player.addDefaultWidgetEventPlayers();
 
       pqEventPlayerXML xml_player;
-      xml_player.playXML(player, argument->c_str());
+      if(!xml_player.playXML(player, argument->c_str()))
+        {
+        Quit = true;
+        Error = true;
+        }
       
       continue;
       }

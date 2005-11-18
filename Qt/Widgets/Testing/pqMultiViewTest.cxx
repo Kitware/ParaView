@@ -11,6 +11,7 @@
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
 #include "vtkIOStream.h"
+#include "vtkstd/algorithm"
 
 typedef vtkstd::vector<vtkstd::string> arguments_t;
 
@@ -27,7 +28,11 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
       player.addDefaultWidgetEventPlayers();
 
       pqEventPlayerXML xml_player;
-      xml_player.playXML(player, argument->c_str());
+      if(!xml_player.playXML(player, argument->c_str()))
+        {
+        Quit = true;
+        Error = true;
+        }
       
       continue;
       }
@@ -78,7 +83,7 @@ int main(int argc, char** argv)
   bool error = false;
 
   QApplication app(argc, argv);
-  Q_INIT_RESOURCE(pqWidgets);
+//  Q_INIT_RESOURCE(pqWidgets);
 
   pqMultiView* mv = new pqMultiView;
   mv->resize(400, 300);
