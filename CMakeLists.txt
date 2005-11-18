@@ -30,3 +30,4 @@ ENDIF(BUILD_TESTING)
 
 # Configure data directory
 FIND_PATH(PARAQ_DATA_ROOT ParaQData.readme ${ParaQ_SOURCE_DIR}/../ParaQData $ENV{PARAQ_DATA_ROOT})
+
