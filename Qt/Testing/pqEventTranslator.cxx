@@ -89,8 +89,13 @@ bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
   for(int i = 0; i != this->Implementation->Translators.size(); ++i)
     {
-    if(this->Implementation->Translators[i]->translateEvent(Object, Event))
+    bool error = false;
+    if(this->Implementation->Translators[i]->translateEvent(Object, Event, error))
+      {
+      if(error)
+        qWarning() << "Error translating an event for object " << Object;
       return false;
+      }
     }
     
   return false;

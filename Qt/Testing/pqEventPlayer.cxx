@@ -78,14 +78,21 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
 
   for(int i = 0; i != this->Players.size(); ++i)
     {
-    if(this->Players[i]->playEvent(object, Command, Arguments))
+    bool error = false;
+    if(this->Players[i]->playEvent(object, Command, Arguments, error))
       {
+      if(error)
+        {
+        qCritical() << "error playing command " << Command << " object " << object;
+        return false;
+        }
+        
       QApplication::instance()->processEvents();
       return true;
       }
     }
 
-  qCritical() << "no player for object " << object;
+  qCritical() << "no player for command " << Command << " object " << object;
   return false;
 }
 

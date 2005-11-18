@@ -11,12 +11,13 @@
 
 #include <QAction>
 #include <QPushButton>
+#include <QtDebug>
 
 pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer()
 {
 }
 
-bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments)
+bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   if(Command != "activate")
     return false;
@@ -33,6 +34,8 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
     return true;
     }
 
-  return false;
+  qCritical() << "calling activate on unhandled type " << Object;
+  Error = true;
+  return true;
 }
 

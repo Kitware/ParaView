@@ -12,8 +12,9 @@
 
 #include <QFile>
 #include <QtXml/QDomDocument>
+#include <QtDebug>
 
-void pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
+bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
 {
   QFile file(Path);
   QDomDocument xml_document;
@@ -21,7 +22,10 @@ void pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
 
   QDomElement xml_events = xml_document.documentElement();
   if(xml_events.nodeName() != "pqevents")
-    return;
+    {
+    qCritical() << Path << " is not an XML test case document";
+    return false;
+    }
 
   for(QDomNode xml_event = xml_events.firstChild(); !xml_event.isNull(); xml_event = xml_event.nextSibling())
     {
@@ -32,7 +36,10 @@ void pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     const QString command = xml_event.toElement().attribute("command");
     const QString arguments = xml_event.toElement().attribute("arguments");
       
-    Player.playEvent(object, command, arguments);
+    if(!Player.playEvent(object, command, arguments))
+      return false;
     }
+    
+  return true;
 }
 

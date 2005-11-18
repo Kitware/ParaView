@@ -17,7 +17,7 @@ pqDoubleSpinBoxEventTranslator::pqDoubleSpinBoxEventTranslator() :
 {
 }
 
-bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   QDoubleSpinBox* const object = qobject_cast<QDoubleSpinBox*>(Object);
   if(!object)

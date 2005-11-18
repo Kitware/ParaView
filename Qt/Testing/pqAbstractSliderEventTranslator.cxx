@@ -17,7 +17,7 @@ pqAbstractSliderEventTranslator::pqAbstractSliderEventTranslator() :
 {
 }
 
-bool pqAbstractSliderEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqAbstractSliderEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   QAbstractSlider* const object = qobject_cast<QAbstractSlider*>(Object);
   if(!object)

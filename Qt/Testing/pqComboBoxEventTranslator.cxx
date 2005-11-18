@@ -17,7 +17,7 @@ pqComboBoxEventTranslator::pqComboBoxEventTranslator() :
 {
 }
 
-bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   QComboBox* const object = qobject_cast<QComboBox*>(Object);
   if(!object)

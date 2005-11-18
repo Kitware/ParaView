@@ -19,7 +19,7 @@ class pqAbstractDoubleEventPlayer :
 public:
   pqAbstractDoubleEventPlayer();
 
-  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
   pqAbstractDoubleEventPlayer(const pqAbstractDoubleEventPlayer&);

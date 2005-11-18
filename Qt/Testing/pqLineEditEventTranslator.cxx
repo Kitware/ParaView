@@ -18,7 +18,7 @@ pqLineEditEventTranslator::pqLineEditEventTranslator() :
 {
 }
 
-bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   QLineEdit* const object = qobject_cast<QLineEdit*>(Object);
   if(!object)

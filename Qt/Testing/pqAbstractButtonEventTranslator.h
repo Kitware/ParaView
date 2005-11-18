@@ -21,7 +21,7 @@ class pqAbstractButtonEventTranslator :
 public:
   pqAbstractButtonEventTranslator();
   
-  virtual bool translateEvent(QObject* Object, QEvent* Event);
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private:
   pqAbstractButtonEventTranslator(const pqAbstractButtonEventTranslator&);

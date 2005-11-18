@@ -19,7 +19,7 @@ class pqAbstractActivateEventPlayer :
 public:
   pqAbstractActivateEventPlayer();
 
-  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
   pqAbstractActivateEventPlayer(const pqAbstractActivateEventPlayer&);

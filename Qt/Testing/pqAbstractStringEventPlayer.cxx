@@ -11,12 +11,13 @@
 
 #include <QComboBox>
 #include <QLineEdit>
+#include <QtDebug>
 
 pqAbstractStringEventPlayer::pqAbstractStringEventPlayer()
 {
 }
 
-bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments)
+bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   if(Command != "set_string")
     return false;
@@ -35,6 +36,9 @@ bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Comm
     return true;
     }
 
-  return false;
+  qCritical() << "calling set_string on unhandled type " << Object;
+
+  Error = true;
+  return true;
 }
 

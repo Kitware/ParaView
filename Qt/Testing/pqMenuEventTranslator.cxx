@@ -22,7 +22,7 @@ pqMenuEventTranslator::~pqMenuEventTranslator()
   clearActions();
 }
 
-bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event)
+bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   QMenu* const object = qobject_cast<QMenu*>(Object);
   if(!object)

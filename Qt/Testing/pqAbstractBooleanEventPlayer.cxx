@@ -10,12 +10,13 @@
 #include "pqAbstractBooleanEventPlayer.h"
 
 #include <QAbstractButton>
+#include <QtDebug>
 
 pqAbstractBooleanEventPlayer::pqAbstractBooleanEventPlayer()
 {
 }
 
-bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments)
+bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   if(Command != "set_boolean")
     return false;
@@ -29,6 +30,8 @@ bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Com
     return true;
     }
 
-  return false;
+  qCritical() << "calling set_boolean on unhandled type " << Object;
+  Error = true;
+  return true;
 }
 

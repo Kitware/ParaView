@@ -19,7 +19,8 @@ class pqWidgetEventPlayer
 public:
   virtual ~pqWidgetEventPlayer() {}
 
-  virtual bool playEvent(QObject* Object, const QString& Command, const QString& Arguments) = 0;
+  /// Derivatives should implement this and play-back the given command, returning "true" if they handled the command, and setting Error to "true" if there were any problems.
+  virtual bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error) = 0;
 
 protected:
   pqWidgetEventPlayer() {}

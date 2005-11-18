@@ -11,12 +11,13 @@
 
 #include <QAbstractSlider>
 #include <QSpinBox>
+#include <QtDebug>
 
 pqAbstractIntEventPlayer::pqAbstractIntEventPlayer()
 {
 }
 
-bool pqAbstractIntEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments)
+bool pqAbstractIntEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   if(Command != "set_int")
     return false;
@@ -35,6 +36,8 @@ bool pqAbstractIntEventPlayer::playEvent(QObject* Object, const QString& Command
     return true;
     }
 
-  return false;
+  qCritical() << "calling set_int on unhandled type " << Object;
+  Error = true;
+  return true;
 }
 

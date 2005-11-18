@@ -10,12 +10,13 @@
 #include "pqAbstractDoubleEventPlayer.h"
 
 #include <QDoubleSpinBox>
+#include <QtDebug>
 
 pqAbstractDoubleEventPlayer::pqAbstractDoubleEventPlayer()
 {
 }
 
-bool pqAbstractDoubleEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments)
+bool pqAbstractDoubleEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   if(Command != "set_double")
     return false;
@@ -28,6 +29,8 @@ bool pqAbstractDoubleEventPlayer::playEvent(QObject* Object, const QString& Comm
     return true;
     }
 
-  return false;
+  qCritical() << "calling set_double on unhandled type " << Object;
+  Error = true;
+  return true;
 }
 

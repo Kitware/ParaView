@@ -24,7 +24,7 @@ public:
   pqMenuEventTranslator();
   ~pqMenuEventTranslator();
   
-  virtual bool translateEvent(QObject* Object, QEvent* Event);
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private:
   pqMenuEventTranslator(const pqMenuEventTranslator&);

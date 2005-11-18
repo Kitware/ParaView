@@ -19,7 +19,7 @@ class pqAbstractBooleanEventPlayer :
 public:
   pqAbstractBooleanEventPlayer();
 
-  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments);
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
   pqAbstractBooleanEventPlayer(const pqAbstractBooleanEventPlayer&);

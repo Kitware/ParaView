@@ -21,7 +21,7 @@ class pqAbstractSliderEventTranslator :
 public:
   pqAbstractSliderEventTranslator();
   
-  virtual bool translateEvent(QObject* Object, QEvent* Event);
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private:
   pqAbstractSliderEventTranslator(const pqAbstractSliderEventTranslator&);

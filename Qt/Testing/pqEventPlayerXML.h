@@ -17,7 +17,8 @@ class pqEventPlayer;
 class pqEventPlayerXML
 {
 public:
-  void playXML(pqEventPlayer& Player, const QString& Path);
+  /// Loads an XML test case from a file, and plays it with the given player, returning true iff every command was successfully executed
+  bool playXML(pqEventPlayer& Player, const QString& Path);
 };
 
 #endif // !_pqEventPlayerXML_h

@@ -20,7 +20,9 @@ class pqWidgetEventTranslator :
   
 public:
   virtual ~pqWidgetEventTranslator() {}
-  virtual bool translateEvent(QObject* Object, QEvent* Event) = 0;
+  
+  /// Derivatives should implement this and translate events into commands, returning "true" if they handled the event, and setting Error to "true" if there were any problems
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error) = 0;
 
 signals:
   /// Derivatives should emit this signal whenever they wish to record a high-level event
