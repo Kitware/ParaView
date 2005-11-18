@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.2");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -4885,8 +4885,17 @@ void vtkPVWindow::UpdateEnableState()
         {
         for ( kk = 0; kk < col->GetNumberOfItems(); kk ++ )
           {
-          this->PropagateEnableState(
-            vtkPVSource::SafeDownCast(col->GetItemAsObject(kk)));
+          vtkPVSource* src = vtkPVSource::SafeDownCast(
+            col->GetItemAsObject(kk));
+          if (!src || src == this->CurrentPVSource)
+            {
+            // we call PropagateEnableState(this->CurrentPVSource)
+            // later, since we want the vtkPVSourceNotebook to
+            // reflect the enabled state are required by this->CurrentPVSource
+            
+            continue;
+            }
+          this->PropagateEnableState(src);          
           }
         }
       }
