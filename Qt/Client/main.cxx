@@ -182,6 +182,8 @@ int main(int argc, char* argv[])
 
   // Create the main window
   QApplication application(argc, argv);
+  Q_INIT_RESOURCE(pqWidgets);
+  
   pqMainWindow main_window;
   main_window.resize(800, 600);
   main_window.show();
