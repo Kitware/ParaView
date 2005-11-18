@@ -20,12 +20,12 @@ SET(MULTIVIEW_TEST_SRCS
     ../pqMultiViewFrame.cxx
     )
 
-QT4_ADD_RESOURCES(RCS_SOURCES
+QT4_ADD_RESOURCES(MV_RESOURCES
   pqMultiViewTest.qrc
 )
 
 ADD_EXECUTABLE(QtWidgetsMultiViewTest pqMultiViewTest.cxx 
-               ${MULTIVIEW_TEST_SRCS} ${RCS_SOURCES} ${TEST_MV_UIS} ${TEST_MV_MOCS})
+               ${MULTIVIEW_TEST_SRCS} ${MV_RESOURCES} ${TEST_MV_UIS} ${TEST_MV_MOCS})
 TARGET_LINK_LIBRARIES(QtWidgetsMultiViewTest QtTesting ${QT_LIBRARIES})
 ADD_TEST(QtWidgetsMultiView  ${EXECUTABLE_OUTPUT_PATH}/QtWidgetsMultiViewTest --run-test ${TEST_DIR}/pqMultiViewTest.xml --exit)
 
