@@ -27,7 +27,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
     return true;
     }
 
-  if(QPushButton* const object = qobject_cast<QPushButton*>(Object))
+  if(QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object))
     {
     object->click();
     return true;
