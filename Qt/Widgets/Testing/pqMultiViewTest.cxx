@@ -83,7 +83,7 @@ int main(int argc, char** argv)
   bool error = false;
 
   QApplication app(argc, argv);
-//  Q_INIT_RESOURCE(pqWidgets);
+  Q_INIT_RESOURCE(pqMultiViewTest);
 
   pqMultiView* mv = new pqMultiView;
   mv->resize(400, 300);
