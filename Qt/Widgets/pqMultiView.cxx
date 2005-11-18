@@ -149,8 +149,6 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     
     int location = splitter->indexOf(w);
     QSplitter* newSplitter = makeNewSplitter(orientation);
-    QByteArray n = "MultiViewSplitter:";
-    newSplitter->setObjectName("splitter");
     // add splitter to splitter
     splitter->insertWidget(location, newSplitter);
     // remove from old splitter, and add to new splitter
@@ -171,6 +169,18 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     for(i=0; i<sizes.size(); i++)
       sizes[i] = sum / sizes.size();
     newSplitter->setSizes(sizes);
+    
+    QByteArray n = "MultiViewSplitter:";
+    Index idxName = this->indexOf(newSplitter);
+    for(int i=0; i<idxName.size(); i++)
+      {
+      QString tmp;
+      tmp.setNum(idxName[i]);
+      if(i != 0)
+        n += ",";
+      n += tmp;
+      }
+    newSplitter->setObjectName(n);
     }
   else
     {

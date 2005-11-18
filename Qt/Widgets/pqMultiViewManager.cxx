@@ -8,11 +8,16 @@
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
 
+static int gNameNum = 0;
+
 pqMultiViewManager::pqMultiViewManager(QWidget* parent)
   : pqMultiView(parent)
 {
   pqMultiViewFrame* frame = new pqMultiViewFrame(this);
-  frame->setObjectName("MultiViewFrame:");
+  QString name;
+  name.setNum(gNameNum);
+  gNameNum++;
+  frame->setObjectName(name);
   QWidget* old = this->replaceView(pqMultiView::Index(), frame);
   delete old;
   this->installEventFilter(this);
@@ -48,7 +53,10 @@ void pqMultiViewManager::splitWidget(QWidget* widget, Qt::Orientation o)
   pqMultiView::Index newindex = this->splitView(index, o);
   pqMultiViewFrame* frame = new pqMultiViewFrame;
   this->replaceView(newindex, frame);
-  frame->setObjectName("MultiViewFrame");
+  QString name;
+  name.setNum(gNameNum);
+  gNameNum++;
+  frame->setObjectName(name);
   this->setup(frame);
   emit this->frameAdded(frame);
 }
