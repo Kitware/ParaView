@@ -45,11 +45,28 @@ QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
 
   QWidget* w = this->widgetOfIndex(index);
   QSplitter* splitter = qobject_cast<QSplitter*>(w->parentWidget());
+  
   if(splitter)
     {
+    // get location of widget in splitter
     int location = splitter->indexOf(w);
+    // save splitter sizes
+    QList<int> sizes;
+    if(splitter->count() > 1)
+      {
+      sizes = splitter->sizes();
+      }
+
+    // remove widget
     w->setParent(NULL);
+    // add replacement at same location
     splitter->insertWidget(location, widget);
+
+    // ensure same splitter sizes
+    if(splitter->count() > 1)
+      {
+      splitter->setSizes(sizes);
+      }
     return w;
     }
   return NULL;
@@ -60,13 +77,16 @@ void pqMultiView::removeView(QWidget* widget)
   QSplitter* splitter = qobject_cast<QSplitter*>(widget->parentWidget());
   if(splitter)
     {
+
+    // remove widget
     widget->setParent(NULL);
-    splitter->refresh();
     
+    // if splitter is empty, add place holder
     if(splitter->count() == 0 && splitter->parentWidget() == this)
       {
       splitter->addWidget(makeNewFrame());
       }
+    // if splitter can be merged with parent splitter
     else if(splitter->count() < 2 && splitter->parentWidget() != this)
       {
       QWidget* otherWidget = splitter->widget(0);
@@ -103,12 +123,14 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
   if(!splitter)
     return Index();
 
+  // if there is only one item in splitter
   if(splitter->count() < 2)
     {
+    // change orientation
     splitter->setOrientation(orientation);
+    // add new place holder
     newFrame = makeNewFrame();
     splitter->addWidget(newFrame);
-    
     // make equal spacing
     QList<int> sizes = splitter->sizes();
     int sum=0, i;
@@ -118,8 +140,13 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
       sizes[i] = sum / sizes.size();
     splitter->setSizes(sizes);
     }
+  // else if the orientation isn't the same, we need to make a new child splitter
+  // with the desired orientation
   else if(splitter->orientation() != orientation)
     {
+    // get parent sizes
+    QList<int> parentsizes = splitter->sizes();
+    
     int location = splitter->indexOf(w);
     QSplitter* newSplitter = makeNewSplitter(orientation);
     QByteArray n = "MultiViewSplitter:";
@@ -133,14 +160,17 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     newFrame = makeNewFrame();
     newSplitter->addWidget(newFrame);
     
-    // make equal spacing
-    QList<int> sizes = splitter->sizes();
+    // ensure same sizes for parent splitter
+    splitter->setSizes(parentsizes);
+
+    // make equal spacing for new splitter
+    QList<int> sizes = newSplitter->sizes();
     int sum=0, i;
     for(i=0; i<sizes.size(); i++)
       sum += sizes[i];
     for(i=0; i<sizes.size(); i++)
       sizes[i] = sum / sizes.size();
-    splitter->setSizes(sizes);
+    newSplitter->setSizes(sizes);
     }
   else
     {
