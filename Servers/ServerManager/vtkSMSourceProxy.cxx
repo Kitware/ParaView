@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.31");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.31.2.1");
 
 struct vtkSMSourceProxyInternals
 {
@@ -272,7 +272,10 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
   for(; it != this->PInternals->Parts.end(); it++)
     {
     it->GetPointer()->CreateTranslatorIfNecessary();
-    it->GetPointer()->InsertExtractPiecesIfNecessary();
+    if (strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader"))
+      {
+      it->GetPointer()->InsertExtractPiecesIfNecessary();
+      }
     }
 
 }
