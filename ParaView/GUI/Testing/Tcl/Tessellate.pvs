@@ -36,7 +36,7 @@ $kw(vtkTemp1173) SetPoint2 0 0.48746 0
 $kw(vtkTemp1173) SetResolution 20
 $kw(vtkTemp1161) AcceptCallback
 
-set kw(vtkTemp1361) [$kw(vtkTemp5) CreatePVSource TempTessellatorFilter]
+set kw(vtkTemp1361) [$kw(vtkTemp5) CreatePVSource TessellatorFilter]
 set kw(vtkTemp1381) [$kw(vtkTemp1361) GetPVWidget {Input}]
 $kw(vtkTemp1381) SetCurrentValue $kw(vtkTemp1161)
 set kw(vtkTemp1369) [$kw(vtkTemp1361) GetPVWidget {OutputDimension}]
