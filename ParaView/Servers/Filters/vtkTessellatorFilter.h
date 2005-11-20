@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkTempTessellatorFilter.h
+  Module:    vtkTessellatorFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -14,10 +14,10 @@
   statement of authorship are reproduced on all copies.
 
 =========================================================================*/
-#ifndef __vtkTempTessellatorFilter_h
-#define __vtkTempTessellatorFilter_h
+#ifndef __vtkTessellatorFilter_h
+#define __vtkTessellatorFilter_h
 
-// .NAME vtkTempTessellatorFilter - approximate nonlinear FEM elements with simplices
+// .NAME vtkTessellatorFilter - approximate nonlinear FEM elements with simplices
 // .SECTION Description
 // This class approximates nonlinear FEM elements with linear simplices.
 //
@@ -60,13 +60,13 @@ class vtkStreamingTessellator;
 class vtkSubdivisionAlgorithm;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkTessellatorFilter : public vtkDataSetToUnstructuredGridFilter
 {
   public:
-    vtkTypeRevisionMacro(vtkTempTessellatorFilter,vtkDataSetToUnstructuredGridFilter);
+    vtkTypeRevisionMacro(vtkTessellatorFilter,vtkDataSetToUnstructuredGridFilter);
     void PrintSelf( ostream& os, vtkIndent indent );
 
-    static vtkTempTessellatorFilter* New();
+    static vtkTessellatorFilter* New();
 
     virtual void SetTessellator( vtkStreamingTessellator* );
     vtkGetObjectMacro(Tessellator, vtkStreamingTessellator);
@@ -105,8 +105,8 @@ class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridF
     int GetMergePoints() const { return this->MergePoints; }
 
   protected:
-    vtkTempTessellatorFilter();
-    ~vtkTempTessellatorFilter();
+    vtkTessellatorFilter();
+    ~vtkTessellatorFilter();
 
     // Description:
     // Called by Execute to set up a multitude of member variables used by the per-primitive
@@ -144,12 +144,12 @@ class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridF
     //ETX
 
   private:
-    vtkTempTessellatorFilter( const vtkTempTessellatorFilter& ); // Not implemented.
-    void operator = ( const vtkTempTessellatorFilter& ); // Not implemented.
+    vtkTessellatorFilter( const vtkTessellatorFilter& ); // Not implemented.
+    void operator = ( const vtkTessellatorFilter& ); // Not implemented.
 };
 
 //BTX
-inline int vtkTempTessellatorFilter::GetOutputDimension() const { return this->OutputDimension; }
+inline int vtkTessellatorFilter::GetOutputDimension() const { return this->OutputDimension; }
 //ETX
 
-#endif // __vtkTempTessellatorFilter_h
+#endif // __vtkTessellatorFilter_h

@@ -67,7 +67,7 @@ SET(Filters_SRCS
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
   vtkSquirtCompressor.cxx
-  vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
+  vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVRMLSource.cxx

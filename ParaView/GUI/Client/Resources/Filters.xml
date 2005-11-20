@@ -1607,10 +1607,10 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
 The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. Three new points are added per triangle -- one at the midpoint of each edge. The image below shows a triangle with the new points inserted and the appropriate edges added to form the four new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
     </Documentation>
   </Module>
-  <Module name="TempTessellatorFilter" menu_name="Tessellate" root_name="TempTessellatorFilter" module_type="Filter"
+  <Module name="TessellatorFilter" menu_name="Tessellate" root_name="TessellatorFilter" module_type="Filter"
           long_help="Tessellate nonlinear curves, surfaces, and volumes with lines, triangles, and tetrahedra."
           short_help="Polygonize a mesh.">
-    <Filter class="vtkTempTessellatorFilter">
+    <Filter class="vtkTessellatorFilter">
       <Input name="Input" class="vtkPolyData"/>
       <Input name="Input" class="vtkDataSet"/>
       <Input name="Input" class="vtkUnstructuredGrid"/>
