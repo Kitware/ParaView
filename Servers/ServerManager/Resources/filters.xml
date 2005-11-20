@@ -1735,7 +1735,7 @@
    <!-- End Subdivide -->
    </SourceProxy>
 
-   <SourceProxy name="TempTessellatorFilter" class="vtkTempTessellatorFilter">
+   <SourceProxy name="TessellatorFilter" class="vtkTessellatorFilter">
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1786,7 +1786,7 @@
         command="ResetFieldCriteria"
         immediate_update="1">
      </Property>
-   <!-- End TempTessellatorFilter -->
+   <!-- End TessellatorFilter -->
    </SourceProxy>
 
    <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter">

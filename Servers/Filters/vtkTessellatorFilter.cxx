@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkTempTessellatorFilter.cxx
+  Module:    vtkTessellatorFilter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,19 +25,19 @@
 #include "vtkDataSet.h"
 #include "vtkCell.h"
 
-#include "vtkTempTessellatorFilter.h"
+#include "vtkTessellatorFilter.h"
 #include "vtkDataSet.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkStreamingTessellator.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkSubdivisionAlgorithm.h"
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.9");
-vtkStandardNewMacro(vtkTempTessellatorFilter);
+vtkCxxRevisionMacro(vtkTessellatorFilter, "1.1");
+vtkStandardNewMacro(vtkTessellatorFilter);
 
 // ========================================
 // convenience routines for paraview
-void vtkTempTessellatorFilter::SetMaximumNumberOfSubdivisions( int N )
+void vtkTessellatorFilter::SetMaximumNumberOfSubdivisions( int N )
 {
   if ( this->Tessellator )
     {
@@ -45,12 +45,12 @@ void vtkTempTessellatorFilter::SetMaximumNumberOfSubdivisions( int N )
     }
 }
 
-int vtkTempTessellatorFilter::GetMaximumNumberOfSubdivisions()
+int vtkTessellatorFilter::GetMaximumNumberOfSubdivisions()
 {
   return this->Tessellator ? this->Tessellator->GetMaximumNumberOfSubdivisions() : 0;
 }
 
-void vtkTempTessellatorFilter::SetChordError( double E )
+void vtkTessellatorFilter::SetChordError( double E )
 {
   if ( this->Subdivider )
     {
@@ -58,13 +58,13 @@ void vtkTempTessellatorFilter::SetChordError( double E )
     }
 }
 
-double vtkTempTessellatorFilter::GetChordError()
+double vtkTessellatorFilter::GetChordError()
 {
   double tmp = this->Subdivider ? this->Subdivider->GetChordError2() : 0.;
   return tmp > 0. ? sqrt( tmp ) : tmp;
 }
 
-void vtkTempTessellatorFilter::SetMergePoints( int DoTheMerge )
+void vtkTessellatorFilter::SetMergePoints( int DoTheMerge )
 {
   if ( DoTheMerge == this->MergePoints )
     {
@@ -77,14 +77,14 @@ void vtkTempTessellatorFilter::SetMergePoints( int DoTheMerge )
 
 // ========================================
 // callbacks for simplex output
-void vtkTempTessellatorFilter::AddATetrahedron( const double* a, const double* b, const double* c, const double* d,
+void vtkTessellatorFilter::AddATetrahedron( const double* a, const double* b, const double* c, const double* d,
                                               vtkSubdivisionAlgorithm*, void* pd, const void* )
 {
-  vtkTempTessellatorFilter* self = (vtkTempTessellatorFilter*) pd;
+  vtkTessellatorFilter* self = (vtkTessellatorFilter*) pd;
   self->OutputTetrahedron( a, b, c, d );
 }
 
-void vtkTempTessellatorFilter::OutputTetrahedron( const double* a,
+void vtkTessellatorFilter::OutputTetrahedron( const double* a,
                                                   const double* b, 
                                                   const double* c, 
                                                   const double* d )
@@ -117,16 +117,16 @@ void vtkTempTessellatorFilter::OutputTetrahedron( const double* a,
     }
 }
 
-void vtkTempTessellatorFilter::AddATriangle( const double* a, const double* b, 
+void vtkTessellatorFilter::AddATriangle( const double* a, const double* b, 
                                              const double* c,
                                              vtkSubdivisionAlgorithm*, 
                                              void* pd, const void* )
 {
-  vtkTempTessellatorFilter* self = (vtkTempTessellatorFilter*) pd;
+  vtkTessellatorFilter* self = (vtkTessellatorFilter*) pd;
   self->OutputTriangle( a, b, c );
 }
 
-void vtkTempTessellatorFilter::OutputTriangle( const double* a, 
+void vtkTessellatorFilter::OutputTriangle( const double* a, 
                                                const double* b, 
                                                const double* c )
 {
@@ -155,15 +155,15 @@ void vtkTempTessellatorFilter::OutputTriangle( const double* a,
     }
 }
 
-void vtkTempTessellatorFilter::AddALine( const double* a, const double* b,
+void vtkTessellatorFilter::AddALine( const double* a, const double* b,
                                          vtkSubdivisionAlgorithm*, void* pd, 
                                          const void* )
 {
-  vtkTempTessellatorFilter* self = (vtkTempTessellatorFilter*) pd;
+  vtkTessellatorFilter* self = (vtkTessellatorFilter*) pd;
   self->OutputLine( a, b );
 }
 
-void vtkTempTessellatorFilter::OutputLine( const double* a, const double* b )
+void vtkTessellatorFilter::OutputLine( const double* a, const double* b )
 {
   vtkIdType cellIds[2];
 
@@ -190,7 +190,7 @@ void vtkTempTessellatorFilter::OutputLine( const double* a, const double* b )
 // ========================================
 
 // constructor/boilerplate members
-vtkTempTessellatorFilter::vtkTempTessellatorFilter()
+vtkTessellatorFilter::vtkTessellatorFilter()
   : Tessellator( 0 ), Subdivider( 0 )
 {
   this->OutputDimension = 3; // Tesselate elements directly, not boundaries
@@ -203,13 +203,13 @@ vtkTempTessellatorFilter::vtkTempTessellatorFilter()
   this->Tessellator->SetEmbeddingDimension( 2, 3 );
 }
 
-vtkTempTessellatorFilter::~vtkTempTessellatorFilter()
+vtkTessellatorFilter::~vtkTessellatorFilter()
 {
   this->SetSubdivider( 0 );
   this->SetTessellator( 0 );
 }
 
-void vtkTempTessellatorFilter::PrintSelf( ostream& os, vtkIndent indent )
+void vtkTessellatorFilter::PrintSelf( ostream& os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
   os << indent << "OutputDimension: " << this->OutputDimension << endl
@@ -219,7 +219,7 @@ void vtkTempTessellatorFilter::PrintSelf( ostream& os, vtkIndent indent )
 }
 
 // override for proper Update() behavior
-unsigned long vtkTempTessellatorFilter::GetMTime()
+unsigned long vtkTessellatorFilter::GetMTime()
 {
   unsigned long mt = this->MTime;
   unsigned long tmp;
@@ -241,7 +241,7 @@ unsigned long vtkTempTessellatorFilter::GetMTime()
   return mt;
 }
 
-void vtkTempTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
+void vtkTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
 {
   if ( this->Tessellator == t )
     {
@@ -264,7 +264,7 @@ void vtkTempTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
   this->Modified();
 }
 
-void vtkTempTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s )
+void vtkTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s )
 {
   if ( this->Subdivider == s )
     {
@@ -291,7 +291,7 @@ void vtkTempTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s 
   this->Modified();
 } 
 
-void vtkTempTessellatorFilter::SetFieldCriterion( int s, double err )
+void vtkTessellatorFilter::SetFieldCriterion( int s, double err )
 {
   if ( this->Subdivider )
     {
@@ -299,7 +299,7 @@ void vtkTempTessellatorFilter::SetFieldCriterion( int s, double err )
     }
 }
 
-void vtkTempTessellatorFilter::ResetFieldCriteria()
+void vtkTessellatorFilter::ResetFieldCriteria()
 {
   if ( this->Subdivider )
     {
@@ -309,7 +309,7 @@ void vtkTempTessellatorFilter::ResetFieldCriteria()
 
 // ========================================
 // pipeline procedures
-void vtkTempTessellatorFilter::SetupOutput()
+void vtkTessellatorFilter::SetupOutput()
 {
   this->OutputMesh = this->GetOutput(); 
   // avoid doing all the stupid checks on NumberOfOutputs for every
@@ -360,7 +360,7 @@ void vtkTempTessellatorFilter::SetupOutput()
     }
 }
 
-void vtkTempTessellatorFilter::Teardown()
+void vtkTessellatorFilter::Teardown()
 {
   this->OutputMesh = 0;
   this->OutputPoints = 0;
@@ -776,13 +776,166 @@ vtkIdType quadHexEdges[][2] =
   {19, 3}
 };
 
+
+vtkIdType quadVoxTetrahedra[][4] =
+{
+  { 0, 8,20,26},
+  { 8, 1,20,26},
+  { 1, 9,20,26},
+  { 9, 3,20,26},
+  { 3,10,20,26},
+  {10, 2,20,26},
+  { 2,11,20,26},
+  {11, 0,20,26},
+
+  { 4,15,21,26},
+  {15, 6,21,26},
+  { 6,14,21,26},
+  {14, 7,21,26},
+  { 7,13,21,26},
+  {13, 5,21,26},
+  { 5,12,21,26},
+  {12, 4,21,26},
+
+  { 0,16,22,26},
+  {16, 4,22,26},
+  { 4,12,22,26},
+  {12, 5,22,26},
+  { 5,17,22,26},
+  {17, 1,22,26},
+  { 1, 8,22,26},
+  { 8, 0,22,26},
+
+  { 2,10,23,26},
+  {10, 3,23,26},
+  { 3,18,23,26},
+  {18, 7,23,26},
+  { 7,14,23,26},
+  {14, 6,23,26},
+  { 6,19,23,26},
+  {19, 2,23,26},
+
+  { 0,11,24,26},
+  {11, 2,24,26},
+  { 2,19,24,26},
+  {19, 6,24,26},
+  { 6,15,24,26},
+  {15, 4,24,26},
+  { 4,16,24,26},
+  {16, 0,24,26},
+
+  { 1,17,25,26},
+  {17, 5,25,26},
+  { 5,13,25,26},
+  {13, 7,25,26},
+  { 7,18,25,26},
+  {18, 3,25,26},
+  { 3, 9,25,26},
+  { 9, 1,25,26}
+};
+
+vtkIdType quadVoxTris[][3] =
+{
+  { 0, 8,20},
+  { 8, 1,20},
+  { 1, 9,20},
+  { 9, 3,20},
+  { 3,10,20},
+  {10, 2,20},
+  { 2,11,20},
+  {11, 0,20},
+
+  { 4,15,21},
+  {15, 6,21},
+  { 6,14,21},
+  {14, 7,21},
+  { 7,13,21},
+  {13, 5,21},
+  { 5,12,21},
+  {12, 4,21},
+
+  { 0,16,22},
+  {16, 4,22},
+  { 4,12,22},
+  {12, 5,22},
+  { 5,17,22},
+  {17, 1,22},
+  { 1, 8,22},
+  { 8, 0,22},
+
+  { 2,10,23},
+  {10, 3,23},
+  { 3,18,23},
+  {18, 7,23},
+  { 7,14,23},
+  {14, 6,23},
+  { 6,19,23},
+  {19, 2,23},
+
+  { 0,11,24},
+  {11, 2,24},
+  { 2,19,24},
+  {19, 6,24},
+  { 6,15,24},
+  {15, 4,24},
+  { 4,16,24},
+  {16, 0,24},
+
+  { 1,17,25},
+  {17, 5,25},
+  { 5,13,25},
+  {13, 7,25},
+  { 7,18,25},
+  {18, 3,25},
+  { 3, 9,25},
+  { 9, 1,25}
+};
+
+vtkIdType quadVoxEdges[][2] =
+{
+  { 0, 8},
+  { 8, 1},
+  { 1, 9},
+  { 9, 3},
+  { 3,10},
+  {10, 2},
+  { 2,11},
+  {11, 0},
+  { 4,15},
+  {15, 6},
+  { 6,14},
+  {14, 7},
+  { 7,13},
+  {13, 5},
+  { 5,12},
+  {12, 4},
+  { 0,16},
+  {16, 4},
+  { 5,17},
+  {17, 1},
+  { 3,18},
+  {18, 7},
+  { 6,19},
+  {19, 2}
+};
+
+
+
+
+// This is used by the Execute() method to avoid printing out one
+// "Not Supported" error message per cell. Instead, we print one
+// per Execute().
+static int vtkNotSupportedErrorPrinted = 0;
+
 // ========================================
 // the meat of the class: execution!
-void vtkTempTessellatorFilter::Execute()
+void vtkTessellatorFilter::Execute()
 {
   static double weights[27];
   int dummySubId=-1;
   int p;
+
+  vtkNotSupportedErrorPrinted = 0;
 
   vtkDataSet* mesh = this->GetInput();
 
@@ -848,7 +1001,11 @@ void vtkTempTessellatorFilter::Execute()
       break;
     case VTK_POLY_LINE:
       dim = -1;
-      vtkWarningMacro( "Oops, POLY_LINE not supported" );
+      if ( ! vtkNotSupportedErrorPrinted )
+        {
+        vtkNotSupportedErrorPrinted = 1;
+        vtkWarningMacro( "Oops, POLY_LINE not supported" );
+        }
       break;
     case VTK_TRIANGLE:
       if ( dim > 1 )
@@ -865,11 +1022,19 @@ void vtkTempTessellatorFilter::Execute()
       break;
     case VTK_TRIANGLE_STRIP:
       dim = -1;
-      vtkWarningMacro( "Oops, TRIANGLE_STRIP not supported" );
+      if ( ! vtkNotSupportedErrorPrinted )
+        {
+        vtkNotSupportedErrorPrinted = 1;
+        vtkWarningMacro( "Oops, TRIANGLE_STRIP not supported" );
+        }
       break;
     case VTK_POLYGON:
       dim = -1;
-      vtkWarningMacro( "Oops, POLYGON not supported" );
+      if ( ! vtkNotSupportedErrorPrinted )
+        {
+        vtkNotSupportedErrorPrinted = 1;
+        vtkWarningMacro( "Oops, POLYGON not supported" );
+        }
       break;
     case VTK_QUAD:
       if ( dim > 1 )
@@ -1018,7 +1183,7 @@ void vtkTempTessellatorFilter::Execute()
         outconn = &quadHexTetrahedra[0][0];
         nprim = sizeof(quadHexTetrahedra)/sizeof(quadHexTetrahedra[0]);
         }
-      else if ( dim ==2 )
+      else if ( dim == 2 )
         {
         outconn = &quadHexTris[0][0];
         nprim = sizeof(quadHexTris)/sizeof(quadHexTris[0]);
@@ -1030,13 +1195,59 @@ void vtkTempTessellatorFilter::Execute()
         }
       break;
     case VTK_VOXEL:
+      // we sample 19 extra points to guarantee a compatible tetrahedralization
+      for ( p = 8; p < 20; ++p )
+        {
+        dummySubId=-1;
+        for ( int y = 0; y < 3; ++y )
+          {
+          pts[p][y+3] = extraLinHexParams[p-8][y];
+          }
+        cp->EvaluateLocation( dummySubId, pts[p] + 3, pts[p], weights );
+        this->Subdivider->EvaluateFields( pts[p], weights, 6 );
+        }
+      for ( p = 20; p < 27; ++p )
+        {
+        dummySubId=-1;
+        for ( int x = 0; x < 3; ++x )
+          {
+          pts[p][x+3] = extraQuadHexParams[p-20][x];
+          }
+        cp->EvaluateLocation( dummySubId, pts[p] + 3, pts[p], weights );
+        this->Subdivider->EvaluateFields( pts[p], weights, 6 );
+        }
+      if ( dim == 3 )
+        {
+        outconn = &quadVoxTetrahedra[0][0];
+        nprim = sizeof(quadVoxTetrahedra)/sizeof(quadVoxTetrahedra[0]);
+        }
+      else if ( dim == 2 )
+        {
+        outconn = &quadVoxTris[0][0];
+        nprim = sizeof(quadVoxTris)/sizeof(quadVoxTris[0]);
+        }
+      else
+        {
+        outconn = &quadVoxEdges[0][0];
+        nprim = sizeof(quadVoxEdges)/sizeof(quadVoxEdges[0]);
+        }
+      break;
     case VTK_PIXEL:
       dim = -1;
-      vtkWarningMacro( "Oops, voxels and pixels not supported" );
+      if ( ! vtkNotSupportedErrorPrinted )
+        {
+        vtkNotSupportedErrorPrinted = 1;
+        vtkWarningMacro( "Oops, pixels are not supported" );
+        }
       break;
     default:
       dim = -1;
-      vtkWarningMacro( "Oops, something not supported" );
+      if ( ! vtkNotSupportedErrorPrinted )
+        {
+        vtkNotSupportedErrorPrinted = 1;
+        vtkWarningMacro( "Oops, some cell type (" << cp->GetCellType()
+          << ") not supported" );
+        }
       }
 
     // OK, now output the primitives

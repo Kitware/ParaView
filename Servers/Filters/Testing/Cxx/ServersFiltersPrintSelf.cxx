@@ -58,7 +58,7 @@
 #include "vtkSelectInputs.h"
 #include "vtkStreamingTessellator.h"
 #include "vtkSubdivisionAlgorithm.h"
-#include "vtkTempTessellatorFilter.h"
+#include "vtkTessellatorFilter.h"
 #include "vtkTiledDisplaySchedule.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLCollectionReader.h"
@@ -131,7 +131,7 @@ int main(int , char *[])
   c = vtkSelectInputs::New(); c->Print(cout); c->Delete();
   c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();
   c = vtkSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
-  c = vtkTempTessellatorFilter::New(); c->Print(cout); c->Delete();
+  c = vtkTessellatorFilter::New(); c->Print(cout); c->Delete();
   c = vtkTiledDisplaySchedule::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();
