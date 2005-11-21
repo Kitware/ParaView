@@ -42,7 +42,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.3");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.3.4.1");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -184,7 +184,8 @@ void vtkCommandOptions::AddDeprecatedArgument(const char* longarg, const char* s
                                          const char* help, int type)
 {
   // if it is for xml or not for the current process do nothing
-  if((type == XMLONLY) || !(type & this->ProcessType))
+  if((type & XMLONLY) || 
+     !(type & this->ProcessType || type == vtkCommandOptions::EVERYBODY))
     {
     return;
     }
@@ -216,7 +217,7 @@ void vtkCommandOptions::AddBooleanArgument(const char* longarg, const char* shor
 {
   // add the argument to the XML parser
   this->Internals->XMLParser->AddBooleanArgument(longarg, var, type);
-  if(type == XMLONLY)
+  if(type & XMLONLY)
     {
     return;
     }
@@ -235,7 +236,7 @@ void vtkCommandOptions::AddBooleanArgument(const char* longarg, const char* shor
 void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, int* var, const char* help, int type)
 {
   this->Internals->XMLParser->AddArgument(longarg, var, type);
-  if(type == XMLONLY)
+  if(type & XMLONLY)
     {
     return;
     }
@@ -254,7 +255,7 @@ void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, i
 void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, char** var, const char* help, int type)
 {
   this->Internals->XMLParser->AddArgument(longarg, var, type);
-  if(type == XMLONLY)
+  if(type & XMLONLY)
     {
     return;
     }

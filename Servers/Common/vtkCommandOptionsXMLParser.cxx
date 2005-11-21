@@ -36,7 +36,11 @@ public:
       this->ProcessType = 0;
     }
   
-  void AddArgument(const char* arg, vtkCommandOptionsXMLParserArgumentStructure::Type type, void* var, int ptype);
+  void AddArgument(
+    const char* arg, 
+    vtkCommandOptionsXMLParserArgumentStructure::Type type, 
+    void* var, 
+    int ptype);
   int SetArgument(const char* arg, const char* value);
   int GetArgumentProcessType(const char* arg)
     {
@@ -72,8 +76,10 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
 {
   if(this->ArgumentToVariableMap.count(arg))
     {
-    vtkCommandOptionsXMLParserArgumentStructure tmp = this->ArgumentToVariableMap[arg];
-    if(!(tmp.ProcessType & this->ProcessType))
+    vtkCommandOptionsXMLParserArgumentStructure tmp = 
+      this->ArgumentToVariableMap[arg];
+    if(!(tmp.ProcessType & this->ProcessType || 
+         tmp.ProcessType == vtkCommandOptions::EVERYBODY))
       {
       // Silently skip argument in xml because the process type does not match
       return 1;
@@ -90,7 +96,8 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
         { 
         if(!value)
           {
-          vtkGenericWarningMacro("Bad XML Format missing Value for Name=\"" << arg << "\"");
+          vtkGenericWarningMacro("Bad XML Format missing Value for Name=\"" 
+                                 << arg << "\"");
           return 0;
           }
         int* variable = (int*)tmp.Variable;
@@ -101,7 +108,8 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
         { 
         if(!value)
           {
-          vtkGenericWarningMacro("Bad XML Format missing Value for Name=\"" << arg << "\"");
+          vtkGenericWarningMacro("Bad XML Format missing Value for Name=\"" 
+                                 << arg << "\"");
           return 0;
           }
         char** variable = static_cast<char**>(tmp.Variable);
@@ -124,15 +132,17 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
 }
 
 //----------------------------------------------------------------------------
-void vtkCommandOptionsXMLParserInternal::AddArgument(const char* arg, 
-                                                vtkCommandOptionsXMLParserArgumentStructure::Type type, 
-                                                void* var,
-                                                int ptype)
+void vtkCommandOptionsXMLParserInternal::AddArgument(
+  const char* arg, 
+  vtkCommandOptionsXMLParserArgumentStructure::Type type, 
+  void* var,
+  int ptype)
 {
   if(strlen(arg) < 3)
     {
     vtkGenericWarningMacro(
-      "AddArgument must take arguments of the form --foo.  Argument not added: " << arg );
+      "AddArgument must take arguments of the form --foo.  "
+      "Argument not added: " << arg );
     return;
     }
   vtkCommandOptionsXMLParserArgumentStructure vardata;
@@ -147,7 +157,7 @@ void vtkCommandOptionsXMLParserInternal::AddArgument(const char* arg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptionsXMLParser);
-vtkCxxRevisionMacro(vtkCommandOptionsXMLParser, "1.1");
+vtkCxxRevisionMacro(vtkCommandOptionsXMLParser, "1.1.4.1");
 
 //----------------------------------------------------------------------------
 vtkCommandOptionsXMLParser::vtkCommandOptionsXMLParser()
@@ -168,7 +178,8 @@ vtkCommandOptionsXMLParser::~vtkCommandOptionsXMLParser()
 
 
 //----------------------------------------------------------------------------
-void vtkCommandOptionsXMLParser::StartElement(const char* name, const char** atts)
+void vtkCommandOptionsXMLParser::StartElement(const char* name, 
+                                              const char** atts)
 {
   if(strcmp(name, "pvx") == 0)
     {
@@ -189,7 +200,9 @@ void vtkCommandOptionsXMLParser::StartElement(const char* name, const char** att
       {
       if(strcmp(atts[0],"Name") == 0)
         {
-        if(!(this->Internals->GetArgumentProcessType(atts[1]) & this->PVOptions->GetProcessType()))
+        int type = this->Internals->GetArgumentProcessType(atts[1]);
+        if(!(type & this->PVOptions->GetProcessType() || 
+             type == vtkCommandOptions::EVERYBODY) )
           {
           return;
           }
@@ -253,15 +266,20 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
     vtkErrorMacro("Bad XML Format missing value tag");
     return;
     }
-  else
+  else if (valueTag)
     {
-    value = atts[3];
-    if(!value)
+    if (atts[3])
+      {
+      value = atts[3];
+      }
+    else
       {
       vtkErrorMacro("Bad XML Format missing value tag present but no value");
       return;
       }
     }
+
+
   this->Internals->SetArgument(name, value);
 }
 
@@ -282,21 +300,39 @@ void vtkCommandOptionsXMLParser::EndElement(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkCommandOptionsXMLParser::AddBooleanArgument(const char* longarg, int* var, int type)
+void vtkCommandOptionsXMLParser::AddBooleanArgument(const char* longarg, 
+                                                    int* var, 
+                                                    int type)
 {
-  this->Internals->AddArgument(longarg, vtkCommandOptionsXMLParserArgumentStructure::BOOL_TYPE, var, type);
+  this->Internals->AddArgument(
+    longarg, 
+    vtkCommandOptionsXMLParserArgumentStructure::BOOL_TYPE, 
+    var, 
+    type);
 }
 
 //----------------------------------------------------------------------------
-void vtkCommandOptionsXMLParser::AddArgument(const char* longarg, int* var, int type)
+void vtkCommandOptionsXMLParser::AddArgument(const char* longarg, 
+                                             int* var, 
+                                             int type)
 {
-  this->Internals->AddArgument(longarg, vtkCommandOptionsXMLParserArgumentStructure::INT_TYPE, var, type);
+  this->Internals->AddArgument(
+    longarg, 
+    vtkCommandOptionsXMLParserArgumentStructure::INT_TYPE, 
+    var, 
+    type);
 }
 
 //----------------------------------------------------------------------------
-void vtkCommandOptionsXMLParser::AddArgument(const char* longarg, char** var, int type)
+void vtkCommandOptionsXMLParser::AddArgument(const char* longarg, 
+                                             char** var, 
+                                             int type)
 {
-  this->Internals->AddArgument(longarg, vtkCommandOptionsXMLParserArgumentStructure::CHAR_TYPE, var, type);
+  this->Internals->AddArgument(
+    longarg, 
+    vtkCommandOptionsXMLParserArgumentStructure::CHAR_TYPE, 
+    var, 
+    type);
 }
 
 //----------------------------------------------------------------------------
