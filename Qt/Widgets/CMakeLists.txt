@@ -1,7 +1,6 @@
+PROJECT(QtWidgets)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
-
-PROJECT(QtWidgets)
 
 FIND_PACKAGE(Qt4)
 INCLUDE(${QT_USE_FILE})
@@ -31,10 +30,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
 )
 
-QT4_ADD_RESOURCES(RCS_SOURCES
-  pqWidgets.qrc
-)
-
 SET(UI_FORMS
   pqFileDialog.ui
   pqServerBrowser.ui
@@ -45,16 +40,24 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   ${UI_FORMS}
 )
 
+SET(UI_RESOURCES
+  pqWidgets.qrc
+)
+
+QT4_ADD_RESOURCES(RCS_SOURCES
+  ${UI_RESOURCES}
+)
 
 SOURCE_GROUP("Resources" FILES
+  ${UI_RESOURCES}
   ${UI_FORMS}
 )
 
 SOURCE_GROUP("Generated" FILES
   ${MOC_BUILT_SOURCES}
+  ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
 )
-
 
 ADD_LIBRARY(QtWidgets
   pqCommandDispatcher.cxx
