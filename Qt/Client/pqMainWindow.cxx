@@ -773,7 +773,6 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
   QVTKWidget* w = qobject_cast<QVTKWidget*>(parent->mainWidget());
   QMap<QVTKWidget*, vtkSMRenderModuleProxy*>::iterator iter;
   iter = this->GraphicsViews.find(w);
-  this->GraphicsViews.erase(iter);
   
   // delete render module
   (*iter)->Delete();
@@ -782,6 +781,8 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
     {
     this->ActiveView = 0;
     }
+
+  this->GraphicsViews.erase(iter);
 }
 
 void pqMainWindow::onFrameActive(QWidget* w)
