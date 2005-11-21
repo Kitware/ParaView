@@ -593,7 +593,9 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
 void pqMainWindow::onCreateSource(QAction* action)
 {
   if(!action || !this->ActiveView)
+    {
     return;
+    }
 
   QByteArray sourceName = action->data().toString().toAscii();
 
@@ -613,7 +615,9 @@ void pqMainWindow::onCreateSource(QAction* action)
 void pqMainWindow::onCreateFilter(QAction* action)
 {
   if(!action || !this->ActiveView)
+    {
     return;
+    }
   
   QByteArray filterName = action->data().toString().toAscii();
 
@@ -684,20 +688,17 @@ void pqMainWindow::onPythonShell()
 class pqMultiViewRenderModuleUpdater : public QObject
 {
 public:
-  pqMultiViewRenderModuleUpdater(vtkSMProxy* view, QObject* parent)
-    : QObject(parent), View(view) {}
+  pqMultiViewRenderModuleUpdater(vtkSMProxy* view, QWidget* topWidget, QWidget* parent)
+    : QObject(parent), View(view), TopWidget(topWidget) {}
 
 protected:
   bool eventFilter(QObject* caller, QEvent* e)
     {
-    // TODO, apparently, this should watch for window positions, not resizes
+    // TODO, apparently, this should watch for window position changes, not resizes
     if(e->type() == QEvent::Resize)
       {
       // find top level window;
       QWidget* me = qobject_cast<QWidget*>(caller);
-      QWidget* top = me;
-      while(top->parentWidget() != NULL)
-        top = top->parentWidget();
       
       vtkSMIntVectorProperty* prop = 0;
       
@@ -705,15 +706,15 @@ protected:
       prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("GUISize"));
       if(prop)
         {
-        prop->SetElements2(top->width(), top->height());
+        prop->SetElements2(this->TopWidget->width(), this->TopWidget->height());
         }
       
       // position relative to main window
       prop = vtkSMIntVectorProperty::SafeDownCast(this->View->GetProperty("WindowPosition"));
       if(prop)
         {
-        QPoint pos = me->pos();
-        pos = me->mapTo(top, pos);
+        QPoint pos(0,0);
+        pos = me->mapTo(this->TopWidget, pos);
         prop->SetElements2(pos.x(), pos.y());
         }
       }
@@ -721,6 +722,7 @@ protected:
     }
 
   vtkSMProxy* View;
+  QWidget* TopWidget;
 
 };
 
@@ -728,10 +730,23 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
 {
   vtkSMMultiViewRenderModuleProxy* rm = this->CurrentServer->GetRenderModule();
   vtkSMRenderModuleProxy* view = vtkSMRenderModuleProxy::SafeDownCast(rm->NewRenderModule());
+
+  // if this property exists (server/client mode), render remotely
+  // this should change to a user controlled setting, but this is here for testing
+  vtkSMProperty* prop = view->GetProperty("CompositeThreshold");
+  if(prop)
+    {
+    this->Adaptor->setProperty(prop, 0.0);  // remote render
+    }
   view->UpdateVTKObjects();
+
 
   QVTKWidget* w = new QVTKWidget(parent);
   parent->setMainWidget(w);
+
+  // gotta tell SM about window positions
+  pqMultiViewRenderModuleUpdater* u = new pqMultiViewRenderModuleUpdater(view, this->MultiViewManager, w);
+  w->installEventFilter(u);
 
   w->SetRenderWindow(view->GetRenderWindow());
 
