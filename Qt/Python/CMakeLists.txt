@@ -1,0 +1,37 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
+
+PROJECT(QtPython)
+
+FIND_PACKAGE(Qt4)
+INCLUDE(${QT_USE_FILE})
+
+FIND_PACKAGE(PythonLibs)
+
+INCLUDE_DIRECTORIES(
+  ${ParaQ_SOURCE_DIR}/Python
+  ${PYTHON_INCLUDE_PATH}
+)
+
+QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqPythonShell.h
+  pqPythonStream.h
+)
+
+ADD_LIBRARY(QtPython
+  pqPythonShell.cxx
+  pqPythonShell.h
+  pqPythonStream.cxx
+  pqPythonStream.h
+  ${MOC_BUILT_SOURCES}
+  ${UI_BUILT_SOURCES}
+)
+
+TARGET_LINK_LIBRARIES(QtPython
+  ${QT_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+)
+
+SOURCE_GROUP("Generated" FILES
+  ${MOC_BUILT_SOURCES}
+)
+

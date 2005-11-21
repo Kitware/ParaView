@@ -97,6 +97,8 @@ private slots:
   void onRecordTest(const QStringList& Files);
   void onPlayTest();
   void onPlayTest(const QStringList& Files);
+  
+  void onPythonShell();
 };
 
 #endif // !_pqMainWindow_h

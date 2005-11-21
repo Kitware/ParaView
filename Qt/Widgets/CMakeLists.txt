@@ -13,6 +13,7 @@ INCLUDE_DIRECTORIES(
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCommandDispatcher.h
   pqCommandDispatcherManager.h
+  pqConsoleWidget.h
   pqExplicitCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
@@ -67,6 +68,8 @@ ADD_LIBRARY(QtWidgets
   pqCommand.h
   pqConnect.cxx
   pqConnect.h
+  pqConsoleWidget.cxx
+  pqConsoleWidget.h
   pqExplicitCommandDispatcher.cxx
   pqExplicitCommandDispatcher.h
   pqFileDialog.cxx

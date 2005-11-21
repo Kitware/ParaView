@@ -31,6 +31,10 @@
 #include "pqMultiViewManager.h"
 #include "pqMultiViewFrame.h"
 
+#ifdef PARAQ_EMBED_PYTHON
+#include "pqPythonDialog.h"
+#endif // PARAQ_EMBED_PYTHON
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QDockWidget>
@@ -150,6 +154,14 @@ pqMainWindow::pqMainWindow() :
   testsMenu->addAction(tr("Play"))
     << pqSetName("Play")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
+    
+#ifdef PARAQ_EMBED_PYTHON
+
+  testsMenu->addAction(tr("Python Shell"))
+    << pqSetName("PythonShell")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onPythonShell()));
+    
+#endif // PARAQ_EMBED_PYTHON
   
   // Help menu.
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help"))
@@ -661,6 +673,13 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
     }
 }
 
+void pqMainWindow::onPythonShell()
+{
+#ifdef PARAQ_EMBED_PYTHON
+  pqPythonDialog* const dialog = new pqPythonDialog(this);
+  dialog->show();
+#endif // PARAQ_EMBED_PYTHON
+}
 
 class pqMultiViewRenderModuleUpdater : public QObject
 {
@@ -761,6 +780,4 @@ void pqMainWindow::onFrameActive(QWidget* w)
 
   this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
 }
-
-
 

@@ -31,3 +31,12 @@ ENDIF(BUILD_TESTING)
 # Configure data directory
 FIND_PATH(PARAQ_DATA_ROOT ParaQData.readme ${ParaQ_SOURCE_DIR}/../ParaQData $ENV{PARAQ_DATA_ROOT})
 
+# Configure Python
+OPTION(PARAQ_EMBED_PYTHON "Embedded Python Interpreter" ON)
+
+IF(PARAQ_EMBED_PYTHON)
+  SUBDIRS(
+    Python
+  )
+  ADD_DEFINITIONS(-DPARAQ_EMBED_PYTHON)
+ENDIF(PARAQ_EMBED_PYTHON)
