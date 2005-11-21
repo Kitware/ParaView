@@ -149,44 +149,17 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
     }
   if (!renderModuleName)
     {
-    // User didn't specify the render module to use.
     if (options->GetTileDimensions()[0])
       {
-      // Server/client says we are rendering for a Tile Display.
-      // Now decide if we must use IceT or not.
-      if (process_module->GetServerInformation()->GetUseIceT())
-        {
-        renderModuleName = "IceTRenderModule";
-        }
-      else
-        {
-        renderModuleName = "MultiDisplayRenderModule";
-        }
+      renderModuleName = "IceTRenderModule";
       }
-    else if (options->GetClientMode())
+    else if(options->GetClientMode())
       {
-      // Client server configuration without Tiles.
-      if (process_module->GetServerInformation()->GetUseIceT())
-        {
-        renderModuleName = "IceTDesktopRenderModule";
-        }
-      else
-        {
-        renderModuleName = "MPIRenderModule"; 
-        // TODO: if I separated the MPI and ClientServer
-        // render modules, this is where I will use
-        // the ClientServerRenderModule.
-        }
+      renderModuleName = "IceTDesktopRenderModule";
       }
     else
       {
-      // Not running in Client Server Mode.
-      // Use local information to choose render module.
-#ifdef VTK_USE_MPI
-      renderModuleName = "MPIRenderModule";
-#else
       renderModuleName = "LODRenderModule";
-#endif
       }
     }
   
