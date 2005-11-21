@@ -43,7 +43,7 @@ public:
   ~pqMainWindow();
 
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
-  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output);
+  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 
 signals:
   void serverChanged();

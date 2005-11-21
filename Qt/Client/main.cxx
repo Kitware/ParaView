@@ -28,6 +28,8 @@
 
 /// Stores a threshold for test-case image comparison
 double g_image_threshold = 10.0;
+/// Stores a temp directory to receive test-case output images
+QString g_test_directory = ".";
 
 /// Defines storage for command-line arguments
 typedef vtkstd::vector<vtkstd::string> arguments_t;
@@ -39,6 +41,7 @@ void printUsage()
   cerr << "Options:\n\n";
   cerr << "--help                         Print usage information and exit\n";
   cerr << "--compare-view <image>         Compare the viewport to a reference image, and exit\n";
+  cerr << "--test-directory <path>        Set the temporary directory where test-case output will be stored\n";
   cerr << "--image-threshold <threshold>  Set the threshold beyond which viewport-image comparisons fail\n";
   cerr << "--run-test <test>              Run a recorded test case\n";
   cerr << "--version                      Print version information and exit\n";
@@ -98,6 +101,25 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
   return unused;
 }
 
+/// Parses command-line arguments for the --temp-directory flag, returning unused arguments
+const arguments_t handleTestDirectory(const arguments_t& Arguments, bool& Quit, bool& Error)
+{
+  arguments_t unused;
+  
+  for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
+    {
+    if(*argument == "--test-directory" && ++argument != Arguments.end())
+      {
+      g_test_directory = argument->c_str();
+      continue;
+      }
+
+    unused.push_back(*argument);
+    }
+
+  return unused;
+}
+
 /// Parses command-line arguments for the --image-threshold flag, returning unused arguments
 const arguments_t handleImageThreshold(const arguments_t& Arguments, bool& Quit, bool& Error)
 {
@@ -127,7 +149,7 @@ const arguments_t handleCompareView(const arguments_t& Arguments, pqMainWindow& 
     if(*argument == "--compare-view" && ++argument != Arguments.end())
       {
       Quit = true;
-      Error = !MainWindow.compareView(argument->c_str(), g_image_threshold, cout);
+      Error = !MainWindow.compareView(argument->c_str(), g_image_threshold, cout, g_test_directory);
       continue;
       }
 
@@ -194,6 +216,8 @@ int main(int argc, char* argv[])
 
   // Run test cases
   arguments = handleTestCases(arguments, main_window, quit, error);
+  // Set the temp directory for test case image comparison
+  arguments = handleTestDirectory(arguments, quit, error);
   // Set the image threshold value
   arguments = handleImageThreshold(arguments, quit, error);
   // Perform image comparisons

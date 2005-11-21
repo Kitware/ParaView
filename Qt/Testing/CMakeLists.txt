@@ -10,6 +10,7 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
+  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Imaging
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
@@ -61,6 +62,8 @@ ADD_LIBRARY(QtTesting
   pqEventPlayerXML.h
   pqEventTranslator.cxx
   pqEventTranslator.h
+  pqImageComparison.cxx
+  pqImageComparison.h
   pqLineEditEventTranslator.cxx
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.cxx

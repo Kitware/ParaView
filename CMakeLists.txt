@@ -23,7 +23,10 @@ SUBDIRS(
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaQ Testing" ON)
 IF(BUILD_TESTING)
-  MAKE_DIRECTORY(${ParaView_BINARY_DIR}/Testing/Temporary)
+  SET(PARAQ_TEST_DIR
+    ${ParaView_BINARY_DIR}/Testing/Temporary
+  )
+  MAKE_DIRECTORY(${PARAQ_TEST_DIR})
   ENABLE_TESTING()
   INCLUDE (CTest)
 ENDIF(BUILD_TESTING)
