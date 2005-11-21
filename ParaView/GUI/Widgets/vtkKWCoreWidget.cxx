@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.11");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.12");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -375,7 +375,7 @@ const char* vtkKWCoreWidget::ConvertTclStringToInternalString(
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::SetTextOption(const char *option, const char *value)
 {
-  if (!option || !this->IsCreated() || value==NULL || strlen(value)==0)
+  if (!option || !this->IsCreated())
     {
     return;
     }

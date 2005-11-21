@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.44");
+vtkCxxRevisionMacro(vtkKWText, "1.45");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -266,10 +266,6 @@ void vtkKWText::AppendTextInternal(const char *s, const char *tag)
   // Don't check for this->Created() for speed, since it is called
   // by AppendText which does the check already
 
-  if( strlen(s) == 0 ) 
-    {
-    return;
-    }
   const char *val = this->ConvertInternalStringToTclString(
     s, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
 
