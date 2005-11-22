@@ -26,15 +26,16 @@
 #ifndef __vtkSMNumberOfGroupsDomain_h
 #define __vtkSMNumberOfGroupsDomain_h
 
-#include "vtkSMDomain.h"
+#include "vtkSMIntRangeDomain.h"
 
+class vtkSMProxyProperty;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMNumberOfGroupsDomain : public vtkSMDomain
+class VTK_EXPORT vtkSMNumberOfGroupsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMNumberOfGroupsDomain* New();
-  vtkTypeRevisionMacro(vtkSMNumberOfGroupsDomain, vtkSMDomain);
+  vtkTypeRevisionMacro(vtkSMNumberOfGroupsDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -52,6 +53,11 @@ public:
   int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
+  // Update self checking the "unchecked" values of all required
+  // properties. Overwritten by sub-classes.
+  virtual void Update(vtkSMProperty*);
+
+  // Description:
   // Set/get the group multiplicity. Can be either SINGLE or MULTIPLE.
   vtkSetMacro(GroupMultiplicity, unsigned char);
   vtkGetMacro(GroupMultiplicity, unsigned char);
@@ -59,8 +65,9 @@ public:
 //BTX
   enum NumberOfGroups
   {
-    SINGLE = 0,
-    MULTIPLE = 1
+    NOT_SET = 0,
+    SINGLE = 1,
+    MULTIPLE = 2
   };
 //ETX
 
@@ -74,6 +81,8 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+
+  void Update(vtkSMProxyProperty *pp);
 
   unsigned char GroupMultiplicity;
 
