@@ -22,12 +22,12 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.2.2.1");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()
 {
-  this->GroupMultiplicity = vtkSMNumberOfGroupsDomain::SINGLE;
+  this->GroupMultiplicity = vtkSMNumberOfGroupsDomain::NOT_SET;
 }
 
 //---------------------------------------------------------------------------
@@ -41,6 +41,11 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMProperty* property)
   if (!property)
     {
     return 0;
+    }
+
+  if (this->GroupMultiplicity == vtkSMNumberOfGroupsDomain::NOT_SET)
+    {
+    return this->Superclass::IsInDomain(property);
     }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
@@ -111,6 +116,84 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy)
     }
 
   return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMNumberOfGroupsDomain::Update(vtkSMProperty*)
+{
+  this->RemoveAllMinima();
+  this->RemoveAllMaxima();
+  
+  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetRequiredProperty("Input"));
+  if (pp)
+    {
+    this->Update(pp);
+    this->InvokeModified();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
+{
+  unsigned int i;
+  unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
+  for (i = 0; i < numProxs; i++)
+    {
+    vtkSMSourceProxy* sp =
+      vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
+    if (sp)
+      {
+      vtkPVDataInformation *info = sp->GetDataInformation();
+      if (!info)
+        {
+        continue;
+        }
+      vtkPVCompositeDataInformation* cInfo = 
+        info->GetCompositeDataInformation();
+      this->AddMinimum(0, 0);
+      if (cInfo)
+        {
+        this->AddMaximum(0, cInfo->GetNumberOfGroups()-1);
+        }
+      else
+        {
+        this->AddMaximum(0, -1);
+        }
+      this->InvokeModified();
+      return;
+      }
+    }
+
+  // In case there is no valid unchecked proxy, use the actual
+  // proxy values
+  numProxs = pp->GetNumberOfProxies();
+  for (i=0; i<numProxs; i++)
+    {
+    vtkSMSourceProxy* sp = 
+      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
+    if (sp)
+      {
+      vtkPVDataInformation *info = sp->GetDataInformation();
+      if (!info)
+        {
+        continue;
+        }
+      vtkPVCompositeDataInformation* cInfo = 
+        info->GetCompositeDataInformation();
+      this->AddMinimum(0, 0);
+      if (cInfo)
+        {
+        this->AddMaximum(0, cInfo->GetNumberOfGroups());
+        }
+      else
+        {
+        this->AddMaximum(0, -1);
+        }
+      this->InvokeModified();
+      return;
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
