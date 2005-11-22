@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()
@@ -136,7 +136,7 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProperty*)
 //---------------------------------------------------------------------------
 void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
 {
-  unsigned int i, j;
+  unsigned int i;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i = 0; i < numProxs; i++)
     {
