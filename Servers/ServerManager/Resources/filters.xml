@@ -3335,11 +3335,11 @@
         command="SetGroupRange" 
         number_of_elements="2"
         default_values="0 0" > 
-       <IntRangeDomain name="range">
+       <NumberOfGroupsDomain name="range">
           <RequiredProperties>
-             <Property name="InputGroups" function="Range"/>
+             <Property name="Input" function="Input"/>
           </RequiredProperties>
-       </IntRangeDomain>
+       </NumberOfGroupsDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
