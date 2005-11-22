@@ -81,6 +81,8 @@ ADD_LIBRARY(QtTesting
 )
 
 TARGET_LINK_LIBRARIES(QtTesting
+  vtkIO
+  vtkRendering
   ${QT_LIBRARIES}
   ${QT_XML_LIBRARIES}
 )
