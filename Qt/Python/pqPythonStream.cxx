@@ -57,7 +57,8 @@ PyObject* pqPythonStreamWrapperWrite(PyObject* self, PyObject* args)
     return 0;
     
   stream->write(string);
-  Py_RETURN_NONE;
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 PyMethodDef pqPythonStreamWrapperMethods[] =

@@ -9,6 +9,7 @@ FIND_PACKAGE(PythonLibs)
 
 INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/Python
+  ${ParaQ_SOURCE_DIR}/Qt/Widgets
   ${PYTHON_INCLUDE_PATH}
 )
 
