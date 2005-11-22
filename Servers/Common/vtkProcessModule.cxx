@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.29");
+vtkCxxRevisionMacro(vtkProcessModule, "1.30");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -464,20 +464,20 @@ int vtkProcessModule::ConnectToRemote()
 
     case vtkPVOptions::PVSERVER:
       id = this->ConnectionManager->OpenConnection(
-        this->Options->GetServerHostName(),
+        this->Options->GetClientHostName(),
         this->Options->GetServerPort());
       break;
 
     case vtkPVOptions::PVRENDER_SERVER:
       id = this->ConnectionManager->OpenConnection(
-        this->Options->GetRenderServerHostName(),
+        this->Options->GetClientHostName(),
         this->Options->GetRenderServerPort());
       cout << "RenderServer: ";
       break;
 
     case vtkPVOptions::PVDATA_SERVER:
       id = this->ConnectionManager->OpenConnection(
-        this->Options->GetDataServerHostName(),
+        this->Options->GetClientHostName(),
         this->Options->GetDataServerPort());
       break;
 
