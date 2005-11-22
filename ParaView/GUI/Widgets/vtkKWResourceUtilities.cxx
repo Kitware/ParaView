@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.14");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.15");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -490,52 +490,19 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
         }
       }
 
-    unsigned long buffer_decoded_length = buffer_length;
+    unsigned long encoded_buffer_length = buffer_length;
+    unsigned char *encoded_buffer = buffer;
 
-    unsigned char *data_ptr = buffer;
-
-    // Zlib the buffer
-
-    unsigned char *zlib_buffer = NULL;
-    if (opt_zlib)
+    if (!vtkKWResourceUtilities::EncodeBuffer(
+          buffer, buffer_length,
+          &encoded_buffer, &encoded_buffer_length, options))
       {
-      unsigned long zlib_buffer_size = 
-        (unsigned long)((float)buffer_length * 1.2 + 12);
-      zlib_buffer = new unsigned char [zlib_buffer_size];
-      if (compress2(zlib_buffer, &zlib_buffer_size, 
-                    data_ptr, buffer_length, 
-                    Z_BEST_COMPRESSION) != Z_OK)
-        {
-        vtkGenericWarningMacro("Unable to compress buffer!");
-        delete [] zlib_buffer;
-        delete [] buffer;
-        all_ok = 0;
-        continue;
-        }
-      data_ptr = zlib_buffer;
-      buffer_length = zlib_buffer_size;
+      vtkGenericWarningMacro("Unable to compress buffer!");
+      delete [] buffer;
+      all_ok = 0;
+      continue;
       }
-  
-    // Base64 the buffer
-
-    unsigned char *base64_buffer = NULL;
-    if (opt_base64)
-      {
-      base64_buffer = new unsigned char [buffer_length * 2];
-      buffer_length = 
-        vtksysBase64_Encode(data_ptr, buffer_length, base64_buffer, 0);
-      if (buffer_length == 0)
-        {
-        vtkGenericWarningMacro("Unable to base64 buffer!");
-        delete [] zlib_buffer;
-        delete [] base64_buffer;
-        delete [] buffer;
-        all_ok = 0;
-        continue;
-        }
-      data_ptr = base64_buffer;
-      }
-    
+   
     // Output the file in the header
 
     vtksys_stl::string filename_base = 
@@ -610,23 +577,23 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
           << "_pixel_size     = " << pixel_size << ";" << endl;
       }
 
-    if (buffer_length)
+    if (encoded_buffer_length)
       {
       out << "static const unsigned long " << prefix.c_str() 
-          << "_length         = " << buffer_length << ";" << endl;
+          << "_length         = " << encoded_buffer_length << ";" << endl;
       }
 
     if (opt_zlib || opt_base64)
       {
       out << "static const unsigned long " << prefix.c_str() 
           << "_decoded_length = " 
-          << buffer_decoded_length << ";" << endl;
+          << buffer_length << ";" << endl;
       }
     
     out << endl;
 
     out << "static " << pixel_byte_type << " " << prefix.c_str();
-    if (buffer_length >= max_bytes)
+    if (encoded_buffer_length >= max_bytes)
       {
       out << "_section_" << ++section_idx;
       }
@@ -635,8 +602,8 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     // Loop over pixels
 
-    unsigned char *ptr = data_ptr;
-    unsigned char *end = data_ptr + buffer_length;
+    unsigned char *ptr = encoded_buffer;
+    unsigned char *end = encoded_buffer + encoded_buffer_length;
 
     int cc = 0;
     while (ptr < (end - 1))
@@ -709,8 +676,10 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     // Free mem
 
-    delete [] base64_buffer;
-    delete [] zlib_buffer;
+    if (buffer != encoded_buffer)
+      {
+      delete [] encoded_buffer;
+      }
     delete [] buffer;
 
     } // Next file
@@ -720,6 +689,73 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
   out.close();
 
   return all_ok;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWResourceUtilities::EncodeBuffer(
+  const unsigned char *input, unsigned long input_length, 
+  unsigned char **output, unsigned long *output_length,
+  int options)
+{
+  // Options
+
+  int opt_zlib = 
+    options & vtkKWResourceUtilities::ConvertImageToHeaderOptionZlib;
+  int opt_base64 = 
+    options & vtkKWResourceUtilities::ConvertImageToHeaderOptionBase64;
+
+  // Zlib the buffer
+  
+  unsigned char *zlib_buffer = NULL;
+  if (opt_zlib)
+    {
+    *output_length = (unsigned long)((double)input_length * 1.2 + 12);
+    zlib_buffer = new unsigned char [*output_length];
+    if (compress2(zlib_buffer, output_length, input, input_length, 
+                  Z_BEST_COMPRESSION) != Z_OK)
+      {
+      vtkGenericWarningMacro("Unable to compress buffer!");
+      delete [] zlib_buffer;
+      return 0;
+      }
+    *output = zlib_buffer;
+    input = *output;
+    input_length = *output_length;
+    }
+  
+  // Base64 the buffer
+
+  unsigned char *base64_buffer = NULL;
+  if (opt_base64)
+    {
+    base64_buffer = new unsigned char [input_length * 2];
+    *output_length = 
+      vtksysBase64_Encode(input, input_length, base64_buffer, 0);
+    if (*output_length == 0)
+      {
+      vtkGenericWarningMacro("Unable to base64 buffer!");
+      delete [] zlib_buffer;
+      delete [] base64_buffer;
+      return 0;
+      }
+    *output = base64_buffer;
+    input = *output;
+    input_length = *output_length;
+    }
+
+  // Free mem
+
+  if (*output != zlib_buffer)
+    {
+    delete [] zlib_buffer;
+    }
+
+  if (*output != base64_buffer)
+    {
+    delete [] base64_buffer;
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

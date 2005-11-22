@@ -126,6 +126,17 @@ public:
     int options);
 
   // Description:
+  // Encode a buffer that using zlib and/or base64.
+  // output_buffer is automatically allocated using the 'new' operator
+  // and should be deallocated using 'delete []'.
+  // The 'options' parameter is the same as ConvertImageToHeader.
+  // Return 1 on success, 0 otherwise (also sets *output to NULL on error).
+  static int EncodeBuffer(
+    const unsigned char *input, unsigned long input_length, 
+    unsigned char **output, unsigned long *output_length,
+    int options);
+
+  // Description:
   // Decode a buffer that was encoded using zlib and/or base64.
   // output_buffer is automatically allocated using the 'new' operator
   // and should be deallocated using 'delete []'.
