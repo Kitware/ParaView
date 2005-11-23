@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.30");
+vtkCxxRevisionMacro(vtkProcessModule, "1.31");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -1157,13 +1157,15 @@ const char* vtkProcessModule::GetPath(const char* tag,
         this->Options->GetArgv0(), selfPath, errorMsg))
       {
       selfPath = vtksys::SystemTools::GetFilenamePath(selfPath);
+      selfPath += "/../share/paraview-" PARAVIEW_VERSION;
       vtkstd::string str = selfPath;
-      str += "/../share/paraview-" PARAVIEW_VERSION "/";
+      str += "/";
       str += relativePath;
+      str += "/";
       str += file;
       if(vtksys::SystemTools::FileExists(str.c_str()))
         {
-        this->Internals->Paths[tag] = str.c_str();
+        this->Internals->Paths[tag] = selfPath.c_str();
         found = 1;
         }
       }
