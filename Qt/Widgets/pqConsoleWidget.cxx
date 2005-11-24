@@ -28,9 +28,8 @@ public:
     this->setTabChangesFocus(false);
     this->setAcceptDrops(false);
     
-    QFont font("courier");
+    QFont font;
     font.setStyleHint(QFont::TypeWriter);
-    font.setPointSizeF(6.0);
     
     QTextCharFormat format;
     format.setFont(font);
