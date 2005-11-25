@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.18");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1938,6 +1938,7 @@ void vtkKWPresetSelector::PresetSelectPreviousCallback()
         prev_row = (nb_rows == 1 || sel_row == 0) ? nb_rows - 1 : sel_row - 1;
         }
       list->SelectSingleRow(prev_row);
+      list->SeeRow(prev_row);
       }
     }
 }
@@ -1962,6 +1963,7 @@ void vtkKWPresetSelector::PresetSelectNextCallback()
         next_row = (nb_rows == 1 || sel_row == nb_rows - 1) ? 0 : sel_row + 1;
         }
       list->SelectSingleRow(next_row);
+      list->SeeRow(next_row);
       }
     }
 }
