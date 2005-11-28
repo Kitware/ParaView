@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.20");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -162,6 +162,7 @@ vtkKWPresetSelector::vtkKWPresetSelector()
   this->ApplyPresetOnSelection = 1;
   this->SelectSpinButtonsVisibility = 1;
   this->LocateButtonVisibility = 0;
+  this->RemoveButtonVisibility = 1;
   this->EmailButtonVisibility = 0;
 
   this->ThumbnailSize = 32;
@@ -587,6 +588,20 @@ void vtkKWPresetSelector::SetLocateButtonVisibility(int arg)
     }
 
   this->LocateButtonVisibility = arg;
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetRemoveButtonVisibility(int arg)
+{
+  if (this->RemoveButtonVisibility == arg)
+    {
+    return;
+    }
+
+  this->RemoveButtonVisibility = arg;
   this->Modified();
 
   this->Update();
@@ -2101,6 +2116,10 @@ void vtkKWPresetSelector::Update()
     this->PresetButtons->GetWidget(
       vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
         has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+    this->PresetButtons->SetWidgetVisibility(
+      vtkKWPresetSelector::RemoveButtonId, 
+      this->RemoveButtonVisibility ? 1 : 0);
 
     this->PresetButtons->SetWidgetVisibility(
       vtkKWPresetSelector::LocateButtonId, 

@@ -274,6 +274,14 @@ public:
   vtkBooleanMacro(EmailButtonVisibility,int);
 
   // Description:
+  // Set/Get the visibility of the remove preset button (visible by default).
+  // If visible, triggering this button will remove all selected presets and
+  // eventually call the callbacks that was set using SetPresetRemoveCommand.
+  virtual void SetRemoveButtonVisibility(int);
+  vtkGetMacro(RemoveButtonVisibility,int);
+  vtkBooleanMacro(RemoveButtonVisibility,int);
+
+  // Description:
   // Specifies a command to be invoked when the "add preset" button is pressed.
   // This gives the opportunity for the application to check and collect the
   // relevant information to store in a new preset. The application is then
@@ -457,6 +465,7 @@ protected:
   int SelectSpinButtonsVisibility;
   int EmailButtonVisibility;
   int LocateButtonVisibility;
+  int RemoveButtonVisibility;
 
   int ThumbnailSize;
   int ScreenshotSize;
