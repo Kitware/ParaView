@@ -21,11 +21,13 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.10");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.11");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
 #define VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN "File%dCmd"
+#define VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN "File%dLabel"
+
 #define VTK_KW_MRF_REGISTRY_MAX_ENTRIES 50
 
 //----------------------------------------------------------------------------
@@ -39,29 +41,13 @@ public:
     FileEntry() { this->TargetObject = NULL; };
     ~FileEntry() {};
     
-    const char *GetFileName() 
-      { return this->FileName.c_str(); }
-    void SetFileName(const char *filename) 
-      { this->FileName = filename; }
-    
-    const char *GetTargetCommand() 
-      { return this->TargetCommand.c_str(); }
-    void SetTargetCommand(const char *command) 
-      { this->TargetCommand = command; }
-
-    vtkObject *GetTargetObject() 
-      { return this->TargetObject; }
-    void SetTargetObject(vtkObject *object) 
-      { this->TargetObject = object; }
+    vtksys_stl::string FileName;
+    vtkObject          *TargetObject;
+    vtksys_stl::string TargetCommand;
+    vtksys_stl::string Label;
 
     int IsEqual(const char *filename, vtkObject *, const char *) 
       { return (filename && !strcmp(filename, this->FileName.c_str())); }
-  
-  private:
-    
-    vtksys_stl::string FileName;
-    vtkObject *TargetObject;
-    vtksys_stl::string TargetCommand;
   };
 
   typedef vtksys_stl::list<FileEntry*> FileEntriesContainer;
@@ -76,12 +62,14 @@ vtkKWMostRecentFilesManager::vtkKWMostRecentFilesManager()
   this->DefaultTargetObject   = NULL;
   this->DefaultTargetCommand  = NULL;
   this->RegistryKey           = NULL;
-  this->Menu   = NULL;
+  this->Menu                  = NULL;
+  this->LabelVisibilityInMenu = 0;
+  this->SeparatePathInMenu    = 0;
 
   this->SetRegistryKey("MRU");
 
-  this->MaximumNumberOfFilesInRegistry = 10;
-  this->MaximumNumberOfFilesInMenu = 10;
+  this->MaximumNumberOfFilesInRegistry = 15;
+  this->MaximumNumberOfFilesInMenu = 15;
 
   this->Internals = new vtkKWMostRecentFilesManagerInternals;
 }
@@ -100,8 +88,10 @@ vtkKWMostRecentFilesManager::~vtkKWMostRecentFilesManager()
 
   if (this->Internals)
     {
-    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = 
+      this->Internals->MostRecentFileEntries.begin();
+    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = 
+      this->Internals->MostRecentFileEntries.end();
     for (; it != end; ++it)
       {
       if (*it)
@@ -117,7 +107,8 @@ vtkKWMostRecentFilesManager::~vtkKWMostRecentFilesManager()
 void vtkKWMostRecentFilesManager::AddFileInternal(
   const char *filename, 
   vtkObject *target_object, 
-  const char *target_command)
+  const char *target_command,
+  const char *label)
 {
   if (!filename || !*filename)
     {
@@ -126,8 +117,10 @@ void vtkKWMostRecentFilesManager::AddFileInternal(
 
   // Find if already inserted (and delete it)
 
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = 
+    this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = 
+    this->Internals->MostRecentFileEntries.end();
   for (; it != end; ++it)
     {
     if (*it && (*it)->IsEqual(filename, target_object, target_command))
@@ -142,9 +135,13 @@ void vtkKWMostRecentFilesManager::AddFileInternal(
 
   vtkKWMostRecentFilesManagerInternals::FileEntry
     *entry = new vtkKWMostRecentFilesManagerInternals::FileEntry;
-  entry->SetFileName(filename);
-  entry->SetTargetObject(target_object);
-  entry->SetTargetCommand(target_command);
+  entry->FileName = filename;
+  entry->TargetObject = target_object;
+  entry->TargetCommand = target_command;
+  if (label && *label)
+    {
+    entry->Label = label;
+    }
 
   this->Internals->MostRecentFileEntries.push_front(entry);
 }
@@ -153,7 +150,8 @@ void vtkKWMostRecentFilesManager::AddFileInternal(
 void vtkKWMostRecentFilesManager::AddFile(
   const char *filename, 
   vtkObject *target_object, 
-  const char *target_command)
+  const char *target_command,
+  const char *label)
 {
   if (!this->GetApplication())
     {
@@ -169,9 +167,35 @@ void vtkKWMostRecentFilesManager::AddFile(
     this->GetApplication()->Script(evalstr.c_str());
 
   this->AddFileInternal(
-    filename_expanded.c_str(), target_object, target_command);
+    filename_expanded.c_str(), target_object, target_command, label);
 
   this->UpdateMenu();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMostRecentFilesManager::SetFileLabel(
+  const char *filename, const char *label)
+{
+  if (!filename || !*filename)
+    {
+    return;
+    }
+
+  // Find entry and set label
+
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = 
+    this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = 
+    this->Internals->MostRecentFileEntries.end();
+  for (; it != end; ++it)
+    {
+    if (*it && !strcmp((*it)->FileName.c_str(), filename))
+      {
+      (*it)->Label = label ? label : "";
+      this->UpdateMenu();
+      break;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -244,21 +268,27 @@ void vtkKWMostRecentFilesManager::SaveFilesToRegistry(
     return;
     }
 
-  char filename_key[20], command_key[20];
+  char filename_key[20], command_key[20], label_key[20];
 
   // Store all most recent files entries to registry
 
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = 
+    this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = 
+    this->Internals->MostRecentFileEntries.end();
   int count = 0;
   for (; it != end && count < max_nb; ++it)
     {
     if (*it)
       {
-      sprintf(filename_key,VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN,count);
-      sprintf(command_key,VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN,count);
+      sprintf(filename_key,
+              VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN, count);
+      sprintf(command_key,
+              VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN, count);
+      sprintf(label_key,
+              VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN, count);
 
-      const char* target_command = (*it)->GetTargetCommand();
+      const char* target_command = (*it)->TargetCommand.c_str();
       if (!target_command || !*target_command)
         {
         target_command = this->DefaultTargetCommand;
@@ -266,9 +296,14 @@ void vtkKWMostRecentFilesManager::SaveFilesToRegistry(
       if (target_command && *target_command)
         {
         this->GetApplication()->SetRegistryValue(
-          1, reg_key, filename_key, (*it)->GetFileName());
+          1, reg_key, filename_key, (*it)->FileName.c_str());
         this->GetApplication()->SetRegistryValue(
           1, reg_key, command_key, target_command);
+        if ((*it)->Label.size())
+          {
+          this->GetApplication()->SetRegistryValue(
+            1, reg_key, label_key, (*it)->Label.c_str());
+          }
         ++count;
         }
       }
@@ -278,12 +313,18 @@ void vtkKWMostRecentFilesManager::SaveFilesToRegistry(
   
   for (; count < VTK_KW_MRF_REGISTRY_MAX_ENTRIES; count++)
     {
-    sprintf(filename_key,VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN,count);
-    sprintf(command_key,VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN,count);
+    sprintf(filename_key,
+            VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN, count);
+    sprintf(command_key,
+            VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN, count);
+      sprintf(label_key,
+              VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN, count);
     this->GetApplication()->DeleteRegistryValue(
       1, reg_key, filename_key);
     this->GetApplication()->DeleteRegistryValue(
       1, reg_key, command_key);
+    this->GetApplication()->DeleteRegistryValue(
+      1, reg_key, label_key);
     }
 }
 
@@ -311,7 +352,8 @@ void vtkKWMostRecentFilesManager::RestoreFilesListFromRegistry(
     return;
     }
 
-  char filename_key[20], command_key[20], filename[1024], command[1024];
+  char filename_key[20], command_key[20], label_key[20];
+  char filename[1024], command[1024], label[1024];
 
   int i;
   for (i = VTK_KW_MRF_REGISTRY_MAX_ENTRIES - 1; 
@@ -320,13 +362,19 @@ void vtkKWMostRecentFilesManager::RestoreFilesListFromRegistry(
     {
     sprintf(filename_key, VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN, i);
     sprintf(command_key, VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN, i);
+    sprintf(label_key, VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN, i);
     if (this->GetApplication()->GetRegistryValue(
           1, reg_key, filename_key, filename) &&
         this->GetApplication()->GetRegistryValue(
           1, reg_key, command_key, command) &&
         strlen(filename) >= 1)
       {
-      this->AddFileInternal(filename, NULL, command);
+      if (!this->GetApplication()->GetRegistryValue(
+            1, reg_key, label_key, label))
+        {
+        *label = '\0';
+        }
+      this->AddFileInternal(filename, NULL, command, label);
       max_nb--;
       }
     }
@@ -385,20 +433,22 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
 
   // Fill the menu
   
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = 
+    this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = 
+    this->Internals->MostRecentFileEntries.end();
   int count = 0;
   for (; it != end && count < max_nb; ++it)
     {
     if (*it)
       {
-      const char *filename = (*it)->GetFileName();
-      vtkObject *target_object = (*it)->GetTargetObject();
+      const char *filename = (*it)->FileName.c_str();
+      vtkObject *target_object = (*it)->TargetObject;
       if (!target_object)
         {
         target_object= this->DefaultTargetObject;
         }
-      const char *target_command = (*it)->GetTargetCommand();
+      const char *target_command = (*it)->TargetCommand.c_str();
       if (!target_command || !*target_command)
         {
         target_command= this->DefaultTargetCommand;
@@ -411,21 +461,90 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
           vtkErrorMacro("Error! Can not add entry with empty target object!");
           continue;
           }
-        vtksys_stl::string short_file = 
-          vtksys::SystemTools::CropString(filename, 40);
-        ostrstream label;
-        ostrstream cmd;
-        label << count << " " << short_file.c_str() << ends;
-        cmd << target_command << " {" << filename << "}" << ends;
+        vtksys_stl::string cmd(target_command);
+        cmd += " {";
+        cmd += filename;
+        cmd += "}";
+
+        char buffer[10];
+        sprintf(buffer, "%d", count);
+        vtksys_stl::string label(buffer);
+        label += " - ";
+
+        int has_label = this->LabelVisibilityInMenu && (*it)->Label.size();
+        if (has_label)
+          {
+          label += (*it)->Label;
+          label += " ";
+          }
+
+        if (this->SeparatePathInMenu)
+          {
+          if (has_label)
+            {
+            label += "(";
+            }
+          label += vtksys::SystemTools::CropString(
+            vtksys::SystemTools::GetFilenameName(filename), 40);
+          label += " ";
+          if (!has_label)
+            {
+            label += "(";
+            }
+          label += "in ";
+          label += vtksys::SystemTools::CropString(
+            vtksys::SystemTools::GetFilenamePath(filename), 40);
+          label += ")";
+          }
+        else
+          {
+          if (has_label)
+            {
+            label += "(";
+            }
+          label += vtksys::SystemTools::CropString(filename, 40);
+          if (has_label)
+            {
+            label += ")";
+            }
+          }
+
         menu->AddCommand(
-          label.str(), target_object, cmd.str(), (count < 10 ? 0 : -1),
+          label.c_str(), 
+          target_object, 
+          cmd.c_str(), 
+          (count < 10 ? 0 : -1),
           filename);
-        label.rdbuf()->freeze(0);
-        cmd.rdbuf()->freeze(0);
         count++;
         }
       }
     }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWMostRecentFilesManager::SetLabelVisibilityInMenu(int _arg)
+{
+  if (this->LabelVisibilityInMenu == _arg)
+    {
+    return;
+    }
+  this->LabelVisibilityInMenu = _arg;
+  this->Modified();
+
+  this->UpdateMenu();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWMostRecentFilesManager::SetSeparatePathInMenu(int _arg)
+{
+  if (this->SeparatePathInMenu == _arg)
+    {
+    return;
+    }
+  this->SeparatePathInMenu = _arg;
+  this->Modified();
+
+  this->UpdateMenu();
 }
 
 //----------------------------------------------------------------------------
@@ -467,6 +586,10 @@ void vtkKWMostRecentFilesManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RegistryKey: " 
      << (this->RegistryKey ? this->RegistryKey : "NULL") 
      << endl;
+  os << indent << "LabelVisibilityInMenu: " 
+     << (this->LabelVisibilityInMenu ? "On" : "Off") << endl;
+  os << indent << "SeparatePathInMenu: " 
+     << (this->SeparatePathInMenu ? "On" : "Off") << endl;
 }
 
 
