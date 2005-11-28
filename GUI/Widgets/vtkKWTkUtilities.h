@@ -493,6 +493,36 @@ public:
                         const char *widget);
   static int IsTopLevel(vtkKWWidget *widget);
 
+  // Description:
+  // Withdraw toplevel
+  static void WithdrawTopLevel(Tcl_Interp *interp,
+                              const char *widget);
+  static void WithdrawTopLevel(vtkKWWidget *widget);
+
+  // Description:
+  // If a Tcl script file is currently being evaluated (i.e. there is a call
+  // to Tcl_EvalFile active or there is an active invocation of the source 
+  // command), then this command returns the name of the innermost file
+  // being processed.
+  static const char *GetCurrentScript(Tcl_Interp *interp);
+  static const char *GetCurrentScript(vtkKWApplication *app);
+
+  // Description:
+  // Cancel all event handlers, i.e. cancel all delayed command that
+  // were registered using the 'after' command.
+  static void CancelAllAfterEventHandlers(Tcl_Interp *interp);
+  static void CancelAllAfterEventHandlers(vtkKWApplication *app);
+
+  // Description:
+  // Rings the bell on the display of the application's main window
+  static void Bell(Tcl_Interp *interp);
+  static void Bell(vtkKWApplication *app);
+
+  // Description:
+  // Process/update pending events
+  static void ProcessPendingEvents(Tcl_Interp *interp);
+  static void ProcessPendingEvents(vtkKWApplication *app);
+
 protected:
   vtkKWTkUtilities() {};
   ~vtkKWTkUtilities() {};
