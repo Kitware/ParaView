@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.70");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.71");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -2637,6 +2637,114 @@ int vtkKWTkUtilities::IsTopLevel(vtkKWWidget *widget)
   return vtkKWTkUtilities::IsTopLevel(
     widget->GetApplication()->GetMainInterp(),
     widget->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::WithdrawTopLevel(Tcl_Interp *interp,
+                                       const char* widget)
+{
+  if (!interp || !widget)
+    {
+    return;
+    }
+
+  vtksys_stl::string cmd("wm withdraw ");
+  cmd += widget;
+
+  if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to withdraw toplevel: " << Tcl_GetStringResult(interp));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::WithdrawTopLevel(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return;
+    }
+  
+  vtkKWTkUtilities::WithdrawTopLevel(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetCurrentScript(
+  Tcl_Interp *interp)
+{
+  if (interp && Tcl_GlobalEval(interp, "info script") == TCL_OK)
+    {
+    return Tcl_GetStringResult(interp);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetCurrentScript(
+  vtkKWApplication *app)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+  return vtkKWTkUtilities::GetCurrentScript(app->GetMainInterp());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::CancelAllAfterEventHandlers(Tcl_Interp *interp)
+{
+  if (interp)
+    { 
+    Tcl_GlobalEval(interp, "foreach a [after info] {after cancel $a}");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::CancelAllAfterEventHandlers(vtkKWApplication *app)
+{
+  if (app)
+    {
+    vtkKWTkUtilities::CancelAllAfterEventHandlers(app->GetMainInterp());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::Bell(Tcl_Interp *interp)
+{
+  if (interp)
+    { 
+    Tcl_GlobalEval(interp, "bell");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::Bell(vtkKWApplication *app)
+{
+  if (app)
+    {
+    vtkKWTkUtilities::Bell(app->GetMainInterp());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::ProcessPendingEvents(Tcl_Interp *interp)
+{
+  if (interp)
+    { 
+    Tcl_GlobalEval(interp, "update");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::ProcessPendingEvents(vtkKWApplication *app)
+{
+  if (app)
+    {
+    vtkKWTkUtilities::ProcessPendingEvents(app->GetMainInterp());
+    }
 }
 
 //----------------------------------------------------------------------------

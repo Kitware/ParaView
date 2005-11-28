@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.261");
+vtkCxxRevisionMacro(vtkKWApplication, "1.262");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -163,10 +163,13 @@ vtkKWApplication::vtkKWApplication()
   // Try to find if we are running from a script and set the application name
   // accordingly. Otherwise try to find the executable name.
 
-  const char *script = this->Script("file rootname [file tail [info script]]");
-  if (script && *script)
+  vtksys_stl::string script =
+    vtksys::SystemTools::GetFilenameWithoutExtension(
+      vtksys::SystemTools::GetFilenameName(
+        vtkKWTkUtilities::GetCurrentScript(this->MainInterp)));
+  if (script.size())
     {
-    this->Name = vtksys::SystemTools::DuplicateString(script);
+    this->Name = vtksys::SystemTools::DuplicateString(script.c_str());
     }
   else
     {
@@ -270,7 +273,7 @@ void vtkKWApplication::PrepareForDelete()
 
   if (this->MainInterp)
     {
-    this->Script("foreach a [ after info ] { after cancel $a }");
+    vtkKWTkUtilities::CancelAllAfterEventHandlers(this->MainInterp);
     }
 }
 
@@ -369,7 +372,7 @@ int vtkKWApplication::Exit()
 
   if (this->IsDialogUp())
     {
-    this->Script("bell");
+    vtkKWTkUtilities::Bell(this->MainInterp);
     return 0;
     }
 
@@ -694,7 +697,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   if (i >= nb_windows && nb_windows)
     {
     this->GetNthWindow(0)->Display();
-    this->Script("wm withdraw .");
+    vtkKWTkUtilities::WithdrawTopLevel(this->MainInterp, ".");
     }
 
   // Set the KWWidgets icon by default
@@ -704,7 +707,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   // ADD_EXECUTABLE(... foo.rc)
 
 #ifdef _WIN32
-  this->Script("update");
+  vtkKWTkUtilities::ProcessPendingEvents(this->MainInterp);
   this->Script(
     "catch {vtkKWSetApplicationIcon {} %d big}", IDI_KWWIDGETSICO);
   this->Script(
