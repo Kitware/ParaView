@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.19");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -306,7 +306,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   this->PresetControlFrame->SetParent(this);
   this->PresetControlFrame->Create(app);
 
-  this->Script("pack %s -side top -anchor nw -fill both -expand t",
+  this->Script("pack %s -side top -anchor nw -fill both -expand f",
                this->PresetControlFrame->GetWidgetName());
 
   // --------------------------------------------------------------
