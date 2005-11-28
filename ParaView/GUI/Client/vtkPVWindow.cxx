@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.773");
+vtkCxxRevisionMacro(vtkPVWindow, "1.774");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2436,12 +2436,12 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
     }
   int retVal;
   retVal = this->ReadFileInformation(clone, fileName);
-  clone->GrabFocus();
-  this->UpdateEnableState();
   if (retVal != VTK_OK)
     {
     return retVal;
     }
+  clone->GrabFocus();
+  this->UpdateEnableState();
   int timesteps = clone->GetNumberOfTimeSteps(); 
   if (timesteps > 0)
     {
