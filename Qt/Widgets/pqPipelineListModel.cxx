@@ -61,7 +61,7 @@ class pqPipelineListInternal :
 pqPipelineListItem::pqPipelineListItem()
   : Name(), Internal()
 {
-  this->Type = ItemType::Invalid;
+  this->Type = pqPipelineListItem::Invalid;
   this->Parent = 0;
   this->Data.Object = 0;
 }
