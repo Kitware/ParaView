@@ -9,7 +9,6 @@
 
 #include "pqServer.h"
 #include "pqOptions.h"
-#include "pqPipelineData.h"
 #include <QCoreApplication>
 
 #include <vtkToolkits.h>
@@ -220,12 +219,13 @@ pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
 }
 
 pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMApplication* server_manager, vtkSMMultiViewRenderModuleProxy* render_module) :
+  FriendlyName(),
   Options(options),
   ProcessModule(process_module),
   ServerManager(server_manager),
   RenderModule(render_module)
 {
-  this->PipelineData = new pqPipelineData(this);
+  this->FriendlyName = this->getAddress();
 }
 
 pqServer::~pqServer()
@@ -244,6 +244,24 @@ pqServer::~pqServer()
 
 }
 
+QString pqServer::getAddress() const
+{
+  QString address;
+  if(this->Options)
+  {
+    address.setNum(this->Options->GetServerPort());
+    address.prepend(":");
+    address.prepend(this->Options->GetServerHostName());
+  }
+
+  return address;
+}
+
+void pqServer::setFriendlyName(const QString& name)
+{
+  this->FriendlyName = name;
+}
+
 vtkProcessModule* pqServer::GetProcessModule()
 {
   return ProcessModule;
@@ -257,11 +275,6 @@ vtkSMProxyManager* pqServer::GetProxyManager()
 vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
 {
   return RenderModule;
-}
-
-pqPipelineData* pqServer::GetPipelineData()
-{
-  return PipelineData;
 }
 
 

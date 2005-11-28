@@ -27,6 +27,6 @@ does NOT have to delete it (it can be ignored).
 vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part);
 
 /// Removes a part created with AddPart.
-void pqRemovePart(vtkSMDisplayProxy* Part);
+void pqRemovePart(vtkSMRenderModuleProxy* rm, vtkSMDisplayProxy* Part);
 
 #endif //_pqParts_h

@@ -27,6 +27,9 @@ public:
   ~pqSMAdaptor();
 
 
+  /// Get the global adapter instance.
+  static pqSMAdaptor* instance();
+
   /// Set the specified property of a proxy property index 0 is assumed if Value is not a QList
   void setProperty(vtkSMProperty* Property, QVariant Value);
   /// Get the specified property of a proxy if property has more than one element, a QList is returned
@@ -77,6 +80,8 @@ protected slots:
 protected:
   pqSMAdaptorInternal* Internal;
 
+private:
+  static pqSMAdaptor *Instance;
 };
 
 #endif // !_pqSMAdaptor_h

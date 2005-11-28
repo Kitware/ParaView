@@ -8,11 +8,13 @@
 #include "pqObjectInspector.h"
 
 #include "pqObjectInspectorItem.h"
+#include "pqPipelineData.h"
 #include "pqSMAdaptor.h"
+#include "QVTKWidget.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyAdaptor.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QList>
 #include <QString>
@@ -28,7 +30,6 @@ pqObjectInspector::pqObjectInspector(QObject *parent)
 {
   this->Commit = pqObjectInspector::Individually;
   this->Internal = new pqObjectInspectorInternal();
-  this->Adapter = 0;
   this->Proxy = 0;
 }
 
@@ -137,6 +138,7 @@ QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
     switch(role)
       {
       case Qt::DisplayRole:
+      case Qt::ToolTipRole:
         {
         if(index.column() == 0)
           return QVariant(item->getPropertyName());
@@ -188,10 +190,17 @@ bool pqObjectInspector::setData(const QModelIndex &index,
         // Otherwise, mark the item as modified for a later commit.
         if(this->Commit == pqObjectInspector::Individually)
           {
-          if(this->Adapter && this->Proxy)
+          if(this->Proxy)
             {
             this->commitChange(item);
             this->Proxy->UpdateVTKObjects();
+            pqPipelineData *pipeline = pqPipelineData::instance();
+            if(pipeline)
+              {
+              QVTKWidget *window = pipeline->getWindowFor(this->Proxy);
+              if(window)
+                window->update();
+              }
             }
           }
         else
@@ -232,15 +241,15 @@ QVariant pqObjectInspector::getDomain(const QModelIndex &index) const
   return QVariant();
 }
 
-void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
+void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
 {
   // Clean up the current property data.
   this->cleanData();
 
   // Save the new proxy. Get all the property data.
-  this->Adapter = adapter;
+  pqSMAdaptor *adapter = pqSMAdaptor::instance();
   this->Proxy = proxy;
-  if(this->Internal && this->Adapter && this->Proxy)
+  if(this->Internal && adapter && this->Proxy)
     {
     pqObjectInspectorItem *item = 0;
     pqObjectInspectorItem *child = 0;
@@ -252,7 +261,7 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
       // Skip the property if it doesn't have a valid value. This
       // is the case with the data information.
       prop = iter->GetProperty();
-      QVariant value = this->Adapter->getProperty(prop);
+      QVariant value = adapter->getProperty(prop);
       if(!value.isValid())
         continue;
 
@@ -279,7 +288,7 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
               child->setValue(*li);
               child->setParent(item);
               item->addChild(child);
-              this->Adapter->linkPropertyTo(this->Proxy, prop, index,
+              adapter->linkPropertyTo(this->Proxy, prop, index,
                   child, "value");
               connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
                   this, SLOT(handleValueChange(pqObjectInspectorItem *)));
@@ -289,14 +298,14 @@ void pqObjectInspector::setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy)
         else
           {
           item->setValue(value);
-          this->Adapter->linkPropertyTo(this->Proxy, prop, 0, item, "value");
+          adapter->linkPropertyTo(this->Proxy, prop, 0, item, "value");
           connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
               this, SLOT(handleValueChange(pqObjectInspectorItem *)));
           }
 
         // Set up the property domain information and link it to the server.
         item->updateDomain(prop);
-        this->Adapter->connectDomain(prop, item,
+        adapter->connectDomain(prop, item,
             SLOT(updateDomain(vtkSMProperty*)));
         }
       }
@@ -315,7 +324,11 @@ void pqObjectInspector::setCommitType(pqObjectInspector::CommitType commit)
 
 void pqObjectInspector::commitChanges()
 {
-  if(!this->Adapter || !this->Proxy || !this->Internal)
+  if(!this->Proxy || !this->Internal)
+    return;
+
+  pqSMAdaptor *adapter = pqSMAdaptor::instance();
+  if(!adapter)
     return;
 
   // Loop through all the properties and commit the modified values.
@@ -346,7 +359,16 @@ void pqObjectInspector::commitChanges()
 
   // Update the server.
   if(changeCount > 0)
+    {
     this->Proxy->UpdateVTKObjects();
+    pqPipelineData *pipeline = pqPipelineData::instance();
+    if(pipeline)
+      {
+      QVTKWidget *window = pipeline->getWindowFor(this->Proxy);
+      if(window)
+        window->update();
+      }
+    }
 }
 
 void pqObjectInspector::cleanData()
@@ -354,32 +376,32 @@ void pqObjectInspector::cleanData()
   if(this->Internal)
     {
     // Clean up the list of items.
+    pqSMAdaptor *adapter = pqSMAdaptor::instance();
     pqObjectInspectorInternal::Iterator iter = this->Internal->begin();
     for( ; iter != this->Internal->end(); ++iter)
       {
       pqObjectInspectorItem *item = *iter;
       if(item)
         {
-        if(this->Adapter && this->Proxy)
+        if(adapter && this->Proxy)
           {
           // If the item has a list, unlink each item from its property.
           // Otherwise, unlink the item from the vtk property.
-          QString name = item->getPropertyName();
+          vtkSMProperty *property = this->Proxy->GetProperty(
+              item->getPropertyName().toAscii().data());
           if(item->getChildCount() > 0)
             {
             for(int i = 0; i < item->getChildCount(); ++i)
               {
               pqObjectInspectorItem *child = item->getChild(i);
-              this->Adapter->unlinkPropertyFrom(this->Proxy,
-                  this->Proxy->GetProperty(name.toAscii().data()), i,
-                  child, "value");
+              adapter->unlinkPropertyFrom(this->Proxy, property, i, child,
+                  "value");
               }
             }
           else
             {
-            this->Adapter->unlinkPropertyFrom(this->Proxy,
-                this->Proxy->GetProperty(name.toAscii().data()), 0,
-                item, "value");
+            adapter->unlinkPropertyFrom(this->Proxy, property, 0, item,
+                "value");
             }
           }
 
@@ -417,6 +439,10 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
   if(!item)
     return;
 
+  pqSMAdaptor *adapter = pqSMAdaptor::instance();
+  if(!adapter)
+    return;
+
   int index = 0;
   vtkSMProperty *property = 0;
   item->setModified(false);
@@ -426,7 +452,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     index = this->getItemIndex(item);
     property = this->Proxy->GetProperty(
         item->getParent()->getPropertyName().toAscii().data());
-    this->Adapter->setProperty(property, index, item->getValue());
+    adapter->setProperty(property, index, item->getValue());
     }
   else if(item->getChildCount() > 0)
     {
@@ -437,7 +463,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     for(index = 0; index < item->getChildCount(); index++)
       {
       child = item->getChild(index);
-      this->Adapter->setProperty(property, index, child->getValue());
+      adapter->setProperty(property, index, child->getValue());
       child->setModified(false);
       }
     }
@@ -445,7 +471,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     {
     property = this->Proxy->GetProperty(
         item->getPropertyName().toAscii().data());
-    this->Adapter->setProperty(property, 0, item->getValue());
+    adapter->setProperty(property, 0, item->getValue());
     }
 }
 

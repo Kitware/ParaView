@@ -13,8 +13,7 @@
 
 class pqObjectInspectorInternal;
 class pqObjectInspectorItem;
-class pqSMAdaptor;
-class vtkSMProxy;
+class vtkSMSourceProxy;
 
 
 /// \class pqObjectInspector
@@ -128,27 +127,10 @@ public:
   QVariant getDomain(const QModelIndex &index) const;
 
   /// \brief
-  ///   Sets the current object.
-  ///
-  /// The current object must be accompanied by the adapter. The adapter
-  /// is used to get the values for the current object properties. It is
-  /// also used to link those properties to the object inspector items.
-  ///
-  /// \param adapter The current pqSMAdaptor.
-  /// \param proxy The current object.
-  void setProxy(pqSMAdaptor *adapter, vtkSMProxy *proxy);
-
-  /// \brief
   ///   Gets the current object.
   /// \return
   ///   A pointer to the current object.
-  vtkSMProxy *getProxy() const {return this->Proxy;}
-
-  /// \brief
-  ///   Gets the current pqSMAdaptor.
-  /// \return
-  ///   A pointer to the current pqSMAdaptor.
-  pqSMAdaptor *getAdaptor() const {return this->Adapter;}
+  vtkSMSourceProxy *getProxy() const {return this->Proxy;}
 
   /// \brief
   ///   Gets the change commit policy.
@@ -158,11 +140,24 @@ public:
 
 public slots:
   /// \brief
+  ///   Sets the current object.
+  ///
+  /// If there is already a current object, its properties will be
+  /// removed from the list. The properties for the new object will
+  /// be added to the list. The pqSMAdaptor is used to get the values
+  /// for each of the properties. It is also used to link those
+  /// properties to the object inspector items. Model reset is called
+  /// after all the changes are made to notify the view.
+  ///
+  /// \param proxy The current object.
+  void setProxy(vtkSMSourceProxy *proxy);
+
+  /// \brief
   ///   Sets the change commit policy.
   /// \param commit The new change commit policy.
   void setCommitType(CommitType commit);
 
-  /// brief
+  /// \brief
   ///   Commits the changes for all modified properties.
   ///
   /// Searches the list of property items for modified valus. Each
@@ -176,7 +171,7 @@ private:
   ///
   /// This method does not emit any Qt model/view signals.
   ///
-  /// \sa pqObjectInspector::setProxy(pqSMAdaptor *, vtkSMProxy *)
+  /// \sa pqObjectInspector::setProxy(vtkSMProxy *)
   void cleanData();
 
   /// \brief
@@ -217,8 +212,7 @@ private slots:
 private:
   CommitType Commit;                   ///< The change commit policy.
   pqObjectInspectorInternal *Internal; ///< The list of property items.
-  pqSMAdaptor *Adapter;                ///< A pointer to the pqSMAdaptor.
-  vtkSMProxy *Proxy;                   ///< A pointer to the current object.
+  vtkSMSourceProxy *Proxy;             ///< A pointer to the current object.
 };
 
 #endif

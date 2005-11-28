@@ -1,5 +1,27 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
+        <file alias="pqCamera16.png">Resources/pqCamera16.png</file>
+        <file alias="pqCamerad16.png">Resources/pqCamerad16.png</file>
+        <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
+        <file alias="pqFilter22.png">Resources/pqFilter22.png</file>
+        <file alias="pqFilter32.png">Resources/pqFilter32.png</file>
+        <file alias="pqLinkBack16.png">Resources/pqLinkBack16.png</file>
+        <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
+        <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
+        <file alias="pqMerge16.png">Resources/pqMerge16.png</file>
+        <file alias="pqServer16.png">Resources/pqServer16.png</file>
+        <file alias="pqServer22.png">Resources/pqServer22.png</file>
+        <file alias="pqServer32.png">Resources/pqServer32.png</file>
+        <file alias="pqSource16.png">Resources/pqSource16.png</file>
+        <file alias="pqSource22.png">Resources/pqSource22.png</file>
+        <file alias="pqSource32.png">Resources/pqSource32.png</file>
+        <file alias="pqSplit16.png">Resources/pqSplit16.png</file>
+        <file alias="pqWindow16.png">Resources/pqWindow16.png</file>
+        <file alias="pqWindow22.png">Resources/pqWindow22.png</file>
+        <file alias="pqWindow32.png">Resources/pqWindow32.png</file>
+        <file alias="pqWindowd16.png">Resources/pqWindowd16.png</file>
+        <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
+        <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
         <file>SplitViewHorizontal.png</file>
         <file>SplitViewVertical.png</file>
     </qresource>

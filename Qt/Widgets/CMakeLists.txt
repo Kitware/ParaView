@@ -23,12 +23,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewManager.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
+  pqPipelineData.h
+  pqPipelineListModel.h
   pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.h
-  pqPipelineData.h
 )
 
 SET(UI_FORMS
@@ -48,6 +49,7 @@ SET(UI_RESOURCES
 QT4_ADD_RESOURCES(RCS_SOURCES
   ${UI_RESOURCES}
 )
+
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES}
@@ -92,12 +94,22 @@ ADD_LIBRARY(QtWidgets
   pqObjectInspectorDelegate.h
   pqObjectInspectorItem.cxx
   pqObjectInspectorItem.h
+  pqObjectInspectorWidget.cxx
+  pqObjectInspectorWidget.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx
   pqParts.h
   pqPipelineData.cxx
   pqPipelineData.h
+  pqPipelineListModel.cxx
+  pqPipelineListModel.h
+  pqPipelineListWidget.cxx
+  pqPipelineListWidget.h
+  pqPipelineObject.cxx
+  pqPipelineObject.h
+  pqPipelineServer.cxx
+  pqPipelineServer.h
   pqRefreshToolbar.cxx
   pqRefreshToolbar.h
   pqRenderViewProxy.cxx

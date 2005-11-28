@@ -15,9 +15,13 @@
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
+#include "pqMultiViewManager.h"
+#include "pqMultiViewFrame.h"
 #include "pqObjectInspector.h"
-#include "pqObjectInspectorDelegate.h"
+#include "pqObjectInspectorWidget.h"
 #include "pqParts.h"
+#include "pqPipelineData.h"
+#include "pqPipelineListWidget.h"
 #include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
@@ -27,9 +31,6 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
-#include "pqPipelineData.h"
-#include "pqMultiViewManager.h"
-#include "pqMultiViewFrame.h"
 
 #ifdef PARAQ_EMBED_PYTHON
 #include "pqPythonDialog.h"
@@ -75,10 +76,12 @@ pqMainWindow::pqMainWindow() :
   PropertyToolbar(0),
   MultiViewManager(0),
   ServerDisconnectAction(0),
+  Adaptor(0),
+  Pipeline(0),
   Inspector(0),
-  InspectorDelegate(0),
   InspectorDock(0),
-  InspectorView(0),
+  PipelineList(0),
+  PipelineDock(0),
   ActiveView(0)
 {
 
@@ -167,12 +170,30 @@ pqMainWindow::pqMainWindow() :
   this->RefreshToolbar = new pqRefreshToolbar(this);
   this->addToolBar(this->RefreshToolbar);
 
-  // Create the object inspector model.
-  this->Inspector = new pqObjectInspector(this);
-  if(this->Inspector)
-    this->Inspector->setObjectName("Inspector");
+  // Create the pipeline instance.
+  this->Pipeline = new pqPipelineData(this);
 
-  this->InspectorDelegate = new pqObjectInspectorDelegate(this);
+  // Add the pipeline list dock window.
+  this->PipelineDock = new QDockWidget("Pipeline Inspector", this);
+  if(this->PipelineDock)
+    {
+    this->PipelineDock->setObjectName("PipelineDock");
+    this->PipelineDock->setAllowedAreas(
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    this->PipelineDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+
+    // Make sure the pipeline data instance is created before the
+    // pipeline list model. This ensures that the connections will
+    // work.
+    this->PipelineList = new pqPipelineListWidget(this->PipelineDock);
+    if(this->PipelineList)
+      {
+      this->PipelineList->setObjectName("PipelineList");
+      this->PipelineDock->setWidget(this->PipelineList);
+      }
+
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->PipelineDock);
+    }
 
   // Add the object inspector dock window.
   this->InspectorDock = new QDockWidget("Object Inspector", this);
@@ -182,35 +203,35 @@ pqMainWindow::pqMainWindow() :
     this->InspectorDock->setAllowedAreas(
         Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     this->InspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    this->InspectorView = new QTreeView(this->InspectorDock);
-    if(this->InspectorView)
+
+    this->Inspector = new pqObjectInspectorWidget(this->InspectorDock);
+    if(this->Inspector)
       {
-      this->InspectorView->setObjectName("InspectorView");
-      this->InspectorView->setAlternatingRowColors(true);
-      this->InspectorView->header()->hide();
-      this->InspectorDock->setWidget(this->InspectorView);
-      this->InspectorView->setModel(this->Inspector);
-      if(this->InspectorDelegate)
-        this->InspectorView->setItemDelegate(this->InspectorDelegate);
+      this->Inspector->setObjectName("Inspector");
+      this->InspectorDock->setWidget(this->Inspector);
+      if(this->Pipeline)
+        {
+        connect(this->Pipeline, SIGNAL(currentProxyChanged(vtkSMSourceProxy*)),
+            this->Inspector->getObjectModel(),
+            SLOT(setProxy(vtkSMSourceProxy*)));
+        }
       }
 
     this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
     }
 
   this->setServer(0);
-  this->Adaptor = new pqSMAdaptor;  // should go in pqServer?
-
+  this->Adaptor = new pqSMAdaptor;
 }
 
 pqMainWindow::~pqMainWindow()
 {
   // Clean up the model before deleting the adaptor.
   if(this->Inspector)
-  {
-    if(this->InspectorView)
-      this->InspectorView->setModel(0);
+    {
     delete this->Inspector;
-  }
+    this->Inspector = 0;
+    }
   
   // clean up multiview before server
   if(this->MultiViewManager)
@@ -227,6 +248,12 @@ pqMainWindow::~pqMainWindow()
 
 void pqMainWindow::setServer(pqServer* Server)
 {
+  if(this->Pipeline)
+    {
+    this->Pipeline->clearViewMapping();
+    this->Pipeline->removeServer(this->CurrentServer);
+    }
+
   if(this->MultiViewManager)
     {
     delete this->MultiViewManager;
@@ -242,6 +269,8 @@ void pqMainWindow::setServer(pqServer* Server)
   if(Server)
     {
     this->CurrentServer = Server;
+
+    this->Pipeline->addServer(this->CurrentServer);
 
     this->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
     QObject::connect(this->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)), this, SLOT(onNewQVTKWidget(pqMultiViewFrame*)));
@@ -293,27 +322,24 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 
 void pqMainWindow::onFileOpen(const QStringList& Files)
 {
-  if(!this->ActiveView)
+  if(!this->ActiveView || !this->Pipeline)
     return;
     
   QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
+  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
 
   for(int i = 0; i != Files.size(); ++i)
     {
     QString file = Files[i];
     
-    vtkSMProxy* source = this->CurrentServer->GetPipelineData()->newSMProxy("sources", "ExodusReader");
+    vtkSMProxy* source = this->Pipeline->createSource("ExodusReader", w);
     this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
     source->Delete();
     Adaptor->setProperty(source->GetProperty("FileName"), file);
     Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
     Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
     source->UpdateVTKObjects();
-    
-    pqAddPart(rm, vtkSMSourceProxy::SafeDownCast(source));
-    if(this->Inspector)
-      this->Inspector->setProxy(this->Adaptor, source);
+    this->Pipeline->setVisibility(source, true);
     }
 
   rm->ResetCamera();
@@ -484,22 +510,15 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
 
 void pqMainWindow::onCreateSource(QAction* action)
 {
-  if(!action || !this->ActiveView)
-    {
+  if(!action || !this->ActiveView || !this->Pipeline)
     return;
-    }
 
   QByteArray sourceName = action->data().toString().toAscii();
 
-  vtkSMProxy* source = this->CurrentServer->GetPipelineData()->newSMProxy("sources", sourceName);
-  
-  //TEMP
-  if(this->Inspector)
-    this->Inspector->setProxy(this->Adaptor, source);
-  
   QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
-  pqAddPart(rm, vtkSMSourceProxy::SafeDownCast(source));
+  vtkSMProxy* source = this->Pipeline->createSource(sourceName, w);
+  this->Pipeline->setVisibility(source, true);
+  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
   rm->ResetCamera();
   w->update();
 }
@@ -513,17 +532,13 @@ void pqMainWindow::onCreateFilter(QAction* action)
   
   QByteArray filterName = action->data().toString().toAscii();
 
-  vtkSMSourceProxy* cp = this->CurrentServer->GetPipelineData()->currentProxy();
-  vtkSMProxy* source = this->CurrentServer->GetPipelineData()->newSMProxy("filters", filterName);
-  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
-  this->CurrentServer->GetPipelineData()->addInput(sp, cp);
-  //TEMP
-  if(this->Inspector)
-    this->Inspector->setProxy(this->Adaptor, sp);
-  
+  vtkSMSourceProxy* cp = this->Pipeline->currentProxy();
   QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMRenderModuleProxy* rm = this->GraphicsViews[w];
-  pqAddPart(rm, sp);
+  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
+  vtkSMProxy* source = this->Pipeline->createFilter(filterName, w);
+  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
+  this->Pipeline->addInput(sp, cp);
+  this->Pipeline->setVisibility(source, true);
   rm->ResetCamera();
   w->update();
 }
@@ -649,7 +664,10 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   vp->Delete();
   iren->Enable();
 
-  this->GraphicsViews.insert(w, view);
+  // Keep a map of window to render module. Add the new window to the
+  // pipeline data structure.
+  this->Pipeline->addViewMapping(w, view);
+  this->Pipeline->addWindow(w, this->CurrentServer);
 
   QSignalMapper* sm = new QSignalMapper(parent);
   sm->setMapping(parent, parent);
@@ -663,18 +681,18 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
 void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
 {
   QVTKWidget* w = qobject_cast<QVTKWidget*>(parent->mainWidget());
-  QMap<QVTKWidget*, vtkSMRenderModuleProxy*>::iterator iter;
-  iter = this->GraphicsViews.find(w);
-  
+  vtkSMRenderModuleProxy* rm = this->Pipeline->removeViewMapping(w);
+
   // delete render module
-  (*iter)->Delete();
+  rm->Delete();
+
+  // Remove the window from the pipeline data structure.
+  this->Pipeline->removeWindow(w);
 
   if(this->ActiveView == parent)
     {
     this->ActiveView = 0;
     }
-
-  this->GraphicsViews.erase(iter);
 }
 
 void pqMainWindow::onFrameActive(QWidget* w)

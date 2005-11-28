@@ -11,11 +11,11 @@
 #define _pqMainWindow_h
 
 #include <QMainWindow>
-#include <QMap>
 #include <vtkIOStream.h>
 
-class pqObjectInspector;
-class pqObjectInspectorDelegate;
+class pqObjectInspectorWidget;
+class pqPipelineData;
+class pqPipelineListWidget;
 class pqRefreshToolbar;
 class pqServer;
 class pqSMAdaptor;
@@ -57,13 +57,13 @@ private:
   pqMultiViewManager* MultiViewManager;
   QAction* ServerDisconnectAction;
   pqSMAdaptor *Adaptor;
+  pqPipelineData *Pipeline;
   QMenu* SourcesMenu;
   QMenu* FiltersMenu;
-  pqObjectInspector *Inspector;
-  pqObjectInspectorDelegate *InspectorDelegate;
+  pqObjectInspectorWidget *Inspector;
   QDockWidget *InspectorDock;
-  QTreeView *InspectorView;
-  QMap<QVTKWidget*, vtkSMRenderModuleProxy*> GraphicsViews;
+  pqPipelineListWidget *PipelineList;
+  QDockWidget *PipelineDock;
   pqMultiViewFrame* ActiveView;
 
 private slots:

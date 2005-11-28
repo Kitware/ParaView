@@ -87,16 +87,29 @@ public:
 };
 
 
+pqSMAdaptor *pqSMAdaptor::Instance = 0;
+
 pqSMAdaptor::pqSMAdaptor()
 {
   this->Internal = new pqSMAdaptorInternal;
   QObject::connect(this->Internal->QtConnections, SIGNAL(mapped(QWidget*)), 
                    this, SLOT(qtLinkedPropertyChanged(QWidget*)));
+
+  if(!pqSMAdaptor::Instance)
+    pqSMAdaptor::Instance = this;
 }
 
 pqSMAdaptor::~pqSMAdaptor()
 {
+  if(pqSMAdaptor::Instance == this)
+    pqSMAdaptor::Instance = 0;
+
   delete this->Internal;
+}
+
+pqSMAdaptor* pqSMAdaptor::instance()
+{
+  return pqSMAdaptor::Instance;
 }
 
 void pqSMAdaptor::setProperty(vtkSMProperty* Property, QVariant QtProperty)
