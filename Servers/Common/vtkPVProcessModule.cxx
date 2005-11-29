@@ -66,7 +66,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.40.2.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.40.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -438,11 +438,29 @@ const char* vtkPVProcessModule::GetPath(const char* tag, const char* relativePat
   if(this->Options)
     {
     vtksys_stl::string selfPath, errorMsg;
+    vtksys_stl::string oldSelfPath;
     if (vtksys::SystemTools::FindProgramPath(
         this->Options->GetArgv0(), selfPath, errorMsg))
       {
+      oldSelfPath = selfPath;
       selfPath = vtksys::SystemTools::GetFilenamePath(selfPath);
       selfPath += "/../share/paraview-" PARAVIEW_VERSION;
+      vtkstd::string str = selfPath;
+      str += "/";
+      str += relativePath;
+      str += "/";
+      str += file;
+      if(vtksys::SystemTools::FileExists(str.c_str()))
+        {
+        this->Internals->Paths[tag] = selfPath.c_str();
+        found = 1;
+        }
+      }
+    if ( !found )
+      {
+      selfPath = oldSelfPath;
+      selfPath = vtksys::SystemTools::GetFilenamePath(selfPath);
+      selfPath += "/../../share/paraview-" PARAVIEW_VERSION;
       vtkstd::string str = selfPath;
       str += "/";
       str += relativePath;
