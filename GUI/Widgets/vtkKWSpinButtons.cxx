@@ -14,65 +14,11 @@
 #include "vtkKWApplication.h"
 #include "vtkKWSpinButtons.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSpinButtons );
-vtkCxxRevisionMacro(vtkKWSpinButtons, "1.2");
-
-/* 
- * Resource generated for file:
- *    spin_up.png (zlib, base64) (image file)
- */
-static const unsigned int  image_spin_up_width          = 8;
-static const unsigned int  image_spin_up_height         = 4;
-static const unsigned int  image_spin_up_pixel_size     = 4;
-static const unsigned long image_spin_up_length         = 76;
-static const unsigned long image_spin_up_decoded_length = 128;
-
-static const unsigned char image_spin_up[] = 
-  "eNr7//8/w38oBoLpIPwfSQxJbj4Qv4fi+Whys4H4NRD/hmIQezZULhuItwPxcTQMEssGAI"
-  "0RMok=";
-
-/* 
- * Resource generated for file:
- *    spin_down.png (zlib, base64) (image file)
- */
-static const unsigned int  image_spin_down_width          = 8;
-static const unsigned int  image_spin_down_height         = 4;
-static const unsigned int  image_spin_down_pixel_size     = 4;
-static const unsigned long image_spin_down_length         = 80;
-static const unsigned long image_spin_down_decoded_length = 128;
-
-static const unsigned char image_spin_down[] = 
-  "eNpjYGDIZmBg2A7Ex9EwSCz7////QIphNhC/BuLfUAxizwbJwTAQzAfi91A8H1kOSc10EE"
-  "YWAwDjtzKJ";
-
-/* 
- * Resource generated for file:
- *    spin_left.png (zlib, base64) (image file)
- */
-static const unsigned int  image_spin_left_width          = 4;
-static const unsigned int  image_spin_left_height         = 8;
-static const unsigned int  image_spin_left_pixel_size     = 4;
-static const unsigned long image_spin_left_length         = 64;
-static const unsigned long image_spin_left_decoded_length = 128;
-
-static const unsigned char image_spin_left[] = 
-  "eNr7//8/w38oBoJsJPZsIN4OZc8H4tdAfByIpwPxeyD+jY2Prh6becj2AQATAzKJ";
-
-/* 
- * Resource generated for file:
- *    spin_right.png (zlib, base64) (image file)
- */
-static const unsigned int  image_spin_right_width          = 4;
-static const unsigned int  image_spin_right_height         = 8;
-static const unsigned int  image_spin_right_pixel_size     = 4;
-static const unsigned long image_spin_right_length         = 64;
-static const unsigned long image_spin_right_decoded_length = 128;
-
-static const unsigned char image_spin_right[] = 
-  "eNpjYGDI/v//PwMMA8F2IJ6NxD8OxK+BeD4S/zcQvwfi6Tj4yOrRzUOxDwBd1DKJ";
-
+vtkCxxRevisionMacro(vtkKWSpinButtons, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWSpinButtons::vtkKWSpinButtons()
@@ -171,38 +117,22 @@ void vtkKWSpinButtons::UpdateArrowOrientation()
     {
     if (this->PreviousButton && this->PreviousButton->IsCreated())
       {
-      this->PreviousButton->SetImageToPixels(
-        image_spin_up, 
-        image_spin_up_width, image_spin_up_height, 
-        image_spin_up_pixel_size,
-        image_spin_up_length);
+      this->PreviousButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinUp);
       }
     if (this->NextButton && this->NextButton->IsCreated())
       {
-      this->NextButton->SetImageToPixels(
-        image_spin_down, 
-        image_spin_down_width, image_spin_down_height, 
-        image_spin_down_pixel_size,
-        image_spin_down_length);
+      this->NextButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinDown);
       }
     }
   else
     {
     if (this->PreviousButton && this->PreviousButton->IsCreated())
       {
-      this->PreviousButton->SetImageToPixels(
-        image_spin_left, 
-        image_spin_left_width, image_spin_left_height, 
-        image_spin_left_pixel_size,
-        image_spin_left_length);
+      this->PreviousButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinLeft);
       }
     if (this->NextButton && this->NextButton->IsCreated())
       {
-      this->NextButton->SetImageToPixels(
-        image_spin_right, 
-        image_spin_right_width, image_spin_right_height, 
-        image_spin_right_pixel_size,
-        image_spin_right_length);
+      this->NextButton->SetImageToPredefinedIcon(vtkKWIcon::IconSpinRight);
       }
     }
 }
@@ -312,6 +242,27 @@ int vtkKWSpinButtons::GetButtonsWidth()
   int d_w = this->PreviousButton ? this->PreviousButton->GetWidth() : 0;
   int i_w = this->NextButton ? this->NextButton->GetWidth() : 0;
   return d_w > i_w ? d_w : i_w;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinButtons::SetButtonsHeight(int h)
+{
+  if (this->PreviousButton)
+    {
+    this->PreviousButton->SetHeight(h);
+    }
+  if (this->NextButton)
+    {
+    this->NextButton->SetHeight(h);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinButtons::GetButtonsHeight()
+{
+  int d_h = this->PreviousButton ? this->PreviousButton->GetHeight() : 0;
+  int i_h = this->NextButton ? this->NextButton->GetHeight() : 0;
+  return d_h > i_h ? d_h : i_h;
 }
 
 //----------------------------------------------------------------------------
