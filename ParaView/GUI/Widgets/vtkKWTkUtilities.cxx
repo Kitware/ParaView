@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.71");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.72");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -474,9 +474,7 @@ int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
     return 0;
     }
 
-  vtksys_stl::string geometry;
-
-  geometry = "winfo geometry ";
+  vtksys_stl::string geometry("winfo geometry ");
   geometry += widget;
   if (Tcl_GlobalEval(interp, geometry.c_str()) != TCL_OK)
     {
@@ -562,25 +560,13 @@ int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
     return 0;
     }
 
-  ostrstream geometry;
-  geometry << "concat [winfo width " << widget << "] [winfo height "
-           << widget << "] [winfo rootx " << widget << "] [winfo rooty "
-           << widget << "]" << ends;
-  int res = Tcl_GlobalEval(interp, geometry.str());
-  geometry.rdbuf()->freeze(0);
-  if (res != TCL_OK)
+  int ww, wh, wx, wy;
+  if (!vtkKWTkUtilities::GetWidgetCoordinates(interp, widget, &wx, &wy) ||
+      !vtkKWTkUtilities::GetWidgetSize(interp, widget, &ww, &wh))
     {
-    vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
     return 0;
     }
   
-  int ww, wh, wx, wy;
-  if (sscanf(
-        Tcl_GetStringResult(interp), "%d %d %d %d", &ww, &wh, &wx, &wy) != 4)
-    {
-    return 0;
-    }
-
   return (x >= wx && x < (wx + ww) && y >= wy && y < (wy + wh)) ? 1 : 0;
 }
 
@@ -1035,8 +1021,7 @@ int vtkKWTkUtilities::GetPhotoHeight(vtkKWWidget *widget)
 
   // Retrieve -image option
 
-  vtksys_stl::string cmd;
-  cmd += widget->GetWidgetName();
+  vtksys_stl::string cmd(widget->GetWidgetName());
   cmd += " cget -image";
   
   if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
@@ -1680,7 +1665,7 @@ int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(Tcl_Interp *interp,
     return 1;
     }
   
-  // Browse each slave for reqwidth, reqheight
+  // Browse each slave for its requested width/height
 
   int buffer_length = strlen(result);
   char *buffer = new char [buffer_length + 1];
@@ -1705,20 +1690,13 @@ int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(Tcl_Interp *interp,
 
     // Get width / height
 
-    ostrstream geometry;
-    geometry << "concat [winfo reqwidth " << ptr << "] [winfo reqheight " 
-             << ptr << "]"<< ends;
-    res = Tcl_GlobalEval(interp, geometry.str());
-    geometry.rdbuf()->freeze(0);
-    if (res != TCL_OK)
+    int w, h;
+    if (!vtkKWTkUtilities::GetWidgetRequestedSize(interp, ptr, &w, &h))
       {
       vtkGenericWarningMacro(<< "Unable to query slave geometry!");
       }
     else
       {
-      int w, h;
-      sscanf(Tcl_GetStringResult(interp), "%d %d", &w, &h);
-
       // If w == h == 1 then again it might not have been packed, so call
       // recursively
 
@@ -1832,18 +1810,13 @@ int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(Tcl_Interp *interp,
 
     // Get width
 
-    ostrstream geometry;
-    geometry << "winfo reqwidth " << ptr << ends;
-    res = Tcl_GlobalEval(interp, geometry.str());
-    geometry.rdbuf()->freeze(0);
-    if (res != TCL_OK)
+    int w;
+    if (!vtkKWTkUtilities::GetWidgetRequestedSize(interp, ptr, &w, NULL))
       {
       vtkGenericWarningMacro(<< "Unable to query slave geometry!");
       }
     else
       {
-      int w = atoi(Tcl_GetStringResult(interp));
-      
       // If w == 1 then again it might not have been packed, so get bbox
 
       if (w == 1)
@@ -1941,18 +1914,14 @@ int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
 
       // Get the slave reqwidth
 
-      ostrstream reqwidth;
-      reqwidth << "winfo reqwidth " << result << ends;
-      res = Tcl_GlobalEval(interp, reqwidth.str());
-      reqwidth.rdbuf()->freeze(0);
-      if (res != TCL_OK)
+      int width;
+      if (!vtkKWTkUtilities::GetWidgetRequestedSize(
+            interp, result, &width, NULL))
         {
         vtkGenericWarningMacro(<< "Unable to query slave width!");
         continue;
         }
-      int width = 0;
-      if (sscanf(Tcl_GetStringResult(interp), "%d", &width) == 1 && 
-          width > (*col_widths)[col])
+      if (width > (*col_widths)[col])
         {
         (*col_widths)[col] = width;
         }
@@ -2394,26 +2363,13 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
     return 0;
     }
 
-  ostrstream geometry;
-  geometry << "concat [winfo rootx " << widget << "] [winfo rooty "
-           << widget << "] [winfo width " << widget << "] [winfo height "
-           << widget << "]" << ends;
-  int res = Tcl_GlobalEval(interp, geometry.str());
-  geometry.rdbuf()->freeze(0);
-  if (res != TCL_OK)
+  int ww, hh, xx, yy;
+  if (!vtkKWTkUtilities::GetWidgetCoordinates(interp, widget, &xx, &yy) ||
+      !vtkKWTkUtilities::GetWidgetSize(interp, widget, &ww, &hh))
     {
-    vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
     return 0;
     }
   
-  int xx, yy, ww, hh;
-  xx = yy = ww = hh = 0;
-  if (sscanf(
-        Tcl_GetStringResult(interp), "%d %d %d %d", &xx, &yy, &ww, &hh) != 4)
-    {
-    return 0;
-    }
-
   xx -= left;
   yy -= top;
   ww += left + right;
@@ -2568,8 +2524,7 @@ int vtkKWTkUtilities::SetTopLevelMouseCursor(Tcl_Interp *interp,
     return 0;
     }
 
-  vtksys_stl::string cmd;
-  cmd = "[winfo toplevel ";
+  vtksys_stl::string cmd("[winfo toplevel ");
   cmd += widget;
   cmd += "] configure -cursor {";
   if (cursor)
@@ -2675,9 +2630,14 @@ void vtkKWTkUtilities::WithdrawTopLevel(vtkKWWidget *widget)
 const char* vtkKWTkUtilities::GetCurrentScript(
   Tcl_Interp *interp)
 {
-  if (interp && Tcl_GlobalEval(interp, "info script") == TCL_OK)
+  if (interp)
     {
-    return Tcl_GetStringResult(interp);
+    if (Tcl_GlobalEval(interp, "info script") == TCL_OK)
+      {
+      return Tcl_GetStringResult(interp);
+      }
+    vtkGenericWarningMacro(
+      << "Unable to get current script: " << Tcl_GetStringResult(interp));
     }
   return NULL;
 }
@@ -2694,11 +2654,44 @@ const char* vtkKWTkUtilities::GetCurrentScript(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTkUtilities::CancelAfterEventHandler(Tcl_Interp *interp, 
+                                               const char *id)
+{
+  if (interp && id)
+    { 
+    char cmd[256];
+    sprintf(cmd, "after cancel %s", id);
+
+    if (Tcl_GlobalEval(interp, cmd) != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to cancel after event " << id << ": " 
+        << Tcl_GetStringResult(interp));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::CancelAfterEventHandler(vtkKWApplication *app,
+                                               const char *id)
+{
+  if (app)
+    {
+    vtkKWTkUtilities::CancelAfterEventHandler(app->GetMainInterp(), id);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTkUtilities::CancelAllAfterEventHandlers(Tcl_Interp *interp)
 {
   if (interp)
     { 
-    Tcl_GlobalEval(interp, "foreach a [after info] {after cancel $a}");
+    if (Tcl_GlobalEval(
+          interp, "foreach a [after info] {after cancel $a}") != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to cancel all after events: "<<Tcl_GetStringResult(interp));
+      }
     }
 }
 
@@ -2716,7 +2709,11 @@ void vtkKWTkUtilities::Bell(Tcl_Interp *interp)
 {
   if (interp)
     { 
-    Tcl_GlobalEval(interp, "bell");
+    if (Tcl_GlobalEval(interp, "bell") != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to ring a bell: " << Tcl_GetStringResult(interp));
+      }
     }
 }
 
@@ -2734,7 +2731,11 @@ void vtkKWTkUtilities::ProcessPendingEvents(Tcl_Interp *interp)
 {
   if (interp)
     { 
-    Tcl_GlobalEval(interp, "update");
+    if (Tcl_GlobalEval(interp, "update") != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to process pending events: " <<Tcl_GetStringResult(interp));
+      }
     }
 }
 
@@ -2745,6 +2746,254 @@ void vtkKWTkUtilities::ProcessPendingEvents(vtkKWApplication *app)
     {
     vtkKWTkUtilities::ProcessPendingEvents(app->GetMainInterp());
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetMousePointerCoordinates(
+  Tcl_Interp *interp, const char *widget, int *x, int *y)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string pointerxy("winfo pointerxy ");
+  pointerxy += widget;
+  if (Tcl_GlobalEval(interp, pointerxy.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query mouse coordinates! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int px, py;
+  if (sscanf(
+        Tcl_GetStringResult(interp), "%d %d", &px, &py) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse mouse coordinates!");
+    return 0;
+    }
+  
+  if (x)
+    {
+    *x = px;
+    }
+  if (y)
+    {
+    *y = py;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetMousePointerCoordinates(
+  vtkKWWidget *widget, int *x, int *y)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetMousePointerCoordinates(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      x, y);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetCoordinates(
+  Tcl_Interp *interp, const char *widget, int *x, int *y)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string widgetxy("concat [winfo rootx ");
+  widgetxy += widget;
+  widgetxy += "] [winfo rooty ";
+  widgetxy += widget;
+  widgetxy += "]";
+  if (Tcl_GlobalEval(interp, widgetxy.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget coordinates! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int wx, wy;
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d", &wx, &wy) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse widget coordinates!");
+    return 0;
+    }
+  
+  if (x)
+    {
+    *x = wx;
+    }
+  if (y)
+    {
+    *y = wy;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetCoordinates(
+  vtkKWWidget *widget, int *x, int *y)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetWidgetCoordinates(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      x, y);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetSize(
+  Tcl_Interp *interp, const char *widget, int *w, int *h)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string widgetwh("concat [winfo width ");
+  widgetwh += widget;
+  widgetwh += "] [winfo height ";
+  widgetwh += widget;
+  widgetwh += "]";
+  if (Tcl_GlobalEval(interp, widgetwh.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget size! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int ww, wh;
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d", &ww, &wh) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse widget size!");
+    return 0;
+    }
+  
+  if (w)
+    {
+    *w = ww;
+    }
+  if (h)
+    {
+    *h = wh;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetSize(
+  vtkKWWidget *widget, int *w, int *h)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetWidgetSize(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      w, h);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetRequestedSize(
+  Tcl_Interp *interp, const char *widget, int *w, int *h)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string widgetwh("concat [winfo reqwidth ");
+  widgetwh += widget;
+  widgetwh += "] [winfo reqheight ";
+  widgetwh += widget;
+  widgetwh += "]";
+  if (Tcl_GlobalEval(interp, widgetwh.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget requested size! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int ww, wh;
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d", &ww, &wh) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse widget requested size!");
+    return 0;
+    }
+  
+  if (w)
+    {
+    *w = ww;
+    }
+  if (h)
+    {
+    *h = wh;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetRequestedSize(
+  vtkKWWidget *widget, int *w, int *h)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetWidgetRequestedSize(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      w, h);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetWidgetClass(
+  Tcl_Interp *interp, const char *widget)
+{
+  if (!interp)
+    {
+    return NULL;
+    }
+
+  vtksys_stl::string widgetclass("winfo class ");
+  widgetclass += widget;
+  if (Tcl_GlobalEval(interp, widgetclass.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget class! " 
+                           << Tcl_GetStringResult(interp));
+    return NULL;
+    }
+
+  return Tcl_GetStringResult(interp);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetWidgetClass(
+  vtkKWWidget *widget)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetWidgetClass(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName());
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

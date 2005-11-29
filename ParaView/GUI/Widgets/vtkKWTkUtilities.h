@@ -508,8 +508,10 @@ public:
   static const char *GetCurrentScript(vtkKWApplication *app);
 
   // Description:
-  // Cancel all event handlers, i.e. cancel all delayed command that
+  // Cancel one or all event handlers, i.e. cancel all delayed command that
   // were registered using the 'after' command.
+  static void CancelAfterEventHandler(Tcl_Interp *interp, const char *id);
+  static void CancelAfterEventHandler(vtkKWApplication *app, const char *id);
   static void CancelAllAfterEventHandlers(Tcl_Interp *interp);
   static void CancelAllAfterEventHandlers(vtkKWApplication *app);
 
@@ -522,6 +524,53 @@ public:
   // Process/update pending events
   static void ProcessPendingEvents(Tcl_Interp *interp);
   static void ProcessPendingEvents(vtkKWApplication *app);
+
+  // Description:
+  // Get the coordinates of the mouse pointer in the screen widget is in.
+  // Return 1 on success, 0 otherwise.
+  static int GetMousePointerCoordinates(
+    Tcl_Interp *interp, const char *widget, int *x, int *y);
+  static int GetMousePointerCoordinates(
+    vtkKWWidget *widget, int *x, int *y);
+
+  // Description:
+  // Get the coordinates of the upper-left corner of widget in its screen.
+  // Return 1 on success, 0 otherwise.
+  static int GetWidgetCoordinates(
+    Tcl_Interp *interp, const char *widget, int *x, int *y);
+  static int GetWidgetCoordinates(
+    vtkKWWidget *widget, int *x, int *y);
+
+  // Description:
+  // Get the width and height of widget in its screen.
+  // When a window is first created its width will be 1 pixel; the width will
+  // eventually be changed by a geometry manager to fulfill the window's needs.
+  // If you need the true width immediately after creating a widget, invoke
+  // ProcessPendingEvents to force the geometry manager to arrange it, or use
+  // GetWidgetRequestedSize to get the window's requested size instead of its
+  // actual size. 
+  // Return 1 on success, 0 otherwise.
+  static int GetWidgetSize(
+    Tcl_Interp *interp, const char *widget, int *w, int *h);
+  static int GetWidgetSize(
+    vtkKWWidget *widget, int *w, int *h);
+
+  // Description:
+  // Get the requested width and height of widget in its screen.
+  // This is the value used by window's geometry manager to compute its
+  // geometry.
+  // Return 1 on success, 0 otherwise.
+  static int GetWidgetRequestedSize(
+    Tcl_Interp *interp, const char *widget, int *w, int *h);
+  static int GetWidgetRequestedSize(
+    vtkKWWidget *widget, int *w, int *h);
+
+  // Description:
+  // Get the widget class (i.e. Tk type).
+  static const char* GetWidgetClass(
+    Tcl_Interp *interp, const char *widget);
+  static const char* GetWidgetClass(
+    vtkKWWidget *widget);
 
 protected:
   vtkKWTkUtilities() {};
