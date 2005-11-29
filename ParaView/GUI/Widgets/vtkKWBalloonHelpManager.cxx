@@ -17,6 +17,7 @@
 #include "vtkKWWidget.h"
 #include "vtkKWTopLevel.h"
 #include "vtkKWApplication.h"
+#include "vtkKWTkUtilities.h"
 
 #include "vtkObjectFactory.h"
 
@@ -24,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.8");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -141,7 +142,8 @@ void vtkKWBalloonHelpManager::CancelCallback()
   
   if (this->AfterTimerId)
     {
-    this->Script("after cancel %s", this->AfterTimerId);
+    vtkKWTkUtilities::CancelAfterEventHandler(
+      this->GetApplication(), this->AfterTimerId);
     this->SetAfterTimerId(NULL);
     }
   
@@ -210,21 +212,21 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 
   // Get the position of the mouse
 
-  int x = atoi(this->Script( "winfo pointerx %s", widget->GetWidgetName()));
-  int y = atoi(this->Script( "winfo pointery %s", widget->GetWidgetName()));
+  int x, y;
+  vtkKWTkUtilities::GetMousePointerCoordinates(widget, &x, &y);
 
   // Get the position in and size of the parent window of the one needing help
 
-  int xw = atoi(
-    this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName()));
+  int xw;
+  vtkKWTkUtilities::GetWidgetCoordinates(widget->GetParent(), &xw, NULL);
 
-  int dxw = atoi(
-    this->Script( "winfo width %s", widget->GetParent()->GetWidgetName()));
+  int dxw;
+  vtkKWTkUtilities::GetWidgetSize(widget->GetParent(), &dxw, NULL);
 
   // Get the size of the balloon window
 
-  int dx = atoi(
-    this->Script("winfo reqwidth %s", this->Label->GetWidgetName()));
+  int dx;
+  vtkKWTkUtilities::GetWidgetRequestedSize(this->Label, &dx, NULL);
   
   // Set the position of the widget relative to the mouse
   // Try to keep the help from going past the right edge of the widget
@@ -243,7 +245,7 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
   // Place the balloon
 
   this->TopLevel->SetPosition(x, y + 15);
-  this->Script("update");
+  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
 
   // Map the balloon
 
@@ -322,9 +324,7 @@ void vtkKWBalloonHelpManager::AddBindings(vtkKWWidget *widget)
     return;
     }
 
-  const char *enter_bindings = 
-    widget->Script("bind %s <Enter>", widget->GetWidgetName());
-  if (strstr(enter_bindings, "TriggerCallback"))
+  if (strstr(widget->GetBinding("<Enter>"), "TriggerCallback"))
     {
     return;
     }
