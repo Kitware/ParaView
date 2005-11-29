@@ -42,34 +42,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 
-int vtkKWSetApplicationIconCmd(ClientData clientdata, 
-                          Tcl_Interp *interp, 
-                          int argc, 
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4 && TCL_RELEASE_LEVEL >= TCL_FINAL_RELEASE)
-                                 CONST84
-#endif
-                          char *argv[])
+int vtkKWSetApplicationIconCmdInternal(Tcl_Interp *interp, 
+                                       const char *app_name,
+                                       int icon_res_id,
+                                       int set_small)
 {
 #ifdef _WIN32
+  char cmd[1024];
+  int error;
   HWND winHandle;
+  DWORD app_path_length;
+  char app_path[_MAX_PATH];
+  HINSTANCE hInst = 0;
   HANDLE hIcon;
   LPVOID lpMsgBuf;
-  HINSTANCE hInst = 0;
-  int iconID, error, set_small;
-  char cmd[1024];
-  char app_path[_MAX_PATH];
-  DWORD app_path_length;
 
-  clientdata = 0; // To avoid warning: unreferenced formal parameter
-
-  // Check usage
-
-  if (argc < 3)
-    {
-    interp->result = "Usage: vtkKWSetApplicationIcon app_name icon_res_id [small|big]";
-    return TCL_ERROR;
-    }
-  
   // Get window handle (and convert it to Windows HWND)
 
   sprintf(cmd, "wm frame .");
@@ -83,18 +70,18 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 
   // If the app name is empty, try to find the current application name
 
-  if (!argv[1] || !*argv[1])
+  if (!app_name || !*app_name)
     {
     app_path_length = GetModuleFileName(NULL, app_path, _MAX_PATH);
     if (app_path_length)
       {
-      argv[1] = app_path;
+      app_name = app_path;
       }
     }
                                    
   // Get application instance
 
-  hInst = LoadLibrary(argv[1]);
+  hInst = LoadLibrary(app_name);
   if (hInst == NULL)
     {
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -112,14 +99,8 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 
   // Load icon from its resource ID
 
-  error = Tcl_GetInt(interp, argv[2], &iconID);
-  if (error != TCL_OK)
-    {
-    return error;
-    }
-
   hIcon = LoadImage(hInst,
-                    MAKEINTRESOURCE(iconID),
+                    MAKEINTRESOURCE(icon_res_id),
                     IMAGE_ICON,
                     0,
                     0,
@@ -129,22 +110,6 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 
   if (hIcon != NULL)
     {
-    set_small = 0;
-    if (argc > 3)
-      {
-      if (!strcmp(argv[3], "small"))
-        {
-        set_small = 1;
-        }
-      else if (strcmp(argv[3], "big"))
-        {
-        sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
-                argv[3]);
-        return TCL_ERROR;
-        }
-      }
-
-    // SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
     SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LONG)hIcon);
     }
 #if 0
@@ -165,6 +130,81 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 #endif
 
 #endif // WIN32
+
+  return TCL_OK;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSetApplicationIcon(Tcl_Interp *interp, 
+                            const char *app_name, 
+                            int icon_res_id)
+{
+  return vtkKWSetApplicationIconCmdInternal(
+    interp, app_name, icon_res_id, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSetApplicationSmallIcon(Tcl_Interp *interp, 
+                                 const char *app_name, 
+                                 int icon_res_id)
+{
+  return vtkKWSetApplicationIconCmdInternal(
+    interp, app_name, icon_res_id, 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSetApplicationIconCmd(ClientData clientdata, 
+                               Tcl_Interp *interp, 
+                               int argc, 
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4 && TCL_RELEASE_LEVEL >= TCL_FINAL_RELEASE)
+                               CONST84
+#endif
+                               char *argv[])
+{
+#ifdef _WIN32
+  int error;
+  int icon_res_id;
+  int set_small;
+
+  clientdata = 0; // To avoid warning: unreferenced formal parameter
+
+  // Check usage
+
+  if (argc < 3)
+    {
+    interp->result = 
+      "Usage: vtkKWSetApplicationIcon app_name icon_res_id [small|big]";
+    return TCL_ERROR;
+    }
+
+  // Get resource ID
+
+  error = Tcl_GetInt(interp, argv[2], &icon_res_id);
+  if (error != TCL_OK)
+    {
+    return error;
+    }
+  
+  // Get small or big ?
+
+  set_small = 0;
+  if (argc > 3)
+    {
+    if (!strcmp(argv[3], "small"))
+      {
+      set_small = 1;
+      }
+    else if (strcmp(argv[3], "big"))
+      {
+      sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
+              argv[3]);
+      return TCL_ERROR;
+      }
+    }
+
+  return vtkKWSetApplicationIconCmdInternal(
+    interp, argv[1], icon_res_id, set_small);
+#endif
 
   return TCL_OK;
 }
