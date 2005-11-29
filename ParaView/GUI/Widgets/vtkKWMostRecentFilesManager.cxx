@@ -21,12 +21,12 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.11");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.12");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
-#define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
-#define VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN "File%dCmd"
-#define VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN "File%dLabel"
+#define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%02d"
+#define VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN "File%02dCmd"
+#define VTK_KW_MRF_REGISTRY_LABEL_KEYNAME_PATTERN "File%02dLabel"
 
 #define VTK_KW_MRF_REGISTRY_MAX_ENTRIES 50
 
