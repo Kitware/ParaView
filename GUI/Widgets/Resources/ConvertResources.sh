@@ -57,6 +57,10 @@ KWConvertImageToHeader --zlib --base64 \
     scale_bar_annotation.png \
     shrink.png \
     side_annotation.png \
+    spin_down.png \
+    spin_left.png \
+    spin_right.png \
+    spin_up.png \
     stopwatch.png \
     transport_beginning.png \
     transport_end.png \

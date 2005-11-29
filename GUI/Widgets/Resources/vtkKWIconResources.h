@@ -704,6 +704,60 @@ static const unsigned char image_side_annotation[] =
 
 /* 
  * Resource generated for file:
+ *    spin_down.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_spin_down_width          = 8;
+static const unsigned int  image_spin_down_height         = 4;
+static const unsigned int  image_spin_down_pixel_size     = 4;
+static const unsigned long image_spin_down_length         = 80;
+static const unsigned long image_spin_down_decoded_length = 128;
+
+static const unsigned char image_spin_down[] = 
+  "eNpjYGDIZmBg2A7Ex9EwSCz7////QIphNhC/BuLfUAxizwbJwTAQzAfi91A8H1kOSc10EE"
+  "YWAwDjtzKJ";
+
+/* 
+ * Resource generated for file:
+ *    spin_left.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_spin_left_width          = 4;
+static const unsigned int  image_spin_left_height         = 8;
+static const unsigned int  image_spin_left_pixel_size     = 4;
+static const unsigned long image_spin_left_length         = 64;
+static const unsigned long image_spin_left_decoded_length = 128;
+
+static const unsigned char image_spin_left[] = 
+  "eNr7//8/w38oBoJsJPZsIN4OZc8H4tdAfByIpwPxeyD+jY2Prh6becj2AQATAzKJ";
+
+/* 
+ * Resource generated for file:
+ *    spin_right.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_spin_right_width          = 4;
+static const unsigned int  image_spin_right_height         = 8;
+static const unsigned int  image_spin_right_pixel_size     = 4;
+static const unsigned long image_spin_right_length         = 64;
+static const unsigned long image_spin_right_decoded_length = 128;
+
+static const unsigned char image_spin_right[] = 
+  "eNpjYGDI/v//PwMMA8F2IJ6NxD8OxK+BeD4S/zcQvwfi6Tj4yOrRzUOxDwBd1DKJ";
+
+/* 
+ * Resource generated for file:
+ *    spin_up.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_spin_up_width          = 8;
+static const unsigned int  image_spin_up_height         = 4;
+static const unsigned int  image_spin_up_pixel_size     = 4;
+static const unsigned long image_spin_up_length         = 76;
+static const unsigned long image_spin_up_decoded_length = 128;
+
+static const unsigned char image_spin_up[] = 
+  "eNr7//8/w38oBoLpIPwfSQxJbj4Qv4fi+Whys4H4NRD/hmIQezZULhuItwPxcTQMEssGAI"
+  "0RMok=";
+
+/* 
+ * Resource generated for file:
  *    stopwatch.png (zlib, base64) (image file)
  */
 static const unsigned int  image_stopwatch_width          = 16;

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.29");
+vtkCxxRevisionMacro(vtkKWIcon, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -505,6 +505,38 @@ void vtkKWIcon::SetImage(int image)
         image_side_annotation_width, image_side_annotation_height,
         image_side_annotation_pixel_size, 
         image_side_annotation_length);
+      break;
+
+    case vtkKWIcon::IconSpinDown:
+      this->SetImage(
+        image_spin_down, 
+        image_spin_down_width, image_spin_down_height,
+        image_spin_down_pixel_size, 
+        image_spin_down_length);
+      break;
+
+    case vtkKWIcon::IconSpinLeft:
+      this->SetImage(
+        image_spin_left, 
+        image_spin_left_width, image_spin_left_height,
+        image_spin_left_pixel_size, 
+        image_spin_left_length);
+      break;
+
+    case vtkKWIcon::IconSpinRight:
+      this->SetImage(
+        image_spin_right, 
+        image_spin_right_width, image_spin_right_height,
+        image_spin_right_pixel_size, 
+        image_spin_right_length);
+      break;
+
+    case vtkKWIcon::IconSpinUp:
+      this->SetImage(
+        image_spin_up, 
+        image_spin_up_width, image_spin_up_height,
+        image_spin_up_pixel_size, 
+        image_spin_up_length);
       break;
 
     case vtkKWIcon::IconShrink:
