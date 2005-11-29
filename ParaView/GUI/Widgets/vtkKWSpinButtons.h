@@ -107,10 +107,12 @@ public:
   vtkGetMacro(ButtonsPadY, int);
 
   // Description:
-  // Convenience method to set the buttons width.
+  // Convenience method to set the buttons width/height.
   // No effects if called before Create()
   virtual void SetButtonsWidth(int w);
   virtual int GetButtonsWidth();
+  virtual void SetButtonsHeight(int h);
+  virtual int GetButtonsHeight();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
