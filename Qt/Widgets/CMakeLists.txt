@@ -128,6 +128,7 @@ ADD_LIBRARY(QtWidgets
   pqSMAdaptor.h
   pqTimeoutCommandDispatcher.cxx
   pqTimeoutCommandDispatcher.h
+  QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}

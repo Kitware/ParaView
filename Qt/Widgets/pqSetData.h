@@ -10,14 +10,17 @@
 #ifndef _pqSetData_h
 #define _pqSetData_h
 
+#include "QtWidgetsExport.h"
 #include <QVariant>
 
-struct pqSetData
+/// Helper class for setting custom Qt object data
+struct QTWIDGETS_EXPORT pqSetData
 {
   pqSetData(const QVariant& Data);
   const QVariant Data;
 };
 
+/// Sets custom data for a Qt object
 template<typename T>
 T* operator<<(T* LHS, const pqSetData& RHS)
 {

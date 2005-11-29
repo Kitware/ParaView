@@ -5,10 +5,11 @@
 
 class pqMultiViewFrame;
 
+#include "QtWidgetsExport.h"
 #include "pqMultiView.h"
 
 /// multi-view manager
-class pqMultiViewManager : public pqMultiView
+class QTWIDGETS_EXPORT pqMultiViewManager : public pqMultiView
 {
   Q_OBJECT
 public:

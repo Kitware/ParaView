@@ -10,12 +10,13 @@
 #ifndef _pqServerBrowser_h
 #define _pqServerBrowser_h
 
+#include "QtWidgetsExport.h"
 #include "ui_pqServerBrowser.h"
 
 class pqServer;
 
 /// Provides a user-interface component for creating server connections
-class pqServerBrowser :
+class QTWIDGETS_EXPORT pqServerBrowser :
   public QDialog
 {
   typedef QDialog base;

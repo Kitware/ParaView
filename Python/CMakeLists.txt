@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(
 )
 
 ADD_LIBRARY(pqPython
+  pqPythonExport.h
   pqPythonInterpreter.cxx
   pqPythonInterpreter.h
 )

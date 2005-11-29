@@ -10,10 +10,11 @@
 #ifndef _pqPythonShell_h
 #define _pqPythonShell_h
 
+#include "QtPythonExport.h"
 #include <QFrame>
 
 /// Provides an interactive "shell" interface to an embedded Python interpreter
-class pqPythonShell :
+class QTPYTHON_EXPORT pqPythonShell :
   public QFrame
 {
   Q_OBJECT

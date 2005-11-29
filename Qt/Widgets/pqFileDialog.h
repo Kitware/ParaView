@@ -10,12 +10,13 @@
 #ifndef _pqFileDialog_h
 #define _pqFileDialog_h
 
+#include "QtWidgetsExport.h"
 #include "ui_pqFileDialog.h"
 
 class pqFileDialogModel;
 
 /// Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing
-class pqFileDialog :
+class QTWIDGETS_EXPORT pqFileDialog :
   public QDialog
 {
   typedef QDialog base;

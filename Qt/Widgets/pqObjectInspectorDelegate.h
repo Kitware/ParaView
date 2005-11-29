@@ -9,9 +9,8 @@
 #ifndef _pqObjectInspectorDelegate_h
 #define _pqObjectInspectorDelegate_h
 
-
+#include "QtWidgetsExport.h"
 #include <QItemDelegate>
-
 
 /// \class pqObjectInspectorDelegate
 /// \brief
@@ -22,7 +21,7 @@
 /// an editor. The type of editor created is based on the property
 /// value and domain. The delegate is also used to move the property
 /// value back and forth between the model and the editor.
-class pqObjectInspectorDelegate : public QItemDelegate
+class QTWIDGETS_EXPORT pqObjectInspectorDelegate : public QItemDelegate
 {
 public:
   /// \brief

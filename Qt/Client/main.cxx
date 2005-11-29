@@ -208,7 +208,11 @@ int main(int argc, char* argv[])
 
   // Create the main window
   QApplication application(argc, argv);
+
+/** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
+#if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
   Q_INIT_RESOURCE(pqWidgets);
+#endif
   
   pqMainWindow main_window;
   main_window.resize(800, 600);

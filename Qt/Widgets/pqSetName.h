@@ -10,14 +10,17 @@
 #ifndef _pqSetName_h
 #define _pqSetName_h
 
+#include "QtWidgetsExport.h"
 #include <QString>
 
-struct pqSetName
+/// Helper class for setting a Qt object name
+struct QTWIDGETS_EXPORT pqSetName
 {
   pqSetName(const QString& Name);
   const QString Name;
 };
 
+/// Sets a Qt object's name
 template<typename T>
 T* operator<<(T* LHS, const pqSetName& RHS)
 {

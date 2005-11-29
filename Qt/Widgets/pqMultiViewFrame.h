@@ -3,10 +3,11 @@
 #define _pqMultiViewFrame_h
 
 #include <QWidget>
+#include "QtWidgetsExport.h"
 #include "ui_pqMultiViewFrameMenu.h"
 
 /// a holder for a widget in a multiview
-class pqMultiViewFrame : public QWidget
+class QTWIDGETS_EXPORT pqMultiViewFrame : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(bool menuAutoHide READ menuAutoHide WRITE setMenuAutoHide)

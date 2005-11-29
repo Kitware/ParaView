@@ -76,6 +76,7 @@ ADD_LIBRARY(QtTesting
   pqSpinBoxEventTranslator.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
+  QtTestingExport.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

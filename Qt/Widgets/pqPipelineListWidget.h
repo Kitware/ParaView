@@ -9,14 +9,13 @@
 #ifndef _pqPipelineListWidget_h
 #define _pqPipelineListWidget_h
 
-
+#include "QtWidgetsExport.h"
 #include <QWidget>
 
 class pqPipelineListModel;
 class QTreeView;
 
-
-class pqPipelineListWidget : public QWidget
+class QTWIDGETS_EXPORT pqPipelineListWidget : public QWidget
 {
 public:
   pqPipelineListWidget(QWidget *parent=0);

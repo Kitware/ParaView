@@ -1,4 +1,3 @@
-
 #ifndef _pqPipelineData_h
 #define _pqPipelineData_h
 
@@ -12,9 +11,14 @@ class QVTKWidget;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
+class vtkSMProxy;
+class pqServer;
+
+#include "QtWidgetsExport.h"
+#include <QObject>
 
 /// interface for querying pipline state, also provides signals for pipeline changes
-class pqPipelineData : public QObject
+class QTWIDGETS_EXPORT pqPipelineData : public QObject
 {
   Q_OBJECT
 
@@ -77,7 +81,5 @@ protected:
   static pqPipelineData *Instance;
 };
 
-
 #endif // _pqPipelineData_h
-
 

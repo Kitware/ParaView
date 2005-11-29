@@ -13,6 +13,8 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
 )
 
+ADD_DEFINITIONS(-DPARAQ_PYTHON_MODULE_DIR="${ParaQ_SOURCE_DIR}/ParaView/Wrapping/Python")
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPythonShell.h
   pqPythonStream.h
@@ -23,11 +25,14 @@ ADD_LIBRARY(QtPython
   pqPythonShell.h
   pqPythonStream.cxx
   pqPythonStream.h
+  QtPythonExport.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )
 
 TARGET_LINK_LIBRARIES(QtPython
+  pqPython
+  QtWidgets
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
 )

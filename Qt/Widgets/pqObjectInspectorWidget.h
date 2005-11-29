@@ -9,15 +9,14 @@
 #ifndef _pqObjectInspectorWidget_h
 #define _pqObjectInspectorWidget_h
 
-
+#include "QtWidgetsExport.h"
 #include <QWidget>
 
 class pqObjectInspector;
 class pqObjectInspectorDelegate;
 class QTreeView;
 
-
-class pqObjectInspectorWidget : public QWidget
+class QTWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
 {
 public:
   pqObjectInspectorWidget(QWidget *parent=0);

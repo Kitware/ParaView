@@ -10,9 +10,12 @@
 #ifndef _pqConnect_h
 #define _pqConnect_h
 
+#include "QtWidgetsExport.h"
+
 class QObject;
 
-struct pqConnect
+/// Helper class for making Qt connections
+struct QTWIDGETS_EXPORT pqConnect
 {
   pqConnect(const char* Signal, const QObject* Receiver, const char* Method);
   
@@ -21,6 +24,7 @@ struct pqConnect
   const char* Method;
 };
 
+/// Makes a Qt connection
 template<typename T>
 T* operator<<(T* LHS, const pqConnect& RHS)
 {

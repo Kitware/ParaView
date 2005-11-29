@@ -10,9 +10,10 @@
 #ifndef _pqRecordEventsDialog_h
 #define _pqRecordEventsDialog_h
 
+#include "QtTestingExport.h"
 #include <QDialog>
 
-class pqRecordEventsDialog :
+class QTTESTING_EXPORT pqRecordEventsDialog :
   public QDialog
 {
   Q_OBJECT

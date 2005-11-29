@@ -10,10 +10,11 @@
 #ifndef _pqLocalFileDialogModel_h
 #define _pqLocalFileDialogModel_h
 
+#include "QtWidgetsExport.h"
 #include "pqFileDialogModel.h"
 
 /// Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem
-class pqLocalFileDialogModel :
+class QTWIDGETS_EXPORT pqLocalFileDialogModel :
   public pqFileDialogModel
 {
   Q_OBJECT

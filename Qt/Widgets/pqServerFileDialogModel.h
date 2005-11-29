@@ -10,12 +10,13 @@
 #ifndef _pqServerFileDialogModel_h
 #define _pqServerFileDialogModel_h
 
+#include "QtWidgetsExport.h"
 #include "pqFileDialogModel.h"
 
 class vtkProcessModule;
 
 /// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
-class pqServerFileDialogModel :
+class QTWIDGETS_EXPORT pqServerFileDialogModel :
   public pqFileDialogModel
 {
   typedef pqFileDialogModel base;

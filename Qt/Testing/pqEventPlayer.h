@@ -10,6 +10,8 @@
 #ifndef _pqEventPlayer_h
 #define _pqEventPlayer_h
 
+#include "QtTestingExport.h"
+
 #include <QString>
 #include <QVector>
 
@@ -17,7 +19,7 @@ class QObject;
 class pqWidgetEventPlayer;
 
 /// Manages translation of high-level ParaQ events to low-level Qt events, for playback of test-cases, demos, tutorials, etc.
-class pqEventPlayer
+class QTTESTING_EXPORT pqEventPlayer
 {
 public:
   pqEventPlayer(QObject& RootObject);

@@ -10,13 +10,14 @@
 #ifndef _pqCommandDispatcherManager_h
 #define _pqCommandDispatcherManager_h
 
+#include "QtWidgetsExport.h"
 #include <QObject>
 
 class pqCommandDispatcher;
 
 /// Singleton object that manages a "current" command dispatcher that implements the user's preferred update policy - immediate updates, explicit updates, etc.
 /** \todo Need to figure-out how this will interoperate with pqSMAdaptor and server-manager undo/redo */
-class pqCommandDispatcherManager :
+class QTWIDGETS_EXPORT pqCommandDispatcherManager :
   public QObject
 {
   Q_OBJECT

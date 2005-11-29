@@ -10,12 +10,14 @@
 #ifndef _pqPythonInterpreter_h
 #define _pqPythonInterpreter_h
 
+#include "pqPythonExport.h"
+
 /// Encapsulates a single instance of a Python interpreter.
 /** Create an instance of pqPythonInterpreter and call its MakeCurrent() method
     before making any other Python calls.  You may create multiple interpreter
     instances (separate Python runtime environments) and execute python calls in
     each by calling MakeCurrent() to "switch" between interpreters */
-class pqPythonInterpreter
+class PQPYTHON_EXPORT pqPythonInterpreter
 {
 public:
   pqPythonInterpreter();

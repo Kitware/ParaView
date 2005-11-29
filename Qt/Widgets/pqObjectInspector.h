@@ -8,13 +8,12 @@
 #ifndef _pqObjectInspector_h
 #define _pqObjectInspector_h
 
-
+#include "QtWidgetsExport.h"
 #include <QAbstractItemModel>
 
 class pqObjectInspectorInternal;
 class pqObjectInspectorItem;
 class vtkSMSourceProxy;
-
 
 /// \class pqObjectInspector
 /// \brief
@@ -25,7 +24,7 @@ class vtkSMSourceProxy;
 /// Since the model is hirarchical, it is best viewed in a tree view.
 /// The pqObjectInspectorDelegate class can be used in conjuntion with
 /// the model to allow the user to edit the properties.
-class pqObjectInspector : public QAbstractItemModel
+class QTWIDGETS_EXPORT pqObjectInspector : public QAbstractItemModel
 {
   Q_OBJECT
 

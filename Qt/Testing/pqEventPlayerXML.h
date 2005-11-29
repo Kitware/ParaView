@@ -10,11 +10,12 @@
 #ifndef _pqEventPlayerXML_h
 #define _pqEventPlayerXML_h
 
+#include "QtTestingExport.h"
 #include <QString>
 
 class pqEventPlayer;
 
-class pqEventPlayerXML
+class QTTESTING_EXPORT pqEventPlayerXML
 {
 public:
   /// Loads an XML test case from a file, and plays it with the given player, returning true iff every command was successfully executed

@@ -16,11 +16,12 @@ class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
 
+#include "QtWidgetsExport.h"
 #include <QObject>
 #include <QString>
 
 /// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
-class pqServer : public QObject
+class QTWIDGETS_EXPORT pqServer : public QObject
 {
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure

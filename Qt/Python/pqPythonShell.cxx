@@ -33,6 +33,14 @@ struct pqPythonShell::pqImplementation
     PySys_SetObject("stdout", reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
     PySys_SetObject("stderr", reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
     
+    // Add the paraview module path(s) to Python's path
+    if(PyObject* path = PySys_GetObject("path"))
+      {
+      PyObject* const module_dir = PyString_FromString(PARAQ_PYTHON_MODULE_DIR);
+      PyList_Insert(path, 0, module_dir);
+      Py_XDECREF(module_dir);
+      }
+    
     // Setup Python's interactive prompts
     PyObject* ps1 = PySys_GetObject("ps1");
     if(!ps1)

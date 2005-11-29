@@ -10,13 +10,14 @@
 #ifndef _pqImageComparison_h
 #define _pqImageComparison_h
 
+#include "QtTestingExport.h"
 #include <vtkIOStream.h>
 
 class QString;
 class vtkRenderWindow;
 
-bool pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
-bool pqCompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+QTTESTING_EXPORT bool pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
+QTTESTING_EXPORT bool pqCompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 
 #endif // !_pqImageComparison_h
 

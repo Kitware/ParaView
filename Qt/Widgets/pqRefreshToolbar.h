@@ -10,13 +10,14 @@
 #ifndef _pqRefreshToolbar_h
 #define _pqRefreshToolbar_h
 
+#include "QtWidgetsExport.h"
 #include <QToolBar>
 
 class QComboBox;
 class QPushButton;
 
 /// Provides a user-interface component that allows the user to choose their preferred screen-update policy
-class pqRefreshToolbar :
+class QTWIDGETS_EXPORT pqRefreshToolbar :
   public QToolBar
 {
   Q_OBJECT

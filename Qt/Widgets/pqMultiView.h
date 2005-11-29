@@ -2,11 +2,12 @@
 #ifndef _pqMultiView_h
 #define _pqMultiView_h
 
+#include "QtWidgetsExport.h"
 #include <QFrame>
 #include <QList>
 
 /// class to manage locations of multiple view widgets
-class pqMultiView : public QFrame
+class QTWIDGETS_EXPORT pqMultiView : public QFrame
 {
   Q_OBJECT
 public:

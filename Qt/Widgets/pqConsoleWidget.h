@@ -10,11 +10,13 @@
 #ifndef _pqConsoleWidget_h
 #define _pqConsoleWidget_h
 
+#include "QtWidgetsExport.h"
+
 #include <QFrame>
 #include <QTextCharFormat>
 
 /// Qt widget that provides an interactive console - send text to the console by calling printString(), and connect to the executeCommand() slot to receive user input
-class pqConsoleWidget :
+class QTWIDGETS_EXPORT pqConsoleWidget :
   public QFrame
 {
   Q_OBJECT
