@@ -8,22 +8,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>354</width>
-    <height>43</height>
+    <width>405</width>
+    <height>18</height>
    </rect>
   </property>
   <property name="sizePolicy" >
    <sizepolicy>
     <hsizetype>5</hsizetype>
-    <vsizetype>1</vsizetype>
+    <vsizetype>5</vsizetype>
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize" >
    <size>
-    <width>24</width>
-    <height>24</height>
+    <width>18</width>
+    <height>18</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>16777215</width>
+    <height>18</height>
+   </size>
+  </property>
+  <property name="baseSize" >
+   <size>
+    <width>22</width>
+    <height>22</height>
    </size>
   </property>
   <property name="windowTitle" >
@@ -31,7 +43,7 @@
   </property>
   <layout class="QGridLayout" >
    <property name="margin" >
-    <number>-1</number>
+    <number>0</number>
    </property>
    <property name="spacing" >
     <number>0</number>
@@ -42,28 +54,40 @@
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>4</number>
+      <number>6</number>
      </property>
      <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Maximum</enum>
+       </property>
        <property name="sizeHint" >
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>2001</width>
+         <height>16</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
       <widget class="QToolButton" name="Active" >
+       <property name="minimumSize" >
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
        <property name="text" >
         <string>A</string>
        </property>
        <property name="checkable" >
         <bool>true</bool>
+       </property>
+       <property name="autoRaise" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -79,12 +103,15 @@
        </property>
        <property name="minimumSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>16</width>
+         <height>16</height>
         </size>
        </property>
        <property name="icon" >
-        <iconset resource="pqWidgets.qrc" >:/pqWidgets/SplitViewHorizontal.png</iconset>
+        <iconset resource="pqWidgets.qrc" >:/pqWidgets/Resources/SplitViewHorizontal.png</iconset>
+       </property>
+       <property name="autoRaise" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -100,12 +127,15 @@
        </property>
        <property name="minimumSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>16</width>
+         <height>16</height>
         </size>
        </property>
        <property name="icon" >
-        <iconset resource="pqWidgets.qrc" >:/pqWidgets/SplitViewVertical.png</iconset>
+        <iconset resource="pqWidgets.qrc" >:/pqWidgets/Resources/SplitViewVertical.png</iconset>
+       </property>
+       <property name="autoRaise" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -121,9 +151,12 @@
        </property>
        <property name="minimumSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>16</width>
+         <height>16</height>
         </size>
+       </property>
+       <property name="autoRaise" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -139,15 +172,19 @@
        </property>
        <property name="minimumSize" >
         <size>
-         <width>24</width>
-         <height>24</height>
+         <width>16</width>
+         <height>16</height>
         </size>
+       </property>
+       <property name="autoRaise" >
+        <bool>false</bool>
        </property>
       </widget>
      </item>
     </layout>
    </item>
   </layout>
+  <widget class="QWidget" name="" />
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
