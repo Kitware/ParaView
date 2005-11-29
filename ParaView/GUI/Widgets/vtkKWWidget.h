@@ -92,6 +92,7 @@ public:
     const char *event, vtkObject *object, const char *method);
   virtual void SetBinding(
     const char *event, const char *command);
+  virtual const char* GetBinding(const char *event);
   virtual void AddBinding(
     const char *event, vtkObject *object, const char *method);
   virtual void AddBinding(

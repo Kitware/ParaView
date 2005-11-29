@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.141");
+vtkCxxRevisionMacro(vtkKWWidget, "1.142");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -696,6 +696,16 @@ void vtkKWWidget::SetBinding(const char *event,
 void vtkKWWidget::SetBinding(const char *event, const char *command)
 {
   this->SetBinding(event, NULL, command);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::GetBinding(const char *event)
+{
+  if (this->IsCreated())
+    {
+    return this->Script("bind %s %s", this->GetWidgetName(), event);
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
