@@ -25,13 +25,13 @@
 # Release version number.
 TAG="ParaView-2-5-0"
 VERSION="2.5.0"
-PARAVIEW_VERSION="2.5"
+PROJECT_VERSION="2.5"
 RELEASE="0"
 
 # Project configuration.
-PROJECT="paraview"
+PROJECT="ParaView"
 CVS_MODULE="ParaView"
-CVS_MODULE_DOCS="ParaViewReleaseDocs/${PARAVIEW_VERSION}"
+CVS_MODULE_DOCS="ParaViewReleaseDocs/${PROJECT_VERSION}"
 
 # CVSROOT setting used to check out ParaView.
 CVSROOT=":pserver:anonymous@www.paraview.org:/cvsroot/ParaView"
@@ -42,11 +42,11 @@ CVS_PASS="paraview"
 CMAKE="cmake"
 MAKE="make"
 
-# ParaView release root directory.
-RELEASE_ROOT_NAME="ParaViewReleaseRoot"
+# Project release root directory.
+RELEASE_ROOT_NAME="${PROJECT}ReleaseRoot"
 RELEASE_ROOT="${HOME}/${RELEASE_ROOT_NAME}"
 
-RELEASE_UTILITIES="ParaViewReleaseUtilities"
+RELEASE_UTILITIES="${PROJECT}ReleaseUtilities"
 RELEASE_UTILITIES_CVS="ParaView/Utilities/Release"
 
 # Installation prefix used during tarball creation.  Tarballs are
@@ -55,7 +55,7 @@ RELEASE_UTILITIES_CVS="ParaView/Utilities/Release"
 PREFIX="/usr/local"
 
 # Directory relative to PREFIX where documentation should be placed.
-DOC_DIR="/doc/paraview-${PARAVIEW_VERSION}"
+DOC_DIR="/doc/${PROJECT}-${PROJECT_VERSION}"
 
 # No default compiler.  The config file must provide it.
 CC=""
@@ -70,7 +70,7 @@ CXXFLAGS=""
 usage()
 {
     cat <<EOF
-ParaView Release Script Usage:
+${PROJECT} Release Script Usage:
   $0 [command]
 
 Typical usage:
@@ -252,7 +252,7 @@ upload()
            ${PROJECT}-${VERSION}.zip \
            ${PROJECT}-docs-${VERSION}.zip`
 
-    scp ${files} kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
+    scp ${files} kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PROJECT_VERSION}
     echo "---- Done copying tarballs to www.paraview.org. -----"
 }
 
@@ -575,7 +575,7 @@ EOF
         ) &&
         rm -rf Install/README &&
         (cat > Install/README <<EOF
-ParaView $VERSION binary for $PLATFORM
+${PROJECT} $VERSION binary for $PLATFORM
 
 Extract the file "${PROJECT}-${VERSION}-${PLATFORM}-files.tar" into your
 destination directory (typically /usr/local).  The following files will
