@@ -39,7 +39,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.109");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.110");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -407,65 +407,60 @@ void vtkKWRenderWidget::AddInteractionBindings()
 
   if (this->VTKWidget->IsAlive())
     {
-    this->VTKWidget->SetBinding(
-      "<Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 0 0");
+    typedef struct
+    {
+      const char *Modifier;
+      int Ctrl;
+      int Shift;
+    } EventTranslator;
+    EventTranslator translators[] = {
+      { "",               0, 0 },
+      { "Shift-",         0, 1 },
+      { "Control-",       1, 0 },
+      { "Control-Shift-", 1, 1 }
+    };
+    char event[256];
+    char callback[256];
+    for (int i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
+      {
+      sprintf(event, "<%sAny-ButtonPress>", translators[i].Modifier);
+      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d 0", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
 
-    this->VTKWidget->SetBinding(
-      "<Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
+      sprintf(event, "<Double-%sAny-ButtonPress>", translators[i].Modifier);
+      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d 1", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
 
-    this->VTKWidget->SetBinding(
-      "<Shift-Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 0 1");
+      sprintf(event, "<%sAny-ButtonRelease>", translators[i].Modifier);
+      sprintf(callback, "MouseButtonReleaseCallback %%b %%x %%y %d %d", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
 
-    this->VTKWidget->SetBinding(
-      "<Shift-Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
+      sprintf(event, "<%sMotion>", translators[i].Modifier);
+      sprintf(callback, "MouseMoveCallback 0 %%x %%y %d %d", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
+        
+      for (int b = 1; b <= 3; b++)
+        {
+        sprintf(event, "<%sB%d-Motion>", translators[i].Modifier, b);
+        sprintf(callback, "MouseMoveCallback %d %%x %%y %d %d", 
+                b, translators[i].Ctrl, translators[i].Shift);
+        this->VTKWidget->SetBinding(event, this, callback);
+        }
 
-    this->VTKWidget->SetBinding(
-      "<Control-Any-ButtonPress>", this, "MouseButtonPressCallback %b %x %y 1 0");
-
-    this->VTKWidget->SetBinding(
-      "<Control-Any-ButtonRelease>", this, "MouseButtonReleaseCallback %b %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<B1-Motion>", this, "MouseMoveCallback 1 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<B2-Motion>", this, "MouseMoveCallback 2 %x %y");
-  
-    this->VTKWidget->SetBinding(
-      "<B3-Motion>", this, "MouseMoveCallback 3 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<Shift-B1-Motion>", this, "MouseMoveCallback 1 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<Shift-B2-Motion>", this, "MouseMoveCallback 2 %x %y");
-  
-    this->VTKWidget->SetBinding(
-      "<Shift-B3-Motion>", this, "MouseMoveCallback 3 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<Control-B1-Motion>", this, "MouseMoveCallback 1 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<Control-B2-Motion>", this, "MouseMoveCallback 2 %x %y");
-  
-    this->VTKWidget->SetBinding(
-      "<Control-B3-Motion>", this, "MouseMoveCallback 3 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<KeyPress>", this, "KeyPressCallback %A %x %y 0 0 %K");
-  
-    this->VTKWidget->SetBinding(
-      "<Shift-KeyPress>", this, "KeyPressCallback %A %x %y 0 1 %K");
-  
-    this->VTKWidget->SetBinding(
-      "<Control-KeyPress>", this, "KeyPressCallback %A %x %y 1 0 %K");
-  
-    this->VTKWidget->SetBinding(
-      "<Motion>", this, "MouseMoveCallback 0 %x %y");
-
-    this->VTKWidget->SetBinding(
-      "<MouseWheel>", this, "MouseWheelCallback %D");
+      sprintf(event, "<%sMouseWheel>", translators[i].Modifier);
+      sprintf(callback, "MouseWheelCallback %%D %d %d", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
+        
+      sprintf(event, "<%sKeyPress>", translators[i].Modifier);
+      sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %K", 
+              translators[i].Ctrl, translators[i].Shift);
+      this->VTKWidget->SetBinding(event, this, callback);
+      }
     }
 }
 
@@ -479,44 +474,62 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 
   if (this->VTKWidget->IsAlive())
     {
-    this->VTKWidget->RemoveBinding("<Any-ButtonPress>");
-    this->VTKWidget->RemoveBinding("<Any-ButtonRelease>");
-    this->VTKWidget->RemoveBinding("<Shift-Any-ButtonPress>");
-    this->VTKWidget->RemoveBinding("<Shift-Any-ButtonRelease>");
-    this->VTKWidget->RemoveBinding("<Control-Any-ButtonPress>");
-    this->VTKWidget->RemoveBinding("<Control-Any-ButtonRelease>");
+    typedef struct
+    {
+      const char *Modifier;
+      int Ctrl;
+      int Shift;
+    } EventTranslator;
+    EventTranslator translators[] = {
+      { "",               0, 0 },
+      { "Shift-",         0, 1 },
+      { "Control-",       1, 0 },
+      { "Control-Shift-", 1, 1 }
+    };
+    char event[256];
+    for (int i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
+      {
+      sprintf(event, "<%sAny-ButtonPress>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
 
-    this->VTKWidget->RemoveBinding("<B1-Motion>");
-    this->VTKWidget->RemoveBinding("<B2-Motion>");
-    this->VTKWidget->RemoveBinding("<B3-Motion>");
+      sprintf(event, "<Double-%sAny-ButtonPress>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
 
-    this->VTKWidget->RemoveBinding("<Shift-B1-Motion>");
-    this->VTKWidget->RemoveBinding("<Shift-B2-Motion>");
-    this->VTKWidget->RemoveBinding("<Shift-B3-Motion>");
+      sprintf(event, "<%sAny-ButtonRelease>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
 
-    this->VTKWidget->RemoveBinding("<Control-B1-Motion>");
-    this->VTKWidget->RemoveBinding("<Control-B2-Motion>");
-    this->VTKWidget->RemoveBinding("<Control-B3-Motion>");
+      sprintf(event, "<%sMotion>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
+        
+      for (int b = 1; b <= 3; b++)
+        {
+        sprintf(event, "<%sB%d-Motion>", translators[i].Modifier, b);
+        this->VTKWidget->RemoveBinding(event);
+        }
 
-    this->VTKWidget->RemoveBinding("<KeyPress>");
-    this->VTKWidget->RemoveBinding("<Shift-KeyPress>");
-    this->VTKWidget->RemoveBinding("<Control-KeyPress>");
-
-    this->VTKWidget->RemoveBinding("<Motion>");
-    this->VTKWidget->RemoveBinding("<MouseWheel>");
+      sprintf(event, "<%sMouseWheel>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
+        
+      sprintf(event, "<%sKeyPress>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseMoveCallback(int vtkNotUsed(num), int x, int y)
+void vtkKWRenderWidget::MouseMoveCallback(
+  int vtkNotUsed(num), int x, int y, int ctrl, int shift)
 {
-  this->Interactor->SetEventPositionFlipY(x, y);
+  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
   this->Interactor->MouseMoveEvent();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseWheelCallback(int delta)
+void vtkKWRenderWidget::MouseWheelCallback(int delta, int ctrl, int shift)
 {
+  this->Interactor->SetControlKey(ctrl);
+  this->Interactor->SetShiftKey(shift);
+
   if (delta < 0)
     {
     this->Interactor->MouseWheelBackwardEvent();
@@ -528,12 +541,12 @@ void vtkKWRenderWidget::MouseWheelCallback(int delta)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseButtonPressCallback(int num, int x, int y,
-                                     int ctrl, int shift)
+void vtkKWRenderWidget::MouseButtonPressCallback(
+  int num, int x, int y, int ctrl, int shift, int repeat)
 {
   this->VTKWidget->Focus();
   
-  if (this->UseContextMenu && num == 3)
+  if (this->UseContextMenu && num == 3 && repeat == 0)
     {
     if (!this->ContextMenu)
       {
@@ -555,7 +568,7 @@ void vtkKWRenderWidget::MouseButtonPressCallback(int num, int x, int y,
     }
   else
     {
-    this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+    this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift, 0, repeat);
     
     switch (num)
       {
@@ -573,9 +586,10 @@ void vtkKWRenderWidget::MouseButtonPressCallback(int num, int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseButtonReleaseCallback(int num, int x, int y)
+void vtkKWRenderWidget::MouseButtonReleaseCallback(
+  int num, int x, int y, int ctrl, int shift)
 {
-  this->Interactor->SetEventInformationFlipY(x, y, 0, 0);
+  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
   
   switch (num)
     {
@@ -593,15 +607,12 @@ void vtkKWRenderWidget::MouseButtonReleaseCallback(int num, int x, int y)
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::KeyPressCallback(char key, 
-                                  int x, int y,
-                                  int ctrl, int shift,
-                                  char *keysym)
+                                         int x, int y,
+                                         int ctrl, int shift,
+                                         char *keysym)
 {
-  this->Interactor->SetEventPositionFlipY(x, y);
-  this->Interactor->SetControlKey(ctrl);
-  this->Interactor->SetShiftKey(shift);
-  this->Interactor->SetKeyCode(key);
-  this->Interactor->SetKeySym(keysym);
+  this->Interactor->SetEventInformationFlipY(
+    x, y, ctrl, shift, key, 0, keysym);
   this->Interactor->CharEvent();
 }
 
