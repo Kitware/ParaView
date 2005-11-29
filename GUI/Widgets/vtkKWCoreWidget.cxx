@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.13");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -422,11 +422,12 @@ int vtkKWCoreWidget::GetState()
 //----------------------------------------------------------------------------
 const char* vtkKWCoreWidget::GetType()
 {
-  if (this->IsCreated())
+  const char *res = vtkKWTkUtilities::GetWidgetClass(this);
+  if (!res)
     {
-    return this->Script("winfo class %s", this->GetWidgetName());
+    return "None";
     }
-  return "None";
+  return res;
 }
 
 //----------------------------------------------------------------------------
