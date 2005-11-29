@@ -24,7 +24,6 @@
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
-#include "vtkKWSpinButtons.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
@@ -41,12 +40,14 @@
 
 #include <time.h>
 
-int vtkKWPresetSelector::AddButtonId    = 0;
-int vtkKWPresetSelector::ApplyButtonId  = 1;
-int vtkKWPresetSelector::UpdateButtonId = 2;
-int vtkKWPresetSelector::RemoveButtonId = 3;
-int vtkKWPresetSelector::LocateButtonId  = 4;
-int vtkKWPresetSelector::EmailButtonId  = 5;
+int vtkKWPresetSelector::SelectPreviousButtonId = 0;
+int vtkKWPresetSelector::SelectNextButtonId     = 1;
+int vtkKWPresetSelector::AddButtonId            = 2;
+int vtkKWPresetSelector::ApplyButtonId          = 3;
+int vtkKWPresetSelector::UpdateButtonId         = 4;
+int vtkKWPresetSelector::RemoveButtonId         = 5;
+int vtkKWPresetSelector::LocateButtonId         = 6;
+int vtkKWPresetSelector::EmailButtonId          = 7;
 
 const char *vtkKWPresetSelector::IdColumnName        = "Id";
 const char *vtkKWPresetSelector::ThumbnailColumnName = "Image";
@@ -55,7 +56,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.21");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -156,7 +157,6 @@ vtkKWPresetSelector::vtkKWPresetSelector()
 
   this->PresetList              = NULL;
   this->PresetControlFrame      = NULL;
-  this->PresetSelectSpinButtons = NULL;
   this->PresetButtons           = NULL;
 
   this->ApplyPresetOnSelection = 1;
@@ -185,12 +185,6 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
     {
     this->PresetControlFrame->Delete();
     this->PresetControlFrame = NULL;
-    }
-
-  if (this->PresetSelectSpinButtons)
-    {
-    this->PresetSelectSpinButtons->Delete();
-    this->PresetSelectSpinButtons = NULL;
     }
 
   if (this->PresetButtons)
@@ -311,25 +305,6 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
                this->PresetControlFrame->GetWidgetName());
 
   // --------------------------------------------------------------
-  // Preset : spin buttons
-
-  if (!this->PresetSelectSpinButtons)
-    {
-    this->PresetSelectSpinButtons = vtkKWSpinButtons::New();
-    }
-
-  this->PresetSelectSpinButtons->SetParent(this->PresetControlFrame);
-  this->PresetSelectSpinButtons->Create(app);
-  this->PresetSelectSpinButtons->SetLayoutOrientationToHorizontal();
-  this->PresetSelectSpinButtons->SetArrowOrientationToVertical();
-  this->PresetSelectSpinButtons->SetButtonsPadX(2);
-  this->PresetSelectSpinButtons->SetButtonsPadY(2);
-  this->PresetSelectSpinButtons->SetPreviousCommand(
-    this, "PresetSelectPreviousCallback");
-  this->PresetSelectSpinButtons->SetNextCommand(
-    this, "PresetSelectNextCallback");
-
-  // --------------------------------------------------------------
   // Preset : buttons
 
   if (!this->PresetButtons)
@@ -367,6 +342,22 @@ void vtkKWPresetSelector::CreatePresetButtons()
     }
 
   vtkKWPushButton *pb = NULL;
+
+  // select previous preset
+
+  pb = this->PresetButtons->AddWidget(
+    vtkKWPresetSelector::SelectPreviousButtonId);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconSpinUp);
+  pb->SetHeight(12);
+  pb->SetCommand(this, "PresetSelectPreviousCallback");
+
+  // select next preset
+
+  pb = this->PresetButtons->AddWidget(
+    vtkKWPresetSelector::SelectNextButtonId);
+  pb->SetImageToPredefinedIcon(vtkKWIcon::IconSpinDown);
+  pb->SetHeight(12);
+  pb->SetCommand(this, "PresetSelectNextCallback");
 
   // add preset
 
@@ -418,17 +409,9 @@ void vtkKWPresetSelector::Pack()
     this->PresetControlFrame->UnpackChildren();
     }
 
-  if (this->PresetSelectSpinButtons && 
-      this->PresetSelectSpinButtons->IsCreated() &&
-      this->SelectSpinButtonsVisibility)
-    {
-    this->Script("pack %s -side left -anchor nw -fill both -expand t",
-                 this->PresetSelectSpinButtons->GetWidgetName());
-    }
-
   if (this->PresetButtons && this->PresetButtons->IsCreated())
     {
-    this->Script("pack %s -side left -anchor nw -fill x -expand t",
+    this->Script("pack %s -side top -anchor nw -fill x -expand t",
                  this->PresetButtons->GetWidgetName());
     }
 }
@@ -479,34 +462,34 @@ void vtkKWPresetSelector::CreateColumns()
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::SetDefaultHelpStrings()
 {
-  if (this->PresetSelectSpinButtons)
+  if (!this->PresetButtons)
     {
-    this->PresetSelectSpinButtons->GetPreviousButton()->SetBalloonHelpString(
-      "Select and apply previous preset");
-    this->PresetSelectSpinButtons->GetNextButton()->SetBalloonHelpString(
-      "Select and apply next preset");
+    return;
     }
 
-  if (this->PresetButtons)
-    {
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
-      SetBalloonHelpString("Add a preset");
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectPreviousButtonId)->
+    SetBalloonHelpString("Select and apply previous preset");
+  
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectNextButtonId)->
+    SetBalloonHelpString("Select and apply next preset");
 
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
-      SetBalloonHelpString("Apply the selected preset(s)");
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
+    SetBalloonHelpString("Add a preset");
 
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
-      SetBalloonHelpString("Update the selected preset(s)");
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
+    SetBalloonHelpString("Apply the selected preset(s)");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
+    SetBalloonHelpString("Update the selected preset(s)");
     
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
-      SetBalloonHelpString("Delete the selected preset(s)");
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
+    SetBalloonHelpString("Delete the selected preset(s)");
 
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
-      SetBalloonHelpString("Locate the selected preset(s)");
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
+    SetBalloonHelpString("Locate the selected preset(s)");
 
-    this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
-      SetBalloonHelpString("Email the selected preset(s)");
-    }
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
+    SetBalloonHelpString("Email the selected preset(s)");
 }
 
 //----------------------------------------------------------------------------
@@ -576,7 +559,7 @@ void vtkKWPresetSelector::SetSelectSpinButtonsVisibility(int arg)
   this->SelectSpinButtonsVisibility = arg;
   this->Modified();
 
-  this->Pack();
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1524,6 +1507,26 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPresetSelector::SelectPreset(int id)
+{
+  int row = this->GetPresetRow(id);
+  if (row >= 0 && this->PresetList)
+    {
+    this->PresetList->GetWidget()->SelectSingleRow(row);
+    this->PresetList->GetWidget()->SeeRow(row);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::ClearSelection()
+{
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->ClearSelection();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPresetSelector::NumberOfPresetsHasChanged()
 {
   this->Update(); // enable/disable some buttons valid only if we have presets
@@ -2086,65 +2089,91 @@ void vtkKWPresetSelector::Update()
 {
   this->UpdateEnableState();
 
-  if (this->PresetButtons)
+  if (!this->PresetButtons)
     {
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::AddButtonId, 
-      (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
-
-    int has_selection = 
-      (this->PresetList && 
-       this->PresetList->GetWidget()->GetNumberOfSelectedCells());
-    
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::ApplyButtonId, 
-      this->PresetApplyCommand && *this->PresetApplyCommand &&
-      !this->ApplyPresetOnSelection ? 1 : 0);
-
-    this->PresetButtons->GetWidget(
-      vtkKWPresetSelector::ApplyButtonId)->SetEnabled(
-        has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::UpdateButtonId, 
-      (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
-
-    this->PresetButtons->GetWidget(
-      vtkKWPresetSelector::UpdateButtonId)->SetEnabled(
-        has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-    this->PresetButtons->GetWidget(
-      vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
-        has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::RemoveButtonId, 
-      this->RemoveButtonVisibility ? 1 : 0);
-
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::LocateButtonId, 
-      this->LocateButtonVisibility ? 1 : 0);
-
-    this->PresetButtons->GetWidget(
-      vtkKWPresetSelector::LocateButtonId)->SetEnabled(
-        has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-    this->PresetButtons->SetWidgetVisibility(
-      vtkKWPresetSelector::EmailButtonId, 
-      this->EmailButtonVisibility ? 1 : 0);
-
-    this->PresetButtons->GetWidget(
-      vtkKWPresetSelector::EmailButtonId)->SetEnabled(
-        has_selection ? this->PresetButtons->GetEnabled() : 0);
+    return;
     }
 
-  if (this->PresetSelectSpinButtons)
-    {
-    if (!this->GetNumberOfVisiblePresets())
-      {
-      this->PresetSelectSpinButtons->SetEnabled(0);
-      }
-    }
+  int has_selection = 
+    (this->PresetList && 
+     this->PresetList->GetWidget()->GetNumberOfSelectedCells());
+
+  int has_presets = this->GetNumberOfVisiblePresets();
+
+  // Select prev/next
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::SelectPreviousButtonId, 
+    this->SelectSpinButtonsVisibility);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::SelectPreviousButtonId)->SetEnabled(
+      has_presets ? this->PresetButtons->GetEnabled() : 0);
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::SelectNextButtonId, 
+    this->SelectSpinButtonsVisibility);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::SelectNextButtonId)->SetEnabled(
+      has_presets ? this->PresetButtons->GetEnabled() : 0);
+
+  // Add
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::AddButtonId, 
+    (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
+
+  // Apply
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::ApplyButtonId, 
+    this->PresetApplyCommand && *this->PresetApplyCommand &&
+    !this->ApplyPresetOnSelection ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::ApplyButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Update
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::UpdateButtonId, 
+    (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::UpdateButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Remove
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::RemoveButtonId, 
+    this->RemoveButtonVisibility ? 1 : 0);
+
+  // Locate
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::LocateButtonId, 
+    this->LocateButtonVisibility ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::LocateButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Email
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::EmailButtonId, 
+    this->EmailButtonVisibility ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::EmailButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -2160,11 +2189,6 @@ void vtkKWPresetSelector::UpdateEnableState()
   if (this->PresetControlFrame)
     {
     this->PresetControlFrame->SetEnabled(this->GetEnabled());
-    }
-
-  if (this->PresetSelectSpinButtons)
-    {
-    this->PresetSelectSpinButtons->SetEnabled(this->GetEnabled());
     }
 
   if (this->PresetButtons)

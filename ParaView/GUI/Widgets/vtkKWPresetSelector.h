@@ -45,7 +45,6 @@ class vtkKWIcon;
 class vtkKWMultiColumnListWithScrollbars;
 class vtkKWPresetSelectorInternals;
 class vtkKWPushButtonSet;
-class vtkKWSpinButtons;
 class vtkRenderWindow;
 
 class KWWIDGETS_EXPORT vtkKWPresetSelector : public vtkKWCompositeWidget
@@ -236,6 +235,11 @@ public:
   virtual int RemovePreset(int id);
   virtual int RemoveAllPresets();
   virtual int RemoveAllPresetsWithGroup(const char *group);
+
+  // Description:
+  // Select a preset, clear the selection.
+  virtual void SelectPreset(int id);
+  virtual void ClearSelection();
 
   // Description:
   // Set/Get the list height (in number of items)
@@ -458,7 +462,6 @@ protected:
 
   vtkKWMultiColumnListWithScrollbars *PresetList;
   vtkKWFrame                         *PresetControlFrame;
-  vtkKWSpinButtons                   *PresetSelectSpinButtons;
   vtkKWPushButtonSet                 *PresetButtons;
 
   int ApplyPresetOnSelection;
@@ -521,6 +524,8 @@ protected:
   // Description:
   // Some constants
   //BTX
+  static int SelectPreviousButtonId;
+  static int SelectNextButtonId;
   static int AddButtonId;
   static int ApplyButtonId;
   static int UpdateButtonId;
