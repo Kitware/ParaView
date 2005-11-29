@@ -233,11 +233,14 @@ public:
   
   // Description:
   // Event handlers and useful interactions
-  virtual void MouseMoveCallback(int num, int x, int y);
-  virtual void MouseWheelCallback(int delta);
-  virtual void MouseButtonPressCallback(
+  virtual void MouseMoveCallback(
     int num, int x, int y, int ctrl, int shift);
-  virtual void MouseButtonReleaseCallback(int num, int x, int y);
+  virtual void MouseWheelCallback(
+    int delta, int ctrl, int shift);
+  virtual void MouseButtonPressCallback(
+    int num, int x, int y, int ctrl, int shift, int repeat);
+  virtual void MouseButtonReleaseCallback(
+    int num, int x, int y, int ctrl, int shift);
   virtual void KeyPressCallback(
     char key, int x, int y, int ctrl, int shift, char *keysym);
   virtual void ConfigureCallback(int width, int height);
