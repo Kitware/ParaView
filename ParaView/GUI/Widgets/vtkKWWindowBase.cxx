@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.35");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.36");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -676,6 +676,13 @@ int vtkKWWindowBase::Close()
   if (this->GetApplication()->GetSaveUserInterfaceGeometry())
     {
     this->SaveWindowGeometryToRegistry();
+    }
+
+  // Just in case this was not done properly so far
+
+  if (this->MostRecentFilesManager)
+    {
+    this->MostRecentFilesManager->SaveFilesToRegistry();
     }
 
   // Remove this window from the application. 
