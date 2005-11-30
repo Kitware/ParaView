@@ -15,9 +15,10 @@
 #include "vtkKWSplitFrame.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.37");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -275,12 +276,12 @@ void vtkKWSplitFrame::ConfigureCallback()
 
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
-    size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this, &size, NULL);
     size -= this->GetInternalMarginHorizontal() * 2;
     }
   else
     {
-    size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this, NULL, &size);
     size -= this->GetInternalMarginVertical() * 2;
     }
 
@@ -360,12 +361,12 @@ void vtkKWSplitFrame::DragCallback()
 
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
-    size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this, &size, NULL);
     size -= this->GetInternalMarginHorizontal() * 2;
     }
   else
     {
-    size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this, NULL, &size);
     size -= this->GetInternalMarginVertical() * 2;
     }
 
@@ -375,22 +376,22 @@ void vtkKWSplitFrame::DragCallback()
 
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
-    smin = atoi(this->Script( "winfo rootx %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetCoordinates(this, &smin, NULL);
     }
   else
     {
-    smin = atoi(this->Script( "winfo rooty %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetCoordinates(this, NULL, &smin);
     } 
 
   // Get the position of the mouse in screen
 
   if (this->Orientation == vtkKWSplitFrame::OrientationHorizontal)
     {
-    s = atoi(this->Script( "winfo pointerx %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetMousePointerCoordinates(this, &s, NULL);
     }
   else
     {
-    s = atoi(this->Script( "winfo pointery %s", this->GetWidgetName()));
+    vtkKWTkUtilities::GetMousePointerCoordinates(this, NULL, &s);
     }
 
   // Relative position.

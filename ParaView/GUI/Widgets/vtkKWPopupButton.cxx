@@ -19,12 +19,13 @@
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTopLevel.h"
+#include "vtkKWTkUtilities.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.26");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -90,8 +91,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app)
 
   if (!this->PopupTopLevel->GetTitle())
     {
-    this->PopupTopLevel->SetTitle(
-      this->Script("wm title [winfo toplevel %s]", this->GetWidgetName()));
+    this->PopupTopLevel->SetTitleToTopLevelTitle(this);
     }
 
   this->PopupTopLevel->SetDeleteWindowProtocolCommand(
@@ -179,20 +179,11 @@ void vtkKWPopupButton::DisplayPopupCallback()
 
   // Get the position of the mouse, the size of the top level window.
 
-  const char *res = 
-    this->Script("concat "
-                 " [winfo pointerx %s] [winfo pointery %s]" 
-                 " [winfo reqwidth %s] [winfo reqheight %s]"
-                 " [winfo screenwidth %s] [winfo screenheight %s]",
-                 this->GetWidgetName(), 
-                 this->GetWidgetName(),
-                 this->PopupTopLevel->GetWidgetName(), 
-                 this->PopupTopLevel->GetWidgetName(),
-                 this->GetWidgetName(), 
-                 this->GetWidgetName());
-  
   int px, py, tw, th, sw, sh;
-  sscanf(res, "%d %d %d %d %d %d", &px, &py, &tw, &th, &sw, &sh);
+
+  vtkKWTkUtilities::GetMousePointerCoordinates(this, &px, &py);
+  vtkKWTkUtilities::GetWidgetRequestedSize(this->PopupTopLevel, &tw, &th);
+  vtkKWTkUtilities::GetScreenSize(this, &sw, &sh);
 
   px -= tw / 2;
   if (px + tw > sw)
@@ -224,7 +215,7 @@ void vtkKWPopupButton::WithdrawPopupCallback()
 {
   if ( this->GetApplication()->IsDialogUp() )
     {
-    this->Script("bell");
+    vtkKWTkUtilities::Bell(this->GetApplication());
     return;
     }
   if (!this->IsCreated())

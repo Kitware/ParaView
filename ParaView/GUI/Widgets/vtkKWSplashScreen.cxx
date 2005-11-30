@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.33");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -139,7 +139,7 @@ void vtkKWSplashScreen::Display()
   // do the trick because this code is usually executed during initialization
   // or creation of the UI, not in the event loop
 
-  this->Script("update");
+  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------

@@ -142,6 +142,11 @@ public:
   virtual void SetStateToReadOnly() 
     { this->SetState(vtkKWTkOptions::StateReadOnly); };
 
+  // Description:
+  // Arranges for window to be displayed above all of its siblings in the
+  // stacking order.
+  virtual void Raise();
+
 protected:
   vtkKWCoreWidget() {};
   ~vtkKWCoreWidget() {};

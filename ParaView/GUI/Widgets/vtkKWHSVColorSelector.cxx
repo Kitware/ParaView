@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.14");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.15");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -249,8 +249,6 @@ void vtkKWHSVColorSelector::Bind()
     return;
     }
 
-  ostrstream tk_cmd;
-
   // Hue/Sat Box Canvas
 
   if (this->HueSatWheelCanvas && this->HueSatWheelCanvas->IsAlive())
@@ -272,10 +270,6 @@ void vtkKWHSVColorSelector::Bind()
     this->ValueBoxCanvas->SetBinding(
       "<ButtonRelease-1>", this, "ValueReleaseCallback");
     }
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -285,8 +279,6 @@ void vtkKWHSVColorSelector::UnBind()
     {
     return;
     }
-
-  ostrstream tk_cmd;
 
   // Hue/Sat Box Canvas
 
@@ -303,10 +295,6 @@ void vtkKWHSVColorSelector::UnBind()
     this->ValueBoxCanvas->RemoveBinding("<B1-Motion>");
     this->ValueBoxCanvas->RemoveBinding("<ButtonRelease-1>");
     }
-  
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

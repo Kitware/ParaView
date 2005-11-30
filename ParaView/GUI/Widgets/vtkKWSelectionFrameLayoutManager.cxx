@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.45");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.46");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -2185,7 +2185,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
   if (this->IsCreated())
     {
     vtkKWTkUtilities::SetTopLevelMouseCursor(this, "watch");
-    this->Script("update");
+    vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
     }
   
   di.cbSize = sizeof(DOCINFO);
@@ -2329,7 +2329,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 
   if (this->IsCreated())
     {
-    this->Script("update");
+    vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
     }
 
 #endif

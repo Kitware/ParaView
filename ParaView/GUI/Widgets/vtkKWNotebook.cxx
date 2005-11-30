@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.90");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.91");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -1993,8 +1993,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
       }
     }
 
-  this->Script("tk_popup %s %d %d", 
-               this->TabPopupMenu->GetWidgetName(), x, y);
+  this->TabPopupMenu->PopUp(x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -2126,8 +2125,8 @@ void vtkKWNotebook::UpdateBodyPosition()
     // right under it, but slightly higher so that the bottom border of the
     // tabs is hidden (which will give the "notebook" look).
 
-    int rheight = atoi(
-      this->Script("winfo reqheight %s", this->TabsFrame->GetWidgetName()));
+    int rheight = 0;
+    vtkKWTkUtilities::GetWidgetRequestedSize(this->TabsFrame, NULL, &rheight);
 
     // if 1, then we have not been mappep/configured at the moment, but this
     // function will be called by Resize() when Configure is triggered, so
@@ -2172,16 +2171,14 @@ void vtkKWNotebook::UpdateMaskPosition()
       return;
       }
 
-    const char *res;
-
     // tabs_x: horizontal pos of the tabs container inside the notebook
     // tab_x:  horizontal pos of the selected tab inside the tabs container
 
-    int tabs_x, tab_x = 0, tab_is_mapped;
-    res = this->Script("concat [winfo x %s] [winfo ismapped %s]", 
-                       this->TabsFrame->GetWidgetName(),
-                       page->TabFrame->GetWidgetName());
-    sscanf(res, "%d %d", &tabs_x, &tab_is_mapped);
+    int tabs_x = 0;
+    vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+      this->TabsFrame, &tabs_x, NULL);
+
+    int tab_is_mapped = page->TabFrame->IsMapped();
 
     // For some reasons, even if the tabs container is mapped and its position
     // can be queried, the position of the tab inside the container can not
@@ -2191,11 +2188,12 @@ void vtkKWNotebook::UpdateMaskPosition()
     // UPDATE: if it is mapped, it does not seem to be reliable, so let's use
     // the slowest method anyway.
 
+    int tab_x = 0;
 #if 0
     if (tab_is_mapped)
       {
-      tab_x = atoi(
-        this->Script("winfo x %s", page->TabFrame->GetWidgetName()));
+      vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+        page->TabFrame, &tab_x, NULL);
       }
     else
 #endif
@@ -2207,11 +2205,11 @@ void vtkKWNotebook::UpdateMaskPosition()
     // tab_width: width of the selected tab
     // body_y:    vertical pos of the body (i.e. the page itself)
 
-    int tab_width, body_y;
-    res = this->Script("concat [winfo reqwidth %s] [winfo y %s]", 
-                       page->TabFrame->GetWidgetName(),
-                       this->Body->GetWidgetName());
-    sscanf(res, "%d %d", &tab_width, &body_y);
+    int tab_width = 0, body_y = 0;
+    vtkKWTkUtilities::GetWidgetRequestedSize(
+      page->TabFrame, &tab_width, NULL);
+    vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+      this->Body, NULL, &body_y);
 
     // Now basically the mask:
     // - starts right after the inner left border of the selected tab 
@@ -2269,8 +2267,6 @@ void vtkKWNotebook::Resize()
     return;
     }
 
-  const char *res;
-
   // First update the body position, because we need to know where the page
   // location is vertically.
 
@@ -2282,21 +2278,21 @@ void vtkKWNotebook::Resize()
 
   int height, width, tabs_width;
 
-  res = this->Script(
-    "concat [winfo reqheight %s] [winfo reqwidth %s] [winfo reqwidth %s]", 
-    this->Body->GetWidgetName(),
-    this->Body->GetWidgetName(),
-    this->TabsFrame->GetWidgetName());
-  sscanf(res, "%d %d %d", &height, &width, &tabs_width);
-
+  vtkKWTkUtilities::GetWidgetRequestedSize(
+    this->Body, &width, &height);
+  vtkKWTkUtilities::GetWidgetRequestedSize(
+    this->TabsFrame, &tabs_width, NULL);
+  
   // If the tabs container is visible, add the vertical space required for 
   // the tabs to get the total required height (use the body position since
   // the tabs are not completely visible)
 
   if (this->AreTabsVisible())
     {
-    height += atoi(
-      this->Script("winfo y %s", this->Body->GetWidgetName()));
+    int body_y = 0;
+    vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+      this->Body, NULL, &body_y);
+    height += body_y;
     }
 
   // Now if the tabs require more width than the page, use the tabs width

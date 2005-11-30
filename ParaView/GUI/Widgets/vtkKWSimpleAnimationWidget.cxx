@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -826,7 +826,8 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
         {
         win->GetProgressGauge()->SetValue((int)(100.0 * i / num_frames));
         }
-      this->Script("update"); // necessary for being able to interrupt
+      // process pending events... necessary for being able to interrupt
+      vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
       cam->Azimuth(azimuth);
       cam->Elevation(elev);
       cam->Roll(roll);
@@ -1017,7 +1018,8 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
         {
         win->GetProgressGauge()->SetValue((int)(100.0 * i / num_frames));
         }
-      this->Script("update"); // necessary for being able to interrupt
+      // process pending events... necessary for being able to interrupt
+      vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
       int slice_num = (int)(min + inc * i);
       if ((slice_num > max && dir > 0) || (slice_num < max && dir < 0))
         {

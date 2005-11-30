@@ -14,10 +14,11 @@
 #include "vtkKWToolbar.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWFrame.h"
-#include "vtkKWRadioButton.h"
-#include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrame.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWRadioButton.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/list>
@@ -54,7 +55,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.64");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.65");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -566,8 +567,9 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
     {
     if (*it)
       {
-      totReqWidth += this->WidgetsPadX + atoi(
-        this->Script("winfo reqwidth %s", (*it)->GetWidgetName()));
+      int reqw = 0;
+      vtkKWTkUtilities::GetWidgetRequestedSize((*it), &reqw, NULL);
+      totReqWidth += this->WidgetsPadX + reqw;
       if (this->WidgetsFlatAspect)
         {
         totReqWidth += this->WidgetsFlatAdditionalPadX;
@@ -575,8 +577,8 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       }
     }
 
-  int width = atoi(
-    this->Script("winfo width %s", this->GetWidgetName()));
+  int width = 0;
+  vtkKWTkUtilities::GetWidgetSize(this, &width, NULL);
 
   int widthWidget = totReqWidth / this->Internals->Widgets.size();
   int numPerRow = width / widthWidget;

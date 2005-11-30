@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.3");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.4");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -118,8 +118,8 @@ void vtkKWFrameWithLabel::AdjustMarginCallback()
     // Get the height of the label frame, and share it between
     // the two borders (frame).
 
-    int height = atoi(this->Script("winfo reqheight %s", 
-                                   this->LabelFrame->GetWidgetName()));
+    int height = 0;
+    vtkKWTkUtilities::GetWidgetRequestedSize(this->LabelFrame, NULL, &height);
 
     // If the frame has not been packed yet, reqheight will return 1,
     // so try the hard way by checking what's inside the pack, provided
@@ -160,7 +160,7 @@ void vtkKWFrameWithLabel::AdjustMarginCallback()
                    this->Icon->GetWidgetName(),
                    -this->IconData->GetWidth() -1,
                    border_h + 1);    
-      this->Script("raise %s", this->Icon->GetWidgetName());
+      this->Icon->Raise();
       }
     }
 }
@@ -254,7 +254,7 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
                this->LabelFrame->GetWidgetName());
 
-  this->Script("raise %s", this->Label->GetWidgetName());
+  this->Label->Raise();
 
   if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
       this->AllowFrameToCollapse)

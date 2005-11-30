@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.14");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create(vtkKWApplication *app)
@@ -428,6 +428,15 @@ const char* vtkKWCoreWidget::GetType()
     return "None";
     }
   return res;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCoreWidget::Raise()
+{
+  if (this->IsCreated())
+    {
+    this->Script("raise %s", this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------

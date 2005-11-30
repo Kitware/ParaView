@@ -35,7 +35,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.73");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.74");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4282,12 +4282,14 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     {
     if (this->CanvasVisibility)
       {
-      this->CanvasWidth = atoi(this->Script("winfo width %s", canv));
+      vtkKWTkUtilities::GetWidgetSize(
+        this->Canvas, &this->CanvasWidth, NULL);
       }
     else
       {
-      this->CanvasWidth = atoi(
-        this->Script("winfo width %s", this->GetWidgetName()));
+      vtkKWTkUtilities::GetWidgetSize(
+        this, &this->CanvasWidth, NULL);
+
       this->CanvasWidth -= (this->GetBorderWidth() + this->GetPadX())* 2;
       }
     if (this->CanvasWidth < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
@@ -6738,10 +6740,7 @@ void vtkKWParameterValueFunctionEditor::ConfigureCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::CanvasEnterCallback()
 {
-  if (this->IsCreated())
-    {
-    this->Script("focus %s", this->Canvas->GetWidgetName());
-    }
+  this->Canvas->Focus();
 }
 
 //----------------------------------------------------------------------------

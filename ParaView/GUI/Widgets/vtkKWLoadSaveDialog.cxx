@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.45");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -146,7 +146,9 @@ int vtkKWLoadSaveDialog::Invoke()
     }
 
   this->GetApplication()->UnRegisterDialogUp(this);
-  this->Script("update");
+
+  // Calls to update are evil, document why this one is needed
+  //this->Script ("update"); 
 
   this->Done = res + 1;
 

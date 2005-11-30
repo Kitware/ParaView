@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.36");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.37");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -660,7 +660,7 @@ int vtkKWWindowBase::Close()
 
   if (this->GetApplication()->IsDialogUp())
     {
-    this->Script("bell");
+    vtkKWTkUtilities::Bell(this->GetApplication());
     return 0;
     }
 
