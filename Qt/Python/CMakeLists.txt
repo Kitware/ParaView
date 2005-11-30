@@ -10,11 +10,9 @@ FIND_PACKAGE(PythonLibs)
 INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/Python
   ${ParaQ_SOURCE_DIR}/Qt/Widgets
+  ${QtPython_BINARY_DIR}
   ${PYTHON_INCLUDE_PATH}
 )
-
-#ADD_DEFINITIONS(-DPARAQ_PYTHON_MODULE_DIR="\\"${ParaQ_SOURCE_DIR}/ParaView/Wrapping/Python\\"")
-#ADD_DEFINITIONS(-DPARAQ_PYTHON_MODULE_DIR="${ParaQ_SOURCE_DIR}/ParaView/Wrapping/Python")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPythonShell.h
@@ -38,7 +36,12 @@ TARGET_LINK_LIBRARIES(QtPython
   ${PYTHON_LIBRARIES}
 )
 
-SOURCE_GROUP("Generated" FILES
+CONFIGURE_FILE(
+  ${QtPython_SOURCE_DIR}/QtPythonConfig.h.in
+  ${QtPython_BINARY_DIR}/QtPythonConfig.h
+)
+
+SOURCE_GROUP("Generated Files" FILES
   ${MOC_BUILT_SOURCES}
 )
 
