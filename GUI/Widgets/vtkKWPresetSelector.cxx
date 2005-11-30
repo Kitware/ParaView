@@ -56,7 +56,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.22");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -269,7 +269,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
   if (this->ApplyPresetOnSelection)
     {
-    list->SetSelectionModeToSingle();
+    list->SetSelectionModeToBrowse();
     }
   else
     {
@@ -349,7 +349,7 @@ void vtkKWPresetSelector::CreatePresetButtons()
     vtkKWPresetSelector::SelectPreviousButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconSpinUp);
   pb->SetHeight(12);
-  pb->SetCommand(this, "PresetSelectPreviousCallback");
+  pb->SetCommand(this, "SelectPreviousPreset");
 
   // select next preset
 
@@ -357,7 +357,7 @@ void vtkKWPresetSelector::CreatePresetButtons()
     vtkKWPresetSelector::SelectNextButtonId);
   pb->SetImageToPredefinedIcon(vtkKWIcon::IconSpinDown);
   pb->SetHeight(12);
-  pb->SetCommand(this, "PresetSelectNextCallback");
+  pb->SetCommand(this, "SelectNextPreset");
 
   // add preset
 
@@ -539,7 +539,7 @@ void vtkKWPresetSelector::SetApplyPresetOnSelection(int arg)
     {
     if (this->ApplyPresetOnSelection)
       {
-      this->PresetList->GetWidget()->SetSelectionModeToSingle();
+      this->PresetList->GetWidget()->SetSelectionModeToBrowse();
       }
     else
       {
@@ -1518,6 +1518,56 @@ void vtkKWPresetSelector::SelectPreset(int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPresetSelector::SelectPreviousPreset()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int nb_rows = list->GetNumberOfRows();
+    if (nb_rows)
+      {
+      int prev_row; 
+      if (!list->GetNumberOfSelectedRows())
+        {
+        prev_row = nb_rows - 1;
+        }
+      else
+        {
+        int sel_row = list->GetIndexOfFirstSelectedRow();
+        prev_row = (nb_rows == 1 || sel_row == 0) ? nb_rows - 1 : sel_row - 1;
+        }
+      list->SelectSingleRow(prev_row);
+      list->SeeRow(prev_row);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SelectNextPreset()
+{
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int nb_rows = list->GetNumberOfRows();
+    if (nb_rows)
+      {
+      int next_row; 
+      if (!list->GetNumberOfSelectedRows())
+        {
+        next_row = 0;
+        }
+      else
+        {
+        int sel_row = list->GetIndexOfFirstSelectedRow();
+        next_row = (nb_rows == 1 || sel_row == nb_rows - 1) ? 0 : sel_row + 1;
+        }
+      list->SelectSingleRow(next_row);
+      list->SeeRow(next_row);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPresetSelector::ClearSelection()
 {
   if (this->PresetList)
@@ -1933,56 +1983,6 @@ void vtkKWPresetSelector::PresetSelectionCallback()
   if (this->ApplyPresetOnSelection)
     {
     this->PresetApplyCallback();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWPresetSelector::PresetSelectPreviousCallback()
-{
-  if (this->PresetList)
-    {
-    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-    int nb_rows = list->GetNumberOfRows();
-    if (nb_rows)
-      {
-      int prev_row; 
-      if (!list->GetNumberOfSelectedRows())
-        {
-        prev_row = nb_rows - 1;
-        }
-      else
-        {
-        int sel_row = list->GetIndexOfFirstSelectedRow();
-        prev_row = (nb_rows == 1 || sel_row == 0) ? nb_rows - 1 : sel_row - 1;
-        }
-      list->SelectSingleRow(prev_row);
-      list->SeeRow(prev_row);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWPresetSelector::PresetSelectNextCallback()
-{
-  if (this->PresetList)
-    {
-    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-    int nb_rows = list->GetNumberOfRows();
-    if (nb_rows)
-      {
-      int next_row; 
-      if (!list->GetNumberOfSelectedRows())
-        {
-        next_row = 0;
-        }
-      else
-        {
-        int sel_row = list->GetIndexOfFirstSelectedRow();
-        next_row = (nb_rows == 1 || sel_row == nb_rows - 1) ? 0 : sel_row + 1;
-        }
-      list->SelectSingleRow(next_row);
-      list->SeeRow(next_row);
-      }
     }
 }
 

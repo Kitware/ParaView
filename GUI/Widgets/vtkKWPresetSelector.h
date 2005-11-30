@@ -239,6 +239,8 @@ public:
   // Description:
   // Select a preset, clear the selection.
   virtual void SelectPreset(int id);
+  virtual void SelectPreviousPreset();
+  virtual void SelectNextPreset();
   virtual void ClearSelection();
 
   // Description:
@@ -383,8 +385,6 @@ public:
   virtual void PresetLocateCallback();
   virtual void PresetSelectionCallback();
   virtual void PresetSelectionChangedCallback() {};
-  virtual void PresetSelectPreviousCallback();
-  virtual void PresetSelectNextCallback();
 
   // Description:
   // Callback used to refresh the contents of the image cell for each preset
