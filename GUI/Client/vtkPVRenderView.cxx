@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.407");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.408");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1821,7 +1821,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   frame->Delete();
 
-  this->Notebook->Raise("General");
+  this->Notebook->RaisePage("General");
 }
 
 //----------------------------------------------------------------------------

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.25");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -192,7 +192,7 @@ void vtkPVSourceNotebook::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::Raise(const char* pageName)
 {
-  this->Notebook->Raise(pageName);
+  this->Notebook->RaisePage(pageName);
 }  
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::HidePage(const char* pageName)

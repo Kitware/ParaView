@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.91");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.92");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -954,19 +954,19 @@ void vtkKWNotebook::RemovePagesMatchingTag(int tag)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Raise(int id)
+void vtkKWNotebook::RaisePage(int id)
 {
   this->RaisePage(this->GetPage(id));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Raise(const char *title)
+void vtkKWNotebook::RaisePage(const char *title)
 {
   this->RaisePage(this->GetPage(title));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Raise(const char *title, int tag)
+void vtkKWNotebook::RaisePage(const char *title, int tag)
 {
   this->RaisePage(this->GetPage(title, tag));
 }
@@ -1897,7 +1897,7 @@ void vtkKWNotebook::SendEventForPage(unsigned long event, int id)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RaiseCallback(int id)
 {
-  this->Raise(id);
+  this->RaisePage(id);
 
   this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
 }
