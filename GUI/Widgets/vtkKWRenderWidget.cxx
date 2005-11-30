@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.111");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.112");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -422,7 +422,7 @@ void vtkKWRenderWidget::AddInteractionBindings()
     };
     char event[256];
     char callback[256];
-    for (int i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
+    for (size_t i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
       {
       sprintf(event, "<%sAny-ButtonPress>", translators[i].Modifier);
       sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d 0", 
@@ -488,7 +488,7 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
       { "Control-Shift-", 1, 1 }
     };
     char event[256];
-    for (int i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
+    for (size_t i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
       {
       sprintf(event, "<%sAny-ButtonPress>", translators[i].Modifier);
       this->VTKWidget->RemoveBinding(event);
