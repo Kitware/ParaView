@@ -88,9 +88,9 @@ public:
   // none is raised.
   // RaiseFirstPageMatchingTag() is a convenience method use to raise the first
   // page matching a given tag.
-  void Raise(int id);
-  void Raise(const char *title);
-  void Raise(const char *title, int tag);
+  void RaisePage(int id);
+  void RaisePage(const char *title);
+  void RaisePage(const char *title, int tag);
   int GetRaisedPageId();
   void RaiseFirstPageMatchingTag(int tag);
   

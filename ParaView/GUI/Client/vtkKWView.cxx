@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.24");
+vtkCxxRevisionMacro(vtkKWView, "1.25");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -360,7 +360,7 @@ void vtkKWView::CreateViewProperties()
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
                this->AnnotationPropertiesFrame->GetWidgetName());
-  this->Notebook->Raise("Annotate");
+  this->Notebook->RaisePage("Annotate");
   
   // create the anno widgets
   this->CornerAnnotation->SetParent(

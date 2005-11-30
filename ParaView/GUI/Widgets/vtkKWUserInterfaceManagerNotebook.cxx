@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerNotebook);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerNotebook, "1.2");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerNotebook, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerNotebookInternals
@@ -255,7 +255,7 @@ void vtkKWUserInterfaceManagerNotebook::RaisePage(int id)
   // Since each page has a unique id, whatever the panel it belongs to, just 
   // raise the corresponding notebook page.
 
-  this->Notebook->Raise(id);
+  this->Notebook->RaisePage(id);
 }
 
 //----------------------------------------------------------------------------
@@ -298,7 +298,7 @@ void vtkKWUserInterfaceManagerNotebook::RaisePage(
     return;
     }
 
-  this->Notebook->Raise(title, tag);
+  this->Notebook->RaisePage(title, tag);
 }
 
 //----------------------------------------------------------------------------
