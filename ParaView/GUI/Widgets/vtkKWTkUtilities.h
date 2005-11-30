@@ -521,9 +521,18 @@ public:
   static void Bell(vtkKWApplication *app);
 
   // Description:
-  // Process/update pending events
+  // Process/update pending events. This command is used to bring the 
+  // application "up to date" by entering the event loop repeatedly until
+  // all pending events (including idle callbacks) have been processed. 
   static void ProcessPendingEvents(Tcl_Interp *interp);
   static void ProcessPendingEvents(vtkKWApplication *app);
+
+  // Description:
+  // Process/update idle tasks. This causes operations that are normally 
+  // deferred, such as display updates and window layout calculations, to be
+  // performed immediately. 
+  static void ProcessIdleTasks(Tcl_Interp *interp);
+  static void ProcessIdleTasks(vtkKWApplication *app);
 
   // Description:
   // Get the coordinates of the mouse pointer in the screen widget is in.
@@ -539,6 +548,15 @@ public:
   static int GetWidgetCoordinates(
     Tcl_Interp *interp, const char *widget, int *x, int *y);
   static int GetWidgetCoordinates(
+    vtkKWWidget *widget, int *x, int *y);
+
+  // Description:
+  // Get the relative coordinates of the upper-left corner of widget in its
+  // widget's parent.
+  // Return 1 on success, 0 otherwise.
+  static int GetWidgetRelativeCoordinates(
+    Tcl_Interp *interp, const char *widget, int *x, int *y);
+  static int GetWidgetRelativeCoordinates(
     vtkKWWidget *widget, int *x, int *y);
 
   // Description:
@@ -571,6 +589,14 @@ public:
     Tcl_Interp *interp, const char *widget);
   static const char* GetWidgetClass(
     vtkKWWidget *widget);
+
+  // Description:
+  // Get the width and height (in pixels) of the screen the widget is in.
+  // Return 1 on success, 0 otherwise.
+  static int GetScreenSize(
+    Tcl_Interp *interp, const char *widget, int *w, int *h);
+  static int GetScreenSize(
+    vtkKWWidget *widget, int *w, int *h);
 
 protected:
   vtkKWTkUtilities() {};

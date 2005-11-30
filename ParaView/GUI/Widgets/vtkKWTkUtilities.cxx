@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.72");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.73");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -2749,6 +2749,28 @@ void vtkKWTkUtilities::ProcessPendingEvents(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTkUtilities::ProcessIdleTasks(Tcl_Interp *interp)
+{
+  if (interp)
+    { 
+    if (Tcl_GlobalEval(interp, "update idletasks") != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to process pending events: " <<Tcl_GetStringResult(interp));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::ProcessIdleTasks(vtkKWApplication *app)
+{
+  if (app)
+    {
+    vtkKWTkUtilities::ProcessIdleTasks(app->GetMainInterp());
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::GetMousePointerCoordinates(
   Tcl_Interp *interp, const char *widget, int *x, int *y)
 {
@@ -2847,6 +2869,60 @@ int vtkKWTkUtilities::GetWidgetCoordinates(
   if (widget && widget->IsCreated())
     {
     return vtkKWTkUtilities::GetWidgetCoordinates(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      x, y);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+  Tcl_Interp *interp, const char *widget, int *x, int *y)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string widgetxy("concat [winfo x ");
+  widgetxy += widget;
+  widgetxy += "] [winfo y ";
+  widgetxy += widget;
+  widgetxy += "]";
+  if (Tcl_GlobalEval(interp, widgetxy.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget relative coordinates! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int wx, wy;
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d", &wx, &wy) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse widget relative coordinates!");
+    return 0;
+    }
+  
+  if (x)
+    {
+    *x = wx;
+    }
+  if (y)
+    {
+    *y = wy;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetRelativeCoordinates(
+  vtkKWWidget *widget, int *x, int *y)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetWidgetRelativeCoordinates(
       widget->GetApplication()->GetMainInterp(), 
       widget->GetWidgetName(), 
       x, y);
@@ -2994,6 +3070,60 @@ const char* vtkKWTkUtilities::GetWidgetClass(
       widget->GetWidgetName());
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetScreenSize(
+  Tcl_Interp *interp, const char *widget, int *w, int *h)
+{
+  if (!interp)
+    {
+    return 0;
+    }
+
+  vtksys_stl::string widgetwh("concat [winfo screenwidth ");
+  widgetwh += widget;
+  widgetwh += "] [winfo screenheight ";
+  widgetwh += widget;
+  widgetwh += "]";
+  if (Tcl_GlobalEval(interp, widgetwh.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query screen size! " 
+                           << Tcl_GetStringResult(interp));
+    return 0;
+    }
+  
+  int ww, wh;
+  if (sscanf(Tcl_GetStringResult(interp), "%d %d", &ww, &wh) != 2)
+    {
+    vtkGenericWarningMacro(<< "Unable to parse screen size!");
+    return 0;
+    }
+  
+  if (w)
+    {
+    *w = ww;
+    }
+  if (h)
+    {
+    *h = wh;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetScreenSize(
+  vtkKWWidget *widget, int *w, int *h)
+{
+  if (widget && widget->IsCreated())
+    {
+    return vtkKWTkUtilities::GetScreenSize(
+      widget->GetApplication()->GetMainInterp(), 
+      widget->GetWidgetName(), 
+      w, h);
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
