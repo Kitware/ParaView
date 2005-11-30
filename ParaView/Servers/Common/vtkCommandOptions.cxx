@@ -25,16 +25,6 @@
 class vtkCommandOptionsInternal
 {
 public:
-  vtkCommandOptionsInternal(vtkCommandOptions* p)
-    {
-      this->XMLParser = vtkCommandOptionsXMLParser::New();
-      this->XMLParser->SetPVOptions(p);
-    }
-  ~vtkCommandOptionsInternal()
-    {
-      this->XMLParser->Delete();
-    }
-  vtkCommandOptionsXMLParser* XMLParser;
   vtksys::CommandLineArguments CMD;
 };
 //****************************************************************************
@@ -42,14 +32,14 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.4");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.5");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
 {
   this->ProcessType = EVERYBODY;
   // Initialize vtksys::CommandLineArguments
-  this->Internals = new vtkCommandOptionsInternal(this);
+  this->Internals = new vtkCommandOptionsInternal();
   this->Internals->CMD.SetUnknownArgumentCallback(vtkCommandOptions::UnknownArgumentHandler);
   this->Internals->CMD.SetClientData(this);
   this->UnknownArgument = 0;
@@ -60,6 +50,9 @@ vtkCommandOptions::vtkCommandOptions()
   this->Argv = 0;
 
   this->XMLConfigFile = 0;
+
+  this->XMLParser = vtkCommandOptionsXMLParser::New();
+  this->XMLParser->SetPVOptions(this);
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +65,12 @@ vtkCommandOptions::~vtkCommandOptions()
   this->SetErrorMessage(0);
   this->CleanArgcArgv();
   delete this->Internals;
+
+  if (this->XMLParser)
+    {
+    this->XMLParser->Delete();
+    this->XMLParser = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -128,8 +127,8 @@ const char* vtkCommandOptions::GetArgv0()
 //----------------------------------------------------------------------------
 int vtkCommandOptions::LoadXMLConfigFile(const char* fname)
 {
-  this->Internals->XMLParser->SetFileName(fname);
-  this->Internals->XMLParser->Parse();
+  this->XMLParser->SetFileName(fname);
+  this->XMLParser->Parse();
   this->SetXMLConfigFile(fname);
   return 1;
 }
@@ -216,7 +215,7 @@ void vtkCommandOptions::AddBooleanArgument(const char* longarg, const char* shor
                                       int* var, const char* help, int type)
 {
   // add the argument to the XML parser
-  this->Internals->XMLParser->AddBooleanArgument(longarg, var, type);
+  this->XMLParser->AddBooleanArgument(longarg, var, type);
   if(type & XMLONLY)
     {
     return;
@@ -235,7 +234,7 @@ void vtkCommandOptions::AddBooleanArgument(const char* longarg, const char* shor
 //----------------------------------------------------------------------------
 void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, int* var, const char* help, int type)
 {
-  this->Internals->XMLParser->AddArgument(longarg, var, type);
+  this->XMLParser->AddArgument(longarg, var, type);
   if(type & XMLONLY)
     {
     return;
@@ -254,7 +253,7 @@ void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, i
 //----------------------------------------------------------------------------
 void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, char** var, const char* help, int type)
 {
-  this->Internals->XMLParser->AddArgument(longarg, var, type);
+  this->XMLParser->AddArgument(longarg, var, type);
   if(type & XMLONLY)
     {
     return;
