@@ -25,6 +25,7 @@
 #include "vtkObject.h"
 
 class vtkCommandOptionsInternal;
+class vtkCommandOptionsXMLParser;
 
 class VTK_EXPORT vtkCommandOptions : public vtkObject
 {
@@ -38,10 +39,10 @@ public:
   const char* GetHelp();
 
   enum
-    {
+  {
     EVERYBODY = 0,
     XMLONLY = 0x1
-    };
+  };
 
   // Description:
   // Was help selected?
@@ -133,6 +134,8 @@ protected:
   vtkSetStringMacro(XMLConfigFile);
 
   void CleanArgcArgv();
+
+  vtkCommandOptionsXMLParser* XMLParser;
 
 private:
   int Argc;
