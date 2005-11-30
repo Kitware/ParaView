@@ -41,6 +41,7 @@ set kw(vtkTemp880) [$kw(vtkTemp2) GetPVColorMap {Part Index} 1]
 $kw(vtkTemp880) SetScalarBarTitle {Part Index}
 $kw(vtkTemp833) AcceptCallback
 $kw(vtkTemp23) SetCameraState -17.750 6.583 -16.838  -0.000 0.000 0.000  0.213 0.965 0.153
+[$kw(vtkTemp833) GetPVOutput] ColorByArray {Part Index} 3
 
 # Retrace
 update
