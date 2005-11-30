@@ -25,6 +25,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspectorItem.h
   pqPipelineData.h
   pqPipelineListModel.h
+  pqPipelineListWidget.h
   pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h

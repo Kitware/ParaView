@@ -47,6 +47,8 @@ public:
   void addInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input);
 
   QVTKWidget *getWindowFor(vtkSMProxy *proxy) const;
+  pqPipelineObject *getObjectFor(vtkSMProxy *proxy) const;
+  pqPipelineObject *getObjectFor(QVTKWidget *window) const;
 
 signals:
   void serverAdded(pqPipelineServer *server);

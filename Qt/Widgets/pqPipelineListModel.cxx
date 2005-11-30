@@ -13,6 +13,7 @@
 #include "pqPipelineServer.h"
 #include "pqServer.h"
 
+#include "QVTKWidget.h"
 #include "vtkSMProxy.h"
 
 #include <QHash>
@@ -24,26 +25,11 @@
 class pqPipelineListItem
 {
 public:
-  enum ItemType {
-    Invalid = -1,
-    Server = 0,
-    Window,
-    Source,
-    Filter,
-    Bundle,
-    LinkBack,
-    LinkOut,
-    LinkIn,
-    Split,
-    Merge
-  };
-
-public:
   pqPipelineListItem();
   ~pqPipelineListItem();
 
 public:
-  ItemType Type;
+  pqPipelineListModel::ItemType Type;
   QString Name;
   pqPipelineListItem *Parent;
   QList<pqPipelineListItem *> Internal;
@@ -61,7 +47,7 @@ class pqPipelineListInternal :
 pqPipelineListItem::pqPipelineListItem()
   : Name(), Internal()
 {
-  this->Type = pqPipelineListItem::Invalid;
+  this->Type = pqPipelineListModel::Invalid;
   this->Parent = 0;
   this->Data.Object = 0;
 }
@@ -91,28 +77,28 @@ pqPipelineListModel::pqPipelineListModel(QObject *parent)
 
   // Initialize the list pixmaps.
   Q_INIT_RESOURCE(pqWidgets);
-  this->PixmapList = new QPixmap[pqPipelineListItem::Merge + 1];
+  this->PixmapList = new QPixmap[pqPipelineListModel::Merge + 1];
   if(this->PixmapList)
     {
-    this->PixmapList[pqPipelineListItem::Server].load(
+    this->PixmapList[pqPipelineListModel::Server].load(
         ":/pqWidgets/pqServer16.png");
-    this->PixmapList[pqPipelineListItem::Window].load(
+    this->PixmapList[pqPipelineListModel::Window].load(
         ":/pqWidgets/pqWindow16.png");
-    this->PixmapList[pqPipelineListItem::Source].load(
+    this->PixmapList[pqPipelineListModel::Source].load(
         ":/pqWidgets/pqSource16.png");
-    this->PixmapList[pqPipelineListItem::Filter].load(
+    this->PixmapList[pqPipelineListModel::Filter].load(
         ":/pqWidgets/pqFilter16.png");
-    //this->PixmapList[pqPipelineListItem::Bundle].load(
+    //this->PixmapList[pqPipelineListModel::Bundle].load(
     //    ":/pqWidgets/pqBundle16.png");
-    this->PixmapList[pqPipelineListItem::LinkBack].load(
+    this->PixmapList[pqPipelineListModel::LinkBack].load(
         ":/pqWidgets/pqLinkBack16.png");
-    this->PixmapList[pqPipelineListItem::LinkOut].load(
+    this->PixmapList[pqPipelineListModel::LinkOut].load(
         ":/pqWidgets/pqLinkOut16.png");
-    this->PixmapList[pqPipelineListItem::LinkIn].load(
+    this->PixmapList[pqPipelineListModel::LinkIn].load(
         ":/pqWidgets/pqLinkIn16.png");
-    this->PixmapList[pqPipelineListItem::Split].load(
+    this->PixmapList[pqPipelineListModel::Split].load(
         ":/pqWidgets/pqSplit16.png");
-    this->PixmapList[pqPipelineListItem::Merge].load(
+    this->PixmapList[pqPipelineListModel::Merge].load(
         ":/pqWidgets/pqMerge16.png");
     }
 
@@ -237,7 +223,7 @@ QVariant pqPipelineListModel::data(const QModelIndex &index, int role) const
           }
         case Qt::DecorationRole:
           {
-          if(this->PixmapList && item->Type != pqPipelineListItem::Invalid)
+          if(this->PixmapList && item->Type != pqPipelineListModel::Invalid)
             return QVariant(this->PixmapList[item->Type]);
           }
         }
@@ -252,6 +238,89 @@ Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &index) const
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
+pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
+    const QModelIndex &index) const
+{
+  if(this->Internal && index.isValid() && index.model() == this)
+    {
+    pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
+        index.internalPointer());
+    if(item)
+      return item->Type;
+    }
+
+  return pqPipelineListModel::Invalid;
+}
+
+vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &index) const
+{
+  vtkSMProxy *proxy = 0;
+  if(this->Internal && index.isValid() && index.model() == this)
+    {
+    pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
+        index.internalPointer());
+    if(item && (item->Type == pqPipelineListModel::Source || 
+        item->Type == pqPipelineListModel::Filter))
+      {
+      proxy = item->Data.Object->GetProxy();
+      }
+    }
+
+  return proxy;
+}
+
+QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &index) const
+{
+  QWidget *widget = 0;
+  if(this->Internal && index.isValid() && index.model() == this)
+    {
+    pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
+        index.internalPointer());
+    if(item && item->Type == pqPipelineListModel::Window)
+      widget = item->Data.Object->GetWidget();
+    }
+
+  return widget;
+}
+
+QModelIndex pqPipelineListModel::getIndexFor(vtkSMProxy *proxy) const
+{
+  pqPipelineData *pipeline = pqPipelineData::instance();
+  if(this->Internal && pipeline && proxy)
+    {
+    pqPipelineObject *object = pipeline->getObjectFor(proxy);
+    QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
+        this->Internal->find(object);
+    if(iter != this->Internal->end())
+      {
+      pqPipelineListItem *item = *iter;
+      int row = item->Parent->Internal.indexOf(item);
+      return this->createIndex(row, 0, item);
+      }
+    }
+
+  return QModelIndex();
+}
+
+QModelIndex pqPipelineListModel::getIndexFor(QVTKWidget *window) const
+{
+  pqPipelineData *pipeline = pqPipelineData::instance();
+  if(this->Internal && pipeline && window)
+  {
+    pqPipelineObject *object = pipeline->getObjectFor(window);
+    QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
+        this->Internal->find(object);
+    if(iter != this->Internal->end())
+    {
+      pqPipelineListItem *item = *iter;
+      int row = item->Parent->Internal.indexOf(item);
+      return this->createIndex(row, 0, item);
+    }
+  }
+
+  return QModelIndex();
+}
+
 void pqPipelineListModel::addServer(pqPipelineServer *server)
 {
   if(!this->Root || !server || !server->GetServer())
@@ -260,7 +329,7 @@ void pqPipelineListModel::addServer(pqPipelineServer *server)
   pqPipelineListItem *item = new pqPipelineListItem();
   if(item)
     {
-    item->Type = pqPipelineListItem::Server;
+    item->Type = pqPipelineListModel::Server;
     item->Name = server->GetServer()->getFriendlyName();
     item->Data.Server = server;
     item->Parent = this->Root;
@@ -323,7 +392,7 @@ void pqPipelineListModel::addWindow(pqPipelineObject *window)
   pqPipelineListItem *item = new pqPipelineListItem();
   if(item)
     {
-    item->Type = pqPipelineListItem::Window;
+    item->Type = pqPipelineListModel::Window;
     item->Name = "Window";
     item->Data.Object = window;
     item->Parent = serverItem;
@@ -391,7 +460,7 @@ void pqPipelineListModel::addSource(pqPipelineObject *source)
   pqPipelineListItem *item = new pqPipelineListItem();
   if(item)
     {
-    item->Type = pqPipelineListItem::Source;
+    item->Type = pqPipelineListModel::Source;
     item->Name = source->GetProxy()->GetVTKClassName();
     item->Data.Object = source;
     item->Parent = windowItem;
@@ -459,7 +528,7 @@ void pqPipelineListModel::addFilter(pqPipelineObject *filter)
   pqPipelineListItem *item = new pqPipelineListItem();
   if(item)
     {
-    item->Type = pqPipelineListItem::Filter;
+    item->Type = pqPipelineListModel::Filter;
     item->Name = filter->GetProxy()->GetVTKClassName();
     item->Data.Object = filter;
     item->Parent = windowItem;

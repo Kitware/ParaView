@@ -17,6 +17,9 @@ class pqPipelineListItem;
 class pqPipelineObject;
 class pqPipelineServer;
 class QPixmap;
+class QVTKWidget;
+class QWidget;
+class vtkSMProxy;
 
 
 /// \class pqPipelineListModel
@@ -26,6 +29,21 @@ class QPixmap;
 class pqPipelineListModel : public QAbstractItemModel
 {
   Q_OBJECT
+
+public:
+  enum ItemType {
+    Invalid = -1,
+    Server = 0,
+    Window,
+    Source,
+    Filter,
+    Bundle,
+    LinkBack,
+    LinkOut,
+    LinkIn,
+    Split,
+    Merge
+  };
 
 public:
   /// \brief
@@ -93,6 +111,14 @@ public:
   ///   The flags for the given model index.
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
   //@}
+
+  ItemType getTypeFor(const QModelIndex &index) const;
+
+  vtkSMProxy *getProxyFor(const QModelIndex &index) const;
+  QWidget *getWidgetFor(const QModelIndex &index) const;
+
+  QModelIndex getIndexFor(vtkSMProxy *proxy) const;
+  QModelIndex getIndexFor(QVTKWidget *window) const;
 
 public slots:
   void addServer(pqPipelineServer *server);

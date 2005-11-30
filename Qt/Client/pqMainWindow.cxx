@@ -209,11 +209,11 @@ pqMainWindow::pqMainWindow() :
       {
       this->Inspector->setObjectName("Inspector");
       this->InspectorDock->setWidget(this->Inspector);
-      if(this->Pipeline)
+      if(this->PipelineList)
         {
-        connect(this->Pipeline, SIGNAL(currentProxyChanged(vtkSMSourceProxy*)),
+        connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy *)),
             this->Inspector->getObjectModel(),
-            SLOT(setProxy(vtkSMSourceProxy*)));
+            SLOT(setProxy(vtkSMSourceProxy *)));
         }
       }
 
@@ -322,28 +322,35 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 
 void pqMainWindow::onFileOpen(const QStringList& Files)
 {
-  if(!this->ActiveView || !this->Pipeline)
+  if(!this->Pipeline || !this->PipelineList)
     return;
     
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
-
-  for(int i = 0; i != Files.size(); ++i)
+  QVTKWidget *window = this->PipelineList->getCurrentWindow();
+  if(window)
     {
-    QString file = Files[i];
-    
-    vtkSMProxy* source = this->Pipeline->createSource("ExodusReader", w);
-    this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
-    source->Delete();
-    Adaptor->setProperty(source->GetProperty("FileName"), file);
-    Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
-    Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
-    source->UpdateVTKObjects();
-    this->Pipeline->setVisibility(source, true);
-    }
+    vtkSMProxy* source = 0;
+    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
+    for(int i = 0; i != Files.size(); ++i)
+      {
+      QString file = Files[i];
+      
+      source = this->Pipeline->createSource("ExodusReader", window);
+      this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
+      source->Delete();
+      Adaptor->setProperty(source->GetProperty("FileName"), file);
+      Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
+      Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
+      source->UpdateVTKObjects();
+      this->Pipeline->setVisibility(source, true);
+      }
 
-  rm->ResetCamera();
-  w->update();
+    rm->ResetCamera();
+    window->update();
+
+    // Select the latest source in the pipeline inspector.
+    if(source)
+      this->PipelineList->selectProxy(source);
+    }
 }
 
 void pqMainWindow::onFileOpenServerState()
@@ -510,37 +517,41 @@ void pqMainWindow::onUpdateSourcesFiltersMenu()
 
 void pqMainWindow::onCreateSource(QAction* action)
 {
-  if(!action || !this->ActiveView || !this->Pipeline)
+  if(!action || !this->Pipeline || !this->PipelineList)
     return;
 
   QByteArray sourceName = action->data().toString().toAscii();
-
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMProxy* source = this->Pipeline->createSource(sourceName, w);
-  this->Pipeline->setVisibility(source, true);
-  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
-  rm->ResetCamera();
-  w->update();
+  QVTKWidget* window = this->PipelineList->getCurrentWindow();
+  if(window)
+    {
+    vtkSMProxy* source = this->Pipeline->createSource(sourceName, window);
+    this->Pipeline->setVisibility(source, true);
+    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
+    rm->ResetCamera();
+    window->update();
+    this->PipelineList->selectProxy(source);
+    }
 }
 
 void pqMainWindow::onCreateFilter(QAction* action)
 {
-  if(!action || !this->ActiveView)
-    {
+  if(!action || !this->Pipeline || !this->PipelineList)
     return;
-    }
   
   QByteArray filterName = action->data().toString().toAscii();
-
-  vtkSMSourceProxy* cp = this->Pipeline->currentProxy();
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget());
-  vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(w);
-  vtkSMProxy* source = this->Pipeline->createFilter(filterName, w);
-  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
-  this->Pipeline->addInput(sp, cp);
-  this->Pipeline->setVisibility(source, true);
-  rm->ResetCamera();
-  w->update();
+  vtkSMSourceProxy* current = this->PipelineList->getSelectedProxy();
+  QVTKWidget* window = this->PipelineList->getCurrentWindow();
+  if(current && window)
+    {
+    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
+    vtkSMProxy* source = this->Pipeline->createFilter(filterName, window);
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
+    this->Pipeline->addInput(sp, current);
+    this->Pipeline->setVisibility(source, true);
+    rm->ResetCamera();
+    window->update();
+    this->PipelineList->selectProxy(source);
+    }
 }
 
 void pqMainWindow::onHelpAbout()
@@ -668,6 +679,7 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   // pipeline data structure.
   this->Pipeline->addViewMapping(w, view);
   this->Pipeline->addWindow(w, this->CurrentServer);
+  this->PipelineList->selectWindow(w);
 
   QSignalMapper* sm = new QSignalMapper(parent);
   sm->setMapping(parent, parent);

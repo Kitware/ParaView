@@ -64,6 +64,11 @@ SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 ADD_EXECUTABLE(vtkWrapPython 
   ${VTK_SOURCE_DIR}/Wrapping/vtkWrapPython.c 
   ${VTK_SOURCE_DIR}/Wrapping/vtkParse.tab.c)
+
+TARGET_LINK_LIBRARIES(vtkWrapPython
+  ${PYTHON_LIBRARY}
+  )
+
 ADD_EXECUTABLE(vtkWrapPythonInit 
   ${VTK_SOURCE_DIR}/Wrapping/vtkWrapPythonInit.c)
 

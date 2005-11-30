@@ -366,6 +366,16 @@ void pqPipelineData::addInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input)
 
 QVTKWidget *pqPipelineData::getWindowFor(vtkSMProxy *proxy) const
 {
+  // Get the pipeline object for the proxy.
+  pqPipelineObject *object = getObjectFor(proxy);
+  if(object && object->GetParent())
+    return qobject_cast<QVTKWidget *>(object->GetParent()->GetWidget());
+
+  return 0;
+}
+
+pqPipelineObject *pqPipelineData::getObjectFor(vtkSMProxy *proxy) const
+{
   if(!this->Internal || !proxy)
     return 0;
 
@@ -378,12 +388,30 @@ QVTKWidget *pqPipelineData::getWindowFor(vtkSMProxy *proxy) const
       {
       object = (*iter)->GetObject(proxy);
       if(object)
-        break;
+        return object;
       }
     }
 
-  if(object && object->GetParent())
-    return qobject_cast<QVTKWidget *>(object->GetParent()->GetWidget());
+  return 0;
+}
+
+pqPipelineObject *pqPipelineData::getObjectFor(QVTKWidget *window) const
+{
+  if(!this->Internal || !window)
+    return 0;
+
+  // Get the pipeline object for the proxy.
+  pqPipelineObject *object = 0;
+  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+  for( ; iter != this->Internal->Servers.end(); ++iter)
+    {
+    if(*iter)
+      {
+      object = (*iter)->GetWindow(window);
+      if(object)
+        return object;
+      }
+    }
 
   return 0;
 }
