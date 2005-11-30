@@ -2,6 +2,7 @@
 PROJECT(QtWidgetsTesting)
 
 INCLUDE_DIRECTORIES(${QtTesting_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${QtWidgetsTesting_BINARY_DIR})
 
 # test multi view widgets
 QT4_WRAP_UI(MULTIVIEW_TEST_UIS 
