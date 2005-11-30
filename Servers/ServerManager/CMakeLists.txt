@@ -237,7 +237,8 @@ IF (PARAVIEW_WRAP_PYTHON)
   ENDIF(NOT WIN32)
   ADD_LIBRARY(vtkPVServerManagerPython ${ServerManagerPython_SRCS})
   TARGET_LINK_LIBRARIES (vtkPVServerManagerPython 
-    vtkPVServerCommonPython vtkPVServerManager vtkCommonPython)
+    vtkPVServerCommonPython vtkPVServerManager vtkCommonPython
+    ${PYTHON_LIBRARY})
 ENDIF (PARAVIEW_WRAP_PYTHON)
 
 SET(CFG_INIT "/${CMAKE_CFG_INTDIR}")

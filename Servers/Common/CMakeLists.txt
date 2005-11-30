@@ -139,7 +139,7 @@ IF (PARAVIEW_WRAP_PYTHON)
   ENDIF(NOT WIN32)
   ADD_LIBRARY(vtkPVServerCommonPython ${ServerCommonPython_SRCS})
   TARGET_LINK_LIBRARIES (vtkPVServerCommonPython 
-    vtkPVServerCommon vtkCommonPython)
+    vtkPVServerCommon vtkCommonPython ${PYTHON_LIBRARY})
 ENDIF (PARAVIEW_WRAP_PYTHON)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
