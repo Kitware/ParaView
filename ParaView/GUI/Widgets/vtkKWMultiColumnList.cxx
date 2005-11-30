@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.42");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -127,7 +127,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   this->SetColumnSeparatorsVisibility(1);
   this->SetSortArrowVisibility(0);
   this->SetHighlightThickness(0);
-  this->SetSelectionModeToSingle();
+  this->SetSelectionModeToBrowse();
   this->SetLabelCommand(NULL, "tablelist::sortByColumn");
   this->SetReliefToSunken();
   this->SetBorderWidth(2);
@@ -150,6 +150,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app)
   this->AddBinding("<<TablelistSelectionLost>>", this, "SelectionCallback");
   this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
   this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
+  this->AddBinding("<Enter>", this, "EnterCallback");
 
   // Update enable state
 
@@ -3520,6 +3521,12 @@ void vtkKWMultiColumnList::SetSortCommand(vtkObject* object,
     this->SetConfigurationOption("-sortcommand", command);
     delete [] command;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::EnterCallback()
+{
+  this->Focus();
 }
 
 //----------------------------------------------------------------------------

@@ -1054,6 +1054,7 @@ public:
   virtual void CellWindowCommandToColorButtonCallback(
     const char*, int, int, const char*);
   virtual void ColumnSortedCallback();
+  virtual void EnterCallback();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
