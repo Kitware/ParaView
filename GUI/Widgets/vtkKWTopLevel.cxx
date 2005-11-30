@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.19");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -150,10 +150,7 @@ void vtkKWTopLevel::Display()
 //----------------------------------------------------------------------------
 void vtkKWTopLevel::Withdraw()
 {
-  if (this->IsCreated())
-    {
-    this->Script("wm withdraw %s", this->GetWidgetName());
-    }
+  vtkKWTkUtilities::WithdrawTopLevel(this);
   if (this->Modal)
     {
     this->ReleaseGrab();
@@ -229,8 +226,8 @@ int vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
 
   if (display_pos == vtkKWTopLevel::DisplayPositionPointer)
     {
-    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
-           "%d %d", x, y);
+    vtkKWTkUtilities::GetMousePointerCoordinates(
+      this->GetApplication()->GetMainInterp(), ".", x, y);
     }
   else if (display_pos == 
            vtkKWTopLevel::DisplayPositionMasterWindowCenter ||
@@ -253,10 +250,9 @@ int vtkKWTopLevel::ComputeDisplayPosition(int *x, int *y)
     else
       {
       int screen_width, screen_height;
-      sscanf(this->Script(
-               "concat [winfo screenwidth .] [winfo screenheight .]"),
-             "%d %d", 
-             &screen_width, &screen_height);
+      vtkKWTkUtilities::GetScreenSize(
+        this->GetApplication()->GetMainInterp(), ".", 
+        &screen_width, &screen_height);
 
       *x = screen_width / 2;
       *y = screen_height / 2;
@@ -288,15 +284,6 @@ void vtkKWTopLevel::DeIconify()
   if (this->IsCreated())
     {
     this->Script("wm deiconify %s", this->GetWidgetName());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTopLevel::Raise()
-{
-  if (this->IsCreated())
-    {
-    this->Script("raise %s", this->GetWidgetName());
     }
 }
 
@@ -377,6 +364,16 @@ void vtkKWTopLevel::SetTitle(const char* _arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTopLevel::SetTitleToTopLevelTitle(vtkKWWidget *widget)
+{
+  if (widget && widget->IsCreated())
+    {
+    this->SetTitle(
+      this->Script("wm title [winfo toplevel %s]", widget->GetWidgetName()));
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTopLevel::GetWidth()
 {
   if (!this->IsCreated())
@@ -408,7 +405,7 @@ int vtkKWTopLevel::GetRequestedWidth()
 
   // The call to 'update' enable the geometry manager to compute the layout
   // of the widget behind the scene, and return proper values.
-  this->Script("update idletasks");
+  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
   return atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
 }
 
@@ -422,7 +419,7 @@ int vtkKWTopLevel::GetRequestedHeight()
 
   // The call to 'update' enable the geometry manager to compute the layout
   // of the widget behind the scene, and return proper values.
-  this->Script("update idletasks");
+  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
   return atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
 }
 

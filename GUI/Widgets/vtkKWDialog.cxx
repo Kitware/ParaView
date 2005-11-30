@@ -14,12 +14,13 @@
 #include "vtkKWDialog.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.54");
+vtkCxxRevisionMacro(vtkKWDialog, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
@@ -43,7 +44,7 @@ int vtkKWDialog::PreInvoke()
 
   if (this->Beep)
     {
-    this->Script("bell");
+    vtkKWTkUtilities::Bell(this->GetApplication());
     }
 
   return 1;

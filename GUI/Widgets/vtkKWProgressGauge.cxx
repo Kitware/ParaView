@@ -16,12 +16,13 @@
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.34");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -217,7 +218,7 @@ void vtkKWProgressGauge::Redraw()
   int height = this->Height;
   if (this->ExpandHeight)
     {
-    height = atoi(this->Script("winfo height %s", wname));
+    vtkKWTkUtilities::GetWidgetSize(this->Canvas, NULL, &height);
     if (height < this->MinimumHeight)
       {
       height = this->MinimumHeight;
@@ -274,13 +275,11 @@ void vtkKWProgressGauge::Redraw()
            << wname << "]" << endl;
     }
 
-  // Do an update
-
-  tk_cmd << "update idletasks" << endl;
-
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+
+  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
 
   if (!enabled)
     {

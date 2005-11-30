@@ -129,14 +129,14 @@ public:
   virtual void DeIconify();
 
   // Description:
-  // Arranges for window to be displayed above all of its siblings in the
-  // stacking order.
-  virtual void Raise();
-
-  // Description:
   // Set the title of the toplevel.
   virtual void SetTitle(const char *);
   vtkGetStringMacro(Title);
+
+  // Description:
+  // Convenience method to set the title to the same title as another
+  // widget's toplevel.
+  virtual void SetTitleToTopLevelTitle(vtkKWWidget*);
 
   // Description:
   // Convenience method to set/get the window position in screen pixel

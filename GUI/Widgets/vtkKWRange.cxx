@@ -22,9 +22,10 @@
 #include "vtkKWPushButton.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.55");
+vtkCxxRevisionMacro(vtkKWRange, "1.56");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1386,8 +1387,7 @@ void vtkKWRange::RedrawCanvas()
 
   if (this->Orientation == vtkKWRange::OrientationHorizontal)
     {
-    width = atoi(this->Script("winfo width %s", 
-                              this->CanvasFrame->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this->CanvasFrame, &width, NULL);
     if (this->RequestedLength)
       {
       width = this->RequestedLength;
@@ -1401,8 +1401,7 @@ void vtkKWRange::RedrawCanvas()
   else
     {
     width = this->Thickness;
-    height = atoi(this->Script("winfo height %s", 
-                               this->CanvasFrame->GetWidgetName()));
+    vtkKWTkUtilities::GetWidgetSize(this->CanvasFrame, NULL, &height);
     if (this->RequestedLength)
       {
       height = this->RequestedLength;

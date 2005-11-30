@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.85");
+vtkCxxRevisionMacro(vtkKWMenu, "1.86");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -1149,6 +1149,15 @@ void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
 void vtkKWMenu::SetItemAccelerator(const char *label, const char *accelerator)
 {
   this->SetItemAccelerator(this->GetIndexOfItem(label), accelerator);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::PopUp(int x, int y)
+{
+  if (this->IsCreated())
+    {
+    this->Script("tk_popup %s %d %d", this->GetWidgetName(), x, y);
+    }
 }
 
 //----------------------------------------------------------------------------

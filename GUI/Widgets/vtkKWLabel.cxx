@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.45");
+vtkCxxRevisionMacro(vtkKWLabel, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -165,7 +165,7 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
   int wraplength = atoi(this->GetWrapLength());
 
   int width;
-  sscanf(this->Script("winfo width %s", this->GetWidgetName()), "%d", &width);
+  vtkKWTkUtilities::GetWidgetSize(this, &width, NULL);
 
   // Adjust the wraplength to width (within a tolerance so that it does
   // not put too much stress on the GUI).

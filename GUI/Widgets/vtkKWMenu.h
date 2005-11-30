@@ -257,6 +257,10 @@ public:
   void ConfigureItem(int index, const char*);
 
   // Description:
+  // Pop-up the menu at screen coordinates x, y
+  virtual void PopUp(int x, int y);
+
+  // Description:
   // Set or get enabled state.
   // This method has been overriden to propagate the state to all its
   // menu entries by calling UpdateEnableState(), *even* if the

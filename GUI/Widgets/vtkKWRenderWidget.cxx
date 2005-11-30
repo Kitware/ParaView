@@ -19,8 +19,10 @@
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
-#include "vtkKWIcon.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
+#include "vtkKWIcon.h"
+#include "vtkKWMenu.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -30,7 +32,6 @@
 #include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
-#include "vtkKWMenu.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -39,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.110");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.111");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -560,10 +561,9 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
     this->PopulateContextMenu(this->ContextMenu);
     if (this->ContextMenu->GetNumberOfItems())
       {
-      this->Script("tk_popup %s [winfo pointerx %s] [winfo pointery %s]", 
-                   this->ContextMenu->GetWidgetName(), 
-                   this->VTKWidget->GetWidgetName(), 
-                   this->VTKWidget->GetWidgetName());
+      int x, y;
+      vtkKWTkUtilities::GetMousePointerCoordinates(this->VTKWidget, &x, &y);
+      this->ContextMenu->PopUp(x, y);
       }
     }
   else
@@ -632,7 +632,7 @@ void vtkKWRenderWidget::ExposeCallback()
     }
   
   this->InExpose = 1;
-  this->Script("update");
+  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
   this->Render();
   this->InExpose = 0;
 }
