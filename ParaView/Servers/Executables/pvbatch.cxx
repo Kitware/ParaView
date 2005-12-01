@@ -32,28 +32,18 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImagingInstantiator.h"
 #include "vtkGraphicsInstantiator.h"
 
-#ifdef VTK_USE_RENDERING
 #include "vtkRenderingInstantiator.h"
-#endif
-
-#ifdef VTK_USE_VOLUMERENDERING
 #include "vtkVolumeRenderingInstantiator.h"
-#endif
-
-#ifdef VTK_USE_HYBRID
 #include "vtkHybridInstantiator.h"
-#endif
-
-#ifdef VTK_USE_PARALLEL
 #include "vtkParallelInstantiator.h"
-#endif
 
 #include "vtkPVServerCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
-#include "vtkSMInstantiator.h"
+#include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
-static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
+// forward declare the initialize function
+static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])

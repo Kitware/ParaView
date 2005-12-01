@@ -1,14 +1,14 @@
 PROJECT(ServerManager)
+INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
-SET( ServerManagerCS_SRCS
-  vtkPickBoxWidget.cxx
-  vtkPickPointWidget.cxx
-  vtkPickLineWidget.cxx
-  vtkPickSphereWidget.cxx
-  )
- 
+SET(KIT PVServerManager)
+SET(KIT_UPCASE "PVSERVERMANAGER")
+IF(NOT WIN32)
+  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
+ENDIF(NOT WIN32)
 
-SET( ServerManagerCommon_SRCS
+SET(Kit_SRCS
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
@@ -118,6 +118,12 @@ SET( ServerManagerCommon_SRCS
   vtkSMXYPlotDisplayProxy.cxx
   )
 
+SET( ServerManagerCS_SRCS
+  vtkPickBoxWidget.cxx
+  vtkPickPointWidget.cxx
+  vtkPickLineWidget.cxx
+  vtkPickSphereWidget.cxx
+  )
 
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
@@ -126,10 +132,11 @@ SET( ServerManagerNonWrapped_SRCS
 
 SET( ServerManager_SRCS
   ${ServerManagerCS_SRCS}
-  ${ServerManagerCommon_SRCS}
+  ${Kit_SRCS}
   ${ServerManagerNonWrapped_SRCS}
   )
 
+# Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
@@ -150,95 +157,92 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${KWCommon_INCLUDE_PATH}
-  
-)
+
+  )
 
 SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-VTK_MAKE_INSTANTIATOR3(
-  vtkSMInstantiator 
-  SMInstantiator_SRCS
+VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator KitInstantiator_SRCS
   "${ServerManager_SRCS}"
   VTK_EXPORT
-  ${ParaView_BINARY_DIR}/Servers/ServerManager "")
+  "${CMAKE_CURRENT_BINARY_DIR}" "")
 
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
-INCLUDE_DIRECTORIES(
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  )
+INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 
 # Wrap PVServer
 # Create ClientServer wrappers for ParaView classes.
+SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
+SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
-SET(VTK_BINARY_DIR "${ServerManager_BINARY_DIR}")
-VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS};${ServerManagerCS_SRCS}")
+VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS};${ServerManagerCS_SRCS}")
+SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
+# Wrap PVServerCommon
 SET(KIT_WRAP_DEPS "")
-SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/ServerManager/Utilities")
-PV_PRE_WRAP_VTK_CS(vtkPVServerManager PVServerManager PVSERVERMANAGER "${KIT_WRAP_DEPS}")
+SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
+PV_PRE_WRAP_VTK_CS("vtk${KIT}" "${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
-ADD_LIBRARY(vtkPVServerManager 
+# Create the library.
+ADD_LIBRARY(vtk${KIT}
   ${ServerManager_SRCS} 
   ${CMInstantiator_SRCS} 
   ${vtkPVServerManagerCS_SRCS} 
-  ${SMInstantiator_SRCS}
-  ) 
-TARGET_LINK_LIBRARIES (vtkPVServerManager 
+  ${KitInstantiator_SRCS}
+  )
+TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVFiltersCS 
   vtkClientServer
   ${KWCommon_LIBRARIES})
 
-# Create Tcl wrappers for SM classes.
+# Create Tcl wrappers for classes.
 IF (PARAVIEW_BUILD_GUI)
   SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
   SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
   SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
   INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
   VTK_WRAP_TCL3(
-    vtkPVServerManagerTCL 
-    ServerManagerTCL_SRCS 
-    "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
+    vtk${KIT}TCL 
+    KitTCL_SRCS 
+    "${Kit_SRCS}"
     ""
     )
-  IF(NOT WIN32)
-    SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-    ADD_DEFINITIONS(-D_HPUX_SOURCE)
-  ENDIF(NOT WIN32)
   CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVProcessModuleBatchHelperConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/vtkPVProcessModuleBatchHelperConfig.h"
-  @ONLY IMMEDIATE)
-  ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
-    vtkPVProcessModuleBatchHelper.cxx)
-  TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL 
-    vtkPVServerCommonTCL vtkPVServerManager vtkCommonTCL)
+    @ONLY IMMEDIATE)
+  ADD_LIBRARY(vtk${KIT}TCL ${KitTCL_SRCS}
+    vtkPVProcessModuleBatchHelper.cxx
+    )
+  TARGET_LINK_LIBRARIES (vtk${KIT}TCL vtk${KIT} vtkCommonTCL)
+  TARGET_LINK_LIBRARIES (vtk${KIT}TCL vtkPVServerCommonTCL)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 IF (PARAVIEW_WRAP_PYTHON)
   SET(VTK_WRAP_PYTHON_EXE ${PARAVIEW_VTK_WRAP_PYTHON_EXE})
   SET(VTK_WRAP_PYTHON_INIT_EXE ${PARAVIEW_VTK_WRAP_PYTHON_INIT_EXE})
   SET(VTK_WRAP_PYTHON3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
+  SET(Kit_PYTHON_EXTRA_SRCS
+    )
+  SET(KIT_PYTHON_LIBS
+    vtkPVServerCommonPython vtk${KIT}
+    )
   INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
-  VTK_WRAP_PYTHON3(
-    vtkPVServerManagerPython 
-    ServerManagerPython_SRCS 
-    "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
-    ""
-    )
-  IF(NOT WIN32)
-    SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-    ADD_DEFINITIONS(-D_HPUX_SOURCE)
-  ENDIF(NOT WIN32)
-  ADD_LIBRARY(vtkPVServerManagerPython ${ServerManagerPython_SRCS})
-  TARGET_LINK_LIBRARIES (vtkPVServerManagerPython 
-    vtkPVServerCommonPython vtkPVServerManager vtkCommonPython
-    ${PYTHON_LIBRARY})
+  SET(KIT_PYTHON_DEPS)
+  SET(VTK_INSTALL_NO_LIBRARIES 1)
+  IF(VTKPythonWrapping_INSTALL_BIN_DIR)
+    SET(VTK_INSTALL_NO_LIBRARIES)
+  ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
+  SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
+  SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
+
+  # include python wrapping from VTK
+  INCLUDE(KitCommonPythonWrapBlock)
 ENDIF (PARAVIEW_WRAP_PYTHON)
 
 SET(CFG_INIT "/${CMAKE_CFG_INTDIR}")
@@ -286,8 +290,9 @@ SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   INSTALL_TARGETS(${PV_INSTALL_LIB_DIR}
-    vtkPVServerManagerTCL
-    vtkPVServerManager)
+    vtk${KIT}TCL
+    vtk${KIT}
+    )
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
 IF(NOT PV_INSTALL_NO_RUNTIME)
   INSTALL_FILES(${PV_INSTALL_LIB_DIR}/ServerManager/Resources FILES

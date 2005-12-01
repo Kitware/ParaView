@@ -17,32 +17,27 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVServerOptions.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 
-// Include all the Instantiators:
+/*
+ * Make sure all the kits register their classes with vtkInstantiator.
+ * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
+ * anyway.  The instantiators will add no more code for the linker to
+ * collect.
+ */
 #include "vtkCommonInstantiator.h"
 #include "vtkFilteringInstantiator.h"
+#include "vtkGenericFilteringInstantiator.h"
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"
 #include "vtkGraphicsInstantiator.h"
 
-#ifdef VTK_USE_RENDERING
 #include "vtkRenderingInstantiator.h"
-#endif
-
-#ifdef VTK_USE_VOLUMERENDERING
 #include "vtkVolumeRenderingInstantiator.h"
-#endif
-
-#ifdef VTK_USE_HYBRID
 #include "vtkHybridInstantiator.h"
-#endif
-
-#ifdef VTK_USE_PARALLEL
 #include "vtkParallelInstantiator.h"
-#endif
 
 #include "vtkPVServerCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
-#include "vtkSMInstantiator.h"
+#include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 
 #include "vtkProcessModule.h"

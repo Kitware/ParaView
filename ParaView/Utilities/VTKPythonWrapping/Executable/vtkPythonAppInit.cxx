@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPVServerCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
-#include "vtkSMInstantiator.h"
+#include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
