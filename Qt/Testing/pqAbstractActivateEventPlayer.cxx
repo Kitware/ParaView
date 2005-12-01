@@ -17,7 +17,7 @@ pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer()
 {
 }
 
-bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
+bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& /*Arguments*/, bool& Error)
 {
   if(Command != "activate")
     return false;

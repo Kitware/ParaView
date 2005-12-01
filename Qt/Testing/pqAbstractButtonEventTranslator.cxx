@@ -36,6 +36,8 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
       disconnect(Object, 0, this, 0);
       this->CurrentObject = 0;
       break;
+    default:
+      break;
     }
       
   return true;
