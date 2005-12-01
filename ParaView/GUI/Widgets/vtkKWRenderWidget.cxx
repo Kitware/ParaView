@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.112");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.113");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -561,9 +561,9 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
     this->PopulateContextMenu(this->ContextMenu);
     if (this->ContextMenu->GetNumberOfItems())
       {
-      int x, y;
-      vtkKWTkUtilities::GetMousePointerCoordinates(this->VTKWidget, &x, &y);
-      this->ContextMenu->PopUp(x, y);
+      int px, py;
+      vtkKWTkUtilities::GetMousePointerCoordinates(this->VTKWidget, &px, &py);
+      this->ContextMenu->PopUp(px, py);
       }
     }
   else

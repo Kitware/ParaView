@@ -63,7 +63,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.463");
+vtkCxxRevisionMacro(vtkPVSource, "1.464");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2890,7 +2890,7 @@ int vtkPVSource::InitializeClone(int makeCurrent)
   // Show the source page, and hide the display and information pages.
   if (this->Notebook)
     {
-    this->Notebook->Raise("Parameters");
+    this->Notebook->RaisePage("Parameters");
     this->Notebook->HidePage("Display");
     this->Notebook->HidePage("Information");
     }    

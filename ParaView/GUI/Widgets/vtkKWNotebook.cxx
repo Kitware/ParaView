@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.92");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.93");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -2178,8 +2178,6 @@ void vtkKWNotebook::UpdateMaskPosition()
     vtkKWTkUtilities::GetWidgetRelativeCoordinates(
       this->TabsFrame, &tabs_x, NULL);
 
-    int tab_is_mapped = page->TabFrame->IsMapped();
-
     // For some reasons, even if the tabs container is mapped and its position
     // can be queried, the position of the tab inside the container can not
     // be queried if it is not mapped. In that case use a slower method by
@@ -2190,6 +2188,7 @@ void vtkKWNotebook::UpdateMaskPosition()
 
     int tab_x = 0;
 #if 0
+    int tab_is_mapped = page->TabFrame->IsMapped();
     if (tab_is_mapped)
       {
       vtkKWTkUtilities::GetWidgetRelativeCoordinates(
