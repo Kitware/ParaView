@@ -26,6 +26,7 @@
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkPVServerInformation.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
@@ -37,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -93,7 +94,26 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
   vtkSMIntVectorProperty* ivp;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
- 
+
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation();
+  unsigned int idx;
+  unsigned int numMachines = serverInfo->GetNumberOfMachines();
+  vtkClientServerStream stream;
+  for (idx = 0; idx < numMachines; idx++)
+    {
+    if (serverInfo->GetEnvironment(idx))
+      {
+      stream << vtkClientServerStream::Invoke 
+             << pm->GetProcessModuleID() << "SetProcessEnvironmentVariable"
+             << idx << serverInfo->GetEnvironment(idx)
+             << vtkClientServerStream::End;
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+    }
+
   p = this->CompositeManagerProxy->GetProperty("InitializeRMIs");
   if (!p)
     {
