@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5.4.1");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -237,12 +237,23 @@ void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
 
   unsigned int idx;
   unsigned int numMachines = serverInfo->GetNumberOfMachines();
+  vtkClientServerStream stream;
   for (idx = 0; idx < numMachines; idx++)
     {
-    pm->SetProcessEnvironmentVariable(idx, serverInfo->GetEnvironment(idx));
+    if (serverInfo->GetEnvironment(idx))
+      {
+      stream << vtkClientServerStream::Invoke 
+             << pm->GetProcessModuleID() << "SetProcessEnvironmentVariable"
+             << idx << serverInfo->GetEnvironment(idx)
+             << vtkClientServerStream::End;
+      }
     crm->DefineDisplay(idx, serverInfo->GetLowerLeft(idx),
                        serverInfo->GetLowerRight(idx),
                        serverInfo->GetUpperLeft(idx));
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
