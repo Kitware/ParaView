@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.32");
+vtkCxxRevisionMacro(vtkProcessModule, "1.33");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -1288,11 +1288,13 @@ vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID(
 // cannot be deleted until paraview exits.  The var should have the form:
 // "DISPLAY=amber1"
 void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
-                                                       const char* var)
+                                                     const char* var)
 {
-  (void)processId;
-  char* envstr = vtksys::SystemTools::DuplicateString(var);
-  putenv(envstr);
+  if (this->GetPartitionId() == processId)
+    {
+    char* envstr = vtksys::SystemTools::DuplicateString(var);
+    putenv(envstr);
+    }
 }
 
 //-----------------------------------------------------------------------------
