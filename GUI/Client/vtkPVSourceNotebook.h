@@ -85,7 +85,7 @@ public:
   // Description:
   // These are to setup the notebook when a new source before accept.
   // We could have a special state instead of these general methods.
-  void Raise(const char* pageName);
+  void RaisePage(const char* pageName);
   void HidePage(const char* pageName);
   void ShowPage(const char* pageName);
 

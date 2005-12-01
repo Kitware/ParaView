@@ -35,7 +35,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.74");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.75");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4270,8 +4270,6 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     {
     return;
     }
-
-  const char *canv = this->Canvas->GetWidgetName();
 
   // Get the new canvas size
 
