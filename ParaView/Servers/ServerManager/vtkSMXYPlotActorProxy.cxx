@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.6");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -84,7 +84,7 @@ void vtkSMXYPlotActorProxy::SetPosition(double x, double y)
     }
   if ( stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 
@@ -106,7 +106,7 @@ void vtkSMXYPlotActorProxy::SetPosition2(double x, double y)
     }
   if ( stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 
@@ -142,7 +142,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
   const char* arrayname = 0;
   if (total_numArrays == 0)
     {
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     return;
     }
 
@@ -202,7 +202,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
       << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1
       << vtkClientServerStream::End;
     }
-  pm->SendStream(this->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
   this->UpdateVTKObjects(); // this is required for LegendVisibility. 
 }
 
@@ -229,7 +229,7 @@ void vtkSMXYPlotActorProxy::CleanInputs(const char* command)
 
   stream << vtkClientServerStream::Invoke
     << sourceID << command << vtkClientServerStream::End;
-  pm->SendStream(this->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
   this->ArrayNamesModified = 1;
   this->SetInput(0);
   

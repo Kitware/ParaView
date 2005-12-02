@@ -33,7 +33,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMPickBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickBoxWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPickBoxWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMPickBoxWidgetProxy::vtkSMPickBoxWidgetProxy()
@@ -70,7 +70,7 @@ void vtkSMPickBoxWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers,str,0);
     } 
 }
 

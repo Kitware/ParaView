@@ -19,6 +19,7 @@
 #include "vtkPLOT3DReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkSMPart.h"
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.34");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVPLOT3DReaderModule::vtkPVPLOT3DReaderModule()
@@ -61,11 +62,16 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
          << this->GetVTKSourceID(0) << "GetFileName" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke 
-         << this->GetVTKSourceID(0) << "CanReadBinaryFile" << vtkClientServerStream::LastResult
+         << this->GetVTKSourceID(0) << "CanReadBinaryFile" 
+         << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 0);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER_ROOT, stream, 0);
   int canread = 0;
-  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&canread))
+  if(!pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&canread))
     {
     vtkErrorMacro(<< "Faild to get server result.");
     return;

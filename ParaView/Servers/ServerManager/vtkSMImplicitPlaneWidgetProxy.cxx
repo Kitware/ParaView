@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -65,7 +65,7 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
     stream << vtkClientServerStream::Invoke << id
            << "OutlineTranslationOff"
            << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream, 1);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
     stream << vtkClientServerStream::Invoke << id
            << "GetPlaneProperty"
            << vtkClientServerStream::End
@@ -82,7 +82,7 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
            << "SetOpacity" 
            << opacity 
                     << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream, 1);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
     }
   this->SetDrawPlane(0);
 }
@@ -155,7 +155,7 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 }
 

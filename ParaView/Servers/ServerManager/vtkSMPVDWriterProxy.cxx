@@ -47,7 +47,7 @@ void vtkSMPVDWriterProxy::UpdatePipeline()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 
   this->Superclass::UpdatePipeline();
@@ -62,7 +62,7 @@ void vtkSMPVDWriterProxy::UpdatePipeline()
 
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 }
 

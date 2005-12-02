@@ -20,7 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIntInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.4");
+vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIntInformationHelper::vtkSMSimpleIntInformationHelper()
@@ -34,7 +34,8 @@ vtkSMSimpleIntInformationHelper::~vtkSMSimpleIntInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMSimpleIntInformationHelper::UpdateProperty(
-    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop)
+  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkSMProperty* prop)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
   if (!ivp)
@@ -56,11 +57,11 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
       << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str);
 
   // Get the result
   const vtkClientServerStream& res = 
-    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
+    pm->GetLastResult(connectionId, vtkProcessModule::GetRootId(serverIds));
 
   int numMsgs = res.GetNumberOfMessages();
   if (numMsgs < 1)

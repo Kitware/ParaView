@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -137,7 +137,7 @@ void vtkSMLookupTableProxy::Build()
       }
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //---------------------------------------------------------------------------

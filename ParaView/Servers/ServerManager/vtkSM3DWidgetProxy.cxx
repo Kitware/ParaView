@@ -25,7 +25,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.13");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.14");
 //===========================================================================
 //***************************************************************************
 class vtkSM3DWidgetProxyObserver : public vtkCommand
@@ -91,7 +91,7 @@ void vtkSM3DWidgetProxy::SetEnabled(int e)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers,str,0);
     } 
 }
 
@@ -146,7 +146,7 @@ void vtkSM3DWidgetProxy::UpdateVTKObjects()
              << this->Bounds[0] << this->Bounds[1] << this->Bounds[2] 
              << this->Bounds[3] 
              << this->Bounds[4] << this->Bounds[5] << vtkClientServerStream::End;
-      pm->SendStream(this->Servers, stream);
+      pm->SendStream(this->ConnectionID, this->Servers, stream);
       } 
     this->Placed = 1;
     }
@@ -208,7 +208,7 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
            << 0 << 1 << 0 << 1 << 0 << 1 
            << vtkClientServerStream::End;
     // this->Bounds have already been initialized to 0,1,0,1,0,1
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 
@@ -262,7 +262,7 @@ void vtkSM3DWidgetProxy::SetCurrentRenderer(vtkSMProxy *renderer)
            << ( (renderer)? renderer->GetID(0) : null )
            << vtkClientServerStream::End;
     pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
+      this->ConnectionID, this->GetServers(), stream, 1);
     }
 }
 
@@ -279,7 +279,7 @@ void vtkSM3DWidgetProxy::SetInteractor(vtkSMProxy* interactor)
            << ((interactor)? interactor->GetID(0) : null)
            << vtkClientServerStream::End;
     pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
+      this->ConnectionID, this->GetServers(), stream, 1);
     } 
 }
 

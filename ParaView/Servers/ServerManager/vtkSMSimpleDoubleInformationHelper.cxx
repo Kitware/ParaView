@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleDoubleInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.4");
+vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleDoubleInformationHelper::vtkSMSimpleDoubleInformationHelper()
@@ -34,7 +34,8 @@ vtkSMSimpleDoubleInformationHelper::~vtkSMSimpleDoubleInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
-    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop)
+  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkSMProperty* prop)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
   if (!dvp)
@@ -56,11 +57,11 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
       << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str);
 
   // Get the result
   const vtkClientServerStream& res =     
-    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
+    pm->GetLastResult(connectionId, vtkProcessModule::GetRootId(serverIds));
 
 
   int numMsgs = res.GetNumberOfMessages();

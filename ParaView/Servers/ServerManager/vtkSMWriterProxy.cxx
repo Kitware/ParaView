@@ -39,7 +39,7 @@ void vtkSMWriterProxy::UpdatePipeline()
 
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 }
 

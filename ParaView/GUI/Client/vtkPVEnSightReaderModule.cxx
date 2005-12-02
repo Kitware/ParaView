@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVFileEntry.h"
@@ -23,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.59");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -64,7 +65,9 @@ int vtkPVEnSightReaderModule::InitializeData()
            <<  this->GetVTKSourceID(i) << "Update" 
            << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
   return this->Superclass::InitializeData();
 }
 
@@ -117,7 +120,9 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
              << this->GetVTKSourceID(i) << "SetController" << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   return this->Superclass::ReadFileInformation(fname);
 }

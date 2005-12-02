@@ -26,7 +26,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMPickSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickSphereWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPickSphereWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMPickSphereWidgetProxy::vtkSMPickSphereWidgetProxy()
@@ -59,7 +59,7 @@ void vtkSMPickSphereWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers,str,0);
     } 
 
 }

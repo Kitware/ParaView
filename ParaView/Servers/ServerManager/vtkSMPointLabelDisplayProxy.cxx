@@ -146,6 +146,7 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
       this->UpdateSuppressorProxy->GetServers(), stream);
     }
 
@@ -202,7 +203,8 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToClient"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      pm->SendStream(this->ConnectionID, 
+        vtkProcessModule::CLIENT, stream);
       }
     // pm->ClientMode is only set when there is a server.
     if(pm->GetClientMode())
@@ -210,7 +212,8 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToDataServer"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER, stream);
       }
     // if running in render server mode
     if(pm->GetOptions()->GetRenderServerMode())
@@ -218,26 +221,28 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::RENDER_SERVER, stream);
       }  
 
     // Handle collection setup with client server.
     stream << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetSocketController"
+      << pm->GetConnectionClientServerID(this->ConnectionID)
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) 
       << "SetClientDataServerSocketController"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(
+    pm->SendStream(this->ConnectionID,
       vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 
     stream << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
-      << pm->GetMPIMToNSocketConnectionID()
+      << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
       << vtkClientServerStream::End;
-    pm->SendStream(
+    pm->SendStream(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
 
     }
@@ -268,7 +273,8 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(this->UpdateSuppressorProxy->GetServers(), stream);
+    pm->SendStream(this->ConnectionID,
+      this->UpdateSuppressorProxy->GetServers(), stream);
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(

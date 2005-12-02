@@ -29,6 +29,7 @@
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
@@ -43,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.52");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.53");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -793,7 +794,9 @@ void vtkPVServerFileDialog::Update()
     }
 
   // Read the list of subdirectories and files.
-  if(!(pm->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog)))
+  if(!(pm->GetDirectoryListing(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+        this->LastPath, dirs, files, this->SaveDialog)))
     {
     // Directory did not exist, use current directory instead.
     this->CreateServerSide();
@@ -805,7 +808,9 @@ void vtkPVServerFileDialog::Update()
     this->ConvertLastPath();
 
     // We will now succeed.
-    pm->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog);
+    pm->GetDirectoryListing(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      this->LastPath, dirs, files, this->SaveDialog);
     }
   
   this->Script("%s delete all", this->FileList->GetWidgetName());

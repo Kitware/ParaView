@@ -19,6 +19,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
@@ -30,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.30");
+vtkCxxRevisionMacro(vtkPVWriter, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -242,11 +243,14 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
   stream << vtkClientServerStream::Invoke
          << writerID << "GetErrorCode"
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),  
+    vtkProcessModule::DATA_SERVER, stream);
   int retVal;
   if(pm->GetLastResult(
-       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal) &&
-     retVal == vtkErrorCode::OutOfDiskSpaceError)
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal) &&
+    retVal == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
       pvApp, pvApp->GetMainWindow(),
@@ -257,7 +261,9 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 
   // Cleanup.
   pm->DeleteStreamObject(writerID, stream);
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),  
+    vtkProcessModule::DATA_SERVER, stream);
   return success;
 }
 

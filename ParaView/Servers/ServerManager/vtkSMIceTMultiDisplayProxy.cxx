@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.5");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -113,8 +113,8 @@ void vtkSMIceTMultiDisplayProxy::SetupPipeline()
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
-                                           vtkProcessModule::CLIENT_AND_SERVERS,
-                                           stream);
+      this->ConnectionID,
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
   this->OutlineUpdateSuppressorProxy->UpdateVTKObjects();
 }
@@ -150,18 +150,24 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
       << vtkClientServerStream::Invoke
       << this->OutlineCollectProxy->GetID(i) << "AddObserver" << "EndEvent"
       << cmd << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    pm->SendStream(
+      this->ConnectionID,
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     // Handle collection setup with client server.
     stream
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetSocketController"
+      << pm->GetConnectionClientServerID(this->ConnectionID)
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->OutlineCollectProxy->GetID(i) << "SetSocketController"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    // Since socket controllers are only available on the root nodes,
+    // we send this stream only to the roots.
+    pm->SendStream(this->ConnectionID,
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
@@ -171,7 +177,8 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
         << vtkClientServerStream::Invoke
         << this->OutlineCollectProxy->GetID(i) << "SetController" << 0
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::CLIENT, stream);
       }
     }
 
@@ -203,7 +210,8 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
       << this->OutlineUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    pm->SendStream(this->ConnectionID,
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
 }
 
@@ -234,8 +242,8 @@ void vtkSMIceTMultiDisplayProxy::SetCollectionDecision(int v)
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       }
-    vtkProcessModule::GetProcessModule()->SendStream(vtkProcessModule::CLIENT,
-                                                     stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     // Turn off collection of real data.  Skip over vtkSMMultiDisplayProxy
     // since it has different logic for setting the collection decision.
@@ -255,8 +263,8 @@ void vtkSMIceTMultiDisplayProxy::SetCollectionDecision(int v)
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       }
-    vtkProcessModule::GetProcessModule()->SendStream(vtkProcessModule::CLIENT,
-                                                     stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     this->Superclass::SetCollectionDecision(v);
     }
@@ -289,8 +297,8 @@ void vtkSMIceTMultiDisplayProxy::SetLODCollectionDecision(int v)
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       }
-    vtkProcessModule::GetProcessModule()->SendStream(vtkProcessModule::CLIENT,
-                                                     stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     // Turn off collection of real data.  Skip over vtkSMMultiDisplayProxy
     // since it has different logic for setting the collection decision.
@@ -311,8 +319,8 @@ void vtkSMIceTMultiDisplayProxy::SetLODCollectionDecision(int v)
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       }
-    vtkProcessModule::GetProcessModule()->SendStream(vtkProcessModule::CLIENT,
-                                                     stream);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     this->Superclass::SetLODCollectionDecision(v);
     }

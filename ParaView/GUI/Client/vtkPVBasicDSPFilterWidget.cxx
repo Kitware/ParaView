@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkKWEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -56,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.3");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -1203,8 +1204,12 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
     <<  l_pvsource->GetVTKSourceID(l_whichSource)
     << "GetNumberOfVariableArrays"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-  pm->GetLastResult(vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_numVarArrays);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
+  pm->GetLastResult(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_numVarArrays);
 
 
   if(l_numVarArrays<0)
@@ -1222,8 +1227,12 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
       << "GetVariableArrayName"
       << i
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_name);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_name);
 
 
     char *l_command = (char *)malloc( strlen(l_name)+64 );
@@ -1635,8 +1644,12 @@ void vtkPVBasicDSPFilterWidget::Initialize()
         << "GetFileName"
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_filename);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_filename);
 
     for(i = 0; i < numSources; ++i)
       {
@@ -1644,8 +1657,12 @@ void vtkPVBasicDSPFilterWidget::Initialize()
         << "GetNumberOfBlockArrays"
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_numBlockArrays);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER).GetArgument(0, 0, &l_numBlockArrays);
 
     if( l_filename && l_numBlockArrays )
       {
@@ -1760,7 +1777,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
     << "AddFilterOutputVar"
     << a_outputName
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 
 
   //ADD THE FILTER WEIGHTS
@@ -1786,7 +1805,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
         << g_butter_lp_denominator_coeffs[l_whichCutoff][j]
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   else if( a_filterType==FILTER_WIDGET_HIGH_PASS )
     {
@@ -1804,7 +1825,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
         << g_butter_hp_denominator_coeffs[l_whichCutoff][j]
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   else if( a_filterType==FILTER_WIDGET_USER_DEFINED )
     {
@@ -1849,7 +1872,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
           << "AddFilterNumeratorWeight"
           << l_weight
           << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+        pm->SendStream(
+          vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+          vtkProcessModule::DATA_SERVER, stream);
 
         } while( l_numString.size() );
       }
@@ -1891,7 +1916,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
           << "AddFilterDenominatorWeight"
           << l_weight
           << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+        pm->SendStream(
+          vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+          vtkProcessModule::DATA_SERVER, stream);
 
       } while( l_numString.size() );
       }
@@ -1935,7 +1962,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
           << "AddFilterForwardNumeratorWeight"
           << l_weight
           << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+        pm->SendStream(
+          vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+          vtkProcessModule::DATA_SERVER, stream);
 
       } while( l_numString.size() );
       }
@@ -1968,7 +1997,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
       << "AddFilterDenominatorWeight"
       << l_weight
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   else if( a_filterType==FILTER_WIDGET_DERIVATIVE )
     {
@@ -1996,7 +2027,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
       << "AddFilterDenominatorWeight"
       << l_weight
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   else if( a_filterType==FILTER_WIDGET_SMOOTHING )
     {
@@ -2026,7 +2059,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
         << l_weights[i]
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
 
     //do the x[n] terms
     for(i=0;i<l_length;i++)
@@ -2036,7 +2071,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
         << l_weights[i]
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
 
     //do the y[n] term
     double l_weight=1;
@@ -2044,7 +2081,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
       << "AddFilterDenominatorWeight"
       << l_weight
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
 
     delete l_weights;
     }
@@ -2057,7 +2096,9 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
   stream << vtkClientServerStream::Invoke <<  l_pvsource->GetVTKSourceID(0)
     << "FinishAddingFilter"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 
 }
 //----------------------------------------------------------------------------
@@ -2084,7 +2125,9 @@ void vtkPVBasicDSPFilterWidget::RemoveThisFilterFromSource(const char *a_outputN
       << "RemoveFilter"
       << a_outputName
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
 }
 

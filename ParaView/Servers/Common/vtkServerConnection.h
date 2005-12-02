@@ -98,7 +98,8 @@ protected:
   virtual int SendStreamToRenderServer(vtkClientServerStream&);
   // send a stream to the render server root mpi process
   virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
-
+  // send a stream to the client.
+  virtual int SendStreamToClient(vtkClientServerStream&);
 
   // Description:
   // Helper methods.

@@ -18,10 +18,11 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 
-vtkCxxRevisionMacro(vtkRemoteConnection, "1.1");
+vtkCxxRevisionMacro(vtkRemoteConnection, "1.2");
 //-----------------------------------------------------------------------------
 vtkRemoteConnection::vtkRemoteConnection()
 {

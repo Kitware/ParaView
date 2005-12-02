@@ -34,6 +34,7 @@ class vtkClientServerStream;
 class vtkDataObject;
 class vtkKWProcessStatistics;
 class vtkMultiProcessController;
+class vtkProcessModuleConnection;
 class vtkProcessModuleInternals;
 class vtkProcessModuleObserver;
 class vtkProcessModuleConnectionManager;
@@ -66,9 +67,6 @@ public:
     RENDER_SERVER = 0x04,
     RENDER_SERVER_ROOT = 0x08,
     SERVERS = DATA_SERVER | RENDER_SERVER,
-    // CLIENT is only here for the time being.
-    // Step 2 of conversion should relinquish the notion of Client,
-    // instead use SelfConnection.
     CLIENT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
     };
@@ -104,14 +102,7 @@ public:
   // success, and 0 for failure (when the directory does not exist).
   virtual int GetDirectoryListing(vtkConnectionID connectionID, const char* dir, 
     vtkStringList* dirs, vtkStringList* files, int save);
-//ETX
-
-  // Description:
-  // Legacy Method.
-  virtual int GetDirectoryListing(const char* dir, 
-    vtkStringList* dirs, vtkStringList* files, int save);
-
-//BTX
+  
   // Description:
   // Load a ClientServer wrapper module dynamically in the server
   // processes.  Returns 1 if all server nodes loaded the module and 0
@@ -121,11 +112,6 @@ public:
   // to specify a directory in which to look for the module. 
   virtual int LoadModule(vtkConnectionID connectionID,
     vtkTypeUInt32 serverFlags, const char* name, const char* directory);
-
-  // Description:
-  // Legacy Method.
-  int LoadModule(vtkTypeUInt32 serverFlags, const char* name, 
-    const char* directory);
 //ETX
   
   // Description:
@@ -148,10 +134,6 @@ public:
   virtual void GatherInformation(vtkConnectionID connectionID,
     vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id);
 
-  // Description:
-  // Legacy Methods.
-  void GatherInformation(vtkPVInformation* info, vtkClientServerID id);
-  void GatherInformationRenderServer(vtkPVInformation* info, vtkClientServerID id);
 //ETX
 
   // Description:
@@ -190,21 +172,12 @@ public:
     vtkTypeUInt32 server);
 
   // Description:
-  // Legacy Method.
-  const vtkClientServerStream& GetLastResult(vtkTypeUInt32 server);
-
-  // Description:
   // Send a vtkClientServerStream to the specified servers.  Servers
   // are specified with a bit vector.  To send to more than one server
   // use the bitwise or operator to combine servers.  The resetStream
   // flag determines if Reset is called to clear the stream after it
   // is sent.
   int SendStream(vtkConnectionID connectionID, vtkTypeUInt32 server, 
-    vtkClientServerStream& stream, int resetStream=1);
-
-  // Description:
-  // Legacy Method.
-  int SendStream(vtkTypeUInt32 server, 
     vtkClientServerStream& stream, int resetStream=1);
 
   // Description:
@@ -262,11 +235,11 @@ public:
   // Description:
   // Internal method--called when a progress event is received.
   void ProgressEvent(vtkObject *o, int val, const char* filter);
-
+//BTX
   // Description:
-  virtual void SendPrepareProgress();
-  virtual void SendCleanupPendingProgress();
-
+  virtual void SendPrepareProgress(vtkConnectionID);
+  virtual void SendCleanupPendingProgress(vtkConnectionID);
+//ETX
   // Description:
   // This method is called before progress reports start comming.
   void PrepareProgress();
@@ -354,38 +327,47 @@ public:
   vtkPVServerInformation* GetServerInformation(vtkConnectionID id);
 
   // Description:
-  // Legacy Method
-  vtkPVServerInformation* GetServerInformation();
-
-  // Description:
   // Get the ID used for MPIMToNSocketConnection for the given connection.
   vtkClientServerID GetMPIMToNSocketConnectionID(vtkConnectionID id);
   
-  // Description:
-  // Legacy Method.
-  vtkClientServerID GetMPIMToNSocketConnectionID(); 
-//ETX
 
   // Description:
-  // Synchronizes the Client options with the specified server.
+  // Synchronizes the Client options with the specified server connection.
   // Not sure this is applicable in anything but legacy ParaView.
-  // Synchronizes with the the first server connection.
-  void SynchronizeServerClientOptions();
-  
-  // Description:
-  // Legacy Methods. These methods returns the controller for the first
-  // server connection for now. Need to figure out how to get rid of them.
-  vtkSocketController* GetSocketController();
-  vtkSocketController* GetRenderServerSocketController();
-  
+  void SynchronizeServerClientOptions(vtkConnectionID);
 
   // Description:
-  // Get the active remote connection.
+  // Given a vtkConnectionID, this call returns the ClientServer ID
+  // assigned to that connection. For now, only vtkRemoteConnections are
+  // assigned valid ClientServer IDs. If needed, we can add these IDs 
+  // to SelfConnection also.
+  vtkClientServerID GetConnectionClientServerID(vtkConnectionID);
+
+//ETX
+  
+  // Description:
+  // Get the active remote connection. The notion of active conntion
+  // is here only for the sake of ProgressHandler.
   vtkGetObjectMacro(ActiveRemoteConnection, vtkRemoteConnection);
 
   // Description:
   // Get the socket controller associated with the ActiveRemoteConnection;
+  // The notion of active conntion
+  // is here only for the sake of ProgressHandler.
   vtkSocketController* GetActiveSocketController();
+
+  // Description:
+  // Get the render-server socket controlled for the ActiveRemoteConnection,
+  // if any. The notion of active conntion
+  // is here only for the sake of ProgressHandler.
+  vtkSocketController* GetActiveRenderServerSocketController();
+
+  // Description:
+  // This is the way to get the socket controllers on all partitions/server/client etc.
+  // using the client server stream. This works because each
+  // connection (for now, each Remote connection) is assigned a ClientServerId.
+  vtkSocketController* GetSocketController(vtkProcessModuleConnection* conn);
+  vtkSocketController* GetRenderServerSocketController(vtkProcessModuleConnection* conn);
 
   // Description:
   // Get and Set the application installation directory
@@ -500,7 +482,8 @@ protected:
   vtkProcessModuleGUIHelper* GUIHelper;
 
   // Description:
-  // A system wide server information object.
+  // This is an empty server information object used when 
+  // no actual server exists.
   vtkPVServerInformation* ServerInformation;
   double LogThreshold;
   ofstream *LogFile;

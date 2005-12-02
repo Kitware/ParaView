@@ -24,6 +24,7 @@
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDisplayGUI.h"
@@ -40,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.14");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.15");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -205,7 +206,9 @@ void vtkPVSelectArrays::Accept()
   stream << vtkClientServerStream::Invoke
          << this->PVSource->GetVTKSourceID(0) << "RemoveAllVolumeArrayNames"
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 
   int count = 0;
   

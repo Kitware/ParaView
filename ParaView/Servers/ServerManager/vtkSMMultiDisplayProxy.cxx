@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {
@@ -73,7 +73,8 @@ void vtkSMMultiDisplayProxy::CreateVTKObjects(int numObjects)
     stream << vtkClientServerStream::Invoke
            << this->LODCollectProxy->GetID(i) << "DefineCollectAsCloneOn"
            << vtkClientServerStream::End;
-    pm->SendStream(this->CollectProxy->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, 
+      this->CollectProxy->GetServers(), stream);
     }
 }
 

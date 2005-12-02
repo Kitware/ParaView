@@ -22,6 +22,7 @@
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
@@ -35,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.62");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.63");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -71,7 +72,9 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
     vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     vtkClientServerStream stream;
     pm->DeleteStreamObject(this->ServerSideID, stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+     vtkProcessModuleConnectionManager::GetRootServerConnectionID(),  
+      vtkProcessModule::DATA_SERVER, stream);
     }
 }
 
@@ -453,7 +456,9 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
   if(!this->ServerSideID.ID)
     {
     this->ServerSideID = pm->NewStreamObject("vtkPVServerSelectTimeSet", stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
 
   // Get the time sets from the reader on the server.
@@ -461,10 +466,13 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
   stream << vtkClientServerStream::Invoke
          << this->ServerSideID << "GetTimeSets" << this->PVSource->GetVTKSourceID(0)
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER_ROOT, stream);
   vtkClientServerStream timeSets;
   if(!pm->GetLastResult(
-       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
     {
     vtkErrorMacro("Error getting time sets from server.");
     return;

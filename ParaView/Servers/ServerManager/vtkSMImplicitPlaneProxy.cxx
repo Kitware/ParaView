@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.5");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneProxy::vtkSMImplicitPlaneProxy()
@@ -68,7 +68,7 @@ void vtkSMImplicitPlaneProxy::UpdateVTKObjects()
   if (str.GetNumberOfMessages() > 0)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(this->Servers, str);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 
 }

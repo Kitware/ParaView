@@ -24,6 +24,11 @@
 // A proxy can be composite. Sub-proxies can be added by the proxy 
 // manager. This is transparent to the user who sees all properties
 // as if they belong to the root proxy.
+//
+// A proxy keeps an iVar ConnectionID. This is the connection ID for
+// the connection on which this proxy exists. Currently, since a ParaView client
+// is connected to 1 and only 1 server. This ID is insignificant. However,
+// it provides the ground work to enable a client to connect with multiple servers.
 // 
 // When defining a proxy in the XML configuration file,
 // to derrive the property interface from another proxy definition,
@@ -102,6 +107,7 @@
 
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
+#include "vtkConnectionID.h" // needed for vtkConnectionID.
 
 //BTX
 struct vtkSMProxyInternals;
@@ -257,6 +263,14 @@ public:
   vtkTypeUInt32 GetServers();
 
   // Description:
+  // Set the server connection ID on self and sub-proxies.
+  void SetConnectionID(vtkConnectionID id);
+
+  // Description:
+  // Returns the server connection ID.
+  vtkConnectionID GetConnectionID();
+
+  // Description:
   // Flags used for the proxyPropertyCopyFlag argument to the Copy method.
   enum
     {
@@ -368,6 +382,10 @@ protected:
   // Description:
   // Set server ids on self
   void SetServersSelf(vtkTypeUInt32 servers);
+
+  // Description:
+  // Set the server connection id on self.
+  void SetConnectionIDSelf(vtkConnectionID id);
 
 //BTX
   // This is a convenience method that pushes the value of one property
@@ -530,6 +548,11 @@ protected:
   
 
   int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
+  // This ID is the connection ID to the server on which this
+  // proxy exists, if at all. By default, it is the RootServerConnectionID.
+  vtkConnectionID ConnectionID;
 
 private:
   vtkSMProxyInternals* Internals;

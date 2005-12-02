@@ -15,6 +15,7 @@
 #include "vtkPVTimerLogDisplay.h"
 
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVTimerInformation.h"
 #include "vtkPVApplication.h"
 #include "vtkKWCheckButton.h"
@@ -33,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.38");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -241,6 +242,7 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
            << pm->GetProcessModuleID() << "SetLogThreshold" << val
            << vtkClientServerStream::End;
     pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
       vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
     }
 
@@ -264,6 +266,7 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
          << pm->GetProcessModuleID() << "SetLogBufferLength" << 2*length
          << vtkClientServerStream::End;
   pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->Update();
 }
@@ -286,6 +289,7 @@ void vtkPVTimerLogDisplay::Clear()
          << pm->GetProcessModuleID() << "ResetLog"
          << vtkClientServerStream::End;
   pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->Update();
 }
@@ -301,6 +305,7 @@ void vtkPVTimerLogDisplay::EnableCheckCallback()
          << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetSelectedState()
          << vtkClientServerStream::End;
   pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 }
 
@@ -395,7 +400,10 @@ void vtkPVTimerLogDisplay::Update()
     }
   this->TimerInformation = vtkPVTimerInformation::New();
   vtkProcessModule* pm = pvApp->GetProcessModule();
-  pm->GatherInformation(this->TimerInformation, pm->GetProcessModuleID());
+  pm->GatherInformation(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::DATA_SERVER,
+    this->TimerInformation, pm->GetProcessModuleID());
 
   // Special case for client-server.  add the client process as a log.
   if (pvApp->GetOptions()->GetClientMode())

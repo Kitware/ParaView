@@ -42,6 +42,7 @@ public:
   // property's Command on the root node of the server and uses the
   // return value(s).
   virtual void UpdateProperty(
+    vtkConnectionID connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
   //ETX
 

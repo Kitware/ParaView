@@ -18,7 +18,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMServerFileListingProxy);
-vtkCxxRevisionMacro(vtkSMServerFileListingProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMServerFileListingProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMServerFileListingProxy::vtkSMServerFileListingProxy()
 {
@@ -68,9 +68,10 @@ void vtkSMServerFileListingProxy::UpdatePropertyInformation()
     stream << vtkClientServerStream::Invoke
       << id << "FileIsDirectory" << this->ActiveFileName
       << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     int isdir;
-    if(!pm->GetLastResult(this->GetServers()).GetArgument(0, 0, &isdir))
+    if(!pm->GetLastResult(this->ConnectionID, 
+        this->GetServers()).GetArgument(0, 0, &isdir))
       {
       vtkErrorMacro("Error checking whether file is directory on server.");
       }
@@ -82,9 +83,10 @@ void vtkSMServerFileListingProxy::UpdatePropertyInformation()
     stream << vtkClientServerStream::Invoke
       << id << "FileIsReadable" << this->ActiveFileName
       << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     int isreadble;
-    if(!pm->GetLastResult(this->GetServers()).GetArgument(0, 0, &isreadble))
+    if(!pm->GetLastResult(this->ConnectionID,
+        this->GetServers()).GetArgument(0, 0, &isreadble))
       {
       vtkErrorMacro("Error checking whether file is readable on server.");
       }

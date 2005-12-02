@@ -20,6 +20,7 @@
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_MAJOR etc.
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
@@ -30,7 +31,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.2");
+vtkCxxRevisionMacro(vtkServerConnection, "1.3");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -123,6 +124,10 @@ vtkTypeUInt32 vtkServerConnection::CreateSendFlag(vtkTypeUInt32 serverFlags)
   // into data server calls
  
   vtkTypeUInt32 sendflag = 0;
+  if (serverFlags & vtkProcessModule::CLIENT)
+    {
+    sendflag |= vtkProcessModule::CLIENT;
+    }
   if(serverFlags & vtkProcessModule::RENDER_SERVER)
     {
     sendflag |= vtkProcessModule::DATA_SERVER;
@@ -169,6 +174,20 @@ int vtkServerConnection::SendStreamToRenderServerRoot(vtkClientServerStream& str
   return this->SendStreamToRoot(this->RenderServerSocketController, stream);
 }
 
+//-----------------------------------------------------------------------------
+// send a stream to the self connection.
+int vtkServerConnection::SendStreamToClient(vtkClientServerStream& stream)
+{
+  // Eventually, each remote connection will have its own self connection
+  // (i.e. separate Interpreters for each connection). Here, we will use
+  // the self connection  for this remote connection.
+  // For now, we simply use the common self connection.
+  this->Activate();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
+    vtkProcessModule::DATA_SERVER_ROOT, stream, 0);
+  this->Deactivate();
+}
 
 //-----------------------------------------------------------------------------
 int vtkServerConnection::SendStreamToServer(vtkSocketController* controller,
@@ -199,6 +218,15 @@ const vtkClientServerStream& vtkServerConnection::GetLastResult(vtkTypeUInt32
   serverFlags)
 {
   vtkTypeUInt32 sendflag = this->CreateSendFlag(serverFlags);
+  if (sendflag & vtkProcessModule::CLIENT)
+    {
+    // return the last result from the self connection.
+    // For now, this is the same single SelfConnection kept by ProcessModule.
+    // Eventually, each connection will have its own self connection.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    return pm->GetLastResult(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT);
+    }
   if ((sendflag & vtkProcessModule::DATA_SERVER_ROOT) 
     || (sendflag & vtkProcessModule::DATA_SERVER))
     {
@@ -209,6 +237,7 @@ const vtkClientServerStream& vtkServerConnection::GetLastResult(vtkTypeUInt32
     {
     return this->GetLastResultInternal(this->GetRenderServerSocketController());
     }
+
   vtkWarningMacro("GetLastResult called with bad server flag. "
     << "Returning DATA SERVER result.");
   return this->GetLastResultInternal(this->GetSocketController());
@@ -219,6 +248,13 @@ const vtkClientServerStream& vtkServerConnection::GetLastResult(vtkTypeUInt32
 const vtkClientServerStream& vtkServerConnection::GetLastResultInternal(
   vtkSocketController* controller)
 {
+  if (this->AbortConnection)
+    {
+    // Don't get last restult on an aborted connection.
+    this->LastResultStream->Reset();
+    return *this->LastResultStream;
+    }
+
   int length =0;
   controller->TriggerRMI(1, "", 
     vtkRemoteConnection::CLIENT_SERVER_LAST_RESULT_TAG);
@@ -247,7 +283,11 @@ const vtkClientServerStream& vtkServerConnection::GetLastResultInternal(
 void vtkServerConnection::GatherInformation(vtkTypeUInt32 serverFlags, 
   vtkPVInformation* info, vtkClientServerID id)
 {
- 
+  if (this->AbortConnection)
+    {
+    // Don't gather info on an aborted connection.
+    return;
+    }
   serverFlags = this->CreateSendFlag(serverFlags);
 
   if (serverFlags & vtkProcessModule::DATA_SERVER ||
@@ -307,7 +347,19 @@ int vtkServerConnection::Initialize(int vtkNotUsed(argc),
   char** vtkNotUsed(argv))
 {
   // returns 0 on success, 1 on error.
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
+  // A remote connnection is assigned a unique vtkClientServerID so that
+  // the connection can be located by the interpreter.
+  this->SelfID = pm->GetUniqueID();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Assign
+    << this->SelfID << this
+    << vtkClientServerStream::End;
+  this->SendStreamToClient(stream);  
+
+
   // Authenticate with DataServer.
   if (!this->AuthenticateWithServer(this->GetSocketController()))
     {
@@ -332,7 +384,7 @@ int vtkServerConnection::Initialize(int vtkNotUsed(argc),
   this->GatherInformation(
     vtkProcessModule::RENDER_SERVER | vtkProcessModule::DATA_SERVER,
     this->ServerInformation,
-    vtkProcessModule::GetProcessModule()->GetProcessModuleID());
+    pm->GetProcessModuleID());
 
   return 0;
 }
@@ -355,6 +407,13 @@ int vtkServerConnection::AuthenticateWithServer(vtkSocketController* controller)
     {
     // No controller, we are not using it. 
     return 1;
+    }
+
+  if (!this->SelfID.ID)
+    {
+    // Sanity check.
+    vtkErrorMacro("SelfID not set.");
+    return 0;
     }
   
   // If any send or receive fails we simply give up.
@@ -414,6 +473,23 @@ int vtkServerConnection::AuthenticateWithServer(vtkSocketController* controller)
     return 0;
     }
 
+  // Now, since the authentication has succeeded, tell the server
+  // to assign the same vtkClientServerID to this connection as the Client is.
+  int id = static_cast<int>(this->SelfID.ID);
+  if (!controller->Send(&id, 1, 1,
+      vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG))
+    {
+    return 0;
+    }
+  match=0;
+  controller->Receive(&match, 1, 1, 
+    vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
+  if (match == 0)
+    {
+    vtkErrorMacro("Failed to assign ID to this connection.");
+    return 0;
+    }
+  
   // Since no of Data Server Processes >= no. of Render Server Processes,
   // this check ensures we only maintain the Data Server processes count.
   this->NumberOfServerProcesses = 

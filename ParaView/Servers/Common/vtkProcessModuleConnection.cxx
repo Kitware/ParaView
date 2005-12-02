@@ -15,11 +15,13 @@
 
 #include "vtkProcessModuleConnection.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSocket.h"
 
 class vtkProcessModuleConnectionObserver : public vtkCommand
@@ -55,10 +57,11 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.2");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.3");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
+  this->SelfID.ID = 0;
   this->Controller = NULL;
   this->StreamBlock = 0;
   this->AbortConnection = 0;
@@ -80,6 +83,32 @@ vtkProcessModuleConnection::~vtkProcessModuleConnection()
     this->Controller = NULL;
     }
 }
+
+//-----------------------------------------------------------------------------
+void vtkProcessModuleConnection::UnRegister(vtkObjectBase* obj)
+{
+  if (this->SelfID.ID != 0)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm && obj != pm->GetInterpreter())
+      {
+      // If the object is not being deleted by the interpreter and it
+      // has a reference count of 2, unassign the clientserver id.
+      if (this->ReferenceCount == 2)
+        {
+        vtkClientServerID selfid = this->SelfID;
+        this->SelfID.ID = 0;
+        vtkClientServerStream deleteStream;
+        deleteStream << vtkClientServerStream::Delete
+          << selfid << vtkClientServerStream::End;
+        pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(), 
+          vtkProcessModule::CLIENT, deleteStream);
+        }
+      }
+    }
+  this->Superclass::UnRegister(obj);
+}
+
 //-----------------------------------------------------------------------------
 vtkCommand* vtkProcessModuleConnection::GetObserver()
 {
@@ -213,6 +242,10 @@ int vtkProcessModuleConnection::SendStream(vtkTypeUInt32 servers,
     {
     this->SendStreamToRenderServerRoot(stream);
     }
+  if (sendflag & vtkProcessModule::CLIENT)
+    {
+    this->SendStreamToClient(stream);
+    }
   return 0;
 }
 
@@ -220,7 +253,7 @@ int vtkProcessModuleConnection::SendStream(vtkTypeUInt32 servers,
 // send a stream to the data server
 int vtkProcessModuleConnection::SendStreamToDataServer(vtkClientServerStream&)
 {
-  vtkErrorMacro("SendStreamToDataServer called on process module that does not implement it");
+  vtkErrorMacro("SendStreamToDataServer called on connection that does not implement it");
   return -1;
 }
 
@@ -229,7 +262,7 @@ int vtkProcessModuleConnection::SendStreamToDataServer(vtkClientServerStream&)
 int vtkProcessModuleConnection::SendStreamToDataServerRoot(vtkClientServerStream&)
 {
   vtkErrorMacro(
-    "SendStreamToDataServerRoot called on process module that does not implement it");
+    "SendStreamToDataServerRoot called on connection that does not implement it");
   return -1;
 }
 
@@ -238,7 +271,7 @@ int vtkProcessModuleConnection::SendStreamToDataServerRoot(vtkClientServerStream
 int vtkProcessModuleConnection::SendStreamToRenderServer(vtkClientServerStream&)
 {
   vtkErrorMacro(
-    "SendStreamToRenderServer called on process module that does not implement it");
+    "SendStreamToRenderServer called on connection that does not implement it");
   return -1;
 }
 
@@ -247,7 +280,15 @@ int vtkProcessModuleConnection::SendStreamToRenderServer(vtkClientServerStream&)
 int vtkProcessModuleConnection::SendStreamToRenderServerRoot(vtkClientServerStream&)
 {
   vtkErrorMacro(
-    "SendStreamToRenderServerRoot called on process module that does not implement it");
+    "SendStreamToRenderServerRoot called on connection that does not implement it");
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModuleConnection::SendStreamToClient(vtkClientServerStream&)
+{
+  vtkErrorMacro(
+    "SendStreamToClient called on connection that does not implement it.");
   return -1;
 }
 

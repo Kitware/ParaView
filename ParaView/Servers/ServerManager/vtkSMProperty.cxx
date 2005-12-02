@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.34");
+vtkCxxRevisionMacro(vtkSMProperty, "1.35");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -197,7 +197,8 @@ void vtkSMProperty::UpdateDependentDomains()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::UpdateInformation(int serverIds, vtkClientServerID objectId)
+void vtkSMProperty::UpdateInformation(vtkConnectionID cid, int serverIds, 
+  vtkClientServerID objectId)
 {
   if (!this->InformationOnly)
     {
@@ -206,7 +207,7 @@ void vtkSMProperty::UpdateInformation(int serverIds, vtkClientServerID objectId)
 
   if (this->InformationHelper)
     {
-    this->InformationHelper->UpdateProperty(serverIds, objectId, this);
+    this->InformationHelper->UpdateProperty(cid, serverIds, objectId, this);
     }
 }
 

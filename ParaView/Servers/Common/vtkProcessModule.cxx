@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.33");
+vtkCxxRevisionMacro(vtkProcessModule, "1.34");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -130,6 +130,7 @@ vtkProcessModule::vtkProcessModule()
 //-----------------------------------------------------------------------------
 vtkProcessModule::~vtkProcessModule()
 {
+  this->SetActiveRemoteConnection(0);
   this->Observer->SetProcessModule(0);
   this->Observer->Delete();
 
@@ -158,7 +159,6 @@ vtkProcessModule::~vtkProcessModule()
     this->LogFile = 0;
     }
 
-  this->SetActiveRemoteConnection(0);
   this->Timer->Delete();
   this->MemoryInformation->Delete();
   this->ServerInformation->Delete();
@@ -256,7 +256,7 @@ int vtkProcessModule::Start(int argc, char** argv)
     return 1;
     }
 
-  
+
   int myId = this->GetPartitionId();
   if (myId != 0)
     {
@@ -283,7 +283,7 @@ int vtkProcessModule::Start(int argc, char** argv)
       this->Exit();
       return 1;
       } 
-    
+
     if (this->Options->GetClientMode() && this->ShouldWaitForConnection())
       {
       if (!this->ClientWaitForConnection())
@@ -304,7 +304,7 @@ int vtkProcessModule::Start(int argc, char** argv)
     {
     cout << "Waiting for client..." << endl;
     }
-  
+
   while  ((ret = this->ConnectionManager->MonitorConnections(0)) >= 0)
     {
     if (ret == 2)
@@ -313,7 +313,7 @@ int vtkProcessModule::Start(int argc, char** argv)
       // Since ParaView closes server sockets, we close them for now.
       this->ConnectionManager->StopAcceptingAllConnections();
       }
-    
+
     else if (ret == 3)
       {
       // Connection dropped.
@@ -586,6 +586,12 @@ const vtkClientServerStream& vtkProcessModule::GetLastResult(
 {
   return this->ConnectionManager->GetLastResult(connectionID, server);
 }
+//-----------------------------------------------------------------------------
+vtkClientServerID vtkProcessModule::GetConnectionClientServerID(
+  vtkConnectionID id)
+{
+  return this->ConnectionManager->GetConnectionClientServerID(id);
+}
 
 //-----------------------------------------------------------------------------
 int vtkProcessModule::SendStream(vtkConnectionID connectionID, 
@@ -647,7 +653,7 @@ void vtkProcessModule::InitializeInterpreter()
   if(getenv("VTK_CLIENT_SERVER_LOG"))
     {
     needLog = true;
-    if(this-Options->GetClientMode())
+    if(this->Options->GetClientMode())
       {
       needLog = false;
       this->GetInterpreter()->SetLogFile("paraviewClient.log");
@@ -673,7 +679,7 @@ void vtkProcessModule::InitializeInterpreter()
   css << vtkClientServerStream::Assign
     << this->GetProcessModuleID() << this
     << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(css);
+  this->Interpreter->ProcessStream(css); 
 }
 
 //-----------------------------------------------------------------------------
@@ -810,7 +816,7 @@ void vtkProcessModule::RegisterProgressEvent(vtkObject* po, int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::SendPrepareProgress()
+void vtkProcessModule::SendPrepareProgress(vtkConnectionID connectionId)
 {
   if (!this->GUIHelper)
     {
@@ -824,13 +830,13 @@ void vtkProcessModule::SendPrepareProgress()
   stream << vtkClientServerStream::Invoke 
          << this->GetProcessModuleID() << "PrepareProgress" 
          << vtkClientServerStream::End;
-  this->SendStream(
+  this->SendStream(connectionId,
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->ProgressRequests ++;
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::SendCleanupPendingProgress()
+void vtkProcessModule::SendCleanupPendingProgress(vtkConnectionID connectionId)
 {
   if ( this->ProgressRequests < 0 )
     {
@@ -847,7 +853,7 @@ void vtkProcessModule::SendCleanupPendingProgress()
   stream << vtkClientServerStream::Invoke 
          << this->GetProcessModuleID() << "CleanupPendingProgress" 
          << vtkClientServerStream::End;
-  this->SendStream(
+  this->SendStream(connectionId,
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   
   if (!this->GUIHelper)
@@ -1033,7 +1039,6 @@ int vtkProcessModule::GetDirectoryListing(vtkConnectionID connectionID,
     return 0;
     }
 }
-
 
 //-----------------------------------------------------------------------------
 int vtkProcessModule::LoadModule(vtkConnectionID connectionID,
@@ -1271,7 +1276,9 @@ const char* vtkProcessModule::GetMachineName(unsigned int idx)
 vtkPVServerInformation* vtkProcessModule::GetServerInformation(
   vtkConnectionID id)
 {
-  return this->ConnectionManager->GetServerInformation(id);
+  vtkPVServerInformation* info = 
+    this->ConnectionManager->GetServerInformation(id);
+  return (info)? info : this->ServerInformation;
 }
 
 //-----------------------------------------------------------------------------
@@ -1298,101 +1305,13 @@ void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
 }
 
 //-----------------------------------------------------------------------------
-// LEGACY METHODS. 
-static vtkConnectionID ServerFlagsToConnections(vtkTypeUInt32 inFlags, 
-  vtkTypeUInt32& outFlags)
+void vtkProcessModule::SynchronizeServerClientOptions(vtkConnectionID id)
 {
-  int hasSelfConnection = 0;
-  int hasServerConnection = 0;
-    
-  outFlags = 0;
-  if (inFlags & vtkProcessModule::CLIENT)
+  vtkPVServerInformation* info = this->GetServerInformation(id);
+  if (!info)
     {
-    hasSelfConnection = 1;
+    return;
     }
-  
-  outFlags = inFlags & ~vtkProcessModule::CLIENT;
-  if (outFlags)
-    {
-    hasServerConnection = 1;
-    }
-
-  if (hasServerConnection && hasSelfConnection)
-    {
-    return vtkProcessModuleConnectionManager::GetAllConnectionsID();
-    }
-  
-  if (hasServerConnection)
-    {
-    return vtkProcessModuleConnectionManager::GetAllServerConnectionsID();
-    }
-  if (outFlags == 0)
-    {
-    outFlags = vtkProcessModule::DATA_SERVER_ROOT;
-    }
-    
-  return vtkProcessModuleConnectionManager::GetSelfConnectionID(); 
-}
-
-int vtkProcessModule::LoadModule(vtkTypeUInt32 serverFlags, const char* name, 
-    const char* directory)
-{
-  return this->LoadModule(vtkProcessModuleConnectionManager::GetAllConnectionsID(),
-    serverFlags, name, directory);
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::GatherInformation(vtkPVInformation* info, 
-  vtkClientServerID id)
-{
-  this->GatherInformation(
-    vtkProcessModuleConnectionManager::GetAllServerConnectionsID(),
-    vtkProcessModule::DATA_SERVER, info, id);
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::GatherInformationRenderServer(vtkPVInformation* info, 
-  vtkClientServerID id)
-{
-  this->GatherInformation(
-    vtkProcessModuleConnectionManager::GetAllServerConnectionsID(),
-    vtkProcessModule::RENDER_SERVER, info, id);
-}
-
-//-----------------------------------------------------------------------------
-const vtkClientServerStream& vtkProcessModule::GetLastResult(vtkTypeUInt32 server)
-{
-  vtkTypeUInt32 flags = 0;
-  vtkConnectionID id = ::ServerFlagsToConnections(server, flags);
-  return this->GetLastResult(id, flags);
-}
-
-//-----------------------------------------------------------------------------
-int vtkProcessModule::SendStream(vtkTypeUInt32 server, 
-    vtkClientServerStream& stream, int resetStream /*=1*/)
-{
-  vtkTypeUInt32 flags = 0;
-  vtkConnectionID id = ::ServerFlagsToConnections(server, flags);
-  return this->SendStream(id, flags, stream, resetStream); 
-}
-
-//-----------------------------------------------------------------------------
-vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID()
-{
-  return this->GetMPIMToNSocketConnectionID(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
-}
-//-----------------------------------------------------------------------------
-vtkPVServerInformation* vtkProcessModule::GetServerInformation()
-{
-  vtkPVServerInformation* info = this->GetServerInformation(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
-  return (info)? info : this->ServerInformation;
-}
-//-----------------------------------------------------------------------------
-void vtkProcessModule::SynchronizeServerClientOptions()
-{
-  vtkPVServerInformation* info = this->GetServerInformation();
   if (!this->Options->GetTileDimensions()[0])
     {
     this->Options->SetTileDimensions
@@ -1404,13 +1323,33 @@ void vtkProcessModule::SynchronizeServerClientOptions()
       (info->GetUseOffscreenRendering());
     }
 }
+
 //-----------------------------------------------------------------------------
-int vtkProcessModule::GetDirectoryListing(const char* dir, 
-    vtkStringList* dirs, vtkStringList* files, int save)
+vtkSocketController* vtkProcessModule::GetSocketController(
+  vtkProcessModuleConnection* conn)
 {
-  return this->GetDirectoryListing(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), dir,
-    dirs, files, save);
+  vtkRemoteConnection* rconn = vtkRemoteConnection::SafeDownCast(conn);
+  if (rconn)
+    {
+    return rconn->GetSocketController();
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+vtkSocketController* vtkProcessModule::GetRenderServerSocketController(
+  vtkProcessModuleConnection* conn)
+{
+  vtkServerConnection* sconn = vtkServerConnection::SafeDownCast(conn);
+  if (sconn)
+    {
+    vtkSocketController* sc = sconn->GetRenderServerSocketController();
+    if (sc)
+      {
+      return sc;
+      }
+    }
+  return this->GetSocketController(conn);
 }
 
 //-----------------------------------------------------------------------------
@@ -1424,58 +1363,22 @@ vtkSocketController* vtkProcessModule::GetActiveSocketController()
 }
 
 //-----------------------------------------------------------------------------
-vtkSocketController* vtkProcessModule::GetSocketController()
+vtkSocketController* vtkProcessModule::GetActiveRenderServerSocketController()
 {
-  // Get first Server Connection.
-  vtkConnectionIterator  * iter = this->ConnectionManager->NewIterator();
-  iter->SetMatchConnectionID(
-    vtkProcessModuleConnectionManager::GetAllServerConnectionsID());
-  
-  vtkRemoteConnection* conn = 0;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  if (!this->ActiveRemoteConnection)
     {
-    conn = vtkRemoteConnection::SafeDownCast(
-      iter->GetCurrentConnection());
-    if (conn)
+    return 0;
+    }
+  if (vtkServerConnection::SafeDownCast(this->ActiveRemoteConnection))
+    {
+    vtkSocketController* c = vtkServerConnection::SafeDownCast(
+      this->ActiveRemoteConnection)->GetRenderServerSocketController();
+    if (c)
       {
-      break;
+      return c;
       }
     }
-  iter->Delete();
-  if (conn)
-    {
-    return conn->GetSocketController();
-    }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-vtkSocketController* vtkProcessModule::GetRenderServerSocketController()
-{
-  // Get first Server Connection.
-  vtkConnectionIterator  * iter = this->ConnectionManager->NewIterator();
-  iter->SetMatchConnectionID(
-    vtkProcessModuleConnectionManager::GetAllServerConnectionsID());
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkServerConnection* sconn = vtkServerConnection::SafeDownCast(
-      iter->GetCurrentConnection());
-    if (sconn && sconn->GetRenderServerSocketController())
-      {
-      iter->Delete();
-      return sconn->GetRenderServerSocketController();
-      }
-    
-    vtkRemoteConnection* conn = vtkRemoteConnection::SafeDownCast(
-      iter->GetCurrentConnection());
-    if (conn)
-      {
-      iter->Delete();
-      return conn->GetSocketController();
-      }
-    }
-  iter->Delete();
-  return 0;
+  return this->GetActiveSocketController();
 }
 
 //-----------------------------------------------------------------------------

@@ -45,6 +45,7 @@ public:
   // Each array is represented by two components:
   // name, state (on/off)  
   virtual void UpdateProperty(
+    vtkConnectionID connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
   //ETX
 
