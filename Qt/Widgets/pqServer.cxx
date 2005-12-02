@@ -16,6 +16,7 @@
 #include <vtkProcessModuleGUIHelper.h>
 #include <vtkPVOptions.h>
 #include <vtkProcessModule.h>
+#include <vtkProcessModuleConnectionManager.h>
 #include <vtkPVServerInformation.h>
 #include <vtkSMApplication.h>
 #include <vtkSMProperty.h>
@@ -134,7 +135,8 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
   vtkSMProxyManager* const proxy_manager = server_manager->GetProxyManager();
   
   // Create render module ...
-  process_module->SynchronizeServerClientOptions();
+  process_module->SynchronizeServerClientOptions(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
 
   render_module = 
     vtkSMMultiViewRenderModuleProxy::SafeDownCast(

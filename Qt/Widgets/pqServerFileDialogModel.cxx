@@ -11,6 +11,7 @@
 
 #include <vtkClientServerStream.h>
 #include <vtkProcessModule.h>
+#include <vtkProcessModuleConnectionManager.h>
 
 #include <QFileIconProvider>
 
@@ -89,9 +90,13 @@ public:
       << Path.toAscii().data()
       << 0
       << vtkClientServerStream::End;
-    ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    ProcessModule->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
     vtkClientServerStream result;
-    ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
+    ProcessModule->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
 
     if(result.GetNumberOfMessages() == 2)
       {
@@ -292,9 +297,13 @@ QString pqServerFileDialogModel::getStartPath()
     << "GetCurrentWorkingDirectory"
     << vtkClientServerStream::End;
     
-  this->Implementation->FileModel->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  this->Implementation->FileModel->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::DATA_SERVER_ROOT, stream);
   const char* cwd = "";
-  this->Implementation->FileModel->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd);
+  this->Implementation->FileModel->ProcessModule->GetLastResult(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd);
   QString result = cwd;
   this->Implementation->FileModel->ProcessModule->DeleteStreamObject(id, stream);
   
