@@ -273,9 +273,11 @@ void pqMainWindow::setServer(pqServer* Server)
     this->Pipeline->addServer(this->CurrentServer);
 
     this->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
+    this->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1
     QObject::connect(this->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)), this, SLOT(onNewQVTKWidget(pqMultiViewFrame*)));
     QObject::connect(this->MultiViewManager, SIGNAL(frameRemoved(pqMultiViewFrame*)), this, SLOT(onDeleteQVTKWidget(pqMultiViewFrame*)));
     this->setCentralWidget(this->MultiViewManager);
+    this->MultiViewManager->show();  // workaround for flickering in Qt 4.0.1
     }
   
   this->ServerDisconnectAction->setEnabled(this->CurrentServer);
