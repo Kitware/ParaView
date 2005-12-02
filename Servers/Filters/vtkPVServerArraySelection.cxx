@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.3");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
@@ -111,6 +111,12 @@ vtkPVServerArraySelection
         if(!interp->GetLastResult().GetArgument(0, 0, &pname))
           {
           vtkErrorMacro("Error getting array name from reader.");
+          break;
+          }
+        if (!pname)
+          {
+          // Initializing a vtkstd::string to NULL does not have a defined
+          // behavior.
           break;
           }
         vtkstd::string name = pname;
