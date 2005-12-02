@@ -1,5 +1,5 @@
 PROJECT(PVClient)
-INCLUDE_REGULAR_EXPRESSION("(vtk.*|pv.*|vtksys.*)")
+INCLUDE_REGULAR_EXPRESSION("(vtk.*|pv.*|vtksys.*|[pP]a.*)")
 
 IF (WIN32)
   ADD_DEFINITIONS(-DPARAVIEW_USE_WIN32_RW)
