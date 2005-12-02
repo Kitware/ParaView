@@ -147,6 +147,8 @@ IF (PARAVIEW_WRAP_PYTHON)
   SET(KIT_PYTHON_LIBS
     vtkCommonPython vtkPVServerCommon vtk${KIT}CS
     )
+  # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
+  SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
   INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
   SET(KIT_PYTHON_DEPS)

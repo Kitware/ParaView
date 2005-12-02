@@ -15,6 +15,10 @@ SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
 # turn off building ParaView Tk based GUI
 SET(PARAVIEW_BUILD_GUI OFF CACHE BOOL "Build end user applications (ParaView, pvclient, pvbatch)")
 
+# Work around CMake 2.2.x FindPythonLibs bug.
+# Do not find Python subdirectory as python debug library.
+SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake FindPythonLibs bug")
+
 SUBDIRS(
   ParaView
   Qt
