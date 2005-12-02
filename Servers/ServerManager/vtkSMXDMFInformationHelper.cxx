@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMXDMFInformationHelper);
-vtkCxxRevisionMacro(vtkSMXDMFInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMXDMFInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMXDMFInformationHelper::vtkSMXDMFInformationHelper()
@@ -34,7 +34,8 @@ vtkSMXDMFInformationHelper::~vtkSMXDMFInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMXDMFInformationHelper::UpdateProperty(
-    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop)
+  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp)
@@ -56,14 +57,14 @@ void vtkSMXDMFInformationHelper::UpdateProperty(
   str << vtkClientServerStream::Invoke
       << serverSideID << "GetParameters" << objectId
       << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str);
 
   vtkClientServerStream parameters;
-  int retVal = 
-    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &parameters);
+  int retVal = pm->GetLastResult(connectionId,
+      vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &parameters);
 
   pm->DeleteStreamObject(serverSideID, str);
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str);
 
   if(!retVal)
     {

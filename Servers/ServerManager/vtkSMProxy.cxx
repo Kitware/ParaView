@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
@@ -32,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.52");
+vtkCxxRevisionMacro(vtkSMProxy, "1.53");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -113,6 +114,8 @@ vtkSMProxy::vtkSMProxy()
 
   vtkClientServerID nullID = { 0 };
   this->SelfID = nullID;
+  this->ConnectionID = 
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID();
 
   this->XMLElement = 0;
   this->DoNotModifyProperty = 0;
@@ -134,7 +137,15 @@ vtkSMProxy::vtkSMProxy()
   initStream << vtkClientServerStream::Assign 
              << this->SelfID << this
              << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT, initStream);
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, initStream);
+  // Now this is tricky. this->ConnectionID is used in the contructor of vtkSMProxy itself.
+  // Until, there is a single vtkSelfConnection on the process module, this is fine,
+  // since we are processing this stream on the local interpreter itself. However, once
+  // we start maintain different vtkSelfConnections (i.e. interpreters) with each connection,
+  // setting the ConnectionID on the proxy can cause havoc, since the SelfID may not
+  // be defined on the local interpreter for the new server connection. 
+
+  
   // This is done to make the last result message release it's reference 
   // count. Otherwise the object has a reference count of 3.
   if (pm)
@@ -205,7 +216,7 @@ void vtkSMProxy::UnRegisterVTKObjects()
     {
     pm->DeleteStreamObject(*it, stream);
     }
-  pm->SendStream(this->Servers, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 
   this->Internals->IDs.clear();
 
@@ -232,7 +243,7 @@ void vtkSMProxy::UnRegister(vtkObjectBase* obj)
         deleteStream << vtkClientServerStream::Delete 
                      << selfid
                      << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::CLIENT, deleteStream);
+        pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, deleteStream);
         }
       }
     }
@@ -268,6 +279,35 @@ void vtkSMProxy::SetServersSelf(vtkTypeUInt32 servers)
 vtkTypeUInt32 vtkSMProxy::GetServers()
 {
   return this->Servers;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetConnectionID(vtkConnectionID id)
+{
+  this->SetConnectionIDSelf(id);
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->SetConnectionID(id);
+    } 
+}
+
+//---------------------------------------------------------------------------
+vtkConnectionID vtkSMProxy::GetConnectionID()
+{
+  return this->ConnectionID;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetConnectionIDSelf(vtkConnectionID id)
+{
+  if (this->ConnectionID == id)
+    {
+    return;
+    }
+  this->ConnectionID = id;
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------
@@ -492,7 +532,7 @@ void vtkSMProxy::PushProperty(
     vtkClientServerStream str;
     it->second.Property.GetPointer()->AppendCommandToStream(this, &str, id);
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(servers, str);
+    pm->SendStream(this->ConnectionID, servers, str);
     }
 }
 
@@ -547,7 +587,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       if (str.GetNumberOfMessages() > 0)
         {
         vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-        pm->SendStream(this->Servers, str);
+        pm->SendStream(this->ConnectionID, this->Servers, str);
         this->MarkModified(this);
         }
       }
@@ -605,11 +645,13 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
       {
       if (prop->GetUpdateSelf())
         {
-        prop->UpdateInformation(vtkProcessModule::CLIENT, this->SelfID);
+        prop->UpdateInformation(this->ConnectionID, 
+          vtkProcessModule::CLIENT, this->SelfID);
         }
       else
         {
-        prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
+        prop->UpdateInformation(this->ConnectionID,
+          this->Servers, this->Internals->IDs[0]);
         }
       prop->UpdateDependentDomains();
       }
@@ -643,11 +685,13 @@ void vtkSMProxy::UpdatePropertyInformation()
       {
       if (prop->GetUpdateSelf())
         {
-        prop->UpdateInformation(vtkProcessModule::CLIENT, this->SelfID);
+        prop->UpdateInformation(this->ConnectionID,
+          vtkProcessModule::CLIENT, this->SelfID);
         }
       else
         {
-        prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
+        prop->UpdateInformation(this->ConnectionID,
+          this->Servers, this->Internals->IDs[0]);
         }
       }
     }
@@ -708,7 +752,7 @@ void vtkSMProxy::UpdateVTKObjects()
   
   vtkClientServerStream str;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendPrepareProgress();
+  pm->SendPrepareProgress(this->ConnectionID);
 
   int old_SelfPropertiesModified = this->SelfPropertiesModified;
   
@@ -784,12 +828,12 @@ void vtkSMProxy::UpdateVTKObjects()
       }
     if (str.GetNumberOfMessages() > 0)
       {
-      pm->SendStream(this->Servers, str);
+      pm->SendStream(this->ConnectionID, this->Servers, str);
       wasModified = 1;
       }
     }
 
-  pm->SendCleanupPendingProgress();
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
@@ -819,14 +863,16 @@ void vtkSMProxy::UpdateSelfAndAllInputs()
 {
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
-  vtkProcessModule::GetProcessModule()->SendPrepareProgress();
+  vtkProcessModule::GetProcessModule()->SendPrepareProgress(
+    this->ConnectionID);
   while (!iter->IsAtEnd())
     {
     iter->GetProperty()->UpdateAllInputs();
     iter->Next();
     }
   iter->Delete();
-  vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress();
+  vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
+    this->ConnectionID);
 
   this->UpdateVTKObjects();
 }
@@ -869,7 +915,7 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
       }
     if (stream.GetNumberOfMessages() > 0)
       {
-      pm->SendStream(this->Servers, stream);
+      pm->SendStream(this->ConnectionID, this->Servers, stream);
       }
     }
 

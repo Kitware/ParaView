@@ -23,11 +23,12 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
+  this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
   this->UseOffscreenRendering = 0;
@@ -88,10 +89,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
     vtkErrorMacro("Cannot downcast to vtkProcessModule.");
     return;
     }
-    
-  // TODO: Process module can no longer give us global ServerOptions.
-  this->DeepCopy(pm->GetServerInformation());
-
+  
   vtkPVServerOptions *options =
     vtkPVServerOptions::SafeDownCast(pm->GetOptions());
   options->GetTileDimensions(this->TileDimensions);

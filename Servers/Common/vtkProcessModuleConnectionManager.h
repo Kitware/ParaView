@@ -97,7 +97,7 @@ public:
   // running in client mode (where it connects/accepts connections from remote 
   // data (and render) servers), SelfConnection is not a ServerConnection. 
   // Only remote connections are ServerConnections in such a case. Providing 
-  // this ID makes this decision complete transparent to the ServerManager.
+  // this ID makes this decision completely transparent to the ServerManager.
   static vtkConnectionID GetRootServerConnectionID()
     { 
     vtkConnectionID id;
@@ -195,6 +195,11 @@ public:
   // Description:
   // Returns the connection with the given ID. If none present returns NULL.
   vtkProcessModuleConnection* GetConnectionFromID(vtkConnectionID id);
+
+  // Description:
+  // Given a vtkConnectionID, this call returns the ClientServer ID
+  // assigned to that connection.
+  vtkClientServerID GetConnectionClientServerID(vtkConnectionID);
 
   // Description:
   // Sends streams to the appropriate connection.

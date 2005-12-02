@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.5");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -59,7 +59,7 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers,str,0);
     }
 
   // Setup the pipeline.
@@ -89,7 +89,7 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->ConnectionID, this->Servers,str,0);
     }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(

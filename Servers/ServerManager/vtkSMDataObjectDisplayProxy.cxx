@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.6");
 
 int vtkSMDataObjectDisplayProxy::UseCache = 0;
 
@@ -404,7 +404,8 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       << end
       << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::DATA_SERVER, stream);
   // Init Mapper properties.
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->MapperProxy->GetProperty("UseLookupTableScalarRange"));
@@ -505,7 +506,8 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
-  pm->SendStream(this->UpdateSuppressorProxy->GetServers(), stream);
+  pm->SendStream(this->ConnectionID,
+    this->UpdateSuppressorProxy->GetServers(), stream);
 
   //  this->UpdateVTKObjects();
 }
@@ -672,7 +674,8 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
-  pm->SendStream(this->VolumeUpdateSuppressorProxy->GetServers(), stream);
+  pm->SendStream(this->ConnectionID,
+    this->VolumeUpdateSuppressorProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -1094,6 +1097,7 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
     << this->MapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
   
 }
@@ -1193,9 +1197,9 @@ void vtkSMDataObjectDisplayProxy::GatherGeometryInformation()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  pm->SendPrepareProgress();
+  pm->SendPrepareProgress(this->ConnectionID);
   this->Update();
-  pm->SendCleanupPendingProgress();
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 
   int num, i;
   vtkPVGeometryInformation* information;
@@ -1203,7 +1207,9 @@ void vtkSMDataObjectDisplayProxy::GatherGeometryInformation()
   information = vtkPVGeometryInformation::New();
   for (i = 0; i < num; ++i)
     {
-    pm->GatherInformation(information, this->GeometryFilterProxy->GetID(i));
+    pm->GatherInformation(this->ConnectionID,
+      this->GeometryFilterProxy->GetServers(),
+      information, this->GeometryFilterProxy->GetID(i));
     this->GeometryInformation->AddInformation(information);
     }
   information->Delete();

@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -83,6 +83,7 @@ vtkPVLODPartDisplayInformation* vtkSMLODDisplayProxy::GetLODInformation()
   if (this->LODDecimatorProxy->GetNumberOfIDs() > 0)
     {
     vtkProcessModule::GetProcessModule()->GatherInformation(
+      this->ConnectionID, this->LODDecimatorProxy->GetServers(),
       this->LODInformation, this->LODDecimatorProxy->GetID(0));
     }
   this->LODInformationIsValid = 1;
@@ -219,7 +220,8 @@ void vtkSMLODDisplayProxy::SetupDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -256,6 +258,7 @@ void vtkSMLODDisplayProxy::CacheUpdate(int idx, int total)
     << this->LODMapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream); 
 }
 

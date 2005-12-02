@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(
+    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
       this->CubeAxesProxy->GetServers(), stream);
     }
   this->RenderModuleProxy = rm;
@@ -282,7 +282,7 @@ void vtkSMCubeAxesDisplayProxy::Update()
            << rgb[0] << rgb[1] << rgb[2]
            << vtkClientServerStream::End;  
     }
-  pm->SendStream(this->CubeAxesProxy->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
   this->GeometryIsValid = 1;
 }
 
@@ -345,7 +345,7 @@ void vtkSMCubeAxesDisplayProxy::CacheUpdate(int idx, int total)
            << this->Caches[idx][4] << this->Caches[idx][5]
            << vtkClientServerStream::End;
     }
-  pm->SendStream(this->CubeAxesProxy->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------

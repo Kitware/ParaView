@@ -72,10 +72,11 @@ public:
   // the SelfConnection.
   void Activate();
   void Deactivate();
+
 protected:
   vtkRemoteConnection();
   ~vtkRemoteConnection(); 
-  
+
 private:
   vtkRemoteConnection(const vtkRemoteConnection&); // Not implemented.
   void operator=(const vtkRemoteConnection&); // Not implemented.

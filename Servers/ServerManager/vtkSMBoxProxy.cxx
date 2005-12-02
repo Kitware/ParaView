@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMBoxProxy);
-vtkCxxRevisionMacro(vtkSMBoxProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMBoxProxy, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void vtkSMBoxProxy::UpdateVTKObjects()
   if (str.GetNumberOfMessages() > 0)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(this->Servers, str, 0);
+    pm->SendStream(this->ConnectionID, this->Servers, str, 0);
     }
   mat->Delete();
 }

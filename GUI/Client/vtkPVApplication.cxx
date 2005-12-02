@@ -83,6 +83,7 @@
 #include "vtkSocketController.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 // #include "vtkPVRenderGroupDialog.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkPVServerFileDialog.h"
@@ -113,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.378");
+vtkCxxRevisionMacro(vtkPVApplication, "1.379");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -511,7 +512,9 @@ void vtkPVApplication::SetProcessModule(vtkProcessModule *pm)
     // Put the flag on the process module.
     if (this->Options->GetDisableComposite())
       {
-      pm->GetServerInformation()->SetRemoteRendering(0);
+      pm->GetServerInformation(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID())
+        ->SetRemoteRendering(0);
       }
     pm->GetProgressHandler()->SetClientMode(this->Options->GetClientMode());
     pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
@@ -522,14 +525,17 @@ int vtkPVApplication::SetupRenderModule()
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  pm->SynchronizeServerClientOptions();
+  pm->SynchronizeServerClientOptions(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
 
   const char* renderModuleName = 0;
-
+  vtkPVServerInformation* server_info = pm->GetServerInformation(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
+  
   renderModuleName = pm->GetOptions()->GetRenderModuleName();
   if (!renderModuleName)
     {
-    renderModuleName = pm->GetServerInformation()->GetRenderModuleName();
+    renderModuleName = server_info->GetRenderModuleName();
     }
   
   if (!renderModuleName)
@@ -539,7 +545,7 @@ int vtkPVApplication::SetupRenderModule()
       {
       // Server/client says we are rendering for a Tile Display.
       // Now decide if we must use IceT or not.
-      if (pm->GetServerInformation()->GetUseIceT())
+      if (server_info->GetUseIceT())
         {
         renderModuleName = "IceTRenderModule";
         }
@@ -551,7 +557,7 @@ int vtkPVApplication::SetupRenderModule()
     else if (pm->GetOptions()->GetClientMode())
       {
       // Client server configuration without Tiles.
-      if (pm->GetServerInformation()->GetUseIceT())
+      if (server_info->GetUseIceT())
         {
         renderModuleName = "IceTDesktopRenderModule";
         }
@@ -981,7 +987,7 @@ void vtkPVApplication::Initialize()
            << imf << "SetUseMesaClasses" << 1
            << vtkClientServerStream::End;
     pm->DeleteStreamObject(imf, stream);
-    pm->SendStream(
+    pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
       vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
     if (this->Options->GetUseSatelliteSoftwareRendering())
@@ -1811,9 +1817,11 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
   stream << vtkClientServerStream::Invoke
          << pm->GetProcessModuleID() << "GetPath" << "Demos" << "Demos" << "Demo1.pvs"
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::DATA_SERVER_ROOT, stream);
   if(!pm->GetLastResult(
-       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;
     }
@@ -1930,7 +1938,9 @@ int vtkPVApplication::SendStringToClient(const char* str)
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT, stream);
+  this->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::CLIENT, stream);
   return 1;
 }
 
@@ -1942,9 +1952,9 @@ int vtkPVApplication::SendStringToClientAndServer(const char* str)
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
-                                  vtkProcessModule::DATA_SERVER,
-                                  stream);
+  this->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::CLIENT |vtkProcessModule::DATA_SERVER, stream);
   return 1;
 }
 
@@ -1956,9 +1966,9 @@ int vtkPVApplication::SendStringToClientAndServerRoot(const char* str)
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
-                                  vtkProcessModule::DATA_SERVER_ROOT,
-                                  stream);
+  this->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER_ROOT, stream);
   return 1;
 }
 
@@ -1970,7 +1980,9 @@ int vtkPVApplication::SendStringToServer(const char* str)
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  this->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
   return 1;
 }
 
@@ -1982,7 +1994,9 @@ int vtkPVApplication::SendStringToServerRoot(const char* str)
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  this->ProcessModule->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER_ROOT, stream);
   return 1;
 }
 
@@ -1990,6 +2004,7 @@ int vtkPVApplication::SendStringToServerRoot(const char* str)
 const char* vtkPVApplication::GetStringFromServer()
 {
   return this->ProcessModule->GetLastResult(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
     vtkProcessModule::DATA_SERVER_ROOT).StreamToString();
 }
 
@@ -1997,6 +2012,7 @@ const char* vtkPVApplication::GetStringFromServer()
 const char* vtkPVApplication::GetStringFromClient()
 {
   return this->ProcessModule->GetLastResult(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
     vtkProcessModule::CLIENT).StreamToString();
 }
 

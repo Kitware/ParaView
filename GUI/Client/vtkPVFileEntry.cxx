@@ -25,6 +25,7 @@
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVListBoxToListBoxSelectionEditor.h"
 #include "vtkPVReaderModule.h"
@@ -70,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.120");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.121");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -485,7 +486,9 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     char secondformat[100];
     sprintf(firstformat, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
-    pm->GetDirectoryListing(path.c_str(), 0, files, 0);
+    pm->GetDirectoryListing(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      path.c_str(), 0, files, 0);
 
     this->FileListSelect->SetSourceList(files);
 
@@ -1009,7 +1012,9 @@ void vtkPVFileEntry::UpdateAvailableFiles( int force )
     }
   vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
-  pm->GetDirectoryListing(this->Path, 0, files, 0);
+  pm->GetDirectoryListing(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    this->Path, 0, files, 0);
 
   if (force)
     {

@@ -21,7 +21,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionInformationHelper);
-vtkCxxRevisionMacro(vtkSMArraySelectionInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMArraySelectionInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionInformationHelper::vtkSMArraySelectionInformationHelper()
@@ -37,7 +37,8 @@ vtkSMArraySelectionInformationHelper::~vtkSMArraySelectionInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMArraySelectionInformationHelper::UpdateProperty(
-    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop)
+  vtkConnectionID connectionId,  int serverIds, vtkClientServerID objectId, 
+  vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp)
@@ -63,14 +64,15 @@ void vtkSMArraySelectionInformationHelper::UpdateProperty(
   str << vtkClientServerStream::Invoke
       << serverSideID << "GetArraySettings" << objectId << this->AttributeName
       << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 1);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str, 1);
 
   vtkClientServerStream arrays;
   int retVal = 
-    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &arrays);
+    pm->GetLastResult(connectionId, 
+      vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &arrays);
 
   pm->DeleteStreamObject(serverSideID, str);
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), str, 0);
 
   if(!retVal)
     {

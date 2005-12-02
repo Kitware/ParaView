@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMShrunkContoursProxy);
-vtkCxxRevisionMacro(vtkSMShrunkContoursProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMShrunkContoursProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMShrunkContoursProxy::vtkSMShrunkContoursProxy()
 {
@@ -67,7 +67,7 @@ void vtkSMShrunkContoursProxy::CreateVTKObjects(int numObjects)
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
-  pm->SendStream(this->Servers, str, 0);
+  pm->SendStream(this->ConnectionID, this->Servers, str, 0);
 
 }
 

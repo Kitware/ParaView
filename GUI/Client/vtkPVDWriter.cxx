@@ -21,13 +21,14 @@
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.15");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -124,7 +125,9 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
            << vtkClientServerStream::End;
     pm->DeleteStreamObject(helperID, stream);
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 
   if(timeSeries)
     {
@@ -142,7 +145,9 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     stream << vtkClientServerStream::Invoke
            << writerID << "Start"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
 
     // Loop through all of the time steps.
     for(int t = 0; t < rm->GetNumberOfTimeSteps(); ++t)
@@ -154,14 +159,18 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
       stream << vtkClientServerStream::Invoke
              << writerID << "WriteTime" << t
              << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      pm->SendStream(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+        vtkProcessModule::DATA_SERVER, stream);
       }
 
     // Finish the animation.
     stream << vtkClientServerStream::Invoke
            << writerID << "Finish"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   else
     {
@@ -230,9 +239,12 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     stream << vtkClientServerStream::Invoke
            << writerID << "GetErrorCode"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     int retVal;
     if(pm->GetLastResult(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
          vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal) &&
        retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
@@ -245,5 +257,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
 
   // Delete the writer.
   pm->DeleteStreamObject(writerID, stream);
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 }

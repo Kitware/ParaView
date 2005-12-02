@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -52,6 +52,7 @@ void vtkSMCaveRenderModuleProxy::CreateCompositeManager()
     return;
     }
   cm->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  cm->SetConnectionID(this->ConnectionID);
   this->AddSubProxy("CompositeManager", cm);
   cm->Delete();
 }
@@ -81,7 +82,8 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
         << "SetMultiSamples" << 0
         << vtkClientServerStream::End;
       }
-    pm->SendStream(this->RenderWindowProxy->GetServers(), stream);
+    pm->SendStream(this->RenderWindowProxy->GetConnectionID(),
+      this->RenderWindowProxy->GetServers(), stream);
     }
 
   if (pm->GetOptions()->GetClientMode())
@@ -98,15 +100,18 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
         << this->CompositeManagerProxy->GetID(i) 
         << "SetClientFlag"
         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-      
+
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "GetRenderServerSocketController" << vtkClientServerStream::End;
+        << "GetRenderServerSocketController" 
+        << pm->GetConnectionClientServerID(this->ConnectionID)
+        << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke 
         << this->CompositeManagerProxy->GetID(i)
         << "SetSocketController" << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
       }
-    pm->SendStream(this->CompositeManagerProxy->GetServers(), stream);
+    pm->SendStream(this->CompositeManagerProxy->GetConnectionID(),
+      this->CompositeManagerProxy->GetServers(), stream);
     }
 
   this->Superclass::InitializeCompositingPipeline();
@@ -120,10 +125,10 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
     // Setup the tiles.
     // We need a better way to retreive the number of processes
     vtkMPIMToNSocketConnection* m2n = NULL;
-    if (pm->GetMPIMToNSocketConnectionID().ID)
+    if (pm->GetMPIMToNSocketConnectionID(this->ConnectionID).ID)
       {
       m2n = vtkMPIMToNSocketConnection::SafeDownCast(
-        pm->GetObjectFromID(pm->GetMPIMToNSocketConnectionID()));
+        pm->GetObjectFromID(pm->GetMPIMToNSocketConnectionID(this->ConnectionID)));
       }   
     if (m2n)
       {
@@ -227,7 +232,8 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerInformation* serverInfo = pm->GetServerInformation();
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation(
+    this->ConnectionID);
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
         this->CompositeManagerProxy->GetID(0)));

@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -79,7 +79,7 @@ void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
            << "PlaceWidget"
            << 0 << 1 << 0 << 1 << 0 << 1
            << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream, 1);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
     }
   
   vtkSMProxy* transformProxy = this->GetSubProxy("transform");
@@ -154,7 +154,7 @@ void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
     {
     stream << vtkClientServerStream::Invoke << this->GetID(cc)
            << "SetTransform" << transformid << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream, 1);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
     }
 }
 

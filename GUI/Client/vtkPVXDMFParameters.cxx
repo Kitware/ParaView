@@ -26,6 +26,7 @@
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
@@ -149,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.41");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -180,7 +181,9 @@ vtkPVXDMFParameters::~vtkPVXDMFParameters()
     vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     vtkClientServerStream stream;
     pm->DeleteStreamObject(this->ServerSideID, stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
 }
 
@@ -371,7 +374,9 @@ void vtkPVXDMFParameters::SetParameterIndex(const char* label, int value)
   stream << vtkClientServerStream::Invoke
          << this->VTKReaderID << "SetParameterIndex" << label << value
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 }
 
 //---------------------------------------------------------------------------

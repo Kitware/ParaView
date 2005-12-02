@@ -25,7 +25,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -170,7 +170,8 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
         << "SetMultiSamples" << 0
         << vtkClientServerStream::End;
       }
-    pm->SendStream(this->RenderWindowProxy->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, 
+      this->RenderWindowProxy->GetServers(), stream);
     }
 
   if (pm->GetOptions()->GetClientMode() || pm->GetOptions()->GetServerMode())
@@ -182,19 +183,23 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
       // Even a cast to vtkPVClientServerModule would be better than this.
       // How can we syncronize the process modules and render modules?
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "GetRenderServerSocketController" << vtkClientServerStream::End;
+        << "GetRenderServerSocketController" 
+        << pm->GetConnectionClientServerID(this->ConnectionID)
+        << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke 
         << this->CompositeManagerProxy->GetID(i)
         << "SetClientController" << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
+
       stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
         << "GetClientMode" << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke 
         << this->CompositeManagerProxy->GetID(i) 
         << "SetClientFlag"
         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-      }
-    pm->SendStream(this->CompositeManagerProxy->GetServers(), stream);
+      } 
+    pm->SendStream(this->ConnectionID,
+      this->CompositeManagerProxy->GetServers(), stream);
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(

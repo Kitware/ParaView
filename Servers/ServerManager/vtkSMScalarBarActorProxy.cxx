@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -198,7 +198,7 @@ void vtkSMScalarBarActorProxy::SetPosition(double x, double y)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 
@@ -221,7 +221,7 @@ void vtkSMScalarBarActorProxy::SetPosition2(double x, double y)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 

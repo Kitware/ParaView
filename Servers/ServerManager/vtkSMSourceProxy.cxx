@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.35");
 
 struct vtkSMSourceProxyInternals
 {
@@ -91,7 +91,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
     }
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, command);
+  pm->SendStream(this->ConnectionID, this->Servers, command);
 
   // This simply iterates over subproxies and calls UpdateInformation();
   this->Superclass::UpdatePipelineInformation();
@@ -139,7 +139,7 @@ void vtkSMSourceProxy::UpdatePipeline()
       command << vtkClientServerStream::Invoke << this->GetID(i)
               << "Update" << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, command);
+    pm->SendStream(this->ConnectionID, this->Servers, command);
     return;
     }
     
@@ -203,7 +203,7 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
 
     if (stream.GetNumberOfMessages() > 0)
       {
-      pm->SendStream(this->Servers, stream);
+      pm->SendStream(this->ConnectionID, this->Servers, stream);
       }
     }
 }
@@ -247,7 +247,8 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
     vtkClientServerID sourceID = op->GetID(i);
     // TODO replace this with UpdateInformation and OutputInformation
     // property.
-    pm->GatherInformation(info, sourceID);
+    pm->GatherInformation(this->ConnectionID,
+      vtkProcessModule::DATA_SERVER, info, sourceID);
     int numOutputs = info->GetNumberOfOutputs();
     for (int j=0; j<numOutputs; j++)
       {
@@ -267,7 +268,7 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(op->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, op->GetServers(), stream);
     }
   info->Delete();
 
@@ -303,7 +304,7 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
 }
 
@@ -337,7 +338,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
       stream << part->GetID(0);
       stream << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   else
     {
@@ -361,7 +362,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
       stream << part->GetID(0);
       stream << vtkClientServerStream::End;
       }
-    pm->SendStream((this->Servers & input->GetServers()), stream);
+    pm->SendStream(this->ConnectionID, (this->Servers & input->GetServers()), stream);
     }
 }
 

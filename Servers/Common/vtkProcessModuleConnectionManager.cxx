@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.2");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -119,14 +119,18 @@ void vtkProcessModuleConnectionManager::Finalize()
 vtkProcessModuleConnection* vtkProcessModuleConnectionManager::
 GetConnectionFromID(vtkConnectionID connectionID)
 {
-  vtkProcessModuleConnectionManagerInternals::MapOfIDToConnection::iterator iter;
-  iter = this->Internals->IDToConnectionMap.find(connectionID);
-  if (iter == this->Internals->IDToConnectionMap.end())
+  vtkConnectionIterator* iter = this->NewIterator();
+  iter->SetMatchConnectionID(connectionID);
+  iter->Begin();
+  if (iter->IsAtEnd())
     {
     vtkErrorMacro("Invalid connection ID: " << connectionID);
+    iter->Delete();
     return NULL;
     }
-  return iter->second.GetPointer();
+  vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
+  iter->Delete();
+  return conn;
 }
 
 //-----------------------------------------------------------------------------
@@ -377,38 +381,26 @@ int vtkProcessModuleConnectionManager::IsServerConnection(
 }
 
 //-----------------------------------------------------------------------------
+vtkClientServerID vtkProcessModuleConnectionManager::
+GetConnectionClientServerID(vtkConnectionID id)
+{
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
+  if (!conn)
+    {
+    vtkClientServerID id = {0};
+    return id;
+    }
+  return conn->GetSelfID();
+}
+
+//-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID, 
   vtkTypeUInt32 serverFlags, vtkClientServerStream& stream, int reset)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(connectionID);
-
-  // We must ensure that the stream is send to the SelfConnection last.
-  int send_to_self = 0;
-  int ret = 0;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
+  if (conn)
     {
-    if (iter->GetCurrentConnectionID() == 
-      vtkProcessModuleConnectionManager::GetSelfConnectionID())
-      {
-      send_to_self = 1;
-      continue;
-      }
-    vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
-    if (conn)
-      {
-      if (conn->SendStream(serverFlags, stream) != 0)
-        {
-        ret = 1;
-        }
-      }
-    }
-  iter->Delete();
-
-  if (send_to_self)
-    {
-    this->GetConnectionFromID(vtkProcessModuleConnectionManager::GetSelfConnectionID())->
-      SendStream(serverFlags, stream);
+    conn->SendStream(serverFlags, stream);
     }
 
   if(reset)
@@ -421,56 +413,31 @@ int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID,
 //-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::GetNumberOfPartitions(vtkConnectionID id)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(id);
-  int ret = 1;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
+  if (conn)
     {
-    vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
-    if (conn)
-      {
-      ret = conn->GetNumberOfPartitions();
-      break;
-      }
+    return conn->GetNumberOfPartitions();
     }
-  iter->Delete(); 
-  return ret;
+  return 1;
 }
+
 //-----------------------------------------------------------------------------
 void vtkProcessModuleConnectionManager::GatherInformation(
   vtkConnectionID connectionID, vtkTypeUInt32 serverFlags,
   vtkPVInformation* info, vtkClientServerID id)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(connectionID);
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
+  if (conn)
     {
-    vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
-    if (conn)
-      {
-      conn->GatherInformation(serverFlags, info, id);
-      }
+    conn->GatherInformation(serverFlags, info, id);
     }
-  
-  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------
 const vtkClientServerStream& vtkProcessModuleConnectionManager::GetLastResult(
     vtkConnectionID connectionID, vtkTypeUInt32 server)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(connectionID);
-  vtkProcessModuleConnection* conn = 0;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    conn = iter->GetCurrentConnection();
-    if (conn)
-      {
-      break;    
-      }
-    }
-  iter->Delete();
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
   if (conn)
     {
     return conn->GetLastResult(server);
@@ -484,25 +451,19 @@ const vtkClientServerStream& vtkProcessModuleConnectionManager::GetLastResult(
 int vtkProcessModuleConnectionManager::LoadModule(vtkConnectionID connectionID, 
   const char* name, const char* dir)
 {
-  int ret = 1;
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(connectionID);
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
+  if (conn)
     {
-    vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
-    if (conn)
+    if (conn->LoadModule(name, dir))
       {
-      if (!conn->LoadModule(name, dir))
-        {
-        vtkErrorMacro("Failed to load Module on connection " 
-          << iter->GetCurrentConnectionID());
-        ret = 0;
-        }
+      return 1;
+      }
+    else
+      {
+      vtkErrorMacro("Failed to load Module on connection "  << connectionID);
       }
     }
-  
-  iter->Delete();
-  return ret;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -531,19 +492,8 @@ int vtkProcessModuleConnectionManager::GetStreamBlock(vtkConnectionID id)
 vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
   vtkConnectionID id)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(id);
- 
-  vtkServerConnection* conn = 0;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    conn = vtkServerConnection::SafeDownCast(iter->GetCurrentConnection());
-    if (conn)
-      {
-      break; 
-      }
-    }
-  iter->Delete();
+  vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
+    this->GetConnectionFromID(id));
   if (conn)
     {
     return conn->GetServerInformation();
@@ -554,19 +504,8 @@ vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
 vtkClientServerID vtkProcessModuleConnectionManager::GetMPIMToNSocketConnectionID(
   vtkConnectionID id)
 {
-  vtkConnectionIterator* iter = this->NewIterator();
-  iter->SetMatchConnectionID(id);
- 
-  vtkServerConnection* conn = 0;
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    conn = vtkServerConnection::SafeDownCast(iter->GetCurrentConnection());
-    if (conn)
-      {
-      break; 
-      }
-    }
-  iter->Delete();
+  vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
+    this->GetConnectionFromID(id));
   if (conn)
     {
     return conn->GetMPIMToNSocketConnectionID();

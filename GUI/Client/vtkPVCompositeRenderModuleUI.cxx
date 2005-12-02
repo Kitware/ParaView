@@ -22,6 +22,7 @@
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.31");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -414,14 +415,16 @@ void vtkPVCompositeRenderModuleUI::Initialize()
   // Consider the command line option that turns compositing off.
   // This is to avoid compositing when it is not available
   // on the server.
-  if (!pm->GetServerInformation()->GetRemoteRendering())
+  if (!pm->GetServerInformation(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID())->GetRemoteRendering())
     {
     this->CompositeOptionEnabled = 0;
     }
 
   int foundDisplay = 1;
   vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-  pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
+  pm->GatherInformation(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
   if (!di->GetCanOpenDisplay())
     {
     this->CompositeOptionEnabled = 0;

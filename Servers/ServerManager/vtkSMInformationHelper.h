@@ -29,6 +29,7 @@
 
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
+#include "vtkConnectionID.h" // needed for vtkConnectionID.
 
 class vtkPVXMLElement;
 class vtkSMProperty;
@@ -44,6 +45,7 @@ public:
   // Fill in the property with values obtained from server. The
   // way in which the information is obtained depends on the sub-class.
   virtual void UpdateProperty(
+    vtkConnectionID connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop) = 0;
   //ETX
 

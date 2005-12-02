@@ -61,6 +61,7 @@
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkSMPart.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSaveBatchScriptDialog.h"
@@ -136,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.774");
+vtkCxxRevisionMacro(vtkPVWindow, "1.775");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -351,7 +352,9 @@ vtkPVWindow::~vtkPVWindow()
     if (pm)
       {
       pm->DeleteStreamObject(this->ServerFileListingID, stream);
-      pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+      pm->SendStream(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+        vtkProcessModule::DATA_SERVER_ROOT, stream);
       }
     }
 
@@ -1551,7 +1554,8 @@ void vtkPVWindow::Create(vtkKWApplication *app)
            << pm->GetProcessModuleID()
            << "CreateLogFile"
            << vtkClientServerStream::End;
-    pm->SendStream(
+    pm->SendStream( 
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
       vtkProcessModule::DATA_SERVER|vtkProcessModule::RENDER_SERVER, stream);
     }
   
@@ -2084,9 +2088,13 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
   stream << vtkClientServerStream::Invoke
          << this->ServerFileListingID << "FileIsReadable"<< fileName
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER_ROOT, stream);
   int readable = 0;
-  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &readable))
+  if(!pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &readable))
     {
     vtkErrorMacro("Error checking whether file is readable on server.");
     }

@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.4");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -59,7 +59,7 @@ vtkSMXMLPVAnimationWriterProxy::~vtkSMXMLPVAnimationWriterProxy()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   delete this->Internals;
   if (this->SummaryHelperProxy)
@@ -101,7 +101,7 @@ void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects(int numObjects)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
 }
 //-----------------------------------------------------------------------------
@@ -154,7 +154,7 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
       }
     }
   groupname_str.rdbuf()->freeze(0);
-  pm->SendStream(this->Servers, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,10 +177,10 @@ void vtkSMXMLPVAnimationWriterProxy::WriteTime(double time)
       << "GetErrorCode" << vtkClientServerStream::End;
     }
   
-  pm->SendStream(this->Servers, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
   int retVal =0;
-  pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(
-    0,0, &retVal);
+  pm->GetLastResult(this->ConnectionID, 
+    vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, &retVal);
   this->ErrorCode = retVal;
 }
 
@@ -225,7 +225,7 @@ void vtkSMXMLPVAnimationWriterProxy::Start()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str);
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 }
 
@@ -242,8 +242,9 @@ void vtkSMXMLPVAnimationWriterProxy::Finish()
     }
   int retVal = 0;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, str);
-  pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
+  pm->SendStream(this->ConnectionID, this->Servers, str);
+  pm->GetLastResult(this->ConnectionID,
+    vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
   this->ErrorCode = retVal;
 }
 

@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -54,7 +54,7 @@ void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
     stream << vtkClientServerStream::Invoke 
            << id << "AllOff" 
            << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 
@@ -78,7 +78,7 @@ void vtkSMPointWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str);
+    pm->SendStream(this->ConnectionID, this->Servers,str);
     }
 }
 

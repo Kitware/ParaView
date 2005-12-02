@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -95,7 +95,7 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  vtkPVServerInformation* serverInfo = pm->GetServerInformation();
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
   unsigned int idx;
   unsigned int numMachines = serverInfo->GetNumberOfMachines();
   vtkClientServerStream stream;
@@ -111,7 +111,8 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
+      stream);
     }
 
   p = this->CompositeManagerProxy->GetProperty("InitializeRMIs");
@@ -157,7 +158,8 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     
     // Non-mesa, X offscreen rendering requires access to the display
     vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformationRenderServer(di, pm->GetProcessModuleID());
+    pm->GatherInformation(this->ConnectionID,
+      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
     if (!di->GetCanOpenDisplay())
       {
       enableOffscreen = 0;
@@ -219,7 +221,7 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   vtkSMCompositeDisplayProxy* pDisp;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendPrepareProgress();
+  pm->SendPrepareProgress(this->ConnectionID);
 
   this->UpdateAllDisplays();
 
@@ -256,7 +258,7 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   
   this->Superclass::StillRender();
 
-  pm->SendCleanupPendingProgress();
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
@@ -266,7 +268,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
   vtkSMCompositeDisplayProxy* pDisp;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendPrepareProgress();
+  pm->SendPrepareProgress(this->ConnectionID);
 
   this->UpdateAllDisplays();
   int useLOD = this->GetUseLODDecision();
@@ -311,7 +313,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
 
   this->Superclass::InteractiveRender();
  
-  pm->SendCleanupPendingProgress();
+  pm->SendCleanupPendingProgress(this->ConnectionID);
   
 }
 
@@ -385,7 +387,7 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor(int inReductionFact
       << this->CompositeManagerProxy->GetID(0) 
       << "SetImageReductionFactor" << int(newReductionFactor)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
     }
 
 }
@@ -502,9 +504,10 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
       << this->CompositeManagerProxy->GetID(0) 
       << "GetZBufferValue" << x << y
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
     float z = 0;
-    if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
+    if(pm->GetLastResult(this->ConnectionID,
+        vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
       {
       return z;
       }

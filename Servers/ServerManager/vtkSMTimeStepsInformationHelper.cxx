@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeStepsInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMTimeStepsInformationHelper::vtkSMTimeStepsInformationHelper()
@@ -34,7 +34,8 @@ vtkSMTimeStepsInformationHelper::~vtkSMTimeStepsInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMTimeStepsInformationHelper::UpdateProperty(
-    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop)
+  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkSMProperty* prop)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
   if (!dvp)
@@ -54,11 +55,11 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
   stream << vtkClientServerStream::Invoke
          << serverObjID << "GetTimeSteps" << objectId
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), stream);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), stream);
 
   vtkClientServerStream timeSteps;
   int retVal = 
-    pm->GetLastResult(
+    pm->GetLastResult(connectionId,
       vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &timeSteps);
 
   if(!retVal)
@@ -82,7 +83,7 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
     }
 
   pm->DeleteStreamObject(serverObjID, stream);
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), stream);
+  pm->SendStream(connectionId, vtkProcessModule::GetRootId(serverIds), stream);
 }
 
 //---------------------------------------------------------------------------

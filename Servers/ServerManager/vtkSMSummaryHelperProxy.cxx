@@ -21,7 +21,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMSummaryHelperProxy);
-vtkCxxRevisionMacro(vtkSMSummaryHelperProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSummaryHelperProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMSummaryHelperProxy::vtkSMSummaryHelperProxy()
 {
@@ -54,7 +54,7 @@ void vtkSMSummaryHelperProxy::CreateVTKObjects(int numObjects)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
 }
 

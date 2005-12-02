@@ -44,7 +44,7 @@ public:
   // and populates the property using the values returned.
   // XDMF parameters are stored as 5 component tuples: name, current value, 
   // first index, stride, count
-  virtual void UpdateProperty(
+  virtual void UpdateProperty(vtkConnectionID connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
   //ETX
 

@@ -40,6 +40,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
@@ -63,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.464");
+vtkCxxRevisionMacro(vtkPVSource, "1.465");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1065,7 +1066,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   unsigned int previous_num_parts = this->GetProxy()->GetNumberOfParts();
 
-  this->GetPVApplication()->GetProcessModule()->SendPrepareProgress();
+  this->GetPVApplication()->GetProcessModule()->SendPrepareProgress(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
 
   window = this->GetPVWindow();
 
@@ -1238,7 +1240,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
 
-  this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();\
+  this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
   
   // Make sure the buttons and filter menu reflect the new current source.
   // This did not happen when the source was selected because it was
@@ -2160,7 +2163,9 @@ void vtkPVSource::RemoveAllPVInputs()
                << sourceID << "SetInputConnection" << 0 << 0
                << vtkClientServerStream::End;
         }
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      pm->SendStream(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+        vtkProcessModule::DATA_SERVER, stream);
 
       if (this->Proxy)
         {

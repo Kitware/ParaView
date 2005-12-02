@@ -20,6 +20,7 @@
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -56,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.165");
+vtkCxxRevisionMacro(vtkPVProbe, "1.166");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -234,7 +235,9 @@ void vtkPVProbe::CreateProperties()
   stream << vtkClientServerStream::Invoke 
          <<  this->GetVTKSourceID(0) << "SetSpatialMatch" << 2
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  pm->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 
   this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
   this->ProbeFrame->Create(pvApp);

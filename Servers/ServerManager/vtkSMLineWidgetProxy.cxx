@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -64,7 +64,7 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str);
+    pm->SendStream(this->ConnectionID, this->Servers,str);
     }
 }
 
@@ -89,7 +89,7 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke <<  id
            << "SetAlignToNone" << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
     }
 }
 

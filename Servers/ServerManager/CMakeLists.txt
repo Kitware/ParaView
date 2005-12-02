@@ -94,7 +94,6 @@ SET(Kit_SRCS
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
-  vtkSMSimpleProxyInformationHelper.cxx
   vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMMPIRenderModuleProxy.cxx

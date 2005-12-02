@@ -21,6 +21,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVScale.h"
 #include "vtkPVRenderView.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.70");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.71");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -149,14 +150,19 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     stream << vtkClientServerStream::Invoke
            << tmpID << "CanReadFile" << fname
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     pm->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
     pm->DeleteStreamObject(tmpID, stream);
     stream << vtkClientServerStream::Invoke
            << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+      vtkProcessModule::DATA_SERVER, stream);
     }
   return canRead;
 }
@@ -361,7 +367,9 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
       stream << vtkClientServerStream::Invoke 
              << this->GetVTKSourceID(0) << prop->GetCommand() << fname
              << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      pm->SendStream(
+        vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+        vtkProcessModule::DATA_SERVER, stream);
       }
     const char* ext = this->ExtractExtension(fname);
     if (ext)

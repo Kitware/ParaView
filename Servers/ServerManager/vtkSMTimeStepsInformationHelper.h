@@ -35,7 +35,7 @@ public:
   //BTX
   // Description:
   // Updates the property using values obtained for server.
-  virtual void UpdateProperty(
+  virtual void UpdateProperty(vtkConnectionID connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
   //ETX
 

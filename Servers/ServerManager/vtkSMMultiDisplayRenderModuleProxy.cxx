@@ -23,7 +23,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMMultiDisplayRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayRenderModuleProxy::vtkSMMultiDisplayRenderModuleProxy()
 {
@@ -69,8 +69,23 @@ void vtkSMMultiDisplayRenderModuleProxy::InitializeCompositingPipeline()
   vtkClientServerStream stream;
   for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
     {
+    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+      << "GetRenderServerSocketController" 
+      << pm->GetConnectionClientServerID(this->ConnectionID)
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+      << this->CompositeManagerProxy->GetID(i)
+      << "SetSocketController" << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(this->ConnectionID,
+    this->CompositeManagerProxy->GetServers(), stream, 1);
+  
+  for (i=0; i < this->CompositeManagerProxy->GetNumberOfIDs(); i++)
+    {
     if (pm->GetOptions()->GetClientMode())
       {
+
       // Clean up this mess !!!!!!!!!!!!!
       // Even a cast to vtkPVClientServerModule would be better than this.
       // How can we syncronize the process modules and render modules?
@@ -80,13 +95,6 @@ void vtkSMMultiDisplayRenderModuleProxy::InitializeCompositingPipeline()
         << this->CompositeManagerProxy->GetID(i) 
         << "SetClientFlag"
         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-
-      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "GetRenderServerSocketController" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-        << this->CompositeManagerProxy->GetID(i)
-        << "SetSocketController" << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
 
       stream << vtkClientServerStream::Invoke
         << this->CompositeManagerProxy->GetID(i) << "SetZeroEmpty" << 0
@@ -102,7 +110,8 @@ void vtkSMMultiDisplayRenderModuleProxy::InitializeCompositingPipeline()
       << this->CompositeManagerProxy->GetID(i) << "InitializeSchedule"
       << vtkClientServerStream::End;
     }
-  pm->SendStream(this->CompositeManagerProxy->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, 
+    this->CompositeManagerProxy->GetServers(), stream);
  
   this->Superclass::InitializeCompositingPipeline();
 

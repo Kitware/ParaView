@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.16");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -197,6 +197,7 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
       this->UpdateSuppressorProxy->GetServers(), stream);
     }
 
@@ -258,11 +259,11 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
     stream << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i)
       << "SetMPIMToNSocketConnection"
-      << pm->GetMPIMToNSocketConnectionID()
+      << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
       << vtkClientServerStream::End;
     // create, SetPassThrough, and set the mToN connection
     // object on all servers and client
-    pm->SendStream(
+    pm->SendStream(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER | vtkProcessModule::DATA_SERVER, stream);
 
     // always set client mode.
@@ -270,7 +271,7 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       << this->CollectProxy->GetID(i)
       << "SetServerToClient"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
     // if running in client mode
     // then set the server to be servermode
@@ -279,7 +280,8 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToDataServer"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER, stream);
       }
 
     // if running in render server mode
@@ -288,7 +290,8 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::RENDER_SERVER, stream);
       }  
 
     if(pm->GetClientMode())
@@ -299,20 +302,21 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       stream << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetServerToClient"
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      pm->SendStream(this->ConnectionID,
+        vtkProcessModule::CLIENT, stream);
       }
 
     // Handle collection setup with client server.
     stream << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetSocketController"
+      << pm->GetConnectionClientServerID(this->ConnectionID)
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) << "SetSocketController"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream( 
+    pm->SendStream(this->ConnectionID,
       vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
     }
 
   // Not we set the properties for the XYPlotActor.

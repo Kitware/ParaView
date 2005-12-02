@@ -22,6 +22,7 @@
 
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // Needed for vtkClientServerID
+
 class vtkClientServerStream;
 class vtkCommand;
 class vtkMultiProcessController;
@@ -99,6 +100,16 @@ public:
   // and closes dead connections.
   vtkGetMacro(AbortConnection, int);
 
+  // Description:
+  // Overridden to break the reference loop caused by the fact that 
+  // vtkRemoteConnections store their own ClientServerIds.
+  virtual void UnRegister(vtkObjectBase* obj);
+
+  //BTX
+  // Description:
+  // Get the SelfID.
+  vtkGetMacro(SelfID, vtkClientServerID);
+  //ETX
 protected:
   vtkProcessModuleConnection();
   ~vtkProcessModuleConnection();
@@ -116,6 +127,8 @@ protected:
   virtual int SendStreamToRenderServer(vtkClientServerStream&);
   // send a stream to the render server root mpi process
   virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
+  // send a stream to the client. 
+  virtual int SendStreamToClient(vtkClientServerStream&);
 
 
   // handles callbacks.
@@ -133,6 +146,9 @@ protected:
   int StreamBlock;
 
   int AbortConnection;
+ 
+  // Every connection is assigned a vtkClientServerID.
+  vtkClientServerID SelfID;
 private:
   vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implemented.
   void operator=(const vtkProcessModuleConnection&); // Not implemented.
