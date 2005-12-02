@@ -86,7 +86,7 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.3");
+vtkCxxRevisionMacro(vtkClientConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -189,8 +189,6 @@ int vtkClientConnection::AuthenticateWithClient()
   else
     {
     this->SelfID.ID = static_cast<vtkTypeUInt32>(id);
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    
     // We will assign the SelfID to this connection on the local interpreter.
 
     // Now, on satellites, we want this ID to be assigned to a null object,
