@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.33");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.34");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1751,7 +1751,7 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::InvokeObjectMethodCommand(char *command)
+void vtkKWVolumePropertyWidget::InvokeObjectMethodCommand(const char *command)
 {
   if (!this->DisableCommands)
     {

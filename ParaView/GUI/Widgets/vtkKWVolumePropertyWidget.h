@@ -300,7 +300,7 @@ protected:
   char  *VolumePropertyChangedCommand;
   char  *VolumePropertyChangingCommand;
 
-  virtual void InvokeObjectMethodCommand(char *command);
+  virtual void InvokeObjectMethodCommand(const char *command);
   virtual void InvokeVolumePropertyChangedCommand();
   virtual void InvokeVolumePropertyChangingCommand();
   

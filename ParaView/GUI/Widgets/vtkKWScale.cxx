@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.108");
+vtkCxxRevisionMacro(vtkKWScale, "1.109");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -299,7 +299,7 @@ void vtkKWScale::ButtonReleaseCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::InvokeObjectMethodCommand(char *command)
+void vtkKWScale::InvokeObjectMethodCommand(const char *command)
 {
   if (!this->DisableCommands)
     {

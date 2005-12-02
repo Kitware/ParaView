@@ -327,7 +327,7 @@ protected:
   char  *EndCommand;
   char  *EntriesCommand;
 
-  virtual void InvokeObjectMethodCommand(char *command);
+  virtual void InvokeObjectMethodCommand(const char *command);
   virtual void InvokeCommand();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();

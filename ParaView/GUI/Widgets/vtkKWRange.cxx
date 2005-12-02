@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.58");
+vtkCxxRevisionMacro(vtkKWRange, "1.59");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1252,7 +1252,7 @@ void vtkKWRange::GetSliderColor(int type, double &r, double &g, double &b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeObjectMethodCommand(char *command)
+void vtkKWRange::InvokeObjectMethodCommand(const char *command)
 {
   if (!this->DisableCommands)
     {
