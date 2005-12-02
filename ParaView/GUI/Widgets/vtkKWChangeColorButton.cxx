@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.67");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.68");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -396,20 +396,23 @@ void vtkKWChangeColorButton::QueryUserForColor()
         &this->Color[0], &this->Color[1], &this->Color[2]))
     {
     this->UpdateColorButton();
-    
-    if (this->Command && *this->Command)
-      {
-      this->Script("eval %s %lf %lf %lf", 
-                   this->Command, 
-                   this->Color[0], this->Color[1], this->Color[2]);
-      }
+    this->InvokeCommand(this->Color[0], this->Color[1], this->Color[2]);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetCommand(vtkObject* obj, const char *method)
+void vtkKWChangeColorButton::SetCommand(vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(&this->Command, obj, method);
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWChangeColorButton::InvokeCommand(double r, double g, double b)
+{  
+  if (this->Command && *this->Command && this->IsCreated())
+    {
+    this->Script("eval %s %lf %lf %lf", this->Command, r, g, b);
+    }
 }
 
 //----------------------------------------------------------------------------

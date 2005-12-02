@@ -79,47 +79,61 @@ public:
 
   // Description:
   // Set the command to invoke to set the slice value on an external
-  // object when the animation is in 'slice' mode. This command is passed
-  // an int (the slice value).
+  // object when the animation is in 'slice' mode. 
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  // This command is passed an int (the slice value).
   // This command is mandatory for the slice animation to work.
   virtual void SetSliceSetCommand(vtkObject *object, const char *method);
-  virtual void InvokeSliceSetCommand(int);
 
   // Description:
   // Set the command to invoke to get the slice value from an external
-  // object when the animation is in 'slice' mode. This command should return
-  // an int (the slice value).
+  // object when the animation is in 'slice' mode. 
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  // This command should return an int (the slice value).
   // This command is optional for the slice animation to work but will
   // guarantee that the slice is set back to its proper value once
   // the animation has been performed.
   virtual void SetSliceGetCommand(vtkObject *object, const char *method);
-  virtual int InvokeSliceGetCommand();
 
   // Description:
   // Set the commands to invoke to get the minimum and maximum value of the
   // slice range from an external object when the animation is in 'slice' mode.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // These commands should return an int (the min and max).
   // These commands are mandatory for the slice animation to work.
   virtual void SetSliceGetMinAndMaxCommands(
     vtkObject *object, const char *get_min_method, const char *get_max_method);
-  virtual int InvokeSliceGetMinCommand();
-  virtual int InvokeSliceGetMaxCommand();
 
   // Description:
   // Set a command to be invoked after the slice animation has been
-  // created/previewed
+  // created/previewed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // This command is optional.
   virtual void SetSlicePostAnimationCommand(
     vtkObject *object, const char *method);
-  virtual void InvokeSlicePostAnimationCommand();
 
   // Description:
   // Set a command to be invoked after the camera animation has been
-  // created/previewed
+  // created/previewed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // This command is optional.
   virtual void SetCameraPostAnimationCommand(
     vtkObject *object, const char *method);
-  virtual void InvokeCameraPostAnimationCommand();
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -173,6 +187,13 @@ protected:
   char *SliceGetMinCommand;
   char *SliceGetMaxCommand;
   char *SliceSetCommand;
+
+  virtual void InvokeSliceSetCommand(int);
+  virtual int InvokeSliceGetCommand();
+  virtual int InvokeSliceGetMinCommand();
+  virtual int InvokeSliceGetMaxCommand();
+  virtual void InvokeSlicePostAnimationCommand();
+  virtual void InvokeCameraPostAnimationCommand();
   
   // Description:
   // Preview and create camera animation

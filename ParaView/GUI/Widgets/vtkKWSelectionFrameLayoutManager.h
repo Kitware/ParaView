@@ -154,9 +154,14 @@ public:
   virtual vtkKWSelectionFrame* GetSelectedWidget();
 
   // Description:
-  // Specifies a command to be invoked when the selection has changed
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the selection is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetSelectionChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Remove a widget, or all of them, or all of the widgets in a group.
@@ -252,6 +257,8 @@ protected:
   int Resolution[2];
   vtkKWMenu    *ResolutionEntriesMenu;
   vtkKWToolbar *ResolutionEntriesToolbar;
+
+  virtual void InvokeSelectionChangedCommand();
   char *SelectionChangedCommand;
 
   // Description:

@@ -185,12 +185,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Set/get whether the above commands should be called or not.
-  vtkSetMacro(DisableCommands, int);
-  vtkGetMacro(DisableCommands, int);
-  vtkBooleanMacro(DisableCommands, int);
-
-  // Description:
   // Set/Get if the scalar color transfer function should be used to color
   // each point in the scalar opacity editor. This also makes sure that
   // any changes made to one or the other will be propagated accordingly. 
@@ -210,13 +204,25 @@ public:
   virtual void MergeScalarOpacityAndColorEditors();
 
   // Description:
-  // Set commands.
+  // Specifies commands to associate with the widget. 
+  // 'VolumePropertyChangedCommand' is invoked when the volume property has
+  // changed (i.e. at the end of the user interaction), whereas 
+  // 'VolumePropertyChangingCommand' is invoked when the volume property is
+  // changing (i.e. during the user interaction itself).
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetVolumePropertyChangedCommand(
-    vtkObject* object,const char *method);
+    vtkObject *object,const char *method);
   virtual void SetVolumePropertyChangingCommand(
-    vtkObject* object,const char *method);
-  virtual void InvokeVolumePropertyChangedCommand();
-  virtual void InvokeVolumePropertyChangingCommand();
+    vtkObject *object,const char *method);
+
+  // Description:
+  // Set/get whether the above commands should be called or not.
+  vtkSetMacro(DisableCommands, int);
+  vtkGetMacro(DisableCommands, int);
+  vtkBooleanMacro(DisableCommands, int);
 
   // Description:
   // Callbacks
@@ -294,7 +300,9 @@ protected:
   char  *VolumePropertyChangedCommand;
   char  *VolumePropertyChangingCommand;
 
-  virtual void InvokeCommand(const char *command);
+  virtual void InvokeObjectMethodCommand(char *command);
+  virtual void InvokeVolumePropertyChangedCommand();
+  virtual void InvokeVolumePropertyChangingCommand();
   
   // GUI
 

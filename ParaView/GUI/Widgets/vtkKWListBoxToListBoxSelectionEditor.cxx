@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -433,7 +433,7 @@ void vtkKWListBoxToListBoxSelectionEditor::EllipsisCallback()
 
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(
-  vtkObject* obj, const char* method)
+  vtkObject *obj, const char *method)
 {
   char *command = NULL;
   this->SetObjectMethodCommand(&command, obj, method);

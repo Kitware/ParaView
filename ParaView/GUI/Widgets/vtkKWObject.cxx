@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.56");
+vtkCxxRevisionMacro(vtkKWObject, "1.57");
 
 vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
 
@@ -153,6 +153,15 @@ void vtkKWObject::SetObjectMethodCommand(
     }
 
   (*command)[object_len + method_len] = '\0';
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::InvokeObjectMethodCommand(const char *command)
+{
+  if (command && *command && this->GetApplication())
+    {
+    this->Script("eval %s", command);
+    }
 }
 
 //----------------------------------------------------------------------------

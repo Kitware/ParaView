@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.22");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -998,31 +998,16 @@ void vtkKWMaterialPropertyWidget::CreateImage(unsigned char *data,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::InvokeCommand(const char *command)
+void vtkKWMaterialPropertyWidget::SetPropertyChangedCommand(
+  vtkObject *object, const char *method)
 {
-  if (command && *command)
-    {
-    this->Script("eval %s", command);
-    }
+  this->SetObjectMethodCommand(&this->PropertyChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::InvokePropertyChangedCommand()
 {
-  this->InvokeCommand(this->PropertyChangedCommand);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::InvokePropertyChangingCommand()
-{
-  this->InvokeCommand(this->PropertyChangingCommand);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::SetPropertyChangedCommand(
-  vtkObject *object, const char *method)
-{
-  this->SetObjectMethodCommand(&this->PropertyChangedCommand, object, method);
+  this->InvokeObjectMethodCommand(this->PropertyChangedCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -1031,6 +1016,13 @@ void vtkKWMaterialPropertyWidget::SetPropertyChangingCommand(
 {
   this->SetObjectMethodCommand(&this->PropertyChangingCommand, object, method);
 }
+
+//----------------------------------------------------------------------------
+void vtkKWMaterialPropertyWidget::InvokePropertyChangingCommand()
+{
+  this->InvokeObjectMethodCommand(this->PropertyChangingCommand);
+}
+
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {

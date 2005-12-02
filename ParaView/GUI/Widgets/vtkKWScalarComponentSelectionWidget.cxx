@@ -21,7 +21,7 @@
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.15");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.16");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -242,6 +242,14 @@ void vtkKWScalarComponentSelectionWidget::SetNumberOfComponents(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWScalarComponentSelectionWidget::SetSelectedComponentChangedCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->SelectedComponentChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand()
 {
   if (this->SelectedComponentChangedCommand && 
@@ -254,14 +262,6 @@ void vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand(
 
   this->InvokeEvent(vtkKWEvent::ScalarComponentChangedEvent, 
                     &this->SelectedComponent);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWScalarComponentSelectionWidget::SetSelectedComponentChangedCommand(
-  vtkObject *object, const char *method)
-{
-  this->SetObjectMethodCommand(
-    &this->SelectedComponentChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------

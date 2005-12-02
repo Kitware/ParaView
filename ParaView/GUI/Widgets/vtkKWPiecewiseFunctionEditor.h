@@ -96,12 +96,14 @@ public:
   vtkGetMacro(Level, double);
 
   // Description:
-  // Set commands.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the window/level is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetWindowLevelModeChangedCommand(
-    vtkObject* object,const char *method);
-  virtual void InvokeWindowLevelModeChangedCommand();
-  virtual void InvokeFunctionChangedCommand();
-  virtual void InvokeFunctionChangingCommand();
+    vtkObject *object,const char *method);
 
   // Description:
   // Set/Get the value entry UI visibility.
@@ -201,6 +203,10 @@ protected:
 
   virtual void UpdatePointsFromWindowLevel(int interactive = 0);
   virtual void UpdateWindowLevelFromPoints();
+
+  virtual void InvokeWindowLevelModeChangedCommand();
+  virtual void InvokeFunctionChangedCommand();
+  virtual void InvokeFunctionChangingCommand();
 
   // Description:
   // Pack the widget

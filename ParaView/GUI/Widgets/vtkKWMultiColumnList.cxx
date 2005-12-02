@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.44");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.45");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -1019,7 +1019,7 @@ const char* vtkKWMultiColumnList::GetColumnConfigurationOptionAsText(
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetColumnFormatCommand(int col_index, 
-                                                  vtkObject* object, 
+                                                  vtkObject *object, 
                                                   const char *method)
 {
   if (this->IsCreated())
@@ -1997,7 +1997,7 @@ int vtkKWMultiColumnList::GetCellEditWindow(int row_index, int col_index)
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellWindowCommand(int row_index, 
                                                 int col_index, 
-                                                vtkObject* object, 
+                                                vtkObject *object, 
                                                 const char *method)
 {
   if (this->IsCreated())
@@ -2019,7 +2019,7 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index, 
                                                        int col_index, 
-                                                       vtkObject* object, 
+                                                       vtkObject *object, 
                                                        const char *method)
 {
   if (this->IsCreated())
@@ -3499,7 +3499,7 @@ void vtkKWMultiColumnList::HasSelectionChanged()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetLabelCommand(vtkObject* object, 
+void vtkKWMultiColumnList::SetLabelCommand(vtkObject *object, 
                                            const char *method)
 {
   if (this->IsCreated())
@@ -3512,7 +3512,7 @@ void vtkKWMultiColumnList::SetLabelCommand(vtkObject* object,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetSortCommand(vtkObject* object, 
+void vtkKWMultiColumnList::SetSortCommand(vtkObject *object, 
                                           const char *method)
 {
   if (this->IsCreated())

@@ -101,8 +101,6 @@ public:
     vtkObject *object, const char *method);
   virtual void SetPropertyChangingCommand(
     vtkObject *object, const char *method);
-  virtual void InvokePropertyChangedCommand();
-  virtual void InvokePropertyChangingCommand();
 
   // Description:
   // Callbacks for the buttons, scales and presets
@@ -143,7 +141,8 @@ protected:
   char  *PropertyChangedCommand;
   char  *PropertyChangingCommand;
 
-  virtual void InvokeCommand(const char *command);
+  virtual void InvokePropertyChangedCommand();
+  virtual void InvokePropertyChangingCommand();
 
   // Presets
 

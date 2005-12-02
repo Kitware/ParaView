@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.28");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -36,7 +36,7 @@ vtkKWPopupButton::vtkKWPopupButton()
 
   this->PopupCloseButton = vtkKWPushButton::New();
 
-  this->WithdrawCommand = 0;
+  this->WithdrawCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -60,7 +60,11 @@ vtkKWPopupButton::~vtkKWPopupButton()
     this->PopupCloseButton = NULL;
     }
 
-  this->SetWithdrawCommand(0);
+  if (this->WithdrawCommand)
+    {
+    delete [] this->WithdrawCommand;
+    this->WithdrawCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -225,19 +229,21 @@ void vtkKWPopupButton::WithdrawPopupCallback()
     }
 
   this->PopupTopLevel->Withdraw();
-  if ( this->WithdrawCommand )
-    {
-    this->Script(this->WithdrawCommand);
-    }
+
+  this->InvokeWithdrawCommand();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupButton::SetWithdrawCommand(vtkObject* obj, const char* method)
+void vtkKWPopupButton::SetWithdrawCommand(
+  vtkObject *object, const char *method)
 {
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
-  this->SetWithdrawCommand(command);
-  delete [] command;
+  this->SetObjectMethodCommand(&this->WithdrawCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPopupButton::InvokeWithdrawCommand()
+{
+  this->InvokeObjectMethodCommand(this->WithdrawCommand);
 }
 
 //----------------------------------------------------------------------------

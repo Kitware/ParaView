@@ -108,16 +108,23 @@ public:
   vtkGetMacro(OpacityVisibility, int);
 
   // Description:
-  // Set/Get the command executed each time a change is made to the
-  // text property.
-  virtual void SetChangedCommand(
-    vtkObject *object, const char *method);
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked each time a change is made to the text property.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetChangedCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Set/Get the command executed each time a change is made to the
-  // color of the text property (the ChangedCommand is run too).
-  virtual void SetColorChangedCommand(
-    vtkObject *object, const char *method);
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked each time a change is made to the color of
+  // the text property (the ChangedCommand is triggered too).
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetColorChangedCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the copy button visibility. This button can be used to
@@ -203,6 +210,9 @@ protected:
 
   char *ChangedCommand;
   char *ColorChangedCommand;
+
+  virtual void InvokeChangedCommand();
+  virtual void InvokeColorChangedCommand();
 
   int CopyVisibility;
   vtkKWPushButtonSetWithLabel *PushButtonSet;

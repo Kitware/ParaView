@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.43");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.44");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1030,76 +1030,60 @@ void vtkKWThumbWheel::StopMotionCallback()
 }
 
 // ---------------------------------------------------------------------------
+void vtkKWThumbWheel::SetCommand(vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+// ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeCommand()
 {
-  if (!this->Command || !*this->Command || this->InInvokeCommand)
+  if (this->InInvokeCommand)
     {
     return;
     }
 
   this->InInvokeCommand = 1;
 
-  this->Script("eval %s", this->Command);
+  this->InvokeObjectMethodCommand(this->Command);
 
   this->InInvokeCommand = 0;
 }
 
 // ---------------------------------------------------------------------------
+void vtkKWThumbWheel::SetStartCommand(vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
+}
+
+// ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeStartCommand()
 {
-  if (this->StartCommand && *this->StartCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->StartCommand);
-    }
+  this->InvokeObjectMethodCommand(this->StartCommand);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWThumbWheel::SetEndCommand(vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeEndCommand()
 {
-  if (this->EndCommand && *this->EndCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->EndCommand);
-    }
+  this->InvokeObjectMethodCommand(this->EndCommand);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWThumbWheel::SetEntryCommand(vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->EntryCommand, object, method);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::InvokeEntryCommand()
 {
-  if (this->EntryCommand && *this->EntryCommand && this->IsCreated())
-    {
-    this->Script("eval %s",this->EntryCommand);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetCommand(vtkObject* Object, 
-                                 const char *CommandString)
-{
-  this->SetObjectMethodCommand(&this->Command, Object, CommandString);
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetStartCommand(vtkObject* Object, 
-                                      const char * MethodAndArgString)
-{
-  this->SetObjectMethodCommand(
-    &this->StartCommand, Object, MethodAndArgString);
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetEndCommand(vtkObject* Object, 
-                                    const char * MethodAndArgString)
-{
-  this->SetObjectMethodCommand(
-    &this->EndCommand, Object, MethodAndArgString);
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetEntryCommand(vtkObject* Object, 
-                                      const char * MethodAndArgString)
-{
-  this->SetObjectMethodCommand(
-    &this->EntryCommand, Object, MethodAndArgString);
+  this->InvokeObjectMethodCommand(this->EntryCommand);
 }
 
 // ---------------------------------------------------------------------------

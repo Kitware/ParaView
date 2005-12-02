@@ -202,14 +202,15 @@ public:
   vtkKWMenu *GetMenu();
 
   // Description:
-  // Convenience method to set the command used to manage window manage 
-  // protocol WM_DELETE_WINDOW. Called when the user closes the window
-  // using the window manager.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the user closes the window using the
+  // window manager.
   // The first argument is the object that will have the method called on it.
-  // The second is the name of the method to be called and any arguments
-  // in string form.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetDeleteWindowProtocolCommand(
-    vtkObject *obj, const char *command);
+    vtkObject *object, const char *method);
 
   // Description:
   // Convenience method to set the name inside the icon associated to this

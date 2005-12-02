@@ -69,7 +69,7 @@ public:
     { this->SetOrientation(vtkKWSplitFrame::OrientationVertical); };
 
   // Description:
-  // Set/Get the the frame layout.
+  // Set/Get the frame layout.
   // If set to Default, depending on the orientation, Frame1 is on the left
   // (respectively bottom) of the separator, Frame2 on the right (top).
   // If set to Swapped, Frame1 and Frame2 position are exchanged.

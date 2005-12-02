@@ -26,7 +26,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.52");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.53");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -600,12 +600,7 @@ void vtkKWSelectionFrame::SetTitle(const char *title)
     this->Title->SetText(title);
     if (strcmp(old_title.c_str(), this->GetTitle()))
       {
-      if (this->TitleChangedCommand && *this->TitleChangedCommand && 
-          this->IsCreated())
-        {
-        this->Script("eval {%s %s}",
-                     this->TitleChangedCommand, this->GetTclName());
-        }
+      this->InvokeTitleChangedCommand();
       }
     }
 }
@@ -954,10 +949,32 @@ void vtkKWSelectionFrame::SetSelectionListCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::InvokeSelectionListCommand(const char *item)
+{
+  if (this->SelectionListCommand && 
+      *this->SelectionListCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval {%s {%s} %s}",
+                 this->SelectionListCommand, item, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetCloseCommand(vtkObject *object,
                                           const char *method)
 {
   this->SetObjectMethodCommand(&this->CloseCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::InvokeCloseCommand()
+{
+  if (this->CloseCommand && *this->CloseCommand && this->IsCreated())
+    {
+    this->Script("eval {%s %s}",
+                 this->CloseCommand, this->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -968,10 +985,30 @@ void vtkKWSelectionFrame::SetSelectCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::InvokeSelectCommand()
+{
+  if (this->SelectCommand && *this->SelectCommand && this->IsCreated())
+    {
+    this->Script("eval {%s %s}", this->SelectCommand, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetDoubleClickCommand(vtkObject *object,
                                                 const char *method)
 {
   this->SetObjectMethodCommand(&this->DoubleClickCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::InvokeDoubleClickCommand()
+{
+  if (this->DoubleClickCommand && *this->DoubleClickCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval {%s %s}",
+                 this->DoubleClickCommand, this->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -982,6 +1019,17 @@ void vtkKWSelectionFrame::SetChangeTitleCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::InvokeChangeTitleCommand()
+{
+  if (this->ChangeTitleCommand && *this->ChangeTitleCommand && 
+      this->IsCreated())
+    {
+    this->Script("eval {%s %s}",
+                 this->ChangeTitleCommand, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitleChangedCommand(vtkObject *object,
                                                 const char *method)
 {
@@ -989,14 +1037,20 @@ void vtkKWSelectionFrame::SetTitleChangedCommand(vtkObject *object,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
+void vtkKWSelectionFrame::InvokeTitleChangedCommand()
 {
-  if (this->SelectionListCommand && *this->SelectionListCommand && 
+  if (this->TitleChangedCommand && *this->TitleChangedCommand && 
       this->IsCreated())
     {
-    this->Script("eval {%s {%s} %s}",
-                 this->SelectionListCommand, menuItem, this->GetTclName());
+    this->Script("eval {%s %s}",
+                 this->TitleChangedCommand, this->GetTclName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
+{
+  this->InvokeSelectionListCommand(menuItem);
 }
 
 //----------------------------------------------------------------------------
@@ -1012,11 +1066,7 @@ void vtkKWSelectionFrame::Close()
 
   this->RemoveCallbackCommandObservers();
 
-  if (this->CloseCommand && *this->CloseCommand && this->IsCreated())
-    {
-    this->Script("eval {%s %s}",
-                 this->CloseCommand, this->GetTclName());
-    }
+  this->InvokeCloseCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -1029,10 +1079,7 @@ void vtkKWSelectionFrame::SelectCallback()
 
   this->SelectedOn();
 
-  if (this->SelectCommand && *this->SelectCommand && this->IsCreated())
-    {
-    this->Script("eval {%s %s}", this->SelectCommand, this->GetTclName());
-    }
+  this->InvokeSelectCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -1040,22 +1087,13 @@ void vtkKWSelectionFrame::DoubleClickCallback()
 {
   this->SelectCallback();
 
-  if (this->DoubleClickCommand && *this->DoubleClickCommand)
-    {
-    this->Script("eval {%s %s}",
-                 this->DoubleClickCommand, this->GetTclName());
-    }
+  this->InvokeDoubleClickCommand();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::ChangeTitleCallback()
 {
-  if (this->ChangeTitleCommand && *this->ChangeTitleCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval {%s %s}",
-                 this->ChangeTitleCommand, this->GetTclName());
-    }
+  this->InvokeChangeTitleCommand();
 }
 
 //----------------------------------------------------------------------------

@@ -35,13 +35,13 @@ public:
   virtual void Create();
 
   // Description:
-  // Set/Get/Toggle the state of the check button 0 = off 1 = on
+  // Set/Get/Toggle the selected state of the check button 0 = off 1 = on
   virtual void SetSelectedState(int );
   virtual int GetSelectedState();
   vtkBooleanMacro(SelectedState, int);
   virtual void ToggleSelectedState();
   virtual void Select() { this->SetSelectedState(1); };
-  virtual void DeSelect() { this->SetSelectedState(0); };
+  virtual void Deselect() { this->SetSelectedState(0); };
 
   // Description:
   // Tell the widget whether it should use an indicator (check box)
@@ -61,11 +61,11 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked when mouse button 1 is released over the button.
+  // typically invoked when the button is selected or deselected.
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method
-  // is evaluated as a simple command.
+  // is still evaluated as a simple command. 
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -176,26 +176,30 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CommandCallback();
+
 protected:
 
-  vtkSetStringMacro(MyText);
+  vtkSetStringMacro(InternalText);
 
   vtkKWCheckButton();
   ~vtkKWCheckButton();
 
   int IndicatorVisibility;
-  char *MyText;
+
+  char *InternalText;
   char *VariableName;
 
-  void Configure();
+  virtual void Configure();
+
+  char *Command;
+  virtual void InvokeCommand();
 
 private:
   vtkKWCheckButton(const vtkKWCheckButton&); // Not implemented
   void operator=(const vtkKWCheckButton&); // Not Implemented
 };
 
-
 #endif
-
-
-

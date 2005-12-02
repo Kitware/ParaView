@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.16");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.17");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -425,9 +425,9 @@ int vtkKWHSVColorSelector::HasSelection()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeCommand(const char *command)
+void vtkKWHSVColorSelector::InvokeCommandWithColor(const char *command)
 {
-  if (command && *command)
+  if (command && *command && this->IsCreated())
     {
     double rgb[3], *color;
     if (this->InvokeCommandsWithRGB)
@@ -444,18 +444,6 @@ void vtkKWHSVColorSelector::InvokeCommand(const char *command)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeSelectionChangedCommand()
-{
-  this->InvokeCommand(this->SelectionChangedCommand);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeSelectionChangingCommand()
-{
-  this->InvokeCommand(this->SelectionChangingCommand);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWHSVColorSelector::SetSelectionChangedCommand(
   vtkObject *object, const char *method)
 {
@@ -464,11 +452,23 @@ void vtkKWHSVColorSelector::SetSelectionChangedCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWHSVColorSelector::InvokeSelectionChangedCommand()
+{
+  this->InvokeCommandWithColor(this->SelectionChangedCommand);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWHSVColorSelector::SetSelectionChangingCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->SelectionChangingCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWHSVColorSelector::InvokeSelectionChangingCommand()
+{
+  this->InvokeCommandWithColor(this->SelectionChangingCommand);
 }
 
 //----------------------------------------------------------------------------

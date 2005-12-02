@@ -52,7 +52,7 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked when mouse button 1 is released over the button.
+  // typically invoked when button is pressed.
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method

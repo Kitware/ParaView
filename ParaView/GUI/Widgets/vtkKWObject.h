@@ -82,14 +82,20 @@ protected:
   ~vtkKWObject();
 
   // Description:
-  // Convenience method that can be used to create a callback function
-  // on an object. The first argument is the command (string) to set, the 
-  // second is the KWObject that the method will be called on. The third is
+  // Convenience method that can be used to create a Tcl callback command.
+  // The first argument is a pointer to the command/callback to be created, 
+  // the second is the object that the method will be called on, the third is
   // the name of the method itself and any arguments in string form. 
-  // Note that the command is allocated automatically using the 'new' 
+  // Note that 'command' is allocated automatically using the 'new' 
   // operator. If it is not NULL, it is deallocated first using 'delete []'.
-  void SetObjectMethodCommand(
+  virtual void SetObjectMethodCommand(
     char **command, vtkObject *object, const char *method);
+
+  // Description:
+  // Convenience method to invoke a Tcl callback command that was created 
+  // using the SetObjectMethodCommand method. This simply checks if the 
+  // command is not empty and evaluate it from Tcl.
+  virtual void InvokeObjectMethodCommand(const char *command);
 
   // Description:
   // Get the callback command. 

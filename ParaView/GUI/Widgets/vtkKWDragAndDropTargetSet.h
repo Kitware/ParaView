@@ -79,6 +79,10 @@ public:
   // performed.
   // The EndCommand of all targets that contain the drop coordinates is called
   // when Drag & Drop ends.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // Note that the each command is passed the absolute/screen (x,y) mouse 
   // coordinates, the Source widget and the SourceAnchor widget (which are the
   // same most of the times), i.e. the last 4 parameters are: int, int, 
@@ -102,6 +106,10 @@ public:
   // The StartCommand is called when Drag & Drop starts.
   // The PerformCommand is called while Drag & Drop is performed.
   // The EndCommand is called when Drag & Drop ends.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // Note that the each command is passed the absolute/screen (x,y) mouse 
   // coordinates.
   // None of them is called is Enable is false.
@@ -153,6 +161,10 @@ protected:
   char *StartCommand;
   char *PerformCommand;
   char *EndCommand;
+  virtual void InvokeCommandWithCoordinates(const char *command, int x, int y);
+  virtual void InvokeStartCommand(int x, int y);
+  virtual void InvokePerformCommand(int x, int y);
+  virtual void InvokeEndCommand(int x, int y);
 
   virtual void AddBindings();
   virtual void RemoveBindings();

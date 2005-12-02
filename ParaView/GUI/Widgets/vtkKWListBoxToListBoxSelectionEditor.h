@@ -83,7 +83,7 @@ public:
   void EllipsisCallback();
   vtkSetStringMacro(EllipsisCommand);
   vtkGetStringMacro(EllipsisCommand);
-  void SetEllipsisCommand(vtkObject* obj, const char* method);
+  void SetEllipsisCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

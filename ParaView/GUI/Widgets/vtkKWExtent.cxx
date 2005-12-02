@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.43");
+vtkCxxRevisionMacro(vtkKWExtent, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -264,40 +264,41 @@ void vtkKWExtent::ExtentChangedCallback()
   this->Extent[4] = this->Range[2]->GetRange()[0];
   this->Extent[5] = this->Range[2]->GetRange()[1];
  
-  if (this->Command && *this->Command)
-    {
-    this->Script("eval %s",this->Command);
-    }
+  this->InvokeCommand();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetCommand(vtkObject *obj, const char *method)
+void vtkKWExtent::SetCommand(vtkObject *object, const char *method)
 { 
-  this->SetObjectMethodCommand(&this->Command, obj, method);
+  this->SetObjectMethodCommand(&this->Command, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetStartCommand(vtkObject* obj, 
-                                  const char *method)
+void vtkKWExtent::InvokeCommand()
+{
+  this->InvokeObjectMethodCommand(this->Command);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetStartCommand(vtkObject *object, const char *method)
 { 
   for (int i = 0; i < 3; i++)
     {
     if (this->Range[i])
       {
-      this->Range[i]->SetStartCommand(obj, method);
+      this->Range[i]->SetStartCommand(object, method);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetEndCommand(vtkObject* obj, 
-                                const char *method)
+void vtkKWExtent::SetEndCommand(vtkObject *object, const char *method)
 { 
   for (int i = 0; i < 3; i++)
     {
     if (this->Range[i])
       {
-      this->Range[i]->SetEndCommand(obj, method);
+      this->Range[i]->SetEndCommand(object, method);
       }
     }
 }

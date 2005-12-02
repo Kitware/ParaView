@@ -204,18 +204,21 @@ public:
   vtkBooleanMacro(ExpandEntry, int);  
 
   // Description:
-  // Set the callback functions on objects.  The first argument is
-  // the KWObject that will have the method called on it.  The second is the
-  // name of the method to be called and any arguments in string form.
-  // The call is done via Tcl wrappers for the KWObject.
-  virtual void SetCommand(vtkObject* Object, const char *arg);
-  virtual void SetStartCommand(vtkObject* Object, const char *arg);
-  virtual void SetEndCommand(vtkObject* Object, const char *arg);
-  virtual void SetEntryCommand (vtkObject* Object, const char *arg);
-  virtual void InvokeCommand();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
-  virtual void InvokeEntryCommand();
+  // Specifies commands to associate with the widget. 
+  // 'Command' is invoked when the widget value is changed.
+  // 'StartCommand' is invoked at the beginning of an interaction with
+  // the widget.
+  // 'EndCommand' is invoked at the end of an interaction with the widget.
+  // 'EntryCommand' is invoked when the widget value is changed using
+  // the text entry.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetCommand(vtkObject *object, const char *method);
+  virtual void SetStartCommand(vtkObject *object, const char *method);
+  virtual void SetEndCommand(vtkObject *object, const char *method);
+  virtual void SetEntryCommand(vtkObject *object, const char *method);
 
   // Description:
   // Setting this string enables balloon help for this widget.
@@ -278,6 +281,11 @@ protected:
   char        *StartCommand;
   char        *EndCommand;
   char        *EntryCommand;
+
+  virtual void InvokeCommand();
+  virtual void InvokeStartCommand();
+  virtual void InvokeEndCommand();
+  virtual void InvokeEntryCommand();
 
   double      ThumbWheelShift;
 

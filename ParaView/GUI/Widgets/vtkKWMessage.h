@@ -83,7 +83,7 @@ public:
   // Justification setting determines how each line is displayed within that
   // rectangular region. For example, suppose Anchor is East and Justification
   // is Left, and that the message window is much larger than needed for the
-  // text. The the text will displayed so that the left edges of all the lines
+  // text. The text will displayed so that the left edges of all the lines
   // line up and the right edge of the longest line is on the right side of
   // the window; the entire text block will be centered in the vertical span
   // of the window. Note that the superclass's PadX and PadY setting can be

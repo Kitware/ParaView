@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.24");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.25");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1989,28 +1989,21 @@ void vtkKWPresetSelector::PresetSelectionCallback()
 void vtkKWPresetSelector::SetPresetAddCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->PresetAddCommand, object, method);
+  this->SetObjectMethodCommand(&this->PresetAddCommand, object, method);
   this->Update(); // this show/hide the add button
 }
 
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::InvokePresetAddCommand()
 {
-  if (this->PresetAddCommand && 
-      *this->PresetAddCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->PresetAddCommand);
-    }
+  this->InvokeObjectMethodCommand(this->PresetAddCommand);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::SetPresetUpdateCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->PresetUpdateCommand, object, method);
+  this->SetObjectMethodCommand(&this->PresetUpdateCommand, object, method);
   this->Update(); // this show/hide the update button
 }
 
@@ -2029,8 +2022,7 @@ void vtkKWPresetSelector::InvokePresetUpdateCommand(int id)
 void vtkKWPresetSelector::SetPresetApplyCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->PresetApplyCommand, object, method);
+  this->SetObjectMethodCommand(&this->PresetApplyCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -2048,8 +2040,7 @@ void vtkKWPresetSelector::InvokePresetApplyCommand(int id)
 void vtkKWPresetSelector::SetPresetRemoveCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->PresetRemoveCommand, object, method);
+  this->SetObjectMethodCommand(&this->PresetRemoveCommand, object, method);
 }
 
 //----------------------------------------------------------------------------

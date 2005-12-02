@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.12");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -1220,7 +1220,7 @@ void vtkKWParameterValueHermiteFunctionEditor::ClearMidPointSelection()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::InvokeMidPointSelectionChangedCommand()
 {
-  this->InvokeCommand(this->MidPointSelectionChangedCommand);
+  this->InvokeObjectMethodCommand(this->MidPointSelectionChangedCommand);
 
   this->InvokeEvent(
     vtkKWParameterValueHermiteFunctionEditor::MidPointSelectionChangedEvent);

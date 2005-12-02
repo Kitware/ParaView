@@ -59,8 +59,13 @@ public:
   vtkGetMacro(TrimPathFromFileName, int);
   
   // Description:
-  // Override vtkKWWidget's SetCommand so that the button command callback
-  // will invoke the load/save dialog, then invoke a user-defined command.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when button is pressed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is evaluated as a simple command.
+  // Override the parent SetCommand method.
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:

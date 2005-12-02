@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.16");
+vtkCxxRevisionMacro(vtkKWTree, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
@@ -160,12 +160,7 @@ void vtkKWTree::SetSelectionChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWTree::InvokeSelectionChangedCommand()
 {
-  if (this->SelectionChangedCommand && 
-      *this->SelectionChangedCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->SelectionChangedCommand);
-    }
+  this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -621,7 +616,7 @@ void vtkKWTree::SetSelectionForegroundColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetOpenCommand(vtkObject *obj, const char *method)
+void vtkKWTree::SetOpenCommand(vtkObject *object, const char *method)
 {
   if (!this->IsCreated())
     {
@@ -629,13 +624,13 @@ void vtkKWTree::SetOpenCommand(vtkObject *obj, const char *method)
     }
 
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
+  this->SetObjectMethodCommand(&command, object, method);
   this->SetConfigurationOption("-opencmd", command);
   delete [] command;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetCloseCommand(vtkObject *obj, const char *method)
+void vtkKWTree::SetCloseCommand(vtkObject *object, const char *method)
 {
   if (!this->IsCreated())
     {
@@ -643,14 +638,14 @@ void vtkKWTree::SetCloseCommand(vtkObject *obj, const char *method)
     }
 
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
+  this->SetObjectMethodCommand(&command, object, method);
   this->SetConfigurationOption("-closecmd", command);
   delete [] command;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTree::SetBindText(const char *event, 
-                            vtkObject *obj, 
+                            vtkObject *object, 
                             const char *method)
 {
   if (!this->IsCreated() || !event)
@@ -659,23 +654,23 @@ void vtkKWTree::SetBindText(const char *event,
     }
 
   char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
+  this->SetObjectMethodCommand(&command, object, method);
   this->Script("%s bindText %s {%s}", this->GetWidgetName(), event, command);
   delete [] command;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetDoubleClickOnNodeCommand(vtkObject *obj, 
+void vtkKWTree::SetDoubleClickOnNodeCommand(vtkObject *object, 
                                             const char *method)
 {
-  this->SetBindText("<Double-ButtonPress-1>", obj, method);
+  this->SetBindText("<Double-ButtonPress-1>", object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *obj, 
+void vtkKWTree::SetSingleClickOnNodeCommand(vtkObject *object, 
                                             const char *method)
 {
-  this->SetBindText("<ButtonPress-1>", obj, method);
+  this->SetBindText("<ButtonPress-1>", object, method);
 }
 
 //----------------------------------------------------------------------------
