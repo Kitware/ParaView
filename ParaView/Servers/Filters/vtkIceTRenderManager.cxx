@@ -92,7 +92,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.31");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.32");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -243,7 +243,13 @@ void vtkIceTRenderManager::UpdateIceTContext()
       double normalizedRendererViewport[4];
       icetRen->GetViewport(normalizedRendererViewport);
 
-      int *displaySize = this->RenderWindow->GetSize();
+      int* tileScale = this->RenderWindow->GetTileScale();
+      // displaySize should take into account render window's
+      // tileScale. Later code assumes that the display size
+      // includes it.
+      int displaySize[2];
+      displaySize[0] = tileScale[0]* this->FullImageSize[0];
+      displaySize[1] = tileScale[1]* this->FullImageSize[1];
 
       // Adjust the global viewport of the renderer.  That is convert the
       // normalized renderer viewport (as values between 0 and 1) to actual
