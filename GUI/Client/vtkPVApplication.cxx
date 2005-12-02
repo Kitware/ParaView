@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.380");
+vtkCxxRevisionMacro(vtkPVApplication, "1.381");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -972,6 +972,10 @@ void vtkPVApplication::Initialize()
   this->FindInstallationDirectory();
 
 #ifdef VTK_USE_MANGLED_MESA
+  // TODO: This is certainly a wrong place to do this. 
+  // In ReverseConnect mode, vtkPVApplication::Initialize()
+  // is called before the Server has connected, so where in the world,
+  // are we sending these streams?
   if (this->Options->GetUseSoftwareRendering())
     {
     vtkProcessModule* pm = this->GetProcessModule();

@@ -15,9 +15,8 @@
 #include "vtkSMAnimationCueManipulatorProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.5");
 
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()
@@ -41,12 +40,11 @@ void vtkSMAnimationCueManipulatorProxy::Copy(vtkSMProxy* src,
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID id = this->SelfID;
   *file << endl;
-  *file << "set pvTemp" << id
+  *file << "set " << this->GetName() 
     << " [$proxyManager NewProxy " << this->GetXMLGroup()
     << " " << this->GetXMLName() << "]" << endl;
-  *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
+  *file << "$" << this->GetName() << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

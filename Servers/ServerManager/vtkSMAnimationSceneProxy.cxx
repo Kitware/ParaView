@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.18");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -373,7 +373,7 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
 void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
-  vtkClientServerID id = this->SelfID;
+  vtkClientServerID id = this->GetSelfID();
 
   *file << "  [$pvTemp" << id << " GetProperty Loop]"
     << " SetElements1 " << this->GetLoop() << endl;
@@ -381,7 +381,7 @@ void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
     << " SetElements1 " << this->GetFrameRate() << endl;
   *file << "  [$pvTemp" << id << " GetProperty PlayMode]"
     << " SetElements1 " << this->GetPlayMode() << endl;
-//TODO: How to set this?
+  
   *file << "  $pvTemp" << id << " SetRenderModuleProxy $Ren1" << endl;
   *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
   *file << endl;

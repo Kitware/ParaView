@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.53");
+vtkCxxRevisionMacro(vtkSMProxy, "1.54");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -119,46 +119,8 @@ vtkSMProxy::vtkSMProxy()
 
   this->XMLElement = 0;
   this->DoNotModifyProperty = 0;
-
-  this->SubProxyObserver = 0;
-
-  // Assign a unique clientserver id to this object.
-  // Note that this ups the reference count to 2.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm)
-    {
-    vtkErrorMacro("Can not fully initialize without a global "
-                  "ProcessModule. This object will not be fully "
-                  "functional.");
-    return;
-    }
-  this->SelfID = pm->GetUniqueID();
-  vtkClientServerStream initStream;
-  initStream << vtkClientServerStream::Assign 
-             << this->SelfID << this
-             << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, initStream);
-  // Now this is tricky. this->ConnectionID is used in the contructor of vtkSMProxy itself.
-  // Until, there is a single vtkSelfConnection on the process module, this is fine,
-  // since we are processing this stream on the local interpreter itself. However, once
-  // we start maintain different vtkSelfConnections (i.e. interpreters) with each connection,
-  // setting the ConnectionID on the proxy can cause havoc, since the SelfID may not
-  // be defined on the local interpreter for the new server connection. 
-
-  
-  // This is done to make the last result message release it's reference 
-  // count. Otherwise the object has a reference count of 3.
-  if (pm)
-    {
-    pm->GetInterpreter()->ClearLastResult();
-    }
   this->InUpdateVTKObjects = 0;
   this->SelfPropertiesModified = 0;
-
-  ostrstream str;
-  str << "pvTemp" << this->SelfID << ends;
-  this->SetName(str.str());
-  str.rdbuf()->freeze(0);
 
   this->SubProxyObserver = vtkSMProxyObserver::New();
   this->SubProxyObserver->SetProxy(this);
@@ -199,6 +161,48 @@ vtkSMProxy::~vtkSMProxy()
     this->SubProxyObserver->SetProxy(0);
     this->SubProxyObserver->Delete();
     }
+}
+
+
+//---------------------------------------------------------------------------
+vtkClientServerID vtkSMProxy::GetSelfID()
+{
+  if (this->SelfID.ID != 0)
+    {
+    return this->SelfID;
+    }
+  
+  // Assign a unique clientserver id to this object.
+  // Note that this ups the reference count to 2.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm)
+    {
+    vtkErrorMacro("Can not fully initialize without a global "
+      "ProcessModule. This object will not be fully "
+      "functional.");
+    return this->SelfID;
+    }
+
+  this->SelfID = pm->GetUniqueID();
+  
+  vtkClientServerStream initStream;
+  initStream << vtkClientServerStream::Assign 
+    << this->SelfID << this
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, initStream);
+
+  // This is done to make the last result message release it's reference 
+  // count. Otherwise the object has a reference count of 3.
+  pm->GetInterpreter()->ClearLastResult();
+  
+  if (!this->Name) 
+    {
+    ostrstream str;
+    str << "pvTemp" << this->SelfID << ends;
+    this->SetName(str.str());
+    str.rdbuf()->freeze(0);
+    }
+  return this->SelfID;
 }
 
 //---------------------------------------------------------------------------
@@ -284,6 +288,14 @@ vtkTypeUInt32 vtkSMProxy::GetServers()
 //---------------------------------------------------------------------------
 void vtkSMProxy::SetConnectionID(vtkConnectionID id)
 {
+  if (this->SelfID.ID)
+    {
+    // Implies that the proxy performed some processing.
+    vtkErrorMacro(
+      "Connection ID can be changed immeditely after creating the proxy.");
+    return;
+    }
+  
   this->SetConnectionIDSelf(id);
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
@@ -569,7 +581,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
     if (prop->GetUpdateSelf())
       {
       this->PushProperty(it->first.c_str(), 
-                         this->SelfID, 
+                         this->GetSelfID(), 
                          vtkProcessModule::CLIENT);
       this->MarkModified(this);
       }
@@ -646,7 +658,7 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
       if (prop->GetUpdateSelf())
         {
         prop->UpdateInformation(this->ConnectionID, 
-          vtkProcessModule::CLIENT, this->SelfID);
+          vtkProcessModule::CLIENT, this->GetSelfID());
         }
       else
         {
@@ -686,7 +698,7 @@ void vtkSMProxy::UpdatePropertyInformation()
       if (prop->GetUpdateSelf())
         {
         prop->UpdateInformation(this->ConnectionID,
-          vtkProcessModule::CLIENT, this->SelfID);
+          vtkProcessModule::CLIENT, this->GetSelfID());
         }
       else
         {
@@ -749,7 +761,10 @@ void vtkSMProxy::UpdateVTKObjects()
     return;
     }
   this->InUpdateVTKObjects = 1;
-  
+
+  // This will ensure that the SelfID is assigned properly.
+  this->GetSelfID();
+
   vtkClientServerStream str;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
@@ -784,7 +799,7 @@ void vtkSMProxy::UpdateVTKObjects()
           if (prop->GetUpdateSelf())
             {
             this->PushProperty(it->first.c_str(), 
-              this->SelfID, 
+              this->GetSelfID(), 
               vtkProcessModule::CLIENT);
             wasModified = 1;
             }
@@ -812,7 +827,7 @@ void vtkSMProxy::UpdateVTKObjects()
         if (prop->GetUpdateSelf())
           {
           this->PushProperty(it->first.c_str(), 
-            this->SelfID, 
+            this->GetSelfID(), 
             vtkProcessModule::CLIENT);
           wasModified = 1;
           }
@@ -896,7 +911,7 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->ObjectsCreated = 1;
-
+  this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -1192,15 +1207,16 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
   property = vtkSMProperty::SafeDownCast(object);
   if (property)
     {
+    int old_val = this->DoNotModifyProperty;
     this->DoNotModifyProperty = 1;
     this->AddProperty(name, property);
     if (!property->ReadXMLAttributes(this, propElement))
       {
       vtkErrorMacro("Could not parse property: " << propElement->GetName());
-      this->DoNotModifyProperty = 0;
+      this->DoNotModifyProperty = old_val;
       return 0;
       }
-    this->DoNotModifyProperty = 0;
+    this->DoNotModifyProperty = old_val;
     property->Delete();
     }
   else

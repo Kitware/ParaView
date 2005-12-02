@@ -104,7 +104,7 @@ public:
   vtkGetMacro(Caching, int);
   
 //BTX
-  vtkClientServerID GetID() { return this->SelfID; }
+  vtkClientServerID GetID() { return this->GetSelfID(); }
 //ETX
  
   // Description:

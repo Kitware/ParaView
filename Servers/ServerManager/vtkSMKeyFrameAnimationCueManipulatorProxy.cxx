@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.11");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -340,7 +340,7 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetKeyFrameAtInde
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID id = this->SelfID;
+  vtkClientServerID id = this->GetSelfID();
   this->Superclass::SaveInBatchScript(file);
 
   vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::

@@ -29,6 +29,9 @@
 // the connection on which this proxy exists. Currently, since a ParaView client
 // is connected to 1 and only 1 server. This ID is insignificant. However,
 // it provides the ground work to enable a client to connect with multiple servers.
+// ConnectionID must be set immediately after instantiating the proxy (if at all).
+// Chanding the ConnectionID after that can be dangerous.
+// 
 // 
 // When defining a proxy in the XML configuration file,
 // to derrive the property interface from another proxy definition,
@@ -192,7 +195,10 @@ public:
 
   // Description:
   // Returns the Self ID of the proxy.
-  vtkClientServerID GetSelfID() { return this->SelfID; }
+  // If the SelfID is not assigned yet, then this method will assign this proxy
+  // a unique SelfID on the interpretor for the connection on which this 
+  // proxy exists i.e. this->ConnectionID.
+  vtkClientServerID GetSelfID();
 
   // Description:
   // Returns the number of server ids (same as the number of server objects
@@ -533,7 +539,6 @@ protected:
   // Indicates if any properties are modified.
   int ArePropertiesModified(int selfOnly = 0);
 
-  vtkClientServerID SelfID;
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
@@ -557,6 +562,9 @@ protected:
 private:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
+  vtkClientServerID SelfID; 
+  // SelfID is private to avoid direct access by subclasses.
+  // They must use GetSelfID().
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
