@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -76,12 +76,12 @@ vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
   this->AnimationButtonSet = NULL;
   this->HelpLabel = NULL;
 
-  this->CameraPostAnimationCommand  = NULL;
+  this->CameraPostAnimationCommand = NULL;
   this->SlicePostAnimationCommand  = NULL;
-  this->SliceGetCommand  = NULL;
-  this->SliceGetMinCommand  = NULL;
-  this->SliceGetMaxCommand  = NULL;
-  this->SliceSetCommand  = NULL;
+  this->SliceGetCommand            = NULL;
+  this->SliceGetMinCommand         = NULL;
+  this->SliceGetMaxCommand         = NULL;
+  this->SliceSetCommand            = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1115,11 +1115,7 @@ void vtkKWSimpleAnimationWidget::SetCameraPostAnimationCommand(
 //----------------------------------------------------------------------------
 void vtkKWSimpleAnimationWidget::InvokeCameraPostAnimationCommand()
 {
-  if (this->CameraPostAnimationCommand && *this->CameraPostAnimationCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->CameraPostAnimationCommand);
-    }
+  this->InvokeObjectMethodCommand(this->CameraPostAnimationCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -1132,11 +1128,7 @@ void vtkKWSimpleAnimationWidget::SetSlicePostAnimationCommand(
 //----------------------------------------------------------------------------
 void vtkKWSimpleAnimationWidget::InvokeSlicePostAnimationCommand()
 {
-  if (this->SlicePostAnimationCommand && *this->SlicePostAnimationCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->SlicePostAnimationCommand);
-    }
+  this->InvokeObjectMethodCommand(this->SlicePostAnimationCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -1237,4 +1229,3 @@ void vtkKWSimpleAnimationWidget::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "AnimationType: Slice\n";
     }
 }
-

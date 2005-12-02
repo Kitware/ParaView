@@ -99,7 +99,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.16");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.17");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -568,16 +568,8 @@ void vtkKWTextPropertyEditor::SetColor(double r, double g, double b)
 
   this->UpdateColorButton();
 
-  if (this->ColorChangedCommand && *this->ColorChangedCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->ColorChangedCommand);
-    }
-  
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeColorChangedCommand();
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -661,10 +653,7 @@ void vtkKWTextPropertyEditor::SetFontFamily(int v)
 
   this->UpdateFontFamilyOptionMenu();
 
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -758,10 +747,7 @@ void vtkKWTextPropertyEditor::SetBold(int v)
 
   this->UpdateBoldCheckButton();
 
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -799,10 +785,7 @@ void vtkKWTextPropertyEditor::SetItalic(int v)
 
   this->UpdateItalicCheckButton();
 
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -840,10 +823,7 @@ void vtkKWTextPropertyEditor::SetShadow(int v)
 
   this->UpdateShadowCheckButton();
 
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -899,10 +879,7 @@ void vtkKWTextPropertyEditor::SetOpacity(float v)
 
   this->UpdateOpacityScale();
 
-  if (this->ChangedCommand && *this->ChangedCommand && this->IsCreated())
-    {
-    this->Script("eval %s", this->ChangedCommand);
-    }
+  this->InvokeChangedCommand();
 }
 
 // ----------------------------------------------------------------------------
@@ -1105,10 +1082,22 @@ void vtkKWTextPropertyEditor::SetChangedCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTextPropertyEditor::InvokeChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->ChangedCommand);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTextPropertyEditor::SetColorChangedCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->ColorChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTextPropertyEditor::InvokeColorChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->ChangedCommand);
 }
 
 //----------------------------------------------------------------------------

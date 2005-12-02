@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.47");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.48");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1433,11 +1433,7 @@ void vtkKWSelectionFrameLayoutManager::SelectWidget(
     {
     widget->SelectedOn();
 
-    if (this->SelectionChangedCommand && *this->SelectionChangedCommand && 
-        this->IsCreated())
-      {
-      this->Script("eval %s", this->SelectionChangedCommand);
-      }
+    this->InvokeSelectionChangedCommand();
     }
 }
 
@@ -1446,6 +1442,12 @@ void vtkKWSelectionFrameLayoutManager::SetSelectionChangedCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->SelectionChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::InvokeSelectionChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
 }
 
 //----------------------------------------------------------------------------

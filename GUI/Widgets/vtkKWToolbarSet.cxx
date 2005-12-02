@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.34");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -878,16 +878,6 @@ void vtkKWToolbarSet::UpdateToolbarsVisibilityMenu(vtkKWMenu *menu)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand()
-{
-  if (this->ToolbarVisibilityChangedCommand && 
-      *this->ToolbarVisibilityChangedCommand)
-    {
-    this->Script("eval %s", this->ToolbarVisibilityChangedCommand);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetToolbarVisibilityChangedCommand(
   vtkObject *object, const char *method)
 {
@@ -896,13 +886,9 @@ void vtkKWToolbarSet::SetToolbarVisibilityChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::InvokeNumberOfToolbarsChangedCommand()
+void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand()
 {
-  if (this->NumberOfToolbarsChangedCommand && 
-      *this->NumberOfToolbarsChangedCommand)
-    {
-    this->Script("eval %s", this->NumberOfToolbarsChangedCommand);
-    }
+  this->InvokeObjectMethodCommand(this->ToolbarVisibilityChangedCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -911,6 +897,12 @@ void vtkKWToolbarSet::SetNumberOfToolbarsChangedCommand(
 {
   this->SetObjectMethodCommand(
     &this->NumberOfToolbarsChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::InvokeNumberOfToolbarsChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->NumberOfToolbarsChangedCommand);
 }
 
 //----------------------------------------------------------------------------

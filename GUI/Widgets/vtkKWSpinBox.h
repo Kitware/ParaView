@@ -85,11 +85,11 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked whenever the button is invoked.
+  // typically invoked when the spinbutton value is changed.
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method
-  // is evaluated as a simple command.
+  // is still evaluated as a simple command. 
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -101,9 +101,16 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CommandCallback();
+
 protected:
   vtkKWSpinBox();
   ~vtkKWSpinBox();
+
+  char *Command;
+  virtual void InvokeCommand();
 
 private:
   vtkKWSpinBox(const vtkKWSpinBox&); // Not implemented

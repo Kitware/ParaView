@@ -21,21 +21,29 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.46");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
 {
   this->IndicatorVisibility = 1;
-  this->MyText = 0;
+
+  this->InternalText = NULL;
   this->VariableName = NULL;
+  this->Command      = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::~vtkKWCheckButton() 
 {
-  this->SetMyText(0);
-  this->SetVariableName(0);
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
+
+  this->SetInternalText(NULL);
+  this->SetVariableName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -84,20 +92,20 @@ void vtkKWCheckButton::SetIndicatorVisibility(int ind)
     this->SetConfigurationOptionAsInt(
       "-indicatoron", (this->IndicatorVisibility ? 1 : 0));
     }
-  this->SetMyText(0);
+  this->SetInternalText(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::SetText(const char* txt)
 {
-  this->SetMyText(txt);
+  this->SetInternalText(txt);
   this->SetTextOption("-text", txt);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWCheckButton::GetText()
 {
-  return this->MyText;
+  return this->InternalText;
 }
 
 //----------------------------------------------------------------------------
@@ -174,10 +182,15 @@ void vtkKWCheckButton::Create()
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::Configure()
 {
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, this, "CommandCallback");
+  this->SetConfigurationOption("-command", command);
+  delete [] command;
+  
   this->SetConfigurationOptionAsInt(
     "-indicatoron", (this->IndicatorVisibility ? 1 : 0));
 
-  this->SetTextOption("-text", this->MyText);
+  this->SetTextOption("-text", this->InternalText);
 
   // Set the variable name if not set already
 
@@ -194,15 +207,21 @@ void vtkKWCheckButton::Configure()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCheckButton::CommandCallback()
+{
+  this->InvokeCommand();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCheckButton::SetCommand(vtkObject *object, const char *method)
 {
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    this->SetConfigurationOption("-command", command);
-    delete [] command;
-    }
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::InvokeCommand()
+{
+  this->InvokeObjectMethodCommand(this->Command);
 }
 
 //----------------------------------------------------------------------------

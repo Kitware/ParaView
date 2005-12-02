@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.32");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.33");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1751,27 +1751,12 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::InvokeCommand(const char *command)
+void vtkKWVolumePropertyWidget::InvokeObjectMethodCommand(char *command)
 {
-  if (command && *command && !this->DisableCommands)
+  if (!this->DisableCommands)
     {
-    this->Script("eval %s", command);
+    this->Superclass::InvokeObjectMethodCommand(command);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangedCommand()
-{
-  this->InvokeCommand(this->VolumePropertyChangedCommand);
-
-  this->InvokeEvent(vtkKWEvent::VolumePropertyChangedEvent, NULL);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangingCommand()
-{
-  this->InvokeCommand(this->VolumePropertyChangingCommand);
-  this->InvokeEvent(vtkKWEvent::VolumePropertyChangingEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -1783,11 +1768,27 @@ void vtkKWVolumePropertyWidget::SetVolumePropertyChangedCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->VolumePropertyChangedCommand);
+
+  this->InvokeEvent(vtkKWEvent::VolumePropertyChangedEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetVolumePropertyChangingCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->VolumePropertyChangingCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangingCommand()
+{
+  this->InvokeObjectMethodCommand(this->VolumePropertyChangingCommand);
+
+  this->InvokeEvent(vtkKWEvent::VolumePropertyChangingEvent, NULL);
 }
 
 //----------------------------------------------------------------------------

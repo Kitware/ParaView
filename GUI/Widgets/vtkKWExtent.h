@@ -75,17 +75,19 @@ public:
   void ExtentChangedCallback();
 
   // Description:
-  // A method to set callback functions on objects.  The first argument is
-  // the KWObject that will have the method called on it.  The second is the
-  // name of the method to be called and any arguments in string form.
-  // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkObject *obj, const char *method);
+  // Specifies a command to associate with the widget. This command is 
+  // invoked when the extent is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
   // A convenience method to set the start and end method of all the
   // internal ranges.  
-  virtual void SetStartCommand(vtkObject *obj, const char *method);
-  virtual void SetEndCommand(vtkObject *obj, const char *method);
+  virtual void SetStartCommand(vtkObject *object, const char *method);
+  virtual void SetEndCommand(vtkObject *object, const char *method);
 
   // Description:
   // Convenience method to set whether the command should be called or not.
@@ -162,6 +164,8 @@ protected:
   ~vtkKWExtent();
 
   char *Command;
+  virtual void InvokeCommand();
+
   double Extent[6];
 
   vtkKWRange  *Range[3];

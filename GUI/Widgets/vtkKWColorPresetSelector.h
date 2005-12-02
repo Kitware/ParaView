@@ -26,8 +26,6 @@
 class vtkColorTransferFunction;
 class vtkKWColorPresetSelectorInternals;
 
-//----------------------------------------------------------------------------
-
 class KWWIDGETS_EXPORT vtkKWColorPresetSelector : public vtkKWMenuButtonWithLabel
 {
 public:
@@ -130,9 +128,13 @@ public:
   virtual void Create();
 
   // Description:
-  // Set/Get the command executed when a preset a selected.
-  virtual void SetPresetSelectedCommand(
-    vtkObject *object, const char *method);
+  // Specifies a command to associate with the widget. This command is 
+  // invoked when a preset is selected.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetPresetSelectedCommand(vtkObject *object, const char *method);
 
   // Description:
   // Callbacks
@@ -144,11 +146,13 @@ protected:
 
   double ScalarRange[2];
   vtkColorTransferFunction *ColorTransferFunction;
-  char *PresetSelectedCommand;
   int PreviewSize;
   int HideSolidColorPresets;
   int HideGradientPresets;
   int ApplyPresetBetweenEndPoints;
+
+  char *PresetSelectedCommand;
+  virtual void InvokePresetSelectedCommand();
 
   // PIMPL Encapsulation for STL containers
 

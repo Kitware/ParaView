@@ -38,7 +38,7 @@ public:
   // format, whichever is more compact for the given value and precision. 
   // The e format is used only when the exponent of the value is less than
   // -4 or greater than or equal to the precision argument (which can be
-  // controlled using the the second parameter of SetValue). Trailing zeros
+  // controlled using the second parameter of SetValue). Trailing zeros
   // are truncated, and the decimal point appears only if one or more digits
   // follow it.
   // IMPORTANT: whenever possible, use any of the GetValueAs...() methods
@@ -73,7 +73,7 @@ public:
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method
-  // is evaluated as a simple command.
+  // is still evaluated as a simple command. 
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:

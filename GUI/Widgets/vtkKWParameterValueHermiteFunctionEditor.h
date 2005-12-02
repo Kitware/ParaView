@@ -141,7 +141,7 @@ public:
   // SelectionChanged is called when the midpoint selection was changed
   // or on deselection.
   virtual void SetMidPointSelectionChangedCommand(
-    vtkObject* object,const char *method);
+    vtkObject *object,const char *method);
 
   // Description:
   // Events. Even though it is highly recommended to use the commands

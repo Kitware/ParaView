@@ -33,7 +33,7 @@ public:
   virtual void Create();
 
   // Description:
-  // Get the the internal widget (technically a Tk frame).
+  // Get the internal widget (technically a Tk frame).
   vtkGetObjectMacro(Frame, vtkKWWidget);
 
   // Description:

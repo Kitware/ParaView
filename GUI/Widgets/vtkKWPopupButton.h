@@ -62,10 +62,13 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Set and get the command that is called when the popup is withdrawed.
-  virtual void SetWithdrawCommand(vtkObject* obj, const char* command);
-  vtkSetStringMacro(WithdrawCommand);
-  vtkGetStringMacro(WithdrawCommand);
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the popup is withdrawn.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetWithdrawCommand(vtkObject *object, const char* command);
 
 protected:
   vtkKWPopupButton();
@@ -76,6 +79,7 @@ protected:
   vtkKWPushButton *PopupCloseButton;
 
   char* WithdrawCommand;
+  virtual void InvokeWithdrawCommand();
 
   virtual void Bind();
   virtual void UnBind();

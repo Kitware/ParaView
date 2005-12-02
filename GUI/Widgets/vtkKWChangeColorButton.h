@@ -53,8 +53,12 @@ public:
 
   // Description:
   // Set the command that is called when the color is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // Note that the current color is passed too, as 3 RGB (double) parameters.
-  virtual void SetCommand(vtkObject *obj, const char *method);
+  virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -88,7 +92,9 @@ protected:
   vtkKWLabel  *ColorButton;
   vtkKWFrame  *ButtonFrame;
 
+  virtual void InvokeCommand(double r, double g, double b);
   char        *Command;
+
   char        *DialogTitle;
   double      Color[3];
   int         LabelOutsideButton;

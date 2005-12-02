@@ -131,16 +131,17 @@ public:
 
   // Description:
   // Specifies commands to associate with the widget. 
+  // 'Command' is invoked when the widget value is changed.
+  // 'StartCommand' is invoked at the beginning of an interaction with
+  // the widget.
+  // 'EndCommand' is invoked at the end of an interaction with the widget.
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method
-  // is evaluated as a simple command.
+  // is still evaluated as a simple command. 
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
-  virtual void InvokeCommand();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
 
   // Description:
   // Set/get whether the above commands should be called or not.
@@ -172,6 +173,8 @@ public:
   vtkSetMacro(DisableScaleValueCallback, int);
   vtkBooleanMacro(DisableScaleValueCallback, int);
   virtual void ScaleValueCallback(double num);
+  virtual void ButtonPressCallback();
+  virtual void ButtonReleaseCallback();
 
 protected:
   vtkKWScale();
@@ -208,6 +211,11 @@ protected:
   //BTX
   friend class vtkKWScaleWithEntry;
   //ETX
+
+  virtual void InvokeObjectMethodCommand(char *command);
+  virtual void InvokeCommand();
+  virtual void InvokeStartCommand();
+  virtual void InvokeEndCommand();
 
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented

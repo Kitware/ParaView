@@ -213,15 +213,20 @@ public:
 
   // Description:
   // Specifies commands to associate with the widget. 
+  // 'Command' is invoked when the widget value is changed.
+  // 'StartCommand' is invoked at the beginning of an interaction with
+  // the widget.
+  // 'EndCommand' is invoked at the end of an interaction with the widget.
+  // 'EntryCommand' is invoked when the widget value is changed using
+  // the text entry.
   // The first argument is the object that will have the method called on it.
   // The second argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method
-  // is evaluated as a simple command.
+  // is still evaluated as a simple command. 
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
   virtual void SetEntryCommand(vtkObject *object, const char *method);
-  virtual void InvokeEntryCommand();
 
   // Description:
   // Set/get whether the above commands should be called or not.
@@ -265,7 +270,9 @@ protected:
   int PopupMode;
   int RangeVisibility;
 
+  virtual void InvokeEntryCommand();
   char *EntryCommand;
+
   int EntryVisibility;
   int EntryPosition;
   int ExpandEntry;

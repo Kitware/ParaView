@@ -814,9 +814,16 @@ public:
   virtual void SetHistogramLogModeOptionMenuVisibility(int);
   vtkBooleanMacro(HistogramLogModeOptionMenuVisibility, int);
   vtkGetMacro(HistogramLogModeOptionMenuVisibility, int);
+
+  // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the histogram log mode is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetHistogramLogModeChangedCommand(
-    vtkObject* object,const char *method);
-  virtual void InvokeHistogramLogModeChangedCommand();
+    vtkObject *object,const char *method);
 
   // Description:
   // Set/Get if the mouse cursor is changed automatically to provide
@@ -826,7 +833,11 @@ public:
   vtkSetMacro(ChangeMouseCursor, int);
 
   // Description:
-  // Set commands.
+  // Specifies commands to associate with the widget.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // Point... commands are passed the index of the point that is/was modified.
   // PointAddedCommand is called when a point was added.
   // PointChangingCommand/PointChangedCommand is called when a point is
@@ -847,33 +858,38 @@ public:
   // the parameter cursor is moving or was moved (at the end of the
   // interaction).
   virtual void SetPointAddedCommand(
-    vtkObject* object,const char *method);
+    vtkObject *object,const char *method);
   virtual void SetPointChangingCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetPointChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetPointRemovedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetSelectionChangedCommand(
-    vtkObject* object,const char *method);
+    vtkObject *object,const char *method);
   virtual void SetFunctionChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetFunctionChangingCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetVisibleRangeChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetVisibleRangeChangingCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetParameterCursorMovingCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetParameterCursorMovedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
-  // Set the command that is invoked when double/clicking on a point.
-  // The id of the node is passed to the function.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when  when double/clicking on a point.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  // The id of the node is passed as a parameter.
   virtual void SetDoubleClickOnPointCommand(
-    vtkObject* object,const char *method);
+    vtkObject *object,const char *method);
 
   // Description:
   // Events. Even though it is highly recommended to use the commands
@@ -1162,7 +1178,8 @@ protected:
   char  *ParameterCursorMovedCommand;
   char  *DoubleClickOnPointCommand;
 
-  virtual void InvokeCommand(const char *command);
+  virtual void InvokeObjectMethodCommand(const char *command);
+  virtual void InvokeHistogramLogModeChangedCommand();
   virtual void InvokePointCommand(
     const char *command, int id, const char *extra = 0);
 

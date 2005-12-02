@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.11");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.12");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -242,27 +242,52 @@ void vtkKWDragAndDropTargetSet::SetSourceAnchor(vtkKWWidget *arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWDragAndDropTargetSet::InvokeCommandWithCoordinates(
+  const char *command, int x, int y)
+{
+  if (command && *command)
+    {
+    this->Script("eval %s %d %d", command, x, y);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetStartCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->StartCommand, object, method);
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDragAndDropTargetSet::InvokeStartCommand(int x, int y)
+{
+  this->InvokeCommandWithCoordinates(this->StartCommand, x, y);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetPerformCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->PerformCommand, object, method);
+  this->SetObjectMethodCommand(&this->PerformCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDragAndDropTargetSet::InvokePerformCommand(int x, int y)
+{
+  this->InvokeCommandWithCoordinates(this->PerformCommand, x, y);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDragAndDropTargetSet::SetEndCommand(
   vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->EndCommand, object, method);
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDragAndDropTargetSet::InvokeEndCommand(int x, int y)
+{
+  this->InvokeCommandWithCoordinates(this->EndCommand, x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -479,10 +504,7 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
     return;
     }
 
-  if (this->StartCommand && *this->StartCommand)
-    {
-    this->Script("eval %s %d %d", this->StartCommand, x, y);
-    }
+  this->InvokeStartCommand(x, y);
 
   if (this->Internals && this->GetNumberOfTargets())
     {
@@ -544,10 +566,7 @@ void vtkKWDragAndDropTargetSet::PerformCallback(int x, int y)
     return;
     }
 
-  if (this->PerformCommand && *this->PerformCommand)
-    {
-    this->Script("eval %s %d %d", this->PerformCommand, x, y);
-    }
+  this->InvokePerformCommand(x, y);
 
   if (this->Internals && this->GetNumberOfTargets())
     {
@@ -643,10 +662,7 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
       }
     }
 
-  if (this->EndCommand && *this->EndCommand)
-    {
-    this->Script("eval %s %d %d", this->EndCommand, x, y);
-    }
+  this->InvokeEndCommand(x, y);
 }
 
 //----------------------------------------------------------------------------

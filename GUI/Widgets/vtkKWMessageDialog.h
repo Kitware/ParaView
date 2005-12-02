@@ -138,7 +138,6 @@ public:
   // Retrieve the frame where the message is.
   vtkGetObjectMacro(TopFrame, vtkKWFrame);
   vtkGetObjectMacro(MessageDialogFrame, vtkKWFrame);
-  vtkGetObjectMacro(Message, vtkKWMessage);
   vtkGetObjectMacro(BottomFrame, vtkKWFrame);
 
   // Description:

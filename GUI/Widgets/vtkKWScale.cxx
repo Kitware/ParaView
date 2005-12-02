@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.107");
+vtkCxxRevisionMacro(vtkKWScale, "1.108");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -139,8 +139,8 @@ void vtkKWScale::SetTroughColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkKWScale::Bind()
 {
-  this->SetBinding("<ButtonPress>", this, "InvokeStartCommand");
-  this->SetBinding("<ButtonRelease>", this, "InvokeEndCommand");
+  this->SetBinding("<ButtonPress>", this, "ButtonPressCallback");
+  this->SetBinding("<ButtonRelease>", this, "ButtonReleaseCallback");
 
   this->AddBinding("<ButtonPress>", this, "DisableScaleValueCallbackOff");
   this->AddBinding("<ButtonRelease>", this, "DisableScaleValueCallbackOn");
@@ -287,54 +287,60 @@ void vtkKWScale::ScaleValueCallback(double num)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWScale::ButtonPressCallback()
+{
+  this->InvokeStartCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScale::ButtonReleaseCallback()
+{
+  this->InvokeEndCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScale::InvokeObjectMethodCommand(char *command)
+{
+  if (!this->DisableCommands)
+    {
+    this->Superclass::InvokeObjectMethodCommand(command);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWScale::SetCommand(vtkObject *object, const char *method)
 {
-  this->SetObjectMethodCommand(
-    &this->Command, object, method);
+  this->SetObjectMethodCommand(&this->Command, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeCommand()
 {
-  if (this->Command && *this->Command && !this->DisableCommands && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->Command);
-    }
+  this->InvokeObjectMethodCommand(this->Command);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::SetStartCommand(vtkObject *object, const char * method)
 {
-  this->SetObjectMethodCommand(
-    &this->StartCommand, object, method);
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeStartCommand()
 {
-  if (this->StartCommand && *this->StartCommand && !this->DisableCommands &&
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->StartCommand);
-    }
+  this->InvokeObjectMethodCommand(this->StartCommand);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::SetEndCommand(vtkObject *object, const char * method)
 {
-  this->SetObjectMethodCommand(
-    &this->EndCommand, object, method);
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::InvokeEndCommand()
 {
-  if (this->EndCommand && *this->EndCommand && !this->DisableCommands &&
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->EndCommand);
-    }
+  this->InvokeObjectMethodCommand(this->EndCommand);
 }
 
 //----------------------------------------------------------------------------

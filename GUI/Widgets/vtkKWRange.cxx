@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.57");
+vtkCxxRevisionMacro(vtkKWRange, "1.58");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1252,38 +1252,11 @@ void vtkKWRange::GetSliderColor(int type, double &r, double &g, double &b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeCommand()
+void vtkKWRange::InvokeObjectMethodCommand(char *command)
 {
-  if (this->Command && *this->Command && !this->DisableCommands)
+  if (!this->DisableCommands)
     {
-    this->Script("eval %s",this->Command);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRange::InvokeStartCommand()
-{
-  if (this->StartCommand && *this->StartCommand && !this->DisableCommands)
-    {
-    this->Script("eval %s", this->StartCommand);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRange::InvokeEndCommand()
-{
-  if (this->EndCommand && *this->EndCommand && !this->DisableCommands)
-    {
-    this->Script("eval %s", this->EndCommand);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRange::InvokeEntriesCommand()
-{
-  if (this->EntriesCommand && *this->EntriesCommand && !this->DisableCommands)
-    {
-    this->Script("eval %s", this->EntriesCommand);
+    this->Superclass::InvokeObjectMethodCommand(command);
     }
 }
 
@@ -1294,9 +1267,21 @@ void vtkKWRange::SetCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRange::InvokeCommand()
+{
+  this->InvokeObjectMethodCommand(this->Command);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRange::SetStartCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->StartCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::InvokeStartCommand()
+{
+  this->InvokeObjectMethodCommand(this->StartCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -1306,9 +1291,21 @@ void vtkKWRange::SetEndCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRange::InvokeEndCommand()
+{
+  this->InvokeObjectMethodCommand(this->EndCommand);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRange::SetEntriesCommand(vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->EntriesCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::InvokeEntriesCommand()
+{
+  this->InvokeObjectMethodCommand(this->EntriesCommand);
 }
 
 //----------------------------------------------------------------------------

@@ -140,18 +140,25 @@ public:
   virtual void UpdateToolbarsVisibilityMenu(vtkKWMenu *menu);
 
   // Description:
-  // Set/Get the command/callback that will be called when the visibility
-  // of a toolbar is changed.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the visibility of a toolbar is changed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetToolbarVisibilityChangedCommand(
-    vtkObject* object,const char *method);
-  virtual void InvokeToolbarVisibilityChangedCommand();
+    vtkObject *object,const char *method);
 
   // Description:
-  // Set/Get the command/callback that will be called when the number of
-  // toolbar has changed (added or removed).
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the number of toolbars has changed 
+  // (i.e. a toolbar is added or removed).
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   virtual void SetNumberOfToolbarsChangedCommand(
-    vtkObject* object,const char *method);
-  virtual void InvokeNumberOfToolbarsChangedCommand();
+    vtkObject *object,const char *method);
 
   // Description:
   // Set/Get the visibility of the separator at the bottom of the set
@@ -198,6 +205,9 @@ protected:
 
   char *ToolbarVisibilityChangedCommand;
   char *NumberOfToolbarsChangedCommand;
+
+  virtual void InvokeToolbarVisibilityChangedCommand();
+  virtual void InvokeNumberOfToolbarsChangedCommand();
 
   //BTX
 

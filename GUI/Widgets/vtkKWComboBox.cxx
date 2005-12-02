@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.9");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.10");
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create()
@@ -178,13 +178,14 @@ int vtkKWComboBox::GetValueIndex(const char* value)
 //----------------------------------------------------------------------------
 void vtkKWComboBox::SetCommand(vtkObject *object, const char *method)
 {
+  this->Superclass::SetCommand(object, method);
+
   if (this->IsCreated())
     {
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
     this->SetConfigurationOption("-command", command);
     this->SetConfigurationOption("-modifycmd", command);
-    this->AddBinding("<FocusOut>", NULL, command);
     delete [] command;
     }
 }

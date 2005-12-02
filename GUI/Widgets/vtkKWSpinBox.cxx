@@ -17,16 +17,22 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.7");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.8");
 
 //----------------------------------------------------------------------------
-vtkKWSpinBox::vtkKWSpinBox()
+vtkKWSpinBox::vtkKWSpinBox() 
 {
+  this->Command = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkKWSpinBox::~vtkKWSpinBox()
+vtkKWSpinBox::~vtkKWSpinBox() 
 {
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -38,6 +44,11 @@ void vtkKWSpinBox::Create()
     return;
     }
 
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, this, "CommandCallback");
+  this->SetConfigurationOption("-command", command);
+  delete [] command;
+  
   this->UpdateEnableState();
 }
 
@@ -131,15 +142,21 @@ int vtkKWSpinBox::GetExportSelection()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSpinBox::CommandCallback()
+{
+  this->InvokeCommand();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSpinBox::SetCommand(vtkObject *object, const char *method)
 {
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    this->SetConfigurationOption("-command", command);
-    delete [] command;
-    }
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::InvokeCommand()
+{
+  this->InvokeObjectMethodCommand(this->Command);
 }
 
 //----------------------------------------------------------------------------

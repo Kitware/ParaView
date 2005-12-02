@@ -288,36 +288,51 @@ public:
   vtkBooleanMacro(RemoveButtonVisibility,int);
 
   // Description:
-  // Specifies a command to be invoked when the "add preset" button is pressed.
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the "add preset" button is pressed.
   // This gives the opportunity for the application to check and collect the
   // relevant information to store in a new preset. The application is then
   // free to add the preset (using the AddPreset() method) and set its
   // fields independently (using the SetPresetGroup(), SetPresetComment(),
   // SetPreset...() methods).
   // Note that if not set, the "add preset" button is not visible.
-  virtual void SetPresetAddCommand(vtkObject* object, const char *method);
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  virtual void SetPresetAddCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Specifies a command to be invoked when the "update selected preset" button
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the "update selected preset" button
   // is pressed. This gives the opportunity for the application to check and
   // collect the relevant information to update in the preset. The application
   // is then free to update the preset's fields independently (using the
   // SetPresetGroup(), SetPresetComment(), SetPreset...() methods).
-  // The id of the preset to update is passed to the command.
   // Note that if not set, the "update selected preset" button is not visible.
-  virtual void SetPresetUpdateCommand(vtkObject* object, const char *method);
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  // The id of the preset to update is passed to the command.
+  virtual void SetPresetUpdateCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Specifies a command to be invoked when the "apply selected preset" 
-  // button is pressed, or when ApplyPresetOnSelection is On and the user
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the "apply selected preset"  button is pressed, 
+  // or when ApplyPresetOnSelection is On and the user
   // applies a preset by selecting it directly. This gives the opportunity
   // for the application to query the preset's fields independently (using the
   // GetPresetGroup(), GetPresetComment(), GetPreset...() methods) and
   // apply those values to the relevant objects.
-  // The id of the preset to apply is passed to the command.
   // Note that if not set or ApplyPresetOnSelection is On, the 
   // "apply selected preset" button is not visible.
-  virtual void SetPresetApplyCommand(vtkObject* object, const char *method);
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
+  // The id of the preset to apply is passed to the command.
+  virtual void SetPresetApplyCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/Get if a preset should be applied directly when it is selected by a
@@ -330,17 +345,22 @@ public:
   vtkBooleanMacro(ApplyPresetOnSelection,int);
 
   // Description:
-  // Specifies a command to be invoked when the "remove selected preset"
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the "remove selected preset"
   // button is pressed. This command is called *before* the preset is
   // removed from the pool: this gives the opportunity for the application 
   // to query the preset's fields independently (using the
   // GetPresetGroup(), GetPresetComment(), GetPreset...() methods),
   // decide if the preset should be removed or not, and delete it from
   // its internal structures accordingly, if needed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // The id of the preset to remove is passed to the command.
   // This command is expected to return an integer equal to 1 if the preset
   // is really to be removed, 0 otherwise.
-  virtual void SetPresetRemoveCommand(vtkObject* object, const char *method);
+  virtual void SetPresetRemoveCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set/Get if the user should be prompted before removing one or
@@ -350,17 +370,22 @@ public:
   vtkBooleanMacro(PromptBeforeRemovePreset, int);
 
   // Description:
-  // Specifies a command to be invoked when the preset has been
-  // changed using direct user-interaction on the widget interface. 
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the preset has been changed using direct
+  // user-interaction on the widget interface. 
   // This includes double-clicking on a table cell (the comment field for
   // example) and editing the contents of the cell directly, when allowed.
   // This gives the opportunity for the application to query the preset's
   // fields independently (using the GetPresetGroup(), GetPresetComment(), 
   // GetPreset...() methods), and update its internal structures accordingly, 
   // if needed.
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // The id of the preset that has changed is passed to the command.
   virtual void SetPresetHasChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Refresh the interface.

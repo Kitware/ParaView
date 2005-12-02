@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.42");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -1167,17 +1167,17 @@ void vtkKWPiecewiseFunctionEditor::ValueEntryCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::InvokeWindowLevelModeChangedCommand()
-{
-  this->InvokeCommand(this->WindowLevelModeChangedCommand);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::SetWindowLevelModeChangedCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
     &this->WindowLevelModeChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::InvokeWindowLevelModeChangedCommand()
+{
+  this->InvokeObjectMethodCommand(this->WindowLevelModeChangedCommand);
 }
 
 //----------------------------------------------------------------------------

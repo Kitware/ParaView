@@ -78,16 +78,23 @@ public:
   vtkBooleanMacro(HideValue, int);
 
   // Description:
-  // Commands.
+  // Description:
+  // Specifies commands to associate with the widget. 
+  // 'SelectionChangedCommand' is invoked when the selected color has
+  // changed (i.e. at the end of the user interaction), whereas 
+  // 'SelectionChangingCommand' is invoked when the select color is
+  // changing (i.e. during the user interaction itself).
+  // The first argument is the object that will have the method called on it.
+  // The second argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method
+  // is still evaluated as a simple command. 
   // Note that the current color is passed, as 3 HSV (double) parameters,
   // unless InvokeCommandsWithRGB is true, in that case the current HSV 
   // value is converted to RGB first.
   virtual void SetSelectionChangedCommand(
-    vtkObject* object, const char *method);
+    vtkObject *object, const char *method);
   virtual void SetSelectionChangingCommand(
-    vtkObject* object, const char *method);
-  virtual void InvokeSelectionChangedCommand();
-  virtual void InvokeSelectionChangingCommand();
+    vtkObject *object, const char *method);
 
   // Description:
   // Set/Get if the commands should be invoked with RGB parameters instead
@@ -139,7 +146,6 @@ protected:
   int    Selected;
   double SelectedColor[3];
   int    ModificationOnly;
-  int    InvokeCommandsWithRGB;
   int    HideValue;
   double PreviouslySelectedColor[3];
 
@@ -147,8 +153,11 @@ protected:
 
   char *SelectionChangedCommand;
   char *SelectionChangingCommand;
+  int    InvokeCommandsWithRGB;
 
-  virtual void InvokeCommand(const char *command);
+  virtual void InvokeCommandWithColor(const char *command);
+  virtual void InvokeSelectionChangedCommand();
+  virtual void InvokeSelectionChangingCommand();
 
   // GUI
 
