@@ -25,14 +25,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVGUIClientOptions.h"
-#include "vtkKWMessage.h"
 
 #include "Resources/vtkPVSplashScreen.h" // for image.
 
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCredits);
-vtkCxxRevisionMacro(vtkPVCredits, "1.4");
+vtkCxxRevisionMacro(vtkPVCredits, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVCredits::vtkPVCredits()
 {
