@@ -648,8 +648,6 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_SOURCE_DIR}/Servers/Common
-  ${ParaView_SOURCE_DIR}/GUI/Widgets
-  ${ParaView_SOURCE_DIR}/GUI/Client
 #
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
@@ -657,10 +655,16 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_BINARY_DIR}/Servers/Filters
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/Common
-  ${ParaView_BINARY_DIR}/GUI/Widgets
-  ${ParaView_BINARY_DIR}/GUI/Client
   ${XDMF_INCLUDE_DIRS}
   )
+IF(PARAVIEW_BUILD_GUI)
+  SET(PARAVIEW_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS}
+    ${ParaView_SOURCE_DIR}/GUI/Widgets
+    ${ParaView_SOURCE_DIR}/GUI/Client
+    ${ParaView_BINARY_DIR}/GUI/Widgets
+    ${ParaView_BINARY_DIR}/GUI/Client
+    )
+ENDIF(PARAVIEW_BUILD_GUI)
 SET(PARAVIEW_GUI_INCLUDE_DIRS
   ${TCL_INCLUDE_PATH}
   ${TK_INCLUDE_PATH}
