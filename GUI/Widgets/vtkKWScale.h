@@ -212,7 +212,7 @@ protected:
   friend class vtkKWScaleWithEntry;
   //ETX
 
-  virtual void InvokeObjectMethodCommand(char *command);
+  virtual void InvokeObjectMethodCommand(const char *command);
   virtual void InvokeCommand();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();
