@@ -40,7 +40,7 @@ public:
 
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication* app);
+  void Create();
   
   // Description:
   // This updates the user interface.  It checks first to see if the

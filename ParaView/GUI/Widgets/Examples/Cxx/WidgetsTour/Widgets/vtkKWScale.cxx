@@ -22,7 +22,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScale *scale1 = vtkKWScale::New();
   scale1->SetParent(parent);
-  scale1->Create(app);
+  scale1->Create();
   scale1->SetRange(0.0, 100.0);
   scale1->SetResolution(1.0);
   scale1->SetLength(150);
@@ -38,7 +38,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScaleWithEntry *scale2 = vtkKWScaleWithEntry::New();
   scale2->SetParent(parent);
-  scale2->Create(app);
+  scale2->Create();
   scale2->SetRange(0.0, 100.0);
   scale2->SetResolution(1.0);
   //  scale2->GetScale()->SetLength(350);
@@ -59,7 +59,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScaleWithEntry *scale2b = vtkKWScaleWithEntry::New();
   scale2b->SetParent(parent);
-  scale2b->Create(app);
+  scale2b->Create();
   scale2b->SetRange(0.0, 100.0);
   scale2b->SetResolution(1.0);
   scale2b->GetScale()->SetLength(350);
@@ -82,7 +82,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   vtkKWScaleWithEntry *scale3 = vtkKWScaleWithEntry::New();
   scale3->SetParent(parent);
   scale3->PopupModeOn();
-  scale3->Create(app);
+  scale3->Create();
   scale3->SetRange(0.0, 100.0);
   scale3->SetResolution(1.0);
   scale3->SetLabelText("A popup scale:");
@@ -105,7 +105,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWScaleSet *scale_set = vtkKWScaleSet::New();
   scale_set->SetParent(parent);
-  scale_set->Create(app);
+  scale_set->Create();
   scale_set->SetBorderWidth(2);
   scale_set->SetReliefToGroove();
   scale_set->SetMaximumNumberOfWidgetsInPackingDirection(2);

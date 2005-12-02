@@ -53,7 +53,7 @@ protected:
   vtkPVSinusoidKeyFrame();
   ~vtkPVSinusoidKeyFrame();
 
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
   vtkKWLabel* PhaseLabel;
   vtkKWThumbWheel* PhaseThumbWheel;

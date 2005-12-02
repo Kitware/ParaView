@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.10");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -52,7 +52,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   vtkKWApplication* app = win->GetApplication();
   this->SetStyleToOkCancel();
   this->SetOptions( vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
-  this->Create(app);
+  this->Create();
   vtkKWWidget* frame = this->GetTopFrame();
   this->SetMasterWindow(win);
   this->SetTitle("Open Data With...");
@@ -61,12 +61,12 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   ostrstream str1;
   str1 << "Open " << openFileName << " with:" << ends;
   label->SetText(str1.str());
-  label->Create(app);
+  label->Create();
   str1.rdbuf()->freeze(0);
 
   vtkKWListBoxWithScrollbars* listbox = vtkKWListBoxWithScrollbars::New();
   listbox->SetParent(frame);
-  listbox->Create(app);
+  listbox->Create();
   int num = 5;
   if ( win->GetReaderList()->GetNumberOfItems() < num )
     {

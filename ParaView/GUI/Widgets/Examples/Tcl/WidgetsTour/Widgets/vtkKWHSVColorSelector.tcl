@@ -6,7 +6,7 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
   vtkKWHSVColorSelector ccb
   ccb SetParent $parent
-  ccb Create $app
+  ccb Create
   ccb SetSelectionChangingCommand $parent "SetBackgroundColor"
   ccb InvokeCommandsWithRGBOn
   ccb SetBalloonHelpString "This HSV Color Selector changes the background color of its parent"

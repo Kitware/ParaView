@@ -33,20 +33,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCanvas );
-vtkCxxRevisionMacro(vtkKWCanvas, "1.8");
+vtkCxxRevisionMacro(vtkKWCanvas, "1.9");
 
 //----------------------------------------------------------------------------
-void vtkKWCanvas::Create(vtkKWApplication *app)
+void vtkKWCanvas::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "canvas"))
+  if (!this->Superclass::CreateSpecificTkWidget("canvas"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

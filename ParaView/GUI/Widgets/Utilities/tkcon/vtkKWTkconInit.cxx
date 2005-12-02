@@ -14,7 +14,6 @@
 #include "vtkKWTkconInit.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWResourceUtilities.h"
 
 #include "vtkTk.h"
@@ -23,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkconInit );
-vtkCxxRevisionMacro(vtkKWTkconInit, "1.1");
+vtkCxxRevisionMacro(vtkKWTkconInit, "1.2");
 
 int vtkKWTkconInit::Initialized = 0;
 

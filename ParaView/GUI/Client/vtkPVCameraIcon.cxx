@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.30");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -57,7 +57,7 @@ vtkPVCameraIcon::~vtkPVCameraIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCameraIcon::Create(vtkKWApplication *pvApp)
+void vtkPVCameraIcon::Create()
 {
   if (this->IsCreated())
     {
@@ -65,7 +65,7 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp)
     return;
     }
 
-  this->Superclass::Create(pvApp);
+  this->Superclass::Create();
 
   this->AddBinding("<Button-1>", this, "RestoreCamera");
   this->AddBinding("<Button-3>", this, "StoreCamera");

@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set and update the progress.

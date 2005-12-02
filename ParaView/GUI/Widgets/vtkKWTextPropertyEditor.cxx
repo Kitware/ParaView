@@ -14,7 +14,6 @@
 #include "vtkKWTextPropertyEditor.h"
 
 #include "vtkActor2D.h"
-#include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
@@ -100,7 +99,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.16");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -189,7 +188,7 @@ vtkKWTextPropertyEditor::~vtkKWTextPropertyEditor()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
+void vtkKWTextPropertyEditor::Create()
 {
   // Check if already created
 
@@ -201,18 +200,18 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Label
 
   this->Label->SetParent(this);
-  this->Label->Create(app);
+  this->Label->Create();
 
   // Color
 
   this->ChangeColorButton->SetParent(this);
   this->ChangeColorButton->LabelOutsideButtonOn();
-  this->ChangeColorButton->Create(app);
+  this->ChangeColorButton->Create();
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
   this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
   this->ChangeColorButton->SetDialogTitle("Text Color");
@@ -220,7 +219,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   // Font Family
 
   this->FontFamilyOptionMenu->SetParent(this);
-  this->FontFamilyOptionMenu->Create(app);
+  this->FontFamilyOptionMenu->Create();
   this->FontFamilyOptionMenu->ExpandWidgetOff();
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
@@ -236,7 +235,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
   // Styles (bold, italic, shadow)
 
   this->StylesCheckButtonSet->SetParent(this);
-  this->StylesCheckButtonSet->Create(app);
+  this->StylesCheckButtonSet->Create();
   this->StylesCheckButtonSet->SetBalloonHelpString("Select the font style.");
 
   vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetWidget();
@@ -287,7 +286,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 
   this->OpacityScale->SetParent(this);
   this->OpacityScale->PopupModeOn();
-  this->OpacityScale->Create(app);
+  this->OpacityScale->Create();
   this->OpacityScale->SetResolution(0.01);
   this->OpacityScale->SetRange(0.0, 1.0);
   this->OpacityScale->SetLabelText("");
@@ -301,7 +300,7 @@ void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 
   this->PushButtonSet->SetParent(this);
   this->PushButtonSet->SetLabelPositionToLeft();
-  this->PushButtonSet->Create(app);
+  this->PushButtonSet->Create();
   this->PushButtonSet->ExpandWidgetOff();
 
   vtkKWPushButtonSet *pbs = this->PushButtonSet->GetWidget();

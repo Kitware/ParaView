@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCredits);
-vtkCxxRevisionMacro(vtkPVCredits, "1.3");
+vtkCxxRevisionMacro(vtkPVCredits, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVCredits::vtkPVCredits()
 {
@@ -89,7 +89,8 @@ vtkKWSplashScreen* vtkPVCredits::GetSplashScreen()
 
   if (!this->SplashScreen->IsCreated())
     {
-    this->SplashScreen->Create(this->GetApplication());
+    this->SplashScreen->SetApplication(this->GetApplication());
+    this->SplashScreen->Create();
     }
   return this->SplashScreen;
 }
@@ -111,7 +112,7 @@ void vtkPVCredits::ShowAboutDialog(vtkKWWidget* master)
     {
     this->AboutDialog->SetMasterWindow(master);
     this->AboutDialog->HideDecorationOn();
-    this->AboutDialog->Create(this->GetApplication());
+    this->AboutDialog->Create();
     this->AboutDialog->SetBorderWidth(1);
     this->AboutDialog->SetReliefToSolid();
     }
@@ -165,7 +166,7 @@ void vtkPVCredits::ConfigureAboutDialog()
     if (!this->AboutDialogImage->IsCreated())
       {
       this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
-      this->AboutDialogImage->Create(this->GetApplication());
+      this->AboutDialogImage->Create();
       }
     this->AboutDialogImage->SetConfigurationOption("-image", photo_name);
     this->AboutDialogImage->Script("pack %s -side top", 
@@ -192,7 +193,7 @@ void vtkPVCredits::ConfigureAboutDialog()
   if (!this->AboutRuntimeInfo->IsCreated())
     {
     this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
-    this->AboutRuntimeInfo->Create(this->GetApplication());
+    this->AboutRuntimeInfo->Create();
     this->AboutRuntimeInfo->VerticalScrollbarVisibilityOn();
     this->AboutRuntimeInfo->HorizontalScrollbarVisibilityOff();
 
@@ -232,7 +233,7 @@ void vtkPVCredits::ConfigureAboutDialog()
     this->SaveRuntimeInfoButton->SetParent(
       this->AboutDialog->GetBottomFrame());
     this->SaveRuntimeInfoButton->SetText("Save Information");
-    this->SaveRuntimeInfoButton->Create(this->GetApplication());
+    this->SaveRuntimeInfoButton->Create();
     this->SaveRuntimeInfoButton->SetWidth(16);
     this->SaveRuntimeInfoButton->SetCommand(this,
       "SaveRuntimeInformation");
@@ -333,7 +334,7 @@ void vtkPVCredits::SaveRuntimeInformation()
   dialog->SetParent(this->AboutDialog);
   dialog->SetTitle("Save Runtime Information");
   dialog->SetFileTypes("{{text file} {.txt}}");
-  dialog->Create(this->GetApplication());
+  dialog->Create();
 
   if (dialog->Invoke() &&
       strlen(dialog->GetFileName()) > 0)

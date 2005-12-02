@@ -12,7 +12,7 @@ proc vtkKWComboBoxEntryPoint {parent win} {
 
   vtkKWComboBox combobox1
   combobox1 SetParent $parent
-  combobox1 Create $app
+  combobox1 Create
   combobox1 SetBalloonHelpString "A simple combobox"
 
   for {set i 0} {$i < [llength $days]} {incr i} {
@@ -28,7 +28,7 @@ proc vtkKWComboBoxEntryPoint {parent win} {
 
   vtkKWComboBox combobox2
   combobox2 SetParent $parent
-  combobox2 Create $app
+  combobox2 Create
   combobox2 SetWidth 20
   combobox2 ReadOnlyOn
   combobox2 SetValue "read-only combobox"
@@ -47,7 +47,7 @@ proc vtkKWComboBoxEntryPoint {parent win} {
 
   vtkKWComboBoxWithLabel combobox3
   combobox3 SetParent $parent
-  combobox3 Create $app
+  combobox3 Create
   combobox3 SetLabelText "Another combobox with a label in front:"
   combobox3 SetBalloonHelpString \
     "This is a vtkKWComboBoxWithLabel i.e. a combobox associated to a\
@@ -68,7 +68,7 @@ proc vtkKWComboBoxEntryPoint {parent win} {
 
   vtkKWComboBoxSet combobox_set
   combobox_set SetParent $parent
-  combobox_set Create $app
+  combobox_set Create
   combobox_set SetBorderWidth 2
   combobox_set SetReliefToGroove
   combobox_set SetWidgetsPadX 1

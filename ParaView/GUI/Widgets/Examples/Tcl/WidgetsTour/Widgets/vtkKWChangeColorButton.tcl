@@ -8,7 +8,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
 
   vtkKWChangeColorButton ccb1
   ccb1 SetParent $parent
-  ccb1 Create $app
+  ccb1 Create
   ccb1 SetColor 1.0 0.0 0.0
   ccb1 SetLabelPositionToLeft
   ccb1 SetLabelText "Set Background Color"
@@ -26,7 +26,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
 
   vtkKWChangeColorButton ccb2
   ccb2 SetParent $parent
-  ccb2 Create $app
+  ccb2 Create
   ccb2 SetColor 0.0 1.0 0.0
   ccb2 LabelOutsideButtonOn
   ccb2 SetLabelPositionToRight
@@ -45,7 +45,7 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
 
   vtkKWChangeColorButton ccb3
   ccb3 SetParent $parent
-  ccb3 Create $app
+  ccb3 Create
   ccb3 SetColor 0.0 0.0 1.0
   ccb3 LabelVisibilityOff
   ccb3 SetBalloonHelpString \

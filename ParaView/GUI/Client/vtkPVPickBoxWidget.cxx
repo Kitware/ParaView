@@ -50,7 +50,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPickBoxWidget);
-vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::vtkPVPickBoxWidget()
@@ -83,9 +83,9 @@ void vtkPVPickBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPickBoxWidget::ChildCreate(vtkPVApplication* app)
+void vtkPVPickBoxWidget::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 
 // ATTRIBUTE EDITOR
   // Widget needs the RenderModuleProxy for picking
@@ -101,7 +101,7 @@ void vtkPVPickBoxWidget::ChildCreate(vtkPVApplication* app)
 
 // ATTRIBUTE EDITOR
   this->InstructionsLabel->SetParent(this->ControlFrame);
-  this->InstructionsLabel->Create(this->GetApplication());
+  this->InstructionsLabel->Create();
   this->InstructionsLabel->SetText("Press 'r' to relocate to mouse position\n Press 'e' to edit current region\nPress 't' to toggle mouse control between the model and widget");
   this->Script("grid %s - - -sticky e",
     this->InstructionsLabel->GetWidgetName());
@@ -109,7 +109,7 @@ void vtkPVPickBoxWidget::ChildCreate(vtkPVApplication* app)
 // ATTRIBUTE EDITOR
   this->MouseControlToggle->SetParent(this->ControlFrame);
   this->MouseControlToggle->SetIndicatorVisibility(1);
-  this->MouseControlToggle->Create(this->GetApplication());
+  this->MouseControlToggle->Create();
   this->MouseControlToggle->SetText("Control Widget Only");
   this->MouseControlToggle->SetSelectedState(0);
   this->MouseControlToggle->SetBalloonHelpString(

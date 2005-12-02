@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Controls the radius of the point cloud.

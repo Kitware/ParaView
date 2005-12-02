@@ -11,7 +11,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   vtkKWMenuButton menubutton1
   menubutton1 SetParent $parent
-  menubutton1 Create $app
+  menubutton1 Create
   menubutton1 SetBalloonHelpString "A simple menu button"
 
   for {set i 0} {$i < [llength $days]} {incr i} {
@@ -27,7 +27,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   vtkKWMenuButtonWithSpinButtons menubutton1b
   menubutton1b SetParent $parent
-  menubutton1b Create $app
+  menubutton1b Create
   [menubutton1b GetWidget] SetWidth 20
   menubutton1b SetBalloonHelpString \
     "This is a vtkKWMenuButtonWithSpinButtons i.e. a menu button associated\
@@ -47,7 +47,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   vtkKWMenuButtonWithLabel menubutton2
   menubutton2 SetParent $parent
-  menubutton2 Create $app
+  menubutton2 Create
   menubutton2 SetBorderWidth 2
   menubutton2 SetReliefToGroove
   menubutton2 SetLabelText "Days:"

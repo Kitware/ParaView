@@ -145,7 +145,6 @@
 
 #include "vtkKWWindowBase.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWNotebook;
 class vtkKWSplitFrame;
@@ -166,7 +165,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Main panel. 

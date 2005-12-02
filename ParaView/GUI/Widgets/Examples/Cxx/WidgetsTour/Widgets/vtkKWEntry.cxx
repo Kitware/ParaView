@@ -23,7 +23,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
 
   vtkKWEntry *entry1 = vtkKWEntry::New();
   entry1->SetParent(parent);
-  entry1->Create(app);
+  entry1->Create();
   entry1->SetBalloonHelpString("A simple entry");
 
   app->Script(
@@ -36,7 +36,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
 
   vtkKWEntry *entry2 = vtkKWEntry::New();
   entry2->SetParent(parent);
-  entry2->Create(app);
+  entry2->Create();
   entry2->SetWidth(20);
   entry2->ReadOnlyOn();
   entry2->SetValue("read-only entry");
@@ -52,7 +52,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
 
   vtkKWEntryWithLabel *entry3 = vtkKWEntryWithLabel::New();
   entry3->SetParent(parent);
-  entry3->Create(app);
+  entry3->Create();
   entry3->SetLabelText("Another entry, with a label in front:");
   entry3->SetBalloonHelpString(
     "This is a vtkKWEntryWithLabel, i.e. a entry associated to a "
@@ -70,7 +70,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
 
   vtkKWEntrySet *entry_set = vtkKWEntrySet::New();
   entry_set->SetParent(parent);
-  entry_set->Create(app);
+  entry_set->Create();
   entry_set->SetBorderWidth(2);
   entry_set->SetReliefToGroove();
   entry_set->SetWidgetsPadX(1);

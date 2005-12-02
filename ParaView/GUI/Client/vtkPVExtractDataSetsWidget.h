@@ -53,7 +53,7 @@ public:
     
   // Description:
   // Set up the UI for this source
-  void Create(vtkKWApplication *app);
+  void Create();
 
   // Description:
   // Save this source to a file.

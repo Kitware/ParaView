@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.55");
+vtkCxxRevisionMacro(vtkKWDialog, "1.56");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
@@ -111,7 +111,7 @@ void vtkKWDialog::OK()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDialog::Create(vtkKWApplication *app)
+void vtkKWDialog::Create()
 {
   // Check if already created
 
@@ -123,7 +123,7 @@ void vtkKWDialog::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetDeleteWindowProtocolCommand(this, "Cancel");
 }

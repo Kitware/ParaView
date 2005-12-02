@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the text of the message (and the width of a line, in pixels)

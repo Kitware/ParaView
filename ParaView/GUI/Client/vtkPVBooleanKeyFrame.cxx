@@ -19,7 +19,7 @@
 #include "vtkKWLabel.h"
 
 vtkStandardNewMacro(vtkPVBooleanKeyFrame);
-vtkCxxRevisionMacro(vtkPVBooleanKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVBooleanKeyFrame, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVBooleanKeyFrame::vtkPVBooleanKeyFrame()
@@ -34,9 +34,9 @@ vtkPVBooleanKeyFrame::~vtkPVBooleanKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVBooleanKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVBooleanKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 }
 
 //-----------------------------------------------------------------------------

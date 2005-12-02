@@ -28,7 +28,7 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -93,7 +93,7 @@ void vtkPVLineSourceWidget::DisableAnimation()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
+void vtkPVLineSourceWidget::Create()
 {
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
@@ -106,7 +106,7 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   delete[] str.str();
 
   // Call the superclass to create the widget and set the appropriate flags
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 

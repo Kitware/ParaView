@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.63");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.64");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -95,7 +95,7 @@ const char* vtkPVSelectTimeSet::GetLabel()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Create(vtkKWApplication *app)
+void vtkPVSelectTimeSet::Create()
 {
   // Check if already created
 
@@ -107,7 +107,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetBorderWidth(2);
 
@@ -122,19 +122,19 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *app)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   
-  this->LabeledFrame->Create(this->GetApplication());
+  this->LabeledFrame->Create();
   if (this->FrameLabel)
     {
     this->LabeledFrame->SetLabelText(this->FrameLabel);
     }
-  this->TimeLabel->Create(this->GetApplication());
+  this->TimeLabel->Create();
 
   char label[32];
   sprintf(label, "Time value: %12.5e", 0.0);
   this->TimeLabel->SetText(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
-  this->Tree->Create(this->GetApplication());
+  this->Tree->Create();
   this->Tree->SetReliefToSunken();
   this->Tree->SetBorderWidth(2);
 

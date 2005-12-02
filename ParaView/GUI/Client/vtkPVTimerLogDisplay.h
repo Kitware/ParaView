@@ -42,7 +42,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Display the toplevel.

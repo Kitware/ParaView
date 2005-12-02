@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.121");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.122");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -173,7 +173,7 @@ void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Create(vtkKWApplication *app)
+void vtkPVFileEntry::Create()
 {
   // Check if already created
 
@@ -185,24 +185,24 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
-  frame->Create(app);
+  frame->Create();
 
   this->LabelWidget->SetParent(frame);
   this->Entry->SetParent(frame);
   this->BrowseButton->SetParent(frame);
   
   // Now a label
-  this->LabelWidget->Create(app);
+  this->LabelWidget->Create();
   this->LabelWidget->SetWidth(18);
   this->LabelWidget->SetJustificationToRight();
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
   
   // Now the entry
-  this->Entry->Create(app);
+  this->Entry->Create();
   this->Entry->SetWidth(8);
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
@@ -215,7 +215,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
                this->Entry->GetWidgetName());
   
   // Now the push button
-  this->BrowseButton->Create(app);
+  this->BrowseButton->Create();
   this->BrowseButton->SetText("Browse");
   this->BrowseButton->SetCommand(this, "BrowseCallback");
 
@@ -223,9 +223,9 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
   this->Script("pack %s -fill both -expand 1", frame->GetWidgetName());
 
   this->TimestepFrame->SetParent(this);
-  this->TimestepFrame->Create(app);
+  this->TimestepFrame->Create();
   this->Timestep->SetParent(this->TimestepFrame);
-  this->Timestep->Create(app);
+  this->Timestep->Create();
   this->Script("pack %s -expand 1 -fill both", this->Timestep->GetWidgetName());
   this->Script("pack %s -side bottom -expand 1 -fill x", this->TimestepFrame->GetWidgetName());
   this->Script("pack forget %s", this->TimestepFrame->GetWidgetName());
@@ -235,13 +235,13 @@ void vtkPVFileEntry::Create(vtkKWApplication *app)
   this->Timestep->SetEntryCommand(this, "TimestepChangedCallback");
 
   this->FileListPopup->SetParent(frame);
-  this->FileListPopup->Create(app);
+  this->FileListPopup->Create();
   this->FileListPopup->SetText("Timesteps");
   this->FileListPopup->SetPopupTitle("Select Files For Time Series");
   this->FileListPopup->SetCommand(this, "UpdateAvailableFiles");
 
   this->FileListSelect->SetParent(this->FileListPopup->GetPopupFrame());
-  this->FileListSelect->Create(app);
+  this->FileListSelect->Create();
   this->Script("pack %s -fill both -expand 1", this->FileListSelect->GetWidgetName());
   this->Script("pack %s -fill x", this->FileListPopup->GetWidgetName());
 
@@ -340,7 +340,7 @@ void vtkPVFileEntry::BrowseCallback()
     {
       this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "OpenPath");
     }
-  loadDialog->Create(this->GetPVApplication());
+  loadDialog->Create();
   if (win) 
     { 
     loadDialog->SetParent(this); 

@@ -52,7 +52,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVPickSphereWidget);
-vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.3");
 
 //*****************************************************************************
 //----------------------------------------------------------------------------
@@ -100,10 +100,12 @@ void vtkPVPickSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPickSphereWidget::ChildCreate(vtkPVApplication* pvApp)
+void vtkPVPickSphereWidget::ChildCreate()
 {
-  this->Superclass::ChildCreate(pvApp);
+  this->Superclass::ChildCreate();
 
+  vtkPVApplication *pvApp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
 // ATTRIBUTE EDITOR
   // Widget needs the RenderModuleProxy for picking
   unsigned int ui;
@@ -119,14 +121,14 @@ void vtkPVPickSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 
 // ATTRIBUTE EDITOR
   this->InstructionsLabel->SetParent(this->Frame);
-  this->InstructionsLabel->Create(pvApp);
+  this->InstructionsLabel->Create();
   this->InstructionsLabel->SetText("Press 'r' to relocate to mouse position\nPress 'e' to edit current region\nPress 't' to toggle mouse control between the model and widget");
   this->Script("grid %s - - -sticky e",
     this->InstructionsLabel->GetWidgetName());
 
 // ATTRIBUTE EDITOR
   this->MouseControlToggle->SetParent(this->Frame);
-  this->MouseControlToggle->Create(this->GetApplication());
+  this->MouseControlToggle->Create();
   this->MouseControlToggle->SetText("Control Widget Only");
   this->MouseControlToggle->SetSelectedState(0);
   this->MouseControlToggle->SetBalloonHelpString(

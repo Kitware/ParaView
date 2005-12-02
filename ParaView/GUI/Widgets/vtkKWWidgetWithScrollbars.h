@@ -31,7 +31,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the vertical scrollbar visibility (default to On).
@@ -81,8 +81,8 @@ protected:
   // to the subclass to reimplement both Create*Scrollbar() methods
   // and have them simply call the super and the Associate*Scrollbar() 
   // methods with the internal argument as parameter.
-  virtual void CreateHorizontalScrollbar(vtkKWApplication *app);
-  virtual void CreateVerticalScrollbar(vtkKWApplication *app);
+  virtual void CreateHorizontalScrollbar();
+  virtual void CreateVerticalScrollbar();
   virtual void AssociateHorizontalScrollbarToWidget(vtkKWCoreWidget *widget);
   virtual void AssociateVerticalScrollbarToWidget(vtkKWCoreWidget *widget);
 

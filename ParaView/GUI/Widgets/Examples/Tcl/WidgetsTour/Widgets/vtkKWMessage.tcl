@@ -10,7 +10,7 @@ proc vtkKWMessageEntryPoint {parent win} {
 
   vtkKWMessage message1
   message1 SetParent $parent
-  message1 Create $app
+  message1 Create
   message1 SetText $lorem_ipsum
   message1 SetWidth 400
   message1 SetBalloonHelpString \
@@ -24,7 +24,7 @@ proc vtkKWMessageEntryPoint {parent win} {
 
   vtkKWMessage message2
   message2 SetParent $parent
-  message2 Create $app
+  message2 Create
   message2 SetText $lorem_ipsum
   message2 SetJustificationToLeft
   message2 SetAnchorToEast
@@ -46,7 +46,7 @@ proc vtkKWMessageEntryPoint {parent win} {
 
   vtkKWMessageWithLabel message4
   message4 SetParent $parent
-  message4 Create $app
+  message4 Create
   [message4 GetLabel] SetImageToPredefinedIcon 61
   [message4 GetWidget] SetText $lorem_ipsum
   message4 SetBalloonHelpString \

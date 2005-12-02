@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.20");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -52,7 +52,19 @@ vtkKWTopLevel::~vtkKWTopLevel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTopLevel::Create(vtkKWApplication *app)
+vtkKWApplication* vtkKWTopLevel::GetApplication()
+{
+  if (!this->Superclass::GetApplication() &&
+      this->MasterWindow && this->MasterWindow->GetApplication())
+    {
+    this->SetApplication(this->MasterWindow->GetApplication());
+    }
+
+  return this->Superclass::GetApplication();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::Create()
 {
   vtksys_stl::string opts;
 
@@ -77,7 +89,7 @@ void vtkKWTopLevel::Create(vtkKWApplication *app)
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "toplevel", opts.c_str()))
+  if (!this->Superclass::CreateSpecificTkWidget("toplevel", opts.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -300,6 +312,11 @@ void vtkKWTopLevel::SetMasterWindow(vtkKWWidget* win)
   this->MasterWindow = win; 
   this->Modified(); 
 
+  if (!this->GetApplication() && win->GetApplication())
+    {
+    this->SetApplication(win->GetApplication());
+    }
+
   if (this->IsCreated() && 
       this->GetMasterWindow() && this->GetMasterWindow()->IsCreated())
     {
@@ -519,7 +536,7 @@ vtkKWMenu *vtkKWTopLevel::GetMenu()
     {
     this->Menu->SetParent(this);
     this->Menu->SetTearOff(0);
-    this->Menu->Create(this->GetApplication());
+    this->Menu->Create();
     this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
     }
 

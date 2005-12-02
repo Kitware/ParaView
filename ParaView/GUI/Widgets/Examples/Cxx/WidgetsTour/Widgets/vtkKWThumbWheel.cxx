@@ -22,7 +22,7 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
 
   vtkKWThumbWheel *thumbwheel1 = vtkKWThumbWheel::New();
   thumbwheel1->SetParent(parent);
-  thumbwheel1->Create(app);
+  thumbwheel1->Create();
   thumbwheel1->SetLength(150);
   thumbwheel1->DisplayEntryOn();
   thumbwheel1->DisplayLabelOn();
@@ -38,7 +38,7 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
 
   vtkKWThumbWheel *thumbwheel2 = vtkKWThumbWheel::New();
   thumbwheel2->SetParent(parent);
-  thumbwheel2->Create(app);
+  thumbwheel2->Create();
   thumbwheel2->SetRange(-10.0, 10.0);
   thumbwheel2->ClampMinimumValueOn();
   thumbwheel2->ClampMaximumValueOn();
@@ -62,7 +62,7 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
   vtkKWThumbWheel *thumbwheel3 = vtkKWThumbWheel::New();
   thumbwheel3->SetParent(parent);
   thumbwheel3->PopupModeOn();
-  thumbwheel3->Create(app);
+  thumbwheel3->Create();
   thumbwheel3->SetRange(0.0, 100.0);
   thumbwheel3->SetResolution(1.0);
   thumbwheel3->DisplayEntryOn();

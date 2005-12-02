@@ -34,7 +34,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create();
 
   // Description:
   // Called when the Accept button is pressed.

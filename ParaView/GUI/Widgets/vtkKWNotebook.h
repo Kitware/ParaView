@@ -21,7 +21,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
@@ -38,7 +37,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Add a new page to the notebook. By setting balloon string, the page will

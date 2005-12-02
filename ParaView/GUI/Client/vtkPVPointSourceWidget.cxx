@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -189,10 +189,10 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
+void vtkPVPointSourceWidget::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
@@ -224,7 +224,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->RadiusWidget->SetSMProperty(prop);
   bd->Delete();
 
-  this->RadiusWidget->Create(app);
+  this->RadiusWidget->Create();
   if (!this->RadiusWidget->GetSMPropertyName())
     {
     this->RadiusWidget->SetValue(&this->DefaultRadius, 1);
@@ -243,7 +243,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->SourceProxy->GetProperty("NumberOfPoints"));
   this->NumberOfPointsWidget->SetSMProperty(ivp);
 
-  this->NumberOfPointsWidget->Create(app);
+  this->NumberOfPointsWidget->Create();
   float numPts = static_cast<float>(this->DefaultNumberOfPoints);
   this->NumberOfPointsWidget->SetValue(&numPts, 1);
   ivp->SetElement(0, this->DefaultNumberOfPoints);

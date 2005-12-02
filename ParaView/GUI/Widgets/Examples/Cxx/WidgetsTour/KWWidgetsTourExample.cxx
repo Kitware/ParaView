@@ -85,7 +85,7 @@ int my_main(int argc, char *argv[])
   win->SupportHelpOn();
   win->SetPanelLayoutToSecondaryBelowMainAndView();
   app->AddWindow(win);
-  win->Create(app);
+  win->Create();
 
   // Add a user interface panel to the main user interface manager
 
@@ -93,7 +93,7 @@ int my_main(int argc, char *argv[])
   widgets_panel->SetName("Widgets Interface");
   widgets_panel->SetUserInterfaceManager(
     win->GetMainUserInterfaceManager());
-  widgets_panel->Create(app);
+  widgets_panel->Create();
 
   widgets_panel->AddPage("Widgets", "Select a widget", NULL);
   vtkKWWidget *page_widget = widgets_panel->GetPageWidget("Widgets");
@@ -104,7 +104,7 @@ int my_main(int argc, char *argv[])
   widgets_tree->SetParent(page_widget);
   widgets_tree->VerticalScrollbarVisibilityOn();
   widgets_tree->HorizontalScrollbarVisibilityOn();
-  widgets_tree->Create(app);
+  widgets_tree->Create();
 
   vtkKWTree *tree = widgets_tree->GetWidget();
   tree->SetPadX(0);
@@ -138,7 +138,7 @@ int my_main(int argc, char *argv[])
   source_panel->SetName("Source Interface");
   source_panel->SetUserInterfaceManager(
     win->GetSecondaryUserInterfaceManager());
-  source_panel->Create(app);
+  source_panel->Create();
   win->GetSecondaryNotebook()->AlwaysShowTabsOff();
 
   // Add a page, and divide it using a split frame
@@ -149,7 +149,7 @@ int my_main(int argc, char *argv[])
   vtkKWSplitFrame *source_split = vtkKWSplitFrame::New();
   source_split->SetParent(page_widget);
   source_split->SetExpandableFrameToBothFrames();
-  source_split->Create(app);
+  source_split->Create();
 
   app->Script("pack %s -side top -expand y -fill both -padx 0 -pady 0", 
               source_split->GetWidgetName());
@@ -159,7 +159,7 @@ int my_main(int argc, char *argv[])
   vtkKWTextWithScrollbarsWithLabel *tcl_source_text = 
     vtkKWTextWithScrollbarsWithLabel::New();
   tcl_source_text->SetParent(source_split->GetFrame1());
-  tcl_source_text->Create(app);
+  tcl_source_text->Create();
   tcl_source_text->SetLabelPositionToTop();
   tcl_source_text->SetLabelText("Tcl Source");
 
@@ -182,7 +182,7 @@ int my_main(int argc, char *argv[])
   vtkKWTextWithScrollbarsWithLabel *cxx_source_text = 
     vtkKWTextWithScrollbarsWithLabel::New();
   cxx_source_text->SetParent(source_split->GetFrame2());
-  cxx_source_text->Create(app);
+  cxx_source_text->Create();
   cxx_source_text->SetLabelPositionToTop();
   cxx_source_text->SetLabelText("C++ Source");
 
@@ -217,7 +217,7 @@ int my_main(int argc, char *argv[])
     vtkKWUserInterfacePanel *panel = vtkKWUserInterfacePanel::New();
     panel->SetName(node_ptr->Name);
     panel->SetUserInterfaceManager(win->GetViewUserInterfaceManager());
-    panel->Create(app);
+    panel->Create();
     panel->Delete();
     panel->AddPage(panel->GetName(), NULL, NULL);
 

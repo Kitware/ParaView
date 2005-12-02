@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.4");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -537,23 +537,23 @@ vtkPVBasicDSPFilterWidget::~vtkPVBasicDSPFilterWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateCutoffFreqToggle(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateCutoffFreqToggle(vtkKWWidget *topframe)
 {
 
   this->CutoffFreqSubFrame->SetParent(topframe);
-  this->CutoffFreqSubFrame->Create(pvApp);
+  this->CutoffFreqSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->CutoffFreqSubFrame->GetWidgetName());
 
 
   this->CutoffFreqLabel->SetParent(this->CutoffFreqSubFrame);
-  this->CutoffFreqLabel->Create(pvApp);
+  this->CutoffFreqLabel->Create();
   this->CutoffFreqLabel->SetJustificationToRight();
   this->CutoffFreqLabel->SetWidth(18);
   this->CutoffFreqLabel->SetText("Cutoff Frequency");
   this->CutoffFreqLabel->SetBalloonHelpString("Select the normalized cutoff frequency");
   this->CutoffFreqMenu->SetParent(this->CutoffFreqSubFrame);
-  this->CutoffFreqMenu->Create(pvApp);
+  this->CutoffFreqMenu->Create();
   this->CutoffFreqMenu->AddRadioButton(".3", this, "ChangeCutoffFreq 3");
   this->CutoffFreqMenu->AddRadioButton(".4", this, "ChangeCutoffFreq 4");
   this->CutoffFreqMenu->AddRadioButton(".5", this, "ChangeCutoffFreq 5");
@@ -569,21 +569,21 @@ void vtkPVBasicDSPFilterWidget::CreateCutoffFreqToggle(vtkPVApplication *pvApp, 
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateInputVarToggle(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateInputVarToggle(vtkKWWidget *topframe)
 {
   this->InputVarSubFrame->SetParent(topframe);
-  this->InputVarSubFrame->Create(pvApp);
+  this->InputVarSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->InputVarSubFrame->GetWidgetName());
 
   this->InputVarLabel->SetParent(this->InputVarSubFrame);
-  this->InputVarLabel->Create(pvApp);
+  this->InputVarLabel->Create();
   this->InputVarLabel->SetJustificationToRight();
   this->InputVarLabel->SetWidth(18);
   this->InputVarLabel->SetText("Input Variable");
   this->InputVarLabel->SetBalloonHelpString("Select the input variable");
   this->InputVarMenu->SetParent(this->InputVarSubFrame);
-  this->InputVarMenu->Create(pvApp);
+  this->InputVarMenu->Create();
 
   this->InputVarMenu->SetBalloonHelpString("Select the input variable");
   this->Script("pack %s %s -side left -pady 1m",
@@ -594,21 +594,21 @@ void vtkPVBasicDSPFilterWidget::CreateInputVarToggle(vtkPVApplication *pvApp, vt
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateOutputVarTextEntry(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateOutputVarTextEntry(vtkKWWidget *topframe)
 {
   this->OutputVarSubFrame->SetParent(topframe);
-  this->OutputVarSubFrame->Create(pvApp);
+  this->OutputVarSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->OutputVarSubFrame->GetWidgetName());
 
   this->OutputVarLabel->SetParent(this->OutputVarSubFrame);
-  this->OutputVarLabel->Create(pvApp);
+  this->OutputVarLabel->Create();
   this->OutputVarLabel->SetJustificationToRight();
   this->OutputVarLabel->SetWidth(18);
   this->OutputVarLabel->SetText("Output Variable");
   this->OutputVarLabel->SetBalloonHelpString("Enter the output variable's name");
   this->OutputVarEntry->SetParent(this->OutputVarSubFrame);
-  this->OutputVarEntry->Create(pvApp);
+  this->OutputVarEntry->Create();
   this->OutputVarEntry->SetValue("name");
 
   this->OutputVarEntry->SetBalloonHelpString("Enter the output variable's name");
@@ -619,15 +619,15 @@ void vtkPVBasicDSPFilterWidget::CreateOutputVarTextEntry(vtkPVApplication *pvApp
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateLengthTextEntry(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateLengthTextEntry(vtkKWWidget *topframe)
 {
   this->LengthSubFrame->SetParent(topframe);
-  this->LengthSubFrame->Create(pvApp);
+  this->LengthSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->LengthSubFrame->GetWidgetName());
 
   this->LengthLabel->SetParent(this->LengthSubFrame);
-  this->LengthLabel->Create(pvApp);
+  this->LengthLabel->Create();
   this->LengthLabel->SetJustificationToRight();
   this->LengthLabel->SetWidth(18);
   this->LengthLabel->SetText("Filter Length");
@@ -635,7 +635,7 @@ void vtkPVBasicDSPFilterWidget::CreateLengthTextEntry(vtkPVApplication *pvApp, v
   this->LengthLabel->SetBalloonHelpString("Enter the integer length of the smoothing filter (2 to N allowed).");
 
   this->LengthEntry->SetParent(this->LengthSubFrame);
-  this->LengthEntry->Create(pvApp);
+  this->LengthEntry->Create();
   this->LengthEntry->SetWidth(12);
   this->LengthEntry->SetValue("");
 
@@ -648,15 +648,15 @@ void vtkPVBasicDSPFilterWidget::CreateLengthTextEntry(vtkPVApplication *pvApp, v
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateNumeratorWeightsTextEntry(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateNumeratorWeightsTextEntry(vtkKWWidget *topframe)
 {
   this->NumeratorWeightsSubFrame->SetParent(topframe);
-  this->NumeratorWeightsSubFrame->Create(pvApp);
+  this->NumeratorWeightsSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->NumeratorWeightsSubFrame->GetWidgetName());
 
   this->NumeratorWeightsLabel->SetParent(this->NumeratorWeightsSubFrame);
-  this->NumeratorWeightsLabel->Create(pvApp);
+  this->NumeratorWeightsLabel->Create();
   this->NumeratorWeightsLabel->SetJustificationToRight();
   this->NumeratorWeightsLabel->SetWidth(18);
   this->NumeratorWeightsLabel->SetText("Numerator Weights");
@@ -666,7 +666,7 @@ void vtkPVBasicDSPFilterWidget::CreateNumeratorWeightsTextEntry(vtkPVApplication
     " - a(1)*y(n-1) - a(2)*y(n-2) - ...");
 
   this->NumeratorWeightsEntry->SetParent(this->NumeratorWeightsSubFrame);
-  this->NumeratorWeightsEntry->Create(pvApp);
+  this->NumeratorWeightsEntry->Create();
   this->NumeratorWeightsEntry->SetWidth(32);
   this->NumeratorWeightsEntry->SetValue("");
 
@@ -678,15 +678,15 @@ void vtkPVBasicDSPFilterWidget::CreateNumeratorWeightsTextEntry(vtkPVApplication
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateForwardNumeratorWeightsTextEntry(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateForwardNumeratorWeightsTextEntry(vtkKWWidget *topframe)
 {
   this->ForwardNumeratorWeightsSubFrame->SetParent(topframe);
-  this->ForwardNumeratorWeightsSubFrame->Create(pvApp);
+  this->ForwardNumeratorWeightsSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->ForwardNumeratorWeightsSubFrame->GetWidgetName());
 
   this->ForwardNumeratorWeightsLabel->SetParent(this->ForwardNumeratorWeightsSubFrame);
-  this->ForwardNumeratorWeightsLabel->Create(pvApp);
+  this->ForwardNumeratorWeightsLabel->Create();
   this->ForwardNumeratorWeightsLabel->SetJustificationToRight();
   this->ForwardNumeratorWeightsLabel->SetWidth(18);
   this->ForwardNumeratorWeightsLabel->SetText("Forward Numer Weights");
@@ -696,7 +696,7 @@ void vtkPVBasicDSPFilterWidget::CreateForwardNumeratorWeightsTextEntry(vtkPVAppl
     " - a(1)*y(n-1) - a(2)*y(n-2) - ... + c(0)*x(n+1) + c(1)*x(n+2) + ...");
 
   this->ForwardNumeratorWeightsEntry->SetParent(this->ForwardNumeratorWeightsSubFrame);
-  this->ForwardNumeratorWeightsEntry->Create(pvApp);
+  this->ForwardNumeratorWeightsEntry->Create();
   this->ForwardNumeratorWeightsEntry->SetWidth(32);
   this->ForwardNumeratorWeightsEntry->SetValue("");
 
@@ -707,15 +707,15 @@ void vtkPVBasicDSPFilterWidget::CreateForwardNumeratorWeightsTextEntry(vtkPVAppl
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateDenominatorWeightsTextEntry(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateDenominatorWeightsTextEntry(vtkKWWidget *topframe)
 {
   this->DenominatorWeightsSubFrame->SetParent(topframe);
-  this->DenominatorWeightsSubFrame->Create(pvApp);
+  this->DenominatorWeightsSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->DenominatorWeightsSubFrame->GetWidgetName());
 
   this->DenominatorWeightsLabel->SetParent(this->DenominatorWeightsSubFrame);
-  this->DenominatorWeightsLabel->Create(pvApp);
+  this->DenominatorWeightsLabel->Create();
   this->DenominatorWeightsLabel->SetJustificationToRight();
   this->DenominatorWeightsLabel->SetWidth(18);
   this->DenominatorWeightsLabel->SetText("Denominator Weights");
@@ -729,7 +729,7 @@ void vtkPVBasicDSPFilterWidget::CreateDenominatorWeightsTextEntry(vtkPVApplicati
 
 
   this->DenominatorWeightsEntry->SetParent(this->DenominatorWeightsSubFrame);
-  this->DenominatorWeightsEntry->Create(pvApp);
+  this->DenominatorWeightsEntry->Create();
   this->DenominatorWeightsEntry->SetWidth(32);
   this->DenominatorWeightsEntry->SetValue("");
 
@@ -744,17 +744,17 @@ void vtkPVBasicDSPFilterWidget::CreateDenominatorWeightsTextEntry(vtkPVApplicati
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::CreateAddThisVarButton(vtkPVApplication *pvApp, vtkKWWidget *topframe)
+void vtkPVBasicDSPFilterWidget::CreateAddThisVarButton(vtkKWWidget *topframe)
 {
   this->AddThisVarSubFrame->SetParent(topframe);
-  this->AddThisVarSubFrame->Create(pvApp);
+  this->AddThisVarSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->AddThisVarSubFrame->GetWidgetName());
 
 
   this->AddThisVarButton->SetText("Add Output Variable");
   this->AddThisVarButton->SetParent(this->AddThisVarSubFrame);
-  this->AddThisVarButton->Create(pvApp);
+  this->AddThisVarButton->Create();
 
   this->AddThisVarButton->SetCommand(this, "AddVarFunction");
 
@@ -774,11 +774,11 @@ void vtkPVBasicDSPFilterWidget::CreateAddThisVarButton(vtkPVApplication *pvApp, 
   int which=0;
   this->DeleteThisVarButton[which]->SetText("Remove");
   this->DeleteThisVarButton[which]->SetParent(this->AddThisVarSubFrame);
-  this->DeleteThisVarButton[which]->Create(pvApp);
+  this->DeleteThisVarButton[which]->Create();
   this->DeleteThisVarButton[which]->SetCommand(this, "DeleteVarFunction 0");
   this->DeleteThisVarButton[which]->SetBalloonHelpString("Remove this output variable");
   this->DeleteThisVarLabel[which]->SetParent(this->AddThisVarSubFrame);
-  this->DeleteThisVarLabel[which]->Create(pvApp);
+  this->DeleteThisVarLabel[which]->Create();
   this->DeleteThisVarLabel[which]->SetJustificationToRight();
   this->DeleteThisVarLabel[which]->SetWidth(18);
   this->DeleteThisVarLabel[which]->SetBalloonHelpString("Output Variable Description");
@@ -1108,12 +1108,12 @@ void vtkPVBasicDSPFilterWidget::AddVarFunction()
     {
     this->DeleteThisVarButton[which]->SetText("Remove");
     this->DeleteThisVarButton[which]->SetParent(this->AddThisVarSubFrame);
-    this->DeleteThisVarButton[which]->Create(pvApp);
+    this->DeleteThisVarButton[which]->Create();
     sprintf(l_str,"DeleteVarFunction %d",which );
     this->DeleteThisVarButton[which]->SetCommand(this, l_str);
     this->DeleteThisVarButton[which]->SetBalloonHelpString("Remove this output variable");
     this->DeleteThisVarLabel[which]->SetParent(this->AddThisVarSubFrame);
-    this->DeleteThisVarLabel[which]->Create(pvApp);
+    this->DeleteThisVarLabel[which]->Create();
     this->DeleteThisVarLabel[which]->SetJustificationToRight();
     this->DeleteThisVarLabel[which]->SetWidth(18);
     this->DeleteThisVarLabel[which]->SetBalloonHelpString("Output Variable Description");
@@ -1251,7 +1251,7 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::Create(vtkKWApplication *app)
+void vtkPVBasicDSPFilterWidget::Create()
 {
   // Check if already created
 
@@ -1263,12 +1263,10 @@ void vtkPVBasicDSPFilterWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  this->Superclass::Create();
 
   this->DSPFilterFrame->SetParent(this);
-  this->DSPFilterFrame->Create(pvApp);
+  this->DSPFilterFrame->Create();
   this->DSPFilterFrame->SetLabelText("Basic DSP Filtering");
   this->Script("pack %s -fill x -expand t -side top",
     this->DSPFilterFrame->GetWidgetName());
@@ -1279,20 +1277,20 @@ void vtkPVBasicDSPFilterWidget::Create(vtkKWApplication *app)
 
 
   this->DSPFilterModeSubFrame->SetParent(this->DSPFilterFrame->GetFrame());
-  this->DSPFilterModeSubFrame->Create(pvApp);
+  this->DSPFilterModeSubFrame->Create();
   this->Script("pack %s -side top -fill x",
     this->DSPFilterModeSubFrame->GetWidgetName());
 
 
 
   this->DSPFilterModeLabel->SetParent(this->DSPFilterModeSubFrame);
-  this->DSPFilterModeLabel->Create(pvApp);
+  this->DSPFilterModeLabel->Create();
   this->DSPFilterModeLabel->SetJustificationToRight();
   this->DSPFilterModeLabel->SetWidth(18);
   this->DSPFilterModeLabel->SetText("Filtering Mode");
   this->DSPFilterModeLabel->SetBalloonHelpString("Select the type of filter");
   this->DSPFilterModeMenu->SetParent(this->DSPFilterModeSubFrame);
-  this->DSPFilterModeMenu->Create(pvApp);
+  this->DSPFilterModeMenu->Create();
 
 
 
@@ -1317,14 +1315,14 @@ void vtkPVBasicDSPFilterWidget::Create(vtkKWApplication *app)
     this->DSPFilterModeMenu->GetWidgetName());
 
 
-  CreateLengthTextEntry(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateCutoffFreqToggle(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateNumeratorWeightsTextEntry(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateDenominatorWeightsTextEntry(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateForwardNumeratorWeightsTextEntry(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateInputVarToggle(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateOutputVarTextEntry(pvApp,this->DSPFilterFrame->GetFrame());
-  CreateAddThisVarButton(pvApp,this->DSPFilterFrame->GetFrame());
+  CreateLengthTextEntry(this->DSPFilterFrame->GetFrame());
+  CreateCutoffFreqToggle(this->DSPFilterFrame->GetFrame());
+  CreateNumeratorWeightsTextEntry(this->DSPFilterFrame->GetFrame());
+  CreateDenominatorWeightsTextEntry(this->DSPFilterFrame->GetFrame());
+  CreateForwardNumeratorWeightsTextEntry(this->DSPFilterFrame->GetFrame());
+  CreateInputVarToggle(this->DSPFilterFrame->GetFrame());
+  CreateOutputVarTextEntry(this->DSPFilterFrame->GetFrame());
+  CreateAddThisVarButton(this->DSPFilterFrame->GetFrame());
 
 
   //SET START TO smoothing

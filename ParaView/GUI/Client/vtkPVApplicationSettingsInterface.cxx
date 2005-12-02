@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.29");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -90,7 +90,7 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
 }
 
 // ---------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
+void vtkPVApplicationSettingsInterface::Create()
 {
   if (this->IsCreated())
     {
@@ -100,7 +100,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   ostrstream tk_cmd;
   vtkKWWidget *frame;
@@ -118,7 +118,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     this->AutoAcceptCheckButton = vtkKWCheckButton::New();
     }
   this->AutoAcceptCheckButton->SetParent(frame);
-  this->AutoAcceptCheckButton->Create(app);
+  this->AutoAcceptCheckButton->Create();
   this->AutoAcceptCheckButton->SetText("AutoAccept");
   this->AutoAcceptCheckButton->SetCommand(
     this, "AutoAcceptCallback");
@@ -141,7 +141,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesDescriptionCheckButton->SetParent(frame);
-  this->ShowSourcesDescriptionCheckButton->Create(app);
+  this->ShowSourcesDescriptionCheckButton->Create();
   this->ShowSourcesDescriptionCheckButton->SetText("Show source descriptions");
   this->ShowSourcesDescriptionCheckButton->SetCommand(
     this, "ShowSourcesDescriptionCallback");
@@ -161,7 +161,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesNameCheckButton->SetParent(frame);
-  this->ShowSourcesNameCheckButton->Create(app);
+  this->ShowSourcesNameCheckButton->Create();
   this->ShowSourcesNameCheckButton->SetText(
     "Show source names in browsers");
   this->ShowSourcesNameCheckButton->SetCommand(
@@ -180,7 +180,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowTraceFilesCheckButton->SetParent(frame);
-  this->ShowTraceFilesCheckButton->Create(app);
+  this->ShowTraceFilesCheckButton->Create();
   this->ShowTraceFilesCheckButton->SetText(
     "Show trace files on ParaView startup");
   this->ShowTraceFilesCheckButton->SetCommand(
@@ -190,6 +190,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "reported during startup. Turn this off to avoid unnecessary popup "
     "messages during startup.");
 
+  vtkKWApplication *app = this->GetApplication();
   if (!app->GetRegistryValue(2,"RunTime", 
       VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY,0)||
     app->GetIntRegistryValue(2,"RunTime",VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY))
@@ -213,7 +214,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->CreateLogFilesCheckButton->SetParent(frame);
-  this->CreateLogFilesCheckButton->Create(app);
+  this->CreateLogFilesCheckButton->Create();
   this->CreateLogFilesCheckButton->SetText(
     "Create per node log files on ParaView startup");
   this->CreateLogFilesCheckButton->SetCommand(
@@ -245,7 +246,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->StreamBlockCheckButton->SetParent(frame);
-  this->StreamBlockCheckButton->Create(app);
+  this->StreamBlockCheckButton->Create();
   this->StreamBlockCheckButton->SetText(
     "Block updates for streaming");
   this->StreamBlockCheckButton->SetCommand(

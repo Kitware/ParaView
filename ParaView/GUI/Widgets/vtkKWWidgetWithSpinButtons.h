@@ -23,7 +23,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWSpinButtons;
 
 class KWWIDGETS_EXPORT vtkKWWidgetWithSpinButtons : public vtkKWCompositeWidget
@@ -35,7 +34,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Retrieve the spin buttons

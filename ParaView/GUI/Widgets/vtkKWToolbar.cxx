@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWToolbar.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
@@ -55,7 +54,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.65");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.66");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -143,7 +142,7 @@ void vtkKWToolbar::UnBind()
   this->RemoveBinding("<Configure>");
 }
 //----------------------------------------------------------------------------
-void vtkKWToolbar::Create(vtkKWApplication *app)
+void vtkKWToolbar::Create()
 {
   // Check if already created
 
@@ -155,19 +154,19 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   this->Bind();
 
   // Create the widgets container itself
 
   this->Frame->SetParent(this);
-  this->Frame->Create(app);
+  this->Frame->Create();
   
   // Create a "toolbar handle"
 
   this->Handle->SetParent(this);
-  this->Handle->Create(app);
+  this->Handle->Create();
   this->Handle->SetBorderWidth(2);
   this->Handle->SetReliefToRaised();
 
@@ -175,7 +174,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   // to keep track of default options)
 
   this->DefaultOptionsWidget->SetParent(this);
-  this->DefaultOptionsWidget->Create(app);
+  this->DefaultOptionsWidget->Create();
 
   // Update aspect
 
@@ -377,7 +376,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   vtkKWRadioButton *rb = vtkKWRadioButton::New();
 
   rb->SetParent(this->GetFrame());
-  rb->Create(this->GetApplication());
+  rb->Create();
   rb->IndicatorVisibilityOff();
   rb->SetValueAsInt(value);
 
@@ -427,7 +426,7 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
   vtkKWCheckButton *cb = vtkKWCheckButton::New();
 
   cb->SetParent(this->GetFrame());
-  cb->Create(this->GetApplication());
+  cb->Create();
   cb->IndicatorVisibilityOff();
 
   if (image_name)

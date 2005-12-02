@@ -46,7 +46,7 @@ public:
   // Creates a SM3DWidgetProxy. The actual proxy XML name is
   // determined using WidgetProxyXMLName which is set by derrived
   // clases of this class.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Set the widget visibility. 
@@ -156,7 +156,7 @@ protected:
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*) = 0;
+  virtual void ChildCreate() = 0;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

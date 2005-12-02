@@ -20,7 +20,7 @@ KWWidgetsTourItem* vtkKWTreeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWTree *tree1 = vtkKWTree::New();
   tree1->SetParent(parent);
-  tree1->Create(app);
+  tree1->Create();
   tree1->SelectionFillOn();
   tree1->SetBalloonHelpString("A simple tree");
   tree1->SetBorderWidth(2);

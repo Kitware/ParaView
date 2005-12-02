@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWLoadSaveButton.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkObjectFactory.h"
@@ -22,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.18");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -48,7 +47,7 @@ vtkKWLoadSaveButton::~vtkKWLoadSaveButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
+void vtkKWLoadSaveButton::Create()
 {
   // Check if already created
 
@@ -61,7 +60,7 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Do not use SetCommand (we override it to get max compatibility)
   // Save the old command, if any
@@ -85,7 +84,8 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app)
 
   // Create the load/save dialog
 
-  this->LoadSaveDialog->Create(app);
+  this->LoadSaveDialog->SetParent(this);
+  this->LoadSaveDialog->Create();
 
   // Update enable state
 

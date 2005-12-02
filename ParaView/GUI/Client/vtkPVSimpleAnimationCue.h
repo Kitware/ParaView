@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
 
   // Description:
   // Virtual indicates if this cue is a actual cue, which has a proxy

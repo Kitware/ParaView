@@ -32,7 +32,7 @@ protected:
   vtkPVRampKeyFrame();
   ~vtkPVRampKeyFrame();
 
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
 private:
   vtkPVRampKeyFrame(const vtkPVRampKeyFrame&); // Not implemented.

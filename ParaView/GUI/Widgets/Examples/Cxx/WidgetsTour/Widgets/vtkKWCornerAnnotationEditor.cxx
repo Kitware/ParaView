@@ -5,7 +5,6 @@
 #include "vtkKWCornerAnnotationEditor.h"
 #include "vtkKWFrame.h"
 #include "vtkKWRenderWidget.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -44,7 +43,7 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
 
   this->cae_renderwidget = vtkKWRenderWidget::New();
   this->cae_renderwidget->SetParent(parent);
-  this->cae_renderwidget->Create(app);
+  this->cae_renderwidget->Create();
   this->cae_renderwidget->CornerAnnotationVisibilityOn();
 
   app->Script("pack %s -side right -fill both -expand y -padx 0 -pady 0", 
@@ -99,7 +98,7 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
   
   this->cae_anno_editor = vtkKWCornerAnnotationEditor::New();
   this->cae_anno_editor->SetParent(parent);
-  this->cae_anno_editor->Create(app);
+  this->cae_anno_editor->Create();
   this->cae_anno_editor->SetRenderWidget(this->cae_renderwidget);
 
   app->Script("pack %s -side left -anchor nw -expand n -padx 2 -pady 2", 

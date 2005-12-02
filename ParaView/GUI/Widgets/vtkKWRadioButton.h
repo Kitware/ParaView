@@ -20,7 +20,6 @@
 #define __vtkKWRadioButton_h
 
 #include "vtkKWCheckButton.h"
-class vtkKWApplication;
 
 class KWWIDGETS_EXPORT vtkKWRadioButton : public vtkKWCheckButton
 {
@@ -31,7 +30,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the state of the Radio button 0 = off 1 = on

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWRange.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -25,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.56");
+vtkCxxRevisionMacro(vtkKWRange, "1.57");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -164,7 +163,7 @@ vtkKWRange::~vtkKWRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::Create(vtkKWApplication *app)
+void vtkKWRange::Create()
 {
   // Check if already created
 
@@ -177,7 +176,7 @@ void vtkKWRange::Create(vtkKWApplication *app)
   // Call the superclass, this will set the application,
   // create the frame and the Label
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Now we need the canvas
 
@@ -186,14 +185,14 @@ void vtkKWRange::Create(vtkKWApplication *app)
     this->CanvasFrame = vtkKWFrame::New();
     }
   this->CanvasFrame->SetParent(this);
-  this->CanvasFrame->Create(app);
+  this->CanvasFrame->Create();
 
   if (!this->Canvas)
     {
     this->Canvas = vtkKWCanvas::New();
     }
   this->Canvas->SetParent(this->CanvasFrame);
-  this->Canvas->Create(app);
+  this->Canvas->Create();
   this->Canvas->SetBorderWidth(0);
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetWidth(0);
@@ -236,7 +235,7 @@ void vtkKWRange::CreateEntries()
     if (!this->Entries[i]->IsCreated() && this->IsCreated())
       {
       this->Entries[i]->SetParent(this);
-      this->Entries[i]->Create(this->GetApplication());
+      this->Entries[i]->Create();
       this->Entries[i]->SetWidth(this->EntriesWidth);
       this->PropagateEnableState(this->Entries[i]);
 

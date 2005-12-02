@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWNotebook.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
@@ -59,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.93");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.94");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -219,7 +218,7 @@ vtkKWNotebook::~vtkKWNotebook()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Create(vtkKWApplication *app)
+void vtkKWNotebook::Create()
 {
   // Check if already created
 
@@ -231,7 +230,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   ostrstream cmd;
 
@@ -243,7 +242,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   // Create the frame that stores the tabs button
 
   this->TabsFrame->SetParent(this);
-  this->TabsFrame->Create(app);
+  this->TabsFrame->Create();
 
   cmd << "pack " << this->TabsFrame->GetWidgetName() 
       << " -fill x -expand y -side top -anchor n " 
@@ -252,7 +251,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   // Create the frame where each page will be mapped
 
   this->Body->SetParent(this);
-  this->Body->Create(app);
+  this->Body->Create();
   this->Body->SetReliefToRaised();
   this->Body->SetBorderWidth(VTK_KW_NB_TAB_BD);
 
@@ -260,7 +259,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app)
   // the body (i.e. between the tab and the corresponding page under the tab).
 
   this->Mask->SetParent(this);
-  this->Mask->Create(app);
+  this->Mask->Create();
 
   this->Bind();
 
@@ -697,7 +696,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Frame = vtkKWFrame::New();
   page->Frame->SetParent(this->Body);
-  page->Frame->Create(this->GetApplication());
+  page->Frame->Create();
 
   // Store the page title for fast page retrieval on title
 
@@ -708,7 +707,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->TabFrame = vtkKWFrame::New();
   page->TabFrame->SetParent(this->TabsFrame);
-  page->TabFrame->Create(this->GetApplication());
+  page->TabFrame->Create();
   page->TabFrame->SetReliefToRaised();
   page->TabFrame->SetBorderWidth(VTK_KW_NB_TAB_BD);
 
@@ -716,7 +715,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Label = vtkKWLabel::New();
   page->Label->SetParent(page->TabFrame);
-  page->Label->Create(this->GetApplication());
+  page->Label->Create();
   page->Label->SetHighlightThickness(0);
   page->Label->SetText(page->Title);
   if (balloon)
@@ -741,7 +740,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
     page->ImageLabel = vtkKWLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);
-    page->ImageLabel->Create(this->GetApplication());
+    page->ImageLabel->Create();
     page->ImageLabel->SetImageToIcon(page->Icon);
 
     if (this->ShowIcons)
@@ -1954,7 +1953,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     this->TabPopupMenu = vtkKWMenu::New();
     this->TabPopupMenu->SetParent(this);
     this->TabPopupMenu->TearOffOff();
-    this->TabPopupMenu->Create(this->GetApplication());
+    this->TabPopupMenu->Create();
     }
 
   this->TabPopupMenu->DeleteAllMenuItems();

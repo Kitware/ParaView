@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.63");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -181,7 +181,7 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::Create(vtkKWApplication* app)
+void vtkPVAnimationManager::Create()
 {
   if (!this->VerticalParent || !this->HorizontalParent)
     {
@@ -199,7 +199,7 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
@@ -215,12 +215,12 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
     }
 
   this->HAnimationInterface->SetParent(this->HorizontalParent);
-  this->HAnimationInterface->Create(app);
+  this->HAnimationInterface->Create();
   this->HAnimationInterface->SetReliefToFlat();
 
   this->VAnimationInterface->SetParent(this->VerticalParent);
   this->VAnimationInterface->SetAnimationManager(this);
-  this->VAnimationInterface->Create(app);
+  this->VAnimationInterface->Create();
   this->VAnimationInterface->SetReliefToFlat();
 
   this->AnimationScene->SetParent(
@@ -228,7 +228,7 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
   this->AnimationScene->SetAnimationManager(this);
   this->AnimationScene->SetWindow(pvWin);
   this->AnimationScene->SetRenderView(pvWin->GetMainView());
-  this->AnimationScene->Create(app);
+  this->AnimationScene->Create();
   this->AnimationScene->SetReliefToFlat();
   // This is set so that when the duration (or anything else)
   // from the scene changes, the VAnimation interface is updated
@@ -242,7 +242,7 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app)
 
   this->ActiveTrackSelector->SetParent(
     this->VAnimationInterface->GetSelectorFrame());
-  this->ActiveTrackSelector->Create(app);
+  this->ActiveTrackSelector->Create();
   this->ActiveTrackSelector->SetReliefToFlat();
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->ActiveTrackSelector->GetWidgetName());
@@ -1042,7 +1042,7 @@ void vtkPVAnimationManager::SaveAnimation()
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveAnimationFile2");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
-  saveDialog->Create(this->GetApplication());
+  saveDialog->Create();
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
@@ -1082,7 +1082,7 @@ void vtkPVAnimationManager::SaveAnimation()
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(pvWin);
-    dlg->Create(this->GetApplication());
+    dlg->Create();
     // is this a video format
     int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
       !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
@@ -1107,7 +1107,7 @@ void vtkPVAnimationManager::SaveAnimation()
       }
     vtkKWFrame *frame = vtkKWFrame::New();
     frame->SetParent(dlg->GetTopFrame());
-    frame->Create(this->GetApplication());
+    frame->Create();
 
     int origWidth = view->GetRenderWindowSize()[0];
     int origHeight = view->GetRenderWindowSize()[1];
@@ -1115,19 +1115,19 @@ void vtkPVAnimationManager::SaveAnimation()
     vtkKWEntryWithLabel *widthEntry = vtkKWEntryWithLabel::New();
     widthEntry->GetLabel()->SetText("Width:");
     widthEntry->SetParent(frame);
-    widthEntry->Create(this->GetApplication());
+    widthEntry->Create();
     widthEntry->GetWidget()->SetValueAsInt(origWidth);
 
     vtkKWEntryWithLabel *heightEntry = vtkKWEntryWithLabel::New();
     heightEntry->GetLabel()->SetText("Height:");
     heightEntry->SetParent(frame);
-    heightEntry->Create(this->GetApplication());
+    heightEntry->Create();
     heightEntry->GetWidget()->SetValueAsInt(origHeight);
 
     vtkKWEntryWithLabel *framerateEntry = vtkKWEntryWithLabel::New();
     framerateEntry->GetLabel()->SetText("Frame Rate:");
     framerateEntry->SetParent(frame);
-    framerateEntry->Create(this->GetApplication());
+    framerateEntry->Create();
     framerateEntry->GetWidget()->SetValueAsInt(15);
 
     this->Script("pack %s %s -side left -fill both -expand t",
@@ -1223,7 +1223,7 @@ void vtkPVAnimationManager::SaveGeometry()
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
-  saveDialog->Create(this->GetApplication());
+  saveDialog->Create();
   saveDialog->SetTitle("Save Animation Geometry");
   saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
   if(saveDialog->Invoke() && (strlen(saveDialog->GetFileName()) > 0))

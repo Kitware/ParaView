@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Convenience method to Set/Get the current background and foreground colors

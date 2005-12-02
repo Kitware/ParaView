@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
 protected:
   vtkKWCompositeWidget() {};

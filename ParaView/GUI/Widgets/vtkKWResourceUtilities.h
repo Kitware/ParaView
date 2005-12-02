@@ -23,7 +23,6 @@
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
 class vtkKWWidget;
-class vtkKWApplication;
 
 class KWWIDGETS_EXPORT vtkKWResourceUtilities : public vtkObject
 {

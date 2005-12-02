@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.20");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.21");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -192,7 +192,7 @@ void vtkPVSimpleAnimationCue::Observe(vtkObject* toObserve, unsigned long event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSimpleAnimationCue::Create(vtkKWApplication* app)
+void vtkPVSimpleAnimationCue::Create()
 {
   if (!this->KeyFrameParent)
     {
@@ -209,7 +209,7 @@ void vtkPVSimpleAnimationCue::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->CreateProxy();
 }
@@ -387,7 +387,7 @@ void vtkPVSimpleAnimationCue::InitializeGUIFromProxy()
       continue;
       }
     kf->SetKeyFrameProxy(kfProxy); 
-    kf->Create(this->GetApplication());
+    kf->Create();
     this->PVKeyFrames->AddItem(kf);
     kf->Delete();
     }
@@ -798,7 +798,7 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
     {
     return -1;
     }
-  keyframe->Create(this->GetApplication());
+  keyframe->Create();
   keyframe->SetDuration(this->Duration);
   keyframe->SetKeyTime(time);
   int id = this->AddKeyFrame(keyframe);
@@ -1375,7 +1375,7 @@ vtkPVKeyFrame* vtkPVSimpleAnimationCue::ReplaceKeyFrame(int type,
     }
   keyFrame->SetParent(this->GetKeyFrameParent());
   keyFrame->SetAnimationCueProxy(this->GetCueProxy());
-  keyFrame->Create(this->GetApplication());
+  keyFrame->Create();
   this->ReplaceKeyFrame(replaceFrame, keyFrame);
   keyFrame->Delete();
   return keyFrame;

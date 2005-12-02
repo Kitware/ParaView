@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.14");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVTraceFileDialog::vtkPVTraceFileDialog()
@@ -55,7 +55,7 @@ vtkPVTraceFileDialog::~vtkPVTraceFileDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
+void vtkPVTraceFileDialog::Create()
 {
   // Check if already created
 
@@ -66,12 +66,12 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
     }
 
   // invoke super method
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  this->SaveFrame->Create(app);
+  this->SaveFrame->Create();
   this->SaveFrame->SetBorderWidth(3);
 
-  this->SaveButton->Create(app);
+  this->SaveButton->Create();
   this->SaveButton->SetText("Save");
   this->SaveButton->SetWidth(16);
   this->SaveButton->SetCommand(this, "Save");
@@ -90,10 +90,10 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app)
     this->SaveButton->AddBinding(
       "<Return>", this, "Save");
     }
-  this->RetraceFrame->Create(app);
+  this->RetraceFrame->Create();
   this->SaveFrame->SetBorderWidth(3);
 
-  this->RetraceButton->Create(app);
+  this->RetraceButton->Create();
   this->RetraceButton->SetText("Recover");
   this->RetraceButton->SetWidth(16);
   this->RetraceButton->SetCommand(this, "Retrace");

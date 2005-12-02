@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.7");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.8");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -88,24 +88,24 @@ vtkPVPropertyKeyFrame::~vtkPVPropertyKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPropertyKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVPropertyKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 
   this->ValueLabel->SetParent(this);
-  this->ValueLabel->Create(app);
+  this->ValueLabel->Create();
   this->ValueLabel->SetText("Value:");
   this->CreateValueWidget();
 
   this->MinButton->SetParent(this);
-  this->MinButton->Create(this->GetApplication());
+  this->MinButton->Create();
   this->MinButton->SetText("min");
   this->MinButton->SetBalloonHelpString(
     "Set the value to the minimum possible, given the "
     "current state of the system.");
   this->MinButton->SetCommand(this,"MinimumCallback");
   this->MaxButton->SetParent(this);
-  this->MaxButton->Create(this->GetApplication());
+  this->MaxButton->Create();
   this->MaxButton->SetText("max");
   this->MaxButton->SetBalloonHelpString(
     "Set the value to the maximum possible, given the "
@@ -163,7 +163,7 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
     valueList->SetParent(this);
     // vtkPVContourEntry complains if the property is not set.
     valueList->SetSMProperty(property);
-    valueList->Create(this->GetApplication());
+    valueList->Create();
     valueList->SetModifiedCommand(this->GetTclName(),"ValueChangedCallback");
     this->ValueWidget = valueList;
     }
@@ -174,7 +174,7 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
       vtkPVSelectionList* pvList = vtkPVSelectionList::New();
       pvList->SetParent(this);
       pvList->SetLabelVisibility(0);
-      pvList->Create(this->GetApplication());
+      pvList->Create();
       pvList->SetModifiedCommand(this->GetTclName(), "ValueChangedCallback");
       this->ValueWidget = pvList;
       }
@@ -183,7 +183,7 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
       vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
       pvWheel->SetParent(this);
       pvWheel->PopupModeOn();
-      pvWheel->Create(this->GetApplication());
+      pvWheel->Create();
       pvWheel->DisplayEntryOn();
       pvWheel->DisplayLabelOff();
       pvWheel->DisplayEntryAndLabelOnTopOff();

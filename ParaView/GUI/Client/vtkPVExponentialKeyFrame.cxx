@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.11");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.12");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -64,19 +64,19 @@ vtkPVExponentialKeyFrame::~vtkPVExponentialKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVExponentialKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 
   this->BaseLabel->SetParent(this);
-  this->BaseLabel->Create(app);
+  this->BaseLabel->Create();
   this->BaseLabel->SetText("Base:");
 
   this->BaseThumbWheel->SetParent(this);
   this->BaseThumbWheel->PopupModeOn();
   this->BaseThumbWheel->SetValue(0.0);
   this->BaseThumbWheel->SetResolution(0.01);
-  this->BaseThumbWheel->Create(app);
+  this->BaseThumbWheel->Create();
   this->BaseThumbWheel->DisplayEntryOn();
   this->BaseThumbWheel->DisplayLabelOff();
   this->BaseThumbWheel->DisplayEntryAndLabelOnTopOff();
@@ -86,14 +86,14 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->BaseThumbWheel->SetEntryCommand(this, "BaseChangedCallback");
 
   this->StartPowerLabel->SetParent(this);
-  this->StartPowerLabel->Create(app);
+  this->StartPowerLabel->Create();
   this->StartPowerLabel->SetText("Start Power:");
 
   this->StartPowerThumbWheel->SetParent(this);
   this->StartPowerThumbWheel->PopupModeOn();
   this->StartPowerThumbWheel->SetValue(0.0);
   this->StartPowerThumbWheel->SetResolution(0.01);
-  this->StartPowerThumbWheel->Create(app);
+  this->StartPowerThumbWheel->Create();
   this->StartPowerThumbWheel->DisplayEntryOn();
   this->StartPowerThumbWheel->DisplayLabelOff();
   this->StartPowerThumbWheel->DisplayEntryAndLabelOnTopOff();
@@ -103,14 +103,14 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->StartPowerThumbWheel->SetEntryCommand(this, "StartPowerChangedCallback");
 
   this->EndPowerLabel->SetParent(this);
-  this->EndPowerLabel->Create(app);
+  this->EndPowerLabel->Create();
   this->EndPowerLabel->SetText("End Power:");
 
   this->EndPowerThumbWheel->SetParent(this);
   this->EndPowerThumbWheel->PopupModeOn();
   this->EndPowerThumbWheel->SetValue(0.0);
   this->EndPowerThumbWheel->SetResolution(0.01);
-  this->EndPowerThumbWheel->Create(app);
+  this->EndPowerThumbWheel->Create();
   this->EndPowerThumbWheel->DisplayEntryOn();
   this->EndPowerThumbWheel->DisplayLabelOff();
   this->EndPowerThumbWheel->DisplayEntryAndLabelOnTopOff();

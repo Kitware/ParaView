@@ -96,7 +96,7 @@ protected:
   
   // Description:
   // Create the GUI for this type of keyframe.
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
   // Description:
   // Update the values from the vtkSMKeyFrameProxy.

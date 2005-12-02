@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.27");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -64,7 +64,7 @@ vtkKWPopupButton::~vtkKWPopupButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupButton::Create(vtkKWApplication *app)
+void vtkKWPopupButton::Create()
 {
   // Check if already created
 
@@ -77,14 +77,15 @@ void vtkKWPopupButton::Create(vtkKWApplication *app)
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   ostrstream tk_cmd;
 
   // Create  top level window
 
   this->PopupTopLevel->SetMasterWindow(this);
-  this->PopupTopLevel->Create(app);
+  this->PopupTopLevel->SetApplication(this->GetApplication());
+  this->PopupTopLevel->Create();
   this->PopupTopLevel->SetBorderWidth(2);
   this->PopupTopLevel->SetReliefToFlat();
   this->PopupTopLevel->Withdraw();
@@ -100,7 +101,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app)
   // Create the frame
 
   this->PopupFrame->SetParent(PopupTopLevel);
-  this->PopupFrame->Create(app);
+  this->PopupFrame->Create();
   this->PopupFrame->SetBorderWidth(2);
 
   tk_cmd << "pack " << this->PopupFrame->GetWidgetName() 
@@ -109,7 +110,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app)
   // Create the close button
 
   this->PopupCloseButton->SetParent(PopupTopLevel);
-  this->PopupCloseButton->Create(app);
+  this->PopupCloseButton->Create();
   this->PopupCloseButton->SetText("Close");
 
   tk_cmd << "pack " << this->PopupCloseButton->GetWidgetName() 
@@ -213,7 +214,7 @@ void vtkKWPopupButton::DisplayPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWPopupButton::WithdrawPopupCallback()
 {
-  if ( this->GetApplication()->IsDialogUp() )
+  if (this->GetApplication()->IsDialogUp())
     {
     vtkKWTkUtilities::Bell(this->GetApplication());
     return;

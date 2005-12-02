@@ -44,10 +44,16 @@ public:
   vtkGetObjectMacro(Parent, vtkKWWidget);
 
   // Description:
+  // Get the application instance for this object.
+  // Override the superclass to try to retrieve the parent's application
+  // if it was not set already.
+  virtual vtkKWApplication* GetApplication();
+
+  // Description:
   // Create the widget.
   // The parent should be set before calling this method.
   // Subclasses should implement a Create() method with the same signature.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the name of the underlying Tk widget being used.
@@ -213,7 +219,7 @@ public:
   // of the 'toplevel' widget.
   // Return 1 on success, 0 otherwise.
   virtual int CreateSpecificTkWidget(
-    vtkKWApplication *app, const char *type, const char *args = NULL);
+    const char *type, const char *args = NULL);
 
 protected:
   vtkKWWidget();

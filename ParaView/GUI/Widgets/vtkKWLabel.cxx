@@ -11,7 +11,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
@@ -19,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.46");
+vtkCxxRevisionMacro(vtkKWLabel, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -90,11 +89,11 @@ void vtkKWLabel::UpdateText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::Create(vtkKWApplication *app)
+void vtkKWLabel::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "label"))
+  if (!this->Superclass::CreateSpecificTkWidget("label"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

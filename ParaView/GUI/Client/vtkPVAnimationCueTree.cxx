@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.19");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -78,14 +78,14 @@ vtkPVAnimationCueTree::~vtkPVAnimationCueTree()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::Create(vtkKWApplication* app)
+void vtkPVAnimationCueTree::Create()
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("Widget already created");
     return;
     }
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   if (!this->IsCreated())
     {
@@ -93,18 +93,18 @@ void vtkPVAnimationCueTree::Create(vtkKWApplication* app)
     }
  
   this->NavigatorContainer->SetParent(this);
-  this->NavigatorContainer->Create(app);
+  this->NavigatorContainer->Create();
 
   this->NavigatorCanvas->SetParent(this->NavigatorContainer);
-  this->NavigatorCanvas->Create(app);
+  this->NavigatorCanvas->Create();
   this->NavigatorCanvas->SetWidth(15);
   this->NavigatorCanvas->SetHeight(0);
 
   this->NavigatorChildrenFrame->SetParent(this->NavigatorContainer);
-  this->NavigatorChildrenFrame->Create(app);
+  this->NavigatorChildrenFrame->Create();
 
   this->TimeLineChildrenFrame->SetParent(this->TimeLineContainer);
-  this->TimeLineChildrenFrame->Create(app);
+  this->TimeLineChildrenFrame->Create();
 
   this->Script("bind %s <ButtonPress-1> {%s ToggleExpandedState}",
     this->Image->GetWidgetName(),
@@ -141,7 +141,7 @@ void vtkPVAnimationCueTree::AddChildCue(vtkPVAnimationCue* child)
   child->GetTraceHelper()->SetReferenceCommand(str.str());
   child->SetParentAnimationCue(this);
   str.rdbuf()->freeze(0);
-  child->Create(this->GetApplication());
+  child->Create();
   child->SetReliefToFlat();
   child->PackWidget();
   // Set the time marker for the child so it's not out of sync.

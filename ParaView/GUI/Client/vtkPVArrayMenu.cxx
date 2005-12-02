@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.82");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.83");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -94,7 +94,7 @@ void vtkPVArrayMenu::SetLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Create(vtkKWApplication *app)
+void vtkPVArrayMenu::Create()
 {
   // Check if already created
 
@@ -106,25 +106,25 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtkKWFrame *extraFrame;
 
   // Extra frame is needed because of the range label.
   extraFrame = vtkKWFrame::New();
   extraFrame->SetParent(this);
-  extraFrame->Create(app);
+  extraFrame->Create();
   this->Script("pack %s -side top -fill x -expand t",
                extraFrame->GetWidgetName());
 
   this->Label->SetParent(extraFrame);
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetJustificationToRight();
   this->Label->SetWidth(18);
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->ArrayMenu->SetParent(extraFrame);
-  this->ArrayMenu->Create(app);
+  this->ArrayMenu->Create();
   this->Script("pack %s -side left", this->ArrayMenu->GetWidgetName());
 
   extraFrame->Delete();

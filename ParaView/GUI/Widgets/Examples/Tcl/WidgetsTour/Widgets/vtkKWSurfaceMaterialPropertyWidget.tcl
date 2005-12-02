@@ -15,7 +15,7 @@ proc vtkKWSurfaceMaterialPropertyWidgetEntryPoint {parent win} {
 
   vtkKWSurfaceMaterialPropertyWidget sprop1_widget
   sprop1_widget SetParent $parent
-  sprop1_widget Create $app
+  sprop1_widget Create
   sprop1_widget SetBalloonHelpString \
     "A surface material property widget."
 
@@ -31,7 +31,7 @@ proc vtkKWSurfaceMaterialPropertyWidgetEntryPoint {parent win} {
   vtkKWSurfaceMaterialPropertyWidget sprop2_widget
   sprop2_widget SetParent $parent
   sprop2_widget PopupModeOn
-  sprop2_widget Create $app
+  sprop2_widget Create
   sprop2_widget SetBalloonHelpString \
     "A surface material property widget created in popup mode. Note that\
     it edits the same surface property object as the first widget."

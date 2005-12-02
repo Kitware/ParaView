@@ -49,12 +49,18 @@ public:
   vtkGetObjectMacro(MasterWindow, vtkKWWidget);
 
   // Description:
+  // Get the application instance for this object.
+  // Override the superclass to try to retrieve the masterwindow's application
+  // if it was not set already.
+  virtual vtkKWApplication* GetApplication();
+
+  // Description:
   // Create the widget.
   // Make sure WindowClass is set before calling this method (if needed).
   // If MasterWindow is set and is a vtkKWTopLevel, its class will be used
   // to set our own WindowClass.
   // Withdraw() is called at the end of the creation.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Display the toplevel. Hide it with the Withdraw() method.

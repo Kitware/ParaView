@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.16");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.17");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -128,7 +128,7 @@ vtkPVTrackEditor::~vtkPVTrackEditor()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTrackEditor::Create(vtkKWApplication* app)
+void vtkPVTrackEditor::Create()
 {
   
   // Check if already created
@@ -141,10 +141,10 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->KeyFramePropertiesFrame->SetParent(this);
-  this->KeyFramePropertiesFrame->Create(app);
+  this->KeyFramePropertiesFrame->Create();
   this->KeyFramePropertiesFrame->SetLabelText(
     VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
   this->Script(
@@ -152,21 +152,21 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
     this->KeyFramePropertiesFrame->GetWidgetName());
 
   this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->TitleLabelLabel->Create(app);
+  this->TitleLabelLabel->Create();
   this->TitleLabelLabel->SetText("Current Track:");
   
   this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->TitleLabel->Create(app);
+  this->TitleLabel->Create();
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->GetApplication()->GetMainInterp(), 
     this->TitleLabel->GetWidgetName());
 
 
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->PropertiesFrame->Create(app);
+  this->PropertiesFrame->Create();
 
   this->IndexScale->SetParent(this->PropertiesFrame);
-  this->IndexScale->Create(app);
+  this->IndexScale->Create();
   this->IndexScale->SetResolution(1);
   this->IndexScale->SetLabelText("Index:");
   this->IndexScale->SetCommand(this, "IndexChangedCallback");
@@ -177,17 +177,17 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
     "current track");
 
   this->TypeLabel->SetParent(this->PropertiesFrame);
-  this->TypeLabel->Create(app);
+  this->TypeLabel->Create();
   this->TypeLabel->SetText("Interpolation:");
 
   this->TypeImage->SetParent(this->PropertiesFrame);
-  this->TypeImage->Create(app);
+  this->TypeImage->Create();
   this->TypeImage->SetReliefToFlat();
   this->TypeImage->SetBalloonHelpString("Specify the type of interpolation "
                                         "starting at the active key frame.");
 
   this->TypeMenuButton->SetParent(this->PropertiesFrame);
-  this->TypeMenuButton->Create(app);
+  this->TypeMenuButton->Create();
   this->TypeMenuButton->SetReliefToFlat();
   this->TypeMenuButton->SetConfigurationOption(
     "-image", "PVToolbarPullDownArrow");
@@ -199,14 +199,14 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
   this->BuildTypeMenu();
 
   this->AddKeyFrameButton->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->AddKeyFrameButton->Create(app);
+  this->AddKeyFrameButton->Create();
   this->AddKeyFrameButton->SetBalloonHelpString("Append a new key frame");
   this->AddKeyFrameButton->SetText("Add KeyFrame");
   this->AddKeyFrameButton->SetCommand(this, "AddKeyFrameButtonCallback");
 
   this->DeleteKeyFrameButton->SetParent(
     this->KeyFramePropertiesFrame->GetFrame());
-  this->DeleteKeyFrameButton->Create(app);
+  this->DeleteKeyFrameButton->Create();
   this->DeleteKeyFrameButton->SetBalloonHelpString("Delete active key frame");
   this->DeleteKeyFrameButton->SetText("Delete KeyFrame");
   this->DeleteKeyFrameButton->SetCommand(this, "DeleteKeyFrameButtonCallback");
@@ -216,7 +216,7 @@ void vtkPVTrackEditor::Create(vtkKWApplication* app)
   this->SelectKeyFrameLabel->SetText("No source selected.");
   
   
-  this->SelectKeyFrameLabel->Create(app);
+  this->SelectKeyFrameLabel->Create();
   this->SelectKeyFrameLabel->SetJustificationToLeft();
   this->Script("grid %s - -row 1 -sticky ew", 
                this->SelectKeyFrameLabel->GetWidgetName());

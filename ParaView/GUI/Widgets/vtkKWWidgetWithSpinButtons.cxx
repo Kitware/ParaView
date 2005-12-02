@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithSpinButtons);
-vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.2");
+vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithSpinButtons::vtkKWWidgetWithSpinButtons()
@@ -38,7 +38,7 @@ vtkKWWidgetWithSpinButtons::~vtkKWWidgetWithSpinButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithSpinButtons::Create(vtkKWApplication *app)
+void vtkKWWidgetWithSpinButtons::Create()
 {
   // Check if already created
 
@@ -50,12 +50,12 @@ void vtkKWWidgetWithSpinButtons::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the spin buttons subwidget
 
   this->SpinButtons->SetParent(this);
-  this->SpinButtons->Create(app);
+  this->SpinButtons->Create();
   this->SpinButtons->SetNextCommand(this, "NextValueCallback");
   this->SpinButtons->SetPreviousCommand(this, "PreviousValueCallback");
 

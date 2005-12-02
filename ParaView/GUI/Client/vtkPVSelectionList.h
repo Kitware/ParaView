@@ -39,7 +39,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value

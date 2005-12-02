@@ -20,19 +20,20 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.8");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.9");
 
 //----------------------------------------------------------------------------
-void vtkKWComboBox::Create(vtkKWApplication *app)
+void vtkKWComboBox::Create()
 {
   // Use BWidget's ComboBox class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
-
+  
+  vtkKWApplication *app = this->GetApplication();
   vtkKWBWidgetsInit::Initialize(app ? app->GetMainInterp() : NULL);
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "ComboBox"))
+  if (!this->Superclass::CreateSpecificTkWidget("ComboBox"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

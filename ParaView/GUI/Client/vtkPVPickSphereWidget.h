@@ -61,7 +61,7 @@ protected:
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
+  virtual void ChildCreate();
 
 // ATTRIBUTE EDITOR
   vtkKWLabel* InstructionsLabel;

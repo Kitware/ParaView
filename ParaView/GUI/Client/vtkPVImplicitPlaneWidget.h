@@ -124,7 +124,7 @@ public:
   // Description:
   // Create the widget.
   // Overloaded to create the ImplicitFunctionProxy
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Updates the Offset property of the plane proxy 
@@ -147,7 +147,7 @@ protected:
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
+  virtual void ChildCreate();
 
   // Description:
   // Execute event of the 3D Widget.

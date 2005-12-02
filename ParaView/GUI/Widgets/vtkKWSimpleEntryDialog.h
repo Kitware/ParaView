@@ -18,7 +18,6 @@
 
 #include "vtkKWMessageDialog.h"
 
-class vtkKWApplication;
 class vtkKWEntryWithLabel;
 
 class KWWIDGETS_EXPORT vtkKWSimpleEntryDialog : public vtkKWMessageDialog
@@ -30,7 +29,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Access to the entry

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.11");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVRenderGroupDialog::vtkPVRenderGroupDialog()
@@ -127,7 +127,7 @@ void vtkPVRenderGroupDialog::SetMasterWindow(vtkKWWindow* win)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
+void vtkPVRenderGroupDialog::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
@@ -164,16 +164,16 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
     }
 
   this->ControlFrame->SetParent(this);
-  this->ControlFrame->Create(app);
+  this->ControlFrame->Create();
   this->Script("pack %s -side top -fill x -expand 0 -pady 2m",
                this->ControlFrame->GetWidgetName());
   this->NumberLabel->SetParent(this->ControlFrame);
-  this->NumberLabel->Create(app);
+  this->NumberLabel->Create();
   this->NumberLabel->SetLabel("Number of Processes in Rendering Group:");
   this->NumberLabel->SetBalloonHelpString(
     "Specify how many processes you want to use for rendering.");
   this->NumberEntry->SetParent(this->ControlFrame);
-  this->NumberEntry->Create(app);
+  this->NumberEntry->Create();
   this->NumberEntry->SetBalloonHelpString(
     "This option filters out short duration events.");
   this->Script("pack %s %s -side left",
@@ -185,21 +185,21 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
                this->NumberEntry->GetWidgetName(), this->GetTclName());
 
   this->DisplayFrame->SetParent(this);
-  this->DisplayFrame->Create(app);
+  this->DisplayFrame->Create();
   this->Display0Label->SetParent(this->DisplayFrame);
-  this->Display0Label->Create(app, " -background white -justify left");
+  this->Display0Label->Create();
 
   for (idx = 0; idx < this->NumberOfProcessesInGroup; ++idx)
     {
-    this->DisplayEntries[idx]->Create(app);
+    this->DisplayEntries[idx]->Create();
     }
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(app);
+  this->ButtonFrame->Create();
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
   this->AcceptButton->SetParent(this->ButtonFrame);
-  this->AcceptButton->Create(app);
+  this->AcceptButton->Create();
   this->AcceptButton->SetCommand(this, "Accept");
   this->AcceptButton->SetLabel("Accept");
   this->Script("pack %s -side left -expand 1 -fill x",
@@ -336,7 +336,7 @@ void vtkPVRenderGroupDialog::SetNumberOfProcessesInGroup(int num)
       tmp[idx]->SetParent(this->DisplayFrame);
       if (this->IsCreated())
         {
-        tmp[idx]->Create(this->GetApplication());
+        tmp[idx]->Create();
         }
       }
       if (this->DisplayEntries)

@@ -13,12 +13,11 @@
 =========================================================================*/
 #include "vtkKWSeparator.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSeparator );
-vtkCxxRevisionMacro(vtkKWSeparator, "1.1");
+vtkCxxRevisionMacro(vtkKWSeparator, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWSeparator::vtkKWSeparator()
@@ -28,7 +27,7 @@ vtkKWSeparator::vtkKWSeparator()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSeparator::Create(vtkKWApplication *app)
+void vtkKWSeparator::Create()
 {
   // Check if already created
 
@@ -40,7 +39,7 @@ void vtkKWSeparator::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetBorderWidth(2);
 

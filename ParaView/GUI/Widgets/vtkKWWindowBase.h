@@ -21,7 +21,6 @@
 
 #include "vtkKWTopLevel.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenu;
@@ -42,7 +41,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Close this window, possibly prompting the user.

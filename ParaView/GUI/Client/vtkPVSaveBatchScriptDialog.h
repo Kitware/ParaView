@@ -40,7 +40,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Access to the results of the dialog.

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
@@ -62,7 +62,7 @@ vtkPVExtractPartsWidget::~vtkPVExtractPartsWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
+void vtkPVExtractPartsWidget::Create()
 {
   // Check if already created
 
@@ -74,22 +74,20 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  this->Superclass::Create();
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(pvApp);
+  this->ButtonFrame->Create();
   this->Script("pack %s -side top -fill x",
                this->ButtonFrame->GetWidgetName());
 
   this->AllOnButton->SetParent(this->ButtonFrame);
-  this->AllOnButton->Create(pvApp);
+  this->AllOnButton->Create();
   this->AllOnButton->SetText("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
 
   this->AllOffButton->SetParent(this->ButtonFrame);
-  this->AllOffButton->Create(pvApp);
+  this->AllOffButton->Create();
   this->AllOffButton->SetText("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
 
@@ -98,7 +96,7 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
                this->AllOffButton->GetWidgetName());
 
   this->PartSelectionList->SetParent(this);
-  this->PartSelectionList->Create(app);
+  this->PartSelectionList->Create();
   this->PartSelectionList->SetSingleClickCommand(this, "PartSelectionCallback");
   this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->ExportSelectionOff();
@@ -140,7 +138,7 @@ void vtkPVExtractPartsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(this->PartSelectionList->GetItem(idx));
-      label->Create(this->GetApplication());
+      label->Create();
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

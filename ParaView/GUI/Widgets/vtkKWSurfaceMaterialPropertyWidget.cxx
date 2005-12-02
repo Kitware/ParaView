@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWSurfaceMaterialPropertyWidget.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkProperty.h"
@@ -22,7 +21,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWSurfaceMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWSurfaceMaterialPropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWSurfaceMaterialPropertyWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWSurfaceMaterialPropertyWidget::vtkKWSurfaceMaterialPropertyWidget()

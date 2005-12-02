@@ -31,7 +31,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Invoke the dialog, display it and enter an event loop until the user

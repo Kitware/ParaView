@@ -29,7 +29,7 @@ app SetHelpDialogStartingPage "http://public.kitware.com/KWWidgets"
 vtkKWWindow win
 win SupportHelpOn
 app AddWindow win
-win Create app
+win Create
 win SecondaryPanelVisibilityOff
 
 # Add a render widget, attach it to the view frame, and pack
@@ -38,7 +38,7 @@ win SecondaryPanelVisibilityOff
 
 vtkKWRenderWidget rw
 rw SetParent [win GetViewFrame]
-rw Create app
+rw Create
 rw CornerAnnotationVisibilityOn
 
 pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
@@ -82,7 +82,7 @@ $ca SetText 3 "<window>\n<level>"
 
 vtkKWScale slice_scale
 slice_scale SetParent [win GetViewPanelFrame]
-slice_scale Create app
+slice_scale Create
 slice_scale SetCommand "" {viewer SetSlice [slice_scale GetValue]}
 
 proc update_slice_scale {} { 
@@ -99,7 +99,7 @@ pack [slice_scale GetWidgetName] -side top -expand n -fill x -padx 2 -pady 2
 vtkKWMenuButtonWithSpinButtonsWithLabel orientation_menubutton
 
 orientation_menubutton SetParent [win GetMainPanelFrame]
-orientation_menubutton Create app
+orientation_menubutton Create
 orientation_menubutton SetLabelText "Orientation:"
 orientation_menubutton SetPadX 2
 orientation_menubutton SetPadY 2
@@ -118,7 +118,7 @@ $mb SetValue "X-Y"
 
 vtkKWFrameWithLabel wl_frame
 wl_frame SetParent [win GetMainPanelFrame] 
-wl_frame Create app
+wl_frame Create
 wl_frame SetLabelText "Window/Level Presets"
 
 pack [wl_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
@@ -126,7 +126,7 @@ pack [wl_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
 vtkKWWindowLevelPresetSelector wl_preset_selector
 
 wl_preset_selector SetParent [wl_frame GetFrame] 
-wl_preset_selector Create app
+wl_preset_selector Create
 wl_preset_selector ThumbnailColumnVisibilityOn
 wl_preset_selector SetPresetApplyCommand "" "wl_preset_apply"
 wl_preset_selector SetPresetAddCommand "" "wl_preset_add"
@@ -161,14 +161,14 @@ proc wl_preset_has_changed {id} {
 
 vtkKWFrameWithLabel animation_frame
 animation_frame SetParent [win GetMainPanelFrame] 
-animation_frame Create app
+animation_frame Create
 animation_frame SetLabelText "Movie Creator"
 
 pack [animation_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
 
 vtkKWSimpleAnimationWidget animation_widget
 animation_widget SetParent [animation_frame GetFrame] 
-animation_widget Create app
+animation_widget Create
 animation_widget SetRenderWidget rw
 animation_widget SetAnimationTypeToSlice
 animation_widget SetSliceSetCommand viewer "SetSlice"

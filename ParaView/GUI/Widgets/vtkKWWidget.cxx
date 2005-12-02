@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.142");
+vtkCxxRevisionMacro(vtkKWWidget, "1.143");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -133,6 +133,18 @@ void vtkKWWidget::SetParent(vtkKWWidget *p)
 }
 
 //----------------------------------------------------------------------------
+vtkKWApplication* vtkKWWidget::GetApplication()
+{
+  if (!this->Superclass::GetApplication() &&
+      this->Parent && this->Parent->GetApplication())
+    {
+    this->SetApplication(this->Parent->GetApplication());
+    }
+
+  return this->Superclass::GetApplication();
+}
+
+//----------------------------------------------------------------------------
 const char *vtkKWWidget::GetWidgetName()
 {
   static unsigned long count = 0;
@@ -166,14 +178,13 @@ const char *vtkKWWidget::GetWidgetName()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::Create(vtkKWApplication *app)
+void vtkKWWidget::Create()
 {
-  this->CreateSpecificTkWidget(app, NULL, NULL);
+  this->CreateSpecificTkWidget(NULL, NULL);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidget::CreateSpecificTkWidget(vtkKWApplication *app, 
-                                        const char *type, 
+int vtkKWWidget::CreateSpecificTkWidget(const char *type, 
                                         const char *args)
 {
   if (this->IsCreated())
@@ -190,13 +201,12 @@ int vtkKWWidget::CreateSpecificTkWidget(vtkKWApplication *app,
     return 0;
     }
 
+  vtkKWApplication *app = this->GetApplication();
   if (!app)
     {
-    vtkErrorMacro("Can not create widget with NULL application. Make sure you did not SafeDowncast a vtkKWApplication to a more specific subclass.");
+    vtkErrorMacro("Can not create widget if its application attribute was not set. Make sure that you called the SetApplication method on this widget, or that you set its parent to a widget which application attribute is set already.");
     return 0;
     }
-
-  this->SetApplication(app);
 
   if (this->HasDragAndDropTargetSet())
     {

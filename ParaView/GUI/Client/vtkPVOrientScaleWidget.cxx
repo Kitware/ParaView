@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -158,7 +158,7 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
+void vtkPVOrientScaleWidget::Create()
 {
   // Check if already created
 
@@ -170,24 +170,24 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create();
   this->LabeledFrame->SetLabelText("Orient / Scale");
   
-  this->ScalarsFrame->Create(app);
-  this->ScalarsLabel->Create(app); 
+  this->ScalarsFrame->Create();
+  this->ScalarsLabel->Create(); 
   this->ScalarsLabel->SetWidth(18); 
   this->ScalarsLabel->SetText("Scalars");
   this->ScalarsLabel->EnabledOff();
-  this->ScalarsMenu->Create(app);
+  this->ScalarsMenu->Create();
   this->ScalarsMenu->EnabledOff();
   
-  this->VectorsFrame->Create(app);
-  this->VectorsLabel->Create(app);
+  this->VectorsFrame->Create();
+  this->VectorsLabel->Create();
   this->VectorsLabel->SetWidth(18); 
   this->VectorsLabel->SetText("Vectors");
-  this->VectorsMenu->Create(app);
+  this->VectorsMenu->Create();
 
   this->Script("pack %s -side left", this->ScalarsLabel->GetWidgetName());
   this->Script("pack %s -side left -fill x -expand yes",
@@ -197,11 +197,11 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -fill x -expand yes",
                this->VectorsMenu->GetWidgetName());
   
-  this->OrientModeFrame->Create(app);
-  this->OrientModeLabel->Create(app);
+  this->OrientModeFrame->Create();
+  this->OrientModeLabel->Create();
   this->OrientModeLabel->SetWidth(18); 
   this->OrientModeLabel->SetText("Orient Mode");
-  this->OrientModeMenu->Create(app);
+  this->OrientModeMenu->Create();
   this->OrientModeMenu->AddRadioButton(
     "Off", this, "OrientModeMenuCallback");
   this->OrientModeMenu->AddRadioButton(
@@ -213,11 +213,11 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -fill x -expand yes",
                this->OrientModeMenu->GetWidgetName());
 
-  this->ScaleModeFrame->Create(app);
-  this->ScaleModeLabel->Create(app);
+  this->ScaleModeFrame->Create();
+  this->ScaleModeLabel->Create();
   this->ScaleModeLabel->SetWidth(18); 
   this->ScaleModeLabel->SetText("Scale Mode");
-  this->ScaleModeMenu->Create(app);
+  this->ScaleModeMenu->Create();
   this->ScaleModeMenu->AddRadioButton("Scalar", this,
                                       "ScaleModeMenuCallback");
   this->ScaleModeMenu->AddRadioButton("Vector Magnitude", this,
@@ -233,11 +233,11 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -fill x -expand yes",
                this->ScaleModeMenu->GetWidgetName());
   
-  this->ScaleFactorFrame->Create(app);
-  this->ScaleFactorLabel->Create(app);
+  this->ScaleFactorFrame->Create();
+  this->ScaleFactorLabel->Create();
   this->ScaleFactorLabel->SetWidth(18); 
   this->ScaleFactorLabel->SetText("Scale Factor");
-  this->ScaleFactorEntry->Create(app);
+  this->ScaleFactorEntry->Create();
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->ScaleFactorEntry->GetWidgetName(), this->GetTclName());
 

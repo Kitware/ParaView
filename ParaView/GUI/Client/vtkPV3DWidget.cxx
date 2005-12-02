@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.76");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.77");
 
 //===========================================================================
 //***************************************************************************
@@ -117,10 +117,8 @@ vtkPV3DWidget::~vtkPV3DWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::Create(vtkKWApplication *app)
+void vtkPV3DWidget::Create()
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
   // Check if already created
 
   if (this->IsCreated())
@@ -131,14 +129,17 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
+    this->GetApplication());
 
   vtkKWWidget* parent = this;
 
   if (this->UseLabel)
     {
     this->LabeledFrame->SetParent(this);
-    this->LabeledFrame->Create(pvApp);
+    this->LabeledFrame->Create();
     this->LabeledFrame->SetLabelText("3D Widget");
     
     this->Script("pack %s -fill both -expand 1", 
@@ -148,13 +149,13 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     }
 
   this->Frame->SetParent(parent);
-  this->Frame->Create(pvApp);
+  this->Frame->Create();
   this->Script("pack %s -fill both -expand 1", 
                this->Frame->GetWidgetName());
   
   this->Visible = pvApp->GetDisplay3DWidgets();
   this->Visibility->SetParent(parent);
-  this->Visibility->Create(pvApp);
+  this->Visibility->Create();
   this->Visibility->SetText("Visibility");
   this->Visibility->SetBalloonHelpString(
     "Toggle the visibility of the 3D widget on/off.");
@@ -207,7 +208,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     }
 
   this->InitializeObservers(this->WidgetProxy);
-  this->ChildCreate(pvApp);
+  this->ChildCreate();
 }
 
 //----------------------------------------------------------------------------

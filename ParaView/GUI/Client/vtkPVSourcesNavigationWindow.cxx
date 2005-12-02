@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.31");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.32");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -131,7 +131,7 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
+void vtkPVSourcesNavigationWindow::Create()
 {
   // Check if already created
 
@@ -143,12 +143,12 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   const char *wname = this->GetWidgetName();
   
   this->Canvas->SetParent(this);
-  this->Canvas->Create(this->GetApplication()); 
+  this->Canvas->Create(); 
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetBackgroundColor(1.0, 1.0, 1.0);
 
@@ -166,7 +166,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
   command << this->Canvas->GetWidgetName()
           << " yview" << ends;
   char* commandStr = command.str();
-  this->ScrollBar->Create(this->GetApplication());
+  this->ScrollBar->Create();
   this->ScrollBar->SetConfigurationOption("-command", commandStr);
   delete[] commandStr;
 
@@ -181,7 +181,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app)
   this->Script("grid columnconfig %s 0 -weight 1", wname);
   this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
-  this->PopupMenu->Create(this->GetApplication());
+  this->PopupMenu->Create();
   this->PopupMenu->SetTearOff(0);
   this->PopupMenu->AddCommand("Delete", this, "PopupDeleteCallback", 0, 
        "Delete the module.  Module that are used by filters cannot be deleted.");
@@ -318,7 +318,7 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module,
             module->GetDisplayProxy()->GetRepresentationCM());
 
   // Show the popup menu in correct location (x, y is cursor position).
-  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
+  this->PopupMenu->PopUp(x, y);
 }
 
 //-----------------------------------------------------------------------------

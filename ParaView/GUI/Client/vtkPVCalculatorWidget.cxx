@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -249,7 +249,7 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
+void vtkPVCalculatorWidget::Create()
 {
   // Check if already created
 
@@ -261,24 +261,22 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  this->Superclass::Create();
 
   this->AttributeModeFrame->SetParent(this);
-  this->AttributeModeFrame->Create(pvApp);
+  this->AttributeModeFrame->Create();
   this->Script("pack %s -side top -fill x",
                this->AttributeModeFrame->GetWidgetName());
 
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
-  this->AttributeModeLabel->Create(pvApp);
+  this->AttributeModeLabel->Create();
   this->AttributeModeLabel->SetWidth(18);
   this->AttributeModeLabel->SetJustificationToRight();
   this->AttributeModeLabel->SetText("Attribute Mode");
   this->AttributeModeLabel->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
-  this->AttributeModeMenu->Create(pvApp);
+  this->AttributeModeMenu->Create();
   this->AttributeModeMenu->AddRadioButton("Point Data", this,
                                                "ChangeAttributeMode point");
   this->AttributeModeMenu->AddRadioButton("Cell Data", this,
@@ -291,13 +289,13 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->AttributeModeMenu->GetWidgetName());
   
   this->CalculatorFrame->SetParent(this);
-  this->CalculatorFrame->Create(pvApp);
+  this->CalculatorFrame->Create();
   this->CalculatorFrame->SetLabelText("Calculator");
   this->Script("pack %s -fill x -expand t -side top",
                this->CalculatorFrame->GetWidgetName());
 
   this->FunctionLabel->SetParent(this->CalculatorFrame->GetFrame());
-  this->FunctionLabel->Create(pvApp);
+  this->FunctionLabel->Create();
   this->FunctionLabel->SetValue("");
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->FunctionLabel->GetWidgetName(), this->GetTclName());
@@ -305,31 +303,31 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->FunctionLabel->GetWidgetName());
   
   this->ButtonClear->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonClear->Create(pvApp);
+  this->ButtonClear->Create();
   this->ButtonClear->SetText("Clear");
   this->ButtonClear->SetCommand(this, "ClearFunction");
   this->ButtonLeftParenthesis->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonLeftParenthesis->Create(pvApp);
+  this->ButtonLeftParenthesis->Create();
   this->ButtonLeftParenthesis->SetText("(");
   this->ButtonLeftParenthesis->SetCommand(this, "UpdateFunction (");
   this->ButtonRightParenthesis->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonRightParenthesis->Create(pvApp);
+  this->ButtonRightParenthesis->Create();
   this->ButtonRightParenthesis->SetText(")");
   this->ButtonRightParenthesis->SetCommand(this, "UpdateFunction )");
   this->ButtonIHAT->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonIHAT->Create(pvApp);
+  this->ButtonIHAT->Create();
   this->ButtonIHAT->SetText("iHat");
   this->ButtonIHAT->SetCommand(this, "UpdateFunction iHat");
   this->ButtonJHAT->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonJHAT->Create(pvApp);
+  this->ButtonJHAT->Create();
   this->ButtonJHAT->SetText("jHat");
   this->ButtonJHAT->SetCommand(this, "UpdateFunction jHat");
   this->ButtonKHAT->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonKHAT->Create(pvApp);
+  this->ButtonKHAT->Create();
   this->ButtonKHAT->SetText("kHat");
   this->ButtonKHAT->SetCommand(this, "UpdateFunction kHat");
   this->ButtonDivide->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonDivide->Create(pvApp);
+  this->ButtonDivide->Create();
   this->ButtonDivide->SetText("/");
   this->ButtonDivide->SetCommand(this, "UpdateFunction /");
   this->Script("grid %s %s %s %s %s %s %s -sticky ew",
@@ -342,31 +340,31 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonDivide->GetWidgetName());
   
   this->ButtonSin->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSin->Create(pvApp);
+  this->ButtonSin->Create();
   this->ButtonSin->SetText("sin");
   this->ButtonSin->SetCommand(this, "UpdateFunction sin");
   this->ButtonCos->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonCos->Create(pvApp);
+  this->ButtonCos->Create();
   this->ButtonCos->SetText("cos");
   this->ButtonCos->SetCommand(this, "UpdateFunction cos");
   this->ButtonTan->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonTan->Create(pvApp);
+  this->ButtonTan->Create();
   this->ButtonTan->SetText("tan");
   this->ButtonTan->SetCommand(this, "UpdateFunction tan");
   this->ButtonSeven->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSeven->Create(pvApp);
+  this->ButtonSeven->Create();
   this->ButtonSeven->SetText("7");
   this->ButtonSeven->SetCommand(this, "UpdateFunction 7");
   this->ButtonEight->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonEight->Create(pvApp);
+  this->ButtonEight->Create();
   this->ButtonEight->SetText("8");
   this->ButtonEight->SetCommand(this, "UpdateFunction 8");
   this->ButtonNine->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonNine->Create(pvApp);
+  this->ButtonNine->Create();
   this->ButtonNine->SetText("9");
   this->ButtonNine->SetCommand(this, "UpdateFunction 9");
   this->ButtonMultiply->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonMultiply->Create(pvApp);
+  this->ButtonMultiply->Create();
   this->ButtonMultiply->SetText("*");
   this->ButtonMultiply->SetCommand(this, "UpdateFunction *");
   this->Script("grid %s %s %s %s %s %s %s -sticky ew",
@@ -379,31 +377,31 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonMultiply->GetWidgetName());
   
   this->ButtonASin->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonASin->Create(pvApp);
+  this->ButtonASin->Create();
   this->ButtonASin->SetText("asin");
   this->ButtonASin->SetCommand(this, "UpdateFunction asin");
   this->ButtonACos->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonACos->Create(pvApp);
+  this->ButtonACos->Create();
   this->ButtonACos->SetText("acos");
   this->ButtonACos->SetCommand(this, "UpdateFunction acos");
   this->ButtonATan->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonATan->Create(pvApp);
+  this->ButtonATan->Create();
   this->ButtonATan->SetText("atan");
   this->ButtonATan->SetCommand(this, "UpdateFunction atan");
   this->ButtonFour->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonFour->Create(pvApp);
+  this->ButtonFour->Create();
   this->ButtonFour->SetText("4");
   this->ButtonFour->SetCommand(this, "UpdateFunction 4");
   this->ButtonFive->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonFive->Create(pvApp);
+  this->ButtonFive->Create();
   this->ButtonFive->SetText("5");
   this->ButtonFive->SetCommand(this, "UpdateFunction 5");
   this->ButtonSix->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSix->Create(pvApp);
+  this->ButtonSix->Create();
   this->ButtonSix->SetText("6");
   this->ButtonSix->SetCommand(this, "UpdateFunction 6");
   this->ButtonSubtract->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSubtract->Create(pvApp);
+  this->ButtonSubtract->Create();
   this->ButtonSubtract->SetText("-");
   this->ButtonSubtract->SetCommand(this, "UpdateFunction -");
   this->Script("grid %s %s %s %s %s %s %s -sticky ew",
@@ -416,31 +414,31 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonSubtract->GetWidgetName());
   
   this->ButtonSinh->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSinh->Create(pvApp);
+  this->ButtonSinh->Create();
   this->ButtonSinh->SetText("sinh");
   this->ButtonSinh->SetCommand(this, "UpdateFunction sinh");
   this->ButtonCosh->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonCosh->Create(pvApp);
+  this->ButtonCosh->Create();
   this->ButtonCosh->SetText("cosh");
   this->ButtonCosh->SetCommand(this, "UpdateFunction cosh");
   this->ButtonTanh->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonTanh->Create(pvApp);
+  this->ButtonTanh->Create();
   this->ButtonTanh->SetText("tanh");
   this->ButtonTanh->SetCommand(this, "UpdateFunction tanh");
   this->ButtonOne->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonOne->Create(pvApp);
+  this->ButtonOne->Create();
   this->ButtonOne->SetText("1");
   this->ButtonOne->SetCommand(this, "UpdateFunction 1");
   this->ButtonTwo->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonTwo->Create(pvApp);
+  this->ButtonTwo->Create();
   this->ButtonTwo->SetText("2");
   this->ButtonTwo->SetCommand(this, "UpdateFunction 2");
   this->ButtonThree->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonThree->Create(pvApp);
+  this->ButtonThree->Create();
   this->ButtonThree->SetText("3");
   this->ButtonThree->SetCommand(this, "UpdateFunction 3");
   this->ButtonAdd->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonAdd->Create(pvApp);
+  this->ButtonAdd->Create();
   this->ButtonAdd->SetText("+");
   this->ButtonAdd->SetCommand(this, "UpdateFunction +");
   this->Script("grid %s %s %s %s %s %s %s -sticky ew",
@@ -453,31 +451,31 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonAdd->GetWidgetName());
 
   this->ButtonPow->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonPow->Create(pvApp);
+  this->ButtonPow->Create();
   this->ButtonPow->SetText("x^y");
   this->ButtonPow->SetCommand(this, "UpdateFunction ^");
   this->ButtonSqrt->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonSqrt->Create(pvApp);
+  this->ButtonSqrt->Create();
   this->ButtonSqrt->SetText("sqrt");
   this->ButtonSqrt->SetCommand(this, "UpdateFunction sqrt");
   this->ButtonExp->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonExp->Create(pvApp);
+  this->ButtonExp->Create();
   this->ButtonExp->SetText("e^x");
   this->ButtonExp->SetCommand(this, "UpdateFunction exp");
   this->ButtonLog->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonLog->Create(pvApp);
+  this->ButtonLog->Create();
   this->ButtonLog->SetText("ln");
   this->ButtonLog->SetCommand(this, "UpdateFunction ln");
   this->ButtonLog10->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonLog10->Create(pvApp);
+  this->ButtonLog10->Create();
   this->ButtonLog10->SetText("log10");
   this->ButtonLog10->SetCommand(this, "UpdateFunction log10");
   this->ButtonZero->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonZero->Create(pvApp);
+  this->ButtonZero->Create();
   this->ButtonZero->SetText("0");
   this->ButtonZero->SetCommand(this, "UpdateFunction 0");
   this->ButtonDecimal->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonDecimal->Create(pvApp);
+  this->ButtonDecimal->Create();
   this->ButtonDecimal->SetText(".");
   this->ButtonDecimal->SetCommand(this, "UpdateFunction .");
   this->Script("grid %s %s %s %s %s %s %s -sticky ew",
@@ -490,15 +488,15 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonDecimal->GetWidgetName());
   
   this->ButtonCeiling->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonCeiling->Create(pvApp);
+  this->ButtonCeiling->Create();
   this->ButtonCeiling->SetText("ceil");
   this->ButtonCeiling->SetCommand(this, "UpdateFunction ceil");
   this->ButtonFloor->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonFloor->Create(pvApp);
+  this->ButtonFloor->Create();
   this->ButtonFloor->SetText("floor");
   this->ButtonFloor->SetCommand(this, "UpdateFunction floor");
   this->ButtonAbs->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonAbs->Create(pvApp);
+  this->ButtonAbs->Create();
   this->ButtonAbs->SetText("abs");
   this->ButtonAbs->SetCommand(this, "UpdateFunction abs");
   this->Script("grid %s %s %s -sticky ew",
@@ -507,15 +505,15 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonAbs->GetWidgetName());
   
   this->ButtonDot->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonDot->Create(pvApp);
+  this->ButtonDot->Create();
   this->ButtonDot->SetText("v1.v2");
   this->ButtonDot->SetCommand(this, "UpdateFunction .");
   this->ButtonMag->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonMag->Create(pvApp);
+  this->ButtonMag->Create();
   this->ButtonMag->SetText("mag");
   this->ButtonMag->SetCommand(this, "UpdateFunction mag");
   this->ButtonNorm->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonNorm->Create(pvApp);
+  this->ButtonNorm->Create();
   this->ButtonNorm->SetText("norm");
   this->ButtonNorm->SetCommand(this, "UpdateFunction norm");
   this->Script("grid %s %s %s -sticky ew", 
@@ -524,11 +522,11 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->ButtonNorm->GetWidgetName());
   
   this->ScalarsMenu->SetParent(this->CalculatorFrame->GetFrame());
-  this->ScalarsMenu->Create(pvApp);
+  this->ScalarsMenu->Create();
   this->ScalarsMenu->SetValue("scalars");
   this->ScalarsMenu->SetBalloonHelpString("Select a scalar array to operate on");
   this->VectorsMenu->SetParent(this->CalculatorFrame->GetFrame());
-  this->VectorsMenu->Create(pvApp);
+  this->VectorsMenu->Create();
   this->VectorsMenu->SetValue("vectors");
   this->VectorsMenu->SetBalloonHelpString("Select a vector array to operate on");
   this->Script("grid %s -row 6 -column 3 -columnspan 4 -sticky news",

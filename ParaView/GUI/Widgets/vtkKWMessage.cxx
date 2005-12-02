@@ -11,15 +11,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWMessage.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessage );
-vtkCxxRevisionMacro(vtkKWMessage, "1.1");
+vtkCxxRevisionMacro(vtkKWMessage, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMessage::vtkKWMessage()
@@ -81,11 +79,11 @@ void vtkKWMessage::UpdateText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessage::Create(vtkKWApplication *app)
+void vtkKWMessage::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "message"))
+  if (!this->Superclass::CreateSpecificTkWidget("message"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

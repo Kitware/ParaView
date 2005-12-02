@@ -36,14 +36,14 @@ vtkKWWindow win
 win SupportHelpOn
 win SetPanelLayoutToSecondaryBelowMainAndView
 app AddWindow win
-win Create app
+win Create
 
 # Add a user interface panel to the main user interface manager
 
 vtkKWUserInterfacePanel widgets_panel
 widgets_panel SetName "Widgets Interface"
 widgets_panel SetUserInterfaceManager [win GetMainUserInterfaceManager]
-widgets_panel Create app
+widgets_panel Create
 
 widgets_panel AddPage "Widgets" "Select a widget" ""
 set page_widget [widgets_panel GetPageWidget "Widgets"]
@@ -54,7 +54,7 @@ vtkKWTreeWithScrollbars widgets_tree
 widgets_tree SetParent $page_widget
 widgets_tree VerticalScrollbarVisibilityOn
 widgets_tree HorizontalScrollbarVisibilityOff
-widgets_tree Create app
+widgets_tree Create
 
 set tree [widgets_tree GetWidget]
 $tree SetPadX 0;
@@ -78,7 +78,7 @@ widgets_panel Raise
 vtkKWUserInterfacePanel source_panel
 source_panel SetName "Source Interface"
 source_panel SetUserInterfaceManager [win GetSecondaryUserInterfaceManager]
-source_panel Create app
+source_panel Create
 [win GetSecondaryNotebook] AlwaysShowTabsOff
 
 # Add a page, and divide it using a split frame
@@ -89,14 +89,14 @@ set page_widget [source_panel GetPageWidget "Source"]
 vtkKWSplitFrame source_split
 source_split SetParent $page_widget
 source_split SetExpandableFrameToBothFrames
-source_split Create app
+source_split Create
 
 pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 # Add text widget to display the Tcl example source
 
 vtkKWTextWithScrollbarsWithLabel tcl_source_text
 tcl_source_text SetParent [source_split GetFrame1]
-tcl_source_text Create app
+tcl_source_text Create
 tcl_source_text SetLabelPositionToTop
 tcl_source_text SetLabelText "Tcl Source"
 
@@ -117,7 +117,7 @@ pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pad
 
 vtkKWTextWithScrollbarsWithLabel cxx_source_text
 cxx_source_text SetParent [source_split GetFrame2]
-cxx_source_text Create app
+cxx_source_text Create
 cxx_source_text SetLabelPositionToTop
 cxx_source_text SetLabelText "C++ Source"
 
@@ -150,7 +150,7 @@ foreach widget $widgets {
   vtkKWUserInterfacePanel $panel
   $panel SetName $name
   $panel SetUserInterfaceManager [win GetViewUserInterfaceManager]
-  $panel Create app
+  $panel Create
   $panel AddPage [$panel GetName] "" ""
   lappend objects $panel
 

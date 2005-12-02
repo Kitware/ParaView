@@ -20,7 +20,7 @@ KWWidgetsTourItem* vtkKWHSVColorSelectorEntryPoint(
 
   vtkKWHSVColorSelector *ccb = vtkKWHSVColorSelector::New();
   ccb->SetParent(parent);
-  ccb->Create(app);
+  ccb->Create();
   ccb->SetSelectionChangingCommand(parent, "SetBackgroundColor");
   ccb->InvokeCommandsWithRGBOn();
   ccb->SetBalloonHelpString(

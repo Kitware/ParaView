@@ -41,7 +41,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
 
   // Description:
   // This is the frame which should be used as parent for the vtkPVKeyFrame

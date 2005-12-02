@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.62");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -85,7 +85,7 @@ void vtkPVSelectionList::Disable()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::Create(vtkKWApplication *app)
+void vtkPVSelectionList::Create()
 {
   // Check if already created
 
@@ -97,10 +97,10 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Label->SetParent(this);
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetWidth(18);
   this->Label->SetJustificationToRight();
   if (this->LabelVisibility)
@@ -109,7 +109,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     }
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app);
+  this->Menu->Create();
   if (this->OptionWidth > 0)
     {
     this->Menu->SetWidth(this->OptionWidth);

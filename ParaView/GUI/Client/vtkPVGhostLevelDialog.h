@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // GhostLevel selected by the user. SetGhostLevel is for

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.15");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.16");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ vtkPVSelectArrays::~vtkPVSelectArrays()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectArrays::Create(vtkKWApplication *app)
+void vtkPVSelectArrays::Create()
 {
   // Check if already created
 
@@ -96,19 +96,17 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-  
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(pvApp);
+  this->ButtonFrame->Create();
   this->Script("pack %s -side top -fill x",
                this->ButtonFrame->GetWidgetName());
   this->ShowAllLabel->SetParent(this->ButtonFrame);
-  this->ShowAllLabel->Create(pvApp);
+  this->ShowAllLabel->Create();
   this->ShowAllLabel->SetText("Show All");
   this->ShowAllCheck->SetParent(this->ButtonFrame);
-  this->ShowAllCheck->Create(pvApp);
+  this->ShowAllCheck->Create();
   this->ShowAllCheck->SetSelectedState(0);
   this->ShowAllCheck->SetCommand(this, "ShowAllArraysCheckCallback");
 
@@ -122,7 +120,7 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
     }
     
   this->ArraySelectionList->SetParent(this);
-  this->ArraySelectionList->Create(app);
+  this->ArraySelectionList->Create();
   this->ArraySelectionList->SetSelectionModeToExtended();
   this->ArraySelectionList->SetHeight(0);
   this->ArraySelectionList->SetSingleClickCommand(this,"ModifiedCallback");
@@ -164,7 +162,7 @@ void vtkPVSelectArrays::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(arrayName);
-      label->Create(this->GetApplication());
+      label->Create();
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->ArrayLabelCollection->AddItem(label);

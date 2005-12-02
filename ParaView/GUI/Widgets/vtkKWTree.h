@@ -51,7 +51,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Add a new node identified by 'node' at the end of the children list of 

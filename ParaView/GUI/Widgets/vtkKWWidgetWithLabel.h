@@ -21,7 +21,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWLabel;
 
 class KWWIDGETS_EXPORT vtkKWWidgetWithLabel : public vtkKWCompositeWidget
@@ -33,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the internal label visibility (On by default).
@@ -126,7 +125,7 @@ protected:
 
   // Description:
   // Create the label
-  virtual void CreateLabel(vtkKWApplication *app);
+  virtual void CreateLabel();
 
   // Description:
   // Pack or repack the widget. To be implemented by subclasses.

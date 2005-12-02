@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.10");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -81,7 +81,7 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
+void vtkPVIceTRenderModuleUI::Create()
 {
   if (this->IsCreated())
     {
@@ -89,24 +89,25 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+  vtkPVApplication *pvapp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
   // Skip over LOD res and threshold, composite threshold, and subsample rate.
   int row = 10;
 
   this->StillReductionLabel->SetParent(this->LODScalesFrame);
-  this->StillReductionLabel->Create(app);
+  this->StillReductionLabel->Create();
   this->StillReductionLabel->SetAnchorToWest();
   this->StillReductionLabel->SetText("Still Subsample Rate:");
 
   this->StillReductionCheck->SetParent(this->LODScalesFrame);
-  this->StillReductionCheck->Create(app);
+  this->StillReductionCheck->Create();
   this->StillReductionCheck->SetSelectedState(1);
   this->StillReductionCheck->SetCommand(this, "StillReductionCheckCallback");
 
   this->StillReductionFactorScale->SetParent(this->LODScalesFrame);
-  this->StillReductionFactorScale->Create(app);
+  this->StillReductionFactorScale->Create();
   this->StillReductionFactorScale->SetRange(2, 20);
   this->StillReductionFactorScale->SetResolution(1);
   this->StillReductionFactorScale->SetValue(2);
@@ -117,7 +118,7 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
 
   this->StillReductionFactorLabel->SetParent(this->LODScalesFrame);
   this->StillReductionFactorLabel->SetText("2 Pixels");
-  this->StillReductionFactorLabel->Create(app);
+  this->StillReductionFactorLabel->Create();
   this->StillReductionFactorLabel->SetAnchorToWest();
   if (pvapp &&
       pvapp->GetRegistryValue(2, "RunTime", "StillReductionFactor", 0))
@@ -140,17 +141,17 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
                 this->StillReductionFactorScale->GetWidgetName(), row++);
 
   this->CollectLabel->SetParent(this->LODScalesFrame);
-  this->CollectLabel->Create(app);
+  this->CollectLabel->Create();
   this->CollectLabel->SetAnchorToWest();
   this->CollectLabel->SetText("Client Collect:");
 
   this->CollectCheck->SetParent(this->LODScalesFrame);
-  this->CollectCheck->Create(app);
+  this->CollectCheck->Create();
   this->CollectCheck->SetSelectedState(1);
   this->CollectCheck->SetCommand(this, "CollectCheckCallback");
 
   this->CollectThresholdScale->SetParent(this->LODScalesFrame);
-  this->CollectThresholdScale->Create(app);
+  this->CollectThresholdScale->Create();
   this->CollectThresholdScale->SetRange(0.0, 1000.0);
   this->CollectThresholdScale->SetResolution(10.0);
   this->CollectThresholdScale->SetValue(this->CollectThreshold);
@@ -166,7 +167,7 @@ void vtkPVIceTRenderModuleUI::Create(vtkKWApplication *app)
     "Right: Collect larger geometry on client.");
 
   this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
-  this->CollectThresholdLabel->Create(app);
+  this->CollectThresholdLabel->Create();
   this->CollectThresholdLabel->SetAnchorToWest();
   if (pvapp->GetRegistryValue(2, "RunTime", "CollectThreshold", 0))
     {

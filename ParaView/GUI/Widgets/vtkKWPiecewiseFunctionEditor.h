@@ -47,7 +47,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -219,8 +219,8 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateWindowLevelModeCheckButton(vtkKWApplication *app);
-  virtual void CreateValueEntry(vtkKWApplication *app);
+  virtual void CreateWindowLevelModeCheckButton();
+  virtual void CreateValueEntry();
   virtual int IsTopLeftFrameUsed();
   virtual int IsPointEntriesFrameUsed();
 

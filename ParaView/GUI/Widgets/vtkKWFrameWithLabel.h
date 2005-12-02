@@ -22,7 +22,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
@@ -37,7 +36,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the label for the frame.

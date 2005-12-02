@@ -39,7 +39,7 @@ public:
   vtkTypeRevisionMacro(vtkPVExtentEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create();
   
   // Description:
   // Methods to set this widgets value from a script.

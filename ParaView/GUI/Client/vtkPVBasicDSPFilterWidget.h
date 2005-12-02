@@ -66,24 +66,24 @@ public:
 
   // Description:
   // Set up the UI for this source
-  void Create(vtkKWApplication *app);
+  void Create();
 
 
   void ChangeDSPFilterMode(const char* newMode);
   void ChangeCutoffFreq(const char* newMode);
   void ChangeInputVar(const char* newMode);
 
-  void CreateCutoffFreqToggle(vtkPVApplication *app, vtkKWWidget *topframe);
+  void CreateCutoffFreqToggle(vtkKWWidget *topframe);
   void DisableCutoffFreqToggle();
   void EnableCutoffFreqToggle();
 
-  void CreateInputVarToggle(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateLengthTextEntry(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateNumeratorWeightsTextEntry(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateDenominatorWeightsTextEntry(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateForwardNumeratorWeightsTextEntry(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateOutputVarTextEntry(vtkPVApplication *app, vtkKWWidget *topframe);
-  void CreateAddThisVarButton(vtkPVApplication *app, vtkKWWidget *topframe);
+  void CreateInputVarToggle(vtkKWWidget *topframe);
+  void CreateLengthTextEntry(vtkKWWidget *topframe);
+  void CreateNumeratorWeightsTextEntry(vtkKWWidget *topframe);
+  void CreateDenominatorWeightsTextEntry(vtkKWWidget *topframe);
+  void CreateForwardNumeratorWeightsTextEntry(vtkKWWidget *topframe);
+  void CreateOutputVarTextEntry(vtkKWWidget *topframe);
+  void CreateAddThisVarButton(vtkKWWidget *topframe);
 
   bool UpdateTogglesWithFileInformation();
 

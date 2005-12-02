@@ -13,14 +13,13 @@
 =========================================================================*/
 #include "vtkKWSaveImageDialog.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.29");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.30");
 
 //----------------------------------------------------------------------------
 int vtkKWSaveImageDialog::Invoke()
@@ -71,7 +70,7 @@ int vtkKWSaveImageDialog::Invoke()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSaveImageDialog::Create(vtkKWApplication *app)
+void vtkKWSaveImageDialog::Create()
 {
   if (this->IsCreated())
     {
@@ -81,7 +80,7 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app)
 
   // Call the superclass to create the dialog
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetTitle("Save As Image");
 }

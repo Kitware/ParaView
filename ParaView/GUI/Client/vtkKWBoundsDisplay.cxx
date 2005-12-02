@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.18");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWBoundsDisplay::vtkKWBoundsDisplay()
@@ -51,7 +51,7 @@ vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
+void vtkKWBoundsDisplay::Create()
 {
   if (this->IsCreated())
     {
@@ -59,16 +59,16 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetLabelText("Bounds");
 
   this->XRangeLabel->SetParent(this->GetFrame());
-  this->XRangeLabel->Create(app);
+  this->XRangeLabel->Create();
   this->YRangeLabel->SetParent(this->GetFrame());
-  this->YRangeLabel->Create(app);
+  this->YRangeLabel->Create();
   this->ZRangeLabel->SetParent(this->GetFrame());
-  this->ZRangeLabel->Create(app);
+  this->ZRangeLabel->Create();
 
   this->Script("pack %s %s %s -side top -anchor w", 
                this->XRangeLabel->GetWidgetName(),

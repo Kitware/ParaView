@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Control the resolution in widget by widget (columns, rows)

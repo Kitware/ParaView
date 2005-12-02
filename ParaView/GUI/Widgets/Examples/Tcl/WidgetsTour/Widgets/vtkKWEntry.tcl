@@ -8,7 +8,7 @@ proc vtkKWEntryEntryPoint {parent win} {
 
   vtkKWEntry entry1
   entry1 SetParent $parent
-  entry1 Create $app
+  entry1 Create
   entry1 SetBalloonHelpString "A simple entry"
 
   pack [entry1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -19,7 +19,7 @@ proc vtkKWEntryEntryPoint {parent win} {
 
   vtkKWEntry entry2
   entry2 SetParent $parent
-  entry2 Create $app
+  entry2 Create
   entry2 SetWidth 20
   entry2 ReadOnlyOn
   entry2 SetValue "read-only entry"
@@ -33,7 +33,7 @@ proc vtkKWEntryEntryPoint {parent win} {
 
   vtkKWEntryWithLabel entry3
   entry3 SetParent $parent
-  entry3 Create $app
+  entry3 Create
   entry3 SetLabelText "Another entry with a label in front:"
   entry3 SetBalloonHelpString \
     "This is a vtkKWEntryWithLabel i.e. a entry associated to a\
@@ -49,7 +49,7 @@ proc vtkKWEntryEntryPoint {parent win} {
 
   vtkKWEntrySet entry_set
   entry_set SetParent $parent
-  entry_set Create $app
+  entry_set Create
   entry_set SetBorderWidth 2
   entry_set SetReliefToGroove
   entry_set SetWidgetsPadX 1

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.38");
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
@@ -49,7 +49,7 @@ vtkPVContainerWidget::~vtkPVContainerWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::Create(vtkKWApplication *app)
+void vtkPVContainerWidget::Create()
 {
   // Check if already created
 
@@ -61,7 +61,7 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
@@ -71,9 +71,13 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
   while( !it->IsDoneWithTraversal() )
     {
     widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-    if (!widget->GetApplication())
+    if (!widget->IsCreated())
       {
-      widget->Create(app);
+      if (!widget->GetApplication())
+        {
+        widget->SetApplication(this->GetApplication());
+        }
+      widget->Create();
       this->Script("pack %s -side %s -fill both -expand true",
                    widget->GetWidgetName(), this->PackDirection);
       }

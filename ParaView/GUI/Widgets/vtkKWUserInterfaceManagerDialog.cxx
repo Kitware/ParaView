@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.11");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.12");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -107,7 +107,19 @@ vtkKWUserInterfaceManagerDialog::~vtkKWUserInterfaceManagerDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
+vtkKWApplication* vtkKWUserInterfaceManagerDialog::GetApplication()
+{
+  if (!this->Superclass::GetApplication() &&
+      this->TopLevel && this->TopLevel->GetApplication())
+    {
+    this->SetApplication(this->TopLevel->GetApplication());
+    }
+
+  return this->Superclass::GetApplication();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManagerDialog::Create()
 {
   if (this->IsCreated())
     {
@@ -117,15 +129,16 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the dialog
 
   if (!this->TopLevel->GetMasterWindow())
     {
-    this->TopLevel->SetMasterWindow(app->GetNthWindow(0));
+    this->TopLevel->SetMasterWindow(this->GetApplication()->GetNthWindow(0));
     }
-  this->TopLevel->Create(app);
+  this->TopLevel->SetApplication(this->GetApplication());
+  this->TopLevel->Create();
   this->TopLevel->ModalOff();
   this->TopLevel->SetSize(600, 300);
   this->TopLevel->SetMinimumSize(600, 300);
@@ -135,7 +148,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   // Create the splitframe
 
   this->SplitFrame->SetParent(parent);
-  this->SplitFrame->Create(app);
+  this->SplitFrame->Create();
   this->SplitFrame->SetFrame1Size(220);
   this->SplitFrame->SetFrame1MinimumSize(this->SplitFrame->GetFrame1Size());
   
@@ -145,7 +158,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   // Create the tree
 
   this->Tree->SetParent(this->SplitFrame->GetFrame1());
-  this->Tree->Create(app);
+  this->Tree->Create();
   this->Tree->HorizontalScrollbarVisibilityOff();
   this->Tree->VerticalScrollbarVisibilityOff();
   this->Tree->SetPadX(0);
@@ -169,7 +182,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   // Separator
 
   this->Separator->SetParent(parent);
-  this->Separator->Create(app);
+  this->Separator->Create();
   
   this->Script("pack %s -side top -fill x  -padx 2 -pady 0", 
                this->Separator->GetWidgetName());
@@ -177,7 +190,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   // Close button
 
   this->CloseButton->SetParent(parent);
-  this->CloseButton->Create(app);
+  this->CloseButton->Create();
   this->CloseButton->SetText("Close");
   this->CloseButton->SetWidth(20);
   this->CloseButton->SetCommand(this->TopLevel, "Withdraw");
@@ -189,7 +202,7 @@ void vtkKWUserInterfaceManagerDialog::Create(vtkKWApplication *app)
   // Don't pack it though, it's just here fore storage
 
   this->Notebook->SetParent(this->SplitFrame->GetFrame2());
-  this->Notebook->Create(app);
+  this->Notebook->Create();
 }
 
 //----------------------------------------------------------------------------
@@ -425,7 +438,7 @@ int vtkKWUserInterfaceManagerDialog::CreateAllPanels()
     vtkKWUserInterfacePanel *panel = this->GetNthPanel(i);
     if (panel && !panel->IsCreated())
       {
-      panel->Create(this->GetApplication());
+      panel->Create();
       nb_created++;
       }
     }

@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create();
   
   // Description:
   // Allow scripts to set/get the widget's value.

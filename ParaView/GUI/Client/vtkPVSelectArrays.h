@@ -42,7 +42,7 @@ public:
     
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  void Create();
 
   // Description:
   // Save this source to a file.

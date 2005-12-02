@@ -14,7 +14,6 @@
 
 #include "vtkKWUserInterfaceManagerNotebook.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabel.h"
@@ -28,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerNotebook);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerNotebook, "1.3");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerNotebook, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerNotebookInternals
@@ -108,7 +107,19 @@ void vtkKWUserInterfaceManagerNotebook::SetNotebook(vtkKWNotebook *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceManagerNotebook::Create(vtkKWApplication *app)
+vtkKWApplication* vtkKWUserInterfaceManagerNotebook::GetApplication()
+{
+  if (!this->Superclass::GetApplication() &&
+      this->Notebook && this->Notebook->GetApplication())
+    {
+    this->SetApplication(this->Notebook->GetApplication());
+    }
+
+  return this->Superclass::GetApplication();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManagerNotebook::Create()
 {
   if (this->IsCreated())
     {
@@ -127,7 +138,7 @@ void vtkKWUserInterfaceManagerNotebook::Create(vtkKWApplication *app)
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 }
 
 //----------------------------------------------------------------------------
@@ -330,7 +341,7 @@ int vtkKWUserInterfaceManagerNotebook::RaisePanel(
 
   if (!panel->IsCreated())
     {
-    panel->Create(this->GetApplication());
+    panel->Create();
     }
 
   // Show the pages that share the same tag (i.e. the pages that belong to the 
@@ -403,7 +414,7 @@ int vtkKWUserInterfaceManagerNotebook::ShowPanel(
 
   if (!panel->IsCreated())
     {
-    panel->Create(this->GetApplication());
+    panel->Create();
     }
 
   // Show the pages that share the same tag (i.e. the pages that belong to the 
@@ -1053,7 +1064,7 @@ int vtkKWUserInterfaceManagerNotebook::DragAndDropWidget(
     {
     if (!from_panel->IsCreated())
       {
-      from_panel->Create(this->GetApplication());
+      from_panel->Create();
       }
     int from_panel_id = this->GetPanelId(from_panel);
     if (this->Notebook->HasPage(from_page_title, from_panel_id))
@@ -1093,7 +1104,7 @@ int vtkKWUserInterfaceManagerNotebook::DragAndDropWidget(
     {
     if (!to_panel->IsCreated())
       {
-      to_panel->Create(this->GetApplication());
+      to_panel->Create();
       }
     int to_panel_id = this->GetPanelId(to_panel);
     if (this->Notebook->HasPage(to_page_title, to_panel_id))

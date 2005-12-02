@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWProgressGauge.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
@@ -22,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.35");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -49,7 +48,7 @@ vtkKWProgressGauge::~vtkKWProgressGauge()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWProgressGauge::Create(vtkKWApplication *app)
+void vtkKWProgressGauge::Create()
 {
   // Check if already created
 
@@ -61,11 +60,11 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Canvas = vtkKWCanvas::New();
   this->Canvas->SetParent(this);
-  this->Canvas->Create(app);
+  this->Canvas->Create();
   this->Canvas->SetBorderWidth(0);
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetWidth(0);

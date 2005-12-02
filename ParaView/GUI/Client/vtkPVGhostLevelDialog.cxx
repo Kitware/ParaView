@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
@@ -77,7 +77,7 @@ vtkPVGhostLevelDialog::~vtkPVGhostLevelDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGhostLevelDialog::Create(vtkKWApplication *app)
+void vtkPVGhostLevelDialog::Create()
 {
   if (this->IsCreated())
     {
@@ -85,54 +85,54 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  this->ButtonFrame->Create(app);
+  this->ButtonFrame->Create();
 
-  this->SelFrame1->Create(app);
+  this->SelFrame1->Create();
   this->SelFrame1->SetBorderWidth(3);
-  this->SelFrame2->Create(app);
+  this->SelFrame2->Create();
   this->SelFrame2->SetBorderWidth(3);
-  this->SelFrame3->Create(app);
+  this->SelFrame3->Create();
   this->SelFrame3->SetBorderWidth(3);
 
-  this->SelButton1->Create(app);
+  this->SelButton1->Create();
   this->SelButton1->SetText("0");
   this->SelButton1->SetCommand(this, "SetGhostLevel 0");
-  app->Script("pack %s -expand t", 
+  this->Script("pack %s -expand t", 
                             this->SelButton1->GetWidgetName());
 
-  this->SelButton2->Create(app);
+  this->SelButton2->Create();
   this->SelButton2->SetText("1");
   this->SelButton2->SetCommand(this, "SetGhostLevel 1");
-  app->Script("pack %s -expand t", 
+  this->Script("pack %s -expand t", 
                             this->SelButton2->GetWidgetName());
 
-  this->SelButton3->Create(app);
+  this->SelButton3->Create();
   this->SelButton3->SetText("2");
   this->SelButton3->SetCommand(this, "SetGhostLevel 2");
-  app->Script("pack %s -expand t", 
+  this->Script("pack %s -expand t", 
                             this->SelButton3->GetWidgetName());
 
-  this->Separator->Create(app);
+  this->Separator->Create();
   this->Separator->SetBorderWidth(1);
   this->Separator->SetHeight(3);
   this->Separator->SetReliefToSunken();
 
-  this->Label->Create(app);
+  this->Label->Create();
 
-  app->Script("pack %s %s %s -padx 4 -side left -expand t", 
+  this->Script("pack %s %s %s -padx 4 -side left -expand t", 
                             this->SelFrame1->GetWidgetName(),
                             this->SelFrame2->GetWidgetName(),
                             this->SelFrame3->GetWidgetName());
   
-  app->Script(
+  this->Script(
     "pack %s -ipadx 10 -ipady 10 -side top -expand t -fill x", 
     this->Label->GetWidgetName());
-  app->Script(
+  this->Script(
     "pack %s -side top -expand t -fill x", 
     this->Separator->GetWidgetName());
-  app->Script(
+  this->Script(
     "pack %s -ipadx 10 -ipady 10 -side top -expand t -fill x", 
     this->ButtonFrame->GetWidgetName());
 

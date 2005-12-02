@@ -48,7 +48,7 @@ public:
     
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Since thie GUI is shared, the call backs need a source

@@ -14,7 +14,6 @@
 #include "vtkKWSelectionFrame.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
@@ -27,7 +26,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.51");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -205,7 +204,7 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::Create(vtkKWApplication *app)
+void vtkKWSelectionFrame::Create()
 {
   // Check if already created
 
@@ -217,7 +216,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetBorderWidth(1);
   this->SetReliefToRidge();
@@ -225,7 +224,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   // The outer selection frame
 
   this->OuterSelectionFrame->SetParent(this);
-  this->OuterSelectionFrame->Create(app);
+  this->OuterSelectionFrame->Create();
   this->OuterSelectionFrame->SetReliefToFlat();
   this->OuterSelectionFrame->SetBorderWidth(this->OuterSelectionFrameWidth);
 
@@ -234,19 +233,19 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   // The title bar
 
   this->TitleBarFrame->SetParent(parent);
-  this->TitleBarFrame->Create(app);
+  this->TitleBarFrame->Create();
 
   // The selection button
 
   this->SelectionList->SetParent(parent);
-  this->SelectionList->Create(app);
+  this->SelectionList->Create();
   this->SelectionList->IndicatorVisibilityOff();
   this->SelectionList->SetImageToPredefinedIcon(vtkKWIcon::IconExpand);
 
   // The close button
 
   this->CloseButton->SetParent(parent);
-  this->CloseButton->Create(app);
+  this->CloseButton->Create();
   this->CloseButton->SetImageToPredefinedIcon(vtkKWIcon::IconShrink);
   this->CloseButton->SetCommand(this, "CloseCallback");
   this->CloseButton->SetBalloonHelpString("Close window");
@@ -254,14 +253,14 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app)
   // The title itself
 
   this->Title->SetParent(this->TitleBarFrame);
-  this->Title->Create(app);
+  this->Title->Create();
   this->Title->SetJustificationToLeft();
   this->Title->SetAnchorToWest();
   
   // The body frame
 
   this->BodyFrame->SetParent(parent);
-  this->BodyFrame->Create(app);
+  this->BodyFrame->Create();
   this->BodyFrame->SetBackgroundColor(0.0, 0.0, 0.0);
 
   // Pack
@@ -289,7 +288,7 @@ vtkKWToolbarSet* vtkKWSelectionFrame::GetToolbarSet()
     {
     this->ToolbarSet->SetParent(this->OuterSelectionFrame);
     this->ToolbarSet->BottomSeparatorVisibilityOff();
-    this->ToolbarSet->Create(this->GetApplication());
+    this->ToolbarSet->Create();
     this->Pack();
     this->UpdateEnableState();
     }
@@ -308,7 +307,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetTitleBarUserFrame()
   if (!this->TitleBarUserFrame->IsCreated() && this->IsCreated())
     {
     this->TitleBarUserFrame->SetParent(this->TitleBarFrame);
-    this->TitleBarUserFrame->Create(this->GetApplication());
+    this->TitleBarUserFrame->Create();
     this->Pack();
     this->UpdateEnableState();
     }
@@ -327,7 +326,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetLeftUserFrame()
   if (!this->LeftUserFrame->IsCreated() && this->IsCreated())
     {
     this->LeftUserFrame->SetParent(this->OuterSelectionFrame);
-    this->LeftUserFrame->Create(this->GetApplication());
+    this->LeftUserFrame->Create();
     this->Pack();
     this->UpdateEnableState();
     }
@@ -346,7 +345,7 @@ vtkKWFrame* vtkKWSelectionFrame::GetRightUserFrame()
   if (!this->RightUserFrame->IsCreated() && this->IsCreated())
     {
     this->RightUserFrame->SetParent(this->OuterSelectionFrame);
-    this->RightUserFrame->Create(this->GetApplication());
+    this->RightUserFrame->Create();
     this->Pack();
     this->UpdateEnableState();
     }

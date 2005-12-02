@@ -8,7 +8,7 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   vtkKWPushButton pushbutton1
   pushbutton1 SetParent $parent
-  pushbutton1 Create $app
+  pushbutton1 Create
   pushbutton1 SetText "A push button"
 
   pack [pushbutton1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -19,7 +19,7 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   vtkKWPushButton pushbutton2
   pushbutton2 SetParent $parent
-  pushbutton2 Create $app
+  pushbutton2 Create
   pushbutton2 SetImageToPredefinedIcon 1
   pushbutton2 SetBalloonHelpString \
     "Another pushbutton using one of the predefined icons"
@@ -32,7 +32,7 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   vtkKWPushButtonWithLabel pushbutton3
   pushbutton3 SetParent $parent
-  pushbutton3 Create $app
+  pushbutton3 Create
   pushbutton3 SetLabelText "Press this..."
   [pushbutton3 GetWidget] SetText "button"
   pushbutton3 SetBalloonHelpString \
@@ -49,7 +49,7 @@ proc vtkKWPushButtonEntryPoint {parent win} {
 
   vtkKWPushButtonSet pushbutton_set
   pushbutton_set SetParent $parent
-  pushbutton_set Create $app
+  pushbutton_set Create
   pushbutton_set SetBorderWidth 2
   pushbutton_set SetReliefToGroove
   pushbutton_set SetWidgetsPadX 1

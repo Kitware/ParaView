@@ -524,7 +524,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get if the points of the function are locked in the parameter
@@ -1212,7 +1212,7 @@ protected:
   char          *HistogramLogModeChangedCommand;
 
   vtkKWMenuButton  *HistogramLogModeOptionMenu;
-  virtual void CreateHistogramLogModeOptionMenu(vtkKWApplication *app);
+  virtual void CreateHistogramLogModeOptionMenu();
   virtual void UpdateHistogramLogModeOptionMenu();
 
   // Description:
@@ -1223,18 +1223,18 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateLabel(vtkKWApplication *app);
-  virtual void CreateParameterRange(vtkKWApplication *app);
-  virtual void CreateValueRange(vtkKWApplication *app);
-  virtual void CreateRangeLabel(vtkKWApplication *app);
-  virtual void CreatePointEntriesFrame(vtkKWApplication *app);
-  virtual void CreateParameterEntry(vtkKWApplication *app);
-  virtual void CreateTopLeftContainer(vtkKWApplication *app);
-  virtual void CreateTopLeftFrame(vtkKWApplication *app);
-  virtual void CreateUserFrame(vtkKWApplication *app);
-  virtual void CreateValueTicksCanvas(vtkKWApplication *app);
-  virtual void CreateParameterTicksCanvas(vtkKWApplication *app);
-  virtual void CreateGuidelineValueCanvas(vtkKWApplication *app);
+  virtual void CreateLabel();
+  virtual void CreateParameterRange();
+  virtual void CreateValueRange();
+  virtual void CreateRangeLabel();
+  virtual void CreatePointEntriesFrame();
+  virtual void CreateParameterEntry();
+  virtual void CreateTopLeftContainer();
+  virtual void CreateTopLeftFrame();
+  virtual void CreateUserFrame();
+  virtual void CreateValueTicksCanvas();
+  virtual void CreateParameterTicksCanvas();
+  virtual void CreateGuidelineValueCanvas();
   virtual int IsTopLeftFrameUsed();
   virtual int IsPointEntriesFrameUsed();
   virtual int IsGuidelineValueCanvasUsed();

@@ -21,8 +21,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWEntry : public vtkKWCoreWidget
 {
 public:
@@ -32,7 +30,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the value of the entry in a few different formats.

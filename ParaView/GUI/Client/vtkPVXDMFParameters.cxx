@@ -102,7 +102,7 @@ public:
       scale->SetParent(parent->GetFrame()->GetFrame());
       scale->SetRange(p->Min, p->Max);
       scale->SetResolution(1);
-      scale->Create(parent->GetApplication());
+      scale->Create();
       scale->RangeVisibilityOn();
       scale->SetValue(p->Value);
       scale->SetLabelText(name->c_str());
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.42");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -196,7 +196,7 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::Create(vtkKWApplication *app)
+void vtkPVXDMFParameters::Create()
 {
   // Check if already created
 
@@ -208,11 +208,11 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Frame = vtkKWFrameWithLabel::New();
   this->Frame->SetParent(this);
-  this->Frame->Create(app);
+  this->Frame->Create();
   this->Frame->SetLabelText(this->FrameLabel);
   this->Script("pack %s -fill both -expand 1", this->Frame->GetWidgetName());
 }

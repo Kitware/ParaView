@@ -8,7 +8,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   vtkKWCheckButton cb1
   cb1 SetParent $parent
-  cb1 Create $app
+  cb1 Create
   cb1 SetText "A checkbutton"
 
   pack [cb1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -19,7 +19,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   vtkKWCheckButton cb2
   cb2 SetParent $parent
-  cb2 Create $app
+  cb2 Create
   cb2 SetImageToPredefinedIcon 62
   cb2 IndicatorVisibilityOff
   cb2 SetBalloonHelpString "This time use one of the predefined icon"
@@ -32,7 +32,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   vtkKWCheckButtonWithLabel cb3
   cb3 SetParent $parent
-  cb3 Create $app
+  cb3 Create
   cb3 SetLabelText "Another checkbutton with a label in front"
   cb3 SetBalloonHelpString \
     "This is a vtkKWCheckButtonWithLabel i.e. a checkbutton associated to a\
@@ -48,7 +48,7 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
 
   vtkKWCheckButtonSet cbs
   cbs SetParent $parent
-  cbs Create $app
+  cbs Create
   cbs SetBorderWidth 2
   cbs SetReliefToGroove
   cbs SetMaximumNumberOfWidgetsInPackingDirection 2

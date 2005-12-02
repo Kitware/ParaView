@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.15");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.16");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -107,7 +107,7 @@ vtkKWHSVColorSelector::~vtkKWHSVColorSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::Create(vtkKWApplication *app)
+void vtkKWHSVColorSelector::Create()
 {
   // Check if already created
 
@@ -119,12 +119,12 @@ void vtkKWHSVColorSelector::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the Hue/Sat canvas
 
   this->HueSatWheelCanvas->SetParent(this);
-  this->HueSatWheelCanvas->Create(app);
+  this->HueSatWheelCanvas->Create();
   this->HueSatWheelCanvas->SetHeight(0);
   this->HueSatWheelCanvas->SetWidth(0);
   this->HueSatWheelCanvas->SetReliefToSolid();
@@ -133,7 +133,7 @@ void vtkKWHSVColorSelector::Create(vtkKWApplication *app)
   // Create the Value canvas
 
   this->ValueBoxCanvas->SetParent(this);
-  this->ValueBoxCanvas->Create(app);
+  this->ValueBoxCanvas->Create();
   this->ValueBoxCanvas->SetHeight(0);
   this->ValueBoxCanvas->SetWidth(0);
   this->ValueBoxCanvas->SetReliefToSolid();
@@ -142,14 +142,14 @@ void vtkKWHSVColorSelector::Create(vtkKWApplication *app)
   // Create the Hue/Sat label
 
   this->HueSatLabel->SetParent(this);
-  this->HueSatLabel->Create(app);
+  this->HueSatLabel->Create();
   this->HueSatLabel->SetBorderWidth(0);
   this->HueSatLabel->SetText("Hue/Saturation:");
 
   // Create the Value label
 
   this->ValueLabel->SetParent(this);
-  this->ValueLabel->Create(app);
+  this->ValueLabel->Create();
   this->ValueLabel->SetBorderWidth(0);
   this->ValueLabel->SetText("Value:");
 

@@ -45,7 +45,7 @@ public:
     
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  void Create();
 
   // Description:
   // Tcl callback for the buttons in the calculator

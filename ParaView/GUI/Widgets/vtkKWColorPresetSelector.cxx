@@ -16,7 +16,6 @@
 
 #include "vtkColorTransferFunction.h"
 #include "vtkKWLabel.h"
-#include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -28,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.20");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.21");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -607,7 +606,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWColorPresetSelector::Create(vtkKWApplication *app)
+void vtkKWColorPresetSelector::Create()
 {
   if (this->IsCreated())
     {
@@ -617,7 +616,7 @@ void vtkKWColorPresetSelector::Create(vtkKWApplication *app)
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   if (!this->HasLabel() || !this->GetLabel()->GetText())
     {

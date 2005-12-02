@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.14");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -189,13 +189,13 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   vtkKWFrame* f1 = vtkKWFrame::New();
   this->Internal->PropertyFrames.push_back(f1);
   f1->SetParent(this->VisualizationListFrame->GetFrame());
-  f1->Create(this->GetApplication());
+  f1->Create();
   this->Script("pack %s -side top -pady 2 -padx 4", f1->GetWidgetName());
   
   vtkKWRadioButton* r1 = vtkKWRadioButton::New();
   this->Internal->RadioButtons.push_back(r1);
   r1->SetParent(f1);
-  r1->Create(this->GetApplication());
+  r1->Create();
   r1->SetVariableName("vtkPVComparativeVisDialogVar");
   unsigned int value = this->Internal->RadioButtons.size() - 1;
   r1->SetValueAsInt(value);
@@ -225,7 +225,7 @@ void vtkPVComparativeVisDialog::NewPropertyWidget()
   dcommand->Delete();
 
   w1->SetParent(f1);
-  w1->Create(this->GetApplication());
+  w1->Create();
   this->Script("pack %s -side left", w1->GetWidgetName());
 
   f1->Delete();
@@ -266,7 +266,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
+void vtkPVComparativeVisDialog::Create()
 {
   if (this->IsCreated())
     {
@@ -274,34 +274,34 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app);
+  this->MainFrame->Create();
   this->Script("pack %s -expand t -fill both -padx 5 -pady 5", 
                this->MainFrame->GetWidgetName());
 
   this->NameEntry->SetParent(this->MainFrame);
-  this->NameEntry->Create(app);
+  this->NameEntry->Create();
   this->NameEntry->SetLabelText("Visualization Name:");
   vtkKWTkUtilities::ChangeFontWeightToBold(this->NameEntry->GetLabel());
   this->Script("pack %s -side top -fill x -anchor n -pady 5", 
                this->NameEntry->GetWidgetName());
 
   this->NumberOfFramesFrame->SetParent(this->MainFrame);
-  this->NumberOfFramesFrame->Create(app);
+  this->NumberOfFramesFrame->Create();
   this->Script(
     "pack %s -side top -fill x -anchor n -pady 5", 
     this->NumberOfFramesFrame->GetWidgetName());
 
   this->NumberOfXFramesEntry->SetParent(this->NumberOfFramesFrame);
-  this->NumberOfXFramesEntry->Create(app);
+  this->NumberOfXFramesEntry->Create();
   this->NumberOfXFramesEntry->SetLabelText("Number of X Frames:");
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->NumberOfXFramesEntry->GetLabel());
 
   this->NumberOfYFramesEntry->SetParent(this->NumberOfFramesFrame);
-  this->NumberOfYFramesEntry->Create(app);
+  this->NumberOfYFramesEntry->Create();
   this->NumberOfYFramesEntry->SetLabelText("Number of Y Frames:");
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->NumberOfYFramesEntry->GetLabel());
@@ -314,31 +314,31 @@ void vtkPVComparativeVisDialog::Create(vtkKWApplication *app)
     this->NumberOfYFramesEntry->GetWidgetName());
 
   this->VisualizationListFrame->SetParent(this->MainFrame);
-  this->VisualizationListFrame->Create(app);
+  this->VisualizationListFrame->Create();
   this->VisualizationListFrame->SetLabelText("Comparative Vis Properties");
   this->Script(
     "pack %s -side top -fill x -anchor n -pady 5", 
     this->VisualizationListFrame->GetWidgetName());
 
   this->TrackEditor->SetParent(this->MainFrame);
-  this->TrackEditor->Create(app);
+  this->TrackEditor->Create();
   this->Script("pack %s -side top -expand t -fill both", 
                this->TrackEditor->GetWidgetName());
 
   this->ButtonFrame->SetParent(this->MainFrame);
-  this->ButtonFrame->Create(app);
+  this->ButtonFrame->Create();
   this->Script("pack %s -side top -fill x -pady 5", 
                this->ButtonFrame->GetWidgetName());
   
   this->OKButton->SetParent(this->ButtonFrame);
-  this->OKButton->Create(app);
+  this->OKButton->Create();
   this->OKButton->SetCommand(this, "OK");
   this->OKButton->SetText("OK");
   this->Script("pack %s -side left -fill x -expand t", 
                this->OKButton->GetWidgetName());
 
   this->CancelButton->SetParent(this->ButtonFrame);
-  this->CancelButton->Create(app);
+  this->CancelButton->Create();
   this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetText("Cancel");
   this->Script("pack %s -side left -fill x -expand t", 

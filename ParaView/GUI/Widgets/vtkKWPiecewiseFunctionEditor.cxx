@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.41");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -626,7 +626,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
+void vtkKWPiecewiseFunctionEditor::Create()
 {
   // Check if already created
 
@@ -638,20 +638,20 @@ void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the value entry
 
   if (this->ValueEntryVisibility && this->PointEntriesVisibility)
     {
-    this->CreateValueEntry(app);
+    this->CreateValueEntry();
     }
 
   // Window/Level mode
 
   if (this->WindowLevelModeButtonVisibility)
     {
-    this->CreateWindowLevelModeCheckButton(app);
+    this->CreateWindowLevelModeCheckButton();
     }
 
   // Pack the widget
@@ -664,15 +664,14 @@ void vtkKWPiecewiseFunctionEditor::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
-  vtkKWApplication *app)
+void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton()
 {
   if (this->WindowLevelModeCheckButton && 
       !this->WindowLevelModeCheckButton->IsCreated())
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
     this->WindowLevelModeCheckButton->SetParent(this->TopLeftFrame);
-    this->WindowLevelModeCheckButton->Create(app);
+    this->WindowLevelModeCheckButton->Create();
     this->WindowLevelModeCheckButton->SetPadX(0);
     this->WindowLevelModeCheckButton->SetPadY(0);
     this->WindowLevelModeCheckButton->SetHighlightThickness(0);
@@ -687,14 +686,13 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
-  vtkKWApplication *app)
+void vtkKWPiecewiseFunctionEditor::CreateValueEntry()
 {
   if (this->ValueEntry && !this->ValueEntry->IsCreated())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
     this->ValueEntry->SetParent(this->PointEntriesFrame);
-    this->ValueEntry->Create(app);
+    this->ValueEntry->Create();
     this->ValueEntry->GetWidget()->SetWidth(6);
     this->ValueEntry->GetLabel()->SetText("V:");
 
@@ -889,7 +887,7 @@ void vtkKWPiecewiseFunctionEditor::SetValueEntryVisibility(int arg)
       this->PointEntriesVisibility && 
       this->IsCreated())
     {
-    this->CreateValueEntry(this->GetApplication());
+    this->CreateValueEntry();
     }
 
   this->UpdatePointEntries(this->GetSelectedPoint());
@@ -920,7 +918,7 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelModeButtonVisibility(int arg)
 
   if (this->WindowLevelModeButtonVisibility && this->IsCreated())
     {
-    this->CreateWindowLevelModeCheckButton(this->GetApplication());
+    this->CreateWindowLevelModeCheckButton();
     }
 
   this->Modified();

@@ -30,7 +30,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   vtkKWColorTransferFunctionEditor *cpsel_tfunc_editor = 
     vtkKWColorTransferFunctionEditor::New();
   cpsel_tfunc_editor->SetParent(parent);
-  cpsel_tfunc_editor->Create(app);
+  cpsel_tfunc_editor->Create();
   cpsel_tfunc_editor->SetBorderWidth(2);
   cpsel_tfunc_editor->SetReliefToGroove();
   cpsel_tfunc_editor->ExpandCanvasWidthOff();
@@ -54,7 +54,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
 
   vtkKWColorPresetSelector *cpsel1 = vtkKWColorPresetSelector::New();
   cpsel1->SetParent(parent);
-  cpsel1->Create(app);
+  cpsel1->Create();
   cpsel1->SetColorTransferFunction(cpsel_func);
   cpsel1->SetPresetSelectedCommand(cpsel_tfunc_editor, "Update");
   cpsel1->SetBalloonHelpString(
@@ -71,7 +71,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
 
   vtkKWColorPresetSelector *cpsel2 = vtkKWColorPresetSelector::New();
   cpsel2->SetParent(parent);
-  cpsel2->Create(app);
+  cpsel2->Create();
   cpsel2->SetLabelText("Solid Color Presets:");
   cpsel2->HideGradientPresetsOn();
   cpsel2->SetColorTransferFunction(cpsel_func);
@@ -89,7 +89,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
 
   vtkKWColorPresetSelector *cpsel3 = vtkKWColorPresetSelector::New();
   cpsel3->SetParent(parent);
-  cpsel3->Create(app);
+  cpsel3->Create();
   cpsel3->SetLabelPositionToRight();
   cpsel3->SetColorTransferFunction(cpsel_func);
   cpsel3->SetPresetSelectedCommand(cpsel_tfunc_editor, "Update");

@@ -19,7 +19,6 @@
 
 #include "vtkKWMaterialPropertyWidget.h"
 
-class vtkKWApplication;
 class vtkKWCheckButtonWithLabel;
 class vtkKWScalarComponentSelectionWidget;
 class vtkVolumeProperty;
@@ -33,7 +32,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Set/get the volume property to edit with this widget

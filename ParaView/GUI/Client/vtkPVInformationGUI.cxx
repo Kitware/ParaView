@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.14");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -75,15 +75,15 @@ vtkPVInformationGUI::~vtkPVInformationGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInformationGUI::Create(vtkKWApplication* app)
+void vtkPVInformationGUI::Create()
 {  
-  if (this->GetApplication())
+  if (this->IsCreated())
     {
     vtkErrorMacro("Widget has already been created.");
     return;
     }
   
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->StatsFrame = vtkKWFrameWithLabel::New();
   this->TypeLabel = vtkKWLabel::New();
@@ -99,35 +99,35 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
   this->ArrayInformationList = vtkKWMultiColumnList::New();
 
   this->StatsFrame->SetParent(this->GetFrame());
-  this->StatsFrame->Create(this->GetApplication());
+  this->StatsFrame->Create();
   this->StatsFrame->SetLabelText("Statistics");
 
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
-  this->TypeLabel->Create(this->GetApplication());
+  this->TypeLabel->Create();
 
   this->CompositeDataFrame->SetParent(this->StatsFrame->GetFrame());
-  this->CompositeDataFrame->Create(this->GetApplication());
+  this->CompositeDataFrame->Create();
 
   this->NumBlocksLabel->SetParent(this->CompositeDataFrame);
-  this->NumBlocksLabel->Create(this->GetApplication());
+  this->NumBlocksLabel->Create();
 
   this->NumDataSetsLabel->SetParent(this->CompositeDataFrame);
-  this->NumDataSetsLabel->Create(this->GetApplication());
+  this->NumDataSetsLabel->Create();
 
   this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
-  this->NumCellsLabel->Create(this->GetApplication());
+  this->NumCellsLabel->Create();
 
   this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
-  this->NumPointsLabel->Create(this->GetApplication());
+  this->NumPointsLabel->Create();
   
   this->MemorySizeLabel->SetParent(this->StatsFrame->GetFrame());
-  this->MemorySizeLabel->Create(this->GetApplication());
+  this->MemorySizeLabel->Create();
 
   this->BoundsDisplay->SetParent(this->GetFrame());
-  this->BoundsDisplay->Create(this->GetApplication());
+  this->BoundsDisplay->Create();
   
   this->ExtentDisplay->SetParent(this->GetFrame());
-  this->ExtentDisplay->Create(this->GetApplication());
+  this->ExtentDisplay->Create();
   this->ExtentDisplay->SetLabelText("Extents");
   
   this->Script("pack %s %s % s %s %s -side top -anchor nw",
@@ -142,11 +142,11 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app)
                this->BoundsDisplay->GetWidgetName());
 
   this->ArrayInformationFrame->SetParent(this->StatsFrame->GetFrame());
-  this->ArrayInformationFrame->Create(this->GetApplication());
+  this->ArrayInformationFrame->Create();
 
   this->ArrayInformationList->SetParent(this->ArrayInformationFrame->GetFrame());
   this->ArrayInformationFrame->SetLabelText("Data Arrays");
-  this->ArrayInformationList->Create(this->GetApplication());
+  this->ArrayInformationList->Create();
   this->ArrayInformationList->AddColumn("Name");
   this->ArrayInformationList->AddColumn("Type");
   this->ArrayInformationList->AddColumn("Data Type");

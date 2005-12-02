@@ -25,7 +25,7 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
 
   vtkKWFrameWithScrollbar *vpw_frame = vtkKWFrameWithScrollbar::New();
   vpw_frame->SetParent(parent);
-  vpw_frame->Create(app);
+  vpw_frame->Create();
 
   app->Script("pack %s -side top -fill both -expand y", 
               vpw_frame->GetWidgetName());
@@ -36,7 +36,7 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
 
   vtkKWVolumePropertyWidget *vpw = vtkKWVolumePropertyWidget::New();
   vpw->SetParent(vpw_frame->GetFrame());
-  vpw->Create(app);
+  vpw->Create();
 
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               vpw->GetWidgetName());

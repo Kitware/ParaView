@@ -19,7 +19,6 @@
 #define __vtkKWSaveImageDialog_h
 
 #include "vtkKWLoadSaveDialog.h"
-class vtkKWApplication;
 
 class KWWIDGETS_EXPORT vtkKWSaveImageDialog : public vtkKWLoadSaveDialog
 {
@@ -30,7 +29,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description::
   // Invoke the dialog 

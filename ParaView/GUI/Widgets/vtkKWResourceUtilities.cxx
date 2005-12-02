@@ -14,7 +14,6 @@
 #include "vtkKWResourceUtilities.h"
 
 #include "vtkKWWidget.h"
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 #include "vtk_png.h"
@@ -32,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.15");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.16");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(

@@ -23,7 +23,6 @@
 #include "vtkKWCompositeWidget.h"
 
 class vtkActor2D;
-class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWLabel;
 class vtkKWCheckButtonSetWithLabel;
@@ -42,7 +41,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description
   // Refresh/Update the interface according to the value of the text property

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWThumbWheel.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -35,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.42");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.43");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -158,7 +157,7 @@ vtkKWThumbWheel::~vtkKWThumbWheel()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::Create(vtkKWApplication *app)
+void vtkKWThumbWheel::Create()
 {
   // Check if already created
 
@@ -170,7 +169,7 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // If we need the scale to popup, create the top level window accordingly
   // and its push button
@@ -178,7 +177,8 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
   if (this->PopupMode)
     {
     this->TopLevel = vtkKWTopLevel::New();
-    this->TopLevel->Create(app);
+    this->TopLevel->SetApplication(this->GetApplication());
+    this->TopLevel->Create();
     this->TopLevel->SetBackgroundColor(0.0, 0.0, 0.0);
     this->TopLevel->SetBorderWidth(2);
     this->TopLevel->SetReliefToFlat();
@@ -188,7 +188,7 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
 
     this->PopupPushButton = vtkKWPushButton::New();
     this->PopupPushButton->SetParent(this);
-    this->PopupPushButton->Create(app);
+    this->PopupPushButton->Create();
     this->PopupPushButton->SetPadX(0);
     this->PopupPushButton->SetPadY(0);
 
@@ -207,7 +207,7 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app)
 
   // Create the scale
 
-  this->ThumbWheel->Create(app);
+  this->ThumbWheel->Create();
   this->ThumbWheel->SetBorderWidth(VTK_KW_TW_BORDER_SIZE);
   this->ThumbWheel->SetHighlightThickness(0);
   this->ThumbWheel->SetReliefToSunken();
@@ -390,7 +390,7 @@ void vtkKWThumbWheel::CreateEntry()
 
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->Entry->Create(this->GetApplication());
+  this->Entry->Create();
   this->Entry->SetWidth(7);
   this->PropagateEnableState(this->Entry);
   this->Entry->SetValueAsDouble(this->GetValue());
@@ -426,7 +426,7 @@ void vtkKWThumbWheel::CreateLabel()
 
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
-  this->Label->Create(this->GetApplication());
+  this->Label->Create();
   this->PropagateEnableState(this->Label);
 }
 

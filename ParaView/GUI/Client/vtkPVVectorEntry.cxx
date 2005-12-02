@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.81");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.82");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
@@ -134,7 +134,7 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::Create(vtkKWApplication *app)
+void vtkPVVectorEntry::Create()
 {
   // Check if already created
 
@@ -146,7 +146,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   int i;
 
@@ -168,7 +168,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *app)
   // Now a label
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->LabelWidget->Create(app);
+    this->LabelWidget->Create();
     this->LabelWidget->SetWidth(18);
     this->LabelWidget->SetJustificationToRight();
     this->LabelWidget->SetText(this->EntryLabel);
@@ -180,7 +180,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *app)
     {
     entry = vtkKWEntry::New();
     entry->SetParent(this);
-    entry->Create(app);
+    entry->Create();
     entry->SetWidth(2);
     this->Script("bind %s <KeyPress> {%s CheckModifiedCallback %K}",
                  entry->GetWidgetName(), this->GetTclName());

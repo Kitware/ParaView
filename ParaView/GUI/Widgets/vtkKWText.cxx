@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.45");
+vtkCxxRevisionMacro(vtkKWText, "1.46");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -275,11 +275,11 @@ void vtkKWText::AppendTextInternal(const char *s, const char *tag)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::Create(vtkKWApplication *app)
+void vtkKWText::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "text"))
+  if (!this->Superclass::CreateSpecificTkWidget("text"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -292,6 +292,8 @@ void vtkKWText::Create(vtkKWApplication *app)
 
   const char *wname = this->GetWidgetName();
   vtksys_stl::string font(this->GetConfigurationOption("-font"));
+
+  vtkKWApplication *app = this->GetApplication();
 
   char bold_font[512], italic_font[512];
   vtkKWTkUtilities::ChangeFontWeightToBold(

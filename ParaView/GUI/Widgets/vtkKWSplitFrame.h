@@ -21,7 +21,6 @@
 #define __vtkKWSplitFrame_h
 
 #include "vtkKWCompositeWidget.h"
-class vtkKWApplication;
 class vtkKWFrame;
 
 class KWWIDGETS_EXPORT vtkKWSplitFrame : public vtkKWCompositeWidget
@@ -33,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Get Frame1. In horizontal orientation, this is the one on the left of the

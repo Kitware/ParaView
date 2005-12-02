@@ -8,7 +8,7 @@ proc vtkKWProgressGaugeEntryPoint {parent win} {
 
   vtkKWProgressGauge progress1
   progress1 SetParent $parent
-  progress1 Create $app
+  progress1 Create
   progress1 SetWidth 150
   progress1 SetBorderWidth 2
   progress1 SetReliefToGroove
@@ -23,7 +23,7 @@ proc vtkKWProgressGaugeEntryPoint {parent win} {
 
   vtkKWPushButtonSet progress1_pbs
   progress1_pbs SetParent $parent
-  progress1_pbs Create $app
+  progress1_pbs Create
   progress1_pbs SetBorderWidth 2
   progress1_pbs SetReliefToGroove
   progress1_pbs SetWidgetsPadX 1

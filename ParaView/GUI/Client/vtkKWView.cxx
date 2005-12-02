@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.25");
+vtkCxxRevisionMacro(vtkKWView, "1.26");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -344,7 +344,7 @@ void vtkKWView::CreateViewProperties()
   vtkKWApplication *app = this->GetApplication();
 
   this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(app);
+  this->Notebook->Create();
 
   vtkKWIcon *ico = vtkKWIcon::New();
   this->Notebook->AddPage(
@@ -355,7 +355,7 @@ void vtkKWView::CreateViewProperties()
   
   this->AnnotationPropertiesFrame->SetParent(
     this->Notebook->GetFrame("Annotate"));
-  this->AnnotationPropertiesFrame->Create(app);
+  this->AnnotationPropertiesFrame->Create();
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -366,13 +366,13 @@ void vtkKWView::CreateViewProperties()
   this->CornerAnnotation->SetParent(
     this->AnnotationPropertiesFrame->GetFrame());
   this->CornerAnnotation->SetView(this);
-  this->CornerAnnotation->Create(app);
+  this->CornerAnnotation->Create();
   this->CornerAnnotation->GetFrame()->SetLabelText("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
 
   this->GeneralPropertiesFrame->SetParent(this->Notebook->GetFrame("General"));
-  this->GeneralPropertiesFrame->Create(app);
+  this->GeneralPropertiesFrame->Create();
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -380,7 +380,7 @@ void vtkKWView::CreateViewProperties()
 
   this->ColorsFrame->SetParent(
     this->GeneralPropertiesFrame->GetFrame());
-  this->ColorsFrame->Create(app);
+  this->ColorsFrame->Create();
   this->ColorsFrame->SetLabelText("Colors");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ColorsFrame->GetWidgetName());
@@ -389,7 +389,7 @@ void vtkKWView::CreateViewProperties()
   this->RendererBackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
   this->RendererBackgroundColor->SetColor( c );
   this->RendererBackgroundColor->GetLabel()->SetText("Set Background Color");
-  this->RendererBackgroundColor->Create(app);
+  this->RendererBackgroundColor->Create();
   this->RendererBackgroundColor->SetCommand(
     this, "SetRendererBackgroundColor");
   this->RendererBackgroundColor->SetBalloonHelpString(
@@ -434,7 +434,7 @@ vtkKWFrame *vtkKWView::GetPropertiesParent()
   this->PropertiesParent = vtkKWFrame::New();
   this->PropertiesParent->SetParent
     (this->ParentWindow->GetMainPanelFrame());
-  this->PropertiesParent->Create(this->GetApplication());
+  this->PropertiesParent->Create();
   this->SharedPropertiesParent = 1;
 
   return this->PropertiesParent;
@@ -449,7 +449,7 @@ void vtkKWView::CreateDefaultPropertiesParent()
     {
     this->PropertiesParent = vtkKWFrame::New();
     this->PropertiesParent->SetParent(this);
-    this->PropertiesParent->Create(this->GetApplication());
+    this->PropertiesParent->Create();
     this->Script("pack %s -before %s -fill y -side left -anchor nw",
                  this->PropertiesParent->GetWidgetName(),
                  this->Frame->GetWidgetName());
@@ -616,7 +616,7 @@ void vtkKWView::PrintView()
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->ParentWindow);
-    dlg->Create(this->GetApplication());
+    dlg->Create();
     dlg->SetText(
       "A postscript file has been generated. You will need to\n"
       "print this file using a print command appropriate for\n"
@@ -746,7 +746,7 @@ void vtkKWView::SaveAsImage()
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
   dlg->SetParent(window);
-  dlg->Create(this->GetApplication());
+  dlg->Create();
   int enabled = 0;
   if (window)
     {

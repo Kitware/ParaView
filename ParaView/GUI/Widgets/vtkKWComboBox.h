@@ -29,8 +29,6 @@
 
 #include "vtkKWEntry.h"
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWComboBox : public vtkKWEntry
 {
 public:
@@ -40,7 +38,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Add and delete values to put in the list.

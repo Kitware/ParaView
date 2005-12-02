@@ -22,7 +22,7 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
 
   vtkKWChangeColorButton *ccb1 = vtkKWChangeColorButton::New();
   ccb1->SetParent(parent);
-  ccb1->Create(app);
+  ccb1->Create();
   ccb1->SetColor(1.0, 0.0, 0.0);
   ccb1->SetLabelPositionToLeft();
   ccb1->SetLabelText("Set Background Color");
@@ -42,7 +42,7 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
 
   vtkKWChangeColorButton *ccb2 = vtkKWChangeColorButton::New();
   ccb2->SetParent(parent);
-  ccb2->Create(app);
+  ccb2->Create();
   ccb2->SetColor(0.0, 1.0, 0.0);
   ccb2->LabelOutsideButtonOn();
   ccb2->SetLabelPositionToRight();
@@ -63,7 +63,7 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
 
   vtkKWChangeColorButton *ccb3 = vtkKWChangeColorButton::New();
   ccb3->SetParent(parent);
-  ccb3->Create(app);
+  ccb3->Create();
   ccb3->SetColor(0.0, 0.0, 1.0);
   ccb3->LabelVisibilityOff();
   ccb3->SetBalloonHelpString(

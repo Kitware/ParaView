@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVRampKeyFrame);
-vtkCxxRevisionMacro(vtkPVRampKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVRampKeyFrame, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVRampKeyFrame::vtkPVRampKeyFrame()
@@ -32,9 +32,9 @@ vtkPVRampKeyFrame::~vtkPVRampKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVRampKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVRampKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 }
 
 //-----------------------------------------------------------------------------
