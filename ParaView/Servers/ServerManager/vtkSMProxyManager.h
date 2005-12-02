@@ -21,6 +21,9 @@
 // the proxy manager. For latter, pass the control of the proxy to the
 // manager with RegisterProxy() and unregister it. At destruction, proxy
 // manager deletes all managed proxies.
+// Every proxy has a ConnectionID associated with it which indicates the
+// Server connection on which the proxy exists. Changing the ConnectionID
+// must be done immediately after the proxy is instantiated.
 // .SECTION See Also
 // vtkSMXMLParser
 
@@ -126,6 +129,7 @@ public:
   // Description:
   // Given a group name, create prototypes and store them
   // in a instance group called groupName_prototypes.
+  // Prototypes have their ConnectionID set to the SelfConnection.
   void InstantiateGroupPrototypes(const char* groupName);
 
   // Description:

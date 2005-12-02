@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.7");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -94,7 +94,7 @@ unsigned int vtkSMKeyFrameProxy::GetNumberOfKeyValues()
 void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
 {
   *file << endl;
-  vtkClientServerID id = this->SelfID;
+  vtkClientServerID id = this->GetSelfID();
   *file << "set pvTemp" << id
     << " [$proxyManager NewProxy " 
     << this->GetXMLGroup() <<" "

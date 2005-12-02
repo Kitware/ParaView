@@ -31,7 +31,7 @@ public:
   vtkTypeRevisionMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
-  vtkClientServerID GetID() {return this->SelfID;}
+  vtkClientServerID GetID() {return this->GetSelfID();}
 //ETX
 
   virtual void SaveInBatchScript(ofstream* file);

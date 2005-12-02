@@ -68,7 +68,7 @@ public:
   virtual void UpdateValue(double currenttime,
     vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
 //BTX
-  vtkClientServerID GetID() { return this->SelfID; }
+  vtkClientServerID GetID() { return this->GetSelfID(); }
 //ETX
   
   // Description:

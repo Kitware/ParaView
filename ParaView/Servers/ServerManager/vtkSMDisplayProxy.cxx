@@ -23,7 +23,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
@@ -151,7 +151,7 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
   // For such displays we use their self ids. 
   
   unsigned int count = this->GetNumberOfIDs();
-  vtkClientServerID id = (count)? this->GetID(0) : this->SelfID;
+  vtkClientServerID id = (count)? this->GetID(0) : this->GetSelfID();
   count = (count)? count : 1;
    
   for (unsigned int kk = 0; kk < count ; kk++)
