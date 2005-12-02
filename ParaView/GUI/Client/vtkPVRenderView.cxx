@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.409");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.410");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -163,7 +163,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->SplitFrame = vtkKWSplitFrame::New();
 
-  this->BlockRender = 0;
+  this->BlockRender = 1;
 
   this->MenuEntryUnderline = 4;
   this->SetMenuEntryName(VTK_PV_VIEW_MENU_LABEL);

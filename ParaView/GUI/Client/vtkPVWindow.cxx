@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.776");
+vtkCxxRevisionMacro(vtkPVWindow, "1.777");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1591,6 +1591,8 @@ void vtkPVWindow::Create()
     this->TimerLogDisplay->SetMasterWindow(this);
     this->TimerLogDisplay->Create();
     }
+
+  this->MainView->EndBlockingRender();
 }
 
 //----------------------------------------------------------------------------
