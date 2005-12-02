@@ -34,7 +34,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Create the widget.
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create();
   
   // Description:
   // Set the current render view.

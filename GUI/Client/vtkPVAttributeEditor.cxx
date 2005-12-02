@@ -60,7 +60,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.11");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ void vtkPVAttributeEditor::CreateProperties()
   //  }
 
   this->SaveButton->SetParent(this->ParameterFrame->GetFrame());
-  this->SaveButton->Create(pvApp);
+  this->SaveButton->Create();
   this->SaveButton->SetText("Save");
   this->SaveButton->SetCommand(this->GetPVWindow(), "WriteData");
   this->Script("pack %s -padx 2 -pady 4 -expand t", this->SaveButton->GetWidgetName());

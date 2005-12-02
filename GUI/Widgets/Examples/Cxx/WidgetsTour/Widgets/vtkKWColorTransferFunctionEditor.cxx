@@ -36,7 +36,7 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   vtkKWColorTransferFunctionEditor *cpsel_tfunc1_editor = 
     vtkKWColorTransferFunctionEditor::New();
   cpsel_tfunc1_editor->SetParent(parent);
-  cpsel_tfunc1_editor->Create(app);
+  cpsel_tfunc1_editor->Create();
   cpsel_tfunc1_editor->SetBorderWidth(2);
   cpsel_tfunc1_editor->SetReliefToGroove();
   cpsel_tfunc1_editor->SetPadX(2);
@@ -91,7 +91,7 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   vtkKWColorTransferFunctionEditor *cpsel_tfunc2_editor = 
     vtkKWColorTransferFunctionEditor::New();
   cpsel_tfunc2_editor->SetParent(parent);
-  cpsel_tfunc2_editor->Create(app);
+  cpsel_tfunc2_editor->Create();
   cpsel_tfunc2_editor->SetBorderWidth(2);
   cpsel_tfunc2_editor->SetReliefToGroove();
   cpsel_tfunc2_editor->SetPadX(2);

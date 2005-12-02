@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.72");
+vtkCxxRevisionMacro(vtkPVScale, "1.73");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -153,7 +153,7 @@ void vtkPVScale::EntryCheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Create(vtkKWApplication *app)
+void vtkPVScale::Create()
 {
   // Check if already created
 
@@ -165,7 +165,7 @@ void vtkPVScale::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
@@ -181,14 +181,14 @@ void vtkPVScale::Create(vtkKWApplication *app)
   
   // Now a label
   this->LabelWidget->SetParent(this);
-  this->LabelWidget->Create(app);
+  this->LabelWidget->Create();
   this->LabelWidget->SetWidth(18);
   this->LabelWidget->SetJustificationToRight();
   this->LabelWidget->SetText(this->EntryLabel);
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
 
   this->Scale->SetParent(this);
-  this->Scale->Create(this->GetApplication());
+  this->Scale->Create();
   this->Scale->GetScale()->SetValueVisibility(this->DisplayValueFlag);
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");

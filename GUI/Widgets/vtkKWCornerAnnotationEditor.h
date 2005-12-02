@@ -49,7 +49,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the vtkKWView or the vtkKWRenderWidget that owns this annotation.

@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.40");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.41");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -257,7 +257,7 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::Create(vtkKWApplication* app)
+void vtkPVAnimationCue::Create()
 {
   if (!this->TimeLineParent)
     {
@@ -275,10 +275,10 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->TimeLineContainer->SetParent(this->TimeLineParent);
-  this->TimeLineContainer->Create(app);
+  this->TimeLineContainer->Create();
   
   this->TimeLineFrame->SetParent(this->TimeLineContainer);
   this->TimeLine->SetParameterCursorInteractionStyle(
@@ -286,7 +286,7 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
     vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithRighButton |
     vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithControlLeftButton);
 
-  this->TimeLineFrame->Create(app);
+  this->TimeLineFrame->Create();
   this->TimeLineFrame->SetHeight(VTK_PV_ANIMATON_ENTRY_HEIGHT);
   
   // Create the time line associated with this entry.
@@ -296,25 +296,25 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app)
     vtkKWParameterValueFunctionEditor::PointMarginHorizontalSides);
   this->TimeLine->SetAnimationCue(this);
   this->TimeLine->SetParent(this->TimeLineFrame);
-  this->TimeLine->Create(app);
+  this->TimeLine->Create();
   this->TimeLine->SetCanvasOutlineStyle(
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleHorizontalSides |
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide);
 
   this->Frame->SetParent(this);
-  this->Frame->Create(app);
+  this->Frame->Create();
   int height = (this->TimeLine->GetParameterRangeVisibility())? 
     this->TimeLine->GetParameterRange()->GetThickness() : 0;
   this->Frame->SetHeight(this->TimeLine->GetCanvasHeight() + height);
 
   this->Label->SetParent(this->Frame);
-  this->Label->Create(app);
+  this->Label->Create();
 
   this->Script("pack propagate %s 0", this->Frame->GetWidgetName());
   this->Script("bind %s <ButtonPress-1> {%s GetFocus}",
     this->Label->GetWidgetName(), this->GetTclName());
   this->Image->SetParent(this->Frame);
-  this->Image->Create(app);
+  this->Image->Create();
   this->SetImageType(this->ImageType);
   this->InitializeObservers(this->TimeLine);
 }

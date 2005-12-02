@@ -27,13 +27,13 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
 
   vtkKWRadioButton *radiob1 = vtkKWRadioButton::New();
   radiob1->SetParent(parent);
-  radiob1->Create(app);
+  radiob1->Create();
   radiob1->SetText("A radiobutton");
   radiob1->SetValueAsInt(123);
 
   vtkKWRadioButton *radiob1b = vtkKWRadioButton::New();
   radiob1b->SetParent(parent);
-  radiob1b->Create(app);
+  radiob1b->Create();
   radiob1b->SetText("Another radiobutton");
   radiob1b->SetValueAsInt(456);
 
@@ -53,14 +53,14 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
 
   vtkKWRadioButton *radiob2 = vtkKWRadioButton::New();
   radiob2->SetParent(parent);
-  radiob2->Create(app);
+  radiob2->Create();
   radiob2->SetImageToPredefinedIcon(vtkKWIcon::IconPlus);
   radiob2->IndicatorVisibilityOff();
   radiob2->SetValue("foo");
 
   vtkKWRadioButton *radiob2b = vtkKWRadioButton::New();
   radiob2b->SetParent(parent);
-  radiob2b->Create(app);
+  radiob2b->Create();
   radiob2b->SetImageToPredefinedIcon(vtkKWIcon::IconMinus);
   radiob2b->IndicatorVisibilityOff();
   radiob2b->SetValue("bar");
@@ -81,7 +81,7 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
 
   vtkKWRadioButtonSet *radiob_set = vtkKWRadioButtonSet::New();
   radiob_set->SetParent(parent);
-  radiob_set->Create(app);
+  radiob_set->Create();
   radiob_set->SetBorderWidth(2);
   radiob_set->SetReliefToGroove();
 

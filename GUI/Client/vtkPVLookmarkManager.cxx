@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.74");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.75");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -224,7 +224,7 @@ vtkPVWindow* vtkPVLookmarkManager::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::Create(vtkKWApplication *app)
+void vtkPVLookmarkManager::Create()
 {
   char methodAndArgs[100];
 
@@ -236,7 +236,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetGeometry("380x700+0+0");
   this->SetDisplayPositionToScreenCenterFirst();
@@ -246,13 +246,13 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   vtkKWMenu *root_menu = this->GetMenu();
   this->MenuFile->SetParent(root_menu);
   this->MenuFile->SetTearOff(0);
-  this->MenuFile->Create(app);
+  this->MenuFile->Create();
   this->MenuImport->SetParent(this->MenuFile);
   this->MenuImport->SetTearOff(0);
-  this->MenuImport->Create(app);
+  this->MenuImport->Create();
   this->MenuImportLmkFile->SetParent(this->MenuImport);
   this->MenuImportLmkFile->SetTearOff(0);
-  this->MenuImportLmkFile->Create(app);
+  this->MenuImportLmkFile->Create();
   this->MenuImport->AddCascade("Lookmark File",this->MenuImportLmkFile,0);
   char* rbv = 
     this->MenuImportLmkFile->CreateRadioButtonVariable(this, "ImportLookmarkFileButtonVar");
@@ -262,7 +262,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   delete [] rbv;
   this->MenuImportBoundingBoxFile->SetParent(this->MenuImport);
   this->MenuImportBoundingBoxFile->SetTearOff(0);
-  this->MenuImportBoundingBoxFile->Create(app);
+  this->MenuImportBoundingBoxFile->Create();
   this->MenuImport->AddCommand("Bounding Box File",this,"ImportBoundingBoxFileCallback");
   root_menu->AddCascade("File", this->MenuFile, 0);
   this->MenuFile->AddCascade("Import", this->MenuImport,0);
@@ -274,14 +274,14 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->MenuEdit->SetParent(root_menu);
   this->MenuEdit->SetTearOff(0);
-  this->MenuEdit->Create(app);
+  this->MenuEdit->Create();
   root_menu->AddCascade("Edit", this->MenuEdit, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
   this->MenuEdit->AddCommand("Redo", this, "RedoCallback");
   this->MenuEdit->AddSeparator();
   this->MenuExamples->SetParent(this->MenuEdit);
   this->MenuExamples->SetTearOff(0);
-  this->MenuExamples->Create(app);
+  this->MenuExamples->Create();
   this->MenuEdit->AddCascade("Add Existing Macro", this->MenuExamples,0);
   sprintf(methodAndArgs,"CreateLookmarkCallback 1");
   this->MenuEdit->AddCommand("Create Macro", this, methodAndArgs);
@@ -306,30 +306,30 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->MenuHelp->SetParent(root_menu);
   this->MenuHelp->SetTearOff(0);
-  this->MenuHelp->Create(app);
+  this->MenuHelp->Create();
   root_menu->AddCascade("Help", this->MenuHelp, 0);
   this->MenuHelp->AddCommand("Quick Start Guide", this, "DisplayQuickStartGuide");
   this->MenuHelp->AddCommand("User's Tutorial", this, "DisplayUsersTutorial");
 
   this->WindowFrame->SetParent(this);
-  this->WindowFrame->Create(this->GetPVApplication());
+  this->WindowFrame->Create();
 
   this->ScrollFrame->SetParent(this->WindowFrame);
-  this->ScrollFrame->Create(this->GetPVApplication());
+  this->ScrollFrame->Create();
 
   this->SeparatorFrame->SetParent(this->WindowFrame);
-  this->SeparatorFrame->Create(this->GetPVApplication());
+  this->SeparatorFrame->Create();
   this->SeparatorFrame->SetBorderWidth(2);
   this->SeparatorFrame->SetReliefToGroove();
 
   this->CreateLookmarkButton->SetParent(this->WindowFrame);
-  this->CreateLookmarkButton->Create(this->GetPVApplication());
+  this->CreateLookmarkButton->Create();
   this->CreateLookmarkButton->SetText("Create Lookmark");
   sprintf(methodAndArgs,"CreateLookmarkCallback 0");
   this->CreateLookmarkButton->SetCommand(this,methodAndArgs);
 
   this->TopDragAndDropTarget->SetParent(this->ScrollFrame->GetFrame());
-  this->TopDragAndDropTarget->Create(this->GetPVApplication());
+  this->TopDragAndDropTarget->Create();
 
   this->Script("pack %s -padx 2 -pady 4 -expand t", 
                 this->CreateLookmarkButton->GetWidgetName());
@@ -405,7 +405,7 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
   newLookmark->SetLocation(this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()));
   newLookmark->SetApplication(this->GetApplication());
   newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
-  newLookmark->Create(this->GetPVApplication());
+  newLookmark->Create();
   methodAndArgs << "SelectItemCallback" << newLookmark->GetWidgetName() << ends;
   newLookmark->GetCheckbox()->SetCommand(this,methodAndArgs.str());
   methodAndArgs.rdbuf()->freeze(0);
@@ -561,7 +561,7 @@ void vtkPVLookmarkManager::ImportMacroExamplesInternal(int locationOfLmkItemAmon
     vtkKWMenu *childMenu = vtkKWMenu::New();
     childMenu->SetParent(this->MenuEdit);
     childMenu->SetTearOff(0);
-    childMenu->Create(this->GetPVApplication());
+    childMenu->Create();
     parentMenu->AddCascade(lmkElement->GetAttribute("Name"), childMenu,0);
 */
     // use the label frame of this lmk container as the parent frame in which to pack into (constant)
@@ -641,7 +641,7 @@ void vtkPVLookmarkManager::DisplayQuickStartGuide()
   if (!this->QuickStartGuideDialog->IsCreated())
     {
     this->QuickStartGuideDialog->SetMasterWindow(this->MasterWindow);
-    this->QuickStartGuideDialog->Create(this->GetPVApplication());
+    this->QuickStartGuideDialog->Create();
     this->QuickStartGuideDialog->SetReliefToSolid();
     this->QuickStartGuideDialog->SetBorderWidth(1);
     this->QuickStartGuideDialog->SetModal(0);
@@ -666,7 +666,7 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
   if (!this->QuickStartGuideTxt->IsCreated())
     {
     this->QuickStartGuideTxt->SetParent(this->QuickStartGuideDialog->GetBottomFrame());
-    this->QuickStartGuideTxt->Create(app);
+    this->QuickStartGuideTxt->Create();
     this->QuickStartGuideTxt->VerticalScrollbarVisibilityOn();
 
     vtkKWText *text = this->QuickStartGuideTxt->GetWidget();
@@ -727,7 +727,7 @@ void vtkPVLookmarkManager::DisplayUsersTutorial()
   if (!this->UsersTutorialDialog->IsCreated())
     {
     this->UsersTutorialDialog->SetMasterWindow(this->MasterWindow);
-    this->UsersTutorialDialog->Create(this->GetPVApplication());
+    this->UsersTutorialDialog->Create();
     this->UsersTutorialDialog->SetReliefToSolid();
     this->UsersTutorialDialog->SetBorderWidth(1);
     this->UsersTutorialDialog->SetModal(0);
@@ -751,7 +751,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
   if (!this->UsersTutorialTxt->IsCreated())
     {
     this->UsersTutorialTxt->SetParent(this->UsersTutorialDialog->GetBottomFrame());
-    this->UsersTutorialTxt->Create(app);
+    this->UsersTutorialTxt->Create();
     this->UsersTutorialTxt->VerticalScrollbarVisibilityOn();
 
     vtkKWText *text = this->UsersTutorialTxt->GetWidget();
@@ -1136,7 +1136,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
     vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::OkDefault );
   dlg2->SetStyleToOkCancel();
   dlg2->SetModal(0);
-  dlg2->Create(this->GetPVApplication());
+  dlg2->Create();
   string1 = "Please check one and only one lookmark macro to invoke on the regions defined in the bounding box file. Press OK when you are done. Press Cancel for no macro to be invoked.";
   string1.append("\n");
   dlg2->SetText( string1.c_str() );
@@ -1664,7 +1664,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
       }
     lmkWidget->UpdateVariableValues();
     newLmkWidget->SetParent(dstPrnt);
-    newLmkWidget->Create(this->GetPVApplication());
+    newLmkWidget->Create();
     sprintf(methodAndArg,"SelectItemCallback %s",newLmkWidget->GetWidgetName());
     newLmkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     newLmkWidget->UpdateWidgetValues();
@@ -1711,7 +1711,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
     newLmkFolder->SetMacroFlag(lmkFolder->GetMacroFlag());
     newLmkFolder->SetParent(dstPrnt);
-    newLmkFolder->Create(this->GetPVApplication());
+    newLmkFolder->Create();
     sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
     newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
     newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetText());
@@ -1775,7 +1775,7 @@ void vtkPVLookmarkManager::ImportLookmarkFileInternal(int locationOfLmkItemAmong
       {
       lmkFolderWidget->SetMacroFlag(1);
       }
-    lmkFolderWidget->Create(this->GetPVApplication());
+    lmkFolderWidget->Create();
     sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
     lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
@@ -1826,7 +1826,7 @@ void vtkPVLookmarkManager::ImportLookmarkFileInternal(int locationOfLmkItemAmong
       lookmarkWidget->SetMacroFlag(this->IsWidgetInsideFolder(parent,folder));
       }
     lookmarkWidget->SetParent(parent);
-    lookmarkWidget->Create(this->GetPVApplication());
+    lookmarkWidget->Create();
     sprintf(methodAndArg,"SelectItemCallback %s",lookmarkWidget->GetWidgetName());
     lookmarkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
     lookmarkWidget->UpdateWidgetValues();
@@ -1844,18 +1844,22 @@ char* vtkPVLookmarkManager::PromptForFile(char *ext, int saveFlag)
   ostrstream str;
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
   vtkPVWindow *win = this->GetPVWindow();
+  if (win)
+    {
+    dialog->SetParent(this->ScrollFrame);
+    }
+  else
+    {
+    dialog->SetParent(this);
+    }
 
   if(saveFlag)
     {
     dialog->SaveDialogOn();
     }
 
-  dialog->Create(this->GetPVApplication());
+  dialog->Create();
 
-  if (win)
-    {
-    dialog->SetParent(this->ScrollFrame);
-    }
   dialog->SetDefaultExtension(ext);
   str << "{{} {." << ext << "} } ";
   str << "{{All files} {*}}" << ends;
@@ -2118,7 +2122,7 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
     newLookmark->SetParent(this->ScrollFrame->GetFrame());
     }
   newLookmark->SetMacroFlag(macroFlag);
-  newLookmark->Create(this->GetPVApplication());
+  newLookmark->Create();
   sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
   newLookmark->GetCheckbox()->SetCommand(this,methodAndArg);
   newLookmark->SetName(name);
@@ -3252,7 +3256,7 @@ vtkKWLookmarkFolder* vtkPVLookmarkManager::CreateFolder(const char *name, int ma
   // append to the end of the lookmark manager:
   lmkFolderWidget->SetParent(this->ScrollFrame->GetFrame());
   lmkFolderWidget->SetMacroFlag(macroFlag);
-  lmkFolderWidget->Create(this->GetPVApplication());
+  lmkFolderWidget->Create();
   char methodAndArg[200];
   sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
   lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
@@ -3360,7 +3364,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       {
       vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
       newLmkFolder->SetParent(packingFrame);
-      newLmkFolder->Create(this->GetPVApplication());
+      newLmkFolder->Create();
       char methodAndArg[200];
       sprintf(methodAndArg,"SelectItemCallback %s",newLmkFolder->GetWidgetName());
       newLmkFolder->GetCheckbox()->SetCommand(this,methodAndArg);
@@ -3407,7 +3411,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
         this->GetPVWindow()->GetLookmarkToolbar()->RemoveWidget(oldLmkWidget->GetToolbarButton());
         }
       newLmkWidget->SetParent(packingFrame);
-      newLmkWidget->Create(this->GetPVApplication());
+      newLmkWidget->Create();
       char methodAndArg[200];
       sprintf(methodAndArg,"SelectItemCallback %s",newLmkWidget->GetWidgetName());
       newLmkWidget->GetCheckbox()->SetCommand(this,methodAndArg);

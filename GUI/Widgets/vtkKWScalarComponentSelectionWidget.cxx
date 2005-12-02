@@ -21,7 +21,7 @@
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.15");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ vtkKWScalarComponentSelectionWidget::~vtkKWScalarComponentSelectionWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarComponentSelectionWidget::Create(vtkKWApplication *app)
+void vtkKWScalarComponentSelectionWidget::Create()
 {
   // Check if already created
 
@@ -72,13 +72,13 @@ void vtkKWScalarComponentSelectionWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // --------------------------------------------------------------
   // Component selection
 
   this->SelectedComponentOptionMenu->SetParent(this);
-  this->SelectedComponentOptionMenu->Create(app);
+  this->SelectedComponentOptionMenu->Create();
   this->SelectedComponentOptionMenu->ExpandWidgetOff();
   this->SelectedComponentOptionMenu->GetLabel()->SetText("Component:");
   this->SelectedComponentOptionMenu->SetBalloonHelpString(

@@ -19,7 +19,6 @@
 
 #include "vtkKWMaterialPropertyWidget.h"
 
-class vtkKWApplication;
 class vtkProperty;
 
 class KWWIDGETS_EXPORT vtkKWSurfaceMaterialPropertyWidget : public vtkKWMaterialPropertyWidget

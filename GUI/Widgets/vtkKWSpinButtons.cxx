@@ -11,14 +11,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWSpinButtons.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSpinButtons );
-vtkCxxRevisionMacro(vtkKWSpinButtons, "1.3");
+vtkCxxRevisionMacro(vtkKWSpinButtons, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWSpinButtons::vtkKWSpinButtons()
@@ -50,7 +49,7 @@ vtkKWSpinButtons::~vtkKWSpinButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinButtons::Create(vtkKWApplication *app)
+void vtkKWSpinButtons::Create()
 {
   // Check if already created
 
@@ -62,15 +61,15 @@ void vtkKWSpinButtons::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->PreviousButton->SetParent(this);
-  this->PreviousButton->Create(app);
+  this->PreviousButton->Create();
   this->PreviousButton->SetPadX(0);
   this->PreviousButton->SetPadY(this->PreviousButton->GetPadX());
 
   this->NextButton->SetParent(this);
-  this->NextButton->Create(app);
+  this->NextButton->Create();
   this->NextButton->SetPadX(this->PreviousButton->GetPadX());
   this->NextButton->SetPadY(this->PreviousButton->GetPadY());
   

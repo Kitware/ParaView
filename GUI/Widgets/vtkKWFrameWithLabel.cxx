@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.4");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.5");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -166,7 +166,7 @@ void vtkKWFrameWithLabel::AdjustMarginCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
+void vtkKWFrameWithLabel::Create()
 {
   // Check if already created
 
@@ -178,27 +178,27 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Border->SetParent(this);
-  this->Border->Create(app);
+  this->Border->Create();
 
   this->Groove->SetParent(this);
-  this->Groove->Create(app);
+  this->Groove->Create();
   this->Groove->SetReliefToGroove();
   this->Groove->SetBorderWidth(2);
 
   this->Border2->SetParent(this->Groove);
-  this->Border2->Create(app);
+  this->Border2->Create();
 
   this->Frame->SetParent(this->Groove);
-  this->Frame->Create(app);
+  this->Frame->Create();
 
   this->LabelFrame->SetParent(this);
-  this->LabelFrame->Create(app);
+  this->LabelFrame->Create();
 
   this->Label->SetParent(this->LabelFrame);
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetBorderWidth(0);
   this->Label->ExpandWidgetOff();
 
@@ -221,8 +221,8 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   label->SetPadX(0);
   label->SetPadY(0);
 
-  const char *lem_name = app->GetLimitedEditionModeName() 
-    ? app->GetLimitedEditionModeName() : "Limited Edition";
+  const char *lem_name = this->GetApplication()->GetLimitedEditionModeName() 
+    ? this->GetApplication()->GetLimitedEditionModeName() : "Limited Edition";
   
   ostrstream balloon_str;
   balloon_str << "This feature is not available in \"" << lem_name 
@@ -239,7 +239,7 @@ void vtkKWFrameWithLabel::Create(vtkKWApplication *app)
   this->IconData->SetImage(vtkKWIcon::IconShrink);
 
   this->Icon->SetParent(this);
-  this->Icon->Create(app);
+  this->Icon->Create();
   this->Icon->SetImageToIcon(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   

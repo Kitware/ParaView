@@ -11,7 +11,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
@@ -19,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.27");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -34,11 +33,11 @@ vtkKWPushButton::~vtkKWPushButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButton::Create(vtkKWApplication *app)
+void vtkKWPushButton::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "button"))
+  if (!this->Superclass::CreateSpecificTkWidget("button"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

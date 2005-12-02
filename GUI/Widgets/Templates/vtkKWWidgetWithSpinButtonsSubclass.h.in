@@ -35,7 +35,6 @@
 
 #include "vtkKWWidgetWithSpinButtons.h"
 
-class vtkKWApplication;
 class @WidgetType@;
 
 class KWWIDGETS_EXPORT @WidgetType@WithSpinButtons : public vtkKWWidgetWithSpinButtons
@@ -47,7 +46,7 @@ public:
 
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the @WidgetType@ that is being associated to the spin buttons

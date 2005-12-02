@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWScale.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
@@ -21,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.106");
+vtkCxxRevisionMacro(vtkKWScale, "1.107");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -70,11 +69,11 @@ vtkKWScale::~vtkKWScale()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::Create(vtkKWApplication *app)
+void vtkKWScale::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "scale"))
+  if (!this->Superclass::CreateSpecificTkWidget("scale"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

@@ -47,7 +47,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Create the widget.
-  void Create(vtkKWApplication* app);
+  void Create();
 
   void OK();
   void SetHostname(const char* hn);

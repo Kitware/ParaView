@@ -24,7 +24,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
 class vtkKWTextInternals;
 
 class KWWIDGETS_EXPORT vtkKWText : public vtkKWCoreWidget
@@ -36,7 +35,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the value of the text. AppendText() is a convenience function

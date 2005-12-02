@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.15");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
@@ -27,6 +27,7 @@ vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
   this->UserInterfaceManager = NULL;
   this->Enabled = 1;
   this->Name = NULL;
+  this->PanelIsCreated = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -63,14 +64,23 @@ void vtkKWUserInterfacePanel::SetUserInterfaceManager(vtkKWUserInterfaceManager 
 
   if (this->UserInterfaceManager != NULL) 
     { 
+    // Use the same application (for convenience)
+
+    if (!this->GetApplication() && 
+        this->UserInterfaceManager->GetApplication())
+      {
+      this->SetApplication(this->UserInterfaceManager->GetApplication());
+      }
+
     this->UserInterfaceManager->AddPanel(this);
+    
     } 
   
   this->Modified(); 
 } 
 
 // ---------------------------------------------------------------------------
-void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
+void vtkKWUserInterfacePanel::Create()
 {
   if (this->IsCreated())
     {
@@ -81,9 +91,7 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
     return;
     }
 
-  // Set the application
-
-  this->SetApplication(app);
+  this->PanelIsCreated = 1;
 
   // As a convenience, if the manager associated to this panel has not been
   // created yet, it is created now. This might be useful since concrete
@@ -92,7 +100,7 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
 
   if (this->UserInterfaceManager && !this->UserInterfaceManager->IsCreated())
     {
-    this->UserInterfaceManager->Create(this->GetApplication());
+    this->UserInterfaceManager->Create();
     }
 
   // Do *not* call Update() here.
@@ -101,7 +109,7 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
 // ---------------------------------------------------------------------------
 int vtkKWUserInterfacePanel::IsCreated()
 {
-  return (this->GetApplication() != NULL);
+  return (this->GetApplication() != NULL && this->PanelIsCreated);
 }
 
 //----------------------------------------------------------------------------

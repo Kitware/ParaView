@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWChangeColorButton.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
@@ -21,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.66");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.67");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -83,7 +82,7 @@ void vtkKWChangeColorButton::SetColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::Create(vtkKWApplication *app)
+void vtkKWChangeColorButton::Create()
 {
   // Check if already created
 
@@ -96,16 +95,16 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app)
   // Call the superclass, this will set the application,
   // create the frame and the Label
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the main frame
 
-  this->CreateButtonFrame(app);
+  this->CreateButtonFrame();
 
   // Create the color button
 
   this->ColorButton->SetParent(this->ButtonFrame);
-  this->ColorButton->Create(app);
+  this->ColorButton->Create();
   this->ColorButton->SetBorderWidth(1);
   this->ColorButton->SetReliefToGroove();
   this->ColorButton->SetPadX(0);
@@ -130,14 +129,14 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::CreateLabel(vtkKWApplication *app)
+void vtkKWChangeColorButton::CreateLabel()
 {
   // Tk bug: The button frame *has* to be created before the label if we
   // want to be able to pack the label inside the frame
 
-  this->CreateButtonFrame(app);
+  this->CreateButtonFrame();
 
-  this->Superclass::CreateLabel(app);
+  this->Superclass::CreateLabel();
 
   vtkKWLabel *label = this->GetLabel();
   label->SetPadX(2);
@@ -146,7 +145,7 @@ void vtkKWChangeColorButton::CreateLabel(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::CreateButtonFrame(vtkKWApplication *app)
+void vtkKWChangeColorButton::CreateButtonFrame()
 {
   if (this->ButtonFrame->IsCreated())
     {
@@ -154,7 +153,7 @@ void vtkKWChangeColorButton::CreateButtonFrame(vtkKWApplication *app)
     }
 
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(app);
+  this->ButtonFrame->Create();
   this->ButtonFrame->SetReliefToRaised();
   this->ButtonFrame->SetBorderWidth(2);
 }

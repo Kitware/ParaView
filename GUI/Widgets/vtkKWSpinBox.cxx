@@ -13,12 +13,11 @@
 =========================================================================*/
 #include "vtkKWSpinBox.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.6");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox()
@@ -31,9 +30,9 @@ vtkKWSpinBox::~vtkKWSpinBox()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::Create(vtkKWApplication *app)
+void vtkKWSpinBox::Create()
 {
-  if (!this->Superclass::CreateSpecificTkWidget(app, "spinbox"))
+  if (!this->Superclass::CreateSpecificTkWidget("spinbox"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

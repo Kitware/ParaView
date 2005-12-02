@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -111,7 +111,7 @@ void vtkKWHeaderAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
+void vtkKWHeaderAnnotationEditor::Create()
 {
   // Create the superclass widgets
 
@@ -121,7 +121,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
@@ -153,7 +153,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
   // Text frame
 
   this->TextFrame->SetParent(frame);
-  this->TextFrame->Create(app);
+  this->TextFrame->Create();
 
   this->Script("pack %s -side top -fill both -expand y", 
                this->TextFrame->GetWidgetName());
@@ -162,7 +162,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
   // Header text
 
   this->TextEntry->SetParent(this->TextFrame);
-  this->TextEntry->Create(app);
+  this->TextEntry->Create();
   this->TextEntry->GetLabel()->SetText("Header:");
   this->TextEntry->GetWidget()->SetWidth(20);
   this->TextEntry->GetWidget()->SetCommand(this, "HeaderTextCallback");
@@ -185,7 +185,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
       this->TextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
-    this->TextPropertyPopupButton->Create(app);
+    this->TextPropertyPopupButton->Create();
     this->TextPropertyPopupButton->GetLabel()->SetText("Header properties:");
     this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
 
@@ -211,7 +211,7 @@ void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app)
   this->TextPropertyWidget->LongFormatOn();
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->LabelVisibilityOn();
-  this->TextPropertyWidget->Create(app);
+  this->TextPropertyWidget->Create();
   this->TextPropertyWidget->GetLabel()->SetText("Header properties:");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 

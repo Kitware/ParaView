@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.33");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.34");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -127,7 +127,7 @@ vtkKWToolbarSet::GetToolbarSlot(vtkKWToolbar *toolbar)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::Create(vtkKWApplication *app)
+void vtkKWToolbarSet::Create()
 {
   // Check if already created
 
@@ -139,23 +139,23 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the toolbars frame container
 
   this->ToolbarsFrame->SetParent(this);  
-  this->ToolbarsFrame->Create(app);
+  this->ToolbarsFrame->Create();
 
   // Bottom separator
 
   this->BottomSeparator->SetParent(this);  
-  this->BottomSeparator->Create(app);
+  this->BottomSeparator->Create();
   this->BottomSeparator->SetOrientationToHorizontal();
 
   // Top separator
 
   this->TopSeparator->SetParent(this);  
-  this->TopSeparator->Create(app);
+  this->TopSeparator->Create();
   this->TopSeparator->SetOrientationToHorizontal();
 
   // This is needed for the hack in Pack() to work, otherwise
@@ -386,7 +386,7 @@ void vtkKWToolbarSet::PackToolbars()
           if (!(*it)->Separator->IsCreated())
             {
             (*it)->Separator->SetParent(this->ToolbarsFrame);
-            (*it)->Separator->Create(this->GetApplication());
+            (*it)->Separator->Create();
             (*it)->Separator->SetOrientationToVertical();
             }
           tk_cmd << "pack " << (*it)->Separator->GetWidgetName() 

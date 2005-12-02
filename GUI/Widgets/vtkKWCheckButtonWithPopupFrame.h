@@ -34,7 +34,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Automatically disable the popup button when the checkbutton is not 

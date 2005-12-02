@@ -10,7 +10,7 @@ proc vtkKWTextEntryPoint {parent win} {
 
   vtkKWText text1
   text1 SetParent $parent
-  text1 Create $app
+  text1 Create
   text1 SetText $lorem_ipsum
   text1 SetWidth 50
   text1 SetHeight 12
@@ -26,7 +26,7 @@ proc vtkKWTextEntryPoint {parent win} {
 
   vtkKWText text2
   text2 SetParent $parent
-  text2 Create $app
+  text2 Create
   text2 SetText $lorem_ipsum
   text2 SetHeight 7
   text2 SetWrapToChar
@@ -44,7 +44,7 @@ proc vtkKWTextEntryPoint {parent win} {
 
   vtkKWTextWithScrollbars text4
   text4 SetParent $parent
-  text4 Create $app
+  text4 Create
   [text4 GetWidget] SetText $lorem_ipsum
   [text4 GetWidget] QuickFormattingOn 
   [text4 GetWidget] SetWidth 25

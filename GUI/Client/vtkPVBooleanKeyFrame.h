@@ -32,7 +32,7 @@ protected:
   vtkPVBooleanKeyFrame();
   ~vtkPVBooleanKeyFrame();
 
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
 private:
   vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&); // Not implemented.

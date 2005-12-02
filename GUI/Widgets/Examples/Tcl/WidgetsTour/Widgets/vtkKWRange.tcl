@@ -8,7 +8,7 @@ proc vtkKWRangeEntryPoint {parent win} {
 
   vtkKWRange range1
   range1 SetParent $parent
-  range1 Create $app
+  range1 Create
   range1 SetLabelText "A range:"
   range1 SetWholeRange 0.0 100.0
   range1 SetRange 20.0 60.0
@@ -28,7 +28,7 @@ proc vtkKWRangeEntryPoint {parent win} {
 
   vtkKWRange range2
   range2 SetParent $parent
-  range2 Create $app
+  range2 Create
   range2 SetLabelText "Another range:"
   eval range2 SetWholeRange [range1 GetWholeRange] 
   eval range2 SetRange [range1 GetRange] 
@@ -56,7 +56,7 @@ proc vtkKWRangeEntryPoint {parent win} {
   vtkKWRange range3
   range3 SetLabelText "Another range again"
   range3 SetParent $parent
-  range3 Create $app
+  range3 Create
   range3 SetLabelPositionToRight
   range3 SetEntry1PositionToLeft
   range3 SetEntry2PositionToLeft

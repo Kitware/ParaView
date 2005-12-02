@@ -46,7 +46,7 @@ const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.269");
+vtkCxxRevisionMacro(vtkKWWindow, "1.270");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -192,7 +192,7 @@ void vtkKWWindow::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Create(vtkKWApplication *app)
+void vtkKWWindow::Create()
 {
   // Check if already created
 
@@ -204,7 +204,7 @@ void vtkKWWindow::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtksys_stl::string cmd, event;
   vtkKWMenu *menu = NULL;
@@ -221,23 +221,23 @@ void vtkKWWindow::Create(vtkKWApplication *app)
   if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowView)
     {
     this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
-    this->MainSplitFrame->Create(app);
+    this->MainSplitFrame->Create();
     this->SecondarySplitFrame->SetParent(this->MainSplitFrame->GetFrame2());
-    this->SecondarySplitFrame->Create(app);
+    this->SecondarySplitFrame->Create();
     }
   else if (this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain)
     {
     this->MainSplitFrame->SetParent(this->Superclass::GetViewFrame());
-    this->MainSplitFrame->Create(app);
+    this->MainSplitFrame->Create();
     this->SecondarySplitFrame->SetParent(this->MainSplitFrame->GetFrame1());
-    this->SecondarySplitFrame->Create(app);
+    this->SecondarySplitFrame->Create();
     }
   else
     {
     this->SecondarySplitFrame->SetParent(this->Superclass::GetViewFrame());
-    this->SecondarySplitFrame->Create(app);
+    this->SecondarySplitFrame->Create();
     this->MainSplitFrame->SetParent(this->SecondarySplitFrame->GetFrame2());
-    this->MainSplitFrame->Create(app);
+    this->MainSplitFrame->Create();
     }
 
   this->Script("pack %s -side top -fill both -expand t",
@@ -368,7 +368,7 @@ vtkKWToolbarSet* vtkKWWindow::GetSecondaryToolbarSet()
   if (!this->SecondaryToolbarSet->IsCreated() && this->IsCreated())
     {
     this->SecondaryToolbarSet->SetParent(this->MainSplitFrame->GetFrame2());
-    this->SecondaryToolbarSet->Create(this->GetApplication());
+    this->SecondaryToolbarSet->Create();
     this->SecondaryToolbarSet->TopSeparatorVisibilityOn();
     this->SecondaryToolbarSet->BottomSeparatorVisibilityOff();
     this->SecondaryToolbarSet->SynchronizeToolbarsVisibilityWithRegistryOn();
@@ -492,8 +492,7 @@ vtkKWWindow::GetApplicationSettingsUserInterfaceManager()
   if  (this->IsCreated() && 
        !this->ApplicationSettingsUserInterfaceManager->IsCreated())
     {
-    this->ApplicationSettingsUserInterfaceManager->Create(
-      this->GetApplication());
+    this->ApplicationSettingsUserInterfaceManager->Create();
     }
   
   return this->ApplicationSettingsUserInterfaceManager;
@@ -546,7 +545,7 @@ vtkKWNotebook* vtkKWWindow::GetMainNotebook()
   if (!this->MainNotebook->IsCreated() && this->IsCreated())
     {
     this->MainNotebook->SetParent(this->GetMainPanelFrame());
-    this->MainNotebook->Create(this->GetApplication());
+    this->MainNotebook->Create();
     this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                  this->MainNotebook->GetWidgetName());
     }
@@ -572,7 +571,7 @@ vtkKWUserInterfaceManager* vtkKWWindow::GetMainUserInterfaceManager()
 
   if (!this->MainUserInterfaceManager->IsCreated() && this->IsCreated())
     {
-    this->MainUserInterfaceManager->Create(this->GetApplication());
+    this->MainUserInterfaceManager->Create();
     }
                         
   return this->MainUserInterfaceManager;
@@ -700,7 +699,7 @@ vtkKWNotebook* vtkKWWindow::GetSecondaryNotebook()
   if (!this->SecondaryNotebook->IsCreated() && this->IsCreated())
     {
     this->SecondaryNotebook->SetParent(this->GetSecondaryPanelFrame());
-    this->SecondaryNotebook->Create(this->GetApplication());
+    this->SecondaryNotebook->Create();
     this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                  this->SecondaryNotebook->GetWidgetName());
     }
@@ -728,7 +727,7 @@ vtkKWUserInterfaceManager* vtkKWWindow::GetSecondaryUserInterfaceManager()
 
   if (!this->SecondaryUserInterfaceManager->IsCreated() && this->IsCreated())
     {
-    this->SecondaryUserInterfaceManager->Create(this->GetApplication());
+    this->SecondaryUserInterfaceManager->Create();
     }
                         
   return this->SecondaryUserInterfaceManager;
@@ -870,7 +869,7 @@ vtkKWNotebook* vtkKWWindow::GetViewNotebook()
   if (!this->ViewNotebook->IsCreated() && this->IsCreated())
     {
     this->ViewNotebook->SetParent(this->GetViewPanelFrame());
-    this->ViewNotebook->Create(this->GetApplication());
+    this->ViewNotebook->Create();
     this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                  this->ViewNotebook->GetWidgetName());
     }
@@ -898,14 +897,14 @@ vtkKWUserInterfaceManager* vtkKWWindow::GetViewUserInterfaceManager()
 
   if (!this->ViewUserInterfaceManager->IsCreated() && this->IsCreated())
     {
-    this->ViewUserInterfaceManager->Create(this->GetApplication());
+    this->ViewUserInterfaceManager->Create();
 
     // Also create a default page for the view
 
     vtkKWUserInterfacePanel *panel = vtkKWUserInterfacePanel::New();
     panel->SetName(vtkKWWindow::DefaultViewPanelName);
     panel->SetUserInterfaceManager(this->ViewUserInterfaceManager);
-    panel->Create(this->GetApplication());
+    panel->Create();
     panel->Delete();
     panel->AddPage(panel->GetName(), NULL);
     }

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.16");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -166,7 +166,7 @@ void vtkKWCornerAnnotationEditor::Close()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
+void vtkKWCornerAnnotationEditor::Create()
 {
   // Create the superclass widgets
 
@@ -176,7 +176,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
@@ -206,7 +206,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   // Corners text
 
   this->CornerFrame->SetParent(this->Frame->GetFrame());
-  this->CornerFrame->Create(app);
+  this->CornerFrame->Create();
 
   this->Script("pack %s -side top -padx 2 -expand t -fill x -anchor nw",
                this->CornerFrame->GetWidgetName());
@@ -216,7 +216,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   for (i = 0; i < 4; i++)
     {
     this->CornerText[i]->SetParent(this->CornerFrame);
-    this->CornerText[i]->Create(app);
+    this->CornerText[i]->Create();
     this->CornerText[i]->SetLabelPositionToTop();
     vtkKWText *text = this->CornerText[i]->GetWidget();
     text->SetHeight(3);
@@ -266,7 +266,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   // Properties frame
 
   this->PropertiesFrame->SetParent(this->Frame->GetFrame());
-  this->PropertiesFrame->Create(app);
+  this->PropertiesFrame->Create();
 
   this->Script("pack %s -side top -padx 2 -expand t -fill both -anchor nw",
                this->PropertiesFrame->GetWidgetName());
@@ -276,7 +276,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
 
   this->MaximumLineHeightScale->SetParent(this->PropertiesFrame);
   this->MaximumLineHeightScale->PopupModeOn();
-  this->MaximumLineHeightScale->Create(app);
+  this->MaximumLineHeightScale->Create();
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->EntryVisibilityOn();
@@ -312,7 +312,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
       this->TextPropertyPopupButton = vtkKWPopupButtonWithLabel::New();
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
-    this->TextPropertyPopupButton->Create(app);
+    this->TextPropertyPopupButton->Create();
     this->TextPropertyPopupButton->GetLabel()->SetText("Text properties:");
     this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
 
@@ -338,7 +338,7 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app)
   this->TextPropertyWidget->LongFormatOn();
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->LabelVisibilityOn();
-  this->TextPropertyWidget->Create(app);
+  this->TextPropertyWidget->Create();
   this->TextPropertyWidget->GetLabel()->SetText("Text properties:");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 

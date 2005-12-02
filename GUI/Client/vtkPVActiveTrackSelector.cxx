@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.13");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.14");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -69,7 +69,7 @@ vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
+void vtkPVActiveTrackSelector::Create()
 {
   // Check if already created
 
@@ -81,23 +81,23 @@ void vtkPVActiveTrackSelector::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   this->SourceLabel->SetParent(this);
   this->SourceLabel->SetText("Source:");
-  this->SourceLabel->Create(app);
+  this->SourceLabel->Create();
   
   this->SourceMenuButton->SetParent(this);
-  this->SourceMenuButton->Create(app);
+  this->SourceMenuButton->Create();
   this->SourceMenuButton->SetBalloonHelpString("Select a Source to animate.");
   this->SourceMenuButton->SetValue("Unselected"); 
   
   this->PropertyLabel->SetParent(this);
   this->PropertyLabel->SetText("Property:");
-  this->PropertyLabel->Create(app);
+  this->PropertyLabel->Create();
 
   this->PropertyMenuButton->SetParent(this);
-  this->PropertyMenuButton->Create(app);
+  this->PropertyMenuButton->Create();
   this->PropertyMenuButton->SetBalloonHelpString(
     "Select a Property to animate for the choosen Source.");
   this->PropertyMenuButton->SetValue("Unselected"); 

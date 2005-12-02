@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.14");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.15");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -81,7 +81,7 @@ vtkPVVCRControl::~vtkPVVCRControl()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVCRControl::Create(vtkKWApplication* app)
+void vtkPVVCRControl::Create()
 {
   if (this->IsCreated())
     {
@@ -89,7 +89,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   vtkKWIcon* icon = vtkKWIcon::New();
   if (this->Mode == vtkPVVCRControl::PLAYBACK ||
@@ -97,7 +97,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     {
     // Animation Control: Play button to start the animation.
     this->PlayButton->SetParent(this->GetFrame());
-    this->PlayButton->Create(app);
+    this->PlayButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportPlay);
     this->PlayButton->SetImageToIcon(icon);
     this->PlayButton->SetCommand(this, "PlayCallback");
@@ -105,7 +105,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     // Animation Control: Stop button to stop the animation.
     this->StopButton->SetParent(this->GetFrame());
-    this->StopButton->Create(app);
+    this->StopButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportStop);
     this->StopButton->SetImageToIcon(icon);
     this->StopButton->SetCommand(this, "StopCallback");
@@ -113,7 +113,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     // Animation Control: "go to beginning" button.
     this->GoToBeginningButton->SetParent(this->GetFrame());
-    this->GoToBeginningButton->Create(app);
+    this->GoToBeginningButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportBeginning);
     this->GoToBeginningButton->SetImageToIcon(icon);
     this->GoToBeginningButton->SetCommand(this, "GoToBeginningCallback");
@@ -121,7 +121,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     // Animation Control: "go to end" button.
     this->GoToEndButton->SetParent(this->GetFrame());
-    this->GoToEndButton->Create(app);
+    this->GoToEndButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportEnd);
     this->GoToEndButton->SetImageToIcon(icon);
     this->GoToEndButton->SetBalloonHelpString("Go to the end of the animation.");
@@ -129,7 +129,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     // Animation Control: "go to previous frame" button.
     this->GoToPreviousButton->SetParent(this->GetFrame());
-    this->GoToPreviousButton->Create(app);
+    this->GoToPreviousButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportRewindToKey);
     this->GoToPreviousButton->SetImageToIcon(icon);
     this->GoToPreviousButton->SetBalloonHelpString("Go to the previous frame.");
@@ -137,7 +137,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     // Animation Control: "go to next frame" button.
     this->GoToNextButton->SetParent(this->GetFrame());
-    this->GoToNextButton->Create(app);
+    this->GoToNextButton->Create();
     icon->SetImage(vtkKWIcon::IconTransportFastForwardToKey);
     this->GoToNextButton->SetImageToIcon(icon);
     this->GoToNextButton->SetBalloonHelpString("Go to the next frame.");
@@ -145,7 +145,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
 
     //  Animation Control: loop button to loop the animation.
     this->LoopCheckButton->SetParent(this->GetFrame());
-    this->LoopCheckButton->Create(app);
+    this->LoopCheckButton->Create();
     this->LoopCheckButton->SetSelectedState(0);
     this->LoopCheckButton->IndicatorVisibilityOff();
     icon->SetImage(vtkKWIcon::IconTransportLoop);
@@ -166,7 +166,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   if (this->Mode == vtkPVVCRControl::RECORD || this->Mode == vtkPVVCRControl::BOTH)
     {
     this->RecordCheckButton->SetParent(this->GetFrame());
-    this->RecordCheckButton->Create(app);
+    this->RecordCheckButton->Create();
     this->RecordCheckButton->SetConfigurationOption("-image", "PVRecord");
     this->RecordCheckButton->SetSelectedState(0);
     this->RecordCheckButton->IndicatorVisibilityOff();
@@ -174,13 +174,13 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
     this->RecordCheckButton->SetCommand(this, "RecordCheckCallback");
 
     this->RecordStateButton->SetParent(this->GetFrame());
-    this->RecordStateButton->Create(app);
+    this->RecordStateButton->Create();
     this->RecordStateButton->SetConfigurationOption("-image", "PVRecordState");
     this->RecordStateButton->SetCommand(this, "RecordStateCallback");
     this->RecordStateButton->SetBalloonHelpString("Record a frame.");
 
     this->SaveAnimationButton->SetParent(this->GetFrame());
-    this->SaveAnimationButton->Create(app);
+    this->SaveAnimationButton->Create();
     this->SaveAnimationButton->SetConfigurationOption("-image", "PVMovie");
     this->SaveAnimationButton->SetCommand(this, "SaveAnimationCallback");
     this->SaveAnimationButton->SetBalloonHelpString("Save animation as a movie or images.");
@@ -188,7 +188,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
       {
       vtkKWFrame* separator = vtkKWFrame::New();
       separator->SetParent(this->GetFrame());
-      separator->Create(app);
+      separator->Create();
       separator->SetWidth(5);
       separator->SetBorderWidth(1);
       this->AddWidget(separator);

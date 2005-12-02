@@ -79,7 +79,7 @@ public:
   // Description:
   // Create the widget.
   // Overridden to set up control dependencies among properties.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
 
 protected:
   vtkPVPointWidget();
@@ -89,7 +89,7 @@ protected:
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
+  virtual void ChildCreate();
 
   // Description:
   // Execute event of the 3D Widget.

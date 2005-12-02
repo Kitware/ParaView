@@ -25,7 +25,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   vtkKWCheckButton *cb1 = vtkKWCheckButton::New();
   cb1->SetParent(parent);
-  cb1->Create(app);
+  cb1->Create();
   cb1->SetText("A checkbutton");
 
   app->Script(
@@ -38,7 +38,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   vtkKWCheckButton *cb2 = vtkKWCheckButton::New();
   cb2->SetParent(parent);
-  cb2->Create(app);
+  cb2->Create();
   cb2->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
   cb2->IndicatorVisibilityOff();
   cb2->SetBalloonHelpString("This time, use one of the predefined icon");
@@ -53,7 +53,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   vtkKWCheckButtonWithLabel *cb3 = vtkKWCheckButtonWithLabel::New();
   cb3->SetParent(parent);
-  cb3->Create(app);
+  cb3->Create();
   cb3->SetLabelText("Another checkbutton, with a label in front");
   cb3->SetBalloonHelpString(
     "This is a vtkKWCheckButtonWithLabel, i.e. a checkbutton associated to a "
@@ -71,7 +71,7 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
 
   vtkKWCheckButtonSet *cbs = vtkKWCheckButtonSet::New();
   cbs->SetParent(parent);
-  cbs->Create(app);
+  cbs->Create();
   cbs->SetBorderWidth(2);
   cbs->SetReliefToGroove();
   cbs->SetMaximumNumberOfWidgetsInPackingDirection(2);

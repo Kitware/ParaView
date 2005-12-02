@@ -27,7 +27,7 @@ KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint(
 
   vtkKWRenderWidget *rw_renderwidget = vtkKWRenderWidget::New();
   rw_renderwidget->SetParent(parent);
-  rw_renderwidget->Create(app);
+  rw_renderwidget->Create();
 
   app->Script("pack %s -side top -fill both -expand y -padx 0 -pady 0", 
               rw_renderwidget->GetWidgetName());

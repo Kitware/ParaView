@@ -26,7 +26,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWWidget;
 class vtkKWWidgetSetInternals;
 
@@ -38,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the number of vtkKWWidget in the set.

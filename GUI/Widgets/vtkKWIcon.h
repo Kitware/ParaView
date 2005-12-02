@@ -24,7 +24,6 @@
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class vtkKWApplication;
 class vtkKWIcon;
 
 class KWWIDGETS_EXPORT vtkKWIcon : public vtkObject

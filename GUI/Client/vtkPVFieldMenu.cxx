@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.31");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.32");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -92,7 +92,7 @@ vtkPVInputProperty* vtkPVFieldMenu::GetInputProperty()
 
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::Create(vtkKWApplication *app)
+void vtkPVFieldMenu::Create()
 {
   // Check if already created
 
@@ -104,10 +104,10 @@ void vtkPVFieldMenu::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Label->SetParent(this);
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetWidth(18);
   this->Label->SetJustificationToRight();
   this->Label->SetText("Attribute Mode");
@@ -116,7 +116,7 @@ void vtkPVFieldMenu::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->FieldMenu->SetParent(this);
-  this->FieldMenu->Create(app);
+  this->FieldMenu->Create();
   this->FieldMenu->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
   this->Script("pack %s -side left", this->FieldMenu->GetWidgetName());

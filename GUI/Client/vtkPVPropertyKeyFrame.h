@@ -97,7 +97,7 @@ protected:
   // Description:
   // Subclasses create the GUI elements they need in this method.
   // Don't forget to call the superclass implementation.
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
   // Description:
   // Method to create the value 

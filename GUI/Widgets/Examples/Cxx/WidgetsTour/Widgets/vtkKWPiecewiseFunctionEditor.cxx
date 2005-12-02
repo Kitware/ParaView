@@ -36,7 +36,7 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   vtkKWPiecewiseFunctionEditor *pfed_tfunc1_editor = 
     vtkKWPiecewiseFunctionEditor::New();
   pfed_tfunc1_editor->SetParent(parent);
-  pfed_tfunc1_editor->Create(app);
+  pfed_tfunc1_editor->Create();
   pfed_tfunc1_editor->SetBorderWidth(2);
   pfed_tfunc1_editor->SetReliefToGroove();
   pfed_tfunc1_editor->SetPadX(2);
@@ -97,7 +97,7 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   vtkKWPiecewiseFunctionEditor *pfed_tfunc2_editor = 
     vtkKWPiecewiseFunctionEditor::New();
   pfed_tfunc2_editor->SetParent(parent);
-  pfed_tfunc2_editor->Create(app);
+  pfed_tfunc2_editor->Create();
   pfed_tfunc2_editor->SetBorderWidth(2);
   pfed_tfunc2_editor->SetReliefToGroove();
   pfed_tfunc2_editor->SetPadX(2);

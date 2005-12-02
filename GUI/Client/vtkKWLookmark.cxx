@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.33");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -159,7 +159,7 @@ vtkKWLookmark::~vtkKWLookmark()
 
 
 //----------------------------------------------------------------------------
-void vtkKWLookmark::Create(vtkKWApplication *app)
+void vtkKWLookmark::Create()
 {
   // Check if already created
 
@@ -171,40 +171,40 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Frame->SetParent(this);
-  this->Frame->Create(app);
+  this->Frame->Create();
 
   this->MainFrame->SetParent(this->Frame);
   this->MainFrame->AllowFrameToCollapseOn();
-  this->MainFrame->Create(app);
+  this->MainFrame->Create();
   this->MainFrame->SetLabelText("Lookmark");
   //  this->MainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
   this->MainFrame->GetLabel()->SetBalloonHelpString("Drag and drop lookmark");
 
   this->Checkbox->SetParent(this->MainFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();
-  this->Checkbox->Create(app);
+  this->Checkbox->Create();
   this->Checkbox->SetSelectedState(0);
 
   this->SeparatorFrame->SetParent(this);
-  this->SeparatorFrame->Create(app);
+  this->SeparatorFrame->Create();
 
   this->LeftFrame->SetParent(this->MainFrame->GetFrame());
-  this->LeftFrame->Create(app);
+  this->LeftFrame->Create();
 
   this->RightFrame->SetParent(this->MainFrame->GetFrame());
-  this->RightFrame->Create(app);
+  this->RightFrame->Create();
 /*
   this->Icon->SetParent(this->LeftFrame);
-  this->Icon->Create(app);
+  this->Icon->Create();
   this->Icon->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
                this->Icon->GetWidgetName());
 */
   this->Icon->SetParent(this->LeftFrame);
-  this->Icon->Create(app);
+  this->Icon->Create();
 
   this->GetDragAndDropTargetSet()->SetSourceAnchor(this->Icon);
 
@@ -228,24 +228,24 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
 
   this->DatasetFrame->SetParent(this->RightFrame);
-  this->DatasetFrame->Create(app);
+  this->DatasetFrame->Create();
 
   this->DatasetLabel->SetParent(this->DatasetFrame);
-  this->DatasetLabel->Create(app);
+  this->DatasetLabel->Create();
   this->DatasetLabel->SetText("Dataset: ");
 
   this->CommentsFrame->SetParent(this->RightFrame);
   this->CommentsFrame->AllowFrameToCollapseOn();
-  this->CommentsFrame->Create(app);
+  this->CommentsFrame->Create();
   this->CommentsFrame->SetLabelText("Comments:");
 
   this->CommentsText->SetParent(this->CommentsFrame->GetFrame());
-  this->CommentsText->Create(app);
+  this->CommentsText->Create();
   this->CommentsText->SetBinding("<KeyPress>", this, "CommentsModifiedCallback");
   this->CommentsText->SetState(vtkKWTkOptions::StateNormal);
 
   this->NameField->SetParent(this->MainFrame->GetLabelFrame());
-  this->NameField->Create(app);
+  this->NameField->Create();
   this->NameField->SetState(vtkKWTkOptions::StateNormal);
 
   this->Pack();

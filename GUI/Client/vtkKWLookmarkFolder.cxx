@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.32");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -95,7 +95,7 @@ void vtkKWLookmarkFolder::RemoveFolder()
 
 
 //----------------------------------------------------------------------------
-void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
+void vtkKWLookmarkFolder::Create()
 {
   // Check if already created
   if (this->IsCreated())
@@ -105,20 +105,20 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(app);
+  this->MainFrame->Create();
 
   this->LabelFrame->SetParent(this->MainFrame);
   this->LabelFrame->AllowFrameToCollapseOn();
-  this->LabelFrame->Create(app);
+  this->LabelFrame->Create();
   this->LabelFrame->SetLabelText("Folder");
   this->LabelFrame->GetLabel()->SetBalloonHelpString("Drag and drop folder");
 
   this->Checkbox->SetParent(this->LabelFrame->GetLabelFrame());
   this->Checkbox->IndicatorVisibilityOn();
-  this->Checkbox->Create(app);
+  this->Checkbox->Create();
   this->Checkbox->SetSelectedState(0);
 
   if(!this->MacroFlag)
@@ -132,13 +132,13 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     }
 
   this->SeparatorFrame->SetParent(this);
-  this->SeparatorFrame->Create(app);
+  this->SeparatorFrame->Create();
 
   this->NestedSeparatorFrame->SetParent(this->LabelFrame->GetFrame());
-  this->NestedSeparatorFrame->Create(app);
+  this->NestedSeparatorFrame->Create();
 
   this->NameField->SetParent(this->LabelFrame->GetLabelFrame());
-  this->NameField->Create(app);
+  this->NameField->Create();
   this->NameField->SetState(vtkKWTkOptions::StateNormal);
 
   this->Pack();

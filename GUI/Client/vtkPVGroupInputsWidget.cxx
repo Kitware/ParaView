@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.38");
 
 class vtkPVSourceVectorInternals
 {
@@ -62,7 +62,7 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
+void vtkPVGroupInputsWidget::Create()
 {
   // Check if already created
 
@@ -74,10 +74,10 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->PartSelectionList->SetParent(this);
-  this->PartSelectionList->Create(app);
+  this->PartSelectionList->Create();
   this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->SetHeight(0);
   // I assume we need focus for control and alt modifiers.
@@ -190,7 +190,7 @@ void vtkPVGroupInputsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetText(this->PartSelectionList->GetItem(idx));
-      label->Create(this->GetApplication());
+      label->Create();
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

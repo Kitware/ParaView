@@ -115,7 +115,7 @@ public:
   // Create the window and all of the associated widgets. This
   // essentially creates the whole user interface. ParaView supports
   // only one window.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Access to the RenderView.
@@ -676,8 +676,8 @@ protected:
   vtkPVAnimationManager* AnimationManager;
 
   // Initialization methods called from create.
-  void InitializeMenus(vtkKWApplication* app);
-  void InitializeInteractorInterfaces(vtkKWApplication* app);
+  void InitializeMenus();
+  void InitializeInteractorInterfaces();
 
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;

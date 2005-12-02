@@ -38,7 +38,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
 
   // Description:
   // Get the keyframe proxy.
@@ -154,7 +154,7 @@ protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
 
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
   
   vtkSMKeyFrameProxy* KeyFrameProxy;
   char* KeyFrameProxyName;

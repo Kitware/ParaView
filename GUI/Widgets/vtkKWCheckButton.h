@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get/Toggle the state of the check button 0 = off 1 = on

@@ -30,7 +30,7 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
   vtkKWVolumeMaterialPropertyWidget *volprop1_widget = 
     vtkKWVolumeMaterialPropertyWidget::New();
   volprop1_widget->SetParent(parent);
-  volprop1_widget->Create(app);
+  volprop1_widget->Create();
   volprop1_widget->SetBalloonHelpString(
     "A volume material property widget.");
 
@@ -49,7 +49,7 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
     vtkKWVolumeMaterialPropertyWidget::New();
   volprop2_widget->SetParent(parent);
   volprop2_widget->PopupModeOn();
-  volprop2_widget->Create(app);
+  volprop2_widget->Create();
   volprop2_widget->SetMaterialColor(0.3, 0.4, 1.0);
   volprop2_widget->SetBalloonHelpString(
     "A volume material property widget, created in popup mode. Note that "

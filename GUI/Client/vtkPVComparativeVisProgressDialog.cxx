@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisProgressDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisProgressDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisProgressDialog, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVComparativeVisProgressDialog::vtkPVComparativeVisProgressDialog()
@@ -49,7 +49,7 @@ vtkPVComparativeVisProgressDialog::~vtkPVComparativeVisProgressDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisProgressDialog::Create(vtkKWApplication *app)
+void vtkPVComparativeVisProgressDialog::Create()
 {
   if (this->IsCreated())
     {
@@ -57,32 +57,32 @@ void vtkPVComparativeVisProgressDialog::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Message->SetParent(this);
-  this->Message->Create(app);
+  this->Message->Create();
   this->Message->SetText("ParaView is creating comparative visualization "
                          "frames. Please wait.");
   this->Script("pack %s -side top -pady 5", this->Message->GetWidgetName());
 
   this->ProgressFrame->SetParent(this);
-  this->ProgressFrame->Create(app);
+  this->ProgressFrame->Create();
   this->Script("pack %s -side top -pady 5", 
                this->ProgressFrame->GetWidgetName());
 
   this->ProgressLabel->SetParent(this->ProgressFrame);
-  this->ProgressLabel->Create(app);
+  this->ProgressLabel->Create();
   this->ProgressLabel->SetText("Progress: ");
   this->Script("pack %s -side left -padx 5", 
                this->ProgressLabel->GetWidgetName());
 
   this->ProgressBar->SetParent(this->ProgressFrame);
-  this->ProgressBar->Create(app);
+  this->ProgressBar->Create();
   this->ProgressBar->SetHeight(15);
   this->Script("pack %s -side left", this->ProgressBar->GetWidgetName());
 
   this->CancelButton->SetParent(this);
-  this->CancelButton->Create(app);
+  this->CancelButton->Create();
   this->CancelButton->SetText("Abort");
   this->CancelButton->SetCommand(this, "SetAbortFlag 1");
   this->Script("pack %s -side top -pady 5", this->CancelButton->GetWidgetName());

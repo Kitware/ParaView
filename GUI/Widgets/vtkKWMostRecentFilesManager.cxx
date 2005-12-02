@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.12");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.13");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%02d"
@@ -164,7 +164,7 @@ void vtkKWMostRecentFilesManager::AddFile(
   evalstr += "\"}";
 
   vtksys_stl::string filename_expanded = 
-    this->GetApplication()->Script(evalstr.c_str());
+    this->Script(evalstr.c_str());
 
   this->AddFileInternal(
     filename_expanded.c_str(), target_object, target_command, label);

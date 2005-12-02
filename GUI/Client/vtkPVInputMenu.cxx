@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.75");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.76");
 
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void vtkPVInputMenu::SetLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Create(vtkKWApplication *app)
+void vtkPVInputMenu::Create()
 {
   // Check if already created
 
@@ -94,16 +94,16 @@ void vtkPVInputMenu::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Label->SetParent(this);
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetWidth(18);
   this->Label->SetJustificationToRight();
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app);
+  this->Menu->Create();
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 }
 

@@ -14,7 +14,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
 
   vtkKWColorTransferFunctionEditor cpsel_tfunc_editor
   cpsel_tfunc_editor SetParent $parent
-  cpsel_tfunc_editor Create $app
+  cpsel_tfunc_editor Create
   cpsel_tfunc_editor SetBorderWidth 2
   cpsel_tfunc_editor SetReliefToGroove
   cpsel_tfunc_editor ExpandCanvasWidthOff
@@ -38,7 +38,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
 
   vtkKWColorPresetSelector cpsel1
   cpsel1 SetParent $parent
-  cpsel1 Create $app
+  cpsel1 Create
   cpsel1 SetColorTransferFunction cpsel_func
   cpsel1 SetPresetSelectedCommand cpsel_tfunc_editor "Update"
   cpsel1 SetBalloonHelpString \
@@ -53,7 +53,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
 
   vtkKWColorPresetSelector cpsel2
   cpsel2 SetParent $parent
-  cpsel2 Create $app
+  cpsel2 Create
   cpsel2 SetLabelText "Solid Color Presets:"
   cpsel2 HideGradientPresetsOn
   cpsel2 SetColorTransferFunction cpsel_func
@@ -69,7 +69,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
 
   vtkKWColorPresetSelector cpsel3
   cpsel3 SetParent $parent
-  cpsel3 Create $app
+  cpsel3 Create
   cpsel3 SetLabelPositionToRight
   cpsel3 SetColorTransferFunction cpsel_func
   cpsel3 SetPresetSelectedCommand cpsel_tfunc_editor "Update"

@@ -8,7 +8,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabel label1
   label1 SetParent $parent
-  label1 Create $app
+  label1 Create
   label1 SetText "A label"
 
   pack [label1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -19,7 +19,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabel label2
   label2 SetParent $parent
-  label2 Create $app
+  label2 Create
   label2 SetText "Another label"
   label2 SetJustificationToRight
   label2 SetWidth 30
@@ -37,7 +37,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabelWithLabel label3
   label3 SetParent $parent
-  label3 Create $app
+  label3 Create
   [label3 GetLabel] SetText "Name:"
   [label3 GetLabel] SetBackgroundColor 0.7 0.7 0.7
   [label3 GetWidget] SetText "Sebastien Barre"
@@ -55,7 +55,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabelWithLabel label4
   label4 SetParent $parent
-  label4 Create $app
+  label4 Create
   [label4 GetLabel] SetImageToPredefinedIcon 61
   [label4 GetWidget] SetText "Another use of a labeled label !"
   label4 SetBalloonHelpString \
@@ -74,7 +74,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabelSet label_set
   label_set SetParent $parent
-  label_set Create $app
+  label_set Create
   label_set SetBorderWidth 2
   label_set SetReliefToGroove
   label_set SetMaximumNumberOfWidgetsInPackingDirection 3
@@ -110,7 +110,7 @@ proc vtkKWLabelEntryPoint {parent win} {
 
   vtkKWLabelWithLabelSet label_set2
   label_set2 SetParent $parent
-  label_set2 Create $app
+  label_set2 Create
   label_set2 SetBorderWidth 2
   label_set2 SetReliefToGroove
   label_set2 SetWidgetsPadX 1

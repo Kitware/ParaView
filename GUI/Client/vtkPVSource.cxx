@@ -64,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.465");
+vtkCxxRevisionMacro(vtkPVSource, "1.466");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -538,7 +538,7 @@ void vtkPVSource::CreateProperties()
 
   this->ParameterFrame->SetParent(this->Notebook->GetMainParameterFrame());
 
-  this->ParameterFrame->Create(this->GetApplication());
+  this->ParameterFrame->Create();
 
   this->UpdateProperties();
 
@@ -550,8 +550,9 @@ void vtkPVSource::CreateProperties()
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
+    pvWidget->SetApplication(this->GetApplication());
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
-    pvWidget->Create(this->GetApplication());
+    pvWidget->Create();
     if (!pvWidget->GetHideGUI())
       {
       this->Script("pack %s -side top -fill x -expand t", 

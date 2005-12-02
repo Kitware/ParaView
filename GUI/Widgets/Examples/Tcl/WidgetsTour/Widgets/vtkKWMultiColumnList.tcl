@@ -15,7 +15,7 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
 
   vtkKWMultiColumnList mcl1
   mcl1 SetParent $parent
-  mcl1 Create $app
+  mcl1 Create
   mcl1 SetBalloonHelpString \
     "A simple multicolumn list. Columns can be resized moved and sorted.\
     Double-click on some entries to edit them."

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.32");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -143,16 +143,17 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
+void vtkPVCompositeRenderModuleUI::Create()
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("RenderModuleUI already created");
     return;
     }
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+  vtkPVApplication *pvapp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
   // Skip over LOD res and threshold.
   int row = 6;
   
@@ -163,17 +164,17 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
     {
     // Determines when geometry is collected to process 0 for rendering.
     this->CompositeLabel->SetParent(this->LODScalesFrame);
-    this->CompositeLabel->Create(app);
+    this->CompositeLabel->Create();
     this->CompositeLabel->SetAnchorToWest();
     this->CompositeLabel->SetText("Composite:");
 
     this->CompositeCheck->SetParent(this->LODScalesFrame);
-    this->CompositeCheck->Create(app);
+    this->CompositeCheck->Create();
     this->CompositeCheck->SetSelectedState(1);
     this->CompositeCheck->SetCommand(this, "CompositeCheckCallback");
 
     this->CompositeThresholdScale->SetParent(this->LODScalesFrame);
-    this->CompositeThresholdScale->Create(app);
+    this->CompositeThresholdScale->Create();
     this->CompositeThresholdScale->SetRange(0.0, 100.0);
     this->CompositeThresholdScale->SetResolution(0.1);
     this->CompositeThresholdScale->SetValue(this->CompositeThreshold);
@@ -190,7 +191,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
       "to process 0.");    
 
     this->CompositeThresholdLabel->SetParent(this->LODScalesFrame);
-    this->CompositeThresholdLabel->Create(app);
+    this->CompositeThresholdLabel->Create();
     this->CompositeThresholdLabel->SetAnchorToWest();
     if (pvapp &&
         pvapp->GetRegistryValue(2, "RunTime", "CompositeThreshold", 0))
@@ -219,17 +220,17 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
 
     // Determines which reduction/subsampling factor to use.
     this->ReductionLabel->SetParent(this->LODScalesFrame);
-    this->ReductionLabel->Create(app);
+    this->ReductionLabel->Create();
     this->ReductionLabel->SetAnchorToWest();
     this->ReductionLabel->SetText("Subsample Rate:");
 
     this->ReductionCheck->SetParent(this->LODScalesFrame);
-    this->ReductionCheck->Create(app);
+    this->ReductionCheck->Create();
     this->ReductionCheck->SetSelectedState(1);
     this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
 
     this->ReductionFactorScale->SetParent(this->LODScalesFrame);
-    this->ReductionFactorScale->Create(app);
+    this->ReductionFactorScale->Create();
     this->ReductionFactorScale->SetRange(2, 20);
     this->ReductionFactorScale->SetResolution(1);
     this->ReductionFactorScale->SetValue(this->ReductionFactor);
@@ -240,7 +241,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
 
     this->ReductionFactorLabel->SetParent(this->LODScalesFrame);
     this->ReductionFactorLabel->SetText("2 Pixels");
-    this->ReductionFactorLabel->Create(app);
+    this->ReductionFactorLabel->Create();
     this->ReductionFactorLabel->SetAnchorToWest();
     if (pvapp &&
         pvapp->GetRegistryValue(2, "RunTime", "ReductionFactor", 0))
@@ -265,17 +266,17 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
 
     // Determines whether to squirt and what compression level.
     this->SquirtLabel->SetParent(this->LODScalesFrame);
-    this->SquirtLabel->Create(app);
+    this->SquirtLabel->Create();
     this->SquirtLabel->SetAnchorToWest();
     this->SquirtLabel->SetText("Squirt Compression:");
 
     this->SquirtCheck->SetParent(this->LODScalesFrame);
-    this->SquirtCheck->Create(app);
+    this->SquirtCheck->Create();
     this->SquirtCheck->SetSelectedState(1);
     this->SquirtCheck->SetCommand(this, "SquirtCheckCallback");
 
     this->SquirtLevelScale->SetParent(this->LODScalesFrame);
-    this->SquirtLevelScale->Create(app);
+    this->SquirtLevelScale->Create();
     this->SquirtLevelScale->SetRange(1, 6);
     this->SquirtLevelScale->SetResolution(1);
     this->SquirtLevelScale->SetValue(this->SquirtLevel);
@@ -283,7 +284,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
                                           "SquirtLevelScaleCallback");
 
     this->SquirtLevelLabel->SetParent(this->LODScalesFrame);
-    this->SquirtLevelLabel->Create(app);
+    this->SquirtLevelLabel->Create();
     this->SquirtLevelLabel->SetAnchorToWest();
     if (pvapp &&
         pvapp->GetRegistryValue(2, "RunTime", "SquirtLevel", 0))
@@ -327,7 +328,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
   if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1)
     {
     this->ParallelRenderParametersFrame->SetParent(this); 
-    this->ParallelRenderParametersFrame->Create(app);
+    this->ParallelRenderParametersFrame->Create();
     this->ParallelRenderParametersFrame->SetLabelText(
       "Parallel Rendering Parameters");
 
@@ -336,17 +337,17 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app)
   
     this->CompositeWithFloatCheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeWithFloatCheck->Create(app);
+    this->CompositeWithFloatCheck->Create();
     this->CompositeWithFloatCheck->SetText("Composite with floats");
 
     this->CompositeWithRGBACheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeWithRGBACheck->Create(app);
+    this->CompositeWithRGBACheck->Create();
     this->CompositeWithRGBACheck->SetText("Composite RGBA");
 
     this->CompositeCompressionCheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeCompressionCheck->Create(app);
+    this->CompositeCompressionCheck->Create();
     this->CompositeCompressionCheck->SetText("Composite compression");
   
     this->CompositeWithFloatCheck->SetCommand(this, 

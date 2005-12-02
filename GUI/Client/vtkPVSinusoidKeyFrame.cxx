@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.12");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.13");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -64,19 +64,19 @@ vtkPVSinusoidKeyFrame::~vtkPVSinusoidKeyFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVSinusoidKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 
   this->PhaseLabel->SetParent(this);
-  this->PhaseLabel->Create(app);
+  this->PhaseLabel->Create();
   this->PhaseLabel->SetText("Phase:");
 
   this->PhaseThumbWheel->SetParent(this);
   this->PhaseThumbWheel->PopupModeOn();
   this->PhaseThumbWheel->SetValue(0.0);
   this->PhaseThumbWheel->SetResolution(0.01);
-  this->PhaseThumbWheel->Create(app);
+  this->PhaseThumbWheel->Create();
   this->PhaseThumbWheel->DisplayEntryOn();
   this->PhaseThumbWheel->DisplayLabelOff();
   this->PhaseThumbWheel->DisplayEntryAndLabelOnTopOff();
@@ -88,7 +88,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->PhaseThumbWheel->SetEndCommand(this, "PhaseChangedCallback");
 
   this->FrequencyLabel->SetParent(this);
-  this->FrequencyLabel->Create(app);
+  this->FrequencyLabel->Create();
   this->FrequencyLabel->SetText("Frequency:");
 
   this->FrequencyThumbWheel->SetParent(this);
@@ -97,7 +97,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->FrequencyThumbWheel->SetMinimumValue(0);
   this->FrequencyThumbWheel->ClampMinimumValueOn();
   this->FrequencyThumbWheel->SetResolution(0.01);
-  this->FrequencyThumbWheel->Create(app);
+  this->FrequencyThumbWheel->Create();
   this->FrequencyThumbWheel->DisplayEntryOn();
   this->FrequencyThumbWheel->DisplayLabelOff();
   this->FrequencyThumbWheel->DisplayEntryAndLabelOnTopOff();
@@ -109,7 +109,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->FrequencyThumbWheel->SetEndCommand(this, "FrequencyChangedCallback");
 
   this->OffsetLabel->SetParent(this);
-  this->OffsetLabel->Create(app);
+  this->OffsetLabel->Create();
   this->OffsetLabel->SetText("Amplitude:");
 
   this->OffsetThumbWheel->SetParent(this);
@@ -118,7 +118,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->OffsetThumbWheel->SetMinimumValue(0);
   this->OffsetThumbWheel->ClampMinimumValueOn();
   this->OffsetThumbWheel->SetResolution(0.01);
-  this->OffsetThumbWheel->Create(app);
+  this->OffsetThumbWheel->Create();
   this->OffsetThumbWheel->DisplayEntryOn();
   this->OffsetThumbWheel->DisplayLabelOff();
   this->OffsetThumbWheel->DisplayEntryAndLabelOnTopOff();

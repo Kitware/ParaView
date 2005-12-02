@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.53");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -224,7 +224,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
       if ( !it->second->IsCreated() )
         {
         it->second->SetParent(this->ArgumentsFrame);
-        it->second->Create(this->GetApplication());
+        it->second->Create();
         ostrstream str;
         str << "ChangeArgument " << it->first.c_str() << " " 
           << it->second->GetTclName() << ends;
@@ -521,7 +521,7 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::Create(vtkKWApplication *app)
+void vtkPVInteractorStyleControl::Create()
 {
   // Check if already created
 
@@ -533,27 +533,27 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create();
   this->LabeledFrame->SetLabelText("Camera Manipulators Control");
 
   this->OuterFrame = vtkKWFrame::New();
   this->OuterFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->OuterFrame->Create(app);
+  this->OuterFrame->Create();
   
   int cc;
 
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->Labels[cc]->SetParent(this->OuterFrame);
-    this->Labels[cc]->Create(app);
+    this->Labels[cc]->Create();
     }
 
   for ( cc = 0; cc < 9; cc ++ )
     {
     this->Menus[cc]->SetParent(this->OuterFrame);
-    this->Menus[cc]->Create(app);
+    this->Menus[cc]->Create();
     this->Menus[cc]->SetAnchorToWest();
     }
 
@@ -606,7 +606,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app)
   this->UpdateMenus();
 
   this->ArgumentsFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->ArgumentsFrame->Create(app);
+  this->ArgumentsFrame->Create();
   this->Script("pack %s -expand true -fill x -side top", 
                this->ArgumentsFrame->GetWidgetName());
 }

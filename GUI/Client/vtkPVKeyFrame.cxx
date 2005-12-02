@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.27");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.28");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -123,7 +123,7 @@ void vtkPVKeyFrame::DetermineKeyFrameProxyName()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::Create(vtkKWApplication* app)
+void vtkPVKeyFrame::Create()
 {
   if (!this->KeyFrameProxyXMLName)
     {
@@ -147,8 +147,8 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
-  this->ChildCreate(app);
+  this->Superclass::Create();
+  this->ChildCreate();
 
   if (!this->KeyFrameProxy)
     {
@@ -195,16 +195,16 @@ void vtkPVKeyFrame::SetKeyFrameProxy(vtkSMKeyFrameProxy* kf)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVKeyFrame::ChildCreate()
 {
   this->TimeLabel->SetParent(this);
-  this->TimeLabel->Create(app);
+  this->TimeLabel->Create();
   this->TimeLabel->SetText("Time:");
   
   this->TimeThumbWheel->SetParent(this);
   this->TimeThumbWheel->PopupModeOn();
   this->TimeThumbWheel->SetResolution(0.01);
-  this->TimeThumbWheel->Create(app);
+  this->TimeThumbWheel->Create();
   this->TimeThumbWheel->DisplayEntryOn();
   this->TimeThumbWheel->DisplayLabelOff();
   this->TimeThumbWheel->DisplayEntryAndLabelOnTopOff();

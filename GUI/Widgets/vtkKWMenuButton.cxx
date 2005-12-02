@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWMenuButton.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
@@ -23,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.31");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -213,18 +212,18 @@ void vtkKWMenuButton::AddRadioButtonImage(const char *image_name,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::Create(vtkKWApplication *app)
+void vtkKWMenuButton::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "menubutton"))
+  if (!this->Superclass::CreateSpecificTkWidget("menubutton"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app);
+  this->Menu->Create();
   this->Menu->SetTearOff(0);
 
   this->IndicatorVisibilityOn();

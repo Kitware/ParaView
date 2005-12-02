@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.22");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -64,7 +64,7 @@ vtkPVHorizontalAnimationInterface::~vtkPVHorizontalAnimationInterface()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
+void vtkPVHorizontalAnimationInterface::Create()
 {
   // Check if already created
 
@@ -76,15 +76,15 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
  
   this->ScrollFrame->SetParent(this);
-  this->ScrollFrame->Create(app);
+  this->ScrollFrame->Create();
   this->Script("pack %s -side top -fill both -expand t",
     this->ScrollFrame->GetWidgetName());
   
   this->SplitFrame->SetParent(this->ScrollFrame->GetFrame());
-  this->SplitFrame->Create(app);
+  this->SplitFrame->Create();
   this->SplitFrame->SetFrame1Size(120);
   this->Script("bind %s <Configure> {%s ResizeCallback}",
     this->GetWidgetName(), this->GetTclName());
@@ -93,11 +93,11 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
 
   
   this->TimeLineFrame->SetParent(this->SplitFrame->GetFrame2());
-  this->TimeLineFrame->Create(app);
+  this->TimeLineFrame->Create();
   this->Script("pack %s -anchor n -side top -fill x -expand t",
     this->TimeLineFrame->GetWidgetName());
   this->PropertiesFrame->SetParent(this->SplitFrame->GetFrame1());
-  this->PropertiesFrame->Create(app);
+  this->PropertiesFrame->Create();
   this->Script("pack %s -anchor n -side top -fill x -expand t",
     this->PropertiesFrame->GetWidgetName());
 
@@ -105,7 +105,7 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app)
   this->ParentTree->SetTimeLineParent(this->TimeLineFrame);
   this->ParentTree->SetLabelText("Animation Tracks");
   this->ParentTree->SetEnableZoom(1);
-  this->ParentTree->Create(app);
+  this->ParentTree->Create();
   this->InitializeObservers(this->ParentTree);
   this->ParentTree->PackWidget(); 
   this->ParentTree->SetExpanded(1);

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.71");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.72");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -73,7 +73,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToModified");
   this->FileEntry->SetSMPropertyName("FileName");
-  this->FileEntry->Create(this->GetPVApplication());
+  this->FileEntry->Create();
   if (this->AddFileEntry)
     {
     // This widget has to be the first.

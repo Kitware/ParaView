@@ -21,7 +21,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWEntry;
 class vtkKWPushButton;
@@ -36,7 +35,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the value of the thumbwheel.

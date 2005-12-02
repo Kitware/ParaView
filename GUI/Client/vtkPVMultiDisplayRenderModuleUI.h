@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  void Create();
 
 protected:
   vtkPVMultiDisplayRenderModuleUI();

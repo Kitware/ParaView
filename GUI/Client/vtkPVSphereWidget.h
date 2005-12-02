@@ -110,7 +110,7 @@ public:
   // Description:
   // Create the widgets.
   // Overloaded to create the ImplicitFunction proxy
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Register the animatable proxies and make them avaiblable for animation.
@@ -142,7 +142,7 @@ protected:
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
+  virtual void ChildCreate();
 
   // Description:
   // Execute event of the 3D Widget.

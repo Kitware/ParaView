@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *pvApp);
+  virtual void Create();
 
   // Description:
   // I will eventually remove access to internal widgets once I figure

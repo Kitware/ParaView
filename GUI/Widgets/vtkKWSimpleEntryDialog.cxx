@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.12");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
@@ -41,7 +41,7 @@ vtkKWSimpleEntryDialog::~vtkKWSimpleEntryDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app)
+void vtkKWSimpleEntryDialog::Create()
 {
   // Check if already created
 
@@ -51,10 +51,10 @@ void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   this->Entry->SetParent(this->MessageDialogFrame);
-  this->Entry->Create(app);
+  this->Entry->Create();
 
   this->Script("pack %s -side top -after %s -padx 4 -fill x -expand yes", 
                this->Entry->GetWidgetName(), this->Message->GetWidgetName());

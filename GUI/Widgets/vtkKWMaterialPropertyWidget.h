@@ -19,7 +19,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWFrameWithLabel;
@@ -47,7 +46,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Refresh the interface given the value extracted from the current widget.

@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.166");
+vtkCxxRevisionMacro(vtkPVProbe, "1.167");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -240,27 +240,27 @@ void vtkPVProbe::CreateProperties()
     vtkProcessModule::DATA_SERVER, stream);
 
   this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->ProbeFrame->Create(pvApp);
+  this->ProbeFrame->Create();
   
   this->Script("pack %s -fill x -expand true",
                this->ProbeFrame->GetWidgetName());
 
   // widgets for points
   this->SelectedPointFrame->SetParent(this->ProbeFrame);
-  this->SelectedPointFrame->Create(pvApp);
+  this->SelectedPointFrame->Create();
 
   this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
-  this->SelectedPointLabel->Create(pvApp);
+  this->SelectedPointLabel->Create();
   this->SelectedPointLabel->SetText("Point");
 
   this->Script("pack %s -side left",
                this->SelectedPointLabel->GetWidgetName());
   
   this->PointDataLabel->SetParent(this->ProbeFrame);
-  this->PointDataLabel->Create(pvApp);
+  this->PointDataLabel->Create();
 
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
-  this->ShowXYPlotToggle->Create(pvApp);
+  this->ShowXYPlotToggle->Create();
   this->ShowXYPlotToggle->SetText("Show XY-Plot");
   this->ShowXYPlotToggle->SetSelectedState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
@@ -335,7 +335,7 @@ void vtkPVProbe::CreateProperties()
 
   // Add a button to save XYPlotActor as CSV file
   this->SaveButton->SetParent(this->ParameterFrame->GetFrame());
-  this->SaveButton->Create(pvApp); //, "foo");
+  this->SaveButton->Create();
   this->SaveButton->SetCommand(this, "SaveDialogCallback");
   this->SaveButton->SetText("Save as CSV");
   vtkKWLoadSaveDialog *dlg = this->SaveButton->GetLoadSaveDialog();
@@ -546,7 +546,7 @@ void vtkPVProbe::AcceptCallbackInternal()
         }
 
       this->ArraySelection->SetSMProperty(svp);
-      this->ArraySelection->Create(pvApp);
+      this->ArraySelection->Create();
       }
     else
       {

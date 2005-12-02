@@ -38,7 +38,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.75");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.76");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -465,9 +465,9 @@ void vtkPVLineWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::Create(vtkKWApplication* app)
+void vtkPVLineWidget::Create()
 {
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 
@@ -790,7 +790,7 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
+void vtkPVLineWidget::ChildCreate()
 {
   if ((this->GetTraceHelper()->GetObjectNameState() == 
        vtkPVTraceHelper::ObjectNameStateUninitialized ||
@@ -805,16 +805,16 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame);
-  this->Labels[0]->Create(pvApp);
+  this->Labels[0]->Create();
   this->Labels[0]->SetText(this->GetPoint1LabelText());
   this->Labels[1]->SetParent(this->Frame);
-  this->Labels[1]->Create(pvApp);
+  this->Labels[1]->Create();
   this->Labels[1]->SetText(this->GetPoint2LabelText());
   int i;
   for (i=0; i<3; i++)
     {
     this->CoordinateLabel[i]->SetParent(this->Frame);
-    this->CoordinateLabel[i]->Create(pvApp);
+    this->CoordinateLabel[i]->Create();
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
     this->CoordinateLabel[i]->SetText(buffer);
@@ -823,25 +823,25 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   for (i=0; i<3; i++)
     {
     this->Point1[i]->SetParent(this->Frame);
-    this->Point1[i]->Create(pvApp);
+    this->Point1[i]->Create();
     }
 
   for (i=0; i<3; i++)    
     {
     this->Point2[i]->SetParent(this->Frame);
-    this->Point2[i]->Create(pvApp);
+    this->Point2[i]->Create();
     }
   this->ResolutionLabel->SetParent(this->Frame);
-  this->ResolutionLabel->Create(pvApp);
+  this->ResolutionLabel->Create();
   this->ResolutionLabel->SetText(this->GetResolutionLabelText());
   this->ResolutionEntry->SetParent(this->Frame);
-  this->ResolutionEntry->Create(pvApp);
+  this->ResolutionEntry->Create();
   this->ResolutionEntry->SetValue(0);
   this->LengthLabel->SetParent(this->Frame);
-  this->LengthLabel->Create(pvApp);
+  this->LengthLabel->Create();
   this->LengthLabel->SetText("Length:");
   this->LengthValue->SetParent(this->Frame);
-  this->LengthValue->Create(pvApp);
+  this->LengthValue->Create();
   this->LengthValue->SetText("1.0");
 
   this->Script("grid propagate %s 1",

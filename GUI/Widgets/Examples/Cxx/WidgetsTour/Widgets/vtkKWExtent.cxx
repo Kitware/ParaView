@@ -20,7 +20,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWExtent *extent1 = vtkKWExtent::New();
   extent1->SetParent(parent);
-  extent1->Create(app);
+  extent1->Create();
   extent1->SetBorderWidth(2);
   extent1->SetReliefToGroove();
   extent1->SetExtentRange(0.0, 100.0, 20.0, 30.0, -100.0, -50.0);
@@ -38,7 +38,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWExtent *extent2 = vtkKWExtent::New();
   extent2->SetParent(parent);
-  extent2->Create(app);
+  extent2->Create();
   extent2->SetBorderWidth(2);
   extent2->SetReliefToGroove();
   extent2->SetExtentRange(extent1->GetExtentRange());
@@ -69,7 +69,7 @@ KWWidgetsTourItem* vtkKWExtentEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWExtent *extent3 = vtkKWExtent::New();
   extent3->SetParent(parent);
-  extent3->Create(app);
+  extent3->Create();
   extent3->SetBorderWidth(2);
   extent3->SetReliefToGroove();
   extent3->SetLabelPositionToRight();

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.9");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -83,7 +83,8 @@ void vtkKWBalloonHelpManager::CreateBalloon()
     if (!this->TopLevel->IsCreated())
       {
       this->TopLevel->HideDecorationOn();
-      this->TopLevel->Create(app);
+      this->TopLevel->SetApplication(app);
+      this->TopLevel->Create();
       this->TopLevel->SetBackgroundColor(0.0, 0.0, 0.0);
       this->TopLevel->SetBorderWidth(1);
       this->TopLevel->SetReliefToFlat();
@@ -92,7 +93,7 @@ void vtkKWBalloonHelpManager::CreateBalloon()
     if (!this->Label->IsCreated() && this->TopLevel)
       {
       this->Label->SetParent(this->TopLevel);    
-      this->Label->Create(app);
+      this->Label->Create();
       this->Label->SetBackgroundColor(1.0, 1.0, 0.88);
       this->Label->SetForegroundColor(0.0, 0.0, 0.0);
       this->Label->SetJustificationToLeft();

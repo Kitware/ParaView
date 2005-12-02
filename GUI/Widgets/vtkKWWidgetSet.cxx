@@ -14,7 +14,6 @@
 
 #include "vtkKWWidgetSet.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
@@ -22,7 +21,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.13");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -158,7 +157,7 @@ int vtkKWWidgetSet::GetWidgetPosition(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetSet::Create(vtkKWApplication *app)
+void vtkKWWidgetSet::Create()
 {
   // Check if already created
 
@@ -170,7 +169,7 @@ void vtkKWWidgetSet::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Update enable state
 

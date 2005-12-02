@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.27");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -206,7 +206,7 @@ void vtkPVSourceNotebook::ShowPage(const char* pageName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceNotebook::Create(vtkKWApplication* app)
+void vtkPVSourceNotebook::Create()
 {
   // Check if already created
 
@@ -218,10 +218,10 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
     
   this->Notebook->SetParent(this);
-  this->Notebook->Create(app);
+  this->Notebook->Create();
   this->Notebook->AddPage("Parameters");
   this->Notebook->AddPage("Display");
   this->Notebook->AddPage("Information");
@@ -231,13 +231,13 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
   // Create the easiest (modular) pages first
   // Create the display GUI.
   this->DisplayGUI->SetParent(this->Notebook->GetFrame("Display"));
-  this->DisplayGUI->Create(app);
+  this->DisplayGUI->Create();
   this->Script("pack %s -fill both -expand yes -side top",
                 this->DisplayGUI->GetWidgetName());
   // Create the information page.
   this->InformationGUI->SetParent(
         this->Notebook->GetFrame("Information"));
-  this->InformationGUI->Create(app);
+  this->InformationGUI->Create();
   this->Script("pack %s -fill both -expand yes -side top",
                this->InformationGUI->GetWidgetName());
 
@@ -245,14 +245,14 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
   // Now create the parameters page item by item.
   // one frame is left blank for the source to pack when selected.
   this->DescriptionFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->DescriptionFrame->Create(this->GetApplication());
+  this->DescriptionFrame->Create();
   this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
                this->DescriptionFrame->GetWidgetName());
 
   const char *label1_opt = "-width 12 -anchor e";
 
   this->NameLabel->SetParent(this->DescriptionFrame);
-  this->NameLabel->Create(this->GetApplication());
+  this->NameLabel->Create();
   this->NameLabel->ExpandWidgetOff();
   this->NameLabel->GetLabel()->SetText("Name:");
   this->Script("%s configure -anchor w", 
@@ -266,7 +266,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
     this->NameLabel->GetWidget()->GetWidgetName());
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
-  this->TypeLabel->Create(this->GetApplication());
+  this->TypeLabel->Create();
   this->TypeLabel->ExpandWidgetOff();
   this->TypeLabel->GetLabel()->SetText("Class:");
   this->Script("%s configure -anchor w", 
@@ -277,7 +277,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
                this->TypeLabel->GetWidget()->GetWidgetName());
 
   this->LabelEntry->SetParent(this->DescriptionFrame);
-  this->LabelEntry->Create(this->GetApplication());
+  this->LabelEntry->Create();
   this->LabelEntry->GetLabel()->SetText("Label:");
   this->Script("%s config %s", 
                this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
@@ -288,7 +288,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
                this->GetTclName());
 
   this->LongHelpLabel->SetParent(this->DescriptionFrame);
-  this->LongHelpLabel->Create(this->GetApplication());
+  this->LongHelpLabel->Create();
   this->LongHelpLabel->ExpandWidgetOff();
   this->LongHelpLabel->GetLabel()->SetText("Description:");
   this->LongHelpLabel->GetWidget()->AdjustWrapLengthToWidthOn();
@@ -311,18 +311,18 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
                this->LongHelpLabel->GetParent()->GetWidgetName());
                
   this->ButtonFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->ButtonFrame->Create(this->GetApplication());
+  this->ButtonFrame->Create();
   this->Script("pack %s -fill both -expand t -side top", 
                this->ButtonFrame->GetWidgetName());
 
   // Why do the buttons need two nested frames?
   vtkKWFrame *frame = vtkKWFrame::New();
   frame->SetParent(this->ButtonFrame);
-  frame->Create(this->GetApplication());
+  frame->Create();
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->GetApplication());
+  this->AcceptButton->Create();
   if (this->AutoAccept)
     {
     this->AcceptButton->SetText("Auto Accept");
@@ -339,11 +339,13 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
     "(key shortcut: Ctrl+Enter)");
 
   this->AcceptPullDownArrow->SetParent(this->AcceptButton);
-  this->AcceptPullDownArrow->Create(this->GetApplication());
+  this->AcceptPullDownArrow->Create();
   this->AcceptPullDownArrow->SetConfigurationOption(
     "-image", "PVPullDownArrow");
   this->Script("place %s -relx 0 -rely 1 -x -5 -y 5 -anchor se", 
                 this->AcceptPullDownArrow->GetWidgetName());
+
+  vtkKWApplication *app = this->GetApplication();
 
   if (app->GetRegistryValue(2,"RunTime", 
           VTK_PV_AUTO_ACCEPT_REG_KEY,0))
@@ -367,14 +369,14 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
   delete [] var;
 
   this->ResetButton->SetParent(frame);
-  this->ResetButton->Create(this->GetApplication());
+  this->ResetButton->Create();
   this->ResetButton->SetText("Reset");
   this->ResetButton->SetCommand(this, "ResetButtonCallback");
   this->ResetButton->SetBalloonHelpString(
     "Revert to the previous parameters of the module.");
 
   this->DeleteButton->SetParent(frame);
-  this->DeleteButton->Create(this->GetApplication());
+  this->DeleteButton->Create();
   this->DeleteButton->SetText("Delete");
   this->DeleteButton->SetCommand(this, "DeleteButtonCallback");
   this->DeleteButton->SetBalloonHelpString(
@@ -393,7 +395,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app)
  
   // This is left blank for the source to pack when selected.
   this->MainParameterFrame->SetParent(this->Notebook->GetFrame("Parameters"));
-  this->MainParameterFrame->Create(this->GetApplication());
+  this->MainParameterFrame->Create();
   this->Script("pack %s -fill both -expand t -side top", 
                this->MainParameterFrame->GetWidgetName());
 }

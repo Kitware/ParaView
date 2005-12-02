@@ -9,7 +9,7 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
 
   vtkKWRenderWidget cae_renderwidget
   cae_renderwidget SetParent $parent
-  cae_renderwidget Create $app
+  cae_renderwidget Create
   cae_renderwidget CornerAnnotationVisibilityOn
 
   pack [cae_renderwidget GetWidgetName] -side right -fill both -expand y -padx 0 -pady 0
@@ -61,7 +61,7 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   
   vtkKWCornerAnnotationEditor cae_anno_editor
   cae_anno_editor SetParent $parent
-  cae_anno_editor Create $app
+  cae_anno_editor Create
   cae_anno_editor SetRenderWidget cae_renderwidget
 
   pack [cae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2

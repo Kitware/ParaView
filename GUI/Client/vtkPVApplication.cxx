@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.379");
+vtkCxxRevisionMacro(vtkPVApplication, "1.380");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -905,7 +905,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this->GetMainWindow());
-  exportDialog->Create(this);
+  exportDialog->Create();
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
@@ -1161,7 +1161,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->Credits->SetSplashScreenProgressMessage("Creating UI...");
     }
 
-  ui->Create(this);
+  ui->Create();
 
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
@@ -1217,7 +1217,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     vtkPVTraceFileDialog *dlg2 = vtkPVTraceFileDialog::New();
     dlg2->SetMasterWindow(ui);
-    dlg2->Create(this);
+    dlg2->Create();
     ostrstream str;
     str << "Do you want to save the existing tracefile?\n\n"
         << "A tracefile called " << traceName << " was found in "
@@ -1562,7 +1562,7 @@ void vtkPVApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
-  dlg->Create(this);
+  dlg->Create();
   dlg->SetText("\"The ParaView Guide\", covering both the use and development of ParaView, is available for purchase from Kitware's online store at http://store.yahoo.com/kitware/paraviewguide.html");
   dlg->Invoke();  
   dlg->Delete();
@@ -1898,14 +1898,18 @@ char* vtkPVApplication::GetTextRepresentation(vtkPVSource* comp)
 
 vtkKWLoadSaveDialog* vtkPVApplication::NewLoadSaveDialog()
 {
+  vtkKWLoadSaveDialog *dialog = NULL;
   if(!this->Options->GetClientMode())
     {
-      return vtkKWLoadSaveDialog::New();
+    dialog = vtkKWLoadSaveDialog::New();
     }
-  vtkPVServerFileDialog* dialog = vtkPVServerFileDialog::New();
-  dialog->SetMasterWindow(this->GetMainWindow());
+  else
+    {
+    dialog = vtkPVServerFileDialog::New();
+    dialog->SetMasterWindow(this->GetMainWindow());
+    }
+  dialog->SetApplication(this);
   return dialog;
-  
 }
 
 void vtkPVApplication::FindInstallationDirectory()

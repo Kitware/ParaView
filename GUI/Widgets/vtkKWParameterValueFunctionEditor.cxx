@@ -15,7 +15,6 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkImageData.h"
-#include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -35,7 +34,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.75");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.76");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1137,7 +1136,7 @@ void vtkKWParameterValueFunctionEditor::UpdatePointEntries(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::Create()
 {
   if (this->IsCreated())
     {
@@ -1147,12 +1146,12 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the canvas
 
   this->Canvas->SetParent(this);
-  this->Canvas->Create(app);
+  this->Canvas->Create();
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetReliefToSolid();
   this->Canvas->SetBorderWidth(0);
@@ -1188,11 +1187,11 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   if (this->ParameterRangeVisibility)
     {
-    this->CreateParameterRange(app);
+    this->CreateParameterRange();
     }
   else
     {
-    this->ParameterRange->SetApplication(app);
+    this->ParameterRange->SetApplication(this->GetApplication());
     }
 
   this->ValueRange->SetOrientationToVertical();
@@ -1218,11 +1217,11 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   if (this->ValueRangeVisibility)
     {
-    this->CreateValueRange(app);
+    this->CreateValueRange();
     }
   else
     {
-    this->ValueRange->SetApplication(app);
+    this->ValueRange->SetApplication(this->GetApplication());
     }
 
   // Create the top left container
@@ -1235,26 +1234,26 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   if (this->IsTopLeftFrameUsed())
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
     }
 
   if (this->IsPointEntriesFrameUsed())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
     }
 
   // Create the user frame
 
   if (this->UserFrameVisibility)
     {
-    this->CreateUserFrame(app);
+    this->CreateUserFrame();
     }
 
   // Create the label now if it has to be shown now
 
   if (this->LabelVisibility)
     {
-    this->CreateLabel(app);
+    this->CreateLabel();
     }
 
   // Create the range label
@@ -1262,7 +1261,7 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
   if (this->ParameterRangeLabelVisibility || 
       this->ValueRangeLabelVisibility)
     {
-    this->CreateRangeLabel(app);
+    this->CreateRangeLabel();
     }
 
   // Do not create the point entries frame
@@ -1273,33 +1272,33 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 
   if (this->ParameterEntryVisibility && this->PointEntriesVisibility)
     {
-    this->CreateParameterEntry(app);
+    this->CreateParameterEntry();
     }
 
   // Create the ticks canvas
 
   if (this->ValueTicksVisibility)
     {
-    this->CreateValueTicksCanvas(app);
+    this->CreateValueTicksCanvas();
     }
 
   if (this->ParameterTicksVisibility)
     {
-    this->CreateParameterTicksCanvas(app);
+    this->CreateParameterTicksCanvas();
     }
 
   // Create the guideline value canvas
 
   if (this->IsGuidelineValueCanvasUsed())
     {
-    this->CreateGuidelineValueCanvas(app);
+    this->CreateGuidelineValueCanvas();
     }
 
   // Histogram log mode
 
   if (this->HistogramLogModeOptionMenuVisibility)
     {
-    this->CreateHistogramLogModeOptionMenu(app);
+    this->CreateHistogramLogModeOptionMenu();
     }
 
   // Set the bindings
@@ -1316,7 +1315,7 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateLabel()
 {
   // If we are displaying the label in the top left frame, make sure it has
   // been created. 
@@ -1324,7 +1323,7 @@ void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
   if (this->GetLabelVisibility() && 
       this->LabelPosition == vtkKWWidgetWithLabel::LabelPositionDefault)
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
     }
 
   if (this->HasLabel() && this->GetLabel()->IsCreated())
@@ -1332,48 +1331,45 @@ void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::CreateLabel(app);
+  this->Superclass::CreateLabel();
   vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateParameterRange(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateParameterRange()
 {
   if (this->ParameterRange && !this->ParameterRange->IsCreated())
     {
     this->ParameterRange->SetParent(this);
-    this->ParameterRange->Create(app);
+    this->ParameterRange->Create();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateValueRange(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateValueRange()
 {
   if (this->ValueRange && !this->ValueRange->IsCreated())
     {
     this->ValueRange->SetParent(this);
-    this->ValueRange->Create(app);
+    this->ValueRange->Create();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateRangeLabel()
 {
   if ((this->ParameterRangeLabelVisibility || 
        this->ValueRangeLabelVisibility) && 
       (this->RangeLabelPosition == 
        vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault))
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
     }
 
   if (this->RangeLabel && !this->RangeLabel->IsCreated())
     {
     this->RangeLabel->SetParent(this);
-    this->RangeLabel->Create(app);
+    this->RangeLabel->Create();
     this->RangeLabel->SetBorderWidth(0);
     this->RangeLabel->SetAnchorToWest();
     this->UpdateRangeLabel();
@@ -1381,13 +1377,12 @@ void vtkKWParameterValueFunctionEditor::CreateRangeLabel(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreatePointEntriesFrame(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreatePointEntriesFrame()
 {
   if (this->PointEntriesFrame && !this->PointEntriesFrame->IsCreated())
     {
     this->PointEntriesFrame->SetParent(this);
-    this->PointEntriesFrame->Create(app);
+    this->PointEntriesFrame->Create();
     }
 }
 
@@ -1401,25 +1396,24 @@ vtkKWEntryWithLabel* vtkKWParameterValueFunctionEditor::GetParameterEntry()
         this->PointEntriesVisibility && 
         this->IsCreated())
       {
-      this->CreateParameterEntry(this->GetApplication());
+      this->CreateParameterEntry();
       }
     }
   return this->ParameterEntry;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateParameterEntry()
 {
   if (this->GetParameterEntry() && !this->ParameterEntry->IsCreated())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
 
     // If we are displaying the entry in the top right frame, make sure it
     // has been created. 
 
     this->ParameterEntry->SetParent(this->PointEntriesFrame);
-    this->ParameterEntry->Create(app);
+    this->ParameterEntry->Create();
     this->ParameterEntry->GetWidget()->SetWidth(7);
     this->ParameterEntry->GetLabel()->SetText("P:");
 
@@ -1431,16 +1425,15 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
 {
   if (this->HistogramLogModeOptionMenu && 
       !this->HistogramLogModeOptionMenu->IsCreated())
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
 
     this->HistogramLogModeOptionMenu->SetParent(this->TopLeftFrame);
-    this->HistogramLogModeOptionMenu->Create(app);
+    this->HistogramLogModeOptionMenu->Create();
     this->HistogramLogModeOptionMenu->SetPadX(1);
     this->HistogramLogModeOptionMenu->SetPadY(0);
     this->HistogramLogModeOptionMenu->IndicatorVisibilityOff();
@@ -1470,13 +1463,12 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateTopLeftContainer(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateTopLeftContainer()
 {
   if (this->TopLeftContainer && !this->TopLeftContainer->IsCreated())
     {
     this->TopLeftContainer->SetParent(this);
-    this->TopLeftContainer->Create(app);
+    this->TopLeftContainer->Create();
     }
 }
 
@@ -1500,37 +1492,34 @@ int vtkKWParameterValueFunctionEditor::IsPointEntriesFrameUsed()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateTopLeftFrame(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateTopLeftFrame()
 {
   if (this->TopLeftFrame && !this->TopLeftFrame->IsCreated())
     {
-    this->CreateTopLeftContainer(app);
+    this->CreateTopLeftContainer();
     this->TopLeftFrame->SetParent(this->TopLeftContainer);
-    this->TopLeftFrame->Create(app);
+    this->TopLeftFrame->Create();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateUserFrame(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateUserFrame()
 {
   if (this->UserFrame && !this->UserFrame->IsCreated())
     {
-    this->CreateTopLeftContainer(app);
+    this->CreateTopLeftContainer();
     this->UserFrame->SetParent(this->TopLeftContainer);
-    this->UserFrame->Create(app);
+    this->UserFrame->Create();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateValueTicksCanvas(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateValueTicksCanvas()
 {
   if (this->ValueTicksCanvas && !this->ValueTicksCanvas->IsCreated())
     {
     this->ValueTicksCanvas->SetParent(this);
-    this->ValueTicksCanvas->Create(app);
+    this->ValueTicksCanvas->Create();
     this->ValueTicksCanvas->SetHighlightThickness(0);
     this->ValueTicksCanvas->SetReliefToSolid();
     this->ValueTicksCanvas->SetHeight(0);
@@ -1539,13 +1528,12 @@ void vtkKWParameterValueFunctionEditor::CreateValueTicksCanvas(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas()
 {
   if (this->ParameterTicksCanvas && !this->ParameterTicksCanvas->IsCreated())
     {
     this->ParameterTicksCanvas->SetParent(this);
-    this->ParameterTicksCanvas->Create(app);
+    this->ParameterTicksCanvas->Create();
     this->ParameterTicksCanvas->SetHighlightThickness(0);
     this->ParameterTicksCanvas->SetReliefToSolid();
     this->ParameterTicksCanvas->SetWidth(0);
@@ -1556,13 +1544,12 @@ void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateGuidelineValueCanvas(
-  vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateGuidelineValueCanvas()
 {
   if (this->GuidelineValueCanvas && !this->GuidelineValueCanvas->IsCreated())
     {
     this->GuidelineValueCanvas->SetParent(this);
-    this->GuidelineValueCanvas->Create(app);
+    this->GuidelineValueCanvas->Create();
     this->GuidelineValueCanvas->SetHighlightThickness(0);
     this->GuidelineValueCanvas->SetReliefToSolid();
     this->GuidelineValueCanvas->SetWidth(0);
@@ -2298,7 +2285,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterRangeVisibility(int arg)
 
   if (this->ParameterRangeVisibility && this->IsCreated())
     {
-    this->CreateParameterRange(this->GetApplication());
+    this->CreateParameterRange();
     }
 
   this->Modified();
@@ -2426,7 +2413,7 @@ void vtkKWParameterValueFunctionEditor::SetValueRangeVisibility(int arg)
 
   if (this->ValueRangeVisibility && this->IsCreated())
     {
-    this->CreateValueRange(this->GetApplication());
+    this->CreateValueRange();
     }
 
   this->Modified();
@@ -2478,7 +2465,7 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 
   if (this->GetLabelVisibility() && this->IsCreated())
     {
-    this->CreateLabel(this->GetApplication());
+    this->CreateLabel();
     }
 
   this->Modified();
@@ -2501,7 +2488,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterRangeLabelVisibility(int arg
 
   if (this->ParameterRangeLabelVisibility && this->IsCreated())
     {
-    this->CreateRangeLabel(this->GetApplication());
+    this->CreateRangeLabel();
     }
 
   this->UpdateRangeLabel();
@@ -2526,7 +2513,7 @@ void vtkKWParameterValueFunctionEditor::SetValueRangeLabelVisibility(int arg)
 
   if (this->ValueRangeLabelVisibility && this->IsCreated())
     {
-    this->CreateRangeLabel(this->GetApplication());
+    this->CreateRangeLabel();
     }
 
   this->UpdateRangeLabel();
@@ -2562,7 +2549,7 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
   if ((this->ParameterRangeLabelVisibility ||
        this->ValueRangeLabelVisibility) && this->IsCreated())
     {
-    this->CreateRangeLabel(this->GetApplication());
+    this->CreateRangeLabel();
     }
 
   this->UpdateRangeLabel();
@@ -2630,7 +2617,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryVisibility(int arg)
       this->PointEntriesVisibility && 
       this->IsCreated())
     {
-    this->CreateParameterEntry(this->GetApplication());
+    this->CreateParameterEntry();
     }
 
   this->UpdateParameterEntry(this->GetSelectedPoint());
@@ -2689,7 +2676,7 @@ void vtkKWParameterValueFunctionEditor::SetUserFrameVisibility(int arg)
 
   if (this->UserFrameVisibility && this->IsCreated())
     {
-    this->CreateUserFrame(this->GetApplication());
+    this->CreateUserFrame();
     }
 
   this->Modified();
@@ -3063,7 +3050,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterTicksVisibility(int arg)
 
   if (this->ParameterTicksVisibility && this->IsCreated())
     {
-    this->CreateParameterTicksCanvas(this->GetApplication());
+    this->CreateParameterTicksCanvas();
     }
 
   this->RedrawRangeTicks();
@@ -3084,7 +3071,7 @@ void vtkKWParameterValueFunctionEditor::SetValueTicksVisibility(int arg)
 
   if (this->ValueTicksVisibility && this->IsCreated())
     {
-    this->CreateValueTicksCanvas(this->GetApplication());
+    this->CreateValueTicksCanvas();
     }
 
   this->RedrawRangeTicks();
@@ -3696,7 +3683,7 @@ void vtkKWParameterValueFunctionEditor::SetHistogramLogModeOptionMenuVisibility(
 
   if (this->HistogramLogModeOptionMenuVisibility && this->IsCreated())
     {
-    this->CreateHistogramLogModeOptionMenu(this->GetApplication());
+    this->CreateHistogramLogModeOptionMenu();
     }
 
   this->Modified();

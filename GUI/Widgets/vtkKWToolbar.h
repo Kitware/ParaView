@@ -22,7 +22,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWRadioButton;
 class vtkKWToolbarInternals;
@@ -36,7 +35,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Returns the main frame of the toolbar. 

@@ -32,7 +32,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWPushButton;
 
 class KWWIDGETS_EXPORT vtkKWSpinButtons : public vtkKWCompositeWidget
@@ -44,7 +43,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Get the buttons

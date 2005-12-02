@@ -28,8 +28,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWSpinBox : public vtkKWCoreWidget
 {
 public:
@@ -39,7 +37,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the range.

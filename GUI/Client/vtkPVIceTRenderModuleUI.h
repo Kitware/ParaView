@@ -33,7 +33,7 @@ public:
 
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  void Create();
 
   // Description:
   // Threshold for collecting geometry to the client (vs. showing the outline

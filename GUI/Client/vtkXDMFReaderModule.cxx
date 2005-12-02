@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.45");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.46");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -140,24 +140,24 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->SetTitle("Domain and Grids Selection");
     dlg->SetStyleToOkCancel();
     dlg->SetMasterWindow(this->GetPVWindow());
-    dlg->Create(pvApp);
+    dlg->Create();
     dlg->SetText("Select Domain and Grids");
 
     this->DomainGridFrame = vtkKWFrameWithLabel::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
-    this->DomainGridFrame->Create(pvApp);
+    this->DomainGridFrame->Create();
     this->DomainGridFrame->SetLabelText("Domain and Grids Selection");
 
     this->DomainMenu = vtkKWMenuButton::New();
     this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
-    this->DomainMenu->Create(pvApp);
+    this->DomainMenu->Create();
     this->UpdateDomains();
 
     this->GridSelection = vtkKWListBoxWithScrollbars::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
     this->GridSelection->VerticalScrollbarVisibilityOn();
     this->GridSelection->HorizontalScrollbarVisibilityOff();
-    this->GridSelection->Create(pvApp);
+    this->GridSelection->Create();
 
     this->GridSelection->GetWidget()->SetSelectionModeToExtended();
     this->GridSelection->GetWidget()->SetHeight(0);
@@ -181,7 +181,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
         vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
         selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
         selectAllButton->SetText("Select All Grids");
-        selectAllButton->Create(pvApp);
+        selectAllButton->Create();
         selectAllButton->SetCommand(this, "EnableAllGrids");
         this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
           selectAllButton->GetWidgetName());

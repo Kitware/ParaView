@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(@WidgetType@Set);
-vtkCxxRevisionMacro(@WidgetType@Set, "1.6");
+vtkCxxRevisionMacro(@WidgetType@Set, "1.7");
 
 //----------------------------------------------------------------------------
 @WidgetType@* @WidgetType@Set::GetWidget(int id)
@@ -47,7 +47,7 @@ vtkKWWidget* @WidgetType@Set::AllocateAndCreateWidget()
 {
   @WidgetType@ *widget = @WidgetType@::New();
   widget->SetParent(this);
-  widget->Create(this->GetApplication());
+  widget->Create();
   return static_cast<vtkKWWidget*>(widget);
 }
 

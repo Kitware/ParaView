@@ -29,7 +29,7 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
 
   vtkKWComboBox *combobox1 = vtkKWComboBox::New();
   combobox1->SetParent(parent);
-  combobox1->Create(app);
+  combobox1->Create();
   combobox1->SetBalloonHelpString("A simple combobox");
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
@@ -47,7 +47,7 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
 
   vtkKWComboBox *combobox2 = vtkKWComboBox::New();
   combobox2->SetParent(parent);
-  combobox2->Create(app);
+  combobox2->Create();
   combobox2->SetWidth(20);
   combobox2->ReadOnlyOn();
   combobox2->SetValue("read-only combobox");
@@ -68,7 +68,7 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
 
   vtkKWComboBoxWithLabel *combobox3 = vtkKWComboBoxWithLabel::New();
   combobox3->SetParent(parent);
-  combobox3->Create(app);
+  combobox3->Create();
   combobox3->SetLabelText("Another combobox, with a label in front:");
   combobox3->SetBalloonHelpString(
     "This is a vtkKWComboBoxWithLabel, i.e. a combobox associated to a "
@@ -91,7 +91,7 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
 
   vtkKWComboBoxSet *combobox_set = vtkKWComboBoxSet::New();
   combobox_set->SetParent(parent);
-  combobox_set->Create(app);
+  combobox_set->Create();
   combobox_set->SetBorderWidth(2);
   combobox_set->SetReliefToGroove();
   combobox_set->SetWidgetsPadX(1);

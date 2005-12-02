@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.40");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -63,7 +63,7 @@ void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Create(vtkKWApplication *app)
+void vtkPVLabeledToggle::Create()
 {
   // Check if already created
 
@@ -75,16 +75,16 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   // Now a label
-  this->Label->Create(app);
+  this->Label->Create();
   this->Label->SetWidth(18);
   this->Label->SetJustificationToRight();
   this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the check button
-  this->CheckButton->Create(app);
+  this->CheckButton->Create();
   this->CheckButton->SetCommand(this, "ModifiedCallback");
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
 }

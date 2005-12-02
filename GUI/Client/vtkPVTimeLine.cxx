@@ -22,7 +22,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.12");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -97,14 +97,14 @@ void vtkPVTimeLine::ForceUpdate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTimeLine::Create(vtkKWApplication* app)
+void vtkPVTimeLine::Create()
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("vtkPVTimeLine already created");
     return;
     }
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 }
 
 //----------------------------------------------------------------------------

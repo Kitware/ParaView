@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.43");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.44");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -100,16 +100,17 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::Create(vtkKWApplication *app)
+void vtkKWMultiColumnList::Create()
 {
   // Use Tablelist class:
   // http://www.nemethi.de/
 
+  vtkKWApplication *app = this->GetApplication();
   vtkKWTablelistInit::Initialize(app ? app->GetMainInterp() : NULL);
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "tablelist::tablelist"))
+  if (!this->Superclass::CreateSpecificTkWidget("tablelist::tablelist"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -2200,7 +2201,7 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
   vtkKWCheckButton *child = vtkKWCheckButton::New();
   child->SetWidgetName(widget);
   child->SetParent(this);
-  child->Create(this->GetApplication());
+  child->Create();
   child->SetHighlightThickness(0);
   child->SetBorderWidth(0);
   child->SetPadX(0);
@@ -2279,7 +2280,7 @@ void vtkKWMultiColumnList::CellWindowCommandToColorButtonCallback(
   vtkKWFrame *child = vtkKWFrame::New();
   child->SetWidgetName(widget);
   child->SetParent(this);
-  child->Create(this->GetApplication());
+  child->Create();
   child->SetBorderWidth(1);
   child->SetReliefToSolid();
   child->SetWidth(16);
@@ -2316,7 +2317,7 @@ void vtkKWMultiColumnList::CellWindowCommandToReadOnlyComboBoxCallback(
   vtkKWComboBox *child = vtkKWComboBox::New();
   child->SetWidgetName(widget);
   child->SetParent(this);
-  child->Create(this->GetApplication());
+  child->Create();
   child->SetHighlightThickness(0);
   child->SetBorderWidth(0);
   

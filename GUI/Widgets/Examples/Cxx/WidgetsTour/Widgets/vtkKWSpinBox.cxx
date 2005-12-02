@@ -22,7 +22,7 @@ KWWidgetsTourItem* vtkKWSpinBoxEntryPoint(
 
   vtkKWSpinBox *spinbox1 = vtkKWSpinBox::New();
   spinbox1->SetParent(parent);
-  spinbox1->Create(app);
+  spinbox1->Create();
   spinbox1->SetRange(0, 10);
   spinbox1->SetIncrement(1);
   spinbox1->SetBalloonHelpString("A simple spinbox");
@@ -37,7 +37,7 @@ KWWidgetsTourItem* vtkKWSpinBoxEntryPoint(
 
   vtkKWSpinBox *spinbox2 = vtkKWSpinBox::New();
   spinbox2->SetParent(parent);
-  spinbox2->Create(app);
+  spinbox2->Create();
   spinbox2->SetRange(10.0, 15.0);
   spinbox2->SetIncrement(0.5);
   spinbox2->SetValue(12);
@@ -56,7 +56,7 @@ KWWidgetsTourItem* vtkKWSpinBoxEntryPoint(
 
   vtkKWSpinBoxWithLabel *spinbox3 = vtkKWSpinBoxWithLabel::New();
   spinbox3->SetParent(parent);
-  spinbox3->Create(app);
+  spinbox3->Create();
   spinbox3->GetWidget()->SetRange(10, 100);
   spinbox3->GetWidget()->SetIncrement(10);
   spinbox3->SetLabelText("Another spinbox, with a label in front:");

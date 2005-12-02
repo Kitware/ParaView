@@ -20,7 +20,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWMenu;
 class vtkKWSeparator;
@@ -36,7 +35,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the frame that can be used as a parent to a toolbar

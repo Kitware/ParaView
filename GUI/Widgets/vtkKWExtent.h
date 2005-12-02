@@ -25,8 +25,6 @@
 
 #include "vtkKWRange.h" // Needed for some constants
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWExtent : public vtkKWCompositeWidget
 {
 public:
@@ -36,7 +34,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the Range of the Extent, this is the range of

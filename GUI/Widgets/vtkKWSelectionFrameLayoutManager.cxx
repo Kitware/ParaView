@@ -25,8 +25,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWSelectionFrameLayoutManager.h"
 
-#include "vtkImageData.h"
 #include "vtkKWApplication.h"
+#include "vtkImageData.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWLabel.h"
@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.46");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -148,7 +148,7 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::Create(vtkKWApplication *app)
+void vtkKWSelectionFrameLayoutManager::Create()
 {
   // Check if already created
 
@@ -160,7 +160,7 @@ void vtkKWSelectionFrameLayoutManager::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetBackgroundColor(0.2, 0.2, 0.2);
 
@@ -450,7 +450,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
   if (!this->ResolutionEntriesMenu->IsCreated())
     {
     this->ResolutionEntriesMenu->SetParent(parent);
-    this->ResolutionEntriesMenu->Create(parent->GetApplication());
+    this->ResolutionEntriesMenu->Create();
     }
 
   // Allowed resolutions
@@ -536,7 +536,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   if (!this->ResolutionEntriesToolbar->IsCreated())
     {
     this->ResolutionEntriesToolbar->SetParent(parent);
-    this->ResolutionEntriesToolbar->Create(parent->GetApplication());
+    this->ResolutionEntriesToolbar->Create();
     }
 
   // Got to create the icons
@@ -990,7 +990,7 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
   if (this->IsCreated() && widget && !widget->IsCreated())
     {
     widget->SetParent(this);
-    widget->Create(this->GetApplication());
+    widget->Create();
     widget->SetWidth(350);
     widget->SetHeight(350);
     this->ConfigureWidget(widget);
@@ -1639,7 +1639,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   dlg->SetDisplayPositionToPointer();
   dlg->SetTitle("Change frame title");
   dlg->SetStyleToOkCancel();
-  dlg->Create(this->GetApplication());
+  dlg->Create();
   dlg->GetEntry()->GetLabel()->SetText("Name:");
   dlg->SetText("Enter a new value for this frame title");
 
@@ -1920,7 +1920,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
 
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
   save_dialog->SetParent(this->GetParentWindow());
-  save_dialog->Create(this->GetApplication());
+  save_dialog->Create();
   save_dialog->SetTitle("Save Screenshot");
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     save_dialog, "SavePath");

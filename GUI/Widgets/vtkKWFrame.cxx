@@ -11,20 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWFrame);
-vtkCxxRevisionMacro(vtkKWFrame, "1.28");
+vtkCxxRevisionMacro(vtkKWFrame, "1.29");
 
 //----------------------------------------------------------------------------
-void vtkKWFrame::Create(vtkKWApplication *app)
+void vtkKWFrame::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "frame"))
+  if (!this->Superclass::CreateSpecificTkWidget("frame"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

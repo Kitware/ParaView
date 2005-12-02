@@ -37,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.75");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.76");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -70,7 +70,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectWidget::Create(vtkKWApplication *app)
+void vtkPVSelectWidget::Create()
 {
   // Check if already created
 
@@ -82,10 +82,10 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->LabeledFrame->SetParent(this);
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create();
   if (this->EntryLabel)
     {
     this->LabeledFrame->SetLabelText(this->EntryLabel);
@@ -95,12 +95,12 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 
   vtkKWFrame *justifyFrame = vtkKWFrame::New();
   justifyFrame->SetParent(this->LabeledFrame->GetFrame());
-  justifyFrame->Create(app);
+  justifyFrame->Create();
   this->Script("pack %s -side top -fill x -expand true", 
                justifyFrame->GetWidgetName());
 
   this->Menu->SetParent(justifyFrame);
-  this->Menu->Create(app);
+  this->Menu->Create();
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   justifyFrame->Delete();
@@ -112,9 +112,13 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   for(i=0; i<len; i++)
     {
     widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
-    if (!widget->GetApplication())
+    if (!widget->IsCreated())
       {
-      widget->Create(this->GetApplication());
+      if (!widget->GetApplication())
+        {
+        widget->SetApplication(this->GetApplication());
+        }
+      widget->Create();
       }
     }
 

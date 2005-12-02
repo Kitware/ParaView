@@ -13,8 +13,8 @@
 =========================================================================*/
 #include "vtkKWMenu.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
+#include "vtkObjectFactory.h"
 #include "vtkKWWindowBase.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.86");
+vtkCxxRevisionMacro(vtkKWMenu, "1.87");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -37,11 +37,11 @@ vtkKWMenu::~vtkKWMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::Create(vtkKWApplication* app)
+void vtkKWMenu::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "menu"))
+  if (!this->Superclass::CreateSpecificTkWidget("menu"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -165,7 +165,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
 
   str << ends;
   
-  this->GetApplication()->Script(str.str());
+  this->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)
@@ -186,7 +186,7 @@ void vtkKWMenu::AddCascade(const char* label,
   ostrstream str;
   str << this->GetWidgetName() << " add cascade -label {" << label << "}"
       << " -underline " << underline << ends;
-  this->GetApplication()->Script(str.str());
+  this->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)
@@ -210,7 +210,7 @@ void  vtkKWMenu::InsertCascade(int position,
   
   str << this->GetWidgetName() << " insert " << position 
       << " cascade -label {" << label << "} -underline " << underline << ends;
-  this->GetApplication()->Script(str.str());
+  this->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)

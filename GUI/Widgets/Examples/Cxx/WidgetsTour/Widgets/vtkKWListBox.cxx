@@ -26,7 +26,7 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWListBox *listbox1 = vtkKWListBox::New();
   listbox1->SetParent(parent);
-  listbox1->Create(app);
+  listbox1->Create();
   listbox1->SetSelectionModeToSingle();
   listbox1->SetBalloonHelpString("A simple listbox");
 
@@ -45,7 +45,7 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWListBoxWithScrollbars *listbox2 = vtkKWListBoxWithScrollbars::New();
   listbox2->SetParent(parent);
-  listbox2->Create(app);
+  listbox2->Create();
   listbox2->SetBorderWidth(2);
   listbox2->SetReliefToGroove();
   listbox2->SetPadX(2);

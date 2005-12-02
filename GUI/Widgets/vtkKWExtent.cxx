@@ -13,14 +13,13 @@
 =========================================================================*/
 #include "vtkKWExtent.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWRange.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.42");
+vtkCxxRevisionMacro(vtkKWExtent, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -53,7 +52,7 @@ vtkKWExtent::~vtkKWExtent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::Create(vtkKWApplication *app)
+void vtkKWExtent::Create()
 {
   // Check if already created
 
@@ -65,14 +64,14 @@ void vtkKWExtent::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   for (int i = 0; i < 3; i++)
     {
     this->Range[i]->SetParent(this);
     this->Range[i]->LabelVisibilityOn();
     this->Range[i]->EntriesVisibilityOn();
-    this->Range[i]->Create(app);
+    this->Range[i]->Create();
     this->Range[i]->SetCommand(this, "ExtentChangedCallback");
     this->Range[i]->AdjustResolutionOn();
     }

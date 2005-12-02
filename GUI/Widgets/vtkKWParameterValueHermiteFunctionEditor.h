@@ -40,7 +40,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the midpoint entry UI visibility.
@@ -284,8 +284,8 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateMidPointEntry(vtkKWApplication *app);
-  virtual void CreateSharpnessEntry(vtkKWApplication *app);
+  virtual void CreateMidPointEntry();
+  virtual void CreateSharpnessEntry();
   virtual int IsPointEntriesFrameUsed();
   virtual int IsGuidelineValueCanvasUsed();
 

@@ -13,11 +13,11 @@
 =========================================================================*/
 #include "vtkKWRenderWidget.h"
 
+#include "vtkKWApplication.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkCornerAnnotation.h"
-#include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWIcon.h"
@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.113");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.114");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -280,7 +280,7 @@ void vtkKWRenderWidget::SetDistanceUnits(const char* _arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::Create(vtkKWApplication *app)
+void vtkKWRenderWidget::Create()
 {
   // Check if already created
 
@@ -292,7 +292,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   // Create the VTK Tk render widget in VTKWidget
 
@@ -300,7 +300,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app)
   sprintf(opts, "-rw Addr=%p", this->RenderWindow);
 
   this->VTKWidget->SetParent(this);
-  this->VTKWidget->CreateSpecificTkWidget(app, "vtkTkRenderWidget", opts);
+  this->VTKWidget->CreateSpecificTkWidget("vtkTkRenderWidget", opts);
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
@@ -555,7 +555,8 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
       }
     if (!this->ContextMenu->IsCreated())
       {
-      this->ContextMenu->Create(this->GetApplication());
+      this->ContextMenu->SetParent(this);
+      this->ContextMenu->Create();
       }
     this->ContextMenu->DeleteAllMenuItems();
     this->PopulateContextMenu(this->ContextMenu);

@@ -27,7 +27,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVCameraKeyFrame);
-vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.5");
 //------------------------------------------------------------------------------
 vtkPVCameraKeyFrame::vtkPVCameraKeyFrame()
 {
@@ -68,21 +68,21 @@ vtkPVCameraKeyFrame::~vtkPVCameraKeyFrame()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
+void vtkPVCameraKeyFrame::ChildCreate()
 {
-  this->Superclass::ChildCreate(app);
+  this->Superclass::ChildCreate();
 
   this->PositionLabel->SetParent(this);
-  this->PositionLabel->Create(app);
+  this->PositionLabel->Create();
   this->PositionLabel->SetText("Position:");
   this->FocalPointLabel->SetParent(this);
-  this->FocalPointLabel->Create(app);
+  this->FocalPointLabel->Create();
   this->FocalPointLabel->SetText("Focal Point:");
   this->ViewUpLabel->SetParent(this);
-  this->ViewUpLabel->Create(app);
+  this->ViewUpLabel->Create();
   this->ViewUpLabel->SetText("View Up:");
   this->ViewAngleLabel->SetParent(this);
-  this->ViewAngleLabel->Create(app);
+  this->ViewAngleLabel->Create();
   this->ViewAngleLabel->SetText("View Angle:");
 
   for (int i=0; i < 3; i++)
@@ -90,7 +90,7 @@ void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
     this->PositionWheels[i]->SetParent(this);
     this->PositionWheels[i]->PopupModeOn();
     this->PositionWheels[i]->SetResolution(0.01);
-    this->PositionWheels[i]->Create(app);
+    this->PositionWheels[i]->Create();
     this->PositionWheels[i]->DisplayEntryOn();
     this->PositionWheels[i]->DisplayLabelOff();
     this->PositionWheels[i]->DisplayEntryAndLabelOnTopOff();
@@ -101,7 +101,7 @@ void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
     this->FocalPointWheels[i]->SetParent(this);
     this->FocalPointWheels[i]->PopupModeOn();
     this->FocalPointWheels[i]->SetResolution(0.01);
-    this->FocalPointWheels[i]->Create(app);
+    this->FocalPointWheels[i]->Create();
     this->FocalPointWheels[i]->DisplayEntryOn();
     this->FocalPointWheels[i]->DisplayLabelOff();
     this->FocalPointWheels[i]->DisplayEntryAndLabelOnTopOff();
@@ -112,7 +112,7 @@ void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
     this->ViewUpWheels[i]->SetParent(this);
     this->ViewUpWheels[i]->PopupModeOn();
     this->ViewUpWheels[i]->SetResolution(0.01);
-    this->ViewUpWheels[i]->Create(app);
+    this->ViewUpWheels[i]->Create();
     this->ViewUpWheels[i]->DisplayEntryOn();
     this->ViewUpWheels[i]->DisplayLabelOff();
     this->ViewUpWheels[i]->DisplayEntryAndLabelOnTopOff();
@@ -126,7 +126,7 @@ void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
   this->ViewAngleWheel->SetMinimumValue(0.00000001);
   this->ViewAngleWheel->SetMaximumValue(179);
   this->ViewAngleWheel->SetResolution(0.01);
-  this->ViewAngleWheel->Create(app);
+  this->ViewAngleWheel->Create();
   this->ViewAngleWheel->DisplayEntryOn();
   this->ViewAngleWheel->DisplayLabelOff();
   this->ViewAngleWheel->DisplayEntryAndLabelOnTopOff();
@@ -135,7 +135,7 @@ void vtkPVCameraKeyFrame::ChildCreate(vtkKWApplication* app)
   this->ViewAngleWheel->SetEndCommand(this, "ViewAngleChangedCallback");
 
   this->CaptureCurrentCamera->SetParent(this);
-  this->CaptureCurrentCamera->Create(app);
+  this->CaptureCurrentCamera->Create();
   this->CaptureCurrentCamera->SetText("Capture");
   this->CaptureCurrentCamera->SetBalloonHelpString(
     "Capture the current camera properties");

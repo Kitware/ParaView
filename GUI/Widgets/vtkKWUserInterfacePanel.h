@@ -43,7 +43,6 @@
 
 #include "vtkKWObject.h"
 
-class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWUserInterfaceManager;
 class vtkKWWidget;
@@ -77,7 +76,7 @@ public:
   // panel to be delayed until it is really needed. In the same way, if
   // the user interface manager has not been created at this point, it
   // is automatically created now (see vtkKWUserInterfaceManager::Create()).
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   virtual int IsCreated();
 
   // Description:
@@ -156,6 +155,7 @@ protected:
 private:
 
   int Enabled;
+  int PanelIsCreated;
 
   vtkKWUserInterfacePanel(const vtkKWUserInterfacePanel&); // Not implemented
   void operator=(const vtkKWUserInterfacePanel&); // Not Implemented

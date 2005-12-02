@@ -48,7 +48,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get/Set the transfer function mapping scalar value to color

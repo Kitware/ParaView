@@ -94,7 +94,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
   
   // Description:
   // Set the parent frames for the vertical and horizontal animation guis.

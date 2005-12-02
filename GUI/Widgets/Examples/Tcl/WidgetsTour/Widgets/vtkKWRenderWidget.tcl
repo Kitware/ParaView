@@ -8,7 +8,7 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
   vtkKWRenderWidget rw_renderwidget
   rw_renderwidget SetParent $parent
-  rw_renderwidget Create $app
+  rw_renderwidget Create
 
   pack [rw_renderwidget GetWidgetName] -side top -fill both -expand y -padx 0 -pady 0
 

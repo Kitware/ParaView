@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.39");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.40");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -130,7 +130,7 @@ void vtkPVVolumeAppearanceEditor::SetPVRenderView(vtkPVRenderView *rv)
   this->PVRenderView = rv;
 }
 //----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
+void vtkPVVolumeAppearanceEditor::Create()
 {
   // Check if already created
 
@@ -142,11 +142,12 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Superclass create takes a KWApplication, but we need a PVApplication.
 
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
+  vtkPVApplication* pvApp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
   if (pvApp == NULL)
     {
     vtkErrorMacro("Need a PV application");
@@ -156,7 +157,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   // Back button
   this->BackButton = vtkKWPushButton::New();
   this->BackButton->SetParent(this);
-  this->BackButton->Create(this->GetApplication());
+  this->BackButton->Create();
   this->BackButton->SetText("Back");
   this->BackButton->SetCommand(this, "BackButtonCallback");
 
@@ -169,7 +170,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->VolumePropertyWidget->GradientOpacityFunctionVisibilityOff();
   this->VolumePropertyWidget->ComponentWeightsVisibilityOff();
   this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->WindowLevelModeButtonVisibilityOff();
-  this->VolumePropertyWidget->Create(pvApp);
+  this->VolumePropertyWidget->Create();
   this->VolumePropertyWidget->AddObserver(
     vtkKWEvent::VolumePropertyChangedEvent, this->VolumeAppearanceObserver);
   this->VolumePropertyWidget->AddObserver(

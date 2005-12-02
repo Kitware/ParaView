@@ -14,6 +14,7 @@
 
 #include "vtkKWPresetSelector.h"
 
+#include "vtkKWApplication.h"
 #include "vtkImageData.h"
 #include "vtkImageResample.h"
 #include "vtkKWBalloonHelpManager.h"
@@ -24,11 +25,9 @@
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkKWApplication.h"
 #include "vtkImagePermute.h"
 #include "vtkImageClip.h"
 #include "vtkKWIcon.h"
@@ -56,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.23");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.24");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -236,7 +235,7 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::Create(vtkKWApplication *app)
+void vtkKWPresetSelector::Create()
 {
   // Check if already created
 
@@ -248,7 +247,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // --------------------------------------------------------------
   // Preset : preset list
@@ -259,7 +258,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
     }
 
   this->PresetList->SetParent(this);
-  this->PresetList->Create(app);
+  this->PresetList->Create();
   this->PresetList->HorizontalScrollbarVisibilityOff();
 
   this->Script(
@@ -299,7 +298,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
     }
 
   this->PresetControlFrame->SetParent(this);
-  this->PresetControlFrame->Create(app);
+  this->PresetControlFrame->Create();
 
   this->Script("pack %s -side top -anchor nw -fill both -expand f",
                this->PresetControlFrame->GetWidgetName());
@@ -318,7 +317,7 @@ void vtkKWPresetSelector::Create(vtkKWApplication *app)
   this->PresetButtons->SetWidgetsPadY(2);
   this->PresetButtons->SetWidgetsInternalPadY(1);
   this->PresetButtons->ExpandWidgetsOn();
-  this->PresetButtons->Create(app);
+  this->PresetButtons->Create();
 
   this->CreatePresetButtons();
 
@@ -1731,7 +1730,7 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
       child->SetBalloonHelpIcon(screenshot);
       }
 
-    child->Create(list->GetApplication());
+    child->Create();
     child->SetBorderWidth(0);
     child->SetHighlightThickness(0);
     child->SetWidth(this->ThumbnailSize);

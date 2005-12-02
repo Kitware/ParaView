@@ -14,7 +14,6 @@
 #include "vtkKWColorTransferFunctionEditor.h"
 
 #include "vtkColorTransferFunction.h"
-#include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
@@ -31,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.44");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.45");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -632,7 +631,7 @@ void vtkKWColorTransferFunctionEditor::UpdateColorSpaceOptionMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
+void vtkKWColorTransferFunctionEditor::Create()
 {
   // Check if already created
 
@@ -644,27 +643,27 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Add the color space option menu
 
   if (this->ColorSpaceOptionMenuVisibility)
     {
-    this->CreateColorSpaceOptionMenu(app);
+    this->CreateColorSpaceOptionMenu();
     }
 
   // Create the value entries
 
   if (this->ValueEntriesVisibility && this->PointEntriesVisibility)
     {
-    this->CreateValueEntries(app);
+    this->CreateValueEntries();
     }
 
   // Create the ramp
 
   if (this->ColorRampVisibility)
     {
-    this->CreateColorRamp(app);
+    this->CreateColorRamp();
     }
 
   // Pack the widget
@@ -677,14 +676,13 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
-  vtkKWApplication *app)
+void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu()
 {
   if (this->ColorSpaceOptionMenu && !this->ColorSpaceOptionMenu->IsCreated())
     {
-    this->CreateTopLeftFrame(app);
+    this->CreateTopLeftFrame();
     this->ColorSpaceOptionMenu->SetParent(this->TopLeftFrame);
-    this->ColorSpaceOptionMenu->Create(app);
+    this->ColorSpaceOptionMenu->Create();
     this->ColorSpaceOptionMenu->SetPadX(1);
     this->ColorSpaceOptionMenu->SetPadY(0);
     this->ColorSpaceOptionMenu->IndicatorVisibilityOff();
@@ -706,13 +704,12 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::CreateColorRamp(
-  vtkKWApplication *app)
+void vtkKWColorTransferFunctionEditor::CreateColorRamp()
 {
   if (this->ColorRamp && !this->ColorRamp->IsCreated())
     {
     this->ColorRamp->SetParent(this);
-    this->ColorRamp->Create(app);
+    this->ColorRamp->Create();
     this->ColorRamp->SetBorderWidth(0);
     this->ColorRamp->SetAnchorToNorthWest();
     if (!this->IsColorRampUpToDate())
@@ -723,17 +720,16 @@ void vtkKWColorTransferFunctionEditor::CreateColorRamp(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::CreateValueEntries(
-  vtkKWApplication *app)
+void vtkKWColorTransferFunctionEditor::CreateValueEntries()
 {
   if (this->ValueEntries[0] && !this->ValueEntries[0]->IsCreated())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
     int i;
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
       this->ValueEntries[i]->SetParent(this->PointEntriesFrame);
-      this->ValueEntries[i]->Create(app);
+      this->ValueEntries[i]->Create();
       this->ValueEntries[i]->GetWidget()->SetWidth(4);
       this->ValueEntries[i]->GetWidget()->SetCommand(
         this, "ValueEntriesCallback");
@@ -1061,7 +1057,7 @@ void vtkKWColorTransferFunctionEditor::SetColorSpaceOptionMenuVisibility(int arg
 
   if (this->ColorSpaceOptionMenuVisibility && this->IsCreated())
     {
-    this->CreateColorSpaceOptionMenu(this->GetApplication());
+    this->CreateColorSpaceOptionMenu();
     }
 
   this->UpdateColorSpaceOptionMenu();
@@ -1088,7 +1084,7 @@ void vtkKWColorTransferFunctionEditor::SetColorRampVisibility(int arg)
     {
     if (this->IsCreated() && !this->ColorRamp->IsCreated())
       {
-      this->CreateColorRamp(this->GetApplication());
+      this->CreateColorRamp();
       }
     }
 
@@ -1192,7 +1188,7 @@ void vtkKWColorTransferFunctionEditor::SetValueEntriesVisibility(int arg)
       this->PointEntriesVisibility && 
       this->IsCreated())
     {
-    this->CreateValueEntries(this->GetApplication());
+    this->CreateValueEntries();
     }
 
   this->UpdatePointEntriesLabel();

@@ -38,7 +38,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the current color (RGB space)
@@ -113,11 +113,11 @@ protected:
 
   // Description:
   // Create the label (override the superclass)
-  virtual void CreateLabel(vtkKWApplication *app);
+  virtual void CreateLabel();
 
   // Description:
   // Create the button frame
-  virtual void CreateButtonFrame(vtkKWApplication *app);
+  virtual void CreateButtonFrame();
 
 private:
 

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.46");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -50,7 +50,7 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveDialog::Create(vtkKWApplication *app)
+void vtkKWLoadSaveDialog::Create()
 {
   // Check if already created
 
@@ -62,7 +62,7 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Note that for this specific class, we are not really going to
   // display or use the toplevel that has been just created, we

@@ -8,7 +8,7 @@ proc vtkKWExtentEntryPoint {parent win} {
 
   vtkKWExtent extent1
   extent1 SetParent $parent
-  extent1 Create $app
+  extent1 Create
   extent1 SetBorderWidth 2
   extent1 SetReliefToGroove
   extent1 SetExtentRange 0.0 100.0 20.0 30.0 -100.0 -50.0
@@ -24,7 +24,7 @@ proc vtkKWExtentEntryPoint {parent win} {
 
   vtkKWExtent extent2
   extent2 SetParent $parent
-  extent2 Create $app
+  extent2 Create
   extent2 SetBorderWidth 2
   extent2 SetReliefToGroove
   eval extent2 SetExtentRange [extent1 GetExtentRange] 
@@ -51,7 +51,7 @@ proc vtkKWExtentEntryPoint {parent win} {
 
   vtkKWExtent extent3
   extent3 SetParent $parent
-  extent3 Create $app
+  extent3 Create
   extent3 SetBorderWidth 2
   extent3 SetReliefToGroove
   extent3 SetLabelPositionToRight

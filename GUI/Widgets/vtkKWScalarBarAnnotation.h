@@ -47,7 +47,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the vtkScalarBarWidget that owns the scalar bar actor.

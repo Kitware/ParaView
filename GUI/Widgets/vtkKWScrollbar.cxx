@@ -11,20 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWScrollbar.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWScrollbar);
-vtkCxxRevisionMacro(vtkKWScrollbar, "1.2");
+vtkCxxRevisionMacro(vtkKWScrollbar, "1.3");
 
 //----------------------------------------------------------------------------
-void vtkKWScrollbar::Create(vtkKWApplication *app)
+void vtkKWScrollbar::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "scrollbar"))
+  if (!this->Superclass::CreateSpecificTkWidget("scrollbar"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

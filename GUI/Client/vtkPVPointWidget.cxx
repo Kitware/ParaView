@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -200,9 +200,9 @@ void vtkPVPointWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::Create(vtkKWApplication* app)
+void vtkPVPointWidget::Create()
 {
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
@@ -250,7 +250,7 @@ void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
+void vtkPVPointWidget::ChildCreate()
 {
   int i;
   if ((this->GetTraceHelper()->GetObjectNameState() == 
@@ -265,13 +265,13 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame);
-  this->Labels[0]->Create(pvApp);
+  this->Labels[0]->Create();
   this->Labels[0]->SetText("Position");
 
   for (i=0; i<3; i++)
     {
     this->CoordinateLabel[i]->SetParent(this->Frame);
-    this->CoordinateLabel[i]->Create(pvApp);
+    this->CoordinateLabel[i]->Create();
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
     this->CoordinateLabel[i]->SetText(buffer);
@@ -279,7 +279,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   for (i=0; i<3; i++)
     {
     this->PositionEntry[i]->SetParent(this->Frame);
-    this->PositionEntry[i]->Create(pvApp);
+    this->PositionEntry[i]->Create();
     }
 
   this->Script("grid propagate %s 1",
@@ -317,7 +317,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
                  this->GetTclName());
     }
   this->PositionResetButton->SetParent(this->Frame);
-  this->PositionResetButton->Create(pvApp);
+  this->PositionResetButton->Create();
   this->PositionResetButton->SetText("Set Point Position to Center of Bounds");
   this->PositionResetButton->SetCommand(this, "PositionResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 

@@ -11,7 +11,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWWidgetWithScrollbars.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWScrollbar.h"
@@ -20,7 +19,7 @@
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.5");
+vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithScrollbars::vtkKWWidgetWithScrollbars()
@@ -48,7 +47,7 @@ vtkKWWidgetWithScrollbars::~vtkKWWidgetWithScrollbars()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::Create(vtkKWApplication *app)
+void vtkKWWidgetWithScrollbars::Create()
 {
   // Check if already created
 
@@ -60,7 +59,7 @@ void vtkKWWidgetWithScrollbars::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
 #if 0
   this->SetPadX(2); // or 1
@@ -73,12 +72,12 @@ void vtkKWWidgetWithScrollbars::Create(vtkKWApplication *app)
 
   if (this->VerticalScrollbarVisibility)
     {
-    this->CreateVerticalScrollbar(app);
+    this->CreateVerticalScrollbar();
     }
 
   if (this->HorizontalScrollbarVisibility)
     {
-    this->CreateHorizontalScrollbar(app);
+    this->CreateHorizontalScrollbar();
     }
 
   // Pack
@@ -91,7 +90,7 @@ void vtkKWWidgetWithScrollbars::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::CreateVerticalScrollbar(vtkKWApplication *app)
+void vtkKWWidgetWithScrollbars::CreateVerticalScrollbar()
 {
   if (!this->VerticalScrollBar)
     {
@@ -101,7 +100,7 @@ void vtkKWWidgetWithScrollbars::CreateVerticalScrollbar(vtkKWApplication *app)
   if (!this->VerticalScrollBar->IsCreated())
     {
     this->VerticalScrollBar->SetParent(this);
-    this->VerticalScrollBar->Create(app);
+    this->VerticalScrollBar->Create();
     this->VerticalScrollBar->SetOrientationToVertical();
     }
 }
@@ -124,7 +123,7 @@ void vtkKWWidgetWithScrollbars::AssociateVerticalScrollbarToWidget(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::CreateHorizontalScrollbar(vtkKWApplication *app)
+void vtkKWWidgetWithScrollbars::CreateHorizontalScrollbar()
 {
   if (!this->HorizontalScrollBar)
     {
@@ -134,7 +133,7 @@ void vtkKWWidgetWithScrollbars::CreateHorizontalScrollbar(vtkKWApplication *app)
   if (!this->HorizontalScrollBar->IsCreated())
     {
     this->HorizontalScrollBar->SetParent(this);
-    this->HorizontalScrollBar->Create(app);
+    this->HorizontalScrollBar->Create();
     this->HorizontalScrollBar->SetOrientationToHorizontal();
     }
 }
@@ -209,7 +208,7 @@ void vtkKWWidgetWithScrollbars::SetVerticalScrollbarVisibility(int arg)
   this->VerticalScrollbarVisibility = arg;
   if (this->VerticalScrollbarVisibility)
     {
-    this->CreateVerticalScrollbar(this->GetApplication());
+    this->CreateVerticalScrollbar();
     }
   this->Pack();
   this->Modified();
@@ -226,7 +225,7 @@ void vtkKWWidgetWithScrollbars::SetHorizontalScrollbarVisibility(int arg)
   this->HorizontalScrollbarVisibility = arg;
   if (this->HorizontalScrollbarVisibility)
     {
-    this->CreateHorizontalScrollbar(this->GetApplication());
+    this->CreateHorizontalScrollbar();
     }
   this->Pack();
   this->Modified();

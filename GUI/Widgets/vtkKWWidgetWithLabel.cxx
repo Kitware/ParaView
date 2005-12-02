@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithLabel);
-vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithLabel::vtkKWWidgetWithLabel()
@@ -60,7 +60,7 @@ int vtkKWWidgetWithLabel::HasLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithLabel::Create(vtkKWApplication *app)
+void vtkKWWidgetWithLabel::Create()
 {
   // Check if already created
 
@@ -72,13 +72,13 @@ void vtkKWWidgetWithLabel::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the label subwidget now if it has to be shown now
 
   if (this->LabelVisibility)
     {
-    this->CreateLabel(app);
+    this->CreateLabel();
     }
 
   // Subclasses will call this->Pack() here. Not now.
@@ -90,7 +90,7 @@ void vtkKWWidgetWithLabel::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithLabel::CreateLabel(vtkKWApplication *app)
+void vtkKWWidgetWithLabel::CreateLabel()
 {
   // Create the label. If the parent has been set before (i.e. by the subclass)
   // do not set it.
@@ -107,7 +107,7 @@ void vtkKWWidgetWithLabel::CreateLabel(vtkKWApplication *app)
     label->SetParent(this);
     }
 
-  label->Create(app);
+  label->Create();
   label->SetAnchorToWest();
   // -bd 0 -highlightthickness 0 -padx 0 -pady 0");
 
@@ -186,7 +186,7 @@ void vtkKWWidgetWithLabel::SetLabelVisibility(int _arg)
 
   if (this->LabelVisibility && this->IsCreated())
     {
-    this->CreateLabel(this->GetApplication());
+    this->CreateLabel();
     }
 
   this->Pack();

@@ -3,7 +3,6 @@
 #include "vtkKWHeaderAnnotationEditor.h"
 #include "vtkKWFrame.h"
 #include "vtkKWRenderWidget.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -42,7 +41,7 @@ vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
 
   this->hae_renderwidget = vtkKWRenderWidget::New();
   this->hae_renderwidget->SetParent(parent);
-  this->hae_renderwidget->Create(app);
+  this->hae_renderwidget->Create();
 
   this->hae_renderwidget->HeaderAnnotationVisibilityOn();
   this->hae_renderwidget->SetHeaderAnnotationText("Hello, World!");
@@ -77,7 +76,7 @@ vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
   
   this->hae_anno_editor = vtkKWHeaderAnnotationEditor::New();
   this->hae_anno_editor->SetParent(parent);
-  this->hae_anno_editor->Create(app);
+  this->hae_anno_editor->Create();
   this->hae_anno_editor->SetRenderWidget(this->hae_renderwidget);
 
   app->Script("pack %s -side left -anchor nw -expand n -padx 2 -pady 2", 

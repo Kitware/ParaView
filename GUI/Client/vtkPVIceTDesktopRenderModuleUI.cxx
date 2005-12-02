@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -51,7 +51,7 @@ vtkPVIceTDesktopRenderModuleUI::~vtkPVIceTDesktopRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
+void vtkPVIceTDesktopRenderModuleUI::Create()
 {
   // Skip over LOD res and threshold.
   
@@ -61,15 +61,16 @@ void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+  vtkPVApplication *pvapp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
 
   this->Script("pack forget %s",
                this->ParallelRenderParametersFrame->GetWidgetName());
 
   this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
-  this->OrderedCompositingCheck->Create(app);
+  this->OrderedCompositingCheck->Create();
   this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
   this->OrderedCompositingCheck->SetCommand(this,
                                             "OrderedCompositingCheckCallback");

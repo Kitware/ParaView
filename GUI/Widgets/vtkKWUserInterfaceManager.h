@@ -37,7 +37,6 @@
 
 #include "vtkKWObject.h"
 
-class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWWidget;
 class vtkKWUserInterfacePanel;
@@ -52,7 +51,7 @@ public:
   // Description:
   // Create the manager widget (i.e. the widget that will group and display
   // all user interface panels).
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   virtual int IsCreated();
 
   // Description:
@@ -213,6 +212,8 @@ protected:
   virtual void NumberOfPanelsChanged() {};
 
 private:
+
+  int ManagerIsCreated;
 
   vtkKWUserInterfaceManager(const vtkKWUserInterfaceManager&); // Not implemented
   void operator=(const vtkKWUserInterfaceManager&); // Not Implemented

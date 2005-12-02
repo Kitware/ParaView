@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.12");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrame::vtkKWPopupFrame()
@@ -52,7 +52,7 @@ vtkKWPopupFrame::~vtkKWPopupFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrame::Create(vtkKWApplication *app)
+void vtkKWPopupFrame::Create()
 {
   // Check if already created
 
@@ -64,7 +64,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // --------------------------------------------------------------
   // If in popup mode, create the popup button
@@ -77,7 +77,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app)
       }
     
     this->PopupButton->SetParent(this);
-    this->PopupButton->Create(app);
+    this->PopupButton->Create();
     }
 
   // --------------------------------------------------------------
@@ -93,7 +93,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app)
     this->Frame->SetParent(this);
     }
 
-  this->Frame->Create(app);
+  this->Frame->Create();
 
   this->Script("pack %s -side top -anchor nw -fill both -expand y",
                this->Frame->GetWidgetName());

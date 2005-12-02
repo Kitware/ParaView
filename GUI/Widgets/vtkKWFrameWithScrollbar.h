@@ -21,8 +21,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWFrameWithScrollbar : public vtkKWCoreWidget
 {
 public:
@@ -32,7 +30,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the the internal widget (technically a Tk frame).

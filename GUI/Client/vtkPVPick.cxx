@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.33");
+vtkCxxRevisionMacro(vtkPVPick, "1.34");
 
 
 //*****************************************************************************
@@ -246,14 +246,14 @@ void vtkPVPick::CreateProperties()
 
   //point label controls
   this->PointLabelFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->PointLabelFrame->Create(pvApp);
+  this->PointLabelFrame->Create();
   this->PointLabelFrame->SetLabelText("Point Label Display");
   this->Script("pack %s -fill x -expand true",
                this->PointLabelFrame->GetWidgetName());
   this->PointLabelFrame->CollapseButtonCallback();
 
   this->PointLabelCheck->SetParent(this->PointLabelFrame->GetFrame());
-  this->PointLabelCheck->Create(pvApp);
+  this->PointLabelCheck->Create();
   this->PointLabelCheck->SetText("Label Point Ids");
   this->PointLabelCheck->SetCommand(this, "PointLabelCheckCallback");
   this->PointLabelCheck->SetBalloonHelpString(
@@ -263,7 +263,7 @@ void vtkPVPick::CreateProperties()
   this->PointLabelCheck->SetSelectedState(this->GetPointLabelVisibility());
 
   this->PointLabelFontSizeLabel->SetParent(this->PointLabelFrame->GetFrame());
-  this->PointLabelFontSizeLabel->Create(pvApp);
+  this->PointLabelFontSizeLabel->Create();
   this->PointLabelFontSizeLabel->SetText("Point Id size:");
   this->PointLabelFontSizeLabel->SetBalloonHelpString(
     "This scale adjusts the size of the point ID labels.");
@@ -274,7 +274,7 @@ void vtkPVPick::CreateProperties()
   this->PointLabelFontSizeThumbWheel->SetResolution(1.0);
   this->PointLabelFontSizeThumbWheel->SetMinimumValue(4.0);
   this->PointLabelFontSizeThumbWheel->ClampMinimumValueOn();
-  this->PointLabelFontSizeThumbWheel->Create(pvApp);
+  this->PointLabelFontSizeThumbWheel->Create();
   this->PointLabelFontSizeThumbWheel->DisplayEntryOn();
   this->PointLabelFontSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->PointLabelFontSizeThumbWheel->SetBalloonHelpString("Set the point ID label font size.");
@@ -294,14 +294,14 @@ void vtkPVPick::CreateProperties()
 
   //temporal plot
   this->XYPlotFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->XYPlotFrame->Create(pvApp);
+  this->XYPlotFrame->Create();
   this->XYPlotFrame->SetLabelText("Temporal Plot");
   this->Script("pack %s -fill x -expand true",
                this->XYPlotFrame->GetWidgetName());
   this->XYPlotFrame->CollapseButtonCallback();
 
   this->ShowXYPlotToggle->SetParent(this->XYPlotFrame->GetFrame());
-  this->ShowXYPlotToggle->Create(pvApp);
+  this->ShowXYPlotToggle->Create();
   this->ShowXYPlotToggle->SetText("Show XY-Plot");
   this->ShowXYPlotToggle->SetSelectedState(0);
   this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
@@ -364,7 +364,7 @@ void vtkPVPick::CreateProperties()
   this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
 
   this->SaveButton->SetParent(this->XYPlotFrame->GetFrame());
-  this->SaveButton->Create(pvApp); 
+  this->SaveButton->Create(); 
   this->SaveButton->SetCommand(this, "SaveDialogCallback");
   this->SaveButton->SetText("Save as CSV");
   vtkKWLoadSaveDialog *dlg = this->SaveButton->GetLoadSaveDialog();
@@ -376,7 +376,7 @@ void vtkPVPick::CreateProperties()
 
   //data values drawn on parameters tab
   this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->DataFrame->Create(pvApp);
+  this->DataFrame->Create();
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
 
@@ -520,7 +520,7 @@ void vtkPVPick::AcceptCallbackInternal()
       svp->SetNumberOfElements(e);
 
       this->ArraySelection->SetSMProperty(svp);
-      this->ArraySelection->Create(this->GetPVApplication());
+      this->ArraySelection->Create();
       }
     else
       {
@@ -706,7 +706,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   // First the point/cell index label.
   kwl = vtkKWLabel::New();
   kwl->SetParent(this->DataFrame);
-  kwl->Create(this->GetPVApplication());
+  kwl->Create();
   ostrstream kwlStr;
   kwlStr << labelArg  << ": " << idx << ends;
   kwl->SetText(kwlStr.str());
@@ -787,7 +787,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
 
   kwl = vtkKWLabel::New();
   kwl->SetParent(this->DataFrame);
-  kwl->Create(this->GetPVApplication());
+  kwl->Create();
   kwl->SetText( label.c_str() );
   this->LabelCollection->AddItem(kwl);
   this->Script("grid %s -column 2 -row %d -sticky nw",

@@ -13,12 +13,11 @@
 =========================================================================*/
 #include "vtkKWListBox.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.46");
+vtkCxxRevisionMacro(vtkKWListBox, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -238,11 +237,11 @@ int vtkKWListBox::Append(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::Create(vtkKWApplication *app)
+void vtkKWListBox::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "listbox"))
+  if (!this->Superclass::CreateSpecificTkWidget("listbox"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

@@ -23,8 +23,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
-
 class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWCoreWidget
 {
 public:
@@ -34,7 +32,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the one of several styles for manipulating the selection. 

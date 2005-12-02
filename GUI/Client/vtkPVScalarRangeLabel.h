@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // The scalar range display gets its array object from the array menu.

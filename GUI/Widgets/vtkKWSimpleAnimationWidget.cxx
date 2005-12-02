@@ -13,9 +13,9 @@
 =========================================================================*/
 #include "vtkKWSimpleAnimationWidget.h"
 
+#include "vtkKWApplication.h"
 #include "vtkCamera.h"
 #include "vtkImageData.h"
-#include "vtkKWApplication.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWIcon.h"
@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -143,7 +143,7 @@ vtkKWSimpleAnimationWidget::~vtkKWSimpleAnimationWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::Create(vtkKWApplication *app)
+void vtkKWSimpleAnimationWidget::Create()
 {
   if (this->IsCreated())
     {
@@ -153,7 +153,7 @@ void vtkKWSimpleAnimationWidget::Create(vtkKWApplication *app)
   
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
   
   ostrstream tk_cmd;
 
@@ -173,7 +173,7 @@ void vtkKWSimpleAnimationWidget::Create(vtkKWApplication *app)
     }
 
   this->Parameters->SetParent(this);
-  this->Parameters->Create(app);
+  this->Parameters->Create();
   this->Parameters->PackHorizontallyOff();
   this->Parameters->ExpandWidgetsOn();
   
@@ -269,7 +269,7 @@ void vtkKWSimpleAnimationWidget::Create(vtkKWApplication *app)
   this->AnimationButtonSet->PackHorizontallyOn();
   this->AnimationButtonSet->SetWidgetsPadX(2);
   this->AnimationButtonSet->SetWidgetsPadY(2);
-  this->AnimationButtonSet->Create(app);
+  this->AnimationButtonSet->Create();
 
   tk_cmd << "pack " << this->AnimationButtonSet->GetWidgetName()
          << " -side top -anchor w -expand y -fill x -pady 2" << endl;
@@ -300,7 +300,7 @@ void vtkKWSimpleAnimationWidget::Create(vtkKWApplication *app)
     }
 
   this->HelpLabel->SetParent(this);
-  this->HelpLabel->Create(app);
+  this->HelpLabel->Create();
   this->HelpLabel->GetLabel()->SetImageToPredefinedIcon(
     vtkKWIcon::IconHelpBubble);
   this->HelpLabel->ExpandWidgetOn();
@@ -528,7 +528,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->SetParent(this->GetParentWindow());
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     save_dialog, "SavePath");
-  save_dialog->Create(this->GetApplication());
+  save_dialog->Create();
   save_dialog->SetTitle("Save Animation");
   save_dialog->SaveDialogOn();
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
@@ -574,7 +574,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
 
   vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
   msg_dialog->SetMasterWindow(this->GetParentWindow());
-  msg_dialog->Create(this->GetApplication());
+  msg_dialog->Create();
 
   // Is this a video format
 
@@ -604,20 +604,20 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   
   vtkKWFrame *frame = vtkKWFrame::New();
   frame->SetParent(msg_dialog->GetTopFrame());
-  frame->Create(this->GetApplication());
+  frame->Create();
   
   int orig_width = this->RenderWidget->GetRenderWindow()->GetSize()[0];
   int orig_height = this->RenderWidget->GetRenderWindow()->GetSize()[1];
   
   vtkKWEntryWithLabel *width_entry = vtkKWEntryWithLabel::New();
   width_entry->SetParent(frame);
-  width_entry->Create(this->GetApplication());
+  width_entry->Create();
   width_entry->SetLabelText("Width:");
   width_entry->GetWidget()->SetValueAsInt(orig_width);
   
   vtkKWEntryWithLabel *height_entry = vtkKWEntryWithLabel::New();
   height_entry->SetParent(frame);
-  height_entry->Create(this->GetApplication());
+  height_entry->Create();
   height_entry->SetLabelText("Height:");
   height_entry->GetWidget()->SetValueAsInt(orig_height);
   

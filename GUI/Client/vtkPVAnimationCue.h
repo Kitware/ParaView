@@ -60,7 +60,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication* app);
+  virtual void Create();
 
   // Description:
   // TimeLineParent is the frame that contains the timelines.

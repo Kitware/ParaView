@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Get the @WidgetType@ for which we addded the scrollbars
@@ -72,8 +72,8 @@ protected:
   // Create scrollbars and associate the scrollbars to a widget by
   // setting up the callbacks between both instances.
   // Re-implemented to set the associated now that we know the internal widget
-  virtual void CreateHorizontalScrollbar(vtkKWApplication *app);
-  virtual void CreateVerticalScrollbar(vtkKWApplication *app);
+  virtual void CreateHorizontalScrollbar();
+  virtual void CreateVerticalScrollbar();
 
   // Description:
   // Pack.

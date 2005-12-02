@@ -56,7 +56,7 @@ protected:
   vtkPVExponentialKeyFrame();
   ~vtkPVExponentialKeyFrame();
 
-  virtual void ChildCreate(vtkKWApplication* app);
+  virtual void ChildCreate();
 
   vtkKWLabel* BaseLabel;
   vtkKWThumbWheel* BaseThumbWheel;

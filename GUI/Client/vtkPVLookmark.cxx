@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.63");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.64");
 
 
 //*****************************************************************************
@@ -265,10 +265,10 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
     vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dialog->SetModal(0);
   dialog->SetStyleToOkCancel();
-  dialog->Create(this->GetPVApplication());
+  dialog->Create();
   vtkKWMenuButton *menu = vtkKWMenuButton::New();
   menu->SetParent(dialog->GetBottomFrame());
-  menu->Create(this->GetPVApplication());
+  menu->Create();
   this->Script("pack %s",menu->GetWidgetName());
   itChoices = sources->NewIterator();
   itChoices->InitTraversal();
@@ -396,10 +396,10 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, ch
     vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dialog->SetModal(0);
   dialog->SetStyleToOkCancel();
-  dialog->Create(this->GetPVApplication());
+  dialog->Create();
   vtkKWMenuButton *menu = vtkKWMenuButton::New();
   menu->SetParent(dialog->GetBottomFrame());
-  menu->Create(this->GetPVApplication());
+  menu->Create();
   this->Script("pack %s",menu->GetWidgetName());
   itChoices->InitTraversal();
   while(!itChoices->IsDoneWithTraversal())
@@ -511,10 +511,10 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
       //dialog->SetModal(0);
       dialog->SetStyleToOkOtherCancel();
       dialog->SetOtherButtonText("Open");
-      dialog->Create(this->GetPVApplication());
+      dialog->Create();
       vtkKWMenuButton *menu = vtkKWMenuButton::New();
       menu->SetParent(dialog->GetBottomFrame());
-      menu->Create(this->GetPVApplication());
+      menu->Create();
       this->Script("pack %s",menu->GetWidgetName());
       itChoices->InitTraversal();
       while(!itChoices->IsDoneWithTraversal())
@@ -663,7 +663,7 @@ void vtkPVLookmark::AddLookmarkToolbarButton(vtkKWIcon *icon)
     {
     this->ToolbarButton = vtkKWPushButton::New();
     this->ToolbarButton->SetParent(win->GetLookmarkToolbar()->GetFrame());
-    this->ToolbarButton->Create(this->GetPVApplication());
+    this->ToolbarButton->Create();
     this->ToolbarButton->SetImageToIcon(icon);
     ostrstream os;
     os << this->GetName() << " -- " << this->CommentsText->GetText() << ends;
@@ -1589,7 +1589,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
           dlg2->SetOptions(
             vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
           dlg2->SetModal(0);
-          dlg2->Create(this->GetPVApplication());
+          dlg2->Create();
           string1 = "Please use the Append filter panel to select the inputs to the filter. Below is a list of recommendations based one the inputs used when this lookmark was created. Press OK when you are done.";
           string1.append("\n");
           while(ptr.rfind("AcceptCallback",ptr.size())==vtkstd::string::npos)

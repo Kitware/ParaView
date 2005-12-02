@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.52");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -129,7 +129,7 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Create(vtkKWApplication *app)
+void vtkPVMinMax::Create()
 {
   // Check if already created
 
@@ -141,7 +141,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // For getting the widget in a script.
 
@@ -157,12 +157,12 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  this->MinFrame->Create(app);
+  this->MinFrame->Create();
   this->Script("pack %s -side top -fill x -expand t", 
                this->MinFrame->GetWidgetName());
   if (this->PackVertically)
     {
-    this->MaxFrame->Create(app);
+    this->MaxFrame->Create();
     this->Script("pack %s -side top -fill x -expand t", 
                  this->MaxFrame->GetWidgetName());
     }
@@ -171,7 +171,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
   if ( this->ShowMinLabel )
     {
     this->MinLabel->SetParent(this->MinFrame);
-    this->MinLabel->Create(app);
+    this->MinLabel->Create();
     this->MinLabel->SetWidth(this->MinLabelWidth);
     this->MinLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 
@@ -179,7 +179,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
     }
 
   this->MinScale->SetParent(this->MinFrame);
-  this->MinScale->Create(this->GetApplication());
+  this->MinScale->Create();
   this->MinScale->SetRange(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX);
   this->MinScale->SetCommand(this, "MinValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
@@ -195,7 +195,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
       {
       this->MaxLabel->SetParent(this->MinFrame);
       }
-    this->MaxLabel->Create(app);
+    this->MaxLabel->Create();
     this->MaxLabel->SetWidth(this->MaxLabelWidth);
     this->MaxLabel->SetJustificationToRight();
     this->Script("pack %s -side left -anchor s", 
@@ -210,7 +210,7 @@ void vtkPVMinMax::Create(vtkKWApplication *app)
     {
     this->MaxScale->SetParent(this->MinFrame);
     }
-  this->MaxScale->Create(this->GetApplication());
+  this->MaxScale->Create();
   this->MaxScale->SetRange(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX);
   this->MaxScale->SetCommand(this, "MaxValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 

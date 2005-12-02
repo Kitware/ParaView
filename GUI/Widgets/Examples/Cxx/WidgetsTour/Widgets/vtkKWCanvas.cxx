@@ -18,7 +18,7 @@ KWWidgetsTourItem* vtkKWCanvasEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
 
   vtkKWCanvas *canvas1 = vtkKWCanvas::New();
   canvas1->SetParent(parent);
-  canvas1->Create(app);
+  canvas1->Create();
   canvas1->SetWidth(400);
   canvas1->SetHeight(200);
   canvas1->SetBorderWidth(2);

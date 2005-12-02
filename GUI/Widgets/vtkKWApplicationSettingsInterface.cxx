@@ -39,7 +39,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.49");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -180,7 +180,7 @@ void vtkKWApplicationSettingsInterface::SetWindow(vtkKWWindow *arg)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
+void vtkKWApplicationSettingsInterface::Create()
 {
   if (this->IsCreated())
     {
@@ -190,7 +190,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   ostrstream tk_cmd;
   vtkKWWidget *page;
@@ -211,7 +211,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->InterfaceSettingsFrame->Create(app);
+  this->InterfaceSettingsFrame->Create();
   this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
@@ -229,7 +229,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ConfirmExitCheckButton->SetParent(frame);
-  this->ConfirmExitCheckButton->Create(app);
+  this->ConfirmExitCheckButton->Create();
   this->ConfirmExitCheckButton->SetText("Confirm on exit");
   this->ConfirmExitCheckButton->SetCommand(this, "ConfirmExitCallback");
   this->ConfirmExitCheckButton->SetBalloonHelpString(
@@ -247,7 +247,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->SaveUserInterfaceGeometryCheckButton->SetParent(frame);
-  this->SaveUserInterfaceGeometryCheckButton->Create(app);
+  this->SaveUserInterfaceGeometryCheckButton->Create();
   this->SaveUserInterfaceGeometryCheckButton->SetText(
     "Save user interface geometry on exit");
   this->SaveUserInterfaceGeometryCheckButton->SetCommand(
@@ -263,7 +263,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Interface settings : Show splash screen ?
 
-  if (app->GetSupportSplashScreen())
+  if (this->GetApplication()->GetSupportSplashScreen())
     {
     if (!this->SplashScreenVisibilityCheckButton)
       {
@@ -271,7 +271,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
       }
 
     this->SplashScreenVisibilityCheckButton->SetParent(frame);
-    this->SplashScreenVisibilityCheckButton->Create(app);
+    this->SplashScreenVisibilityCheckButton->Create();
     this->SplashScreenVisibilityCheckButton->SetText("Show splash screen");
     this->SplashScreenVisibilityCheckButton->SetCommand(
       this, "SplashScreenVisibilityCallback");
@@ -291,7 +291,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->BalloonHelpVisibilityCheckButton->SetParent(frame);
-  this->BalloonHelpVisibilityCheckButton->Create(app);
+  this->BalloonHelpVisibilityCheckButton->Create();
   this->BalloonHelpVisibilityCheckButton->SetText("Show balloon help");
   this->BalloonHelpVisibilityCheckButton->SetCommand(
     this, "BalloonHelpVisibilityCallback");
@@ -311,7 +311,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ViewPanelPositionOptionMenu->SetParent(frame);
-  this->ViewPanelPositionOptionMenu->Create(app);
+  this->ViewPanelPositionOptionMenu->Create();
 
   this->ViewPanelPositionOptionMenu->GetLabel()->SetText(
     "View panel position:");
@@ -333,7 +333,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
-  this->InterfaceCustomizationFrame->Create(app);
+  this->InterfaceCustomizationFrame->Create();
   this->InterfaceCustomizationFrame->SetLabelText("Drag & Drop Settings");
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
@@ -351,7 +351,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ResetDragAndDropButton->SetParent(frame);
-  this->ResetDragAndDropButton->Create(app);
+  this->ResetDragAndDropButton->Create();
   this->ResetDragAndDropButton->SetText("Reset Interface To Default State");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
@@ -376,7 +376,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->ToolbarSettingsFrame->Create(app);
+  this->ToolbarSettingsFrame->Create();
   this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
@@ -394,7 +394,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->FlatFrameCheckButton->SetParent(frame);
-  this->FlatFrameCheckButton->Create(app);
+  this->FlatFrameCheckButton->Create();
   this->FlatFrameCheckButton->SetText("Flat frame");
   this->FlatFrameCheckButton->SetCommand(this, "FlatFrameCallback");
   this->FlatFrameCheckButton->SetBalloonHelpString(
@@ -412,7 +412,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->FlatButtonsCheckButton->SetParent(frame);
-  this->FlatButtonsCheckButton->Create(app);
+  this->FlatButtonsCheckButton->Create();
   this->FlatButtonsCheckButton->SetText("Flat buttons");
   this->FlatButtonsCheckButton->SetCommand(this, "FlatButtonsCallback");
   this->FlatButtonsCheckButton->SetBalloonHelpString(
@@ -430,7 +430,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
-  this->PrintSettingsFrame->Create(app);
+  this->PrintSettingsFrame->Create();
   this->PrintSettingsFrame->SetLabelText(
     vtkKWApplicationSettingsInterface::PrintSettingsLabel);
     
@@ -449,7 +449,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->DPIOptionMenu->SetParent(frame);
-  this->DPIOptionMenu->Create(app);
+  this->DPIOptionMenu->Create();
 
   this->DPIOptionMenu->GetLabel()->SetText("DPI:");
 
@@ -551,7 +551,7 @@ void vtkKWApplicationSettingsInterface::Update()
     uim_nb = vtkKWUserInterfaceManagerNotebook::SafeDownCast(
       this->Window->GetMainUserInterfaceManager());
     }
-  if (!uim_nb)
+  if (this->ResetDragAndDropButton && !uim_nb)
     {
     this->ResetDragAndDropButton->SetEnabled(0);
     }

@@ -13,7 +13,6 @@
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWSimpleAnimationWidget.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 #include "vtkKWWindowLevelPresetSelector.h"
 #include "vtkObjectFactory.h"
@@ -29,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.9");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.10");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -67,14 +66,14 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   vtkKWWindow *win = vtkKWWindow::New();
   win->SupportHelpOn();
   app->AddWindow(win);
-  win->Create(app);
+  win->Create();
   win->SecondaryPanelVisibilityOff();
 
   // Add a render widget, attach it to the view frame, and pack
   
   this->RenderWidget = vtkKWRenderWidget::New();
   this->RenderWidget->SetParent(win->GetViewFrame());
-  this->RenderWidget->Create(app);
+  this->RenderWidget->Create();
   this->RenderWidget->CornerAnnotationVisibilityOn();
 
   app->Script("pack %s -expand y -fill both -anchor c -expand y", 
@@ -130,7 +129,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   this->SliceScale = vtkKWScale::New();
   this->SliceScale->SetParent(win->GetViewPanelFrame());
-  this->SliceScale->Create(app);
+  this->SliceScale->Create();
   this->SliceScale->SetCommand(this, "SetSliceFromScaleCallback");
 
   this->UpdateSliceScale();
@@ -144,7 +143,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
     vtkKWMenuButtonWithSpinButtonsWithLabel::New();
 
   orientation_menubutton->SetParent(win->GetMainPanelFrame());
-  orientation_menubutton->Create(app);
+  orientation_menubutton->Create();
   orientation_menubutton->SetLabelText("Orientation:");
   orientation_menubutton->SetPadX(2);
   orientation_menubutton->SetPadY(2);
@@ -164,7 +163,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   vtkKWFrameWithLabel *wl_frame = vtkKWFrameWithLabel::New();
   wl_frame->SetParent(win->GetMainPanelFrame());
-  wl_frame->Create(app);
+  wl_frame->Create();
   wl_frame->SetLabelText("Window/Level Presets");
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
@@ -173,7 +172,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   this->WindowLevelPresetSelector = vtkKWWindowLevelPresetSelector::New();
 
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
-  this->WindowLevelPresetSelector->Create(app);
+  this->WindowLevelPresetSelector->Create();
   this->WindowLevelPresetSelector->ThumbnailColumnVisibilityOn();
   this->WindowLevelPresetSelector->SetPresetAddCommand(
     this, "WindowLevelPresetAddCallback");
@@ -191,7 +190,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   vtkKWFrameWithLabel *animation_frame = vtkKWFrameWithLabel::New();
   animation_frame->SetParent(win->GetMainPanelFrame());
-  animation_frame->Create(app);
+  animation_frame->Create();
   animation_frame->SetLabelText("Movie Creator");
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
@@ -200,7 +199,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   vtkKWSimpleAnimationWidget *animation_widget = 
     vtkKWSimpleAnimationWidget::New();
   animation_widget->SetParent(animation_frame->GetFrame());
-  animation_widget->Create(app);
+  animation_widget->Create();
   animation_widget->SetRenderWidget(this->RenderWidget);
   animation_widget->SetAnimationTypeToSlice();
   animation_widget->SetSliceSetCommand(this, "SetSliceCallback");

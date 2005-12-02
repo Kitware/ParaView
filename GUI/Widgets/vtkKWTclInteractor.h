@@ -20,7 +20,6 @@
 
 #include "vtkKWTopLevel.h"
 
-class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWPushButton;
 class vtkKWEntry;
@@ -36,7 +35,7 @@ public:
   
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
   
   // Description:
   // Append text to the display window. Can be used for sending

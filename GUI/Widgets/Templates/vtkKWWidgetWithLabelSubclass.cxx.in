@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithLabel);
-vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.4");
+vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.5");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithLabel::@WidgetType@WithLabel()
@@ -46,7 +46,7 @@ vtkCxxRevisionMacro(@WidgetType@WithLabel, "1.4");
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@WithLabel::Create(vtkKWApplication *app)
+void @WidgetType@WithLabel::Create()
 {
   // Check if already created
 
@@ -58,7 +58,7 @@ void @WidgetType@WithLabel::Create(vtkKWApplication *app)
 
   // Call the superclass
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the widget
 
@@ -66,7 +66,7 @@ void @WidgetType@WithLabel::Create(vtkKWApplication *app)
     {
     this->Widget->SetParent(this);
     }
-  this->Widget->Create(app);
+  this->Widget->Create();
   if (!this->Widget->IsCreated())
     {
     vtkErrorMacro(<< this->GetClassName() << " failed creating @WidgetType@");

@@ -21,7 +21,6 @@
 
 #include "vtkKWCoreWidget.h"
 
-class vtkKWApplication;
 class vtkKWMenu;
 class vtkKWIcon;
 
@@ -34,7 +33,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set/Get the current entry of this option menu.

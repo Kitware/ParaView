@@ -14,11 +14,10 @@
 #include "vtkKWEntry.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkKWApplication.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.73");
+vtkCxxRevisionMacro(vtkKWEntry, "1.74");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -35,11 +34,11 @@ vtkKWEntry::~vtkKWEntry()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::Create(vtkKWApplication *app)
+void vtkKWEntry::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(app, "entry"))
+  if (!this->Superclass::CreateSpecificTkWidget("entry"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.263");
+vtkCxxRevisionMacro(vtkKWApplication, "1.264");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -290,6 +290,10 @@ int vtkKWApplication::AddWindow(vtkKWWindowBase *win)
     {
     this->Internals->Windows.push_back(win);
     win->Register(this);
+    if (!win->GetApplication())
+      {
+      win->SetApplication(this);
+      }
     return 1;
     }
   return 0;
@@ -905,7 +909,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
   dialog->SetDialogName(vtkKWApplication::ExitDialogName);
-  dialog->Create(this);
+  dialog->Create();
   dialog->SetText(msg.c_str());
   dialog->SetTitle(title.c_str());
 
@@ -1021,7 +1025,7 @@ void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
     {
     this->AboutDialog->SetMasterWindow(master);
     this->AboutDialog->HideDecorationOn();
-    this->AboutDialog->Create(this);
+    this->AboutDialog->Create();
     this->AboutDialog->SetBorderWidth(1);
     this->AboutDialog->SetReliefToSolid();
     }
@@ -1048,7 +1052,7 @@ void vtkKWApplication::ConfigureAboutDialog()
       if (!this->AboutDialogImage->IsCreated())
         {
         this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
-        this->AboutDialogImage->Create(this);
+        this->AboutDialogImage->Create();
         }
       this->AboutDialogImage->SetConfigurationOption("-image", img_name);
       this->Script("pack %s -side top", 
@@ -1074,7 +1078,7 @@ void vtkKWApplication::ConfigureAboutDialog()
   if (!this->AboutRuntimeInfo->IsCreated())
     {
     this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
-    this->AboutRuntimeInfo->Create(this);
+    this->AboutRuntimeInfo->Create();
     this->AboutRuntimeInfo->VerticalScrollbarVisibilityOn();
     this->AboutRuntimeInfo->HorizontalScrollbarVisibilityOff();
 
@@ -1153,7 +1157,8 @@ vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
   if (!this->SplashScreen)
     {
     this->SplashScreen = vtkKWSplashScreen::New();
-    this->SplashScreen->Create(this);
+    this->SplashScreen->SetApplication(this);
+    this->SplashScreen->Create();
     }
   return this->SplashScreen;
 }
@@ -1787,6 +1792,7 @@ int vtkKWApplication::SendEmail(
         }
 
       vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+      dlg->SetApplication(this);
       dlg->SetStyleToOkCancel();
       dlg->SetOptions(vtkKWMessageDialog::ErrorIcon);
       dlg->SetTitle("Send Email Error");
@@ -1797,12 +1803,12 @@ int vtkKWApplication::SendEmail(
         dlg->SetStyleToOkOtherCancel();
         dlg->SetOtherButtonText("Locate attachment");
         }
-      dlg->Create(this);
+      dlg->Create();
       dlg->SetIcon();
 
       vtkKWSeparator *sep = vtkKWSeparator::New();
       sep->SetParent(dlg->GetBottomFrame());
-      sep->Create(this);
+      sep->Create();
 
       this->Script("pack %s -side top -padx 2 -pady 2 -expand 1 -fill x",
                    sep->GetWidgetName());
@@ -1811,7 +1817,7 @@ int vtkKWApplication::SendEmail(
 
       vtkKWEntryWithLabel *to_entry = vtkKWEntryWithLabel::New();
       to_entry->SetParent(dlg->GetBottomFrame());
-      to_entry->Create(this);
+      to_entry->Create();
       to_entry->SetLabelText("To:");
       to_entry->SetLabelWidth(label_width);
       to_entry->GetWidget()->SetValue(to ? to : "");
@@ -1825,7 +1831,7 @@ int vtkKWApplication::SendEmail(
 
       vtkKWEntryWithLabel *subject_entry = vtkKWEntryWithLabel::New();
       subject_entry->SetParent(dlg->GetBottomFrame());
-      subject_entry->Create(this);
+      subject_entry->Create();
       subject_entry->SetLabelText("Subject:");
       subject_entry->SetLabelWidth(label_width);
       subject_entry->GetWidget()->SetValue(subject ? subject : "");
@@ -1839,7 +1845,7 @@ int vtkKWApplication::SendEmail(
 
       vtkKWEntryWithLabel *attachment_entry = vtkKWEntryWithLabel::New();
       attachment_entry->SetParent(dlg->GetBottomFrame());
-      attachment_entry->Create(this);
+      attachment_entry->Create();
       attachment_entry->SetLabelText("Attachment:");
       attachment_entry->SetLabelWidth(label_width);
       attachment_entry->GetWidget()->SetValue(
@@ -1854,7 +1860,7 @@ int vtkKWApplication::SendEmail(
 
       vtkKWTextWithScrollbars *message_text = vtkKWTextWithScrollbars::New();
       message_text->SetParent(dlg->GetBottomFrame());
-      message_text->Create(this);
+      message_text->Create();
       message_text->VerticalScrollbarVisibilityOn();
       message_text->HorizontalScrollbarVisibilityOff();
       vtkKWText *text_widget = message_text->GetWidget();

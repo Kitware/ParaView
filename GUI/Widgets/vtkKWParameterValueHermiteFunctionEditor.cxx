@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.10");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.11");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -107,7 +107,7 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntries(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::Create(vtkKWApplication *app)
+void vtkKWParameterValueHermiteFunctionEditor::Create()
 {
   // Check if already created
 
@@ -119,20 +119,20 @@ void vtkKWParameterValueHermiteFunctionEditor::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   // Create the midpoint entry
 
   if (this->MidPointEntryVisibility && this->PointEntriesVisibility)
     {
-    this->CreateMidPointEntry(app);
+    this->CreateMidPointEntry();
     }
 
   // Create the sharpness entry
 
   if (this->SharpnessEntryVisibility && this->PointEntriesVisibility)
     {
-    this->CreateSharpnessEntry(app);
+    this->CreateSharpnessEntry();
     }
 
   // Pack the widget
@@ -155,26 +155,25 @@ vtkKWScaleWithEntry* vtkKWParameterValueHermiteFunctionEditor::GetMidPointEntry(
         this->PointEntriesVisibility && 
         this->IsCreated())
       {
-      this->CreateMidPointEntry(this->GetApplication());
+      this->CreateMidPointEntry();
       }
     }
   return this->MidPointEntry;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::CreateMidPointEntry(
-  vtkKWApplication *app)
+void vtkKWParameterValueHermiteFunctionEditor::CreateMidPointEntry()
 {
   if (this->GetMidPointEntry() && !this->MidPointEntry->IsCreated())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
 
     // If we are displaying the entry in the top right frame, make sure it
     // has been created. 
 
     this->MidPointEntry->SetParent(this->PointEntriesFrame);
     this->MidPointEntry->PopupModeOn();
-    this->MidPointEntry->Create(app);
+    this->MidPointEntry->Create();
     this->MidPointEntry->SetEntryWidth(7);
     this->MidPointEntry->SetLabelText("M:");
     this->MidPointEntry->SetLength(100);
@@ -204,26 +203,25 @@ vtkKWScaleWithEntry* vtkKWParameterValueHermiteFunctionEditor::GetSharpnessEntry
         this->PointEntriesVisibility &&
         this->IsCreated())
       {
-      this->CreateSharpnessEntry(this->GetApplication());
+      this->CreateSharpnessEntry();
       }
     }
   return this->SharpnessEntry;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::CreateSharpnessEntry(
-  vtkKWApplication *app)
+void vtkKWParameterValueHermiteFunctionEditor::CreateSharpnessEntry()
 {
   if (this->GetSharpnessEntry() && !this->SharpnessEntry->IsCreated())
     {
-    this->CreatePointEntriesFrame(app);
+    this->CreatePointEntriesFrame();
 
     // If we are displaying the entry in the top right frame, make sure it
     // has been created. 
 
     this->SharpnessEntry->SetParent(this->PointEntriesFrame);
     this->SharpnessEntry->PopupModeOn();
-    this->SharpnessEntry->Create(app);
+    this->SharpnessEntry->Create();
     this->SharpnessEntry->SetEntryWidth(7);
     this->SharpnessEntry->SetLabelText("S:");
     this->SharpnessEntry->SetLength(100);
@@ -330,7 +328,7 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointEntryVisibility(int ar
       this->PointEntriesVisibility && 
       this->IsCreated())
     {
-    this->CreateMidPointEntry(this->GetApplication());
+    this->CreateMidPointEntry();
     }
 
   this->UpdateMidPointEntry(this->GetSelectedMidPoint());
@@ -479,7 +477,7 @@ void vtkKWParameterValueHermiteFunctionEditor::SetSharpnessEntryVisibility(
       this->PointEntriesVisibility && 
       this->IsCreated())
     {
-    this->CreateSharpnessEntry(this->GetApplication());
+    this->CreateSharpnessEntry();
     }
 
   this->UpdateSharpnessEntry(this->GetSelectedMidPoint());
@@ -647,7 +645,7 @@ void vtkKWParameterValueHermiteFunctionEditor::SetMidPointGuidelineValueVisibili
 
   if (this->MidPointGuidelineValueVisibility && this->IsCreated())
     {
-    this->CreateGuidelineValueCanvas(this->GetApplication());
+    this->CreateGuidelineValueCanvas();
     }
 
   this->Redraw();

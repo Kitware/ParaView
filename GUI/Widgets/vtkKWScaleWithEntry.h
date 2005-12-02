@@ -40,7 +40,6 @@
 
 #include "vtkKWScaleWithLabel.h"
 
-class vtkKWApplication;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWPushButton;
@@ -55,7 +54,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the range for this scale.
@@ -283,7 +282,7 @@ protected:
 
   // Description:
   // Create the entry
-  virtual void CreateEntry(vtkKWApplication *app);
+  virtual void CreateEntry();
 
   // Description:
   // Update internal widgets value

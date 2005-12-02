@@ -8,7 +8,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
   vtkKWScale scale1
   scale1 SetParent $parent
-  scale1 Create $app
+  scale1 Create
   scale1 SetRange 0.0 100.0
   scale1 SetResolution 1.0
   scale1 SetLength 150
@@ -22,7 +22,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
   vtkKWScaleWithEntry scale2
   scale2 SetParent $parent
-  scale2 Create $app
+  scale2 Create
   scale2 SetRange 0.0 100.0
   scale2 SetResolution 1.0
   #  [[scale2 GetScale] SetLength 350]
@@ -41,7 +41,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
   vtkKWScaleWithEntry scale2b
   scale2b SetParent $parent
-  scale2b Create $app
+  scale2b Create
   scale2b SetRange 0.0 100.0
   scale2b SetResolution 1.0
   [scale2b GetScale] SetLength 350
@@ -62,7 +62,7 @@ proc vtkKWScaleEntryPoint {parent win} {
   vtkKWScaleWithEntry scale3
   scale3 SetParent $parent
   scale3 PopupModeOn
-  scale3 Create $app
+  scale3 Create
   scale3 SetRange 0.0 100.0
   scale3 SetResolution 1.0
   scale3 SetLabelText "A popup scale:"
@@ -81,7 +81,7 @@ proc vtkKWScaleEntryPoint {parent win} {
 
   vtkKWScaleSet scale_set
   scale_set SetParent $parent
-  scale_set Create $app
+  scale_set Create
   scale_set SetBorderWidth 2
   scale_set SetReliefToGroove
   scale_set SetMaximumNumberOfWidgetsInPackingDirection 2

@@ -13,15 +13,14 @@
 =========================================================================*/
 #include "vtkKWCompositeWidget.h"
 
-#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCompositeWidget );
-vtkCxxRevisionMacro(vtkKWCompositeWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWCompositeWidget, "1.4");
 
 //----------------------------------------------------------------------------
-void vtkKWCompositeWidget::Create(vtkKWApplication *app)
+void vtkKWCompositeWidget::Create()
 {
   // Check if already created
 
@@ -33,7 +32,7 @@ void vtkKWCompositeWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 }
 
 //----------------------------------------------------------------------------

@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -74,7 +74,7 @@ vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
+void vtkPVComparativeVisPropertyWidget::Create()
 {
   // Check if already created
 
@@ -85,15 +85,16 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  vtkPVApplication* pvApp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
   vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
 
   this->TrackSelector->SetParent(this);
   this->TrackSelector->SetPackHorizontally(1);
-  this->TrackSelector->Create(app);
+  this->TrackSelector->Create();
   this->TrackSelector->ShallowCopy(pvAM->GetActiveTrackSelector(), 1);
   this->TrackSelector->SetFocusCurrentCue(0);
   this->TrackSelector->GetSourceMenuButton()->SetWidth(15);
@@ -101,7 +102,7 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->TrackSelector->GetWidgetName());
 
   this->NumberOfFramesEntry->SetParent(this);
-  this->NumberOfFramesEntry->Create(app);
+  this->NumberOfFramesEntry->Create();
   this->NumberOfFramesEntry->GetWidget()->SetValueAsInt(5);
   this->NumberOfFramesEntry->GetWidget()->SetWidth(3);
   this->NumberOfFramesEntry->SetLabelText("Number of Frames:");;
@@ -111,7 +112,7 @@ void vtkPVComparativeVisPropertyWidget::Create(vtkKWApplication *app)
   this->CueEditor = vtkPVSimpleAnimationCue::New();
   this->CueEditor->SetDuration(4);
   this->CueEditor->SetKeyFrameParent(this->TrackEditor->GetPropertiesFrame());
-  this->CueEditor->Create(this->GetApplication());
+  this->CueEditor->Create();
 }
 
 //----------------------------------------------------------------------------

@@ -26,7 +26,7 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
 
   vtkKWPushButton *pushbutton1 = vtkKWPushButton::New();
   pushbutton1->SetParent(parent);
-  pushbutton1->Create(app);
+  pushbutton1->Create();
   pushbutton1->SetText("A push button");
 
   app->Script(
@@ -39,7 +39,7 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
 
   vtkKWPushButton *pushbutton2 = vtkKWPushButton::New();
   pushbutton2->SetParent(parent);
-  pushbutton2->Create(app);
+  pushbutton2->Create();
   pushbutton2->SetImageToPredefinedIcon(vtkKWIcon::IconConnection);
   pushbutton2->SetBalloonHelpString(
     "Another pushbutton, using one of the predefined icons");
@@ -54,7 +54,7 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
 
   vtkKWPushButtonWithLabel *pushbutton3 = vtkKWPushButtonWithLabel::New();
   pushbutton3->SetParent(parent);
-  pushbutton3->Create(app);
+  pushbutton3->Create();
   pushbutton3->SetLabelText("Press this...");
   pushbutton3->GetWidget()->SetText("button");
   pushbutton3->SetBalloonHelpString(
@@ -73,7 +73,7 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
 
   vtkKWPushButtonSet *pushbutton_set = vtkKWPushButtonSet::New();
   pushbutton_set->SetParent(parent);
-  pushbutton_set->Create(app);
+  pushbutton_set->Create();
   pushbutton_set->SetBorderWidth(2);
   pushbutton_set->SetReliefToGroove();
   pushbutton_set->SetWidgetsPadX(1);

@@ -11,14 +11,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.38");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -71,7 +70,7 @@ vtkKWSplitFrame::~vtkKWSplitFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplitFrame::Create(vtkKWApplication *app)
+void vtkKWSplitFrame::Create()
 {
   // Check if already created
 
@@ -83,21 +82,21 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->SetConfigurationOptionAsInt("-width", 200);
   this->SetConfigurationOptionAsInt("-height", 100);
 
   this->Frame1->SetParent(this);
-  this->Frame1->Create(app);
+  this->Frame1->Create();
 
   this->Separator->SetParent(this);
-  this->Separator->Create(app);
+  this->Separator->Create();
   this->Separator->SetBorderWidth(2);
   this->Separator->SetReliefToRaised();
 
   this->Frame2->SetParent(this);
-  this->Frame2->Create(app);
+  this->Frame2->Create();
   
   this->Pack();
 

@@ -8,7 +8,7 @@ proc vtkKWCheckButtonWithChangeColorButtonEntryPoint {parent win} {
 
   vtkKWCheckButtonWithChangeColorButton cbwcc1
   cbwcc1 SetParent $parent
-  cbwcc1 Create $app
+  cbwcc1 Create
   [cbwcc1 GetCheckButton] SetText "a checkbutton with color change button"
   [cbwcc1 GetChangeColorButton] SetColor 0.1 0.3 0.9
   cbwcc1 SetBalloonHelpString \
@@ -25,7 +25,7 @@ proc vtkKWCheckButtonWithChangeColorButtonEntryPoint {parent win} {
 
   vtkKWCheckButtonWithChangeColorButton cbwcc2
   cbwcc2 SetParent $parent
-  cbwcc2 Create $app
+  cbwcc2 Create
   cbwcc2 SetBorderWidth 2
   cbwcc2 SetReliefToGroove
   [cbwcc2 GetCheckButton] SetText "Another one"

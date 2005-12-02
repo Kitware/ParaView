@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.53");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.54");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -219,7 +219,7 @@ void vtkPVServerFileDialog::CreateServerSide()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerFileDialog::Create(vtkKWApplication *app)
+void vtkPVServerFileDialog::Create()
 {
   // Check if already created
 
@@ -231,7 +231,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   if (this->SaveDialog)
     {
@@ -243,17 +243,17 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     }
 
   this->TopFrame->SetParent(this->GetFrame());
-  this->TopFrame->Create(app);
+  this->TopFrame->Create();
   this->Script("grid %s -column 0 -row 0 -padx 2m -sticky ew",
                this->TopFrame->GetWidgetName());
 
   this->MiddleFrame->SetParent(this->GetFrame());
-  this->MiddleFrame->Create(app);
+  this->MiddleFrame->Create();
   this->Script("grid %s -column 0 -row 1 -padx 2m -sticky ewns",
                this->MiddleFrame->GetWidgetName());
 
   this->FileList->SetParent(this->MiddleFrame); 
-  this->FileList->Create(app); 
+  this->FileList->Create(); 
   this->FileList->SetBackgroundColor(1.0, 1.0, 1.0); 
   this->FileList->SetBorderWidth(2); 
   this->FileList->SetReliefToSunken(); 
@@ -269,7 +269,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 
   // Scrollbar
   this->ScrollBar->SetParent(this->MiddleFrame);
-  this->ScrollBar->Create(this->GetApplication());
+  this->ScrollBar->Create();
   ostrstream command;
   command << this->FileList->GetWidgetName()
           << " yview" << ends;
@@ -282,7 +282,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
   this->FileList->AddBinding("<Configure>", this, "Reconfigure");
 
   this->BottomFrame->SetParent(this->GetFrame());
-  this->BottomFrame->Create(app);
+  this->BottomFrame->Create();
   this->Script("grid %s -column 0 -row 2 -pady 1m  -padx 2m -sticky ew",
                this->BottomFrame->GetWidgetName());
 
@@ -294,7 +294,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                this->GetWidgetName());
 
   this->DirectoryDisplay->SetParent(this->TopFrame);
-  this->DirectoryDisplay->Create(app);
+  this->DirectoryDisplay->Create();
   this->DirectoryDisplay->SetBackgroundColor(1.0, 1.0, 1.0);
   this->DirectoryDisplay->SetBorderWidth(2);
   this->DirectoryDisplay->SetReliefToSunken();
@@ -302,7 +302,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
                this->DirectoryDisplay->GetWidgetName());
 
   this->DownDirectoryButton->SetParent(this->TopFrame);
-  this->DownDirectoryButton->Create(app);
+  this->DownDirectoryButton->Create();
   this->DownDirectoryButton->SetImageToPixels(
     image_PVUpDirectoryButton, 
     image_PVUpDirectoryButton_width,
@@ -322,17 +322,17 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
 
   this->FileNameLabel->SetParent(this->BottomFrame);
   this->FileNameLabel->SetText("File name:");
-  this->FileNameLabel->Create(app);
+  this->FileNameLabel->Create();
   this->Script("grid %s -row 0 -column 0 -sticky w", 
                this->FileNameLabel->GetWidgetName());
 
   this->FileNameEntry->SetParent(this->BottomFrame);
-  this->FileNameEntry->Create(app);
+  this->FileNameEntry->Create();
   this->Script("grid %s -row 0 -column 1 -sticky ew -padx 5m", 
                this->FileNameEntry->GetWidgetName());
 
   this->LoadSaveButton->SetParent(this->BottomFrame);
-  this->LoadSaveButton->Create(app);
+  this->LoadSaveButton->Create();
   this->LoadSaveButton->SetCommand(this, "OK");
 
   if (this->SaveDialog)
@@ -355,30 +355,30 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app)
     {
     this->ExtensionsLabel->SetText("Load type:");
     }
-  this->ExtensionsLabel->Create(app);
+  this->ExtensionsLabel->Create();
   this->Script("grid %s -row 1 -column 0 -sticky w", 
                this->ExtensionsLabel->GetWidgetName());
 
   this->ExtensionsDisplayFrame->SetParent(this->BottomFrame);
-  this->ExtensionsDisplayFrame->Create(app);
+  this->ExtensionsDisplayFrame->Create();
   this->ExtensionsDisplayFrame->SetBorderWidth(2);
   this->ExtensionsDisplayFrame->SetReliefToSunken();
   this->Script("grid %s -row 1 -column 1  -sticky ew -padx 5m", 
                this->ExtensionsDisplayFrame->GetWidgetName());
   this->ExtensionsDisplay->SetParent(this->ExtensionsDisplayFrame);
-  this->ExtensionsDisplay->Create(app);
+  this->ExtensionsDisplay->Create();
   this->ExtensionsDisplay->SetBackgroundColor(1.0, 1.0, 1.0);
   this->Script("pack %s -side left -expand 1 -fill both",
                this->ExtensionsDisplay->GetWidgetName());
   this->ExtensionsMenuButton->SetParent(this->ExtensionsDisplayFrame);
   this->ExtensionsMenuButton->GetMenu()->SetTearOff(0);
-  this->ExtensionsMenuButton->Create(app);
+  this->ExtensionsMenuButton->Create();
   this->ExtensionsMenuButton->SetValue("");
   this->Script("pack %s -side left -expand 0", 
                this->ExtensionsMenuButton->GetWidgetName());
 
   this->CancelButton->SetParent(this->BottomFrame);
-  this->CancelButton->Create(app);
+  this->CancelButton->Create();
   this->CancelButton->SetPadY(0);
   this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetText("Cancel");

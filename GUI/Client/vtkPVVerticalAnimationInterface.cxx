@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.25");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.26");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -110,7 +110,7 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
+void vtkPVVerticalAnimationInterface::Create()
 {
   if (!this->AnimationManager)
     {
@@ -128,17 +128,17 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->TopFrame->SetParent(this);
-  this->TopFrame->Create(app);
+  this->TopFrame->Create();
   this->Script(
     // "pack %s -side top -expand t", // -fill both  -anchor center",
     "pack %s -pady 2 -fill both -expand yes -anchor n",
     this->TopFrame->GetWidgetName());
 
   this->ScenePropertiesFrame->SetParent(this->TopFrame->GetFrame());
-  this->ScenePropertiesFrame->Create(app);
+  this->ScenePropertiesFrame->Create();
   this->ScenePropertiesFrame->SetLabelText("Animation Control");
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
@@ -146,7 +146,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
 
   // SELECTOR FRAME
   this->SelectorFrame->SetParent(this->TopFrame->GetFrame());
-  this->SelectorFrame->Create(app);
+  this->SelectorFrame->Create();
   this->SelectorFrame->SetLabelText(VTK_PV_SELECTOR_DEFAULT_LABEL); 
   this->Script(
     "pack %s -side top -anchor nw  -fill x -expand y -padx 2 -pady 2",
@@ -154,7 +154,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   
   // KEYFRAME PROPERTIES FRAME
   this->TrackEditor->SetParent(this->TopFrame->GetFrame());
-  this->TrackEditor->Create(app);
+  this->TrackEditor->Create();
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", 
     this->TrackEditor->GetWidgetName());
@@ -162,14 +162,14 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->SetLabelText("Animation Settings");
-  this->SaveFrame->Create(app);
+  this->SaveFrame->Create();
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->SaveFrame->GetWidgetName());
 
 
   this->CacheGeometryCheck->SetParent(this->SaveFrame->GetFrame());
-  this->CacheGeometryCheck->Create(app);
+  this->CacheGeometryCheck->Create();
   this->CacheGeometryCheck->SetText("Cache Geometry");
   this->CacheGeometryCheck->SetCommand(this, "CacheGeometryCheckCallback");
   this->CacheGeometryCheck->SetSelectedState(this->CacheGeometry);
@@ -179,7 +179,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   this->Script("grid %s x -sticky w", this->CacheGeometryCheck->GetWidgetName());
 
   this->RecordAllButton->SetParent(this->SaveFrame->GetFrame());
-  this->RecordAllButton->Create(app);
+  this->RecordAllButton->Create();
   this->RecordAllButton->SetText("Record All properties");
   this->RecordAllButton->SetSelectedState(this->AnimationManager->GetRecordAll());
   this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
@@ -188,7 +188,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app)
   this->Script("grid %s x -sticky w", this->RecordAllButton->GetWidgetName());
 
   this->AdvancedAnimationCheck->SetParent(this->SaveFrame->GetFrame());
-  this->AdvancedAnimationCheck->Create(app);
+  this->AdvancedAnimationCheck->Create();
   this->AdvancedAnimationCheck->SetText("Show all animatable properties");
   this->AdvancedAnimationCheck->SetCommand(this, "AdvancedAnimationViewCallback");
   this->AdvancedAnimationCheck->SetSelectedState(this->AnimationManager->GetAdvancedView());

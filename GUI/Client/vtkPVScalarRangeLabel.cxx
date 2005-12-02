@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.29");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -50,7 +50,7 @@ vtkPVScalarRangeLabel::~vtkPVScalarRangeLabel()
 
 
 //----------------------------------------------------------------------------
-void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
+void vtkPVScalarRangeLabel::Create()
 {
   // Check if already created
 
@@ -62,11 +62,11 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   this->Label->SetParent(this);
   this->Label->SetText("");
-  this->Label->Create(app);
+  this->Label->Create();
   this->Script("pack %s -side top -expand t -fill x", 
                this->Label->GetWidgetName());
 }

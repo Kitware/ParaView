@@ -137,7 +137,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -250,9 +250,9 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateColorSpaceOptionMenu(vtkKWApplication *app);
-  virtual void CreateColorRamp(vtkKWApplication *app);
-  virtual void CreateValueEntries(vtkKWApplication *app);
+  virtual void CreateColorSpaceOptionMenu();
+  virtual void CreateColorRamp();
+  virtual void CreateValueEntries();
   virtual int IsTopLeftFrameUsed();
   virtual int IsPointEntriesFrameUsed();
 

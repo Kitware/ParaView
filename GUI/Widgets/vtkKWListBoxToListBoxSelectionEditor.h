@@ -22,7 +22,6 @@
 
 #include "vtkKWCompositeWidget.h"
 
-class vtkKWApplication;
 class vtkKWListBoxWithScrollbars;
 class vtkKWPushButton;
 class vtkKWListBox;
@@ -36,7 +35,7 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Add a string element to the source list if it is not already there or on

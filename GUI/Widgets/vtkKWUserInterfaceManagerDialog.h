@@ -45,7 +45,6 @@
 
 #include "vtkKWUserInterfaceManager.h"
 
-class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWNotebook;
 class vtkKWPushButton;
@@ -68,7 +67,7 @@ public:
   // Create the manager widget (i.e. the widget that will group and display
   // all user interface panels). A notebook must be associated to the manager
   // before it is created.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Set the panel node visibility. If On, each panel will show up as
@@ -91,6 +90,12 @@ public:
   // Access to the dialog/toplevel
   // Can be used to change its title, and master window
   vtkGetObjectMacro(TopLevel, vtkKWTopLevel);
+
+  // Description:
+  // Get the application instance for this object.
+  // Override the superclass to try to retrieve the toplevel's application
+  // if it was not set already.
+  virtual vtkKWApplication* GetApplication();
 
   // Description:
   // Raise a specific section, given a panel, a page id (or page title) 

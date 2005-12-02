@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -425,7 +425,7 @@ vtkPVWidget* vtkPVBoxWidget::ClonePrototypeInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
+void vtkPVBoxWidget::ChildCreate()
 {
   if ((this->GetTraceHelper()->GetObjectNameState() == 
        vtkPVTraceHelper::ObjectNameStateUninitialized ||
@@ -439,22 +439,22 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 
   this->SetFrameLabel("Box Widget");
   this->ControlFrame->SetParent(this->Frame);
-  this->ControlFrame->Create(this->GetApplication());
+  this->ControlFrame->Create();
 
   this->TranslateLabel->SetParent(this->ControlFrame);
-  this->TranslateLabel->Create(this->GetApplication());
+  this->TranslateLabel->Create();
   this->TranslateLabel->SetText("Translate:");
   this->TranslateLabel->SetBalloonHelpString(
     "Translate the geometry relative to the dataset location.");
 
   this->ScaleLabel->SetParent(this->ControlFrame);
-  this->ScaleLabel->Create(this->GetApplication());
+  this->ScaleLabel->Create();
   this->ScaleLabel->SetText("Scale:");
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
   this->OrientationLabel->SetParent(this->ControlFrame);
-  this->OrientationLabel->Create(this->GetApplication());
+  this->OrientationLabel->Create();
   this->OrientationLabel->SetText("Orientation:");
   this->OrientationLabel->SetBalloonHelpString(
     "Orient the geometry relative to the dataset origin.");
@@ -466,7 +466,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->TranslateThumbWheel[cc]->PopupModeOn();
     this->TranslateThumbWheel[cc]->SetValue(0.0);
     this->TranslateThumbWheel[cc]->SetResolution(0.001);
-    this->TranslateThumbWheel[cc]->Create(this->GetApplication());
+    this->TranslateThumbWheel[cc]->Create();
     this->TranslateThumbWheel[cc]->DisplayEntryOn();
     this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
@@ -486,7 +486,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->ScaleThumbWheel[cc]->PopupModeOn();
     this->ScaleThumbWheel[cc]->SetValue(1.0);
     this->ScaleThumbWheel[cc]->SetResolution(0.001);
-    this->ScaleThumbWheel[cc]->Create(this->GetApplication());
+    this->ScaleThumbWheel[cc]->Create();
     this->ScaleThumbWheel[cc]->DisplayEntryOn();
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->ScaleThumbWheel[cc]->ExpandEntryOn();
@@ -502,7 +502,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 
     this->OrientationScale[cc]->SetParent(this->ControlFrame);
     this->OrientationScale[cc]->PopupModeOn();
-    this->OrientationScale[cc]->Create(this->GetApplication());
+    this->OrientationScale[cc]->Create();
     this->OrientationScale[cc]->SetRange(0, 360);
     this->OrientationScale[cc]->SetResolution(.001);
     this->OrientationScale[cc]->SetValue(0);
@@ -574,9 +574,9 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::Create( vtkKWApplication *app)
+void vtkPVBoxWidget::Create()
 {
-  this->Superclass::Create(app);
+  this->Superclass::Create();
 
   static int instanceCount = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();

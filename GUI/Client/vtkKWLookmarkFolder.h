@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Callback to menu item in lookmark manager to rename a folder. Pressing 'Return' calls ChangeName

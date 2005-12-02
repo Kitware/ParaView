@@ -35,7 +35,6 @@
 
 #include "vtkKWUserInterfaceManager.h"
 
-class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWNotebook;
 class vtkKWUserInterfacePanel;
@@ -57,10 +56,16 @@ public:
   vtkGetObjectMacro(Notebook, vtkKWNotebook);
   
   // Description:
+  // Get the application instance for this object.
+  // Override the superclass to try to retrieve the notebook's application
+  // if it was not set already.
+  virtual vtkKWApplication* GetApplication();
+
+  // Description:
   // Create the manager widget (i.e. the widget that will group and display
   // all user interface panels). A notebook must be associated to the manager
   // before it is created.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create();
 
   // Description:
   // Instruct the manager to reserve a page for a given panel. 

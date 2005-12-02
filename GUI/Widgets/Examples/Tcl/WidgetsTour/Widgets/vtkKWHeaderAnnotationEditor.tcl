@@ -9,7 +9,7 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
 
   vtkKWRenderWidget hae_renderwidget
   hae_renderwidget SetParent $parent
-  hae_renderwidget Create $app
+  hae_renderwidget Create
 
   hae_renderwidget HeaderAnnotationVisibilityOn
   hae_renderwidget SetHeaderAnnotationText "Hello World!"
@@ -41,7 +41,7 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
   
   vtkKWHeaderAnnotationEditor hae_anno_editor
   hae_anno_editor SetParent $parent
-  hae_anno_editor Create $app
+  hae_anno_editor Create
   hae_anno_editor SetRenderWidget hae_renderwidget
 
   pack [hae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2

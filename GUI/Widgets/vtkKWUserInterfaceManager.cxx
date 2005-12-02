@@ -22,7 +22,7 @@
 #include <vtksys/stl/algorithm>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.21");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerInternals
@@ -39,6 +39,7 @@ public:
 vtkKWUserInterfaceManager::vtkKWUserInterfaceManager()
 {
   this->IdCounter = 0;
+  this->ManagerIsCreated = 0;
 
   this->Internals = new vtkKWUserInterfaceManagerInternals;
 }
@@ -202,7 +203,7 @@ vtkKWUserInterfacePanel* vtkKWUserInterfaceManager::GetNthPanel(int rank)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceManager::Create(vtkKWApplication *app)
+void vtkKWUserInterfaceManager::Create()
 {
   // Set the application
 
@@ -212,13 +213,13 @@ void vtkKWUserInterfaceManager::Create(vtkKWApplication *app)
     return;
     }
 
-  this->SetApplication(app);
+  this->ManagerIsCreated = 1;
 }
 
 // ---------------------------------------------------------------------------
 int vtkKWUserInterfaceManager::IsCreated()
 {
-  return (this->GetApplication() != NULL);
+  return (this->GetApplication() != NULL && this->ManagerIsCreated);
 }
 
 //----------------------------------------------------------------------------
@@ -318,6 +319,13 @@ int vtkKWUserInterfaceManager::AddPanel(vtkKWUserInterfacePanel *panel)
   // calls the current method for convenience.
 
   panel_slot->Panel->SetUserInterfaceManager(this);
+
+  // Use the same application (for convenience)
+
+  if (!this->GetApplication() && panel->GetApplication())
+    {
+    this->SetApplication(panel->GetApplication());
+    }
 
   panel_slot->Panel->Register(this);
 
