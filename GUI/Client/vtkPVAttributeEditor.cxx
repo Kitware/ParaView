@@ -60,7 +60,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.12");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -93,8 +93,6 @@ vtkPVAttributeEditor::~vtkPVAttributeEditor()
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::CreateProperties()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
   // Call the superclass to create the widget and set the appropriate flags
   this->Superclass::CreateProperties();
 
