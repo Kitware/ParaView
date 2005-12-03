@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.34");
+vtkCxxRevisionMacro(vtkPVPick, "1.35");
 
 
 //*****************************************************************************
@@ -240,7 +240,6 @@ void vtkPVPick::CreateProperties()
 {
   //sets up the GUI
   //TODO: move as much of this as possible into XML
-  vtkPVApplication* pvApp = this->GetPVApplication();
 
   this->Superclass::CreateProperties();
 

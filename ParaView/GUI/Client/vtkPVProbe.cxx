@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.167");
+vtkCxxRevisionMacro(vtkPVProbe, "1.168");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -362,7 +362,6 @@ void vtkPVProbe::SetVisibilityNoTrace(int val)
 //----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallbackInternal()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
   this->GetTraceHelper()->AddEntry("[$kw(%s) GetShowXYPlotToggle] SetSelectedState %d",
                       this->GetTclName(),
                       this->ShowXYPlotToggle->GetSelectedState());

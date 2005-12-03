@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.46");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.47");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -119,7 +119,6 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 {
   int cc;
   vtkProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkPVApplication* pvApp = this->GetPVApplication();
 
   vtkClientServerStream stream;
 

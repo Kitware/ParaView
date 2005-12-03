@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.75");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.76");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -656,8 +656,6 @@ void vtkPVLookmarkManager::DisplayQuickStartGuide()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::ConfigureQuickStartGuide()
 {
-  vtkPVApplication *app = this->GetPVApplication();
-
   if (!this->QuickStartGuideTxt)
     {
     this->QuickStartGuideTxt = vtkKWTextWithScrollbars::New();
@@ -742,8 +740,6 @@ void vtkPVLookmarkManager::DisplayUsersTutorial()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::ConfigureUsersTutorial()
 {
-  vtkPVApplication *app = this->GetPVApplication();
-
   if (!this->UsersTutorialTxt)
     {
     this->UsersTutorialTxt = vtkKWTextWithScrollbars::New();
