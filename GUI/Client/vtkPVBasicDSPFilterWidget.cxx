@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.5");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -1041,12 +1041,6 @@ void vtkPVBasicDSPFilterWidget::ResizeOutputVariableList()
 //----------------------------------------------------------------------------
 void vtkPVBasicDSPFilterWidget::AddVarFunction()
 {
-
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-
-
-
   const char *l_filtertype = this->DSPFilterModeMenu->GetValue();
   const char *l_cutoffstring = this->CutoffFreqMenu->GetValue();
   const char *l_inputvarname = this->InputVarMenu->GetValue();

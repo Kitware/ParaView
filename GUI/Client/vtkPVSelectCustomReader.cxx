@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.11");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -49,7 +49,6 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
        << "crash. Make sure to pick the right reader." << ends;
   this->SetDialogText(str2.str());
   str2.rdbuf()->freeze(0);
-  vtkKWApplication* app = win->GetApplication();
   this->SetStyleToOkCancel();
   this->SetOptions( vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   this->Create();

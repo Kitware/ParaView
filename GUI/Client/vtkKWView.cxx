@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.26");
+vtkCxxRevisionMacro(vtkKWView, "1.27");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -341,8 +341,6 @@ void vtkKWView::Close()
 //----------------------------------------------------------------------------
 void vtkKWView::CreateViewProperties()
 {
-  vtkKWApplication *app = this->GetApplication();
-
   this->Notebook->SetParent(this->GetPropertiesParent());
   this->Notebook->Create();
 
