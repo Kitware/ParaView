@@ -45,6 +45,14 @@ struct pqPythonShell::pqImplementation
       PyList_Insert(path, 0, module_dir);
       Py_XDECREF(module_dir);
       }
+
+    // For the convenience of developers, add the path to the built server manager wrappers to Python's path
+    if(PyObject* path = PySys_GetObject("path"))
+      {
+      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAQ_LIBRARY_OUTPUT_PATH).toAscii().data());
+      PyList_Insert(path, 0, module_dir);
+      Py_XDECREF(module_dir);
+      }
       
     // Setup Python's interactive prompts
     PyObject* ps1 = PySys_GetObject("ps1");

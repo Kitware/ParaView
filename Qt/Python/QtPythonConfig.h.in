@@ -11,5 +11,6 @@
 #define _QtPythonConfig_h
 
 #define PARAQ_DEFAULT_PYTHON_MODULE_DIR "@ParaQ_SOURCE_DIR@/ParaView/Servers/Wrapping/Python"
+#define PARAQ_LIBRARY_OUTPUT_PATH "@LIBRARY_OUTPUT_PATH@"
 
 #endif // !_QtPythonConfig_h
