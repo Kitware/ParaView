@@ -92,6 +92,7 @@ private slots:
   void onUpdateWindows();
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
+  void onOpenLinkEditor();
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);

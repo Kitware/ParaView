@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QVBoxLayout>
+#include <QMenu>
 
 static int gPenWidth = 2;
 
@@ -16,22 +17,46 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* parent)
   layout->setSpacing(gPenWidth);
 
   this->Menu = new QWidget(this);
-  this->MenuUi.setupUi(Menu);
+  this->setupUi(Menu);
   layout->addWidget(this->Menu);
 
   QVBoxLayout* sublayout = new QVBoxLayout();
   layout->addLayout(sublayout);
   sublayout->addStretch();
 
-  this->MenuUi.Close->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
-  this->MenuUi.Maximize->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
+  this->CloseButton->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
+  this->MaximizeButton->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
+
+  // set up actions
+  QAction* a = new QAction(this->ActiveButton->icon(), tr("Active"), this->Menu);
+  a->setCheckable(true);
+  this->ActiveButton->setDefaultAction(a);
+  a = new QAction(this->SplitHorizontalButton->icon(), this->SplitHorizontalButton->text(), this->Menu);
+  this->SplitHorizontalButton->setDefaultAction(a);
+  a = new QAction(this->SplitVerticalButton->icon(), this->SplitVerticalButton->text(), this->Menu);
+  this->SplitVerticalButton->setDefaultAction(a);
+  a = new QAction(this->MaximizeButton->icon(), this->MaximizeButton->text(), this->Menu);
+  this->MaximizeButton->setDefaultAction(a);
+  a = new QAction(this->CloseButton->icon(), this->CloseButton->text(), this->Menu);
+  this->CloseButton->setDefaultAction(a);
+
 
   // queued connections because these signals can potentially modify/delete this object
-  connect(this->MenuUi.Active, SIGNAL(toggled(bool)), SLOT(setActive(bool)), Qt::QueuedConnection);
-  connect(this->MenuUi.Close, SIGNAL(clicked(bool)), SLOT(close()), Qt::QueuedConnection);
-  connect(this->MenuUi.Maximize, SIGNAL(clicked(bool)), SLOT(maximize()), Qt::QueuedConnection);
-  connect(this->MenuUi.SplitVertical, SIGNAL(clicked(bool)), SLOT(splitVertical()), Qt::QueuedConnection);
-  connect(this->MenuUi.SplitHorizontal, SIGNAL(clicked(bool)), SLOT(splitHorizontal()), Qt::QueuedConnection);
+  this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(setActive(bool)), Qt::QueuedConnection);
+  this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(close()), Qt::QueuedConnection);
+  this->connect(this->MaximizeButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(maximize()), Qt::QueuedConnection);
+  this->connect(this->SplitVerticalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitVertical()), Qt::QueuedConnection);
+  this->connect(this->SplitHorizontalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitHorizontal()), Qt::QueuedConnection);
+  
+  // setup the context menu
+  this->Menu->setContextMenuPolicy(Qt::ActionsContextMenu);
+  this->Menu->addAction(this->SplitHorizontalButton->defaultAction());
+  this->Menu->addAction(this->SplitVerticalButton->defaultAction());
+  this->Menu->addAction(this->CloseButton->defaultAction());
+  
+  // TODO: temporary until they can be implemented or wanted
+  this->MaximizeButton->hide();
+  this->ActiveButton->hide();
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
@@ -55,11 +80,11 @@ bool pqMultiViewFrame::active() const
 
 void pqMultiViewFrame::setActive(bool a)
 {
-  if(this->MenuUi.Active->isChecked() != a)
+  if(this->ActiveButton->isChecked() != a)
     {
-    this->MenuUi.Active->blockSignals(true);
-    this->MenuUi.Active->setChecked(a);
-    this->MenuUi.Active->blockSignals(false);
+    this->ActiveButton->blockSignals(true);
+    this->ActiveButton->setChecked(a);
+    this->ActiveButton->blockSignals(false);
     }
 
   if(this->Active != a)
@@ -131,4 +156,5 @@ void pqMultiViewFrame::splitHorizontal()
 {
   emit this->splitHorizontalPressed();
 }
+
 

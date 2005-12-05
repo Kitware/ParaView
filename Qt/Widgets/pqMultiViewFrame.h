@@ -7,7 +7,7 @@
 #include "ui_pqMultiViewFrameMenu.h"
 
 /// a holder for a widget in a multiview
-class QTWIDGETS_EXPORT pqMultiViewFrame : public QWidget
+class QTWIDGETS_EXPORT pqMultiViewFrame : public QWidget, public Ui::MultiViewFrameMenu
 {
   Q_OBJECT
   Q_PROPERTY(bool menuAutoHide READ menuAutoHide WRITE setMenuAutoHide)
@@ -68,7 +68,6 @@ private:
   bool Active;
   QColor Color;
   QWidget* Menu;
-  Ui::MultiViewFrameMenu MenuUi;
 };
 
 #endif //_pqMultiViewFrame_h

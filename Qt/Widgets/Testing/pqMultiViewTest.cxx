@@ -64,7 +64,7 @@ const arguments_t handleTestRecording(const arguments_t& Arguments, QWidget& Roo
 }
 
 /// Parses command-line arguments for the --exit flag, returning unused arguments
-const arguments_t handleExit(arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleExit(arguments_t& Arguments, bool& Quit, bool&)
 {
   if(vtkstd::count(Arguments.begin(), Arguments.end(), "--exit"))
     {

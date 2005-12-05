@@ -137,6 +137,11 @@ pqMainWindow::pqMainWindow() :
   
   QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesFiltersMenu()));
 
+  // Tools menu.
+  QMenu* toolsMenu = this->menuBar()->addMenu(tr("Tools")) << pqSetName("toolsMenu");
+  toolsMenu->addAction(tr("Link Editor..."))
+    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
+
   // Test menu.
   QMenu* const testsMenu = this->menuBar()->addMenu(tr("Tests"))
     << pqSetName("testsMenu");
@@ -556,6 +561,11 @@ void pqMainWindow::onCreateFilter(QAction* action)
     }
 }
 
+void pqMainWindow::onOpenLinkEditor()
+{
+}
+
+
 void pqMainWindow::onHelpAbout()
 {
   pqAboutDialog* const dialog = new pqAboutDialog(this);
@@ -688,7 +698,7 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   QObject::connect(parent, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
   QObject::connect(sm, SIGNAL(mapped(QWidget*)), this, SLOT(onFrameActive(QWidget*)));
 
-  parent->setActive(1);
+  //parent->setActive(1);
   
 }
 

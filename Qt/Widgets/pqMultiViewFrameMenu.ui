@@ -73,7 +73,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="Active" >
+      <widget class="QToolButton" name="ActiveButton" >
        <property name="minimumSize" >
         <size>
          <width>16</width>
@@ -92,7 +92,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="SplitHorizontal" >
+      <widget class="QToolButton" name="SplitHorizontalButton" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
@@ -106,6 +106,9 @@
          <width>16</width>
          <height>16</height>
         </size>
+       </property>
+       <property name="text" >
+        <string>Split Horizontal</string>
        </property>
        <property name="icon" >
         <iconset resource="pqWidgets.qrc" >:/pqWidgets/Resources/SplitViewHorizontal.png</iconset>
@@ -116,7 +119,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="SplitVertical" >
+      <widget class="QToolButton" name="SplitVerticalButton" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
@@ -130,6 +133,9 @@
          <width>16</width>
          <height>16</height>
         </size>
+       </property>
+       <property name="text" >
+        <string>Split Vertical</string>
        </property>
        <property name="icon" >
         <iconset resource="pqWidgets.qrc" >:/pqWidgets/Resources/SplitViewVertical.png</iconset>
@@ -140,7 +146,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="Maximize" >
+      <widget class="QToolButton" name="MaximizeButton" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
@@ -154,6 +160,9 @@
          <width>16</width>
          <height>16</height>
         </size>
+       </property>
+       <property name="text" >
+        <string>Maximize</string>
        </property>
        <property name="autoRaise" >
         <bool>false</bool>
@@ -161,7 +170,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="Close" >
+      <widget class="QToolButton" name="CloseButton" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>0</hsizetype>
@@ -175,6 +184,9 @@
          <width>16</width>
          <height>16</height>
         </size>
+       </property>
+       <property name="text" >
+        <string>Close</string>
        </property>
        <property name="autoRaise" >
         <bool>false</bool>
@@ -184,7 +196,16 @@
     </layout>
    </item>
   </layout>
-  <widget class="QWidget" name="" />
+  <widget class="QWidget" name="widget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
