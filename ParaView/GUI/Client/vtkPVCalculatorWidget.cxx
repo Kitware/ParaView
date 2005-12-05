@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -1081,39 +1081,46 @@ void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
     {
     for (i = 0; i < fdi->GetNumberOfArrays(); i++)
       {
-      numComponents = fdi->GetArrayInformation(i)->GetNumberOfComponents();
-      name = fdi->GetArrayInformation(i)->GetName();
-      for (j = 0; j < numComponents; j++)
+      vtkPVArrayInformation* arrayInfo =
+        fdi->GetArrayInformation(i);
+      if (!arrayInfo->GetIsPartial())
         {
-        if (numComponents == 1)
+        numComponents = arrayInfo->GetNumberOfComponents();
+        name = arrayInfo->GetName();
+
+        for (j = 0; j < numComponents; j++)
           {
-          this->AddScalarVariable(name, name, 0);
+          if (numComponents == 1)
+            {
+            this->AddScalarVariable(name, name, 0);
+            if (populateMenus)
+              {
+              sprintf(menuCommand, "UpdateFunction {%s}", name);
+              this->ScalarsMenu->GetMenu()->AddCommand(name, this,
+                                                       menuCommand);
+              }
+            }
+          else
+            {
+            sprintf(menuEntry, "%s_%d", name, j);
+            this->AddScalarVariable(menuEntry, name, j);
+            if (populateMenus)
+              {
+              sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
+              this->ScalarsMenu->GetMenu()->AddCommand(
+                menuEntry, this, menuCommand);
+              }
+            }
+          }
+        if (numComponents == 3)
+          {
+          this->AddVectorVariable(name, name);
           if (populateMenus)
             {
             sprintf(menuCommand, "UpdateFunction {%s}", name);
-            this->ScalarsMenu->GetMenu()->AddCommand(name, this,
+            this->VectorsMenu->GetMenu()->AddCommand(name, this,
                                                      menuCommand);
             }
-          }
-        else
-          {
-          sprintf(menuEntry, "%s_%d", name, j);
-          this->AddScalarVariable(menuEntry, name, j);
-          if (populateMenus)
-            {
-            sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
-            this->ScalarsMenu->GetMenu()->AddCommand(menuEntry, this, menuCommand);
-            }
-          }
-        }
-      if (numComponents == 3)
-        {
-        this->AddVectorVariable(name, name);
-        if (populateMenus)
-          {
-          sprintf(menuCommand, "UpdateFunction {%s}", name);
-          this->VectorsMenu->GetMenu()->AddCommand(name, this,
-                                                   menuCommand);
           }
         }
       }
