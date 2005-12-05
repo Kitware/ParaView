@@ -57,7 +57,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.3");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -322,4 +322,5 @@ void vtkProcessModuleConnection::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "SelfID: " << SelfID << endl;
 }
